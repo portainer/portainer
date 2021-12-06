@@ -64,7 +64,7 @@ func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var endpointGroup portainer.EndpointGroup
-			err := internal.UnmarshalObject(v, &endpointGroup)
+			err := internal.UnmarshalObject(v, &endpointGroup, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -85,7 +85,7 @@ func (service *Service) CreateEndpointGroup(endpointGroup *portainer.EndpointGro
 		id, _ := bucket.NextSequence()
 		endpointGroup.ID = portainer.EndpointGroupID(id)
 
-		data, err := internal.MarshalObject(endpointGroup)
+		data, err := internal.MarshalObject(endpointGroup, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

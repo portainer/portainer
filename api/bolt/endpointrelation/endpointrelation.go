@@ -46,7 +46,7 @@ func (service *Service) CreateEndpointRelation(endpointRelation *portainer.Endpo
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
-		data, err := internal.MarshalObject(endpointRelation)
+		data, err := internal.MarshalObject(endpointRelation, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

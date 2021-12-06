@@ -38,7 +38,7 @@ func (service *Service) EdgeGroups() ([]portainer.EdgeGroup, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var group portainer.EdgeGroup
-			err := internal.UnmarshalObjectWithJsoniter(v, &group)
+			err := internal.UnmarshalObjectWithJsoniter(v, &group, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -84,7 +84,7 @@ func (service *Service) CreateEdgeGroup(group *portainer.EdgeGroup) error {
 		id, _ := bucket.NextSequence()
 		group.ID = portainer.EdgeGroupID(id)
 
-		data, err := internal.MarshalObject(group)
+		data, err := internal.MarshalObject(group, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

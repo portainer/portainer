@@ -2,7 +2,7 @@ package migrator
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 )
 
@@ -66,7 +66,7 @@ func (m *Migrator) retrieveLegacyResourceControls() ([]portainer.ResourceControl
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var resourceControl portainer.ResourceControl
-			err := internal.UnmarshalObject(v, &resourceControl)
+			err := internal.UnmarshalObject(v, &resourceControl, "") // TODO
 			if err != nil {
 				return err
 			}
@@ -78,7 +78,7 @@ func (m *Migrator) retrieveLegacyResourceControls() ([]portainer.ResourceControl
 		cursor = bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var resourceControl portainer.ResourceControl
-			err := internal.UnmarshalObject(v, &resourceControl)
+			err := internal.UnmarshalObject(v, &resourceControl, "") // TODO
 			if err != nil {
 				return err
 			}
@@ -90,7 +90,7 @@ func (m *Migrator) retrieveLegacyResourceControls() ([]portainer.ResourceControl
 		cursor = bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var resourceControl portainer.ResourceControl
-			err := internal.UnmarshalObject(v, &resourceControl)
+			err := internal.UnmarshalObject(v, &resourceControl, "") // TODO
 			if err != nil {
 				return err
 			}

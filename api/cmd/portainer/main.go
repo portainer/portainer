@@ -59,8 +59,8 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(dataStorePath string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) portainer.DataStore {
-	store := bolt.NewStore(dataStorePath, fileService)
+func initDataStore(dataStorePath string, encryptionKey string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) portainer.DataStore {
+	store := bolt.NewStore(dataStorePath, fileService, encryptionKey)
 	err := store.Open()
 	if err != nil {
 		log.Fatalf("failed opening store: %v", err)
@@ -483,7 +483,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Println("proceeding without encryption key")
 	}
 
-	dataStore := initDataStore(*flags.Data, *flags.Rollback, fileService, shutdownCtx)
+	dataStore := initDataStore(*flags.Data, encryptionKey, *flags.Rollback, fileService, shutdownCtx)
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
 		log.Fatal(err)

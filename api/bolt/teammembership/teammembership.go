@@ -52,7 +52,7 @@ func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
+			err := internal.UnmarshalObject(v, &membership, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -75,7 +75,7 @@ func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]port
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
+			err := internal.UnmarshalObject(v, &membership, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -101,7 +101,7 @@ func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]port
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
+			err := internal.UnmarshalObject(v, &membership, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -131,7 +131,7 @@ func (service *Service) CreateTeamMembership(membership *portainer.TeamMembershi
 		id, _ := bucket.NextSequence()
 		membership.ID = portainer.TeamMembershipID(id)
 
-		data, err := internal.MarshalObject(membership)
+		data, err := internal.MarshalObject(membership, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -154,7 +154,7 @@ func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) er
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
+			err := internal.UnmarshalObject(v, &membership, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -179,7 +179,7 @@ func (service *Service) DeleteTeamMembershipByTeamID(teamID portainer.TeamID) er
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
+			err := internal.UnmarshalObject(v, &membership, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}

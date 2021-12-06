@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/stack"
 )
@@ -113,7 +113,7 @@ func (m *Migrator) retrieveLegacyStacks() ([]legacyStack, error) {
 
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var stack legacyStack
-			err := internal.UnmarshalObject(v, &stack)
+			err := internal.UnmarshalObject(v, &stack, "") // TODO
 			if err != nil {
 				return err
 			}

@@ -52,7 +52,7 @@ func (service *Service) Registries() ([]portainer.Registry, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var registry portainer.Registry
-			err := internal.UnmarshalObject(v, &registry)
+			err := internal.UnmarshalObject(v, &registry, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -73,7 +73,7 @@ func (service *Service) CreateRegistry(registry *portainer.Registry) error {
 		id, _ := bucket.NextSequence()
 		registry.ID = portainer.RegistryID(id)
 
-		data, err := internal.MarshalObject(registry)
+		data, err := internal.MarshalObject(registry, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

@@ -73,6 +73,7 @@ type Store struct {
 	UserService               *user.Service
 	VersionService            *version.Service
 	WebhookService            *webhook.Service
+	EncryptionKey			  string
 }
 
 func (store *Store) version() (int, error) {
@@ -92,12 +93,13 @@ func (store *Store) edition() portainer.SoftwareEdition {
 }
 
 // NewStore initializes a new Store and the associated services
-func NewStore(storePath string, fileService portainer.FileService) *Store {
+func NewStore(storePath string, fileService portainer.FileService, encryptionKey string) *Store {
 	return &Store{
 		path:        storePath,
 		fileService: fileService,
 		isNew:       true,
 		connection:  &internal.DbConnection{},
+		EncryptionKey: encryptionKey,
 	}
 }
 

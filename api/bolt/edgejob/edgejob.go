@@ -38,7 +38,7 @@ func (service *Service) EdgeJobs() ([]portainer.EdgeJob, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var edgeJob portainer.EdgeJob
-			err := internal.UnmarshalObject(v, &edgeJob)
+			err := internal.UnmarshalObject(v, &edgeJob, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -74,7 +74,7 @@ func (service *Service) CreateEdgeJob(edgeJob *portainer.EdgeJob) error {
 			edgeJob.ID = portainer.EdgeJobID(id)
 		}
 
-		data, err := internal.MarshalObject(edgeJob)
+		data, err := internal.MarshalObject(edgeJob, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

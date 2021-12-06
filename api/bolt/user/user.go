@@ -57,7 +57,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var u portainer.User
-			err := internal.UnmarshalObject(v, &u)
+			err := internal.UnmarshalObject(v, &u, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -87,7 +87,7 @@ func (service *Service) Users() ([]portainer.User, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var user portainer.User
-			err := internal.UnmarshalObject(v, &user)
+			err := internal.UnmarshalObject(v, &user, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -109,7 +109,7 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var user portainer.User
-			err := internal.UnmarshalObject(v, &user)
+			err := internal.UnmarshalObject(v, &user, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -140,7 +140,7 @@ func (service *Service) CreateUser(user *portainer.User) error {
 		user.ID = portainer.UserID(id)
 		user.Username = strings.ToLower(user.Username)
 
-		data, err := internal.MarshalObject(user)
+		data, err := internal.MarshalObject(user, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

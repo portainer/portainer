@@ -40,7 +40,7 @@ func (service *Service) Webhooks() ([]portainer.Webhook, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var webhook portainer.Webhook
-			err := internal.UnmarshalObject(v, &webhook)
+			err := internal.UnmarshalObject(v, &webhook, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -76,7 +76,7 @@ func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, erro
 
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var w portainer.Webhook
-			err := internal.UnmarshalObject(v, &w)
+			err := internal.UnmarshalObject(v, &w, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -107,7 +107,7 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var w portainer.Webhook
-			err := internal.UnmarshalObject(v, &w)
+			err := internal.UnmarshalObject(v, &w, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -142,7 +142,7 @@ func (service *Service) CreateWebhook(webhook *portainer.Webhook) error {
 		id, _ := bucket.NextSequence()
 		webhook.ID = portainer.WebhookID(id)
 
-		data, err := internal.MarshalObject(webhook)
+		data, err := internal.MarshalObject(webhook, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

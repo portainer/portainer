@@ -8,6 +8,7 @@ import (
 )
 
 type DbConnection struct {
+	EncryptionKey string
 	*bolt.DB
 }
 
@@ -52,7 +53,7 @@ func GetObject(connection *DbConnection, bucketName string, key []byte, object i
 		return err
 	}
 
-	return UnmarshalObject(data, object)
+	return UnmarshalObject(data, object, connection.EncryptionKey)
 }
 
 // UpdateObject is a generic function used to update an object inside a bolt database.
@@ -60,7 +61,7 @@ func UpdateObject(connection *DbConnection, bucketName string, key []byte, objec
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
-		data, err := MarshalObject(object)
+		data, err := MarshalObject(object, connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

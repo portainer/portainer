@@ -63,7 +63,7 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var endpoint portainer.Endpoint
-			err := internal.UnmarshalObjectWithJsoniter(v, &endpoint)
+			err := internal.UnmarshalObjectWithJsoniter(v, &endpoint, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -87,7 +87,7 @@ func (service *Service) CreateEndpoint(endpoint *portainer.Endpoint) error {
 			return err
 		}
 
-		data, err := internal.MarshalObject(endpoint)
+		data, err := internal.MarshalObject(endpoint, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -110,7 +110,7 @@ func (service *Service) Synchronize(toCreate, toUpdate, toDelete []*portainer.En
 			id, _ := bucket.NextSequence()
 			endpoint.ID = portainer.EndpointID(id)
 
-			data, err := internal.MarshalObject(endpoint)
+			data, err := internal.MarshalObject(endpoint, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -122,7 +122,7 @@ func (service *Service) Synchronize(toCreate, toUpdate, toDelete []*portainer.En
 		}
 
 		for _, endpoint := range toUpdate {
-			data, err := internal.MarshalObject(endpoint)
+			data, err := internal.MarshalObject(endpoint, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}

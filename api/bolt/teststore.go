@@ -35,7 +35,7 @@ func NewTestStore(init bool) (*Store, func(), error) {
 		return nil, nil, err
 	}
 
-	store := NewStore(dataStorePath, fileService)
+	store := NewStore(dataStorePath, fileService, "") // TODO: encryption key
 	err = store.Open()
 	if err != nil {
 		return nil, nil, err

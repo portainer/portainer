@@ -54,7 +54,7 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var rc portainer.ResourceControl
-			err := internal.UnmarshalObject(v, &rc)
+			err := internal.UnmarshalObject(v, &rc, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -88,7 +88,7 @@ func (service *Service) ResourceControls() ([]portainer.ResourceControl, error) 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var resourceControl portainer.ResourceControl
-			err := internal.UnmarshalObject(v, &resourceControl)
+			err := internal.UnmarshalObject(v, &resourceControl, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -109,7 +109,7 @@ func (service *Service) CreateResourceControl(resourceControl *portainer.Resourc
 		id, _ := bucket.NextSequence()
 		resourceControl.ID = portainer.ResourceControlID(id)
 
-		data, err := internal.MarshalObject(resourceControl)
+		data, err := internal.MarshalObject(resourceControl, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

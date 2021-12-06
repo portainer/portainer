@@ -64,7 +64,7 @@ func (service *Service) Schedules() ([]portainer.Schedule, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var schedule portainer.Schedule
-			err := internal.UnmarshalObject(v, &schedule)
+			err := internal.UnmarshalObject(v, &schedule, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -88,7 +88,7 @@ func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portain
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var schedule portainer.Schedule
-			err := internal.UnmarshalObject(v, &schedule)
+			err := internal.UnmarshalObject(v, &schedule, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -114,7 +114,7 @@ func (service *Service) CreateSchedule(schedule *portainer.Schedule) error {
 			return err
 		}
 
-		data, err := internal.MarshalObject(schedule)
+		data, err := internal.MarshalObject(schedule, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

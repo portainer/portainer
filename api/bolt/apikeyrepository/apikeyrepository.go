@@ -42,7 +42,7 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var record portainer.APIKey
-			err := internal.UnmarshalObject(v, &record)
+			err := internal.UnmarshalObject(v, &record, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -68,7 +68,7 @@ func (service *Service) GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, err
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var record portainer.APIKey
-			err := internal.UnmarshalObject(v, &record)
+			err := internal.UnmarshalObject(v, &record, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -92,7 +92,7 @@ func (service *Service) CreateAPIKey(record *portainer.APIKey) error {
 		id, _ := bucket.NextSequence()
 		record.ID = portainer.APIKeyID(id)
 
-		data, err := internal.MarshalObject(record)
+		data, err := internal.MarshalObject(record, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -112,7 +112,7 @@ func (service *Service) GetAPIKey(keyID portainer.APIKeyID) (*portainer.APIKey, 
 			return errors.ErrObjectNotFound
 		}
 
-		err := internal.UnmarshalObject(item, &apiKey)
+		err := internal.UnmarshalObject(item, &apiKey, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

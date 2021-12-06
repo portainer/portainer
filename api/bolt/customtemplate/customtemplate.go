@@ -38,7 +38,7 @@ func (service *Service) CustomTemplates() ([]portainer.CustomTemplate, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var customTemplate portainer.CustomTemplate
-			err := internal.UnmarshalObjectWithJsoniter(v, &customTemplate)
+			err := internal.UnmarshalObjectWithJsoniter(v, &customTemplate, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -81,7 +81,7 @@ func (service *Service) CreateCustomTemplate(customTemplate *portainer.CustomTem
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
-		data, err := internal.MarshalObject(customTemplate)
+		data, err := internal.MarshalObject(customTemplate, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

@@ -39,7 +39,7 @@ func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]p
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var record portainer.HelmUserRepository
-			err := internal.UnmarshalObject(v, &record)
+			err := internal.UnmarshalObject(v, &record, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -63,7 +63,7 @@ func (service *Service) CreateHelmUserRepository(record *portainer.HelmUserRepos
 		id, _ := bucket.NextSequence()
 		record.ID = portainer.HelmUserRepositoryID(id)
 
-		data, err := internal.MarshalObject(record)
+		data, err := internal.MarshalObject(record, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

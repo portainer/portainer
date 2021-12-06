@@ -52,7 +52,7 @@ func (service *Service) Extensions() ([]portainer.Extension, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var extension portainer.Extension
-			err := internal.UnmarshalObject(v, &extension)
+			err := internal.UnmarshalObject(v, &extension, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -70,7 +70,7 @@ func (service *Service) Persist(extension *portainer.Extension) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
-		data, err := internal.MarshalObject(extension)
+		data, err := internal.MarshalObject(extension, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

@@ -38,7 +38,7 @@ func (service *Service) EdgeStacks() ([]portainer.EdgeStack, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var stack portainer.EdgeStack
-			err := internal.UnmarshalObject(v, &stack)
+			err := internal.UnmarshalObject(v, &stack, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -74,7 +74,7 @@ func (service *Service) CreateEdgeStack(edgeStack *portainer.EdgeStack) error {
 			edgeStack.ID = portainer.EdgeStackID(id)
 		}
 
-		data, err := internal.MarshalObject(edgeStack)
+		data, err := internal.MarshalObject(edgeStack, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

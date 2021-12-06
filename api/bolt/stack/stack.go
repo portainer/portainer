@@ -56,7 +56,7 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var t portainer.Stack
-			err := internal.UnmarshalObject(v, &t)
+			err := internal.UnmarshalObject(v, &t, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -86,7 +86,7 @@ func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var t portainer.Stack
-			err := internal.UnmarshalObject(v, &t)
+			err := internal.UnmarshalObject(v, &t, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -112,7 +112,7 @@ func (service *Service) Stacks() ([]portainer.Stack, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var stack portainer.Stack
-			err := internal.UnmarshalObject(v, &stack)
+			err := internal.UnmarshalObject(v, &stack, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -141,7 +141,7 @@ func (service *Service) CreateStack(stack *portainer.Stack) error {
 			return err
 		}
 
-		data, err := internal.MarshalObject(stack)
+		data, err := internal.MarshalObject(stack, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -182,14 +182,14 @@ func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 				} `json:"AutoUpdate"`
 			}
 
-			err := internal.UnmarshalObject(v, &t)
+			err := internal.UnmarshalObject(v, &t, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
 
 			if t.AutoUpdate != nil && strings.EqualFold(t.AutoUpdate.WebhookID, id) {
 				found = true
-				err := internal.UnmarshalObject(v, &stack)
+				err := internal.UnmarshalObject(v, &stack, service.connection.EncryptionKey)
 				if err != nil {
 					return err
 				}
@@ -219,7 +219,7 @@ func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
 
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			stack := portainer.Stack{}
-			err := internal.UnmarshalObject(v, &stack)
+			err := internal.UnmarshalObject(v, &stack, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}

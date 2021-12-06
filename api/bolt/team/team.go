@@ -55,7 +55,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var t portainer.Team
-			err := internal.UnmarshalObject(v, &t)
+			err := internal.UnmarshalObject(v, &t, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -86,7 +86,7 @@ func (service *Service) Teams() ([]portainer.Team, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var team portainer.Team
-			err := internal.UnmarshalObject(v, &team)
+			err := internal.UnmarshalObject(v, &team, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -113,7 +113,7 @@ func (service *Service) CreateTeam(team *portainer.Team) error {
 		id, _ := bucket.NextSequence()
 		team.ID = portainer.TeamID(id)
 
-		data, err := internal.MarshalObject(team)
+		data, err := internal.MarshalObject(team, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}

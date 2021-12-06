@@ -52,7 +52,7 @@ func (service *Service) Roles() ([]portainer.Role, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var set portainer.Role
-			err := internal.UnmarshalObject(v, &set)
+			err := internal.UnmarshalObject(v, &set, service.connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -73,7 +73,7 @@ func (service *Service) CreateRole(role *portainer.Role) error {
 		id, _ := bucket.NextSequence()
 		role.ID = portainer.RoleID(id)
 
-		data, err := internal.MarshalObject(role)
+		data, err := internal.MarshalObject(role, service.connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
