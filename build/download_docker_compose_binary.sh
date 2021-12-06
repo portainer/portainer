@@ -39,7 +39,7 @@ function download_plugin() {
         PLATFORM="darwin"
     fi
     
-    FILENAME="docker-compose-${PLATFORM}-${ARCH}"
+    FILENAME="docker-${PLATFORM}-${ARCH}"
     TARGET_FILENAME="docker-compose.plugin"
     if [[ "$PLATFORM" == "windows" ]]; then
         FILENAME="$FILENAME.exe"
