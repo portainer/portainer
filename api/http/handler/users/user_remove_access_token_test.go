@@ -97,4 +97,25 @@ func Test_userRemoveAccessToken(t *testing.T) {
 
 		is.Equal(0, len(keys))
 	})
+
+	t.Run("user cannot delete another users API Keys using api-key auth", func(t *testing.T) {
+		_, adminAPIKey, err := apiKeyService.GenerateApiKey(*adminUser, "admin-key")
+		is.NoError(err)
+
+		rawAPIKey, _, err := apiKeyService.GenerateApiKey(*user, "user-key")
+		is.NoError(err)
+
+		req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/users/%d/tokens/%d", user.ID, adminAPIKey.ID), nil)
+		req.Header.Add("x-api-key", rawAPIKey)
+
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, req)
+
+		is.Equal(http.StatusForbidden, rr.Code)
+
+		adminKeyGot, err := apiKeyService.GetAPIKey(adminAPIKey.ID)
+		is.NoError(err)
+
+		is.Equal(adminAPIKey, adminKeyGot)
+	})
 }

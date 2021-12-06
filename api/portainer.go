@@ -95,6 +95,7 @@ type (
 		SSLKey                    *string
 		Rollback                  *bool
 		SnapshotInterval          *string
+		BaseURL                   *string
 	}
 
 	// CustomTemplate represents a custom template
@@ -1126,6 +1127,7 @@ type (
 		Token       string      `json:"Token"`
 		ResourceID  string      `json:"ResourceId"`
 		EndpointID  EndpointID  `json:"EndpointId"`
+		RegistryID  RegistryID  `json:"RegistryId"`
 		WebhookType WebhookType `json:"Type"`
 	}
 
@@ -1540,6 +1542,7 @@ type (
 		Webhooks() ([]Webhook, error)
 		Webhook(ID WebhookID) (*Webhook, error)
 		CreateWebhook(portainer *Webhook) error
+		UpdateWebhook(ID WebhookID, webhook *Webhook) error
 		WebhookByResourceID(resourceID string) (*Webhook, error)
 		WebhookByToken(token string) (*Webhook, error)
 		DeleteWebhook(serviceID WebhookID) error
