@@ -63,6 +63,51 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
       }
     };
 
+    this.kvmAction = async function (device) {
+      try {
+        if (device.features['KVM'] && device.features['userConsent'] === 'none') {
+          $state.go('portainer.endpoints.endpoint.kvm', {
+            id: this.endpointId,
+            deviceId: device.guid,
+            deviceName: device.hostname,
+          });
+          return;
+        }
+
+        const confirmed = await ModalService.confirmAsync({
+          title: `Enable KVM`,
+          message: `KVM is not currently enabled on this device. Enable KVM?`,
+          buttons: {
+            confirm: {
+              label: 'Enable',
+              className: 'btn-success',
+            },
+          },
+        });
+        if (!confirmed) {
+          return;
+        }
+
+        const featuresPayload = {
+          IDER: true,
+          KVM: true,
+          SOL: true,
+          redirection: true,
+          userConsent: 'none',
+        };
+        await OpenAMTService.enableDeviceFeatures(this.endpointId, device.guid, featuresPayload);
+        Notifications.success(`KVM successfully enabled`);
+        $state.go('portainer.endpoints.endpoint.kvm', {
+          id: this.endpointId,
+          deviceId: device.guid,
+          deviceName: device.hostname,
+        });
+      } catch (err) {
+        console.log(err);
+        Notifications.error('Failure', err, `Failed to load kvm for device`);
+      }
+    };
+
     this.$onInit = function () {
       this.setDefaults();
     };

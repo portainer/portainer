@@ -11,6 +11,7 @@ function OpenAMTServiceFactory(OpenAMT) {
     activateDevice,
     getDevices,
     executeDeviceAction,
+    enableDeviceFeatures,
   };
 
   function submit(formValues) {
@@ -35,5 +36,9 @@ function OpenAMTServiceFactory(OpenAMT) {
 
   function activateDevice(endpointID) {
     return OpenAMT.activate({ id: endpointID }).$promise;
+  }
+
+  function enableDeviceFeatures(endpointID, deviceGUID, featuresPayload) {
+    return OpenAMT.enableDeviceFeatures({ id: endpointID, deviceId: deviceGUID, payload: featuresPayload }).$promise;
   }
 }

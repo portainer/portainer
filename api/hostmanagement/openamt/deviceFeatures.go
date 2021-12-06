@@ -8,15 +8,15 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-func (service *Service) enableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string) error {
+func (service *Service) enableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string, features portainer.OpenAMTDeviceEnabledFeatures) error {
 	url := fmt.Sprintf("https://%s/mps/api/v1/amt/features/%s", configuration.MPSServer, deviceGUID)
 
 	payload := map[string]interface{}{
-		"enableSOL":   true,
-		"enableIDER":  true,
-		"enableKVM":   true,
-		"redirection": true,
-		"userConsent": "none",
+		"enableSOL":   features.SOL,
+		"enableIDER":  features.IDER,
+		"enableKVM":   features.KVM,
+		"redirection": features.Redirection,
+		"userConsent": features.UserConsent,
 	}
 	jsonValue, _ := json.Marshal(payload)
 
