@@ -59,7 +59,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(dataStorePath string, encryptionKey string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) portainer.DataStore {
+func initDataStore(dataStorePath, encryptionKey string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) portainer.DataStore {
 	store := bolt.NewStore(dataStorePath, fileService, encryptionKey)
 	err := store.Open()
 	if err != nil {
@@ -471,7 +471,7 @@ func initSecretKey(fileName string) string {
 		return ""
 	}
 
-	return string(content)
+	return strings.TrimSuffix(string(content), "\n")
 }
 
 func buildServer(flags *portainer.CLIFlags) portainer.Server {
