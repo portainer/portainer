@@ -12,7 +12,6 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	kcli "github.com/portainer/portainer/api/kubernetes/cli"
-	v1 "k8s.io/api/core/v1"
 	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
@@ -123,21 +122,14 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 	authInfosSet := make(map[string]bool)
 
 	for idx, endpoint := range endpoints {
-		cli, err := handler.kubernetesClientFactory.GetKubeClient(&endpoint)
-		if err != nil {
-			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
-		}
-
-		serviceAccount, err := handler.getOrCreateServiceAccount(cli, tokenData, endpoint)
-		if err != nil {
-			return nil, &httperror.HandlerError{http.StatusInternalServerError, fmt.Sprintf("unable to retrieve serviceaccount associated with user; username=%s", tokenData.Username), err}
-		}
+		instantID := handler.kubernetesClientFactory.GetInstantID()
+		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instantID)
 
 		configClusters[idx] = buildCluster(r, endpoint)
-		configContexts[idx] = buildContext(serviceAccount.Name, endpoint)
-		if !authInfosSet[serviceAccount.Name] {
-			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccount.Name, bearerToken))
-			authInfosSet[serviceAccount.Name] = true
+		configContexts[idx] = buildContext(serviceAccountName, endpoint)
+		if !authInfosSet[serviceAccountName] {
+			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccountName, bearerToken))
+			authInfosSet[serviceAccountName] = true
 		}
 	}
 
@@ -149,33 +141,6 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 		CurrentContext: configContexts[0].Name,
 		AuthInfos:      configAuthInfos,
 	}, nil
-}
-
-func (handler *Handler) getOrCreateServiceAccount(cli portainer.KubeClient, tokenData *portainer.TokenData, endpoint portainer.Endpoint) (*v1.ServiceAccount, error) {
-	serviceAccount, err := cli.GetServiceAccount(tokenData)
-	if err != nil {
-		userID := tokenData.ID
-		memberships, err := handler.dataStore.TeamMembership().TeamMembershipsByUserID(userID)
-		if err != nil {
-			return nil, err
-		}
-
-		teamIds := make([]int, 0)
-		for _, membership := range memberships {
-			teamIds = append(teamIds, int(membership.TeamID))
-		}
-
-		restrictDefaultNamespace := endpoint.Kubernetes.Configuration.RestrictDefaultNamespace
-		err = cli.SetupUserServiceAccount(int(userID), teamIds, restrictDefaultNamespace)
-		if err != nil {
-			return nil, err
-		}
-		serviceAccount, err = cli.GetServiceAccount(tokenData)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return serviceAccount, nil
 }
 
 func buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
