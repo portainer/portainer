@@ -673,6 +673,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
+		BaseURL:                     *flags.BaseURL,
 	}
 }
 

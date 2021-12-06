@@ -96,6 +96,7 @@ type (
 		Rollback                  *bool
 		SnapshotInterval          *string
 		SecretKeyName             *string
+		BaseURL                   *string
 	}
 
 	// CustomTemplate represents a custom template

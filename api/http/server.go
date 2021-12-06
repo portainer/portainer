@@ -96,6 +96,7 @@ type Server struct {
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               stackdeployer.StackDeployer
+	BaseURL string
 }
 
 // Start starts the HTTP server
@@ -172,7 +173,7 @@ func (server *Server) Start() error {
 	endpointProxyHandler.ProxyManager = server.ProxyManager
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
-	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.KubernetesClientFactory)
+	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.KubernetesClientFactory, server.BaseURL)
 	kubernetesHandler.JwtService = server.JWTService
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
