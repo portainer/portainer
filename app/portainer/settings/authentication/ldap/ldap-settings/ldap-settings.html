@@ -27,6 +27,9 @@
     connectivity-check="$ctrl.connectivityCheck"
     on-search-users-click="($ctrl.searchUsers)"
     on-search-groups-click="($ctrl.searchGroups)"
+    on-save-settings="($ctrl.onSaveSettings)"
+    save-button-state="($ctrl.saveButtonState)"
+    save-button-disabled="$ctrl.isLdapFormValid"
   ></ldap-settings-custom>
   <ldap-settings-open-ldap
     ng-if="$ctrl.settings.ServerType === $ctrl.SERVER_TYPES.OPEN_LDAP"
@@ -37,5 +40,8 @@
     connectivity-check="$ctrl.connectivityCheck"
     on-search-users-click="($ctrl.searchUsers)"
     on-search-groups-click="($ctrl.searchGroups)"
+    on-save-settings="($ctrl.onSaveSettings)"
+    save-button-state="($ctrl.saveButtonState)"
+    save-button-disabled="$ctrl.isLdapFormValid"
   ></ldap-settings-open-ldap>
 </div>

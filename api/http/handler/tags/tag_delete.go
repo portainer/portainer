@@ -16,9 +16,8 @@ import (
 // @description Remove a tag.
 // @description **Access policy**: administrator
 // @tags tags
+// @security ApiKeyAuth
 // @security jwt
-// @accept json
-// @produce json
 // @param id path int true "Tag identifier"
 // @success 204 "Success"
 // @failure 400 "Invalid request"

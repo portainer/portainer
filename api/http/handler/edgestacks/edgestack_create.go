@@ -19,10 +19,10 @@ import (
 
 // @id EdgeStackCreate
 // @summary Create an EdgeStack
-// @description
+// @description **Access policy**: administrator
 // @tags edge_stacks
+// @security ApiKeyAuth
 // @security jwt
-// @accept json
 // @produce json
 // @param method query string true "Creation Method" Enums(file,string,repository)
 // @param body_string body swarmStackFromFileContentPayload true "Required when using method=string"

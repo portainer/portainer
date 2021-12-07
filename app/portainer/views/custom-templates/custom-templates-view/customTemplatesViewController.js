@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 
 class CustomTemplatesViewController {
   /* @ngInject */
@@ -44,6 +45,7 @@ class CustomTemplatesViewController {
       actionInProgress: false,
       isEditorVisible: false,
       deployable: false,
+      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
     };
 
     this.currentUser = {

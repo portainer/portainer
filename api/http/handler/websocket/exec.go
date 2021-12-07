@@ -26,7 +26,8 @@ type execStartOperationPayload struct {
 // @description If the nodeName query parameter is present, the request will be proxied to the underlying agent environment(endpoint).
 // @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
 // @description an ExecStart operation HTTP request will be created and hijacked.
-// @description Authentication and access is controlled via the mandatory token query parameter.
+// @**Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags websocket
 // @accept json

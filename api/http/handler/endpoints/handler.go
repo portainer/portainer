@@ -60,7 +60,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/endpoints/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
 	h.Handle("/endpoints/{id}/dockerhub/{registryId}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/extensions",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExtensionAdd))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/extensions/{extensionType}",

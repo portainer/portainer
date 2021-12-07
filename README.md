@@ -2,13 +2,15 @@
   <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/app/assets/images/portainer-github-banner.png?raw=true' />
 </p>
 
-**Portainer CE** is a lightweight ‘universal’ management GUI that can be used to **easily** manage Docker, Swarm, Kubernetes and ACI environments. It is designed to be as **simple** to deploy as it is to use.
+**Portainer Community Edition** is a lightweight service delivery platform for containerized applications that can be used to manage Docker, Swarm, Kubernetes and ACI environments. It is designed to be as simple to deploy as it is to use. The application allows you to manage all your orchestrator resources (containers, images, volumes, networks and more) through a ‘smart’ GUI and/or an extensive API.
 
 Portainer consists of a single container that can run on any cluster. It can be deployed as a Linux container or a Windows native container.
 
-**Portainer** allows you to manage all your orchestrator resources (containers, images, volumes, networks and more) through a super-simple graphical interface.
+**Portainer Business Edition** builds on the open-source base and includes a range of advanced features and functions (like RBAC and Support) that are specific to the needs of business users.
 
-A fully supported version of Portainer is available for business use. Visit http://www.portainer.io to learn more
+- [Compare Portainer CE and Compare Portainer BE](https://portainer.io/products)
+- [Take5 – get 5 free nodes of Portainer Business for as long as you want them](https://portainer.io/pricing/take5)
+- [Portainer BE install guide](https://install.portainer.io)
 
 ## Demo
 
@@ -20,12 +22,11 @@ Please note that the public demo cluster is **reset every 15min**.
 
 Portainer CE is updated regularly. We aim to do an update release every couple of months.
 
-**The latest version of Portainer is 2.6.x** And you can find the release notes [here.](https://www.portainer.io/blog/new-portainer-ce-2.6.0-release)
-Portainer is on version 2, the second number denotes the month of release.
+**The latest version of Portainer is 2.9.x**. Portainer is on version 2, the second number denotes the month of release.
 
 ## Getting started
 
-- [Deploy Portainer](https://documentation.portainer.io/quickstart/)
+- [Deploy Portainer](https://docs.portainer.io/v/ce-2.9/start/install)
 - [Documentation](https://documentation.portainer.io)
 - [Contribute to the project](https://documentation.portainer.io/contributing/instructions/)
 
@@ -41,7 +42,7 @@ View [this](https://www.portainer.io/products) table to see all of the Portainer
 
 Portainer CE is an open source project and is supported by the community. You can buy a supported version of Portainer at portainer.io
 
-Learn more about Portainers community support channels [here.](https://www.portainer.io/help_about)
+Learn more about Portainers community support channels [here.](https://www.portainer.io/community_help)
 
 - Issues: https://github.com/portainer/portainer/issues
 - Slack (chat): [https://portainer.slack.com/](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA)
@@ -51,15 +52,15 @@ You can join the Portainer Community by visiting community.portainer.io. This wi
 ## Reporting bugs and contributing
 
 - Want to report a bug or request a feature? Please open [an issue](https://github.com/portainer/portainer/issues/new).
-- Want to help us build **_portainer_**? Follow our [contribution guidelines](https://documentation.portainer.io/contributing/instructions/) to build it locally and make a pull request. We need all the help we can get!
+- Want to help us build **_portainer_**? Follow our [contribution guidelines](https://documentation.portainer.io/contributing/instructions/) to build it locally and make a pull request.
 
 ## Security
 
 - Here at Portainer, we believe in [responsible disclosure](https://en.wikipedia.org/wiki/Responsible_disclosure) of security issues. If you have found a security issue, please report it to <security@portainer.io>.
 
-## WORK FOR US
+## Work for us
 
-If you are a developer, and our code in this repo makes sense to you, we would love to hear from you. We are always on the hunt for awesome devs, either freelance or employed. Drop us a line to info@portainer.io with your details and we will be in touch.
+If you are a developer, and our code in this repo makes sense to you, we would love to hear from you. We are always on the hunt for awesome devs, either freelance or employed. Drop us a line to info@portainer.io with your details and/or visit our [careers page](https://portainer.io/careers).
 
 ## Privacy
 

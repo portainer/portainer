@@ -20,7 +20,7 @@ export default class WizardAciController {
         // Check name is duplicated or not
         let nameUsed = await this.NameValidator.validateEnvironmentName(name);
         if (nameUsed) {
-          this.Notifications.error('Failure', true, 'This name is been used, please try another one');
+          this.Notifications.error('Failure', null, 'This name is been used, please try another one');
           return;
         }
         await this.EndpointService.createAzureEndpoint(name, azureApplicationId, azureTenantId, azureAuthenticationKey, groupId, tagIds);

@@ -16,6 +16,7 @@ import (
 // @description Remove an environment(endpoint).
 // @description **Access policy**: administrator
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Environment(Endpoint) identifier"
 // @success 204 "Success"
@@ -49,7 +50,7 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove environment from the database", err}
 	}
 
-	handler.ProxyManager.DeleteEndpointProxy(endpoint)
+	handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 
 	err = handler.DataStore.EndpointRelation().DeleteEndpointRelation(endpoint.ID)
 	if err != nil {

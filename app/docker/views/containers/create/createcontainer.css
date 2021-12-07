@@ -1,0 +1,20 @@
+.edit-resources {
+  padding: 20px;
+  border: 1px solid var(--border-widget-color);
+}
+
+.widget .edit-resources button {
+  margin-left: 0;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mt-7 {
+  margin-top: 7px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}

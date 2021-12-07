@@ -46,7 +46,7 @@ angular.module('portainer.docker').factory('LogHelper', [
 
     function stripHeaders(logs) {
       logs = logs.substring(8);
-      logs = logs.replace(/\n(.{8})/g, '\n\r');
+      logs = logs.replace(/\r?\n(.{8})/g, '\n');
 
       return logs;
     }

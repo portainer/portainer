@@ -12,8 +12,9 @@ import (
 // @id TeamMembershipList
 // @summary List team memberships
 // @description  List team memberships. Access is only available to administrators and team leaders.
-// @description **Access policy**: admin
+// @description **Access policy**: administrator
 // @tags team_memberships
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {array} portainer.TeamMembership "Success"

@@ -8,7 +8,12 @@
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal" name="customTemplateForm">
-          <custom-template-common-fields form-values="$ctrl.formValues" show-platform-field="true" show-type-field="true"></custom-template-common-fields>
+          <custom-template-common-fields
+            form-values="$ctrl.formValues"
+            show-platform-field="true"
+            show-type-field="true"
+            name-regex="$ctrl.state.templateNameRegex"
+          ></custom-template-common-fields>
 
           <!-- build-method -->
           <div ng-if="!$ctrl.state.fromStack">

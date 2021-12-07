@@ -16,8 +16,9 @@ import (
 // @summary Inspect a user
 // @description Retrieve details about a user.
 // @description User passwords are filtered out, and should never be accessible.
-// @description **Access policy**: administrator
+// @description **Access policy**: authenticated
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "User identifier"

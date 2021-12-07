@@ -36,8 +36,9 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 
 // @id EgeGroupUpdate
 // @summary Updates an EdgeGroup
-// @description
+// @description **Access policy**: administrator
 // @tags edge_groups
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

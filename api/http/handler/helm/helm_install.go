@@ -36,8 +36,9 @@ var errChartNameInvalid = errors.New("invalid chart name. " +
 // @id HelmInstall
 // @summary Install Helm Chart
 // @description
-// @description **Access policy**: authorized
+// @description **Access policy**: authenticated
 // @tags helm
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

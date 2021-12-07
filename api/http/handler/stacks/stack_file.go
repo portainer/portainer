@@ -2,7 +2,6 @@ package stacks
 
 import (
 	"net/http"
-	"path"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -24,6 +23,7 @@ type stackFileResponse struct {
 // @description Get Stack file content.
 // @description **Access policy**: restricted
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Stack identifier"
@@ -82,7 +82,7 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 		}
 	}
 
-	stackFileContent, err := handler.FileService.GetFileContent(path.Join(stack.ProjectPath, stack.EntryPoint))
+	stackFileContent, err := handler.FileService.GetFileContent(stack.ProjectPath, stack.EntryPoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Compose file from disk", err}
 	}

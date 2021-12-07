@@ -34,8 +34,9 @@ func (payload *stackMigratePayload) Validate(r *http.Request) error {
 // @id StackMigrate
 // @summary Migrate a stack to another environment(endpoint)
 // @description  Migrate a stack from an environment(endpoint) to another environment(endpoint). It will re-create the stack inside the target environment(endpoint) before removing the original stack.
-// @description **Access policy**: restricted
+// @description **Access policy**: authenticated
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Stack identifier"
@@ -143,12 +144,14 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return migrationError
 	}
 
+	newName := stack.Name
 	stack.Name = oldName
 	err = handler.deleteStack(securityContext.UserID, stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 	}
 
+	stack.Name = newName
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack changes inside the database", Err: err}

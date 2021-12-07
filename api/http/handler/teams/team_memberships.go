@@ -16,6 +16,7 @@ import (
 // @description List team memberships. Access is only available to administrators and team leaders.
 // @description **Access policy**: restricted
 // @tags team_memberships
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path string true "Team Id"

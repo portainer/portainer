@@ -144,8 +144,6 @@ class KubernetesCreateApplicationController {
     this.setPullImageValidity = this.setPullImageValidity.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.onServicePublishChange = this.onServicePublishChange.bind(this);
-
-    this.$scope.$watch(() => this.formValues.IsPublishingService, this.onServicePublishChange);
   }
   /* #endregion */
 
@@ -426,34 +424,31 @@ class KubernetesCreateApplicationController {
 
   /* #endregion */
 
+  /* #region  PUBLISHED PORTS UI MANAGEMENT */
   onServicePublishChange() {
-    // service creation
-    if (this.formValues.PublishedPorts.length === 0) {
-      if (this.formValues.IsPublishingService) {
-        // toggle enabled
-        this.addPublishedPort();
-      }
+    // enable publishing with no previous ports exposed
+    if (this.formValues.IsPublishingService && !this.formValues.PublishedPorts.length) {
+      this.addPublishedPort();
       return;
     }
 
     // service update
     if (this.formValues.IsPublishingService) {
-      // toggle enabled
       this.formValues.PublishedPorts.forEach((port) => (port.NeedsDeletion = false));
     } else {
-      // toggle disabled
-      // all new ports need to be deleted, existing ports need to be marked as needing deletion
+      // delete new ports, mark old ports to be deleted
       this.formValues.PublishedPorts = this.formValues.PublishedPorts.filter((port) => !port.IsNew).map((port) => ({ ...port, NeedsDeletion: true }));
     }
   }
 
-  /* #region  PUBLISHED PORTS UI MANAGEMENT */
   addPublishedPort() {
     const p = new KubernetesApplicationPublishedPortFormValue();
     const ingresses = this.ingresses;
-    p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
-    p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
-    p.IngressHosts = ingresses && ingresses.length ? ingresses[0].Hosts : undefined;
+    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
+      p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
+      p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
+      p.IngressHosts = ingresses && ingresses.length ? ingresses[0].Hosts : undefined;
+    }
     if (this.formValues.PublishedPorts.length) {
       p.Protocol = this.formValues.PublishedPorts[0].Protocol;
     }
@@ -1079,7 +1074,10 @@ class KubernetesCreateApplicationController {
         ]);
         this.nodesLimits = nodesLimits;
 
-        this.resourcePools = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+        const nonSystemNamespaces = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+
+        this.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
+
         this.formValues.ResourcePool = this.resourcePools[0];
         if (!this.formValues.ResourcePool) {
           return;

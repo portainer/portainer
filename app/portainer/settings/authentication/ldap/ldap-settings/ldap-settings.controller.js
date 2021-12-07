@@ -4,7 +4,7 @@ const SERVER_TYPES = {
   AD: 2,
 };
 
-import { buildOpenLDAPSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
+import { buildLdapSettingsModel, buildOpenLDAPSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
 import { EXTERNAL_AUTH_LDAP } from '@/portainer/feature-flags/feature-ids';
 
 const DEFAULT_GROUP_FILTER = '(objectClass=groupOfNames)';
@@ -16,6 +16,7 @@ export default class LdapSettingsController {
     Object.assign(this, { LDAPService, SERVER_TYPES });
 
     this.tlscaCert = null;
+    this.settingsDrafts = {};
 
     this.boxSelectorOptions = [
       { id: 'ldap_custom', value: SERVER_TYPES.CUSTOM, label: 'Custom', icon: 'fa fa-server' },
@@ -37,16 +38,21 @@ export default class LdapSettingsController {
   }
 
   onChangeServerType(serverType) {
+    this.settingsDrafts[this.settings.ServerType] = this.settings;
+
+    if (this.settingsDrafts[serverType]) {
+      this.settings = this.settingsDrafts[serverType];
+      return;
+    }
+
     switch (serverType) {
       case SERVER_TYPES.OPEN_LDAP:
-        return this.onChangeToOpenLDAP();
-      default:
+        this.settings = buildOpenLDAPSettingsModel();
+        break;
+      case SERVER_TYPES.CUSTOM:
+        this.settings = buildLdapSettingsModel();
         break;
     }
-  }
-
-  onChangeToOpenLDAP() {
-    this.settings = buildOpenLDAPSettingsModel();
   }
 
   searchUsers() {

@@ -19,10 +19,10 @@ type taskContainer struct {
 
 // @id EdgeJobTasksList
 // @summary Fetch the list of tasks on an EdgeJob
-// @description
+// @description **Access policy**: administrator
 // @tags edge_jobs
+// @security ApiKeyAuth
 // @security jwt
-// @accept json
 // @produce json
 // @param id path string true "EdgeJob Id"
 // @success 200 {array} taskContainer

@@ -67,9 +67,9 @@ func (manager *Manager) GetEndpointProxy(endpoint *portainer.Endpoint) http.Hand
 // DeleteEndpointProxy deletes the proxy associated to a key
 // and cleans the k8s environment(endpoint) client cache. DeleteEndpointProxy
 // is currently only called for edge connection clean up.
-func (manager *Manager) DeleteEndpointProxy(endpoint *portainer.Endpoint) {
-	manager.endpointProxies.Remove(fmt.Sprint(endpoint.ID))
-	manager.k8sClientFactory.RemoveKubeClient(endpoint)
+func (manager *Manager) DeleteEndpointProxy(endpointID portainer.EndpointID) {
+	manager.endpointProxies.Remove(fmt.Sprint(endpointID))
+	manager.k8sClientFactory.RemoveKubeClient(endpointID)
 }
 
 // CreateLegacyExtensionProxy creates a new HTTP reverse proxy for a legacy extension and adds it to the registered proxies

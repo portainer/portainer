@@ -3,6 +3,7 @@ package webhooks
 import (
 	"context"
 	"errors"
+	"github.com/portainer/portainer/api/internal/registryutils"
 	"net/http"
 	"strings"
 
@@ -16,9 +17,8 @@ import (
 
 // @summary Execute a webhook
 // @description Acts on a passed in token UUID to restart the docker service
+// @description **Access policy**: public
 // @tags webhooks
-// @accept json
-// @produce json
 // @param token path string true "Webhook token"
 // @success 202 "Webhook executed"
 // @failure 400
@@ -42,6 +42,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 
 	resourceID := webhook.ResourceID
 	endpointID := webhook.EndpointID
+	registryID := webhook.RegistryID
 	webhookType := webhook.WebhookType
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
@@ -55,13 +56,19 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 
 	switch webhookType {
 	case portainer.ServiceWebhook:
-		return handler.executeServiceWebhook(w, endpoint, resourceID, imageTag)
+		return handler.executeServiceWebhook(w, endpoint, resourceID, registryID, imageTag)
 	default:
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unsupported webhook type", errors.New("Webhooks for this resource are not currently supported")}
 	}
 }
 
-func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *portainer.Endpoint, resourceID string, imageTag string) *httperror.HandlerError {
+func (handler *Handler) executeServiceWebhook(
+	w http.ResponseWriter,
+	endpoint *portainer.Endpoint,
+	resourceID string,
+	registryID portainer.RegistryID,
+	imageTag string,
+) *httperror.HandlerError {
 	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating docker client", err}
@@ -74,14 +81,39 @@ func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *p
 	}
 
 	service.Spec.TaskTemplate.ForceUpdate++
+	
+	var imageName = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
 
 	if imageTag != "" {
-		service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, ":")[0] + ":" + imageTag
+		var tagIndex = strings.LastIndex(imageName, ":")
+		if tagIndex == -1 {
+	  		tagIndex = len(imageName)
+		}
+		service.Spec.TaskTemplate.ContainerSpec.Image = imageName[:tagIndex] + ":" + imageTag
 	} else {
-		service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
+		service.Spec.TaskTemplate.ContainerSpec.Image = imageName
 	}
 
-	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
+	serviceUpdateOptions := dockertypes.ServiceUpdateOptions{
+		QueryRegistry: true,
+	}
+
+	if registryID != 0 {
+		registry, err := handler.DataStore.Registry().Registry(registryID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Error getting registry", err}
+		}
+
+		if registry.Authentication {
+			registryutils.EnsureRegTokenValid(handler.DataStore, registry)
+			serviceUpdateOptions.EncodedRegistryAuth, err = registryutils.GetRegistryAuthHeader(registry)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Error getting registry auth header", err}
+			}
+		}
+	}
+
+	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions)
 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error updating service", err}

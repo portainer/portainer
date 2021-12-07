@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 export default class HelmTemplatesController {
@@ -97,8 +98,9 @@ export default class HelmTemplatesController {
     try {
       // fetch globally set helm repo and user helm repos (parallel)
       const { GlobalRepository, UserRepositories } = await this.HelmService.getHelmRepositories(this.endpoint.Id);
+      this.state.globalRepository = GlobalRepository;
       const userHelmReposUrls = UserRepositories.map((repo) => repo.URL);
-      const uniqueHelmRepos = [...new Set([GlobalRepository, ...userHelmReposUrls])].map((url) => url.toLowerCase()); // remove duplicates, to lowercase
+      const uniqueHelmRepos = [...new Set([GlobalRepository, ...userHelmReposUrls])].map((url) => url.toLowerCase()).filter((url) => url); // remove duplicates and blank, to lowercase
       this.state.repos = uniqueHelmRepos;
       return uniqueHelmRepos;
     } catch (err) {
@@ -141,8 +143,8 @@ export default class HelmTemplatesController {
       const resourcePools = await this.KubernetesResourcePoolService.get();
 
       const nonSystemNamespaces = resourcePools.filter((resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
-      this.state.resourcePools = nonSystemNamespaces;
-      this.state.resourcePool = nonSystemNamespaces[0];
+      this.state.resourcePools = _.sortBy(nonSystemNamespaces, ({ Namespace }) => (Namespace.Name === 'default' ? 0 : 1));
+      this.state.resourcePool = this.state.resourcePools[0];
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve initial helm data.');
     } finally {
@@ -168,6 +170,8 @@ export default class HelmTemplatesController {
         chartsLoading: false,
         resourcePoolsLoading: false,
         viewReady: false,
+        isAdmin: this.Authentication.isAdmin(),
+        globalRepository: undefined,
       };
 
       const helmRepos = await this.getHelmRepoURLs();

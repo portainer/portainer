@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -26,6 +25,7 @@ import (
 // @description Remove a stack.
 // @description **Access policy**: restricted
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Stack identifier"
 // @param external query boolean false "Set to true to delete an external stack. Only external Swarm stacks are supported"
@@ -198,8 +198,8 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 			defer os.RemoveAll(tmpDir)
 
 			for _, fileName := range fileNames {
-				manifestFilePath := path.Join(tmpDir, fileName)
-				manifestContent, err := ioutil.ReadFile(path.Join(stack.ProjectPath, fileName))
+				manifestFilePath := filesystem.JoinPaths(tmpDir, fileName)
+				manifestContent, err := handler.FileService.GetFileContent(stack.ProjectPath, fileName)
 				if err != nil {
 					return errors.Wrap(err, "failed to read manifest file")
 				}

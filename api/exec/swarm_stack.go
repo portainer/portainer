@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/registryutils"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
@@ -22,17 +23,25 @@ type SwarmStackManager struct {
 	signatureService     portainer.DigitalSignatureService
 	fileService          portainer.FileService
 	reverseTunnelService portainer.ReverseTunnelService
+	dataStore            portainer.DataStore
 }
 
 // NewSwarmStackManager initializes a new SwarmStackManager service.
 // It also updates the configuration of the Docker CLI binary.
-func NewSwarmStackManager(binaryPath, configPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (*SwarmStackManager, error) {
+func NewSwarmStackManager(
+	binaryPath, configPath string,
+	signatureService portainer.DigitalSignatureService,
+	fileService portainer.FileService,
+	reverseTunnelService portainer.ReverseTunnelService,
+	datastore portainer.DataStore,
+) (*SwarmStackManager, error) {
 	manager := &SwarmStackManager{
 		binaryPath:           binaryPath,
 		configPath:           configPath,
 		signatureService:     signatureService,
 		fileService:          fileService,
 		reverseTunnelService: reverseTunnelService,
+		dataStore:            datastore,
 	}
 
 	err := manager.updateDockerCLIConfiguration(manager.configPath)
@@ -44,19 +53,36 @@ func NewSwarmStackManager(binaryPath, configPath string, signatureService portai
 }
 
 // Login executes the docker login command against a list of registries (including DockerHub).
-func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoint *portainer.Endpoint) {
-	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
+func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoint *portainer.Endpoint) error {
+	command, args, err := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
+	if err != nil {
+		return err
+	}
 	for _, registry := range registries {
 		if registry.Authentication {
-			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
+			err = registryutils.EnsureRegTokenValid(manager.dataStore, &registry)
+			if err != nil {
+				return err
+			}
+
+			username, password, err := registryutils.GetRegEffectiveCredential(&registry)
+			if err != nil {
+				return err
+			}
+
+			registryArgs := append(args, "login", "--username", username, "--password", password, registry.URL)
 			runCommandAndCaptureStdErr(command, registryArgs, nil, "")
 		}
 	}
+	return nil
 }
 
 // Logout executes the docker logout command.
 func (manager *SwarmStackManager) Logout(endpoint *portainer.Endpoint) error {
-	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
+	command, args, err := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
+	if err != nil {
+		return err
+	}
 	args = append(args, "logout")
 	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
@@ -64,7 +90,10 @@ func (manager *SwarmStackManager) Logout(endpoint *portainer.Endpoint) error {
 // Deploy executes the docker stack deploy command.
 func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
 	filePaths := stackutils.GetStackFilePaths(stack)
-	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
+	command, args, err := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
+	if err != nil {
+		return err
+	}
 
 	if prune {
 		args = append(args, "stack", "deploy", "--prune", "--with-registry-auth")
@@ -84,7 +113,10 @@ func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, end
 
 // Remove executes the docker stack rm command.
 func (manager *SwarmStackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
+	command, args, err := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
+	if err != nil {
+		return err
+	}
 	args = append(args, "stack", "rm", stack.Name)
 	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
@@ -108,7 +140,7 @@ func runCommandAndCaptureStdErr(command string, args []string, env []string, wor
 	return nil
 }
 
-func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, configPath string, endpoint *portainer.Endpoint) (string, []string) {
+func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, configPath string, endpoint *portainer.Endpoint) (string, []string, error) {
 	// Assume Linux as a default
 	command := path.Join(binaryPath, "docker")
 
@@ -121,7 +153,10 @@ func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, config
 
 	endpointURL := endpoint.URL
 	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
-		tunnel := manager.reverseTunnelService.GetTunnelDetails(endpoint.ID)
+		tunnel, err := manager.reverseTunnelService.GetActiveTunnel(endpoint)
+		if err != nil {
+			return "", nil, err
+		}
 		endpointURL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnel.Port)
 	}
 
@@ -141,7 +176,7 @@ func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, config
 		}
 	}
 
-	return command, args
+	return command, args, nil
 }
 
 func (manager *SwarmStackManager) updateDockerCLIConfiguration(configPath string) error {
@@ -175,7 +210,7 @@ func (manager *SwarmStackManager) updateDockerCLIConfiguration(configPath string
 func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (map[string]interface{}, error) {
 	var config map[string]interface{}
 
-	raw, err := manager.fileService.GetFileContent(path)
+	raw, err := manager.fileService.GetFileContent(path, "")
 	if err != nil {
 		return make(map[string]interface{}), nil
 	}

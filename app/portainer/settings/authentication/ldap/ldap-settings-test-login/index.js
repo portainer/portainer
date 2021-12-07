@@ -1,3 +1,4 @@
+import './ldap-settings-test-login.css';
 import controller from './ldap-settings-test-login.controller';
 
 export const ldapSettingsTestLogin = {
@@ -7,5 +8,6 @@ export const ldapSettingsTestLogin = {
     settings: '=',
     limitedFeatureId: '<',
     showBeIndicatorIfNeeded: '<',
+    isLimitedFeatureSelfContained: '<',
   },
 };

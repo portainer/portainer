@@ -27,6 +27,16 @@
                 </label>
               </div>
               <div>
+                <input type="radio" id="registry_aws_ecr" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.ECR" />
+                <label for="registry_aws_ecr" ng-click="$ctrl.selectEcr()">
+                  <div class="boxselector_header">
+                    <i class="fab fa-aws" aria-hidden="true" style="margin-right: 2px;"></i>
+                    AWS ECR
+                  </div>
+                  <p>Amazon elastic container registry</p>
+                </label>
+              </div>
+              <div>
                 <input type="radio" id="registry_quay" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.QUAY" />
                 <label for="registry_quay" ng-click="$ctrl.selectQuayRegistry()">
                   <div class="boxselector_header">
@@ -102,6 +112,14 @@
             form-action-label="Add registry"
             action-in-progress="$ctrl.state.actionInProgress"
           ></registry-form-custom>
+
+          <registry-form-ecr
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.ECR"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+          ></registry-form-ecr>
 
           <registry-form-proget
             ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.PROGET"

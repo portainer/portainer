@@ -34,8 +34,9 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 
 // @id EdgeGroupCreate
 // @summary Create an EdgeGroup
-// @description
+// @description **Access policy**: administrator
 // @tags edge_groups
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

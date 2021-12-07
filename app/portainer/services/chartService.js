@@ -39,6 +39,7 @@ angular.module('portainer.app').factory('ChartService', [
               ticks: {
                 beginAtZero: true,
                 callback: scalesCallback,
+                precision: 0,
               },
             },
           ],

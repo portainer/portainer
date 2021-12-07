@@ -10,8 +10,9 @@ import (
 // @id TagList
 // @summary List tags
 // @description List tags.
-// @description **Access policy**: administrator
+// @description **Access policy**: authenticated
 // @tags tags
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {array} portainer.Tag "Success"

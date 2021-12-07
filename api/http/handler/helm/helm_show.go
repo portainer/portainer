@@ -15,11 +15,12 @@ import (
 // @id HelmShow
 // @summary Show Helm Chart Information
 // @description
-// @description **Access policy**: authorized
-// @tags helm_chart
+// @description **Access policy**: authenticated
+// @tags helm
 // @param repo query string true "Helm repository URL"
 // @param chart query string true "Chart name"
 // @param command path string true "chart/values/readme"
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce text/plain

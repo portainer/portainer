@@ -9,10 +9,10 @@ import (
 
 // @id EdgeJobList
 // @summary Fetch EdgeJobs list
-// @description
+// @description **Access policy**: administrator
 // @tags edge_jobs
+// @security ApiKeyAuth
 // @security jwt
-// @accept json
 // @produce json
 // @success 200 {array} portainer.EdgeJob
 // @failure 500

@@ -2,6 +2,7 @@ package customtemplates
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -21,6 +22,7 @@ import (
 // @description Create a custom template.
 // @description **Access policy**: authenticated
 // @tags custom_templates
+// @security ApiKeyAuth
 // @security jwt
 // @accept json,multipart/form-data
 // @produce json
@@ -268,6 +270,23 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
 	if err != nil {
 		return nil, err
+	}
+
+	entryPath := filesystem.JoinPaths(projectPath, customTemplate.EntryPoint)
+
+	exists, err := handler.FileService.FileExists(entryPath)
+	if err != nil || !exists {
+		if err := handler.FileService.RemoveDirectory(projectPath); err != nil {
+			log.Printf("[WARN] [http,customtemplate,git] [error: %s] [message: unable to remove git repository directory]", err)
+		}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return nil, errors.New("Invalid Compose file, ensure that the Compose file path is correct")
 	}
 
 	return customTemplate, nil

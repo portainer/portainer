@@ -2,7 +2,6 @@ package customtemplates
 
 import (
 	"net/http"
-	"path"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -18,8 +17,9 @@ type fileResponse struct {
 // @id CustomTemplateFile
 // @summary Get Template stack file content.
 // @description Retrieve the content of the Stack file for the specified custom template
-// @description **Access policy**: authorized
+// @description **Access policy**: authenticated
 // @tags custom_templates
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Template identifier"
@@ -41,7 +41,7 @@ func (handler *Handler) customTemplateFile(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a custom template with the specified identifier inside the database", err}
 	}
 
-	fileContent, err := handler.FileService.GetFileContent(path.Join(customTemplate.ProjectPath, customTemplate.EntryPoint))
+	fileContent, err := handler.FileService.GetFileContent(customTemplate.ProjectPath, customTemplate.EntryPoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve custom template file from disk", err}
 	}

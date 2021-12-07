@@ -4,7 +4,7 @@ import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
-
+import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/application/models';
 class KubernetesApplicationsController {
   /* @ngInject */
   constructor($async, $state, Notifications, KubernetesApplicationService, HelmService, KubernetesConfigurationService, Authentication, ModalService, LocalStorage, StackService) {
@@ -81,13 +81,17 @@ class KubernetesApplicationsController {
           await this.HelmService.uninstall(this.endpoint.Id, application);
         } else {
           await this.KubernetesApplicationService.delete(application);
-          // Update applications in stack
-          const stack = this.state.stacks.find((x) => x.Name === application.StackName);
-          const index = stack.Applications.indexOf(application);
-          stack.Applications.splice(index, 1);
-          // remove stack if no app left in the stack
-          if (stack.Applications.length === 0 && application.StackId) {
-            await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
+
+          if (application.Metadata.labels[KubernetesPortainerApplicationStackNameLabel]) {
+            // Update applications in stack
+            const stack = this.state.stacks.find((x) => x.Name === application.StackName);
+            const index = stack.Applications.indexOf(application);
+            stack.Applications.splice(index, 1);
+
+            // remove stack if no app left in the stack
+            if (stack.Applications.length === 0 && application.StackId) {
+              await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
+            }
           }
         }
         this.Notifications.success('Application successfully removed', application.Name);

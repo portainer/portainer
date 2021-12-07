@@ -7,5 +7,8 @@ export const ldapSettings = {
     settings: '=',
     state: '<',
     connectivityCheck: '<',
+    onSaveSettings: '<',
+    saveButtonState: '<',
+    isLdapFormValid: '<',
   },
 };

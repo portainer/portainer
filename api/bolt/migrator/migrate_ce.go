@@ -237,6 +237,7 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 1.24.0
 	if m.currentDBVersion < 23 {
+		migrateLog.Info("Migrating to DB 23")
 		err := m.updateTagsToDBVersion23()
 		if err != nil {
 			return migrationError(err, "updateTagsToDBVersion23")
@@ -250,6 +251,7 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 1.24.1
 	if m.currentDBVersion < 24 {
+		migrateLog.Info("Migrating to DB 24")
 		err := m.updateSettingsToDB24()
 		if err != nil {
 			return migrationError(err, "updateSettingsToDB24")
@@ -258,6 +260,7 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 2.0.0
 	if m.currentDBVersion < 25 {
+		migrateLog.Info("Migrating to DB 25")
 		err := m.updateSettingsToDB25()
 		if err != nil {
 			return migrationError(err, "updateSettingsToDB25")
@@ -271,6 +274,7 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 2.1.0
 	if m.currentDBVersion < 26 {
+		migrateLog.Info("Migrating to DB 26")
 		err := m.updateEndpointSettingsToDB25()
 		if err != nil {
 			return migrationError(err, "updateEndpointSettingsToDB25")
@@ -279,6 +283,7 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 2.2.0
 	if m.currentDBVersion < 27 {
+		migrateLog.Info("Migrating to DB 27")
 		err := m.updateStackResourceControlToDB27()
 		if err != nil {
 			return migrationError(err, "updateStackResourceControlToDB27")
@@ -287,6 +292,7 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 2.6.0
 	if m.currentDBVersion < 30 {
+		migrateLog.Info("Migrating to DB 30")
 		err := m.migrateDBVersionToDB30()
 		if err != nil {
 			return migrationError(err, "migrateDBVersionToDB30")
@@ -303,6 +309,7 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 2.9.1, 2.9.2
 	if m.currentDBVersion < 33 {
+		migrateLog.Info("Migrating to DB 33")
 		err := m.migrateDBVersionToDB33()
 		if err != nil {
 			return migrationError(err, "migrateDBVersionToDB33")
@@ -311,6 +318,7 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 2.10
 	if m.currentDBVersion < 34 {
+		migrateLog.Info("Migrating to DB 34")
 		if err := m.migrateDBVersionToDB34(); err != nil {
 			return migrationError(err, "migrateDBVersionToDB34")
 		}
@@ -318,6 +326,7 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 2.9.3 (yep out of order, but 2.10 is EE only)
 	if m.currentDBVersion < 35 {
+		migrateLog.Info("Migrating to DB 35")
 		if err := m.migrateDBVersionToDB35(); err != nil {
 			return migrationError(err, "migrateDBVersionToDB35")
 		}

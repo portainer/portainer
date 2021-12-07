@@ -17,8 +17,9 @@ type listResponse struct {
 // @id TemplateList
 // @summary List available templates
 // @description List available templates.
-// @description **Access policy**: restricted
+// @description **Access policy**: authenticated
 // @tags templates
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {object} listResponse "Success"

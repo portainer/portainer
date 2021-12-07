@@ -32,6 +32,7 @@ class KubernetesDeployController {
     this.StackService = StackService;
     this.WebhookHelper = WebhookHelper;
     this.CustomTemplateService = CustomTemplateService;
+    this.DeployMethod = 'manifest';
 
     this.deployOptions = [
       buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
@@ -69,6 +70,7 @@ class KubernetesDeployController {
       RepositoryFetchInterval: '5m',
       RepositoryWebhookURL: this.WebhookHelper.returnStackWebhookUrl(uuidv4()),
     };
+
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
     this.BuildMethods = KubernetesDeployBuildMethods;
     this.endpointId = this.EndpointProvider.endpointID();
@@ -79,6 +81,7 @@ class KubernetesDeployController {
     this.getNamespacesAsync = this.getNamespacesAsync.bind(this);
     this.onChangeFormValues = this.onChangeFormValues.bind(this);
     this.buildAnalyticsProperties = this.buildAnalyticsProperties.bind(this);
+    this.onDeployTypeChange = this.onDeployTypeChange.bind(this);
   }
 
   buildAnalyticsProperties() {
@@ -207,9 +210,15 @@ class KubernetesDeployController {
           throw new PortainerError('Unable to determine build method');
       }
 
+      let deployNamespace = '';
+
+      if (this.formValues.Namespace !== 'default') {
+        deployNamespace = this.formValues.Namespace;
+      }
+
       const payload = {
         ComposeFormat: composeFormat,
-        Namespace: this.formValues.Namespace,
+        Namespace: deployNamespace,
         StackName: this.formValues.StackName,
       };
 
@@ -278,6 +287,14 @@ class KubernetesDeployController {
 
   getNamespaces() {
     return this.$async(this.getNamespacesAsync);
+  }
+
+  onDeployTypeChange(value) {
+    if (value == this.ManifestDeployTypes.COMPOSE) {
+      this.DeployMethod = 'compose';
+    } else {
+      this.DeployMethod = 'manifest';
+    }
   }
 
   async uiCanExit() {

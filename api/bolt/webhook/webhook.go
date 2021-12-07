@@ -150,3 +150,9 @@ func (service *Service) CreateWebhook(webhook *portainer.Webhook) error {
 		return bucket.Put(internal.Itob(int(webhook.ID)), data)
 	})
 }
+
+// UpdateWebhook update a webhook.
+func (service *Service) UpdateWebhook(ID portainer.WebhookID, webhook *portainer.Webhook) error {
+	identifier := internal.Itob(int(ID))
+	return internal.UpdateObject(service.connection, BucketName, identifier, webhook)
+}

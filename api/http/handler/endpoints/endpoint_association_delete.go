@@ -19,6 +19,7 @@ import (
 // @summary De-association an edge environment(endpoint)
 // @description De-association an edge environment(endpoint).
 // @description **Access policy**: administrator
+// @security ApiKeyAuth
 // @security jwt
 // @tags endpoints
 // @produce json
@@ -27,7 +28,7 @@ import (
 // @failure 400 "Invalid request"
 // @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
-// @router /api/endpoints/{id}/association [put]
+// @router /endpoints/{id}/association [put]
 func (handler *Handler) endpointAssociationDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

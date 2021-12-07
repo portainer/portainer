@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
@@ -43,7 +44,9 @@ class CreateCustomTemplateViewController {
       fromStack: false,
       loading: true,
       isEditorDirty: false,
+      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
     };
+
     this.templates = [];
 
     this.createCustomTemplate = this.createCustomTemplate.bind(this);

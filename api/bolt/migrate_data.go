@@ -2,6 +2,7 @@ package bolt
 
 import (
 	"fmt"
+	"runtime/debug"
 
 	"github.com/portainer/portainer/api/cli"
 
@@ -22,7 +23,8 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			store.Rollback(true)
-			err = fmt.Errorf("%v", e)
+			// return error with cause and stacktrace (recover() doesn't include a stacktrace)
+			err = fmt.Errorf("%v %s", e, string(debug.Stack()))
 		}
 	}()
 

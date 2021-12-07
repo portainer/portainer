@@ -88,7 +88,11 @@ angular.module('portainer.app').factory('Authentication', [
       const data = await UserService.user(user.ID);
       // Initialize user theme base on Usertheme from database
       const userTheme = data.UserTheme;
-      ThemeManager.setTheme(userTheme);
+      if (userTheme === 'auto' || !userTheme) {
+        ThemeManager.autoTheme();
+      } else {
+        ThemeManager.setTheme(userTheme);
+      }
     }
 
     async function setUser(jwt) {

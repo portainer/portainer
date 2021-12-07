@@ -13,17 +13,17 @@ import (
 // @summary Execute a websocket on kubectl shell pod
 // @description The request will be upgraded to the websocket protocol. The request will proxy input from the client to the pod via long-lived websocket connection.
 // @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags websocket
 // @accept json
 // @produce json
 // @param endpointId query int true "environment(endpoint) ID of the environment(endpoint) where the resource is located"
 // @param token query string true "JWT token used for authentication against this environment(endpoint)"
-// @success 200
-// @failure 400
-// @failure 403
-// @failure 404
-// @failure 500
+// @success 200 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 500 "Server error"
 // @router /websocket/kubernetes-shell [get]
 func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)

@@ -14,8 +14,9 @@ import (
 // @id UserMembershipsInspect
 // @summary Inspect a user memberships
 // @description Inspect a user memberships.
-// @description **Access policy**: authenticated
+// @description **Access policy**: restricted
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "User identifier"

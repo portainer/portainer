@@ -62,6 +62,7 @@ html {
   --grey-58: #ebf4f8;
   --grey-59: #e6e6e6;
   --grey-60: #cacaca;
+  --grey-61: rgb(231, 231, 231);
 
   --blue-1: #219;
   --blue-2: #337ab7;
@@ -158,6 +159,8 @@ html {
   --bg-small-select-color: var(--white-color);
   --bg-app-datatable-thead: var(--grey-23);
   --bg-app-datatable-tbody: var(--grey-24);
+  --bg-stepper-item-active: var(--white-color);
+  --bg-stepper-item-counter: var(--grey-61);
 
   --text-main-color: var(--grey-7);
   --text-body-color: var(--grey-6);
@@ -214,7 +217,7 @@ html {
   --border-table-color: var(--grey-19);
   --border-table-top-color: var(--grey-19);
   --border-datatable-top-color: var(--grey-10);
-  --border-blocklist-color: var(--grey-44) ccc;
+  --border-blocklist-color: var(--grey-44);
   --border-input-group-addon-color: var(--grey-44);
   --border-btn-default-color: var(--grey-44);
   --border-boxselector-color: var(--grey-6);
@@ -328,6 +331,8 @@ html {
   --bg-small-select-color: var(--grey-2);
   --bg-app-datatable-thead: var(--grey-1);
   --bg-app-datatable-tbody: var(--grey-1);
+  --bg-stepper-item-active: var(--grey-1);
+  --bg-stepper-item-counter: var(--grey-7);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -497,6 +502,8 @@ html {
   --bg-small-select-color: var(--black-color);
   --bg-app-datatable-thead: var(--black-color);
   --bg-app-datatable-tbody: var(--black-color);
+  --bg-stepper-item-active: var(--black-color);
+  --bg-stepper-item-counter: var(--grey-3);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -564,6 +571,7 @@ html {
   --border-pre-color: var(--grey-3);
   --border-codemirror-cursor-color: var(--white-color);
   --border-modal: 1px solid var(--white-color);
+  --border-blocklist-color: var(--white-color);
 
   --hover-sidebar-color: var(--blue-9);
   --hover-sidebar-color: var(--black-color);

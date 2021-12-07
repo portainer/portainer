@@ -15,12 +15,12 @@ type webhookListOperationFilters struct {
 }
 
 // @summary List webhooks
-// @description
+// @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags webhooks
 // @accept json
 // @produce json
-// @param body body webhookCreatePayload true "Webhook data"
 // @param filters query webhookListOperationFilters false "Filters"
 // @success 200 {array} portainer.Webhook
 // @failure 400

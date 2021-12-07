@@ -12,8 +12,9 @@ import (
 // @id HelmList
 // @summary List Helm Releases
 // @description
-// @description **Access policy**: authorized
+// @description **Access policy**: authenticated
 // @tags helm
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

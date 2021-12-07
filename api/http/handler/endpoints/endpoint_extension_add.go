@@ -29,6 +29,12 @@ func (payload *endpointExtensionAddPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id endpointExtensionAdd
+// @tags endpoints
+// @deprecated
+// @param id path int true "Environment(Endpoint) identifier"
+// @success 204 "Success"
+// @router /endpoints/{id}/extensions [post]
 func (handler *Handler) endpointExtensionAdd(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

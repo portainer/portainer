@@ -20,8 +20,9 @@ import (
 // @id StackStart
 // @summary Starts a stopped Stack
 // @description Starts a stopped Stack.
-// @description **Access policy**: restricted
+// @description **Access policy**: authenticated
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Stack identifier"
 // @success 200 {object} portainer.Stack "Success"

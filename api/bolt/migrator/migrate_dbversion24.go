@@ -1,10 +1,12 @@
 package migrator
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 func (m *Migrator) updateSettingsToDB25() error {
+	migrateLog.Info("Updating settings")
+
 	legacySettings, err := m.settingsService.Settings()
 	if err != nil {
 		return err

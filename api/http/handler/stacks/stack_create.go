@@ -33,8 +33,9 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 // @id StackCreate
 // @summary Deploy a new stack
 // @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
-// @description **Access policy**: restricted
+// @description **Access policy**: authenticated
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @accept json,multipart/form-data
 // @produce json

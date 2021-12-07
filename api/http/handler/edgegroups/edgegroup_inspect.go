@@ -12,10 +12,10 @@ import (
 
 // @id EdgeGroupInspect
 // @summary Inspects an EdgeGroup
-// @description
+// @description **Access policy**: administrator
 // @tags edge_groups
+// @security ApiKeyAuth
 // @security jwt
-// @accept json
 // @produce json
 // @param id path int true "EdgeGroup Id"
 // @success 200 {object} portainer.EdgeGroup

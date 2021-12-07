@@ -167,7 +167,15 @@
             <!-- select-file-input -->
             <div class="form-group">
               <div class="col-sm-12">
-                <button class="btn btn-sm btn-primary" ngf-select accept=".tar.gz,.encrypted" ng-model="formValues.BackupFile" auto-focus>Select file</button>
+                <button
+                  class="btn btn-sm btn-primary"
+                  ngf-select
+                  accept=".gz,.encrypted"
+                  ngf-accept="'application/x-tar,application/x-gzip'"
+                  ng-model="formValues.BackupFile"
+                  auto-focus
+                  >Select file</button
+                >
                 <span style="margin-left: 5px;">
                   {{ formValues.BackupFile.name }}
                   <i class="fa fa-times red-icon" ng-if="!formValues.BackupFile" aria-hidden="true"></i>

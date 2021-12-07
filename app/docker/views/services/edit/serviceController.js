@@ -19,9 +19,8 @@ require('./includes/updateconfig.html');
 
 import _ from 'lodash-es';
 
-import * as envVarsUtils from '@/portainer/helpers/env-vars';
-
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import * as envVarsUtils from '@/portainer/helpers/env-vars';
 
 angular.module('portainer.docker').controller('ServiceController', [
   '$q',
@@ -53,6 +52,7 @@ angular.module('portainer.docker').controller('ServiceController', [
   'clipboard',
   'WebhookHelper',
   'NetworkService',
+  'RegistryService',
   'endpoint',
   function (
     $q,
@@ -84,6 +84,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     clipboard,
     WebhookHelper,
     NetworkService,
+    RegistryService,
     endpoint
   ) {
     $scope.endpoint = endpoint;
@@ -335,7 +336,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             Notifications.error('Failure', err, 'Unable to delete webhook');
           });
       } else {
-        WebhookService.createServiceWebhook(service.Id, endpoint.Id)
+        WebhookService.createServiceWebhook(service.Id, endpoint.Id, $scope.initialRegistryID)
           .then(function success(data) {
             $scope.WebhookExists = true;
             $scope.webhookID = data.Id;
@@ -347,28 +348,41 @@ angular.module('portainer.docker').controller('ServiceController', [
       }
     };
 
+    $scope.updateWebhookRegistryId = function () {
+      const newRegistryID = _.get($scope.formValues.RegistryModel, 'Registry.Id', 0);
+      const registryChanged = $scope.initialRegistryID != newRegistryID;
+
+      if ($scope.WebhookExists && registryChanged) {
+        WebhookService.updateServiceWebhook($scope.webhookID, newRegistryID)
+          .then(function success() {})
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to update webhook');
+          });
+      }
+    };
+
     $scope.copyWebhook = function copyWebhook() {
       clipboard.copyText($scope.webhookURL);
       $('#copyNotification').show();
       $('#copyNotification').fadeOut(2000);
     };
 
-    $scope.cancelChanges = function cancelChanges(service, keys) {
+    $scope.cancelChanges = async function cancelChanges(service, keys) {
       if (keys) {
         // clean out the keys only from the list of modified keys
-        keys.forEach(function (key) {
+        for (const key of keys) {
           if (key === 'Image') {
-            $scope.formValues.RegistryModel.Image = '';
+            $scope.formValues.RegistryModel = await RegistryService.retrievePorRegistryModelFromRepository(originalService.Image, endpoint.Id);
           } else {
             var index = previousServiceValues.indexOf(key);
             if (index >= 0) {
               previousServiceValues.splice(index, 1);
             }
           }
-        });
+        }
       } else {
         // clean out all changes
-        $scope.formValues.RegistryModel.Image = '';
+        $scope.formValues.RegistryModel = await RegistryService.retrievePorRegistryModelFromRepository(originalService.Image, endpoint.Id);
         keys = Object.keys(service);
         previousServiceValues = [];
       }
@@ -382,7 +396,9 @@ angular.module('portainer.docker').controller('ServiceController', [
       var hasChanges = false;
       elements.forEach(function (key) {
         if (key === 'Image') {
-          hasChanges = hasChanges || $scope.formValues.RegistryModel.Image ? true : false;
+          const originalImage = service ? service.Model.Spec.TaskTemplate.ContainerSpec.Image : null;
+          const currentImage = ImageHelper.createImageConfigForContainer($scope.formValues.RegistryModel).fromImage;
+          hasChanges = hasChanges || originalImage !== currentImage;
         } else {
           hasChanges = hasChanges || previousServiceValues.indexOf(key) >= 0;
         }
@@ -501,7 +517,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       ServiceService.update(service, config, 'previous')
         .then(function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
-            Notifications.error(data.message, 'Error');
+            Notifications.error('Failure', data, 'Error');
           } else {
             Notifications.success('Success', 'Service successfully rolled back');
             $scope.cancelChanges({});
@@ -550,9 +566,10 @@ angular.module('portainer.docker').controller('ServiceController', [
       ServiceService.update(service, config).then(
         function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
-            Notifications.error(data.message, 'Error');
+            Notifications.error('Failure', data, 'Error');
           } else {
             Notifications.success('Service successfully updated', 'Service updated');
+            $scope.updateWebhookRegistryId();
           }
           $scope.cancelChanges({});
           initView();
@@ -762,6 +779,12 @@ angular.module('portainer.docker').controller('ServiceController', [
           } else {
             $scope.state.sliderMaxCpu = 32;
           }
+
+          const image = $scope.service.Model.Spec.TaskTemplate.ContainerSpec.Image;
+          RegistryService.retrievePorRegistryModelFromRepository(image, endpoint.Id).then((model) => {
+            $scope.formValues.RegistryModel = model;
+            $scope.initialRegistryID = _.get(model, 'Registry.Id', 0);
+          });
 
           // Default values
           $scope.state.addSecret = { override: false };

@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
@@ -102,8 +105,15 @@ func initComposeStackManager(assetsPath string, configPath string, reverseTunnel
 	return composeWrapper
 }
 
-func initSwarmStackManager(assetsPath string, configPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (portainer.SwarmStackManager, error) {
-	return exec.NewSwarmStackManager(assetsPath, configPath, signatureService, fileService, reverseTunnelService)
+func initSwarmStackManager(
+	assetsPath string,
+	configPath string,
+	signatureService portainer.DigitalSignatureService,
+	fileService portainer.FileService,
+	reverseTunnelService portainer.ReverseTunnelService,
+	dataStore portainer.DataStore,
+) (portainer.SwarmStackManager, error) {
+	return exec.NewSwarmStackManager(assetsPath, configPath, signatureService, fileService, reverseTunnelService, dataStore)
 }
 
 func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheManager, kubernetesClientFactory *kubecli.ClientFactory, dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, proxyManager *proxy.Manager, assetsPath string) portainer.KubernetesDeployer {
@@ -112,6 +122,10 @@ func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheMan
 
 func initHelmPackageManager(assetsPath string) (libhelm.HelmPackageManager, error) {
 	return libhelm.NewHelmPackageManager(libhelm.HelmConfig{BinaryPath: assetsPath})
+}
+
+func initAPIKeyService(datastore portainer.DataStore) apikey.APIKeyService {
+	return apikey.NewAPIKeyService(datastore.APIKeyRepository(), datastore.User())
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
@@ -235,6 +249,49 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	}
 
 	return nil
+}
+
+// enableFeaturesFromFlags turns on or off feature flags
+// e.g.  portainer --feat open-amt --feat fdo=true ... (defaults to true)
+// note, settings are persisted to the DB. To turn off `--feat open-amt=false`
+func enableFeaturesFromFlags(dataStore portainer.DataStore, flags *portainer.CLIFlags) error {
+	settings, err := dataStore.Settings().Settings()
+	if err != nil {
+		return err
+	}
+
+	if settings.FeatureFlagSettings == nil {
+		settings.FeatureFlagSettings = make(map[portainer.Feature]bool)
+	}
+
+	// loop through feature flags to check if they are supported
+	for _, feat := range *flags.FeatureFlags {
+		var correspondingFeature *portainer.Feature
+		for i, supportedFeat := range portainer.SupportedFeatureFlags {
+			if strings.EqualFold(feat.Name, string(supportedFeat)) {
+				correspondingFeature = &portainer.SupportedFeatureFlags[i]
+			}
+		}
+
+		if correspondingFeature == nil {
+			return fmt.Errorf("unknown feature flag '%s'", feat.Name)
+		}
+
+		featureState, err := strconv.ParseBool(feat.Value)
+		if err != nil {
+			return fmt.Errorf("feature flag's '%s' value should be true or false", feat.Name)
+		}
+
+		if featureState {
+			log.Printf("Feature %v : on", *correspondingFeature)
+		} else {
+			log.Printf("Feature %v : off", *correspondingFeature)
+		}
+
+		settings.FeatureFlagSettings[*correspondingFeature] = featureState
+	}
+
+	return dataStore.Settings().UpdateSettings(settings)
 }
 
 func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
@@ -412,6 +469,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal(err)
 	}
 
+	apiKeyService := initAPIKeyService(dataStore)
+
 	jwtService, err := initJWTService(dataStore)
 	if err != nil {
 		log.Fatalf("failed initializing JWT service: %v", err)
@@ -467,11 +526,13 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
 
+	reverseTunnelService.ProxyManager = proxyManager
+
 	dockerConfigPath := fileService.GetDockerConfigPath()
 
 	composeStackManager := initComposeStackManager(*flags.Assets, dockerConfigPath, reverseTunnelService, proxyManager)
 
-	swarmStackManager, err := initSwarmStackManager(*flags.Assets, dockerConfigPath, digitalSignatureService, fileService, reverseTunnelService)
+	swarmStackManager, err := initSwarmStackManager(*flags.Assets, dockerConfigPath, digitalSignatureService, fileService, reverseTunnelService, dataStore)
 	if err != nil {
 		log.Fatalf("failed initializing swarm stack manager: %s", err)
 	}
@@ -490,6 +551,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		}
 	}
 
+	err = enableFeaturesFromFlags(dataStore, flags)
+	if err != nil {
+		log.Fatalf("failed enabling feature flag: %v", err)
+	}
+
 	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)
 	if err != nil {
 		log.Fatalf("failed loading edge jobs from database: %v", err)
@@ -504,7 +570,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	adminPasswordHash := ""
 	if *flags.AdminPasswordFile != "" {
-		content, err := fileService.GetFileContent(*flags.AdminPasswordFile)
+		content, err := fileService.GetFileContent(*flags.AdminPasswordFile, "")
 		if err != nil {
 			log.Fatalf("failed getting admin password file: %v", err)
 		}
@@ -566,6 +632,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		KubernetesDeployer:          kubernetesDeployer,
 		HelmPackageManager:          helmPackageManager,
 		CryptoService:               cryptoService,
+		APIKeyService:               apiKeyService,
 		JWTService:                  jwtService,
 		FileService:                 fileService,
 		LDAPService:                 ldapService,

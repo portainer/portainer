@@ -8,5 +8,8 @@ export const adSettings = {
     tlscaCert: '=',
     state: '=',
     connectivityCheck: '<',
+    onSaveSettings: '<',
+    saveButtonState: '<',
+    isLdapFormValid: '&?',
   },
 };

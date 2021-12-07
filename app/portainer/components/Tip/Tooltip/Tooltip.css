@@ -1,0 +1,18 @@
+.tooltip.portainer-tooltip .tooltip-inner {
+  font-family: Montserrat;
+  background-color: var(--bg-tooltip-color);
+  padding: 0.833em 1em;
+  color: var(--text-tooltip-color);
+  border: 1px solid var(--border-tooltip-color);
+  border-radius: 0.14285714rem;
+  box-shadow: 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
+}
+
+.tooltip.portainer-tooltip .tooltip-arrow {
+  display: none;
+}
+
+.fa.tooltip-icon {
+  margin-left: 5px;
+  font-size: 1.3em;
+}

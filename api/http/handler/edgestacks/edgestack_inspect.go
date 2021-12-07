@@ -12,10 +12,10 @@ import (
 
 // @id EdgeStackInspect
 // @summary Inspect an EdgeStack
-// @description
+// @description **Access policy**: administrator
 // @tags edge_stacks
+// @security ApiKeyAuth
 // @security jwt
-// @accept json
 // @produce json
 // @param id path string true "EdgeStack Id"
 // @success 200 {object} portainer.EdgeStack
