@@ -7,6 +7,7 @@ import {
   usePagination,
   Row,
 } from 'react-table';
+import { useRowSelectColumn } from '@lineup-lite/hooks';
 
 import { PaginationControls } from '@/portainer/components/pagination-controls';
 import {
@@ -38,6 +39,7 @@ import type {
 } from '@/docker/containers/types';
 import { useEndpoint } from '@/portainer/endpoints/useEndpoint';
 import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
+import { Checkbox } from '@/portainer/components/form-components/Checkbox';
 
 import { ContainersDatatableActions } from './ContainersDatatableActions';
 import { ContainersDatatableSettings } from './ContainersDatatableSettings';
@@ -85,6 +87,7 @@ export function ContainersDatatable({
     state: { pageIndex, pageSize },
   } = useTable<DockerContainer>(
     {
+      defaultCanFilter: false,
       columns,
       data: dataset,
       filterTypes: { multiple },
@@ -97,12 +100,14 @@ export function ContainersDatatable({
       isRowSelectable(row: Row<DockerContainer>) {
         return !row.original.IsPortainer;
       },
+      selectCheckboxComponent: Checkbox,
     },
     useFilters,
     useGlobalFilter,
     useSortBy,
     usePagination,
-    useRowSelect
+    useRowSelect,
+    useRowSelectColumn
   );
 
   const debouncedSearchValue = useDebounce(searchBarValue);

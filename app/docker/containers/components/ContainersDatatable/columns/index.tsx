@@ -1,8 +1,5 @@
 import { useMemo } from 'react';
 
-import { buildSelectionColumn } from '@/portainer/components/datatables/components/selectionColumn';
-import type { DockerContainer } from '@/docker/containers/types';
-
 import { created } from './created';
 import { host } from './host';
 import { image } from './image';
@@ -17,7 +14,6 @@ import { state } from './state';
 export function useColumns() {
   return useMemo(
     () => [
-      buildSelectionColumn<DockerContainer>(),
       name,
       state,
       quickActions,

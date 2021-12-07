@@ -34,7 +34,7 @@ export function TableHeaderRow<
           isSorted={column.isSorted}
           isSortedDesc={column.isSortedDesc}
           render={() => column.render('Header')}
-          canFilter={column.canFilter}
+          canFilter={!column.disableFilters}
           renderFilter={() => column.render('Filter')}
         />
       ))}

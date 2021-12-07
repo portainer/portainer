@@ -82,6 +82,13 @@ input[type='checkbox'] {
   margin-top: -1px;
 }
 
+.md-checkbox input[type='checkbox']:indeterminate + label:before {
+  content: '-';
+  align-content: center;
+  line-height: 16px;
+  text-align: center;
+}
+
 a[ng-click] {
   cursor: pointer;
 }
