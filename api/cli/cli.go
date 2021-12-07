@@ -2,6 +2,7 @@ package cli
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -59,6 +60,9 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 	}
 
 	kingpin.Parse()
+	fmt.Println("-----------")
+	fmt.Println("-----------")
+	fmt.Println(*flags.HTTPDisabled)
 
 	if !filepath.IsAbs(*flags.Assets) {
 		ex, err := os.Executable()
