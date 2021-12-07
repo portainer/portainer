@@ -4,24 +4,45 @@ import axios from '@/portainer/services/axios';
 
 const BASE_URL = '/users';
 
+import PortainerError from '@/portainer/error';
 import { filterNonAdministratorUsers } from '@/portainer/helpers/userHelper';
 import { UserViewModel, UserTokenModel } from '../../models/user';
 import { TeamMembershipModel } from '../../models/teamMembership';
 
 export async function getUsers(includeAdministrators) {
-  let { data: users } = await axios.get(BASE_URL);
+  try {
+    let { data } = await axios.get(BASE_URL);
 
-  if (!includeAdministrators) {
-    users = filterNonAdministratorUsers(users);
+    const users = data.map((user) => new UserViewModel(user));
+
+    if (includeAdministrators) {
+      return users;
+    }
+
+    return filterNonAdministratorUsers(users);
+  } catch (e) {
+    let err = e;
+    if (err.isAxiosError) {
+      err = new Error(e.response.data.message);
+    }
+
+    throw new PortainerError('Unable to retrieve users', err);
   }
-
-  return users.map((user) => new UserViewModel(user));
 }
 
 export async function getUser(id) {
-  const { data: user } = await axios.get(`${BASE_URL}/${id}`);
+  try {
+    const { data: user } = await axios.get(`${BASE_URL}/${id}`);
 
-  return new UserViewModel(user);
+    return new UserViewModel(user);
+  } catch (e) {
+    let err = e;
+    if (err.isAxiosError) {
+      err = new Error(e.response.data.message);
+    }
+
+    throw new PortainerError('Unable to retrieve user details', err);
+  }
 }
 
 /* @ngInject */
