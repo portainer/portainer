@@ -41,13 +41,12 @@ export function SwitchField({
           styles.label,
           labelClass
         )}
-        ng-class="$ctrl.labelClass"
       >
         {label}
         {tooltip && <Tooltip position="bottom" message={tooltip} />}
       </span>
       <Switch
-        class-name="space-right"
+        className="space-right"
         name={toggleName}
         id={toggleName}
         checked={checked}
