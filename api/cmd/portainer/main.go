@@ -500,7 +500,7 @@ func initSecretKey(fileName string) string {
 		return ""
 	}
 
-	return string(content)
+	return strings.TrimSuffix(string(content), "\n")
 }
 
 func buildServer(flags *portainer.CLIFlags) portainer.Server {
