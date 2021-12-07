@@ -31,10 +31,12 @@ type testDatastore struct {
 	user                    dataservices.UserService
 	version                 dataservices.VersionService
 	webhook                 dataservices.WebhookService
+	isNew                   bool
 }
 
+func (d *testDatastore) IsNew() bool                                        { return d.isNew }
 func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
-func (d *testDatastore) Open() (bool, error)                                { return false, nil }
+func (d *testDatastore) Open() error                                        { return nil }
 func (d *testDatastore) Init() error                                        { return nil }
 func (d *testDatastore) Close() error                                       { return nil }
 func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
