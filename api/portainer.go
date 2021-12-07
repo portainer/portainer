@@ -849,6 +849,8 @@ type (
 		AutoUpdate *StackAutoUpdate `json:"AutoUpdate"`
 		// The git config of this stack
 		GitConfig *gittypes.RepoConfig
+		// Whether the stack is from a app template
+		FromAppTemplate bool `example:"false"`
 		// Kubernetes namespace if stack is a kube application
 		Namespace string `example:"default"`
 		// IsComposeFormat indicates if the Kubernetes stack is created from a Docker Compose file

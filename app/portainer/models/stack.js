@@ -21,6 +21,7 @@ export function StackViewModel(data) {
   this.Orphaned = false;
   this.Checked = false;
   this.GitConfig = data.GitConfig;
+  this.FromAppTemplate = data.FromAppTemplate;
   this.AdditionalFiles = data.AdditionalFiles;
   this.AutoUpdate = data.AutoUpdate;
 }
