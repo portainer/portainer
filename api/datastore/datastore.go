@@ -62,6 +62,11 @@ func (store *Store) Open() error {
 			return err
 		}
 		if store.IsErrObjectNotFound(err) {
+			// TODO: Validate if needed
+			err := store.VersionService.StoreDBVersion(portainer.DBVersion)
+			if err != nil {
+				return err
+			}
 			// its new, lets see if there's an import.yml file, and if there is, import it
 			importFile := "/data/import.json"
 			if exists, _ := store.fileService.FileExists(importFile); exists {
