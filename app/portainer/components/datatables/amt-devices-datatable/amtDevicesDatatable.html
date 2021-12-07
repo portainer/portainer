@@ -24,7 +24,7 @@
             <a style="margin: 0 2.5px;" title="Restart the device" ng-click="$ctrl.executeDeviceAction(device.guid, 'restart')">
               <i class="fa fa-sync space-right" aria-hidden="true"></i>
             </a>
-            <a style="margin: 0 2.5px;" title="Connect KVM" ui-sref="portainer.endpoints.endpoint.kvm({id: $ctrl.endpointId, deviceId: device.guid, deviceName: device.hostname})">
+            <a style="margin: 0 2.5px;" title="Connect KVM" ng-click="$ctrl.kvmAction(device, $ctrl.endpointId)">
               <i class="fa fa-desktop space-right" aria-hidden="true"></i>
             </a>
           </div>

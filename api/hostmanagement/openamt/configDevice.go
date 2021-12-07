@@ -18,6 +18,14 @@ type DevicePowerState struct {
 	State portainer.PowerState `json:"powerstate"`
 }
 
+type DeviceEnabledFeatures struct {
+	Redirection bool   `json:"redirection"`
+	KVM         bool   `json:"KVM"`
+	SOL         bool   `json:"SOL"`
+	IDER        bool   `json:"IDER"`
+	UserConsent string `json:"userConsent"`
+}
+
 func (service *Service) getDevice(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*Device, error) {
 	url := fmt.Sprintf("https://%s/mps/api/v1/devices/%s", configuration.MPSServer, deviceGUID)
 
@@ -52,6 +60,25 @@ func (service *Service) getDevicePowerState(configuration portainer.OpenAMTConfi
 	}
 
 	var result DevicePowerState
+	err = json.Unmarshal(responseBody, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+func (service *Service) getDeviceEnabledFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*DeviceEnabledFeatures, error) {
+	url := fmt.Sprintf("https://%s/mps/api/v1/amt/features/%s", configuration.MPSServer, deviceGUID)
+
+	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
+	if err != nil {
+		return nil, err
+	}
+	if responseBody == nil {
+		return nil, nil
+	}
+
+	var result DeviceEnabledFeatures
 	err = json.Unmarshal(responseBody, &result)
 	if err != nil {
 		return nil, err

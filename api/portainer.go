@@ -69,10 +69,20 @@ type (
 
 	// OpenAMTDeviceInformation represents an AMT managed device information
 	OpenAMTDeviceInformation struct {
-		GUID             string     `json:"guid"`
-		HostName         string     `json:"hostname"`
-		ConnectionStatus bool       `json:"connectionStatus"`
-		PowerState       PowerState `json:"powerstate"`
+		GUID             string                        `json:"guid"`
+		HostName         string                        `json:"hostname"`
+		ConnectionStatus bool                          `json:"connectionStatus"`
+		PowerState       PowerState                    `json:"powerstate"`
+		EnabledFeatures  *OpenAMTDeviceEnabledFeatures `json:"features"`
+	}
+
+	// OpenAMTDeviceEnabledFeatures represents an AMT managed device features information
+	OpenAMTDeviceEnabledFeatures struct {
+		Redirection bool   `json:"redirection"`
+		KVM         bool   `json:"KVM"`
+		SOL         bool   `json:"SOL"`
+		IDER        bool   `json:"IDER"`
+		UserConsent string `json:"userConsent"`
 	}
 
 	// PowerState represents an AMT managed device power state
@@ -1332,7 +1342,7 @@ type (
 		Authorization(configuration OpenAMTConfiguration) (string, error)
 		ConfigureDefault(configuration OpenAMTConfiguration) error
 		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
-		EnableDeviceFeatures(configuration OpenAMTConfiguration, deviceGUID string) error
+		EnableDeviceFeatures(configuration OpenAMTConfiguration, deviceGUID string, features OpenAMTDeviceEnabledFeatures) error
 		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
 	}
 

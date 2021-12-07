@@ -111,3 +111,54 @@ func (handler *Handler) deviceAction(w http.ResponseWriter, r *http.Request) *ht
 
 	return response.Empty(w)
 }
+
+type deviceFeaturesPayload struct {
+	DeviceID        string
+	EnabledFeatures portainer.OpenAMTDeviceEnabledFeatures
+}
+
+func (payload *deviceFeaturesPayload) Validate(r *http.Request) error {
+	if payload.DeviceID == "" {
+		return errors.New("device GUID must be provided")
+	}
+	if payload.EnabledFeatures.UserConsent == "" {
+		return errors.New("device user consent status must be provided")
+	}
+	return nil
+}
+
+// @id DeviceFeatures
+// @summary Enable features on an AMT managed device
+// @description Enable features on an AMT managed device
+// @description **Access policy**: administrator
+// @tags intel
+// @security jwt
+// @accept json
+// @produce json
+// @param body body featuresPayload true "Device Features"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied to access settings"
+// @failure 500 "Server error"
+// @router /open_amt/{id}/devices_features/{deviceId} [post]
+func (handler *Handler) deviceFeatures(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload deviceFeaturesPayload
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		logrus.WithError(err).Error("Invalid request payload")
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+	}
+
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	err = handler.OpenAMTService.EnableDeviceFeatures(settings.OpenAMTConfiguration, payload.DeviceID, payload.EnabledFeatures)
+	if err != nil {
+		logrus.WithError(err).Error("Error executing device action")
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error executing device action", Err: err}
+	}
+
+	return response.Empty(w)
+}
