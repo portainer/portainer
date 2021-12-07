@@ -66,8 +66,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 }
 
 func initDataStore(storePath string, rollback bool, secretKey string, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
-	// TODO: the passphrase needs to come from somewhere external to Portainer
-	// Docker Swarm secret, k8s secret, and for plain Docker - on the filesystem?
+	
 	connection, err := database.NewDatabase("boltdb", storePath, secretKey)
 	if err != nil {
 		panic(err)
