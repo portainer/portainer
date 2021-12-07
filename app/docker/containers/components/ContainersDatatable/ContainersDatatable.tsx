@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import {
   useTable,
-  useRowSelect,
   useSortBy,
   useFilters,
   useGlobalFilter,
   usePagination,
+  Row,
 } from 'react-table';
 
 import { PaginationControls } from '@/portainer/components/pagination-controls';
@@ -37,6 +37,7 @@ import type {
   DockerContainer,
 } from '@/docker/containers/types';
 import { useEndpoint } from '@/portainer/endpoints/useEndpoint';
+import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
 
 import { ContainersDatatableActions } from './ContainersDatatableActions';
 import { ContainersDatatableSettings } from './ContainersDatatableSettings';
@@ -92,6 +93,9 @@ export function ContainersDatatable({
         hiddenColumns: settings.hiddenColumns,
         sortBy: [settings.sortBy],
         globalFilter: searchBarValue,
+      },
+      isRowSelectable(row: Row<DockerContainer>) {
+        return !row.original.IsPortainer;
       },
     },
     useFilters,

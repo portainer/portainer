@@ -39,6 +39,7 @@ function SelectionCell<
     role,
     style,
     title,
+    disabled,
   } = row.getToggleRowSelectedProps();
 
   return (
@@ -51,6 +52,7 @@ function SelectionCell<
       role={role}
       style={style}
       title={title}
+      disabled={disabled}
     />
   );
 }

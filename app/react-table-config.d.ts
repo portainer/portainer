@@ -142,4 +142,13 @@ declare module 'react-table' {
       UseGroupByRowProps<D>,
       UseRowSelectRowProps<D>,
       UseRowStateRowProps<D> {}
+
+  export function makePropGetter(
+    hooks: Array<PropGetter>,
+    ...meta: Record<string, unknown>[]
+  ): PropGetter;
+
+  export interface TableToggleRowsSelectedProps {
+    disabled: boolean;
+  }
 }

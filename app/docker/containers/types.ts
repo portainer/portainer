@@ -31,6 +31,7 @@ export interface Port {
 export type ContainerId = string;
 
 export type DockerContainer = {
+  IsPortainer: boolean;
   Status: DockerContainerStatus;
   NodeName: string;
   Id: ContainerId;
