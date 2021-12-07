@@ -17,7 +17,7 @@
         "*.ts"
       ],
       "options": {
-        "printWidth": 80,
+        "printWidth": 80
       }
     }
   ]
