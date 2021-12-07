@@ -25,6 +25,16 @@ angular.module('portainer.docker').controller('VolumesDatatableController', [
       return false;
     };
 
+    this.applyFilters = anonymousVolumesFilters.bind(this);
+    function anonymousVolumesFilters(value) {
+      var volume = value;
+      var isAnonymous = volume.Id.match('[A-z0-9]{32}') != null;
+      if (isAnonymous && !this.settings.showAnonymousVolumes) {
+        return false;
+      }
+      return true;
+    }
+
     this.onstateFilterChange = function () {
       var filters = this.filters.state;
       var filtered = false;
@@ -33,6 +43,10 @@ angular.module('portainer.docker').controller('VolumesDatatableController', [
       }
       this.filters.state.enabled = filtered;
       DatatableService.setDataTableFilters(this.tableKey, this.filters);
+    };
+
+    this.onSettingsAnonymousVolumesChange = function () {
+      DatatableService.setDataTableSettings(this.tableKey, this.settings);
     };
 
     this.$onInit = function () {
@@ -64,6 +78,13 @@ angular.module('portainer.docker').controller('VolumesDatatableController', [
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
+        if (typeof this.settings.showAnonymousVolumes == 'undefined') {
+          // Anonymous volumes will be shown by default.
+          this.settings.showAnonymousVolumes = true;
+        }
+      } else {
+        // Anonymous volumes will be shown by default.
+        this.settings.showAnonymousVolumes = true;
       }
       this.onSettingsRepeaterChange();
     };

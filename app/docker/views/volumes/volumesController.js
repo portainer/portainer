@@ -53,13 +53,45 @@ angular.module('portainer.docker').controller('VolumesController', [
         .then(function success(data) {
           var services = data.services;
           $scope.offlineMode = EndpointProvider.offlineMode();
-          $scope.volumes = data.attached
+          // Aggregate volume
+          var attachedVolumes = new Array();
+          var merged = false;
+          for (let volume of data.attached) {
+            volume.DisplayName = volume.NodeName;
+            merged = false;
+            for (let attvlm of attachedVolumes) {
+              if (attvlm.Id === volume.Id && attvlm.ResourceId === volume.ResourceId) {
+                attvlm.DisplayName = attvlm.DisplayName + ', ' + volume.DisplayName;
+                merged = true;
+                break;
+              }
+            }
+            if (!merged) {
+              attachedVolumes.push(volume);
+            }
+          }
+          var danglingVolumes = new Array();
+          for (let volume of data.dangling) {
+            volume.DisplayName = volume.NodeName;
+            merged = false;
+            for (let attvlm of danglingVolumes) {
+              if (attvlm.Id === volume.Id && attvlm.ResourceId === volume.ResourceId) {
+                attvlm.DisplayName = attvlm.DisplayName + ', ' + volume.DisplayName;
+                merged = true;
+                break;
+              }
+            }
+            if (!merged) {
+              danglingVolumes.push(volume);
+            }
+          }
+          $scope.volumes = attachedVolumes
             .map(function (volume) {
               volume.dangling = false;
               return volume;
             })
             .concat(
-              data.dangling.map(function (volume) {
+              danglingVolumes.map(function (volume) {
                 volume.dangling = true;
                 if (VolumeHelper.isVolumeUsedByAService(volume, services)) {
                   volume.dangling = false;
