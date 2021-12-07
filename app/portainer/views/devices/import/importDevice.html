@@ -1,0 +1,164 @@
+<rd-header>
+  <rd-header-title title-text="FDO Device Configuration"></rd-header-title>
+  <rd-header-content> <a ui-sref="portainer.endpoints">Environments</a> &gt; Import FDO Device </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-magic" title-text="Import Device Set up"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" name="fdoForm">
+          <!-- info -->
+          <span class="small">
+            <p class="text-muted" style="margin-top: 10px;">
+              <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              You are setting up a Portainer Edge Agent that will initiate the communications with the Portainer instance and your FDO Devices.
+            </p>
+          </span>
+          <!-- !info -->
+          <!-- import voucher -->
+          <div class="col-sm-12 form-section-title">
+            Import Voucher
+          </div>
+          <div>
+            <span class="small">
+              <p class="text-muted" style="margin-top: 10px;">
+                <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                Import your Manufacturer's Owner Voucher to initiate device attestation. <a href="/" target="_blank">Link here</a>
+              </p>
+            </span>
+            <div class="form-group">
+              <div class="col-sm-1">
+                <button
+                  style="margin-left: 0px !important;"
+                  class="btn btn-sm btn-primary"
+                  ngf-select
+                  ng-model="$ctrl.formValues.voucherFile"
+                  ngf-pattern=".ov"
+                  name="voucher_file"
+                >
+                  Upload <i class="fa fa-upload" aria-hidden="true" style="margin-left: 5px;"></i>
+                </button>
+                <span style="margin-left: 5px;">
+                  {{ $ctrl.formValues.voucherFile.name }}
+                </span>
+              </div>
+              <label for="voucher_file" class="col-sm-3 control-label text-left">
+                Upload Manufacturer's Owner Voucher
+              </label>
+            </div>
+            <div class="form-group col-md-12" ng-show="fdoForm.voucherFile.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="fdoForm.voucherFile.$error">
+                  <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> File type is invalid.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- !import voucher -->
+          <!-- device details -->
+          <div class="col-sm-12 form-section-title">
+            Device details
+          </div>
+          <div>
+            <span class="small">
+              <p class="text-muted" style="margin-top: 10px;">
+                <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                Profile name will serve as your reference name in Portainer
+              </p>
+            </span>
+            <!-- device name input -->
+            <div class="form-group">
+              <label for="device_name" class="col-sm-3 col-lg-2 control-label text-left">Device Name</label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="device_name"
+                  ng-model="formValues.DeviceName"
+                  placeholder="e.g. FDO-Test01"
+                  required
+                  auto-focus
+                  data-cy="deviceImport-deviceNameInput"
+                />
+              </div>
+            </div>
+            <div class="form-group" ng-show="fdoForm.device_name.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="fdoForm.device_name.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !device name input -->
+          </div>
+          <!-- device profile input -->
+          <div class="form-group">
+            <label for="device_profile" class="col-sm-3 col-lg-2 control-label text-left">Device Profile</label>
+            <div class="col-sm-9 col-lg-10">
+              <select id="device_profile" ng-model="formValues.DeviceProfile" ng-options="profile.Name for profile in $ctrl.profiles" class="form-control">
+                <option selected disabled hidden value="">Select a profile for your device</option>
+              </select>
+            </div>
+          </div>
+          <!-- !device profile input -->
+          <!-- !device details -->
+          <!-- tags -->
+          <div class="col-sm-12 form-section-title">
+            Set up Tags
+          </div>
+          <div>
+            <span class="small">
+              <p class="text-muted" style="margin-top: 10px;">
+                <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This is just an option if your device is under a certain group <a href="/" target="_blank">Link here</a>
+              </p>
+            </span>
+            <!-- group -->
+            <div class="form-group">
+              <label for="device_group" class="col-sm-3 col-lg-2 control-label text-left">
+                Group
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <select
+                  ng-options="group.Id as group.Name for group in groups"
+                  ng-model="formValues.GroupId"
+                  id="device_group"
+                  class="form-control"
+                  data-cy="deviceImport-deviceGroup"
+                ></select>
+              </div>
+            </div>
+            <!-- !group -->
+            <!-- tags -->
+            <div class="form-group">
+              <tag-selector ng-if="formValues && availableTags" tags="availableTags" model="formValues.TagIds" allow-create="state.allowCreateTag" on-create="(onCreateTag)">
+              </tag-selector>
+            </div>
+            <!-- !tags -->
+            <!-- !tags -->
+            <!-- actions -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <a type="button" class="btn btn-default btn-sm">Cancel</a>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  ng-click="saveDevice()"
+                  ng-disabled="state.actionInProgress"
+                  button-spinner="state.actionInProgress"
+                  data-cy="deviceImport-saveDeviceButton"
+                >
+                  <span ng-hide="state.actionInProgress">Save Configuration</span>
+                  <span ng-show="state.actionInProgress">Saving...</span>
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
