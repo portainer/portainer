@@ -23,10 +23,7 @@ type DbConnection struct {
 }
 
 func (connection *DbConnection) GetDatabaseFilename() string {
-	if connection.EncryptionKey == "" {
-		return "portainer.db"
-	}
-	return "portainer.edb"
+	return "portainer.db"
 }
 
 func (connection *DbConnection) GetStorePath() string {
