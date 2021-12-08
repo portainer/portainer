@@ -234,7 +234,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StripPrefix("/api", h.OpenAMTHandler).ServeHTTP(w, r)
 		}
 	case strings.HasPrefix(r.URL.Path, "/api/fdo"):
-		http.StripPrefix("/api", h.FDOHandler).ServeHTTP(w, r)
+		if h.FDOHandler != nil {
+			http.StripPrefix("/api", h.FDOHandler).ServeHTTP(w, r)
+		}
 	case strings.HasPrefix(r.URL.Path, "/api/teams"):
 		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/team_memberships"):
