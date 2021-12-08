@@ -233,7 +233,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if h.OpenAMTHandler != nil {
 			http.StripPrefix("/api", h.OpenAMTHandler).ServeHTTP(w, r)
 		}
-	case strings.HasPrefix(r.URL.Path, "/api/hosts/fdo"):
+	case strings.HasPrefix(r.URL.Path, "/api/fdo"):
 		if h.FDOHandler != nil {
 			http.StripPrefix("/api", h.FDOHandler).ServeHTTP(w, r)
 		}

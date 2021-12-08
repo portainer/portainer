@@ -176,7 +176,8 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 	var wg sync.WaitGroup
 	var resultDevice *Device
 	var resultPowerState *DevicePowerState
-	wg.Add(2)
+	var resultEnabledFeatures *DeviceEnabledFeatures
+	wg.Add(3)
 
 	go func() {
 		device, err := service.getDevice(configuration, deviceGUID)
@@ -200,6 +201,15 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 	}()
 
 	go func() {
+		enabledFeatures, err := service.getDeviceEnabledFeatures(configuration, deviceGUID)
+		if err != nil {
+			amtErrors <- err
+		}
+		resultEnabledFeatures = enabledFeatures
+		wg.Done()
+	}()
+
+	go func() {
 		wg.Wait()
 		close(wgDone)
 	}()
@@ -218,6 +228,15 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 	}
 	if resultPowerState != nil {
 		deviceInformation.PowerState = resultPowerState.State
+	}
+	if resultEnabledFeatures != nil {
+		deviceInformation.EnabledFeatures = &portainer.OpenAMTDeviceEnabledFeatures{
+			Redirection: resultEnabledFeatures.Redirection,
+			KVM:         resultEnabledFeatures.KVM,
+			SOL:         resultEnabledFeatures.SOL,
+			IDER:        resultEnabledFeatures.IDER,
+			UserConsent: resultEnabledFeatures.UserConsent,
+		}
 	}
 
 	return deviceInformation, nil
@@ -243,14 +262,14 @@ func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfi
 	return nil
 }
 
-func (service *Service) EnableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string) error {
+func (service *Service) EnableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string, features portainer.OpenAMTDeviceEnabledFeatures) error {
 	token, err := service.Authorization(configuration)
 	if err != nil {
 		return err
 	}
 	configuration.Credentials.MPSToken = token
 
-	err = service.enableDeviceFeatures(configuration, deviceGUID)
+	err = service.enableDeviceFeatures(configuration, deviceGUID, features)
 	if err != nil {
 		return err
 	}

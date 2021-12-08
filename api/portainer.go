@@ -69,14 +69,31 @@ type (
 
 	// OpenAMTDeviceInformation represents an AMT managed device information
 	OpenAMTDeviceInformation struct {
-		GUID             string     `json:"guid"`
-		HostName         string     `json:"hostname"`
-		ConnectionStatus bool       `json:"connectionStatus"`
-		PowerState       PowerState `json:"powerstate"`
+		GUID             string                        `json:"guid"`
+		HostName         string                        `json:"hostname"`
+		ConnectionStatus bool                          `json:"connectionStatus"`
+		PowerState       PowerState                    `json:"powerstate"`
+		EnabledFeatures  *OpenAMTDeviceEnabledFeatures `json:"features"`
+	}
+
+	// OpenAMTDeviceEnabledFeatures represents an AMT managed device features information
+	OpenAMTDeviceEnabledFeatures struct {
+		Redirection bool   `json:"redirection"`
+		KVM         bool   `json:"KVM"`
+		SOL         bool   `json:"SOL"`
+		IDER        bool   `json:"IDER"`
+		UserConsent string `json:"userConsent"`
 	}
 
 	// PowerState represents an AMT managed device power state
 	PowerState int
+
+	FDOConfiguration struct {
+		Enabled       bool   `json:"Enabled"`
+		OwnerURL      string `json:"OwnerURL"`
+		OwnerUsername string `json:"OwnerUsername"`
+		OwnerPassword string `json:"OwnerPassword"`
+	}
 
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
@@ -777,6 +794,7 @@ type (
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
 		OpenAMTConfiguration OpenAMTConfiguration `json:"OpenAMTConfiguration" example:""`
+		FDOConfiguration     FDOConfiguration     `json:"FDOConfiguration" example:""`
 		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
@@ -1332,7 +1350,7 @@ type (
 		Authorization(configuration OpenAMTConfiguration) (string, error)
 		ConfigureDefault(configuration OpenAMTConfiguration) error
 		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
-		EnableDeviceFeatures(configuration OpenAMTConfiguration, deviceGUID string) error
+		EnableDeviceFeatures(configuration OpenAMTConfiguration, deviceGUID string, features OpenAMTDeviceEnabledFeatures) error
 		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
 	}
 
