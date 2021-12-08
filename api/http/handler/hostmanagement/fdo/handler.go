@@ -32,7 +32,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore)
 
 	h.fdoClient = ownerclient.FDOOwnerClient{
 		//OwnerURL: "http://0.0.0.0:8042",
-		OwnerURL: "http://10.13.13.10:8042",
+		OwnerURL: "http://0.0.0.0:8042",
 		Username: "apiUser",
 		Password: "05EV9CbHbAQANc1t",
 		Timeout:  5 * time.Second,

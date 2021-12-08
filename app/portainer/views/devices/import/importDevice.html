@@ -83,9 +83,10 @@
                   type="text"
                   class="form-control"
                   name="device_name"
-                  ng-model="formValues.DeviceName"
                   placeholder="e.g. FDO-Test01"
-                  required
+                  ng-model="formValues.DeviceName"
+                  ng-required="state.voucherUploaded"
+                  ng-disabled="!state.voucherUploaded"
                   auto-focus
                   data-cy="deviceImport-deviceNameInput"
                 />
@@ -104,7 +105,7 @@
           <div class="form-group">
             <label for="device_profile" class="col-sm-3 col-lg-2 control-label text-left">Device Profile</label>
             <div class="col-sm-9 col-lg-10">
-              <select id="device_profile" ng-model="formValues.DeviceProfile" class="form-control">
+              <select id="device_profile" ng-model="formValues.DeviceProfile" class="form-control" ng-required="state.voucherUploaded" ng-disabled="!state.voucherUploaded">
                 <option selected disabled hidden value="">Select a profile for your device</option>
                 <option ng-repeat="profile in profiles | orderBy: 'Name'" ng-value="profile.Id">{{ profile.Name }}</option>
               </select>
@@ -130,10 +131,12 @@
               </label>
               <div class="col-sm-9 col-lg-10">
                 <select
+                  class="form-control"
                   ng-options="group.Id as group.Name for group in groups"
                   ng-model="formValues.GroupId"
                   id="device_group"
-                  class="form-control"
+                  ng-required="state.voucherUploaded"
+                  ng-disabled="!state.voucherUploaded"
                   data-cy="deviceImport-deviceGroup"
                 ></select>
               </div>
@@ -152,7 +155,7 @@
                   type="button"
                   class="btn btn-primary btn-sm"
                   ng-click="saveDevice()"
-                  ng-disabled="state.actionInProgress"
+                  ng-disabled="state.actionInProgress || !state.voucherUploaded"
                   button-spinner="state.actionInProgress"
                   data-cy="deviceImport-saveDeviceButton"
                 >

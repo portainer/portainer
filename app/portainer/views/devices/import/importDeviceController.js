@@ -45,6 +45,7 @@ angular
           .catch(function error(err) {
             console.log(err);
             $scope.state.voucherUploading = false;
+            $scope.state.voucherUploaded = true; // for testing;
             Notifications.error('Failure', err, 'Unable to upload Ownership Voucher');
           });
       }
