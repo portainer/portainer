@@ -138,6 +138,7 @@
                 ng-disabled="!($ctrl.state.appName && $ctrl.state.resourcePool && !$ctrl.state.loadingValues && !$ctrl.state.actionInProgress)"
                 ng-click="$ctrl.installHelmchart()"
                 button-spinner="$ctrl.state.actionInProgress"
+                data-cy="helm-install"
               >
                 <span ng-hide="$ctrl.state.actionInProgress">Install</span>
                 <span ng-hide="!$ctrl.state.actionInProgress">Helm installing in progress</span>
