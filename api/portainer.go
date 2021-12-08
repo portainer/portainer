@@ -1103,7 +1103,8 @@ type (
 		// User Theme
 		UserTheme string `example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)
-		Role UserRole `json:"Role" example:"1"`
+		Role         UserRole `json:"Role" example:"1"`
+		TokenIssueAt int64    `json:"TokenIssueAt" example:"1"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 25
