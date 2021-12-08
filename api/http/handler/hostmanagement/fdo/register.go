@@ -24,9 +24,6 @@ import (
 // @router /hosts/fdo/register [post]
 func (handler *Handler) fdoRegisterDevice(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	// Post a voucher
-
-	// TODO: get voucher from file upload
-	//ov, err := ioutil.ReadFile("d064b879.ov")
 	ov, filename, err := request.RetrieveMultiPartFormFile(r, "voucher")
 	if err != nil {
 		logrus.WithField("filename", filename).WithError(err).Info("fdoRegisterDevice: readVoucher()")

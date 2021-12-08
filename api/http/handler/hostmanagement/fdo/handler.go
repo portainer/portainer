@@ -21,13 +21,14 @@ type Handler struct {
 }
 
 // NewHandler returns a new Handler
-func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore) (*Handler, error) {
+func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore) *Handler {
 	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatFDO) {
-		return nil, nil
+		return nil
 	}
 
 	h := &Handler{
 		Router: mux.NewRouter(),
+		DataStore: dataStore,
 	}
 
 	h.fdoClient = ownerclient.FDOOwnerClient{
@@ -38,13 +39,14 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore)
 		Timeout:  5 * time.Second,
 	}
 
-	h.Handle("/hosts/fdo/list", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoListAll))).Methods(http.MethodGet)
-	h.Handle("/hosts/fdo/register", httperror.LoggerHandler(h.fdoRegisterDevice)).Methods(http.MethodPost)
+	h.Handle("/fdo", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoConfigure))).Methods(http.MethodPost)
+	h.Handle("/fdo/list", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoListAll))).Methods(http.MethodGet)
+	h.Handle("/fdo/register", httperror.LoggerHandler(h.fdoRegisterDevice)).Methods(http.MethodPost)
 	// h.Handle("//hosts/fdo/{id}/info", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTHostInfo))).Methods(http.MethodGet)
 	// h.Handle("//hosts/fdo/{id}/authorization", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTHostAuthorization))).Methods(http.MethodGet)
 	// h.Handle("//hosts/fdo/{id}/activate", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTActivate))).Methods(http.MethodPost)
 	// h.Handle("//hosts/fdo/{id}/devices", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTDevices))).Methods(http.MethodGet)
 	// h.Handle("//hosts/fdo/{id}/devices/{deviceId}/{deviceAction}", bouncer.AdminAccess(httperror.LoggerHandler(h.deviceAction))).Methods(http.MethodPost)
 
-	return h, nil
+	return h
 }

@@ -34,7 +34,7 @@
                   style="margin-left: 0px !important;"
                   class="btn btn-sm btn-primary"
                   ngf-select="onVoucherFileChange($file)"
-                  ng-model="formValues.voucherFile"
+                  ng-model="formValues.VoucherFile"
                   ngf-pattern=".ov"
                   name="voucherFile"
                   ng-disabled="state.voucherUploading"
@@ -105,7 +105,7 @@
           <div class="form-group">
             <label for="device_profile" class="col-sm-3 col-lg-2 control-label text-left">Device Profile</label>
             <div class="col-sm-9 col-lg-10">
-              <select id="device_profile" ng-model="formValues.DeviceProfile" class="form-control" ng-required="state.voucherUploaded" ng-disabled="!state.voucherUploaded">
+              <select id="device_profile" ng-model="formValues.DeviceProfile" class="form-control" ng-disabled="!state.voucherUploaded">
                 <option selected disabled hidden value="">Select a profile for your device</option>
                 <option ng-repeat="profile in profiles | orderBy: 'Name'" ng-value="profile.Id">{{ profile.Name }}</option>
               </select>
@@ -155,7 +155,7 @@
                   type="button"
                   class="btn btn-primary btn-sm"
                   ng-click="saveDevice()"
-                  ng-disabled="state.actionInProgress || !state.voucherUploaded"
+                  ng-disabled="state.actionInProgress || !state.voucherUploaded || !fdoForm.$valid"
                   button-spinner="state.actionInProgress"
                   data-cy="deviceImport-saveDeviceButton"
                 >

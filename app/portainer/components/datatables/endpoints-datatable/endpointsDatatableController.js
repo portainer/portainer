@@ -68,8 +68,8 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       this.state.showAMTInfo = openAMTFeatureFlagValue && openAMTFeatureEnabled;
 
       const fdoFeatureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['fdo'];
-      //const fdoFeatureEnabled = this.settings && this.settings.OpenAMTConfiguration && this.settings.OpenAMTConfiguration.Enabled;
-      this.state.showFDOInfo = fdoFeatureFlagValue;
+      const fdoFeatureEnabled = this.settings && this.settings.FDOConfiguration && this.settings.FDOConfiguration.Enabled;
+      this.state.showFDOInfo = fdoFeatureFlagValue && fdoFeatureEnabled;
     };
 
     this.showAMTNodes = function (item) {

@@ -9,12 +9,14 @@ angular
     TagService,
     Notifications,
     Authentication,
-    FileUploadService
+    FileUploadService,
+    FDOService
   ) {
     $scope.state = {
       actionInProgress: false,
       voucherUploading: false,
       voucherUploaded: false,
+      deviceID: '',
       allowCreateTag: Authentication.isAdmin(),
     };
 
@@ -23,6 +25,7 @@ angular
       DeviceProfile: '',
       GroupId: 1,
       TagIds: [],
+      VoucherFile: null,
     };
 
     // TODO preguntar que es esto, hay pantalla de CRUD?
@@ -41,11 +44,14 @@ angular
             console.log(response);
             $scope.state.voucherUploading = false;
             $scope.state.voucherUploaded = true;
+
+            // TODO parse deviceID from response
+            //$scope.deviceID = response.data.DeviceID ?;
+            $scope.deviceID = 'c6ea3343-229a-4c07-9096-beef7134e1d3';
           })
           .catch(function error(err) {
             console.log(err);
             $scope.state.voucherUploading = false;
-            $scope.state.voucherUploaded = true; // for testing;
             Notifications.error('Failure', err, 'Unable to upload Ownership Voucher');
           });
       }
@@ -68,12 +74,10 @@ angular
       return $async(async () => {
         $scope.state.actionInProgress = true;
         try {
-          // TODO save endpoint?
-          // const endpoint = await EndpointService.createRemoteEndpoint();
-
-          Notifications.success('Device successfully imported', name);
+          await FDOService.importDevice($scope.deviceID, $scope.formValues);
+          Notifications.success('Device successfully imported');
         } catch (err) {
-          Notifications.error('Failure', err, 'Unable to create environment');
+          Notifications.error('Failure', err, 'Unable to import device');
         } finally {
           $scope.state.actionInProgress = false;
         }

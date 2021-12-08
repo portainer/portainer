@@ -209,7 +209,7 @@ angular.module('portainer.app').factory('FileUploadService', [
 
     service.uploadOwnershipVoucher = function (voucherFile) {
       return Upload.upload({
-        url: 'api/hosts/fdo/register',
+        url: 'api/fdo/register',
         data: {
           voucher: voucherFile,
         },

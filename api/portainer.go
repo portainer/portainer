@@ -88,6 +88,13 @@ type (
 	// PowerState represents an AMT managed device power state
 	PowerState int
 
+	FDOConfiguration struct {
+		Enabled       bool   `json:"Enabled"`
+		OwnerURL      string `json:"OwnerURL"`
+		OwnerUsername string `json:"OwnerUsername"`
+		OwnerPassword string `json:"OwnerPassword"`
+	}
+
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr                      *string
@@ -787,6 +794,7 @@ type (
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
 		OpenAMTConfiguration OpenAMTConfiguration `json:"OpenAMTConfiguration" example:""`
+		FDOConfiguration     FDOConfiguration     `json:"FDOConfiguration" example:""`
 		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
