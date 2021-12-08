@@ -141,6 +141,7 @@ angular.module('portainer.app').controller('TemplatesController', [
       var repositoryOptions = {
         RepositoryURL: template.Repository.url,
         ComposeFilePathInRepository: template.Repository.stackfile,
+        FromAppTemplate: true,
       };
 
       const endpointId = +$state.params.endpointId;
@@ -178,6 +179,7 @@ angular.module('portainer.app').controller('TemplatesController', [
       var repositoryOptions = {
         RepositoryURL: template.Repository.url,
         ComposeFilePathInRepository: template.Repository.stackfile,
+        FromAppTemplate: true,
       };
 
       const endpointId = +$state.params.endpointId;
