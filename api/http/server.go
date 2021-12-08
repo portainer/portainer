@@ -27,6 +27,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
+	"github.com/portainer/portainer/api/http/handler/fdo"
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/helm"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
@@ -218,6 +219,8 @@ func (server *Server) Start() error {
 		openAMTHandler.DockerClientFactory = server.DockerClientFactory
 	}
 
+	fdoHandler := fdo.NewHandler(requestBouncer, server.DataStore)
+
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
@@ -284,6 +287,7 @@ func (server *Server) Start() error {
 		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
 		OpenAMTHandler:         openAMTHandler,
+		FDOHandler:             fdoHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,

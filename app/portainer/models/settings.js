@@ -5,6 +5,7 @@ export function SettingsViewModel(data) {
   this.LDAPSettings = data.LDAPSettings;
   this.OAuthSettings = new OAuthSettingsViewModel(data.OAuthSettings);
   this.OpenAMTConfiguration = data.OpenAMTConfiguration;
+  this.FDOConfiguration = data.FDOConfiguration;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;

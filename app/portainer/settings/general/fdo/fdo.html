@@ -1,0 +1,89 @@
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-laptop" title-text="FDO"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" name="FDOForm">
+          <por-switch-field ng-model="$ctrl.formValues.enabled" label="Enable FDO Management Service"></por-switch-field>
+          <span class="small">
+            <p class="text-muted" style="margin-top: 10px;">
+              <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              When enabled, this will allow Portainer to interact with FDO Services.
+            </p>
+          </span>
+
+          <div ng-show="$ctrl.formValues.enabled">
+            <hr />
+
+            <div class="form-group">
+              <label for="owner_url" class="col-sm-3 control-label text-left">
+                Owner Service Server
+              </label>
+              <div class="col-sm-8">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="owner_url"
+                  name="owner_url"
+                  placeholder="http://127.0.0.1:8042"
+                  ng-model="$ctrl.formValues.ownerURL"
+                  ng-required="$ctrl.formValues.enabled"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="owner_username" class="col-sm-3 control-label text-left">
+                Owner Service Username
+              </label>
+              <div class="col-sm-8">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="owner_username"
+                  name="owner_username"
+                  placeholder="username"
+                  ng-model="$ctrl.formValues.ownerUsername"
+                  ng-required="$ctrl.formValues.enabled"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="owner_url" class="col-sm-3 control-label text-left">
+                Owner Service Password
+              </label>
+              <div class="col-sm-8">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="owner_password"
+                  name="owner_password"
+                  placeholder="password"
+                  ng-model="$ctrl.formValues.ownerPassword"
+                  ng-required="$ctrl.formValues.enabled"
+                />
+              </div>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="$ctrl.state.actionInProgress || !FDOForm.$valid || !$ctrl.isFormChanged()"
+                ng-click="$ctrl.save()"
+                button-spinner="$ctrl.state.actionInProgress"
+              >
+                <span ng-hide="$ctrl.state.actionInProgress">Save Settings</span>
+                <span ng-show="$ctrl.state.actionInProgress">In progress...</span>
+              </button>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
