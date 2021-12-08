@@ -25,6 +25,8 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore)
 	}
 
 	h.Handle("/fdo", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoConfigure))).Methods(http.MethodPost)
+	h.Handle("/fdo/list", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoListAll))).Methods(http.MethodGet)
+	h.Handle("/fdo/register", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoRegisterDevice))).Methods(http.MethodPost)
 
 	return h
 }
