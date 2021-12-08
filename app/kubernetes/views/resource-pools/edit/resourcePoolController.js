@@ -24,6 +24,7 @@ class KubernetesResourcePoolController {
   constructor(
     $async,
     $state,
+    $scope,
     Authentication,
     Notifications,
     LocalStorage,
@@ -42,6 +43,7 @@ class KubernetesResourcePoolController {
     Object.assign(this, {
       $async,
       $state,
+      $scope,
       Authentication,
       Notifications,
       LocalStorage,
@@ -66,6 +68,8 @@ class KubernetesResourcePoolController {
 
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
+    this.onToggleLoadBalancersQuota = this.onToggleLoadBalancersQuota.bind(this);
+    this.onToggleStorageQuota = this.onToggleStorageQuota.bind(this);
   }
   /* #endregion */
 
@@ -79,6 +83,18 @@ class KubernetesResourcePoolController {
     this.onChangeIngressHostname();
   }
   /* #endregion */
+
+  onToggleLoadBalancersQuota(checked) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.UseLoadBalancersQuota = checked;
+    });
+  }
+
+  onToggleStorageQuota(storageClassName, enabled) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.StorageClasses = this.formValues.StorageClasses.map((sClass) => (sClass.Name !== storageClassName ? sClass : { ...sClass, Selected: enabled }));
+    });
+  }
 
   /* #region  INGRESS MANAGEMENT */
   onChangeIngressHostname() {

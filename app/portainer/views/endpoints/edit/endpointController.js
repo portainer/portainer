@@ -112,6 +112,12 @@ function EndpointController(
     return $async(onCreateTagAsync, tagName);
   };
 
+  $scope.onToggleAllowSelfSignedCerts = function onToggleAllowSelfSignedCerts(checked) {
+    return $scope.$evalAsync(() => {
+      $scope.state.allowSelfSignedCerts = checked;
+    });
+  };
+
   async function onCreateTagAsync(tagName) {
     try {
       const tag = await TagService.createTag(tagName);
