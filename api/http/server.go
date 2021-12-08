@@ -27,9 +27,9 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
-	"github.com/portainer/portainer/api/http/handler/fdo"
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/helm"
+	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
@@ -97,7 +97,7 @@ type Server struct {
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               stackdeployer.StackDeployer
-	BaseURL string
+	BaseURL                     string
 }
 
 // Start starts the HTTP server
