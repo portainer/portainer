@@ -22,34 +22,41 @@
             Import Voucher
           </div>
           <div>
-            <span class="small">
-              <p class="text-muted" style="margin-top: 10px;">
-                <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                Import your Manufacturer's Owner Voucher to initiate device attestation. <a href="/" target="_blank">Link here</a>
-              </p>
-            </span>
-            <div class="form-group">
-              <div class="col-sm-1">
+            <div class="form-group" ng-show="!state.voucherUploaded">
+              <span class="small col-sm-12">
+                <p class="text-muted" style="margin-top: 10px;">
+                  <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Import your Manufacturer's Owner Voucher to initiate device attestation. <a href="/" target="_blank">Link here</a>
+                </p>
+              </span>
+              <div class="col-sm-8">
                 <button
                   style="margin-left: 0px !important;"
                   class="btn btn-sm btn-primary"
-                  ngf-select
-                  ng-model="$ctrl.formValues.voucherFile"
+                  ngf-select="onVoucherFileChange($file)"
+                  ng-model="formValues.voucherFile"
                   ngf-pattern=".ov"
-                  name="voucher_file"
+                  name="voucherFile"
+                  ng-disabled="state.voucherUploading"
+                  button-spinner="state.voucherUploading"
                 >
-                  Upload <i class="fa fa-upload" aria-hidden="true" style="margin-left: 5px;"></i>
+                  <span ng-hide="state.voucherUploading">Upload <i class="fa fa-upload" aria-hidden="true" style="margin-left: 5px;"></i></span>
+                  <span ng-show="state.voucherUploading">Uploading Voucher...</span>
                 </button>
-                <span style="margin-left: 5px;">
-                  {{ $ctrl.formValues.voucherFile.name }}
-                </span>
               </div>
-              <label for="voucher_file" class="col-sm-3 control-label text-left">
-                Upload Manufacturer's Owner Voucher
-              </label>
             </div>
-            <div class="form-group col-md-12" ng-show="fdoForm.voucherFile.$invalid">
-              <div class="small text-warning">
+            <div class="form-group" ng-show="state.voucherUploading">
+              <div class="col-sm-12 small text-success">
+                <p>Connecting to Manufacturer's Rendezvous Server...</p>
+              </div>
+            </div>
+            <div class="form-group" ng-show="state.voucherUploaded">
+              <div class="col-sm-12">
+                <p>Ownership Voucher Uploaded <i class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 5px;"></i></p>
+              </div>
+            </div>
+            <div class="form-group" ng-show="fdoForm.voucherFile.$invalid">
+              <div class="col-sm-12 small text-warning">
                 <div ng-messages="fdoForm.voucherFile.$error">
                   <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> File type is invalid.</p>
                 </div>
@@ -97,8 +104,9 @@
           <div class="form-group">
             <label for="device_profile" class="col-sm-3 col-lg-2 control-label text-left">Device Profile</label>
             <div class="col-sm-9 col-lg-10">
-              <select id="device_profile" ng-model="formValues.DeviceProfile" ng-options="profile.Name for profile in $ctrl.profiles" class="form-control">
+              <select id="device_profile" ng-model="formValues.DeviceProfile" class="form-control">
                 <option selected disabled hidden value="">Select a profile for your device</option>
+                <option ng-repeat="profile in profiles | orderBy: 'Name'" ng-value="profile.Id">{{ profile.Name }}</option>
               </select>
             </div>
           </div>
@@ -137,11 +145,9 @@
               </tag-selector>
             </div>
             <!-- !tags -->
-            <!-- !tags -->
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">
-                <a type="button" class="btn btn-default btn-sm">Cancel</a>
                 <button
                   type="button"
                   class="btn btn-primary btn-sm"
@@ -153,6 +159,7 @@
                   <span ng-hide="state.actionInProgress">Save Configuration</span>
                   <span ng-show="state.actionInProgress">Saving...</span>
                 </button>
+                <a type="button" class="btn btn-default btn-sm" ui-sref="portainer.endpoints">Cancel</a>
               </div>
             </div>
             <!-- !actions -->

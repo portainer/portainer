@@ -39,7 +39,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore)
 	}
 
 	h.Handle("/hosts/fdo/list", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoListAll))).Methods(http.MethodGet)
-	h.Handle("/hosts/fdo/register", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoRegisterDevice))).Methods(http.MethodPost)
+	h.Handle("/hosts/fdo/register", httperror.LoggerHandler(h.fdoRegisterDevice)).Methods(http.MethodPost)
 	// h.Handle("//hosts/fdo/{id}/info", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTHostInfo))).Methods(http.MethodGet)
 	// h.Handle("//hosts/fdo/{id}/authorization", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTHostAuthorization))).Methods(http.MethodGet)
 	// h.Handle("//hosts/fdo/{id}/activate", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTActivate))).Methods(http.MethodPost)
