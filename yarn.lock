@@ -1439,10 +1439,10 @@
     "@babel/helper-create-regexp-features-plugin" "^7.14.5"
     "@babel/helper-plugin-utils" "^7.14.5"
 
-"@babel/polyfill@^7.2.5":
-  version "7.10.1"
-  resolved "https://registry.npmjs.org/@babel/polyfill/-/polyfill-7.10.1.tgz"
-  integrity sha512-TviueJ4PBW5p48ra8IMtLXVkDucrlOZAIZ+EXqS3Ot4eukHbWiqcn7DcqpA1k5PcKtmJ4Xl9xwdv6yQvvcA+3g==
+"@babel/polyfill@^7.12.1":
+  version "7.12.1"
+  resolved "https://registry.yarnpkg.com/@babel/polyfill/-/polyfill-7.12.1.tgz#1f2d6371d1261bbd961f3c5d5909150e12d0bd96"
+  integrity sha512-X0pi0V6gxLi6lFZpGmeNa4zxtwEmCs42isWLNjZZDE0Y8yVfgu0T2OAHlzBbdYlqbW/YXVvoBHpATEM+goCj8g==
   dependencies:
     core-js "^2.6.5"
     regenerator-runtime "^0.13.4"
@@ -1963,10 +1963,10 @@
   resolved "https://registry.yarnpkg.com/@exodus/schemasafe/-/schemasafe-1.0.0-rc.6.tgz#7985f681564cff4ffaebb5896eb4be20af3aae7a"
   integrity sha512-dDnQizD94EdBwEj/fh3zPRa/HWCS9O5au2PuHhZBbuM3xWHxuaKzPBOEWze7Nn0xW68MIpZ7Xdyn1CoCpjKCuQ==
 
-"@fortawesome/fontawesome-free@^5.11.2":
-  version "5.13.1"
-  resolved "https://registry.npmjs.org/@fortawesome/fontawesome-free/-/fontawesome-free-5.13.1.tgz"
-  integrity sha512-D819f34FLHeBN/4xvw0HR0u7U2G7RqjPSggXqf7LktsxWQ48VAfGwvMrhcVuaZV2fF069c/619RdgCCms0DHhw==
+"@fortawesome/fontawesome-free@^5.15.4":
+  version "5.15.4"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free/-/fontawesome-free-5.15.4.tgz#ecda5712b61ac852c760d8b3c79c96adca5554e5"
+  integrity sha512-eYm8vijH/hpzr/6/1CJ/V/Eb1xQFW2nnUKArb3z+yUWv7HTwj6M7SP957oMjfZjAHU6qpoNc2wQvIxBLWYa/Jg==
 
 "@gar/promisify@^1.0.1":
   version "1.1.2"
@@ -4286,12 +4286,10 @@ angular-file-saver@^1.1.3:
     blob-tmp "^1.0.0"
     file-saver "^1.3.3"
 
-angular-json-tree@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/angular-json-tree/-/angular-json-tree-1.0.1.tgz"
-  integrity sha1-YbbnarFlEwM12exG+lcuuZYE3lE=
-  dependencies:
-    angular "1.x"
+angular-json-tree@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/angular-json-tree/-/angular-json-tree-1.1.0.tgz#d7faba97130fc273fa29ef517dbed10342cc645e"
+  integrity sha512-HVLyrVkEoYVykcIgzMCdhtK2H8Y4jgNujGNqRXNG4x032tp2ZWp34j/hu/E7h6a7X+ODrSTAfRTbkF4f/JX/Fg==
 
 angular-jwt@~0.1.8:
   version "0.1.11"
@@ -4368,7 +4366,7 @@ angular@1.8.2:
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.2.tgz#5983bbb5a9fa63e213cb7749199e0d352de3a2f1"
   integrity sha512-IauMOej2xEe7/7Ennahkbb5qd/HFADiNuLSESz9Q27inmi32zB0lnAsFeLEWcox3Gd1F6YhNd1CP7/9IukJ0Gw==
 
-angular@1.x, angular@^1.3:
+angular@^1.3:
   version "1.8.0"
   resolved "https://registry.npmjs.org/angular/-/angular-1.8.0.tgz"
   integrity sha512-VdaMx+Qk0Skla7B5gw77a8hzlcOakwF8mjlW13DpIWIDlfqwAbSSLfd8N/qZnzEmQF4jC4iofInd3gE7vL8ZZg==
@@ -5283,13 +5281,13 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.npmjs.org/boolbase/-/boolbase-1.0.0.tgz"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-bootbox@^5.4.0:
-  version "5.4.0"
-  resolved "https://registry.npmjs.org/bootbox/-/bootbox-5.4.0.tgz"
-  integrity sha512-GCPrDwZpJsUnqzrto3ZURVafypl13+DAyE3YZx5jR5EIoTDSyREPhr77hlCuPKvM6VvXR5Mh/34W3DYMC7JE9g==
+bootbox@^5.5.2:
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/bootbox/-/bootbox-5.5.2.tgz#a4200aa03f12ffe4d07905834e9dfb76e52cee00"
+  integrity sha512-q8d9VO2A4+q6S0XvovLtqtBUp7uRy0wtDOuuycnoheK2TiAm3um0jOlAOu9ORn9XoT92tdil+p15Dle1mRgSPQ==
   dependencies:
     bootstrap "^4.4.0"
-    jquery "^3.4.1"
+    jquery "^3.5.1"
     popper.js "^1.16.0"
 
 bootstrap@^3.4.0:
@@ -5898,10 +5896,10 @@ chardet@^0.7.0:
   resolved "https://registry.npmjs.org/chardet/-/chardet-0.7.0.tgz"
   integrity sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==
 
-chardet@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.npmjs.org/chardet/-/chardet-1.3.0.tgz"
-  integrity sha512-cyTQGGptIjIT+CMGT5J/0l9c6Fb+565GCFjjeUTKxUO7w3oR+FcNCMEKTn5xtVKaLFmladN7QF68IiQsv5Fbdw==
+chardet@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/chardet/-/chardet-1.4.0.tgz#278748f260219990fb2167dbfb1b253ca26b41ea"
+  integrity sha512-NpwMDdSIprbYx1CLnfbxEIarI0Z+s9MssEgggMNheGM+WD68yOhV7IEA/3r6tr0yTRgQD0HuZJDw32s99i6L+A==
 
 chart.js@~2.7.0:
   version "2.7.3"
@@ -6181,10 +6179,10 @@ code-point-at@^1.0.0:
   resolved "https://registry.npmjs.org/code-point-at/-/code-point-at-1.1.0.tgz"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
-codemirror@~5.30.0:
-  version "5.30.0"
-  resolved "https://registry.npmjs.org/codemirror/-/codemirror-5.30.0.tgz"
-  integrity sha512-pfJV/7fLAUUenuGK3iANkQu1AxNLuWpeF7HV6YFDjSBMp53F8FTa2F6oPs9NKAHFweT2m08usmXUIA+7sohdew==
+codemirror@~5.64.0:
+  version "5.64.0"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.64.0.tgz#182eec65b62178e3cd1de8f9d88ab819cfe5f625"
+  integrity sha512-fqr6CtDQdJ6iNMbD8NX2gH2G876nNDk+TO1rrYkgWnqQdO3O1Xa9tK6q+psqhJJgE5SpbaDcgdfLmukoUVE8pg==
 
 coffee-script@^1.10.0:
   version "1.12.7"
@@ -6522,10 +6520,10 @@ core-js@^3.0.4, core-js@^3.6.5, core-js@^3.8.2:
   resolved "https://registry.npmjs.org/core-js/-/core-js-3.18.3.tgz"
   integrity sha512-tReEhtMReZaPFVw7dajMx0vlsz3oOb8ajgPoHVYGxr8ErnZ6PcYEvvmjGmXlfpnxpkYSdOQttjB+MvVbCGfvLw==
 
-core-js@^3.16.3:
-  version "3.16.3"
-  resolved "https://registry.npmjs.org/core-js/-/core-js-3.16.3.tgz"
-  integrity sha512-lM3GftxzHNtPNUJg0v4pC2RC6puwMd6VZA7vXUczi+SKmCWSf4JwO89VJGMqbzmB7jlK7B5hr3S64PqwFL49cA==
+core-js@^3.19.3:
+  version "3.20.0"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.20.0.tgz#1c5ac07986b8d15473ab192e45a2e115a4a95b79"
+  integrity sha512-KjbKU7UEfg4YPpskMtMXPhUKn7m/1OdTHTVjy09ScR2LVaoUXe8Jh0UdvN2EKUR6iKTJph52SJP95mAB0MnVLQ==
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -8652,10 +8650,10 @@ fast-json-parse@^1.0.3:
   resolved "https://registry.npmjs.org/fast-json-parse/-/fast-json-parse-1.0.3.tgz"
   integrity sha512-FRWsaZRWEJ1ESVNbDWmsAlqDk96gPQezzLghafp5J4GUKjbCz3OkAHuZs5TuPEtkbVQERysLp9xv6c24fBm8Aw==
 
-fast-json-patch@^3.0.0-1:
-  version "3.0.0-1"
-  resolved "https://registry.npmjs.org/fast-json-patch/-/fast-json-patch-3.0.0-1.tgz"
-  integrity sha512-6pdFb07cknxvPzCeLsFHStEy+MysPJPgZQ9LbQ/2O67unQF93SNqfdSqnPPl71YMHX+AD8gbl7iuoGFzHEdDuw==
+fast-json-patch@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/fast-json-patch/-/fast-json-patch-3.1.0.tgz#ec8cd9b9c4c564250ec8b9140ef7a55f70acaee6"
+  integrity sha512-IhpytlsVTRndz0hU5t0/MGzS/etxLlfrpG5V5M9mVbuj9TrJLWaMfsox9REM5rkuGX0T+5qjpe8XA1o0gZ42nA==
 
 fast-json-stable-stringify@^2.0.0:
   version "2.1.0"
@@ -11967,20 +11965,25 @@ jest@^27.1.0:
     import-local "^3.0.2"
     jest-cli "^27.1.0"
 
-jquery@>=1.12.0, jquery@^3.4.1, jquery@^3.5.1:
+jquery@>=1.12.0, jquery@^3.5.1:
   version "3.5.1"
   resolved "https://registry.npmjs.org/jquery/-/jquery-3.5.1.tgz"
   integrity sha512-XwIBPqcMn57FxfT+Go5pzySnm4KWkT1Tv7gjrpT1srtf8Weynl6R273VJ5GjkRb51IzMp5nbaPjJXMWeju2MKg==
+
+jquery@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.0.tgz#c72a09f15c1bdce142f49dbf1170bdf8adac2470"
+  integrity sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==
 
 js-base64@^2.1.9:
   version "2.6.1"
   resolved "https://registry.npmjs.org/js-base64/-/js-base64-2.6.1.tgz"
   integrity sha512-G5x2saUTupU9D/xBY9snJs3TxvwX8EkpLFiYlPpDt/VmMHOXprnSU1nxiTmFbijCX4BLF/cMRIfAcC5BiMYgFQ==
 
-js-base64@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.npmjs.org/js-base64/-/js-base64-3.6.0.tgz"
-  integrity sha512-wVdUBYQeY2gY73RIlPrysvpYx+2vheGo8Y1SNQv/BzHToWpAZzJU7Z6uheKMAe+GLSBig5/Ps2nxg/8tRB73xg==
+js-base64@^3.7.2:
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.2.tgz#816d11d81a8aff241603d19ce5761e13e41d7745"
+  integrity sha512-NnRs6dsyqUXejqk/yv2aiXlAvOs56sLkX6nUdeaNezI5LFFLlsZjOThmwnrcwh5ZZRwZlCMnVAY3CvhIhoVEKQ==
 
 js-sha3@0.8.0:
   version "0.8.0"
@@ -13123,12 +13126,12 @@ mkdirp@^1.0.3, mkdirp@^1.0.4, mkdirp@~1.0.3:
   resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-moment@^2.10.2:
+moment@^2.10.2, moment@^2.29.1:
   version "2.29.1"
   resolved "https://registry.npmjs.org/moment/-/moment-2.29.1.tgz"
   integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
 
-moment@^2.16.0, moment@^2.21.0:
+moment@^2.16.0:
   version "2.27.0"
   resolved "https://registry.npmjs.org/moment/-/moment-2.27.0.tgz"
   integrity sha512-al0MUK7cpIcglMv3YF13qSgdAIqxHTO7brRtaz3DlSULbqfazqkc5kEjNrLDOM7fsjshoFIihnU8snrP7zUvhQ==
@@ -18722,7 +18725,7 @@ webpack@^5.65.0:
 
 websocket-driver@>=0.5.1, websocket-driver@^0.7.4:
   version "0.7.4"
-  resolved "https://registry.npmjs.org/websocket-driver/-/websocket-driver-0.7.4.tgz"
+  resolved "https://registry.yarnpkg.com/websocket-driver/-/websocket-driver-0.7.4.tgz#89ad5295bbf64b480abcba31e4953aca706f5760"
   integrity sha512-b17KeDIQVjvb0ssuSDF2cYXSg2iztliJ4B9WdsuB6J952qCPKmnVq4DyW5motImXHDC1cBT/1UezrJVsKw5zjg==
   dependencies:
     http-parser-js ">=0.5.1"
