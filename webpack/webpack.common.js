@@ -25,6 +25,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
+        type: 'javascript/auto',
         enforce: 'pre',
         use: [
           {
@@ -82,14 +83,18 @@ module.exports = {
     ],
   },
   devServer: {
-    contentBase: path.join(__dirname, '.tmp'),
+    static: {
+      directory: path.join(__dirname, 'public'),
+    },
     compress: true,
     port: 8999,
     proxy: {
       '/api': 'http://localhost:9000',
     },
     open: true,
-    writeToDisk: true,
+    devMiddleware: {
+      writeToDisk: true,
+    },
   },
   plugins: [
     new Dotenv(),
@@ -122,7 +127,7 @@ module.exports = {
       chunkFilename: '[name].[id].css',
     }),
     new CleanWebpackPlugin(['dist/public']),
-    new IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new IgnorePlugin({ resourceRegExp: /^.\/locale$/, contextRegExp: /moment$/ }),
     // new BundleAnalyzerPlugin()
     new LodashModuleReplacementPlugin({
       shorthands: true,
@@ -133,7 +138,7 @@ module.exports = {
   optimization: {
     splitChunks: {
       cacheGroups: {
-        vendor: {
+        defaultVendors: {
           test: /node_modules/,
           chunks: 'initial',
           name: 'vendor',

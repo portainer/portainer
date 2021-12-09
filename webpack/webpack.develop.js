@@ -1,7 +1,7 @@
-const webpackMerge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const commonConfig = require('./webpack.common.js');
 
-module.exports = webpackMerge(commonConfig, {
+module.exports = merge(commonConfig, {
   mode: 'development',
   devtool: 'eval-source-map',
   module: {
@@ -11,7 +11,9 @@ module.exports = webpackMerge(commonConfig, {
         use: [
           {
             loader: 'file-loader',
-            // options: { limit: 25000 }
+            options: {
+              esModule: false,
+            },
           },
         ],
       },
