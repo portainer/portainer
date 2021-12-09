@@ -66,7 +66,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 }
 
 func initDataStore(storePath string, rollback bool, secretKey string, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase("boltdb", storePath, "B8962909B929B03AC37182F61BF7CFCD") // CE: B8962909B929B03AC37182F61BF7CFCD TODO: pass secretkey
+	connection, err := database.NewDatabase("boltdb", storePath, secretKey)
 	if err != nil {
 		panic(err)
 	}
