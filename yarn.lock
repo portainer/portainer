@@ -3713,6 +3713,13 @@
   dependencies:
     "@uirouter/core" "5.0.11"
 
+"@uirouter/angularjs@1.0.30":
+  version "1.0.30"
+  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.30.tgz#5cea4076300ce5ec6926e2c6e3707745753baefc"
+  integrity sha512-qkc3RFZc91S5K0gc/QVAXc9LGDPXjR04vDgG/11j8+yyZEuQojXxKxdLhKIepiPzqLmGRVqzBmBc27gtqaEeZg==
+  dependencies:
+    "@uirouter/core" "6.0.8"
+
 "@uirouter/core@5.0.11":
   version "5.0.11"
   resolved "https://registry.npmjs.org/@uirouter/core/-/core-5.0.11.tgz"
@@ -3722,6 +3729,11 @@
   version "6.0.7"
   resolved "https://registry.npmjs.org/@uirouter/core/-/core-6.0.7.tgz"
   integrity sha512-KUTJxL+6q0PiBnFx4/Z+Hsyg0pSGiaW5yZQeJmUxknecjpTbnXkLU8H2EqRn9N2B+qDRa7Jg8RcgeNDPY72O1w==
+
+"@uirouter/core@6.0.8":
+  version "6.0.8"
+  resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-6.0.8.tgz#a1e919a4743be729751aafc4ce353d0dc0ffd26c"
+  integrity sha512-Gc/BAW47i4L54p8dqYCJJZuv2s3tqlXQ0fvl6Zp2xrblELPVfxmjnc0eurx3XwfQdaqm3T6uls6tQKkof/4QMw==
 
 "@uirouter/react-hybrid@^1.0.4":
   version "1.0.4"
@@ -4287,20 +4299,20 @@ angular-local-storage@~0.5.2:
   resolved "https://registry.npmjs.org/angular-local-storage/-/angular-local-storage-0.5.2.tgz"
   integrity sha1-cHm+sKpcqROG0iMSXv79E8oOzQw=
 
-angular-messages@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/angular-messages/-/angular-messages-1.8.0.tgz"
-  integrity sha512-LSlyTv80y1vg8Cfdz+RJ0BrraWkq0qsOZHyrHFT8NyYWC5yp6HQabvZvTpKv9YA+6o05wwAU90qXHSrnUlSflA==
+angular-messages@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-messages/-/angular-messages-1.8.2.tgz#47f0cf913030bc2231423ab9388acc14dd931837"
+  integrity sha512-M1qNh/30cLJi4yJJ+3YB8saPonRcavz5Dquqz0T/aUySKJhIkUoeCkmF+BcLH4SJ5PBp04yy4CZUUeNRVi7jZA==
 
 angular-mocks@1.6.1:
   version "1.6.1"
   resolved "https://registry.npmjs.org/angular-mocks/-/angular-mocks-1.6.1.tgz"
   integrity sha1-L0Shs6xgjpN1EwW84XbCdCIdir0=
 
-angular-mocks@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/angular-mocks/-/angular-mocks-1.8.0.tgz"
-  integrity sha512-oFKJIqR6zcsW6V9UQMuUYCXIcTy+n7oYExXxZkvU57hwJQdU1nuNZcSMQA9URiEAPyo7v3bqm0eOP3Ezi7Bigg==
+angular-mocks@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.8.2.tgz#dc022420b86978cf317a8447c116c0be73a853bf"
+  integrity sha512-I5L3P0l21HPdVsP4A4qWmENt4ePjjbkDFdAzOaM7QiibFySbt14DptPbt2IjeG4vFBr4vSLbhIz8Fk03DISl8Q==
 
 angular-moment-picker@^0.10.2:
   version "0.10.2"
@@ -4317,20 +4329,20 @@ angular-moment-picker@^0.10.2:
     angular-mocks "1.6.1"
     angular-sanitize "1.6.1"
 
-angular-resource@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/angular-resource/-/angular-resource-1.8.0.tgz"
-  integrity sha512-9woUq3kDwoT7R6SjKX8vaJMhOplYBm9sqRAxKgDhDIdPyA8iBowqQIusf9+8Q+z/HlXb8ZXvKspJyKXrxmKdvg==
+angular-resource@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-resource/-/angular-resource-1.8.2.tgz#fc1f1adb93dfb83e295d1cfff2a48cec4296e20a"
+  integrity sha512-CbTu8ypkVZMBLm+Wd+jI9xR7QEVCeUgN8WXsr9Yi9l0s/8ZQa5kEIuYX3F/75Ej8Xs1Jp9DoKjAyvACI6Q8IJA==
 
 angular-sanitize@1.6.1:
   version "1.6.1"
   resolved "https://registry.npmjs.org/angular-sanitize/-/angular-sanitize-1.6.1.tgz"
   integrity sha1-ys/+wxme1mKXr7se82bsZmFrOz8=
 
-angular-sanitize@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/angular-sanitize/-/angular-sanitize-1.8.0.tgz"
-  integrity sha512-j5GiOPCvfcDWK5svEOVoPb11X3UDVy/mdHPRWuy14Iyw86xaq+Bb+x/em2sAOa5MQQeY5ciLXbF3RRp8iCKcNg==
+angular-sanitize@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.8.2.tgz#ae78040f00c5e2ce1c63780bcc47fa14a1698296"
+  integrity sha512-OB6Goa+QN3byf5asQ7XRl7DKZejm/F/ZOqa9z1skqYVOWA2hoBxoCmt9E7+i7T/TbxZP5zYzKxNZVVJNu860Hg==
 
 angular-ui-bootstrap@~2.5.0:
   version "2.5.6"
@@ -4342,7 +4354,12 @@ angular-utils-pagination@~0.11.1:
   resolved "https://registry.npmjs.org/angular-utils-pagination/-/angular-utils-pagination-0.11.1.tgz"
   integrity sha1-7618iHm+swrT13cH+T49DvUfLGY=
 
-angular@1.8.0, angular@1.x, angular@^1.3:
+angular@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.2.tgz#5983bbb5a9fa63e213cb7749199e0d352de3a2f1"
+  integrity sha512-IauMOej2xEe7/7Ennahkbb5qd/HFADiNuLSESz9Q27inmi32zB0lnAsFeLEWcox3Gd1F6YhNd1CP7/9IukJ0Gw==
+
+angular@1.x, angular@^1.3:
   version "1.8.0"
   resolved "https://registry.npmjs.org/angular/-/angular-1.8.0.tgz"
   integrity sha512-VdaMx+Qk0Skla7B5gw77a8hzlcOakwF8mjlW13DpIWIDlfqwAbSSLfd8N/qZnzEmQF4jC4iofInd3gE7vL8ZZg==
@@ -14125,10 +14142,10 @@ parse-asn1@^5.0.0, parse-asn1@^5.1.5:
     pbkdf2 "^3.0.3"
     safe-buffer "^5.1.1"
 
-parse-duration@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/parse-duration/-/parse-duration-1.0.0.tgz"
-  integrity sha512-X4kUkCTHU1N/kEbwK9FpUJ0UZQa90VzeczfS704frR30gljxDG0pSziws06XlK+CGRSo/1wtG1mFIdBFQTMQNw==
+parse-duration@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/parse-duration/-/parse-duration-1.0.2.tgz#b9aa7d3a1363cc7e8845bea8fd3baf8a11df5805"
+  integrity sha512-Dg27N6mfok+ow1a2rj/nRjtCfaKrHUZV2SJpEn/s8GaVUSlf4GGRCRP1c13Hj+wfPKVMrFDqLMLITkYKgKxyyg==
 
 parse-entities@^2.0.0:
   version "2.0.0"
@@ -15241,15 +15258,15 @@ rc-motion@^2.0.0:
     classnames "^2.2.1"
     rc-util "^5.2.1"
 
-rc-slider@^9.7.4:
-  version "9.7.4"
-  resolved "https://registry.yarnpkg.com/rc-slider/-/rc-slider-9.7.4.tgz#430c860723bf6445ebf53517b550417a2f25eed1"
-  integrity sha512-pjLKLiDKiaL7/pNywfIBD+lDo5TtVo05KuIBSWEIoqu6FHh6IMWvthCiaODuYaVs3RLeF2nXOP5AjkD2Lt2Rwg==
+rc-slider@^9.7.5:
+  version "9.7.5"
+  resolved "https://registry.yarnpkg.com/rc-slider/-/rc-slider-9.7.5.tgz#193141c68e99b1dc3b746daeb6bf852946f5b7f4"
+  integrity sha512-LV/MWcXFjco1epPbdw1JlLXlTgmWpB9/Y/P2yinf8Pg3wElHxA9uajN21lJiWtZjf5SCUekfSP6QMJfDo4t1hg==
   dependencies:
     "@babel/runtime" "^7.10.1"
     classnames "^2.2.5"
     rc-tooltip "^5.0.1"
-    rc-util "^5.0.0"
+    rc-util "^5.16.1"
     shallowequal "^1.1.0"
 
 rc-tooltip@^5.0.1:
@@ -15271,7 +15288,16 @@ rc-trigger@^5.0.0:
     rc-motion "^2.0.0"
     rc-util "^5.5.0"
 
-rc-util@^5.0.0, rc-util@^5.2.1, rc-util@^5.3.0, rc-util@^5.5.0:
+rc-util@^5.16.1:
+  version "5.16.1"
+  resolved "https://registry.yarnpkg.com/rc-util/-/rc-util-5.16.1.tgz#374db7cb735512f05165ddc3d6b2c61c21b8b4e3"
+  integrity sha512-kSCyytvdb3aRxQacS/71ta6c+kBWvM1v8/2h9d/HaNWauc3qB8pLnF20PJ8NajkNN8gb+rR1l0eWO+D4Pz+LLQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    react-is "^16.12.0"
+    shallowequal "^1.1.0"
+
+rc-util@^5.2.1, rc-util@^5.3.0, rc-util@^5.5.0:
   version "5.14.0"
   resolved "https://registry.yarnpkg.com/rc-util/-/rc-util-5.14.0.tgz#52c650e27570c2c47f7936c7d32eaec5212492a8"
   integrity sha512-2vy6/Z1BJUcwLjm/UEJb/htjUTQPigITUIemCcFEo1fQevAumc9sA32x2z5qyWoa9uhrXbiAjSDpPIUqyg65sA==
@@ -18918,6 +18944,11 @@ yaml@^1.10.0, yaml@^1.7.2:
   version "1.10.0"
   resolved "https://registry.npmjs.org/yaml/-/yaml-1.10.0.tgz"
   integrity sha512-yr2icI4glYaNG+KWONODapy2/jDdMSDnrONSjblABjD9B4Z5LgiircSt8m8sRZFNi08kG9Sm0uSHtEmP3zaEGg==
+
+yaml@^1.10.2:
+  version "1.10.2"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
+  integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
 
 yargs-parser@^18.1.2:
   version "18.1.3"
