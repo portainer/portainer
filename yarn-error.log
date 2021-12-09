@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/richard/Projects/DTD-11-Rebase/portainer/package.json: Unexpected token < in JSON at position 5354
+  SyntaxError: /Users/richard/Projects/DTD-11-Rebase/portainer/package.json: Unexpected token < in JSON at position 4864
       at JSON.parse (<anonymous>)
       at /usr/local/lib/node_modules/yarn/lib/cli.js:1625:59
       at Generator.next (<anonymous>)
@@ -88,7 +88,6 @@ npm manifest:
     },
     "dependencies": {
       "@aws-crypto/sha256-js": "^2.0.0",
-      "@babel/polyfill": "^7.12.1",
       "@fortawesome/fontawesome-free": "^5.15.4",
       "@nxmix/tokenize-ansi": "^3.0.0",
       "@uirouter/angularjs": "1.0.30",
@@ -136,8 +135,11 @@ npm manifest:
       "react": "^17.0.2",
       "react-dom": "^17.0.2",
       "react-tooltip": "^4.2.21",
+  <<<<<<< HEAD
       "sanitize-html": "^2.5.3",
       "source-map-loader": "^1.1.2",
+  =======
+  >>>>>>> 8d15539b (remove ploypill, upgraded babel)
       "spinkit": "^2.0.1",
       "splitargs": "github:deviantony/splitargs#semver:~0.2.0",
       "strip-ansi": "^6.0.0",
@@ -150,19 +152,14 @@ npm manifest:
     },
     "devDependencies": {
       "@apidevtools/swagger-cli": "^4.0.4",
+  <<<<<<< HEAD
       "@babel/core": "^7.1.2",
       "@babel/preset-env": "^7.1.0",
-  <<<<<<< HEAD
-      "@babel/preset-react": "^7.14.5",
-      "@babel/preset-typescript": "^7.15.0",
       "@simbathesailor/use-what-changed": "^2.0.0",
-      "@storybook/addon-actions": "^6.3.11",
-      "@storybook/addon-essentials": "^6.3.11",
-      "@storybook/addon-links": "^6.3.11",
-      "@storybook/addon-postcss": "^2.0.0",
-      "@storybook/react": "^6.3.11",
-      "@testing-library/jest-dom": "^5.14.1",
   =======
+      "@babel/core": "^7.16.0",
+      "@babel/preset-env": "^7.16.4",
+  >>>>>>> 8d15539b (remove ploypill, upgraded babel)
       "@babel/preset-react": "^7.16.0",
       "@babel/preset-typescript": "^7.16.0",
       "@storybook/addon-actions": "^6.4.9",
@@ -171,7 +168,6 @@ npm manifest:
       "@storybook/addon-postcss": "^2.0.0",
       "@storybook/react": "^6.4.9",
       "@testing-library/jest-dom": "^5.16.1",
-  >>>>>>> b91dbcc6 (medium upgrade devDependencies)
       "@testing-library/react": "^12.1.2",
       "@types/angular": "^1.8.3",
       "@types/bootbox": "^5.2.2",
@@ -208,7 +204,7 @@ npm manifest:
       "eslint-plugin-promise": "^5.2.0",
       "eslint-plugin-react": "^7.27.1",
       "eslint-plugin-react-hooks": "^4.3.0",
-      "eslint-webpack-plugin": "^2.5.4",
+      "eslint-webpack-plugin": "^3.1.1",
       "file-loader": "^6.2.0",
       "grunt": "^1.4.1",
       "grunt-cli": "^1.4.3",
@@ -225,7 +221,6 @@ npm manifest:
       "html-loader": "^0.5.5",
       "html-webpack-plugin": "^5.5.0",
       "husky": ">=4",
-      "image-webpack-loader": "^4.5.0",
       "jest": "^27.4.3",
       "lint-staged": ">=10",
       "load-grunt-tasks": "^3.5.2",
@@ -235,13 +230,10 @@ npm manifest:
       "plop": "^2.6.0",
       "postcss": "7",
       "postcss-loader": "4",
-  <<<<<<< HEAD
-      "prettier": "^2.0.2",
       "react-query": "^3.34.3",
-  =======
       "prettier": "^2.5.1",
-  >>>>>>> b91dbcc6 (medium upgrade devDependencies)
       "react-test-renderer": "^17.0.2",
+      "source-map-loader": "^3.0.0",
       "speed-measure-webpack-plugin": "^1.5.0",
       "storybook-css-modules-preset": "^1.1.1",
       "style-loader": "2",
