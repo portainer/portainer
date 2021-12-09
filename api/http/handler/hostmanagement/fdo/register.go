@@ -12,7 +12,7 @@ import (
 
 // @id fdoRegisterDevice
 // @summary register an FDO device
-// @description Request OpenAMT info from a node
+// @description register an FDO device
 // @description **Access policy**: administrator
 // @tags intel
 // @security jwt
@@ -21,7 +21,7 @@ import (
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
-// @router /hosts/fdo/register [post]
+// @router /fdo/register [post]
 func (handler *Handler) fdoRegisterDevice(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	// Post a voucher
 	ov, filename, err := request.RetrieveMultiPartFormFile(r, "voucher")
@@ -30,14 +30,20 @@ func (handler *Handler) fdoRegisterDevice(w http.ResponseWriter, r *http.Request
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: read Voucher()", Err: err}
 	}
 
-	guid, err := handler.fdoClient.PostVoucher(ov)
+	fdoClient, err := handler.newFDOClient()
+	if err != nil {
+		logrus.WithError(err).Info("fdoRegisterDevice: newFDOClient()")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: newFDOClient()", Err: err}
+	}
+
+	guid, err := fdoClient.PostVoucher(ov)
 	if err != nil {
 		logrus.WithError(err).Info("fdoRegisterDevice: PostVoucher()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: PostVoucher()", Err: err}
 	}
 
 	// Put ServiceInfo
-	err = handler.fdoClient.PutDeviceSVI(ownerclient.ServiceInfo{
+	err = fdoClient.PutDeviceSVI(ownerclient.ServiceInfo{
 		Module:   "test-module",
 		Var:      "test-var",
 		Filename: "test-filename",
@@ -58,7 +64,7 @@ func (handler *Handler) fdoRegisterDevice(w http.ResponseWriter, r *http.Request
 	}
 
 	// Get device ServiceInfo
-	svinfo, err := handler.fdoClient.GetDeviceSVI(guid)
+	svinfo, err := fdoClient.GetDeviceSVI(guid)
 	if err != nil {
 		logrus.WithError(err).Info("fdoRegisterDevice: GetDeviceSVI()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: GetDeviceSVI()", Err: err}

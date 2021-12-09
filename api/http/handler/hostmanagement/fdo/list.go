@@ -20,10 +20,16 @@ import (
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
-// @router /hosts/fdo/list [get]
+// @router /fdo/list [get]
 func (handler *Handler) fdoListAll(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	fdoClient, err := handler.newFDOClient()
+	if err != nil {
+		logrus.WithError(err).Info("fdoListAll: newFDOClient()")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: newFDOClient()", Err: err}
+	}
+
 	// Get all vouchers
-	guids, err := handler.fdoClient.GetVouchers()
+	guids, err := fdoClient.GetVouchers()
 	if err != nil {
 		logrus.WithError(err).Info("fdoListAll: GetVouchers()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoListAll: GetVouchers()", Err: err}
