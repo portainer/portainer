@@ -212,7 +212,7 @@ angular
         url: '/device',
         views: {
           'content@': {
-            templateUrl: './views/devices/import/importdevice.html',
+            templateUrl: './views/devices/import/importDevice.html',
             controller: 'ImportDeviceController',
           },
         },
