@@ -11,7 +11,7 @@ function FDOFactory($resource) {
     {},
     {
       submit: { method: 'POST' },
-      importDevice: { method: 'POST', params: { action: 'import', id: '@deviceId' } },
+      configureDevice: { method: 'POST', params: { action: 'configure', id: '@deviceId' } },
     }
   );
 }

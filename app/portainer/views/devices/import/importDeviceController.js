@@ -28,11 +28,7 @@ angular
       VoucherFile: null,
     };
 
-    // TODO preguntar que es esto, hay pantalla de CRUD?
-    $scope.profiles = [
-      { Id: 1, Name: 'profile1' },
-      { Id: 2, Name: 'profile2' },
-    ];
+    $scope.profiles = [{ Id: 1, Name: 'Docker Standalone + Edge Agent' }];
 
     $scope.onVoucherFileChange = function (file) {
       console.log(file);
@@ -44,10 +40,7 @@ angular
             console.log(response);
             $scope.state.voucherUploading = false;
             $scope.state.voucherUploaded = true;
-
-            // TODO parse deviceID from response
-            //$scope.deviceID = response.data.DeviceID ?;
-            $scope.deviceID = 'c6ea3343-229a-4c07-9096-beef7134e1d3';
+            $scope.deviceID = response.data.guid;
           })
           .catch(function error(err) {
             console.log(err);
@@ -70,11 +63,14 @@ angular
       }
     }
 
-    $scope.saveDevice = function () {
+    $scope.configureDevice = function () {
       return $async(async () => {
         $scope.state.actionInProgress = true;
+
+        // TODO: create the endpoint (environment) and pass the data to configureDevice
+
         try {
-          await FDOService.importDevice($scope.deviceID, $scope.formValues);
+          await FDOService.configureDevice($scope.deviceID, $scope.formValues);
           Notifications.success('Device successfully imported');
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to import device');
