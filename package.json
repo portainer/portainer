@@ -91,6 +91,7 @@
     "babel-plugin-angularjs-annotate": "^0.10.0",
     "bootbox": "^5.5.2",
     "bootstrap": "^3.4.0",
+    "buffer": "^6.0.3",
     "chardet": "^1.4.0",
     "chart.js": "~2.7.0",
     "clsx": "^1.1.1",
