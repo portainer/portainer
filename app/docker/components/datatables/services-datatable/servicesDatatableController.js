@@ -16,6 +16,33 @@ angular.module('portainer.docker').controller('ServicesDatatableController', [
       publicURL: EndpointProvider.endpointPublicURL(),
     });
 
+    this.columnVisibility = {
+      columns: {
+        image: {
+          label: 'Image',
+          display: true,
+        },
+        ownership: {
+          label: 'OwnerShip',
+          display: true,
+        },
+        ports: {
+          label: 'Published Ports',
+          display: true,
+        },
+        updated: {
+          label: 'Last Update',
+          display: true,
+        },
+      },
+    };
+
+    this.onColumnVisibilityChange = onColumnVisibilityChange.bind(this);
+    function onColumnVisibilityChange(columns) {
+      this.columnVisibility.columns = columns;
+      DatatableService.setColumnVisibilitySettings(this.tableKey, this.columnVisibility);
+    }
+
     this.expandAll = function () {
       this.state.expandAll = !this.state.expandAll;
       for (var i = 0; i < this.state.filteredDataSet.length; i++) {
@@ -109,6 +136,10 @@ angular.module('portainer.docker').controller('ServicesDatatableController', [
         this.settings.open = false;
       }
       this.onSettingsRepeaterChange();
+      var storedColumnVisibility = DatatableService.getColumnVisibilitySettings(this.tableKey);
+      if (storedColumnVisibility !== null) {
+        this.columnVisibility = storedColumnVisibility;
+      }
     };
   },
 ]);
