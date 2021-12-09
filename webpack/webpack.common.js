@@ -18,7 +18,7 @@ module.exports = {
     main: './app',
   },
   output: {
-    filename: '[name].[hash].js',
+    filename: '[name].[contenthash].js',
     path: path.resolve(projectRoot, 'dist/public'),
   },
   module: {
@@ -136,9 +136,12 @@ module.exports = {
     }),
   ],
   optimization: {
+    moduleIds: 'deterministic',
+    runtimeChunk: 'single',
     splitChunks: {
+      chunks: 'all',
       cacheGroups: {
-        defaultVendors: {
+        vendor: {
           test: /node_modules/,
           chunks: 'initial',
           name: 'vendor',
