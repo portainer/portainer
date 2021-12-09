@@ -2,6 +2,7 @@ package boltdb
 
 import (
 	"encoding/binary"
+	e "errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -40,7 +41,7 @@ func (connection *DbConnection) IsEncryptionRequired() (bool, error) {
 	if connection.EncryptionKey != "" {
 		// set it back to true as encryption key exists
 		defer connection.SetIsDBEncryptedFlag(true)
-		
+
 		// set IsDBEncrypted to false and get the version
 		connection.IsDBEncrypted = false
 		version, err := version.NewService(connection)
@@ -48,10 +49,16 @@ func (connection *DbConnection) IsEncryptionRequired() (bool, error) {
 			return false, err
 		}
 
-		// 0: if encrypted
+		// 0: if encrypted or new
 		// > 0 if unencrypted
 		v, err := version.DBVersion()
+		logrus.Infof("DB version %d", v)
 		if err != nil || v == 0 {
+			if e.Is(err, errors.ErrObjectNotFound) {
+				logrus.Info("it is new database")
+			} else {
+				logrus.Info("it is encrypted database")
+			}
 			return false, err
 		}
 

@@ -39,7 +39,7 @@ func exportJson(databasePath, passphrase string) ([]byte, error) {
 					obj = v
 				}
 				if bucketName == "version" {
-					version[string(k)] = string(v)
+					version[string(k)] = obj.(string)
 				} else {
 					list = append(list, obj)
 				}

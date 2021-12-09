@@ -30,9 +30,9 @@ func (store *Store) edition() portainer.SoftwareEdition {
 // NewStore initializes a new Store and the associated services
 func NewStore(storePath string, fileService portainer.FileService, connection portainer.Connection) *Store {
 	return &Store{
-		fileService:            fileService,
-		connection:             connection,
-		isNew:                  true,
+		fileService: fileService,
+		connection:  connection,
+		isNew:       true,
 	}
 }
 
@@ -52,36 +52,10 @@ func (store *Store) Open() error {
 	if err != nil {
 		logrus.Warnf("Error calling IsEncryptionRequired: %s", err.Error())
 	}
-
-	logrus.Infof("Is migration required: %t", ok)
-
+	logrus.Infof("Is migration required?: %t", ok)
 	if ok {
-		store.connection.SetIsDBEncryptedFlag(false)
-		err := store.initServices()
-		if err != nil {
-			logrus.Fatal("init services failed")
-		}
-
-		exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
-
-		logrus.Infof("exporting database backup to %s", exportFilename)
-		err = store.Export(exportFilename)
-		if err != nil {
-			logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
-			return err
-		}
-
-		logrus.Infof("database backup exported")
-
-		// Set isDBEncryptedFlag to true to import JSON in the encrypted format
-		store.connection.SetIsDBEncryptedFlag(true)
-		err = store.Import(exportFilename)
-		if err != nil {
-			logrus.Fatal("importing backup failed")
-			return err
-		}
-
-		logrus.Fatal("database successfully encrypted")
+		// unencrypted database
+		store.encryptDB()
 	}
 
 	// This creates the accessor structures, and should not mutate the data in any way
@@ -129,6 +103,40 @@ func (store *Store) Open() error {
 
 func (store *Store) Close() error {
 	return store.connection.Close()
+}
+
+func (store *Store) encryptDB() error {
+	// Since database is not encrypted so
+	// settings this flag to false will not
+	// allow connection to use encryption key
+	store.connection.SetIsDBEncryptedFlag(false)
+	err := store.initServices()
+	if err != nil {
+		logrus.Fatal("init services failed")
+	}
+
+	// export file path for backup
+	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
+
+	logrus.Infof("exporting database backup to %s", exportFilename)
+	err = store.Export(exportFilename)
+	if err != nil {
+		logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
+		return err
+	}
+
+	logrus.Infof("database backup exported")
+
+	// Set isDBEncryptedFlag to true to import JSON in the encrypted format
+	store.connection.SetIsDBEncryptedFlag(true)
+	err = store.Import(exportFilename)
+	if err != nil {
+		logrus.Fatal(errors.ErrDBImportFailed.Error()) // TODO: Rollback?
+	}
+
+	logrus.Info("database successfully encrypted")
+	// TODO: Delete the backup??
+	return nil
 }
 
 // BackupTo backs up db to a provided writer.
