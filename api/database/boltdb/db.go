@@ -12,12 +12,14 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/sirupsen/logrus"
 )
 
 type DbConnection struct {
 	Path          string
 	EncryptionKey string
+	IsDBEncrypted bool
 
 	*bolt.DB
 }
@@ -28,6 +30,34 @@ func (connection *DbConnection) GetDatabaseFilename() string {
 
 func (connection *DbConnection) GetStorePath() string {
 	return connection.Path
+}
+
+func (connection *DbConnection) SetIsDBEncryptedFlag(flag bool) {
+	connection.IsDBEncrypted = flag
+}
+
+func (connection *DbConnection) IsEncryptionRequired() (bool, error) {
+	if connection.EncryptionKey != "" {
+		// set it back to true as encryption key exists
+		defer connection.SetIsDBEncryptedFlag(true)
+		
+		// set IsDBEncrypted to false and get the version
+		connection.IsDBEncrypted = false
+		version, err := version.NewService(connection)
+		if err != nil {
+			return false, err
+		}
+
+		// 0: if encrypted
+		// > 0 if unencrypted
+		v, err := version.DBVersion()
+		if err != nil || v == 0 {
+			return false, err
+		}
+
+		return true, nil
+	}
+	return false, nil
 }
 
 // Opens the BoltDB database.
@@ -75,7 +105,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
-	b, err := exportJson(databasePath, connection.EncryptionKey)
+	b, err := exportJson(databasePath, connection.getEncryptionKey())
 	if err != nil {
 		return err
 	}
@@ -124,7 +154,15 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 		return err
 	}
 
-	return UnmarshalObject(data, object, connection.EncryptionKey)
+	return UnmarshalObject(data, object, connection.getEncryptionKey())
+}
+
+func (connection *DbConnection) getEncryptionKey() string {
+	logrus.Infof("With EncryptionKey=%t & IsDBEncrypted=%t", connection.EncryptionKey != "", connection.IsDBEncrypted)
+	if !connection.IsDBEncrypted {
+		return ""
+	}
+	return connection.EncryptionKey
 }
 
 // UpdateObject is a generic function used to update an object inside a database database.
@@ -134,7 +172,7 @@ func (connection *DbConnection) UpdateObject(bucketName string, key []byte, obje
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
-		data, err := MarshalObject(object, connection.EncryptionKey)
+		data, err := MarshalObject(object, connection.getEncryptionKey())
 		if err != nil {
 			return err
 		}
@@ -169,7 +207,7 @@ func (connection *DbConnection) DeleteAllObjects(bucketName string, matching fun
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var obj interface{}
-			err := UnmarshalObject(v, &obj, connection.EncryptionKey)
+			err := UnmarshalObject(v, &obj, connection.getEncryptionKey())
 			if err != nil {
 				return err
 			}
@@ -213,7 +251,7 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 		seqId, _ := bucket.NextSequence()
 		id, obj := fn(seqId)
 
-		data, err := MarshalObject(obj, connection.EncryptionKey)
+		data, err := MarshalObject(obj, connection.getEncryptionKey())
 		if err != nil {
 			return err
 		}
@@ -229,7 +267,7 @@ func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, ob
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
-		data, err := MarshalObject(obj, connection.EncryptionKey)
+		data, err := MarshalObject(obj, connection.getEncryptionKey())
 		if err != nil {
 			return err
 		}
@@ -250,7 +288,7 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 			return err
 		}
 
-		data, err := MarshalObject(obj, connection.EncryptionKey)
+		data, err := MarshalObject(obj, connection.getEncryptionKey())
 		if err != nil {
 			return err
 		}
@@ -267,7 +305,7 @@ func (connection *DbConnection) GetAll(bucketName string, obj interface{}, appen
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObject(v, obj, connection.EncryptionKey)
+			err := UnmarshalObject(v, obj, connection.getEncryptionKey())
 			if err != nil {
 				return err
 			}
@@ -291,7 +329,7 @@ func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interf
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObjectWithJsoniter(v, obj, connection.EncryptionKey)
+			err := UnmarshalObjectWithJsoniter(v, obj, connection.getEncryptionKey())
 			if err != nil {
 				return err
 			}

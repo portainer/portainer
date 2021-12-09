@@ -1,7 +1,10 @@
 package datastore
 
 import (
+	"fmt"
 	"io"
+	"path"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
@@ -27,9 +30,9 @@ func (store *Store) edition() portainer.SoftwareEdition {
 // NewStore initializes a new Store and the associated services
 func NewStore(storePath string, fileService portainer.FileService, connection portainer.Connection) *Store {
 	return &Store{
-		fileService: fileService,
-		connection:  connection,
-		isNew: true,
+		fileService:            fileService,
+		connection:             connection,
+		isNew:                  true,
 	}
 }
 
@@ -44,6 +47,43 @@ func (store *Store) Open() error {
 		return err
 	}
 
+	// Check if DB is encrypted
+	ok, err := store.connection.IsEncryptionRequired()
+	if err != nil {
+		logrus.Warnf("Error calling IsEncryptionRequired: %s", err.Error())
+	}
+
+	logrus.Infof("Is migration required: %t", ok)
+
+	if ok {
+		store.connection.SetIsDBEncryptedFlag(false)
+		err := store.initServices()
+		if err != nil {
+			logrus.Fatal("init services failed")
+		}
+
+		exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
+
+		logrus.Infof("exporting database backup to %s", exportFilename)
+		err = store.Export(exportFilename)
+		if err != nil {
+			logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
+			return err
+		}
+
+		logrus.Infof("database backup exported")
+
+		// Set isDBEncryptedFlag to true to import JSON in the encrypted format
+		store.connection.SetIsDBEncryptedFlag(true)
+		err = store.Import(exportFilename)
+		if err != nil {
+			logrus.Fatal("importing backup failed")
+			return err
+		}
+
+		logrus.Fatal("database successfully encrypted")
+	}
+
 	// This creates the accessor structures, and should not mutate the data in any way
 	err = store.initServices()
 	if err != nil {
@@ -51,14 +91,14 @@ func (store *Store) Open() error {
 	}
 
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
-	if version, err := store.VersionService.DBVersion(); err == nil {
+	version, err := store.VersionService.DBVersion()
+	logrus.Println(fmt.Sprintf("version: %d", version))
+	if err == nil {
 		store.isNew = false
 		logrus.WithField("version", version).Infof("Opened existing store")
 	} else {
 		if err.Error() == "encrypted string too short" {
-			// TODO: this is a magic string in boltdb/json.go
-			// TODO: reopen without passphrase, then resave with encryption?
-			logrus.WithError(err).Debugf("open db failed - seems its not encrypted?")
+			logrus.WithError(err).Debugf("open db failed - %s", err.Error())
 			return err
 		}
 		if store.IsErrObjectNotFound(err) {

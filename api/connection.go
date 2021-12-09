@@ -31,4 +31,7 @@ type Connection interface {
 	GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
 	GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
 	ConvertToKey(v int) []byte
+
+	IsEncryptionRequired() (bool, error)
+	SetIsDBEncryptedFlag(bool)
 }

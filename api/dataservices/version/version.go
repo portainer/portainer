@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -43,6 +44,7 @@ func (service *Service) DBVersion() (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	logrus.Infof("%s - %s", version, err)
 	return strconv.Atoi(version)
 }
 

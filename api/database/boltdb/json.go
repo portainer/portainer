@@ -9,6 +9,7 @@ import (
 	"io"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,17 +31,20 @@ func MarshalObject(object interface{}, passphrase string) ([]byte, error) {
 
 // UnmarshalObject decodes an object from binary data
 func UnmarshalObject(data []byte, object interface{}, passphrase string) error {
+	var err error
 	if passphrase == "" {
 		logrus.Infof("no encryption passphrase")
 	} else {
-		var err error
 		data, err = decrypt(data, passphrase)
 		if err != nil {
 			logrus.WithError(err).Errorf("failed decrypting object")
-			return err
 		}
 	}
-	return json.Unmarshal(data, object)
+	e := json.Unmarshal(data, object)
+	if e != nil {
+		return errors.Wrap(err, e.Error())
+	}
+	return err
 }
 
 // UnmarshalObjectWithJsoniter decodes an object from binary data
@@ -85,25 +89,27 @@ func encrypt(plaintext []byte, passphrase string) (encrypted []byte, err error) 
 
 // On error, return the original byte array - it might be unencrypted...
 func decrypt(encrypted []byte, passphrase string) (plaintextByte []byte, err error) {
+	if string(encrypted) == "false" {
+		return []byte("false"), nil
+	}
 	passphraseByte := []byte(passphrase)
 	block, err := aes.NewCipher(passphraseByte)
 	if err != nil {
-		logrus.Infof("NOT decrypted")
-
+		logrus.Infof("Error creating cypher block: %s", err.Error())
 		return encrypted, err
 	}
+
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		logrus.Infof("NOT decrypted")
-
+		logrus.Infof("Error creating GCM: %s", err.Error())
 		return encrypted, err
 	}
+
 	nonceSize := gcm.NonceSize()
 	if len(encrypted) < nonceSize {
-		logrus.Infof("NOT decrypted")
-
 		return encrypted, encryptedStringTooShort
 	}
+
 	nonce, ciphertextByteClean := encrypted[:nonceSize], encrypted[nonceSize:]
 	plaintextByte, err = gcm.Open(
 		nil,
@@ -111,10 +117,10 @@ func decrypt(encrypted []byte, passphrase string) (plaintextByte []byte, err err
 		ciphertextByteClean,
 		nil)
 	if err != nil {
-		logrus.Infof("NOT decrypted")
-
+		logrus.Infof("Error decrypting text: %s", err.Error())
 		return encrypted, err
 	}
-	logrus.Infof("decrypted")
+	
+	logrus.Infof("decrypted successfully")
 	return plaintextByte, err
 }
