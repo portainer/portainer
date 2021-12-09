@@ -101,16 +101,28 @@
                 <div style="margin-top: 10px;">
                   <uib-tabset active="state.deploymentTab">
                     <uib-tab index="0" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via load balancer">
-                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.kubeLoadBalancer }}</code>
+                      <span ng-if="agentSecret != ''" style="display: block; padding: 16px 45px 0px 45px; background-color: var(--bg-code-color);">
+                        Note that the environment variable AGENT_SECRET will need to be set to {{ agentSecret }}. Please update the manifest that will be download from the
+                        following script.
+                      </span>
+                      <code style="display: block; padding: 16px 45px;">{{ deployCommands.kubeLoadBalancer }}</code>
                     </uib-tab>
 
                     <uib-tab index="1" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via node port">
-                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.kubeNodePort }}</code>
+                      <span ng-if="agentSecret != ''" style="display: block; padding: 16px 45px 0px 45px; background-color: var(--bg-code-color);">
+                        Note that the environment variable AGENT_SECRET will need to be set to {{ agentSecret }}. Please update the manifest that will be download from the
+                        following script.
+                      </span>
+                      <code style="display: block; padding: 16px 45px;">{{ deployCommands.kubeNodePort }}</code>
                     </uib-tab>
 
                     <uib-tab index="2" heading="Docker Swarm">
-                      <code ng-if="state.PlatformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.agentLinux }}</code>
-                      <code ng-if="state.PlatformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.agentWindows }}</code>
+                      <code ng-if="state.PlatformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 45px;">{{
+                        deployCommands.agentLinux(agentVersion, agentSecret)
+                      }}</code>
+                      <code ng-if="state.PlatformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 45px;">{{
+                        deployCommands.agentWindows(agentVersion, agentSecret)
+                      }}</code>
                     </uib-tab>
                   </uib-tabset>
                   <div style="margin-top: 10px;">

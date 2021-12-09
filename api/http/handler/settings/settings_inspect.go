@@ -2,6 +2,7 @@ package settings
 
 import (
 	"net/http"
+	"os"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
@@ -22,7 +23,11 @@ func (handler *Handler) settingsInspect(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}
-
+	if agentKey, ok := os.LookupEnv("AGENT_SECRET"); ok {
+		settings.AgentSecret = agentKey
+	} else {
+		settings.AgentSecret = ""
+	}
 	hideFields(settings)
 	return response.JSON(w, settings)
 }

@@ -46,16 +46,16 @@ angular
       ],
     };
 
-    const agentVersion = StateManager.getState().application.version;
-    const agentShortVersion = getAgentShortVersion(agentVersion);
+    $scope.agentVersion = StateManager.getState().application.version;
+    $scope.agentShortVersion = getAgentShortVersion($scope.agentVersion);
+    $scope.agentSecret = '';
 
-    const deployCommands = {
-      kubeLoadBalancer: `curl -L https://downloads.portainer.io/portainer-agent-ce${agentShortVersion}-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
-      kubeNodePort: `curl -L https://downloads.portainer.io/portainer-agent-ce${agentShortVersion}-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
-      agentLinux: `curl -L https://downloads.portainer.io/agent-stack-ce${agentShortVersion}.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent`,
-      agentWindows: `curl -L https://downloads.portainer.io/agent-stack-ce${agentShortVersion}-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent`,
+    $scope.deployCommands = {
+      kubeLoadBalancer: `curl -L https://downloads.portainer.io/portainer-agent-ce${$scope.agentShortVersion}-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+      kubeNodePort: `curl -L https://downloads.portainer.io/portainer-agent-ce${$scope.agentShortVersion}-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+      agentLinux: agentLinuxSwarmCommand,
+      agentWindows: agentWindowsSwarmCommand,
     };
-    $scope.deployCommands = deployCommands;
 
     $scope.formValues = {
       Name: '',
@@ -72,13 +72,13 @@ angular
 
     $scope.copyAgentCommand = function () {
       if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'linux') {
-        clipboard.copyText(deployCommands.agentLinux);
+        clipboard.copyText($scope.deployCommands.agentLinux);
       } else if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'windows') {
-        clipboard.copyText(deployCommands.agentWindows);
+        clipboard.copyText($scope.deployCommands.agentWindows);
       } else if ($scope.state.deploymentTab === 1) {
-        clipboard.copyText(deployCommands.kubeNodePort);
+        clipboard.copyText($scope.deployCommands.kubeNodePort);
       } else {
-        clipboard.copyText(deployCommands.kubeLoadBalancer);
+        clipboard.copyText($scope.deployCommands.kubeLoadBalancer);
       }
       $('#copyNotification').show().fadeOut(2500);
     };
@@ -291,10 +291,46 @@ angular
 
           const settings = data.settings;
           $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
+          $scope.agentSecret = settings.AgentSecret;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to load groups');
         });
+    }
+
+    function agentLinuxSwarmCommand(agentVersion, agentSecret) {
+      let secret = agentSecret == '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
+      return `
+docker network create \\
+  --driver overlay \\
+  portainer_agent_network
+
+docker service create \\
+  --name portainer_agent \\
+  --network portainer_agent_network \\
+  -p 9001:9001/tcp ${secret}\\
+  --mode global \\
+  --constraint 'node.platform.os == linux' \\
+  --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \\
+  --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
+  portainer/agent:${agentVersion}`;
+    }
+
+    function agentWindowsSwarmCommand(agentVersion, agentSecret) {
+      let secret = agentSecret == '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
+      return `
+docker network create \\
+  --driver overlay \\
+  portainer_agent_network && \\
+docker service create \\
+  --name portainer_agent \\
+  --network portainer_agent_network \\
+  -p 9001:9001/tcp  ${secret}\\
+  --mode global \\
+  --constraint 'node.platform.os == windows' \\
+  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
+  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
+  portainer/agent:${agentVersion}`;
     }
 
     initView();

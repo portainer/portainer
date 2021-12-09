@@ -12,6 +12,7 @@ export function SettingsViewModel(data) {
   this.EnableTelemetry = data.EnableTelemetry;
   this.KubeconfigExpiry = data.KubeconfigExpiry;
   this.HelmRepositoryURL = data.HelmRepositoryURL;
+  this.AgentSecret = data.AgentSecret;
 }
 
 export function PublicSettingsViewModel(settings) {

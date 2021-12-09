@@ -721,6 +721,8 @@ type (
 		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
 		// KubectlImage, defaults to portainer/kubectl-shell
 		KubectlShellImage string `json:"KubectlShellImage" example:"portainer/kubectl-shell"`
+		// Container environment parameter AGENT_SECRET
+		AgentSecret string `json:"AgentSecret"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
