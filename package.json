@@ -189,6 +189,7 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^5.5.0",
     "husky": ">=4",
+    "image-webpack-loader": "^4.5.0",
     "jest": "^27.4.3",
     "lint-staged": ">=10",
     "load-grunt-tasks": "^3.5.2",
