@@ -123,7 +123,7 @@ module.exports = {
       jsyaml: 'js-yaml',
     }),
     new MiniCssExtractPlugin({
-      filename: '[name].[hash].css',
+      filename: '[name].[contenthash].css',
       chunkFilename: '[name].[id].css',
     }),
     new CleanWebpackPlugin(),
