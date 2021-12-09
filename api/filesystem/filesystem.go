@@ -612,12 +612,12 @@ func (service *Service) StoreSSLCertPair(cert, key []byte) (string, string, erro
 func (service *Service) CopySSLCertPair(certPath, keyPath string) (string, string, error) {
 	defCertPath, defKeyPath := service.GetDefaultSSLCertsPath()
 
-	err := service.Copy(certPath, defCertPath, false)
+	err := service.Copy(certPath, defCertPath, true)
 	if err != nil {
 		return "", "", err
 	}
 
-	err = service.Copy(keyPath, defKeyPath, false)
+	err = service.Copy(keyPath, defKeyPath, true)
 	if err != nil {
 		return "", "", err
 	}
