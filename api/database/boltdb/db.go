@@ -2,7 +2,7 @@ package boltdb
 
 import (
 	"encoding/binary"
-	e "errors"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api/dataservices/errors"
+	portainerErrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/sirupsen/logrus"
 )
@@ -54,7 +54,7 @@ func (connection *DbConnection) IsEncryptionRequired() (bool, error) {
 		v, err := version.DBVersion()
 		logrus.Infof("DB version %d", v)
 		if err != nil || v == 0 {
-			if e.Is(err, errors.ErrObjectNotFound) {
+			if errors.Is(err, portainerErrors.ErrObjectNotFound) {
 				logrus.Info("it is new database")
 			} else {
 				logrus.Info("it is encrypted database")
@@ -112,6 +112,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
+	// TODO: Put it behind a debug feature flag
 	b, err := exportJson(databasePath, connection.getEncryptionKey())
 	if err != nil {
 		return err
@@ -149,7 +150,7 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 
 		value := bucket.Get(key)
 		if value == nil {
-			return errors.ErrObjectNotFound
+			return portainerErrors.ErrObjectNotFound
 		}
 
 		data = make([]byte, len(value))

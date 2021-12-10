@@ -32,19 +32,15 @@ func NewStore(storePath string, fileService portainer.FileService, connection po
 	return &Store{
 		fileService: fileService,
 		connection:  connection,
-		isNew:       true,
 	}
 }
 
-func (store *Store) IsNew() bool {
-	return store.isNew
-}
-
 // Open opens and initializes the BoltDB database.
-func (store *Store) Open() error {
+func (store *Store) Open() (bool, error) {
+	newStore := true
 	err := store.connection.Open()
 	if err != nil {
-		return err
+		return newStore, err
 	}
 
 	// Check if DB is encrypted
@@ -61,44 +57,29 @@ func (store *Store) Open() error {
 	// This creates the accessor structures, and should not mutate the data in any way
 	err = store.initServices()
 	if err != nil {
-		return err
+		return newStore, err
 	}
 
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
 	version, err := store.VersionService.DBVersion()
-	logrus.Println(fmt.Sprintf("version: %d", version))
+	logrus.Infof("database version: %d", version)
+	
 	if err == nil {
-		store.isNew = false
+		newStore = true
 		logrus.WithField("version", version).Infof("Opened existing store")
 	} else {
 		if err.Error() == "encrypted string too short" {
-			logrus.WithError(err).Debugf("open db failed - %s", err.Error())
-			return err
+			logrus.WithError(err).Debugf("open db failed - wrong encryption key")
 		}
 		if store.IsErrObjectNotFound(err) {
-			// TODO: Validate if needed
-			err := store.VersionService.StoreDBVersion(portainer.DBVersion)
-			if err != nil {
-				return err
-			}
-			// its new, lets see if there's an import.yml file, and if there is, import it
-			importFile := "/data/import.json"
-			if exists, _ := store.fileService.FileExists(importFile); exists {
-				if err := store.Import(importFile); err != nil {
-					logrus.WithError(err).Debugf("import %s failed", importFile)
-
-					// TODO: should really rollback on failure, but then we have nothing.
-				} else {
-					logrus.Printf("Successfully imported %s to new portainer database", importFile)
-				}
-			}
+			logrus.WithError(err).Debugf("open db failed - object not found")
 		} else {
-			logrus.WithError(err).Debugf("open db failed")
-			return err
+			logrus.WithError(err).Debugf("open db failed - unknown")
 		}
+		return newStore, err
 	}
 
-	return nil
+	return newStore, nil
 }
 
 func (store *Store) Close() error {

@@ -128,7 +128,7 @@ func (store *Store) restoreWithOptions(options *BackupOptions) error {
 		return err
 	}
 
-	err = store.Open()
+	_, err = store.Open()
 	return err
 }
 

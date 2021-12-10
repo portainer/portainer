@@ -48,23 +48,23 @@ func NewTestStore(init bool) (bool, *Store, func(), error) {
 		panic(err)
 	}
 	store := NewStore(storePath, fileService, connection)
-	err = store.Open()
+	isNewStore, err := store.Open()
 	if err != nil {
-		return store.isNew, nil, nil, err
+		return isNewStore, nil, nil, err
 	}
 
 	if init {
 		err = store.Init()
 		if err != nil {
-			return store.isNew, nil, nil, err
+			return isNewStore, nil, nil, err
 		}
 	}
 
-	if store.isNew {
+	if isNewStore {
 		// from MigrateData
 		store.VersionService.StoreDBVersion(portainer.DBVersion)
 		if err != nil {
-			return store.isNew, nil, nil, err
+			return isNewStore, nil, nil, err
 		}
 	}
 
@@ -72,7 +72,7 @@ func NewTestStore(init bool) (bool, *Store, func(), error) {
 		teardown(store, storePath)
 	}
 
-	return store.isNew, store, teardown, nil
+	return isNewStore, store, teardown, nil
 }
 
 func teardown(store *Store, storePath string) {

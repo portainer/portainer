@@ -14,10 +14,9 @@ import (
 type (
 	// DataStore defines the interface to manage the data
 	DataStore interface {
-		Open() error
+		Open() (bool, error)
 		Init() error
 		Close() error
-		IsNew() bool
 		MigrateData() error
 		Rollback(force bool) error
 		CheckCurrentEdition() error

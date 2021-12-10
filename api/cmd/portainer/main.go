@@ -72,15 +72,15 @@ func initDataStore(storePath string, rollback bool, secretKey string, fileServic
 	}
 
 	store := datastore.NewStore(storePath, fileService, connection)
-	err = store.Open()
+	_, err = store.Open()
 	if err != nil {
-		log.Fatalf("failed opening store: %v", err)
+		log.Fatalf("failed opening store: %s", err.Error())
 	}
 
 	if rollback {
 		err := store.Rollback(false)
 		if err != nil {
-			log.Fatalf("failed rolling back: %s", err)
+			log.Fatalf("failed rolling back: %s", err.Error())
 		}
 
 		log.Println("Exiting rollback")
@@ -91,11 +91,6 @@ func initDataStore(storePath string, rollback bool, secretKey string, fileServic
 	err = store.Init()
 	if err != nil {
 		log.Fatalf("failed initializing data store: %v", err)
-	}
-
-	err = store.MigrateData()
-	if err != nil {
-		log.Fatalf("failed migration: %v", err)
 	}
 
 	go func() {
