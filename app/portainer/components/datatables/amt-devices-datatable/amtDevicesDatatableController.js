@@ -66,7 +66,7 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
     };
 
     this.kvmAction = async function (device) {
-      if (!device.connectionStatus) {
+      if (!device.connectionStatus || !device.features) {
         return;
       }
       try {
