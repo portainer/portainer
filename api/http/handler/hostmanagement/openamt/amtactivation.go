@@ -41,8 +41,7 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 		errMsg := fmt.Sprintf("%s is not an agent environment", endpoint.Name)
 		return &httperror.HandlerError{http.StatusBadRequest, errMsg, errors.New(errMsg)}
 	}
-
-
+	
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}

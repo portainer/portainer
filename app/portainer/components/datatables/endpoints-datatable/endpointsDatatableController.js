@@ -124,20 +124,6 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       });
     };
 
-    this.associateOpenAMTAsync = async function (endpoints, deviceId) {
-      for (let endpoint of endpoints) {
-        try {
-          await OpenAMTService.associateEndpoint(endpoint.Id, deviceId);
-
-          Notifications.success('Successfully associated with OpenAMT', endpoint.Name);
-        } catch (err) {
-          Notifications.error('Failure', err, 'Unable to associate with OpenAMT');
-        }
-      }
-
-      $state.reload();
-    };
-
     /**
      * Overridden
      */
