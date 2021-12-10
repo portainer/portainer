@@ -902,3 +902,8 @@ json-tree .branch-preview {
   word-break: break-all;
   white-space: normal;
 }
+
+.icon-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

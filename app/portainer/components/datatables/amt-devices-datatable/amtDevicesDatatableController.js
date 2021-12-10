@@ -33,10 +33,12 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
       }
     };
 
-    this.executeDeviceAction = async function (deviceGUID, action) {
+    this.executeDeviceAction = async function (device, action) {
+      const deviceGUID = device.guid;
+      if (!device.connectionStatus) {
+        return;
+      }
       try {
-        console.log(this.endpointId);
-        console.log(`Execute ${action} on ${deviceGUID} ${this.endpointId}`);
         const confirmed = await ModalService.confirmAsync({
           title: `Confirm action`,
           message: `Are you sure you want to ${action} the device?`,
@@ -64,6 +66,9 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
     };
 
     this.kvmAction = async function (device) {
+      if (!device.connectionStatus || !device.features) {
+        return;
+      }
       try {
         if (device.features['KVM'] && device.features['userConsent'] === 'none') {
           $state.go('portainer.endpoints.endpoint.kvm', {
