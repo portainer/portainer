@@ -19,7 +19,7 @@ const (
 	defaultWirelessConfigName = "wirelessProfileDefault"
 	DefaultProfileName        = "profileAMTDefault"
 
-	httpClientTimeout = 30
+	httpClientTimeout = 5 * time.Minute
 
 	powerUpState  portainer.PowerState = 2
 	powerOffState portainer.PowerState = 8
@@ -38,7 +38,7 @@ func NewService(dataStore portainer.DataStore) *Service {
 	}
 	return &Service{
 		httpsClient: &http.Client{
-			Timeout: time.Second * time.Duration(httpClientTimeout),
+			Timeout: httpClientTimeout,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},

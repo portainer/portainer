@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -37,6 +38,7 @@ const (
 	// TODO: this should get extracted to some configurable - don't assume Docker Hub is everyone's global namespace, or that they're allowed to pull images from the internet
 	rpcGoImageName     = "ptrrd/openamt:rpc-go-json"
 	rpcGoContainerName = "openamt-rpc-go"
+	dockerClientTimeout = 5 * time.Minute
 )
 
 // @id OpenAMTHostInfo
@@ -103,7 +105,8 @@ func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *porta
 	//		on the Docker standalone node (one per env :)
 	//		and later, on the specified node in the swarm, or kube.
 	nodeName := ""
-	docker, err := handler.DockerClientFactory.CreateClient(endpoint, nodeName)
+	timeout := dockerClientTimeout
+	docker, err := handler.DockerClientFactory.CreateClient(endpoint, nodeName, &timeout)
 	if err != nil {
 		return "Unable to create Docker Client connection", err
 	}
@@ -239,12 +242,12 @@ func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings po
 	cmdLine := []string{
 		"activate",
 		"-n",
+		"-v",
 		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
 		"-profile", "profileAMTDefault",
 		"-d", config.DomainConfiguration.DomainName,
 		"-password", config.Credentials.MPSPassword,
 	}
-
 
 	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
@@ -261,6 +264,7 @@ func (handler *Handler) deactivateDevice(endpoint *portainer.Endpoint, settings 
 	cmdLine := []string{
 		"deactivate",
 		"-n",
+		"-v",
 		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
 		"-password", config.Credentials.MPSPassword,
 	}
