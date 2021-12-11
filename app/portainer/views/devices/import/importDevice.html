@@ -35,7 +35,6 @@
                   class="btn btn-sm btn-primary"
                   ngf-select="onVoucherFileChange($file)"
                   ng-model="formValues.VoucherFile"
-                  ngf-pattern=".ov"
                   name="voucherFile"
                   ng-disabled="state.voucherUploading"
                   button-spinner="state.voucherUploading"
@@ -100,6 +99,34 @@
               </div>
             </div>
             <!-- !device name input -->
+            <!-- portainer-instance-input -->
+            <div class="form-group">
+              <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
+                Portainer server URL
+                <portainer-tooltip position="bottom" message="URL of the Portainer instance that the agent will use to initiate the communications."></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="endpoint_url"
+                  ng-model="formValues.PortainerURL"
+                  ng-required="state.voucherUploaded"
+                  ng-disabled="!state.voucherUploaded"
+                  placeholder="e.g. http://10.0.0.10:9443"
+                  required
+                  data-cy="deviceImport-portainerServerUrlInput"
+                />
+              </div>
+            </div>
+            <div class="form-group" ng-show="endpointCreationForm.endpoint_url.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="endpointCreationForm.endpoint_url.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !portainer-instance-input -->
           </div>
           <!-- device profile input -->
           <div class="form-group">

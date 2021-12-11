@@ -2,8 +2,10 @@ package fdo
 
 import (
 	"encoding/hex"
+	"errors"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	cbor "github.com/fxamacker/cbor/v2"
@@ -13,6 +15,24 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/sirupsen/logrus"
 )
+
+type deviceConfigurePayload struct {
+	EdgeKey string `json:"edgekey"`
+	Name    string `json:"name"`
+	Profile int    `json:"profile"`
+}
+
+func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
+	if payload.EdgeKey == "" {
+		return errors.New("invalid edge key provided")
+	}
+
+	if payload.Name == "" {
+		return errors.New("the device name cannot be empty")
+	}
+
+	return nil
+}
 
 // @id fdoConfigureDevice
 // @summary configure an FDO device
@@ -35,20 +55,13 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		logrus.WithError(err).Info("fdoConfigureDevice: request.RetrieveRouteVariableValue()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: guid not found", Err: err}
 	}
-	edgekey, err := request.RetrieveQueryParameter(r, "edgekey", false)
+
+	var payload deviceConfigurePayload
+
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: request.RetrieveQueryParameter()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: edgekey not found", Err: err}
-	}
-	name, err := request.RetrieveQueryParameter(r, "name", false)
-	if err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: request.RetrieveQueryParameter()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: envname not found", Err: err}
-	}
-	profile, err := request.RetrieveQueryParameter(r, "profile", false)
-	if err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: request.RetrieveQueryParameter()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: profile not found", Err: err}
+		logrus.WithError(err).Error("Invalid request payload")
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
 	fdoClient, err := handler.newFDOClient()
@@ -75,7 +88,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"module":   []string{"fdo_sys"},
 		"var":      []string{"filedesc"},
 		"filename": []string{"DEVICE_edgekey.txt"},
-	}, []byte(edgekey)); err != nil {
+	}, []byte(payload.EdgeKey)); err != nil {
 		logrus.WithError(err).Info("fdoRegisterDevice: PutDeviceSVI(edgekey)")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: PutDeviceSVI(edgekey)", Err: err}
 	}
@@ -86,7 +99,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"module":   []string{"fdo_sys"},
 		"var":      []string{"filedesc"},
 		"filename": []string{"DEVICE_name.txt"},
-	}, []byte(name)); err != nil {
+	}, []byte(payload.Name)); err != nil {
 		logrus.WithError(err).Info("fdoRegisterDevice: PutDeviceSVI(name)")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: PutDeviceSVI(name)", Err: err}
 	}
@@ -111,7 +124,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"var":      []string{"filedesc"},
 		"filename": []string{deploymentScriptName},
 	}, []byte(`#!/bin/bash -ex
-# deploying `+profile+`
+# deploying `+strconv.Itoa(payload.Profile)+`
 env > env.log
 
 export AGENT_IMAGE=portainer/agent:2.9.3

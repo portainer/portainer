@@ -17,6 +17,7 @@ require (
 	github.com/docker/cli v20.10.9+incompatible
 	github.com/docker/docker v20.10.9+incompatible
 	github.com/docker/go-connections v0.4.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.3.0 // indirect
 	github.com/g07cha/defender v0.0.0-20180505193036-5665c627c814
 	github.com/go-git/go-git/v5 v5.3.0
 	github.com/go-ldap/ldap/v3 v3.1.8

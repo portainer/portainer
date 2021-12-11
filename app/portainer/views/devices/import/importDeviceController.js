@@ -1,9 +1,12 @@
+import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
+
 angular
   .module('portainer.app')
   .controller('ImportDeviceController', function ImportDeviceController(
     $async,
     $q,
     $scope,
+    $state,
     EndpointService,
     GroupService,
     TagService,
@@ -26,6 +29,7 @@ angular
       GroupId: 1,
       TagIds: [],
       VoucherFile: null,
+      PortainerURL: '',
     };
 
     $scope.profiles = [{ Id: 1, Name: 'Docker Standalone + Edge Agent' }];
@@ -67,16 +71,46 @@ angular
       return $async(async () => {
         $scope.state.actionInProgress = true;
 
-        // TODO: create the endpoint (environment) and pass the data to configureDevice
-
         try {
-          await FDOService.configureDevice($scope.deviceID, $scope.formValues);
-          Notifications.success('Device successfully imported');
+          var endpoint = await EndpointService.createRemoteEndpoint(
+            $scope.formValues.DeviceName,
+            PortainerEndpointCreationTypes.EdgeAgentEnvironment,
+            $scope.formValues.PortainerURL,
+            null,
+            $scope.formValues.GroupId,
+            $scope.formValues.TagIds,
+            false,
+            true,
+            true,
+            null,
+            null,
+            null,
+            null
+          );
         } catch (err) {
-          Notifications.error('Failure', err, 'Unable to import device');
+          this.Notifications.error('Failure', err, 'Unable to create the environment');
+          return;
         } finally {
           $scope.state.actionInProgress = false;
         }
+
+        const config = {
+          edgekey: endpoint.EdgeKey,
+          name: $scope.formValues.DeviceName,
+          profile: $scope.formValues.DeviceProfile,
+        };
+
+        try {
+          await FDOService.configureDevice($scope.deviceID, config);
+          Notifications.success('Device successfully imported');
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to import device');
+          return;
+        } finally {
+          $scope.state.actionInProgress = false;
+        }
+
+        $state.go('portainer.home');
       });
     };
 
