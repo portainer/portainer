@@ -225,13 +225,14 @@
   "resolutions": {
     "**/jquery": "^3.6.0",
     "decompress": "^4.2.1",
-    "lodash": "^4.17.21",
+    "**/lodash": "^4.17.21",
     "js-yaml": "^3.14.0",
     "minimist": "^1.2.5",
     "http-proxy": "^1.18.1",
     "**/@uirouter/react": "^1.0.7",
     "**/@uirouter/angularjs": "1.0.11",
-    "**/css-loader": "5"
+    "**/css-loader": "5",
+    "**/moment": "^2.21.0"
   },
   "husky": {
     "hooks": {
