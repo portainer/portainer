@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/richard/Projects/DTD-11-Rebase/portainer/package.json: Unexpected token < in JSON at position 4864
+  SyntaxError: /Users/richard/Projects/DTD-11-Rebase/portainer/package.json: Unexpected token < in JSON at position 5762
       at JSON.parse (<anonymous>)
       at /usr/local/lib/node_modules/yarn/lib/cli.js:1625:59
       at Generator.next (<anonymous>)
@@ -90,7 +90,7 @@ npm manifest:
       "@aws-crypto/sha256-js": "^2.0.0",
       "@fortawesome/fontawesome-free": "^5.15.4",
       "@nxmix/tokenize-ansi": "^3.0.0",
-      "@uirouter/angularjs": "1.0.30",
+      "@uirouter/angularjs": "1.0.29",
       "@uirouter/react": "^1.0.7",
       "@uirouter/react-hybrid": "^1.0.4",
       "angular": "1.8.2",
@@ -115,6 +115,7 @@ npm manifest:
       "babel-plugin-angularjs-annotate": "^0.10.0",
       "bootbox": "^5.5.2",
       "bootstrap": "^3.4.0",
+      "buffer": "^6.0.3",
       "chardet": "^1.4.0",
       "chart.js": "~2.7.0",
       "clsx": "^1.1.1",
@@ -135,11 +136,7 @@ npm manifest:
       "react": "^17.0.2",
       "react-dom": "^17.0.2",
       "react-tooltip": "^4.2.21",
-  <<<<<<< HEAD
       "sanitize-html": "^2.5.3",
-      "source-map-loader": "^1.1.2",
-  =======
-  >>>>>>> 8d15539b (remove ploypill, upgraded babel)
       "spinkit": "^2.0.1",
       "splitargs": "github:deviantony/splitargs#semver:~0.2.0",
       "strip-ansi": "^6.0.0",
@@ -152,14 +149,9 @@ npm manifest:
     },
     "devDependencies": {
       "@apidevtools/swagger-cli": "^4.0.4",
-  <<<<<<< HEAD
-      "@babel/core": "^7.1.2",
-      "@babel/preset-env": "^7.1.0",
       "@simbathesailor/use-what-changed": "^2.0.0",
-  =======
       "@babel/core": "^7.16.0",
       "@babel/preset-env": "^7.16.4",
-  >>>>>>> 8d15539b (remove ploypill, upgraded babel)
       "@babel/preset-react": "^7.16.0",
       "@babel/preset-typescript": "^7.16.0",
       "@storybook/addon-actions": "^6.4.9",
@@ -170,11 +162,15 @@ npm manifest:
       "@testing-library/jest-dom": "^5.16.1",
       "@testing-library/react": "^12.1.2",
       "@types/angular": "^1.8.3",
+  <<<<<<< HEAD
       "@types/bootbox": "^5.2.2",
       "@types/jest": "^27.0.2",
       "@types/lodash-es": "^4.17.5",
       "@types/sanitize-html": "^2.5.0",
       "@types/toastr": "^2.1.39",
+  =======
+      "@types/jest": "^27.0.3",
+  >>>>>>> e4c02133 (remove url-loader, file-loader, image-webpack-loader, use asset module instead)
       "@types/jquery": "^3.5.10",
       "@types/react": "^17.0.37",
       "@types/react-dom": "^17.0.11",
@@ -189,7 +185,7 @@ npm manifest:
       "clean-webpack-plugin": "^4.0.0",
       "css-loader": "5",
       "cssnano": "^4.1.10",
-      "cypress": "^5.2.0",
+      "cypress": "5.6.0",
       "cypress-wait-until": "^1.7.1",
       "dotenv-webpack": "^7.0.3",
       "eslint": "^7.29.0",
@@ -205,7 +201,6 @@ npm manifest:
       "eslint-plugin-react": "^7.27.1",
       "eslint-plugin-react-hooks": "^4.3.0",
       "eslint-webpack-plugin": "^3.1.1",
-      "file-loader": "^6.2.0",
       "grunt": "^1.4.1",
       "grunt-cli": "^1.4.3",
       "grunt-contrib-clean": "^2.0.0",
@@ -240,7 +235,6 @@ npm manifest:
       "swagger2openapi": "^7.0.8",
       "tsconfig-paths-webpack-plugin": "^3.5.2",
       "typescript": "^4.5.2",
-      "url-loader": "^4.1.1",
       "webpack": "^5.65.0",
       "webpack-build-notifier": "^2.3.0",
       "webpack-cli": "^4.9.1",

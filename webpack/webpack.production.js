@@ -8,22 +8,11 @@ module.exports = merge(commonConfig, {
     rules: [
       {
         test: /\.(woff|woff2|eot|ttf|ico)$/,
-        use: [
-          {
-            loader: 'url-loader',
-            options: { limit: 25000 },
-          },
-        ],
+        type: 'asset/inline',
       },
       {
         test: /\.(gif|png|jpe?g|svg)$/i,
-        use: [
-          'file-loader',
-          {
-            loader: 'image-webpack-loader',
-            options: {},
-          },
-        ],
+        type: 'asset/resource',
       },
     ],
   },

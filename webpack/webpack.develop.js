@@ -8,14 +8,7 @@ module.exports = merge(commonConfig, {
     rules: [
       {
         test: /\.(woff|woff2|eot|ttf|svg|ico|png|jpg|gif)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              esModule: false,
-            },
-          },
-        ],
+        type: 'asset/resource',
       },
     ],
   },

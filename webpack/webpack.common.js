@@ -60,7 +60,7 @@ module.exports = {
 
       {
         test: /.xml$/,
-        use: 'file-loader',
+        type: 'asset/resource',
       },
       {
         test: /\.css$/,
