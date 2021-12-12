@@ -22,6 +22,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.1.8
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
+	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.2
