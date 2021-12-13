@@ -215,6 +215,30 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       $scope.formValues.LogDriverOpts.splice(index, 1);
     };
 
+    $scope.onSecretItemSelected = function (item) {
+      if (isDuplicate($scope.formValues.Secrets, 'model.Id')) {
+        $scope.formValues.Secrets.$invalid = true;
+        $scope.formValues.Secrets.$error = 'Secret ' + item.Name + ' cannot be assigned multiple times.';
+      } else {
+        $scope.formValues.Secrets.$invalid = false;
+        $scope.formValues.Secrets.$error = '';
+      }
+    };
+
+    $scope.onConfigItemSelected = function (item) {
+      if (isDuplicate($scope.formValues.Configs, 'model.Id')) {
+        $scope.formValues.Configs.$invalid = true;
+        $scope.formValues.Configs.$error = 'Config ' + item.Name + ' cannot be assigned multiple times.';
+      } else {
+        $scope.formValues.Configs.$invalid = false;
+        $scope.formValues.Configs.$error = '';
+      }
+    };
+
+    function isDuplicate(arr, key) {
+      return _.uniqBy(arr, key).length !== arr.length;
+    }
+
     function prepareImageConfig(config, input) {
       var imageConfig = ImageHelper.createImageConfigForContainer(input.RegistryModel);
       config.TaskTemplate.ContainerSpec.Image = imageConfig.fromImage;
@@ -511,7 +535,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';
-      error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+      error = FormValidator.validateAccessControl(accessControlData, isAdmin) || $scope.formValues.Secrets.$error || $scope.formValues.Configs.$error;
 
       if (error) {
         $scope.state.formValidationError = error;
