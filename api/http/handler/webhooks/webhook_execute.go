@@ -81,13 +81,13 @@ func (handler *Handler) executeServiceWebhook(
 	}
 
 	service.Spec.TaskTemplate.ForceUpdate++
-	
+
 	var imageName = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
 
 	if imageTag != "" {
 		var tagIndex = strings.LastIndex(imageName, ":")
 		if tagIndex == -1 {
-	  		tagIndex = len(imageName)
+			tagIndex = len(imageName)
 		}
 		service.Spec.TaskTemplate.ContainerSpec.Image = imageName[:tagIndex] + ":" + imageTag
 	} else {
@@ -112,7 +112,13 @@ func (handler *Handler) executeServiceWebhook(
 			}
 		}
 	}
-
+	if imageTag != "" {
+		rc, err := dockerClient.ImagePull(context.Background(), service.Spec.TaskTemplate.ContainerSpec.Image, dockertypes.ImagePullOptions{RegistryAuth: serviceUpdateOptions.EncodedRegistryAuth})
+		if err != nil {
+			return &httperror.HandlerError{http.StatusNotFound, "Error pulling image with the specified tag", err}
+		}
+		defer rc.Close()
+	}
 	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions)
 
 	if err != nil {
