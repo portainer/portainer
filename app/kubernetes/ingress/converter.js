@@ -139,7 +139,7 @@ export class KubernetesIngressConverter {
     const res = new KubernetesIngressCreatePayload();
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
-    res.metadata.annotations = data.Annotations;
+    res.spec.ingressClassName = data.IngressClassName;
     if (data.Paths && data.Paths.length) {
       _.forEach(data.Paths, (p) => {
         if (p.Host === 'undefined' || p.Host === undefined) {
