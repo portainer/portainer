@@ -63,7 +63,7 @@ func (store *Store) Open() (bool, error) {
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
 	version, err := store.VersionService.DBVersion()
 	logrus.Infof("database version: %d", version)
-	
+
 	if err == nil {
 		newStore = true
 		logrus.WithField("version", version).Infof("Opened existing store")
@@ -74,7 +74,7 @@ func (store *Store) Open() (bool, error) {
 		if store.IsErrObjectNotFound(err) {
 			logrus.WithError(err).Debugf("open db failed - object not found")
 		} else {
-			logrus.WithError(err).Debugf("open db failed - unknown")
+			logrus.WithError(err).Debugf("open db failed - other")
 		}
 		return newStore, err
 	}

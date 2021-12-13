@@ -16,26 +16,26 @@ import (
 var encryptedStringTooShort = fmt.Errorf("encrypted string too short")
 
 // MarshalObject encodes an object to binary format
-func MarshalObject(object interface{}, passphrase string) ([]byte, error) {
+func (connection *DbConnection) MarshalObject(object interface{}) ([]byte, error) {
 	data, err := json.Marshal(object)
 	if err != nil {
 		logrus.WithError(err).Errorf("failed marshaling object")
 		return data, err
 	}
-	if passphrase == "" {
+	if connection.getEncryptionKey() == "" {
 		logrus.Infof("no encryption passphrase")
 		return data, nil
 	}
-	return encrypt(data, passphrase)
+	return encrypt(data, connection.getEncryptionKey())
 }
 
 // UnmarshalObject decodes an object from binary data
-func UnmarshalObject(data []byte, object interface{}, passphrase string) error {
+func (connection *DbConnection) UnmarshalObject(data []byte, object interface{}) error {
 	var err error
-	if passphrase == "" {
+	if connection.getEncryptionKey() == "" {
 		logrus.Infof("no encryption passphrase")
 	} else {
-		data, err = decrypt(data, passphrase)
+		data, err = decrypt(data, connection.getEncryptionKey())
 		if err != nil {
 			logrus.WithError(err).Errorf("failed decrypting object")
 		}
@@ -50,12 +50,12 @@ func UnmarshalObject(data []byte, object interface{}, passphrase string) error {
 // UnmarshalObjectWithJsoniter decodes an object from binary data
 // using the jsoniter library. It is mainly used to accelerate environment(endpoint)
 // decoding at the moment.
-func UnmarshalObjectWithJsoniter(data []byte, object interface{}, passphrase string) error {
-	if passphrase == "" {
+func (connection *DbConnection) UnmarshalObjectWithJsoniter(data []byte, object interface{}) error {
+	if connection.getEncryptionKey() == "" {
 		logrus.Infof("no encryption passphrase")
 	} else {
 		var err error
-		data, err = decrypt(data, passphrase)
+		data, err = decrypt(data, connection.getEncryptionKey())
 		if err != nil {
 			logrus.WithError(err).Errorf("failed decrypting object")
 			return err
