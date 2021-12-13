@@ -101,7 +101,7 @@ angular
       });
 
       try {
-        const tags = await TagService.tags();
+        $scope.tags = await TagService.tags();
         $scope.tags = tags;
       } catch (err) {
         Notifications.error('Failed loading page data', err);
