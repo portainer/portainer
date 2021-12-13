@@ -880,6 +880,8 @@ type (
 		AutoUpdate *StackAutoUpdate `json:"AutoUpdate"`
 		// The git config of this stack
 		GitConfig *gittypes.RepoConfig
+		// Whether the stack is from a app template
+		FromAppTemplate bool `example:"false"`
 		// Kubernetes namespace if stack is a kube application
 		Namespace string `example:"default"`
 		// IsComposeFormat indicates if the Kubernetes stack is created from a Docker Compose file
@@ -1158,6 +1160,7 @@ type (
 		Token       string      `json:"Token"`
 		ResourceID  string      `json:"ResourceId"`
 		EndpointID  EndpointID  `json:"EndpointId"`
+		RegistryID  RegistryID  `json:"RegistryId"`
 		WebhookType WebhookType `json:"Type"`
 	}
 
@@ -1576,6 +1579,7 @@ type (
 		Webhooks() ([]Webhook, error)
 		Webhook(ID WebhookID) (*Webhook, error)
 		CreateWebhook(portainer *Webhook) error
+		UpdateWebhook(ID WebhookID, webhook *Webhook) error
 		WebhookByResourceID(resourceID string) (*Webhook, error)
 		WebhookByToken(token string) (*Webhook, error)
 		DeleteWebhook(serviceID WebhookID) error

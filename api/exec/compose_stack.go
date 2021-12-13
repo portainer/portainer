@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -12,6 +13,7 @@ import (
 	libstack "github.com/portainer/docker-compose-wrapper"
 	"github.com/portainer/docker-compose-wrapper/compose"
 
+	"github.com/docker/cli/cli/compose/loader"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
@@ -97,6 +99,12 @@ func (manager *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpo
 }
 
 func createEnvFile(stack *portainer.Stack) (string, error) {
+	// workaround for EE-1862. It will have to be removed when
+	// docker/compose upgraded to v2.x.
+	if err := createNetworkEnvFile(stack); err != nil {
+		return "", errors.Wrap(err, "failed to create network env file")
+	}
+
 	if stack.Env == nil || len(stack.Env) == 0 {
 		return "", nil
 	}
@@ -114,4 +122,138 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	envfile.Close()
 
 	return "stack.env", nil
+}
+
+func createNetworkEnvFile(stack *portainer.Stack) error {
+	networkNameSet := NewStringSet()
+
+	for _, filePath := range stackutils.GetStackFilePaths(stack) {
+		networkNames, err := extractNetworkNames(filePath)
+		if err != nil {
+			return errors.Wrap(err, "failed to extract network name")
+		}
+
+		if networkNames == nil || networkNames.Len() == 0 {
+			continue
+		}
+
+		networkNameSet.Union(networkNames)
+	}
+
+	for _, s := range networkNameSet.List() {
+		if _, ok := os.LookupEnv(s); ok {
+			networkNameSet.Remove(s)
+		}
+	}
+
+	if networkNameSet.Len() == 0 && stack.Env == nil {
+		return nil
+	}
+
+	envfile, err := os.OpenFile(path.Join(stack.ProjectPath, ".env"),
+		os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return errors.Wrap(err, "failed to open env file")
+	}
+
+	defer envfile.Close()
+
+	var scanEnvSettingFunc = func(name string) (string, bool) {
+		if stack.Env != nil {
+			for _, v := range stack.Env {
+				if name == v.Name {
+					return v.Value, true
+				}
+			}
+		}
+
+		return "", false
+	}
+
+	for _, s := range networkNameSet.List() {
+		if _, ok := scanEnvSettingFunc(s); !ok {
+			stack.Env = append(stack.Env, portainer.Pair{
+				Name:  s,
+				Value: "None",
+			})
+		}
+	}
+
+	if stack.Env != nil {
+		for _, v := range stack.Env {
+			envfile.WriteString(
+				fmt.Sprintf("%s=%s\n", v.Name, v.Value))
+		}
+	}
+
+	return nil
+}
+
+func extractNetworkNames(filePath string) (StringSet, error) {
+	if info, err := os.Stat(filePath); errors.Is(err,
+		os.ErrNotExist) || info.IsDir() {
+		return nil, nil
+	}
+
+	stackFileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open yaml file")
+	}
+
+	config, err := loader.ParseYAML(stackFileContent)
+	if err != nil {
+		// invalid stack file
+		return nil, errors.Wrap(err, "invalid stack file")
+	}
+
+	var version string
+	if _, ok := config["version"]; ok {
+		version, _ = config["version"].(string)
+	}
+
+	var networks map[string]interface{}
+	if value, ok := config["networks"]; ok {
+		if value == nil {
+			return nil, nil
+		}
+
+		if networks, ok = value.(map[string]interface{}); !ok {
+			return nil, nil
+		}
+	} else {
+		return nil, nil
+	}
+
+	networkContent, err := loader.LoadNetworks(networks, version)
+	if err != nil {
+		return nil, nil // skip the error
+	}
+
+	re := regexp.MustCompile(`^\$\{?([^\}]+)\}?$`)
+	networkNames := NewStringSet()
+
+	for _, v := range networkContent {
+		matched := re.FindAllStringSubmatch(v.Name, -1)
+		if matched != nil && matched[0] != nil {
+			if strings.Contains(matched[0][1], ":-") {
+				continue
+			}
+
+			if strings.Contains(matched[0][1], "?") {
+				continue
+			}
+
+			if strings.Contains(matched[0][1], "-") {
+				continue
+			}
+
+			networkNames.Add(matched[0][1])
+		}
+	}
+
+	if networkNames.Len() == 0 {
+		return nil, nil
+	}
+
+	return networkNames, nil
 }

@@ -63,6 +63,11 @@ func (a *apiKeyService) GenerateApiKey(user portainer.User, description string) 
 	return prefixedAPIKey, apiKey, nil
 }
 
+// GetAPIKey returns an API key by its ID.
+func (a *apiKeyService) GetAPIKey(apiKeyID portainer.APIKeyID) (*portainer.APIKey, error) {
+	return a.apiKeyRepository.GetAPIKey(apiKeyID)
+}
+
 // GetAPIKeys returns all the API keys associated to a user.
 func (a *apiKeyService) GetAPIKeys(userID portainer.UserID) ([]portainer.APIKey, error) {
 	return a.apiKeyRepository.GetAPIKeysByUserID(userID)

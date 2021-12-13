@@ -26,6 +26,8 @@ type swarmStackFromFileContentPayload struct {
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
 	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
+	// Whether the stack is from a app template
+	FromAppTemplate bool `example:"false"`
 }
 
 func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error {
@@ -61,15 +63,16 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:           portainer.StackID(stackID),
-		Name:         payload.Name,
-		Type:         portainer.DockerSwarmStack,
-		SwarmID:      payload.SwarmID,
-		EndpointID:   endpoint.ID,
-		EntryPoint:   filesystem.ComposeFileDefaultName,
-		Env:          payload.Env,
-		Status:       portainer.StackStatusActive,
-		CreationDate: time.Now().Unix(),
+		ID:              portainer.StackID(stackID),
+		Name:            payload.Name,
+		Type:            portainer.DockerSwarmStack,
+		SwarmID:         payload.SwarmID,
+		EndpointID:      endpoint.ID,
+		EntryPoint:      filesystem.ComposeFileDefaultName,
+		Env:             payload.Env,
+		Status:          portainer.StackStatusActive,
+		CreationDate:    time.Now().Unix(),
+		FromAppTemplate: payload.FromAppTemplate,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -121,6 +124,8 @@ type swarmStackFromGitRepositoryPayload struct {
 	RepositoryUsername string `example:"myGitUsername"`
 	// Password used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryPassword string `example:"myGitPassword"`
+	// Whether the stack is from a app template
+	FromAppTemplate bool `example:"false"`
 	// Path to the Stack file inside the Git repository
 	ComposeFile string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Applicable when deploying with multiple stack files
@@ -189,6 +194,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		EntryPoint:      payload.ComposeFile,
 		AdditionalFiles: payload.AdditionalFiles,
 		AutoUpdate:      payload.AutoUpdate,
+		FromAppTemplate: payload.FromAppTemplate,
 		GitConfig: &gittypes.RepoConfig{
 			URL:            payload.RepositoryURL,
 			ReferenceName:  payload.RepositoryReferenceName,

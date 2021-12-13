@@ -24,6 +24,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 	h.Handle("/webhooks",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.webhookCreate))).Methods(http.MethodPost)
+	h.Handle("/webhooks/{id}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.webhookUpdate))).Methods(http.MethodPut)
 	h.Handle("/webhooks",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.webhookList))).Methods(http.MethodGet)
 	h.Handle("/webhooks/{id}",
