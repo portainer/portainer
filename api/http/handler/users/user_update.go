@@ -2,7 +2,6 @@ package users
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"time"
 
@@ -95,13 +94,13 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 		user.Username = payload.Username
 	}
-	force_logout := false
+
 	if payload.Password != "" {
 		user.Password, err = handler.CryptoService.Hash(payload.Password)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errCryptoHashFailure}
 		}
-		force_logout = true
+		user.TokenIssueAt = time.Now().Unix()
 	}
 
 	if payload.Role != 0 {
@@ -119,21 +118,5 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	// remove all of the users persisted API keys
 	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
-	if force_logout {
-		go func() {
-			time.Sleep(time.Second * 5)
-			user, err := handler.DataStore.User().User(portainer.UserID(userID))
-			if err != nil {
-				log.Printf("[ERROR] [message: update token failed] [error: %s]", err)
-				return
-			}
-			user.TokenIssueAt = time.Now().Unix()
-			err = handler.DataStore.User().UpdateUser(user.ID, user)
-			if err != nil {
-				log.Printf("[ERROR] [message: update token failed] [error: %s]", err)
-			}
-		}()
-	}
-
 	return response.JSON(w, user)
 }
