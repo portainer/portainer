@@ -17,14 +17,18 @@ angular.module('portainer.app').controller('AccountController', [
     };
 
     $scope.updatePassword = function () {
-      UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword)
-        .then(function success() {
-          Notifications.success('Success', 'Password successfully updated');
-          $state.reload();
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, err.msg);
-        });
+      ModalService.confirmChangePassword(function (confirmed) {
+        if (confirmed) {
+          UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword)
+            .then(function success() {
+              Notifications.success('Success', 'Password successfully updated');
+              $state.reload();
+            })
+            .catch(function error(err) {
+              Notifications.error('Failure', err, err.msg);
+            });
+        }
+      });
     };
 
     $scope.removeAction = (selectedTokens) => {

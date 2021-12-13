@@ -124,11 +124,9 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 
 			user, err := service.dataStore.User().User(portainer.UserID(cl.UserID))
 			if err != nil {
-				fmt.Println("cannot check user's token")
 				return nil, errInvalidJWTToken
 			}
 			if user.TokenIssueAt > cl.StandardClaims.IssuedAt {
-				fmt.Println("illege token")
 				return nil, errInvalidJWTToken
 			}
 			return &portainer.TokenData{

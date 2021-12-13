@@ -63,7 +63,15 @@ angular.module('portainer.app').controller('UserController', [
         });
     };
 
-    $scope.updatePassword = function () {
+    $scope.updatePassword = async function () {
+      let promise = Promise.resolve(true);
+      if (Authentication.getUserDetails().ID + '' === $transition$.params().id) {
+        promise = new Promise((resolve) => ModalService.confirmChangePassword(resolve));
+      }
+      const confirmed = await promise;
+      if (!confirmed) {
+        return;
+      }
       UserService.updateUser($scope.user.Id, { password: $scope.formValues.newPassword })
         .then(function success() {
           Notifications.success('Password successfully updated');
