@@ -31,6 +31,16 @@ func NewService(fileService portainer.FileService, dataStore portainer.DataStore
 
 // Init initializes the service
 func (service *Service) Init(host, certPath, keyPath string) error {
+	pathSupplied := certPath != "" && keyPath != ""
+	if pathSupplied {
+		newCertPath, newKeyPath, err := service.fileService.CopySSLCertPair(certPath, keyPath)
+		if err != nil {
+			return errors.Wrap(err, "failed copying supplied certs")
+		}
+
+		return service.cacheInfo(newCertPath, newKeyPath, false)
+	}
+
 	settings, err := service.GetSSLSettings()
 	if err != nil {
 		return errors.Wrap(err, "failed fetching ssl settings")
@@ -47,16 +57,6 @@ func (service *Service) Init(host, certPath, keyPath string) error {
 		if err == nil {
 			return nil
 		}
-	}
-
-	pathSupplied := certPath != "" && keyPath != ""
-	if pathSupplied {
-		newCertPath, newKeyPath, err := service.fileService.CopySSLCertPair(certPath, keyPath)
-		if err != nil {
-			return errors.Wrap(err, "failed copying supplied certs")
-		}
-
-		return service.cacheInfo(newCertPath, newKeyPath, false)
 	}
 
 	// path not supplied and certificates doesn't exist - generate self signed
