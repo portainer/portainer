@@ -300,7 +300,7 @@ function EndpointController(
             clearAMTManagementInfo(amtInfo.RawOutput);
           }
         } catch (err) {
-          Notifications.error('Failure', err, 'Unable to retrieve AMT environment details');
+          console.log('Failure', err);
           clearAMTManagementInfo('Unable to retrieve AMT environment details');
         }
       }
