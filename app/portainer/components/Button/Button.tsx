@@ -1,18 +1,26 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
-type Type = 'submit' | 'reset' | 'button';
 type Color = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'link';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
-export interface Props {
-  type?: Type;
+
+interface PropsInterface {
   color?: Color;
   size?: Size;
   disabled?: boolean;
   title?: string;
   className?: string;
-  onClick: () => void;
+  dataCy?: string;
 }
+
+type PropTypes =
+  | {
+      type?: 'reset' | 'button';
+      onClick: () => void;
+    }
+  | { type?: 'submit'; onClick?: () => void };
+
+export type Props = PropsInterface & PropTypes;
 
 export function Button({
   type = 'button',
@@ -20,12 +28,14 @@ export function Button({
   size = 'small',
   disabled = false,
   className,
+  dataCy,
   onClick,
   title,
   children,
 }: PropsWithChildren<Props>) {
   return (
     <button
+      data-cy={dataCy}
       /* eslint-disable-next-line react/button-has-type */
       type={type}
       disabled={disabled}
