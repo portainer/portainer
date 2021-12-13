@@ -51,7 +51,13 @@ func (store *Store) Open() (bool, error) {
 	logrus.Infof("Is migration required?: %t", ok)
 	if ok {
 		// unencrypted database
-		store.encryptDB()
+		err := store.encryptDB()
+		if err != nil {
+			// In case of an error set DB to unencrypted
+			// and continue without encryption
+			logrus.Errorf("error encrypting database: %s", err.Error())
+			store.connection.SetIsDBEncryptedFlag(false)
+		}
 	}
 
 	// This creates the accessor structures, and should not mutate the data in any way
@@ -73,6 +79,7 @@ func (store *Store) Open() (bool, error) {
 		}
 		if store.IsErrObjectNotFound(err) {
 			logrus.WithError(err).Debugf("open db failed - object not found")
+			return newStore, nil
 		} else {
 			logrus.WithError(err).Debugf("open db failed - other")
 		}
@@ -96,13 +103,21 @@ func (store *Store) encryptDB() error {
 		logrus.Fatal("init services failed")
 	}
 
+	dbBackup := store.databasePath() + fmt.Sprintf(".backup-%d.db", time.Now().Unix())
+
+	err = store.fileService.Copy(store.databasePath(), dbBackup, false)
+	if err != nil {
+		logrus.WithError(err).Warnf("failed to create backup copy of db")
+		return err
+	}
+
 	// export file path for backup
 	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
 
 	logrus.Infof("exporting database backup to %s", exportFilename)
 	err = store.Export(exportFilename)
 	if err != nil {
-		logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
+		logrus.WithError(err).Warnf("failed to export to %s", exportFilename)
 		return err
 	}
 
@@ -112,11 +127,27 @@ func (store *Store) encryptDB() error {
 	store.connection.SetIsDBEncryptedFlag(true)
 	err = store.Import(exportFilename)
 	if err != nil {
-		logrus.Fatal(errors.ErrDBImportFailed.Error()) // TODO: Rollback?
+		
+		logrus.Warnf(errors.ErrDBImportFailed.Error())
+		
+		// Close the connection so that db file can be restored
+		store.connection.Close()
+	
+		// Restore the backup
+		err = store.fileService.Copy(dbBackup, store.databasePath(), true)
+		if err != nil {
+			logrus.WithError(err).Fatalf("failed to restore database backup copy. Rename %s to %s to continue and disbale encryption key. Please report the error.", dbBackup, store.databasePath())
+			return err
+		}
+
+		// Open the connection
+		store.connection.Open()
 	}
 
+	// Remove the backup file
+	store.fileService.Delete(dbBackup)
 	logrus.Info("database successfully encrypted")
-	// TODO: Delete the backup??
+
 	return nil
 }
 

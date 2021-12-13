@@ -652,3 +652,8 @@ func MoveDirectory(originalPath, newPath string) error {
 
 	return os.Rename(originalPath, newPath)
 }
+
+// Deleet the file
+func (service *Service) Delete(filePath string) error {
+	return os.Remove(filePath)
+}

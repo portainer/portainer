@@ -2,6 +2,7 @@ package boltdb
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -42,7 +43,17 @@ func (c *DbConnection) exportJson(databasePath string) ([]byte, error) {
 					if string(k) == "DB_UPDATING" {
 						continue
 					}
-					version[string(k)] = obj.(string)
+					v, ok := obj.(string)
+					if ok {
+						version[string(k)] = v
+					} else {
+						if string(k) == "DB_VERSION" {
+							if v, ok := obj.(int); ok {
+								version[string(k)] = fmt.Sprintf("%s", v)
+							}
+						}
+						logrus.WithError(err).Errorf("unknown type for (bucket version): key=%s value=%v", string(k), string(v))
+					}
 				} else {
 					list = append(list, obj)
 				}

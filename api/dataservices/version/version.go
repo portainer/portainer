@@ -1,9 +1,11 @@
 package version
 
 import (
+	"fmt"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -38,12 +40,22 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 // DBVersion retrieves the stored database version.
 func (service *Service) DBVersion() (int, error) {
-	var version string
+	var version interface{}
 	err := service.connection.GetObject(BucketName, []byte(versionKey), &version)
 	if err != nil {
 		return 0, err
 	}
-	return strconv.Atoi(version)
+	vs, ok := version.(string)
+	if ok {
+		return strconv.Atoi(vs)
+	}
+	// bolt is treating numbers as float64
+	vi, ok := version.(float64)
+	if !ok {
+		logrus.Errorf("db version type unknown %T", version)
+		return 0, fmt.Errorf("db version type unknown %T", version)
+	}
+	return int(vi), nil
 }
 
 // Edition retrieves the stored portainer edition.

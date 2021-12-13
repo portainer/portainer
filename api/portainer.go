@@ -1205,6 +1205,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
+		Delete(filePath string) error
 	}
 
 	// GitService represents a service for managing Git
