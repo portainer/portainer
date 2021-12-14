@@ -540,10 +540,6 @@ func (store *Store) Import(filename string) (err error) {
 	for _, v := range backup.HelmUserRepository {
 		store.HelmUserRepository().UpdateHelmUserRepository(v.ID, &v)
 	}
-	// backup[store.HelmUserRepository().BucketName()], err = store.HelmUserRepository().HelmUserRepositorys()
-	// for _, v := range backup.HelmUserRepository {
-	// 	store.HelmUserRepository().UpdateHelmUserRepository(v.ID, &v)
-	// }
 	for _, v := range backup.Registry {
 		store.Registry().UpdateRegistry(v.ID, &v)
 	}
