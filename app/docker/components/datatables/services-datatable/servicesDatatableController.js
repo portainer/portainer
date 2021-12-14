@@ -4,8 +4,7 @@ angular.module('portainer.docker').controller('ServicesDatatableController', [
   '$scope',
   '$controller',
   'DatatableService',
-  'EndpointProvider',
-  function ($scope, $controller, DatatableService, EndpointProvider) {
+  function ($scope, $controller, DatatableService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     var ctrl = this;
@@ -13,7 +12,6 @@ angular.module('portainer.docker').controller('ServicesDatatableController', [
     this.state = Object.assign(this.state, {
       expandAll: false,
       expandedItems: [],
-      publicURL: EndpointProvider.endpointPublicURL(),
     });
 
     this.expandAll = function () {

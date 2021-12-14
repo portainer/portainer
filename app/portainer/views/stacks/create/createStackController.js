@@ -19,13 +19,13 @@ angular
     FormValidator,
     ResourceControlService,
     FormHelper,
-    EndpointProvider,
     StackHelper,
     ContainerHelper,
     CustomTemplateService,
     ContainerService,
     WebhookHelper,
-    clipboard
+    clipboard,
+    endpoint
   ) {
     $scope.onChangeTemplateId = onChangeTemplateId;
     $scope.buildAnalyticsProperties = buildAnalyticsProperties;
@@ -307,12 +307,7 @@ angular
         $scope.state.StackType = 1;
       }
 
-      try {
-        const endpoint = EndpointProvider.currentEndpoint();
-        $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
-      }
+      $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
 
       try {
         const containers = await ContainerService.containers(true);
