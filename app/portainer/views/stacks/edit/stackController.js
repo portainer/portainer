@@ -1,7 +1,9 @@
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { STACK_PULL_IMAGE, STACK_WEBHOOK } from 'Portainer/feature-flags/feature-ids';
 
 angular.module('portainer.app').controller('StackController', [
   '$async',
+  '$compile',
   '$q',
   '$scope',
   '$state',
@@ -27,6 +29,7 @@ angular.module('portainer.app').controller('StackController', [
   'endpoint',
   function (
     $async,
+    $compile,
     $q,
     $scope,
     $state,
@@ -52,6 +55,7 @@ angular.module('portainer.app').controller('StackController', [
     endpoint
   ) {
     $scope.endpoint = endpoint;
+    $scope.stackWebhookFeature = STACK_WEBHOOK;
     $scope.state = {
       actionInProgress: false,
       migrationInProgress: false,
@@ -207,32 +211,43 @@ angular.module('portainer.app').controller('StackController', [
     };
 
     $scope.deployStack = function () {
-      var stackFile = $scope.stackFileContent;
-      var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      var prune = $scope.formValues.Prune;
-      var stack = $scope.stack;
+      const stack = $scope.stack;
+      const isSwarmStack = stack.Type === 1;
+      $scope.stackPullImageFeature = STACK_PULL_IMAGE;
+      const tplCrop = '<div  style="position: absolute; right: 100px; top: 28px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
+      const template = angular.element(tplCrop);
+      const html = $compile(template)($scope);
+      // 'Do you want to force an update of the stack?'
+      ModalService.confirmStackUpdate(html, true, isSwarmStack, function (result) {
+        if (!result) {
+          return;
+        }
+        var stackFile = $scope.stackFileContent;
+        var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
+        var prune = $scope.formValues.Prune;
 
-      // TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-      // The EndpointID property is not available for these stacks, we can pass
-      // the current endpoint identifier as a part of the update request. It will be used if
-      // the EndpointID property is not defined on the stack.
-      if (stack.EndpointId === 0) {
-        stack.EndpointId = endpoint.Id;
-      }
+        // TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
+        // The EndpointID property is not available for these stacks, we can pass
+        // the current endpoint identifier as a part of the update request. It will be used if
+        // the EndpointID property is not defined on the stack.
+        if (stack.EndpointId === 0) {
+          stack.EndpointId = endpoint.Id;
+        }
 
-      $scope.state.actionInProgress = true;
-      StackService.updateStack(stack, stackFile, env, prune)
-        .then(function success() {
-          Notifications.success('Stack successfully deployed');
-          $scope.state.isEditorDirty = false;
-          $state.reload();
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to create stack');
-        })
-        .finally(function final() {
-          $scope.state.actionInProgress = false;
-        });
+        $scope.state.actionInProgress = true;
+        StackService.updateStack(stack, stackFile, env, prune)
+          .then(function success() {
+            Notifications.success('Stack successfully deployed');
+            $scope.state.isEditorDirty = false;
+            $state.reload();
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to create stack');
+          })
+          .finally(function final() {
+            $scope.state.actionInProgress = false;
+          });
+      });
     };
 
     $scope.editorUpdate = function (cm) {
