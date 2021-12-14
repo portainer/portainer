@@ -85,3 +85,15 @@ func (service *Service) Create(record *portainer.HelmUserRepository) error {
 		},
 	)
 }
+
+// UpdateHelmUserRepostory updates an registry.
+func (service *Service) UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, registry *portainer.HelmUserRepository) error {
+	identifier := service.connection.ConvertToKey(int(ID))
+	return service.connection.UpdateObject(BucketName, identifier, registry)
+}
+
+// DeleteHelmUserRepository deletes an registry.
+func (service *Service) DeleteHelmUserRepository(ID portainer.HelmUserRepositoryID) error {
+	identifier := service.connection.ConvertToKey(int(ID))
+	return service.connection.DeleteObject(BucketName, identifier)
+}
