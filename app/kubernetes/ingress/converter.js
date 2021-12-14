@@ -91,6 +91,7 @@ export class KubernetesIngressConverter {
       _.extend(res.Annotations, KubernetesIngressClassRewriteTargetAnnotations[formValues.IngressClass.Type]);
     }
     res.Annotations[KubernetesIngressClassAnnotation] = formValues.IngressClass.Name;
+    res.IngressClassName = formValues.IngressClass.Name;
     res.Hosts = formValues.Hosts;
     res.Paths = formValues.Paths;
     return res;
