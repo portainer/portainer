@@ -207,6 +207,17 @@ angular
         },
       };
 
+      var deviceImport = {
+        name: 'portainer.endpoints.importdevice',
+        url: '/device',
+        views: {
+          'content@': {
+            templateUrl: './views/devices/import/importDevice.html',
+            controller: 'ImportDeviceController',
+          },
+        },
+      };
+
       var endpointAccess = {
         name: 'portainer.endpoints.endpoint.access',
         url: '/access',
@@ -459,6 +470,7 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(endpointCreation);
+      $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);

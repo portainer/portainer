@@ -6,9 +6,12 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api/fdo/ownerclient"
 	"github.com/sirupsen/logrus"
 )
+
+type registerDeviceResponse struct {
+	Guid string `json:"guid" example:"c6ea3343-229a-4c07-9096-beef7134e1d3"`
+}
 
 // @id fdoRegisterDevice
 // @summary register an FDO device
@@ -42,35 +45,5 @@ func (handler *Handler) fdoRegisterDevice(w http.ResponseWriter, r *http.Request
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: PostVoucher()", Err: err}
 	}
 
-	// Put ServiceInfo
-	err = fdoClient.PutDeviceSVI(ownerclient.ServiceInfo{
-		Module:   "test-module",
-		Var:      "test-var",
-		Filename: "test-filename",
-		Bytes:    []byte("test-bytes"),
-		GUID:     guid,
-		Device:   "test-device-model",
-		Priority: 1,
-		OS:       "Test OS",
-		Version:  "21.11",
-		Arch:     "X86_64",
-		CRID:     123,
-		Hash:     "test-hash",
-	})
-
-	if err != nil {
-		logrus.WithError(err).Info("fdoRegisterDevice: PutDeviceSVI()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: PutDeviceSVI()", Err: err}
-	}
-
-	// Get device ServiceInfo
-	svinfo, err := fdoClient.GetDeviceSVI(guid)
-	if err != nil {
-		logrus.WithError(err).Info("fdoRegisterDevice: GetDeviceSVI()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: GetDeviceSVI()", Err: err}
-	}
-
-	logrus.WithField("Service info", svinfo).Debug("fdoRegisterDevice ok")
-
-	return response.JSON(w, svinfo)
+	return response.JSON(w, registerDeviceResponse{guid})
 }

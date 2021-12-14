@@ -22,6 +22,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       showAMTInfo: false,
       amtDevices: {},
       amtDevicesErrors: {},
+      showFDOInfo: false,
     });
 
     this.paginationChanged = function () {
@@ -60,11 +61,15 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       this.paginationChanged();
     };
 
-    this.setShowAMTInfo = async function () {
+    this.setShowIntelInfo = async function () {
       this.settings = await SettingsService.settings();
-      const featureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['open-amt'];
-      const featureEnabled = this.settings && this.settings.OpenAMTConfiguration && this.settings.OpenAMTConfiguration.Enabled;
-      this.state.showAMTInfo = featureFlagValue && featureEnabled;
+      const openAMTFeatureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['open-amt'];
+      const openAMTFeatureEnabled = this.settings && this.settings.OpenAMTConfiguration && this.settings.OpenAMTConfiguration.Enabled;
+      this.state.showAMTInfo = openAMTFeatureFlagValue && openAMTFeatureEnabled;
+
+      const fdoFeatureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['fdo'];
+      const fdoFeatureEnabled = this.settings && this.settings.FDOConfiguration && this.settings.FDOConfiguration.Enabled;
+      this.state.showFDOInfo = fdoFeatureFlagValue && fdoFeatureEnabled;
     };
 
     this.showAMTNodes = function (item) {
@@ -151,7 +156,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
         this.filters.state.open = false;
       }
 
-      await this.setShowAMTInfo();
+      await this.setShowIntelInfo();
       this.paginationChanged();
     };
   },
