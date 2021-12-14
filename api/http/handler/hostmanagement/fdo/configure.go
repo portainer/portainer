@@ -41,9 +41,7 @@ func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
 // @tags intel
 // @security jwt
 // @produce json
-// @param edgekey query string true "Environment edge key"
-// @param name query string true "Environment name"
-// @param profile query string true "FDO deployment profile name"
+// @param body body deviceConfigurePayload true "Device Configuration"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
