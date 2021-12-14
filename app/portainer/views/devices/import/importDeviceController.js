@@ -35,19 +35,16 @@ angular
     $scope.profiles = [{ Id: 1, Name: 'Docker Standalone + Edge Agent' }];
 
     $scope.onVoucherFileChange = function (file) {
-      console.log(file);
       if (file) {
         $scope.state.voucherUploading = true;
 
         FileUploadService.uploadOwnershipVoucher(file)
           .then(function success(response) {
-            console.log(response);
             $scope.state.voucherUploading = false;
             $scope.state.voucherUploaded = true;
             $scope.deviceID = response.data.guid;
           })
           .catch(function error(err) {
-            console.log(err);
             $scope.state.voucherUploading = false;
             Notifications.error('Failure', err, 'Unable to upload Ownership Voucher');
           });
@@ -57,6 +54,7 @@ angular
     $scope.onCreateTag = function onCreateTag(tagName) {
       return $async(onCreateTagAsync, tagName);
     };
+
     async function onCreateTagAsync(tagName) {
       try {
         const tag = await TagService.createTag(tagName);
