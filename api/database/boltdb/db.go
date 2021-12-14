@@ -223,7 +223,7 @@ func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, ob
 			return err
 		}
 
-		return bucket.Put(connection.ConvertToKey(int(id)), data)
+		return bucket.Put(connection.ConvertToKey(id), data)
 	})
 }
 
@@ -244,7 +244,7 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 			return err
 		}
 
-		return bucket.Put(connection.ConvertToKey(int(id)), data)
+		return bucket.Put(connection.ConvertToKey(id), data)
 	})
 }
 
