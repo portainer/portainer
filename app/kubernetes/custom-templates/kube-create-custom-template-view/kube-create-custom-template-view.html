@@ -14,7 +14,7 @@
           <div class="col-sm-12 form-section-title">
             Build method
           </div>
-          <box-selector radio-name="method" ng-model="$ctrl.state.method" options="$ctrl.methodOptions" on-change="($ctrl.onChangeMethod)"></box-selector>
+          <box-selector radio-name="'method'" value="$ctrl.state.method" options="$ctrl.methodOptions" on-change="($ctrl.onChangeMethod)"></box-selector>
 
           <web-editor-form
             ng-if="$ctrl.state.method === 'editor'"

@@ -12,8 +12,8 @@
 
   <box-selector
     style="margin-bottom: 0;"
-    radio-name="ldap-server-type-selector"
-    ng-model="$ctrl.settings.ServerType"
+    radio-name="'ldap-server-type-selector'"
+    value="$ctrl.settings.ServerType"
     options="$ctrl.boxSelectorOptions"
     on-change="($ctrl.onChangeServerType)"
   ></box-selector>

@@ -147,11 +147,12 @@
                 <div class="form-group">
                   <div class="col-sm-12">
                     <por-switch-field
-                      ng-data-cy="k8sNamespaceCreate-loadBalancerQuotaToggle"
-                      label="Load Balancer quota"
-                      name="k8s-resourcepool-Lbquota"
-                      feature="ctrl.LBQuotaFeatureId"
-                      ng-model="lbquota"
+                      data-cy="'k8sNamespaceCreate-loadBalancerQuotaToggle'"
+                      label="'Load Balancer quota'"
+                      name="'k8s-resourcepool-Lbquota'"
+                      feature-id="ctrl.LBQuotaFeatureId"
+                      checked="ctrl.formValues.UseLoadBalancersQuota"
+                      on-change="(ctrl.onToggleLoadBalancersQuota)"
                     ></por-switch-field>
                   </div>
                 </div>
@@ -386,17 +387,9 @@
                   <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
                   standard
                 </div>
-                <div class="form-group">
-                  <div class="col-sm-12">
-                    <por-switch-field
-                      ng-data-cy="k8sNamespaceCreate-enableQuotaToggle"
-                      label="Enable quota"
-                      name="k8s-resourcepool-storagequota"
-                      feature="ctrl.StorageQuotaFeatureId"
-                      ng-model="storagequota"
-                    ></por-switch-field>
-                  </div>
-                </div>
+
+                <storage-class-switch value="sc.Selected" name="sc.Name" on-change="(ctrl.onToggleStorageQuota)" authorization="K8sResourcePoolDetailsW"></storage-class-switch>
+
                 <!-- #endregion -->
 
                 <!-- summary -->
