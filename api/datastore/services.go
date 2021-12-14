@@ -467,21 +467,20 @@ func (store *Store) Export(filename string) (err error) {
 	} else {
 		backup.User = users
 	}
+	if webhooks, err := store.Webhook().Webhooks(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Webhook = webhooks
+	}
 	v, err := store.Version().DBVersion()
 	if err != nil {
 		logrus.WithError(err).Debugf("Export boom")
 	}
 	instance, _ := store.Version().InstanceID()
-	//edition, _ := store.Version().Edition()
 	backup.Version = map[string]string{
 		"DB_VERSION":  strconv.Itoa(v),
 		"INSTANCE_ID": instance,
 	}
-
-	// backup[store.Webhook().BucketName()], err = store.Webhook().Webhooks()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
 
 	b, err := json.MarshalIndent(backup, "", "  ")
 	if err != nil {
