@@ -127,6 +127,8 @@ type (
 		HelmUserRepositorys() ([]portainer.HelmUserRepository, error)
 		HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error)
 		Create(record *portainer.HelmUserRepository) error
+		UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, repository *portainer.HelmUserRepository) error
+		DeleteHelmUserRepository(ID portainer.HelmUserRepositoryID) error
 		BucketName() string
 	}
 

@@ -120,6 +120,8 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 	// this is for the db restore functionality - needs more tests.
 	go func() {
 		<-shutdownCtx.Done()
+		defer connection.Close()
+
 		exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
 
 		err := store.Export(exportFilename)
