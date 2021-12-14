@@ -48,7 +48,26 @@ type (
 	}
 
 	// MigratorParameters represents the required parameters to create a new Migrator instance.
-
+	MigratorParameters struct {
+		DatabaseVersion         int
+		EndpointGroupService    *endpointgroup.Service
+		EndpointService         *endpoint.Service
+		EndpointRelationService *endpointrelation.Service
+		ExtensionService        *extension.Service
+		RegistryService         *registry.Service
+		ResourceControlService  *resourcecontrol.Service
+		RoleService             *role.Service
+		ScheduleService         *schedule.Service
+		SettingsService         *settings.Service
+		StackService            *stack.Service
+		TagService              *tag.Service
+		TeamMembershipService   *teammembership.Service
+		UserService             *user.Service
+		VersionService          *version.Service
+		FileService             portainer.FileService
+		AuthorizationService    *authorization.Service
+		DockerhubService        *dockerhub.Service
+	}
 )
 
 // NewMigrator creates a new Migrator.
@@ -78,25 +97,4 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 // Version exposes version of database
 func (migrator *Migrator) Version() int {
 	return migrator.currentDBVersion
-}
-
-type MigratorParameters struct {
-	DatabaseVersion         int
-	EndpointGroupService    *endpointgroup.Service
-	EndpointService         *endpoint.Service
-	EndpointRelationService *endpointrelation.Service
-	ExtensionService        *extension.Service
-	RegistryService         *registry.Service
-	ResourceControlService  *resourcecontrol.Service
-	RoleService             *role.Service
-	ScheduleService         *schedule.Service
-	SettingsService         *settings.Service
-	StackService            *stack.Service
-	TagService              *tag.Service
-	TeamMembershipService   *teammembership.Service
-	UserService             *user.Service
-	VersionService          *version.Service
-	FileService             portainer.FileService
-	AuthorizationService    *authorization.Service
-	DockerhubService        *dockerhub.Service
 }
