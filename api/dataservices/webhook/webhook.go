@@ -141,3 +141,9 @@ func (service *Service) Create(webhook *portainer.Webhook) error {
 		},
 	)
 }
+
+// UpdateWebhook update a webhook.
+func (service *Service) UpdateWebhook(ID portainer.WebhookID, webhook *portainer.Webhook) error {
+	identifier := service.connection.ConvertToKey(int(ID))
+	return service.connection.UpdateObject(BucketName, identifier, webhook)
+}
