@@ -1352,12 +1352,14 @@ const (
 const (
 	FeatOpenAMT Feature = "open-amt"
 	FeatFDO     Feature = "fdo"
+	FeatDBSeed  Feature = "db-seed"
 )
 
 // List of supported features
 var SupportedFeatureFlags = []Feature{
 	FeatOpenAMT,
 	FeatFDO,
+	FeatDBSeed,
 }
 
 const (

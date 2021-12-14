@@ -157,9 +157,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/backup"):
-		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/restore"):
+	case strings.HasPrefix(r.URL.Path, "/api/backup") || strings.HasPrefix(r.URL.Path, "/api/restore") || strings.HasPrefix(r.URL.Path, "/api/seed"):
 		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/custom_templates"):
 		http.StripPrefix("/api", h.CustomTemplatesHandler).ServeHTTP(w, r)

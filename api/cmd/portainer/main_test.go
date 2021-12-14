@@ -34,6 +34,8 @@ func Test_enableFeaturesFromFlags(t *testing.T) {
 		{"oPeN-amT", true},
 		{"fdo", true},
 		{"FDO", true},
+		{"Db-SeED", true},
+		{"DB-SEED", true},
 	}
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s succeeds:%v", test.featureFlag, test.isSupported), func(t *testing.T) {

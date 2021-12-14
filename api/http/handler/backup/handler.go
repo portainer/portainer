@@ -39,6 +39,9 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 	h.Handle("/backup", bouncer.RestrictedAccess(adminAccess(httperror.LoggerHandler(h.backup)))).Methods(http.MethodPost)
 	h.Handle("/restore", bouncer.PublicAccess(httperror.LoggerHandler(h.restore))).Methods(http.MethodPost)
 
+	// db seed functionality is only available if specifically set as feature flag
+	h.Handle("/seed", bouncer.RestrictedAccess(adminAccess(httperror.LoggerHandler(h.seed)))).Methods(http.MethodPost)
+
 	return h
 }
 
