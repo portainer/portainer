@@ -284,7 +284,6 @@ type (
 		WebhookByResourceID(resourceID string) (*portainer.Webhook, error)
 		WebhookByToken(token string) (*portainer.Webhook, error)
 		DeleteWebhook(ID portainer.WebhookID) error
-		UpdateWebhook(ID portainer.WebhookID, webhook *portainer.Webhook)
 		BucketName() string
 	}
 )
