@@ -1,14 +1,12 @@
-import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
 import { baseHref } from '@/portainer/helpers/pathHelper';
-
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 import providers, { getProviderByUrl } from './providers';
 
 export default class OAuthSettingsController {
   /* @ngInject */
-  constructor(featureService) {
-    this.featureService = featureService;
-
-    this.limitedFeature = HIDE_INTERNAL_AUTH;
+  constructor() {
+    this.limitedFeature = FeatureId.HIDE_INTERNAL_AUTH;
     this.limitedFeatureClass = 'limited-be';
 
     this.state = {
@@ -63,7 +61,8 @@ export default class OAuthSettingsController {
   }
 
   updateSSO() {
-    this.settings.HideInternalAuth = this.featureService.isLimitedToBE(this.limitedFeature) ? false : this.settings.SSO;
+    this.settings.SSO = !this.settings.SSO;
+    this.settings.HideInternalAuth = !this.isLimitedToBE && this.settings.SSO;
   }
 
   addTeamMembershipMapping() {
@@ -89,7 +88,7 @@ export default class OAuthSettingsController {
   }
 
   $onInit() {
-    this.isLimitedToBE = this.featureService.isLimitedToBE(this.limitedFeature);
+    this.isLimitedToBE = isLimitedToBE(this.limitedFeature);
 
     if (this.isLimitedToBE) {
       return;
