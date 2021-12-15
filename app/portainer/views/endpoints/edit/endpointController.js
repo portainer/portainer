@@ -280,37 +280,43 @@ function EndpointController(
         $scope.groups = groups;
         $scope.availableTags = tags;
 
-        if (EndpointHelper.isDockerEndpoint(endpoint)) {
+        configureState();
+
+        const disconnectedEdge = $scope.state.edgeEndpoint && !endpoint.EdgeID;
+        if (EndpointHelper.isDockerEndpoint(endpoint) && !disconnectedEdge) {
           const featureFlagValue = settings && settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt'];
           const featureEnabled = settings && settings.OpenAMTConfiguration && settings.OpenAMTConfiguration.Enabled;
           $scope.state.showAMTInfo = featureFlagValue && featureEnabled;
         }
-
-        configureState();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve environment details');
       }
 
       if ($scope.state.showAMTInfo) {
         try {
+          $scope.endpoint.ManagementInfo = {};
           const [amtInfo] = await Promise.all([OpenAMTService.info($transition$.params().id)]);
 
-          $scope.endpoint.ManagementInfo = {};
           try {
             $scope.endpoint.ManagementInfo = JSON.parse(amtInfo.RawOutput);
           } catch (err) {
             console.log('Failure', err, 'Unable to JSON parse AMT info: ' + amtInfo.RawOutput);
-            $scope.endpoint.ManagementInfo['AMT'] = amtInfo.RawOutput;
-            $scope.endpoint.ManagementInfo['UUID'] = '-';
-            $scope.endpoint.ManagementInfo['Control Mode'] = '-';
-            $scope.endpoint.ManagementInfo['Build Number'] = '-';
-            $scope.endpoint.ManagementInfo['DNS Suffix'] = '-';
+            clearAMTManagementInfo(amtInfo.RawOutput);
           }
         } catch (err) {
-          Notifications.error('Failure', err, 'Unable to retrieve AMT environment details');
+          console.log('Failure', err);
+          clearAMTManagementInfo('Unable to retrieve AMT environment details');
         }
       }
     });
+  }
+
+  function clearAMTManagementInfo(versionValue) {
+    $scope.endpoint.ManagementInfo['AMT'] = versionValue;
+    $scope.endpoint.ManagementInfo['UUID'] = '-';
+    $scope.endpoint.ManagementInfo['Control Mode'] = '-';
+    $scope.endpoint.ManagementInfo['Build Number'] = '-';
+    $scope.endpoint.ManagementInfo['DNS Suffix'] = '-';
   }
 
   function buildLinuxStandaloneCommand(agentVersion, agentShortVersion, edgeId, edgeKey, allowSelfSignedCerts) {
