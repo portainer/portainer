@@ -5,6 +5,7 @@ import componentsModule from './components';
 import settingsModule from './settings';
 import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
+import servicesModule from './services';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -22,12 +23,19 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
 }
 
 angular
-  .module('portainer.app', ['portainer.oauth', 'portainer.rbac', componentsModule, settingsModule, featureFlagModule, userActivityModule, 'portainer.shared.datatable'])
+  .module('portainer.app', [
+    'portainer.oauth',
+    'portainer.rbac',
+    componentsModule,
+    settingsModule,
+    featureFlagModule,
+    userActivityModule,
+    'portainer.shared.datatable',
+    servicesModule,
+  ])
   .config([
     '$stateRegistryProvider',
     function ($stateRegistryProvider) {
-      'use strict';
-
       var root = {
         name: 'root',
         abstract: true,
@@ -54,18 +62,6 @@ angular
           'sidebar@': {
             templateUrl: './views/sidebar/sidebar.html',
             controller: 'SidebarController',
-          },
-        },
-        resolve: {
-          featuresServiceInitialized: /* @ngInject */ function featuresServiceInitialized($async, featureService, Notifications) {
-            return $async(async () => {
-              try {
-                await featureService.init();
-              } catch (e) {
-                Notifications.error('Failed initializing features service', e);
-                throw e;
-              }
-            });
           },
         },
       };
@@ -203,6 +199,17 @@ angular
           'content@': {
             templateUrl: './views/endpoints/create/createendpoint.html',
             controller: 'CreateEndpointController',
+          },
+        },
+      };
+
+      var deviceImport = {
+        name: 'portainer.endpoints.importdevice',
+        url: '/device',
+        views: {
+          'content@': {
+            templateUrl: './views/devices/import/importDevice.html',
+            controller: 'ImportDeviceController',
           },
         },
       };
@@ -459,6 +466,7 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(endpointCreation);
+      $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);

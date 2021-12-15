@@ -121,3 +121,22 @@ func (c FDOOwnerClient) PutDeviceSVI(info ServiceInfo) error {
 
 	return nil
 }
+
+func (c FDOOwnerClient) PutDeviceSVIRaw(info url.Values, body []byte) error {
+	resp, err := c.doDigestAuthReq(
+		http.MethodPut,
+		"api/v1/device/svi?"+info.Encode(),
+		"application/octet-stream",
+		strings.NewReader(string(body)),
+	)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New(http.StatusText(resp.StatusCode))
+	}
+
+	return nil
+}

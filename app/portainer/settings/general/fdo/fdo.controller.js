@@ -1,7 +1,7 @@
 class FDOController {
   /* @ngInject */
-  constructor($async, $state, FDOService, SettingsService, Notifications) {
-    Object.assign(this, { $async, $state, FDOService, SettingsService, Notifications });
+  constructor($async, $scope, $state, FDOService, SettingsService, Notifications) {
+    Object.assign(this, { $async, $scope, $state, FDOService, SettingsService, Notifications });
 
     this.formValues = {
       enabled: false,
@@ -19,6 +19,13 @@ class FDOController {
     };
 
     this.save = this.save.bind(this);
+    this.onChangeEnableFDO = this.onChangeEnableFDO.bind(this);
+  }
+
+  onChangeEnableFDO(checked) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.enabled = checked;
+    });
   }
 
   isFormChanged() {

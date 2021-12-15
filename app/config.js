@@ -1,6 +1,6 @@
-import toastr from 'toastr';
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
+import { agentInterceptor } from './portainer/services/axios';
 
 /* @ngInject */
 export function configApp($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
@@ -21,28 +21,9 @@ export function configApp($urlRouterProvider, $httpProvider, localStorageService
   $httpProvider.defaults.headers.put['Content-Type'] = 'application/json';
   $httpProvider.defaults.headers.patch['Content-Type'] = 'application/json';
 
-  $httpProvider.interceptors.push(
-    /* @ngInject */ function (HttpRequestHelper) {
-      return {
-        request(config) {
-          if (config.url.indexOf('/docker/') > -1) {
-            config.headers['X-PortainerAgent-Target'] = HttpRequestHelper.portainerAgentTargetHeader();
-            if (HttpRequestHelper.portainerAgentManagerOperation()) {
-              config.headers['X-PortainerAgent-ManagerOperation'] = '1';
-            }
-          }
-          return config;
-        },
-      };
-    }
-  );
-
-  toastr.options = {
-    timeOut: 3000,
-    closeButton: true,
-    progressBar: true,
-    tapToDismiss: false,
-  };
+  $httpProvider.interceptors.push(() => ({
+    request: agentInterceptor,
+  }));
 
   Terminal.applyAddon(fit);
 

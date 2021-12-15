@@ -52,7 +52,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 	if labelsObject[resourceLabelForPortainerPublicResourceControl] != nil {
 		resourceControl := authorization.NewPublicResourceControl(resourceID, resourceType)
 
-		err := transport.dataStore.ResourceControl().CreateResourceControl(resourceControl)
+		err := transport.dataStore.ResourceControl().Create(resourceControl)
 		if err != nil {
 			return nil, err
 		}
@@ -98,7 +98,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 
 		resourceControl := authorization.NewRestrictedResourceControl(resourceID, resourceType, userIDs, teamIDs)
 
-		err := transport.dataStore.ResourceControl().CreateResourceControl(resourceControl)
+		err := transport.dataStore.ResourceControl().Create(resourceControl)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +112,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 func (transport *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
 	resourceControl := authorization.NewPrivateResourceControl(resourceIdentifier, resourceType, userID)
 
-	err := transport.dataStore.ResourceControl().CreateResourceControl(resourceControl)
+	err := transport.dataStore.ResourceControl().Create(resourceControl)
 	if err != nil {
 		log.Printf("[ERROR] [http,proxy,docker,transport] [message: unable to persist resource control] [resource: %s] [err: %s]", resourceIdentifier, err)
 		return nil, err

@@ -184,9 +184,9 @@
 
 <ssl-certificate-settings></ssl-certificate-settings>
 
-<open-amt-settings ng-show="settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt']"></open-amt-settings>
+<open-amt-settings ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt']"></open-amt-settings>
 
-<fdo-settings ng-show="settings.FeatureFlagSettings && settings.FeatureFlagSettings['fdo']"></fdo-settings>
+<fdo-settings ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['fdo']"></fdo-settings>
 
 <div class="row">
   <div class="col-sm-12">
@@ -258,19 +258,20 @@
           <div class="col-sm-12 form-section-title">
             Backup configuration
           </div>
-          <box-selector options="backupOptions" ng-model="formValues.backupFormType" on-change="(onBackupOptionsChange)"></box-selector>
+          <box-selector options="backupOptions" value="formValues.backupFormType" on-change="(onBackupOptionsChange)" radio-name="'backupOptions'"></box-selector>
           <div ng-if="formValues.backupFormType === BACKUP_FORM_TYPES.S3">
             <!-- Schedule automatic backups -->
             <div class="form-group">
               <div class="col-sm-12">
                 <por-switch-field
-                  label="Schedule automatic backups"
-                  name="s3-backup-setting"
-                  feature="s3BackupFeatureId"
-                  ng-model="formValues.scheduleAutomaticBackups"
-                  label-class="col-sm-2"
-                ></por-switch-field>
-              </div>
+                  label="'Schedule automatic backups'"
+                  name="'s3-backup-setting'"
+                  feature-id="s3BackupFeatureId"
+                  checked="formValues.scheduleAutomaticBackups"
+                  label-class="'col-sm-2'"
+                  on-change="(onToggleAutoBackups)"
+                ></por-switch-field
+              ></div>
             </div>
             <!-- !Schedule automatic backups -->
             <!-- Cron rule  -->

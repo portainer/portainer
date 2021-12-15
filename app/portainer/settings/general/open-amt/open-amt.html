@@ -4,7 +4,7 @@
       <rd-widget-header icon="fa-laptop" title-text="Intel OpenAMT"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" name="openAMTForm">
-          <por-switch-field ng-model="$ctrl.formValues.enableOpenAMT" label="Enable edge OpenAMT"></por-switch-field>
+          <por-switch-field checked="$ctrl.formValues.enableOpenAMT" label="'Enable edge OpenAMT'" on-change="($ctrl.onChangeEnableOpenAMT)"></por-switch-field>
           <span class="small">
             <p class="text-muted" style="margin-top: 10px;">
               <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -177,7 +177,7 @@
               <hr />
               <div class="form-group">
                 <div class="col-sm-12">
-                  <por-switch-field ng-model="$ctrl.formValues.useWirelessConfig" label="Wireless Configuration"></por-switch-field>
+                  <!-- <por-switch-field ng-model="$ctrl.formValues.useWirelessConfig" label="Wireless Configuration"></por-switch-field> -->
                 </div>
               </div>
               <div ng-show="$ctrl.formValues.useWirelessConfig">

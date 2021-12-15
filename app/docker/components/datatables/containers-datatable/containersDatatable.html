@@ -264,7 +264,7 @@
                   ng-if="item.Ports.length > 0"
                   ng-repeat="p in item.Ports | unique: 'public'"
                   class="image-tag"
-                  ng-href="http://{{ $ctrl.state.publicURL || p.host }}:{{ p.public }}"
+                  ng-href="http://{{ $ctrl.endpointPublicUrl || p.host }}:{{ p.public }}"
                   target="_blank"
                 >
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}

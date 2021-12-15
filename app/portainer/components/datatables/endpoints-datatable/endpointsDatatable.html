@@ -15,7 +15,7 @@
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
         <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.endpoints.new" data-cy="endpoint-addEndpointButton">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add environment
+          <i class="fa fa-plus-circle space-right" aria-hidden="true"></i>Add environment
         </button>
         <button
           type="button"
@@ -26,6 +26,9 @@
           data-cy="endpoint-associateOpenAMTButton"
         >
           <i class="fa fa-link space-right" aria-hidden="true"></i>Associate with OpenAMT
+        </button>
+        <button type="button" class="btn btn-sm btn-primary" ng-show="$ctrl.state.showFDOInfo" ui-sref="portainer.endpoints.importdevice" data-cy="endpoint-importFDODeviceButton">
+          <i class="fa fa-plus-circle space-right" aria-hidden="true"></i>Import Device
         </button>
       </div>
       <div class="searchBar">

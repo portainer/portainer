@@ -8,7 +8,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -135,7 +135,7 @@ func (payload *deviceFeaturesPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param body body featuresPayload true "Device Features"
+// @param body body deviceFeaturesPayload true "Device Features"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"

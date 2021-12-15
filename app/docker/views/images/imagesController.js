@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
 
 angular.module('portainer.docker').controller('ImagesController', [
   '$scope',
@@ -11,9 +12,8 @@ angular.module('portainer.docker').controller('ImagesController', [
   'HttpRequestHelper',
   'FileSaver',
   'Blob',
-  'EndpointProvider',
   'endpoint',
-  function ($scope, $state, Authentication, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, EndpointProvider, endpoint) {
+  function ($scope, $state, Authentication, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, endpoint) {
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
 
@@ -142,7 +142,7 @@ angular.module('portainer.docker').controller('ImagesController', [
       ImageService.images(true)
         .then(function success(data) {
           $scope.images = data;
-          $scope.offlineMode = EndpointProvider.offlineMode();
+          $scope.offlineMode = isOfflineEndpoint(endpoint);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve images');

@@ -81,7 +81,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 		URL:    p.URL,
 	}
 
-	err = handler.dataStore.HelmUserRepository().CreateHelmUserRepository(&record)
+	err = handler.dataStore.HelmUserRepository().Create(&record)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to save a user Helm repository URL", err}
 	}

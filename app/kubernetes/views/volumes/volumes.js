@@ -4,5 +4,6 @@ angular.module('portainer.kubernetes').component('kubernetesVolumesView', {
   controllerAs: 'ctrl',
   bindings: {
     $transition$: '<',
+    endpoint: '<',
   },
 });

@@ -1,4 +1,4 @@
-import { buildOption } from '@/portainer/components/box-selector';
+import { buildOption } from '@/portainer/components/BoxSelector';
 
 export default class ThemeSettingsController {
   /* @ngInject */
@@ -31,6 +31,7 @@ export default class ThemeSettingsController {
       this.ThemeManager.setTheme(theme);
     }
     this.state.themeInProgress = true;
+    this.state.userTheme = theme;
   }
 
   $onInit() {

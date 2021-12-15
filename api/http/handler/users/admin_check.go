@@ -1,12 +1,12 @@
 package users
 
 import (
+	"github.com/portainer/portainer/api/dataservices/errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 // @id UserAdminCheck
