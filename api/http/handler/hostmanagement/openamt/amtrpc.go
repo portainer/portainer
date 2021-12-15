@@ -19,7 +19,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,8 +36,8 @@ type HostInfo struct {
 
 const (
 	// TODO: this should get extracted to some configurable - don't assume Docker Hub is everyone's global namespace, or that they're allowed to pull images from the internet
-	rpcGoImageName     = "ptrrd/openamt:rpc-go-json"
-	rpcGoContainerName = "openamt-rpc-go"
+	rpcGoImageName      = "ptrrd/openamt:rpc-go-json"
+	rpcGoContainerName  = "openamt-rpc-go"
 	dockerClientTimeout = 5 * time.Minute
 )
 

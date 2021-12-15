@@ -17,7 +17,7 @@ type Handler struct {
 	*mux.Router
 	OpenAMTService portainer.OpenAMTService
 	DataStore      dataservices.DataStore
-  DockerClientFactory *docker.ClientFactory
+  	DockerClientFactory *docker.ClientFactory
 }
 
 // NewHandler returns a new Handler

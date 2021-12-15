@@ -7,15 +7,16 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 type Handler struct {
 	*mux.Router
-	DataStore portainer.DataStore
+	DataStore dataservices.DataStore
 }
 
-func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore) *Handler {
 	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatFDO) {
 		return nil
 	}
