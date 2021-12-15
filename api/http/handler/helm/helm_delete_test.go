@@ -9,26 +9,26 @@ import (
 	"github.com/portainer/libhelm/binary/test"
 	"github.com/portainer/libhelm/options"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/portainer/portainer/api/bolt"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 )
 
 func Test_helmDelete(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
-	err := store.Endpoint().CreateEndpoint(&portainer.Endpoint{ID: 1})
+	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})
 	is.NoError(err, "Error creating environment")
 
-	err = store.User().CreateUser(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
+	err = store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	is.NoError(err, "Error creating a user")
 
 	jwtService, err := jwt.NewService("1h", store)

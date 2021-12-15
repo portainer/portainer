@@ -1,3 +1,5 @@
+import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
+
 angular.module('portainer.docker').controller('VolumesController', [
   '$q',
   '$scope',
@@ -7,11 +9,10 @@ angular.module('portainer.docker').controller('VolumesController', [
   'VolumeHelper',
   'Notifications',
   'HttpRequestHelper',
-  'EndpointProvider',
   'Authentication',
   'ModalService',
   'endpoint',
-  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, EndpointProvider, Authentication, ModalService, endpoint) {
+  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, Authentication, ModalService, endpoint) {
     $scope.removeAction = function (selectedItems) {
       ModalService.confirmDeletion('Do you want to remove the selected volume(s)?', (confirmed) => {
         if (confirmed) {
@@ -52,7 +53,7 @@ angular.module('portainer.docker').controller('VolumesController', [
       })
         .then(function success(data) {
           var services = data.services;
-          $scope.offlineMode = EndpointProvider.offlineMode();
+          $scope.offlineMode = isOfflineEndpoint(endpoint);
           $scope.volumes = data.attached
             .map(function (volume) {
               volume.dangling = false;

@@ -47,6 +47,7 @@
         selected-item-count="$ctrl.state.selectedItemCount"
         show-add-action="$ctrl.showAddAction"
         show-update-action="$ctrl.showUpdateAction"
+        endpoint-id="$ctrl.endpointId"
       ></services-datatable-actions>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -171,7 +172,7 @@
                   ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort"
                   ng-repeat="p in item.Ports"
                   class="image-tag"
-                  ng-href="http://{{ $ctrl.state.publicURL }}:{{ p.PublishedPort }}"
+                  ng-href="http://{{ $ctrl.endpointPublicUrl }}:{{ p.PublishedPort }}"
                   target="_blank"
                   ng-click="$event.stopPropagation();"
                 >

@@ -1,11 +1,11 @@
 import _ from 'lodash-es';
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 
 import AccessViewerPolicyModel from '../../models/access';
 
 export default class AccessViewerController {
   /* @ngInject */
-  constructor(featureService, Notifications, RoleService, UserService, EndpointService, GroupService, TeamService, TeamMembershipService) {
-    this.featureService = featureService;
+  constructor(Notifications, RoleService, UserService, EndpointService, GroupService, TeamService, TeamMembershipService) {
     this.Notifications = Notifications;
     this.RoleService = RoleService;
     this.UserService = UserService;
@@ -102,7 +102,7 @@ export default class AccessViewerController {
 
   async $onInit() {
     try {
-      const limitedToBE = this.featureService.isLimitedToBE(this.limitedFeature);
+      const limitedToBE = isLimitedToBE(this.limitedFeature);
 
       if (limitedToBE) {
         return;

@@ -24,6 +24,7 @@ angular.module('portainer.app').controller('StackController', [
   'ResourceControlService',
   'Authentication',
   'ContainerHelper',
+  'endpoint',
   function (
     $async,
     $q,
@@ -47,8 +48,10 @@ angular.module('portainer.app').controller('StackController', [
     StackHelper,
     ResourceControlService,
     Authentication,
-    ContainerHelper
+    ContainerHelper,
+    endpoint
   ) {
+    $scope.endpoint = endpoint;
     $scope.state = {
       actionInProgress: false,
       migrationInProgress: false,
@@ -79,16 +82,18 @@ angular.module('portainer.app').controller('StackController', [
       $scope.formValues.Env = value;
     }
 
-    $scope.duplicateStack = function duplicateStack(name, endpointId) {
+    $scope.duplicateStack = function duplicateStack(name, targetEndpointId) {
       var stack = $scope.stack;
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      EndpointProvider.setEndpointID(endpointId);
+      // sets the targetEndpointID as global for interceptors
+      EndpointProvider.setEndpointID(targetEndpointId);
 
-      return StackService.duplicateStack(name, $scope.stackFileContent, env, endpointId, stack.Type).then(onDuplicationSuccess).catch(notifyOnError);
+      return StackService.duplicateStack(name, $scope.stackFileContent, env, targetEndpointId, stack.Type).then(onDuplicationSuccess).catch(notifyOnError);
 
       function onDuplicationSuccess() {
         Notifications.success('Stack successfully duplicated');
         $state.go('docker.stacks', {}, { reload: true });
+        // sets back the original endpointID as global for interceptors
         EndpointProvider.setEndpointID(stack.EndpointId);
       }
 
@@ -132,11 +137,10 @@ angular.module('portainer.app').controller('StackController', [
       });
     };
 
-    function migrateStack(name, endpointId) {
-      var stack = $scope.stack;
-      var targetEndpointId = endpointId;
+    function migrateStack(name, targetEndpointId) {
+      const stack = $scope.stack;
 
-      var migrateRequest = StackService.migrateSwarmStack;
+      let migrateRequest = StackService.migrateSwarmStack;
       if (stack.Type === 2) {
         migrateRequest = StackService.migrateComposeStack;
       }
@@ -145,9 +149,8 @@ angular.module('portainer.app').controller('StackController', [
       // The EndpointID property is not available for these stacks, we can pass
       // the current endpoint identifier as a part of the migrate request. It will be used if
       // the EndpointID property is not defined on the stack.
-      var originalEndpointId = EndpointProvider.endpointID();
       if (stack.EndpointId === 0) {
-        stack.EndpointId = originalEndpointId;
+        stack.EndpointId = endpoint.Id;
       }
 
       $scope.state.migrationInProgress = true;
@@ -213,9 +216,8 @@ angular.module('portainer.app').controller('StackController', [
       // The EndpointID property is not available for these stacks, we can pass
       // the current endpoint identifier as a part of the update request. It will be used if
       // the EndpointID property is not defined on the stack.
-      var endpointId = EndpointProvider.endpointID();
       if (stack.EndpointId === 0) {
-        stack.EndpointId = endpointId;
+        stack.EndpointId = endpoint.Id;
       }
 
       $scope.state.actionInProgress = true;
@@ -433,8 +435,6 @@ angular.module('portainer.app').controller('StackController', [
       var stackName = $transition$.params().name;
       $scope.stackName = stackName;
 
-      $scope.currentEndpointId = EndpointProvider.endpointID();
-
       const regular = $transition$.params().regular == 'true';
       $scope.regular = regular;
 
@@ -456,12 +456,7 @@ angular.module('portainer.app').controller('StackController', [
         loadStack(stackId);
       }
 
-      try {
-        const endpoint = EndpointProvider.currentEndpoint();
-        $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
-      }
+      $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
 
       $scope.stackType = $transition$.params().type;
     }

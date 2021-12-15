@@ -53,11 +53,14 @@
           <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'windows'"><i class="fab fa-windows" style="margin-right: 2px;"></i> Windows</label>
         </div>
       </div>
+
       <por-switch-field
-        label="Allow self-signed certs"
-        ng-model="state.allowSelfSignedCerts"
-        tooltip="When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS"
+        label="'Allow self-signed certs'"
+        checked="state.allowSelfSignedCerts"
+        tooltip="'When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS'"
+        on-change="(onToggleAllowSelfSignedCerts)"
       ></por-switch-field>
+
       <div style="margin-top: 10px;">
         <uib-tabset active="state.deploymentTab">
           <uib-tab index="'kubernetes'" heading="Kubernetes" ng-if="state.platformType === 'linux'">

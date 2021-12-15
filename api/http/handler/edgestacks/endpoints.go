@@ -4,18 +4,19 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
-func hasKubeEndpoint(endpointService portainer.EndpointService, endpointIDs []portainer.EndpointID) (bool, error) {
+func hasKubeEndpoint(endpointService dataservices.EndpointService, endpointIDs []portainer.EndpointID) (bool, error) {
 	return hasEndpointPredicate(endpointService, endpointIDs, endpointutils.IsKubernetesEndpoint)
 }
 
-func hasDockerEndpoint(endpointService portainer.EndpointService, endpointIDs []portainer.EndpointID) (bool, error) {
+func hasDockerEndpoint(endpointService dataservices.EndpointService, endpointIDs []portainer.EndpointID) (bool, error) {
 	return hasEndpointPredicate(endpointService, endpointIDs, endpointutils.IsDockerEndpoint)
 }
 
-func hasEndpointPredicate(endpointService portainer.EndpointService, endpointIDs []portainer.EndpointID, predicate func(*portainer.Endpoint) bool) (bool, error) {
+func hasEndpointPredicate(endpointService dataservices.EndpointService, endpointIDs []portainer.EndpointID, predicate func(*portainer.Endpoint) bool) (bool, error) {
 	for _, endpointID := range endpointIDs {
 		endpoint, err := endpointService.Endpoint(endpointID)
 		if err != nil {
@@ -36,7 +37,7 @@ type endpointRelationsConfig struct {
 	edgeGroups     []portainer.EdgeGroup
 }
 
-func fetchEndpointRelationsConfig(dataStore portainer.DataStore) (*endpointRelationsConfig, error) {
+func fetchEndpointRelationsConfig(dataStore dataservices.DataStore) (*endpointRelationsConfig, error) {
 	endpoints, err := dataStore.Endpoint().Endpoints()
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve environments from database: %w", err)

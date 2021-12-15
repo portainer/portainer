@@ -596,10 +596,6 @@ a[ng-click] {
   background-color: var(--bg-log-line-selected-color);
 }
 
-.row.header .meta .page {
-  padding-top: 7px;
-}
-
 .tag:not(.token) {
   padding: 2px 6px;
   color: white;
@@ -738,19 +734,6 @@ a[ng-click] {
   opacity: 0.9;
 }
 /*!toaster override*/
-
-/*angular-loading-bar override*/
-#loadingbar-placeholder {
-  margin-bottom: 0;
-  height: 3px;
-}
-
-#loading-bar .bar {
-  position: relative;
-  height: 3px;
-  background: var(--blue-3);
-}
-/*!angular-loading-bar override*/
 
 .monospaced {
   font-family: monospace;

@@ -8,6 +8,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 const pkg = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
@@ -91,6 +92,7 @@ module.exports = {
     writeToDisk: true,
   },
   plugins: [
+    new Dotenv(),
     new ESLintPlugin(),
     new HtmlWebpackPlugin({
       template: './app/index.html',

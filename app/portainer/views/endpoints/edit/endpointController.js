@@ -20,7 +20,6 @@ function EndpointController(
   EndpointService,
   GroupService,
   TagService,
-  EndpointProvider,
   Notifications,
   Authentication,
   SettingsService,
@@ -115,6 +114,12 @@ function EndpointController(
     return $async(onCreateTagAsync, tagName);
   };
 
+  $scope.onToggleAllowSelfSignedCerts = function onToggleAllowSelfSignedCerts(checked) {
+    return $scope.$evalAsync(() => {
+      $scope.state.allowSelfSignedCerts = checked;
+    });
+  };
+
   async function onCreateTagAsync(tagName) {
     try {
       const tag = await TagService.createTag(tagName);
@@ -194,7 +199,6 @@ function EndpointController(
     EndpointService.updateEndpoint(endpoint.Id, payload).then(
       function success() {
         Notifications.success('Environment updated', $scope.endpoint.Name);
-        EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
         $state.go('portainer.endpoints', {}, { reload: true });
       },
       function error(err) {
