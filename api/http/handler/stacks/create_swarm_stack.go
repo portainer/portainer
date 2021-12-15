@@ -97,7 +97,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 
 	stack.CreatedBy = config.user.Username
 
-	err = handler.DataStore.Stack().CreateStack(stack)
+	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -250,7 +250,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 	stack.CreatedBy = config.user.Username
 
-	err = handler.DataStore.Stack().CreateStack(stack)
+	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
 	}
@@ -347,7 +347,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 
 	stack.CreatedBy = config.user.Username
 
-	err = handler.DataStore.Stack().CreateStack(stack)
+	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}

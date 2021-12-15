@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -45,7 +44,7 @@ func (handler *Handler) userGetAccessTokens(w http.ResponseWriter, r *http.Reque
 
 	_, err = handler.DataStore.User().User(portainer.UserID(userID))
 	if err != nil {
-		if err == bolterrors.ErrObjectNotFound {
+		if handler.DataStore.IsErrObjectNotFound(err) {
 			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 		}
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}

@@ -13,7 +13,7 @@ import (
 	chserver "github.com/jpillora/chisel/server"
 	cmap "github.com/orcaman/concurrent-map"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 const (
@@ -29,7 +29,7 @@ type Service struct {
 	serverFingerprint string
 	serverPort        string
 	tunnelDetailsMap  cmap.ConcurrentMap
-	dataStore         portainer.DataStore
+	dataStore         dataservices.DataStore
 	snapshotService   portainer.SnapshotService
 	chiselServer      *chserver.Server
 	shutdownCtx       context.Context
@@ -37,7 +37,7 @@ type Service struct {
 }
 
 // NewService returns a pointer to a new instance of Service
-func NewService(dataStore portainer.DataStore, shutdownCtx context.Context) *Service {
+func NewService(dataStore dataservices.DataStore, shutdownCtx context.Context) *Service {
 	return &Service{
 		tunnelDetailsMap: cmap.New(),
 		dataStore:        dataStore,
@@ -46,7 +46,7 @@ func NewService(dataStore portainer.DataStore, shutdownCtx context.Context) *Ser
 }
 
 // pingAgent ping the given agent so that the agent can keep the tunnel alive
-func (service *Service) pingAgent(endpointID portainer.EndpointID) error{
+func (service *Service) pingAgent(endpointID portainer.EndpointID) error {
 	tunnel := service.GetTunnelDetails(endpointID)
 	requestURL := fmt.Sprintf("http://127.0.0.1:%d/ping", tunnel.Port)
 	req, err := http.NewRequest(http.MethodHead, requestURL, nil)
@@ -147,7 +147,7 @@ func (service *Service) retrievePrivateKeySeed() (string, error) {
 	var serverInfo *portainer.TunnelServerInfo
 
 	serverInfo, err := service.dataStore.TunnelServer().Info()
-	if err == errors.ErrObjectNotFound {
+	if service.dataStore.IsErrObjectNotFound(err) {
 		keySeed := uniuri.NewLen(16)
 
 		serverInfo = &portainer.TunnelServerInfo{

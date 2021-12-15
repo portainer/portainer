@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/cli"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -20,7 +21,7 @@ func (m mockKingpinSetting) SetValue(value kingpin.Value) {
 func Test_enableFeaturesFromFlags(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	tests := []struct {
@@ -59,7 +60,7 @@ func Test_enableFeaturesFromFlags(t *testing.T) {
 
 const FeatTest portainer.Feature = "optional-test"
 
-func optionalFunc(dataStore portainer.DataStore) string {
+func optionalFunc(dataStore dataservices.DataStore) string {
 
 	// TODO: this is a code smell - finding out if a feature flag is enabled should not require having access to the store, and asking for a settings obj.
 	//       ideally, the `if` should look more like:
@@ -80,7 +81,7 @@ func Test_optionalFeature(t *testing.T) {
 
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	// Enable the test feature

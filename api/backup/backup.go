@@ -3,15 +3,17 @@ package backup
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"time"
 
 	"github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
+	"github.com/sirupsen/logrus"
 )
 
 const rwxr__r__ os.FileMode = 0744
@@ -30,13 +32,25 @@ var filesToBackup = []string{
 }
 
 // Creates a tar.gz system archive and encrypts it if password is not empty. Returns a path to the archive file.
-func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datastore portainer.DataStore, filestorePath string) (string, error) {
+func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datastore dataservices.DataStore, filestorePath string) (string, error) {
 	unlock := gate.Lock()
 	defer unlock()
 
 	backupDirPath := filepath.Join(filestorePath, "backup", time.Now().Format("2006-01-02_15-04-05"))
 	if err := os.MkdirAll(backupDirPath, rwxr__r__); err != nil {
 		return "", errors.Wrap(err, "Failed to create backup dir")
+	}
+
+	{
+		// new export
+		exportFilename := path.Join(backupDirPath, fmt.Sprintf("export-%d.json", time.Now().Unix()))
+
+		err := datastore.Export(exportFilename)
+		if err != nil {
+			logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
+		} else {
+			logrus.Debugf("exported to %s", exportFilename)
+		}
 	}
 
 	if err := backupDb(backupDirPath, datastore); err != nil {
@@ -65,7 +79,7 @@ func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datasto
 	return archivePath, nil
 }
 
-func backupDb(backupDirPath string, datastore portainer.DataStore) error {
+func backupDb(backupDirPath string, datastore dataservices.DataStore) error {
 	backupWriter, err := os.Create(filepath.Join(backupDirPath, "portainer.db"))
 	if err != nil {
 		return err

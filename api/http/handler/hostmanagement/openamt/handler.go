@@ -7,6 +7,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -14,11 +15,11 @@ import (
 type Handler struct {
 	*mux.Router
 	OpenAMTService portainer.OpenAMTService
-	DataStore      portainer.DataStore
+	DataStore      dataservices.DataStore
 }
 
 // NewHandler returns a new Handler
-func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore) (*Handler, error) {
+func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore) (*Handler, error) {
 	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
 		return nil, nil
 	}

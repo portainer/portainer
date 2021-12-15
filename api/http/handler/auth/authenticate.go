@@ -11,7 +11,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 )
 
@@ -63,11 +62,11 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	u, err := handler.DataStore.User().UserByUsername(payload.Username)
-	if err != nil && err != bolterrors.ErrObjectNotFound {
+	if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
 	}
 
-	if err == bolterrors.ErrObjectNotFound && (settings.AuthenticationMethod == portainer.AuthenticationInternal || settings.AuthenticationMethod == portainer.AuthenticationOAuth) {
+	if handler.DataStore.IsErrObjectNotFound(err) && (settings.AuthenticationMethod == portainer.AuthenticationInternal || settings.AuthenticationMethod == portainer.AuthenticationOAuth) {
 		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized}
 	}
 
@@ -117,7 +116,7 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 		Role:     portainer.StandardUserRole,
 	}
 
-	err = handler.DataStore.User().CreateUser(user)
+	err = handler.DataStore.User().Create(user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 	}
@@ -172,7 +171,7 @@ func (handler *Handler) addUserIntoTeams(user *portainer.User, settings *portain
 				Role:   portainer.TeamMember,
 			}
 
-			err := handler.DataStore.TeamMembership().CreateTeamMembership(membership)
+			err := handler.DataStore.TeamMembership().Create(membership)
 			if err != nil {
 				return err
 			}
