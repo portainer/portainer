@@ -13,7 +13,21 @@ func MarshalObject(object interface{}) ([]byte, error) {
 
 // UnmarshalObject decodes an object from binary data
 func UnmarshalObject(data []byte, object interface{}) error {
-	return json.Unmarshal(data, object)
+	err := json.Unmarshal(data, object)
+	if err != nil {
+		var i interface{} = data
+
+		v, ok := i.(int)
+		if ok {
+			object = v
+			return nil
+		}
+
+		s := string(data)
+		object = s
+	}
+
+	return nil
 }
 
 // UnmarshalObjectWithJsoniter decodes an object from binary data
