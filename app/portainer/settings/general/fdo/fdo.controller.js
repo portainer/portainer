@@ -40,6 +40,9 @@ class FDOController {
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
         this.Notifications.success(`FDO successfully ${this.formValues.enabled ? 'enabled' : 'disabled'}`);
+        this.originalValues = {
+          ...this.formValues,
+        };
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed applying changes');
       }

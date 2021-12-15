@@ -26,7 +26,6 @@ class OpenAmtController {
 
     this.state = {
       actionInProgress: false,
-      certFileLoading: false,
     };
 
     this.save = this.save.bind(this);
@@ -47,15 +46,13 @@ class OpenAmtController {
     if (!this.formValues.enableOpenAMT) {
       return true;
     }
-    return !this.state.certFileLoading && this.formValues.certFileText !== '';
+    return this.formValues.certFile != null || this.formValues.certFileText !== '';
   }
 
   onCertFileSelected(file) {
     return this.$scope.$evalAsync(async () => {
       if (file) {
-        this.state.certFileLoading = true;
-        this.formValues.certFileText = await this.readFile(file);
-        this.state.certFileLoading = false;
+        this.formValues.certFileText = '';
       }
     });
   }
@@ -94,6 +91,9 @@ class OpenAmtController {
         };
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed applying changes');
+        if (this.originalValues.certFileText === '') {
+          this.formValues.certFileText = '';
+        }
       }
       this.state.actionInProgress = false;
     });
