@@ -10,7 +10,7 @@ class OpenAmtController {
       mpsUser: '',
       mpsPassword: '',
       domainName: '',
-      certFile: '',
+      certFile: null,
       certFileText: '',
       certPassword: '',
       useWirelessConfig: false,
@@ -26,6 +26,7 @@ class OpenAmtController {
 
     this.state = {
       actionInProgress: false,
+      certFileLoading: false,
     };
 
     this.save = this.save.bind(this);
@@ -43,7 +44,20 @@ class OpenAmtController {
   }
 
   isFormValid() {
-    return !this.formValues.enableOpenAMT || this.formValues.certFileText;
+    if (!this.formValues.enableOpenAMT) {
+      return true;
+    }
+    return !this.state.certFileLoading && this.formValues.certFileText !== '';
+  }
+
+  onCertFileSelected(file) {
+    return this.$scope.$evalAsync(async () => {
+      if (file) {
+        this.state.certFileLoading = true;
+        this.formValues.certFileText = await this.readFile(file);
+        this.state.certFileLoading = false;
+      }
+    });
   }
 
   async readFile(file) {
