@@ -127,19 +127,19 @@
                 ></portainer-tooltip>
               </label>
               <div class="col-sm-8">
-                <button style="margin-left: 0px !important;" class="btn btn-sm btn-primary" ngf-select="$ctrl.onCertFileChange($file)" name="certFile">
+                <button style="margin-left: 0px !important;" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.certFile" ngf-pattern=".pfx" name="certFile">
                   Upload file
                 </button>
                 <span style="margin-left: 5px;">
-                  <i class="fa fa-times red-icon" ng-if="!$ctrl.formValues.certFileText" aria-hidden="true"></i>
-                  <i class="fa fa-check green-icon" ng-if="$ctrl.formValues.certFileText" aria-hidden="true"></i>
+                  <i class="fa fa-times red-icon" ng-if="!$ctrl.formValues.certFileText || openAMTForm.certFile.$invalid" aria-hidden="true"></i>
+                  <i class="fa fa-check green-icon" ng-if="$ctrl.formValues.certFileText && !openAMTForm.certFile.$invalid" aria-hidden="true"></i>
                 </span>
               </div>
             </div>
-            <div class="form-group col-md-12" ng-show="$ctrl.certFileInvalid">
+            <div class="form-group col-md-12" ng-show="openAMTForm.certFile.$invalid">
               <div class="small text-warning">
-                <div>
-                  <p> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> File type is invalid.</p>
+                <div ng-messages="openAMTForm.certFile.$error">
+                  <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> File type is invalid.</p>
                 </div>
               </div>
             </div>

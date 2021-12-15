@@ -10,6 +10,7 @@ class OpenAmtController {
       mpsUser: '',
       mpsPassword: '',
       domainName: '',
+      certFile: '',
       certFileText: '',
       certPassword: '',
       useWirelessConfig: false,
@@ -45,20 +46,6 @@ class OpenAmtController {
     return !this.formValues.enableOpenAMT || this.formValues.certFileText;
   }
 
-  async onCertFileChange(file) {
-    if (!file) {
-      return;
-    }
-    const extension = file.name.split('.').pop();
-    if (extension !== 'pfx') {
-      this.certFileInvalid = true;
-      this.formValues.certFileText = '';
-      return;
-    }
-    this.certFileInvalid = false;
-    this.formValues.certFileText = await this.readFile(file);
-  }
-
   async readFile(file) {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -81,6 +68,9 @@ class OpenAmtController {
     return this.$async(async () => {
       this.state.actionInProgress = true;
       try {
+        if (this.formValues.certFile) {
+          this.formValues.certFileText = await this.readFile(this.formValues.certFile);
+        }
         await this.OpenAMTService.submit(this.formValues);
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
