@@ -97,8 +97,9 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 		// from MigrateData
 		store.VersionService.StoreDBVersion(portainer.DBVersion)
 
+		// Disabled for now.  Can't use feature flags due to the way that works
 		// EXPERIMENTAL, will only activate if `/data/import.json` exists
-		importFromJson(fileService, store)
+		//importFromJson(fileService, store)
 
 		err := updateSettingsFromFlags(store, flags)
 		if err != nil {
@@ -108,7 +109,7 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 
 	storedVersion, err := store.VersionService.DBVersion()
 	if err != nil {
-		log.Fatalf("Something failed duing creation of new database: %v", err)
+		log.Fatalf("Something failed during creation of new database: %v", err)
 	}
 	if storedVersion != portainer.DBVersion {
 		err = store.MigrateData()
@@ -244,7 +245,6 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 	if err != nil {
 		return err
 	}
-	logrus.WithField("settings", settings).Infof("see AuthenticationMethod ")
 
 	settings.LogoURL = *flags.Logo
 	settings.SnapshotInterval = *flags.SnapshotInterval

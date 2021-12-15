@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"time"
@@ -34,12 +33,14 @@ func (connection *DbConnection) GetStorePath() string {
 
 // Open opens and initializes the BoltDB database.
 func (connection *DbConnection) Open() error {
-	databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.json", DatabaseFileName, time.Now().Unix()))
-	if err := connection.ExportRaw(databaseExportPath); err != nil {
-		log.Printf("raw export to %s error: %s", databaseExportPath, err)
-	} else {
-		log.Printf("raw export to %s success", databaseExportPath)
-	}
+
+	// Disabled for now.  Can't use feature flags due to the way that works
+	// databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.json", DatabaseFileName, time.Now().Unix()))
+	// if err := connection.ExportRaw(databaseExportPath); err != nil {
+	// 	log.Printf("raw export to %s error: %s", databaseExportPath, err)
+	// } else {
+	// 	log.Printf("raw export to %s success", databaseExportPath)
+	// }
 
 	databasePath := path.Join(connection.Path, DatabaseFileName)
 
