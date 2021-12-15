@@ -4,7 +4,7 @@
       <rd-widget-header icon="fa-laptop" title-text="FDO"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" name="FDOForm">
-          <por-switch-field ng-model="$ctrl.formValues.enabled" label="Enable FDO Management Service"></por-switch-field>
+          <por-switch-field checked="$ctrl.formValues.enabled" label="'Enable FDO Management Service'" on-change="($ctrl.onChangeEnableFDO)"></por-switch-field>
           <span class="small">
             <p class="text-muted" style="margin-top: 10px;">
               <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
