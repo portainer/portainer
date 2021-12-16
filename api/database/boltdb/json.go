@@ -2,12 +2,21 @@ package boltdb
 
 import (
 	"encoding/json"
+	"log"
+	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
 )
 
 // MarshalObject encodes an object to binary format
 func MarshalObject(object interface{}) ([]byte, error) {
+	switch v := object.(type) {
+	case int:
+		return []byte(strconv.Itoa(v)), nil
+	case string:
+		return []byte(v), nil
+	}
+
 	return json.Marshal(object)
 }
 
@@ -15,16 +24,9 @@ func MarshalObject(object interface{}) ([]byte, error) {
 func UnmarshalObject(data []byte, object interface{}) error {
 	err := json.Unmarshal(data, object)
 	if err != nil {
-		var i interface{} = data
-
-		v, ok := i.(int)
-		if ok {
-			object = v
-			return nil
-		}
-
+		log.Printf("%q", string(data))
 		s := string(data)
-		object = s
+		object = &s
 	}
 
 	return nil
