@@ -28,7 +28,10 @@ func UnmarshalObject(data []byte, object interface{}) error {
 	if err != nil {
 		if s, ok := object.(*string); ok {
 			*s = string(data)
+			return nil
 		}
+
+		return err
 	}
 
 	return nil
