@@ -13,11 +13,6 @@ class OpenAmtController {
       certFile: null,
       certFileText: '',
       certPassword: '',
-      useWirelessConfig: false,
-      wifiAuthenticationMethod: '4',
-      wifiEncryptionMethod: '3',
-      wifiSsid: '',
-      wifiPskPass: '',
     };
 
     this.originalValues = {
@@ -116,13 +111,6 @@ class OpenAmtController {
             certPassword: config.DomainConfiguration.CertPassword,
             certFileText: config.DomainConfiguration.CertFileText,
           };
-
-          if (config.WirelessConfiguration) {
-            this.formValues.useWirelessConfig = true;
-            this.formValues.wifiAuthenticationMethod = config.WirelessConfiguration.AuthenticationMethod;
-            this.formValues.wifiEncryptionMethod = config.WirelessConfiguration.EncryptionMethod;
-            this.formValues.wifiSsid = config.WirelessConfiguration.SSID;
-          }
 
           this.originalValues = {
             ...this.formValues,

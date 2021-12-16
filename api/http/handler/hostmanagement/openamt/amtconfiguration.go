@@ -24,11 +24,6 @@ type openAMTConfigureDefaultPayload struct {
 	CertFileText             string
 	CertPassword             string
 	DomainName               string
-	UseWirelessConfig        bool
-	WifiAuthenticationMethod string
-	WifiEncryptionMethod     string
-	WifiSSID                 string
-	WifiPskPass              string
 }
 
 func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
@@ -50,20 +45,6 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 		}
 		if payload.CertPassword == "" {
 			return errors.New("certificate password must be provided")
-		}
-		if payload.UseWirelessConfig {
-			if payload.WifiAuthenticationMethod == "" {
-				return errors.New("wireless authentication method must be provided")
-			}
-			if payload.WifiEncryptionMethod == "" {
-				return errors.New("wireless encryption method must be provided")
-			}
-			if payload.WifiSSID == "" {
-				return errors.New("wireless config SSID must be provided")
-			}
-			if payload.WifiPskPass == "" {
-				return errors.New("wireless config PSK passphrase must be provided")
-			}
 		}
 	}
 
@@ -156,15 +137,6 @@ func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigureDefau
 			CertPassword: configurationPayload.CertPassword,
 			DomainName:   configurationPayload.DomainName,
 		},
-	}
-
-	if configurationPayload.UseWirelessConfig {
-		configuration.WirelessConfiguration = &portainer.WirelessConfiguration{
-			AuthenticationMethod: configurationPayload.WifiAuthenticationMethod,
-			EncryptionMethod:     configurationPayload.WifiEncryptionMethod,
-			SSID:                 configurationPayload.WifiSSID,
-			PskPass:              configurationPayload.WifiPskPass,
-		}
 	}
 
 	err := handler.OpenAMTService.ConfigureDefault(configuration)
