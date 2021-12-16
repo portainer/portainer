@@ -9,6 +9,7 @@ globals:
 
 extends:
   - 'eslint:recommended'
+  - 'plugin:storybook/recommended'
   - prettier
 
 plugins:
@@ -60,6 +61,7 @@ overrides:
       - 'plugin:@typescript-eslint/recommended'
       - 'plugin:@typescript-eslint/eslint-recommended'
       - 'plugin:promise/recommended'
+      - 'plugin:storybook/recommended'
       - prettier # should be last
     settings:
       react:
