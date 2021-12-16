@@ -2,7 +2,6 @@ package boltdb
 
 import (
 	"encoding/json"
-	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -10,10 +9,7 @@ import (
 // MarshalObject encodes an object to binary format
 func MarshalObject(object interface{}) ([]byte, error) {
 	// Special case for the VERSION bucket. Here we're not using json
-	switch v := object.(type) {
-	case int:
-		return []byte(strconv.Itoa(v)), nil
-	case string:
+	if v, ok := object.(string); ok {
 		return []byte(v), nil
 	}
 
