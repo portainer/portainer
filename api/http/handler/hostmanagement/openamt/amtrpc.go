@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -244,7 +245,7 @@ func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings po
 		"-n",
 		"-v",
 		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
-		"-profile", "profileAMTDefault",
+		"-profile", openamt.DefaultProfileName,
 		"-d", config.DomainConfiguration.DomainName,
 		"-password", config.Credentials.MPSPassword,
 	}

@@ -45,7 +45,6 @@ type (
 		MPSServer             string                 `json:"MPSServer"`
 		Credentials           MPSCredentials         `json:"Credentials"`
 		DomainConfiguration   DomainConfiguration    `json:"DomainConfiguration"`
-		WirelessConfiguration *WirelessConfiguration `json:"WirelessConfiguration"`
 	}
 
 	MPSCredentials struct {
@@ -58,13 +57,6 @@ type (
 		CertFileText string `json:"CertFileText"`
 		CertPassword string `json:"CertPassword"`
 		DomainName   string `json:"DomainName"`
-	}
-
-	WirelessConfiguration struct {
-		AuthenticationMethod string `json:"AuthenticationMethod"`
-		EncryptionMethod     string `json:"EncryptionMethod"`
-		SSID                 string `json:"SSID"`
-		PskPass              string `json:"PskPass"`
 	}
 
 	// OpenAMTDeviceInformation represents an AMT managed device information

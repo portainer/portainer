@@ -16,8 +16,7 @@ import (
 )
 
 const (
-	defaultCIRAConfigName     = "ciraConfigDefault"
-	defaultWirelessConfigName = "wirelessProfileDefault"
+	DefaultCIRAConfigName     = "ciraConfigDefault"
 	DefaultProfileName        = "profileAMTDefault"
 
 	httpClientTimeout = 5 * time.Minute
@@ -77,21 +76,12 @@ func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfigur
 	}
 	configuration.Credentials.MPSToken = token
 
-	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, defaultCIRAConfigName)
+	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, DefaultCIRAConfigName)
 	if err != nil {
 		return err
 	}
 
-	wirelessConfigName := ""
-	if configuration.WirelessConfiguration != nil {
-		wirelessConfig, err := service.createOrUpdateWirelessConfig(configuration, defaultWirelessConfigName)
-		if err != nil {
-			return err
-		}
-		wirelessConfigName = wirelessConfig.ProfileName
-	}
-
-	_, err = service.createOrUpdateAMTProfile(configuration, DefaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
+	_, err = service.createOrUpdateAMTProfile(configuration, DefaultProfileName, ciraConfig.ConfigName)
 	if err != nil {
 		return err
 	}
