@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,6 +12,8 @@ const jsonobject = `{"LogoURL":"","BlackListedLabels":[],"AuthenticationMethod":
 
 func Test_MarshalObject(t *testing.T) {
 	is := assert.New(t)
+
+	uuid := uuid.Must(uuid.NewV4())
 
 	tests := []struct {
 		object   interface{}
@@ -35,6 +38,14 @@ func Test_MarshalObject(t *testing.T) {
 		{
 			object:   "456",
 			expected: "456",
+		},
+		{
+			object:   uuid,
+			expected: "\"" + uuid.String() + "\"",
+		},
+		{
+			object:   uuid.String(),
+			expected: uuid.String(),
 		},
 		{
 			object:   map[string]interface{}{"key": "value"},
