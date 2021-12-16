@@ -26,8 +26,7 @@ func UnmarshalObject(data []byte, object interface{}) error {
 	// So we need to return it as a string
 	err := json.Unmarshal(data, object)
 	if err != nil {
-		s, ok := object.(*string)
-		if ok {
+		if s, ok := object.(*string); ok {
 			*s = string(data)
 		}
 	}
