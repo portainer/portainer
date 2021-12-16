@@ -1,7 +1,7 @@
 class OpenAmtController {
   /* @ngInject */
-  constructor($async, $state, OpenAMTService, SettingsService, Notifications) {
-    Object.assign(this, { $async, $state, OpenAMTService, SettingsService, Notifications });
+  constructor($async, $scope, $state, OpenAMTService, SettingsService, Notifications) {
+    Object.assign(this, { $async, $scope, $state, OpenAMTService, SettingsService, Notifications });
 
     this.originalValues = {};
     this.formValues = {
@@ -28,6 +28,13 @@ class OpenAmtController {
     };
 
     this.save = this.save.bind(this);
+    this.onChangeEnableOpenAMT = this.onChangeEnableOpenAMT.bind(this);
+  }
+
+  onChangeEnableOpenAMT(checked) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.enableOpenAMT = checked;
+    });
   }
 
   isFormChanged() {
