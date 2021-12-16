@@ -176,7 +176,9 @@
                     message="Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack."
                   ></portainer-tooltip>
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.EnableWebhook" disabled="disabled" /><i></i> </label>
+                <label class="switch box-selector-item limited business" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="formValues.EnableWebhook" disabled="disabled" ng-checked="true" /><i></i>
+                </label>
                 <be-feature-indicator feature="stackWebhookFeature"></be-feature-indicator>
               </div>
             </div>

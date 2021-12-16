@@ -1,5 +1,5 @@
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-import { STACK_PULL_IMAGE, STACK_WEBHOOK } from 'Portainer/feature-flags/feature-ids';
+import { FeatureId } from 'Portainer/feature-flags/enums';
 
 angular.module('portainer.app').controller('StackController', [
   '$async',
@@ -55,7 +55,8 @@ angular.module('portainer.app').controller('StackController', [
     endpoint
   ) {
     $scope.endpoint = endpoint;
-    $scope.stackWebhookFeature = STACK_WEBHOOK;
+    $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
+    $scope.stackPullImageFeature = FeatureId.STACK_PULL_IMAGE;
     $scope.state = {
       actionInProgress: false,
       migrationInProgress: false,
@@ -212,13 +213,11 @@ angular.module('portainer.app').controller('StackController', [
 
     $scope.deployStack = function () {
       const stack = $scope.stack;
-      const isSwarmStack = stack.Type === 1;
-      $scope.stackPullImageFeature = STACK_PULL_IMAGE;
-      const tplCrop = '<div  style="position: absolute; right: 100px; top: 28px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
+      const tplCrop = '<div  style="position: absolute; right: 140px; top: 28px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
       const template = angular.element(tplCrop);
       const html = $compile(template)($scope);
       // 'Do you want to force an update of the stack?'
-      ModalService.confirmStackUpdate(html, true, isSwarmStack, function (result) {
+      ModalService.confirmStackUpdate(html, true, true, function (result) {
         if (!result) {
           return;
         }

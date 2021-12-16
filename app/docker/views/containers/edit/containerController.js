@@ -1,7 +1,7 @@
 import moment from 'moment';
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
-import { CONTAINER_WEBHOOK } from 'Portainer/feature-flags/feature-ids';
+import { FeatureId } from 'Portainer/feature-flags/enums';
 
 angular.module('portainer.docker').controller('ContainerController', [
   '$q',
@@ -49,7 +49,7 @@ angular.module('portainer.docker').controller('ContainerController', [
     $scope.activityTime = 0;
     $scope.portBindings = [];
     $scope.displayRecreateButton = false;
-    $scope.containerWebhookFeature = CONTAINER_WEBHOOK;
+    $scope.containerWebhookFeature = FeatureId.CONTAINER_WEBHOOK;
 
     $scope.config = {
       RegistryModel: new PorImageRegistryModel(),

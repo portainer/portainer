@@ -4,7 +4,7 @@ import uuidv4 from 'uuid/v4';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
 import { RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
-import { STACK_WEBHOOK } from 'Portainer/feature-flags/feature-ids';
+import { FeatureId } from 'Portainer/feature-flags/enums';
 
 angular
   .module('portainer.app')
@@ -30,7 +30,7 @@ angular
   ) {
     $scope.onChangeTemplateId = onChangeTemplateId;
     $scope.buildAnalyticsProperties = buildAnalyticsProperties;
-    $scope.stackWebhookFeature = STACK_WEBHOOK;
+    $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
     $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
 
     $scope.formValues = {
