@@ -127,12 +127,20 @@
                 ></portainer-tooltip>
               </label>
               <div class="col-sm-8">
-                <button style="margin-left: 0px !important;" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.certFile" ngf-pattern=".pfx" name="certFile">
+                <button
+                  style="margin-left: 0px !important;"
+                  class="btn btn-sm btn-primary"
+                  ngf-select="$ctrl.onCertFileSelected($file)"
+                  ng-model="$ctrl.formValues.certFile"
+                  ngf-pattern=".pfx"
+                  name="certFile"
+                >
                   Upload file
                 </button>
                 <span style="margin-left: 5px;">
                   {{ $ctrl.formValues.certFile.name }}
-                  <i class="fa fa-times red-icon" ng-if="!$ctrl.formValues.certFile" aria-hidden="true"></i>
+                  <i class="fa fa-check green-icon" ng-show="$ctrl.formValues.certFileText && !$ctrl.state.actionInProgress" aria-hidden="true"></i>
+                  <i class="fa fa-times red-icon" ng-show="!$ctrl.formValues.certFileText && !$ctrl.formValues.certFile" aria-hidden="true"></i>
                 </span>
               </div>
             </div>
