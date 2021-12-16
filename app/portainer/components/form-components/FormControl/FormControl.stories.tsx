@@ -14,7 +14,9 @@ interface TextFieldProps {
   tooltip?: string;
 }
 
-export function TextField({ label, tooltip = '' }: TextFieldProps) {
+export { TextField, SelectField };
+
+function TextField({ label, tooltip = '' }: TextFieldProps) {
   const [value, setValue] = useState('');
   const inputId = 'input';
   return (
@@ -29,7 +31,7 @@ TextField.args = {
   tooltip: '',
 };
 
-export function SelectField({ label, tooltip = '' }: TextFieldProps) {
+function SelectField({ label, tooltip = '' }: TextFieldProps) {
   const options = [
     { value: 1, label: 'one' },
     { value: 2, label: 'two' },

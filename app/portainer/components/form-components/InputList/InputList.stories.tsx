@@ -12,7 +12,9 @@ const meta: Meta = {
 
 export default meta;
 
-export function Defaults() {
+export { Defaults, ListWithInputAndSelect };
+
+function Defaults() {
   const [values, setValues] = useState<DefaultType[]>([{ value: '' }]);
 
   return (
@@ -35,7 +37,7 @@ interface ListWithInputAndSelectArgs {
   movable: boolean;
   tooltip: string;
 }
-export function ListWithInputAndSelect({
+function ListWithInputAndSelect({
   label,
   movable,
   tooltip,

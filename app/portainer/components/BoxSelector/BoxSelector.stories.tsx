@@ -14,7 +14,9 @@ const meta: Meta = {
 
 export default meta;
 
-export function Example() {
+export { Example, LimitedFeature };
+
+function Example() {
   const [value, setValue] = useState(3);
   const options: BoxSelectorOption<number>[] = [
     {
@@ -45,7 +47,7 @@ export function Example() {
   );
 }
 
-export function LimitedFeature() {
+function LimitedFeature() {
   initFeatureService(Edition.CE);
   const [value, setValue] = useState(3);
   const options: BoxSelectorOption<number>[] = [
