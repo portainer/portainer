@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
@@ -18,13 +18,14 @@ module.exports = {
     main: './app',
   },
   output: {
-    filename: '[name].[hash].js',
+    filename: '[name].[contenthash].js',
     path: path.resolve(projectRoot, 'dist/public'),
   },
   module: {
     rules: [
       {
         test: /\.js$/,
+        type: 'javascript/auto',
         enforce: 'pre',
         use: [
           {
@@ -59,7 +60,7 @@ module.exports = {
 
       {
         test: /.xml$/,
-        use: 'file-loader',
+        type: 'asset/resource',
       },
       {
         test: /\.css$/,
@@ -82,14 +83,18 @@ module.exports = {
     ],
   },
   devServer: {
-    contentBase: path.join(__dirname, '.tmp'),
+    static: {
+      directory: path.join(__dirname, 'public'),
+    },
     compress: true,
     port: 8999,
     proxy: {
       '/api': 'http://localhost:9000',
     },
     open: true,
-    writeToDisk: true,
+    devMiddleware: {
+      writeToDisk: true,
+    },
   },
   plugins: [
     new Dotenv(),
@@ -118,11 +123,11 @@ module.exports = {
       jsyaml: 'js-yaml',
     }),
     new MiniCssExtractPlugin({
-      filename: '[name].[hash].css',
+      filename: '[name].[contenthash].css',
       chunkFilename: '[name].[id].css',
     }),
-    new CleanWebpackPlugin(['dist/public']),
-    new IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new CleanWebpackPlugin(),
+    new IgnorePlugin({ resourceRegExp: /^.\/locale$/, contextRegExp: /moment$/ }),
     // new BundleAnalyzerPlugin()
     new LodashModuleReplacementPlugin({
       shorthands: true,
@@ -131,7 +136,10 @@ module.exports = {
     }),
   ],
   optimization: {
+    moduleIds: 'deterministic',
+    runtimeChunk: 'single',
     splitChunks: {
+      chunks: 'all',
       cacheGroups: {
         vendor: {
           test: /node_modules/,

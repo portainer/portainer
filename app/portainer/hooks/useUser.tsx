@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useMemo,
 } from 'react';
 
 import { getUser } from '@/portainer/services/api/userService';
@@ -15,7 +16,7 @@ import { UserViewModel } from '../models/user';
 import { useLocalStorage } from './useLocalStorage';
 
 interface State {
-  user?: UserViewModel;
+  user?: UserViewModel | null;
 }
 
 const state: State = {};
@@ -70,10 +71,13 @@ interface AuthorizedProps {
   children: ReactNode;
 }
 
-export function Authorized({ authorizations, children }: AuthorizedProps) {
+export function Authorized({
+  authorizations,
+  children,
+}: AuthorizedProps): ReactNode {
   const isAllowed = useAuthorizations(authorizations);
 
-  return isAllowed ? <>{children}</> : null;
+  return isAllowed ? children : null;
 }
 
 interface UserProviderProps {
@@ -94,16 +98,20 @@ export function UserProvider({ children }: UserProviderProps) {
     }
   }, [jwt]);
 
+  const providerState = useMemo(() => ({ user }), [user]);
+
   if (jwt === '') {
     return null;
   }
 
-  if (user === null) {
+  if (providerState.user === null) {
     return null;
   }
 
   return (
-    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={providerState}>
+      {children}
+    </UserContext.Provider>
   );
 
   async function loadUser(id: number) {
