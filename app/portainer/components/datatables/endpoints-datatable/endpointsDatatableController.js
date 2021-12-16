@@ -101,6 +101,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
     };
 
     this.associateOpenAMT = function (endpoints) {
+      const setLoadingMessage = this.setLoadingMessage;
       ModalService.confirm({
         title: 'Are you sure?',
         message: 'This operation will associate the selected environments with OpenAMT.',
@@ -114,6 +115,8 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
           if (!confirmed) {
             return;
           }
+
+          setLoadingMessage('Activating Active Management Technology on selected devices...');
           for (let endpoint of endpoints) {
             try {
               await OpenAMTService.activateDevice(endpoint.Id);
