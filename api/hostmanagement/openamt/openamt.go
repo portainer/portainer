@@ -253,17 +253,17 @@ func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfi
 	return nil
 }
 
-func (service *Service) EnableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string, features portainer.OpenAMTDeviceEnabledFeatures) error {
+func (service *Service) EnableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string, features portainer.OpenAMTDeviceEnabledFeatures) (string, error) {
 	token, err := service.Authorization(configuration)
 	if err != nil {
-		return err
+		return "", err
 	}
 	configuration.Credentials.MPSToken = token
 
 	err = service.enableDeviceFeatures(configuration, deviceGUID, features)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return token, nil
 }

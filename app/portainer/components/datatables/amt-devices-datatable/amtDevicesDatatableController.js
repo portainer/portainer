@@ -64,40 +64,7 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
         this.state.executingAction[deviceGUID] = false;
       }
     };
-
-    this.kvmAction = async function (device) {
-      if (!device.connectionStatus || !device.features) {
-        return;
-      }
-      try {
-        if (device.features['KVM'] && device.features['userConsent'] === 'none') {
-          $state.go('portainer.endpoints.endpoint.kvm', {
-            id: this.endpointId,
-            deviceId: device.guid,
-            deviceName: device.hostname,
-          });
-          return;
-        }
-
-        const featuresPayload = {
-          IDER: true,
-          KVM: true,
-          SOL: true,
-          redirection: true,
-          userConsent: 'none',
-        };
-        await OpenAMTService.enableDeviceFeatures(this.endpointId, device.guid, featuresPayload);
-        $state.go('portainer.endpoints.endpoint.kvm', {
-          id: this.endpointId,
-          deviceId: device.guid,
-          deviceName: device.hostname,
-        });
-      } catch (err) {
-        console.log(err);
-        Notifications.error('Failure', err, `Failed to load kvm for device`);
-      }
-    };
-
+    
     this.$onInit = function () {
       this.setDefaults();
     };
