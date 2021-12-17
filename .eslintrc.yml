@@ -79,6 +79,7 @@ overrides:
       react/forbid-prop-types: off
       react/require-default-props: off
       react/no-array-index-key: off
+      no-underscore-dangle: off
       react/jsx-filename-extension: [0]
       import/no-extraneous-dependencies: ['error', { devDependencies: true }]
       '@typescript-eslint/explicit-module-boundary-types': off
