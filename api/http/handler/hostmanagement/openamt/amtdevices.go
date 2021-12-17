@@ -127,6 +127,11 @@ func (payload *deviceFeaturesPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+type AuthorizationResponse struct {
+	Server string
+	Token  string
+}
+
 // @id DeviceFeatures
 // @summary Enable features on an AMT managed device
 // @description Enable features on an AMT managed device
@@ -154,11 +159,20 @@ func (handler *Handler) deviceFeatures(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
 
-	err = handler.OpenAMTService.EnableDeviceFeatures(settings.OpenAMTConfiguration, payload.DeviceID, payload.EnabledFeatures)
+	_, err = handler.OpenAMTService.DeviceInformation(settings.OpenAMTConfiguration, payload.DeviceID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve device information", err}
+	}
+
+	token, err := handler.OpenAMTService.EnableDeviceFeatures(settings.OpenAMTConfiguration, payload.DeviceID, payload.EnabledFeatures)
 	if err != nil {
 		logrus.WithError(err).Error("Error executing device action")
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error executing device action", Err: err}
 	}
 
-	return response.Empty(w)
+	credentials := AuthorizationResponse{
+		Server: settings.OpenAMTConfiguration.MPSServer,
+		Token:  token,
+	}
+	return response.JSON(w, credentials)
 }
