@@ -1,6 +1,6 @@
-const webpackMerge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const productionConfig = require('./webpack.production');
 
-module.exports = webpackMerge(productionConfig, {
+module.exports = merge(productionConfig, {
   optimization: { nodeEnv: 'testing' },
 });

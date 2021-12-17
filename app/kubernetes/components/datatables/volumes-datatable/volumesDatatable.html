@@ -8,7 +8,7 @@
           System resources are hidden, this can be changed in the table settings.
         </span>
         <div class="settings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
+          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open" data-cy="k8s-vol-table-settings">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
@@ -43,7 +43,7 @@
                   </div>
                 </div>
                 <div>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8s-vol-table-settings-close">Close</a>
                 </div>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { Meta, Story } from '@storybook/react';
+import { useMemo } from 'react';
 
 import { Link } from '@/portainer/components/Link';
 import { UserContext } from '@/portainer/hooks/useUser';
@@ -19,10 +20,13 @@ interface StoryProps {
 }
 
 function Template({ title }: StoryProps) {
+  const state = useMemo(
+    () => ({ user: new UserViewModel({ Username: 'test' }) }),
+    []
+  );
+
   return (
-    <UserContext.Provider
-      value={{ user: new UserViewModel({ Username: 'test' }) }}
-    >
+    <UserContext.Provider value={state}>
       <Header>
         <HeaderTitle title={title} />
         <HeaderContent>
