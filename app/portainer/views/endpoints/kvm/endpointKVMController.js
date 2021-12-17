@@ -2,18 +2,27 @@ import angular from 'angular';
 
 class EndpointKVMController {
   /* @ngInject */
-  constructor($state, $transition$, EndpointService, OpenAMTService, Notifications, $async) {
+  constructor($state, $scope, $transition$, EndpointService, OpenAMTService, Notifications) {
     this.$state = $state;
-    this.$async = $async;
     this.$transition$ = $transition$;
     this.OpenAMTService = OpenAMTService;
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
 
+    this.$state.maximized = false;
     this.$state.endpointId = $transition$.params().id;
     this.$state.deviceId = $transition$.params().deviceId;
     this.$state.deviceName = $transition$.params().deviceName;
+
+    $scope.maximize = function() {
+      this.$state.maximized = true;
+    }
+
+    $scope.minimize = function() {
+      this.$state.maximized = false;
+    }
   }
+
 
   async $onInit() {
     try {
