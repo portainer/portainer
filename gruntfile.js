@@ -22,7 +22,7 @@ module.exports = function (grunt) {
       dockerWindowsVersion: '19-03-12',
       dockerLinuxComposeVersion: '1.27.4',
       dockerWindowsComposeVersion: '1.28.0',
-      dockerComposePluginVersion: '1.0.22',
+      dockerComposePluginVersion: '2.0.0-rc.2',
       helmVersion: 'v3.6.3',
       komposeVersion: 'v1.22.0',
       kubectlVersion: 'v1.18.0',
