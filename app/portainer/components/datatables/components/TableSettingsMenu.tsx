@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { PropsWithChildren, ReactNode } from 'react';
 
+import { useTableContext } from './TableContainer';
+
 interface Props {
   quickActions: ReactNode;
 }
@@ -10,6 +12,8 @@ export function TableSettingsMenu({
   quickActions,
   children,
 }: PropsWithChildren<Props>) {
+  useTableContext();
+
   return (
     <Menu className="setting">
       {({ isExpanded }) => (

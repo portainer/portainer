@@ -5,6 +5,8 @@ import { ColumnInstance } from 'react-table';
 import { Checkbox } from '@/portainer/components/form-components/Checkbox';
 import type { DockerContainer } from '@/docker/containers/types';
 
+import { useTableContext } from './TableContainer';
+
 interface Props {
   columns: ColumnInstance<DockerContainer>[];
   onChange: (value: string[]) => void;
@@ -12,6 +14,8 @@ interface Props {
 }
 
 export function ColumnVisibilityMenu({ columns, onChange, value }: Props) {
+  useTableContext();
+
   return (
     <Menu className="setting">
       {({ isExpanded }) => (

@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import { PropsWithChildren, ReactNode } from 'react';
 import { TableHeaderProps } from 'react-table';
 
+import { useTableContext } from './TableContainer';
+
 interface Props {
   canFilter: boolean;
   canSort: boolean;
@@ -23,6 +25,8 @@ export function TableHeaderCell({
   canFilter,
   renderFilter,
 }: Props) {
+  useTableContext();
+
   return (
     <th role={role} style={style} className={className}>
       <SortWrapper
