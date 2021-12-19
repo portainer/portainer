@@ -1,4 +1,4 @@
-import { buildOption } from '@/portainer/components/box-selector';
+import { buildOption } from '@/portainer/components/BoxSelector';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 
 class KubeCreateCustomTemplateViewController {

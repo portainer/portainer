@@ -7,13 +7,14 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 // Service repesents a service to manage environment(endpoint) snapshots.
 // It provides an interface to start background snapshots as well as
 // specific Docker/Kubernetes environment(endpoint) snapshot methods.
 type Service struct {
-	dataStore                 portainer.DataStore
+	dataStore                 dataservices.DataStore
 	refreshSignal             chan struct{}
 	snapshotIntervalInSeconds float64
 	dockerSnapshotter         portainer.DockerSnapshotter
@@ -22,7 +23,7 @@ type Service struct {
 }
 
 // NewService creates a new instance of a service
-func NewService(snapshotInterval string, dataStore portainer.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
+func NewService(snapshotInterval string, dataStore dataservices.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
 	snapshotFrequency, err := time.ParseDuration(snapshotInterval)
 	if err != nil {
 		return nil, err

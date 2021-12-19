@@ -1,5 +1,4 @@
 import './assets/css';
-import '@babel/polyfill';
 
 import angular from 'angular';
 import { UI_ROUTER_REACT_HYBRID } from '@uirouter/react-hybrid';
@@ -15,6 +14,11 @@ import './portainer/__module';
 
 import { onStartupAngular } from './app';
 import { configApp } from './config';
+
+import { init as initFeatureService } from './portainer/feature-flags/feature-flags.service';
+import { Edition } from './portainer/feature-flags/enums';
+
+initFeatureService(Edition.CE);
 
 angular
   .module('portainer', [

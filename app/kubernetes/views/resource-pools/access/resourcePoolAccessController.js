@@ -6,15 +6,13 @@ import KubernetesConfigMapHelper from 'Kubernetes/helpers/configMapHelper';
 
 class KubernetesResourcePoolAccessController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesResourcePoolService, KubernetesConfigMapService, EndpointProvider, EndpointService, GroupService, AccessService) {
+  constructor($async, $state, Notifications, KubernetesResourcePoolService, KubernetesConfigMapService, GroupService, AccessService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesConfigMapService = KubernetesConfigMapService;
 
-    this.EndpointProvider = EndpointProvider;
-    this.EndpointService = EndpointService;
     this.GroupService = GroupService;
     this.AccessService = AccessService;
 
@@ -36,6 +34,7 @@ class KubernetesResourcePoolAccessController {
    * Init
    */
   async onInit() {
+    const endpoint = this.endpoint;
     this.state = {
       actionInProgress: false,
       viewReady: false,
@@ -45,12 +44,9 @@ class KubernetesResourcePoolAccessController {
       multiselectOutput: [],
     };
 
-    this.endpointId = this.EndpointProvider.endpointID();
-
     try {
       const name = this.$transition$.params().id;
-      let [endpoint, pool, configMap] = await Promise.all([
-        this.EndpointService.endpoint(this.endpointId),
+      let [pool, configMap] = await Promise.all([
         this.KubernetesResourcePoolService.get(name),
         this.KubernetesConfigMapService.getAccess(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName),
       ]);

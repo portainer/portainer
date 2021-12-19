@@ -4,12 +4,13 @@ import { TemplateViewModel } from '../../models/template';
 angular.module('portainer.app').factory('TemplateService', TemplateServiceFactory);
 
 /* @ngInject */
-function TemplateServiceFactory($q, Templates, TemplateHelper, EndpointProvider, ImageHelper, ContainerHelper, EndpointService) {
-  var service = {};
+function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, ContainerHelper, EndpointService) {
+  var service = {
+    templates,
+  };
 
-  service.templates = function () {
+  function templates(endpointId) {
     const deferred = $q.defer();
-    const endpointId = EndpointProvider.currentEndpoint().Id;
 
     $q.all({
       templates: Templates.query().$promise,
@@ -36,7 +37,7 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, EndpointProvider,
       });
 
     return deferred.promise;
-  };
+  }
 
   service.templateFile = templateFile;
   function templateFile(repositoryUrl, composeFilePathInRepository) {

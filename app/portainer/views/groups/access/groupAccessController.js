@@ -1,4 +1,4 @@
-import { RBAC_ROLES } from '@/portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 
 angular.module('portainer.app').controller('GroupAccessController', [
   '$scope',
@@ -7,7 +7,7 @@ angular.module('portainer.app').controller('GroupAccessController', [
   'GroupService',
   'Notifications',
   function ($scope, $state, $transition$, GroupService, Notifications) {
-    $scope.limitedFeature = RBAC_ROLES;
+    $scope.limitedFeature = FeatureId.RBAC_ROLES;
 
     $scope.updateAccess = function () {
       $scope.state.actionInProgress = true;

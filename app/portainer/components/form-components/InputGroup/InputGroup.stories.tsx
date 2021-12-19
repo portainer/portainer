@@ -8,7 +8,9 @@ export default {
   title: 'Components/Form/InputGroup',
 } as Meta;
 
-export function BasicExample() {
+export { BasicExample, Addons, Sizing };
+
+function BasicExample() {
   const [value1, setValue1] = useState('');
   const [valueNumber, setValueNumber] = useState(0);
 
@@ -58,7 +60,7 @@ export function BasicExample() {
   );
 }
 
-export function Addons() {
+function Addons() {
   const [value1, setValue1] = useState('');
   const [value2, setValue2] = useState('');
   return (
@@ -85,7 +87,7 @@ export function Addons() {
   );
 }
 
-export function Sizing() {
+function Sizing() {
   const [value, setValue] = useState('');
   return (
     <div className="space-y-8">

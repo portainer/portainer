@@ -4,5 +4,6 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationView', {
   controllerAs: 'ctrl',
   bindings: {
     $transition$: '<',
+    endpoint: '<',
   },
 });

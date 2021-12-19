@@ -1,20 +1,29 @@
 class GitFormComposeAuthFieldsetController {
   /* @ngInject */
-  constructor() {
+  constructor($scope) {
+    Object.assign(this, { $scope });
+
     this.authValues = {
       username: '',
       password: '',
     };
 
+    this.handleChange = this.handleChange.bind(this);
     this.onChangeField = this.onChangeField.bind(this);
     this.onChangeAuth = this.onChangeAuth.bind(this);
     this.onChangeUsername = this.onChangeField('RepositoryUsername');
     this.onChangePassword = this.onChangeField('RepositoryPassword');
   }
 
+  handleChange(...args) {
+    this.$scope.$evalAsync(() => {
+      this.onChange(...args);
+    });
+  }
+
   onChangeField(field) {
     return (value) => {
-      this.onChange({
+      this.handleChange({
         ...this.model,
         [field]: value,
       });
@@ -27,7 +36,7 @@ class GitFormComposeAuthFieldsetController {
       this.authValues.password = this.model.RepositoryPassword;
     }
 
-    this.onChange({
+    this.handleChange({
       ...this.model,
       RepositoryAuthentication: auth,
       RepositoryUsername: auth ? this.authValues.username : '',

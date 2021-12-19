@@ -9,12 +9,13 @@ const meta: Meta = {
 };
 
 export default meta;
+export { Example };
 
 interface Props {
   text: string;
 }
 
-export function Example({ text }: Props) {
+function Example({ text }: Props) {
   return (
     <UIRouter plugins={[pushStateLocationPlugin]}>
       <ReactExample text={text} />

@@ -1,6 +1,12 @@
 <form class="form-horizontal" name="dockerWizardForm">
   <!-- docker tab selection -->
-  <box-selector radio-name="Docker" ng-click="$ctrl.clearForm()" ng-model="$ctrl.state.endpointType" options="$ctrl.state.availableOptions"></box-selector>
+  <box-selector
+    radio-name="'Docker'"
+    ng-click="$ctrl.clearForm()"
+    value="$ctrl.state.endpointType"
+    options="$ctrl.state.availableOptions"
+    on-change="($ctrl.onChangeEndpointType)"
+  ></box-selector>
   <!-- docker tab selection -->
   <div style="padding-left: 10px;">
     <div class="form-group">
@@ -86,16 +92,17 @@
     </div>
 
     <div class="form-group" style="padding-left: 15px; width: 15%;">
-      <por-switch-field ng-model="$ctrl.formValues.tls" name="connect_socket" label="TLS" label-class="col-sm-12 col-lg-4"></por-switch-field>
+      <por-switch-field checked="$ctrl.formValues.tls" name="'connect_socket'" label="'TLS'" label-class="'col-sm-12 col-lg-4'" on-change="($ctrl.onToggleTls)"></por-switch-field>
     </div>
 
     <div class="form-group" style="padding-left: 15px; width: 40%;">
       <por-switch-field
         ng-if="$ctrl.formValues.tls"
-        ng-model="$ctrl.formValues.skipCertification"
-        name="skip_certification"
-        label="Skip Certification Verification"
-        label-class="col-sm-12 col-lg-4"
+        checked="$ctrl.formValues.skipCertification"
+        name="'skip_certification'"
+        label="'Skip Certification Verification'"
+        label-class="'col-sm-12 col-lg-4'"
+        on-change="($ctrl.onToggleSkipCert)"
       ></por-switch-field>
     </div>
 

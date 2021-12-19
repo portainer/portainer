@@ -8,7 +8,9 @@ export default {
   title: 'Components/ButtonSelector',
 } as Meta;
 
-export function TwoOptionsSelector() {
+export { TwoOptionsSelector };
+
+function TwoOptionsSelector() {
   const options: Option<string>[] = [
     { value: 'sAMAccountName', label: 'username' },
     { value: 'userPrincipalName', label: 'user@domainname' },
