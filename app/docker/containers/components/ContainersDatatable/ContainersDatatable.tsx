@@ -40,6 +40,8 @@ import type {
 import { useEndpoint } from '@/portainer/endpoints/useEndpoint';
 import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
 import { Checkbox } from '@/portainer/components/form-components/Checkbox';
+import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
+import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
 
 import { ContainersDatatableActions } from './ContainersDatatableActions';
 import { ContainersDatatableSettings } from './ContainersDatatableSettings';
@@ -60,9 +62,8 @@ export function ContainersDatatable({
   isHostColumnVisible,
   autoFocusSearch,
 }: ContainerTableProps) {
-  const { settings, setTableSettings } = useTableSettings<
-    ContainersTableSettings
-  >();
+  const { settings, setTableSettings } =
+    useTableSettings<ContainersTableSettings>();
   const [searchBarValue, setSearchBarValue] = useSearchBarContext();
 
   const columns = useColumns();
@@ -175,12 +176,8 @@ export function ContainersDatatable({
       >
         <thead>
           {headerGroups.map((headerGroup) => {
-            const {
-              key,
-              className,
-              role,
-              style,
-            } = headerGroup.getHeaderGroupProps();
+            const { key, className, role, style } =
+              headerGroup.getHeaderGroupProps();
 
             return (
               <TableHeaderRow<DockerContainer>
@@ -215,13 +212,8 @@ export function ContainersDatatable({
         </tbody>
       </Table>
 
-      <div className="footer">
-        {selectedFlatRows.length !== 0 && (
-          <div className="infoBar">
-            {selectedFlatRows.length} item(s) selected
-          </div>
-        )}
-
+      <TableFooter>
+        <SelectedRowsCount value={selectedFlatRows.length} />
         <PaginationControls
           showAll
           pageLimit={pageSize}
@@ -230,7 +222,7 @@ export function ContainersDatatable({
           totalCount={dataset.length}
           onPageLimitChange={handlePageSizeChange}
         />
-      </div>
+      </TableFooter>
     </TableContainer>
   );
 
