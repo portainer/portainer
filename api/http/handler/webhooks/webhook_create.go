@@ -2,6 +2,7 @@ package webhooks
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils/access"
 	"net/http"
@@ -63,6 +64,24 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	endpointID := portainer.EndpointID(payload.EndpointID)
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+	if dataservices.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
+	} else if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
+	}
+
+	var resourceType portainer.ResourceControlType
+	if portainer.WebhookType(payload.WebhookType) == portainer.ServiceWebhook {
+		resourceType = portainer.ServiceResourceControl
+	}
+	if resourceType != 0 {
+		handlerErr := handler.checkResourceAccess(r, endpoint, payload.ResourceID, resourceType)
+		if handlerErr != nil {
+			return handlerErr
+		}
+	}
 
 	if payload.RegistryID != 0 {
 		tokenData, err := security.RetrieveTokenData(r)

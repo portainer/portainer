@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"github.com/portainer/portainer/api/dataservices"
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/security"
@@ -51,6 +52,23 @@ func (handler *Handler) webhookUpdate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a webhooks with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a webhooks with the specified identifier inside the database", err}
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(webhook.EndpointID)
+	if dataservices.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
+	} else if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
+	}
+	var resourceType portainer.ResourceControlType
+	if webhook.WebhookType == portainer.ServiceWebhook {
+		resourceType = portainer.ServiceResourceControl
+	}
+	if resourceType != 0 {
+		handlerErr := handler.checkResourceAccess(r, endpoint, webhook.ResourceID, resourceType)
+		if handlerErr != nil {
+			return handlerErr
+		}
 	}
 
 	if payload.RegistryID != 0 {
