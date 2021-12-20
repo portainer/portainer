@@ -142,6 +142,7 @@
     "@storybook/react": "^6.4.9",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
+    "@testing-library/user-event": "^13.5.0",
     "@types/angular": "^1.8.3",
     "@types/bootbox": "^5.2.2",
     "@types/jest": "^27.0.3",
