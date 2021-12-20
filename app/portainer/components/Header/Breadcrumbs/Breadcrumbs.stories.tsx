@@ -12,7 +12,9 @@ const meta: Meta = {
 
 export default meta;
 
-export function Example() {
+export { Example };
+
+function Example() {
   return (
     <UIRouter plugins={[pushStateLocationPlugin]}>
       <Breadcrumbs>

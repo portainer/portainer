@@ -8,12 +8,29 @@ import (
 
 // MarshalObject encodes an object to binary format
 func MarshalObject(object interface{}) ([]byte, error) {
+	// Special case for the VERSION bucket. Here we're not using json
+	if v, ok := object.(string); ok {
+		return []byte(v), nil
+	}
+
 	return json.Marshal(object)
 }
 
 // UnmarshalObject decodes an object from binary data
 func UnmarshalObject(data []byte, object interface{}) error {
-	return json.Unmarshal(data, object)
+	// Special case for the VERSION bucket. Here we're not using json
+	// So we need to return it as a string
+	err := json.Unmarshal(data, object)
+	if err != nil {
+		if s, ok := object.(*string); ok {
+			*s = string(data)
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 // UnmarshalObjectWithJsoniter decodes an object from binary data

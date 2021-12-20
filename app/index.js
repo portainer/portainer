@@ -1,5 +1,4 @@
 import './assets/css';
-import '@babel/polyfill';
 
 import angular from 'angular';
 import { UI_ROUTER_REACT_HYBRID } from '@uirouter/react-hybrid';
