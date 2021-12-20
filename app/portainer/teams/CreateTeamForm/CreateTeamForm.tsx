@@ -3,10 +3,10 @@ import { Formik, Field, Form } from 'formik';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { UserViewModel } from '@/portainer/models/user';
-import { Button } from '@/portainer/components/Button';
 import { TeamViewModel } from '@/portainer/models/team';
 import { Input } from '@/portainer/components/form-components/Input';
 import { UsersSelector } from '@/portainer/components/UsersSelector';
+import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 
 import { validationSchema } from './CreateTeamForm.validation';
 
@@ -89,23 +89,18 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
 
                   <div className="form-group">
                     <div className="col-sm-12">
-                      <Button
-                        type="submit"
-                        disabled={!isValid || isSubmitting}
+                      <LoadingButton
+                        disabled={!isValid}
                         dataCy="team-createTeamButton"
+                        isLoading={isSubmitting}
+                        loadingText="Creating team..."
                       >
-                        {isSubmitting ? (
-                          'Creating team...'
-                        ) : (
-                          <>
-                            <i
-                              className="fa fa-plus space-right"
-                              aria-hidden="true"
-                            />
-                            Create team
-                          </>
-                        )}
-                      </Button>
+                        <i
+                          className="fa fa-plus space-right"
+                          aria-hidden="true"
+                        />
+                        Create team
+                      </LoadingButton>
                     </div>
                   </div>
                 </Form>
