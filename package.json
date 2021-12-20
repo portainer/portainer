@@ -221,7 +221,7 @@
     "webpack-merge": "^5.8.0"
   },
   "resolutions": {
-    "jquery": "^3.5.1",
+    "**/jquery": "^3.6.0",
     "decompress": "^4.2.1",
     "lodash": "^4.17.21",
     "js-yaml": "^3.14.0",
