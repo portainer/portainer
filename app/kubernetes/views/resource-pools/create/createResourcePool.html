@@ -28,16 +28,16 @@
                 />
               </div>
             </div>
-            <div class="form-group" ng-show="resourcePoolCreationForm.pool_name.$invalid || $ctrl.state.isAlreadyExist">
+            <div class="form-group" ng-show="resourcePoolCreationForm.pool_name.$invalid || $ctrl.state.isAlreadyExist || $ctrl.state.hasPrefixKube">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="resourcePoolCreationForm.pool_name.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                   <p ng-message="pattern"
-                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end
-                    with an alphanumeric character.</p
+                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', and contain at most 63
+                    characters, and must start and end with an alphanumeric character.</p
                   >
                 </div>
-                <p ng-if="$ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A namespace with the same name already exists.</p>
+                <p ng-if="$ctrl.state.hasPrefixKube"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Prefix "kube-" is reserved for Kubernetes system namespaces.</p>
               </div>
             </div>
             <!-- #endregion -->
