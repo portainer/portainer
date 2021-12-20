@@ -7,14 +7,14 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt"
+	"github.com/portainer/portainer/api/database/boltdb"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/offlinegate"
 )
 
 // SeedStore seeds the store with provided JSON/map data, will trigger system shutdown, when finished.
 // NOTE: THIS WILL COMPLETELY OVERWRITE THE CURRENT STORE - only use this for testing.
-func SeedStore(storeData map[string]interface{}, filestorePath string, gate *offlinegate.OfflineGate, datastore portainer.DataStore, shutdownTrigger context.CancelFunc) error {
+func SeedStore(storeData map[string]interface{}, filestorePath string, gate *offlinegate.OfflineGate, datastore dataservices.DataStore, shutdownTrigger context.CancelFunc) error {
 	// write storeData map to a temporary file
 	file, err := writeMapToFile(storeData)
 	if err != nil {
@@ -29,7 +29,7 @@ func SeedStore(storeData map[string]interface{}, filestorePath string, gate *off
 		return errors.Wrap(err, "Failed to stop db")
 	}
 
-	storePath := filepath.Join(filestorePath, bolt.DatabaseFileName)
+	storePath := filepath.Join(filestorePath, boltdb.DatabaseFileName)
 	// TODO: use portainer-cli to import
 	if err := ImportJsonToDatabase(file.Name(), storePath); err != nil {
 		return errors.Wrap(err, "Unable to import JSON data to database")
