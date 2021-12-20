@@ -1,36 +1,25 @@
 import clsx from 'clsx';
-import { FormEvent } from 'react';
-
-import { ChangeProps, InputProps } from './types';
+import { SelectHTMLAttributes } from 'react';
 
 interface Option<T extends string | number> {
   value: T;
   label: string;
 }
 
-interface Props<T extends string | number> extends InputProps, ChangeProps<T> {
+interface Props<T extends string | number> {
   options: Option<T>[];
 }
 
 export function Select<T extends number | string>({
   options,
-  onChange,
-  value,
   className,
-  disabled,
-  id,
-  required,
-  placeholder,
-}: Props<T>) {
+  ...props
+}: Props<T> & SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
-      value={value}
-      disabled={disabled}
-      id={id}
-      required={required}
-      className={clsx(className, 'form-control')}
-      placeholder={placeholder}
-      onChange={handleChange}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+      className={clsx('form-control', className)}
     >
       {options.map((item) => (
         <option value={item.value} key={item.value}>
@@ -39,10 +28,4 @@ export function Select<T extends number | string>({
       ))}
     </select>
   );
-
-  function handleChange(e: FormEvent<HTMLSelectElement>) {
-    const { selectedIndex } = e.currentTarget;
-    const option = options[selectedIndex];
-    onChange(option.value);
-  }
 }

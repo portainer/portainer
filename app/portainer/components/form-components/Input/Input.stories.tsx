@@ -1,10 +1,10 @@
 import { Meta, Story } from '@storybook/react';
 import { useState } from 'react';
 
-import { TextInput } from './TextInput';
+import { Input } from './Input';
 
 export default {
-  title: 'Components/Form/TextInput',
+  title: 'Components/Form/Input',
   args: {
     disabled: false,
   },
@@ -16,7 +16,14 @@ interface Args {
 
 export function TextField({ disabled }: Args) {
   const [value, setValue] = useState('');
-  return <TextInput value={value} onChange={setValue} disabled={disabled} />;
+  return (
+    <Input
+      type="text"
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      disabled={disabled}
+    />
+  );
 }
 
 export const DisabledTextField: Story<Args> = TextField.bind({});

@@ -100,6 +100,7 @@
     "fast-json-patch": "^3.1.0",
     "filesize": "~3.3.0",
     "filesize-parser": "^1.5.0",
+    "formik": "^2.2.9",
     "jquery": "^3.6.0",
     "js-base64": "^3.7.2",
     "js-yaml": "^3.14.0",
@@ -111,6 +112,7 @@
     "rc-slider": "^9.7.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-select": "^5.2.1",
     "react-tooltip": "^4.2.21",
     "sanitize-html": "^2.5.3",
     "spinkit": "^2.0.1",
@@ -121,7 +123,8 @@
     "uuid": "^3.3.2",
     "x256": "^0.0.2",
     "xterm": "^3.8.0",
-    "yaml": "^1.10.2"
+    "yaml": "^1.10.2",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@apidevtools/swagger-cli": "^4.0.4",
@@ -139,6 +142,7 @@
     "@storybook/react": "^6.4.9",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
+    "@testing-library/user-event": "^13.5.0",
     "@types/angular": "^1.8.3",
     "@types/bootbox": "^5.2.2",
     "@types/jest": "^27.0.3",

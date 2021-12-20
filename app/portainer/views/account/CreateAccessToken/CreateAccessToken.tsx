@@ -3,12 +3,12 @@ import { useRouter } from '@uirouter/react';
 
 import { Widget, WidgetBody } from '@/portainer/components/widget';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { TextInput } from '@/portainer/components/form-components/Input';
 import { Button } from '@/portainer/components/Button';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 import { Code } from '@/portainer/components/Code';
 import { CopyButton } from '@/portainer/components/Button/CopyButton';
+import { Input } from '@/portainer/components/form-components/Input';
 
 import styles from './CreateAccessToken.module.css';
 
@@ -64,16 +64,15 @@ export function CreateAccessToken({
       <WidgetBody>
         <div>
           <FormControl inputId="input" label="Description" errors={errorText}>
-            <TextInput
+            <Input
               id="input"
-              onChange={(value) => setDescription(value)}
-              type="text"
+              onChange={(e) => setDescription(e.target.value)}
               value={description}
             />
           </FormControl>
           <Button
             disabled={!!errorText || !!accessToken}
-            onClick={generateAccessToken}
+            onClick={() => generateAccessToken()}
             className={styles.addButton}
           >
             Add access token
