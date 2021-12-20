@@ -65,8 +65,8 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase("boltdb", *flags.Data)
+func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService, secretkey string, shutdownCtx context.Context) dataservices.DataStore {
+	connection, err := database.NewDatabase("boltdb", *flags.Data, secretkey)
 	if err != nil {
 		panic(err)
 	}
@@ -516,7 +516,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Println("proceeding without encryption key")
 	}
 
-	dataStore := initDataStore(flags, fileService, shutdownCtx)
+	dataStore := initDataStore(flags, fileService, encryptionKey, shutdownCtx)
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
 		log.Fatal(err)

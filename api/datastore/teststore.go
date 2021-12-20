@@ -42,7 +42,7 @@ func NewTestStore(init bool) (bool, *Store, func(), error) {
 		return false, nil, nil, err
 	}
 
-	connection, err := database.NewDatabase("boltdb", storePath)
+	connection, err := database.NewDatabase("boltdb", storePath, "apassphrasewhichneedstobe32bytes")
 	if err != nil {
 		panic(err)
 	}

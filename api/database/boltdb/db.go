@@ -14,16 +14,22 @@ import (
 )
 
 const (
-	DatabaseFileName = "portainer.db"
+	DatabaseFileName          = "portainer.db"
+	EncryptedDatabaseFileName = "portainer.edb"
 )
 
 type DbConnection struct {
-	Path string
+	Path          string
+	EncryptionKey string
 
 	*bolt.DB
 }
 
 func (connection *DbConnection) GetDatabaseFilename() string {
+	if connection.EncryptionKey != "" {
+		return EncryptedDatabaseFileName
+	}
+
 	return DatabaseFileName
 }
 
@@ -76,7 +82,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
-	b, err := exportJson(databasePath)
+	b, err := exportJson(databasePath, connection.EncryptionKey)
 	if err != nil {
 		return err
 	}
@@ -124,7 +130,7 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 		return err
 	}
 
-	return UnmarshalObject(data, object)
+	return UnmarshalObject(data, object, connection.EncryptionKey)
 }
 
 // UpdateObject is a generic function used to update an object inside a database database.
@@ -132,7 +138,7 @@ func (connection *DbConnection) UpdateObject(bucketName string, key []byte, obje
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
-		data, err := MarshalObject(object)
+		data, err := MarshalObject(object, connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -163,7 +169,7 @@ func (connection *DbConnection) DeleteAllObjects(bucketName string, matching fun
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var obj interface{}
-			err := UnmarshalObject(v, &obj)
+			err := UnmarshalObject(v, &obj, connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -205,7 +211,7 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 		seqId, _ := bucket.NextSequence()
 		id, obj := fn(seqId)
 
-		data, err := MarshalObject(obj)
+		data, err := MarshalObject(obj, connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -219,7 +225,7 @@ func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, ob
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
-		data, err := MarshalObject(obj)
+		data, err := MarshalObject(obj, connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -240,7 +246,7 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 			return err
 		}
 
-		data, err := MarshalObject(obj)
+		data, err := MarshalObject(obj, connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -255,7 +261,7 @@ func (connection *DbConnection) GetAll(bucketName string, obj interface{}, appen
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObject(v, obj)
+			err := UnmarshalObject(v, obj, connection.EncryptionKey)
 			if err != nil {
 				return err
 			}

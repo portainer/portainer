@@ -8,7 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const jsonobject = `{"LogoURL":"","BlackListedLabels":[],"AuthenticationMethod":1,"LDAPSettings":{"AnonymousMode":true,"ReaderDN":"","URL":"","TLSConfig":{"TLS":false,"TLSSkipVerify":false},"StartTLS":false,"SearchSettings":[{"BaseDN":"","Filter":"","UserNameAttribute":""}],"GroupSearchSettings":[{"GroupBaseDN":"","GroupFilter":"","GroupAttribute":""}],"AutoCreateUsers":true},"OAuthSettings":{"ClientID":"","AccessTokenURI":"","AuthorizationURI":"","ResourceURI":"","RedirectURI":"","UserIdentifier":"","Scopes":"","OAuthAutoCreateUsers":false,"DefaultTeamID":0,"SSO":true,"LogoutURI":"","KubeSecretKey":"j0zLVtY/lAWBk62ByyF0uP80SOXaitsABP0TTJX8MhI="},"OpenAMTConfiguration":{"Enabled":false,"MPSServer":"","Credentials":{"MPSUser":"","MPSPassword":"","MPSToken":""},"DomainConfiguration":{"CertFileText":"","CertPassword":"","DomainName":""},"WirelessConfiguration":null},"FeatureFlagSettings":{},"SnapshotInterval":"5m","TemplatesURL":"https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json","EdgeAgentCheckinInterval":5,"EnableEdgeComputeFeatures":false,"UserSessionTimeout":"8h","KubeconfigExpiry":"0","EnableTelemetry":true,"HelmRepositoryURL":"https://charts.bitnami.com/bitnami","KubectlShellImage":"portainer/kubectl-shell","DisplayDonationHeader":false,"DisplayExternalContributors":false,"EnableHostManagementFeatures":false,"AllowVolumeBrowserForRegularUsers":false,"AllowBindMountsForRegularUsers":false,"AllowPrivilegedModeForRegularUsers":false,"AllowHostNamespaceForRegularUsers":false,"AllowStackManagementForRegularUsers":false,"AllowDeviceMappingForRegularUsers":false,"AllowContainerCapabilitiesForRegularUsers":false}`
+const (
+	jsonobject = `{"LogoURL":"","BlackListedLabels":[],"AuthenticationMethod":1,"LDAPSettings":{"AnonymousMode":true,"ReaderDN":"","URL":"","TLSConfig":{"TLS":false,"TLSSkipVerify":false},"StartTLS":false,"SearchSettings":[{"BaseDN":"","Filter":"","UserNameAttribute":""}],"GroupSearchSettings":[{"GroupBaseDN":"","GroupFilter":"","GroupAttribute":""}],"AutoCreateUsers":true},"OAuthSettings":{"ClientID":"","AccessTokenURI":"","AuthorizationURI":"","ResourceURI":"","RedirectURI":"","UserIdentifier":"","Scopes":"","OAuthAutoCreateUsers":false,"DefaultTeamID":0,"SSO":true,"LogoutURI":"","KubeSecretKey":"j0zLVtY/lAWBk62ByyF0uP80SOXaitsABP0TTJX8MhI="},"OpenAMTConfiguration":{"Enabled":false,"MPSServer":"","Credentials":{"MPSUser":"","MPSPassword":"","MPSToken":""},"DomainConfiguration":{"CertFileText":"","CertPassword":"","DomainName":""},"WirelessConfiguration":null},"FeatureFlagSettings":{},"SnapshotInterval":"5m","TemplatesURL":"https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json","EdgeAgentCheckinInterval":5,"EnableEdgeComputeFeatures":false,"UserSessionTimeout":"8h","KubeconfigExpiry":"0","EnableTelemetry":true,"HelmRepositoryURL":"https://charts.bitnami.com/bitnami","KubectlShellImage":"portainer/kubectl-shell","DisplayDonationHeader":false,"DisplayExternalContributors":false,"EnableHostManagementFeatures":false,"AllowVolumeBrowserForRegularUsers":false,"AllowBindMountsForRegularUsers":false,"AllowPrivilegedModeForRegularUsers":false,"AllowHostNamespaceForRegularUsers":false,"AllowStackManagementForRegularUsers":false,"AllowDeviceMappingForRegularUsers":false,"AllowContainerCapabilitiesForRegularUsers":false}`
+	passphrase = "apassphrasewhichneedstobe32bytes"
+)
 
 func Test_MarshalObject(t *testing.T) {
 	is := assert.New(t)
@@ -75,7 +78,7 @@ func Test_MarshalObject(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s -> %s", test.object, test.expected), func(t *testing.T) {
-			data, err := MarshalObject(test.object)
+			data, err := MarshalObject(test.object, passphrase)
 			is.NoError(err)
 			is.Equal(test.expected, string(data))
 		})
@@ -114,7 +117,7 @@ func Test_UnMarshalObject(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s -> %s", test.object, test.expected), func(t *testing.T) {
 			var object string
-			err := UnmarshalObject(test.object, &object)
+			err := UnmarshalObject(test.object, &object, passphrase)
 			is.NoError(err)
 			is.Equal(test.expected, string(object))
 		})
