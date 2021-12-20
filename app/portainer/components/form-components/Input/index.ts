@@ -1,3 +1,2 @@
-export { NumberInput } from './NumberInput';
-export { TextInput } from './TextInput';
+export { Input } from './Input';
 export { Select } from './Select';

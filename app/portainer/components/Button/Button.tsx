@@ -1,17 +1,19 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
-type Type = 'submit' | 'reset' | 'button';
+type Type = 'submit' | 'button' | 'reset';
 type Color = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'link';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
+
 export interface Props {
-  type?: Type;
   color?: Color;
   size?: Size;
   disabled?: boolean;
   title?: string;
   className?: string;
-  onClick: () => void;
+  dataCy?: string;
+  type?: Type;
+  onClick?: () => void;
 }
 
 export function Button({
@@ -20,12 +22,14 @@ export function Button({
   size = 'small',
   disabled = false,
   className,
+  dataCy,
   onClick,
   title,
   children,
 }: PropsWithChildren<Props>) {
   return (
     <button
+      data-cy={dataCy}
       /* eslint-disable-next-line react/button-has-type */
       type={type}
       disabled={disabled}

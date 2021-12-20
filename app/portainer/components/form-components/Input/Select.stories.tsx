@@ -21,9 +21,9 @@ export function Example({ disabled }: Args) {
     { value: 2, label: 'two' },
   ];
   return (
-    <Select<number>
+    <Select
       value={value}
-      onChange={setValue}
+      onChange={(e) => setValue(parseInt(e.target.value, 10))}
       disabled={disabled}
       options={options}
     />
