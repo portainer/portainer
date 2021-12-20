@@ -65,8 +65,8 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService, secretkey string, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase("boltdb", *flags.Data, secretkey)
+func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService, encryptionkey string, shutdownCtx context.Context) dataservices.DataStore {
+	connection, err := database.NewDatabase("boltdb", *flags.Data, encryptionkey)
 	if err != nil {
 		panic(err)
 	}
@@ -491,16 +491,15 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, s
 	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
 }
 
-func initSecretKey(fileName string) string {
-	ok, _ := filesystem.FileExists("/run/secrets/" + fileName)
-	if !ok {
-		log.Println(fmt.Sprintf("encryption secret file `%s` does not exists", fileName))
-		return ""
-	}
-
-	content, err := os.ReadFile("/run/secrets/" + fileName)
+func loadEncryptionKey(keyfilename string) string {
+	content, err := os.ReadFile(path.Join("/run/secrets", keyfilename))
 	if err != nil {
-		log.Println(fmt.Sprintf("error reading encryption key file: %s", err.Error()))
+		if os.IsNotExist(err) {
+			log.Printf("Encryption key file `%s` not present", keyfilename)
+		} else {
+			log.Printf("Error reading encryption key file: %s", err.Error())
+		}
+
 		return ""
 	}
 
@@ -511,7 +510,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	shutdownCtx, shutdownTrigger := context.WithCancel(context.Background())
 
 	fileService := initFileService(*flags.Data)
-	encryptionKey := initSecretKey(*flags.SecretKeyName)
+	encryptionKey := loadEncryptionKey(*flags.SecretKeyName)
 	if encryptionKey == "" {
 		log.Println("proceeding without encryption key")
 	}

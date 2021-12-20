@@ -1,10 +1,14 @@
 package datastore
 
 import (
+	"fmt"
 	"io"
+	"path"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/sirupsen/logrus"
 )
 
 func (store *Store) version() (int, error) {
@@ -37,6 +41,18 @@ func (store *Store) Open() (newStore bool, err error) {
 	err = store.connection.Open()
 	if err != nil {
 		return newStore, err
+	}
+
+	// Check if DB is encrypted
+	ok, err := store.connection.IsEncryptionRequired()
+	if err != nil {
+		logrus.Warnf("Error calling IsEncryptionRequired: %s", err.Error())
+	}
+
+	logrus.Infof("Is migration required?: %t", ok)
+	if ok {
+		// encrypt an un-encrypted database
+		store.encryptDB()
 	}
 
 	err = store.initServices()
@@ -77,4 +93,38 @@ func (store *Store) IsErrObjectNotFound(e error) bool {
 
 func (store *Store) Rollback(force bool) error {
 	return store.connectionRollback(force)
+}
+
+func (store *Store) encryptDB() error {
+	// Since database is not encrypted so
+	// settings this flag to false will not
+	// allow connection to use encryption key
+	store.connection.SetIsDBEncryptedFlag(false)
+	err := store.initServices()
+	if err != nil {
+		logrus.Fatal("init services failed")
+	}
+
+	// export file path for backup
+	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
+
+	logrus.Infof("exporting database backup to %s", exportFilename)
+	err = store.Export(exportFilename)
+	if err != nil {
+		logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
+		return err
+	}
+
+	logrus.Infof("database backup exported")
+
+	// Set isDBEncryptedFlag to true to import JSON in the encrypted format
+	store.connection.SetIsDBEncryptedFlag(true)
+	err = store.Import(exportFilename)
+	if err != nil {
+		logrus.Fatal(errors.ErrDBImportFailed.Error()) // TODO: Rollback?
+	}
+
+	logrus.Info("database successfully encrypted")
+	// TODO: Delete the backup??
+	return nil
 }
