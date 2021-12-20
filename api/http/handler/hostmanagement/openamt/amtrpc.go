@@ -37,8 +37,8 @@ type HostInfo struct {
 
 const (
 	// TODO: this should get extracted to some configurable - don't assume Docker Hub is everyone's global namespace, or that they're allowed to pull images from the internet
-	rpcGoImageName      = "ptrrd/openamt:rpc-go-json"
-	rpcGoContainerName  = "openamt-rpc-go"
+	rpcGoImageName      = "intel/oact-rpc-go"
+	rpcGoContainerName  = "oact-rpc-go"
 	dockerClientTimeout = 5 * time.Minute
 )
 
@@ -102,7 +102,7 @@ func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *porta
 	// TODO: extract from this Handler into something global.
 
 	// TODO: start
-	//      docker run --rm -it --privileged ptrrd/openamt:rpc-go amtinfo
+	//      docker run --rm -it --privileged intel/oact-rpc-go amtinfo
 	//		on the Docker standalone node (one per env :)
 	//		and later, on the specified node in the swarm, or kube.
 	nodeName := ""
