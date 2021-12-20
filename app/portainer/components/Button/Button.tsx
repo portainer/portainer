@@ -1,26 +1,20 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
+type Type = 'submit' | 'button' | 'reset';
 type Color = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'link';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
-interface PropsInterface {
+export interface Props {
   color?: Color;
   size?: Size;
   disabled?: boolean;
   title?: string;
   className?: string;
   dataCy?: string;
+  type?: Type;
+  onClick?: () => void;
 }
-
-type PropTypes =
-  | {
-      type?: 'reset' | 'button';
-      onClick: () => void;
-    }
-  | { type?: 'submit'; onClick?: () => void };
-
-export type Props = PropsInterface & PropTypes;
 
 export function Button({
   type = 'button',
