@@ -72,6 +72,7 @@
                     Create template from stack
                   </button>
                   <button
+                    authorization="PortainerStackUpdate"
                     ng-if="regular && stackFileContent && !stack.FromAppTemplate && stack.GitConfig"
                     ng-disabled="state.actionInProgress"
                     ng-click="detachStackFromGit()"
