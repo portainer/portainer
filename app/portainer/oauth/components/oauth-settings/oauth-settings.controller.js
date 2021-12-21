@@ -72,11 +72,9 @@ export default class OAuthSettingsController {
 
   onChangeHideInternalAuth(checked) {
     this.$scope.$evalAsync(() => {
-      if (this.featureService.isLimitedToBE(this.limitedFeature)) {
-        return;
+      if (!this.isLimitedToBE) {
+        this.settings.HideInternalAuth = checked;
       }
-
-      this.settings.HideInternalAuth = checked;
     });
   }
 
