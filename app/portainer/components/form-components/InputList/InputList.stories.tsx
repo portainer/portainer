@@ -1,12 +1,12 @@
 import { Meta } from '@storybook/react';
 import { useState } from 'react';
 
-import { NumberInput, Select } from '../Input';
+import { Input, Select } from '../Input';
 
 import { DefaultType, InputList } from './InputList';
 
 const meta: Meta = {
-  title: 'InputList',
+  title: 'Components/Form/InputList',
   component: InputList,
 };
 
@@ -75,12 +75,15 @@ function SelectAndInputItem({
 }) {
   return (
     <div>
-      <NumberInput
+      <Input
+        type="number"
         value={item.value}
-        onChange={(value: number) => onChange({ ...item, value })}
+        onChange={(e) =>
+          onChange({ ...item, value: parseInt(e.target.value, 10) })
+        }
       />
       <Select
-        onChange={(select: string) => onChange({ ...item, select })}
+        onChange={(e) => onChange({ ...item, select: e.target.value })}
         options={[
           { label: 'option1', value: 'option1' },
           { label: 'option2', value: 'option2' },

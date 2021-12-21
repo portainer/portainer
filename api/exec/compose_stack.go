@@ -3,6 +3,7 @@ package exec
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"regexp"
@@ -75,6 +76,10 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 		defer proxy.Close()
 	}
 
+	if err := updateNetworkEnvFile(stack); err != nil {
+		return err
+	}
+
 	filePaths := stackutils.GetStackFilePaths(stack)
 	err = manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths)
 	return errors.Wrap(err, "failed to remove a stack")
@@ -122,6 +127,44 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	envfile.Close()
 
 	return "stack.env", nil
+}
+
+func fileNotExist(filePath string) bool {
+	if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+		return true
+	}
+
+	return false
+}
+
+func updateNetworkEnvFile(stack *portainer.Stack) error {
+	envFilePath := path.Join(stack.ProjectPath, ".env")
+	stackFilePath := path.Join(stack.ProjectPath, "stack.env")
+	if fileNotExist(envFilePath) {
+		if fileNotExist(stackFilePath) {
+			return nil
+		}
+
+		flags := os.O_WRONLY | os.O_SYNC | os.O_CREATE
+		envFile, err := os.OpenFile(envFilePath, flags, 0666)
+		if err != nil {
+			return err
+		}
+
+		defer envFile.Close()
+
+		stackFile, err := os.Open(stackFilePath)
+		if err != nil {
+			return err
+		}
+
+		defer stackFile.Close()
+
+		_, err = io.Copy(envFile, stackFile)
+		return err
+	}
+
+	return nil
 }
 
 func createNetworkEnvFile(stack *portainer.Stack) error {

@@ -4,6 +4,7 @@
       <div class="toolBar">
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
         <div class="settings">
+          <datatable-columns-visibility columns="$ctrl.columnVisibility.columns" on-change="($ctrl.onColumnVisibilityChange)"></datatable-columns-visibility>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
@@ -88,7 +89,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-show="$ctrl.columnVisibility.columns.image.display">
                 <a ng-click="$ctrl.changeOrderBy('Image')">
                   Image
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
@@ -102,21 +103,21 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mode' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
                   Published Ports
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-show="$ctrl.columnVisibility.columns.updated.display">
                 <a ng-click="$ctrl.changeOrderBy('UpdatedAt')">
                   Last Update
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
@@ -143,7 +144,7 @@
                 <a ui-sref="docker.services.service({id: item.Id})" ng-click="$event.stopPropagation()">{{ item.Name }}</a>
               </td>
               <td ng-if="$ctrl.showStackColumn">{{ item.StackName ? item.StackName : '-' }}</td>
-              <td>{{ item.Image | hideshasum }}</td>
+              <td ng-show="$ctrl.columnVisibility.columns.image.display">{{ item.Image | hideshasum }}</td>
               <td ng-controller="ServicesDatatableActionsController as actionCtrl">
                 {{ item.Mode }}
                 <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount: item) }}</code>
@@ -167,7 +168,7 @@
                   <a class="interactive" ng-click="actionCtrl.scaleAction(item); $event.stopPropagation();"><i class="fa fa-check-square"></i></a>
                 </span>
               </td>
-              <td>
+              <td ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a
                   ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort"
                   ng-repeat="p in item.Ports"
@@ -180,8 +181,8 @@
                 </a>
                 <span ng-if="!item.Ports || item.Ports.length === 0">-</span>
               </td>
-              <td>{{ item.UpdatedAt | getisodate }}</td>
-              <td>
+              <td ng-show="$ctrl.columnVisibility.columns.updated.display">{{ item.UpdatedAt | getisodate }}</td>
+              <td ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
                   {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = $ctrl.RCO.ADMINISTRATORS }}

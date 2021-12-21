@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { AddButton, Button } from '@/portainer/components/Button';
 import { Tooltip } from '@/portainer/components/Tip/Tooltip';
 
-import { TextInput } from '../Input';
+import { Input } from '../Input';
 
 import styles from './InputList.module.css';
 import { arrayMove } from './utils';
@@ -174,9 +174,9 @@ function defaultItemBuilder(): DefaultType {
 
 function DefaultItem({ item, onChange }: ItemProps<DefaultType>) {
   return (
-    <TextInput
+    <Input
       value={item.value}
-      onChange={(value: string) => onChange({ value })}
+      onChange={(e) => onChange({ value: e.target.value })}
       className={styles.defaultItem}
     />
   );
