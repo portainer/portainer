@@ -159,6 +159,7 @@ module.exports = {
       Kubernetes: path.resolve(projectRoot, 'app/kubernetes'),
       Portainer: path.resolve(projectRoot, 'app/portainer'),
       '@': path.resolve(projectRoot, 'app'),
+      'lodash-es': 'lodash',
     },
     extensions: ['.js', '.ts', '.tsx'],
     plugins: [
