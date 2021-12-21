@@ -41,8 +41,8 @@ func (connection *DbConnection) GetStorePath() string {
 	return connection.Path
 }
 
-// SetIsDBEncryptedFlag
-func (connection *DbConnection) SetIsDBEncryptedFlag(flag bool) {
+// SetIsEncryptedFlag
+func (connection *DbConnection) SetIsEncryptedFlag(flag bool) {
 	connection.IsDBEncrypted = flag
 }
 
@@ -50,7 +50,7 @@ func (connection *DbConnection) SetIsDBEncryptedFlag(flag bool) {
 func (connection *DbConnection) IsEncryptionRequired() (bool, error) {
 	if connection.EncryptionKey != "" {
 		// set it back to true as encryption key exists
-		defer connection.SetIsDBEncryptedFlag(true)
+		defer connection.SetIsEncryptedFlag(true)
 
 		// set IsDBEncrypted to false and get the version
 		connection.IsDBEncrypted = false

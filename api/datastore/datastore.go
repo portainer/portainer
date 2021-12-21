@@ -99,7 +99,7 @@ func (store *Store) encryptDB() error {
 	// Since database is not encrypted so
 	// settings this flag to false will not
 	// allow connection to use encryption key
-	store.connection.SetIsDBEncryptedFlag(false)
+	store.connection.SetIsEncryptedFlag(false)
 	err := store.initServices()
 	if err != nil {
 		logrus.Fatal("init services failed")
@@ -118,7 +118,7 @@ func (store *Store) encryptDB() error {
 	logrus.Infof("database backup exported")
 
 	// Set isDBEncryptedFlag to true to import JSON in the encrypted format
-	store.connection.SetIsDBEncryptedFlag(true)
+	store.connection.SetIsEncryptedFlag(true)
 	err = store.Import(exportFilename)
 	if err != nil {
 		logrus.Fatal(errors.ErrDBImportFailed.Error()) // TODO: Rollback?
