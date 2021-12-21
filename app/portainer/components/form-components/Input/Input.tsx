@@ -1,12 +1,12 @@
 import clsx from 'clsx';
-import { TextareaHTMLAttributes } from 'react';
+import { InputHTMLAttributes } from 'react';
 
-export function TextArea({
+export function Input({
   className,
   ...props
-}: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+}: InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <textarea
+    <input
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
       className={clsx('form-control', className)}
