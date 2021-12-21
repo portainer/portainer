@@ -2,8 +2,8 @@ import { configureAMT } from '@/portainer/services/api/hostmanagement/open-amt.s
 
 class OpenAmtController {
   /* @ngInject */
-  constructor($async, $scope, $state, OpenAMTService, SettingsService, Notifications) {
-    Object.assign(this, { $async, $scope, $state, OpenAMTService, SettingsService, Notifications });
+  constructor($async, $scope, $state, SettingsService, Notifications) {
+    Object.assign(this, { $async, $scope, $state, SettingsService, Notifications });
 
     this.originalValues = {};
     this.formValues = {
