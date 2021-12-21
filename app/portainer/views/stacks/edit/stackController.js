@@ -138,7 +138,7 @@ angular.module('portainer.app').controller('StackController', [
     };
 
     $scope.detachStackFromGit = function () {
-      ModalService.confirmDeletion('Do you want to detach the stack from Git?', function onConfirm(confirmed) {
+      ModalService.confirmDetachment('Do you want to detach the stack from Git?', function onConfirm(confirmed) {
         if (!confirmed) {
           return;
         }
