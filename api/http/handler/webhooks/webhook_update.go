@@ -60,12 +60,21 @@ func (handler *Handler) webhookUpdate(w http.ResponseWriter, r *http.Request) *h
 	} else if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
 	}
+
+	// No OperationPortainerWebhookUpdate for now
+	authorizations := []portainer.Authorization{portainer.OperationPortainerWebhookCreate}
 	var resourceType portainer.ResourceControlType
-	if webhook.WebhookType == portainer.ServiceWebhook {
+	if portainer.WebhookType(webhook.WebhookType) == portainer.ServiceWebhook {
 		resourceType = portainer.ServiceResourceControl
+		authorizations = append(authorizations, portainer.OperationDockerServiceUpdate)
 	}
-	if resourceType != 0 {
-		handlerErr := handler.checkResourceAccess(r, endpoint, webhook.ResourceID, resourceType)
+
+	isAuthorized, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
+	if handlerErr != nil {
+		return handlerErr
+	}
+	if !isAuthorized && resourceType != 0{
+		handlerErr := handler.checkResourceAccess(r, webhook.ResourceID, resourceType)
 		if handlerErr != nil {
 			return handlerErr
 		}

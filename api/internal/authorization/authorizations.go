@@ -614,3 +614,21 @@ func (service *Service) UserIsAdminOrEndpointAdmin(userID portainer.UserID, endp
 	}
 	return false, nil
 }
+
+func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpointID portainer.EndpointID, authorizations []portainer.Authorization) (bool, error) {
+	user, err := service.dataStore.User().User(userID)
+	if err != nil {
+		return false, err
+	}
+	if user.Role == portainer.AdministratorRole {
+		return true, nil
+	}
+
+	for _, authorization := range authorizations {
+		_, authorized := user.EndpointAuthorizations[endpointID][authorization]
+		if authorized {
+			return true, nil
+		}
+	}
+	return false, nil
+}

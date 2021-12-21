@@ -15,6 +15,7 @@ import (
 // Handler is the HTTP handler used to handle webhook operations.
 type Handler struct {
 	*mux.Router
+	requestBouncer     *security.RequestBouncer
 	DataStore           dataservices.DataStore
 	DockerClientFactory *docker.ClientFactory
 }
@@ -23,6 +24,7 @@ type Handler struct {
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
+		requestBouncer: bouncer,
 	}
 	h.Handle("/webhooks",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.webhookCreate))).Methods(http.MethodPost)
@@ -37,23 +39,14 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	return h
 }
 
-func (handler *Handler) checkResourceAccess(r *http.Request, endpoint *portainer.Endpoint, resourceID string, resourceControlType portainer.ResourceControlType) *httperror.HandlerError {
-	// admins and endpoint admins
+func (handler *Handler) checkResourceAccess(r *http.Request, resourceID string, resourceControlType portainer.ResourceControlType) *httperror.HandlerError {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
 	}
-	authService := authorization.NewService(handler.DataStore)
-	isAdmin, err := authService.UserIsAdminOrEndpointAdmin(securityContext.UserID, endpoint.ID)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to get user role", Err: err}
-	}
-	if isAdmin {
-		return nil
-	}
 	// non-admins
 	rc, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceID, resourceControlType)
-	if err != nil {
+	if rc == nil || err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the resource", Err: err}
 	}
 	userTeamIDs := make([]portainer.TeamID, 0)
@@ -65,4 +58,23 @@ func (handler *Handler) checkResourceAccess(r *http.Request, endpoint *portainer
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "This operation is disabled for non-admin users and unassigned access users"}
 	}
 	return nil
+}
+
+func (handler *Handler) checkAuthorization(r *http.Request, endpoint *portainer.Endpoint,  authorizations []portainer.Authorization) (bool, *httperror.HandlerError)  {
+	err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
+	if err != nil {
+		return false, &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access environment", Err: err}
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return false, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
+	}
+
+	authService := authorization.NewService(handler.DataStore)
+	isAdminOrAuthorized, err := authService.UserIsAdminOrAuthorized(securityContext.UserID, endpoint.ID, authorizations)
+	if err != nil {
+		return false, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to get user authorizations", Err: err}
+	}
+	return isAdminOrAuthorized, nil
 }

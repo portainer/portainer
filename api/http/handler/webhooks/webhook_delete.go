@@ -40,12 +40,19 @@ func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
 	}
 
+	authorizations := []portainer.Authorization{portainer.OperationPortainerWebhookDelete}
 	var resourceType portainer.ResourceControlType
-	if webhook.WebhookType == portainer.ServiceWebhook {
+	if portainer.WebhookType(webhook.WebhookType) == portainer.ServiceWebhook {
 		resourceType = portainer.ServiceResourceControl
+		authorizations = append(authorizations, portainer.OperationDockerServiceUpdate)
 	}
-	if resourceType != 0 {
-		handlerErr := handler.checkResourceAccess(r, endpoint, webhook.ResourceID, resourceType)
+
+	isAuthorized, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
+	if handlerErr != nil {
+		return handlerErr
+	}
+	if !isAuthorized && resourceType != 0{
+		handlerErr := handler.checkResourceAccess(r, webhook.ResourceID, resourceType)
 		if handlerErr != nil {
 			return handlerErr
 		}
