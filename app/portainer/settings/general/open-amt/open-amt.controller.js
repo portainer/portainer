@@ -1,4 +1,4 @@
-import { configureAMT } from "Portainer/services/api/hostmanagement/open-amt.service";
+import { configureAMT } from '@/portainer/services/api/hostmanagement/open-amt.service';
 
 class OpenAmtController {
   /* @ngInject */

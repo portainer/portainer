@@ -1,7 +1,9 @@
+import { configureFDO } from "@/portainer/services/api/hostmanagement/fdo.service";
+
 class FDOController {
   /* @ngInject */
-  constructor($async, $scope, $state, FDOService, SettingsService, Notifications) {
-    Object.assign(this, { $async, $scope, $state, FDOService, SettingsService, Notifications });
+  constructor($async, $scope, $state, SettingsService, Notifications) {
+    Object.assign(this, { $async, $scope, $state, SettingsService, Notifications });
 
     this.formValues = {
       enabled: false,
@@ -36,7 +38,7 @@ class FDOController {
     return this.$async(async () => {
       this.state.actionInProgress = true;
       try {
-        await this.FDOService.submit(this.formValues);
+        await configureFDO(this.formValues);
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
         this.Notifications.success(`FDO successfully ${this.formValues.enabled ? 'enabled' : 'disabled'}`);

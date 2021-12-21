@@ -6,7 +6,7 @@ const BASE_URL = '/open_amt';
 
 export async function configureAMT(formValues : AMTConfiguration) {
   try {
-    await axios.post<AMTInformation>(`${BASE_URL}/configure`, formValues);
+    await axios.post(`${BASE_URL}/configure`, formValues);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to configure AMT');
   }

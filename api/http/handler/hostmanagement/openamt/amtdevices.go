@@ -74,7 +74,7 @@ func (payload *deviceActionPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param body deviceActionPayload true "Device Action"
+// @param body body deviceActionPayload true "Device Action"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
@@ -131,7 +131,7 @@ type AuthorizationResponse struct {
 // @security jwt
 // @accept json
 // @produce json
-// @param body deviceFeaturesPayload true "Device Features"
+// @param body body deviceFeaturesPayload true "Device Features"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"

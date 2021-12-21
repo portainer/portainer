@@ -1,5 +1,7 @@
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 
+import { configureDevice } from "@/portainer/services/api/hostmanagement/fdo.service";
+
 angular
   .module('portainer.app')
   .controller('ImportDeviceController', function ImportDeviceController(
@@ -13,7 +15,6 @@ angular
     Notifications,
     Authentication,
     FileUploadService,
-    FDOService
   ) {
     $scope.state = {
       actionInProgress: false,
@@ -65,7 +66,7 @@ angular
       }
     }
 
-    $scope.configureDevice = function () {
+    $scope.createEndpointAndConfigureDevice = function () {
       return $async(async () => {
         $scope.state.actionInProgress = true;
 
@@ -93,13 +94,13 @@ angular
         }
 
         const config = {
-          edgekey: endpoint.EdgeKey,
+          edgeKey: endpoint.EdgeKey,
           name: $scope.formValues.DeviceName,
           profile: $scope.formValues.DeviceProfile,
         };
 
         try {
-          await FDOService.configureDevice($scope.deviceID, config);
+          await configureDevice($scope.deviceID, config);
           Notifications.success('Device successfully imported');
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to import device');

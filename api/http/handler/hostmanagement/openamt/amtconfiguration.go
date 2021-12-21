@@ -59,7 +59,7 @@ func (payload *openAMTConfigurePayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param body openAMTConfigurePayload true "OpenAMT Settings"
+// @param body body openAMTConfigurePayload true "OpenAMT Settings"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
