@@ -604,17 +604,6 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 	return authorizations
 }
 
-func (service *Service) UserIsAdminOrEndpointAdmin(userID portainer.UserID, endpointID portainer.EndpointID) (bool, error) {
-	user, err := service.dataStore.User().User(userID)
-	if err != nil {
-		return false, err
-	}
-	if user.Role == portainer.AdministratorRole {
-		return true, nil
-	}
-	return false, nil
-}
-
 func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpointID portainer.EndpointID, authorizations []portainer.Authorization) (bool, error) {
 	user, err := service.dataStore.User().User(userID)
 	if err != nil {
