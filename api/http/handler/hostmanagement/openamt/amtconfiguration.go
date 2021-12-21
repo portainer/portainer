@@ -16,17 +16,17 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-type openAMTConfigureDefaultPayload struct {
-	EnableOpenAMT            bool
-	MPSServer                string
-	MPSUser                  string
-	MPSPassword              string
-	CertFileText             string
-	CertPassword             string
-	DomainName               string
+type openAMTConfigurePayload struct {
+	EnableOpenAMT bool
+	MPSServer     string
+	MPSUser       string
+	MPSPassword   string
+	CertFileText  string
+	CertPassword  string
+	DomainName    string
 }
 
-func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
+func (payload *openAMTConfigurePayload) Validate(r *http.Request) error {
 	if payload.EnableOpenAMT {
 		if payload.MPSServer == "" {
 			return errors.New("MPS Server must be provided")
@@ -51,7 +51,7 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @id OpenAMTConfigureDefault
+// @id OpenAMTConfigure
 // @summary Enable Portainer's OpenAMT capabilities
 // @description Enable Portainer's OpenAMT capabilities
 // @description **Access policy**: administrator
@@ -59,14 +59,14 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param body body openAMTConfigureDefaultPayload true "OpenAMT Settings"
+// @param body openAMTConfigurePayload true "OpenAMT Settings"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
 // @router /open_amt [post]
-func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload openAMTConfigureDefaultPayload
+func (handler *Handler) openAMTConfigure(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload openAMTConfigurePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		logrus.WithError(err).Error("Invalid request payload")
@@ -124,7 +124,7 @@ func isValidIssuer(issuer string) bool {
 		strings.Contains(formattedIssuer, "godaddy")
 }
 
-func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigureDefaultPayload) error {
+func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigurePayload) error {
 	configuration := portainer.OpenAMTConfiguration{
 		Enabled:   true,
 		MPSServer: configurationPayload.MPSServer,
@@ -139,7 +139,7 @@ func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigureDefau
 		},
 	}
 
-	err := handler.OpenAMTService.ConfigureDefault(configuration)
+	err := handler.OpenAMTService.Configure(configuration)
 	if err != nil {
 		logrus.WithError(err).Error("error configuring OpenAMT server")
 		return err

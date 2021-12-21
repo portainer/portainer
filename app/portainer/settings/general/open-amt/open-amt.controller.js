@@ -1,3 +1,5 @@
+import { configureAMT } from "Portainer/services/api/hostmanagement/open-amt.service";
+
 class OpenAmtController {
   /* @ngInject */
   constructor($async, $scope, $state, OpenAMTService, SettingsService, Notifications) {
@@ -77,7 +79,7 @@ class OpenAmtController {
         if (this.formValues.certFile) {
           this.formValues.certFileText = await this.readFile(this.formValues.certFile);
         }
-        await this.OpenAMTService.submit(this.formValues);
+        await configureAMT(this.formValues);
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
         this.Notifications.success(`OpenAMT successfully ${this.formValues.enableOpenAMT ? 'enabled' : 'disabled'}`);

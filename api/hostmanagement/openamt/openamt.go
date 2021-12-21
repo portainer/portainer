@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	DefaultCIRAConfigName     = "ciraConfigDefault"
-	DefaultProfileName        = "profileAMTDefault"
+	DefaultCIRAConfigName = "ciraConfigDefault"
+	DefaultProfileName    = "profileAMTDefault"
 
 	httpClientTimeout = 5 * time.Minute
 
@@ -69,7 +69,7 @@ func parseError(responseBody []byte) error {
 	return nil
 }
 
-func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfiguration) error {
+func (service *Service) Configure(configuration portainer.OpenAMTConfiguration) error {
 	token, err := service.Authorization(configuration)
 	if err != nil {
 		return err

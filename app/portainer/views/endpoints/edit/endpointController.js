@@ -5,6 +5,7 @@ import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
+import { getAMTInfo } from "Portainer/services/api/hostmanagement/open-amt.service";
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
@@ -25,7 +26,6 @@ function EndpointController(
   SettingsService,
   ModalService,
   StateManager,
-  OpenAMTService
 ) {
   const DEPLOYMENT_TABS = {
     SWARM: 'swarm',
@@ -295,7 +295,7 @@ function EndpointController(
       if ($scope.state.showAMTInfo) {
         try {
           $scope.endpoint.ManagementInfo = {};
-          const [amtInfo] = await Promise.all([OpenAMTService.info($transition$.params().id)]);
+          const [amtInfo] = await Promise.all([getAMTInfo($transition$.params().id)]);
 
           try {
             $scope.endpoint.ManagementInfo = JSON.parse(amtInfo.RawOutput);
