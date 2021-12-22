@@ -44,7 +44,7 @@ func writeMapToFile(mapData map[string]interface{}) (*os.File, error) {
 	// map (json export) -> string
 	jsonData, err := json.Marshal(mapData)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Unable to marshal map to json")
 	}
 
 	// write string (json) to temporary file
@@ -52,12 +52,10 @@ func writeMapToFile(mapData map[string]interface{}) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
+
 	_, err = file.Write(jsonData)
 	if err != nil {
-		file.Close()
-		return nil, err
-	}
-	if err = file.Close(); err != nil {
 		return nil, err
 	}
 

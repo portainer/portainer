@@ -14,6 +14,7 @@ import (
 )
 
 // TODO: use portainer-cli to import
+// source: https://github.com/portainer/portainer-cli/blob/master/util/database/import.go
 
 func ImportJsonToDatabase(jsonFilePath, portainerDbPath string) error {
 	if _, err := os.Stat(jsonFilePath); err != nil {
