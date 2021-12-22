@@ -1,6 +1,6 @@
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 
-import { configureDevice } from "@/portainer/services/api/hostmanagement/fdo.service";
+import { configureDevice } from "Portainer/hostmanagement/fdo/fdo.service";
 
 angular
   .module('portainer.app')

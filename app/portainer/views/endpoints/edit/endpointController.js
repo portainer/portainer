@@ -5,7 +5,7 @@ import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
-import { getAMTInfo } from '@/portainer/services/api/hostmanagement/open-amt.service';
+import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 

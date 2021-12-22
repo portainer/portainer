@@ -1,6 +1,6 @@
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 
-import { activateDevice, getDevices } from '@/portainer/services/api/hostmanagement/open-amt.service';
+import { activateDevice, getDevices } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 
 angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$scope',

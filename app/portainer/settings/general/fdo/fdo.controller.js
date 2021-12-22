@@ -1,4 +1,4 @@
-import { configureFDO } from "@/portainer/services/api/hostmanagement/fdo.service";
+import { configureFDO } from "Portainer/hostmanagement/fdo/fdo.service";
 
 class FDOController {
   /* @ngInject */

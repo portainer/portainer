@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { enableDeviceFeatures } from '@/portainer/services/api/hostmanagement/open-amt.service';
+import { enableDeviceFeatures } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 
 class EndpointKVMController {
   /* @ngInject */

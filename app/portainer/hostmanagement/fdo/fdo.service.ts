@@ -1,6 +1,6 @@
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, { parseAxiosError } from 'Portainer/services/axios';
 
-import { FDOConfiguration, DeviceConfiguration } from '../../../models/hostmanagement/fdo';
+import { FDOConfiguration, DeviceConfiguration } from './model';
 
 const BASE_URL = '/fdo';
 

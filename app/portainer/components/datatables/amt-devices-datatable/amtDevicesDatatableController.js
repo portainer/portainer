@@ -1,4 +1,4 @@
-import { executeDeviceAction } from '@/portainer/services/api/hostmanagement/open-amt.service';
+import { executeDeviceAction } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 
 angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
   '$scope',

@@ -1,4 +1,4 @@
-import axios, { parseAxiosError } from '@/portainer/services/axios';
+import axios, { parseAxiosError } from 'Portainer/services/axios';
 
 import {
   AMTConfiguration,
@@ -6,7 +6,7 @@ import {
   AuthorizationResponse,
   Device,
   DeviceFeatures
-} from '../../../models/hostmanagement/open-amt';
+} from './model';
 
 const BASE_URL = '/open_amt';
 
