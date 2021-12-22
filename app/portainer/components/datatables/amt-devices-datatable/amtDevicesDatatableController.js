@@ -2,12 +2,13 @@ import { executeDeviceAction } from 'Portainer/hostmanagement/open-amt/open-amt.
 
 angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
   '$scope',
+  '$async',
   '$state',
   '$controller',
   'ModalService',
   'Notifications',
-  function ($scope, $state, $controller, ModalService, Notifications) {
-    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope, $state: $state }));
+  function ($scope, $async, $state, $controller, ModalService, Notifications) {
+    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope, $state: $state, $async: $async }));
 
     this.state = Object.assign(this.state, {
       executingAction: {},
@@ -53,10 +54,8 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
         if (!confirmed) {
           return;
         }
-        $scope.$evalAsync(() => {
-          this.state.executingAction[deviceGUID] = true;
-        })
 
+        this.setExecutingAction(deviceGUID, true);
         await executeDeviceAction(this.endpointId, deviceGUID, action);
         Notifications.success(`${action} action sent successfully`);
         $state.reload();
@@ -64,11 +63,15 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
         console.log(err);
         Notifications.error('Failure', err, `Failed to ${action} the device`);
       } finally {
-        $scope.$evalAsync(() => {
-          this.state.executingAction[deviceGUID] = false;
-        })
+        this.setExecutingAction(deviceGUID, false);
       }
     };
+
+    this.setExecutingAction = function(deviceGUID, isExecutingAction) {
+      $async(async () => {
+        this.state.executingAction[deviceGUID] = isExecutingAction;
+      })
+    }
     
     this.$onInit = function () {
       this.setDefaults();
