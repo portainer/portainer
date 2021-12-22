@@ -453,7 +453,7 @@ a[ng-click] {
 
 .bootbox-checkbox-list {
   max-height: 200px;
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: var(--white-color);
   border: 1px solid var(--grey-48);
   border-radius: 4px;
