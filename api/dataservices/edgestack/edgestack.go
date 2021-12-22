@@ -67,11 +67,10 @@ func (service *Service) EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStac
 	return &stack, nil
 }
 
-// CreateEdgeStack saves an Edge stack object to db. If no ID was assigned, it will assign a new one.
-func (service *Service) Create(edgeStack *portainer.EdgeStack) error {
-	if edgeStack.ID == 0 {
-		edgeStack.ID = portainer.EdgeStackID(service.GetNextIdentifier())
-	}
+// CreateEdgeStack saves an Edge stack object to db.
+func (service *Service) Create(id portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error {
+
+	edgeStack.ID = id
 
 	return service.connection.CreateObjectWithId(
 		BucketName,
