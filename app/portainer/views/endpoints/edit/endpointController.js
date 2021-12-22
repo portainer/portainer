@@ -151,63 +151,65 @@ function EndpointController(
   }
 
   $scope.updateEndpoint = function () {
-    var endpoint = $scope.endpoint;
-    var securityData = $scope.formValues.SecurityFormData;
-    var TLS = securityData.TLS;
-    var TLSMode = securityData.TLSMode;
-    var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
-    var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
+    return $async(async () => {
+      var endpoint = $scope.endpoint;
+      var securityData = $scope.formValues.SecurityFormData;
+      var TLS = securityData.TLS;
+      var TLSMode = securityData.TLSMode;
+      var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
+      var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
 
-    var payload = {
-      Name: endpoint.Name,
-      PublicURL: endpoint.PublicURL,
-      GroupID: endpoint.GroupId,
-      TagIds: endpoint.TagIds,
-      EdgeCheckinInterval: endpoint.EdgeCheckinInterval,
-      TLS: TLS,
-      TLSSkipVerify: TLSSkipVerify,
-      TLSSkipClientVerify: TLSSkipClientVerify,
-      TLSCACert: TLSSkipVerify || securityData.TLSCACert === endpoint.TLSConfig.TLSCACert ? null : securityData.TLSCACert,
-      TLSCert: TLSSkipClientVerify || securityData.TLSCert === endpoint.TLSConfig.TLSCert ? null : securityData.TLSCert,
-      TLSKey: TLSSkipClientVerify || securityData.TLSKey === endpoint.TLSConfig.TLSKey ? null : securityData.TLSKey,
-      AzureApplicationID: endpoint.AzureCredentials.ApplicationID,
-      AzureTenantID: endpoint.AzureCredentials.TenantID,
-      AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey,
-    };
+      var payload = {
+        Name: endpoint.Name,
+        PublicURL: endpoint.PublicURL,
+        GroupID: endpoint.GroupId,
+        TagIds: endpoint.TagIds,
+        EdgeCheckinInterval: endpoint.EdgeCheckinInterval,
+        TLS: TLS,
+        TLSSkipVerify: TLSSkipVerify,
+        TLSSkipClientVerify: TLSSkipClientVerify,
+        TLSCACert: TLSSkipVerify || securityData.TLSCACert === endpoint.TLSConfig.TLSCACert ? null : securityData.TLSCACert,
+        TLSCert: TLSSkipClientVerify || securityData.TLSCert === endpoint.TLSConfig.TLSCert ? null : securityData.TLSCert,
+        TLSKey: TLSSkipClientVerify || securityData.TLSKey === endpoint.TLSConfig.TLSKey ? null : securityData.TLSKey,
+        AzureApplicationID: endpoint.AzureCredentials.ApplicationID,
+        AzureTenantID: endpoint.AzureCredentials.TenantID,
+        AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey,
+      };
 
-    if (
-      $scope.endpointType !== 'local' &&
-      endpoint.Type !== PortainerEndpointTypes.AzureEnvironment &&
-      endpoint.Type !== PortainerEndpointTypes.KubernetesLocalEnvironment &&
-      endpoint.Type !== PortainerEndpointTypes.AgentOnKubernetesEnvironment
-    ) {
-      payload.URL = 'tcp://' + endpoint.URL;
-    }
-
-    if (endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment) {
-      payload.URL = endpoint.URL;
-    }
-
-    if (endpoint.Type === PortainerEndpointTypes.KubernetesLocalEnvironment) {
-      payload.URL = 'https://' + endpoint.URL;
-    }
-
-    $scope.state.actionInProgress = true;
-    EndpointService.updateEndpoint(endpoint.Id, payload).then(
-      function success() {
-        Notifications.success('Environment updated', $scope.endpoint.Name);
-        $state.go('portainer.endpoints', {}, { reload: true });
-      },
-      function error(err) {
-        Notifications.error('Failure', err, 'Unable to update environment');
-        $scope.state.actionInProgress = false;
-      },
-      function update(evt) {
-        if (evt.upload) {
-          $scope.state.uploadInProgress = evt.upload;
-        }
+      if (
+        $scope.endpointType !== 'local' &&
+        endpoint.Type !== PortainerEndpointTypes.AzureEnvironment &&
+        endpoint.Type !== PortainerEndpointTypes.KubernetesLocalEnvironment &&
+        endpoint.Type !== PortainerEndpointTypes.AgentOnKubernetesEnvironment
+      ) {
+        payload.URL = 'tcp://' + endpoint.URL;
       }
-    );
+
+      if (endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment) {
+        payload.URL = endpoint.URL;
+      }
+
+      if (endpoint.Type === PortainerEndpointTypes.KubernetesLocalEnvironment) {
+        payload.URL = 'https://' + endpoint.URL;
+      }
+
+      $scope.state.actionInProgress = true;
+      EndpointService.updateEndpoint(endpoint.Id, payload).then(
+        function success() {
+          Notifications.success('Environment updated', $scope.endpoint.Name);
+          $state.go('portainer.endpoints', {}, { reload: true });
+        },
+        function error(err) {
+          Notifications.error('Failure', err, 'Unable to update environment');
+          $scope.state.actionInProgress = false;
+        },
+        function update(evt) {
+          if (evt.upload) {
+            $scope.state.uploadInProgress = evt.upload;
+          }
+        }
+      );
+    });
   };
 
   function decodeEdgeKey(key) {
