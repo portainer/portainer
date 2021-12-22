@@ -60,10 +60,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $scope.create = create;
 
     $scope.formValues = {
-      alwaysPull: true,
+      alwaysPull: false,
       GPU: {
         enabled: false,
-        useSpecific: false,
+        useSpecific: true,
         selectedGPUs: [],
         capabilities: [],
       },
@@ -437,7 +437,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       if (gpuOptions.useSpecific) {
         const gpuIds = _.map(gpuOptions.selectedGPUs, 'key');
         deviceRequest.DeviceIDs = gpuIds;
-        deviceRequest.Count = gpuIds.length;
+        deviceRequest.Count = 0;
       }
       const caps = _.map(gpuOptions.capabilities, 'name');
       // we only support a single set of capabilities for now
