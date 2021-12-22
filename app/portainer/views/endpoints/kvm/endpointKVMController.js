@@ -4,9 +4,10 @@ import { enableDeviceFeatures } from '@/portainer/services/api/hostmanagement/op
 
 class EndpointKVMController {
   /* @ngInject */
-  constructor($state, $scope, $transition$, EndpointService, Notifications) {
+  constructor($state, $scope, $async, $transition$, EndpointService, Notifications) {
     this.$state = $state;
     this.$scope = $scope;
+    this.$async = $async;
     this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
@@ -25,31 +26,30 @@ class EndpointKVMController {
     }
   }
 
-
   async $onInit() {
-    try {
-      this.$state.endpoint = await this.EndpointService.endpoint(this.$state.endpointId);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
-    }
+    this.$async(async () => {
+      try {
+        this.$state.endpoint = await this.EndpointService.endpoint(this.$state.endpointId);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
+      }
 
-    try {
-      const features = {
-        IDER: true,
-        KVM: true,
-        SOL: true,
-        redirection: true,
-        userConsent: 'none',
-      };
-      const mpsAuthorization = await enableDeviceFeatures(this.$state.endpointId, this.$state.deviceId, features);
+      try {
+        const features = {
+          IDER: true,
+          KVM: true,
+          SOL: true,
+          redirection: true,
+          userConsent: 'none',
+        };
+        const mpsAuthorization = await enableDeviceFeatures(this.$state.endpointId, this.$state.deviceId, features);
 
-      this.$scope.$evalAsync(() => {
         this.$state.mpsServer = mpsAuthorization.Server;
         this.$state.mpsToken = mpsAuthorization.Token;
-      })
-    } catch (e) {
-      this.Notifications.error('Failure', e, `Failed to load kvm for device`);
-    }
+      } catch (e) {
+        this.Notifications.error('Failure', e, `Failed to load kvm for device`);
+      }
+    })
   }
 }
 

@@ -17,6 +17,11 @@ export interface AMTInformation {
     rawOutput: string;
 }
 
+export interface AuthorizationResponse {
+    server: string;
+    token:  string;
+}
+
 export interface DeviceFeatures {
     IDER: boolean;
     KVM: boolean;

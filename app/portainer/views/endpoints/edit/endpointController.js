@@ -295,8 +295,7 @@ function EndpointController(
       if ($scope.state.showAMTInfo) {
         try {
           $scope.endpoint.ManagementInfo = {};
-          const [amtInfo] = await Promise.all([getAMTInfo($transition$.params().id)]);
-
+          const amtInfo = await getAMTInfo($state.params.id);
           try {
             $scope.endpoint.ManagementInfo = JSON.parse(amtInfo.RawOutput);
           } catch (err) {

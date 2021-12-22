@@ -4,6 +4,7 @@ import { activateDevice, getDevices } from '@/portainer/services/api/hostmanagem
 
 angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$scope',
+  '$async',
   '$state',
   '$controller',
   'DatatableService',
@@ -11,8 +12,8 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
   'SettingsService',
   'ModalService',
   'Notifications',
-  function ($scope, $state, $controller, DatatableService, PaginationService, SettingsService, ModalService, Notifications) {
-    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
+  function ($scope, $async, $state, $controller, DatatableService, PaginationService, SettingsService, ModalService, Notifications) {
+    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope, $async: $async }));
 
     this.state = Object.assign(this.state, {
       orderBy: this.orderBy,
@@ -87,22 +88,18 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
     };
 
     this.fetchAMTDeviceInfo = function (endpoint) {
-      if (!this.showAMTNodes(endpoint) || this.state.amtDevices[endpoint.Id]) {
-        return;
-      }
+      $async(async () => {
+        if (!this.showAMTNodes(endpoint) || this.state.amtDevices[endpoint.Id]) {
+          return;
+        }
 
-      getDevices(endpoint.Id)
-        .then((devices) => {
-          $scope.$evalAsync(() => {
-            this.state.amtDevices[endpoint.Id] = devices;
-          });
-        })
-        .catch((e) => {
+        try {
+          this.state.amtDevices[endpoint.Id] = await getDevices(endpoint.Id);
+        } catch (e) {
           console.log(e);
-          $scope.$evalAsync(() => {
-            this.state.amtDevicesErrors[endpoint.Id] = e.message;
-          })
-        });
+          this.state.amtDevicesErrors[endpoint.Id] = e.message;
+        }
+      })
 
     };
 

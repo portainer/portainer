@@ -1,6 +1,12 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
-import { AMTConfiguration, AMTInformation, Device, DeviceFeatures} from '../../../models/hostmanagement/open-amt';
+import {
+  AMTConfiguration,
+  AMTInformation,
+  AuthorizationResponse,
+  Device,
+  DeviceFeatures
+} from '../../../models/hostmanagement/open-amt';
 
 const BASE_URL = '/open_amt';
 
@@ -52,7 +58,7 @@ export async function executeDeviceAction(endpointId : number, deviceGUID : stri
 export async function enableDeviceFeatures(endpointId : number, deviceGUID : string, features : DeviceFeatures) {
   try {
     const featuresPayload = { features };
-    const { data : authorizationResponse } = await axios.post(`${BASE_URL}/${endpointId}/devices/${deviceGUID}/features`, featuresPayload);
+    const { data : authorizationResponse } = await axios.post<AuthorizationResponse>(`${BASE_URL}/${endpointId}/devices/${deviceGUID}/features`, featuresPayload);
     return authorizationResponse;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to enable device features');
