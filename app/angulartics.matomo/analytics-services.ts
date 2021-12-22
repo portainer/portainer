@@ -18,7 +18,7 @@ enum DimensionConfig {
 
 interface TrackEventProps {
   category: Category;
-  metadata: string;
+  metadata?: Record<string, unknown>;
   value?: string | number;
   dimensions?: DimensionConfig;
 }
