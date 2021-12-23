@@ -130,13 +130,11 @@ func (store *Store) encryptDB() error {
 		os.Remove(store.connection.GetDatabaseFilename(true))
 	}
 
-	logrus.Info("Database successfully encrypted")
-
-	// TODO: Delete the unencrypted db file
 	err = os.Remove(oldFilename)
 	if err != nil {
 		logrus.Errorf("failed to remove the un-encrypted db file")
 	}
 
+	logrus.Info("Database successfully encrypted")
 	return nil
 }
