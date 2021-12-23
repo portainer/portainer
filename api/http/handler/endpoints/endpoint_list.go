@@ -80,6 +80,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
+	totalAvailableEndpoints := len(filteredEndpoints)
 
 	if endpointIDs != nil {
 		filteredEndpoints = filteredEndpointsByIds(filteredEndpoints, endpointIDs)
@@ -127,6 +128,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(filteredEndpointCount))
+	w.Header().Set("X-Total-Available", strconv.Itoa(totalAvailableEndpoints))
 	return response.JSON(w, paginatedEndpoints)
 }
 
