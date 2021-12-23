@@ -3,8 +3,10 @@ import {
   EnvironmentGroupId,
 } from '@/portainer/environment-groups/types';
 import { Environment } from '@/portainer/environments/types';
-import { render } from '@/react-tools/test-utils';
-import '@testing-library/jest-dom';
+import { UserContext } from '@/portainer/hooks/useUser';
+import { UserViewModel } from '@/portainer/models/user';
+import { renderWithQueryClient } from '@/react-tools/test-utils';
+import { server, rest } from '@/setup-tests/server';
 
 import { EnvironmentItem } from './EnvironmentItem';
 
@@ -21,21 +23,12 @@ test('loads component', async () => {
     Id: 3,
     UserTrusted: false,
   };
-  const { getByText } = render(
-    <EnvironmentItem
-      onClick={() => {}}
-      tags={[]}
-      groups={[]}
-      environment={env}
-      isAdmin
-      homepageLoadTime={0}
-    />
-  );
+  const { getByText } = renderComponent(env);
 
   expect(getByText(env.Name)).toBeInTheDocument();
 });
 
-test('shows group name', () => {
+test('shows group name', async () => {
   const groupName = 'group-name';
   const groupId: EnvironmentGroupId = 14;
 
@@ -52,23 +45,31 @@ test('shows group name', () => {
     UserTrusted: false,
   };
 
-  const group: EnvironmentGroup = {
-    Description: '',
-    Name: groupName,
-    Id: groupId,
-    TagIds: [],
-  };
+  const { findByText } = renderComponent(env, { Name: groupName });
 
-  const { getByText } = render(
-    <EnvironmentItem
-      onClick={() => {}}
-      tags={[]}
-      groups={[group]}
-      environment={env}
-      isAdmin
-      homepageLoadTime={0}
-    />
-  );
-
-  expect(getByText(groupName, { exact: false })).toBeVisible();
+  await expect(findByText(groupName)).resolves.toBeVisible();
 });
+
+function renderComponent(
+  env: Environment,
+  group?: Partial<EnvironmentGroup>,
+  isAdmin = false
+) {
+  const user = new UserViewModel({ Username: 'test', Role: isAdmin ? 1 : 2 });
+  if (group) {
+    server.use(
+      rest.get('/api/endpoint_groups/:groupId', (req, res, ctx) =>
+        res(ctx.json(group))
+      )
+    );
+  }
+  return renderWithQueryClient(
+    <UserContext.Provider value={{ user }}>
+      <EnvironmentItem
+        onClick={() => {}}
+        environment={env}
+        homepageLoadTime={0}
+      />
+    </UserContext.Provider>
+  );
+}

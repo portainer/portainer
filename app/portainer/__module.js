@@ -324,8 +324,7 @@ angular
         url: '/home',
         views: {
           'content@': {
-            templateUrl: './views/home/home.html',
-            controller: 'HomeController',
+            component: 'homeView',
           },
         },
       };

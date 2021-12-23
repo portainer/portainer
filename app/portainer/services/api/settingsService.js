@@ -1,32 +1,50 @@
-import { SettingsViewModel } from '../../models/settings';
+import { SettingsViewModel, PublicSettingsViewModel } from '../../models/settings';
 
-import { publicSettings } from './settings.service';
+angular.module('portainer.app').factory('SettingsService', [
+  '$q',
+  'Settings',
+  function SettingsServiceFactory($q, Settings) {
+    'use strict';
+    var service = {};
 
-angular.module('portainer.app').factory('SettingsService', SettingsServiceFactory);
+    service.settings = function () {
+      var deferred = $q.defer();
 
-function SettingsServiceFactory($q, Settings) {
-  return {
-    settings,
-    update,
-    publicSettings,
-  };
+      Settings.get()
+        .$promise.then(function success(data) {
+          var settings = new SettingsViewModel(data);
+          deferred.resolve(settings);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to retrieve application settings', err: err });
+        });
 
-  function settings() {
-    var deferred = $q.defer();
+      return deferred.promise;
+    };
 
-    Settings.get()
-      .$promise.then(function success(data) {
-        var settings = new SettingsViewModel(data);
-        deferred.resolve(settings);
-      })
-      .catch(function error(err) {
-        deferred.reject({ msg: 'Unable to retrieve application settings', err: err });
-      });
+    service.update = function (settings) {
+      return Settings.update({}, settings).$promise;
+    };
 
-    return deferred.promise;
-  }
+    service.publicSettings = function () {
+      var deferred = $q.defer();
 
-  function update(settings) {
-    return Settings.update({}, settings).$promise;
-  }
-}
+      Settings.publicSettings()
+        .$promise.then(function success(data) {
+          var settings = new PublicSettingsViewModel(data);
+          deferred.resolve(settings);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to retrieve application settings', err: err });
+        });
+
+      return deferred.promise;
+    };
+
+    service.checkLDAPConnectivity = function (settings) {
+      return Settings.checkLDAPConnectivity({}, settings).$promise;
+    };
+
+    return service;
+  },
+]);

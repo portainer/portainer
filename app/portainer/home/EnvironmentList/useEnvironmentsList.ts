@@ -7,7 +7,7 @@ import * as notifications from '@/portainer/services/notifications';
 
 const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
-export function useEnvironmentsList(
+export function useEnvironments(
   page: number,
   pageLimit: number,
   textFilter: string
@@ -47,5 +47,6 @@ export function useEnvironmentsList(
     isLoading,
     environments: data ? data.value : [],
     totalCount: data ? data.totalCount : 0,
+    totalAvailable: data ? data.totalAvailable : 0,
   };
 }

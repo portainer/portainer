@@ -10,20 +10,14 @@ test('renders correctly', async () => {
 
   const { getByText } = renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
-      <EnvironmentList
-        homepageLoadTime={0}
-        groups={[]}
-        onClickItem={jest.fn()}
-        tags={[]}
-        onRefresh={jest.fn()}
-      />
+      <EnvironmentList onClickItem={jest.fn()} onRefresh={jest.fn()} />
     </UserContext.Provider>
   );
 
   expect(getByText('Environments')).toBeVisible();
 });
 
-test('when no environments should show empty list message', async () => {
+test('when no environments for query should show empty list message', async () => {
   const user = new UserViewModel({ Username: 'test' });
   server.use(
     rest.get('/api/environments', (req, res, ctx) =>
@@ -33,15 +27,49 @@ test('when no environments should show empty list message', async () => {
 
   const { findByText } = renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
-      <EnvironmentList
-        homepageLoadTime={0}
-        groups={[]}
-        onClickItem={jest.fn()}
-        tags={[]}
-        onRefresh={jest.fn()}
-      />
+      <EnvironmentList onClickItem={jest.fn()} onRefresh={jest.fn()} />
     </UserContext.Provider>
   );
 
   await expect(findByText('No environments available.')).resolves.toBeVisible();
+});
+
+test('when user is not admin and no environments at all should show empty list info message', async () => {
+  const user = new UserViewModel({ Username: 'test' });
+  server.use(
+    rest.get('/api/environments', (req, res, ctx) =>
+      res(ctx.set('x-total-available', '0'), ctx.json([]))
+    )
+  );
+
+  const { findByText } = renderWithQueryClient(
+    <UserContext.Provider value={{ user }}>
+      <EnvironmentList onClickItem={jest.fn()} onRefresh={jest.fn()} />
+    </UserContext.Provider>
+  );
+
+  await expect(
+    findByText(
+      'You do not have access to any environment. Please contact your administrator.'
+    )
+  ).resolves.toBeVisible();
+});
+
+test('when user is an admin and no environments at all should show empty list info message', async () => {
+  const user = new UserViewModel({ Username: 'test', Role: 1 });
+  server.use(
+    rest.get('/api/environments', (req, res, ctx) =>
+      res(ctx.set('x-total-available', '0'), ctx.json([]))
+    )
+  );
+
+  const { findByText } = renderWithQueryClient(
+    <UserContext.Provider value={{ user }}>
+      <EnvironmentList onClickItem={jest.fn()} onRefresh={jest.fn()} />
+    </UserContext.Provider>
+  );
+
+  await expect(
+    findByText(/No environment available for management. Please head over the/)
+  ).resolves.toBeVisible();
 });

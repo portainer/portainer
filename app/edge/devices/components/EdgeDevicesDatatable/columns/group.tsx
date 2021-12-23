@@ -3,6 +3,7 @@ import { CellProps, Column } from 'react-table';
 import { Environment } from '@/portainer/environments/types';
 import { DefaultFilter } from '@/portainer/components/datatables/components/Filter';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { useGroup } from '@/portainer/environment-groups/queries';
 
 export const group: Column<Environment> = {
   Header: 'Group',
@@ -13,7 +14,8 @@ export const group: Column<Environment> = {
   canHide: true,
 };
 
-// TODO use useGroupName instead of this
 function GroupCell({ value }: CellProps<Environment, EnvironmentGroupId>) {
-  return value;
+  const groupName = useGroup(value, (group) => group.Name);
+
+  return groupName;
 }

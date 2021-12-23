@@ -1,4 +1,3 @@
-import EndpointHelper from 'Portainer/helpers/endpointHelper';
 import { getEndpoints } from 'Portainer/environments/environment.service';
 import { EnvironmentType } from 'Portainer/environments/types';
 
@@ -12,8 +11,7 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
   this.getEnvironments = function () {
     return $async(async () => {
       try {
-        const [endpointsResponse, groups] = await Promise.all([getEndpoints(0, 100, { types: [EnvironmentType.EdgeAgentOnDocker] }), GroupService.groups()]);
-        EndpointHelper.mapGroupNameToEndpoint(endpointsResponse.value, groups);
+        const [endpointsResponse] = await Promise.all([getEndpoints(0, 100, { types: [EnvironmentType.EdgeAgentOnDocker] })]);
         ctrl.edgeDevices = endpointsResponse.value;
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve edge devices');

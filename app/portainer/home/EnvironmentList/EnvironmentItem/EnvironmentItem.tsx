@@ -1,21 +1,23 @@
 import clsx from 'clsx';
+import _ from 'lodash';
 
 import {
   isoDateFromTimestamp,
   humanize,
   stripProtocol,
 } from '@/portainer/filters/filters';
-import { idsToTagNames } from '@/portainer/helpers/tagHelper';
 import { type Environment, PlatformType } from '@/portainer/environments/types';
 import {
   getPlatformType,
   isDockerEnvironment,
   isEdgeEnvironment,
 } from '@/portainer/environments/utils';
-import type { Tag, TagId } from '@/portainer/tags/types';
+import type { TagId } from '@/portainer/tags/types';
 import { Button } from '@/portainer/components/Button';
 import { Link } from '@/portainer/components/Link';
-import { EnvironmentGroup } from '@/portainer/environment-groups/types';
+import { useIsAdmin } from '@/portainer/hooks/useUser';
+import { useGroup } from '@/portainer/environment-groups/queries';
+import { useTags } from '@/portainer/tags/queries';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EdgeIndicator } from './EdgeIndicator';
@@ -25,28 +27,22 @@ import { EnvironmentStatusBadge } from './EnvironmentStatusBadge';
 
 interface Props {
   homepageLoadTime?: number;
-  isAdmin: boolean;
   environment: Environment;
   onClick(environment: Environment): void;
-  tags?: Tag[];
-  groups: EnvironmentGroup[];
 }
 
 export function EnvironmentItem({
   environment,
   onClick,
-  isAdmin,
-  tags,
   homepageLoadTime,
-  groups,
 }: Props) {
-  const environmentTags = joinTags(tags, environment.TagIds);
+  const isAdmin = useIsAdmin();
   const isEdge = isEdgeEnvironment(environment.Type);
 
   const snapshotTime = getSnapshotTime(environment);
 
-  const group = groups.find((g) => g.Id === environment.GroupId);
-
+  const groupName = useGroup(environment.GroupId, (group) => group.Name);
+  const tags = useEnvironmentTagNames(environment.TagIds);
   const route = getRoute(environment);
 
   return (
@@ -88,7 +84,12 @@ export function EnvironmentItem({
                   )}
                 </span>
               </span>
-              {!!group && <span className="small">Group: {group.Name}</span>}
+              {groupName && (
+                <span className="small">
+                  <span>Group: </span>
+                  <span>{groupName}</span>
+                </span>
+              )}
             </div>
             <EnvironmentStats environment={environment} />
             <div className="blocklist-item-line endpoint-item">
@@ -108,7 +109,7 @@ export function EnvironmentItem({
                 )}
                 <span>
                   <i className="fa fa-tags space-right" aria-hidden="true" />
-                  {environmentTags.length > 0 ? environmentTags : 'No tags'}
+                  {tags}
                 </span>
               </span>
               {!isEdge && (
@@ -135,17 +136,27 @@ export function EnvironmentItem({
   );
 }
 
-function joinTags(tags: Tag[] = [], tagIds: TagId[] = []) {
-  if (!tags) {
+function useEnvironmentTagNames(tagIds?: TagId[]) {
+  const { tags, isLoading } = useTags((tags) => {
+    if (!tagIds) {
+      return [];
+    }
+    return _.compact(
+      tagIds
+        .map((id) => tags.find((tag) => tag.ID === id))
+        .map((tag) => tag?.Name)
+    );
+  });
+
+  if (tags) {
+    return tags.join(', ');
+  }
+
+  if (isLoading) {
     return 'Loading tags...';
   }
 
-  if (!tagIds || !tagIds.length) {
-    return '';
-  }
-
-  const tagNames = idsToTagNames(tags, tagIds);
-  return tagNames.join(',');
+  return 'No tags';
 }
 
 function getSnapshotTime(environment: Environment) {
