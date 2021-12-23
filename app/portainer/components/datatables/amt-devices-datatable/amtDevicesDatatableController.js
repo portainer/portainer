@@ -1,12 +1,14 @@
+import { executeDeviceAction } from 'Portainer/hostmanagement/open-amt/open-amt.service';
+
 angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
   '$scope',
+  '$async',
   '$state',
   '$controller',
-  'OpenAMTService',
   'ModalService',
   'Notifications',
-  function ($scope, $state, $controller, OpenAMTService, ModalService, Notifications) {
-    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope, $state: $state }));
+  function ($scope, $async, $state, $controller, ModalService, Notifications) {
+    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope, $state: $state, $async: $async }));
 
     this.state = Object.assign(this.state, {
       executingAction: {},
@@ -33,7 +35,7 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
       }
     };
 
-    this.executeDeviceAction = async function (device, action) {
+    this.executeDeviceActionConfirm = async function (device, action) {
       const deviceGUID = device.guid;
       if (!device.connectionStatus) {
         return;
@@ -52,18 +54,24 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
         if (!confirmed) {
           return;
         }
-        this.state.executingAction[deviceGUID] = true;
 
-        await OpenAMTService.executeDeviceAction(this.endpointId, deviceGUID, action);
+        this.setExecutingAction(deviceGUID, true);
+        await executeDeviceAction(this.endpointId, deviceGUID, action);
         Notifications.success(`${action} action sent successfully`);
         $state.reload();
       } catch (err) {
         console.log(err);
         Notifications.error('Failure', err, `Failed to ${action} the device`);
       } finally {
-        this.state.executingAction[deviceGUID] = false;
+        this.setExecutingAction(deviceGUID, false);
       }
     };
+
+    this.setExecutingAction = function(deviceGUID, isExecutingAction) {
+      $async(async () => {
+        this.state.executingAction[deviceGUID] = isExecutingAction;
+      })
+    }
     
     this.$onInit = function () {
       this.setDefaults();

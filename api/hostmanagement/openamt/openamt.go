@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"io/ioutil"
 	"net/http"
-	"sync"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	DefaultCIRAConfigName     = "ciraConfigDefault"
-	DefaultProfileName        = "profileAMTDefault"
+	DefaultCIRAConfigName = "ciraConfigDefault"
+	DefaultProfileName    = "profileAMTDefault"
 
 	httpClientTimeout = 5 * time.Minute
 
@@ -69,7 +69,7 @@ func parseError(responseBody []byte) error {
 	return nil
 }
 
-func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfiguration) error {
+func (service *Service) Configure(configuration portainer.OpenAMTConfiguration) error {
 	token, err := service.Authorization(configuration)
 	if err != nil {
 		return err
@@ -161,54 +161,42 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 	}
 	configuration.Credentials.MPSToken = token
 
-	amtErrors := make(chan error)
-	wgDone := make(chan bool)
-
-	var wg sync.WaitGroup
+	var g errgroup.Group
 	var resultDevice *Device
 	var resultPowerState *DevicePowerState
 	var resultEnabledFeatures *DeviceEnabledFeatures
-	wg.Add(3)
 
-	go func() {
+	g.Go(func() error {
 		device, err := service.getDevice(configuration, deviceGUID)
 		if err != nil {
-			amtErrors <- err
+			return err
 		}
 		if device == nil {
-			amtErrors <- fmt.Errorf("device %s not found", deviceGUID)
+			return fmt.Errorf("device %s not found", deviceGUID)
 		}
 		resultDevice = device
-		wg.Done()
-	}()
+		return nil
+	})
 
-	go func() {
+	g.Go(func() error {
 		powerState, err := service.getDevicePowerState(configuration, deviceGUID)
 		if err != nil {
-			amtErrors <- err
+			return err
 		}
 		resultPowerState = powerState
-		wg.Done()
-	}()
+		return nil
+	})
 
-	go func() {
+	g.Go(func() error {
 		enabledFeatures, err := service.getDeviceEnabledFeatures(configuration, deviceGUID)
 		if err != nil {
-			amtErrors <- err
+			return err
 		}
 		resultEnabledFeatures = enabledFeatures
-		wg.Done()
-	}()
+		return nil
+	})
 
-	go func() {
-		wg.Wait()
-		close(wgDone)
-	}()
-
-	select {
-	case <-wgDone:
-		break
-	case err := <-amtErrors:
+	if err := g.Wait(); err != nil {
 		return nil, err
 	}
 

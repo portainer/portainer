@@ -17,7 +17,7 @@ import (
 )
 
 type deviceConfigurePayload struct {
-	EdgeKey string `json:"edgekey"`
+	EdgeKey string `json:"edgeKey"`
 	Name    string `json:"name"`
 	Profile int    `json:"profile"`
 }

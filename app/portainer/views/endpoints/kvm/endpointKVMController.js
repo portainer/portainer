@@ -1,11 +1,14 @@
 import angular from 'angular';
 
+import { enableDeviceFeatures } from 'Portainer/hostmanagement/open-amt/open-amt.service';
+
 class EndpointKVMController {
   /* @ngInject */
-  constructor($state, $scope, $transition$, EndpointService, OpenAMTService, Notifications) {
+  constructor($state, $scope, $async, $transition$, EndpointService, Notifications) {
     this.$state = $state;
+    this.$scope = $scope;
+    this.$async = $async;
     this.$transition$ = $transition$;
-    this.OpenAMTService = OpenAMTService;
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
 
@@ -23,28 +26,30 @@ class EndpointKVMController {
     }
   }
 
-
   async $onInit() {
-    try {
-      this.$state.endpoint = await this.EndpointService.endpoint(this.$state.endpointId);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
-    }
+    this.$async(async () => {
+      try {
+        this.$state.endpoint = await this.EndpointService.endpoint(this.$state.endpointId);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
+      }
 
-    try {
-      const featuresPayload = {
-        IDER: true,
-        KVM: true,
-        SOL: true,
-        redirection: true,
-        userConsent: 'none',
-      };
-      const mpsAuthorization = await this.OpenAMTService.enableDeviceFeatures(this.$state.endpointId, this.$state.deviceId, featuresPayload);
-      this.$state.mpsServer = mpsAuthorization.Server;
-      this.$state.mpsToken = mpsAuthorization.Token;
-    } catch (e) {
-      this.Notifications.error('Failure', e, `Failed to load kvm for device`);
-    }
+      try {
+        const features = {
+          IDER: true,
+          KVM: true,
+          SOL: true,
+          redirection: true,
+          userConsent: 'none',
+        };
+        const mpsAuthorization = await enableDeviceFeatures(this.$state.endpointId, this.$state.deviceId, features);
+
+        this.$state.mpsServer = mpsAuthorization.Server;
+        this.$state.mpsToken = mpsAuthorization.Token;
+      } catch (e) {
+        this.Notifications.error('Failure', e, `Failed to load kvm for device`);
+      }
+    })
   }
 }
 

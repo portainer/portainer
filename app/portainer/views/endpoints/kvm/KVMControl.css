@@ -8,8 +8,9 @@
 
 .kvm-maximized {
   position: fixed;
-  background: #000;
+  background: white;
   bottom: 0;
+  top: 0;
   left: 0;
   width: 100vw;
   z-index: 1000;

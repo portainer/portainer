@@ -15,17 +15,17 @@
         <td>{{ $ctrl.parsePowerState(device.powerstate) }} <i class="fa fa-cog fa-spin" ng-show="$ctrl.state.executingAction[device.guid]" style="margin-left: 5px;"></i></td>
         <td>
           <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display: inline-flex;">
-            <a style="margin: 0 2.5px;" title="Power up the device" ng-click="$ctrl.executeDeviceAction(device, 'power up')">
-              <i class="fa fa-plug space-right" ng-class="{ 'icon-disabled': !device.connectionStatus }" aria-hidden="true"></i>
+            <a style="margin: 0 2.5px;" title="Power up the device" ng-click="$ctrl.executeDeviceActionConfirm(device, 'power up')">
+              <i class="fa fa-plug space-right" ng-class="{ 'icon-disabled': !device.connectionStatus || $ctrl.state.executingAction[device.guid] }" aria-hidden="true"></i>
             </a>
-            <a style="margin: 0 2.5px;" title="Power off the device" ng-click="$ctrl.executeDeviceAction(device, 'power off')">
-              <i class="fa fa-power-off space-right" ng-class="{ 'icon-disabled': !device.connectionStatus }" aria-hidden="true"></i>
+            <a style="margin: 0 2.5px;" title="Power off the device" ng-click="$ctrl.executeDeviceActionConfirm(device, 'power off')">
+              <i class="fa fa-power-off space-right" ng-class="{ 'icon-disabled': !device.connectionStatus || $ctrl.state.executingAction[device.guid] }" aria-hidden="true"></i>
             </a>
-            <a style="margin: 0 2.5px;" title="Restart the device" ng-click="$ctrl.executeDeviceAction(device, 'restart')">
-              <i class="fa fa-sync space-right" ng-class="{ 'icon-disabled': !device.connectionStatus }" aria-hidden="true"></i>
+            <a style="margin: 0 2.5px;" title="Restart the device" ng-click="$ctrl.executeDeviceActionConfirm(device, 'restart')">
+              <i class="fa fa-sync space-right" ng-class="{ 'icon-disabled': !device.connectionStatus || $ctrl.state.executingAction[device.guid] }" aria-hidden="true"></i>
             </a>
             <a style="margin: 0 2.5px;" title="Connect KVM" target="_blank" ui-sref="portainer.endpoints.endpoint.kvm({id: $ctrl.endpointId, deviceId: device.guid, deviceName: device.hostname})">
-              <i class="fa fa-desktop space-right" ng-class="{ 'icon-disabled': !device.connectionStatus }" aria-hidden="true"></i>
+              <i class="fa fa-desktop space-right" ng-class="{ 'icon-disabled': !device.connectionStatus || $ctrl.state.executingAction[device.guid] }" aria-hidden="true"></i>
             </a>
           </div>
         </td>

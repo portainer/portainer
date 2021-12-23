@@ -1,7 +1,10 @@
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 
+import { activateDevice, getDevices } from 'Portainer/hostmanagement/open-amt/open-amt.service';
+
 angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$scope',
+  '$async',
   '$state',
   '$controller',
   'DatatableService',
@@ -9,9 +12,8 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
   'SettingsService',
   'ModalService',
   'Notifications',
-  'OpenAMTService',
-  function ($scope, $state, $controller, DatatableService, PaginationService, SettingsService, ModalService, Notifications, OpenAMTService) {
-    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
+  function ($scope, $async, $state, $controller, DatatableService, PaginationService, SettingsService, ModalService, Notifications) {
+    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope, $async: $async }));
 
     this.state = Object.assign(this.state, {
       orderBy: this.orderBy,
@@ -86,18 +88,19 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
     };
 
     this.fetchAMTDeviceInfo = function (endpoint) {
-      if (!this.showAMTNodes(endpoint) || this.state.amtDevices[endpoint.Id]) {
-        return;
-      }
+      $async(async () => {
+        if (!this.showAMTNodes(endpoint) || this.state.amtDevices[endpoint.Id]) {
+          return;
+        }
 
-      OpenAMTService.getDevices(endpoint.Id)
-        .then((data) => {
-          this.state.amtDevices[endpoint.Id] = data.Devices;
-        })
-        .catch((e) => {
+        try {
+          this.state.amtDevices[endpoint.Id] = await getDevices(endpoint.Id);
+        } catch (e) {
           console.log(e);
-          this.state.amtDevicesErrors[endpoint.Id] = 'Error fetching devices information: ' + e.data.details;
-        });
+          this.state.amtDevicesErrors[endpoint.Id] = e.message;
+        }
+      })
+
     };
 
     this.associateOpenAMT = function (endpoints) {
@@ -116,18 +119,20 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
             return;
           }
 
-          setLoadingMessage('Activating Active Management Technology on selected devices...');
-          for (let endpoint of endpoints) {
-            try {
-              await OpenAMTService.activateDevice(endpoint.Id);
+          $scope.$evalAsync(async () => {
+            setLoadingMessage('Activating Active Management Technology on selected devices...');
+            for (let endpoint of endpoints) {
+              try {
+                await activateDevice(endpoint.Id);
 
-              Notifications.success('Successfully associated with OpenAMT', endpoint.Name);
-            } catch (err) {
-              Notifications.error('Failure', err, 'Unable to associate with OpenAMT');
+                Notifications.success('Successfully associated with OpenAMT', endpoint.Name);
+              } catch (err) {
+                Notifications.error('Failure', err, 'Unable to associate with OpenAMT');
+              }
             }
-          }
 
-          $state.reload();
+            $state.reload();
+          })
         },
       });
     };

@@ -41,10 +41,10 @@ type (
 
 	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
 	OpenAMTConfiguration struct {
-		Enabled               bool                   `json:"Enabled"`
-		MPSServer             string                 `json:"MPSServer"`
-		Credentials           MPSCredentials         `json:"Credentials"`
-		DomainConfiguration   DomainConfiguration    `json:"DomainConfiguration"`
+		Enabled             bool                `json:"Enabled"`
+		MPSServer           string              `json:"MPSServer"`
+		Credentials         MPSCredentials      `json:"Credentials"`
+		DomainConfiguration DomainConfiguration `json:"DomainConfiguration"`
 	}
 
 	MPSCredentials struct {
@@ -1241,8 +1241,7 @@ type (
 
 	// OpenAMTService represents a service for managing OpenAMT
 	OpenAMTService interface {
-		Authorization(configuration OpenAMTConfiguration) (string, error)
-		ConfigureDefault(configuration OpenAMTConfiguration) error
+		Configure(configuration OpenAMTConfiguration) error
 		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
 		EnableDeviceFeatures(configuration OpenAMTConfiguration, deviceGUID string, features OpenAMTDeviceEnabledFeatures) (string, error)
 		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
