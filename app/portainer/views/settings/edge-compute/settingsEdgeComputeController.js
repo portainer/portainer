@@ -8,8 +8,7 @@ function SettingsEdgeComputeController($q, $scope, $state, Notifications, Settin
     SettingsService.update(settings)
         .then(function success() {
           Notifications.success('Settings updated');
-            StateManager.updateSnapshotInterval(settings.SnapshotInterval);
-            StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
+          StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
           $state.reload();
         })
         .catch(function error(err) {
