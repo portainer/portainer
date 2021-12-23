@@ -198,14 +198,6 @@ function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointPro
 
   return service;
 
-  // function withEndpointId<T extends (...args: never[]) => unknown>(
-  //   func: (endpointId: EndpointId, ...args: Parameters<T>) => ReturnType<T>
-  // ): (...args: Parameters<T>) => ReturnType<T> {
-  //   const endpointId = EndpointProvider.endpointID();
-
-  //   return func.bind(null, endpointId);
-  // }
-
   function withEndpointId(func) {
     const endpointId = EndpointProvider.endpointID();
 

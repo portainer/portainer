@@ -43,19 +43,3 @@ export type DockerContainer = {
   StackName?: string;
   Image: string;
 };
-
-export interface HttpRequestHelper {
-  setPortainerAgentTargetHeader: (header: string) => void;
-}
-
-export interface NotificationsService {
-  success: (title: string, text: string) => void;
-  error: (title: string, error: Error, fallbackText: string) => void;
-}
-
-export interface ModalService {
-  confirmContainerDeletion: (
-    title: string,
-    callback: (result: [boolean]) => void
-  ) => void;
-}
