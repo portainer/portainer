@@ -1,0 +1,14 @@
+<rd-header>
+  <rd-header-title title-text="Settings"></rd-header-title>
+  <rd-header-content> <a ui-sref="portainer.settings">Settings</a> &gt; Edge Compute </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <settings-edge-compute on-submit="(onSubmit)"></settings-edge-compute>
+  </div>
+</div>
+
+<open-amt-settings ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt']"></open-amt-settings>
+
+<fdo-settings ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['fdo']"></fdo-settings>

@@ -400,6 +400,17 @@ angular
         },
       };
 
+      var settingsEdgeCompute = {
+        name: 'portainer.settings.edgeCompute',
+        url: '/edge',
+        views: {
+          'content@': {
+            templateUrl: './views/settings/edge-compute/settingsEdgeCompute.html',
+            controller: 'SettingsEdgeComputeController',
+          },
+        },
+      };
+
       var tags = {
         name: 'portainer.tags',
         url: '/tags',
@@ -485,6 +496,7 @@ angular
       $stateRegistryProvider.register(registryCreation);
       $stateRegistryProvider.register(settings);
       $stateRegistryProvider.register(settingsAuthentication);
+      $stateRegistryProvider.register(settingsEdgeCompute);
       $stateRegistryProvider.register(tags);
       $stateRegistryProvider.register(users);
       $stateRegistryProvider.register(user);

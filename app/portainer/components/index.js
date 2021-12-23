@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 import { CreateAccessTokenAngular } from '../views/account/CreateAccessToken';
+import { SettingsEdgeComputeAngular } from '../settings/edge-compute/SettingsEdgeCompute';
 
 import sidebarModule from './sidebar';
 import gitFormModule from './forms/git-form';
@@ -19,4 +20,6 @@ export default angular
   .component('portainerTooltip', TooltipAngular)
   .component('reactExample', ReactExampleAngular)
   .component('beFeatureIndicator', beFeatureIndicatorAngular)
-  .component('createAccessToken', CreateAccessTokenAngular).name;
+  .component('createAccessToken', CreateAccessTokenAngular)
+    .component('settingsEdgeCompute', SettingsEdgeComputeAngular)
+    .name;
