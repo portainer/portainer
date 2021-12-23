@@ -1,5 +1,10 @@
 import clsx from 'clsx';
+import { useQuery } from 'react-query';
+import { useEffect } from 'react';
 
+import * as notifications from '@/portainer/services/notifications';
+import { getTags } from '@/portainer/tags/tags.service';
+import { getGroup } from '@/portainer/environment-groups/environment-groups.service';
 import {
   isoDateFromTimestamp,
   humanize,
@@ -12,10 +17,11 @@ import {
   isDockerEnvironment,
   isEdgeEnvironment,
 } from '@/portainer/environments/utils';
-import type { Tag, TagId } from '@/portainer/tags/types';
+import type { TagId } from '@/portainer/tags/types';
 import { Button } from '@/portainer/components/Button';
 import { Link } from '@/portainer/components/Link';
-import { EnvironmentGroup } from '@/portainer/environment-groups/types';
+import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { useIsAdmin } from '@/portainer/hooks/useUser';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EdgeIndicator } from './EdgeIndicator';
@@ -25,28 +31,22 @@ import { EnvironmentStatusBadge } from './EnvironmentStatusBadge';
 
 interface Props {
   homepageLoadTime?: number;
-  isAdmin: boolean;
   environment: Environment;
   onClick(environment: Environment): void;
-  tags?: Tag[];
-  groups: EnvironmentGroup[];
 }
 
 export function EnvironmentItem({
   environment,
   onClick,
-  isAdmin,
-  tags,
   homepageLoadTime,
-  groups,
 }: Props) {
-  const environmentTags = joinTags(tags, environment.TagIds);
+  const isAdmin = useIsAdmin();
   const isEdge = isEdgeEnvironment(environment.Type);
 
   const snapshotTime = getSnapshotTime(environment);
 
-  const group = groups.find((g) => g.Id === environment.GroupId);
-
+  const groupName = useGroupName(environment.GroupId);
+  const tags = useEnvironmentTags(environment.TagIds);
   const route = getRoute(environment);
 
   return (
@@ -88,7 +88,10 @@ export function EnvironmentItem({
                   )}
                 </span>
               </span>
-              {!!group && <span className="small">Group: {group.Name}</span>}
+              <span className="small">
+                <span>Group: </span>
+                <span>{groupName}</span>
+              </span>
             </div>
             <EnvironmentStats environment={environment} />
             <div className="blocklist-item-line endpoint-item">
@@ -108,7 +111,7 @@ export function EnvironmentItem({
                 )}
                 <span>
                   <i className="fa fa-tags space-right" aria-hidden="true" />
-                  {environmentTags.length > 0 ? environmentTags : 'No tags'}
+                  {tags}
                 </span>
               </span>
               {!isEdge && (
@@ -135,17 +138,20 @@ export function EnvironmentItem({
   );
 }
 
-function joinTags(tags: Tag[] = [], tagIds: TagId[] = []) {
-  if (!tags) {
+function useEnvironmentTags(tagIds?: TagId[]) {
+  const { tags, isLoading } = useTags();
+
+  if (isLoading) {
     return 'Loading tags...';
   }
 
-  if (!tagIds || !tagIds.length) {
-    return '';
+  if (!tags || !tagIds) {
+    return 'No tags';
   }
 
   const tagNames = idsToTagNames(tags, tagIds);
-  return tagNames.join(',');
+
+  return tagNames.join(', ');
 }
 
 function getSnapshotTime(environment: Environment) {
@@ -182,4 +188,45 @@ function getRoute(environment: Environment) {
     default:
       return '';
   }
+}
+
+function useTags() {
+  const { data, isError, error, isLoading } = useQuery(
+    'tags',
+    () => getTags(),
+    {
+      staleTime: 50,
+    }
+  );
+
+  useEffect(() => {
+    if (isError) {
+      notifications.error('Failed loading tags', error as Error);
+    }
+  }, [isError, error]);
+
+  return { tags: data, isLoading };
+}
+
+function useGroup(groupId: EnvironmentGroupId) {
+  const { data, isError, error } = useQuery(
+    ['environment-groups', groupId],
+    () => getGroup(groupId),
+    {
+      staleTime: 50,
+    }
+  );
+
+  useEffect(() => {
+    if (isError) {
+      notifications.error('Failed loading group', error as Error);
+    }
+  }, [isError, error]);
+
+  return data;
+}
+
+function useGroupName(groupId: EnvironmentGroupId) {
+  const group = useGroup(groupId);
+  return group && group.Name;
 }

@@ -15,17 +15,14 @@ export default {
 
 interface Args {
   environment: Environment;
-  isAdmin: boolean;
   homepageLoadTime: number;
 }
 
-function Template({ environment, isAdmin, homepageLoadTime = 1 }: Args) {
+function Template({ environment, homepageLoadTime = 1 }: Args) {
   return (
     <EnvironmentItem
-      groups={[]}
       environment={environment}
       homepageLoadTime={homepageLoadTime}
-      isAdmin={isAdmin}
       onClick={() => {}}
     />
   );

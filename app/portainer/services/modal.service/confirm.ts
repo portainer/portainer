@@ -189,21 +189,6 @@ export function confirmDeletionAsync(message: string) {
   });
 }
 
-export function confirmEndpointSnapshot(callback: ConfirmCallback) {
-  confirm({
-    title: 'Are you sure?',
-    message:
-      'Triggering a manual refresh will poll each environment to retrieve its information, this may take a few moments.',
-    buttons: {
-      confirm: {
-        label: 'Continue',
-        className: 'btn-primary',
-      },
-    },
-    callback,
-  });
-}
-
 export function confirmImageExport(callback: ConfirmCallback) {
   confirm({
     title: 'Caution',
