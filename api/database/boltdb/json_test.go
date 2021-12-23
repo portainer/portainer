@@ -1,6 +1,7 @@
 package boltdb
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"testing"
 
@@ -10,10 +11,15 @@ import (
 
 const (
 	jsonobject = `{"LogoURL":"","BlackListedLabels":[],"AuthenticationMethod":1,"LDAPSettings":{"AnonymousMode":true,"ReaderDN":"","URL":"","TLSConfig":{"TLS":false,"TLSSkipVerify":false},"StartTLS":false,"SearchSettings":[{"BaseDN":"","Filter":"","UserNameAttribute":""}],"GroupSearchSettings":[{"GroupBaseDN":"","GroupFilter":"","GroupAttribute":""}],"AutoCreateUsers":true},"OAuthSettings":{"ClientID":"","AccessTokenURI":"","AuthorizationURI":"","ResourceURI":"","RedirectURI":"","UserIdentifier":"","Scopes":"","OAuthAutoCreateUsers":false,"DefaultTeamID":0,"SSO":true,"LogoutURI":"","KubeSecretKey":"j0zLVtY/lAWBk62ByyF0uP80SOXaitsABP0TTJX8MhI="},"OpenAMTConfiguration":{"Enabled":false,"MPSServer":"","Credentials":{"MPSUser":"","MPSPassword":"","MPSToken":""},"DomainConfiguration":{"CertFileText":"","CertPassword":"","DomainName":""},"WirelessConfiguration":null},"FeatureFlagSettings":{},"SnapshotInterval":"5m","TemplatesURL":"https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json","EdgeAgentCheckinInterval":5,"EnableEdgeComputeFeatures":false,"UserSessionTimeout":"8h","KubeconfigExpiry":"0","EnableTelemetry":true,"HelmRepositoryURL":"https://charts.bitnami.com/bitnami","KubectlShellImage":"portainer/kubectl-shell","DisplayDonationHeader":false,"DisplayExternalContributors":false,"EnableHostManagementFeatures":false,"AllowVolumeBrowserForRegularUsers":false,"AllowBindMountsForRegularUsers":false,"AllowPrivilegedModeForRegularUsers":false,"AllowHostNamespaceForRegularUsers":false,"AllowStackManagementForRegularUsers":false,"AllowDeviceMappingForRegularUsers":false,"AllowContainerCapabilitiesForRegularUsers":false}`
-	passphrase = "apassphrasewhichneedstobe32bytes"
+	passphrase = "my secret key"
 )
 
-func Test_MarshalObject(t *testing.T) {
+func secretToEncryptionKey(passphrase string) []byte {
+	hash := sha256.Sum256([]byte(passphrase))
+	return hash[:]
+}
+
+func Test_MarshalObjectUnencrypted(t *testing.T) {
 	is := assert.New(t)
 
 	uuid := uuid.Must(uuid.NewV4())
@@ -78,14 +84,14 @@ func Test_MarshalObject(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s -> %s", test.object, test.expected), func(t *testing.T) {
-			data, err := MarshalObject(test.object, passphrase)
+			data, err := MarshalObject(test.object, nil)
 			is.NoError(err)
 			is.Equal(test.expected, string(data))
 		})
 	}
 }
 
-func Test_UnMarshalObject(t *testing.T) {
+func Test_UnMarshalObjectUnencrypted(t *testing.T) {
 	is := assert.New(t)
 
 	// Based on actual data entering and what we expect out of the function
@@ -108,7 +114,7 @@ func Test_UnMarshalObject(t *testing.T) {
 			expected: "9ca4a1dd-a439-4593-b386-a7dfdc2e9fc6",
 		},
 		{
-			// An unmarshalled json object string should return the same as a string without error also
+			// An un-marshalled json object string should return the same as a string without error also
 			object:   []byte(jsonobject),
 			expected: jsonobject,
 		},
@@ -117,9 +123,50 @@ func Test_UnMarshalObject(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s -> %s", test.object, test.expected), func(t *testing.T) {
 			var object string
-			err := UnmarshalObject(test.object, &object, passphrase)
+			err := UnmarshalObject(test.object, &object, nil)
 			is.NoError(err)
 			is.Equal(test.expected, string(object))
+		})
+	}
+}
+
+func Test_ObjectMarshallingEncrypted(t *testing.T) {
+	is := assert.New(t)
+
+	// Based on actual data entering and what we expect out of the function
+
+	tests := []struct {
+		object   []byte
+		expected string
+	}{
+		{
+			object: []byte(""),
+		},
+		{
+			object: []byte("35"),
+		},
+		{
+			// An unmarshalled byte string should return the same without error
+			object: []byte("9ca4a1dd-a439-4593-b386-a7dfdc2e9fc6"),
+		},
+		{
+			// An un-marshalled json object string should return the same as a string without error also
+			object: []byte(jsonobject),
+		},
+	}
+
+	key := secretToEncryptionKey(passphrase)
+	for _, test := range tests {
+		t.Run(fmt.Sprintf("%s -> %s", test.object, test.expected), func(t *testing.T) {
+
+			data, err := MarshalObject(test.object, key)
+			is.NoError(err)
+
+			var object []byte
+			err = UnmarshalObject(data, &object, key)
+
+			is.NoError(err)
+			is.Equal(test.object, object)
 		})
 	}
 }
