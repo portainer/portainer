@@ -11,7 +11,6 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,14 +21,23 @@ const (
 
 type DbConnection struct {
 	Path          string
-	EncryptionKey string
-	IsDBEncrypted bool
+	EncryptionKey []byte
+	isEncrypted   bool
 
 	*bolt.DB
 }
 
-func (connection *DbConnection) GetDatabaseFilename() string {
-	if connection.EncryptionKey != "" {
+func (connection *DbConnection) GetDatabaseFilename(fullpath bool) string {
+
+	if fullpath {
+		if connection.IsEncryptedStore() {
+			return path.Join(connection.Path, EncryptedDatabaseFileName)
+		}
+
+		return path.Join(connection.Path, DatabaseFileName)
+	}
+
+	if connection.IsEncryptedStore() {
 		return EncryptedDatabaseFileName
 	}
 
@@ -41,39 +49,40 @@ func (connection *DbConnection) GetStorePath() string {
 	return connection.Path
 }
 
-// SetIsEncryptedFlag
-func (connection *DbConnection) SetIsEncryptedFlag(flag bool) {
-	connection.IsDBEncrypted = flag
+func (connection *DbConnection) SetEncrypted(flag bool) {
+	connection.isEncrypted = flag
 }
 
-// IsEncryptionRequired
-func (connection *DbConnection) IsEncryptionRequired() (bool, error) {
-	if connection.EncryptionKey != "" {
-		// set it back to true as encryption key exists
-		defer connection.SetIsEncryptedFlag(true)
+// Return true if the database is encrypted
+func (connection *DbConnection) IsEncryptedStore() bool {
 
-		// set IsDBEncrypted to false and get the version
-		connection.IsDBEncrypted = false
-		version, err := version.NewService(connection)
-		if err != nil {
-			return false, err
-		}
-
-		// 0: if encrypted
-		// > 0 if unencrypted
-		v, err := version.DBVersion()
-		if err != nil || v == 0 {
-			return false, err
-		}
-
-		return true, nil
+	if connection.isEncrypted {
+		return true
 	}
-	return false, nil
+
+	// otherwise determine whether the database is an encrypted one by whether we have
+	// an EncryptionKey set and the presense of the encrypted database file
+	if connection.EncryptionKey != nil {
+		dbFile := path.Join(connection.Path, EncryptedDatabaseFileName)
+		if _, err := os.Stat(dbFile); err == nil {
+			connection.isEncrypted = true
+			return true
+		}
+
+		// however, if this is a new db (no existing portainer.db),
+		// indicate this is encrypted from the start
+		dbFile = path.Join(connection.Path, DatabaseFileName)
+		if _, err := os.Stat(dbFile); err != nil {
+			connection.isEncrypted = true
+			return true
+		}
+	}
+
+	return false
 }
 
 // Open opens and initializes the BoltDB database.
 func (connection *DbConnection) Open() error {
-
 	// Disabled for now.  Can't use feature flags due to the way that works
 	// databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.json", DatabaseFileName, time.Now().Unix()))
 	// if err := connection.ExportRaw(databaseExportPath); err != nil {
@@ -82,8 +91,10 @@ func (connection *DbConnection) Open() error {
 	// 	log.Printf("raw export to %s success", databaseExportPath)
 	// }
 
-	databasePath := path.Join(connection.Path, DatabaseFileName)
+	logrus.Infof("Loading PortainerDB: %s", connection.GetDatabaseFilename(false))
 
+	// Now we open the db
+	databasePath := connection.GetDatabaseFilename(true)
 	db, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return err
@@ -111,7 +122,7 @@ func (connection *DbConnection) BackupTo(w io.Writer) error {
 }
 
 func (connection *DbConnection) ExportRaw(filename string) error {
-	databasePath := path.Join(connection.Path, DatabaseFileName)
+	databasePath := connection.GetDatabaseFilename(true)
 	if _, err := os.Stat(databasePath); err != nil {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
@@ -164,14 +175,14 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 		return err
 	}
 
-	return UnmarshalObject(data, object, connection.EncryptionKey)
+	return UnmarshalObject(data, object, connection.getEncryptionKey())
 }
 
-func (connection *DbConnection) getEncryptionKey() string {
-	logrus.Infof("With EncryptionKey=%t & IsDBEncrypted=%t", connection.EncryptionKey != "", connection.IsDBEncrypted)
-	if !connection.IsDBEncrypted {
-		return ""
+func (connection *DbConnection) getEncryptionKey() []byte {
+	if !connection.IsEncryptedStore() {
+		return nil
 	}
+
 	return connection.EncryptionKey
 }
 
@@ -266,7 +277,6 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-
 		data, err := MarshalObject(obj, connection.getEncryptionKey())
 		if err != nil {
 			return err
@@ -300,7 +310,6 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 func (connection *DbConnection) GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			err := UnmarshalObject(v, obj, connection.getEncryptionKey())
@@ -325,7 +334,7 @@ func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interf
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObjectWithJsoniter(v, obj)
+			err := UnmarshalObjectWithJsoniter(v, obj, connection.getEncryptionKey())
 			if err != nil {
 				return err
 			}

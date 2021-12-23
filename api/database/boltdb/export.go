@@ -10,8 +10,7 @@ import (
 
 // inspired by github.com/konoui/boltdb-exporter (which has no license)
 // but very much simplified, based on how we use boltdb
-
-func exportJson(databasePath, passphrase string) ([]byte, error) {
+func exportJson(databasePath string, encryptionKey []byte) ([]byte, error) {
 	logrus.WithField("databasePath", databasePath).Infof("exportJson")
 
 	connection, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second, ReadOnly: true})
@@ -33,7 +32,7 @@ func exportJson(databasePath, passphrase string) ([]byte, error) {
 					continue
 				}
 				var obj interface{}
-				err := UnmarshalObject(v, &obj, passphrase)
+				err := UnmarshalObject(v, &obj, encryptionKey)
 				if err != nil {
 					logrus.WithError(err).Errorf("Failed to unmarshal (bucket %s): %v", bucketName, string(v))
 					obj = v

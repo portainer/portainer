@@ -15,47 +15,48 @@ import (
 var encryptedStringTooShort = fmt.Errorf("encrypted string too short")
 
 // MarshalObject encodes an object to binary format
-func MarshalObject(object interface{}, passphrase string) (data []byte, err error) {
+func MarshalObject(object interface{}, encryptionKey []byte) (data []byte, err error) {
+
 	// Special case for the VERSION bucket. Here we're not using json
 	if v, ok := object.(string); ok {
 		data = []byte(v)
+	} else {
+		data, err = json.Marshal(object)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed marshaling object")
+			return data, err
+		}
 	}
 
-	data, err = json.Marshal(object)
-	if err != nil {
-		logrus.WithError(err).Errorf("failed marshaling object")
-		return data, err
-	}
-	if passphrase == "" {
-		logrus.Infof("no encryption passphrase")
+	if encryptionKey == nil {
 		return data, nil
 	}
-	return encrypt(data, passphrase)
+
+	return encrypt(data, encryptionKey)
 }
 
 // UnmarshalObject decodes an object from binary data
-func UnmarshalObject(data []byte, object interface{}, passphrase string) error {
-	if passphrase == "" {
-		logrus.Infof("no encryption passphrase")
-	} else {
+func UnmarshalObject(data []byte, object interface{}, encryptionKey []byte) error {
+
+	if encryptionKey != nil {
 		var err error
-		data, err = decrypt(data, passphrase)
+		data, err = decrypt(data, encryptionKey)
 		if err != nil {
 			logrus.WithError(err).Errorf("failed decrypting object")
 			return err
 		}
 	}
 
-	// Special case for the VERSION bucket. Here we're not using json
-	// So we need to return it as a string
 	err := json.Unmarshal(data, object)
 	if err != nil {
-		if s, ok := object.(*string); ok {
-			*s = string(data)
-			return nil
+		// Special case for the VERSION bucket. Here we're not using json
+		// So we need to return it as a string
+		s, ok := object.(*string)
+		if !ok {
+			return err
 		}
 
-		return err
+		*s = string(data)
 	}
 
 	return nil
@@ -64,64 +65,60 @@ func UnmarshalObject(data []byte, object interface{}, passphrase string) error {
 // UnmarshalObjectWithJsoniter decodes an object from binary data
 // using the jsoniter library. It is mainly used to accelerate environment(endpoint)
 // decoding at the moment.
-func UnmarshalObjectWithJsoniter(data []byte, object interface{}) error {
+func UnmarshalObjectWithJsoniter(data []byte, object interface{}, encryptionKey []byte) error {
+
+	if encryptionKey != nil {
+		var err error
+		data, err = decrypt(data, encryptionKey)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed decrypting object")
+			return err
+		}
+	}
+
 	var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
 	return jsoni.Unmarshal(data, &object)
 }
 
 // We don't have a KMS... aes GCM seems the most likely from
 // https://gist.github.com/atoponce/07d8d4c833873be2f68c34f9afc5a78a#symmetric-encryption
-func encrypt(plaintext []byte, passphrase string) (encrypted []byte, err error) {
-	logrus.Infof("encrypt")
-	block, _ := aes.NewCipher([]byte(passphrase))
+func encrypt(plaintext []byte, encryptionKey []byte) (encrypted []byte, err error) {
+	block, _ := aes.NewCipher([]byte(encryptionKey))
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return encrypted, err
 	}
+
 	nonce := make([]byte, gcm.NonceSize())
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
 		return encrypted, err
 	}
-	ciphertextByte := gcm.Seal(
-		nonce,
-		nonce,
-		plaintext,
-		nil)
-	return ciphertextByte, nil
+
+	return gcm.Seal(nonce, nonce, plaintext, nil), nil
 }
 
 // On error, return the original byte array - it might be unencrypted...
-func decrypt(encrypted []byte, passphrase string) (plaintextByte []byte, err error) {
-	passphraseByte := []byte(passphrase)
-	block, err := aes.NewCipher(passphraseByte)
+func decrypt(encrypted []byte, encryptionKey []byte) (plaintextByte []byte, err error) {
+	block, err := aes.NewCipher(encryptionKey)
 	if err != nil {
-		logrus.Infof("NOT decrypted")
-
 		return encrypted, err
 	}
+
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		logrus.Infof("NOT decrypted")
-
 		return encrypted, err
 	}
+
 	nonceSize := gcm.NonceSize()
 	if len(encrypted) < nonceSize {
-		logrus.Infof("NOT decrypted")
-
 		return encrypted, encryptedStringTooShort
 	}
-	nonce, ciphertextByteClean := encrypted[:nonceSize], encrypted[nonceSize:]
-	plaintextByte, err = gcm.Open(
-		nil,
-		nonce,
-		ciphertextByteClean,
-		nil)
-	if err != nil {
-		logrus.Infof("NOT decrypted")
 
+	nonce, ciphertextByteClean := encrypted[:nonceSize], encrypted[nonceSize:]
+	plaintextByte, err = gcm.Open(nil, nonce, ciphertextByteClean, nil)
+	if err != nil {
 		return encrypted, err
 	}
-	logrus.Infof("decrypted")
+
 	return plaintextByte, err
 }

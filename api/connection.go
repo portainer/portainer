@@ -13,8 +13,11 @@ type Connection interface {
 
 	// TODO: this one is very database specific atm
 	BackupTo(w io.Writer) error
-	GetDatabaseFilename() string
+	GetDatabaseFilename(fullpath bool) string
 	GetStorePath() string
+
+	IsEncryptedStore() bool
+	SetEncrypted(encrypted bool)
 
 	SetServiceName(bucketName string) error
 	GetObject(bucketName string, key []byte, object interface{}) error
@@ -28,7 +31,4 @@ type Connection interface {
 	GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
 	GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
 	ConvertToKey(v int) []byte
-
-	IsEncryptionRequired() (bool, error)
-	SetIsEncryptedFlag(bool)
 }

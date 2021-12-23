@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"log"
 	"os"
@@ -65,7 +66,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService, encryptionkey string, shutdownCtx context.Context) dataservices.DataStore {
+func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService, encryptionkey []byte, shutdownCtx context.Context) dataservices.DataStore {
 	connection, err := database.NewDatabase("boltdb", *flags.Data, encryptionkey)
 	if err != nil {
 		panic(err)
@@ -491,7 +492,7 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, s
 	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
 }
 
-func loadEncryptionKey(keyfilename string) string {
+func loadEncryptionSecretKey(keyfilename string) []byte {
 	content, err := os.ReadFile(path.Join("/run/secrets", keyfilename))
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -500,18 +501,20 @@ func loadEncryptionKey(keyfilename string) string {
 			log.Printf("Error reading encryption key file: %s", err.Error())
 		}
 
-		return ""
+		return nil
 	}
 
-	return strings.TrimSuffix(string(content), "\n")
+	// return a 32 byte hash of the secret (required for AES)
+	hash := sha256.Sum256(content)
+	return hash[:]
 }
 
 func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	shutdownCtx, shutdownTrigger := context.WithCancel(context.Background())
 
 	fileService := initFileService(*flags.Data)
-	encryptionKey := loadEncryptionKey(*flags.SecretKeyName)
-	if encryptionKey == "" {
+	encryptionKey := loadEncryptionSecretKey(*flags.SecretKeyName)
+	if encryptionKey == nil {
 		log.Println("proceeding without encryption key")
 	}
 
