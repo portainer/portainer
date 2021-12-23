@@ -91,12 +91,9 @@ func (store *Store) Rollback(force bool) error {
 }
 
 func (store *Store) encryptDB() error {
-	// Since database is not encrypted so
-	// settings this flag to false will not
-	// allow connection to use encryption key
-
+	// The DB is not currently encrypted.  First save the encrypted db filename
 	oldFilename := store.connection.GetDatabaseFilename(true)
-	logrus.Infof("Encrypting database")
+	logrus.Infof("Encrypting database...")
 
 	// export file path for backup
 	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
@@ -108,15 +105,16 @@ func (store *Store) encryptDB() error {
 		return err
 	}
 
-	logrus.Infof("database backup exported")
+	logrus.Infof("Database backup exported")
 
-	// Set isDBEncryptedFlag to true to import JSON in the encrypted format
+	// Close existing un-encrypted db so that we can delete he file later
+	store.connection.Close()
+
+	// Tell the db layer to create an encrypted db when opened
 	store.connection.SetEncrypted(true)
-	store.connection.Close() // So we can delete the old db file
-
-	// Re-open the store as a new encrypted db file
 	store.connection.Open()
 
+	// We have to init services before import
 	err = store.initServices()
 	if err != nil {
 		return err
@@ -124,10 +122,9 @@ func (store *Store) encryptDB() error {
 
 	err = store.Import(exportFilename)
 	if err != nil {
-		logrus.Fatal(errors.ErrDBImportFailed.Error())
-
-		// Remove the new encrypted file that failed
+		// Remove the new encrypted file that we failed to import
 		os.Remove(store.connection.GetDatabaseFilename(true))
+		logrus.Fatal(errors.ErrDBImportFailed.Error())
 	}
 
 	err = os.Remove(oldFilename)
