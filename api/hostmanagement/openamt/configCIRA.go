@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -131,7 +130,7 @@ func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfig
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return "", errors.New(fmt.Sprintf("unexpected status code %s", response.Status))
+		return "", fmt.Errorf("unexpected status code %s", response.Status)
 	}
 
 	certificate, err := io.ReadAll(response.Body)

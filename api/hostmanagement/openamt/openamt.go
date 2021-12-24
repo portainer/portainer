@@ -6,13 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.org/x/sync/errgroup"
 	"io/ioutil"
 	"net/http"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -116,7 +116,7 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 		if errorResponse != nil {
 			return nil, errorResponse
 		}
-		return nil, errors.New(fmt.Sprintf("unexpected status code %s", response.Status))
+		return nil, fmt.Errorf("unexpected status code %s", response.Status)
 	}
 
 	return responseBody, nil
@@ -148,7 +148,7 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 		if errorResponse != nil {
 			return nil, errorResponse
 		}
-		return nil, errors.New(fmt.Sprintf("unexpected status code %s", response.Status))
+		return nil, fmt.Errorf("unexpected status code %s", response.Status)
 	}
 
 	return responseBody, nil
