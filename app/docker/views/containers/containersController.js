@@ -13,6 +13,16 @@ angular.module('portainer.docker').controller('ContainersController', [
         .then(function success(data) {
           $scope.containers = data;
           $scope.offlineMode = EndpointProvider.offlineMode();
+          for (let item of $scope.containers) {
+            ContainerService.container(item.Id).then(function success(data) {
+              var Id = data.Id;
+              for (var i = 0; i < $scope.containers.length; i++) {
+                if (Id == $scope.containers[i].Id) {
+                  $scope.containers[i]['HostConfig'] = data.HostConfig;
+                }
+              }
+            });
+          }
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve containers');

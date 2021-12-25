@@ -61,6 +61,10 @@ angular.module('portainer.docker').controller('ContainersDatatableController', [
           label: 'Host',
           display: true,
         },
+        gpus: {
+          label: 'Allocated Gpus',
+          display: true,
+        },
         ports: {
           label: 'Published Ports',
           display: true,
@@ -70,6 +74,18 @@ angular.module('portainer.docker').controller('ContainersDatatableController', [
           display: true,
         },
       },
+    };
+
+    this.getGpus = function (DeviceRequests) {
+      const gpuOptions = _.find(DeviceRequests, { Driver: 'nvidia' });
+      if (!gpuOptions) {
+        return 'none';
+      }
+      let gpuStr = 'all';
+      if (gpuOptions.Count !== -1) {
+        gpuStr = `id:${_.join(gpuOptions.DeviceIDs, ',')}`;
+      }
+      return `${gpuStr}`;
     };
 
     this.onColumnVisibilityChange = onColumnVisibilityChange.bind(this);
