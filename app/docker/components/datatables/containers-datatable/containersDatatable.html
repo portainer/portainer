@@ -183,6 +183,9 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th ng-show="$ctrl.columnVisibility.columns.gpus.display">
+                Allocated Gpus
+              </th>
               <th ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
                   Published Ports
@@ -251,6 +254,9 @@
                 {{ item.Created | getisodatefromtimestamp }}
               </td>
               <td ng-if="$ctrl.showHostColumn" ng-show="$ctrl.columnVisibility.columns.host.display">{{ item.NodeName ? item.NodeName : '-' }}</td>
+              <td ng-show="$ctrl.columnVisibility.columns.gpus.display">
+                {{ $ctrl.getGpus(item.HostConfig.DeviceRequests) }}
+              </td>
               <td ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a
                   ng-if="item.Ports.length > 0"
