@@ -2,7 +2,10 @@ import clsx from 'clsx';
 import { PropsWithChildren, ReactNode } from 'react';
 import { TableHeaderProps } from 'react-table';
 
+import { Button } from '@/portainer/components/Button';
+
 import { useTableContext } from './TableContainer';
+import styles from './TableHeaderCell.module.css';
 
 interface Props {
   canFilter: boolean;
@@ -61,7 +64,8 @@ function SortWrapper({
   }
 
   return (
-    <button
+    <Button
+      color="link"
       type="button"
       onClick={() => onClick(!isSortedDesc)}
       className="sortable"
@@ -73,14 +77,14 @@ function SortWrapper({
           className={clsx(
             'fa',
             'space-left',
-            isSortedDesc ? 'fa-sort-alpha-up' : 'fa-sort-alpha-down'
+            isSortedDesc ? 'fa-sort-alpha-up' : 'fa-sort-alpha-down',
+            styles.sortIcon
           )}
-          style={{ width: '1em' }}
           aria-hidden="true"
         />
       ) : (
-        <div style={{ width: '1em', height: '1em', display: 'inline-block' }} />
+        <div className={styles.sortIcon} />
       )}
-    </button>
+    </Button>
   );
 }

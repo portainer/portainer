@@ -39,10 +39,7 @@ export function ContainerQuickActions({
   );
 
   return (
-    <div
-      className={clsx('btn-group btn-group-xs space-x-1', styles.root)}
-      role="group"
-    >
+    <div className={clsx('space-x-1', styles.root)}>
       {state.showQuickActionLogs && (
         <Authorized authorizations="DockerContainerLogs">
           <Link
@@ -113,10 +110,7 @@ interface TaskProps {
 
 function TaskQuickActions({ taskId, state }: TaskProps) {
   return (
-    <div
-      className={clsx('btn-group btn-group-xs space-x-1', styles.root)}
-      role="group"
-    >
+    <div className={clsx('space-x-1', styles.root)}>
       {state.showQuickActionLogs && (
         <Authorized authorizations="DockerTaskLogs">
           <Link

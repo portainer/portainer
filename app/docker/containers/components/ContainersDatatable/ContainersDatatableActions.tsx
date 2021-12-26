@@ -16,6 +16,7 @@ import {
   stopContainer,
 } from '@/docker/containers/containers.service';
 import type { EndpointId } from '@/portainer/endpoints/types';
+import { ButtonGroup, Button } from '@/portainer/components/Button';
 
 type ContainerServiceAction = (
   endpointId: EndpointId,
@@ -63,97 +64,89 @@ export function ContainersDatatableActions({
 
   return (
     <div className="actionBar">
-      <div className="btn-group space-right" role="group">
+      <ButtonGroup>
         <Authorized authorizations="DockerContainerStart">
-          <button
-            type="button"
-            className="btn btn-sm btn-success"
+          <Button
+            color="success"
             onClick={() => onStartClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasStoppedItemsSelected}
           >
             <i className="fa fa-play space-right" aria-hidden="true" />
             Start
-          </button>
+          </Button>
         </Authorized>
 
         <Authorized authorizations="DockerContainerStop">
-          <button
-            type="button"
-            className="btn btn-sm btn-danger"
+          <Button
+            color="danger"
             onClick={() => onStopClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
           >
             <i className="fa fa-stop space-right" aria-hidden="true" />
             Stop
-          </button>
+          </Button>
         </Authorized>
 
         <Authorized authorizations="DockerContainerKill">
-          <button
-            type="button"
-            className="btn btn-sm btn-danger"
+          <Button
+            color="danger"
             onClick={() => onKillClick(selectedItems)}
             disabled={selectedItemCount === 0}
           >
             <i className="fa fa-bomb space-right" aria-hidden="true" />
             Kill
-          </button>
+          </Button>
         </Authorized>
 
         <Authorized authorizations="DockerContainerRestart">
-          <button
-            type="button"
-            className="btn btn-sm btn-primary"
+          <Button
             onClick={() => onRestartClick(selectedItems)}
             disabled={selectedItemCount === 0}
           >
             <i className="fa fa-sync space-right" aria-hidden="true" />
             Restart
-          </button>
+          </Button>
         </Authorized>
 
         <Authorized authorizations="DockerContainerPause">
-          <button
-            type="button"
-            className="btn btn-sm btn-primary"
+          <Button
             onClick={() => onPauseClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
           >
             <i className="fa fa-pause space-right" aria-hidden="true" />
             Pause
-          </button>
+          </Button>
         </Authorized>
 
         <Authorized authorizations="DockerContainerUnpause">
-          <button
-            type="button"
-            className="btn btn-sm btn-primary"
+          <Button
             onClick={() => onResumeClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasPausedItemsSelected}
           >
             <i className="fa fa-play space-right" aria-hidden="true" />
             Resume
-          </button>
+          </Button>
         </Authorized>
 
         <Authorized authorizations="DockerContainerDelete">
-          <button
-            type="button"
-            className="btn btn-sm btn-danger"
+          <Button
+            color="danger"
             onClick={() => onRemoveClick(selectedItems)}
             disabled={selectedItemCount === 0}
           >
             <i className="fa fa-trash-alt space-right" aria-hidden="true" />
             Remove
-          </button>
+          </Button>
         </Authorized>
-      </div>
+      </ButtonGroup>
 
       {isAddActionVisible && (
         <Authorized authorizations="DockerContainerCreate">
-          <Link to="docker.containers.new" className="btn btn-sm btn-primary">
-            <i className="fa fa-plus space-right" aria-hidden="true" />
-            Add container
+          <Link to="docker.containers.new" className="space-left">
+            <Button>
+              <i className="fa fa-plus space-right" aria-hidden="true" />
+              Add container
+            </Button>
           </Link>
         </Authorized>
       )}
