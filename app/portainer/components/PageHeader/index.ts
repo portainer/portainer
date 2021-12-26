@@ -1,10 +1,12 @@
 import angular from 'angular';
 
-import { Header, HeaderAngular } from './Header';
+import { Breadcrumbs } from './Breadcrumbs';
+import { PageHeader } from './PageHeader';
+import { HeaderContainer, HeaderAngular } from './HeaderContainer';
 import { HeaderContent, HeaderContentAngular } from './HeaderContent';
 import { HeaderTitle, HeaderTitleAngular } from './HeaderTitle';
 
-export { Header, HeaderTitle, HeaderContent };
+export { PageHeader, Breadcrumbs, HeaderContainer, HeaderContent, HeaderTitle };
 
 export default angular
   .module('portainer.app.components.header', [])

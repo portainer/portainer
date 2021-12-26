@@ -5,14 +5,11 @@ import { Link } from '@/portainer/components/Link';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 
-import { Header } from './Header';
-import { Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
-
-import { HeaderContent, HeaderTitle } from '.';
+import { PageHeader } from './PageHeader';
 
 export default {
-  component: Header,
-  title: 'Components/Header',
+  component: PageHeader,
+  title: 'Components/PageHeader',
 } as Meta;
 
 interface StoryProps {
@@ -27,15 +24,12 @@ function Template({ title }: StoryProps) {
 
   return (
     <UserContext.Provider value={state}>
-      <Header>
-        <HeaderTitle title={title} />
-        <HeaderContent>
-          <Breadcrumbs>
-            <Link to="example">Container instances</Link>
-            Add container
-          </Breadcrumbs>
-        </HeaderContent>
-      </Header>
+      <PageHeader title={title}>
+        <Link to="example">bread1</Link>
+        <Link to="example">bread2</Link>
+        <span>bread3</span>
+        bread4 and bread5
+      </PageHeader>
     </UserContext.Provider>
   );
 }
