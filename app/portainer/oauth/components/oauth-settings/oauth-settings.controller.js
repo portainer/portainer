@@ -33,6 +33,7 @@ export default class OAuthSettingsController {
     this.settings.AuthorizationURI = `https://login.microsoftonline.com/${tenantID}/oauth2/authorize`;
     this.settings.AccessTokenURI = `https://login.microsoftonline.com/${tenantID}/oauth2/token`;
     this.settings.ResourceURI = `https://graph.windows.net/${tenantID}/me?api-version=2013-11-08`;
+    this.settings.LogoutURI = `https://login.microsoftonline.com/${tenantID}/oauth2/logout`;
   }
 
   useDefaultProviderConfiguration(providerId) {
