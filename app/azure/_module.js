@@ -1,4 +1,8 @@
-angular.module('portainer.azure', ['portainer.app']).config([
+import angular from 'angular';
+
+import { containerInstancesModule } from './ContainerInstances';
+
+angular.module('portainer.azure', ['portainer.app', containerInstancesModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -53,8 +57,7 @@ angular.module('portainer.azure', ['portainer.app']).config([
       url: '/new/',
       views: {
         'content@': {
-          templateUrl: './views/containerinstances/create/createcontainerinstance.html',
-          controller: 'AzureCreateContainerInstanceController',
+          component: 'createContainerInstanceView',
         },
       },
     };

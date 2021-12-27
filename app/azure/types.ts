@@ -1,16 +1,20 @@
-import { PortMapping } from './ContainerInstances/PortsMappingField';
+import { AccessControlFormData } from '@/portainer/components/accessControlForm/model';
 
+import { PortMapping } from './ContainerInstances/CreateContainerInstanceForm/PortsMappingField';
+
+type OS = 'Linux' | 'Windows';
 export interface ContainerInstanceFormValues {
   name: string;
-  location: string;
-  subscription: string;
-  resourceGroup: string;
+  location?: string;
+  subscription?: string;
+  resourceGroup?: string;
   image: string;
-  os: string;
+  os: OS;
   memory: number;
   cpu: number;
   ports: PortMapping[];
   allocatePublicIP: boolean;
+  accessControl: AccessControlFormData;
 }
 
 export interface ContainerGroup {
