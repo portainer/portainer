@@ -1,4 +1,6 @@
+import { ResourceGroupViewModel } from '../models/resource_group';
 import { SubscriptionViewModel } from '../models/subscription';
+import { getResourceGroups } from './resource-groups.service';
 import { getSubscriptions } from './subscription.service';
 
 angular.module('portainer.azure').factory('AzureService', AzureService);
@@ -28,8 +30,15 @@ export function AzureService($q, Azure, $async, EndpointProvider, ResourceGroupS
     return retrieveResourcesForEachSubscription(subscriptions, ProviderService.containerInstanceProvider);
   };
 
-  service.resourceGroups = function (subscriptions) {
-    return retrieveResourcesForEachSubscription(subscriptions, ResourceGroupService.resourceGroups);
+  service.resourceGroups = function resourceGroups(subscriptions) {
+    return $async(async () => {
+      return retrieveResourcesForEachSubscription(subscriptions, async (subscriptionId) => {
+        const environmentId = EndpointProvider.endpointID();
+
+        const resourceGroups = await getResourceGroups(environmentId, subscriptionId);
+        return resourceGroups.map((r) => new ResourceGroupViewModel(r, subscriptionId));
+      });
+    });
   };
 
   service.containerGroups = function (subscriptions) {
