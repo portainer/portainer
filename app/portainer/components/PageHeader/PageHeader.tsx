@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 
 import { Button } from '../Button';
 
-import { Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
+import { Breadcrumbs } from './Breadcrumbs';
 import { HeaderContainer } from './HeaderContainer';
 import { HeaderContent } from './HeaderContent';
 import { HeaderTitle } from './HeaderTitle';

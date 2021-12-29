@@ -6,7 +6,7 @@ import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 
 import { HeaderContainer } from './HeaderContainer';
-import { Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
+import { Breadcrumbs } from './Breadcrumbs';
 import { HeaderTitle } from './HeaderTitle';
 import { HeaderContent } from './HeaderContent';
 
