@@ -10,12 +10,14 @@ export async function getResourceGroups(
   subscriptionId: string
 ) {
   try {
-    const { data } = await axios.get<{ value: ResourceGroup[] }>(
+    const {
+      data: { value },
+    } = await axios.get<{ value: ResourceGroup[] }>(
       buildUrl(environmentId, subscriptionId),
       { params: { 'api-version': '2018-02-01' } }
     );
 
-    return data.value;
+    return value;
   } catch (err) {
     throw parseAxiosError(
       err as Error,

@@ -2,42 +2,37 @@ import { Field, Form, Formik } from 'formik';
 
 import { FormControl } from '@/portainer/components/form-components/FormControl';
 import { Input, Select } from '@/portainer/components/form-components/Input';
-import { Option } from '@/portainer/components/form-components/Input/Select';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { InputListError } from '@/portainer/components/form-components/InputList/InputList';
 import { AccessControlForm } from '@/portainer/components/accessControlForm';
-import { parseFromResourceControl } from '@/portainer/components/accessControlForm/model';
-import { ContainerInstanceFormValues } from '@/azure/types';
 
 import { validationSchema } from './CreateContainerInstanceForm.validation';
 import { PortMapping, PortsMappingField } from './PortsMappingField';
+import { useLoadFormState } from './useLoadFormState';
+import {
+  getSubscriptionLocations,
+  getSubscriptionResourceGroups,
+} from './utils';
 
 export function CreateContainerInstanceForm() {
-  const isAdmin = true;
+  const {
+    initialValues,
+    isLoading,
+    providers,
+    subscriptions,
+    resourceGroups,
+    isUserAdmin,
+  } = useLoadFormState();
 
-  const initialValues: ContainerInstanceFormValues = {
-    name: '',
-    location: '',
-    subscription: '',
-    resourceGroup: '',
-    image: '',
-    os: 'Linux',
-    memory: 1,
-    cpu: 1,
-    ports: [],
-    allocatePublicIP: true,
-    accessControl: parseFromResourceControl(isAdmin),
-  };
-
-  const subscriptions: Option<string>[] = [];
-  const resourceGroups: Option<string>[] = [];
-  const locations: Option<string>[] = [];
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={() => validationSchema(isAdmin)}
+      validationSchema={() => validationSchema(isUserAdmin)}
       onSubmit={onSubmit}
       validateOnMount
       validateOnChange
@@ -74,7 +69,10 @@ export function CreateContainerInstanceForm() {
               name="resourceGroup"
               as={Select}
               id="resourceGroup-input"
-              options={resourceGroups}
+              options={getSubscriptionResourceGroups(
+                values.subscription,
+                resourceGroups
+              )}
             />
           </FormControl>
 
@@ -87,7 +85,7 @@ export function CreateContainerInstanceForm() {
               name="location"
               as={Select}
               id="location-input"
-              options={locations}
+              options={getSubscriptionLocations(values.subscription, providers)}
             />
           </FormControl>
 

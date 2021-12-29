@@ -1,6 +1,6 @@
 import { ResourceGroupViewModel } from '../models/resource_group';
 import { SubscriptionViewModel } from '../models/subscription';
-import { getContainerInstanceProviders } from './provider.service';
+import { getContainerInstanceProvider } from './provider.service';
 import { getResourceGroups } from './resource-groups.service';
 import { getSubscriptions } from './subscription.service';
 
@@ -32,7 +32,7 @@ export function AzureService($q, Azure, $async, EndpointProvider, ContainerGroup
       return retrieveResourcesForEachSubscription(subscriptions, async (subscriptionId) => {
         const environmentId = EndpointProvider.endpointID();
 
-        return await getContainerInstanceProviders(environmentId, subscriptionId);
+        return await getContainerInstanceProvider(environmentId, subscriptionId);
       });
     });
   };
@@ -52,10 +52,10 @@ export function AzureService($q, Azure, $async, EndpointProvider, ContainerGroup
     return retrieveResourcesForEachSubscription(subscriptions, ContainerGroupService.containerGroups);
   };
 
-  service.aggregate = function (resourcesBySubcription) {
+  service.aggregate = function (resourcesBySubscription) {
     var aggregatedResources = [];
-    Object.keys(resourcesBySubcription).forEach(function (key) {
-      aggregatedResources = aggregatedResources.concat(resourcesBySubcription[key]);
+    Object.keys(resourcesBySubscription).forEach(function (key) {
+      aggregatedResources = aggregatedResources.concat(resourcesBySubscription[key]);
     });
     return aggregatedResources;
   };

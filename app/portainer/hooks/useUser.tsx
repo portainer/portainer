@@ -125,6 +125,6 @@ export function UserProvider({ children }: UserProviderProps) {
   }
 }
 
-function isAdmin(user?: UserViewModel | null) {
+export function isAdmin(user?: UserViewModel | null): boolean {
   return !!user && user.Role === 1;
 }

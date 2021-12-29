@@ -30,6 +30,7 @@ export interface ResourceGroup {
   id: string;
   name: string;
   location: string;
+  subscriptionId: string;
 }
 
 interface ResourceType {
@@ -37,7 +38,7 @@ interface ResourceType {
   locations: string[];
 }
 
-export interface Provider {
+export interface ProviderResponse {
   id: string;
   namespace: string;
   resourceTypes: ResourceType[];
