@@ -37,7 +37,7 @@ import type {
   ContainersTableSettings,
   DockerContainer,
 } from '@/docker/containers/types';
-import { useEndpoint } from '@/portainer/endpoints/useEndpoint';
+import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
 import { Checkbox } from '@/portainer/components/form-components/Checkbox';
 import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
@@ -68,7 +68,7 @@ export function ContainersDatatable({
 
   const columns = useColumns();
 
-  const endpoint = useEndpoint();
+  const endpoint = useEnvironment();
 
   useRepeater(settings.autoRefreshRate, onRefresh);
 

@@ -1,4 +1,4 @@
-import { EndpointId } from '@/portainer/endpoints/types';
+import { EnvironmentId } from '@/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 import axios from '@/portainer/services/axios';
 
@@ -6,7 +6,10 @@ import { genericHandler } from '../rest/response/handlers';
 
 import { ContainerId, DockerContainer } from './types';
 
-export async function startContainer(endpointId: EndpointId, id: ContainerId) {
+export async function startContainer(
+  endpointId: EnvironmentId,
+  id: ContainerId
+) {
   await axios.post<void>(
     urlBuilder(endpointId, id, 'start'),
     {},
@@ -14,31 +17,43 @@ export async function startContainer(endpointId: EndpointId, id: ContainerId) {
   );
 }
 
-export async function stopContainer(endpointId: EndpointId, id: ContainerId) {
+export async function stopContainer(
+  endpointId: EnvironmentId,
+  id: ContainerId
+) {
   await axios.post<void>(urlBuilder(endpointId, id, 'stop'), {});
 }
 
 export async function restartContainer(
-  endpointId: EndpointId,
+  endpointId: EnvironmentId,
   id: ContainerId
 ) {
   await axios.post<void>(urlBuilder(endpointId, id, 'restart'), {});
 }
 
-export async function killContainer(endpointId: EndpointId, id: ContainerId) {
+export async function killContainer(
+  endpointId: EnvironmentId,
+  id: ContainerId
+) {
   await axios.post<void>(urlBuilder(endpointId, id, 'kill'), {});
 }
 
-export async function pauseContainer(endpointId: EndpointId, id: ContainerId) {
+export async function pauseContainer(
+  endpointId: EnvironmentId,
+  id: ContainerId
+) {
   await axios.post<void>(urlBuilder(endpointId, id, 'pause'), {});
 }
 
-export async function resumeContainer(endpointId: EndpointId, id: ContainerId) {
+export async function resumeContainer(
+  endpointId: EnvironmentId,
+  id: ContainerId
+) {
   await axios.post<void>(urlBuilder(endpointId, id, 'unpause'), {});
 }
 
 export async function renameContainer(
-  endpointId: EndpointId,
+  endpointId: EnvironmentId,
   id: ContainerId,
   name: string
 ) {
@@ -50,7 +65,7 @@ export async function renameContainer(
 }
 
 export async function removeContainer(
-  endpointId: EndpointId,
+  endpointId: EnvironmentId,
   container: DockerContainer,
   removeVolumes: boolean
 ) {
@@ -71,7 +86,11 @@ export async function removeContainer(
   }
 }
 
-function urlBuilder(endpointId: EndpointId, id: ContainerId, action?: string) {
+function urlBuilder(
+  endpointId: EnvironmentId,
+  id: ContainerId,
+  action?: string
+) {
   const url = `/endpoints/${endpointId}/docker/containers/${id}`;
 
   if (action) {

@@ -15,18 +15,18 @@ import {
   startContainer,
   stopContainer,
 } from '@/docker/containers/containers.service';
-import type { EndpointId } from '@/portainer/endpoints/types';
+import type { EnvironmentId } from '@/portainer/environments/types';
 import { ButtonGroup, Button } from '@/portainer/components/Button';
 
 type ContainerServiceAction = (
-  endpointId: EndpointId,
+  endpointId: EnvironmentId,
   containerId: ContainerId
 ) => Promise<void>;
 
 interface Props {
   selectedItems: DockerContainer[];
   isAddActionVisible: boolean;
-  endpointId: EndpointId;
+  endpointId: EnvironmentId;
 }
 
 export function ContainersDatatableActions({

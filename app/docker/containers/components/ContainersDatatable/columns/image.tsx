@@ -1,8 +1,8 @@
 import { Column } from 'react-table';
 import { useSref } from '@uirouter/react';
 
-import { useEndpoint } from '@/portainer/endpoints/useEndpoint';
-import { EndpointStatus } from '@/portainer/endpoints/types';
+import { useEnvironment } from '@/portainer/environments/useEnvironment';
+import { EnvironmentStatus } from '@/portainer/environments/types';
 import type { DockerContainer } from '@/docker/containers/types';
 
 export const image: Column<DockerContainer> = {
@@ -21,8 +21,8 @@ interface Props {
 }
 
 function ImageCell({ value: imageName }: Props) {
-  const endpoint = useEndpoint();
-  const offlineMode = endpoint.Status !== EndpointStatus.Up;
+  const endpoint = useEnvironment();
+  const offlineMode = endpoint.Status !== EnvironmentStatus.Up;
 
   const shortImageName = trimSHASum(imageName);
 

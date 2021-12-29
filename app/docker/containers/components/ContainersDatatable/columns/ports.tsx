@@ -1,7 +1,7 @@
 import { Column } from 'react-table';
 import _ from 'lodash-es';
 
-import { useEndpoint } from '@/portainer/endpoints/useEndpoint';
+import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import type { DockerContainer, Port } from '@/docker/containers/types';
 
 export const ports: Column<DockerContainer> = {
@@ -20,7 +20,7 @@ interface Props {
 }
 
 function PortsCell({ value: ports }: Props) {
-  const { PublicURL: publicUrl } = useEndpoint();
+  const { PublicURL: publicUrl } = useEnvironment();
 
   if (ports.length === 0) {
     return '-';
