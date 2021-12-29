@@ -1,7 +1,6 @@
 import { Meta, Story } from '@storybook/react';
 import { useMemo } from 'react';
 
-import { Link } from '@/portainer/components/Link';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 
@@ -30,10 +29,12 @@ function Template({ title }: StoryProps) {
       <HeaderContainer>
         <HeaderTitle title={title} />
         <HeaderContent>
-          <Breadcrumbs>
-            <Link to="example">Container instances</Link>
-            Add container
-          </Breadcrumbs>
+          <Breadcrumbs
+            breadcrumbs={[
+              { link: 'example', label: 'crumb1' },
+              { label: 'crumb2' },
+            ]}
+          />
         </HeaderContent>
       </HeaderContainer>
     </UserContext.Provider>

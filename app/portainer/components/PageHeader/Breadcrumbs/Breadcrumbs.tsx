@@ -1,21 +1,39 @@
-import { Children, ReactNode, Fragment } from 'react';
+import { Fragment } from 'react';
+
+import { Link } from '@/portainer/components/Link';
 
 import './Breadcrumbs.css';
 
+export interface Crumb {
+  label: string;
+  link?: string;
+  linkParams?: Record<string, unknown>;
+}
 interface Props {
-  children: ReactNode | ReactNode[];
+  breadcrumbs: Crumb[];
 }
 
-export function Breadcrumbs({ children }: Props) {
-  const count = Children.count(children);
+export function Breadcrumbs({ breadcrumbs }: Props) {
   return (
     <div className="breadcrumb-links">
-      {Children.toArray(children).map((child, index) => (
+      {breadcrumbs.map((crumb, index) => (
         <Fragment key={index}>
-          {child}
-          {index !== count - 1 ? ' > ' : ''}
+          {renderCrumb(crumb)}
+          {index !== breadcrumbs.length - 1 ? ' > ' : ''}
         </Fragment>
       ))}
     </div>
   );
+}
+
+function renderCrumb(crumb: Crumb) {
+  if (crumb.link) {
+    return (
+      <Link to={crumb.link} params={crumb.linkParams}>
+        {crumb.label}
+      </Link>
+    );
+  }
+
+  return crumb.label;
 }

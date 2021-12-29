@@ -1,20 +1,20 @@
 import { useRouter } from '@uirouter/react';
-import { ReactNode } from 'react';
 
 import { Button } from '../Button';
 
 import { Breadcrumbs } from './Breadcrumbs';
+import { Crumb } from './Breadcrumbs/Breadcrumbs';
 import { HeaderContainer } from './HeaderContainer';
 import { HeaderContent } from './HeaderContent';
 import { HeaderTitle } from './HeaderTitle';
 
 interface Props {
   reload?: boolean;
-  children?: ReactNode | ReactNode[];
+  breadcrumbs: Crumb[];
   title: string;
 }
 
-export function PageHeader({ title, children, reload }: Props) {
+export function PageHeader({ title, breadcrumbs, reload }: Props) {
   const router = useRouter();
   return (
     <HeaderContainer>
@@ -26,7 +26,7 @@ export function PageHeader({ title, children, reload }: Props) {
         )}
       </HeaderTitle>
       <HeaderContent>
-        {!!children && <Breadcrumbs>{children}</Breadcrumbs>}
+        <Breadcrumbs breadcrumbs={breadcrumbs} />
       </HeaderContent>
     </HeaderContainer>
   );

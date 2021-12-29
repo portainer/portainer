@@ -1,7 +1,6 @@
 import { Meta, Story } from '@storybook/react';
 import { useMemo } from 'react';
 
-import { Link } from '@/portainer/components/Link';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 
@@ -24,12 +23,15 @@ function Template({ title }: StoryProps) {
 
   return (
     <UserContext.Provider value={state}>
-      <PageHeader title={title}>
-        <Link to="example">bread1</Link>
-        <Link to="example">bread2</Link>
-        <span>bread3</span>
-        bread4 and bread5
-      </PageHeader>
+      <PageHeader
+        title={title}
+        breadcrumbs={[
+          { link: 'example', label: 'bread1' },
+          { link: 'example2', label: 'bread2' },
+          { label: 'bread3' },
+          { label: 'bread4' },
+        ]}
+      />
     </UserContext.Provider>
   );
 }
