@@ -6,7 +6,7 @@ import { useUser } from '@/portainer/hooks/useUser';
 
 import controller from './HeaderContent.controller';
 import styles from './HeaderContent.module.css';
-import { useHeaderContext } from './Header';
+import { useHeaderContext } from './HeaderContainer';
 
 export function HeaderContent({ children }: PropsWithChildren<unknown>) {
   useHeaderContext();
