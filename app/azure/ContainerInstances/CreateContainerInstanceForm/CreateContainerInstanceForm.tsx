@@ -1,4 +1,5 @@
 import { Field, Form, Formik } from 'formik';
+import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 
 import { FormControl } from '@/portainer/components/form-components/FormControl';
 import { Input, Select } from '@/portainer/components/form-components/Input';
@@ -6,6 +7,9 @@ import { FormSectionTitle } from '@/portainer/components/form-components/FormSec
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { InputListError } from '@/portainer/components/form-components/InputList/InputList';
 import { AccessControlForm } from '@/portainer/components/accessControlForm';
+import { ContainerInstanceFormValues } from '@/azure/types';
+import * as notifications from '@/portainer/services/notifications';
+import { isAdmin, useUser } from '@/portainer/hooks/useUser';
 
 import { validationSchema } from './CreateContainerInstanceForm.validation';
 import { PortMapping, PortsMappingField } from './PortsMappingField';
@@ -14,23 +18,33 @@ import {
   getSubscriptionLocations,
   getSubscriptionResourceGroups,
 } from './utils';
+import { useCreateInstance } from './useCreateInstanceMutation';
 
 export function CreateContainerInstanceForm() {
   const {
-    initialValues,
-    isLoading,
-    providers,
-    subscriptions,
+    params: { endpointId: environmentId },
+  } = useCurrentStateAndParams();
+
+  const { user } = useUser();
+  const isUserAdmin = isAdmin(user);
+
+  const { initialValues, isLoading, providers, subscriptions, resourceGroups } =
+    useLoadFormState(environmentId, isUserAdmin);
+
+  const router = useRouter();
+
+  const { mutateAsync } = useCreateInstance(
     resourceGroups,
-    isUserAdmin,
-  } = useLoadFormState();
+    environmentId,
+    user?.Id
+  );
 
   if (isLoading) {
     return null;
   }
 
   return (
-    <Formik
+    <Formik<ContainerInstanceFormValues>
       initialValues={initialValues}
       validationSchema={() => validationSchema(isUserAdmin)}
       onSubmit={onSubmit}
@@ -47,6 +61,7 @@ export function CreateContainerInstanceForm() {
         setFieldValue,
       }) => (
         <Form className="form-horizontal" onSubmit={handleSubmit} noValidate>
+          <FormSectionTitle>Azure settings</FormSectionTitle>
           <FormControl
             label="Subscription"
             inputId="subscription-input"
@@ -179,5 +194,13 @@ export function CreateContainerInstanceForm() {
     </Formik>
   );
 
-  function onSubmit() {}
+  async function onSubmit(values: ContainerInstanceFormValues) {
+    try {
+      await mutateAsync(values);
+      notifications.success('Container successfully created', values.name);
+      router.stateService.go('azure.containerinstances');
+    } catch (e) {
+      notifications.error('Failure', e as Error, 'Unable to create container');
+    }
+  }
 }

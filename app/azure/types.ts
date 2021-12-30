@@ -1,8 +1,10 @@
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/model';
+import { ResourceControlResponse } from '@/portainer/models/resourceControl/resourceControl';
 
 import { PortMapping } from './ContainerInstances/CreateContainerInstanceForm/PortsMappingField';
 
 type OS = 'Linux' | 'Windows';
+
 export interface ContainerInstanceFormValues {
   name: string;
   location?: string;
@@ -17,8 +19,44 @@ export interface ContainerInstanceFormValues {
   accessControl: AccessControlFormData;
 }
 
-export interface ContainerGroup {
+interface PortainerMetadata {
+  ResourceControl: ResourceControlResponse;
+}
+
+interface Container {
   name: string;
+  properties: {
+    environmentVariables: unknown[];
+    image: string;
+    ports: { port: number }[];
+    resources: {
+      cpu: number;
+      memoryInGB: number;
+    };
+  };
+}
+
+interface ContainerGroupProperties {
+  containers: Container[];
+  instanceView: {
+    events: unknown[];
+    state: 'pending' | string;
+  };
+  ipAddress: {
+    dnsNameLabelReusePolicy: string;
+    ports: { port: number; protocol: 'TCP' | 'UDP' }[];
+    type: 'Public' | 'Private';
+  };
+  osType: OS;
+}
+
+export interface ContainerGroup {
+  id: string;
+  name: string;
+  location: string;
+  type: string;
+  properties: ContainerGroupProperties;
+  Portainer: PortainerMetadata;
 }
 
 export interface Subscription {

@@ -1,5 +1,4 @@
 import { useQueries, useQuery } from 'react-query';
-import { useCurrentStateAndParams } from '@uirouter/react';
 import { useEffect } from 'react';
 
 import * as notifications from '@/portainer/services/notifications';
@@ -10,7 +9,6 @@ import { getResourceGroups } from '@/azure/services/resource-groups.service';
 import { getSubscriptions } from '@/azure/services/subscription.service';
 import { getContainerInstanceProvider } from '@/azure/services/provider.service';
 import { ContainerInstanceFormValues, Subscription } from '@/azure/types';
-import { useUser } from '@/portainer/hooks/useUser';
 import { parseFromResourceControl } from '@/portainer/components/accessControlForm/model';
 
 import {
@@ -18,14 +16,10 @@ import {
   getSubscriptionResourceGroups,
 } from './utils';
 
-export function useLoadFormState() {
-  const {
-    params: { endpointId: environmentId },
-  } = useCurrentStateAndParams();
-
-  const user = useUser();
-  const isUserAdmin = isAdmin(user);
-
+export function useLoadFormState(
+  environmentId: EnvironmentId,
+  isUserAdmin: boolean
+) {
   const { subscriptions, isLoading: isLoadingSubscriptions } =
     useSubscriptions(environmentId);
   const { resourceGroups, isLoading: isLoadingResourceGroups } =
