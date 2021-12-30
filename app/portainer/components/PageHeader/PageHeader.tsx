@@ -10,11 +10,11 @@ import { HeaderTitle } from './HeaderTitle';
 
 interface Props {
   reload?: boolean;
-  breadcrumbs: Crumb[];
+  breadcrumbs?: Crumb[];
   title: string;
 }
 
-export function PageHeader({ title, breadcrumbs, reload }: Props) {
+export function PageHeader({ title, breadcrumbs = [], reload }: Props) {
   const router = useRouter();
   return (
     <HeaderContainer>

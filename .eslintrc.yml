@@ -94,3 +94,5 @@ overrides:
       - 'plugin:jest/style'
     env:
       'jest/globals': true
+    rules:
+      'react/jsx-no-constructed-context-values': off
