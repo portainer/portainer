@@ -10,7 +10,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/fdo/ownerclient"
+	"github.com/portainer/portainer/api/hostmanagement/fdo"
 	"github.com/sirupsen/logrus"
 )
 
@@ -45,13 +45,13 @@ func (handler *Handler) saveSettings(config portainer.FDOConfiguration) error {
 	return handler.DataStore.Settings().UpdateSettings(settings)
 }
 
-func (handler *Handler) newFDOClient() (ownerclient.FDOOwnerClient, error) {
+func (handler *Handler) newFDOClient() (fdo.FDOOwnerClient, error) {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return ownerclient.FDOOwnerClient{}, err
+		return fdo.FDOOwnerClient{}, err
 	}
 
-	return ownerclient.FDOOwnerClient{
+	return fdo.FDOOwnerClient{
 		OwnerURL: settings.FDOConfiguration.OwnerURL,
 		Username: settings.FDOConfiguration.OwnerUsername,
 		Password: settings.FDOConfiguration.OwnerPassword,
