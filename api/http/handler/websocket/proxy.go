@@ -12,7 +12,10 @@ import (
 )
 
 func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	tunnel := handler.ReverseTunnelService.GetTunnelDetails(params.endpoint.ID)
+	tunnel, err := handler.ReverseTunnelService.GetActiveTunnel(params.endpoint)
+	if err != nil {
+		return err
+	}
 
 	endpointURL, err := url.Parse(fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port))
 	if err != nil {
@@ -22,11 +25,22 @@ func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r 
 	endpointURL.Scheme = "ws"
 	proxy := websocketproxy.NewProxy(endpointURL)
 
+	signature, err := handler.SignatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return err
+	}
+
 	proxy.Director = func(incoming *http.Request, out http.Header) {
+		out.Set(portainer.PortainerAgentPublicKeyHeader, handler.SignatureService.EncodedPublicKey())
+		out.Set(portainer.PortainerAgentSignatureHeader, signature)
 		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
+		out.Set(portainer.PortainerAgentKubernetesSATokenHeader, params.token)
 	}
 
 	handler.ReverseTunnelService.SetTunnelStatusToActive(params.endpoint.ID)
+
+	handler.ReverseTunnelService.KeepTunnelAlive(params.endpoint.ID, r.Context(), portainer.WebSocketKeepAlive)
+
 	proxy.ServeHTTP(w, r)
 
 	return nil
@@ -64,6 +78,7 @@ func (handler *Handler) proxyAgentWebsocketRequest(w http.ResponseWriter, r *htt
 		out.Set(portainer.PortainerAgentPublicKeyHeader, handler.SignatureService.EncodedPublicKey())
 		out.Set(portainer.PortainerAgentSignatureHeader, signature)
 		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
+		out.Set(portainer.PortainerAgentKubernetesSATokenHeader, params.token)
 	}
 
 	proxy.ServeHTTP(w, r)

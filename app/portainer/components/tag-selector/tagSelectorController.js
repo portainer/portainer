@@ -29,16 +29,16 @@ class TagSelectorController {
   filterTags(searchValue) {
     let filteredTags = _.filter(this.tags, (tag) => !_.includes(this.model, tag.Id));
     if (!searchValue) {
-      return filteredTags.slice(0, 7);
+      return filteredTags;
     }
 
     const exactTag = _.find(this.tags, (tag) => tag.Name === searchValue);
     filteredTags = _.filter(filteredTags, (tag) => _.includes(tag.Name.toLowerCase(), searchValue.toLowerCase()));
     if (exactTag || !this.allowCreate) {
-      return filteredTags.slice(0, 7);
+      return filteredTags;
     }
 
-    return filteredTags.slice(0, 6).concat({ Name: `Create "${searchValue}"`, create: true, value: searchValue });
+    return filteredTags.concat({ Name: `Create "${searchValue}"`, create: true, value: searchValue });
   }
 
   generateSelectedTags(model, tags) {

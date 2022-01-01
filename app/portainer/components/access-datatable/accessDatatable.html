@@ -3,7 +3,7 @@
     <rd-widget-header icon="{{ $ctrl.titleIcon }}" title-text="{{ $ctrl.titleText }}"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
       <div class="toolBar small" ng-if="$ctrl.inheritFrom">
-        Access tagged as <code>inherited</code> are inherited from the group access. They cannot be removed or modified at the endpoint level but they can be overriden.
+        Access tagged as <code>inherited</code> are inherited from the group access. They cannot be removed or modified at the environment level but they can be overriden.
       </div>
       <div class="toolBar small" ng-if="$ctrl.inheritFrom"> Access tagged as <code>override</code> are overriding the group access for the related users/teams. </div>
       <div class="actionBar">
@@ -81,7 +81,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

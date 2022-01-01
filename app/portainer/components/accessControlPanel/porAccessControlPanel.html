@@ -18,7 +18,7 @@
                   {{ $ctrl.resourceControl.Ownership }}
                   <portainer-tooltip
                     ng-if="$ctrl.resourceControl.Ownership === $ctrl.RCO.PUBLIC"
-                    message="This resource can be managed by any user with access to this endpoint."
+                    message="This resource can be managed by any user with access to this environment."
                     position="bottom"
                     style="margin-left: -3px;"
                   ></portainer-tooltip>
@@ -145,7 +145,7 @@
                         <i ng-class="'public' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
                         Public
                       </div>
-                      <p>I want any user with access to this endpoint to be able to manage this resource</p>
+                      <p>I want any user with access to this environment to be able to manage this resource</p>
                     </label>
                   </div>
                 </div>

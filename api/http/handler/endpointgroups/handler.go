@@ -3,19 +3,22 @@ package endpointgroups
 import (
 	"net/http"
 
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/internal/authorization"
+
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle endpoint group operations.
+// Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
-	DataStore portainer.DataStore
+	AuthorizationService *authorization.Service
+	DataStore            dataservices.DataStore
 }
 
-// NewHandler creates a handler to manage endpoint group operations.
+// NewHandler creates a handler to manage environment(endpoint) group operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),

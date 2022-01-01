@@ -4,6 +4,7 @@
       <div class="toolBar">
         <div class="toolBarTitle"><i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
         <div class="settings">
+          <datatable-columns-visibility columns="$ctrl.columnVisibility.columns" on-change="($ctrl.onColumnVisibilityChange)"></datatable-columns-visibility>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
@@ -13,6 +14,10 @@
                 </div>
                 <div class="menuContent">
                   <div>
+                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                      <input id="setting_all_orphaned_stacks" type="checkbox" ng-model="$ctrl.settings.allOrphanedStacks" ng-change="$ctrl.onSettingsAllOrphanedStacksChange()" />
+                      <label for="setting_all_orphaned_stacks">Show all orphaned stacks</label>
+                    </div>
                     <div class="md-checkbox">
                       <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
                       <label for="setting_auto_refresh">Auto refresh</label>
@@ -49,10 +54,18 @@
           authorization="PortainerStackDelete"
           ng-disabled="$ctrl.state.selectedItemCount === 0"
           ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          data-cy="stack-removeStackButton"
         >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button ng-disabled="!$ctrl.createEnabled" type="button" class="btn btn-sm btn-primary" ui-sref="docker.stacks.newstack" authorization="PortainerStackCreate">
+        <button
+          ng-disabled="!$ctrl.createEnabled"
+          type="button"
+          class="btn btn-sm btn-primary"
+          ui-sref="docker.stacks.newstack"
+          authorization="PortainerStackCreate"
+          data-cy="stack-addStackButton"
+        >
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack
         </button>
       </div>
@@ -66,10 +79,11 @@
           placeholder="Search..."
           auto-focus
           ng-model-options="{ debounce: 300 }"
+          data-cy="stack-searchInput"
         />
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table table-hover nowrap-cells" data-cy="stack-stackTable">
           <thead>
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
@@ -118,6 +132,20 @@
               </th>
               <th>Control</th>
               <th>
+                <a ng-click="$ctrl.changeOrderBy('ResourceControl.CreationDate')">
+                  Created
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th ng-if="$ctrl.columnVisibility.columns.updated.display">
+                <a ng-click="$ctrl.changeOrderBy('ResourceControl.UpdateDate')">
+                  Updated
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
@@ -136,12 +164,26 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ng-if="!$ctrl.offlineMode" ui-sref="docker.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, external: item.External })">{{ item.Name }}</a>
+                <a
+                  ng-if="!$ctrl.offlineMode"
+                  ui-sref="docker.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, regular: item.Regular, external: item.External, orphaned: item.Orphaned, orphanedRunning: item.OrphanedRunning })"
+                  >{{ item.Name }}</a
+                >
                 <span ng-if="$ctrl.offlineMode">{{ item.Name }}</span>
-                <span ng-if="item.Status == 2" style="margin-left: 10px;" class="label label-warning image-tag space-left">Inactive</span>
+                <span ng-if="item.Regular && item.Status == 2" style="margin-left: 10px;" class="label label-warning image-tag space-left">Inactive</span>
               </td>
               <td>{{ item.Type === 1 ? 'Swarm' : 'Compose' }}</td>
               <td>
+                <span
+                  ng-if="item.Orphaned"
+                  class="interactive"
+                  tooltip-append-to-body="true"
+                  tooltip-placement="bottom"
+                  tooltip-class="portainer-tooltip"
+                  uib-tooltip="This stack was created inside an environment that is no longer registered inside Portainer."
+                >
+                  Orphaned <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                </span>
                 <span
                   ng-if="item.External"
                   class="interactive"
@@ -152,7 +194,15 @@
                 >
                   Limited <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-left: 2px;"></i>
                 </span>
-                <span ng-if="!item.External">Total</span>
+                <span ng-if="item.Regular">Total</span>
+              </td>
+              <td>
+                <span ng-if="item.CreationDate">{{ item.CreationDate | getisodatefromtimestamp }} {{ item.CreatedBy ? 'by ' + item.CreatedBy : '' }}</span>
+                <span ng-if="!item.CreationDate"> - </span>
+              </td>
+              <td ng-if="$ctrl.columnVisibility.columns.updated.display">
+                <span ng-if="item.UpdateDate">{{ item.UpdateDate | getisodatefromtimestamp }} {{ item.UpdatedBy ? 'by ' + item.UpdatedBy : '' }}</span>
+                <span ng-if="!item.UpdateDate"> - </span>
               </td>
               <td>
                 <span>
@@ -161,11 +211,11 @@
                 </span>
               </td>
             </tr>
-            <tr ng-if="!$ctrl.dataset">
-              <td colspan="4" class="text-center text-muted">Loading...</td>
+            <tr ng-if="!$ctrl.dataset" data-cy="stacks-loadingTableRow">
+              <td colspan="6" class="text-center text-muted">Loading...</td>
             </tr>
-            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="4" class="text-center text-muted">No stack available.</td>
+            <tr ng-if="$ctrl.state.filteredDataSet.length === 0" data-cy="stacks-noStackTableRow">
+              <td colspan="6" class="text-center text-muted">No stack available.</td>
             </tr>
           </tbody>
         </table>
@@ -181,7 +231,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

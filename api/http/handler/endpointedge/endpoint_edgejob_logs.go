@@ -7,8 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type logsPayload struct {
@@ -19,23 +18,34 @@ func (payload *logsPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on api/endpoints/:id/edge/jobs/:jobID/logs
+// endpointEdgeJobsLogs
+// @summary Inspect an EdgeJob Log
+// @description **Access policy**: public
+// @tags edge, endpoints
+// @accept json
+// @produce json
+// @param id path string true "environment(endpoint) Id"
+// @param jobID path string true "Job Id"
+// @success 200
+// @failure 500
+// @failure 400
+// @router /endpoints/{id}/edge/jobs/{jobID}/logs [post]
 func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "jobID")
@@ -50,7 +60,7 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 	}
 
 	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an edge job with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an edge job with the specified identifier inside the database", err}

@@ -5,16 +5,35 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/portainer/portainer/api"
-
 	"github.com/portainer/libhttp/request"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// GET request on /api/endpoints?(start=<start>)&(limit=<limit>)&(search=<search>)&(groupId=<groupId)
+// @id EndpointList
+// @summary List environments(endpoints)
+// @description List all environments(endpoints) based on the current user authorizations. Will
+// @description return all environments(endpoints) if using an administrator account otherwise it will
+// @description only return authorized environments(endpoints).
+// @description **Access policy**: restricted
+// @tags endpoints
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param start query int false "Start searching from"
+// @param search query string false "Search query"
+// @param groupId query int false "List environments(endpoints) of this group"
+// @param limit query int false "Limit results to this value"
+// @param types query []int false "List environments(endpoints) of this type"
+// @param tagIds query []int false "search environments(endpoints) with these tags (depends on tagsPartialMatch)"
+// @param tagsPartialMatch query bool false "If true, will return environment(endpoint) which has one of tagIds, if false (or missing) will return only environments(endpoints) that has all the tags"
+// @param endpointIds query []int false "will return only these environments(endpoints)"
+// @success 200 {array} portainer.Endpoint "Endpoints"
+// @failure 500 "Server error"
+// @router /endpoints [get]
 func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	start, _ := request.RetrieveNumericQueryParameter(r, "start", true)
 	if start != 0 {
@@ -28,7 +47,9 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	groupID, _ := request.RetrieveNumericQueryParameter(r, "groupId", true)
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
-	endpointType, _ := request.RetrieveNumericQueryParameter(r, "type", true)
+
+	var endpointTypes []int
+	request.RetrieveJSONQueryParameter(r, "types", &endpointTypes, true)
 
 	var tagIDs []portainer.TagID
 	request.RetrieveJSONQueryParameter(r, "tagIds", &tagIDs, true)
@@ -40,12 +61,17 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from the database", err}
 	}
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
+	}
+
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -75,8 +101,8 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		filteredEndpoints = filterEndpointsBySearchCriteria(filteredEndpoints, endpointGroups, tagsMap, search)
 	}
 
-	if endpointType != 0 {
-		filteredEndpoints = filterEndpointsByType(filteredEndpoints, portainer.EndpointType(endpointType))
+	if endpointTypes != nil {
+		filteredEndpoints = filterEndpointsByTypes(filteredEndpoints, endpointTypes)
 	}
 
 	if tagIDs != nil {
@@ -89,6 +115,10 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	for idx := range paginatedEndpoints {
 		hideFields(&paginatedEndpoints[idx])
+		paginatedEndpoints[idx].ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
+		if paginatedEndpoints[idx].EdgeCheckinInterval == 0 {
+			paginatedEndpoints[idx].EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
+		}
 	}
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(filteredEndpointCount))
@@ -185,11 +215,16 @@ func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGrou
 	return false
 }
 
-func filterEndpointsByType(endpoints []portainer.Endpoint, endpointType portainer.EndpointType) []portainer.Endpoint {
+func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []int) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
+	typeSet := map[portainer.EndpointType]bool{}
+	for _, endpointType := range endpointTypes {
+		typeSet[portainer.EndpointType(endpointType)] = true
+	}
+
 	for _, endpoint := range endpoints {
-		if endpoint.Type == endpointType {
+		if typeSet[endpoint.Type] {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
 		}
 	}

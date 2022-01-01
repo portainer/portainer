@@ -1,47 +1,30 @@
 import _ from 'lodash-es';
+import { RegistryTypes } from 'Portainer/models/registryTypes';
 
 angular.module('portainer.app').controller('RegistriesController', [
   '$q',
   '$scope',
   '$state',
   'RegistryService',
-  'DockerHubService',
   'ModalService',
   'Notifications',
-  'Authentication',
-  function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, Authentication) {
+  function ($q, $scope, $state, RegistryService, ModalService, Notifications) {
     $scope.state = {
       actionInProgress: false,
     };
 
-    $scope.formValues = {
-      dockerHubPassword: '',
-    };
-
-    const nonBrowsableUrls = ['quay.io'];
+    const nonBrowsableTypes = [RegistryTypes.ANONYMOUS, RegistryTypes.DOCKERHUB, RegistryTypes.QUAY];
 
     $scope.canBrowse = function (item) {
-      return !_.includes(nonBrowsableUrls, item.URL);
-    };
-
-    $scope.updateDockerHub = function () {
-      var dockerhub = $scope.dockerhub;
-      dockerhub.Password = $scope.formValues.dockerHubPassword;
-      $scope.state.actionInProgress = true;
-      DockerHubService.update(dockerhub)
-        .then(function success() {
-          Notifications.success('DockerHub registry updated');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to update DockerHub details');
-        })
-        .finally(function final() {
-          $scope.state.actionInProgress = false;
-        });
+      return !_.includes(nonBrowsableTypes, item.Type);
     };
 
     $scope.removeAction = function (selectedItems) {
-      ModalService.confirmDeletion('Do you want to remove the selected registries?', function onConfirm(confirmed) {
+      const regAttrMsg = selectedItems.length > 1 ? 'hese' : 'his';
+      const registriesMsg = selectedItems.length > 1 ? 'registries' : 'registry';
+      const msg = `T${regAttrMsg} ${registriesMsg} might be used by applications inside one or more environments. Removing the ${registriesMsg} could lead to a service interruption for the applications using t${regAttrMsg} ${registriesMsg}. Do you want to remove the selected ${registriesMsg}?`;
+
+      ModalService.confirmDeletion(msg, function onConfirm(confirmed) {
         if (!confirmed) {
           return;
         }
@@ -73,12 +56,9 @@ angular.module('portainer.app').controller('RegistriesController', [
     function initView() {
       $q.all({
         registries: RegistryService.registries(),
-        dockerhub: DockerHubService.dockerhub(),
       })
         .then(function success(data) {
           $scope.registries = data.registries;
-          $scope.dockerhub = data.dockerhub;
-          $scope.isAdmin = Authentication.isAdmin();
         })
         .catch(function error(err) {
           $scope.registries = [];

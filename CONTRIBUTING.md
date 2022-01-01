@@ -74,3 +74,71 @@ Our contribution process is described below. Some of the steps can be visualized
 The feature request process is similar to the bug report process but has an extra functional validation before the technical validation as well as a documentation validation before the testing phase.
 
 ![portainer_featurerequest_workflow](https://user-images.githubusercontent.com/5485061/45727229-5ad39f00-bbf5-11e8-9550-16ba66c50615.png)
+
+## Build and run Portainer locally
+
+Ensure you have Docker, Node.js, yarn, and Golang installed in the correct versions.
+
+Install dependencies with yarn:
+
+```sh
+$ yarn
+```
+
+Then build and run the project in a Docker container:
+
+```sh
+$ yarn start
+```
+
+Portainer can now be accessed at <https://localhost:9443>.
+
+Find more detailed steps at <https://documentation.portainer.io/contributing/instructions/>.
+
+### Build customisation
+
+You can customise the following settings:
+
+- `PORTAINER_DATA`: The host dir or volume name used by portainer (default is `/tmp/portainer`, which won't persist over reboots).
+- `PORTAINER_PROJECT`: The root dir of the repository - `${portainerRoot}/dist/` is imported into the container to get the build artifacts and external tools (defaults to `your current dir`).
+- `PORTAINER_FLAGS`: a list of flags to be used on the portainer commandline, in the form `--admin-password=<pwd hash> --feat fdo=false --feat open-amt` (default: `""`).
+
+## Adding api docs
+
+When adding a new resource (or a route handler), we should add a new tag to api/http/handler/handler.go#L136 like this:
+
+```
+// @tag.name <Name of resource>
+// @tag.description a short description
+```
+
+When adding a new route to an existing handler use the following as a template (you can use `swapi` snippet if you're using vscode):
+
+```
+// @id
+// @summary
+// @description
+// @description **Access policy**:
+// @tags
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "identifier"
+// @param body body Object true "details"
+// @success 200 {object} portainer. "Success"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 " not found"
+// @failure 500 "Server error"
+// @router /{id} [get]
+```
+
+explanation about each line can be found (here)[https://github.com/swaggo/swag#api-operation]
+
+## Licensing
+
+See the [LICENSE](https://github.com/portainer/portainer/blob/develop/LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
+
+We may ask you to sign a [Contributor License Agreement (CLA)](http://en.wikipedia.org/wiki/Contributor_License_Agreement) for larger changes.

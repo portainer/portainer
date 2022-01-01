@@ -2,9 +2,9 @@ package kubernetes
 
 import (
 	"io/ioutil"
-	"sync"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -12,20 +12,18 @@ const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceac
 type tokenManager struct {
 	tokenCache *tokenCache
 	kubecli    portainer.KubeClient
-	dataStore  portainer.DataStore
-	mutex      sync.Mutex
+	dataStore  dataservices.DataStore
 	adminToken string
 }
 
 // NewTokenManager returns a pointer to a new instance of tokenManager.
 // If the useLocalAdminToken parameter is set to true, it will search for the local admin service account
 // and associate it to the manager.
-func NewTokenManager(kubecli portainer.KubeClient, dataStore portainer.DataStore, cache *tokenCache, setLocalAdminToken bool) (*tokenManager, error) {
+func NewTokenManager(kubecli portainer.KubeClient, dataStore dataservices.DataStore, cache *tokenCache, setLocalAdminToken bool) (*tokenManager, error) {
 	tokenManager := &tokenManager{
 		tokenCache: cache,
 		kubecli:    kubecli,
 		dataStore:  dataStore,
-		mutex:      sync.Mutex{},
 		adminToken: "",
 	}
 
@@ -41,13 +39,13 @@ func NewTokenManager(kubecli portainer.KubeClient, dataStore portainer.DataStore
 	return tokenManager, nil
 }
 
-func (manager *tokenManager) getAdminServiceAccountToken() string {
+func (manager *tokenManager) GetAdminServiceAccountToken() string {
 	return manager.adminToken
 }
 
-func (manager *tokenManager) getUserServiceAccountToken(userID int) (string, error) {
-	manager.mutex.Lock()
-	defer manager.mutex.Unlock()
+func (manager *tokenManager) GetUserServiceAccountToken(userID int, endpointID portainer.EndpointID) (string, error) {
+	manager.tokenCache.mutex.Lock()
+	defer manager.tokenCache.mutex.Unlock()
 
 	token, ok := manager.tokenCache.getToken(userID)
 	if !ok {
@@ -61,7 +59,13 @@ func (manager *tokenManager) getUserServiceAccountToken(userID int) (string, err
 			teamIds = append(teamIds, int(membership.TeamID))
 		}
 
-		err = manager.kubecli.SetupUserServiceAccount(userID, teamIds)
+		endpoint, err := manager.dataStore.Endpoint().Endpoint(endpointID)
+		if err != nil {
+			return "", err
+		}
+
+		restrictDefaultNamespace := endpoint.Kubernetes.Configuration.RestrictDefaultNamespace
+		err = manager.kubecli.SetupUserServiceAccount(userID, teamIds, restrictDefaultNamespace)
 		if err != nil {
 			return "", err
 		}

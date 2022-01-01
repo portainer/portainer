@@ -144,6 +144,12 @@ angular.module('portainer.app').factory('LocalStorage', [
       cleanEndpointData() {
         localStorageService.remove('ENDPOINT_ID', 'ENDPOINT_PUBLIC_URL', 'ENDPOINT_OFFLINE_MODE', 'ENDPOINTS_DATA', 'ENDPOINT_STATE');
       },
+      storeKubernetesSummaryToggle(value) {
+        localStorageService.set('kubernetes_summary_expanded', value);
+      },
+      getKubernetesSummaryToggle() {
+        return localStorageService.get('kubernetes_summary_expanded');
+      },
     };
   },
 ]);

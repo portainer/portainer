@@ -10,15 +10,28 @@ import (
 	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
+	portainer "github.com/portainer/portainer/api"
 )
 
-// websocketAttach handles GET requests on /websocket/attach?id=<attachID>&endpointId=<endpointID>&nodeName=<nodeName>&token=<token>
-// If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
-// If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
-// an AttachStart operation HTTP request will be created and hijacked.
-// Authentication and access is controled via the mandatory token query parameter.
+// @summary Attach a websocket
+// @description If the nodeName query parameter is present, the request will be proxied to the underlying agent environment(endpoint).
+// @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
+// @description an AttachStart operation HTTP request will be created and hijacked.
+// @description **Access policy**: authenticated
+// @security ApiKeyAuth
+// @security jwt
+// @tags websocket
+// @accept json
+// @produce json
+// @param endpointId query int true "environment(endpoint) ID of the environment(endpoint) where the resource is located"
+// @param nodeName query string false "node name"
+// @param token query string true "JWT token used for authentication against this environment(endpoint)"
+// @success 200
+// @failure 400
+// @failure 403
+// @failure 404
+// @failure 500
+// @router /websocket/attach [get]
 func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	attachID, err := request.RetrieveQueryParameter(r, "id", false)
 	if err != nil {
@@ -34,15 +47,15 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == errors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	params := &webSocketRequestParams{

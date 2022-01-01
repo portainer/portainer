@@ -91,8 +91,8 @@
               <td
                 ><a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a></td
               >
-              <td>{{ item.StackName }}</td>
-              <td>{{ item.Image }}</td>
+              <td>{{ item.StackName || '-' }}</td>
+              <td title="{{ item.Image }}">{{ item.Image | truncate: 64 }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="3" class="text-center text-muted">Loading...</td>
@@ -110,7 +110,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

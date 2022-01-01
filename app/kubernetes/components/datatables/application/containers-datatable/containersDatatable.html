@@ -54,10 +54,10 @@
         />
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table table-hover nowrap-cells" data-cy="k8sAppDetail-containerTable">
           <thead>
             <tr>
-              <th>
+              <th ng-if="!$ctrl.isPod">
                 <a ng-click="$ctrl.changeOrderBy('PodName')">
                   Pod
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PodName' && !$ctrl.state.reverseOrder"></i>
@@ -79,6 +79,13 @@
                 </a>
               </th>
               <th>
+                <a ng-click="$ctrl.changeOrderBy('ImagePullPolicy')">
+                  Image Pull Policy
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImagePullPolicy' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImagePullPolicy' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('Status')">
                   Status
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
@@ -90,6 +97,13 @@
                   Node
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Node' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Node' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('IP')">
+                  Pod IP
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -107,9 +121,10 @@
               dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
               pagination-id="$ctrl.tableKey"
             >
-              <td>{{ item.PodName }}</td>
+              <td ng-if="!$ctrl.isPod">{{ item.PodName }}</td>
               <td>{{ item.Name }}</td>
-              <td>{{ item.Image }}</td>
+              <td title="{{ item.Image }}">{{ item.Image | truncate: 64 }}</td>
+              <td>{{ item.ImagePullPolicy }}</td>
               <td
                 ><span class="label label-{{ item.Status | kubernetesPodStatusColor }}">{{ item.Status }}</span></td
               >
@@ -121,8 +136,16 @@
                 </span>
                 <span ng-if="!item.Node">-</span>
               </td>
+              <td>{{ item.PodIP }}</td>
               <td>{{ item.CreationDate | getisodate }}</td>
               <td>
+                <a
+                  ng-if="item.Status === 'Running' && $ctrl.useServerMetrics"
+                  ui-sref="kubernetes.applications.application.stats({ pod: item.PodName, container: item.Name })"
+                  style="margin-right: 10px;"
+                >
+                  <i class="fa fa-chart-area" aria-hidden="true"></i> Stats
+                </a>
                 <a ui-sref="kubernetes.applications.application.logs({ pod: item.PodName, container: item.Name })"> <i class="fa fa-file-alt" aria-hidden="true"></i> Logs </a>
                 <a ng-if="item.Status === 'Running'" ui-sref="kubernetes.applications.application.console({ pod: item.PodName, container: item.Name })" style="margin-left: 10px;">
                   <i class="fa fa-terminal" aria-hidden="true"></i> Console
@@ -146,7 +169,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

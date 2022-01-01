@@ -20,10 +20,15 @@ export function KubernetesIngressRuleCreatePayload() {
 
 export function KubernetesIngressRulePathCreatePayload() {
   return {
-    backend: {
-      serviceName: '',
-      servicePort: 0,
-    },
     path: '',
+    pathType: 'ImplementationSpecific',
+    backend: {
+      service: {
+        name: '',
+        port: {
+          number: 0,
+        },
+      },
+    },
   };
 }

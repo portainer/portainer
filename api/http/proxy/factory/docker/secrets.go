@@ -7,7 +7,7 @@ import (
 	"github.com/docker/docker/client"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -15,15 +15,15 @@ const (
 	secretObjectIdentifier = "ID"
 )
 
-func getInheritedResourceControlFromSecretLabels(dockerClient *client.Client, secretID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromSecretLabels(dockerClient *client.Client, endpointID portainer.EndpointID, secretID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	secret, _, err := dockerClient.SecretInspectWithRaw(context.Background(), secretID)
 	if err != nil {
 		return nil, err
 	}
 
-	swarmStackName := secret.Spec.Labels[resourceLabelForDockerSwarmStackName]
-	if swarmStackName != "" {
-		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	stackResourceID := getStackResourceIDFromLabels(secret.Spec.Labels, endpointID)
+	if stackResourceID != "" {
+		return authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil
@@ -34,7 +34,7 @@ func getInheritedResourceControlFromSecretLabels(dockerClient *client.Client, se
 func (transport *Transport) secretListOperation(response *http.Response, executor *operationExecutor) error {
 	// SecretList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/SecretList
-	responseArray, err := responseutils.GetResponseAsJSONArray(response)
+	responseArray, err := utils.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (transport *Transport) secretListOperation(response *http.Response, executo
 		return err
 	}
 
-	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
+	return utils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // secretInspectOperation extracts the response as a JSON object, verify that the user
@@ -58,7 +58,7 @@ func (transport *Transport) secretListOperation(response *http.Response, executo
 func (transport *Transport) secretInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// SecretInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/SecretInspect
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -78,9 +78,9 @@ func (transport *Transport) secretInspectOperation(response *http.Response, exec
 // https://docs.docker.com/engine/api/v1.37/#operation/SecretList
 // https://docs.docker.com/engine/api/v1.37/#operation/SecretInspect
 func selectorSecretLabels(responseObject map[string]interface{}) map[string]interface{} {
-	secretSpec := responseutils.GetJSONObject(responseObject, "Spec")
+	secretSpec := utils.GetJSONObject(responseObject, "Spec")
 	if secretSpec != nil {
-		secretLabelsObject := responseutils.GetJSONObject(secretSpec, "Labels")
+		secretLabelsObject := utils.GetJSONObject(secretSpec, "Labels")
 		return secretLabelsObject
 	}
 	return nil

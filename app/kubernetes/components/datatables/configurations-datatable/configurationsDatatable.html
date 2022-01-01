@@ -9,7 +9,7 @@
         </span>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
+            <span uib-dropdown-toggle data-cy="k8sConfig-configSettingsButton"><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader">
@@ -18,7 +18,13 @@
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox" ng-if="$ctrl.isAdmin">
-                      <input id="setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
+                      <input
+                        id="setting_show_system"
+                        type="checkbox"
+                        ng-model="$ctrl.settings.showSystem"
+                        ng-change="$ctrl.onSettingsShowSystemChange()"
+                        data-cy="k8sConfig-systemResourceCheckbox"
+                      />
                       <label for="setting_show_system">Show system resources</label>
                     </div>
                     <div class="md-checkbox">
@@ -43,7 +49,7 @@
                   </div>
                 </div>
                 <div>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sConfig-closeSettingsButton">Close</a>
                 </div>
               </div>
             </div>
@@ -51,11 +57,20 @@
         </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          data-cy="k8sConfig-removeConfigButton"
+        >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.configurations.new">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add configuration
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.configurations.new" data-cy="k8sConfig-addConfigWithFormButton">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add with form
+        </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.deploy" data-cy="k8sConfig-deployFromManifestButton">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Create from manifest
         </button>
       </div>
       <div class="searchBar">
@@ -68,10 +83,11 @@
           placeholder="Search..."
           auto-focus
           ng-model-options="{ debounce: 300 }"
+          data-cy="k8sConfig-searchInput"
         />
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table table-hover nowrap-cells" data-cy="k8sConfig-tableSettingsButtonconfigsTable">
           <thead>
             <tr>
               <th>
@@ -87,7 +103,7 @@
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Namespace')">
-                  Resource Pool
+                  Namespace
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace' && $ctrl.state.reverseOrder"></i>
                 </a>
@@ -145,7 +161,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="k8sConfig-paginationDropdown">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

@@ -15,5 +15,8 @@ angular.module('portainer.docker').component('servicesDatatable', {
     showStackColumn: '<',
     showTaskLogsButton: '<',
     refreshCallback: '<',
+    notAutoFocus: '<',
+    endpointPublicUrl: '<',
+    endpointId: '<',
   },
 });

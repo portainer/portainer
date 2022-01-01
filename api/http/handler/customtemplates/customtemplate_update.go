@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -17,13 +15,22 @@ import (
 )
 
 type customTemplateUpdatePayload struct {
-	Logo        string
-	Title       string
-	Description string
-	Note        string
-	Platform    portainer.CustomTemplatePlatform
-	Type        portainer.StackType
-	FileContent string
+	// URL of the template's logo
+	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	// Title of the template
+	Title string `example:"Nginx" validate:"required"`
+	// Description of the template
+	Description string `example:"High performance web server" validate:"required"`
+	// A note that will be displayed in the UI. Supports HTML content
+	Note string `example:"This is my <b>custom</b> template"`
+	// Platform associated to the template.
+	// Valid values are: 1 - 'linux', 2 - 'windows'
+	// Required for Docker stacks
+	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2"`
+	// Type of created stack (1 - swarm, 2 - compose, 3 - kubernetes)
+	Type portainer.StackType `example:"1" enums:"1,2,3" validate:"required"`
+	// Content of stack file
+	FileContent string `validate:"required"`
 }
 
 func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
@@ -33,18 +40,38 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.FileContent) {
 		return errors.New("Invalid file content")
 	}
-	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
+	if payload.Type != portainer.KubernetesStack && payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
 	}
-	if payload.Type != portainer.DockerComposeStack && payload.Type != portainer.DockerSwarmStack {
+	if payload.Type != portainer.KubernetesStack && payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
 		return errors.New("Invalid custom template type")
 	}
 	if govalidator.IsNull(payload.Description) {
 		return errors.New("Invalid custom template description")
 	}
+	if !isValidNote(payload.Note) {
+		return errors.New("Invalid note. <img> tag is not supported")
+	}
 	return nil
 }
 
+// @id CustomTemplateUpdate
+// @summary Update a template
+// @description Update a template.
+// @description **Access policy**: authenticated
+// @tags custom_templates
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Template identifier"
+// @param body body customTemplateUpdatePayload true "Template details"
+// @success 200 {object} portainer.CustomTemplate "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied to access template"
+// @failure 404 "Template not found"
+// @failure 500 "Server error"
+// @router /custom_templates/{id} [put]
 func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -69,7 +96,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	}
 
 	customTemplate, err := handler.DataStore.CustomTemplate().CustomTemplate(portainer.CustomTemplateID(customTemplateID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a custom template with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a custom template with the specified identifier inside the database", err}

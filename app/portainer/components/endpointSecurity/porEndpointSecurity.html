@@ -4,7 +4,7 @@
     <div class="col-sm-12">
       <label for="tls" class="control-label text-left">
         TLS
-        <portainer-tooltip position="bottom" message="Enable this option if you need to connect to the Docker endpoint with TLS."></portainer-tooltip>
+        <portainer-tooltip position="bottom" message="Enable this option if you need to connect to the Docker environment with TLS."></portainer-tooltip>
       </label>
       <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.formData.TLS" /><i></i> </label>
     </div>
@@ -78,7 +78,7 @@
     <div class="form-group" ng-if="$ctrl.formData.TLSMode === 'tls_client_ca' || $ctrl.formData.TLSMode === 'tls_ca'">
       <label class="col-sm-3 col-lg-2 control-label text-left">TLS CA certificate</label>
       <div class="col-sm-9 col-lg-10">
-        <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSCACert">Select file</button>
+        <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSCACert">Select file</button>
         <span style="margin-left: 5px;">
           {{ $ctrl.formData.TLSCACert.name }}
           <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSCACert && $ctrl.formData.TLSCACert === $ctrl.endpoint.TLSConfig.TLSCACert" aria-hidden="true"></i>
@@ -93,7 +93,7 @@
       <div class="form-group">
         <label for="tls_cert" class="col-sm-3 col-lg-2 control-label text-left">TLS certificate</label>
         <div class="col-sm-9 col-lg-10">
-          <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSCert">Select file</button>
+          <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSCert">Select file</button>
           <span style="margin-left: 5px;">
             {{ $ctrl.formData.TLSCert.name }}
             <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSCert && $ctrl.formData.TLSCert === $ctrl.endpoint.TLSConfig.TLSCert" aria-hidden="true"></i>
@@ -106,7 +106,7 @@
       <div class="form-group">
         <label class="col-sm-3 col-lg-2 control-label text-left">TLS key</label>
         <div class="col-sm-9 col-lg-10">
-          <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSKey">Select file</button>
+          <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formData.TLSKey">Select file</button>
           <span style="margin-left: 5px;">
             {{ $ctrl.formData.TLSKey.name }}
             <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSKey && $ctrl.formData.TLSKey === $ctrl.endpoint.TLSConfig.TLSKey" aria-hidden="true"></i>

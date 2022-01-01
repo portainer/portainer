@@ -61,6 +61,16 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
+    service.uploadBackup = function (file, password) {
+      return Upload.upload({
+        url: 'api/restore',
+        data: {
+          file,
+          password,
+        },
+      });
+    };
+
     service.createSwarmStack = function (stackName, swarmId, file, env, endpointId) {
       return Upload.upload({
         url: 'api/stacks?method=file&type=1&endpointId=' + endpointId,
@@ -86,13 +96,13 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.createEdgeStack = function createEdgeStack(stackName, file, edgeGroups) {
+    service.createEdgeStack = function createEdgeStack({ EdgeGroups, ...payload }, file) {
       return Upload.upload({
         url: 'api/edge_stacks?method=file',
         data: {
-          file: file,
-          Name: stackName,
-          EdgeGroups: Upload.json(edgeGroups),
+          file,
+          EdgeGroups: Upload.json(EdgeGroups),
+          ...payload,
         },
         ignoreLoadingBar: true,
       });

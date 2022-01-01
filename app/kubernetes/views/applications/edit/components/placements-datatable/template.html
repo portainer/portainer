@@ -75,8 +75,7 @@
           <tbody>
             <tr
               dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | filter: $ctrl.isDisplayed | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
-              ng-class="{ active: item.Checked }"
-              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '' }"
+              ng-class="{ active: item.Checked, 'datatable-highlighted': item.Highlighted }"
               ng-click="$ctrl.expandItem(item, !item.Expanded)"
               pagination-id="$ctrl.tableKey"
             >
@@ -92,14 +91,23 @@
               </td>
             </tr>
             <!-- ADMIN + UNMET TAINTS -->
-            <tr ng-if="$ctrl.isAdmin" ng-show="item.Expanded" ng-repeat="taint in item.UnmetTaints" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <tr
+              ng-if="$ctrl.isAdmin"
+              ng-show="item.Expanded"
+              ng-repeat="taint in item.UnmetTaints"
+              ng-class="{ 'datatable-highlighted': item.Highlighted, 'datatable-unhighlighted': !item.Highlighted }"
+            >
               <td colspan="2">
                 This application is missing a toleration for the taint <code>{{ taint.Key }}{{ taint.Value ? '=' + taint.Value : '' }}:{{ taint.Effect }}</code>
               </td>
             </tr>
             <!-- !ADMIN + UNMET TAINTS -->
             <!-- USER + UNMET TAINTS -->
-            <tr ng-if="!$ctrl.isAdmin && item.UnmetTaints.length" ng-show="item.Expanded" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <tr
+              ng-if="!$ctrl.isAdmin && item.UnmetTaints.length"
+              ng-show="item.Expanded"
+              ng-class="{ 'datatable-highlighted': item.Highlighted, 'datatable-unhighlighted': !item.Highlighted }"
+            >
               <td colspan="2">
                 Placement constraint not respected for that node.
               </td>
@@ -110,7 +118,7 @@
               ng-if="$ctrl.isAdmin"
               ng-show="item.Expanded"
               ng-repeat="label in item.UnmatchedNodeSelectorLabels"
-              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
+              ng-class="{ 'datatable-highlighted': item.Highlighted, 'datatable-unhighlighted': !item.Highlighted }"
             >
               <td colspan="2">
                 This application can only be scheduled on a node where the label <code>{{ label.key }}</code> is set to <code>{{ label.value }}</code>
@@ -121,7 +129,7 @@
             <tr
               ng-if="!$ctrl.isAdmin && (item.UnmatchedNodeSelectorLabels.length || item.UnmatchedNodeAffinities.length)"
               ng-show="item.Expanded"
-              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
+              ng-class="{ 'datatable-highlighted': item.Highlighted, 'datatable-unhighlighted': !item.Highlighted }"
             >
               <td colspan="2">
                 Placement label not respected for that node.
@@ -129,7 +137,11 @@
             </tr>
             <!-- ! USER + UNMET NODE SELECTOR LABELS || UNMET NODE AFFINITIES -->
             <!-- ADMIN + UNMET NODE AFFINITIES -->
-            <tr ng-if="$ctrl.isAdmin" ng-show="item.Expanded && item.UnmatchedNodeAffinities.length" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <tr
+              ng-if="$ctrl.isAdmin"
+              ng-show="item.Expanded && item.UnmatchedNodeAffinities.length"
+              ng-class="{ 'datatable-highlighted': item.Highlighted, 'datatable-unhighlighted': !item.Highlighted }"
+            >
               <td colspan="2">
                 This application can only be scheduled on nodes respecting one of the following labels combination:
               </td>
@@ -139,7 +151,7 @@
               ng-if="$ctrl.isAdmin"
               ng-show="item.Expanded"
               ng-repeat="aff in item.UnmatchedNodeAffinities"
-              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
+              ng-class="{ 'datatable-highlighted': item.Highlighted, 'datatable-unhighlighted': !item.Highlighted }"
             >
               <td></td>
               <td>
@@ -167,7 +179,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

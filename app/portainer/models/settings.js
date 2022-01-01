@@ -4,36 +4,27 @@ export function SettingsViewModel(data) {
   this.AuthenticationMethod = data.AuthenticationMethod;
   this.LDAPSettings = data.LDAPSettings;
   this.OAuthSettings = new OAuthSettingsViewModel(data.OAuthSettings);
-  this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
-  this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
-  this.AllowVolumeBrowserForRegularUsers = data.AllowVolumeBrowserForRegularUsers;
-  this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
-  this.AllowDeviceMappingForRegularUsers = data.AllowDeviceMappingForRegularUsers;
-  this.AllowStackManagementForRegularUsers = data.AllowStackManagementForRegularUsers;
-  this.AllowContainerCapabilitiesForRegularUsers = data.AllowContainerCapabilitiesForRegularUsers;
+  this.OpenAMTConfiguration = data.OpenAMTConfiguration;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
-  this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
+  this.FeatureFlagSettings = data.FeatureFlagSettings;
   this.UserSessionTimeout = data.UserSessionTimeout;
   this.EnableTelemetry = data.EnableTelemetry;
+  this.KubeconfigExpiry = data.KubeconfigExpiry;
+  this.HelmRepositoryURL = data.HelmRepositoryURL;
 }
 
 export function PublicSettingsViewModel(settings) {
-  this.AllowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
-  this.AllowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
-  this.AllowVolumeBrowserForRegularUsers = settings.AllowVolumeBrowserForRegularUsers;
-  this.AllowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
-  this.AllowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
-  this.AllowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
-  this.AllowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
   this.AuthenticationMethod = settings.AuthenticationMethod;
-  this.EnableHostManagementFeatures = settings.EnableHostManagementFeatures;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
+  this.FeatureFlagSettings = settings.FeatureFlagSettings;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
   this.EnableTelemetry = settings.EnableTelemetry;
+  this.OAuthLogoutURI = settings.OAuthLogoutURI;
+  this.KubeconfigExpiry = settings.KubeconfigExpiry;
 }
 
 export function LDAPSettingsViewModel(data) {
@@ -68,4 +59,6 @@ export function OAuthSettingsViewModel(data) {
   this.Scopes = data.Scopes;
   this.OAuthAutoCreateUsers = data.OAuthAutoCreateUsers;
   this.DefaultTeamID = data.DefaultTeamID;
+  this.SSO = data.SSO;
+  this.LogoutURI = data.LogoutURI;
 }

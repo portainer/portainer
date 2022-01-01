@@ -1,0 +1,24 @@
+<div class="form-group">
+  <label class="col-sm-3 col-lg-2 control-label text-left">
+    Select user(s) and/or team(s)
+  </label>
+  <div class="col-sm-9 col-lg-4">
+    <span class="small text-muted" ng-if="$ctrl.options.length === 0">
+      No users or teams available.
+    </span>
+    <span
+      isteven-multi-select
+      ng-if="$ctrl.options.length > 0"
+      input-model="$ctrl.options"
+      output-model="$ctrl.value"
+      button-label="icon Name"
+      item-label="icon Name"
+      tick-property="ticked"
+      helper-elements="filter"
+      search-property="Name"
+      translation="{nothingSelected: 'Select one or more users and/or teams', search: 'Search...'}"
+      data-cy="component-selectUser"
+    >
+    </span>
+  </div>
+</div>

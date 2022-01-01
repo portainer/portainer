@@ -2,37 +2,71 @@
   <div class="col-sm-12 form-section-title">
     Stack duplication / migration
   </div>
-  <div class="form-group">
-    <span class="small" style="margin-top: 10px;">
-      <p class="text-muted">
-        This feature allows you to duplicate or migrate this stack.
-      </p>
-    </span>
-    <div>
-      <div class="form-group">
-        <input class="form-control" placeholder="Stack name (optional for migration)" aria-placeholder="Stack name" ng-model="$ctrl.formValues.newName" />
-      </div>
-      <endpoint-selector ng-if="$ctrl.endpoints && $ctrl.groups" model="$ctrl.formValues.endpoint" endpoints="$ctrl.endpoints" groups="$ctrl.groups"></endpoint-selector>
-      <button
-        class="btn btn-sm btn-primary"
-        ng-click="$ctrl.migrateStack()"
-        ng-disabled="$ctrl.isMigrationButtonDisabled()"
-        style="margin-top: 7px; margin-left: 0;"
-        button-spinner="$ctrl.state.migrationInProgress"
-      >
-        <span ng-hide="$ctrl.state.migrationInProgress"> <i class="fa fa-long-arrow-alt-right space-right" aria-hidden="true"></i> Migrate </span>
-        <span ng-show="$ctrl.state.migrationInProgress">Migration in progress...</span>
-      </button>
-      <button
-        class="btn btn-sm btn-primary"
-        ng-click="$ctrl.duplicateStack()"
-        ng-disabled="!$ctrl.isFormValidForDuplication() || $ctrl.state.duplicationInProgress || $ctrl.state.migrationInProgress"
-        style="margin-top: 7px; margin-left: 0;"
-        button-spinner="$ctrl.state.duplicationInProgress"
-      >
-        <span ng-hide="$ctrl.state.duplicationInProgress"> <i class="fa fa-clone space-right" aria-hidden="true"></i> Duplicate </span>
-        <span ng-show="$ctrl.state.duplicationInProgress">Duplication in progress...</span>
-      </button>
-    </div>
-  </div>
+  <rd-widget>
+    <rd-widget-body>
+      <form class="form-horizontal" name="dupStackForm">
+        <div class="form-group">
+          <span class="small" style="margin-top: 10px;">
+            <p class="text-muted">
+              This feature allows you to duplicate or migrate this stack.
+            </p>
+          </span>
+        </div>
+
+        <div class="form-group">
+          <input
+            class="form-control"
+            placeholder="Stack name (optional for migration)"
+            aria-placeholder="Stack name"
+            name="new_stack_name"
+            ng-pattern="$ctrl.STACK_NAME_VALIDATION_REGEX"
+            ng-model="$ctrl.formValues.newName"
+          />
+        </div>
+        <div class="form-group" ng-show="dupStackForm.new_stack_name.$invalid">
+          <div class="col-sm-12 small text-warning">
+            <div ng-messages="dupStackForm.new_stack_name.$error">
+              <p ng-message="pattern">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <endpoint-selector ng-if="$ctrl.endpoints && $ctrl.groups" model="$ctrl.formValues.endpoint" endpoints="$ctrl.endpoints" groups="$ctrl.groups"></endpoint-selector>
+        </div>
+
+        <div class="form-group">
+          <button
+            class="btn btn-sm btn-primary"
+            ng-click="$ctrl.migrateStack()"
+            ng-disabled="$ctrl.isMigrationButtonDisabled()"
+            style="margin-top: 7px; margin-left: 0;"
+            button-spinner="$ctrl.state.migrationInProgress"
+          >
+            <span ng-hide="$ctrl.state.migrationInProgress"> <i class="fa fa-long-arrow-alt-right space-right" aria-hidden="true"></i> Migrate </span>
+            <span ng-show="$ctrl.state.migrationInProgress">Migration in progress...</span>
+          </button>
+          <button
+            class="btn btn-sm btn-primary"
+            ng-click="$ctrl.duplicateStack()"
+            ng-disabled="!$ctrl.isFormValidForDuplication() || $ctrl.state.duplicationInProgress || $ctrl.state.migrationInProgress"
+            style="margin-top: 7px; margin-left: 0;"
+            button-spinner="$ctrl.state.duplicationInProgress"
+          >
+            <span ng-hide="$ctrl.state.duplicationInProgress"> <i class="fa fa-clone space-right" aria-hidden="true"></i> Duplicate </span>
+            <span ng-show="$ctrl.state.duplicationInProgress">Duplication in progress...</span>
+          </button>
+        </div>
+
+        <div class="form-group">
+          <div ng-if="$ctrl.yamlError && $ctrl.isEndpointSelected()">
+            <span class="text-danger small">{{ $ctrl.yamlError }}</span>
+          </div>
+        </div>
+      </form>
+    </rd-widget-body>
+  </rd-widget>
 </div>

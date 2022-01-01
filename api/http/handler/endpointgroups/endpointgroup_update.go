@@ -7,15 +7,17 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/tag"
 )
 
 type endpointGroupUpdatePayload struct {
-	Name               string
-	Description        string
-	TagIDs             []portainer.TagID
+	// Environment(Endpoint) group name
+	Name string `example:"my-environment-group"`
+	// Environment(Endpoint) group description
+	Description string `example:"description"`
+	// List of tag identifiers associated to the environment(endpoint) group
+	TagIDs             []portainer.TagID `example:"3,4"`
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }
@@ -24,11 +26,26 @@ func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/endpoint_groups/:id
+// @id EndpointGroupUpdate
+// @summary Update an environment(endpoint) group
+// @description Update an environment(endpoint) group.
+// @description **Access policy**: administrator
+// @tags endpoint_groups
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "EndpointGroup identifier"
+// @param body body endpointGroupUpdatePayload true "EndpointGroup details"
+// @success 200 {object} portainer.EndpointGroup "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "EndpointGroup not found"
+// @failure 500 "Server error"
+// @router /endpoint_groups/{id} [put]
 func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint group identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment group identifier route variable", err}
 	}
 
 	var payload endpointGroupUpdatePayload
@@ -38,10 +55,10 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	}
 
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
-	if err == errors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint group with the specified identifier inside the database", err}
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment group with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment group with the specified identifier inside the database", err}
 	}
 
 	if payload.Name != "" {
@@ -92,23 +109,44 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
+	updateAuthorizations := false
 	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpointGroup.UserAccessPolicies) {
 		endpointGroup.UserAccessPolicies = payload.UserAccessPolicies
+		updateAuthorizations = true
 	}
 
 	if payload.TeamAccessPolicies != nil && !reflect.DeepEqual(payload.TeamAccessPolicies, endpointGroup.TeamAccessPolicies) {
 		endpointGroup.TeamAccessPolicies = payload.TeamAccessPolicies
+		updateAuthorizations = true
+	}
+
+	if updateAuthorizations {
+		endpoints, err := handler.DataStore.Endpoint().Endpoints()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
+		}
+
+		for _, endpoint := range endpoints {
+			if endpoint.GroupID == endpointGroup.ID {
+				if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+					err = handler.AuthorizationService.CleanNAPWithOverridePolicies(&endpoint, endpointGroup)
+					if err != nil {
+						return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+					}
+				}
+			}
+		}
 	}
 
 	err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment group changes inside the database", err}
 	}
 
 	if tagsChanged {
 		endpoints, err := handler.DataStore.Endpoint().Endpoints()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
 
 		}
 
@@ -116,7 +154,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 			if endpoint.GroupID == endpointGroup.ID {
 				err = handler.updateEndpointRelations(&endpoint, endpointGroup)
 				if err != nil {
-					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment relations changes inside the database", err}
 				}
 			}
 		}

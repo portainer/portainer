@@ -4,7 +4,6 @@ export function ImageViewModel(data) {
   this.Repository = data.Repository;
   this.Created = data.Created;
   this.Checked = false;
-
   this.RepoTags = data.RepoTags;
   if (!this.RepoTags && data.RepoDigests) {
     this.RepoTags = [];
@@ -21,6 +20,7 @@ export function ImageViewModel(data) {
   if (data.Portainer && data.Portainer.Agent && data.Portainer.Agent.NodeName) {
     this.NodeName = data.Portainer.Agent.NodeName;
   }
+  this.Labels = data.Labels;
 }
 
 export function ImageBuildModel(data) {

@@ -75,7 +75,7 @@
           <input class="form-control" moment-picker ng-model="$ctrl.formValues.datetime" format="YYYY-MM-DD HH:mm" />
         </div>
         <div class="col-sm-12 small text-muted" style="margin-top: 10px;">
-          Time should be set according to the chosen endpoints' timezone.
+          Time should be set according to the chosen environments' timezone.
         </div>
         <div ng-show="edgeJobForm.datepicker.$invalid">
           <div class="col-sm-12 small text-warning">
@@ -130,7 +130,7 @@
         />
       </div>
       <div class="col-sm-12 small text-muted" style="margin-top: 10px;">
-        Time should be set according to the chosen endpoints' timezone.
+        Time should be set according to the chosen environments' timezone.
       </div>
     </div>
     <div class="form-group" ng-show="edgeJobForm.edgejob_cron.$invalid && edgeJobForm.edgejob_cron.$dirty">
@@ -205,7 +205,7 @@
     </div>
     <div class="form-group">
       <div class="col-sm-12">
-        <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.File">Select file</button>
+        <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.File">Select file</button>
         <span style="margin-left: 5px;">
           {{ $ctrl.model.File.name }}
           <i class="fa fa-times red-icon" ng-if="!$ctrl.model.File" aria-hidden="true"></i>
@@ -215,7 +215,7 @@
   </div>
   <!-- !upload -->
   <div class="col-sm-12 form-section-title">
-    Target endpoints
+    Target environments
   </div>
   <!-- node-selection -->
   <associated-endpoints-selector

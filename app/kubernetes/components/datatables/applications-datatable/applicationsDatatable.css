@@ -1,0 +1,16 @@
+.secondary-heading {
+  background-color: var(--bg-app-datatable-thead) !important;
+}
+
+.secondary-body {
+  background-color: var(--bg-app-datatable-tbody);
+}
+
+.datatable-wide {
+  width: 55px;
+}
+
+.datatable-padding-vertical {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}

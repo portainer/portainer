@@ -1,0 +1,5 @@
+.boxselector_wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0.5rem;
+}

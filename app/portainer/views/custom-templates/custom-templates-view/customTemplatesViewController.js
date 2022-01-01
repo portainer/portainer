@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 
 class CustomTemplatesViewController {
   /* @ngInject */
@@ -10,7 +11,6 @@ class CustomTemplatesViewController {
     $state,
     Authentication,
     CustomTemplateService,
-    EndpointProvider,
     FormValidator,
     ModalService,
     NetworkService,
@@ -25,7 +25,6 @@ class CustomTemplatesViewController {
     this.$state = $state;
     this.Authentication = Authentication;
     this.CustomTemplateService = CustomTemplateService;
-    this.EndpointProvider = EndpointProvider;
     this.FormValidator = FormValidator;
     this.ModalService = ModalService;
     this.NetworkService = NetworkService;
@@ -34,12 +33,17 @@ class CustomTemplatesViewController {
     this.StateManager = StateManager;
     this.StackService = StackService;
 
+    this.DOCKER_STANDALONE = 'DOCKER_STANDALONE';
+    this.DOCKER_SWARM_MODE = 'DOCKER_SWARM_MODE';
+
     this.state = {
       selectedTemplate: null,
       showAdvancedOptions: false,
       formValidationError: '',
       actionInProgress: false,
       isEditorVisible: false,
+      deployable: false,
+      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
     };
 
     this.currentUser = {
@@ -77,16 +81,12 @@ class CustomTemplatesViewController {
     return this.currentUser.isAdmin || this.currentUser.id === template.CreatedByUserId;
   }
 
-  getTemplates(endpointMode) {
-    return this.$async(this.getTemplatesAsync, endpointMode);
+  getTemplates() {
+    return this.$async(this.getTemplatesAsync);
   }
-  async getTemplatesAsync({ provider, role }) {
+  async getTemplatesAsync() {
     try {
-      let stackType = 2;
-      if (provider === 'DOCKER_SWARM_MODE' && role === 'MANAGER') {
-        stackType = 1;
-      }
-      this.templates = await this.CustomTemplateService.customTemplates(stackType);
+      this.templates = await this.CustomTemplateService.customTemplates([1, 2]);
     } catch (err) {
       this.Notifications.error('Failed loading templates', err, 'Unable to load custom templates');
     }
@@ -130,7 +130,7 @@ class CustomTemplatesViewController {
     }
     const stackName = this.formValues.name;
 
-    const endpointId = this.EndpointProvider.endpointID();
+    const endpointId = this.endpoint.Id;
 
     this.state.actionInProgress = true;
 
@@ -181,7 +181,8 @@ class CustomTemplatesViewController {
     this.formValues.name = template.Title ? template.Title : '';
     this.state.selectedTemplate = template;
     this.$anchorScroll('view-top');
-
+    const applicationState = this.StateManager.getState();
+    this.state.deployable = this.isDeployable(applicationState.endpoint, template.Type);
     const file = await this.CustomTemplateService.customTemplateFile(template.Id);
     this.formValues.fileContent = file;
   }
@@ -223,6 +224,20 @@ class CustomTemplatesViewController {
     this.formValues.fileContent = cm.getValue();
   }
 
+  isDeployable(endpoint, templateType) {
+    let deployable = false;
+    switch (templateType) {
+      case 1:
+        deployable = endpoint.mode.provider === this.DOCKER_SWARM_MODE;
+        break;
+      case 2:
+        deployable = endpoint.mode.provider === this.DOCKER_STANDALONE;
+        break;
+    }
+
+    return deployable;
+  }
+
   $onInit() {
     const applicationState = this.StateManager.getState();
 
@@ -231,7 +246,7 @@ class CustomTemplatesViewController {
       apiVersion,
     } = applicationState;
 
-    this.getTemplates(endpointMode);
+    this.getTemplates();
     this.getNetworks(endpointMode.provider, apiVersion);
 
     this.currentUser.isAdmin = this.Authentication.isAdmin();

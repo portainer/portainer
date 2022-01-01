@@ -5,6 +5,7 @@ class AuthenticationController {
   /* @ngInject */
   constructor(
     $async,
+    $analytics,
     $scope,
     $state,
     $stateParams,
@@ -20,6 +21,7 @@ class AuthenticationController {
     StatusService
   ) {
     this.$async = $async;
+    this.$analytics = $analytics;
     this.$scope = $scope;
     this.$state = $state;
     this.$stateParams = $stateParams;
@@ -40,6 +42,8 @@ class AuthenticationController {
       Password: '',
     };
     this.state = {
+      showOAuthLogin: false,
+      showStandardLogin: false,
       AuthenticationError: '',
       loginInProgress: true,
       OAuthProvider: '',
@@ -120,12 +124,12 @@ class AuthenticationController {
       const isAdmin = this.Authentication.isAdmin();
 
       if (endpoints.value.length === 0 && isAdmin) {
-        return this.$state.go('portainer.init.endpoint');
+        return this.$state.go('portainer.wizard');
       } else {
         return this.$state.go('portainer.home');
       }
     } catch (err) {
-      this.error(err, 'Unable to retrieve endpoints');
+      this.error(err, 'Unable to retrieve environments');
     }
   }
 
@@ -148,6 +152,10 @@ class AuthenticationController {
 
   async postLoginSteps() {
     await this.StateManager.initialize();
+
+    const isAdmin = this.Authentication.isAdmin();
+    this.$analytics.setUserRole(isAdmin ? 'admin' : 'standard-user');
+
     await this.checkForEndpointsAsync();
     await this.checkForLatestVersionAsync();
   }
@@ -222,12 +230,17 @@ class AuthenticationController {
     }
   }
 
+  toggleStandardLogin() {
+    this.state.showStandardLogin = !this.state.showStandardLogin;
+  }
+
   async onInit() {
     try {
       const settings = await this.SettingsService.publicSettings();
-      this.AuthenticationMethod = settings.AuthenticationMethod;
-      this.state.OAuthProvider = this.determineOauthProvider(settings.OAuthLoginURI);
+      this.state.showOAuthLogin = settings.AuthenticationMethod === 3;
+      this.state.showStandardLogin = !this.state.showOAuthLogin;
       this.state.OAuthLoginURI = settings.OAuthLoginURI;
+      this.state.OAuthProvider = this.determineOauthProvider(settings.OAuthLoginURI);
 
       const code = this.URLHelper.getParameter('code');
       const state = this.URLHelper.getParameter('state');
@@ -235,6 +248,10 @@ class AuthenticationController {
         await this.manageOauthCodeReturn(code, state);
         this.generateOAuthLoginURI();
         return;
+      }
+      if(!this.logo){
+        await this.StateManager.initialize();
+        this.logo = this.StateManager.getState().application.logo;
       }
       this.generateOAuthLoginURI();
 

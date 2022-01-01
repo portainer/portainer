@@ -2,22 +2,38 @@ package customtemplates
 
 import (
 	"net/http"
+	"strconv"
 
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
+// @id CustomTemplateList
+// @summary List available custom templates
+// @description List available custom templates.
+// @description **Access policy**: authenticated
+// @tags custom_templates
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param type query []int true "Template types" Enums(1,2,3)
+// @success 200 {array} portainer.CustomTemplate "Success"
+// @failure 500 "Server error"
+// @router /custom_templates [get]
 func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	templateTypes, err := parseTemplateTypes(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Custom template type", err}
+	}
+
 	customTemplates, err := handler.DataStore.CustomTemplate().CustomTemplates()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve custom templates from the database", err}
 	}
-
-	stackType, _ := request.RetrieveNumericQueryParameter(r, "type", true)
 
 	resourceControls, err := handler.DataStore.ResourceControl().ResourceControls()
 	if err != nil {
@@ -25,8 +41,6 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 	}
 
 	customTemplates = authorization.DecorateCustomTemplates(customTemplates, resourceControls)
-
-	customTemplates = filterTemplatesByEngineType(customTemplates, portainer.StackType(stackType))
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
@@ -47,21 +61,52 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 		customTemplates = authorization.FilterAuthorizedCustomTemplates(customTemplates, user, userTeamIDs)
 	}
 
+	customTemplates = filterByType(customTemplates, templateTypes)
+
 	return response.JSON(w, customTemplates)
 }
 
-func filterTemplatesByEngineType(templates []portainer.CustomTemplate, stackType portainer.StackType) []portainer.CustomTemplate {
-	if stackType == 0 {
-		return templates
+func parseTemplateTypes(r *http.Request) ([]portainer.StackType, error) {
+	err := r.ParseForm()
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to parse request params")
 	}
 
-	filteredTemplates := []portainer.CustomTemplate{}
+	types, exist := r.Form["type"]
+	if !exist {
+		return []portainer.StackType{}, nil
+	}
 
-	for _, template := range templates {
-		if template.Type == stackType {
-			filteredTemplates = append(filteredTemplates, template)
+	res := []portainer.StackType{}
+	for _, templateTypeStr := range types {
+		templateType, err := strconv.Atoi(templateTypeStr)
+		if err != nil {
+			return nil, errors.WithMessage(err, "failed parsing template type")
+		}
+
+		res = append(res, portainer.StackType(templateType))
+	}
+
+	return res, nil
+}
+
+func filterByType(customTemplates []portainer.CustomTemplate, templateTypes []portainer.StackType) []portainer.CustomTemplate {
+	if len(templateTypes) == 0 {
+		return customTemplates
+	}
+
+	typeSet := map[portainer.StackType]bool{}
+	for _, templateType := range templateTypes {
+		typeSet[templateType] = true
+	}
+
+	filtered := []portainer.CustomTemplate{}
+
+	for _, template := range customTemplates {
+		if typeSet[template.Type] {
+			filtered = append(filtered, template)
 		}
 	}
 
-	return filteredTemplates
+	return filtered
 }

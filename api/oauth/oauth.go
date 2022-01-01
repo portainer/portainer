@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/oauth2"
 	"io/ioutil"
 	"log"
 	"mime"
 	"net/http"
 	"net/url"
 
-	"github.com/portainer/portainer/api"
+	"golang.org/x/oauth2"
+
+	portainer "github.com/portainer/portainer/api"
 )
 
 // Service represents a service used to authenticate users against an authorization server
@@ -22,32 +23,36 @@ func NewService() *Service {
 	return &Service{}
 }
 
-// Authenticate takes an access code and exchanges it for an access token from portainer OAuthSettings token endpoint.
-// On success, it will then return the username associated to authenticated user by fetching this information
+// Authenticate takes an access code and exchanges it for an access token from portainer OAuthSettings token environment(endpoint).
+// On success, it will then return the username and token expiry time associated to authenticated user by fetching this information
 // from the resource server and matching it with the user identifier setting.
 func (*Service) Authenticate(code string, configuration *portainer.OAuthSettings) (string, error) {
-	token, err := getAccessToken(code, configuration)
+	token, err := getOAuthToken(code, configuration)
 	if err != nil {
 		log.Printf("[DEBUG] - Failed retrieving access token: %v", err)
 		return "", err
 	}
-
-	return getUsername(token, configuration)
+	username, err := getUsername(token.AccessToken, configuration)
+	if err != nil {
+		log.Printf("[DEBUG] - Failed retrieving oauth user name: %v", err)
+		return "", err
+	}
+	return username, nil
 }
 
-func getAccessToken(code string, configuration *portainer.OAuthSettings) (string, error) {
+func getOAuthToken(code string, configuration *portainer.OAuthSettings) (*oauth2.Token, error) {
 	unescapedCode, err := url.QueryUnescape(code)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	config := buildConfig(configuration)
 	token, err := config.Exchange(context.Background(), unescapedCode)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return token.AccessToken, nil
+	return token, nil
 }
 
 func getUsername(token string, configuration *portainer.OAuthSettings) (string, error) {

@@ -1,3 +1,5 @@
+import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
+
 angular.module('portainer.app').controller('StackDuplicationFormController', [
   'Notifications',
   function StackDuplicationFormController(Notifications) {
@@ -13,18 +15,21 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
       newName: '',
     };
 
+    ctrl.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
+
     ctrl.isFormValidForDuplication = isFormValidForDuplication;
     ctrl.isFormValidForMigration = isFormValidForMigration;
     ctrl.duplicateStack = duplicateStack;
     ctrl.migrateStack = migrateStack;
     ctrl.isMigrationButtonDisabled = isMigrationButtonDisabled;
+    ctrl.isEndpointSelected = isEndpointSelected;
 
     function isFormValidForMigration() {
       return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
     }
 
     function isFormValidForDuplication() {
-      return isFormValidForMigration() && ctrl.formValues.newName;
+      return isFormValidForMigration() && ctrl.formValues.newName && !ctrl.yamlError;
     }
 
     function duplicateStack() {
@@ -61,6 +66,10 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
 
     function isTargetEndpointAndCurrentEquals() {
       return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id === ctrl.currentEndpointId;
+    }
+
+    function isEndpointSelected() {
+      return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
     }
   },
 ]);

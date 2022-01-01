@@ -33,6 +33,7 @@ angular.module('portainer.app').controller('GenericDatatableController', [
         refreshRate: '30',
       },
     };
+
     this.resetSelectionState = function () {
       this.state.selectAll = false;
       this.state.selectedItems = [];
@@ -70,7 +71,7 @@ angular.module('portainer.app').controller('GenericDatatableController', [
         item.Checked = !item.Checked;
         this.state.firstClickedItem = item;
       }
-      this.state.selectedItems = this.dataset.filter((i) => i.Checked);
+      this.state.selectedItems = _.uniq(_.concat(this.state.selectedItems, this.state.filteredDataSet)).filter((i) => i.Checked);
       if (event && this.state.selectAll && this.state.selectedItems.length !== this.state.filteredDataSet.length) {
         this.state.selectAll = false;
       }
@@ -127,7 +128,11 @@ angular.module('portainer.app').controller('GenericDatatableController', [
      * https://github.com/portainer/portainer/pull/2877#issuecomment-503333425
      * https://github.com/portainer/portainer/pull/2877#issuecomment-503537249
      */
-    this.$onInit = function () {
+    this.$onInit = function $onInit() {
+      this.$onInitGeneric();
+    };
+
+    this.$onInitGeneric = function $onInitGeneric() {
       this.setDefaults();
       this.prepareTableFromDataset();
 
@@ -158,6 +163,11 @@ angular.module('portainer.app').controller('GenericDatatableController', [
         this.settings.open = false;
       }
       this.onSettingsRepeaterChange();
+
+      var storedColumnVisibility = DatatableService.getColumnVisibilitySettings(this.tableKey);
+      if (storedColumnVisibility !== null) {
+        this.columnVisibility = storedColumnVisibility;
+      }
     };
 
     /**
@@ -177,8 +187,9 @@ angular.module('portainer.app').controller('GenericDatatableController', [
     };
 
     this.startRepeater = function () {
-      this.repeater = $interval(() => {
-        this.refreshCallback();
+      this.repeater = $interval(async () => {
+        await this.refreshCallback();
+        this.onDataRefresh();
       }, this.settings.repeater.refreshRate * 1000);
     };
 
@@ -191,6 +202,14 @@ angular.module('portainer.app').controller('GenericDatatableController', [
       }
       DatatableService.setDataTableSettings(this.tableKey, this.settings);
     };
+
+    /**
+     * Override this method to execute code after calling the refresh callback
+     */
+    this.onDataRefresh = function () {
+      return;
+    };
+
     /**
      * !REPEATER SECTION
      */

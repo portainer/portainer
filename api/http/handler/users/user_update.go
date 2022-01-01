@@ -8,16 +8,17 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 type userUpdatePayload struct {
-	Username string
-	Password string
-	Role     int
+	Username  string `validate:"required" example:"bob"`
+	Password  string `validate:"required" example:"cg9Wgky3"`
+	UserTheme string `example:"dark"`
+	// User role (1 for administrator account and 2 for regular account)
+	Role int `validate:"required" enums:"1,2" example:"2"`
 }
 
 func (payload *userUpdatePayload) Validate(r *http.Request) error {
@@ -31,7 +32,24 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/users/:id
+// @id UserUpdate
+// @summary Update a user
+// @description Update user details. A regular user account can only update his details.
+// @description **Access policy**: authenticated
+// @tags users
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "User identifier"
+// @param body body userUpdatePayload true "User details"
+// @success 200 {object} portainer.User "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "User not found"
+// @failure 409 "Username already exist"
+// @failure 500 "Server error"
+// @router /users/{id} [put]
 func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -58,7 +76,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
@@ -66,7 +84,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	if payload.Username != "" && payload.Username != user.Username {
 		sameNameUser, err := handler.DataStore.User().UserByUsername(payload.Username)
-		if err != nil && err != bolterrors.ErrObjectNotFound {
+		if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 		}
 		if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
@@ -87,10 +105,17 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.Role = portainer.UserRole(payload.Role)
 	}
 
+	if payload.UserTheme != "" {
+		user.UserTheme = payload.UserTheme
+	}
+
 	err = handler.DataStore.User().UpdateUser(user.ID, user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user changes inside the database", err}
 	}
+
+	// remove all of the users persisted API keys
+	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
 
 	return response.JSON(w, user)
 }

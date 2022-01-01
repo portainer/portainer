@@ -32,8 +32,9 @@
             </div>
           </div>
           <!-- !registry-url-input -->
+
           <!-- authentication-checkbox -->
-          <div class="form-group">
+          <div class="form-group" ng-if="registry.Type !== RegistryTypes.PROGET">
             <div class="col-sm-12">
               <label for="registry_auth" class="control-label text-left">
                 Authentication
@@ -43,11 +44,14 @@
             </div>
           </div>
           <!-- !authentication-checkbox -->
+
           <!-- authentication-credentials -->
           <div ng-if="registry.Authentication">
             <!-- credentials-user -->
             <div class="form-group">
-              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">
+                {{ registry.Type === RegistryTypes.ECR ? 'AWS Access Key' : 'Username' }}
+              </label>
               <div class="col-sm-9 col-lg-10">
                 <input type="text" class="form-control" id="credentials_username" ng-model="registry.Username" />
               </div>
@@ -55,7 +59,9 @@
             <!-- !credentials-user -->
             <!-- credentials-password -->
             <div class="form-group">
-              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">
+                {{ registry.Type === RegistryTypes.ECR ? 'AWS Secret Access Key' : 'Password' }}
+              </label>
               <div class="col-sm-9 col-lg-10">
                 <input type="password" class="form-control" id="credentials_password" ng-model="formValues.Password" placeholder="*******" />
               </div>
@@ -63,12 +69,54 @@
             <!-- !credentials-password -->
           </div>
           <!-- !authentication-credentials -->
+
+          <div ng-if="registry.Type == RegistryTypes.QUAY">
+            <!-- organisation-checkbox -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Use organisation registry
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="registry.Quay.UseOrganisation" /><i></i> </label>
+              </div>
+            </div>
+            <!-- !organisation-checkbox -->
+            <div ng-if="registry.Quay.UseOrganisation">
+              <!-- organisation_name -->
+              <div class="form-group">
+                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label text-left">Organisation name</label>
+                <div class="col-sm-9 col-lg-10">
+                  <input type="text" class="form-control" id="organisation_name" name="organisation_name" ng-model="registry.Quay.OrganisationName" required />
+                </div>
+              </div>
+              <!-- !organisation_name -->
+            </div>
+          </div>
+
+          <div ng-if="registry.Type == RegistryTypes.ECR">
+            <!-- region -->
+            <div class="form-group">
+              <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left">Region</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="registry_region" name="registry_region" placeholder="us-west-1" ng-model="registry.Ecr.Region" required />
+              </div>
+            </div>
+            <div class="form-group" ng-show="registryFormEcr.registry_region.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="registryFormEcr.registry_region.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !region -->
+          </div>
+
           <div class="form-group">
             <div class="col-sm-12">
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !registry.Name || !registry.URL"
+                ng-disabled="state.actionInProgress || !registry.Name || !registry.URL || (registry.Type == RegistryTypes.QUAY && registry.Quay.UseOrganisation && !registry.Quay.OrganisationName)"
                 ng-click="updateRegistry()"
                 button-spinner="state.actionInProgress"
               >

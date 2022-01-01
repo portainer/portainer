@@ -1,15 +1,20 @@
 angular.module('portainer.docker').component('porImageRegistry', {
-  templateUrl: './porImageRegistry.html',
+  templateUrl: './por-image-registry.html',
   controller: 'porImageRegistryController',
   bindings: {
     model: '=', // must be of type PorImageRegistryModel
-    pullWarning: '<',
     autoComplete: '<',
     labelClass: '@',
     inputClass: '@',
+    endpoint: '<',
+    isAdmin: '<',
+    checkRateLimits: '<',
     onImageChange: '&',
+    setValidity: '<',
+    namespace: '<',
   },
   require: {
     form: '^form',
   },
+  transclude: true,
 });

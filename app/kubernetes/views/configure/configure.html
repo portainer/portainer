@@ -1,5 +1,5 @@
-<kubernetes-view-header title="Kubernetes features configuration" state="portainer.endpoints.endpoint.kubernetesConfig" view-ready="ctrl.state.viewReady">
-  <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Kubernetes configuration
+<kubernetes-view-header title="Kubernetes features configuration" state="portainer.k8sendpoint.kubernetesConfig" view-ready="ctrl.state.viewReady">
+  <a ui-sref="portainer.endpoints">Environment</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Kubernetes configuration
 </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
@@ -27,13 +27,15 @@
                 <label class="control-label text-left">
                   Allow users to use external load balancer
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><i></i> </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><i data-cy="kubeSetup-loadBalancerToggle"></i>
+                </label>
               </div>
             </div>
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Adding ingress controllers will allow users to expose application they deploy over a HTTP route.<br />
+                Configuring ingress controllers will allow users to expose application they deploy over a HTTP route.<br />
                 <p style="margin-top: 2px;">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                   Ingress classes must be manually specified for each controller you want to use in the cluster. Make sure that each controller is running inside your cluster.
@@ -43,8 +45,8 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">Ingress controller</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addIngressClass()">
-                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add ingress controller
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addIngressClass()" data-cy="kubeSetup-congifIngressButton">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> configure ingress controller
                 </span>
               </div>
 
@@ -61,6 +63,7 @@
                       ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
                       ng-change="ctrl.onChangeIngressClassName($index)"
                       required
+                      data-cy="kubeSetup-ingressClassName"
                     />
                   </div>
                   <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
@@ -71,12 +74,19 @@
                       ng-model="ingressClass.Type"
                       ng-options="value as value for (key, value) in ctrl.IngressClassTypes"
                       required
+                      data-cy="kubeSetup-ingressType"
                     >
                       <option selected disabled hidden value="">Select a type</option>
                     </select>
                   </div>
                   <div class="col-sm-1 input-group input-group-sm">
-                    <button ng-if="!ingressClass.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeIngressClass($index)">
+                    <button
+                      ng-if="!ingressClass.NeedsDeletion"
+                      class="btn btn-sm btn-danger"
+                      type="button"
+                      ng-click="ctrl.removeIngressClass($index)"
+                      data-cy="kubeSetup-deleteIngress"
+                    >
                       <i class="fa fa-trash-alt" aria-hidden="true"></i>
                     </button>
                     <button ng-if="ingressClass.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreIngressClass($index)">
@@ -131,26 +141,109 @@
               </span>
             </div>
 
+            <!-- auto update window -->
             <div class="col-sm-12 form-section-title">
-              Metrics
+              Change Window Setting
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  checked="ctrl.state.autoUpdateSettings.Enabled"
+                  name="'disableSysctlSettingForRegularUsers'"
+                  label="'Enable Change Window'"
+                  feature-id="ctrl.limitedFeatureAutoWindow"
+                  tooltip="'Specify a timeframe during which automatic updates can occur in this environment.'"
+                  on-change="(ctrl.onToggleAutoUpdate)"
+                >
+                </por-switch-field>
+              </div>
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Security
             </div>
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Enabling this feature will allow users to use specific features that leverage the metrics server component.
+                By default, all the users have access to the default namespace. Enable this option to set accesses on the default namespace.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Restrict access to the default namespace
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><i data-cy="kubeSetup-restrictDefaultNsToggle"></i>
+                </label>
+              </div>
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Resources and Metrics
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                By ENABLING resource over-commit, you are able to assign more resources to namespaces than is physically available in the cluster. This may lead to unexpected
+                deployment failures if there is insufficient resource to service demand.
                 <p style="margin-top: 2px;">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> is
-                  running inside your cluster.
+                  By DISABLING resource over-commit (highly recommended), you are only able to assign resources to namespaces that are less (in aggregate) than the cluster total
+                  minus any system resource reservation.
+                </p>
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  data-cy="'kubeSetup-resourceOverCommitToggle'"
+                  label="'Allow resource over-commit'"
+                  name="'resource-over-commit-switch'"
+                  feature-id="ctrl.limitedFeature"
+                  checked="ctrl.formValues.EnableResourceOverCommit"
+                  on-change="(ctrl.onChangeEnableResourceOverCommit)"
+                ></por-switch-field>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Enabling this feature will allow users to use specific features like autoscaling and to see container and node resource usage.
+                <p style="margin-top: 2px;">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> or
+                  <a href="https://github.com/kubernetes-sigs/prometheus-adapter" target="_blank">prometheus</a> is running inside your cluster.
                 </p>
               </span>
             </div>
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">
-                  Enable features using metrics server
+                  Enable features using the metrics API
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" /><i></i> </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" /><i data-cy="kubeSetup-metricsToggle"></i>
+                </label>
+              </div>
+              <div ng-if="ctrl.state.metrics.pending && ctrl.state.metrics.userClick" class="col-sm-12 small text-muted" style="margin-top: 5px;">
+                Checking metrics API... <i class="fa fa-spinner fa-spin" style="margin-left: 2px;"></i>
+              </div>
+              <div
+                ng-if="!ctrl.state.metrics.pending && ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
+                class="col-sm-12 small text-muted"
+                style="margin-top: 5px;"
+              >
+                <i class="fa fa-check green-icon" aria-hidden="true" style="margin-right: 2px;"></i> Successfully reached metrics API
+              </div>
+              <div
+                ng-if="!ctrl.state.metrics.pending && !ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
+                class="col-sm-12 small text-muted"
+                style="margin-top: 5px;"
+              >
+                <i class="fa fa-times red-icon" aria-hidden="true" style="margin-right: 2px;"></i> Unable to reach metrics API, make sure metrics server is properly deployed inside
+                that cluster.
               </div>
             </div>
 
@@ -190,7 +283,9 @@
                     <tr ng-repeat="class in ctrl.StorageClasses">
                       <td>
                         <div style="margin: 5px;">
-                          <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.selected" /><i></i> </label>
+                          <label class="switch" style="margin-right: 10px;">
+                            <input type="checkbox" ng-model="class.selected" /><i data-cy="kubeSetup-storageToggle{{ class.Name }}"></i>
+                          </label>
                           <span>{{ class.Name }}</span>
                         </div>
                       </td>
@@ -205,12 +300,15 @@
                           directive-id="{{ class.Name }}"
                           helper-elements=""
                           translation="{nothingSelected: 'Not configured'}"
+                          data-cy="kubeSetup-storageAccessSelect{{ class.Name }}"
                         >
                         </span>
                       </td>
                       <td>
                         <div style="margin: 5px;">
-                          <label class="switch"><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><i></i> </label>
+                          <label class="switch"
+                            ><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><i data-cy="kubeSetup-storageExpansionToggle{{ class.Name }}"></i>
+                          </label>
                         </div>
                       </td>
                     </tr>
@@ -237,6 +335,12 @@
                   ng-click="ctrl.configure()"
                   ng-disabled="ctrl.state.actionInProgress || !kubernetesClusterSetupForm.$valid || !ctrl.hasValidStorageConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"
+                  analytics-on
+                  analytics-if="ctrl.restrictDefaultToggledOn()"
+                  analytics-category="kubernetes"
+                  analytics-event="kubernetes-configure"
+                  analytics-properties="{ metadata: { restrictAccessToDefaultNamespace: ctrl.formValues.RestrictDefaultNamespace } }"
+                  data-cy="kubeSetup-saveConfigurationButton"
                 >
                   <span ng-hide="ctrl.state.actionInProgress">Save configuration</span>
                   <span ng-show="ctrl.state.actionInProgress">Saving configuration...</span>

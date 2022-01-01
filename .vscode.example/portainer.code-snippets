@@ -1,0 +1,182 @@
+{
+  // Place your portainer workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
+  // description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
+  // is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
+  // used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+  // $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
+  // Placeholders with the same ids are connected.
+  // Example:
+  // "Print to console": {
+  // 	"scope": "javascript,typescript",
+  // 	"prefix": "log",
+  // 	"body": [
+  // 		"console.log('$1');",
+  // 		"$2"
+  // 	],
+  // 	"description": "Log output to console"
+  // }
+  "Component": {
+    "scope": "javascript",
+    "prefix": "mycomponent",
+    "description": "Dummy Angularjs Component",
+    "body": [
+      "import angular from 'angular';",
+      "import controller from './${TM_FILENAME_BASE}Controller'",
+      "",
+      "angular.module('portainer.${TM_DIRECTORY/.*\\/app\\/([^\\/]*)(\\/.*)?$/$1/}').component('$TM_FILENAME_BASE', {",
+      "  templateUrl: './$TM_FILENAME_BASE.html',",
+      "  controller,",
+      "});",
+      ""
+    ]
+  },
+  "Controller": {
+    "scope": "javascript",
+    "prefix": "mycontroller",
+    "body": [
+      "class ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/} {",
+      "\t/* @ngInject */",
+      "\tconstructor($0) {",
+      "\t}",
+      "}",
+      "",
+      "export default ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/};"
+    ],
+    "description": "Dummy ES6+ controller"
+  },
+  "Service": {
+    "scope": "javascript",
+    "prefix": "myservice",
+    "description": "Dummy ES6+ service",
+    "body": [
+      "import angular from 'angular';",
+      "import PortainerError from 'Portainer/error';",
+      "",
+      "class $1 {",
+      "  /* @ngInject */",
+      "  constructor(\\$async, $0) {",
+      "    this.\\$async = \\$async;",
+      "",
+      "    this.getAsync = this.getAsync.bind(this);",
+      "    this.getAllAsync = this.getAllAsync.bind(this);",
+      "    this.createAsync = this.createAsync.bind(this);",
+      "    this.updateAsync = this.updateAsync.bind(this);",
+      "    this.deleteAsync = this.deleteAsync.bind(this);",
+      "  }",
+      "",
+      "  /**",
+      "   * GET",
+      "   */",
+      "  async getAsync() {",
+      "    try {",
+      "",
+      "    } catch (err) {",
+      "      throw new PortainerError('', err);",
+      "    }",
+      "  }",
+      "",
+      "  async getAllAsync() {",
+      "    try {",
+      "",
+      "    } catch (err) {",
+      "      throw new PortainerError('', err);",
+      "    }",
+      "  }",
+      "",
+      "  get() {",
+      "    if () {",
+      "      return this.\\$async(this.getAsync);",
+      "    }",
+      "    return this.\\$async(this.getAllAsync);",
+      "  }",
+      "",
+      "  /**",
+      "   * CREATE",
+      "   */",
+      "  async createAsync() {",
+      "    try {",
+      "",
+      "    } catch (err) {",
+      "      throw new PortainerError('', err);",
+      "    }",
+      "  }",
+      "",
+      "  create() {",
+      "    return this.\\$async(this.createAsync);",
+      "  }",
+      "",
+      "  /**",
+      "   * UPDATE",
+      "   */",
+      "  async updateAsync() {",
+      "    try {",
+      "",
+      "    } catch (err) {",
+      "      throw new PortainerError('', err);",
+      "    }",
+      "  }",
+      "",
+      "  update() {",
+      "    return this.\\$async(this.updateAsync);",
+      "  }",
+      "",
+      "  /**",
+      "   * DELETE",
+      "   */",
+      "  async deleteAsync() {",
+      "    try {",
+      "",
+      "    } catch (err) {",
+      "      throw new PortainerError('', err);",
+      "    }",
+      "  }",
+      "",
+      "  delete() {",
+      "    return this.\\$async(this.deleteAsync);",
+      "  }",
+      "}",
+      "",
+      "export default $1;",
+      "angular.module('portainer.${TM_DIRECTORY/.*\\/app\\/([^\\/]*)(\\/.*)?$/$1/}').service('$1', $1);"
+    ]
+  },
+  "swagger-api-doc": {
+    "prefix": "swapi",
+    "scope": "go",
+    "description": "Snippet for a api doc",
+    "body": [
+      "// @id ",
+      "// @summary ",
+      "// @description ",
+      "// @description **Access policy**: ",
+      "// @tags ",
+      "// @security ApiKeyAuth",
+      "// @security jwt",
+      "// @accept json",
+      "// @produce json",
+      "// @param id path int true \"identifier\"",
+      "// @param body body Object true \"details\"",
+      "// @success 200 {object} portainer. \"Success\"",
+      "// @success 204 \"Success\"",
+      "// @failure 400 \"Invalid request\"",
+      "// @failure 403 \"Permission denied\"",
+      "// @failure 404 \" not found\"",
+      "// @failure 500 \"Server error\"",
+      "// @router /{id} [get]"
+    ]
+  },
+  "analytics": {
+    "prefix": "nlt",
+    "body": ["analytics-on", "analytics-category=\"$1\"", "analytics-event=\"$2\""],
+    "description": "analytics"
+  },
+  "analytics-if": {
+    "prefix": "nltf",
+    "body": ["analytics-if=\"$1\""],
+    "description": "analytics"
+  },
+  "analytics-metadata": {
+    "prefix": "nltm",
+    "body": "analytics-properties=\"{ metadata: { $1 } }\""
+  }
+}

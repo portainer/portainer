@@ -21,15 +21,16 @@
                 model="$ctrl.formValues"
                 action-in-progress="$ctrl.state.actionInProgress"
                 submit-action="$ctrl.deployStack"
+                is-editor-dirty="$ctrl.state.isEditorDirty"
               ></edit-edge-stack-form>
             </div>
           </uib-tab>
           <uib-tab index="1" classes="btn-sm">
-            <uib-tab-heading> <i class="fa fa-plug space-right" aria-hidden="true"></i> Endpoints</uib-tab-heading>
+            <uib-tab-heading> <i class="fa fa-plug space-right" aria-hidden="true"></i> Environments</uib-tab-heading>
 
             <div style="margin-top: 25px;">
               <edge-stack-endpoints-datatable
-                title-text="Endpoints Status"
+                title-text="Environments Status"
                 dataset="$ctrl.endpoints"
                 title-icon="fa-plug"
                 table-key="edgeStackEndpoints"

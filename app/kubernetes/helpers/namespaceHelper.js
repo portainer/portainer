@@ -1,16 +1,33 @@
 import _ from 'lodash-es';
-import angular from 'angular';
 
-class KubernetesNamespaceHelper {
-  /* @ngInject */
-  constructor(KUBERNETES_SYSTEM_NAMESPACES) {
-    this.KUBERNETES_SYSTEM_NAMESPACES = KUBERNETES_SYSTEM_NAMESPACES;
+import { KUBERNETES_DEFAULT_NAMESPACE, KUBERNETES_DEFAULT_SYSTEM_NAMESPACES } from 'Kubernetes/models/namespace/models';
+import { isSystem } from 'Kubernetes/store/namespace';
+
+export default class KubernetesNamespaceHelper {
+  /**
+   * Check if namespace is system or not
+   * @param {String} namespace Namespace (string name) to evaluate
+   * @returns Boolean
+   */
+  static isSystemNamespace(namespace) {
+    return isSystem(namespace);
   }
 
-  isSystemNamespace(namespace) {
-    return _.includes(this.KUBERNETES_SYSTEM_NAMESPACES, namespace);
+  /**
+   * Check if namespace is default or not
+   * @param {String} namespace Namespace (string name) to evaluate
+   * @returns Boolean
+   */
+  static isDefaultNamespace(namespace) {
+    return namespace === KUBERNETES_DEFAULT_NAMESPACE;
+  }
+
+  /**
+   * Check if namespace is one of the default system namespaces
+   * @param {String} namespace Namespace (string name) to evaluate
+   * @returns Boolean
+   */
+  static isDefaultSystemNamespace(namespace) {
+    return _.includes(KUBERNETES_DEFAULT_SYSTEM_NAMESPACES, namespace);
   }
 }
-
-export default KubernetesNamespaceHelper;
-angular.module('portainer.app').service('KubernetesNamespaceHelper', KubernetesNamespaceHelper);

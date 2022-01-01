@@ -4,9 +4,20 @@
   "htmlWhitespaceSensitivity": "strict",
   "overrides": [
     {
-      "files": ["*.html"],
+      "files": [
+        "*.html"
+      ],
       "options": {
         "parser": "angular"
+      }
+    },
+    {
+      "files": [
+        "*.{j,t}sx",
+        "*.ts"
+      ],
+      "options": {
+        "printWidth": 80
       }
     }
   ]

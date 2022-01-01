@@ -26,7 +26,9 @@ class KubernetesNodeService {
       const [details, yaml] = await Promise.all([this.KubernetesNodes().get(params).$promise, this.KubernetesNodes().getYaml(params).$promise]);
       return KubernetesNodeConverter.apiToNodeDetails(details, yaml);
     } catch (err) {
-      throw new PortainerError('Unable to retrieve node details', err);
+      // changing the structure of error message to fix [object, Object] issue
+      const errData = err.data;
+      throw new PortainerError('Unable to retrieve node details', errData);
     }
   }
 
@@ -57,7 +59,8 @@ class KubernetesNodeService {
       const newNode = KubernetesNodeConverter.formValuesToNode(node, nodeFormValues);
       const payload = KubernetesNodeConverter.patchPayload(node, newNode);
       const data = await this.KubernetesNodes().patch(params, payload).$promise;
-      return data;
+      const patchedNode = KubernetesNodeConverter.apiToNodeDetails(data);
+      return patchedNode;
     } catch (err) {
       throw { msg: 'Unable to patch node', err: err };
     }

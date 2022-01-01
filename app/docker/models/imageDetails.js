@@ -16,4 +16,5 @@ export function ImageDetailsViewModel(data) {
   this.ExposedPorts = data.ContainerConfig.ExposedPorts ? Object.keys(data.ContainerConfig.ExposedPorts) : [];
   this.Volumes = data.ContainerConfig.Volumes ? Object.keys(data.ContainerConfig.Volumes) : [];
   this.Env = data.ContainerConfig.Env ? data.ContainerConfig.Env : [];
+  this.Labels = data.ContainerConfig.Labels;
 }

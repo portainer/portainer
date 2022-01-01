@@ -1,0 +1,51 @@
+<div class="form-group">
+  <div class="col-sm-12">
+    <por-switch-field
+      checked="$ctrl.model.RepositoryAuthentication"
+      label="'Authentication'"
+      name="'authSwitch'"
+      on-change="($ctrl.onChangeAuth)"
+      data-cy="'component-gitAuthToggle'"
+    ></por-switch-field>
+  </div>
+</div>
+<div class="small text-warning" style="margin: 5px 0 15px 0;" ng-if="$ctrl.model.RepositoryAuthentication && $ctrl.showAuthExplanation">
+  <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+  <span class="text-muted">Enabling authentication will store the credentials and it is advisable to use a git service account</span>
+</div>
+<div ng-if="$ctrl.model.RepositoryAuthentication">
+  <div class="form-group">
+    <label for="repository_username" class="control-label text-left inline-label">
+      Username
+    </label>
+    <div class="inline-input">
+      <input
+        type="text"
+        class="form-control"
+        ng-model="$ctrl.model.RepositoryUsername"
+        name="repository_username"
+        placeholder="git username"
+        ng-change="$ctrl.onChangeUsername($ctrl.model.RepositoryUsername)"
+        data-cy="component-gitUsernameInput"
+      />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="repository_password" class="control-label text-left inline-label">
+      Personal Access Token
+      <portainer-tooltip position="bottom" message="Provide a personal access token or password"></portainer-tooltip>
+    </label>
+    <div class="inline-input">
+      <input
+        type="password"
+        class="form-control"
+        ng-model="$ctrl.model.RepositoryPassword"
+        name="repository_password"
+        placeholder="*******"
+        ng-change="$ctrl.onChangePassword($ctrl.model.RepositoryPassword)"
+        ng-required="!$ctrl.isEdit"
+        data-cy="component-gitPasswordInput"
+      />
+    </div>
+  </div>
+</div>

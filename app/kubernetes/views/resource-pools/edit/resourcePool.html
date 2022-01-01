@@ -1,5 +1,5 @@
-<kubernetes-view-header title="Resource pool details" state="kubernetes.resourcePools.resourcePool" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; {{ ctrl.pool.Namespace.Name }}
+<kubernetes-view-header title="Namespace details" state="kubernetes.resourcePools.resourcePool" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt; {{ ctrl.pool.Namespace.Name }}
 </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
@@ -11,13 +11,22 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading> <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Resource pool </uib-tab-heading>
+              <uib-tab-heading> <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Namespace </uib-tab-heading>
               <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px;">
                 <!-- name-input -->
                 <div class="form-group">
-                  <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
-                  <div class="col-sm-11">
-                    <input type="text" class="form-control" name="pool_name" ng-model="ctrl.pool.Namespace.Name" disabled />
+                  <div class="col-sm-12">
+                    <table class="table">
+                      <tbody>
+                        <tr>
+                          <td>Name</td>
+                          <td>
+                            {{ ctrl.pool.Namespace.Name }}
+                            <span class="label label-info image-tag label-margins" ng-if="ctrl.isSystem">system</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
                 <!-- !name-input -->
@@ -36,6 +45,20 @@
                     <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
                   </span>
                 </div>
+                <div ng-if="ctrl.formValues.HasQuota">
+                  <kubernetes-resource-reservation
+                    ng-if="ctrl.pool.Quota"
+                    description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this namespace."
+                    cpu-reservation="ctrl.state.resourceReservation.CPU"
+                    memory-reservation="ctrl.state.resourceReservation.Memory"
+                    cpu-limit="ctrl.formValues.CpuLimit"
+                    memory-limit="ctrl.formValues.MemoryLimit"
+                    display-usage="ctrl.state.useServerMetrics"
+                    cpu-usage="ctrl.state.resourceUsage.CPU"
+                    memory-usage="ctrl.state.resourceUsage.Memory"
+                  >
+                  </kubernetes-resource-reservation>
+                </div>
                 <!-- !quotas-switch -->
                 <div ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable">
                   <div class="col-sm-12 form-section-title">
@@ -50,7 +73,7 @@
                       <div class="col-sm-3">
                         <slider
                           model="ctrl.formValues.MemoryLimit"
-                          floor="ctrl.defaults.MemoryLimit"
+                          floor="ctrl.ResourceQuotaDefaults.MemoryLimit"
                           ceil="ctrl.state.sliderMaxMemory"
                           step="128"
                           ng-if="ctrl.state.sliderMaxMemory"
@@ -60,7 +83,7 @@
                         <input
                           name="memory_limit"
                           type="number"
-                          min="{{ ctrl.defaults.MemoryLimit }}"
+                          min="{{ ctrl.ResourceQuotaDefaults.MemoryLimit }}"
                           max="{{ ctrl.state.sliderMaxMemory }}"
                           class="form-control"
                           ng-model="ctrl.formValues.MemoryLimit"
@@ -78,7 +101,7 @@
                       <div class="col-sm-12 small text-warning">
                         <div ng-messages="resourcePoolEditForm.pool_name.$error">
                           <p
-                            ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and
+                            ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.ResourceQuotaDefaults.MemoryLimit }} and
                             {{ ctrl.state.sliderMaxMemory }}</p
                           >
                         </div>
@@ -93,7 +116,7 @@
                       <div class="col-sm-5">
                         <slider
                           model="ctrl.formValues.CpuLimit"
-                          floor="ctrl.defaults.CpuLimit"
+                          floor="ctrl.ResourceQuotaDefaults.CpuLimit"
                           ceil="ctrl.state.sliderMaxCpu"
                           step="0.1"
                           precision="2"
@@ -109,17 +132,31 @@
                     <!-- !cpu-limit-input -->
                   </div>
                 </div>
-                <div ng-if="ctrl.formValues.HasQuota">
-                  <kubernetes-resource-reservation
-                    ng-if="ctrl.pool.Quota"
-                    description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this resource pool."
-                    cpu="ctrl.state.cpuUsed"
-                    memory="ctrl.state.memoryUsed"
-                    cpu-limit="ctrl.formValues.CpuLimit"
-                    memory-limit="ctrl.formValues.MemoryLimit"
-                  >
-                  </kubernetes-resource-reservation>
+                <!-- #region LOADBALANCERS -->
+                <div class="col-sm-12 form-section-title">
+                  Load balancers
                 </div>
+
+                <div class="form-group">
+                  <span class="col-sm-12 text-muted small">
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    You can set a quota on the amount of external load balancers that can be created inside this namespace. Set this quota to 0 to effectively disable the use of
+                    load balancers in this namespace.
+                  </span>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <por-switch-field
+                      data-cy="'k8sNamespaceCreate-loadBalancerQuotaToggle'"
+                      label="'Load Balancer quota'"
+                      name="'k8s-resourcepool-Lbquota'"
+                      feature-id="ctrl.LBQuotaFeatureId"
+                      checked="ctrl.formValues.UseLoadBalancersQuota"
+                      on-change="(ctrl.onToggleLoadBalancersQuota)"
+                    ></por-switch-field>
+                  </div>
+                </div>
+                <!-- #endregion -->
                 <div ng-if="ctrl.isAdmin && ctrl.isEditable && ctrl.state.canUseIngress">
                   <div class="col-sm-12 form-section-title">
                     Ingresses
@@ -128,8 +165,8 @@
                   <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length === 0">
                     <div class="col-sm-12 small text-muted">
                       The ingress feature must be enabled in the
-                      <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside
-                      this resource pool.
+                      <a ui-sref="portainer.k8sendpoint.kubernetesConfig({id: ctrl.endpoint.Id})">environment configuration view</a> to be able to register ingresses inside this
+                      namespace.
                     </div>
                   </div>
 
@@ -142,7 +179,7 @@
                     </div>
                   </div>
 
-                  <div class="form-group" ng-repeat-start="ic in ctrl.formValues.IngressClasses">
+                  <div class="form-group" ng-repeat-start="ic in ctrl.formValues.IngressClasses track by ic.IngressClass.Name">
                     <div class="text-muted col-sm-12" style="width: 100%;">
                       <div style="border-bottom: 1px solid #cdcdcd; padding-bottom: 5px;">
                         <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i> {{ ic.IngressClass.Name }}
@@ -159,34 +196,63 @@
 
                   <div ng-if="ic.Selected">
                     <div class="form-group">
-                      <label class="control-label text-left col-sm-2">
-                        Hostname
-                        <portainer-tooltip
-                          position="bottom"
-                          message="Hostname associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via this hostname."
-                        >
-                        </portainer-tooltip>
-                      </label>
-                      <div class="col-sm-10">
-                        <input
-                          class="form-control"
-                          name="ingress_host_{{ $index }}"
-                          ng-model="ic.Host"
-                          placeholder="host.com"
-                          ng-change="ctrl.onChangeIngressHostname()"
-                          required
-                        />
+                      <div class="col-sm-12">
+                        <label class="control-label text-left">
+                          Hostnames
+                          <portainer-tooltip
+                            position="bottom"
+                            message="Hostnames associated to the ingress inside this namespace. Users will be able to expose and access their applications over the ingress via one of these hostname."
+                          >
+                          </portainer-tooltip>
+                        </label>
+                        <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addHostname(ic)">
+                          <i class="fa fa-plus-circle" aria-hidden="true"></i> add hostname
+                        </span>
                       </div>
-                    </div>
-                    <div class="form-group" ng-show="resourcePoolEditForm['ingress_host_' + $index].$invalid || ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined">
-                      <div class="col-sm-12 small text-warning">
-                        <div ng-messages="resourcePoolEditForm['ingress_host_' + $index].$error">
-                          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                      <div class="col-sm-12" style="margin-top: 10px;">
+                        <div ng-repeat="item in ic.Hosts track by $index" style="margin-top: 2px;">
+                          <div class="form-inline">
+                            <div class="col-sm-10 input-group input-group-sm" ng-class="{ striked: item.NeedsDeletion }">
+                              <span class="input-group-addon">Hostname</span>
+                              <input
+                                type="text"
+                                class="form-control"
+                                name="hostname_{{ ic.IngressClass.Name }}_{{ $index }}"
+                                ng-model="item.Host"
+                                ng-change="ctrl.onChangeIngressHostname()"
+                                placeholder="foo"
+                                pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
+                                required
+                              />
+                            </div>
+                            <div class="col-sm-1 input-group input-group-sm" ng-if="$index > 0">
+                              <button ng-if="!item.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeHostname(ic, $index)">
+                                <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                              </button>
+                              <button ng-if="item.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreHostname(item)">
+                                <i class="fa fa-trash-restore" aria-hidden="true"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div
+                            class="small text-warning"
+                            style="margin-top: 5px;"
+                            ng-show="resourcePoolEditForm['hostname_' + ic.IngressClass.Name + '_' + $index].$invalid || item.Duplicate"
+                          >
+                            <ng-messages for="resourcePoolEditForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
+                              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hostname is required.</p>
+                              <p ng-message="pattern">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g.
+                                'example.com').
+                              </p>
+                            </ng-messages>
+                            <p ng-if="item.Duplicate">
+                              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                              This hostname is already used.
+                            </p>
+                          </div>
                         </div>
-                        <p ng-if="ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined">
-                          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                          This host is already used.
-                        </p>
                       </div>
                     </div>
 
@@ -250,21 +316,116 @@
                   </div>
                   <!-- #endregion -->
                 </div>
+
+                <!-- #region REGISTRIES -->
+                <div>
+                  <div class="col-sm-12 form-section-title">
+                    Registries
+                  </div>
+
+                  <div class="form-group" ng-if="!ctrl.isAdmin || ctrl.isSystem">
+                    <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0;">
+                      Selected registries
+                    </label>
+                    <div class="col-sm-9 col-lg-4">
+                      {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }}
+                    </div>
+                  </div>
+
+                  <div ng-if="ctrl.isAdmin && !ctrl.isSystem">
+                    <div class="form-group">
+                      <div class="col-sm-12 small text-muted">
+                        <p>
+                          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Define which registry can be used by users who have access to this namespace.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0;">
+                        Select registries
+                      </label>
+                      <div class="col-sm-9 col-lg-4">
+                        <span class="small text-muted" ng-if="!ctrl.registries.length && ctrl.state.isAdmin">
+                          No registries available. Head over <a ui-sref="portainer.registries">registry view</a> to define container registry.
+                        </span>
+                        <span class="small text-muted" ng-if="!ctrl.registries.length && !ctrl.state.isAdmin">
+                          No registries available. Contact your administrator to create a container registry.
+                        </span>
+                        <span
+                          isteven-multi-select
+                          ng-if="ctrl.registries.length"
+                          input-model="ctrl.registries"
+                          output-model="ctrl.formValues.Registries"
+                          button-label="Name"
+                          item-label="Name"
+                          tick-property="Checked"
+                          helper-elements="filter"
+                          search-property="Name"
+                          translation="{nothingSelected: 'Select one or more registry', search: 'Search...'}"
+                        >
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- #endregion -->
+
+                <!-- #region STORAGES -->
+                <div class="col-sm-12 form-section-title">
+                  Storage
+                </div>
+
+                <div class="form-group">
+                  <span class="col-sm-12 text-muted small">
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to
+                    effectively prevent the usage of a specific storage option inside this namespace.
+                  </span>
+                </div>
+                <div class="col-sm-12 form-section-title">
+                  <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
+                  standard
+                </div>
+
+                <storage-class-switch value="sc.Selected" name="sc.Name" on-change="(ctrl.onToggleStorageQuota)" authorization="K8sResourcePoolDetailsW"></storage-class-switch>
+
+                <!-- #endregion -->
+
+                <!-- summary -->
+                <kubernetes-summary-view
+                  ng-if="resourcePoolEditForm.$valid && !ctrl.isUpdateButtonDisabled()"
+                  form-values="ctrl.formValues"
+                  old-form-values="ctrl.savedFormValues"
+                ></kubernetes-summary-view>
+                <!-- !summary -->
+
                 <!-- actions -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
+                <div ng-if="ctrl.isAdmin" class="col-sm-12 form-section-title">
                   Actions
                 </div>
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
+                <div ng-if="ctrl.isAdmin" class="form-group">
                   <div class="col-sm-12">
                     <button
                       type="button"
+                      ng-if="!ctrl.isSystem"
                       class="btn btn-primary btn-sm"
                       ng-disabled="!resourcePoolEditForm.$valid || ctrl.isUpdateButtonDisabled()"
                       ng-click="ctrl.updateResourcePool()"
                       button-spinner="ctrl.state.actionInProgress"
                     >
-                      <span ng-hide="ctrl.state.actionInProgress">Update resource pool</span>
+                      <span ng-hide="ctrl.state.actionInProgress" data-cy="k8sNamespaceEdit-updateNamespaceButton">Update namespace</span>
                       <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
+                    </button>
+                    <button
+                      ng-if="!ctrl.isDefaultNamespace"
+                      type="button"
+                      class="btn btn-primary btn-sm"
+                      ng-click="ctrl.markUnmarkAsSystem()"
+                      button-spinner="ctrl.state.actionInProgress"
+                    >
+                      <span ng-if="ctrl.isSystem">Unmark as system</span>
+                      <span ng-if="!ctrl.isSystem">Mark as system</span>
                     </button>
                   </div>
                 </div>
@@ -310,7 +471,7 @@
         order-by="Name"
         refresh-callback="ctrl.getApplications"
         loading="ctrl.state.applicationsLoading"
-        title-text="Applications running in this resource pool"
+        title-text="Applications running in this namespace"
         title-icon="fa-laptop-code"
       >
       </kubernetes-resource-pool-applications-datatable>

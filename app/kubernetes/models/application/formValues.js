@@ -1,40 +1,37 @@
+import { PorImageRegistryModel } from '@/docker/models/porImageRegistry';
 import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes, KubernetesApplicationPlacementTypes } from './models';
 
 /**
  * KubernetesApplicationFormValues Model
  */
-const _KubernetesApplicationFormValues = Object.freeze({
-  ApplicationType: undefined, // will only exist for formValues generated from Application (app edit situation)
-  ResourcePool: {},
-  Name: '',
-  StackName: '',
-  ApplicationOwner: '',
-  Image: '',
-  Note: '',
-  MemoryLimit: 0,
-  CpuLimit: 0,
-  DeploymentType: KubernetesApplicationDeploymentTypes.REPLICATED,
-  ReplicaCount: 1,
-  AutoScaler: {},
-  Containers: [],
-  EnvironmentVariables: [], // KubernetesApplicationEnvironmentVariableFormValue list
-  DataAccessPolicy: KubernetesApplicationDataAccessPolicies.SHARED,
-  PersistedFolders: [], // KubernetesApplicationPersistedFolderFormValue list
-  Configurations: [], // KubernetesApplicationConfigurationFormValue list
-  PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
-  PublishedPorts: [], // KubernetesApplicationPublishedPortFormValue list
-  PlacementType: KubernetesApplicationPlacementTypes.PREFERRED,
-  Placements: [], // KubernetesApplicationPlacementFormValue list
-  OriginalIngresses: undefined,
-});
-
-export class KubernetesApplicationFormValues {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationFormValues)));
-  }
+export function KubernetesApplicationFormValues() {
+  this.ApplicationType = undefined; // will only exist for formValues generated from Application (app edit situation;
+  this.ResourcePool = {};
+  this.Name = '';
+  this.StackName = '';
+  this.ApplicationOwner = '';
+  this.ImageModel = new PorImageRegistryModel();
+  this.Note = '';
+  this.MemoryLimit = 0;
+  this.CpuLimit = 0;
+  this.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
+  this.ReplicaCount = 1;
+  this.AutoScaler = {};
+  this.Containers = [];
+  this.EnvironmentVariables = []; // KubernetesApplicationEnvironmentVariableFormValue lis;
+  this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
+  this.PersistedFolders = []; // KubernetesApplicationPersistedFolderFormValue lis;
+  this.Configurations = []; // KubernetesApplicationConfigurationFormValue lis;
+  this.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER_IP;
+  this.PublishedPorts = []; // KubernetesApplicationPublishedPortFormValue lis;
+  this.PlacementType = KubernetesApplicationPlacementTypes.PREFERRED;
+  this.Placements = []; // KubernetesApplicationPlacementFormValue lis;
+  this.OriginalIngresses = undefined;
+  this.IsPublishingService = false;
 }
 
 export const KubernetesApplicationConfigurationFormValueOverridenKeyTypes = Object.freeze({
+  NONE: 0,
   ENVIRONMENT: 1,
   FILESYSTEM: 2,
 });
@@ -78,6 +75,7 @@ const _KubernetesApplicationEnvironmentVariableFormValue = Object.freeze({
   IsSecret: false,
   NeedsDeletion: false,
   IsNew: true,
+  NameIndex: '', // keep the original name for sorting
 });
 
 export class KubernetesApplicationEnvironmentVariableFormValue {
@@ -122,6 +120,7 @@ export function KubernetesApplicationPublishedPortFormValue() {
     IngressName: undefined,
     IngressRoute: undefined,
     IngressHost: undefined,
+    IngressHosts: [],
   };
 }
 
@@ -151,9 +150,9 @@ export class KubernetesApplicationAutoScalerFormValue {
   }
 }
 
-export function KubernetesFormValueDuplicate() {
+export function KubernetesFormValidationReferences() {
   return {
     refs: {},
-    hasDuplicates: false,
+    hasRefs: false,
   };
 }

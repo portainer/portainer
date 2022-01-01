@@ -7,19 +7,20 @@ import (
 
 	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle edge endpoint operations.
+// Handler is the HTTP handler used to handle edge environment(endpoint) operations.
 type Handler struct {
 	*mux.Router
 	requestBouncer       *security.RequestBouncer
-	DataStore            portainer.DataStore
+	DataStore            dataservices.DataStore
 	FileService          portainer.FileService
 	ReverseTunnelService portainer.ReverseTunnelService
 }
 
-// NewHandler creates a handler to manage endpoint operations.
+// NewHandler creates a handler to manage environment(endpoint) operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),

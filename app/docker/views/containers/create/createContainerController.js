@@ -1,11 +1,14 @@
 import _ from 'lodash-es';
-import * as simpleDuration from 'simple-duration';
-import * as envVarsUtils from '@/portainer/helpers/env-vars';
+
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
+import * as envVarsUtils from '@/portainer/helpers/env-vars';
+import * as simpleDuration from 'simple-duration';
 import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '../../../models/container';
+
+import './createcontainer.css';
 
 angular.module('portainer.docker').controller('CreateContainerController', [
   '$q',
@@ -61,6 +64,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     endpoint
   ) {
     $scope.create = create;
+    $scope.update = update;
     $scope.endpoint = endpoint;
 
     $scope.formValues = {
@@ -98,6 +102,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       actionInProgress: false,
       mode: '',
       pullImageValidity: true,
+      settingUnlimitedResources: false,
     };
 
     $scope.handleEnvVarChange = handleEnvVarChange;
@@ -621,7 +626,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           $scope.formValues.RegistryModel = model;
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrive registry');
+          Notifications.error('Failure', err, 'Unable to retrieve registry');
         });
     }
 
@@ -821,6 +826,40 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         return false;
       }
       return true;
+    }
+
+    $scope.handleResourceChange = handleResourceChange;
+    function handleResourceChange() {
+      $scope.state.settingUnlimitedResources = false;
+      if (
+        ($scope.config.HostConfig.Memory > 0 && $scope.formValues.MemoryLimit === 0) ||
+        ($scope.config.HostConfig.MemoryReservation > 0 && $scope.formValues.MemoryReservation === 0) ||
+        ($scope.config.HostConfig.NanoCpus > 0 && $scope.formValues.CpuLimit === 0)
+      ) {
+        $scope.state.settingUnlimitedResources = true;
+      }
+    }
+
+    async function updateLimits(config) {
+      try {
+        if ($scope.state.settingUnlimitedResources) {
+          create();
+        } else {
+          await ContainerService.updateLimits($transition$.params().from, config);
+          $scope.config = config;
+          Notifications.success('Limits updated');
+        }
+      } catch (err) {
+        Notifications.error('Failure', err, 'Update Limits fail');
+      }
+    }
+
+    async function update() {
+      $scope.state.actionInProgress = true;
+      var config = angular.copy($scope.config);
+      prepareResources(config);
+      await updateLimits(config);
+      $scope.state.actionInProgress = false;
     }
 
     function create() {

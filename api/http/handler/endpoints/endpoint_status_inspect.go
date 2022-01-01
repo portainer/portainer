@@ -5,53 +5,79 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type stackStatusResponse struct {
-	ID      portainer.EdgeStackID
-	Version int
+	// EdgeStack Identifier
+	ID portainer.EdgeStackID `example:"1"`
+	// Version of this stack
+	Version int `example:"3"`
 }
 
 type edgeJobResponse struct {
-	ID             portainer.EdgeJobID `json:"Id"`
-	CollectLogs    bool                `json:"CollectLogs"`
-	CronExpression string              `json:"CronExpression"`
-	Script         string              `json:"Script"`
-	Version        int                 `json:"Version"`
+	// EdgeJob Identifier
+	ID portainer.EdgeJobID `json:"Id" example:"2"`
+	// Whether to collect logs
+	CollectLogs bool `json:"CollectLogs" example:"true"`
+	// A cron expression to schedule this job
+	CronExpression string `json:"CronExpression" example:"* * * * *"`
+	// Script to run
+	Script string `json:"Script" example:"echo hello"`
+	// Version of this EdgeJob
+	Version int `json:"Version" example:"2"`
 }
 
 type endpointStatusInspectResponse struct {
-	Status          string                `json:"status"`
-	Port            int                   `json:"port"`
-	Schedules       []edgeJobResponse     `json:"schedules"`
-	CheckinInterval int                   `json:"checkin"`
-	Credentials     string                `json:"credentials"`
-	Stacks          []stackStatusResponse `json:"stacks"`
+	// Status represents the environment(endpoint) status
+	Status string `json:"status" example:"REQUIRED"`
+	// The tunnel port
+	Port int `json:"port" example:"8732"`
+	// List of requests for jobs to run on the environment(endpoint)
+	Schedules []edgeJobResponse `json:"schedules"`
+	// The current value of CheckinInterval
+	CheckinInterval int `json:"checkin" example:"5"`
+	//
+	Credentials string `json:"credentials" example:""`
+	// List of stacks to be deployed on the environments(endpoints)
+	Stacks []stackStatusResponse `json:"stacks"`
 }
 
-// GET request on /api/endpoints/:id/status
+// @id EndpointStatusInspect
+// @summary Get environment(endpoint) status
+// @description Environment(Endpoint) for edge agent to check status of environment(endpoint)
+// @description **Access policy**: restricted only to Edge environments(endpoints)
+// @tags endpoints
+// @security ApiKeyAuth
+// @security jwt
+// @param id path int true "Environment(Endpoint) identifier"
+// @success 200 {object} endpointStatusInspectResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied to access environment(endpoint)"
+// @failure 404 "Environment(Endpoint) not found"
+// @failure 500 "Server error"
+// @router /endpoints/{id}/status [get]
 func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	if endpoint.EdgeID == "" {
@@ -75,11 +101,13 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		} else if agentPlatform == portainer.AgentPlatformKubernetes {
 			endpoint.Type = portainer.EdgeAgentOnKubernetesEnvironment
 		}
+	}
 
-		err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist endpoint changes inside the database", err}
-		}
+	endpoint.LastCheckInDate = time.Now().Unix()
+
+	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist environment changes inside the database", err}
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()
@@ -103,7 +131,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 			Version:        job.Version,
 		}
 
-		file, err := handler.FileService.GetFileContent(job.ScriptPath)
+		file, err := handler.FileService.GetFileContent("", job.ScriptPath)
 
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge job script file", err}

@@ -7,12 +7,25 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// DELETE request on /api/users/:id
+// @id UserDelete
+// @summary Remove a user
+// @description Remove a user.
+// @description **Access policy**: administrator
+// @tags users
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param id path int true "User identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "User not found"
+// @failure 500 "Server error"
+// @router /users/{id} [delete]
 func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -33,7 +46,7 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
@@ -79,6 +92,18 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 	err = handler.DataStore.TeamMembership().DeleteTeamMembershipByUserID(user.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user memberships from the database", err}
+	}
+
+	// Remove all of the users persisted API keys
+	apiKeys, err := handler.apiKeyService.GetAPIKeys(user.ID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user API keys from the database", err}
+	}
+	for _, k := range apiKeys {
+		err = handler.apiKeyService.DeleteAPIKey(k.ID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user API key from the database", err}
+		}
 	}
 
 	return response.Empty(w)

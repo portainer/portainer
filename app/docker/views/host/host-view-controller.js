@@ -1,3 +1,5 @@
+import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
+
 angular.module('portainer.docker').controller('HostViewController', [
   '$q',
   'SystemService',
@@ -6,8 +8,7 @@ angular.module('portainer.docker').controller('HostViewController', [
   'AgentService',
   'ContainerService',
   'Authentication',
-  'EndpointProvider',
-  function HostViewController($q, SystemService, Notifications, StateManager, AgentService, ContainerService, Authentication, EndpointProvider) {
+  function HostViewController($q, SystemService, Notifications, StateManager, AgentService, ContainerService, Authentication) {
     var ctrl = this;
 
     this.$onInit = initView;
@@ -29,7 +30,7 @@ angular.module('portainer.docker').controller('HostViewController', [
       ctrl.state.isAdmin = Authentication.isAdmin();
       var agentApiVersion = applicationState.endpoint.agentApiVersion;
       ctrl.state.agentApiVersion = agentApiVersion;
-      ctrl.state.enableHostManagementFeatures = applicationState.application.enableHostManagementFeatures;
+      ctrl.state.enableHostManagementFeatures = ctrl.endpoint.SecuritySettings.enableHostManagementFeatures;
 
       $q.all({
         version: SystemService.version(),
@@ -39,7 +40,7 @@ angular.module('portainer.docker').controller('HostViewController', [
         .then(function success(data) {
           ctrl.engineDetails = buildEngineDetails(data);
           ctrl.hostDetails = buildHostDetails(data.info);
-          ctrl.state.offlineMode = EndpointProvider.offlineMode();
+          ctrl.state.offlineMode = isOfflineEndpoint(ctrl.endpoint);
           ctrl.jobs = data.jobs;
 
           if (ctrl.state.isAgent && agentApiVersion > 1) {

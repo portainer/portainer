@@ -1,7 +1,7 @@
 <rd-header ng-if="$ctrl.viewReady">
   <rd-header-title title-text="{{ $ctrl.title }}">
-    <a data-toggle="tooltip" title="refresh the view" ui-sref="{{ $ctrl.state }}" ui-sref-opts="{reload: true}" ng-if="$ctrl.viewReady">
-      <i class="fa fa-sm fa-sync" aria-hidden="true"></i>
+    <a data-toggle="tooltip" title="refresh the view" ui-sref="{{ $ctrl.state }}" ui-sref-opts="{reload: $ctrl.state}" ng-if="$ctrl.viewReady">
+      <i class="fa fa-sm fa-sync" aria-hidden="true" data-cy="component-refreshTableButton"></i>
     </a>
   </rd-header-title>
   <rd-header-content>

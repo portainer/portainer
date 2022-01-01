@@ -16,8 +16,8 @@ angular.module('portainer.app').controller('TemplatesController', [
   'ResourceControlService',
   'Authentication',
   'FormValidator',
-  'SettingsService',
   'StackService',
+  'endpoint',
   function (
     $scope,
     $q,
@@ -33,9 +33,12 @@ angular.module('portainer.app').controller('TemplatesController', [
     ResourceControlService,
     Authentication,
     FormValidator,
-    SettingsService,
-    StackService
+    StackService,
+    endpoint
   ) {
+    const DOCKER_STANDALONE = 'DOCKER_STANDALONE';
+    const DOCKER_SWARM_MODE = 'DOCKER_SWARM_MODE';
+
     $scope.state = {
       selectedTemplate: null,
       showAdvancedOptions: false,
@@ -138,6 +141,7 @@ angular.module('portainer.app').controller('TemplatesController', [
       var repositoryOptions = {
         RepositoryURL: template.Repository.url,
         ComposeFilePathInRepository: template.Repository.stackfile,
+        FromAppTemplate: true,
       };
 
       const endpointId = +$state.params.endpointId;
@@ -175,6 +179,7 @@ angular.module('portainer.app').controller('TemplatesController', [
       var repositoryOptions = {
         RepositoryURL: template.Repository.url,
         ComposeFilePathInRepository: template.Repository.stackfile,
+        FromAppTemplate: true,
       };
 
       const endpointId = +$state.params.endpointId;
@@ -240,8 +245,25 @@ angular.module('portainer.app').controller('TemplatesController', [
 
       $scope.formValues.name = template.Name ? template.Name : '';
       $scope.state.selectedTemplate = template;
+      $scope.state.deployable = isDeployable($scope.applicationState.endpoint, template.Type);
       $anchorScroll('view-top');
     };
+
+    function isDeployable(endpoint, templateType) {
+      let deployable = false;
+      switch (templateType) {
+        case 1:
+          deployable = endpoint.mode.provider === DOCKER_SWARM_MODE || endpoint.mode.provider === DOCKER_STANDALONE;
+          break;
+        case 2:
+          deployable = endpoint.mode.provider === DOCKER_SWARM_MODE;
+          break;
+        case 3:
+          deployable = endpoint.mode.provider === DOCKER_STANDALONE;
+          break;
+      }
+      return deployable;
+    }
 
     function createTemplateConfiguration(template) {
       var network = $scope.formValues.network;
@@ -254,16 +276,16 @@ angular.module('portainer.app').controller('TemplatesController', [
 
       var endpointMode = $scope.applicationState.endpoint.mode;
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
+      const endpointId = +$state.params.endpointId;
 
       $q.all({
-        templates: TemplateService.templates(),
+        templates: TemplateService.templates(endpointId),
         volumes: VolumeService.getVolumes(),
         networks: NetworkService.networks(
           endpointMode.provider === 'DOCKER_STANDALONE' || endpointMode.provider === 'DOCKER_SWARM_MODE',
           false,
           endpointMode.provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
         ),
-        settings: SettingsService.publicSettings(),
       })
         .then(function success(data) {
           var templates = data.templates;
@@ -271,12 +293,11 @@ angular.module('portainer.app').controller('TemplatesController', [
           $scope.availableVolumes = _.orderBy(data.volumes.Volumes, [(volume) => volume.Name.toLowerCase()], ['asc']);
           var networks = data.networks;
           $scope.availableNetworks = networks;
-          var settings = data.settings;
-          $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
+          $scope.allowBindMounts = endpoint.SecuritySettings.allowBindMountsForRegularUsers;
         })
         .catch(function error(err) {
           $scope.templates = [];
-          Notifications.error('Failure', err, 'An error occured during apps initialization.');
+          Notifications.error('Failure', err, 'An error occurred during apps initialization.');
         });
     }
 

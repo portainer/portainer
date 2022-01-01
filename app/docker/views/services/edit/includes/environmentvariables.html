@@ -1,8 +1,8 @@
-<div ng-if="service.EnvironmentVariables" id="service-env-variables">
+<ng-form ng-if="service.EnvironmentVariables" id="service-env-variables" name="serviceEnvForm">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title-text="Environment variables">
       <div class="nopadding" authorization="DockerServiceUpdate">
-        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addEnvironmentVariable(service)" ng-disabled="isUpdating">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating || addEnvironmentVariable(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable
         </a>
       </div>
@@ -10,49 +10,20 @@
     <rd-widget-body ng-if="service.EnvironmentVariables.length === 0">
       <p>There are no environment variables for this service.</p>
     </rd-widget-body>
-    <rd-widget-body ng-if="service.EnvironmentVariables.length > 0" classes="no-padding">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr ng-repeat="var in service.EnvironmentVariables">
-            <td>
-              <div class="input-group input-group-sm">
-                <span class="input-group-addon fit-text-size">name</span>
-                <input type="text" class="form-control" ng-model="var.key" ng-disabled="var.added || isUpdating" placeholder="e.g. FOO" />
-              </div>
-            </td>
-            <td>
-              <div class="input-group input-group-sm">
-                <span class="input-group-addon fit-text-size">value</span>
-                <input
-                  type="text"
-                  class="form-control"
-                  ng-model="var.value"
-                  ng-change="updateEnvironmentVariable(service, var)"
-                  placeholder="e.g. bar"
-                  ng-disabled="isUpdating"
-                  disable-authorization="DockerServiceUpdate"
-                />
-                <span class="input-group-btn" authorization="DockerServiceUpdate">
-                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable(service, $index)" ng-disabled="isUpdating">
-                    <i class="fa fa-trash" aria-hidden="true"></i>
-                  </button>
-                </span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <rd-widget-body ng-if="service.EnvironmentVariables.length > 0">
+      <environment-variables-panel is-name-disabled="true" ng-model="service.EnvironmentVariables" on-change="(onChangeEnvVars)"></environment-variables-panel>
     </rd-widget-body>
     <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['EnvironmentVariables'])" ng-click="updateService(service)">Apply changes</button>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            ng-disabled="!hasChanges(service, ['EnvironmentVariables']) || serviceEnvForm.$invalid"
+            ng-click="updateService(service)"
+          >
+            Apply changes
+          </button>
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
           </button>
@@ -64,4 +35,4 @@
       </div>
     </rd-widget-footer>
   </rd-widget>
-</div>
+</ng-form>

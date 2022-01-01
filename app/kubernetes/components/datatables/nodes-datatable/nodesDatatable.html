@@ -107,6 +107,9 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAddress' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th ng-if="$ctrl.useServerMetrics">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -128,6 +131,9 @@
               <td>{{ item.Memory | humansize }}</td>
               <td>{{ item.Version }}</td>
               <td>{{ item.IPAddress }}</td>
+              <td ng-if="$ctrl.useServerMetrics">
+                <a ui-sref="kubernetes.cluster.node.stats({ name: item.Name })" style="cursor: pointer;"> <i class="fa fa-chart-area" aria-hidden="true"></i> Stats </a>
+              </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="7" class="text-center text-muted">Loading...</td>
@@ -146,7 +152,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

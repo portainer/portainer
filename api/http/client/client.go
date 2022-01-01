@@ -102,7 +102,7 @@ func Get(url string, timeout int) ([]byte, error) {
 	return body, nil
 }
 
-// ExecutePingOperation will send a SystemPing operation HTTP request to a Docker environment
+// ExecutePingOperation will send a SystemPing operation HTTP request to a Docker environment(endpoint)
 // using the specified host and optional TLS configuration.
 // It uses a new Http.Client for each operation.
 func ExecutePingOperation(host string, tlsConfig *tls.Config) (bool, error) {

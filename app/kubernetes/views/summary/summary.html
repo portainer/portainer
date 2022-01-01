@@ -1,0 +1,38 @@
+<div
+  class="col-xs-12 form-section-title interactive"
+  ng-click="$ctrl.toggleSummary()"
+  style="display: flex; justify-content: space-between;"
+  ng-if="$ctrl.state.resources.length > 0"
+>
+  Summary
+  <span class="small space-left">
+    <a ng-if="!$ctrl.state.expandedTemplate"><i class="fa fa-angle-down" aria-hidden="true"></i> expand</a>
+    <a ng-if="$ctrl.state.expandedTemplate"><i class="fa fa-angle-up" aria-hidden="true"></i> collapse</a>
+  </span>
+</div>
+
+<div class="form-group" ng-if="$ctrl.state.expandedTemplate">
+  <div class="col-sm-12 small text-muted">
+    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+    Portainer will execute the following Kubernetes actions.
+  </div>
+
+  <div class="col-sm-12 small text-muted" style="padding-top: 1em;" ng-if="$ctrl.state.resources.length > 0">
+    <ul>
+      <li ng-repeat="summary in $ctrl.state.resources" ng-if="summary.action && summary.kind && summary.name">
+        {{ summary.action }}
+        {{ $ctrl.getArticle(summary.kind, summary.action) }}
+        <span class="bold">{{ summary.kind }}</span> named <code>{{ summary.name }}</code>
+        <span ng-if="summary.type">
+          of type <code>{{ summary.type }}</code></span
+        >
+      </li>
+      <li ng-if="$ctrl.state.limits.memory">
+        Set the memory resources limits and requests to <code>{{ $ctrl.state.limits.memory }}M</code>
+      </li>
+      <li ng-if="$ctrl.state.limits.cpu">
+        Set the CPU resources limits and requests to <code>{{ $ctrl.state.limits.cpu }}</code>
+      </li>
+    </ul>
+  </div>
+</div>

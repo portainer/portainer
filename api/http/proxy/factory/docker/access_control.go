@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/internal/stackutils"
+
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 const (
@@ -29,11 +31,28 @@ type (
 	}
 )
 
+func getUniqueElements(items string) []string {
+	result := []string{}
+	seen := make(map[string]struct{})
+	for _, item := range strings.Split(items, ",") {
+		v := strings.TrimSpace(item)
+		if v == "" {
+			continue
+		}
+		if _, ok := seen[v]; !ok {
+			result = append(result, v)
+			seen[v] = struct{}{}
+		}
+	}
+
+	return result
+}
+
 func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject map[string]interface{}, resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	if labelsObject[resourceLabelForPortainerPublicResourceControl] != nil {
 		resourceControl := authorization.NewPublicResourceControl(resourceID, resourceType)
 
-		err := transport.dataStore.ResourceControl().CreateResourceControl(resourceControl)
+		err := transport.dataStore.ResourceControl().Create(resourceControl)
 		if err != nil {
 			return nil, err
 		}
@@ -45,12 +64,12 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 	userNames := make([]string, 0)
 	if labelsObject[resourceLabelForPortainerTeamResourceControl] != nil {
 		concatenatedTeamNames := labelsObject[resourceLabelForPortainerTeamResourceControl].(string)
-		teamNames = strings.Split(concatenatedTeamNames, ",")
+		teamNames = getUniqueElements(concatenatedTeamNames)
 	}
 
 	if labelsObject[resourceLabelForPortainerUserResourceControl] != nil {
 		concatenatedUserNames := labelsObject[resourceLabelForPortainerUserResourceControl].(string)
-		userNames = strings.Split(concatenatedUserNames, ",")
+		userNames = getUniqueElements(concatenatedUserNames)
 	}
 
 	if len(teamNames) > 0 || len(userNames) > 0 {
@@ -79,7 +98,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 
 		resourceControl := authorization.NewRestrictedResourceControl(resourceID, resourceType, userIDs, teamIDs)
 
-		err := transport.dataStore.ResourceControl().CreateResourceControl(resourceControl)
+		err := transport.dataStore.ResourceControl().Create(resourceControl)
 		if err != nil {
 			return nil, err
 		}
@@ -93,7 +112,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 func (transport *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
 	resourceControl := authorization.NewPrivateResourceControl(resourceIdentifier, resourceType, userID)
 
-	err := transport.dataStore.ResourceControl().CreateResourceControl(resourceControl)
+	err := transport.dataStore.ResourceControl().Create(resourceControl)
 	if err != nil {
 		log.Printf("[ERROR] [http,proxy,docker,transport] [message: unable to persist resource control] [resource: %s] [err: %s]", resourceIdentifier, err)
 		return nil, err
@@ -103,31 +122,25 @@ func (transport *Transport) createPrivateResourceControl(resourceIdentifier stri
 }
 
 func (transport *Transport) getInheritedResourceControlFromServiceOrStack(resourceIdentifier, nodeName string, resourceType portainer.ResourceControlType, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
-	client := transport.dockerClient
-
-	if nodeName != "" {
-		dockerClient, err := transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName)
-		if err != nil {
-			return nil, err
-		}
-		defer dockerClient.Close()
-
-		client = dockerClient
+	client, err := transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName)
+	if err != nil {
+		return nil, err
 	}
+	defer client.Close()
 
 	switch resourceType {
 	case portainer.ContainerResourceControl:
-		return getInheritedResourceControlFromContainerLabels(client, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromContainerLabels(client, transport.endpoint.ID, resourceIdentifier, resourceControls)
 	case portainer.NetworkResourceControl:
-		return getInheritedResourceControlFromNetworkLabels(client, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromNetworkLabels(client, transport.endpoint.ID, resourceIdentifier, resourceControls)
 	case portainer.VolumeResourceControl:
-		return getInheritedResourceControlFromVolumeLabels(client, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromVolumeLabels(client, transport.endpoint.ID, resourceIdentifier, resourceControls)
 	case portainer.ServiceResourceControl:
-		return getInheritedResourceControlFromServiceLabels(client, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromServiceLabels(client, transport.endpoint.ID, resourceIdentifier, resourceControls)
 	case portainer.ConfigResourceControl:
-		return getInheritedResourceControlFromConfigLabels(client, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromConfigLabels(client, transport.endpoint.ID, resourceIdentifier, resourceControls)
 	case portainer.SecretResourceControl:
-		return getInheritedResourceControlFromSecretLabels(client, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromSecretLabels(client, transport.endpoint.ID, resourceIdentifier, resourceControls)
 	}
 
 	return nil, nil
@@ -143,7 +156,7 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 		systemResourceControl := findSystemNetworkResourceControl(responseObject)
 		if systemResourceControl != nil {
 			responseObject = decorateObject(responseObject, systemResourceControl)
-			return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+			return utils.RewriteResponse(response, responseObject, http.StatusOK)
 		}
 	}
 
@@ -156,15 +169,15 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 	}
 
 	if resourceControl == nil && (executor.operationContext.isAdmin) {
-		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+		return utils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	if executor.operationContext.isAdmin || (resourceControl != nil && authorization.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl)) {
 		responseObject = decorateObject(responseObject, resourceControl)
-		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+		return utils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return responseutils.RewriteAccessDeniedResponse(response)
+	return utils.RewriteAccessDeniedResponse(response)
 }
 
 func (transport *Transport) applyAccessControlOnResourceList(parameters *resourceOperationParameters, resourceData []interface{}, executor *operationExecutor) ([]interface{}, error) {
@@ -273,8 +286,9 @@ func (transport *Transport) findResourceControl(resourceIdentifier string, resou
 		}
 
 		if resourceLabelsObject[resourceLabelForDockerSwarmStackName] != nil {
-			inheritedSwarmStackIdentifier := resourceLabelsObject[resourceLabelForDockerSwarmStackName].(string)
-			resourceControl = authorization.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
+			stackName := resourceLabelsObject[resourceLabelForDockerSwarmStackName].(string)
+			stackResourceID := stackutils.ResourceControlID(transport.endpoint.ID, stackName)
+			resourceControl = authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls)
 
 			if resourceControl != nil {
 				return resourceControl, nil
@@ -282,8 +296,9 @@ func (transport *Transport) findResourceControl(resourceIdentifier string, resou
 		}
 
 		if resourceLabelsObject[resourceLabelForDockerComposeStackName] != nil {
-			inheritedComposeStackIdentifier := resourceLabelsObject[resourceLabelForDockerComposeStackName].(string)
-			resourceControl = authorization.GetResourceControlByResourceIDAndType(inheritedComposeStackIdentifier, portainer.StackResourceControl, resourceControls)
+			stackName := resourceLabelsObject[resourceLabelForDockerComposeStackName].(string)
+			stackResourceID := stackutils.ResourceControlID(transport.endpoint.ID, stackName)
+			resourceControl = authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls)
 
 			if resourceControl != nil {
 				return resourceControl, nil
@@ -294,6 +309,20 @@ func (transport *Transport) findResourceControl(resourceIdentifier string, resou
 	}
 
 	return nil, nil
+}
+
+func getStackResourceIDFromLabels(resourceLabelsObject map[string]string, endpointID portainer.EndpointID) string {
+	if resourceLabelsObject[resourceLabelForDockerSwarmStackName] != "" {
+		stackName := resourceLabelsObject[resourceLabelForDockerSwarmStackName]
+		return stackutils.ResourceControlID(endpointID, stackName)
+	}
+
+	if resourceLabelsObject[resourceLabelForDockerComposeStackName] != "" {
+		stackName := resourceLabelsObject[resourceLabelForDockerComposeStackName]
+		return stackutils.ResourceControlID(endpointID, stackName)
+	}
+
+	return ""
 }
 
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {

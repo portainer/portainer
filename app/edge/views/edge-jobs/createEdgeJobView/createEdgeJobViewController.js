@@ -1,8 +1,9 @@
 export class CreateEdgeJobViewController {
   /* @ngInject */
-  constructor($async, $q, $state, EdgeJobService, GroupService, Notifications, TagService) {
+  constructor($async, $q, $state, $window, ModalService, EdgeJobService, GroupService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
+      isEditorDirty: false,
     };
 
     this.model = {
@@ -17,6 +18,8 @@ export class CreateEdgeJobViewController {
     this.$async = $async;
     this.$q = $q;
     this.$state = $state;
+    this.$window = $window;
+    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.GroupService = GroupService;
     this.EdgeJobService = EdgeJobService;
@@ -37,6 +40,7 @@ export class CreateEdgeJobViewController {
     try {
       await this.createEdgeJob(method, this.model);
       this.Notifications.success('Edge job successfully created');
+      this.state.isEditorDirty = false;
       this.$state.go('edge.jobs', {}, { reload: true });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create Edge job');
@@ -52,6 +56,12 @@ export class CreateEdgeJobViewController {
     return this.EdgeJobService.createEdgeJobFromFileUpload(model);
   }
 
+  async uiCanExit() {
+    if (this.model.FileContent && this.state.isEditorDirty) {
+      return this.ModalService.confirmWebEditorDiscard();
+    }
+  }
+
   async $onInit() {
     try {
       const [groups, tags] = await Promise.all([this.GroupService.groups(), this.TagService.tags()]);
@@ -60,5 +70,15 @@ export class CreateEdgeJobViewController {
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve page data');
     }
+
+    this.$window.onbeforeunload = () => {
+      if (this.model.FileContent && this.state.isEditorDirty) {
+        return '';
+      }
+    };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 }

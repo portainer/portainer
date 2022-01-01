@@ -14,7 +14,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
@@ -53,13 +53,13 @@ const (
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return errors.New("Invalid endpoint name")
+		return errors.New("Invalid environment name")
 	}
 	payload.Name = name
 
 	endpointCreationType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointCreationType", false)
 	if err != nil || endpointCreationType == 0 {
-		return errors.New("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge Agent environment) or 5 (Local Kubernetes environment)")
+		return errors.New("Invalid environment type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge Agent environment) or 5 (Local Kubernetes environment)")
 	}
 	payload.EndpointCreationType = endpointCreationEnum(endpointCreationType)
 
@@ -133,7 +133,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	default:
 		endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", true)
 		if err != nil {
-			return errors.New("Invalid endpoint URL")
+			return errors.New("Invalid environment URL")
 		}
 		payload.URL = endpointURL
 
@@ -147,7 +147,35 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/endpoints
+// @id EndpointCreate
+// @summary Create a new environment(endpoint)
+// @description  Create a new environment(endpoint) that will be used to manage an environment(endpoint).
+// @description **Access policy**: administrator
+// @tags endpoints
+// @security ApiKeyAuth
+// @security jwt
+// @accept multipart/form-data
+// @produce json
+// @param Name formData string true "Name that will be used to identify this environment(endpoint) (example: my-environment)"
+// @param EndpointCreationType formData integer true "Environment(Endpoint) type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment" Enum(1,2,3,4,5)
+// @param URL formData string false "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine)"
+// @param PublicURL formData string false "URL or IP address where exposed containers will be reachable. Defaults to URL if not specified (example: docker.mydomain.tld:2375)"
+// @param GroupID formData int false "Environment(Endpoint) group identifier. If not specified will default to 1 (unassigned)."
+// @param TLS formData bool false "Require TLS to connect against this environment(endpoint)"
+// @param TLSSkipVerify formData bool false "Skip server verification when using TLS"
+// @param TLSSkipClientVerify formData bool false "Skip client verification when using TLS"
+// @param TLSCACertFile formData file false "TLS CA certificate file"
+// @param TLSCertFile formData file false "TLS client certificate file"
+// @param TLSKeyFile formData file false "TLS client key file"
+// @param AzureApplicationID formData string false "Azure application ID. Required if environment(endpoint) type is set to 3"
+// @param AzureTenantID formData string false "Azure tenant ID. Required if environment(endpoint) type is set to 3"
+// @param AzureAuthenticationKey formData string false "Azure authentication key. Required if environment(endpoint) type is set to 3"
+// @param TagIDs formData []int false "List of tag identifiers to which this environment(endpoint) is associated"
+// @param EdgeCheckinInterval formData int false "The check in interval for edge agent (in seconds)"
+// @success 200 {object} portainer.Endpoint "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /endpoints [post]
 func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload := &endpointCreatePayload{}
 	err := payload.Validate(r)
@@ -162,7 +190,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment group inside the database", err}
 	}
 
 	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
@@ -187,7 +215,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	err = handler.DataStore.EndpointRelation().CreateEndpointRelation(relationObject)
+	err = handler.DataStore.EndpointRelation().Create(relationObject)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the relation object inside the database", err}
 	}
@@ -211,7 +239,7 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 	if payload.EndpointCreationType == agentEnvironment {
 		agentPlatform, err := handler.pingAndCheckPlatform(payload)
 		if err != nil {
-			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to get endpoint type", err}
+			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to get environment type", err}
 		}
 
 		if agentPlatform == portainer.AgentPlatformDocker {
@@ -261,7 +289,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the environment", err}
 	}
 
 	return endpoint, nil
@@ -272,7 +300,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 
 	portainerURL, err := url.Parse(payload.URL)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint URL", err}
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid environment URL", err}
 	}
 
 	portainerHost, _, err := net.SplitHostPort(portainerURL.Host)
@@ -281,7 +309,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 	}
 
 	if portainerHost == "localhost" {
-		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint URL", errors.New("cannot use localhost as endpoint URL")}
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid environment URL", errors.New("cannot use localhost as environment URL")}
 	}
 
 	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
@@ -295,8 +323,8 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
-		AuthorizedUsers:     []portainer.UserID{},
-		AuthorizedTeams:     []portainer.TeamID{},
+		UserAccessPolicies:  portainer.UserAccessPolicies{},
+		TeamAccessPolicies:  portainer.TeamAccessPolicies{},
 		Extensions:          []portainer.EndpointExtension{},
 		TagIDs:              payload.TagIDs,
 		Status:              portainer.EndpointStatusUp,
@@ -308,7 +336,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the environment", err}
 	}
 
 	return endpoint, nil
@@ -428,19 +456,32 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 		if strings.Contains(err.Error(), "Invalid request signature") {
 			err = errors.New("agent already paired with another Portainer instance")
 		}
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to initiate communications with endpoint", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to initiate communications with environment", err}
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the environment", err}
 	}
 
 	return nil
 }
 
 func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.Endpoint) error {
-	err := handler.DataStore.Endpoint().CreateEndpoint(endpoint)
+	endpoint.SecuritySettings = portainer.EndpointSecuritySettings{
+		AllowVolumeBrowserForRegularUsers: false,
+		EnableHostManagementFeatures:      false,
+
+		AllowSysctlSettingForRegularUsers:         true,
+		AllowBindMountsForRegularUsers:            true,
+		AllowPrivilegedModeForRegularUsers:        true,
+		AllowHostNamespaceForRegularUsers:         true,
+		AllowContainerCapabilitiesForRegularUsers: true,
+		AllowDeviceMappingForRegularUsers:         true,
+		AllowStackManagementForRegularUsers:       true,
+	}
+
+	err := handler.DataStore.Endpoint().Create(endpoint)
 	if err != nil {
 		return err
 	}

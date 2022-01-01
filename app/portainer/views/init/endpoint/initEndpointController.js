@@ -9,12 +9,11 @@ require('./includes/agent.html');
 
 class InitEndpointController {
   /* @ngInject */
-  constructor($async, $scope, $state, EndpointService, EndpointProvider, StateManager, Notifications) {
+  constructor($async, $scope, $state, EndpointService, StateManager, Notifications) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
     this.EndpointService = EndpointService;
-    this.EndpointProvider = EndpointProvider;
     this.StateManager = StateManager;
     this.Notifications = Notifications;
 
@@ -61,8 +60,12 @@ class InitEndpointController {
       case PortainerEndpointConnectionTypes.AGENT:
         return this.createAgentEndpoint();
       default:
-        this.Notifications.error('Failure', 'Unable to determine which action to do');
+        this.Notifications.error('Failure', null, 'Unable to determine which action to do to create environment');
     }
+  }
+
+  skipEndpointCreation() {
+    this.$state.go('portainer.home');
   }
 
   /**
@@ -91,7 +94,7 @@ class InitEndpointController {
     try {
       this.state.actionInProgress = true;
       const endpoint = await this.EndpointService.createLocalKubernetesEndpoint();
-      this.$state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: endpoint.Id });
+      this.$state.go('portainer.k8sendpoint.kubernetesConfig', { id: endpoint.Id });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to connect to the Kubernetes environment');
     } finally {
@@ -127,7 +130,7 @@ class InitEndpointController {
         null,
         null
       );
-      const routeName = endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment ? 'portainer.endpoints.endpoint.kubernetesConfig' : 'portainer.home';
+      const routeName = endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment ? 'portainer.k8sendpoint.kubernetesConfig' : 'portainer.home';
       this.$state.go(routeName, { id: endpoint.Id });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to connect to the Docker environment');

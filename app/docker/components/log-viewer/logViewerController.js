@@ -1,8 +1,12 @@
 import moment from 'moment';
+import _ from 'lodash-es';
+import { NEW_LINE_BREAKER } from '@/constants';
 
 angular.module('portainer.docker').controller('LogViewerController', [
   'clipboard',
-  function (clipboard) {
+  'Blob',
+  'FileSaver',
+  function (clipboard, Blob, FileSaver) {
     this.state = {
       availableSinceDatetime: [
         { desc: 'Last day', value: moment().subtract(1, 'days').format() },
@@ -20,13 +24,13 @@ angular.module('portainer.docker').controller('LogViewerController', [
     };
 
     this.copy = function () {
-      clipboard.copyText(this.state.filteredLogs);
+      clipboard.copyText(this.state.filteredLogs.map((log) => log.line).join(NEW_LINE_BREAKER));
       $('#refreshRateChange').show();
       $('#refreshRateChange').fadeOut(2000);
     };
 
     this.copySelection = function () {
-      clipboard.copyText(this.state.selectedLines);
+      clipboard.copyText(this.state.selectedLines.join(NEW_LINE_BREAKER));
       $('#refreshRateChange').show();
       $('#refreshRateChange').fadeOut(2000);
     };
@@ -42,6 +46,13 @@ angular.module('portainer.docker').controller('LogViewerController', [
       } else {
         this.state.selectedLines.splice(idx, 1);
       }
+    };
+
+    this.downloadLogs = function () {
+      // To make the feature of downloading container logs working both on Windows and Linux,
+      // we need to use correct new line breakers on corresponding OS.
+      const data = new Blob([_.reduce(this.state.filteredLogs, (acc, log) => acc + log.line + NEW_LINE_BREAKER, '')]);
+      FileSaver.saveAs(data, this.resourceName + '_logs.txt');
     };
   },
 ]);

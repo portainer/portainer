@@ -1,14 +1,16 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
+	cmap "github.com/orcaman/concurrent-map"
 	"net/http"
 	"strconv"
+	"sync"
 
-	cmap "github.com/orcaman/concurrent-map"
+	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -17,6 +19,7 @@ import (
 type (
 	// ClientFactory is used to create Kubernetes clients
 	ClientFactory struct {
+		dataStore            dataservices.DataStore
 		reverseTunnelService portainer.ReverseTunnelService
 		signatureService     portainer.DigitalSignatureService
 		instanceID           string
@@ -25,14 +28,16 @@ type (
 
 	// KubeClient represent a service used to execute Kubernetes operations
 	KubeClient struct {
-		cli        *kubernetes.Clientset
+		cli        kubernetes.Interface
 		instanceID string
+		lock       *sync.Mutex
 	}
 )
 
 // NewClientFactory returns a new instance of a ClientFactory
-func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string) *ClientFactory {
+func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore dataservices.DataStore) *ClientFactory {
 	return &ClientFactory{
+		dataStore:            dataStore,
 		signatureService:     signatureService,
 		reverseTunnelService: reverseTunnelService,
 		instanceID:           instanceID,
@@ -40,7 +45,16 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 	}
 }
 
-// GetKubeClient checks if an existing client is already registered for the endpoint and returns it if one is found.
+func (factory *ClientFactory) GetInstanceID() (instanceID string) {
+	return factory.instanceID
+}
+
+// Remove the cached kube client so a new one can be created
+ func (factory *ClientFactory) RemoveKubeClient(endpointID portainer.EndpointID) {
+	factory.endpointClients.Remove(strconv.Itoa(int(endpointID)))
+}
+
+// GetKubeClient checks if an existing client is already registered for the environment(endpoint) and returns it if one is found.
 // If no client is registered, it will create a new client, register it, and returns it.
 func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
 	key := strconv.Itoa(int(endpoint.ID))
@@ -67,6 +81,7 @@ func (factory *ClientFactory) createKubeClient(endpoint *portainer.Endpoint) (po
 	kubecli := &KubeClient{
 		cli:        cli,
 		instanceID: factory.instanceID,
+		lock:       &sync.Mutex{},
 	}
 
 	return kubecli, nil
@@ -83,7 +98,7 @@ func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint) (*kuber
 		return factory.buildEdgeClient(endpoint)
 	}
 
-	return nil, errors.New("unsupported endpoint type")
+	return nil, errors.New("unsupported environment type")
 }
 
 type agentHeaderRoundTripper struct {
@@ -104,6 +119,21 @@ func (rt *agentHeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response,
 
 func (factory *ClientFactory) buildAgentClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
 	endpointURL := fmt.Sprintf("https://%s/kubernetes", endpoint.URL)
+
+	return factory.createRemoteClient(endpointURL)
+}
+
+func (factory *ClientFactory) buildEdgeClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
+	tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed activating tunnel")
+	}
+	endpointURL := fmt.Sprintf("http://127.0.0.1:%d/kubernetes", tunnel.Port)
+
+	return factory.createRemoteClient(endpointURL)
+}
+
+func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernetes.Clientset, error) {
 	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
 		return nil, err
@@ -122,19 +152,6 @@ func (factory *ClientFactory) buildAgentClient(endpoint *portainer.Endpoint) (*k
 			roundTripper:    rt,
 		}
 	})
-
-	return kubernetes.NewForConfig(config)
-}
-
-func (factory *ClientFactory) buildEdgeClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
-	tunnel := factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
-	endpointURL := fmt.Sprintf("http://localhost:%d/kubernetes", tunnel.Port)
-
-	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
-	if err != nil {
-		return nil, err
-	}
-	config.Insecure = true
 
 	return kubernetes.NewForConfig(config)
 }

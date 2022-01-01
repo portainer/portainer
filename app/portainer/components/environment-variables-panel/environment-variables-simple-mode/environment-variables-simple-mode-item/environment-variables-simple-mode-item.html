@@ -1,0 +1,61 @@
+<ng-form class="env-item" name="$ctrl.{{ $ctrl.formName }}">
+  <div class="col-sm-5">
+    <div class="input-group input-group-sm env-item-key w-full">
+      <span class="input-group-addon">name</span>
+      <input
+        type="text"
+        name="name"
+        class="form-control"
+        placeholder="e.g. FOO"
+        ng-model="$ctrl.variable.name"
+        ng-disabled="$ctrl.variable.added"
+        ng-change="$ctrl.onChangeName($ctrl.variable.name)"
+        required
+      />
+    </div>
+    <div class="form-group" style="margin-top: 5px;" ng-show="$ctrl[$ctrl.formName].name.$invalid">
+      <div class="col-sm-12 small text-warning">
+        <div ng-messages="$ctrl[$ctrl.formName].name.$error">
+          <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Name is required. </p>
+          <p ng-message="pattern">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            This field must consist alphanumeric characters, '-' or '_', start with an alphabetic character, and end with an alphanumeric character (e.g. 'my-var', or 'MY_VAR123').
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ng-if="$ctrl.hasValue()" class="col-sm-6">
+    <div class="w-full env-item-value">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">value</span>
+        <input
+          type="text"
+          class="form-control"
+          ng-model="$ctrl.variable.value"
+          placeholder="e.g. bar"
+          ng-trim="false"
+          name="value"
+          ng-change="$ctrl.onChangeValue($ctrl.variable.value)"
+        />
+      </div>
+      <button class="btn btn-sm btn-primary" type="button" ng-click="$ctrl.removeValue()"> <i class="fa fa-minus" aria-hidden="true"></i> Remove value </button>
+    </div>
+    <div class="form-group" ng-show="$ctrl[$ctrl.formName].value.$invalid">
+      <div class="col-sm-12 small text-warning">
+        <div ng-messages="$ctrl[$ctrl.formName].value.$error">
+          <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value is required. </p>
+          <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value is invalid. </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <button class="btn btn-sm btn-primary" type="button" ng-if="!$ctrl.hasValue()" ng-click="$ctrl.onChangeValue('')">
+      <i class="fa fa-plus" aria-hidden="true"></i> Add value
+    </button>
+    <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.onRemove($ctrl.index)">
+      <i class="fa fa-trash" aria-hidden="true"></i>
+    </button>
+  </div>
+</ng-form>

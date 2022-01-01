@@ -3,7 +3,8 @@ angular.module('portainer.app').controller('MainController', [
   'LocalStorage',
   'StateManager',
   'EndpointProvider',
-  function ($scope, LocalStorage, StateManager, EndpointProvider) {
+  'ThemeManager',
+  function ($scope, LocalStorage, StateManager, EndpointProvider, ThemeManager) {
     /**
      * Sidebar Toggle & Cookie Control
      */
@@ -32,5 +33,7 @@ angular.module('portainer.app').controller('MainController', [
     window.onresize = function () {
       $scope.$apply();
     };
+
+    ThemeManager.autoTheme();
   },
 ]);

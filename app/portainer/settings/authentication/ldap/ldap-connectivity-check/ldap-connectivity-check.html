@@ -1,0 +1,21 @@
+<div class="form-group">
+  <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
+    Connectivity check
+    <i class="fa fa-check green-icon m-l-5" ng-if="$ctrl.state.successfulConnectivityCheck"></i>
+    <i class="fa fa-times red-icon m-l-5" ng-if="$ctrl.state.failedConnectivityCheck"></i>
+  </label>
+  <div class="col-sm-9 col-lg-10">
+    <button
+      type="button"
+      class="btn btn-primary btn-sm"
+      ng-disabled="($ctrl.state.connectivityCheckInProgress) || (!$ctrl.settings.URLs.length) || ((!$ctrl.settings.ReaderDN || !$ctrl.settings.Password) && !$ctrl.settings.AnonymousMode)"
+      ng-click="$ctrl.connectivityCheck()"
+      button-spinner="$ctrl.state.connectivityCheckInProgress"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-tabindex="-1"
+    >
+      <span ng-hide="$ctrl.state.connectivityCheckInProgress">Test connectivity</span>
+      <span ng-show="$ctrl.state.connectivityCheckInProgress">Testing connectivity...</span>
+    </button>
+  </div>
+</div>

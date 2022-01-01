@@ -1,11 +1,13 @@
 package settings
 
 import (
-	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
+	"github.com/portainer/libhelm"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -14,25 +16,32 @@ import (
 )
 
 type settingsUpdatePayload struct {
-	LogoURL                                   *string
-	BlackListedLabels                         []portainer.Pair
-	AuthenticationMethod                      *int
-	LDAPSettings                              *portainer.LDAPSettings
-	OAuthSettings                             *portainer.OAuthSettings
-	AllowBindMountsForRegularUsers            *bool
-	AllowPrivilegedModeForRegularUsers        *bool
-	AllowHostNamespaceForRegularUsers         *bool
-	AllowVolumeBrowserForRegularUsers         *bool
-	AllowDeviceMappingForRegularUsers         *bool
-	AllowStackManagementForRegularUsers       *bool
-	AllowContainerCapabilitiesForRegularUsers *bool
-	EnableHostManagementFeatures              *bool
-	SnapshotInterval                          *string
-	TemplatesURL                              *string
-	EdgeAgentCheckinInterval                  *int
-	EnableEdgeComputeFeatures                 *bool
-	UserSessionTimeout                        *string
-	EnableTelemetry                           *bool
+	// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
+	LogoURL *string `example:"https://mycompany.mydomain.tld/logo.png"`
+	// A list of label name & value that will be used to hide containers when querying containers
+	BlackListedLabels []portainer.Pair
+	// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
+	AuthenticationMethod *int                     `example:"1"`
+	LDAPSettings         *portainer.LDAPSettings  `example:""`
+	OAuthSettings        *portainer.OAuthSettings `example:""`
+	// The interval in which environment(endpoint) snapshots are created
+	SnapshotInterval *string `example:"5m"`
+	// URL to the templates that will be displayed in the UI when navigating to App Templates
+	TemplatesURL *string `example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
+	// The default check in interval for edge agent (in seconds)
+	EdgeAgentCheckinInterval *int `example:"5"`
+	// Whether edge compute features are enabled
+	EnableEdgeComputeFeatures *bool `example:"true"`
+	// The duration of a user session
+	UserSessionTimeout *string `example:"5m"`
+	// The expiry of a Kubeconfig
+	KubeconfigExpiry *string `example:"24h" default:"0"`
+	// Whether telemetry is enabled
+	EnableTelemetry *bool `example:"false"`
+	// Helm repository URL
+	HelmRepositoryURL *string `example:"https://charts.bitnami.com/bitnami"`
+	// Kubectl Shell Image
+	KubectlShellImage *string `example:"portainer/kubectl-shell:latest"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -45,17 +54,39 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
 		return errors.New("Invalid external templates URL. Must correspond to a valid URL format")
 	}
+	if payload.HelmRepositoryURL != nil && *payload.HelmRepositoryURL != "" && !govalidator.IsURL(*payload.HelmRepositoryURL) {
+		return errors.New("Invalid Helm repository URL. Must correspond to a valid URL format")
+	}
 	if payload.UserSessionTimeout != nil {
 		_, err := time.ParseDuration(*payload.UserSessionTimeout)
 		if err != nil {
 			return errors.New("Invalid user session timeout")
 		}
 	}
+	if payload.KubeconfigExpiry != nil {
+		_, err := time.ParseDuration(*payload.KubeconfigExpiry)
+		if err != nil {
+			return errors.New("Invalid Kubeconfig Expiry")
+		}
+	}
 
 	return nil
 }
 
-// PUT request on /api/settings
+// @id SettingsUpdate
+// @summary Update Portainer settings
+// @description Update Portainer settings.
+// @description **Access policy**: administrator
+// @tags settings
+// @security ApiKeyAuth
+// @security jwt
+// @accept json
+// @produce json
+// @param body body settingsUpdatePayload true "New settings"
+// @success 200 {object} portainer.Settings "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /settings [put]
 func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload settingsUpdatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -78,6 +109,21 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.TemplatesURL != nil {
 		settings.TemplatesURL = *payload.TemplatesURL
+	}
+
+	if payload.HelmRepositoryURL != nil {
+		newHelmRepo := strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
+
+		if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
+			err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusBadRequest, "Invalid Helm repository URL. Must correspond to a valid URL format", err}
+			}
+		}
+
+		settings.HelmRepositoryURL = newHelmRepo
+	} else {
+		settings.HelmRepositoryURL = ""
 	}
 
 	if payload.BlackListedLabels != nil {
@@ -103,40 +149,17 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		if clientSecret == "" {
 			clientSecret = settings.OAuthSettings.ClientSecret
 		}
+		kubeSecret := payload.OAuthSettings.KubeSecretKey
+		if kubeSecret == nil {
+			kubeSecret = settings.OAuthSettings.KubeSecretKey
+		}
 		settings.OAuthSettings = *payload.OAuthSettings
 		settings.OAuthSettings.ClientSecret = clientSecret
-	}
-
-	if payload.AllowBindMountsForRegularUsers != nil {
-		settings.AllowBindMountsForRegularUsers = *payload.AllowBindMountsForRegularUsers
-	}
-
-	if payload.AllowPrivilegedModeForRegularUsers != nil {
-		settings.AllowPrivilegedModeForRegularUsers = *payload.AllowPrivilegedModeForRegularUsers
-	}
-
-	if payload.AllowVolumeBrowserForRegularUsers != nil {
-		settings.AllowVolumeBrowserForRegularUsers = *payload.AllowVolumeBrowserForRegularUsers
-	}
-
-	if payload.EnableHostManagementFeatures != nil {
-		settings.EnableHostManagementFeatures = *payload.EnableHostManagementFeatures
+		settings.OAuthSettings.KubeSecretKey = kubeSecret
 	}
 
 	if payload.EnableEdgeComputeFeatures != nil {
 		settings.EnableEdgeComputeFeatures = *payload.EnableEdgeComputeFeatures
-	}
-
-	if payload.AllowHostNamespaceForRegularUsers != nil {
-		settings.AllowHostNamespaceForRegularUsers = *payload.AllowHostNamespaceForRegularUsers
-	}
-
-	if payload.AllowStackManagementForRegularUsers != nil {
-		settings.AllowStackManagementForRegularUsers = *payload.AllowStackManagementForRegularUsers
-	}
-
-	if payload.AllowContainerCapabilitiesForRegularUsers != nil {
-		settings.AllowContainerCapabilitiesForRegularUsers = *payload.AllowContainerCapabilitiesForRegularUsers
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
@@ -150,16 +173,16 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.EdgeAgentCheckinInterval = *payload.EdgeAgentCheckinInterval
 	}
 
+	if payload.KubeconfigExpiry != nil {
+		settings.KubeconfigExpiry = *payload.KubeconfigExpiry
+	}
+
 	if payload.UserSessionTimeout != nil {
 		settings.UserSessionTimeout = *payload.UserSessionTimeout
 
 		userSessionDuration, _ := time.ParseDuration(*payload.UserSessionTimeout)
 
 		handler.JWTService.SetUserSessionDuration(userSessionDuration)
-	}
-
-	if payload.AllowDeviceMappingForRegularUsers != nil {
-		settings.AllowDeviceMappingForRegularUsers = *payload.AllowDeviceMappingForRegularUsers
 	}
 
 	if payload.EnableTelemetry != nil {
@@ -169,6 +192,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	tlsError := handler.updateTLS(settings)
 	if tlsError != nil {
 		return tlsError
+	}
+
+	if payload.KubectlShellImage != nil {
+		settings.KubectlShellImage = *payload.KubectlShellImage
 	}
 
 	err = handler.DataStore.Settings().UpdateSettings(settings)

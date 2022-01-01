@@ -1,12 +1,18 @@
 import angular from 'angular';
+import EndpointHelper from 'Portainer/helpers/endpointHelper';
 
 angular.module('portainer.app').controller('EndpointsController', EndpointsController);
 
-function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, EndpointHelper, Notifications) {
+function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, ModalService, Notifications, EndpointProvider, StateManager) {
   $scope.removeAction = removeAction;
 
   function removeAction(endpoints) {
-    return $async(removeActionAsync, endpoints);
+    ModalService.confirmDeletion('This action will remove all configurations associated to your environment(s). Continue?', (confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+      return $async(removeActionAsync, endpoints);
+    });
   }
 
   async function removeActionAsync(endpoints) {
@@ -14,10 +20,18 @@ function EndpointsController($q, $scope, $state, $async, EndpointService, GroupS
       try {
         await EndpointService.deleteEndpoint(endpoint.Id);
 
-        Notifications.success('Endpoint successfully removed', endpoint.Name);
+        Notifications.success('Environment successfully removed', endpoint.Name);
       } catch (err) {
-        Notifications.error('Failure', err, 'Unable to remove endpoint');
+        Notifications.error('Failure', err, 'Unable to remove environment');
       }
+    }
+
+    const endpointId = EndpointProvider.endpointID();
+    // If the current endpoint was deleted, then clean endpoint store
+    if (endpoints.some((item) => item.Id === endpointId)) {
+      StateManager.cleanEndpoint();
+      // trigger sidebar rerender
+      $scope.applicationState.endpoint = {};
     }
 
     $state.reload();
@@ -37,7 +51,7 @@ function EndpointsController($q, $scope, $state, $async, EndpointService, GroupS
         deferred.resolve({ endpoints: endpoints, totalCount: data.endpoints.totalCount });
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
+        Notifications.error('Failure', err, 'Unable to retrieve environment information');
       });
     return deferred.promise;
   }

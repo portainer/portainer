@@ -15,7 +15,7 @@
   <label for="tags" class="col-sm-3 col-lg-2 control-label text-left">
     Tags
   </label>
-  <div class="col-sm-9 col-lg-10" ng-if="$ctrl.allowCreate || $ctrl.tags.length > 0">
+  <div class="col-sm-9 col-lg-10" id="scrollable-dropdown-menu" ng-if="$ctrl.allowCreate || $ctrl.tags.length > 0">
     <input
       type="text"
       ng-model="$ctrl.state.selectedValue"
@@ -27,6 +27,7 @@
       typeahead-no-results="$ctrl.state.noResult"
       typeahead-show-hint="true"
       typeahead-min-length="0"
+      data-cy="tags-tagInput"
     />
   </div>
   <div class="col-sm-9 col-lg-10" ng-if="!$ctrl.allowCreate && $ctrl.tags.length === 0">

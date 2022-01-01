@@ -10,18 +10,20 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 )
 
 type authenticatePayload struct {
-	Username string
-	Password string
+	// Username
+	Username string `example:"admin" validate:"required"`
+	// Password
+	Password string `example:"mypassword" validate:"required"`
 }
 
 type authenticateResponse struct {
-	JWT string `json:"jwt"`
+	// JWT token used to authenticate against the API
+	JWT string `json:"jwt" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE"`
 }
 
 func (payload *authenticatePayload) Validate(r *http.Request) error {
@@ -34,6 +36,19 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id AuthenticateUser
+// @summary Authenticate
+// @description **Access policy**: public
+// @description Use this environment(endpoint) to authenticate against Portainer using a username and password.
+// @tags auth
+// @accept json
+// @produce json
+// @param body body authenticatePayload true "Credentials used for authentication"
+// @success 200 {object} authenticateResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 422 "Invalid Credentials"
+// @failure 500 "Server error"
+// @router /auth [post]
 func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload authenticatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -47,11 +62,11 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	u, err := handler.DataStore.User().UserByUsername(payload.Username)
-	if err != nil && err != bolterrors.ErrObjectNotFound {
+	if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
 	}
 
-	if err == bolterrors.ErrObjectNotFound && (settings.AuthenticationMethod == portainer.AuthenticationInternal || settings.AuthenticationMethod == portainer.AuthenticationOAuth) {
+	if handler.DataStore.IsErrObjectNotFound(err) && (settings.AuthenticationMethod == portainer.AuthenticationInternal || settings.AuthenticationMethod == portainer.AuthenticationOAuth) {
 		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized}
 	}
 
@@ -101,7 +116,7 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 		Role:     portainer.StandardUserRole,
 	}
 
-	err = handler.DataStore.User().CreateUser(user)
+	err = handler.DataStore.User().Create(user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 	}
@@ -115,19 +130,13 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 }
 
 func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
-	tokenData := &portainer.TokenData{
-		ID:       user.ID,
-		Username: user.Username,
-		Role:     user.Role,
-	}
-
-	return handler.persistAndWriteToken(w, tokenData)
+	return handler.persistAndWriteToken(w, composeTokenData(user))
 }
 
 func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to generate JWT token", Err: err}
 	}
 
 	return response.JSON(w, &authenticateResponse{JWT: token})
@@ -162,7 +171,7 @@ func (handler *Handler) addUserIntoTeams(user *portainer.User, settings *portain
 				Role:   portainer.TeamMember,
 			}
 
-			err := handler.DataStore.TeamMembership().CreateTeamMembership(membership)
+			err := handler.DataStore.TeamMembership().Create(membership)
 			if err != nil {
 				return err
 			}
@@ -188,4 +197,12 @@ func teamMembershipExists(teamID portainer.TeamID, memberships []portainer.TeamM
 		}
 	}
 	return false
+}
+
+func composeTokenData(user *portainer.User) *portainer.TokenData {
+	return &portainer.TokenData{
+		ID:       user.ID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
 }

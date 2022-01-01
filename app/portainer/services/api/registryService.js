@@ -1,20 +1,32 @@
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
-import { RegistryTypes } from '@/portainer/models/registryTypes';
-import { RegistryCreateRequest, RegistryViewModel } from '../../models/registry';
+import { RegistryTypes } from 'Portainer/models/registryTypes';
+import { RegistryCreateRequest, RegistryViewModel } from 'Portainer/models/registry';
+import { DockerHubViewModel } from 'Portainer/models/dockerhub';
 
 angular.module('portainer.app').factory('RegistryService', [
   '$q',
   '$async',
+  'EndpointService',
   'Registries',
-  'DockerHubService',
   'ImageHelper',
   'FileUploadService',
-  function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageHelper, FileUploadService) {
-    'use strict';
-    var service = {};
+  function RegistryServiceFactory($q, $async, EndpointService, Registries, ImageHelper, FileUploadService) {
+    return {
+      registries,
+      registry,
+      encodedCredentials,
+      deleteRegistry,
+      updateRegistry,
+      configureRegistry,
+      createRegistry,
+      createGitlabRegistries,
+      retrievePorRegistryModelFromRepository,
+      retrievePorRegistryModelFromRepositoryWithRegistries,
+      loadRegistriesForDropdown,
+    };
 
-    service.registries = function () {
+    function registries() {
       var deferred = $q.defer();
 
       Registries.query()
@@ -29,12 +41,12 @@ angular.module('portainer.app').factory('RegistryService', [
         });
 
       return deferred.promise;
-    };
+    }
 
-    service.registry = function (id) {
+    function registry(id, endpointId) {
       var deferred = $q.defer();
 
-      Registries.get({ id: id })
+      Registries.get({ id, endpointId })
         .$promise.then(function success(data) {
           var registry = new RegistryViewModel(data);
           deferred.resolve(registry);
@@ -44,39 +56,35 @@ angular.module('portainer.app').factory('RegistryService', [
         });
 
       return deferred.promise;
-    };
+    }
 
-    service.encodedCredentials = function (registry) {
+    function encodedCredentials(registry) {
       var credentials = {
-        serveraddress: registry.URL,
+        registryId: registry.Id,
       };
       return btoa(JSON.stringify(credentials));
-    };
+    }
 
-    service.updateAccess = function (id, userAccessPolicies, teamAccessPolicies) {
-      return Registries.updateAccess({ id: id }, { UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies }).$promise;
-    };
-
-    service.deleteRegistry = function (id) {
+    function deleteRegistry(id) {
       return Registries.remove({ id: id }).$promise;
-    };
+    }
 
-    service.updateRegistry = function (registry) {
+    function updateRegistry(registry) {
       registry.URL = _.replace(registry.URL, /^https?\:\/\//i, '');
       registry.URL = _.replace(registry.URL, /\/$/, '');
       return Registries.update({ id: registry.Id }, registry).$promise;
-    };
+    }
 
-    service.configureRegistry = function (id, registryManagementConfigurationModel) {
+    function configureRegistry(id, registryManagementConfigurationModel) {
       return FileUploadService.configureRegistry(id, registryManagementConfigurationModel);
-    };
+    }
 
-    service.createRegistry = function (model) {
+    function createRegistry(model) {
       var payload = new RegistryCreateRequest(model);
       return Registries.create(payload).$promise;
-    };
+    }
 
-    service.createGitlabRegistries = function (model, projects) {
+    function createGitlabRegistries(model, projects) {
       const promises = [];
       _.forEach(projects, (p) => {
         const m = model;
@@ -88,26 +96,64 @@ angular.module('portainer.app').factory('RegistryService', [
         promises.push(Registries.create(payload).$promise);
       });
       return $q.all(promises);
-    };
-
-    service.retrievePorRegistryModelFromRepositoryWithRegistries = retrievePorRegistryModelFromRepositoryWithRegistries;
+    }
 
     function getURL(reg) {
       let url = reg.URL;
       if (reg.Type === RegistryTypes.GITLAB) {
         url = reg.URL + '/' + reg.Gitlab.ProjectPath;
+      } else if (reg.Type === RegistryTypes.QUAY) {
+        const name = reg.Quay.UseOrganisation ? reg.Quay.OrganisationName : reg.Username;
+        url = reg.URL + '/' + name;
       }
       return url;
     }
 
-    function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, dockerhub) {
+    // findBestMatchRegistry finds out the best match registry for repository
+    // matching precedence:
+    // 1. registryId matched
+    // 2. both domain name and username matched (for dockerhub only)
+    // 3. only URL matched
+    // 4. pick up the first dockerhub registry
+    function findBestMatchRegistry(repository, registries, registryId) {
+      let match2, match3, match4;
+
+      for (const registry of registries) {
+        if (registry.Id == registryId) {
+          return registry;
+        }
+
+        if (registry.Type === RegistryTypes.DOCKERHUB) {
+          // try to match repository examples:
+          //   <USERNAME>/nginx:latest
+          //   docker.io/<USERNAME>/nginx:latest
+          if (repository.startsWith(registry.Username + '/') || repository.startsWith(getURL(registry) + '/' + registry.Username + '/')) {
+            match2 = registry;
+          }
+
+          // try to match repository examples:
+          //   portainer/portainer-ee:latest
+          //   <NON-USERNAME>/portainer-ee:latest
+          match4 = match4 || registry;
+        }
+
+        if (_.includes(repository, getURL(registry))) {
+          match3 = registry;
+        }
+      }
+
+      return match2 || match3 || match4;
+    }
+
+    function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, registryId) {
       const model = new PorImageRegistryModel();
-      const registry = _.find(registries, (reg) => _.includes(repository, getURL(reg)));
+      const registry = findBestMatchRegistry(repository, registries, registryId);
       if (registry) {
         const url = getURL(registry);
-        const lastIndex = repository.lastIndexOf(url) + url.length;
+        let lastIndex = repository.lastIndexOf(url);
+        lastIndex = lastIndex === -1 ? 0 : lastIndex + url.length;
         let image = repository.substring(lastIndex);
-        if (!_.startsWith(image, ':')) {
+        if (_.startsWith(image, '/')) {
           image = image.substring(1);
         }
         model.Registry = registry;
@@ -116,25 +162,38 @@ angular.module('portainer.app').factory('RegistryService', [
         if (ImageHelper.imageContainsURL(repository)) {
           model.UseRegistry = false;
         }
-        model.Registry = dockerhub;
+        model.Registry = new DockerHubViewModel();
         model.Image = repository;
       }
       return model;
     }
 
-    async function retrievePorRegistryModelFromRepositoryAsync(repository) {
-      try {
-        let [registries, dockerhub] = await Promise.all([service.registries(), DockerHubService.dockerhub()]);
-        return retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, dockerhub);
-      } catch (err) {
-        throw { msg: 'Unable to retrieve the registry associated to the repository', err: err };
-      }
+    function retrievePorRegistryModelFromRepository(repository, endpointId, registryId, namespace) {
+      return $async(async () => {
+        try {
+          const regs = await EndpointService.registries(endpointId, namespace);
+          return retrievePorRegistryModelFromRepositoryWithRegistries(repository, regs, registryId);
+        } catch (err) {
+          throw { msg: 'Unable to retrieve the registry associated to the repository', err: err };
+        }
+      });
     }
 
-    service.retrievePorRegistryModelFromRepository = function (repository) {
-      return $async(retrievePorRegistryModelFromRepositoryAsync, repository);
-    };
+    function loadRegistriesForDropdown(endpointId, namespace) {
+      return $async(async () => {
+        try {
+          const registries = await EndpointService.registries(endpointId, namespace);
 
-    return service;
+          // hide default(anonymous) dockerhub registry if user has an authenticated one
+          if (!registries.some((registry) => registry.Type === RegistryTypes.DOCKERHUB)) {
+            registries.push(new DockerHubViewModel());
+          }
+
+          return registries;
+        } catch (err) {
+          throw { msg: 'Unable to retrieve the registries', err: err };
+        }
+      });
+    }
   },
 ]);

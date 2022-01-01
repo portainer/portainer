@@ -5,12 +5,13 @@ import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resou
 
 class EditCustomTemplateViewController {
   /* @ngInject */
-  constructor($async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService) {
-    Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService });
+  constructor($async, $state, $window, ModalService, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService) {
+    Object.assign(this, { $async, $state, $window, ModalService, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService });
 
     this.formValues = null;
     this.state = {
       formValidationError: '',
+      isEditorDirty: false,
     };
     this.templates = [];
 
@@ -32,6 +33,7 @@ class EditCustomTemplateViewController {
       ]);
       template.FileContent = file;
       this.formValues = template;
+      this.oldFileContent = this.formValues.FileContent;
       this.formValues.ResourceControl = new ResourceControlViewModel(template.ResourceControl);
       this.formValues.AccessControlData = new AccessControlFormData();
     } catch (err) {
@@ -84,6 +86,7 @@ class EditCustomTemplateViewController {
       await this.ResourceControlService.applyResourceControl(userId, this.formValues.AccessControlData, this.formValues.ResourceControl);
 
       this.Notifications.success('Custom template successfully updated');
+      this.state.isEditorDirty = false;
       this.$state.go('docker.templates.custom');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update custom template');
@@ -93,17 +96,36 @@ class EditCustomTemplateViewController {
   }
 
   editorUpdate(cm) {
-    this.formValues.fileContent = cm.getValue();
+    if (this.formValues.FileContent.replace(/(\r\n|\n|\r)/gm, '') !== cm.getValue().replace(/(\r\n|\n|\r)/gm, '')) {
+      this.formValues.FileContent = cm.getValue();
+      this.state.isEditorDirty = true;
+    }
+  }
+
+  async uiCanExit() {
+    if (this.formValues.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
+      return this.ModalService.confirmWebEditorDiscard();
+    }
   }
 
   async $onInit() {
     this.getTemplate();
 
     try {
-      this.templates = await this.CustomTemplateService.customTemplates();
+      this.templates = await this.CustomTemplateService.customTemplates([1, 2]);
     } catch (err) {
       this.Notifications.error('Failure loading', err, 'Failed loading custom templates');
     }
+
+    this.$window.onbeforeunload = () => {
+      if (this.formValues.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
+        return '';
+      }
+    };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 }
 

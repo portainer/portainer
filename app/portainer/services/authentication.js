@@ -1,3 +1,5 @@
+import { clear as clearSessionStorage } from './session-storage';
+
 angular.module('portainer.app').factory('Authentication', [
   '$async',
   '$state',
@@ -7,7 +9,9 @@ angular.module('portainer.app').factory('Authentication', [
   'LocalStorage',
   'StateManager',
   'EndpointProvider',
-  function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
+  'UserService',
+  'ThemeManager',
+  function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService, ThemeManager) {
     'use strict';
 
     var service = {};
@@ -38,6 +42,7 @@ angular.module('portainer.app').factory('Authentication', [
         await Auth.logout().$promise;
       }
 
+      clearSessionStorage();
       StateManager.clean();
       EndpointProvider.clean();
       LocalStorage.cleanAuthData();
@@ -79,12 +84,24 @@ angular.module('portainer.app').factory('Authentication', [
       return user;
     }
 
+    async function setUserTheme() {
+      const data = await UserService.user(user.ID);
+      // Initialize user theme base on Usertheme from database
+      const userTheme = data.UserTheme;
+      if (userTheme === 'auto' || !userTheme) {
+        ThemeManager.autoTheme();
+      } else {
+        ThemeManager.setTheme(userTheme);
+      }
+    }
+
     async function setUser(jwt) {
       LocalStorage.storeJWT(jwt);
       var tokenPayload = jwtHelper.decodeToken(jwt);
       user.username = tokenPayload.username;
       user.ID = tokenPayload.id;
       user.role = tokenPayload.role;
+      await setUserTheme();
     }
 
     function isAdmin() {

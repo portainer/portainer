@@ -39,7 +39,7 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	transport, err := kubernetes.NewLocalTransport(tokenManager)
+	transport, err := kubernetes.NewLocalTransport(tokenManager, endpoint, factory.kubernetesClientFactory, factory.dataStore)
 	if err != nil {
 		return nil, err
 	}
@@ -52,9 +52,9 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 
 func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	tunnel := factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
-	endpoint.URL = fmt.Sprintf("http://localhost:%d", tunnel.Port)
+	rawURL := fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 
-	endpointURL, err := url.Parse(endpoint.URL)
+	endpointURL, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endp
 
 	endpointURL.Scheme = "http"
 	proxy := newSingleHostReverseProxyWithHostHeader(endpointURL)
-	proxy.Transport = kubernetes.NewEdgeTransport(factory.reverseTunnelService, endpoint.ID, tokenManager)
+	proxy.Transport = kubernetes.NewEdgeTransport(factory.dataStore, factory.signatureService, factory.reverseTunnelService, endpoint, tokenManager, factory.kubernetesClientFactory)
 
 	return proxy, nil
 }
@@ -103,7 +103,7 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 	}
 
 	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
-	proxy.Transport = kubernetes.NewAgentTransport(factory.signatureService, tlsConfig, tokenManager)
+	proxy.Transport = kubernetes.NewAgentTransport(factory.signatureService, tlsConfig, tokenManager, endpoint, factory.kubernetesClientFactory, factory.dataStore)
 
 	return proxy, nil
 }

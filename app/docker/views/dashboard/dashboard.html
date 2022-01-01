@@ -1,6 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Dashboard"></rd-header-title>
-  <rd-header-content>Endpoint summary</rd-header-content>
+  <rd-header-content>Environment summary</rd-header-content>
 </rd-header>
 
 <div class="row" ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
@@ -34,12 +34,12 @@
 <div class="row" ng-if="(!applicationState.endpoint.mode.agentProxy || applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE') && info && endpoint">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tachometer-alt" title-text="Endpoint info"></rd-widget-header>
+      <rd-widget-header icon="fa-tachometer-alt" title-text="Environment info"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
-              <td>Endpoint</td>
+              <td>Environment</td>
               <td>
                 {{ endpoint.Name }}
                 <span class="small text-muted space-left">

@@ -45,6 +45,8 @@ export function ContainerViewModel(data) {
   }
   this.Mounts = data.Mounts;
 
+  this.IsPortainer = data.IsPortainer;
+
   this.Ports = [];
   if (data.Ports) {
     for (var i = 0; i < data.Ports.length; ++i) {
@@ -79,18 +81,49 @@ export function ContainerStatsViewModel(data) {
     if (data.memory_stats.stats === undefined || data.memory_stats.usage === undefined) {
       this.MemoryUsage = this.MemoryCache = 0;
     } else {
-      this.MemoryUsage = data.memory_stats.usage - data.memory_stats.stats.cache;
-      this.MemoryCache = data.memory_stats.stats.cache;
+      this.MemoryCache = 0;
+      if (data.memory_stats.stats.cache !== undefined) {
+        // cgroups v1
+        this.MemoryCache = data.memory_stats.stats.cache;
+      }
+      this.MemoryUsage = data.memory_stats.usage - this.MemoryCache;
     }
   }
   this.PreviousCPUTotalUsage = data.precpu_stats.cpu_usage.total_usage;
   this.PreviousCPUSystemUsage = data.precpu_stats.system_cpu_usage;
   this.CurrentCPUTotalUsage = data.cpu_stats.cpu_usage.total_usage;
   this.CurrentCPUSystemUsage = data.cpu_stats.system_cpu_usage;
+  this.CPUCores = 1;
   if (data.cpu_stats.cpu_usage.percpu_usage) {
     this.CPUCores = data.cpu_stats.cpu_usage.percpu_usage.length;
+  } else {
+    if (data.cpu_stats.online_cpus !== undefined) {
+      this.CPUCores = data.cpu_stats.online_cpus;
+    }
   }
   this.Networks = _.values(data.networks);
+  if (data.blkio_stats !== undefined && data.blkio_stats.io_service_bytes_recursive !== null) {
+    //TODO: take care of multiple block devices
+    var readData = data.blkio_stats.io_service_bytes_recursive.find((d) => d.op === 'Read');
+    if (readData === undefined) {
+      // try the cgroups v2 version
+      readData = data.blkio_stats.io_service_bytes_recursive.find((d) => d.op === 'read');
+    }
+    if (readData !== undefined) {
+      this.BytesRead = readData.value;
+    }
+    var writeData = data.blkio_stats.io_service_bytes_recursive.find((d) => d.op === 'Write');
+    if (writeData === undefined) {
+      // try the cgroups v2 version
+      writeData = data.blkio_stats.io_service_bytes_recursive.find((d) => d.op === 'write');
+    }
+    if (writeData !== undefined) {
+      this.BytesWrite = writeData.value;
+    }
+  } else {
+    //no IO related data is available
+    this.noIOdata = true;
+  }
 }
 
 export function ContainerDetailsViewModel(data) {
@@ -108,4 +141,5 @@ export function ContainerDetailsViewModel(data) {
   if (data.Portainer && data.Portainer.ResourceControl) {
     this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
   }
+  this.IsPortainer = data.IsPortainer;
 }

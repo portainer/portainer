@@ -3,6 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesCreateApplicationVie
   controller: 'KubernetesCreateApplicationController',
   controllerAs: 'ctrl',
   bindings: {
-    $transition$: '<',
+    endpoint: '<',
   },
 });

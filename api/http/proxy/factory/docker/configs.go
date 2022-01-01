@@ -7,7 +7,7 @@ import (
 	"github.com/docker/docker/client"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -15,15 +15,15 @@ const (
 	configObjectIdentifier = "ID"
 )
 
-func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, configID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, endpointID portainer.EndpointID, configID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	config, _, err := dockerClient.ConfigInspectWithRaw(context.Background(), configID)
 	if err != nil {
 		return nil, err
 	}
 
-	swarmStackName := config.Spec.Labels[resourceLabelForDockerSwarmStackName]
-	if swarmStackName != "" {
-		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	stackResourceID := getStackResourceIDFromLabels(config.Spec.Labels, endpointID)
+	if stackResourceID != "" {
+		return authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil
@@ -34,7 +34,7 @@ func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, co
 func (transport *Transport) configListOperation(response *http.Response, executor *operationExecutor) error {
 	// ConfigList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.30/#operation/ConfigList
-	responseArray, err := responseutils.GetResponseAsJSONArray(response)
+	responseArray, err := utils.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (transport *Transport) configListOperation(response *http.Response, executo
 		return err
 	}
 
-	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
+	return utils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // configInspectOperation extracts the response as a JSON object, verify that the user
@@ -58,7 +58,7 @@ func (transport *Transport) configListOperation(response *http.Response, executo
 func (transport *Transport) configInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ConfigInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.30/#operation/ConfigInspect
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -78,9 +78,9 @@ func (transport *Transport) configInspectOperation(response *http.Response, exec
 // https://docs.docker.com/engine/api/v1.37/#operation/ConfigList
 // https://docs.docker.com/engine/api/v1.37/#operation/ConfigInspect
 func selectorConfigLabels(responseObject map[string]interface{}) map[string]interface{} {
-	secretSpec := responseutils.GetJSONObject(responseObject, "Spec")
+	secretSpec := utils.GetJSONObject(responseObject, "Spec")
 	if secretSpec != nil {
-		secretLabelsObject := responseutils.GetJSONObject(secretSpec, "Labels")
+		secretLabelsObject := utils.GetJSONObject(secretSpec, "Labels")
 		return secretLabelsObject
 	}
 	return nil

@@ -1,13 +1,14 @@
 import _ from 'lodash-es';
-import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-
 import angular from 'angular';
+import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 
 class CreateConfigController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
+  constructor($async, $state, $transition$, $window, ModalService, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
     this.$state = $state;
     this.$transition$ = $transition$;
+    this.$window = $window;
+    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.ConfigService = ConfigService;
     this.Authentication = Authentication;
@@ -24,6 +25,7 @@ class CreateConfigController {
 
     this.state = {
       formValidationError: '',
+      isEditorDirty: false,
     };
 
     this.editorUpdate = this.editorUpdate.bind(this);
@@ -31,6 +33,12 @@ class CreateConfigController {
   }
 
   async $onInit() {
+    this.$window.onbeforeunload = () => {
+      if (this.formValues.displayCodeEditor && this.formValues.ConfigContent && this.state.isEditorDirty) {
+        return '';
+      }
+    };
+
     if (!this.$transition$.params().id) {
       this.formValues.displayCodeEditor = true;
       return;
@@ -50,6 +58,16 @@ class CreateConfigController {
     } catch (err) {
       this.formValues.displayCodeEditor = true;
       this.Notifications.error('Failure', err, 'Unable to clone config');
+    }
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
+  }
+
+  async uiCanExit() {
+    if (this.formValues.displayCodeEditor && this.formValues.ConfigContent && this.state.isEditorDirty) {
+      return this.ModalService.confirmWebEditorDiscard();
     }
   }
 
@@ -122,6 +140,7 @@ class CreateConfigController {
       const userId = userDetails.ID;
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
       this.Notifications.success('Config successfully created');
+      this.state.isEditorDirty = false;
       this.$state.go('docker.configs', {}, { reload: true });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create config');
@@ -130,6 +149,7 @@ class CreateConfigController {
 
   editorUpdate(cm) {
     this.formValues.ConfigContent = cm.getValue();
+    this.state.isEditorDirty = true;
   }
 }
 

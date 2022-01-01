@@ -1,12 +1,18 @@
 import angular from 'angular';
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
+import {
+  KubernetesApplicationDataAccessPolicies,
+  KubernetesApplicationDeploymentTypes,
+  KubernetesApplicationTypes,
+  KubernetesDeploymentTypes,
+} from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 function computeTolerations(nodes, application) {
   const pod = application.Pods[0];
@@ -67,8 +73,8 @@ function computeAffinities(nodes, application) {
             (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.DOES_NOT_EXIST && !exists) ||
             (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.IN && isIn) ||
             (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.NOT_IN && !isIn) ||
-            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.GREATER_THAN && exists && parseInt(n.Labels[e.key]) > parseInt(e.values[0])) ||
-            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.LOWER_THAN && exists && parseInt(n.Labels[e.key]) < parseInt(e.values[0]))
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.GREATER_THAN && exists && parseInt(n.Labels[e.key], 10) > parseInt(e.values[0], 10)) ||
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.LOWER_THAN && exists && parseInt(n.Labels[e.key], 10) < parseInt(e.values[0], 10))
           ) {
             return;
           }
@@ -106,7 +112,8 @@ class KubernetesApplicationController {
     KubernetesStackService,
     KubernetesPodService,
     KubernetesNodeService,
-    KubernetesNamespaceHelper
+
+    StackService
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -114,6 +121,7 @@ class KubernetesApplicationController {
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.ModalService = ModalService;
+    this.StackService = StackService;
 
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
@@ -121,7 +129,9 @@ class KubernetesApplicationController {
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesNodeService = KubernetesNodeService;
 
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
+    this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
+    this.KubernetesApplicationTypes = KubernetesApplicationTypes;
+    this.KubernetesDeploymentTypes = KubernetesDeploymentTypes;
 
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.KubernetesServiceTypes = KubernetesServiceTypes;
@@ -132,6 +142,7 @@ class KubernetesApplicationController {
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
+    this.updateApplicationKindText = this.updateApplicationKindText.bind(this);
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.redeployApplicationAsync = this.redeployApplicationAsync.bind(this);
     this.rollbackApplicationAsync = this.rollbackApplicationAsync.bind(this);
@@ -144,11 +155,11 @@ class KubernetesApplicationController {
 
   showEditor() {
     this.state.showEditorTab = true;
-    this.selectTab(2);
+    this.selectTab(3);
   }
 
   isSystemNamespace() {
-    return this.KubernetesNamespaceHelper.isSystemNamespace(this.application.ResourcePool);
+    return KubernetesNamespaceHelper.isSystemNamespace(this.application.ResourcePool);
   }
 
   isExternalApplication() {
@@ -190,6 +201,10 @@ class KubernetesApplicationController {
     return !rule.Host && !rule.IP ? false : true;
   }
 
+  isStack() {
+    return this.application.StackId;
+  }
+
   /**
    * ROLLBACK
    */
@@ -199,7 +214,7 @@ class KubernetesApplicationController {
       const revision = _.nth(this.application.Revisions, -2);
       await this.KubernetesApplicationService.rollback(this.application, revision);
       this.Notifications.success('Application successfully rolled back');
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to rollback the application');
     }
@@ -220,7 +235,7 @@ class KubernetesApplicationController {
       const promises = _.map(this.application.Pods, (item) => this.KubernetesPodService.delete(item));
       await Promise.all(promises);
       this.Notifications.success('Application successfully redeployed');
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to redeploy the application');
     }
@@ -243,7 +258,7 @@ class KubernetesApplicationController {
       application.Note = this.formValues.Note;
       await this.KubernetesApplicationService.patch(this.application, application, true);
       this.Notifications.success('Application successfully updated');
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update application');
     }
@@ -251,6 +266,16 @@ class KubernetesApplicationController {
 
   updateApplication() {
     return this.$async(this.updateApplicationAsync);
+  }
+
+  updateApplicationKindText() {
+    if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.GIT) {
+      this.state.appType = `git repository`;
+    } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
+      this.state.appType = `manifest`;
+    } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.URL) {
+      this.state.appType = `manifest`;
+    }
   }
 
   /**
@@ -304,6 +329,12 @@ class KubernetesApplicationController {
       });
 
       this.placements = computePlacements(nodes, this.application);
+      this.state.placementWarning = _.find(this.placements, { AcceptsApplication: true }) ? false : true;
+
+      if (application.StackId) {
+        const file = await this.StackService.getStackFile(application.StackId);
+        this.stackFileContent = file;
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
     } finally {
@@ -328,9 +359,12 @@ class KubernetesApplicationController {
         namespace: this.$transition$.params().namespace,
         name: this.$transition$.params().name,
       },
+      appType: this.KubernetesDeploymentTypes.APPLICATION_FORM,
       eventWarningCount: 0,
+      placementWarning: false,
       expandedNote: false,
       useIngress: false,
+      useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('application');
@@ -340,9 +374,9 @@ class KubernetesApplicationController {
       SelectedRevision: undefined,
     };
 
-    this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     await this.getApplication();
     await this.getEvents();
+    this.updateApplicationKindText();
     this.state.viewReady = true;
   }
 

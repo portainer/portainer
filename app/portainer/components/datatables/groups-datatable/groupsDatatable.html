@@ -5,10 +5,18 @@
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          data-cy="endpointGroup-removeGroupButton"
+        >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.groups.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add group </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.groups.new" data-cy="endpointGroup-addGroupButton">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add group
+        </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -20,15 +28,16 @@
           placeholder="Search..."
           auto-focus
           ng-model-options="{ debounce: 300 }"
+          data-cy="endpointGroup-searchInput"
         />
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table table-hover nowrap-cells" data-cy="endpointGroup-endpointGroupTable">
           <thead>
             <tr>
               <th>
                 <span class="md-checkbox">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="endpointGroup-selectAllCheckbox" />
                   <label for="select_all"></label>
                 </span>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
@@ -73,7 +82,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

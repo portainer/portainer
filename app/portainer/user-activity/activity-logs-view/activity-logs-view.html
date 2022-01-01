@@ -1,0 +1,50 @@
+<rd-header>
+  <rd-header-title title-text="User Activity">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="." ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Activity Logs</rd-header-content>
+</rd-header>
+
+<div class="be-indicator-container">
+  <rd-widget>
+    <rd-widget-body>
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="dateRangeInput" class="col-sm-2 control-label text-left">Date Range</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" disabled />
+          </div>
+        </div>
+      </div>
+
+      <p class="text-muted small">
+        <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+        Portainer user activity logs have a maximum retention of 7 days.
+      </p>
+
+      <div>
+        <button type="button" class="btn btn-sm btn-primary m-r-10" limited-feature-dir="{{::$ctrl.limitedFeature}}" limited-feature-class="limited-be" limited-feature-disabled>
+          <i class="fa fa-download space-right" aria-hidden="true"></i>Export as CSV
+        </button>
+        <be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+
+  <activity-logs-datatable
+    logs="$ctrl.state.logs"
+    keyword="$ctrl.state.keyword"
+    sort="$ctrl.state.sort"
+    limit="$ctrl.state.limit"
+    context-filter="$ctrl.state.contextFilter"
+    total-items="$ctrl.state.totalItems"
+    current-page="$ctrl.state.currentPage"
+    feature="{{:: $ctrl.limitedFeature}}"
+    on-change-keyword="($ctrl.onChangeKeyword)"
+    on-change-sort="($ctrl.onChangeSort)"
+    on-change-limit="($ctrl.onChangeLimit)"
+    on-change-page="($ctrl.onChangePage)"
+  ></activity-logs-datatable>
+</div>

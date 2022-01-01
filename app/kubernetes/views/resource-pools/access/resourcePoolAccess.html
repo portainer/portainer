@@ -1,5 +1,5 @@
-<kubernetes-view-header title="Resource pool access management" state="kubernetes.resourcePools.resourcePool.access" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt;
+<kubernetes-view-header title="Namespace access management" state="kubernetes.resourcePools.resourcePool.access" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
   <a ui-sref="kubernetes.resourcePools.resourcePool({id: ctrl.pool.Namespace.Name})">{{ ctrl.pool.Namespace.Name }}</a> &gt; Access management
 </kubernetes-view-header>
 
@@ -9,7 +9,7 @@
   <div class="row" ng-if="ctrl.pool">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="fa-plug" title-text="Resource pool"></rd-widget-header>
+        <rd-widget-header icon="fa-plug" title-text="Namespace"></rd-widget-header>
         <rd-widget-body classes="no-padding">
           <table class="table">
             <tbody>
@@ -38,8 +38,8 @@
               </label>
               <div class="col-sm-9 col-lg-4">
                 <span class="small text-muted" ng-if="ctrl.availableUsersAndTeams.length === 0">
-                  No user nor team access has been set on the endpoint. Head over to the
-                  <a ui-sref="portainer.endpoints.endpoint.access({id: ctrl.endpointId})">endpoint access view</a> to manage them.
+                  No user nor team access has been set on the environment. Head over to the
+                  <a ui-sref="portainer.endpoints.endpoint.access({id: ctrl.endpointId})">environment access view</a> to manage them.
                 </span>
                 <span
                   isteven-multi-select

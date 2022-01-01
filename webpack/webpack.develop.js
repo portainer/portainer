@@ -1,29 +1,15 @@
-const path = require('path');
-const webpackMerge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const commonConfig = require('./webpack.common.js');
 
-module.exports = webpackMerge(commonConfig, {
+module.exports = merge(commonConfig, {
   mode: 'development',
+  devtool: 'eval-source-map',
   module: {
     rules: [
       {
         test: /\.(woff|woff2|eot|ttf|svg|ico|png|jpg|gif)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            // options: { limit: 25000 }
-          },
-        ],
+        type: 'asset/resource',
       },
     ],
-  },
-  devServer: {
-    contentBase: path.join(__dirname, '.tmp'),
-    compress: true,
-    port: 8999,
-    proxy: {
-      '/api': 'http://localhost:9000',
-    },
-    open: true,
   },
 });

@@ -1,6 +1,6 @@
-<div style="background-color: #d5e8f3; padding: 2px;">
+<div class="service-datatable">
   <table class="table table-condensed table-hover nowrap-cells">
-    <thead style="background-color: #e7f6ff;">
+    <thead>
       <tr>
         <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" style="width: 10%;">
           <a ng-click="$ctrl.changeOrderBy('Status.State')">
@@ -54,7 +54,7 @@
         </th>
       </tr>
     </thead>
-    <tbody style="background-color: #f1f9fd;">
+    <tbody>
       <tr
         ng-repeat="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter: $ctrl.applyFilters | filter:$ctrl.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder))"
       >

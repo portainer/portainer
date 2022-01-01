@@ -4,12 +4,13 @@ import (
 	"context"
 	"net/http"
 
+	portainer "github.com/portainer/portainer/api"
+
 	"github.com/docker/docker/api/types"
 
 	"github.com/docker/docker/client"
 
-	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -18,15 +19,15 @@ const (
 	networkObjectName       = "Name"
 )
 
-func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, networkID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, endpointID portainer.EndpointID, networkID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	network, err := dockerClient.NetworkInspect(context.Background(), networkID, types.NetworkInspectOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	swarmStackName := network.Labels[resourceLabelForDockerSwarmStackName]
-	if swarmStackName != "" {
-		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	stackResourceID := getStackResourceIDFromLabels(network.Labels, endpointID)
+	if stackResourceID != "" {
+		return authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil
@@ -37,7 +38,7 @@ func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, n
 func (transport *Transport) networkListOperation(response *http.Response, executor *operationExecutor) error {
 	// NetworkList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
-	responseArray, err := responseutils.GetResponseAsJSONArray(response)
+	responseArray, err := utils.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -53,7 +54,7 @@ func (transport *Transport) networkListOperation(response *http.Response, execut
 		return err
 	}
 
-	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
+	return utils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // networkInspectOperation extracts the response as a JSON object, verify that the user
@@ -61,7 +62,7 @@ func (transport *Transport) networkListOperation(response *http.Response, execut
 func (transport *Transport) networkInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// NetworkInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -98,5 +99,5 @@ func findSystemNetworkResourceControl(networkObject map[string]interface{}) *por
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
 func selectorNetworkLabels(responseObject map[string]interface{}) map[string]interface{} {
-	return responseutils.GetJSONObject(responseObject, "Labels")
+	return utils.GetJSONObject(responseObject, "Labels")
 }

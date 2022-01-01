@@ -5,9 +5,9 @@ angular.module('portainer.kubernetes').filter('kubernetesConfigurationTypeText',
   return function (type) {
     switch (type) {
       case KubernetesConfigurationTypes.SECRET:
-        return 'Sensitive';
+        return 'Secret';
       case KubernetesConfigurationTypes.CONFIGMAP:
-        return 'Non-sensitive';
+        return 'ConfigMap';
     }
   };
 });

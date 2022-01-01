@@ -12,9 +12,9 @@ angular.module('portainer.integrations.storidge').factory('Storidge', [
       {
         rebootCluster: { method: 'POST', params: { resource: 'clusters', action: 'reboot' } },
         shutdownCluster: { method: 'POST', params: { resource: 'clusters', action: 'shutdown' } },
-        queryEvents: { method: 'GET', params: { resource: 'clusters', action: 'events' }, timeout: 4500, ignoreLoadingBar: true, isArray: true },
+        queryEvents: { method: 'GET', params: { resource: 'clusters', action: 'events' }, ignoreLoadingBar: true, isArray: true },
         getVersion: { method: 'GET', params: { resource: 'clusters', action: 'version' } },
-        getInfo: { method: 'GET', params: { resource: 'clusters', action: 'info' }, timeout: 4500, ignoreLoadingBar: true },
+        getInfo: { method: 'GET', params: { resource: 'clusters', action: 'info' }, ignoreLoadingBar: true },
 
         queryNodes: { method: 'GET', params: { resource: 'nodes' } },
         getNode: { method: 'GET', params: { resource: 'nodes', id: '@id' } },

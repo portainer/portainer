@@ -1,23 +1,13 @@
-import { RegistryTypes } from '@/portainer/models/registryTypes';
-import { RegistryDefaultModel } from '../../../models/registry';
+import { RegistryTypes } from 'Portainer/models/registryTypes';
+import { RegistryCreateFormValues } from 'Portainer/models/registry';
 
-angular.module('portainer.app').controller('CreateRegistryController', [
-  '$scope',
-  '$state',
-  'RegistryService',
-  'Notifications',
-  'RegistryGitlabService',
-  function ($scope, $state, RegistryService, Notifications, RegistryGitlabService) {
-    $scope.selectQuayRegistry = selectQuayRegistry;
-    $scope.selectAzureRegistry = selectAzureRegistry;
-    $scope.selectCustomRegistry = selectCustomRegistry;
-    $scope.selectGitlabRegistry = selectGitlabRegistry;
-    $scope.create = createRegistry;
-    $scope.useDefaultGitlabConfiguration = useDefaultGitlabConfiguration;
-    $scope.retrieveGitlabRegistries = retrieveGitlabRegistries;
-    $scope.createGitlabRegistries = createGitlabRegistries;
+class CreateRegistryController {
+  /* @ngInject */
+  constructor($async, $state, Notifications, RegistryService, RegistryGitlabService) {
+    Object.assign(this, { $async, $state, Notifications, RegistryService, RegistryGitlabService });
 
-    $scope.state = {
+    this.RegistryTypes = RegistryTypes;
+    this.state = {
       actionInProgress: false,
       overrideConfiguration: false,
       gitlab: {
@@ -26,87 +16,129 @@ angular.module('portainer.app').controller('CreateRegistryController', [
         },
         selectedItems: [],
       },
+      originViewReference: 'portainer.registries',
+      originalEndpointId: null,
     };
 
-    function selectQuayRegistry() {
-      $scope.model.Name = 'Quay';
-      $scope.model.URL = 'quay.io';
-      $scope.model.Authentication = true;
-    }
+    this.createRegistry = this.createRegistry.bind(this);
+    this.retrieveGitlabRegistries = this.retrieveGitlabRegistries.bind(this);
+    this.createGitlabRegistries = this.createGitlabRegistries.bind(this);
+  }
 
-    function useDefaultGitlabConfiguration() {
-      $scope.model.URL = 'https://registry.gitlab.com';
-      $scope.model.Gitlab.InstanceURL = 'https://gitlab.com';
-    }
+  useDefaultQuayConfiguration() {
+    this.model.Quay.useOrganisation = false;
+    this.model.Quay.organisationName = '';
+  }
 
-    function selectGitlabRegistry() {
-      $scope.model.Name = '';
-      $scope.model.Authentication = true;
-      $scope.model.Gitlab = {};
-      useDefaultGitlabConfiguration();
-    }
+  selectQuayRegistry() {
+    this.model.Name = 'Quay';
+    this.model.URL = 'quay.io';
+    this.model.Authentication = true;
+    this.model.Quay = {};
+    this.useDefaultQuayConfiguration();
+  }
 
-    function selectAzureRegistry() {
-      $scope.model.Name = '';
-      $scope.model.URL = '';
-      $scope.model.Authentication = true;
-    }
+  useDefaultGitlabConfiguration() {
+    this.model.URL = 'https://registry.gitlab.com';
+    this.model.Gitlab.InstanceURL = 'https://gitlab.com';
+  }
 
-    function selectCustomRegistry() {
-      $scope.model.Name = '';
-      $scope.model.URL = '';
-      $scope.model.Authentication = false;
-    }
+  selectGitlabRegistry() {
+    this.model.Name = '';
+    this.model.Authentication = true;
+    this.model.Gitlab = {};
+    this.useDefaultGitlabConfiguration();
+  }
 
-    function retrieveGitlabRegistries() {
-      $scope.state.actionInProgress = true;
-      RegistryGitlabService.projects($scope.model.Gitlab.InstanceURL, $scope.model.Token)
-        .then((data) => {
-          $scope.gitlabProjects = data;
-        })
-        .catch((err) => {
-          Notifications.error('Failure', err, 'Unable to retrieve projects');
-        })
-        .finally(() => {
-          $scope.state.actionInProgress = false;
-        });
-    }
+  selectAzureRegistry() {
+    this.model.Name = '';
+    this.model.URL = '';
+    this.model.Authentication = true;
+  }
 
-    function createGitlabRegistries() {
-      $scope.state.actionInProgress = true;
-      RegistryService.createGitlabRegistries($scope.model, $scope.state.gitlab.selectedItems)
-        .then(() => {
-          Notifications.success('Registries successfully created');
-          $state.go('portainer.registries');
-        })
-        .catch((err) => {
-          Notifications.error('Failure', err, 'Unable to create registries');
-        })
-        .finally(() => {
-          $scope.state.actionInProgress = false;
-        });
-    }
+  selectProGetRegistry() {
+    this.model.Name = '';
+    this.model.URL = '';
+    this.model.BaseURL = '';
+    this.model.Authentication = true;
+  }
 
-    function createRegistry() {
-      $scope.state.actionInProgress = true;
-      RegistryService.createRegistry($scope.model)
-        .then(function success() {
-          Notifications.success('Registry successfully created');
-          $state.go('portainer.registries');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to create registry');
-        })
-        .finally(function final() {
-          $scope.state.actionInProgress = false;
-        });
-    }
+  selectCustomRegistry() {
+    this.model.Name = '';
+    this.model.URL = '';
+    this.model.Authentication = false;
+  }
 
-    function initView() {
-      $scope.RegistryTypes = RegistryTypes;
-      $scope.model = new RegistryDefaultModel();
-    }
+  selectDockerHub() {
+    this.model.Name = '';
+    this.model.URL = 'docker.io';
+    this.model.Authentication = true;
+  }
 
-    initView();
-  },
-]);
+  useDefaultEcrConfiguration() {
+    this.model.Ecr.Region = '';
+  }
+
+  selectEcr() {
+    this.model.Name = '';
+    this.model.URL = '';
+    this.model.Authentication = false;
+    this.model.Ecr = {};
+    this.useDefaultEcrConfiguration();
+  }
+
+  retrieveGitlabRegistries() {
+    return this.$async(async () => {
+      this.state.actionInProgress = true;
+      try {
+        this.gitlabProjects = await this.RegistryGitlabService.projects(this.model.Gitlab.InstanceURL, this.model.Token);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve projects');
+      } finally {
+        this.state.actionInProgress = false;
+      }
+    });
+  }
+
+  createGitlabRegistries() {
+    return this.$async(async () => {
+      try {
+        this.state.actionInProgress = true;
+        await this.RegistryService.createGitlabRegistries(this.model, this.state.gitlab.selectedItems);
+        this.Notifications.success('Registries successfully created');
+        this.$state.go(this.state.originViewReference, { endpointId: this.state.originalEndpointId });
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to create registries');
+        this.state.actionInProgress = false;
+      }
+    });
+  }
+
+  createRegistry() {
+    return this.$async(async () => {
+      try {
+        this.state.actionInProgress = true;
+        await this.RegistryService.createRegistry(this.model);
+        this.Notifications.success('Registry successfully created');
+        this.$state.go(this.state.originViewReference, { endpointId: this.state.originalEndpointId });
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to create registry');
+        this.state.actionInProgress = false;
+      }
+    });
+  }
+
+  $onInit() {
+    this.model = new RegistryCreateFormValues();
+
+    const from = this.$transition$.from();
+    const params = this.$transition$.params('from');
+
+    if (from.name && /^[a-z]+\.registries$/.test(from.name)) {
+      this.state.originViewReference = from;
+      this.state.originalEndpointId = params.endpointId || null;
+    }
+  }
+}
+
+export default CreateRegistryController;

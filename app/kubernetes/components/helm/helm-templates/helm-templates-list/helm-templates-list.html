@@ -1,0 +1,57 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <div class="toolBar">
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
+      </div>
+
+      <div class="actionBar">
+        <div>
+          <span style="width: 25%;">
+            <ui-select ng-model="$ctrl.state.selectedCategory" theme="bootstrap">
+              <ui-select-match placeholder="Select a category">
+                <a class="btn btn-xs btn-link pull-right" ng-click="$ctrl.clearCategory()"><i class="glyphicon glyphicon-remove"></i></a>
+                <span>{{ $select.selected }}</span>
+              </ui-select-match>
+              <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
+                <span>{{ category }}</span>
+              </ui-select-choices>
+            </ui-select>
+          </span>
+        </div>
+      </div>
+
+      <div class="searchBar" style="border-top: 2px solid #f6f6f6;">
+        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          auto-focus
+          ng-model-options="{ debounce: 300 }"
+        />
+      </div>
+
+      <div class="blocklist">
+        <helm-templates-list-item
+          ng-repeat="chart in $ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory "
+          model="chart"
+          type-label="helm"
+          on-select="($ctrl.selectAction)"
+        >
+        </helm-templates-list-item>
+        <div ng-if="$ctrl.loading" class="text-center text-muted">
+          Loading...
+          <div class="text-center text-muted">
+            Initial download of Helm Charts can take a few minutes
+          </div>
+        </div>
+        <div ng-if="!$ctrl.loading && $ctrl.charts.length === 0" class="text-center text-muted">
+          No helm charts available.
+        </div>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

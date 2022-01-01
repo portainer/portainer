@@ -1,0 +1,73 @@
+<form class="form-horizontal" name="registryFormDockerhub" ng-submit="$ctrl.formAction()">
+  <div class="col-sm-12 form-section-title">
+    DockerHub account details
+  </div>
+  <!-- name-input -->
+  <div class="form-group">
+    <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="registry_name" name="registry_name" ng-model="$ctrl.model.Name" placeholder="dockerhub-prod-us" required />
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormDockerhub.registry_name.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormDockerhub.registry_name.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !name-input -->
+  <!-- credentials-user -->
+  <div class="form-group">
+    <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left">DockerHub username</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormDockerhub.registry_username.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormDockerhub.registry_username.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !credentials-user -->
+  <!-- credentials-password -->
+  <div class="form-group">
+    <label for="registry_password" class="col-sm-3 col-lg-2 control-label text-left">DockerHub password</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="password" class="form-control" id="registry_password" name="registry_password" ng-model="$ctrl.model.Password" required />
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormDockerhub.registry_password.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormDockerhub.registry_password.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !credentials-password -->
+
+  <!-- actions -->
+  <div class="col-sm-12 form-section-title">
+    Actions
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        ng-disabled="$ctrl.actionInProgress || !registryFormDockerhub.$valid"
+        button-spinner="$ctrl.actionInProgress"
+        analytics-on
+        analytics-category="portainer"
+        analytics-event="portainer-registry-creation"
+        analytics-properties="{ metadata: { type: 'dockerhub' } }"
+      >
+        <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
+        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+      </button>
+    </div>
+  </div>
+  <!-- !actions -->
+</form>

@@ -1,0 +1,136 @@
+<div class="col-sm-12 form-section-title ldap-custom-admin-group-title" ng-style="$ctrl.isLimitedFeatureSelfContained && { 'padding-bottom': '15px' }">
+  Auto-populate team admins <be-feature-indicator feature="$ctrl.limitedFeatureId" class="space-left" ng-if="$ctrl.isLimitedFeatureSelfContained"></be-feature-indicator>
+</div>
+
+<rd-widget ng-repeat="config in $ctrl.settings.AdminGroupSearchSettings | limitTo: (1 - $ctrl.settings.AdminGroupSearchSettings)">
+  <rd-widget-body>
+    <div class="form-group m-b-10" ng-if="$index > 0">
+      <span class="col-sm-12 text-muted small">
+        Extra search configuration
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label for="ldap_admin_group_basedn_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
+        Group Base DN
+        <portainer-tooltip position="bottom" message="The distinguished name of the element from which the LDAP server will search for groups."></portainer-tooltip>
+      </label>
+      <div class="col-sm-8 col-md-4">
+        <input
+          type="text"
+          class="form-control"
+          id="ldap_admin_group_basedn_{{ $index }}"
+          ng-model="config.GroupBaseDN"
+          placeholder="dc=ldap,dc=domain,dc=tld"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
+          ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
+          limited-feature-tabindex="-1"
+        />
+      </div>
+
+      <label for="ldap_admin_group_att_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
+        Group Membership Attribute
+        <portainer-tooltip position="bottom" message="LDAP attribute which denotes the group membership."></portainer-tooltip>
+      </label>
+      <div class="col-sm-8 col-md-4">
+        <input
+          type="text"
+          class="form-control"
+          id="ldap_admin_group_att_{{ $index }}"
+          ng-model="config.GroupAttribute"
+          placeholder="member"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
+          ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
+          limited-feature-tabindex="-1"
+        />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="ldap_admin_group_filter_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
+        Group Filter
+        <portainer-tooltip position="bottom" message="The LDAP search filter used to select group elements, optional."></portainer-tooltip>
+      </label>
+      <div ng-class="{ 'col-sm-7 col-md-9': $index, 'col-sm-8 col-md-10': !$index }">
+        <input
+          type="text"
+          class="form-control"
+          id="ldap_admin_group_filter_{{ $index }}"
+          ng-model="config.GroupFilter"
+          placeholder="(objectClass=groupOfNames)"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
+          ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
+          limited-feature-tabindex="-1"
+        />
+      </div>
+      <div class="col-sm-1" ng-if="$index > 0">
+        <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.onRemoveClick($index)">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </rd-widget-body>
+</rd-widget>
+
+<div class="form-group m-t-10">
+  <div class="col-sm-12">
+    <button
+      class="label label-default interactive no-border"
+      ng-click="$ctrl.onAddClick()"
+      limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
+      limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
+      limited-feature-disabled
+    >
+      <i class="fa fa-plus-circle" aria-hidden="true"></i> add group search configuration
+    </button>
+  </div>
+  <div class="col-sm-12 m-t-10">
+    <button
+      class="btn btm-sm btn-primary"
+      type="button"
+      ng-click="$ctrl.search()"
+      limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
+      limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
+      ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
+      limited-feature-tabindex="-1"
+    >
+      Fetch Admin Group(s)
+    </button>
+    <span ng-if="$ctrl.groups && $ctrl.groups.length === 0" class="m-l-30"> <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> No groups found</span>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="col-sm-12">
+    <label for="admin-auto-populate" class="control-label text-left text-muted" ng-class="{ 'text-muted': !$ctrl.enableAssignAdminGroup }">
+      Assign admin rights to group(s)
+    </label>
+    <label class="switch m-l-20" ng-class="{ 'business limited': $ctrl.isLimitedFeatureSelfContained }">
+      <input id="admin-auto-populate" ng-disabled="!$ctrl.enableAssignAdminGroup" name="admin-auto-populate" type="checkbox" ng-model="$ctrl.settings.AdminAutoPopulate" /><i></i>
+    </label>
+  </div>
+</div>
+
+<div class="form-group" ng-if="$ctrl.settings.AdminAutoPopulate">
+  <div class="col-sm-12">
+    <label for="group-access" class="control-label text-left">
+      Select Group(s)
+    </label>
+    <span
+      class="m-l-20"
+      isteven-multi-select
+      ng-if="$ctrl.enableAssignAdminGroup"
+      input-model="$ctrl.groups"
+      output-model="$ctrl.selectedAdminGroups"
+      button-label="name"
+      item-label="name"
+      tick-property="selected"
+      helper-elements="filter"
+      search-property="name"
+      translation="{nothingSelected: 'Select one or more groups', search: 'Search...'}"
+    >
+    </span>
+  </div>
+</div>

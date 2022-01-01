@@ -1,21 +1,37 @@
 import angular from 'angular';
-import _ from 'lodash-es';
+import uuidv4 from 'uuid/v4';
 
-import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
+import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
+import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
+import { RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
 
 angular
   .module('portainer.app')
   .controller('CreateStackController', function (
     $scope,
     $state,
+    $async,
+    $window,
+    ModalService,
     StackService,
     Authentication,
     Notifications,
     FormValidator,
     ResourceControlService,
     FormHelper,
-    CustomTemplateService
+    StackHelper,
+    ContainerHelper,
+    CustomTemplateService,
+    ContainerService,
+    WebhookHelper,
+    clipboard,
+    endpoint
   ) {
+    $scope.onChangeTemplateId = onChangeTemplateId;
+    $scope.buildAnalyticsProperties = buildAnalyticsProperties;
+
+    $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
+
     $scope.formValues = {
       Name: '',
       StackFileContent: '',
@@ -26,8 +42,13 @@ angular
       RepositoryUsername: '',
       RepositoryPassword: '',
       Env: [],
+      AdditionalFiles: [],
       ComposeFilePathInRepository: 'docker-compose.yml',
       AccessControlData: new AccessControlFormData(),
+      RepositoryAutomaticUpdates: true,
+      RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
+      RepositoryFetchInterval: '5m',
+      RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
     };
 
     $scope.state = {
@@ -35,15 +56,73 @@ angular
       formValidationError: '',
       actionInProgress: false,
       StackType: null,
+      editorYamlValidationError: '',
+      uploadYamlValidationError: '',
+      isEditorDirty: false,
+      selectedTemplate: null,
+      selectedTemplateId: null,
     };
 
-    $scope.addEnvironmentVariable = function () {
-      $scope.formValues.Env.push({ name: '', value: '' });
+    $window.onbeforeunload = () => {
+      if ($scope.state.Method === 'editor' && $scope.formValues.StackFileContent && $scope.state.isEditorDirty) {
+        return '';
+      }
     };
 
-    $scope.removeEnvironmentVariable = function (index) {
-      $scope.formValues.Env.splice(index, 1);
+    $scope.$on('$destroy', function () {
+      $scope.state.isEditorDirty = false;
+    });
+
+    $scope.onChangeFormValues = onChangeFormValues;
+
+    $scope.addAdditionalFiles = function () {
+      $scope.formValues.AdditionalFiles.push('');
     };
+
+    $scope.removeAdditionalFiles = function (index) {
+      $scope.formValues.AdditionalFiles.splice(index, 1);
+    };
+
+    function buildAnalyticsProperties() {
+      const metadata = { type: methodLabel($scope.state.Method) };
+
+      if ($scope.state.Method === 'repository') {
+        metadata.automaticUpdates = 'off';
+        if ($scope.formValues.RepositoryAutomaticUpdates) {
+          metadata.automaticUpdates = autoSyncLabel($scope.formValues.RepositoryMechanism);
+        }
+        metadata.auth = $scope.formValues.RepositoryAuthentication;
+      }
+
+      if ($scope.state.Method === 'template') {
+        metadata.templateName = $scope.state.selectedTemplate.Title;
+      }
+
+      return { metadata };
+
+      function methodLabel(method) {
+        switch (method) {
+          case 'editor':
+            return 'web-editor';
+          case 'repository':
+            return 'git';
+          case 'upload':
+            return 'file-upload';
+          case 'template':
+            return 'custom-template';
+        }
+      }
+
+      function autoSyncLabel(type) {
+        switch (type) {
+          case RepositoryMechanismTypes.INTERVAL:
+            return 'polling';
+          case RepositoryMechanismTypes.WEBHOOK:
+            return 'webhook';
+        }
+        return 'off';
+      }
+    }
 
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
@@ -73,6 +152,7 @@ angular
 
       if (method === 'repository') {
         var repositoryOptions = {
+          AdditionalFiles: $scope.formValues.AdditionalFiles,
           RepositoryURL: $scope.formValues.RepositoryURL,
           RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
           ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
@@ -80,7 +160,21 @@ angular
           RepositoryUsername: $scope.formValues.RepositoryUsername,
           RepositoryPassword: $scope.formValues.RepositoryPassword,
         };
+
+        getAutoUpdatesProperty(repositoryOptions);
+
         return StackService.createSwarmStackFromGitRepository(name, repositoryOptions, env, endpointId);
+      }
+    }
+
+    function getAutoUpdatesProperty(repositoryOptions) {
+      if ($scope.formValues.RepositoryAutomaticUpdates) {
+        repositoryOptions.AutoUpdate = {};
+        if ($scope.formValues.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
+          repositoryOptions.AutoUpdate.Interval = $scope.formValues.RepositoryFetchInterval;
+        } else if ($scope.formValues.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
+          repositoryOptions.AutoUpdate.Webhook = $scope.formValues.RepositoryWebhookURL.split('/').reverse()[0];
+        }
       }
     }
 
@@ -96,6 +190,7 @@ angular
         return StackService.createComposeStackFromFileUpload(name, stackFile, env, endpointId);
       } else if (method === 'repository') {
         var repositoryOptions = {
+          AdditionalFiles: $scope.formValues.AdditionalFiles,
           RepositoryURL: $scope.formValues.RepositoryURL,
           RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
           ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
@@ -103,8 +198,22 @@ angular
           RepositoryUsername: $scope.formValues.RepositoryUsername,
           RepositoryPassword: $scope.formValues.RepositoryPassword,
         };
+
+        getAutoUpdatesProperty(repositoryOptions);
+
         return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);
       }
+    }
+
+    $scope.copyWebhook = function () {
+      clipboard.copyText($scope.formValues.RepositoryWebhookURL);
+      $('#copyNotification').show();
+      $('#copyNotification').fadeOut(2000);
+    };
+
+    $scope.handleEnvVarChange = handleEnvVarChange;
+    function handleEnvVarChange(value) {
+      $scope.formValues.Env = value;
     }
 
     $scope.deployStack = function () {
@@ -141,6 +250,7 @@ angular
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
+          $scope.state.isEditorDirty = false;
           $state.go('docker.stacks');
         })
         .catch(function error(err) {
@@ -151,18 +261,44 @@ angular
         });
     };
 
-    $scope.editorUpdate = function (cm) {
-      $scope.formValues.StackFileContent = cm.getValue();
+    $scope.onChangeFileContent = function onChangeFileContent(value) {
+      $scope.formValues.StackFileContent = value;
+      $scope.state.editorYamlValidationError = StackHelper.validateYAML($scope.formValues.StackFileContent, $scope.containerNames);
+      $scope.state.isEditorDirty = true;
     };
 
-    $scope.onChangeTemplate = async function onChangeTemplate(template) {
-      try {
-        $scope.selectedTemplate = template;
-        $scope.formValues.StackFileContent = await CustomTemplateService.customTemplateFile(template.Id);
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to retrieve Custom Template file');
+    async function onFileLoadAsync(event) {
+      $scope.state.uploadYamlValidationError = StackHelper.validateYAML(event.target.result, $scope.containerNames);
+    }
+
+    function onFileLoad(event) {
+      return $async(onFileLoadAsync, event);
+    }
+
+    $scope.uploadFile = function (file) {
+      $scope.formValues.StackFile = file;
+
+      if (file) {
+        const temporaryFileReader = new FileReader();
+        temporaryFileReader.fileName = file.name;
+        temporaryFileReader.onload = onFileLoad;
+        temporaryFileReader.readAsText(file);
       }
     };
+
+    function onChangeTemplateId(templateId, template) {
+      return $async(async () => {
+        try {
+          $scope.state.selectedTemplateId = templateId;
+          $scope.state.selectedTemplate = template;
+
+          const fileContent = await CustomTemplateService.customTemplateFile(templateId);
+          $scope.onChangeFileContent(fileContent);
+        } catch (err) {
+          this.Notifications.error('Failure', err, 'Unable to retrieve Custom Template file');
+        }
+      });
+    }
 
     async function initView() {
       var endpointMode = $scope.applicationState.endpoint.mode;
@@ -171,13 +307,25 @@ angular
         $scope.state.StackType = 1;
       }
 
+      $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
+
       try {
-        const templates = await CustomTemplateService.customTemplates($scope.state.StackType);
-        $scope.templates = _.map(templates, (template) => ({ ...template, label: `${template.Title} - ${template.Description}` }));
+        const containers = await ContainerService.containers(true);
+        $scope.containerNames = ContainerHelper.getContainerNames(containers);
       } catch (err) {
-        Notifications.error('Failure', err, 'Unable to retrieve Custom Templates');
+        Notifications.error('Failure', err, 'Unable to retrieve Containers');
       }
     }
 
+    this.uiCanExit = async function () {
+      if ($scope.state.Method === 'editor' && $scope.formValues.StackFileContent && $scope.state.isEditorDirty) {
+        return ModalService.confirmWebEditorDiscard();
+      }
+    };
+
     initView();
+
+    function onChangeFormValues(newValues) {
+      $scope.formValues = newValues;
+    }
   });

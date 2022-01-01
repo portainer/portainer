@@ -7,11 +7,23 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	portainer "github.com/portainer/portainer/api"
 )
 
-// DELETE request on /api/edge_jobs/:id/tasks/:taskID/logs
+// @id EdgeJobTasksClear
+// @summary Clear the log for a specifc task on an EdgeJob
+// @description **Access policy**: administrator
+// @tags edge_jobs
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param id path string true "EdgeJob Id"
+// @param taskID path string true "Task Id"
+// @success 204
+// @failure 500
+// @failure 400
+// @failure 503 "Edge compute features are disabled"
+// @router /edge_jobs/{id}/tasks/{taskID}/logs [delete]
 func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -24,7 +36,7 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 	}
 
 	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}

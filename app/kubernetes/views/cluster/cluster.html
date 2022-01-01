@@ -12,43 +12,18 @@
           <!-- resource-reservation -->
           <form class="form-horizontal" ng-if="ctrl.resourceReservation">
             <kubernetes-resource-reservation
-              cpu="ctrl.resourceReservation.CPU"
-              cpu-limit="ctrl.CPULimit"
-              memory="ctrl.resourceReservation.Memory"
-              memory-limit="ctrl.MemoryLimit"
               description="Resource reservation represents the total amount of resource assigned to all the applications inside the cluster."
+              cpu-reservation="ctrl.resourceReservation.CPU"
+              cpu-limit="ctrl.CPULimit"
+              memory-reservation="ctrl.resourceReservation.Memory"
+              memory-limit="ctrl.MemoryLimit"
+              display-usage="ctrl.hasResourceUsageAccess()"
+              cpu-usage="ctrl.resourceUsage.CPU"
+              memory-usage="ctrl.resourceUsage.Memory"
             >
             </kubernetes-resource-reservation>
           </form>
           <!-- !resource-reservation -->
-
-          <!-- cluster-status -->
-          <div class="col-sm-12 form-section-title">
-            Cluster status
-          </div>
-
-          <table class="table">
-            <tbody>
-              <tr class="text-muted">
-                <td style="border-top: none; width: 25%;">Component</td>
-                <td style="border-top: none; width: 25%;">Status</td>
-                <td style="border-top: none; width: 50%;" ng-if="ctrl.hasUnhealthyComponentStatus">Error</td>
-              </tr>
-              <tr ng-repeat="cs in ctrl.componentStatuses">
-                <td style="width: 25%;">
-                  {{ cs.ComponentName }}
-                </td>
-                <td style="width: 25%;">
-                  <span ng-if="cs.Healthy"><i class="fa fa-check green-icon" aria-hidden="true" style="margin-right: 2px;"></i> healthy</span>
-                  <span ng-if="!cs.Healthy"><i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> unhealthy</span>
-                </td>
-                <td ng-if="ctrl.hasUnhealthyComponentStatus" style="width: 50%;">
-                  {{ cs.ErrorMessage !== '' ? cs.ErrorMessage : '-' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- !cluster-status -->
 
           <!-- leader-status -->
           <div ng-if="ctrl.systemEndpoints.length > 0">
@@ -89,6 +64,7 @@
         order-by="Name"
         refresh-callback="ctrl.getNodes"
         is-admin="ctrl.isAdmin"
+        use-server-metrics="ctrl.state.useServerMetrics"
       ></kubernetes-nodes-datatable>
     </div>
   </div>

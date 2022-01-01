@@ -1,18 +1,32 @@
 package edgegroups
 
 import (
+	"fmt"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 type decoratedEdgeGroup struct {
 	portainer.EdgeGroup
-	HasEdgeStack bool `json:"HasEdgeStack"`
+	HasEdgeStack  bool `json:"HasEdgeStack"`
+	EndpointTypes []portainer.EndpointType
 }
 
+// @id EdgeGroupList
+// @summary list EdgeGroups
+// @description **Access policy**: administrator
+// @tags edge_groups
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @success 200 {array} decoratedEdgeGroup "EdgeGroups"
+// @failure 500
+// @failure 503 "Edge compute features are disabled"
+// @router /edge_groups [get]
 func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
@@ -35,16 +49,24 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 	decoratedEdgeGroups := []decoratedEdgeGroup{}
 	for _, orgEdgeGroup := range edgeGroups {
 		edgeGroup := decoratedEdgeGroup{
-			EdgeGroup: orgEdgeGroup,
+			EdgeGroup:     orgEdgeGroup,
+			EndpointTypes: []portainer.EndpointType{},
 		}
 		if edgeGroup.Dynamic {
-			endpoints, err := handler.getEndpointsByTags(edgeGroup.TagIDs, edgeGroup.PartialMatch)
+			endpointIDs, err := handler.getEndpointsByTags(edgeGroup.TagIDs, edgeGroup.PartialMatch)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints and endpoint groups for Edge group", err}
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments and environment groups for Edge group", err}
 			}
 
-			edgeGroup.Endpoints = endpoints
+			edgeGroup.Endpoints = endpointIDs
 		}
+
+		endpointTypes, err := getEndpointTypes(handler.DataStore.Endpoint(), edgeGroup.Endpoints)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint types for Edge group", err}
+		}
+
+		edgeGroup.EndpointTypes = endpointTypes
 
 		edgeGroup.HasEdgeStack = usedEdgeGroups[edgeGroup.ID]
 
@@ -52,4 +74,23 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	return response.JSON(w, decoratedEdgeGroups)
+}
+
+func getEndpointTypes(endpointService dataservices.EndpointService, endpointIds []portainer.EndpointID) ([]portainer.EndpointType, error) {
+	typeSet := map[portainer.EndpointType]bool{}
+	for _, endpointID := range endpointIds {
+		endpoint, err := endpointService.Endpoint(endpointID)
+		if err != nil {
+			return nil, fmt.Errorf("failed fetching endpoint: %w", err)
+		}
+
+		typeSet[endpoint.Type] = true
+	}
+
+	endpointTypes := make([]portainer.EndpointType, 0, len(typeSet))
+	for endpointType := range typeSet {
+		endpointTypes = append(endpointTypes, endpointType)
+	}
+
+	return endpointTypes, nil
 }

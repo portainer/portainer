@@ -5,12 +5,10 @@
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.templates.custom.new">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Custom Template
-        </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-state="$ctrl.createPath"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Custom Template </button>
       </div>
 
-      <div class="searchBar" style="border-top: 2px solid #f6f6f6;">
+      <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input
           type="text"
@@ -27,12 +25,12 @@
         <template-item
           ng-repeat="template in $ctrl.templates | filter:$ctrl.state.textFilter"
           model="template"
-          type-label="{{ template.Type === 1 ? 'swarm' : 'standalone' }}"
+          type-label="{{ $ctrl.typeLabel(template.Type) }}"
           on-select="($ctrl.onSelectClick)"
         >
           <template-item-actions>
             <div ng-if="$ctrl.isEditAllowed(template)" style="display: flex;">
-              <a ui-sref="docker.templates.custom.edit({id: template.Id})" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px;">
+              <a ui-state="$ctrl.editPath" ui-state-params="{id: template.Id}" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px;">
                 Edit
               </a>
               <button class="btn btn-danger btn-xs" ng-click="$ctrl.onDeleteClick(template.Id); $event.stopPropagation();">Delete</button>

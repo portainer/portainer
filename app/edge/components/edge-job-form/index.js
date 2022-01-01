@@ -14,5 +14,6 @@ angular.module('portainer.edge').component('edgeJobForm', {
     formAction: '<',
     formActionLabel: '@',
     actionInProgress: '<',
+    isEditorDirty: '=',
   },
 });

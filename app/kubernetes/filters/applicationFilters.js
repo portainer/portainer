@@ -1,6 +1,5 @@
 import _ from 'lodash-es';
 import { KubernetesApplicationDataAccessPolicies } from 'Kubernetes/models/application/models';
-import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'Kubernetes/models/application/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 
@@ -26,24 +25,11 @@ angular
       var status = _.toLower(text);
       switch (status) {
         case 'loadbalancer':
-          return 'Load balancer';
+          return 'LoadBalancer';
         case 'clusterip':
-          return 'Internal';
+          return 'ClusterIP';
         case 'nodeport':
-          return 'Cluster';
-      }
-    };
-  })
-  .filter('kubernetesApplicationPortsTableHeaderText', function () {
-    'use strict';
-    return function (serviceType) {
-      switch (serviceType) {
-        case KubernetesServiceTypes.LOAD_BALANCER:
-          return 'Load balancer';
-        case KubernetesServiceTypes.CLUSTER_IP:
-          return 'Application';
-        case KubernetesServiceTypes.NODE_PORT:
-          return 'Cluster node';
+          return 'NodePort';
       }
     };
   })
@@ -57,6 +43,10 @@ angular
           return KubernetesApplicationTypeStrings.DAEMONSET;
         case KubernetesApplicationTypes.STATEFULSET:
           return KubernetesApplicationTypeStrings.STATEFULSET;
+        case KubernetesApplicationTypes.POD:
+          return KubernetesApplicationTypeStrings.POD;
+        case KubernetesApplicationTypes.HELM:
+          return KubernetesApplicationTypeStrings.HELM;
         default:
           return '-';
       }
@@ -129,5 +119,15 @@ angular
         'kubernetes.io/hostname': 'Node',
       };
       return values[text] || text;
+    };
+  })
+  .filter('kubernetesApplicationIngressEmptyHostname', function () {
+    'use strict';
+    return function (value) {
+      if (value === '') {
+        return '<use IP>';
+      } else {
+        return value;
+      }
     };
   });

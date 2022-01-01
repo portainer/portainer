@@ -305,4 +305,24 @@ angular
       }
       return _.split(imageName, '@sha256')[0];
     };
+  })
+  .filter('trimversiontag', function () {
+    'use strict';
+    return function trimversiontag(fullName) {
+      if (!fullName) {
+        return fullName;
+      }
+      var versionIdx = fullName.lastIndexOf(':');
+      if (versionIdx < 0) {
+        return fullName;
+      }
+      var hostIdx = fullName.indexOf('/');
+      if (hostIdx > versionIdx) {
+        return fullName;
+      }
+      return fullName.substring(0, versionIdx);
+    };
+  })
+  .filter('unique', function () {
+    return _.uniqBy;
   });

@@ -29,8 +29,8 @@ describe('startContainerController', function () {
         Ports: [
           {
             IP: '0.0.0.0',
-            PrivatePort: 9000,
-            PublicPort: 9000,
+            PrivatePort: 9443,
+            PublicPort: 9443,
             Type: 'tcp',
           },
         ],
@@ -46,11 +46,11 @@ describe('startContainerController', function () {
       var expectedBody = {
         name: 'container-name',
         ExposedPorts: {
-          '9000/tcp': {},
+          '9443/tcp': {},
         },
         HostConfig: {
           PortBindings: {
-            '9000/tcp': [
+            '9443/tcp': [
               {
                 HostPort: '9999',
                 HostIp: '10.20.10.15',
@@ -76,7 +76,7 @@ describe('startContainerController', function () {
         {
           ip: '10.20.10.15',
           extPort: '9999',
-          intPort: '9000',
+          intPort: '9443',
         },
       ];
 
@@ -213,6 +213,7 @@ describe('startContainerController', function () {
               CgroupPermissions: 'mrw',
             },
           ],
+          Sysctls: { 'net.ipv6.conf.all.disable_ipv6': '0' },
           LxcConf: { 'lxc.utsname': 'docker' },
           ExtraHosts: ['hostname:127.0.0.1'],
           RestartPolicy: { name: 'always', MaximumRetryCount: 5 },
@@ -255,6 +256,7 @@ describe('startContainerController', function () {
           CgroupPermissions: 'mrw',
         },
       ];
+      scope.config.HostConfig.Sysctls = [{ name: 'net.ipv6.conf.all.disable_ipv6', value: '0' }];
       scope.config.HostConfig.LxcConf = [{ name: 'lxc.utsname', value: 'docker' }];
       scope.config.HostConfig.ExtraHosts = [{ host: 'hostname', ip: '127.0.0.1' }];
 

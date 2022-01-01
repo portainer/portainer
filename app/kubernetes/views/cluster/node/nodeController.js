@@ -5,7 +5,7 @@ import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reserv
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesNodeConverter from 'Kubernetes/node/converter';
 import { KubernetesNodeLabelFormValues, KubernetesNodeTaintFormValues } from 'Kubernetes/node/formValues';
-import { KubernetesNodeTaintEffects } from 'Kubernetes/node/models';
+import { KubernetesNodeTaintEffects, KubernetesNodeAvailabilities } from 'Kubernetes/node/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 
@@ -21,7 +21,9 @@ class KubernetesNodeController {
     KubernetesEventService,
     KubernetesPodService,
     KubernetesApplicationService,
-    KubernetesEndpointService
+    KubernetesEndpointService,
+    KubernetesMetricsService,
+    Authentication
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -33,14 +35,19 @@ class KubernetesNodeController {
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEndpointService = KubernetesEndpointService;
+    this.KubernetesMetricsService = KubernetesMetricsService;
+    this.Authentication = Authentication;
 
     this.onInit = this.onInit.bind(this);
-    this.getNodeAsync = this.getNodeAsync.bind(this);
+    this.getNodesAsync = this.getNodesAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
     this.updateNodeAsync = this.updateNodeAsync.bind(this);
+    this.drainNodeAsync = this.drainNodeAsync.bind(this);
+    this.hasResourceUsageAccess = this.hasResourceUsageAccess.bind(this);
+    this.getNodeUsageAsync = this.getNodeUsageAsync.bind(this);
   }
 
   selectTab(index) {
@@ -152,6 +159,47 @@ class KubernetesNodeController {
 
   /* #endregion */
 
+  /* #region cordon */
+
+  computeCordonWarning() {
+    return this.formValues.Availability === this.availabilities.PAUSE;
+  }
+
+  /* #endregion */
+
+  /* #region drain */
+
+  computeDrainWarning() {
+    return this.formValues.Availability === this.availabilities.DRAIN;
+  }
+
+  async drainNodeAsync() {
+    const pods = _.flatten(_.map(this.applications, (app) => app.Pods));
+    let actionCount = pods.length;
+    for (const pod of pods) {
+      try {
+        await this.KubernetesPodService.eviction(pod);
+        this.Notifications.success('Pod successfully evicted', pod.Name);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to evict pod');
+        this.formValues.Availability = this.availabilities.PAUSE;
+        await this.KubernetesNodeService.patch(this.node, this.formValues);
+      } finally {
+        --actionCount;
+        if (actionCount === 0) {
+          this.formValues.Availability = this.availabilities.PAUSE;
+          await this.KubernetesNodeService.patch(this.node, this.formValues);
+        }
+      }
+    }
+  }
+
+  drainNode() {
+    return this.$async(this.drainNodeAsync);
+  }
+
+  /* #endregion */
+
   /* #region actions */
 
   isNoChangesMade() {
@@ -160,8 +208,12 @@ class KubernetesNodeController {
     return !payload.length;
   }
 
+  isDrainError() {
+    return (this.state.isDrainOperation || this.state.isContainPortainer) && this.formValues.Availability === this.availabilities.DRAIN;
+  }
+
   isFormValid() {
-    return !this.state.hasDuplicateTaintKeys && !this.state.hasDuplicateLabelKeys && !this.isNoChangesMade();
+    return !this.state.hasDuplicateTaintKeys && !this.state.hasDuplicateLabelKeys && !this.isNoChangesMade() && !this.isDrainError();
   }
 
   resetFormValues() {
@@ -186,7 +238,7 @@ class KubernetesNodeController {
         });
       }
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environments');
     }
   }
 
@@ -196,9 +248,12 @@ class KubernetesNodeController {
 
   async updateNodeAsync() {
     try {
-      await this.KubernetesNodeService.patch(this.node, this.formValues);
+      this.node = await this.KubernetesNodeService.patch(this.node, this.formValues);
+      if (this.formValues.Availability === 'Drain') {
+        await this.drainNode();
+      }
       this.Notifications.success('Node updated successfully');
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update node');
     }
@@ -207,6 +262,8 @@ class KubernetesNodeController {
   updateNode() {
     const taintsWarning = this.computeTaintsWarning();
     const labelsWarning = this.computeLabelsWarning();
+    const cordonWarning = this.computeCordonWarning();
+    const drainWarning = this.computeDrainWarning();
 
     if (taintsWarning && !labelsWarning) {
       this.ModalService.confirmUpdate(
@@ -235,16 +292,36 @@ class KubernetesNodeController {
           }
         }
       );
+    } else if (cordonWarning) {
+      this.ModalService.confirmUpdate(
+        'Marking this node as unschedulable will effectively cordon the node and prevent any new workload from being scheduled on that node. Are you sure?',
+        (confirmed) => {
+          if (confirmed) {
+            return this.$async(this.updateNodeAsync);
+          }
+        }
+      );
+    } else if (drainWarning) {
+      this.ModalService.confirmUpdate(
+        'Draining this node will cause all workloads to be evicted from that node. This might lead to some service interruption. Are you sure?',
+        (confirmed) => {
+          if (confirmed) {
+            return this.$async(this.updateNodeAsync);
+          }
+        }
+      );
     } else {
       return this.$async(this.updateNodeAsync);
     }
   }
 
-  async getNodeAsync() {
+  async getNodesAsync() {
     try {
       this.state.dataLoading = true;
       const nodeName = this.$transition$.params().name;
-      this.node = await this.KubernetesNodeService.get(nodeName);
+      this.nodes = await this.KubernetesNodeService.get();
+      this.node = _.find(this.nodes, { Name: nodeName });
+      this.state.isDrainOperation = _.find(this.nodes, { Availability: this.availabilities.DRAIN });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve node');
     } finally {
@@ -252,8 +329,28 @@ class KubernetesNodeController {
     }
   }
 
-  getNode() {
-    return this.$async(this.getNodeAsync);
+  getNodes() {
+    return this.$async(this.getNodesAsync);
+  }
+
+  hasResourceUsageAccess() {
+    return this.state.isAdmin && this.state.useServerMetrics;
+  }
+
+  async getNodeUsageAsync() {
+    try {
+      const nodeName = this.$transition$.params().name;
+      const node = await this.KubernetesMetricsService.getNode(nodeName);
+      this.resourceUsage = new KubernetesResourceReservation();
+      this.resourceUsage.CPU = KubernetesResourceReservationHelper.parseCPU(node.usage.cpu);
+      this.resourceUsage.Memory = KubernetesResourceReservationHelper.megaBytesValue(node.usage.memory);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve node resource usage');
+    }
+  }
+
+  getNodeUsage() {
+    return this.$async(this.getNodeUsageAsync);
   }
 
   hasEventWarnings() {
@@ -263,8 +360,8 @@ class KubernetesNodeController {
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
-      this.events = await this.KubernetesEventService.get();
-      this.events = _.filter(this.events.items, (item) => item.involvedObject.kind === 'Node');
+      const events = await this.KubernetesEventService.get();
+      this.events = events.filter((item) => item.Involved.kind === 'Node');
       this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve node events');
@@ -303,6 +400,11 @@ class KubernetesNodeController {
       });
       this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
       this.memoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.node.Memory);
+      this.state.isContainPortainer = _.find(this.applications, { ApplicationName: 'portainer' });
+
+      if (this.hasResourceUsageAccess()) {
+        await this.getNodeUsage();
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     } finally {
@@ -315,8 +417,11 @@ class KubernetesNodeController {
   }
 
   async onInit() {
+    this.availabilities = KubernetesNodeAvailabilities;
+
     this.state = {
-      activeTab: 0,
+      isAdmin: this.Authentication.isAdmin(),
+      activeTab: this.LocalStorage.getActiveTab('node'),
       currentName: this.$state.$current.name,
       dataLoading: true,
       eventsLoading: true,
@@ -328,19 +433,20 @@ class KubernetesNodeController {
       hasDuplicateTaintKeys: false,
       duplicateLabelKeys: [],
       hasDuplicateLabelKeys: false,
+      isDrainOperation: false,
+      isContainPortainer: false,
+      useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
     };
 
-    this.state.activeTab = this.LocalStorage.getActiveTab('node');
-
-    await this.getNode();
+    await this.getNodes();
     await this.getEvents();
     await this.getApplications();
     await this.getEndpoints();
 
     this.availableEffects = _.values(KubernetesNodeTaintEffects);
     this.formValues = KubernetesNodeConverter.nodeToFormValues(this.node);
-    this.formValues.Labels = KubernetesNodeHelper.reorderLabels(this.formValues.Labels);
     this.formValues.Labels = KubernetesNodeHelper.computeUsedLabels(this.applications, this.formValues.Labels);
+    this.formValues.Labels = KubernetesNodeHelper.reorderLabels(this.formValues.Labels);
 
     this.state.viewReady = true;
   }

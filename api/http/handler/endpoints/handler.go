@@ -3,8 +3,11 @@ package endpoints
 import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	"net/http"
 
@@ -18,18 +21,23 @@ func hideFields(endpoint *portainer.Endpoint) {
 	}
 }
 
-// Handler is the HTTP handler used to handle endpoint operations.
+// Handler is the HTTP handler used to handle environment(endpoint) operations.
 type Handler struct {
 	*mux.Router
 	requestBouncer       *security.RequestBouncer
-	DataStore            portainer.DataStore
+	DataStore            dataservices.DataStore
 	FileService          portainer.FileService
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
 	SnapshotService      portainer.SnapshotService
+	K8sClientFactory     *cli.ClientFactory
+	ComposeStackManager  portainer.ComposeStackManager
+	AuthorizationService *authorization.Service
+	BindAddress          string
+	BindAddressHTTPS     string
 }
 
-// NewHandler creates a handler to manage endpoint operations.
+// NewHandler creates a handler to manage environment(endpoint) operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
@@ -38,6 +46,10 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 
 	h.Handle("/endpoints",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointCreate))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}/settings",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSettingsUpdate))).Methods(http.MethodPut)
+	h.Handle("/endpoints/{id}/association",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointAssociationDelete))).Methods(http.MethodDelete)
 	h.Handle("/endpoints/snapshot",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshots))).Methods(http.MethodPost)
 	h.Handle("/endpoints",
@@ -48,6 +60,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
+	h.Handle("/endpoints/{id}/dockerhub/{registryId}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/extensions",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExtensionAdd))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/extensions/{extensionType}",
@@ -56,5 +70,11 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/registries",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistriesList))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/registries/{registryId}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryInspect))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/registries/{registryId}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryAccess))).Methods(http.MethodPut)
 	return h
 }

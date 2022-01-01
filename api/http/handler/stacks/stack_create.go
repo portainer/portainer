@@ -1,20 +1,20 @@
 package stacks
 
 import (
-	"errors"
 	"log"
 	"net/http"
 
 	"github.com/docker/cli/cli/compose/loader"
 	"github.com/docker/cli/cli/compose/types"
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
 func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
@@ -29,7 +29,30 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 	return nil
 }
 
-// POST request on /api/stacks?type=<type>&method=<method>&endpointId=<endpointId>
+// @id StackCreate
+// @summary Deploy a new stack
+// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
+// @description **Access policy**: authenticated
+// @tags stacks
+// @security ApiKeyAuth
+// @security jwt
+// @accept json,multipart/form-data
+// @produce json
+// @param type query int true "Stack deployment type. Possible values: 1 (Swarm stack) or 2 (Compose stack)." Enums(1,2)
+// @param method query string true "Stack deployment method. Possible values: file, string or repository." Enums(string, file, repository)
+// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
+// @param body_swarm_string body swarmStackFromFileContentPayload false "Required when using method=string and type=1"
+// @param body_swarm_repository body swarmStackFromGitRepositoryPayload false "Required when using method=repository and type=1"
+// @param body_compose_string body composeStackFromFileContentPayload false "Required when using method=string and type=2"
+// @param body_compose_repository body composeStackFromGitRepositoryPayload false "Required when using method=repository and type=2"
+// @param Name formData string false "Name of the stack. required when method is file"
+// @param SwarmID formData string false "Swarm cluster identifier. Required when method equals file and type equals 1. required when method is file"
+// @param Env formData string false "Environment(Endpoint) variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional, used when method equals file and type equals 1."
+// @param file formData file false "Stack file. required when method is file"
+// @success 200 {object} portainer.CustomTemplate
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks [post]
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackType, err := request.RetrieveNumericQueryParameter(r, "type", false)
 	if err != nil {
@@ -46,12 +69,14 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
 
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
-	if !settings.AllowStackManagementForRegularUsers {
+	if endpointutils.IsDockerEndpoint(endpoint) && !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
 		securityContext, err := security.RetrieveRestrictedRequestContext(r)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
@@ -69,16 +94,9 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
@@ -92,11 +110,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	case portainer.DockerComposeStack:
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
-		if tokenData.Role != portainer.AdministratorRole {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized}
-		}
-
-		return handler.createKubernetesStack(w, r, endpoint)
+		return handler.createKubernetesStack(w, r, method, endpoint, tokenData.ID)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}
@@ -113,7 +127,7 @@ func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Reques
 		return handler.createComposeStackFromFileUpload(w, r, endpoint, userID)
 	}
 
-	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
+	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string, repository or file", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
 
 func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
@@ -126,10 +140,22 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 		return handler.createSwarmStackFromFileUpload(w, r, endpoint, userID)
 	}
 
-	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
+	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string, repository or file", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *portainer.Settings) error {
+func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+	switch method {
+	case "string":
+		return handler.createKubernetesStackFromFileContent(w, r, endpoint, userID)
+	case "repository":
+		return handler.createKubernetesStackFromGitRepository(w, r, endpoint, userID)
+	case "url":
+		return handler.createKubernetesStackFromManifestURL(w, r, endpoint, userID)
+	}
+	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string or repository", Err: errors.New(request.ErrInvalidQueryParameter)}
+}
+
+func (handler *Handler) isValidStackFile(stackFileContent []byte, securitySettings *portainer.EndpointSecuritySettings) error {
 	composeConfigYAML, err := loader.ParseYAML(stackFileContent)
 	if err != nil {
 		return err
@@ -154,7 +180,7 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *port
 
 	for key := range composeConfig.Services {
 		service := composeConfig.Services[key]
-		if !settings.AllowBindMountsForRegularUsers {
+		if !securitySettings.AllowBindMountsForRegularUsers {
 			for _, volume := range service.Volumes {
 				if volume.Type == "bind" {
 					return errors.New("bind-mount disabled for non administrator users")
@@ -162,19 +188,23 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *port
 			}
 		}
 
-		if !settings.AllowPrivilegedModeForRegularUsers && service.Privileged == true {
+		if !securitySettings.AllowPrivilegedModeForRegularUsers && service.Privileged == true {
 			return errors.New("privileged mode disabled for non administrator users")
 		}
 
-		if !settings.AllowHostNamespaceForRegularUsers && service.Pid == "host" {
+		if !securitySettings.AllowHostNamespaceForRegularUsers && service.Pid == "host" {
 			return errors.New("pid host disabled for non administrator users")
 		}
 
-		if !settings.AllowDeviceMappingForRegularUsers && service.Devices != nil && len(service.Devices) > 0 {
+		if !securitySettings.AllowDeviceMappingForRegularUsers && service.Devices != nil && len(service.Devices) > 0 {
 			return errors.New("device mapping disabled for non administrator users")
 		}
 
-		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(service.CapAdd) > 0 || len(service.CapDrop) > 0) {
+		if !securitySettings.AllowSysctlSettingForRegularUsers && service.Sysctls != nil && len(service.Sysctls) > 0 {
+			return errors.New("sysctl setting disabled for non administrator users")
+		}
+
+		if !securitySettings.AllowContainerCapabilitiesForRegularUsers && (len(service.CapAdd) > 0 || len(service.CapDrop) > 0) {
 			return errors.New("container capabilities disabled for non administrator users")
 		}
 	}
@@ -183,13 +213,30 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *port
 }
 
 func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
-	resourceControl := authorization.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
+	var resourceControl *portainer.ResourceControl
 
-	err := handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
+	isAdmin, err := handler.userIsAdmin(userID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+	}
+
+	if isAdmin {
+		resourceControl = authorization.NewAdministratorsOnlyResourceControl(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
+	} else {
+		resourceControl = authorization.NewPrivateResourceControl(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl, userID)
+	}
+
+	err = handler.DataStore.ResourceControl().Create(resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
 	}
 
 	stack.ResourceControl = resourceControl
+
+	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+		// sanitize password in the http response to minimise possible security leaks
+		stack.GitConfig.Authentication.Password = ""
+	}
+
 	return response.JSON(w, stack)
 }

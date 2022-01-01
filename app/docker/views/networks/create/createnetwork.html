@@ -196,7 +196,8 @@
           <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">
               <label for="ownership" class="control-label text-left">
-                Restrict external access to the network
+                Isolated network
+                <portainer-tooltip position="bottom" message="An isolated network has no inbound or outbound communications."></portainer-tooltip>
               </label>
               <label name="ownership" class="switch" style="margin-left: 20px;">
                 <input type="checkbox" ng-model="config.Internal" />

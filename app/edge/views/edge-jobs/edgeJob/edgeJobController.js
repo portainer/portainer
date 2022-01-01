@@ -2,15 +2,18 @@ import _ from 'lodash-es';
 
 export class EdgeJobController {
   /* @ngInject */
-  constructor($async, $q, $state, EdgeJobService, EndpointService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
+  constructor($async, $q, $state, $window, ModalService, EdgeJobService, EndpointService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
       showEditorTab: false,
+      isEditorDirty: false,
     };
 
     this.$async = $async;
     this.$q = $q;
     this.$state = $state;
+    this.$window = $window;
+    this.ModalService = ModalService;
     this.EdgeJobService = EdgeJobService;
     this.EndpointService = EndpointService;
     this.FileSaver = FileSaver;
@@ -43,6 +46,7 @@ export class EdgeJobController {
     try {
       await this.EdgeJobService.updateEdgeJob(model);
       this.Notifications.success('Edge job successfully updated');
+      this.state.isEditorDirty = false;
       this.$state.go('edge.jobs', {}, { reload: true });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update Edge job');
@@ -121,6 +125,12 @@ export class EdgeJobController {
     this.state.showEditorTab = true;
   }
 
+  async uiCanExit() {
+    if (this.edgeJob.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
+      return this.ModalService.confirmWebEditorDiscard();
+    }
+  }
+
   async $onInit() {
     const { id, tab } = this.$state.params;
     this.state.activeTab = tab;
@@ -138,6 +148,7 @@ export class EdgeJobController {
       ]);
 
       edgeJob.FileContent = file.FileContent;
+      this.oldFileContent = edgeJob.FileContent;
       this.edgeJob = edgeJob;
       this.groups = groups;
       this.tags = tags;
@@ -150,7 +161,17 @@ export class EdgeJobController {
         this.results = results;
       }
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environment list');
     }
+
+    this.$window.onbeforeunload = () => {
+      if (this.edgeJob.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
+        return '';
+      }
+    };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 }

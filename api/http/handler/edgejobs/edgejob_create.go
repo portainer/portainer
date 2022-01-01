@@ -11,10 +11,23 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
-// POST /api/edge_jobs?method=file|string
+// @id EdgeJobCreate
+// @summary Create an EdgeJob
+// @description **Access policy**: administrator
+// @tags edge_jobs
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param method query string true "Creation Method" Enums(file, string)
+// @param body_string body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
+// @param body_file body edgeJobCreateFromFilePayload true "EdgeGroup data when method is file"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 503 "Edge compute features are disabled"
+// @failure 500
+// @router /edge_jobs [post]
 func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
@@ -53,7 +66,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 	}
 
 	if payload.Endpoints == nil || len(payload.Endpoints) == 0 {
-		return errors.New("Invalid endpoints payload")
+		return errors.New("Invalid environment payload")
 	}
 
 	if govalidator.IsNull(payload.FileContent) {
@@ -106,9 +119,9 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	payload.CronExpression = cronExpression
 
 	var endpoints []portainer.EndpointID
-	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
+	err = request.RetrieveMultiPartFormJSONValue(r, "Environments", &endpoints, false)
 	if err != nil {
-		return errors.New("Invalid endpoints")
+		return errors.New("Invalid environments")
 	}
 	payload.Endpoints = endpoints
 
@@ -193,7 +206,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 	}
 
 	if len(edgeJob.Endpoints) == 0 {
-		return errors.New("Endpoints are mandatory for an Edge job")
+		return errors.New("Environments are mandatory for an Edge job")
 	}
 
 	scriptPath, err := handler.FileService.StoreEdgeJobFileFromBytes(strconv.Itoa(int(edgeJob.ID)), file)
@@ -206,7 +219,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 	}
 
-	return handler.DataStore.EdgeJob().CreateEdgeJob(edgeJob)
+	return handler.DataStore.EdgeJob().Create(edgeJob)
 }
 
 func convertEndpointsToMetaObject(endpoints []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeJobEndpointMeta {

@@ -3,15 +3,21 @@ import angular from 'angular';
 angular.module('portainer.app').factory('CustomTemplateService', CustomTemplateServiceFactory);
 
 /* @ngInject */
-function CustomTemplateServiceFactory(CustomTemplates, FileUploadService) {
+function CustomTemplateServiceFactory($sanitize, CustomTemplates, FileUploadService) {
   var service = {};
 
   service.customTemplate = function customTemplate(id) {
     return CustomTemplates.get({ id }).$promise;
   };
 
-  service.customTemplates = function customTemplates(type) {
-    return CustomTemplates.query({ type }).$promise;
+  service.customTemplates = async function customTemplates(type) {
+    const templates = await CustomTemplates.query({ type }).$promise;
+    templates.forEach((template) => {
+      if (template.Note) {
+        template.Note = $('<p>').html($sanitize(template.Note)).find('img').remove().end().html();
+      }
+    });
+    return templates;
   };
 
   service.remove = function remove(id) {
@@ -41,7 +47,8 @@ function CustomTemplateServiceFactory(CustomTemplates, FileUploadService) {
 
   service.createCustomTemplateFromFileUpload = async function createCustomTemplateFromFileUpload(payload) {
     try {
-      return await FileUploadService.createCustomTemplate(payload);
+      const { data } = await FileUploadService.createCustomTemplate(payload);
+      return data;
     } catch (err) {
       throw { msg: 'Unable to create the customTemplate', err };
     }

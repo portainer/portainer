@@ -1,35 +1,48 @@
 import _ from 'lodash-es';
+import YAML from 'yaml';
+import GenericHelper from '@/portainer/helpers/genericHelper';
+import { ExternalStackViewModel } from '@/portainer/models/stack';
 
 angular.module('portainer.app').factory('StackHelper', [
   function StackHelperFactory() {
     'use strict';
     var helper = {};
 
-    helper.getExternalStackNamesFromContainers = function (containers) {
-      var stackNames = [];
-
-      for (var i = 0; i < containers.length; i++) {
-        var container = containers[i];
-        if (!container.Labels || !container.Labels['com.docker.compose.project']) continue;
-        var stackName = container.Labels['com.docker.compose.project'];
-        stackNames.push(stackName);
-      }
-
-      return _.uniq(stackNames);
+    helper.getExternalStacksFromContainers = function (containers) {
+      return getExternalStacksFromLabel(containers, 'com.docker.compose.project', 2);
     };
 
-    helper.getExternalStackNamesFromServices = function (services) {
-      var stackNames = [];
+    helper.getExternalStacksFromServices = function (services) {
+      return getExternalStacksFromLabel(services, 'com.docker.stack.namespace', 1);
+    };
 
-      for (var i = 0; i < services.length; i++) {
-        var service = services[i];
-        if (!service.Labels || !service.Labels['com.docker.stack.namespace']) continue;
+    function getExternalStacksFromLabel(items, label, type) {
+      return _.uniqBy(
+        items.filter((item) => item.Labels && item.Labels[label]).map((item) => new ExternalStackViewModel(item.Labels[label], type, item.Created)),
+        'Name'
+      );
+    }
 
-        var stackName = service.Labels['com.docker.stack.namespace'];
-        stackNames.push(stackName);
+    helper.validateYAML = function (yaml, containerNames) {
+      let yamlObject;
+
+      try {
+        yamlObject = YAML.parse(yaml);
+      } catch (err) {
+        return 'There is an error in the yaml syntax: ' + err;
       }
 
-      return _.uniq(stackNames);
+      const names = _.uniq(GenericHelper.findDeepAll(yamlObject, 'container_name'));
+      const duplicateContainers = _.intersection(containerNames, names);
+
+      if (duplicateContainers.length === 0) return;
+
+      return (
+        (duplicateContainers.length === 1 ? 'This container name is' : 'These container names are') +
+        ' already used by another container running in this environment: ' +
+        _.join(duplicateContainers, ', ') +
+        '.'
+      );
     };
 
     return helper;

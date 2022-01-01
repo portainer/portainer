@@ -5,7 +5,13 @@
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          data-cy="user-removeUserButton"
+        >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
       </div>
@@ -21,7 +27,7 @@
         />
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table table-hover nowrap-cells" data-cy="user-userTable">
           <thead>
             <tr>
               <th>
@@ -94,7 +100,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

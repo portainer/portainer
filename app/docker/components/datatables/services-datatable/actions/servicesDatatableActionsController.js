@@ -7,8 +7,9 @@ angular.module('portainer.docker').controller('ServicesDatatableActionsControlle
   'ModalService',
   'ImageHelper',
   'WebhookService',
-  'EndpointProvider',
-  function ($q, $state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService, EndpointProvider) {
+  function ($q, $state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService) {
+    const ctrl = this;
+
     this.scaleAction = function scaleService(service) {
       var config = ServiceHelper.serviceToConfig(service.Model);
       config.Mode.Replicated.Replicas = service.Replicas;
@@ -68,7 +69,7 @@ angular.module('portainer.docker').controller('ServicesDatatableActionsControlle
             Notifications.success('Service successfully updated', service.Name);
           })
           .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to force update service', service.Name);
+            Notifications.error('Failure', err, 'Unable to force update service' + service.Name);
           })
           .finally(function final() {
             --actionCount;
@@ -84,7 +85,7 @@ angular.module('portainer.docker').controller('ServicesDatatableActionsControlle
       angular.forEach(services, function (service) {
         ServiceService.remove(service)
           .then(function success() {
-            return WebhookService.webhooks(service.Id, EndpointProvider.endpointID());
+            return WebhookService.webhooks(service.Id, ctrl.endpointId);
           })
           .then(function success(data) {
             return $q.when(data.length !== 0 && WebhookService.deleteWebhook(data[0].Id));

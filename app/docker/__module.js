@@ -24,10 +24,10 @@ angular.module('portainer.docker', ['portainer.app']).config([
 
             if (status === 2) {
               if (!endpoint.Snapshots[0]) {
-                throw new Error('Endpoint is unreachable and there is no snapshot available for offline browsing.');
+                throw new Error('Environment is unreachable and there is no snapshot available for offline browsing.');
               }
               if (endpoint.Snapshots[0].Swarm) {
-                throw new Error('Endpoint is unreachable. Connect to another swarm manager.');
+                throw new Error('Environment is unreachable. Connect to another swarm manager.');
               }
             }
 
@@ -38,7 +38,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
             const extensions = await LegacyExtensionManager.initEndpointExtensions(endpoint);
             await StateManager.updateEndpointState(endpoint, extensions);
           } catch (e) {
-            Notifications.error('Failed loading endpoint', e);
+            Notifications.error('Failed loading environment', e);
             $state.go('portainer.home', {}, { reload: true });
           }
 
@@ -456,7 +456,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
 
     var stack = {
       name: 'docker.stacks.stack',
-      url: '/:name?id&type&external',
+      url: '/:name?id&type&regular&external&orphaned&orphanedRunning',
       views: {
         'content@': {
           templateUrl: '~Portainer/views/stacks/edit/stack.html',
@@ -581,6 +581,36 @@ angular.module('portainer.docker', ['portainer.app']).config([
       },
     };
 
+    const dockerFeaturesConfiguration = {
+      name: 'docker.featuresConfiguration',
+      url: '/feat-config',
+      views: {
+        'content@': {
+          component: 'dockerFeaturesConfigurationView',
+        },
+      },
+    };
+
+    const registries = {
+      name: 'docker.registries',
+      url: '/registries',
+      views: {
+        'content@': {
+          component: 'endpointRegistriesView',
+        },
+      },
+    };
+
+    const registryAccess = {
+      name: 'docker.registries.access',
+      url: '/:id/access',
+      views: {
+        'content@': {
+          component: 'dockerRegistryAccessView',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(configs);
     $stateRegistryProvider.register(config);
     $stateRegistryProvider.register(configCreation);
@@ -630,5 +660,8 @@ angular.module('portainer.docker', ['portainer.app']).config([
     $stateRegistryProvider.register(volume);
     $stateRegistryProvider.register(volumeBrowse);
     $stateRegistryProvider.register(volumeCreation);
+    $stateRegistryProvider.register(dockerFeaturesConfiguration);
+    $stateRegistryProvider.register(registries);
+    $stateRegistryProvider.register(registryAccess);
   },
 ]);

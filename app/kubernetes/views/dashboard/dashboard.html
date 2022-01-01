@@ -1,5 +1,5 @@
 <kubernetes-view-header title="Dashboard" state="kubernetes.dashboard" view-ready="ctrl.state.viewReady">
-  Endpoint summary
+  Environment summary
 </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
@@ -8,12 +8,12 @@
   <div class="row" ng-if="ctrl.endpoint">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="fa-tachometer-alt" title-text="Endpoint info"></rd-widget-header>
+        <rd-widget-header icon="fa-tachometer-alt" title-text="Environment info"></rd-widget-header>
         <rd-widget-body classes="no-padding">
           <table class="table">
             <tbody>
               <tr>
-                <td>Endpoint</td>
+                <td>Environment</td>
                 <td>
                   {{ ctrl.endpoint.Name }}
                 </td>
@@ -34,7 +34,7 @@
   </div>
 
   <div class="row">
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.pools">
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.pools" data-cy="k8sDashboard-namespaces">
       <a ui-sref="kubernetes.resourcePools">
         <rd-widget>
           <rd-widget-body>
@@ -42,12 +42,12 @@
               <i class="fa fa-layer-group"></i>
             </div>
             <div class="title">{{ ctrl.pools.length }}</div>
-            <div class="comment">{{ ctrl.pools.length === 1 ? 'Resource pool' : 'Resource pools' }}</div>
+            <div class="comment">{{ ctrl.pools.length === 1 ? 'Namespace' : 'Namespaces' }}</div>
           </rd-widget-body>
         </rd-widget>
       </a>
     </div>
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.applications">
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.applications" data-cy="k8sDashboard-applications">
       <a ui-sref="kubernetes.applications">
         <rd-widget>
           <rd-widget-body>
@@ -60,7 +60,7 @@
         </rd-widget>
       </a>
     </div>
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.configurations">
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.configurations" data-cy="k8sDashboard-configurations">
       <a ui-sref="kubernetes.configurations">
         <rd-widget>
           <rd-widget-body>
@@ -73,7 +73,7 @@
         </rd-widget>
       </a>
     </div>
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.volumes">
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.volumes" data-cy="k8sDashboard-volumes">
       <a ui-sref="kubernetes.volumes">
         <rd-widget>
           <rd-widget-body>

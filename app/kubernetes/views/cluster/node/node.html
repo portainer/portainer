@@ -52,17 +52,40 @@
                         </span>
                       </td>
                     </tr>
+                    <tr>
+                      <td class="col-xs-3">
+                        Availability
+                      </td>
+                      <td class="col-xs-9">
+                        <select class="form-control" name="availability" style="display: inline-block; width: 16rem;" ng-model="ctrl.formValues.Availability">
+                          <option>{{ ctrl.availabilities.ACTIVE }}</option>
+                          <option>{{ ctrl.availabilities.PAUSE }}</option>
+                          <option>{{ ctrl.availabilities.DRAIN }}</option>
+                        </select>
+                        <span class="small text-warning" ng-if="ctrl.state.isDrainOperation && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
+                          <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Cannot use this action while another node is currently being drained.
+                        </span>
+                        <span class="small text-warning" ng-if="ctrl.state.isContainPortainer && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
+                          <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Cannot drain a node where this Portainer instance is running.
+                        </span>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
 
                 <div style="padding: 8px;">
                   <kubernetes-resource-reservation
                     ng-if="ctrl.resourceReservation"
-                    cpu="ctrl.resourceReservation.CPU"
+                    cpu-reservation="ctrl.resourceReservation.CPU"
+                    cpu-usage="ctrl.resourceUsage.CPU"
                     cpu-limit="ctrl.node.CPU"
-                    memory="ctrl.resourceReservation.Memory"
+                    memory-reservation="ctrl.resourceReservation.Memory"
+                    memory-usage="ctrl.resourceUsage.Memory"
                     memory-limit="ctrl.memoryLimit"
                     description="Resource reservation represents the total amount of resource assigned to all the applications running on this node."
+                    display-usage="ctrl.hasResourceUsageAccess()"
                   >
                   </kubernetes-resource-reservation>
                 </div>

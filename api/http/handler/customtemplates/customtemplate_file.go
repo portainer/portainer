@@ -2,20 +2,31 @@ package customtemplates
 
 import (
 	"net/http"
-	"path"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type fileResponse struct {
 	FileContent string
 }
 
-// GET request on /api/custom_templates/:id/file
+// @id CustomTemplateFile
+// @summary Get Template stack file content.
+// @description Retrieve the content of the Stack file for the specified custom template
+// @description **Access policy**: authenticated
+// @tags custom_templates
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param id path int true "Template identifier"
+// @success 200 {object} fileResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Custom template not found"
+// @failure 500 "Server error"
+// @router /custom_templates/{id}/file [get]
 func (handler *Handler) customTemplateFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -23,13 +34,13 @@ func (handler *Handler) customTemplateFile(w http.ResponseWriter, r *http.Reques
 	}
 
 	customTemplate, err := handler.DataStore.CustomTemplate().CustomTemplate(portainer.CustomTemplateID(customTemplateID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a custom template with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a custom template with the specified identifier inside the database", err}
 	}
 
-	fileContent, err := handler.FileService.GetFileContent(path.Join(customTemplate.ProjectPath, customTemplate.EntryPoint))
+	fileContent, err := handler.FileService.GetFileContent(customTemplate.ProjectPath, customTemplate.EntryPoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve custom template file from disk", err}
 	}

@@ -1,27 +1,33 @@
 import angular from 'angular';
-import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
+import _ from 'lodash-es';
+
+import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configuration/formvalues';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
+import KubernetesConfigurationConverter from 'Kubernetes/converters/configuration';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import _ from 'lodash-es';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesConfigurationController {
   /* @ngInject */
   constructor(
     $async,
     $state,
+    $window,
     clipboard,
     Notifications,
     LocalStorage,
     KubernetesConfigurationService,
+    KubernetesConfigMapService,
+    KubernetesSecretService,
     KubernetesResourcePoolService,
     ModalService,
     KubernetesApplicationService,
-    KubernetesEventService,
-    KubernetesNamespaceHelper
+    KubernetesEventService
   ) {
     this.$async = $async;
     this.$state = $state;
+    this.$window = $window;
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
@@ -31,7 +37,8 @@ class KubernetesConfigurationController {
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
+    this.KubernetesConfigMapService = KubernetesConfigMapService;
+    this.KubernetesSecretService = KubernetesSecretService;
 
     this.onInit = this.onInit.bind(this);
     this.getConfigurationAsync = this.getConfigurationAsync.bind(this);
@@ -45,7 +52,11 @@ class KubernetesConfigurationController {
   }
 
   isSystemNamespace() {
-    return this.KubernetesNamespaceHelper.isSystemNamespace(this.configuration.Namespace);
+    return KubernetesNamespaceHelper.isSystemNamespace(this.configuration.Namespace);
+  }
+
+  isSystemConfig() {
+    return this.isSystemNamespace() || this.configuration.IsRegistrySecret;
   }
 
   selectTab(index) {
@@ -96,7 +107,7 @@ class KubernetesConfigurationController {
       } else {
         await this.KubernetesConfigurationService.update(this.formValues, this.configuration);
         this.Notifications.success('Configuration succesfully updated');
-        this.$state.reload();
+        this.$state.reload(this.$state.current);
       }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update configuration');
@@ -126,7 +137,25 @@ class KubernetesConfigurationController {
       this.state.configurationLoading = true;
       const name = this.$transition$.params().name;
       const namespace = this.$transition$.params().namespace;
-      this.configuration = await this.KubernetesConfigurationService.get(namespace, name);
+      const [configMap, secret] = await Promise.allSettled([this.KubernetesConfigMapService.get(namespace, name), this.KubernetesSecretService.get(namespace, name)]);
+      if (secret.status === 'rejected' && secret.reason.err.status === 403) {
+        this.$state.go('kubernetes.configurations');
+        throw new Error('Not authorized to edit secret');
+      }
+      if (secret.status === 'fulfilled') {
+        this.configuration = KubernetesConfigurationConverter.secretToConfiguration(secret.value);
+        this.formValues.Data = secret.value.Data;
+      } else {
+        this.configuration = KubernetesConfigurationConverter.configMapToConfiguration(configMap.value);
+        this.formValues.Data = configMap.value.Data;
+      }
+      this.formValues.ResourcePool = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.configuration.Namespace);
+      this.formValues.Id = this.configuration.Id;
+      this.formValues.Name = this.configuration.Name;
+      this.formValues.Type = this.configuration.Type;
+      this.oldDataYaml = this.formValues.DataYaml;
+
+      return this.configuration;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve configuration');
     } finally {
@@ -188,6 +217,29 @@ class KubernetesConfigurationController {
     return this.$async(this.getConfigurationsAsync);
   }
 
+  tagUsedDataKeys() {
+    const configName = this.$transition$.params().name;
+    const usedDataKeys = _.uniq(
+      this.configuration.Applications.flatMap((app) =>
+        app.Env.filter((e) => e.valueFrom && e.valueFrom.configMapKeyRef && e.valueFrom.configMapKeyRef.name === configName).map((e) => e.name)
+      )
+    );
+
+    this.formValues.Data = this.formValues.Data.map((variable) => {
+      if (!usedDataKeys.includes(variable.Key)) {
+        return variable;
+      }
+
+      return { ...variable, Used: true };
+    });
+  }
+
+  async uiCanExit() {
+    if (!this.formValues.IsSimple && this.formValues.DataYaml !== this.oldDataYaml && this.state.isEditorDirty) {
+      return this.ModalService.confirmWebEditorDiscard();
+    }
+  }
+
   async onInit() {
     try {
       this.state = {
@@ -201,6 +253,7 @@ class KubernetesConfigurationController {
         activeTab: 0,
         currentName: this.$state.$current.name,
         isDataValid: true,
+        isEditorDirty: false,
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('configuration');
@@ -208,29 +261,24 @@ class KubernetesConfigurationController {
       this.formValues = new KubernetesConfigurationFormValues();
 
       this.resourcePools = await this.KubernetesResourcePoolService.get();
-      await this.getConfiguration();
-      await this.getApplications(this.configuration.Namespace);
-      await this.getEvents(this.configuration.Namespace);
-      this.formValues.ResourcePool = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.configuration.Namespace);
-      this.formValues.Id = this.configuration.Id;
-      this.formValues.Name = this.configuration.Name;
-      this.formValues.Type = this.configuration.Type;
-      this.formValues.Data = _.map(this.configuration.Data, (value, key) => {
-        if (this.configuration.Type === KubernetesConfigurationTypes.SECRET) {
-          value = atob(value);
-        }
-        this.formValues.DataYaml += key + ': ' + value + '\n';
-        const entry = new KubernetesConfigurationFormValuesDataEntry();
-        entry.Key = key;
-        entry.Value = value;
-        return entry;
-      });
-      await this.getConfigurations();
+      const configuration = await this.getConfiguration();
+      if (configuration) {
+        await this.getApplications(this.configuration.Namespace);
+        await this.getEvents(this.configuration.Namespace);
+        await this.getConfigurations();
+      }
+      this.tagUsedDataKeys();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {
       this.state.viewReady = true;
     }
+
+    this.$window.onbeforeunload = () => {
+      if (!this.formValues.IsSimple && this.formValues.DataYaml !== this.oldDataYaml && this.state.isEditorDirty) {
+        return '';
+      }
+    };
   }
 
   $onInit() {
@@ -241,6 +289,7 @@ class KubernetesConfigurationController {
     if (this.state.currentName !== this.$state.$current.name) {
       this.LocalStorage.storeActiveTab('configuration', 0);
     }
+    this.state.isEditorDirty = false;
   }
 }
 

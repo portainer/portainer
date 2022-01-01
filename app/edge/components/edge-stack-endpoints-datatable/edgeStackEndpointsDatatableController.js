@@ -101,7 +101,7 @@ export class EdgeStackEndpointsDatatableController {
       this.state.filteredDataSet = endpoints;
       this.state.totalFilteredDataSet = totalCount;
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environments');
     } finally {
       this.state.loading = false;
     }

@@ -106,9 +106,9 @@
                 <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a>
                 <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="$ctrl.isExternalApplication(item)">external</span>
               </td>
-              <td>{{ item.StackName }}</td>
-              <td
-                >{{ item.Image }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
+              <td>{{ item.StackName || '-' }}</td>
+              <td title="{{ item.Image }}"
+                >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
               >
               <td>{{ item.CPU | kubernetesApplicationCPUValue }}</td>
               <td>{{ item.Memory | humansize }}</td>
@@ -130,7 +130,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

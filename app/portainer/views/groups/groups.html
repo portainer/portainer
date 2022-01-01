@@ -1,14 +1,21 @@
 <rd-header>
-  <rd-header-title title-text="Endpoint groups">
+  <rd-header-title title-text="Environment groups">
     <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.groups" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content>Endpoint group management</rd-header-content>
+  <rd-header-content>Environment group management</rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-sm-12">
-    <groups-datatable title-text="Endpoint groups" title-icon="fa-object-group" dataset="groups" table-key="groups" order-by="Name" remove-action="removeAction"></groups-datatable>
+    <groups-datatable
+      title-text="Environment groups"
+      title-icon="fa-object-group"
+      dataset="groups"
+      table-key="groups"
+      order-by="Name"
+      remove-action="removeAction"
+    ></groups-datatable>
   </div>
 </div>

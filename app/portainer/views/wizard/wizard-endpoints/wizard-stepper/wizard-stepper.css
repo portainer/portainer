@@ -1,0 +1,95 @@
+.stepper-wrapper {
+  width: 60%;
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+.stepper-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1;
+}
+
+.docker {
+  margin-left: -5px;
+  text-transform: capitalize;
+}
+.kubernetes {
+  margin-left: -20px;
+  text-transform: capitalize;
+}
+.aci {
+  margin-left: 5px;
+  text-transform: uppercase;
+}
+
+.stepper-item::before {
+  position: absolute;
+  content: '';
+  width: 100%;
+  top: 20px;
+  left: -100%;
+  z-index: 2;
+  border-bottom: 5px solid var(--bg-stepper-item-counter);
+}
+
+.stepper-item::after {
+  position: absolute;
+  content: '';
+  border-bottom: 5px solid var(--bg-stepper-item-counter);
+  width: 100%;
+  top: 20px;
+  left: 0;
+  z-index: 2;
+}
+
+.stepper-item .step-counter {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-stepper-item-counter);
+  margin-bottom: 6px;
+}
+
+.stepper-item.active {
+  font-weight: bold;
+  background: var(--bg-stepper-item-active);
+  content: none;
+}
+
+.stepper-item.active .step-counter {
+  background: #337ab7;
+  color: #fff;
+}
+
+.stepper-item.completed .step-counter {
+  background-color: #48b400;
+  color: #fff;
+}
+
+.stepper-item.completed::after {
+  position: absolute;
+  content: '';
+  border-bottom: 5px solid #48b400;
+  width: 100%;
+  top: 20px;
+  left: 0;
+  z-index: 3;
+}
+
+.stepper-item:first-child::before {
+  content: none;
+}
+
+.stepper-item:last-child::after {
+  content: none;
+}

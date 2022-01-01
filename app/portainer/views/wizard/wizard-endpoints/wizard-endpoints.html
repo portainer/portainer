@@ -1,0 +1,96 @@
+<rd-header>
+  <rd-header-title title-text="Quick Setup"></rd-header-title>
+  <rd-header-content>Environment Wizard</rd-header-content>
+</rd-header>
+
+<div class="wizard-wrapper" ng-if="$ctrl.state.currentStep !== 0">
+  <div class="wizard-main">
+    <div class="row">
+      <div class="col-sm-12">
+        <rd-widget>
+          <rd-widget-header icon="fa-magic" title-text="Environment Wizard"> </rd-widget-header>
+          <rd-widget-body>
+            <!-- Stepper -->
+            <wizard-stepper endpoint-selections="$ctrl.state.selections"></wizard-stepper>
+            <!-- Stepper -->
+
+            <div class="col-sm-12 form-section-title wizard-main-title"> Connect to your {{ $ctrl.state.section }} environment </div>
+
+            <div ng-switch="$ctrl.state.section" class="wizard-endpoint-section">
+              <wizard-docker ng-switch-when="docker" on-update="($ctrl.updateEndpoint)" on-analytics="($ctrl.addAnalytics)"></wizard-docker>
+              <wizard-aci ng-switch-when="aci" on-update="($ctrl.updateEndpoint)" on-analytics="($ctrl.addAnalytics)"></wizard-aci>
+              <wizard-kubernetes ng-switch-when="kubernetes" on-update="($ctrl.updateEndpoint)" on-analytics="($ctrl.addAnalytics)"></wizard-kubernetes>
+            </div>
+
+            <div class="wizard-step-action">
+              <button
+                ng-click="$ctrl.previousStep()"
+                ng-show="$ctrl.state.currentStep !== 0"
+                type="submit"
+                class="btn btn-primary btn-sm previous-btn"
+                ng-disabled="$ctrl.state.currentStep === 1"
+              >
+                <i class="fas fa-arrow-left space-right"></i>{{ $ctrl.state.previousStep }}
+              </button>
+              <button ng-click="$ctrl.nextStep()" ng-show="$ctrl.state.currentStep !== 0" type="submit" class="btn btn-primary btn-sm next-btn">
+                {{ $ctrl.state.nextStep }} <i class="fas fa-arrow-right space-left"></i
+              ></button>
+            </div>
+          </rd-widget-body>
+        </rd-widget>
+      </div>
+    </div>
+  </div>
+  <div class="wizard-aside" ng-if="$ctrl.state.currentStep !== 0">
+    <wizard-endpoint-list endpoint-list="$ctrl.endpoints"></wizard-endpoint-list>
+  </div>
+</div>
+
+<div class="row" ng-if="$ctrl.state.currentStep === 0">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-magic" title-text="Environment Wizard"> </rd-widget-header>
+      <rd-widget-body>
+        <div class="row">
+          <div class="col-sm-12 form-section-title">
+            Select your environment(s)
+          </div>
+          <div>
+            <span class="text-muted small">You can onboard different types of environments, select all that apply.</span>
+          </div>
+          <div class="wizard-section">
+            <wizard-endpoint-type
+              endpoint-title="Docker"
+              description="Connect to Docker Standalone / Swarm via URL/IP, API or Socket"
+              icon="fab fa-docker"
+              active="$ctrl.state.dockerActive"
+              ng-click="$ctrl.endpointSelect('docker')"
+            ></wizard-endpoint-type>
+
+            <wizard-endpoint-type
+              endpoint-title="Kubernetes"
+              description="Connect to a kubernetes environment via URL/IP"
+              icon="fas fa-dharmachakra"
+              active="$ctrl.state.kubernetesActive"
+              ng-click="$ctrl.endpointSelect('kubernetes')"
+            ></wizard-endpoint-type>
+
+            <wizard-endpoint-type
+              endpoint-title="ACI"
+              description="Connect to ACI environment via API"
+              icon="fab fa-microsoft"
+              active="$ctrl.state.aciActive"
+              ng-click="$ctrl.endpointSelect('aci')"
+            ></wizard-endpoint-type>
+          </div>
+
+          <div class="wizard-section">
+            <div class="wizard-section-action">
+              <button ng-click="$ctrl.startWizard()" ng-disabled="$ctrl.state.selections.length === 0" type="submit" class="btn btn-primary btn-sm no-margin">Start Wizard</button>
+            </div>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

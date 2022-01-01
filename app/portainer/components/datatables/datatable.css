@@ -1,6 +1,6 @@
 .datatable .toolBar {
-  background-color: #f6f6f6;
-  color: #767676;
+  background-color: var(--bg-card-color);
+  color: var(--text-main-color);
   overflow: auto;
   padding: 10px;
 }
@@ -30,9 +30,10 @@
 }
 
 .datatable .searchBar {
-  border-top: 1px solid #d2d1d1;
-  border-bottom: 1px solid #d2d1d1;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   padding: 8px;
+  background: var(--bg-main-color);
 }
 
 .datatable .searchInput {
@@ -60,9 +61,10 @@
 }
 
 .datatable .footer {
-  background-color: #f6f6f6;
-  color: #767676;
+  background-color: var(--bg-card-color);
+  color: var(--text-main-color);
   overflow: auto;
+  border-top: 1px solid var(--border-datatable-top-color);
 }
 
 .datatable .footer .infoBar {
@@ -88,6 +90,10 @@
 .datatable .pagination > li > a,
 .pagination > li > span {
   float: none;
+}
+
+.datatable.datatable-empty .table > tbody > tr > td {
+  padding: 15px 0;
 }
 
 .tableMenu {
@@ -152,9 +158,8 @@
 }
 
 .md-checkbox label:before {
-  background: #fff;
-  border: 2px solid black;
-  border: 2px solid rgba(0, 0, 0, 0.54);
+  background: var(--bg-main-color);
+  border: 2px solid var(--bg-checkbox-border-color);
   border-radius: 2px;
   cursor: pointer;
   height: 16px;

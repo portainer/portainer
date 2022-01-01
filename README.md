@@ -1,16 +1,16 @@
 <p align="center">
-  <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/app/assets/images/logo_alt.png?raw=true' />
+  <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/app/assets/images/portainer-github-banner.png?raw=true' />
 </p>
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/portainer/portainer.svg)](https://hub.docker.com/r/portainer/portainer/)
-[![Microbadger](https://images.microbadger.com/badges/image/portainer/portainer.svg)](http://microbadger.com/images/portainer/portainer 'Image size')
-[![Build Status](https://portainer.visualstudio.com/Portainer%20CI/_apis/build/status/Portainer%20CI?branchName=develop)](https://portainer.visualstudio.com/Portainer%20CI/_build/latest?definitionId=3&branchName=develop)
-[![Code Climate](https://codeclimate.com/github/portainer/portainer/badges/gpa.svg)](https://codeclimate.com/github/portainer/portainer)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YHXZJQNJQ36H6)
+**Portainer Community Edition** is a lightweight service delivery platform for containerized applications that can be used to manage Docker, Swarm, Kubernetes and ACI environments. It is designed to be as simple to deploy as it is to use. The application allows you to manage all your orchestrator resources (containers, images, volumes, networks and more) through a ‘smart’ GUI and/or an extensive API.
 
-**_Portainer_** is a lightweight management UI which allows you to **easily** manage your different Docker environments (Docker hosts or Swarm clusters).
-**_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker engine (can be deployed as Linux container or a Windows native container, supports other platforms too).
-**_Portainer_** allows you to manage all your Docker resources (containers, images, volumes, networks and more!) It is compatible with the _standalone Docker_ engine and with _Docker Swarm mode_.
+Portainer consists of a single container that can run on any cluster. It can be deployed as a Linux container or a Windows native container.
+
+**Portainer Business Edition** builds on the open-source base and includes a range of advanced features and functions (like RBAC and Support) that are specific to the needs of business users.
+
+- [Compare Portainer CE and Compare Portainer BE](https://portainer.io/products)
+- [Take5 – get 5 free nodes of Portainer Business for as long as you want them](https://portainer.io/pricing/take5)
+- [Portainer BE install guide](https://install.portainer.io)
 
 ## Demo
 
@@ -18,37 +18,49 @@ You can try out the public demo instance: http://demo.portainer.io/ (login with 
 
 Please note that the public demo cluster is **reset every 15min**.
 
-Alternatively, you can deploy a copy of the demo stack inside a [play-with-docker (PWD)](https://labs.play-with-docker.com) playground:
+## Latest Version
 
-- Browse [PWD/?stack=portainer-demo/play-with-docker/docker-stack.yml](http://play-with-docker.com/?stack=https://raw.githubusercontent.com/portainer/portainer-demo/master/play-with-docker/docker-stack.yml)
-- Sign in with your [Docker ID](https://docs.docker.com/docker-id)
-- Follow [these](https://github.com/portainer/portainer-demo/blob/master/play-with-docker/docker-stack.yml#L5-L8) steps.
+Portainer CE is updated regularly. We aim to do an update release every couple of months.
 
-Unlike the public demo, the playground sessions are deleted after 4 hours. Apart from that, all the settings are the same, including default credentials.
+**The latest version of Portainer is 2.9.x**. Portainer is on version 2, the second number denotes the month of release.
 
 ## Getting started
 
-- [Deploy Portainer](https://www.portainer.io/installation/)
+- [Deploy Portainer](https://docs.portainer.io/v/ce-2.9/start/install)
 - [Documentation](https://documentation.portainer.io)
+- [Contribute to the project](https://documentation.portainer.io/contributing/instructions/)
+
+## Features & Functions
+
+View [this](https://www.portainer.io/products) table to see all of the Portainer CE functionality and compare to Portainer Business.
+
+- [Portainer CE for Docker / Docker Swarm](https://www.portainer.io/solutions/docker)
+- [Portainer CE for Kubernetes](https://www.portainer.io/solutions/kubernetes-ui)
+- [Portainer CE for Azure ACI](https://www.portainer.io/solutions/serverless-containers)
 
 ## Getting help
 
-For FORMAL Support, please purchase a support subscription from here: https://www.portainer.io/products-services/portainer-business-support/
+Portainer CE is an open source project and is supported by the community. You can buy a supported version of Portainer at portainer.io
 
-For community support: You can find more information about Portainer's community support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
+Learn more about Portainers community support channels [here.](https://www.portainer.io/community_help)
 
 - Issues: https://github.com/portainer/portainer/issues
-- FAQ: https://documentation.portainer.io
-- Slack (chat): https://portainer.io/slack/
+- Slack (chat): [https://portainer.slack.com/](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA)
+
+You can join the Portainer Community by visiting community.portainer.io. This will give you advance notice of events, content and other related Portainer content.
 
 ## Reporting bugs and contributing
 
 - Want to report a bug or request a feature? Please open [an issue](https://github.com/portainer/portainer/issues/new).
-- Want to help us build **_portainer_**? Follow our [contribution guidelines](https://www.portainer.io/documentation/how-to-contribute/) to build it locally and make a pull request. We need all the help we can get!
+- Want to help us build **_portainer_**? Follow our [contribution guidelines](https://documentation.portainer.io/contributing/instructions/) to build it locally and make a pull request.
 
 ## Security
 
 - Here at Portainer, we believe in [responsible disclosure](https://en.wikipedia.org/wiki/Responsible_disclosure) of security issues. If you have found a security issue, please report it to <security@portainer.io>.
+
+## Work for us
+
+If you are a developer, and our code in this repo makes sense to you, we would love to hear from you. We are always on the hunt for awesome devs, either freelance or employed. Drop us a line to info@portainer.io with your details and/or visit our [careers page](https://portainer.io/careers).
 
 ## Privacy
 
@@ -64,8 +76,4 @@ Portainer supports "Current - 2 docker versions only. Prior versions may operate
 
 Portainer is licensed under the zlib license. See [LICENSE](./LICENSE) for reference.
 
-Portainer also contains the following code, which is licensed under the [MIT license](https://opensource.org/licenses/MIT):
-
-UI For Docker: Copyright (c) 2013-2016 Michael Crosby (crosbymichael.com), Kevan Ahlquist (kevanahlquist.com), Anthony Lapenna (portainer.io)
-
-rdash-angular: Copyright (c) [2014][elliot hesp]
+Portainer also contains code from open source projects. See [ATTRIBUTIONS.md](./ATTRIBUTIONS.md) for a list.

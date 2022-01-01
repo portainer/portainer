@@ -3,10 +3,18 @@
     <rd-widget-header icon="{{ $ctrl.titleIcon }}" title-text="Edge Groups"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          data-cy="edgeGroup-removeEdgeGroupButton"
+        >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.groups.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Edge group </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.groups.new" data-cy="edgeGroup-addEdgeGroupButton">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Edge group
+        </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -17,15 +25,16 @@
           ng-change="$ctrl.onTextFilterChange()"
           placeholder="Search..."
           ng-model-options="{ debounce: 300 }"
+          data-cy="edgeGroup-searchInput"
         />
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table table-hover nowrap-cells" data-cy="edgeGroup-edgeGroupTable">
           <thead>
             <tr>
               <th>
                 <span class="md-checkbox">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="edgeGroup-selectAllCheckbox" />
                   <label for="select_all"></label>
                 </span>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
@@ -36,7 +45,7 @@
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Endpoints.length')">
-                  Endpoints Count
+                  Environments Count
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Endpoints.length' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Endpoints.length' && $ctrl.state.reverseOrder"></i>
                 </a>
@@ -85,7 +94,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

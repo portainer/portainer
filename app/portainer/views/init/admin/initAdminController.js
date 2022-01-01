@@ -1,5 +1,4 @@
 angular.module('portainer.app').controller('InitAdminController', [
-  '$async',
   '$scope',
   '$state',
   'Notifications',
@@ -8,18 +7,31 @@ angular.module('portainer.app').controller('InitAdminController', [
   'SettingsService',
   'UserService',
   'EndpointService',
-  function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService) {
+  'BackupService',
+  'StatusService',
+  function ($scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, BackupService, StatusService) {
+    $scope.uploadBackup = uploadBackup;
+
     $scope.logo = StateManager.getState().application.logo;
 
     $scope.formValues = {
       Username: 'admin',
       Password: '',
       ConfirmPassword: '',
-      enableTelemetry: true,
+      enableTelemetry: process.env.NODE_ENV === 'production',
     };
 
     $scope.state = {
       actionInProgress: false,
+      showInitPassword: true,
+      showRestorePortainer: false,
+    };
+
+    createAdministratorFlow();
+
+    $scope.togglePanel = function () {
+      $scope.state.showInitPassword = !$scope.state.showInitPassword;
+      $scope.state.showRestorePortainer = !$scope.state.showRestorePortainer;
     };
 
     $scope.createAdminUser = function () {
@@ -42,7 +54,7 @@ angular.module('portainer.app').controller('InitAdminController', [
         })
         .then(function success(data) {
           if (data.value.length === 0) {
-            $state.go('portainer.init.endpoint');
+            $state.go('portainer.wizard');
           } else {
             $state.go('portainer.home');
           }
@@ -59,13 +71,65 @@ angular.module('portainer.app').controller('InitAdminController', [
       UserService.administratorExists()
         .then(function success(exists) {
           if (exists) {
-            $state.go('portainer.home');
+            $state.go('portainer.wizard');
           }
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to verify administrator account existence');
         });
     }
-    createAdministratorFlow();
+
+    async function uploadBackup() {
+      $scope.state.backupInProgress = true;
+
+      const file = $scope.formValues.BackupFile;
+      const password = $scope.formValues.Password;
+
+      restoreAndRefresh(() => BackupService.uploadBackup(file, password));
+    }
+
+    async function restoreAndRefresh(restoreAsyncFn) {
+      $scope.state.backupInProgress = true;
+
+      try {
+        await restoreAsyncFn();
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to restore the backup');
+        $scope.state.backupInProgress = false;
+
+        return;
+      }
+
+      try {
+        await waitPortainerRestart();
+        Notifications.success('The backup has successfully been restored');
+        $state.go('portainer.auth');
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to check for status');
+        await wait(2);
+        location.reload();
+      }
+
+      $scope.state.backupInProgress = false;
+    }
+
+    async function waitPortainerRestart() {
+      for (let i = 0; i < 10; i++) {
+        await wait(5);
+        try {
+          const status = await StatusService.status();
+          if (status && status.Version) {
+            return;
+          }
+        } catch (e) {
+          // pass
+        }
+      }
+      throw new Error('Timeout to wait for Portainer restarting');
+    }
   },
 ]);
+
+function wait(seconds = 0) {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+}

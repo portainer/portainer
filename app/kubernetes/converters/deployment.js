@@ -11,6 +11,7 @@ import {
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
+import { buildImageFullURI } from 'Docker/helpers/imageHelper';
 
 class KubernetesDeploymentConverter {
   /**
@@ -25,7 +26,7 @@ class KubernetesDeploymentConverter {
     res.ApplicationOwner = formValues.ApplicationOwner;
     res.ApplicationName = formValues.Name;
     res.ReplicaCount = formValues.ReplicaCount;
-    res.Image = formValues.Image;
+    res.ImageModel = formValues.ImageModel;
     res.CpuLimit = formValues.CpuLimit;
     res.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
     res.Env = KubernetesApplicationHelper.generateEnvFromEnvVariables(formValues.EnvironmentVariables);
@@ -53,7 +54,15 @@ class KubernetesDeploymentConverter {
     payload.spec.template.metadata.labels.app = deployment.Name;
     payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = deployment.ApplicationName;
     payload.spec.template.spec.containers[0].name = deployment.Name;
-    payload.spec.template.spec.containers[0].image = deployment.Image;
+
+    if (deployment.ImageModel) {
+      payload.spec.template.spec.containers[0].image = buildImageFullURI(deployment.ImageModel);
+
+      if (deployment.ImageModel.Registry && deployment.ImageModel.Registry.Authentication) {
+        payload.spec.template.spec.imagePullSecrets = [{ name: `registry-${deployment.ImageModel.Registry.Id}` }];
+      }
+    }
+
     payload.spec.template.spec.affinity = deployment.Affinity;
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].env', deployment.Env);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].volumeMounts', deployment.VolumeMounts);

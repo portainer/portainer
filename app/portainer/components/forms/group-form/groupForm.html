@@ -36,20 +36,20 @@
     ></tag-selector>
   </div>
   <!-- !tags -->
-  <!-- endpoints -->
+  <!-- environments -->
   <div ng-if="$ctrl.model.Id !== 1">
     <div class="col-sm-12 form-section-title">
-      Associated endpoints
+      Associated environments
     </div>
     <div class="form-group">
       <div class="col-sm-12 small text-muted">
-        You can select which endpoint should be part of this group by moving them to the associated endpoints table. Simply click on any endpoint entry to move it from one table to
-        the other.
+        You can select which environment should be part of this group by moving them to the associated environments table. Simply click on any environment entry to move it from one
+        table to the other.
       </div>
       <div class="col-sm-12" style="margin-top: 20px;">
         <!-- available-endpoints -->
         <div class="col-sm-6">
-          <div class="text-center small text-muted">Available endpoints</div>
+          <div class="text-center small text-muted">Available environments</div>
           <div style="margin-top: 10px;">
             <group-association-table
               loaded="$ctrl.loaded"
@@ -59,14 +59,14 @@
               dataset="$ctrl.availableEndpoints"
               entry-click="$ctrl.associateEndpoint"
               pagination-state="$ctrl.state.available"
-              empty-dataset-message="No endpoint available"
+              empty-dataset-message="No environment available"
             ></group-association-table>
           </div>
         </div>
         <!-- !available-endpoints -->
         <!-- associated-endpoints -->
         <div class="col-sm-6">
-          <div class="text-center small text-muted">Associated endpoints</div>
+          <div class="text-center small text-muted">Associated environments</div>
           <div style="margin-top: 10px;">
             <group-association-table
               loaded="$ctrl.loaded"
@@ -76,7 +76,7 @@
               dataset="$ctrl.associatedEndpoints"
               entry-click="$ctrl.dissociateEndpoint"
               pagination-state="$ctrl.state.associated"
-              empty-dataset-message="No associated endpoint"
+              empty-dataset-message="No associated environment"
               has-backend-pagination="this.pageType !== 'create'"
             ></group-association-table>
           </div>
@@ -87,7 +87,7 @@
   </div>
   <div ng-if="$ctrl.model.Id === 1">
     <div class="col-sm-12 form-section-title">
-      Unassociated endpoints
+      Unassociated environments
     </div>
     <div style="margin-top: 10px;">
       <group-association-table
@@ -97,7 +97,7 @@
         retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
         dataset="$ctrl.associatedEndpoints"
         pagination-state="$ctrl.state.associated"
-        empty-dataset-message="No endpoint available"
+        empty-dataset-message="No environment available"
       ></group-association-table>
     </div>
   </div>

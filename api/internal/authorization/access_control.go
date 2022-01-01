@@ -3,8 +3,24 @@ package authorization
 import (
 	"strconv"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/stackutils"
 )
+
+// NewAdministratorsOnlyResourceControl will create a new administrators only resource control associated to the resource specified by the
+// identifier and type parameters.
+func NewAdministratorsOnlyResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType) *portainer.ResourceControl {
+	return &portainer.ResourceControl{
+		Type:               resourceType,
+		ResourceID:         resourceIdentifier,
+		SubResourceIDs:     []string{},
+		UserAccesses:       []portainer.UserResourceAccess{},
+		TeamAccesses:       []portainer.TeamResourceAccess{},
+		AdministratorsOnly: true,
+		Public:             false,
+		System:             false,
+	}
+}
 
 // NewPrivateResourceControl will create a new private resource control associated to the resource specified by the
 // identifier and type parameters. It automatically assigns it to the user specified by the userID parameter.
@@ -95,7 +111,7 @@ func NewRestrictedResourceControl(resourceIdentifier string, resourceType portai
 func DecorateStacks(stacks []portainer.Stack, resourceControls []portainer.ResourceControl) []portainer.Stack {
 	for idx, stack := range stacks {
 
-		resourceControl := GetResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl, resourceControls)
+		resourceControl := GetResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl, resourceControls)
 		if resourceControl != nil {
 			stacks[idx].ResourceControl = resourceControl
 		}
@@ -144,9 +160,13 @@ func FilterAuthorizedCustomTemplates(customTemplates []portainer.CustomTemplate,
 	return authorizedTemplates
 }
 
-// UserCanAccessResource will valide that a user has permissions defined in the specified resource control
+// UserCanAccessResource will valid that a user has permissions defined in the specified resource control
 // based on its identifier and the team(s) he is part of.
 func UserCanAccessResource(userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControl *portainer.ResourceControl) bool {
+	if resourceControl == nil {
+		return false
+	}
+
 	for _, authorizedUserAccess := range resourceControl.UserAccesses {
 		if userID == authorizedUserAccess.UserID {
 			return true
