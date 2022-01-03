@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react';
 
 import { useUser } from '@/portainer/hooks/useUser';
 
-import { useHeaderContext } from './Header';
+import { useHeaderContext } from './HeaderContainer';
 import controller from './HeaderTitle.controller';
 
 interface Props {

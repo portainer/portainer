@@ -1,12 +1,10 @@
 import { Meta } from '@storybook/react';
 import { UIRouter, pushStateLocationPlugin } from '@uirouter/react';
 
-import { Link } from '@/portainer/components/Link';
-
 import { Breadcrumbs } from './Breadcrumbs';
 
 const meta: Meta = {
-  title: 'Components/Header/Breadcrumbs',
+  title: 'Components/PageHeader/Breadcrumbs',
   component: Breadcrumbs,
 };
 
@@ -17,13 +15,17 @@ export { Example };
 function Example() {
   return (
     <UIRouter plugins={[pushStateLocationPlugin]}>
-      <Breadcrumbs>
-        <Link to="portainer.endpoints">Environments</Link>
-        <Link to="portainer.endpoints.endpoint({id: endpoint.Id})">
-          endpointName
-        </Link>
-        String item
-      </Breadcrumbs>
+      <Breadcrumbs
+        breadcrumbs={[
+          { link: 'portainer.endpoints', label: 'Environments' },
+          {
+            label: 'endpointName',
+            link: 'portainer.endpoints.endpoint',
+            linkParams: { id: 5 },
+          },
+          { label: 'String item' },
+        ]}
+      />
     </UIRouter>
   );
 }

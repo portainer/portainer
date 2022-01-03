@@ -42,7 +42,7 @@
     "lint:pr": "make lint-pr",
     "test": "yarn test:client; yarn test:server",
     "test:server": "cd api && go test ./...",
-    "test:client": "jest",
+    "test:client": "jest --silent",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -o ./dist/storybook",
     "analyze-webpack": "webpack --config ./webpack/webpack.analyze.js"

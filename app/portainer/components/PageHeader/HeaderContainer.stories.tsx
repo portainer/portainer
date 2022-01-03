@@ -1,18 +1,17 @@
 import { Meta, Story } from '@storybook/react';
 import { useMemo } from 'react';
 
-import { Link } from '@/portainer/components/Link';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 
-import { Header } from './Header';
-import { Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
-
-import { HeaderContent, HeaderTitle } from '.';
+import { HeaderContainer } from './HeaderContainer';
+import { Breadcrumbs } from './Breadcrumbs';
+import { HeaderTitle } from './HeaderTitle';
+import { HeaderContent } from './HeaderContent';
 
 export default {
-  component: Header,
-  title: 'Components/Header',
+  component: HeaderContainer,
+  title: 'Components/PageHeader/HeaderContainer',
 } as Meta;
 
 interface StoryProps {
@@ -27,15 +26,17 @@ function Template({ title }: StoryProps) {
 
   return (
     <UserContext.Provider value={state}>
-      <Header>
+      <HeaderContainer>
         <HeaderTitle title={title} />
         <HeaderContent>
-          <Breadcrumbs>
-            <Link to="example">Container instances</Link>
-            Add container
-          </Breadcrumbs>
+          <Breadcrumbs
+            breadcrumbs={[
+              { link: 'example', label: 'crumb1' },
+              { label: 'crumb2' },
+            ]}
+          />
         </HeaderContent>
-      </Header>
+      </HeaderContainer>
     </UserContext.Provider>
   );
 }

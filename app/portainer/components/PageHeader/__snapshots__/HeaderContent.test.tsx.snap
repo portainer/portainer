@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should not render without a wrapping HeaderContainer 1`] = `"Should be nested inside a HeaderContainer component"`;
