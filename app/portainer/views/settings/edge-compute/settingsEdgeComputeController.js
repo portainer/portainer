@@ -7,20 +7,18 @@ angular.module('portainer.app').controller('SettingsEdgeComputeController', Sett
 function SettingsEdgeComputeController($q, $scope, $state, Notifications, SettingsService, StateManager) {
 
   $scope.onSubmitEdgeCompute = function(settings) {
-      console.log("onSubmitEdgeCompute");
     SettingsService.update(settings)
         .then(function success() {
-          Notifications.success('Settings updated');
-          StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
-          $state.reload();
+            Notifications.success('Settings updated');
+            StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
+            $state.reload();
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to update settings');
+            Notifications.error('Failure', err, 'Unable to update settings');
         })
   }
 
     $scope.onSubmitFDO = async function(formValues) {
-
       try {
         await configureFDO(formValues);
         Notifications.success(`FDO successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);

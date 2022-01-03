@@ -11,6 +11,11 @@
 
 <open-amt-settings ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt']"></open-amt-settings>
 
+<div class="row" ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['fdo']">
+  <div class="col-sm-12">
+    <settings-open-amt on-submit="(onSubmitAMT)" settings="(settings)"></settings-open-amt>
+  </div>
+</div>
 
 <div class="row" ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['fdo']">
   <div class="col-sm-12">
