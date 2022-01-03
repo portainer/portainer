@@ -25,13 +25,13 @@ export function FormControl({
       <div className={clsx('form-group', styles.container)}>
         <label
           htmlFor={inputId}
-          className="col-sm-3 col-lg-2 control-label text-left"
+          className="col-sm-4 col-lg-3 control-label text-left"
         >
           {label}
           {tooltip && <Tooltip message={tooltip} />}
         </label>
 
-        <div className="col-sm-9 col-lg-10">{children}</div>
+        <div className="col-sm-8 col-lg-9">{children}</div>
       </div>
 
       {errors && (

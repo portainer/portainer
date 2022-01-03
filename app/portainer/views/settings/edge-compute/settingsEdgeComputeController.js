@@ -17,14 +17,12 @@ function SettingsEdgeComputeController($q, $scope, $state, Notifications, Settin
   }
 
   function initView() {
-    $q.all({
-      settings: SettingsService.settings(),
-    })
+      SettingsService.settings()
       .then(function success(data) {
-        $scope.settings = data.settings;
+          $scope.settings = data;
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve application settings');
+          Notifications.error('Failure', err, 'Unable to retrieve application settings');
       });
   }
 
