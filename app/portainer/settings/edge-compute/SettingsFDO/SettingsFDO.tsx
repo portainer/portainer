@@ -19,6 +19,7 @@ export interface FormValues {
 
 export interface Settings {
   FDOConfiguration: FormValues,
+  EnableEdgeComputeFeatures: boolean,
 }
 
 interface Props {
@@ -35,6 +36,8 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
     OwnerUsername: fdoConfiguration ? fdoConfiguration.OwnerUsername : '',
     OwnerPassword: fdoConfiguration ? fdoConfiguration.OwnerPassword : '',
   };
+
+  const edgeComputeFeaturesEnabled = settings.EnableEdgeComputeFeatures;
 
   return (
     <div className="row">
@@ -72,7 +75,8 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                     id="edge_enableFDO"
                     name="edge_enableFDO"
                     className="space-right"
-                    checked={values.Enabled}
+                    disabled={!edgeComputeFeaturesEnabled}
+                    checked={edgeComputeFeaturesEnabled && values.Enabled}
                     onChange={(e) =>
                       setFieldValue('Enabled', e.valueOf())
                     }
@@ -83,7 +87,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                   When enabled, this will allow Portainer to interact with FDO Services.
                 </TextTip>
 
-                {values.Enabled && (
+                {edgeComputeFeaturesEnabled && values.Enabled && (
                   <>
                     <hr />
 

@@ -22,11 +22,9 @@ function SettingsEdgeComputeController($q, $scope, $state, Notifications, Settin
     $scope.onSubmitFDO = async function(formValues) {
 
       try {
-        console.log("onSubmitFDO");
-        console.log(formValues);
-
         await configureFDO(formValues);
         Notifications.success(`FDO successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
+        $state.reload();
       } catch (err) {
         Notifications.error('Failure', err, 'Failed applying changes');
       }

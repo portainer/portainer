@@ -66,11 +66,11 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
     this.setShowIntelInfo = async function () {
       this.settings = await SettingsService.settings();
       const openAMTFeatureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['open-amt'];
-      const openAMTFeatureEnabled = this.settings && this.settings.OpenAMTConfiguration && this.settings.OpenAMTConfiguration.Enabled;
+      const openAMTFeatureEnabled = this.settings && this.settings.EnableEdgeComputeFeatures && this.settings.OpenAMTConfiguration && this.settings.OpenAMTConfiguration.Enabled;
       this.state.showAMTInfo = openAMTFeatureFlagValue && openAMTFeatureEnabled;
 
       const fdoFeatureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['fdo'];
-      const fdoFeatureEnabled = this.settings && this.settings.FDOConfiguration && this.settings.FDOConfiguration.Enabled;
+      const fdoFeatureEnabled = this.settings && this.settings.EnableEdgeComputeFeatures && this.settings.FDOConfiguration && this.settings.FDOConfiguration.Enabled;
       this.state.showFDOInfo = fdoFeatureFlagValue && fdoFeatureEnabled;
     };
 
