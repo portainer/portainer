@@ -1,10 +1,13 @@
 import angular from 'angular';
 
+import { configureFDO } from "@/portainer/hostmanagement/fdo/fdo.service";
+
 angular.module('portainer.app').controller('SettingsEdgeComputeController', SettingsEdgeComputeController);
 
 function SettingsEdgeComputeController($q, $scope, $state, Notifications, SettingsService, StateManager) {
 
-  $scope.onSubmit = function(settings) {
+  $scope.onSubmitEdgeCompute = function(settings) {
+      console.log("onSubmitEdgeCompute");
     SettingsService.update(settings)
         .then(function success() {
           Notifications.success('Settings updated');
@@ -15,6 +18,19 @@ function SettingsEdgeComputeController($q, $scope, $state, Notifications, Settin
           Notifications.error('Failure', err, 'Unable to update settings');
         })
   }
+
+    $scope.onSubmitFDO = async function(formValues) {
+
+      try {
+        console.log("onSubmitFDO");
+        console.log(formValues);
+
+        await configureFDO(formValues);
+        Notifications.success(`FDO successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
+      } catch (err) {
+        Notifications.error('Failure', err, 'Failed applying changes');
+      }
+    }
 
   function initView() {
       SettingsService.settings()

@@ -2,6 +2,7 @@ import angular from 'angular';
 
 import { CreateAccessTokenAngular } from '../views/account/CreateAccessToken';
 import { SettingsEdgeComputeAngular } from '../settings/edge-compute/SettingsEdgeCompute';
+import { SettingsFDOAngular } from '../settings/edge-compute/SettingsFDO';
 
 import sidebarModule from './sidebar';
 import gitFormModule from './forms/git-form';
@@ -22,4 +23,5 @@ export default angular
   .component('beFeatureIndicator', beFeatureIndicatorAngular)
   .component('createAccessToken', CreateAccessTokenAngular)
     .component('settingsEdgeCompute', SettingsEdgeComputeAngular)
+    .component('settingsFdo', SettingsFDOAngular)
     .name;
