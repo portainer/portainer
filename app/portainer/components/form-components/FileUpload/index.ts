@@ -1,1 +1,2 @@
-export { FileUpload, FileUploadAngular } from './FileUpload';
+export { FileUploadForm, FileUploadFormAngular } from './FileUploadForm';
+export { FileUploadField, FileUploadFieldAngular } from './FileUploadField';
