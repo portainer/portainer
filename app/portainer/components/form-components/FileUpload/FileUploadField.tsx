@@ -1,29 +1,23 @@
-import {
-  ChangeEvent,
-  createRef,
-  PropsWithChildren,
-  ReactNode,
-  useState,
-} from 'react';
+import { ChangeEvent, createRef, useState } from 'react';
 
 import { r2a } from '@/react-tools/react2angular';
 import { Button } from '@/portainer/components/Button';
 
-import styles from './FileUploadForm.module.css';
+import styles from './FileUploadField.module.css';
 
 export interface Props {
   onChange(value: unknown): void;
-  children?: ReactNode;
+  title?: string;
   file?: File;
   required?: boolean;
 }
 
 export function FileUploadField({
   required = false,
-  children = 'Select a file',
+  title = 'Select a file',
   onChange,
   file,
-}: PropsWithChildren<Props>) {
+}: Props) {
   const fileRef = createRef<HTMLInputElement>();
   function handleButtonClick() {
     if (fileRef && fileRef.current) {
@@ -54,7 +48,7 @@ export function FileUploadField({
         className="btn btn-sm btn-primary"
         onClick={handleButtonClick}
       >
-        {children}
+        {title}
       </Button>
 
       <span className="space-left">
@@ -70,7 +64,7 @@ export function FileUploadField({
 
 export const FileUploadFieldAngular = r2a(FileUploadField, [
   'required',
-  'children',
+  'title',
   'onChange',
   'file',
 ]);
