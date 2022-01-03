@@ -46,7 +46,9 @@ class KubeCreateCustomTemplateViewController {
   }
 
   onChangeFile(file) {
-    this.formValues.File = file;
+    return this.$async(async () => {
+      this.formValues.File = file;
+    });
   }
 
   async createCustomTemplate() {
