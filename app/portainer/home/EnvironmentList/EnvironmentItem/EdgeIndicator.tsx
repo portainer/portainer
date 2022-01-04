@@ -17,16 +17,16 @@ export function EdgeIndicator({
 }: Props) {
   if (!edgeId) {
     return (
-      <span className="label label-default">
+      <span className="label label-default" aria-label="unassociated">
         <s>associated</s>
       </span>
     );
   }
 
   // give checkIn some wiggle room
-  let isCheckInValid = false;
-  if (homepageLoadTime && lastCheckInDate && checkInInterval) {
-    isCheckInValid =
+  let isCheckValid = false;
+  if (checkInInterval && homepageLoadTime && lastCheckInDate) {
+    isCheckValid =
       homepageLoadTime - lastCheckInDate <= checkInInterval * 2 + 20;
   }
 
@@ -34,15 +34,19 @@ export function EdgeIndicator({
     <span>
       <span
         className={clsx('label', {
-          'label-danger': !isCheckInValid,
-          'label-success': isCheckInValid,
+          'label-danger': !isCheckValid,
+          'label-success': isCheckValid,
         })}
+        aria-label="edge-heartbeat"
       >
         heartbeat
       </span>
 
       {!!lastCheckInDate && (
-        <span className="space-left small text-muted">
+        <span
+          className="space-left small text-muted"
+          aria-label="edge-last-checkin"
+        >
           {isoDateFromTimestamp(lastCheckInDate)}
         </span>
       )}
