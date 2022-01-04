@@ -1,6 +1,8 @@
+import { AxiosError } from 'axios';
+
 import PortainerError from '@/portainer/error';
 import { PublicSettingsViewModel } from '@/portainer/models/settings';
-import { AxiosError } from 'axios';
+
 import axios from '../axios';
 
 export async function publicSettings() {
