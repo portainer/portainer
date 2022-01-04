@@ -1,3 +1,4 @@
+import {useState} from "react";
 import {Formik, Form} from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
@@ -6,19 +7,41 @@ import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 import { Input } from "@/portainer/components/form-components/Input";
+import { FileUploadField } from "@/portainer/components/form-components/FileUpload";
 
 import styles from './SettingsOpenAMT.module.css';
 import { validationSchema } from './SettingsOpenAMT.validation';
 
+export interface MPSCredentials {
+  MPSUser: string,
+  MPSPassword: string,
+}
+
+export interface DomainConfiguration {
+  DomainName: string
+  CertFileText: string,
+  CertPassword: string,
+}
+
 export interface FormValues {
   Enabled: boolean,
-  OwnerURL: string,
-  OwnerUsername: string,
-  OwnerPassword: string,
+  MPSServer: string,
+  MPSUser: string,
+  MPSPassword: string,
+  DomainName: string
+  CertFileText: string,
+  CertPassword: string,
+}
+
+export interface OpenAMTConfiguration {
+  Enabled: boolean,
+  MPSServer: string,
+  Credentials: MPSCredentials,
+  DomainConfiguration: DomainConfiguration,
 }
 
 export interface Settings {
-  FDOConfiguration: FormValues,
+  OpenAMTConfiguration: OpenAMTConfiguration,
   EnableEdgeComputeFeatures: boolean,
 }
 
@@ -29,13 +52,55 @@ interface Props {
 
 export function SettingsOpenAMT({ settings, onSubmit }: Props) {
 
-  const fdoConfiguration = settings ? settings.FDOConfiguration : null;
+  const [certFile, setCertFile] = useState<File>();
+  async function handleFileUpload(file: File, setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void) {
+    console.log("handleFileUpload");
+    if (file) {
+      setCertFile(file);
+      const fileContent = await readFileContent(file);
+      setFieldValue("CertFileText", fileContent);
+    }
+  }
+
+  function readFileContent(file: File) {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.onload = (e) => {
+        if (e.target == null || e.target.result == null) {
+          resolve("");
+          return;
+        }
+        const base64 = e.target.result.toString();
+        // remove prefix of "data:application/x-pkcs12;base64," returned by "readAsDataURL()"
+        const index = base64.indexOf('base64,');
+        const cert = base64.substring(index + 7, base64.length);
+        resolve(cert);
+      };
+      fileReader.onerror = () => {
+        reject(new Error('error reading provisioning certificate file'));
+      };
+      fileReader.readAsDataURL(file);
+    });
+  }
+
+  const openAMTConfiguration = settings ? settings.OpenAMTConfiguration : null;
+
+  console.log("SettingsOpenAMT");
+  console.log(openAMTConfiguration);
+
   const initialValues = {
-    Enabled: fdoConfiguration ? fdoConfiguration.Enabled : false,
-    OwnerURL: fdoConfiguration ? fdoConfiguration.OwnerURL : '',
-    OwnerUsername: fdoConfiguration ? fdoConfiguration.OwnerUsername : '',
-    OwnerPassword: fdoConfiguration ? fdoConfiguration.OwnerPassword : '',
+    Enabled: openAMTConfiguration ? openAMTConfiguration.Enabled : false,
+    MPSServer: openAMTConfiguration ? openAMTConfiguration.MPSServer : '',
+    MPSUser: openAMTConfiguration && openAMTConfiguration.Credentials ? openAMTConfiguration.Credentials.MPSUser : '',
+    MPSPassword: openAMTConfiguration && openAMTConfiguration.Credentials ? openAMTConfiguration.Credentials.MPSPassword : '',
+    DomainName: openAMTConfiguration && openAMTConfiguration.DomainConfiguration ? openAMTConfiguration.DomainConfiguration.DomainName : '',
+    CertFileText: openAMTConfiguration && openAMTConfiguration.DomainConfiguration ? openAMTConfiguration.DomainConfiguration.CertFileText : '',
+    CertPassword: openAMTConfiguration && openAMTConfiguration.DomainConfiguration ? openAMTConfiguration.DomainConfiguration.CertPassword : '',
   };
+
+  if (initialValues.CertFileText && !certFile) {
+    setCertFile(new File([], 'existing_file.pfx'));
+  }
 
   const edgeComputeFeaturesEnabled = settings.EnableEdgeComputeFeatures;
 
@@ -67,13 +132,13 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
 
               >
                 <FormControl
-                  inputId="edge_enableFDO"
-                  label="Enable FDO Management Service"
+                  inputId="edge_enableOpenAMT"
+                  label="Enable edge OpenAMT"
                   errors={errors.Enabled}
                 >
                   <Switch
-                    id="edge_enableFDO"
-                    name="edge_enableFDO"
+                    id="edge_enableOpenAMT"
+                    name="edge_enableOpenAMT"
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}
                     checked={edgeComputeFeaturesEnabled && values.Enabled}
@@ -84,7 +149,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                 </FormControl>
 
                 <TextTip color='blue'>
-                  When enabled, this will allow Portainer to interact with FDO Services.
+                  When enabled, this will allow Portainer to interact with an OpenAMT MPS API.
                 </TextTip>
 
                 {edgeComputeFeaturesEnabled && values.Enabled && (
@@ -92,50 +157,101 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     <hr />
 
                     <FormControl
-                        inputId="owner_url"
-                        label="Owner Service Server"
-                        errors={errors.OwnerURL}
+                        inputId="mps_server"
+                        label="MPS Server"
+                        errors={errors.MPSServer}
                     >
                       <Input
-                          name="owner_url"
-                          id="owner_url"
-                          placeholder="http://127.0.0.1:8042"
-                          onChange={(e) => setFieldValue('OwnerURL', e.target.value)}
-                          value={values.OwnerURL}
-                          data-cy="fdo-serverInput"
+                          name="mps_server"
+                          id="mps_server"
+                          placeholder="Enter the MPS Server"
+                          onChange={(e) => setFieldValue('MPSServer', e.target.value)}
+                          value={values.MPSServer}
+                          data-cy="openAMT-serverInput"
                       />
                     </FormControl>
 
                     <FormControl
-                        inputId="owner_username"
-                        label="Owner Service Username"
-                        errors={errors.OwnerUsername}
+                        inputId="mps_username"
+                        label="MPS User"
+                        errors={errors.MPSUser}
                     >
                       <Input
-                          name="owner_username"
-                          id="owner_username"
-                          placeholder="username"
-                          onChange={(e) => setFieldValue('OwnerUsername', e.target.value)}
-                          value={values.OwnerUsername}
-                          data-cy="fdo-usernameInput"
+                          name="mps_username"
+                          id="mps_username"
+                          placeholder="Enter the MPS User"
+                          onChange={(e) => setFieldValue('MPSUsername', e.target.value)}
+                          value={values.MPSUser}
+                          data-cy="openAMT-usernameInput"
                       />
                     </FormControl>
 
                     <FormControl
-                        inputId="owner_password"
-                        label="Owner Service Password"
-                        errors={errors.OwnerPassword}
+                        inputId="mps_password"
+                        label="MPS Password"
+                        tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
+                        errors={errors.MPSPassword}
                     >
                       <Input
                           type='password'
-                          name="owner_password"
-                          id="owner_password"
-                          placeholder="password"
-                          onChange={(e) => setFieldValue('OwnerPassword', e.target.value)}
-                          value={values.OwnerPassword}
-                          data-cy="fdo-passwordInput"
+                          name="mps_password"
+                          id="mps_password"
+                          placeholder="Enter the MPS Password"
+                          onChange={(e) => setFieldValue('MPSPassword', e.target.value)}
+                          value={values.MPSPassword}
+                          data-cy="openAMT-passwordInput"
                       />
                     </FormControl>
+
+                    <hr />
+
+                    <FormControl
+                        inputId="domain_name"
+                        label="Domain Name"
+                        tooltip="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
+                        errors={errors.DomainName}
+                    >
+                      <Input
+                          name="domain_name"
+                          id="domain_name"
+                          placeholder="Enter the Domain Name"
+                          onChange={(e) => setFieldValue('DomainName', e.target.value)}
+                          value={values.DomainName}
+                          data-cy="openAMT-domainInput"
+                      />
+                    </FormControl>
+
+                    <FormControl
+                        inputId="certificate_file"
+                        label="Provisioning Certificate File (.pfx)"
+                        tooltip="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy. The certificate must contain the private key."
+                        errors={errors.CertFileText}
+                    >
+                      <FileUploadField
+                          title="Upload file"
+                          accept=".pfx"
+                          value={certFile}
+                          onChange={(file) => handleFileUpload(file, setFieldValue)}
+                      />
+                    </FormControl>
+
+                    <FormControl
+                        inputId="certificate_password"
+                        label="Provisioning Certificate Password"
+                        tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
+                        errors={errors.CertPassword}
+                    >
+                      <Input
+                          type='password'
+                          name="certificate_password"
+                          id="certificate_password"
+                          placeholder="**********"
+                          onChange={(e) => setFieldValue('CertPassword', e.target.value)}
+                          value={values.CertPassword}
+                          data-cy="openAMT-certPasswordInput"
+                      />
+                    </FormControl>
+
                   </>
                 )}
 

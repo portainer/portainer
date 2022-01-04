@@ -2,15 +2,27 @@ import { object, string } from 'yup';
 
 export function validationSchema() {
   return object().shape({
-    OwnerURL: string().when('Enabled', {
+    MPSServer: string().when('Enabled', {
       is: true,
       then: string().required('Field is required')
     }),
-    OwnerUsername: string().when('Enabled', {
+    MPSUser: string().when('Enabled', {
       is: true,
       then: string().required('Field is required')
     }),
-    OwnerPassword: string().when('Enabled', {
+    MPSPassword: string().when('Enabled', {
+      is: true,
+      then: string().required('Field is required')
+    }),
+    DomainName: string().when('Enabled', {
+      is: true,
+      then: string().required('Field is required')
+    }),
+    CertFileText: string().when('Enabled', {
+      is: true,
+      then: string().required('Field is required')
+    }),
+    CertPassword: string().when('Enabled', {
       is: true,
       then: string().required('Field is required')
     }),
