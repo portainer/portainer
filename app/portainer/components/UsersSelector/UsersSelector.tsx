@@ -1,8 +1,7 @@
 import Select from 'react-select';
 
 import { UserViewModel } from '@/portainer/models/user';
-
-type UserId = number;
+import { UserId } from '@/portainer/users/types';
 
 interface Props {
   value: UserId[];
