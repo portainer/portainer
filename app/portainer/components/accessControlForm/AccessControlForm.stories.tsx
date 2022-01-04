@@ -1,12 +1,13 @@
 import { Meta, Story } from '@storybook/react';
 import { useMemo, useState } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 import { UserContext } from '@/portainer/hooks/useUser';
 import { ResourceControlOwnership } from '@/portainer/models/resourceControl/resourceControlOwnership';
 import { UserViewModel } from '@/portainer/models/user';
+import { createMockTeams, createMockUsers } from '@/react-tools/test-mocks';
 
 import { AccessControlForm } from './AccessControlForm';
-import { createMockTeams, createMockUsers } from './AccessControlForm.mocks';
 import { AccessControlFormData } from './model';
 
 const meta: Meta = {
@@ -21,8 +22,9 @@ enum Role {
   User,
 }
 
-const teams = createMockTeams(3);
-const users = createMockUsers(3);
+const testQueryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } },
+});
 
 interface Args {
   userRole: Role;
@@ -43,14 +45,11 @@ function Template({ userRole }: Args) {
   );
 
   return (
-    <UserContext.Provider value={userProviderState}>
-      <AccessControlForm
-        values={value}
-        onChange={setValue}
-        teams={teams}
-        users={users}
-      />
-    </UserContext.Provider>
+    <QueryClientProvider client={testQueryClient}>
+      <UserContext.Provider value={userProviderState}>
+        <AccessControlForm values={value} onChange={setValue} />
+      </UserContext.Provider>
+    </QueryClientProvider>
   );
 }
 

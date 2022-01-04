@@ -6,7 +6,6 @@ import { BoxSelector, buildOption } from '@/portainer/components/BoxSelector';
 import { ownershipIcon } from '@/portainer/filters/filters';
 import { useUser } from '@/portainer/hooks/useUser';
 import { Team } from '@/portainer/teams/types';
-import { UserViewModel } from '@/portainer/models/user';
 import { BoxSelectorOption } from '@/portainer/components/BoxSelector/types';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { SwitchField } from '@/portainer/components/form-components/SwitchField';
@@ -14,25 +13,17 @@ import { SwitchField } from '@/portainer/components/form-components/SwitchField'
 import { AccessControlFormData } from './model';
 import { UsersField } from './UsersField';
 import { TeamsField } from './TeamsField';
+import { useLoadState } from './useLoadState';
 
-export interface BaseProps {
+export interface Props {
   values: AccessControlFormData;
   onChange(values: AccessControlFormData): void;
   hideTitle?: boolean;
 }
 
-interface Props extends BaseProps {
-  teams: Team[];
-  users: UserViewModel[];
-}
+export function AccessControlForm({ values, onChange, hideTitle }: Props) {
+  const { users, teams, isLoading } = useLoadState();
 
-export function AccessControlForm({
-  values,
-  onChange,
-  hideTitle,
-  users,
-  teams,
-}: Props) {
   const { user } = useUser();
   const isAdmin = user?.Role === 1;
 
@@ -45,6 +36,10 @@ export function AccessControlForm({
 
     [values, onChange]
   );
+
+  if (isLoading || !teams || !users) {
+    return null;
+  }
 
   return (
     <>
@@ -108,7 +103,7 @@ export function AccessControlForm({
   );
 }
 
-function useOptions(isAdmin: boolean, teams: Team[]) {
+function useOptions(isAdmin: boolean, teams?: Team[]) {
   const [options, setOptions] = useState<Array<BoxSelectorOption<RCO>>>([]);
 
   useEffect(() => {
@@ -136,7 +131,7 @@ function adminOptions() {
     ),
   ];
 }
-function nonAdminOptions(teams: Team[]) {
+function nonAdminOptions(teams?: Team[]) {
   return _.compact([
     buildOption(
       'access_private',
@@ -145,7 +140,8 @@ function nonAdminOptions(teams: Team[]) {
       'I want to this resource to be manageable by myself only',
       RCO.PRIVATE
     ),
-    teams.length > 0 &&
+    teams &&
+      teams.length > 0 &&
       buildOption(
         'access_restricted',
         ownershipIcon('restricted'),

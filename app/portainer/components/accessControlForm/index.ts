@@ -1,1 +1,1 @@
-export { AccessControlFormContainer as AccessControlForm } from './AccessControlFormContainer';
+export { AccessControlForm } from './AccessControlForm';

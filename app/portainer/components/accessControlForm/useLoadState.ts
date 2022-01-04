@@ -4,20 +4,14 @@ import { useQuery } from 'react-query';
 import { getTeams } from '@/portainer/teams/teams.service';
 import * as notifications from '@/portainer/services/notifications';
 import { getUsers } from '@/portainer/services/api/userService';
+import { UserViewModel } from '@/portainer/models/user';
 
-import { AccessControlForm, type BaseProps } from './AccessControlForm';
-
-export function AccessControlFormContainer(props: BaseProps) {
+export function useLoadState() {
   const { teams, isLoading: isLoadingTeams } = useTeams();
 
   const { users, isLoading: isLoadingUsers } = useUsers();
 
-  if (isLoadingTeams || isLoadingUsers) {
-    return null;
-  }
-
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <AccessControlForm teams={teams} users={users} {...props} />;
+  return { teams, users, isLoading: isLoadingTeams || isLoadingUsers };
 }
 
 function useTeams() {
@@ -31,13 +25,15 @@ function useTeams() {
     }
   }, [isError, error]);
 
-  return { isLoading, teams: data || [] };
+  return { isLoading, teams: data };
 }
 
 function useUsers() {
-  const { isError, error, isLoading, data } = useQuery('users', () =>
-    getUsers()
-  );
+  const { isError, error, isLoading, data } = useQuery<
+    unknown,
+    unknown,
+    UserViewModel[]
+  >('users', () => getUsers());
 
   useEffect(() => {
     if (isError) {
@@ -45,5 +41,5 @@ function useUsers() {
     }
   }, [isError, error]);
 
-  return { isLoading, users: data || [] };
+  return { isLoading, users: data };
 }

@@ -19,7 +19,7 @@ export * from '@testing-library/react';
 // override render method
 export { customRender as render };
 
-export function renderWithClient(ui: React.ReactElement) {
+export function renderWithQueryClient(ui: React.ReactElement) {
   const testQueryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
