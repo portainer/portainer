@@ -41,22 +41,15 @@ type (
 
 	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
 	OpenAMTConfiguration struct {
-		Enabled             bool                `json:"Enabled"`
-		MPSServer           string              `json:"MPSServer"`
-		Credentials         MPSCredentials      `json:"Credentials"`
-		DomainConfiguration DomainConfiguration `json:"DomainConfiguration"`
-	}
-
-	MPSCredentials struct {
-		MPSUser     string `json:"MPSUser"`
-		MPSPassword string `json:"MPSPassword"`
-		MPSToken    string `json:"MPSToken"` // retrieved from API
-	}
-
-	DomainConfiguration struct {
-		CertFileText string `json:"CertFileText"`
-		CertPassword string `json:"CertPassword"`
-		DomainName   string `json:"DomainName"`
+		Enabled          bool   `json:"Enabled"`
+		MPSServer        string `json:"MPSServer"`
+		MPSUser          string `json:"MPSUser"`
+		MPSPassword      string `json:"MPSPassword"`
+		MPSToken         string `json:"MPSToken"` // retrieved from API
+		CertFileName     string `json:"CertFileName"`
+		CertFileContent  string `json:"CertFileContent"`
+		CertFilePassword string `json:"CertFilePassword"`
+		DomainName       string `json:"DomainName"`
 	}
 
 	// OpenAMTDeviceInformation represents an AMT managed device information

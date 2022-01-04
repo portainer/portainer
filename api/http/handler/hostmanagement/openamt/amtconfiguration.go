@@ -17,17 +17,18 @@ import (
 )
 
 type openAMTConfigurePayload struct {
-	EnableOpenAMT bool
-	MPSServer     string
-	MPSUser       string
-	MPSPassword   string
-	CertFileText  string
-	CertPassword  string
-	DomainName    string
+	Enabled          bool
+	MPSServer        string
+	MPSUser          string
+	MPSPassword      string
+	DomainName       string
+	CertFileName     string
+	CertFileContent  string
+	CertFilePassword string
 }
 
 func (payload *openAMTConfigurePayload) Validate(r *http.Request) error {
-	if payload.EnableOpenAMT {
+	if payload.Enabled {
 		if payload.MPSServer == "" {
 			return errors.New("MPS Server must be provided")
 		}
@@ -40,10 +41,13 @@ func (payload *openAMTConfigurePayload) Validate(r *http.Request) error {
 		if payload.DomainName == "" {
 			return errors.New("domain name must be provided")
 		}
-		if payload.CertFileText == "" {
+		if payload.CertFileContent == "" {
 			return errors.New("certificate file must be provided")
 		}
-		if payload.CertPassword == "" {
+		if payload.CertFileName == "" {
+			return errors.New("certificate file name must be provided")
+		}
+		if payload.CertFilePassword == "" {
 			return errors.New("certificate password must be provided")
 		}
 	}
@@ -73,8 +77,8 @@ func (handler *Handler) openAMTConfigure(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
-	if payload.EnableOpenAMT {
-		certificateErr := validateCertificate(payload.CertFileText, payload.CertPassword)
+	if payload.Enabled {
+		certificateErr := validateCertificate(payload.CertFileContent, payload.CertFilePassword)
 		if certificateErr != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error validating certificate", Err: certificateErr}
 		}
@@ -126,17 +130,14 @@ func isValidIssuer(issuer string) bool {
 
 func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigurePayload) error {
 	configuration := portainer.OpenAMTConfiguration{
-		Enabled:   true,
-		MPSServer: configurationPayload.MPSServer,
-		Credentials: portainer.MPSCredentials{
-			MPSUser:     configurationPayload.MPSUser,
-			MPSPassword: configurationPayload.MPSPassword,
-		},
-		DomainConfiguration: portainer.DomainConfiguration{
-			CertFileText: configurationPayload.CertFileText,
-			CertPassword: configurationPayload.CertPassword,
-			DomainName:   configurationPayload.DomainName,
-		},
+		Enabled:          true,
+		MPSServer:        configurationPayload.MPSServer,
+		MPSUser:          configurationPayload.MPSUser,
+		MPSPassword:      configurationPayload.MPSPassword,
+		CertFileContent:  configurationPayload.CertFileContent,
+		CertFileName:     configurationPayload.CertFileName,
+		CertFilePassword: configurationPayload.CertFilePassword,
+		DomainName:       configurationPayload.DomainName,
 	}
 
 	err := handler.OpenAMTService.Configure(configuration)
@@ -161,7 +162,7 @@ func (handler *Handler) saveConfiguration(configuration portainer.OpenAMTConfigu
 		return err
 	}
 
-	configuration.Credentials.MPSToken = ""
+	configuration.MPSToken = ""
 
 	settings.OpenAMTConfiguration = configuration
 	err = handler.DataStore.Settings().UpdateSettings(settings)

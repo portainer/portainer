@@ -1,7 +1,7 @@
 import axios, { parseAxiosError } from 'Portainer/services/axios';
 
 import {
-  AMTConfiguration,
+  OpenAMTConfiguration,
   AMTInformation,
   AuthorizationResponse,
   Device,
@@ -10,7 +10,7 @@ import {
 
 const BASE_URL = '/open_amt';
 
-export async function configureAMT(formValues: AMTConfiguration) {
+export async function configureAMT(formValues: OpenAMTConfiguration) {
   try {
     await axios.post(`${BASE_URL}/configure`, formValues);
   } catch (e) {

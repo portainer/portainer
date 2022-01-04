@@ -82,11 +82,7 @@ func (handler *Handler) fdoConfigure(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
-	var settings portainer.FDOConfiguration
-	if payload.Enabled {
-		settings = portainer.FDOConfiguration(payload)
-	}
-
+	settings := portainer.FDOConfiguration(payload)
 	if err = handler.saveSettings(settings); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error saving FDO settings", Err: err}
 	}

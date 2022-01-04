@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 import { configureFDO } from "@/portainer/hostmanagement/fdo/fdo.service";
+import { configureAMT } from "Portainer/hostmanagement/open-amt/open-amt.service";
 
 angular.module('portainer.app').controller('SettingsEdgeComputeController', SettingsEdgeComputeController);
 
@@ -18,14 +19,26 @@ function SettingsEdgeComputeController($q, $scope, $state, Notifications, Settin
         })
   }
 
-    $scope.onSubmitFDO = async function(formValues) {
+    $scope.onSubmitOpenAMT = async function(formValues) {
       try {
-        await configureFDO(formValues);
-        Notifications.success(`FDO successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
+          console.log("onSubmitOpenAMT");
+        await configureAMT(formValues);
+        Notifications.success(`OpenAMT successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
         $state.reload();
       } catch (err) {
         Notifications.error('Failure', err, 'Failed applying changes');
       }
+    }
+
+    $scope.onSubmitFDO = async function(formValues) {
+        try {
+            console.log("onSubmitOpenFDO");
+            await configureFDO(formValues);
+            Notifications.success(`FDO successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
+            $state.reload();
+        } catch (err) {
+            Notifications.error('Failure', err, 'Failed applying changes');
+        }
     }
 
   function initView() {

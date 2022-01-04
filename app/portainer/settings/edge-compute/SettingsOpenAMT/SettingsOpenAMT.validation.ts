@@ -4,27 +4,31 @@ export function validationSchema() {
   return object().shape({
     MPSServer: string().when('Enabled', {
       is: true,
-      then: string().required('Field is required')
+      then: string().required('Field is required1')
     }),
     MPSUser: string().when('Enabled', {
       is: true,
-      then: string().required('Field is required')
+      then: string().required('Field is required2')
     }),
     MPSPassword: string().when('Enabled', {
       is: true,
-      then: string().required('Field is required')
+      then: string().required('Field is required3')
     }),
     DomainName: string().when('Enabled', {
       is: true,
-      then: string().required('Field is required')
+      then: string().required('Field is required4')
     }),
-    CertFileText: string().when('Enabled', {
+    CertFileContent: string().when('Enabled', {
       is: true,
-      then: string().required('Field is required')
+      then: string().required('Field is required5')
     }),
-    CertPassword: string().when('Enabled', {
+    CertFileName: string().when('Enabled', {
       is: true,
-      then: string().required('Field is required')
+      then: string().required('Field is required6')
+    }),
+    CertFilePassword: string().when('Enabled', {
+      is: true,
+      then: string().required('Field is required7')
     }),
   });
 }

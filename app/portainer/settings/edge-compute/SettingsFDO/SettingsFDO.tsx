@@ -6,25 +6,19 @@ import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 import { Input } from "@/portainer/components/form-components/Input";
+import { FDOConfiguration } from "@/portainer/hostmanagement/fdo/model";
 
 import styles from './SettingsFDO.module.css';
 import { validationSchema } from './SettingsFDO.validation';
 
-export interface FormValues {
-  Enabled: boolean,
-  OwnerURL: string,
-  OwnerUsername: string,
-  OwnerPassword: string,
-}
-
 export interface Settings {
-  FDOConfiguration: FormValues,
+  FDOConfiguration: FDOConfiguration,
   EnableEdgeComputeFeatures: boolean,
 }
 
 interface Props {
   settings: Settings;
-  onSubmit(values: FormValues): void;
+  onSubmit(values: FDOConfiguration): void;
 }
 
 export function SettingsFDO({ settings, onSubmit }: Props) {
@@ -64,7 +58,6 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
               <Form
                 className="form-horizontal"
                 onSubmit={handleSubmit}
-
               >
                 <FormControl
                   inputId="edge_enableFDO"

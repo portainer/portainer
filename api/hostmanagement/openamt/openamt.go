@@ -74,7 +74,7 @@ func (service *Service) Configure(configuration portainer.OpenAMTConfiguration) 
 	if err != nil {
 		return err
 	}
-	configuration.Credentials.MPSToken = token
+	configuration.MPSToken = token
 
 	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, DefaultCIRAConfigName)
 	if err != nil {
@@ -159,7 +159,7 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 	if err != nil {
 		return nil, err
 	}
-	configuration.Credentials.MPSToken = token
+	configuration.MPSToken = token
 
 	var g errgroup.Group
 	var resultDevice *Device
@@ -231,7 +231,7 @@ func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfi
 	if err != nil {
 		return err
 	}
-	configuration.Credentials.MPSToken = token
+	configuration.MPSToken = token
 
 	err = service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
 	if err != nil {
@@ -246,7 +246,7 @@ func (service *Service) EnableDeviceFeatures(configuration portainer.OpenAMTConf
 	if err != nil {
 		return "", err
 	}
-	configuration.Credentials.MPSToken = token
+	configuration.MPSToken = token
 
 	err = service.enableDeviceFeatures(configuration, deviceGUID, features)
 	if err != nil {

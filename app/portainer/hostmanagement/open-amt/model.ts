@@ -1,11 +1,12 @@
-export interface AMTConfiguration {
-  enableOpenAMT: boolean;
-  mpsServer: string;
-  mpsUser: string;
-  mpsPassword: string;
-  certFileText: string;
-  certPassword: string;
-  domainName: string;
+export interface OpenAMTConfiguration {
+  Enabled: boolean,
+  MPSServer: string,
+  MPSUser: string,
+  MPSPassword: string,
+  DomainName: string
+  CertFileName: string,
+  CertFileContent: string,
+  CertFilePassword: string,
 }
 
 export interface AMTInformation {

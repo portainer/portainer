@@ -18,8 +18,8 @@ func (service *Service) Authorization(configuration portainer.OpenAMTConfigurati
 	loginURL := fmt.Sprintf("https://%s/mps/login/api/v1/authorize", configuration.MPSServer)
 
 	payload := map[string]string{
-		"username": configuration.Credentials.MPSUser,
-		"password": configuration.Credentials.MPSPassword,
+		"username": configuration.MPSUser,
+		"password": configuration.MPSPassword,
 	}
 	jsonValue, _ := json.Marshal(payload)
 

@@ -1,8 +1,8 @@
 export interface FDOConfiguration {
-  enableOpenAMT: boolean;
-  ownerURL: string;
-  ownerUsername: string;
-  ownerPassword: string;
+  Enabled: boolean,
+  OwnerURL: string,
+  OwnerUsername: string,
+  OwnerPassword: string,
 }
 
 export interface DeviceConfiguration {
