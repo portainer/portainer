@@ -21,7 +21,6 @@ function SettingsEdgeComputeController($q, $scope, $state, Notifications, Settin
 
     $scope.onSubmitOpenAMT = async function(formValues) {
       try {
-          console.log("onSubmitOpenAMT");
         await configureAMT(formValues);
         Notifications.success(`OpenAMT successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
         $state.reload();
@@ -32,7 +31,6 @@ function SettingsEdgeComputeController($q, $scope, $state, Notifications, Settin
 
     $scope.onSubmitFDO = async function(formValues) {
         try {
-            console.log("onSubmitOpenFDO");
             await configureFDO(formValues);
             Notifications.success(`FDO successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
             $state.reload();
