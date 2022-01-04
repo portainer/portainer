@@ -70,7 +70,7 @@ export default class WizardKubernetesController {
         tlsSkipClientVerify,
         tlsCaFile,
         tlsCertFile,
-        tlsKeyFile
+        tlsKeyFile,
       );
       this.Notifications.success('Environment connected', name);
       this.clearForm();

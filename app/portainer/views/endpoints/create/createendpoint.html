@@ -34,7 +34,7 @@
                   <p>Portainer Edge agent</p>
                 </label>
               </div>
-              <div ng-click="resetEndpointURL()">
+              <div ng-show="!state.isEdgeDevice" ng-click="resetEndpointURL()">
                 <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker" />
                 <label for="docker_endpoint" data-cy="endpointCreate-dockerSelectButton">
                   <div class="boxselector_header">
@@ -44,7 +44,7 @@
                   <p>Directly connect to the Docker API</p>
                 </label>
               </div>
-              <div ng-click="resetEndpointURL()">
+              <div ng-show="!state.isEdgeDevice" ng-click="resetEndpointURL()">
                 <input type="radio" id="kubernetes_endpoint" ng-model="state.EnvironmentType" value="kubernetes" />
                 <label for="kubernetes_endpoint" data-cy="endpointCreate-kubeSelectButton">
                   <div class="boxselector_header">
@@ -54,7 +54,7 @@
                   <p>Local Kubernetes environment</p>
                 </label>
               </div>
-              <div>
+              <div ng-show="!state.isEdgeDevice">
                 <input type="radio" id="azure_endpoint" ng-model="state.EnvironmentType" value="azure" />
                 <label for="azure_endpoint" data-cy="endpointCreate-azureSelectButton">
                   <div class="boxselector_header">

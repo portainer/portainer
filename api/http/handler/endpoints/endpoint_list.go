@@ -89,6 +89,9 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
 	}
 
+	edgeDeviceFilter := false // TODO mrydel retrieve from param
+	filteredEndpoints = filterEndpointsByEdgeDeviceFilter(filteredEndpoints, edgeDeviceFilter)
+
 	if search != "" {
 		tags, err := handler.DataStore.Tag().Tags()
 		if err != nil {
@@ -225,6 +228,17 @@ func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []int)
 
 	for _, endpoint := range endpoints {
 		if typeSet[endpoint.Type] {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+	return filteredEndpoints
+}
+
+func filterEndpointsByEdgeDeviceFilter(endpoints []portainer.Endpoint, edgeDeviceFilter bool) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, endpoint := range endpoints {
+		if edgeDeviceFilter == endpoint.IsEdgeDevice {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
 		}
 	}

@@ -205,6 +205,20 @@ angular
         },
       };
 
+      var edgeDeviceCreation = {
+        name: 'portainer.endpoints.newEdgeDevice',
+        url: '/newEdgeDevice',
+        params: {
+          isEdgeDevice: true,
+        },
+        views: {
+          'content@': {
+            templateUrl: './views/endpoints/create/createendpoint.html',
+            controller: 'CreateEndpointController',
+          },
+        },
+      };
+
       var deviceImport = {
         name: 'portainer.endpoints.importdevice',
         url: '/device',
@@ -479,6 +493,7 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(endpointCreation);
+      $stateRegistryProvider.register(edgeDeviceCreation);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);

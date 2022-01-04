@@ -11,6 +11,7 @@ angular
     $q,
     $scope,
     $state,
+    $transition$,
     $filter,
     clipboard,
     EndpointService,
@@ -21,12 +22,14 @@ angular
     Authentication,
     StateManager
   ) {
+
     $scope.state = {
       EnvironmentType: 'agent',
       PlatformType: 'linux',
       actionInProgress: false,
       deploymentTab: 0,
       allowCreateTag: Authentication.isAdmin(),
+      isEdgeDevice: $transition$.params().isEdgeDevice,
       availableEdgeAgentCheckinOptions: [
         { key: 'Use default interval', value: 0 },
         {
@@ -46,6 +49,9 @@ angular
         { key: '1 day', value: 86400 },
       ],
     };
+
+    console.log("isEdgeDevice");
+    console.log($scope.state.isEdgeDevice);
 
     const agentVersion = StateManager.getState().application.version;
     const agentShortVersion = getAgentShortVersion(agentVersion);
@@ -242,6 +248,8 @@ angular
       return $async(async () => {
         $scope.state.actionInProgress = true;
         try {
+          console.log("addEndpoint");
+
           const endpoint = await EndpointService.createRemoteEndpoint(
             name,
             creationType,
@@ -255,7 +263,8 @@ angular
             TLSCAFile,
             TLSCertFile,
             TLSKeyFile,
-            CheckinInterval
+            CheckinInterval,
+            $scope.state.isEdgeDevice,
           );
 
           Notifications.success('Environment created', name);

@@ -128,7 +128,7 @@ class InitEndpointController {
         true,
         null,
         null,
-        null
+        null,
       );
       const routeName = endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment ? 'portainer.k8sendpoint.kubernetesConfig' : 'portainer.home';
       this.$state.go(routeName, { id: endpoint.Id });
