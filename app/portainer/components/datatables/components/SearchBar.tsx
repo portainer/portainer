@@ -3,12 +3,18 @@ import { useContext, createContext, PropsWithChildren } from 'react';
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
 
 interface Props {
-  autoFocus: boolean;
   value: string;
+  autoFocus?: boolean;
+  placeholder?: string;
   onChange(value: string): void;
 }
 
-export function SearchBar({ autoFocus, value, onChange }: Props) {
+export function SearchBar({
+  autoFocus = false,
+  value,
+  placeholder = 'Search...',
+  onChange,
+}: Props) {
   return (
     <div className="searchBar">
       <i className="fa fa-search searchIcon" aria-hidden="true" />
@@ -18,7 +24,7 @@ export function SearchBar({ autoFocus, value, onChange }: Props) {
         className="searchInput"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search..."
+        placeholder={placeholder}
       />
     </div>
   );
@@ -36,14 +42,14 @@ export function SearchBarProvider({
   children,
   defaultValue = '',
 }: PropsWithChildren<SearchBarProviderProps>) {
-  const [value, setValue] = useLocalStorage(
+  const storageState = useLocalStorage(
     'datatable_text_filter_containers',
     defaultValue,
     sessionStorage
   );
 
   return (
-    <SearchBarContext.Provider value={[value, setValue]}>
+    <SearchBarContext.Provider value={storageState}>
       {children}
     </SearchBarContext.Provider>
   );
