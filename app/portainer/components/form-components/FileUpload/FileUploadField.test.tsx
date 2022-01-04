@@ -4,14 +4,14 @@ import { FileUploadField } from './FileUploadField';
 
 test('render should make the file button clickable and fie onChange event', async () => {
   const onClick = jest.fn();
-  const { findByText } = render(
+  const { findByText, findByLabelText } = render(
     <FileUploadField title="test button" onChange={onClick} />
   );
 
   const button = await findByText('test button');
   expect(button).toBeVisible();
 
-  const input = button.previousElementSibling;
+  const input = await findByLabelText('file-input');
   expect(input).not.toBeNull();
 
   const mockFile = new File([], 'file.txt');
@@ -20,5 +20,5 @@ test('render should make the file button clickable and fie onChange event', asyn
       target: { files: [mockFile] },
     });
   }
-  expect(onClick).toHaveBeenCalledTimes(1);
+  expect(onClick).toHaveBeenCalledWith(mockFile);
 });

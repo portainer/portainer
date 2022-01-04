@@ -28,6 +28,7 @@ export function FileUploadField({
         required={required}
         className={styles.fileInput}
         onChange={changeHandler}
+        aria-label="file-input"
       />
       <Button size="small" color="primary" onClick={handleButtonClick}>
         {title}
