@@ -26,6 +26,6 @@ function sizeClass(size: Size | undefined) {
     case 'large':
       return 'btn-group-lg';
     default:
-      return 'btn-group-sm';
+      return '';
   }
 }

@@ -1,4 +1,8 @@
-angular.module('portainer.docker', ['portainer.app']).config([
+import angular from 'angular';
+
+import containersModule from './containers';
+
+angular.module('portainer.docker', ['portainer.app', containersModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
