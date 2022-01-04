@@ -7,7 +7,7 @@ import styles from './FileUploadField.module.css';
 
 export interface Props {
   onChange(value: File): void;
-    value?: File;
+  value?: File;
   title?: string;
   required?: boolean;
 }
@@ -18,7 +18,6 @@ export function FileUploadField({
   title = 'Select a file',
   required = false,
 }: Props) {
-
   const fileRef = createRef<HTMLInputElement>();
 
   return (
@@ -30,17 +29,13 @@ export function FileUploadField({
         className={styles.fileInput}
         onChange={changeHandler}
       />
-      <Button
-          size="small"
-          color="primary"
-        onClick={handleButtonClick}
-      >
+      <Button size="small" color="primary" onClick={handleButtonClick}>
         {title}
       </Button>
 
       <span className="space-left">
         {value ? (
-            value.name
+          value.name
         ) : (
           <i className="fa fa-times red-icon" aria-hidden="true" />
         )}
@@ -54,11 +49,11 @@ export function FileUploadField({
     }
   }
 
-    function changeHandler(event: ChangeEvent<HTMLInputElement>) {
-        if (event.target && event.target.files && event.target.files.length > 0) {
-            onChange(event.target.files[0]);
-        }
+  function changeHandler(event: ChangeEvent<HTMLInputElement>) {
+    if (event.target && event.target.files && event.target.files.length > 0) {
+      onChange(event.target.files[0]);
     }
+  }
 }
 
 export const FileUploadFieldAngular = r2a(FileUploadField, [

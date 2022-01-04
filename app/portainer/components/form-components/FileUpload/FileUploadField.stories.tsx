@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/react';
 import { useState } from 'react';
 
-import {FileUploadField} from "./FileUploadField";
+import { FileUploadField } from './FileUploadField';
 
 export default {
   component: FileUploadField,
@@ -12,9 +12,9 @@ interface Args {
   title: string;
 }
 
-export function Example({ title } : Args) {
+export function Example({ title }: Args) {
   const [value, setValue] = useState<File>();
-  function onChange(value : File) {
+  function onChange(value: File) {
     if (value) {
       setValue(value);
     }
