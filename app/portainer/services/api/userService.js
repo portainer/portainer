@@ -1,10 +1,9 @@
 import _ from 'lodash-es';
 
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 const BASE_URL = '/users';
 
-import PortainerError from '@/portainer/error';
 import { filterNonAdministratorUsers } from '@/portainer/helpers/userHelper';
 import { UserViewModel, UserTokenModel } from '../../models/user';
 import { TeamMembershipModel } from '../../models/teamMembership';
@@ -21,12 +20,7 @@ export async function getUsers(includeAdministrators) {
 
     return filterNonAdministratorUsers(users);
   } catch (e) {
-    let err = e;
-    if (err.isAxiosError) {
-      err = new Error(e.response.data.message);
-    }
-
-    throw new PortainerError('Unable to retrieve users', err);
+    throw parseAxiosError(e, 'Unable to retrieve users');
   }
 }
 
@@ -36,12 +30,7 @@ export async function getUser(id) {
 
     return new UserViewModel(user);
   } catch (e) {
-    let err = e;
-    if (err.isAxiosError) {
-      err = new Error(e.response.data.message);
-    }
-
-    throw new PortainerError('Unable to retrieve user details', err);
+    throw parseAxiosError(e, 'Unable to retrieve user details');
   }
 }
 

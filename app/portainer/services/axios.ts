@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
-import PortainerError from '../error';
+import PortainerError from '@/portainer/error';
+
 import { get as localStorageGet } from '../hooks/useLocalStorage';
 
 import {
