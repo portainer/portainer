@@ -6,7 +6,7 @@ import { Button } from '@/portainer/components/Button';
 import styles from './FileUploadField.module.css';
 
 export interface Props {
-  onChange(value: unknown): void;
+  onChange(value: File): void;
     value?: File;
   title?: string;
   required?: boolean;
