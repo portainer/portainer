@@ -1,5 +1,6 @@
 import { PropsWithChildren, ReactNode } from 'react';
 
+import { FormSectionTitle } from "@/portainer/components/form-components/FormSectionTitle";
 import { FileUploadField } from '@/portainer/components/form-components/FileUpload/FileUploadField';
 
 export interface Props {
@@ -19,7 +20,7 @@ export function FileUploadForm({
 }: PropsWithChildren<Props>) {
     return (
         <div className="file-upload-form">
-            <div className="col-sm-12 form-section-title">Upload</div>
+            <FormSectionTitle>Upload</FormSectionTitle>
             <div className="form-group">
                 <span className="col-sm-12 text-muted small">{description}</span>
             </div>
