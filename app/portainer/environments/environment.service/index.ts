@@ -1,7 +1,4 @@
-import { AxiosError } from 'axios';
-
-import axios from '@/portainer/services/axios';
-import PortainerError from '@/portainer/error';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import {
   Environment,
@@ -57,13 +54,7 @@ export async function getEndpoints(
 
     return { totalCount: parseInt(totalCount, 10), value: response.data };
   } catch (e) {
-    const axiosError = e as AxiosError;
-
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -72,13 +63,7 @@ export async function getEndpoint(id: EnvironmentId) {
     const { data: endpoint } = await axios.get<Environment>(buildUrl(id));
     return endpoint;
   } catch (e) {
-    const axiosError = e as AxiosError;
-
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -86,13 +71,7 @@ export async function snapshotEndpoints() {
   try {
     await axios.post<void>(buildUrl(undefined, 'snapshot'));
   } catch (e) {
-    const axiosError = e as AxiosError;
-
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -100,13 +79,7 @@ export async function snapshotEndpoint(id: EnvironmentId) {
   try {
     await axios.post<void>(buildUrl(id, 'snapshot'));
   } catch (e) {
-    const axiosError = e as AxiosError;
-
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -123,13 +96,7 @@ export async function disassociateEndpoint(id: EnvironmentId) {
   try {
     await axios.delete(buildUrl(id, 'association'));
   } catch (e) {
-    const axiosError = e as AxiosError;
-
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -174,13 +141,7 @@ async function uploadTLSFilesForEndpoint(
         params: { folder: id },
       });
     } catch (e) {
-      const axiosError = e as AxiosError;
-
-      if (!axiosError.isAxiosError) {
-        throw e;
-      }
-
-      throw new Error(axiosError.response?.data.message);
+      throw parseAxiosError(e as Error);
     }
   }
 }
@@ -204,15 +165,7 @@ export async function updateEndpoint(
 
     return endpoint;
   } catch (e) {
-    const axiosError = e as AxiosError;
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new PortainerError(
-      'Unable to update environment',
-      new Error(axiosError.response?.data.message)
-    );
+    throw parseAxiosError(e as Error, 'Unable to update environment');
   }
 }
 
@@ -220,13 +173,7 @@ export async function deleteEndpoint(id: EnvironmentId) {
   try {
     await axios.delete(buildUrl(id));
   } catch (e) {
-    const axiosError = e as AxiosError;
-
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -246,13 +193,7 @@ export async function updatePoolAccess(
       teamsToRemove,
     });
   } catch (e) {
-    const axiosError = e as AxiosError;
-
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -267,13 +208,7 @@ export async function forceUpdateService(
       pullImage,
     });
   } catch (e) {
-    const axiosError = e as AxiosError;
-
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -284,12 +219,6 @@ export async function updateSettings(
   try {
     await axios.put(buildUrl(id, 'settings'), settings);
   } catch (e) {
-    const axiosError = e as AxiosError;
-
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }

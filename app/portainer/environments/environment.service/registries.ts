@@ -1,6 +1,4 @@
-import { AxiosError } from 'axios';
-
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import {
   EnvironmentId,
@@ -29,11 +27,7 @@ export async function updateEnvironmentRegistryAccess(
   try {
     await axios.put<void>(buildRegistryUrl(id, registryId), access);
   } catch (e) {
-    const axiosError = e as AxiosError;
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -47,11 +41,7 @@ export async function getEnvironmentRegistries(
     });
     return data;
   } catch (e) {
-    const axiosError = e as AxiosError;
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
@@ -65,11 +55,7 @@ export async function getEnvironmentRegistry(
     );
     return data;
   } catch (e) {
-    const axiosError = e as AxiosError;
-    if (!axiosError.isAxiosError) {
-      throw e;
-    }
-    throw new Error(axiosError.response?.data.message);
+    throw parseAxiosError(e as Error);
   }
 }
 
