@@ -8,7 +8,8 @@ import type { DockerContainer } from '@/docker/containers/types';
 export const ownership: Column<DockerContainer> = {
   Header: 'Ownership',
   id: 'ownership',
-  accessor: (row) => row.ResourceControl?.Ownership,
+  accessor: (row) =>
+    row.ResourceControl?.Ownership || ResourceControlOwnership.ADMINISTRATORS,
   Cell: OwnershipCell,
   disableFilters: true,
   canHide: true,
