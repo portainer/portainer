@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 
 const localStoragePrefix = 'portainer';
 
@@ -21,7 +21,7 @@ export function useLocalStorage<T>(
     [key, storage]
   );
 
-  return useMemo(() => [value, handleChange], [value, handleChange]);
+  return [value, handleChange];
 }
 
 export function get<T>(

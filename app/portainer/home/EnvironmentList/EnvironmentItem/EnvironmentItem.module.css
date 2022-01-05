@@ -1,0 +1,16 @@
+.root {
+  position: relative;
+}
+
+.item {
+  display: block;
+  text-decoration: none;
+  outline: initial;
+  color: inherit;
+}
+
+.edit-button {
+  position: absolute;
+  right: 0;
+  top: 7px;
+}

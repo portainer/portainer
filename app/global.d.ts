@@ -6,3 +6,13 @@ declare module '*.png' {
 }
 
 declare module '*.css';
+
+declare module 'axios-progress-bar' {
+  import { AxiosInstance } from 'axios';
+  import { NProgressOptions } from 'nprogress';
+
+  export function loadProgressBar(
+    config?: Partial<NProgressOptions>,
+    instance?: AxiosInstance
+  ): void;
+}

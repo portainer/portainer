@@ -1,19 +1,22 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import axiosOrigin, { AxiosError, AxiosRequestConfig } from 'axios';
+import { loadProgressBar } from 'axios-progress-bar';
+import 'axios-progress-bar/dist/nprogress.css';
 
 import PortainerError from '@/portainer/error';
-
-import { get as localStorageGet } from '../hooks/useLocalStorage';
+import { get as localStorageGet } from '@/portainer/hooks/useLocalStorage';
 
 import {
   portainerAgentManagerOperation,
   portainerAgentTargetHeader,
 } from './http-request.helper';
 
-const axiosApiInstance = axios.create({ baseURL: '/api' });
+const axios = axiosOrigin.create({ baseURL: '/api' });
 
-export default axiosApiInstance;
+loadProgressBar(undefined, axios);
 
-axiosApiInstance.interceptors.request.use(async (config) => {
+export default axios;
+
+axios.interceptors.request.use(async (config) => {
   const newConfig = { ...config };
 
   const jwt = localStorageGet('JWT', '');
@@ -41,7 +44,7 @@ export function agentInterceptor(config: AxiosRequestConfig) {
   return newConfig;
 }
 
-axiosApiInstance.interceptors.request.use(agentInterceptor);
+axios.interceptors.request.use(agentInterceptor);
 
 export function parseAxiosError(err: Error, msg = '') {
   let resultErr = err;
