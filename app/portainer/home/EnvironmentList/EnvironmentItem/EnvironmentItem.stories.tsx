@@ -69,7 +69,7 @@ KubernetesEdgeEnvironment.args = {
 function mockEnvironment(type: EnvironmentType): Environment {
   return {
     Id: 1,
-    Name: 'docker environment',
+    Name: 'environment',
     GroupId: 1,
     Snapshots: [],
     Status: EnvironmentStatus.Up,
