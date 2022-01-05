@@ -19,7 +19,7 @@ export interface Props {
 export function FormControl({
   inputId,
   label,
-                              size = 'small',
+  size = 'small',
   tooltip = '',
   children,
   errors,
