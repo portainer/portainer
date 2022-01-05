@@ -69,9 +69,13 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
     mpsUser: openAMTConfiguration ? openAMTConfiguration.mpsUser : '',
     mpsPassword: openAMTConfiguration ? openAMTConfiguration.mpsPassword : '',
     domainName: openAMTConfiguration ? openAMTConfiguration.domainName : '',
-    certFileContent: openAMTConfiguration ? openAMTConfiguration.certFileContent : '',
+    certFileContent: openAMTConfiguration
+      ? openAMTConfiguration.certFileContent
+      : '',
     certFileName: openAMTConfiguration ? openAMTConfiguration.certFileName : '',
-    certFilePassword: openAMTConfiguration ? openAMTConfiguration.certFilePassword : '',
+    certFilePassword: openAMTConfiguration
+      ? openAMTConfiguration.certFilePassword
+      : '',
   };
 
   if (
