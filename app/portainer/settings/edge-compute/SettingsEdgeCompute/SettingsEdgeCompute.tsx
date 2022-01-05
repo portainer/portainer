@@ -8,6 +8,7 @@ import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 
 import styles from './SettingsEdgeCompute.module.css';
+import { validationSchema } from './SettingsEdgeCompute.validation';
 
 export interface FormValues {
   EdgeAgentCheckinInterval: number;
@@ -49,6 +50,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
           <Formik
             initialValues={initialValues}
             enableReinitialize
+            validationSchema={() => validationSchema()}
             onSubmit={onSubmit}
             validateOnMount
           >
@@ -69,6 +71,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                 <FormControl
                   inputId="edge_checkin"
                   label="Edge agent default poll frequency"
+                  size="medium"
                   tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
                   errors={errors.EdgeAgentCheckinInterval}
                 >
@@ -87,6 +90,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                 <FormControl
                   inputId="edge_checkin"
                   label="Enable Edge Compute features"
+                  size="medium"
                   errors={errors.EnableEdgeComputeFeatures}
                 >
                   <Switch

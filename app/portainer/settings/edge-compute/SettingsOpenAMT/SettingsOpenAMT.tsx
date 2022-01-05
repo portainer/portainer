@@ -128,6 +128,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     <FormControl
                         inputId="mps_server"
                         label="MPS Server"
+                        size="medium"
                         errors={errors.mpsServer}
                     >
                       <Input
@@ -143,6 +144,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     <FormControl
                         inputId="mps_username"
                         label="MPS User"
+                        size="medium"
                         errors={errors.mpsUser}
                     >
                       <Input
@@ -158,6 +160,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     <FormControl
                         inputId="mps_password"
                         label="MPS Password"
+                        size="medium"
                         tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
                         errors={errors.mpsPassword}
                     >
@@ -177,6 +180,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     <FormControl
                         inputId="domain_name"
                         label="Domain Name"
+                        size="medium"
                         tooltip="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
                         errors={errors.domainName}
                     >
@@ -193,6 +197,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     <FormControl
                         inputId="certificate_file"
                         label="Provisioning Certificate File (.pfx)"
+                        size="medium"
                         tooltip="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy. The certificate must contain the private key."
                         errors={errors.certFileContent}
                     >
@@ -207,6 +212,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     <FormControl
                         inputId="certificate_password"
                         label="Provisioning Certificate Password"
+                        size="medium"
                         tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
                         errors={errors.certFilePassword}
                     >
