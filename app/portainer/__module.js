@@ -7,6 +7,7 @@ import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
 import servicesModule from './services';
 import teamsModule from './teams';
+import homeModule from './home';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -25,6 +26,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
 
 angular
   .module('portainer.app', [
+    homeModule,
     'portainer.oauth',
     'portainer.rbac',
     componentsModule,

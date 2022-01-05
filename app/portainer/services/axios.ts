@@ -3,8 +3,7 @@ import { loadProgressBar } from 'axios-progress-bar';
 import 'axios-progress-bar/dist/nprogress.css';
 
 import PortainerError from '@/portainer/error';
-
-import { get as localStorageGet } from '../hooks/useLocalStorage';
+import { get as localStorageGet } from '@/portainer/hooks/useLocalStorage';
 
 import {
   portainerAgentManagerOperation,

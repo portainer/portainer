@@ -123,3 +123,8 @@ export function UserProvider({ children }: UserProviderProps) {
 export function isAdmin(user?: UserViewModel | null): boolean {
   return !!user && user.Role === 1;
 }
+
+export function useIsAdmin() {
+  const { user } = useUser();
+  return !!user && isAdmin(user);
+}

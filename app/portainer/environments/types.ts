@@ -1,3 +1,6 @@
+import { TagId } from '@/portainer/tags/types';
+import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+
 export type EnvironmentId = number;
 
 export enum EnvironmentType {
@@ -15,13 +18,6 @@ export enum EnvironmentType {
   AgentOnKubernetes,
   // EdgeAgentOnKubernetes represents an environment(endpoint) connected to an Edge agent deployed on a Kubernetes environment(endpoint)
   EdgeAgentOnKubernetes,
-}
-
-export type TagId = number;
-
-export interface Tag {
-  Id: TagId;
-  Name: string;
 }
 
 export enum EnvironmentStatus {
@@ -62,7 +58,7 @@ export type Environment = {
   Id: EnvironmentId;
   Type: EnvironmentType;
   TagIds: TagId[];
-  GroupName: string;
+  GroupId: EnvironmentGroupId;
   EdgeID?: string;
   EdgeCheckinInterval?: number;
   LastCheckInDate?: number;
@@ -87,8 +83,6 @@ export enum EnvironmentCreationTypes {
   EdgeAgentEnvironment,
   LocalKubernetesEnvironment,
 }
-
-export type EnvironmentGroupId = number;
 
 export enum PlatformType {
   Docker,

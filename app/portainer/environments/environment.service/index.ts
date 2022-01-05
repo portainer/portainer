@@ -1,14 +1,14 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { type EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { type TagId } from '@/portainer/tags/types';
 
-import {
+import type {
   Environment,
-  EnvironmentGroupId,
   EnvironmentId,
   EnvironmentType,
   EnvironmentSettings,
-  TagId,
-  TeamId,
   UserId,
+  TeamId,
 } from '../types';
 
 import { arrayToJson, buildUrl } from './utils';
@@ -51,7 +51,7 @@ export async function getEndpoints(
   try {
     const response = await axios.get<Environment[]>(url, { params });
 
-    const totalCount = response.headers['X-Total-Count'];
+    const totalCount = response.headers['x-total-count'];
 
     return { totalCount: parseInt(totalCount, 10), value: response.data };
   } catch (e) {
