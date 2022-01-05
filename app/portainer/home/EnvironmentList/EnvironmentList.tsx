@@ -3,7 +3,6 @@ import clsx from 'clsx';
 
 import { PaginationControls } from '@/portainer/components/pagination-controls';
 import { usePaginationLimitState } from '@/common/hooks/usePaginationLimitState';
-import { useTextFilterState } from '@/common/hooks/useTextFilterState';
 import { Environment } from '@/portainer/environments/types';
 import { useDebounce } from '@/common/hooks/useDebounce';
 import { Button } from '@/portainer/components/Button';
@@ -11,7 +10,10 @@ import { type EnvironmentGroup } from '@/portainer/environment-groups/types';
 import { type Tag } from '@/portainer/tags/types';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
-import { SearchBar } from '@/portainer/components/datatables/components/SearchBar';
+import {
+  SearchBar,
+  useSearchBarState,
+} from '@/portainer/components/datatables/components/SearchBar';
 import {
   TableActions,
   TableContainer,
@@ -41,18 +43,18 @@ export function EnvironmentList({
 }: Props) {
   const storageKey = 'home_endpoints';
 
-  const [textFilter, setTextFilter] = useTextFilterState(storageKey);
+  const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
   const [page, setPage] = useState(1);
 
-  const debouncedTextFilter = useDebounce(textFilter);
+  const debouncedTextFilter = useDebounce(searchBarValue);
 
   const isAdmin = useIsAdmin();
   const isRefreshVisible = isAdmin;
 
   useEffect(() => {
     setPage(1);
-  }, [textFilter]);
+  }, [searchBarValue]);
 
   const { isLoading, environments, totalCount } = useEnvironmentsList(
     page,
@@ -87,8 +89,8 @@ export function EnvironmentList({
       </TableActions>
 
       <SearchBar
-        value={textFilter}
-        onChange={setTextFilter}
+        value={searchBarValue}
+        onChange={setSearchBarValue}
         placeholder="Search by name, group, tag, status, URL..."
         data-cy="home-endpointsSearchInput"
       />

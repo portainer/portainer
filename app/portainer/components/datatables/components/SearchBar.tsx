@@ -1,5 +1,3 @@
-import { useContext, createContext, PropsWithChildren } from 'react';
-
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
 
 interface Props {
@@ -30,36 +28,15 @@ export function SearchBar({
   );
 }
 
-const SearchBarContext = createContext<
-  [string, (value: string) => void] | null
->(null);
+export function useSearchBarState(
+  key: string
+): [string, (value: string) => void] {
+  const filterKey = keyBuilder(key);
+  const [value, setValue] = useLocalStorage(filterKey, '', sessionStorage);
 
-interface SearchBarProviderProps {
-  defaultValue?: string;
-}
+  return [value, setValue];
 
-export function SearchBarProvider({
-  children,
-  defaultValue = '',
-}: PropsWithChildren<SearchBarProviderProps>) {
-  const storageState = useLocalStorage(
-    'datatable_text_filter_containers',
-    defaultValue,
-    sessionStorage
-  );
-
-  return (
-    <SearchBarContext.Provider value={storageState}>
-      {children}
-    </SearchBarContext.Provider>
-  );
-}
-
-export function useSearchBarContext() {
-  const context = useContext(SearchBarContext);
-  if (context === null) {
-    throw new Error('should be used under SearchBarProvider');
+  function keyBuilder(key: string) {
+    return `datatable_text_filter_${key}`;
   }
-
-  return context;
 }

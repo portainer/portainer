@@ -1,7 +1,6 @@
 import { react2angular } from '@/react-tools/react2angular';
 import { EnvironmentProvider } from '@/portainer/environments/useEnvironment';
 import { TableSettingsProvider } from '@/portainer/components/datatables/components/useTableSettings';
-import { SearchBarProvider } from '@/portainer/components/datatables/components/SearchBar';
 import type { Environment } from '@/portainer/environments/types';
 
 import {
@@ -26,10 +25,8 @@ export function ContainersDatatableContainer({ endpoint, ...props }: Props) {
   return (
     <EnvironmentProvider environment={endpoint}>
       <TableSettingsProvider defaults={defaultSettings} storageKey="containers">
-        <SearchBarProvider>
-          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-          <ContainersDatatable {...props} />
-        </SearchBarProvider>
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+        <ContainersDatatable {...props} />
       </TableSettingsProvider>
     </EnvironmentProvider>
   );
