@@ -1,6 +1,4 @@
-<kubernetes-view-header title="Cluster" state="kubernetes.cluster" view-ready="ctrl.state.viewReady">
-  Cluster information
-</kubernetes-view-header>
+<kubernetes-view-header title="Cluster" state="kubernetes.cluster" view-ready="ctrl.state.viewReady"> Cluster information </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -27,21 +25,19 @@
 
           <!-- leader-status -->
           <div ng-if="ctrl.systemEndpoints.length > 0">
-            <div class="col-sm-12 form-section-title">
-              Leader status
-            </div>
+            <div class="col-sm-12 form-section-title"> Leader status </div>
 
             <table class="table">
               <tbody>
                 <tr class="text-muted">
-                  <td style="border-top: none; width: 25%;">Component</td>
-                  <td style="border-top: none; width: 25%;">Leader node</td>
+                  <td style="border-top: none; width: 25%">Component</td>
+                  <td style="border-top: none; width: 25%">Leader node</td>
                 </tr>
                 <tr ng-repeat="ep in ctrl.systemEndpoints">
-                  <td style="width: 25%;">
+                  <td style="width: 25%">
                     {{ ep.Name }}
                   </td>
-                  <td style="width: 25%;">
+                  <td style="width: 25%">
                     {{ ep.HolderIdentity }}
                   </td>
                 </tr>

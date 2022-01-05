@@ -1,6 +1,4 @@
-<kubernetes-view-header title="Advanced deployment" state="kubernetes.deploy" view-ready="ctrl.state.viewReady">
-  Deploy Kubernetes resources
-</kubernetes-view-header>
+<kubernetes-view-header title="Advanced deployment" state="kubernetes.deploy" view-ready="ctrl.state.viewReady"> Deploy Kubernetes resources </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -15,7 +13,7 @@
             <uib-tab index="0">
               <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> Deploy </uib-tab-heading>
 
-              <form class="form-horizontal" style="margin-top: 20px;">
+              <form class="form-horizontal" style="margin-top: 20px">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="target_node" class="col-lg-1 col-sm-2 control-label text-left">Namespace</label>
                   <div class="col-lg-11 col-sm-10">
@@ -24,7 +22,7 @@
                 </div>
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">
                   <div class="col-sm-12 small text-muted">
-                    <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                     You do not have access to any namespace. Contact your administrator to get access to a namespace.
                   </div>
                 </div>
@@ -36,9 +34,7 @@
                   </div>
                 </div>
 
-                <div class="col-sm-12 form-section-title">
-                  Build method
-                </div>
+                <div class="col-sm-12 form-section-title"> Build method </div>
                 <box-selector
                   radio-name="'method'"
                   value="ctrl.state.BuildMethod"
@@ -48,9 +44,7 @@
                 ></box-selector>
 
                 <div ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.CUSTOM_TEMPLATE">
-                  <div class="col-sm-12 form-section-title">
-                    Deployment type
-                  </div>
+                  <div class="col-sm-12 form-section-title"> Deployment type </div>
                   <box-selector
                     radio-name="'deploy'"
                     value="ctrl.state.DeployType"
@@ -95,7 +89,7 @@
                   <editor-description>
                     <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
                       <p>
-                        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                         Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
                         not all the Compose format options are supported by Kompose at the moment.
                       </p>
@@ -109,7 +103,7 @@
                       ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES && ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR"
                     >
                       <p>
-                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                         This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
                       </p>
                       <p>
@@ -124,13 +118,9 @@
 
                 <!-- url -->
                 <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.URL">
-                  <div class="col-sm-12 form-section-title">
-                    URL
-                  </div>
+                  <div class="col-sm-12 form-section-title"> URL </div>
                   <div class="form-group">
-                    <span class="col-sm-12 text-muted small">
-                      Indicate the URL to the manifest.
-                    </span>
+                    <span class="col-sm-12 text-muted small"> Indicate the URL to the manifest. </span>
                   </div>
                   <div class="form-group">
                     <label for="manifest_url" class="col-sm-1 control-label text-left">URL</label>
@@ -149,9 +139,7 @@
                 <!-- !url -->
 
                 <!-- actions -->
-                <div class="col-sm-12 form-section-title">
-                  Actions
-                </div>
+                <div class="col-sm-12 form-section-title"> Actions </div>
                 <div class="form-group">
                   <div class="col-sm-12">
                     <button
@@ -177,7 +165,7 @@
 
             <uib-tab index="1" disable="ctrl.state.tabLogsDisabled">
               <uib-tab-heading> <i class="fa fa-file space-right" aria-hidden="true"></i> Logs </uib-tab-heading>
-              <form class="form-horizontal" style="margin-top: 20px;">
+              <form class="form-horizontal" style="margin-top: 20px">
                 <div class="form-group" ng-if="ctrl.state.activeTab === 1">
                   <div class="col-sm-12">
                     <code-editor identifier="kubernetes-deploy-logs" read-only="true" yml="false" value="ctrl.errorLog"></code-editor>

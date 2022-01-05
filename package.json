@@ -35,7 +35,7 @@
     "start:toolkit": "grunt start:toolkit",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
     "clean:all": "grunt clean:all",
-    "format": "prettier --loglevel warn --write \"**/*.{js,css,html,jsx,tsx,ts}\"",
+    "format": "prettier --loglevel warn --write \"**/*.{js,css,html,jsx,tsx,ts,json}\"",
     "lint": "yarn lint:client; yarn lint:server",
     "lint:server": "cd api && golangci-lint run -E exportloopref",
     "lint:client": "eslint --cache --fix './**/*.{js,jsx,ts,tsx}'",

@@ -17,17 +17,15 @@
 
           <!-- build-method -->
           <div ng-if="!$ctrl.state.fromStack">
-            <div class="col-sm-12 form-section-title">
-              Build method
-            </div>
+            <div class="col-sm-12 form-section-title"> Build method </div>
             <div class="form-group"></div>
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group" style="margin-bottom: 0">
               <div class="boxselector_wrapper">
                 <div>
                   <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor" ng-change="$ctrl.onChangeMethod()" />
                   <label for="method_editor">
                     <div class="boxselector_header">
-                      <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
+                      <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px"></i>
                       Web editor
                     </div>
                     <p>Use our Web editor</p>
@@ -37,7 +35,7 @@
                   <input type="radio" id="method_upload" ng-model="$ctrl.state.Method" value="upload" ng-change="$ctrl.onChangeMethod()" />
                   <label for="method_upload">
                     <div class="boxselector_header">
-                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px"></i>
                       Upload
                     </div>
                     <p>Upload from your computer</p>
@@ -47,7 +45,7 @@
                   <input type="radio" id="method_repository" ng-model="$ctrl.state.Method" value="repository" ng-change="$ctrl.onChangeMethod()" />
                   <label for="method_repository">
                     <div class="boxselector_header">
-                      <i class="fab fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
+                      <i class="fab fa-git" aria-hidden="true" style="margin-right: 2px"></i>
                       Repository
                     </div>
                     <p>Use a git repository</p>
@@ -59,15 +57,11 @@
           <!-- !build-method -->
           <!-- web-editor -->
           <div ng-show="$ctrl.state.Method === 'editor'">
-            <div class="col-sm-12 form-section-title">
-              Web editor
-            </div>
+            <div class="col-sm-12 form-section-title"> Web editor </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 You can get more information about Compose file format in the
-                <a href="https://docs.docker.com/compose/compose-file/" target="_blank">
-                  official documentation
-                </a>
+                <a href="https://docs.docker.com/compose/compose-file/" target="_blank"> official documentation </a>
                 .
               </span>
             </div>
@@ -86,20 +80,14 @@
           <!-- !web-editor -->
           <!-- upload -->
           <div ng-show="$ctrl.state.Method === 'upload'">
-            <div class="col-sm-12 form-section-title">
-              Upload
-            </div>
+            <div class="col-sm-12 form-section-title"> Upload </div>
             <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                You can upload a Compose file from your computer.
-              </span>
+              <span class="col-sm-12 text-muted small"> You can upload a Compose file from your computer. </span>
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.File">
-                  Select file
-                </button>
-                <span style="margin-left: 5px;">
+                <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.File"> Select file </button>
+                <span style="margin-left: 5px">
                   {{ $ctrl.formValues.File.name }}
                   <i class="fa fa-times red-icon" ng-if="!$ctrl.formValues.File" aria-hidden="true"></i>
                 </span>
@@ -113,9 +101,7 @@
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData"></por-access-control-form>
 
           <!-- actions -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
+          <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button
@@ -132,7 +118,7 @@
                 <span ng-hide="$ctrl.state.actionInProgress">Create custom template</span>
                 <span ng-show="$ctrl.state.actionInProgress">Creation in progress...</span>
               </button>
-              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px;">
+              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px">
                 {{ $ctrl.state.formValidationError }}
               </span>
             </div>

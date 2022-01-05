@@ -12,7 +12,7 @@
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
               <uib-tab-heading> <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Namespace </uib-tab-heading>
-              <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px;">
+              <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px">
                 <!-- name-input -->
                 <div class="form-group">
                   <div class="col-sm-12">
@@ -34,15 +34,13 @@
                 <!-- quotas-switch -->
                 <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
                   <div class="col-sm-12">
-                    <label class="control-label text-left">
-                      Resource assignment
-                    </label>
-                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
+                    <label class="control-label text-left"> Resource assignment </label>
+                    <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable && !ctrl.isQuotaValid()">
                   <span class="col-sm-12 text-warning small">
-                    <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
+                    <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px"></i> At least a single limit must be set for the quota to be valid. </p>
                   </span>
                 </div>
                 <div ng-if="ctrl.formValues.HasQuota">
@@ -61,15 +59,11 @@
                 </div>
                 <!-- !quotas-switch -->
                 <div ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable">
-                  <div class="col-sm-12 form-section-title">
-                    Resource limits
-                  </div>
+                  <div class="col-sm-12 form-section-title"> Resource limits </div>
                   <div>
                     <!-- memory-limit-input -->
                     <div class="form-group">
-                      <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-                        Memory limit
-                      </label>
+                      <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> Memory limit </label>
                       <div class="col-sm-3">
                         <slider
                           model="ctrl.formValues.MemoryLimit"
@@ -92,9 +86,7 @@
                         />
                       </div>
                       <div class="col-sm-4">
-                        <p class="small text-muted" style="margin-top: 7px;">
-                          Memory limit (<b>MB</b>)
-                        </p>
+                        <p class="small text-muted" style="margin-top: 7px"> Memory limit (<b>MB</b>) </p>
                       </div>
                     </div>
                     <div class="form-group" ng-show="resourcePoolEditForm.memory_limit.$invalid">
@@ -110,9 +102,7 @@
                     <!-- !memory-limit-input -->
                     <!-- cpu-limit-input -->
                     <div class="form-group">
-                      <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-                        CPU limit
-                      </label>
+                      <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> CPU limit </label>
                       <div class="col-sm-5">
                         <slider
                           model="ctrl.formValues.CpuLimit"
@@ -123,23 +113,19 @@
                           ng-if="ctrl.state.sliderMaxCpu"
                         ></slider>
                       </div>
-                      <div class="col-sm-4" style="margin-top: 20px;">
-                        <p class="small text-muted">
-                          Maximum CPU usage
-                        </p>
+                      <div class="col-sm-4" style="margin-top: 20px">
+                        <p class="small text-muted"> Maximum CPU usage </p>
                       </div>
                     </div>
                     <!-- !cpu-limit-input -->
                   </div>
                 </div>
                 <!-- #region LOADBALANCERS -->
-                <div class="col-sm-12 form-section-title">
-                  Load balancers
-                </div>
+                <div class="col-sm-12 form-section-title"> Load balancers </div>
 
                 <div class="form-group">
                   <span class="col-sm-12 text-muted small">
-                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                     You can set a quota on the amount of external load balancers that can be created inside this namespace. Set this quota to 0 to effectively disable the use of
                     load balancers in this namespace.
                   </span>
@@ -158,9 +144,7 @@
                 </div>
                 <!-- #endregion -->
                 <div ng-if="ctrl.isAdmin && ctrl.isEditable && ctrl.state.canUseIngress">
-                  <div class="col-sm-12 form-section-title">
-                    Ingresses
-                  </div>
+                  <div class="col-sm-12 form-section-title"> Ingresses </div>
                   <!-- #region INGRESSES -->
                   <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length === 0">
                     <div class="col-sm-12 small text-muted">
@@ -173,24 +157,22 @@
                   <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length > 0">
                     <div class="col-sm-12 small text-muted">
                       <p>
-                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                         Enable and configure ingresses available to users when deploying applications.
                       </p>
                     </div>
                   </div>
 
                   <div class="form-group" ng-repeat-start="ic in ctrl.formValues.IngressClasses track by ic.IngressClass.Name">
-                    <div class="text-muted col-sm-12" style="width: 100%;">
-                      <div style="border-bottom: 1px solid #cdcdcd; padding-bottom: 5px;">
-                        <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i> {{ ic.IngressClass.Name }}
+                    <div class="text-muted col-sm-12" style="width: 100%">
+                      <div style="border-bottom: 1px solid #cdcdcd; padding-bottom: 5px">
+                        <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px"></i> {{ ic.IngressClass.Name }}
                       </div>
                     </div>
 
-                    <div class="col-sm-12" style="margin-top: 10px;">
-                      <label class="control-label text-left">
-                        Allow users to use this ingress
-                      </label>
-                      <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.Selected" /><i></i> </label>
+                    <div class="col-sm-12" style="margin-top: 10px">
+                      <label class="control-label text-left"> Allow users to use this ingress </label>
+                      <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="ic.Selected" /><i></i> </label>
                     </div>
                   </div>
 
@@ -205,12 +187,12 @@
                           >
                           </portainer-tooltip>
                         </label>
-                        <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addHostname(ic)">
+                        <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addHostname(ic)">
                           <i class="fa fa-plus-circle" aria-hidden="true"></i> add hostname
                         </span>
                       </div>
-                      <div class="col-sm-12" style="margin-top: 10px;">
-                        <div ng-repeat="item in ic.Hosts track by $index" style="margin-top: 2px;">
+                      <div class="col-sm-12" style="margin-top: 10px">
+                        <div ng-repeat="item in ic.Hosts track by $index" style="margin-top: 2px">
                           <div class="form-inline">
                             <div class="col-sm-10 input-group input-group-sm" ng-class="{ striked: item.NeedsDeletion }">
                               <span class="input-group-addon">Hostname</span>
@@ -236,7 +218,7 @@
                           </div>
                           <div
                             class="small text-warning"
-                            style="margin-top: 5px;"
+                            style="margin-top: 5px"
                             ng-show="resourcePoolEditForm['hostname_' + ic.IngressClass.Name + '_' + $index].$invalid || item.Duplicate"
                           >
                             <ng-messages for="resourcePoolEditForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
@@ -266,11 +248,11 @@
                           >
                           </portainer-tooltip>
                         </label>
-                        <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
+                        <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
                       </div>
                     </div>
                   </div>
-                  <div ng-repeat-end class="form-group" ng-if="ic.Selected" style="margin-bottom: 20px;">
+                  <div ng-repeat-end class="form-group" ng-if="ic.Selected" style="margin-bottom: 20px">
                     <div class="col-sm-12">
                       <p>
                         <a class="small interactive" ng-if="!ic.AdvancedConfig" ng-click="ic.AdvancedConfig = true">
@@ -282,22 +264,22 @@
                       </p>
                     </div>
 
-                    <div class="col-sm-12 small text-muted" ng-if="ic.AdvancedConfig" style="margin-top: 5px;">
+                    <div class="col-sm-12 small text-muted" ng-if="ic.AdvancedConfig" style="margin-top: 5px">
                       <p>
-                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                         You can specify a list of annotations that will be associated to the ingress.
                       </p>
                     </div>
 
                     <div class="col-sm-12" ng-if="ic.AdvancedConfig">
                       <label class="control-label text-left">Annotations</label>
-                      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addAnnotation(ic)">
+                      <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addAnnotation(ic)">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i> add annotation
                       </span>
                     </div>
 
-                    <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="ic.AdvancedConfig">
-                      <div ng-repeat="annotation in ic.Annotations track by $index" style="margin-top: 2px;">
+                    <div class="col-sm-12 form-inline" style="margin-top: 10px" ng-if="ic.AdvancedConfig">
+                      <div ng-repeat="annotation in ic.Annotations track by $index" style="margin-top: 2px">
                         <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">Key</span>
                           <input type="text" class="form-control" ng-model="annotation.Key" placeholder="nginx.ingress.kubernetes.io/rewrite-target" required />
@@ -319,14 +301,10 @@
 
                 <!-- #region REGISTRIES -->
                 <div>
-                  <div class="col-sm-12 form-section-title">
-                    Registries
-                  </div>
+                  <div class="col-sm-12 form-section-title"> Registries </div>
 
                   <div class="form-group" ng-if="!ctrl.isAdmin || ctrl.isSystem">
-                    <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0;">
-                      Selected registries
-                    </label>
+                    <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0"> Selected registries </label>
                     <div class="col-sm-9 col-lg-4">
                       {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }}
                     </div>
@@ -336,15 +314,13 @@
                     <div class="form-group">
                       <div class="col-sm-12 small text-muted">
                         <p>
-                          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                           Define which registry can be used by users who have access to this namespace.
                         </p>
                       </div>
                     </div>
                     <div class="form-group">
-                      <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0;">
-                        Select registries
-                      </label>
+                      <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0"> Select registries </label>
                       <div class="col-sm-9 col-lg-4">
                         <span class="small text-muted" ng-if="!ctrl.registries.length && ctrl.state.isAdmin">
                           No registries available. Head over <a ui-sref="portainer.registries">registry view</a> to define container registry.
@@ -372,19 +348,17 @@
                 <!-- #endregion -->
 
                 <!-- #region STORAGES -->
-                <div class="col-sm-12 form-section-title">
-                  Storage
-                </div>
+                <div class="col-sm-12 form-section-title"> Storage </div>
 
                 <div class="form-group">
                   <span class="col-sm-12 text-muted small">
-                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                     Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to
                     effectively prevent the usage of a specific storage option inside this namespace.
                   </span>
                 </div>
                 <div class="col-sm-12 form-section-title">
-                  <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px"></i>
                   standard
                 </div>
 
@@ -401,9 +375,7 @@
                 <!-- !summary -->
 
                 <!-- actions -->
-                <div ng-if="ctrl.isAdmin" class="col-sm-12 form-section-title">
-                  Actions
-                </div>
+                <div ng-if="ctrl.isAdmin" class="col-sm-12 form-section-title"> Actions </div>
                 <div ng-if="ctrl.isAdmin" class="form-group">
                   <div class="col-sm-12">
                     <button
@@ -436,7 +408,7 @@
               <uib-tab-heading>
                 <i class="fa fa-history space-right" aria-hidden="true"></i> Events
                 <div ng-if="ctrl.hasEventWarnings()">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
@@ -453,7 +425,7 @@
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
-              <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
+              <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="resource-pool-yaml" data="ctrl.pool.Yaml"></kubernetes-yaml-inspector>
               </div>
             </uib-tab>

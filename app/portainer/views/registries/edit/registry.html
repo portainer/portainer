@@ -40,7 +40,7 @@
                 Authentication
                 <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="registry.Authentication" /><i></i> </label>
+              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="registry.Authentication" /><i></i> </label>
             </div>
           </div>
           <!-- !authentication-checkbox -->
@@ -74,10 +74,8 @@
             <!-- organisation-checkbox -->
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Use organisation registry
-                </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="registry.Quay.UseOrganisation" /><i></i> </label>
+                <label class="control-label text-left"> Use organisation registry </label>
+                <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="registry.Quay.UseOrganisation" /><i></i> </label>
               </div>
             </div>
             <!-- !organisation-checkbox -->
