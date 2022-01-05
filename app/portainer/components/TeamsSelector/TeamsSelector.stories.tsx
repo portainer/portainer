@@ -13,7 +13,7 @@ export default meta;
 export { Example };
 
 function Example() {
-  const [selectedTeams, setSelectedTeams] = useState([10]);
+  const [selectedTeams, setSelectedTeams] = useState([1]);
 
   const teams = [createMockTeam(1, 'team1'), createMockTeam(2, 'team2')];
 

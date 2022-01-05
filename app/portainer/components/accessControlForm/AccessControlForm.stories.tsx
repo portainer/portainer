@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { ResourceControlOwnership } from '@/portainer/models/resourceControl/resourceControlOwnership';
 import { UserViewModel } from '@/portainer/models/user';
-import { createMockTeams, createMockUsers } from '@/react-tools/test-mocks';
 
 import { AccessControlForm } from './AccessControlForm';
 import { AccessControlFormData } from './model';
