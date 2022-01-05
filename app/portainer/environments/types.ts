@@ -58,7 +58,6 @@ export interface Environment {
   Id: EnvironmentId;
   Type: EnvironmentType;
   TagIds: TagId[];
-  GroupName: string;
   GroupId: EnvironmentGroupId;
   EdgeID?: string;
   EdgeCheckinInterval?: number;

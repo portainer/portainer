@@ -8,7 +8,6 @@ import { useDebounce } from '@/common/hooks/useDebounce';
 import { Button } from '@/portainer/components/Button';
 import { type EnvironmentGroup } from '@/portainer/environment-groups/types';
 import { type Tag } from '@/portainer/tags/types';
-import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
 import {
   SearchBar,
@@ -62,8 +61,6 @@ export function EnvironmentList({
     debouncedTextFilter
   );
 
-  EndpointHelper.mapGroupNameToEndpoint(environments, groups);
-
   return (
     <TableContainer>
       <TableTitle icon="fa-plug" label="Environments" />
@@ -103,6 +100,7 @@ export function EnvironmentList({
             <EnvironmentItem
               key={env.Id}
               environment={env}
+              groups={groups}
               onClick={onClickItem}
               isAdmin={isAdmin}
               tags={tags}

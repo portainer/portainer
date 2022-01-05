@@ -22,6 +22,7 @@ interface Args {
 function Template({ environment, isAdmin, homepageLoadTime = 1 }: Args) {
   return (
     <EnvironmentItem
+      groups={[]}
       environment={environment}
       homepageLoadTime={homepageLoadTime}
       isAdmin={isAdmin}
@@ -70,7 +71,6 @@ function mockEnvironment(type: EnvironmentType): Environment {
     Id: 1,
     Name: 'docker environment',
     GroupId: 1,
-    GroupName: 'group1',
     Snapshots: [],
     Status: EnvironmentStatus.Up,
     TagIds: [],

@@ -15,6 +15,7 @@ import {
 import type { Tag, TagId } from '@/portainer/tags/types';
 import { Button } from '@/portainer/components/Button';
 import { Link } from '@/portainer/components/Link';
+import { EnvironmentGroup } from '@/portainer/environment-groups/types';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EdgeIndicator } from './EdgeIndicator';
@@ -28,6 +29,7 @@ interface Props {
   environment: Environment;
   onClick(environment: Environment): void;
   tags?: Tag[];
+  groups: EnvironmentGroup[];
 }
 
 export function EnvironmentItem({
@@ -36,11 +38,14 @@ export function EnvironmentItem({
   isAdmin,
   tags,
   homepageLoadTime,
+  groups,
 }: Props) {
   const environmentTags = joinTags(tags, environment.TagIds);
   const isEdge = isEdgeEnvironment(environment.Type);
 
   const snapshotTime = getSnapshotTime(environment);
+
+  const group = groups.find((g) => g.Id === environment.GroupId);
 
   const route = getRoute(environment);
 
@@ -83,11 +88,7 @@ export function EnvironmentItem({
                   )}
                 </span>
               </span>
-              <span>
-                {!!environment.GroupName && (
-                  <span className="small">Group: {environment.GroupName}</span>
-                )}
-              </span>
+              {!!group && <span className="small">Group: {group.Name}</span>}
             </div>
             <EnvironmentStats environment={environment} />
             <div className="blocklist-item-line endpoint-item">

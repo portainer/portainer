@@ -7,7 +7,6 @@ test('loads component', async () => {
   const env = {
     TagIds: [],
     GroupId: 1,
-    GroupName: 'unassigned',
     Type: 1,
     Name: 'environment',
     Status: 1,
@@ -20,6 +19,7 @@ test('loads component', async () => {
     <EnvironmentItem
       onClick={() => {}}
       tags={[]}
+      groups={[]}
       environment={env}
       isAdmin
       homepageLoadTime={0}
