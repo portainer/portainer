@@ -47,7 +47,6 @@ export const ContainersDatatableAngular = react2angular(
     'dataset',
     'onRefresh',
     'isHostColumnVisible',
-    'autoFocusSearch',
     'tableKey',
   ]
 );
