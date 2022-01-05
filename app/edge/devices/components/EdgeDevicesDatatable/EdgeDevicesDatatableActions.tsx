@@ -1,6 +1,6 @@
-import { Link } from '@/portainer/components/Link';
-import type {Environment } from '@/portainer/environments/types';
-import { Button } from '@/portainer/components/Button';
+import { Link } from 'Portainer/components/Link';
+import type {Environment } from 'Portainer/environments/types';
+import { Button } from 'Portainer/components/Button';
 
 interface Props {
   selectedItems: Environment[];

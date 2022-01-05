@@ -1,6 +1,6 @@
 import { CellProps, Column, TableInstance } from 'react-table';
 
-import { Environment } from "@/portainer/environments/types";
+import { Environment } from "Portainer/environments/types";
 
 export const name: Column<Environment> = {
   Header: 'Name',

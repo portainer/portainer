@@ -11,8 +11,8 @@ export function EdgeDevicesViewController($scope, EndpointService, ModalService,
     EndpointService.endpoints()
         .then(function success(data) {
           console.log("edgeDevices");
-          console.log(data);
           $scope.edgeDevices = data.value;
+          console.log($scope.edgeDevices);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve edge devices');

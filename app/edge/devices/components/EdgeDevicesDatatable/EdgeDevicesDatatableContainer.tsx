@@ -1,6 +1,6 @@
 import { react2angular } from '@/react-tools/react2angular';
-import { TableSettingsProvider } from '@/portainer/components/datatables/components/useTableSettings';
-import { SearchBarProvider } from '@/portainer/components/datatables/components/SearchBar';
+import { TableSettingsProvider } from 'Portainer/components/datatables/components/useTableSettings';
+import { SearchBarProvider } from 'Portainer/components/datatables/components/SearchBar';
 
 import {
     EdgeDevicesDatatable,
@@ -10,6 +10,7 @@ import {
 export function EdgeDevicesDatatableContainer({ ...props }: EdgeDevicesTableProps) {
 
     console.log("EdgeDevicesDatatableContainer:");
+    console.log(props);
 
     const defaultSettings = {
     autoRefreshRate: 0,

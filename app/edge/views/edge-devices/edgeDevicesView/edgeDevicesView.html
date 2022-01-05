@@ -9,10 +9,10 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <containers-datatable
-      dataset="endpoints"
-      is-add-action-visible="true"
-      on-refresh="(getEndpoints)"
-    ></containers-datatable>
+    <edge-device-datatable
+      dataset="($ctrl.edgeDevices)"
+      is-add-action-visible="false"
+      on-refresh="($ctrl.getEndpoints)"
+    ></edge-device-datatable>
   </div>
 </div>
