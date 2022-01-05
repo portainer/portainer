@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 
 import { name } from './name';
-import { state } from './state';
+import { status } from './status';
 
 export function useColumns() {
   return useMemo(
     () => [
       name,
-      state,
+      status,
     ],
     []
   );

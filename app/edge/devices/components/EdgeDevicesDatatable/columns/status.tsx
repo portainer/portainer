@@ -1,15 +1,12 @@
 import { Column } from 'react-table';
-
 import { Environment } from "Portainer/environments/types";
 import { DefaultFilter } from 'Portainer/components/datatables/components/Filter';
 
-export const state: Column<Environment> = {
-  Header: 'State',
-  accessor: 'Status',
-  id: 'state',
+export const status: Column<Environment> = {
+  Header: 'Status',
+  accessor: (row) => row.Status || '-',
+  id: 'status',
   Cell: StatusCell,
-  sortType: 'string',
-  filter: 'multiple',
   Filter: DefaultFilter,
   canHide: true,
 };
