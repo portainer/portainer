@@ -17,7 +17,7 @@ import (
 type webhookCreatePayload struct {
 	ResourceID  string
 	EndpointID  int
-	RegistryID portainer.RegistryID
+	RegistryID  portainer.RegistryID
 	WebhookType int
 }
 
