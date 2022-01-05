@@ -6,8 +6,10 @@ import { configureAMT } from "Portainer/hostmanagement/open-amt/open-amt.service
 angular.module('portainer.app').controller('SettingsEdgeComputeController', SettingsEdgeComputeController);
 
 /* @ngInject */
-export default function SettingsEdgeComputeController($q, $scope, $async, $state, Notifications, SettingsService, StateManager) {
-  $scope.onSubmitEdgeCompute = async function(settings) {
+export default function SettingsEdgeComputeController($q, $async, $state, Notifications, SettingsService, StateManager) {
+    var ctrl = this;
+
+    this.onSubmitEdgeCompute = async function(settings) {
     try {
         await SettingsService.update(settings)
         Notifications.success('Settings updated');
@@ -18,7 +20,7 @@ export default function SettingsEdgeComputeController($q, $scope, $async, $state
     }
   }
 
-    $scope.onSubmitOpenAMT = async function(formValues) {
+    this.onSubmitOpenAMT = async function(formValues) {
       try {
         await configureAMT(formValues);
         Notifications.success(`OpenAMT successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
@@ -28,7 +30,7 @@ export default function SettingsEdgeComputeController($q, $scope, $async, $state
       }
     }
 
-    $scope.onSubmitFDO = async function(formValues) {
+    this.onSubmitFDO = async function(formValues) {
         try {
             await configureFDO(formValues);
             Notifications.success(`FDO successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
@@ -39,9 +41,10 @@ export default function SettingsEdgeComputeController($q, $scope, $async, $state
     }
 
   function initView() {
+
       $async(async () => {
           try {
-              $scope.settings = await SettingsService.settings();
+              ctrl.settings = await SettingsService.settings();
           } catch (err) {
               Notifications.error('Failure', err, 'Unable to retrieve application settings');
           }

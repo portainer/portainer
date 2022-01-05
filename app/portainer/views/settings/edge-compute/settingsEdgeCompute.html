@@ -5,18 +5,18 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <settings-edge-compute on-submit="(onSubmitEdgeCompute)" settings="(settings)"></settings-edge-compute>
+    <settings-edge-compute on-submit="($ctrl.onSubmitEdgeCompute)" settings="($ctrl.settings)"></settings-edge-compute>
   </div>
 </div>
 
-<div class="row" ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['fdo']">
+<div class="row" ng-if="$ctrl.settings.FeatureFlagSettings && $ctrl.settings.FeatureFlagSettings['fdo']">
   <div class="col-sm-12">
-    <settings-open-amt on-submit="(onSubmitOpenAMT)" settings="(settings)"></settings-open-amt>
+    <settings-open-amt on-submit="($ctrl.onSubmitOpenAMT)" settings="($ctrl.settings)"></settings-open-amt>
   </div>
 </div>
 
-<div class="row" ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['fdo']">
+<div class="row" ng-if="$ctrl.settings.FeatureFlagSettings && $ctrl.settings.FeatureFlagSettings['fdo']">
   <div class="col-sm-12">
-    <settings-fdo on-submit="(onSubmitFDO)" settings="(settings)"></settings-fdo>
+    <settings-fdo on-submit="($ctrl.onSubmitFDO)" settings="($ctrl.settings)"></settings-fdo>
   </div>
 </div>
