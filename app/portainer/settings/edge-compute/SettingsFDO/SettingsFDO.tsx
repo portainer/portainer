@@ -12,7 +12,7 @@ import styles from './SettingsFDO.module.css';
 import { validationSchema } from './SettingsFDO.validation';
 
 export interface Settings {
-  FDOConfiguration: FDOConfiguration,
+  fdoConfiguration: FDOConfiguration,
   EnableEdgeComputeFeatures: boolean,
 }
 
@@ -23,12 +23,12 @@ interface Props {
 
 export function SettingsFDO({ settings, onSubmit }: Props) {
 
-  const fdoConfiguration = settings ? settings.FDOConfiguration : null;
+  const fdoConfiguration = settings ? settings.fdoConfiguration : null;
   const initialValues = {
-    Enabled: fdoConfiguration ? fdoConfiguration.Enabled : false,
-    OwnerURL: fdoConfiguration ? fdoConfiguration.OwnerURL : '',
-    OwnerUsername: fdoConfiguration ? fdoConfiguration.OwnerUsername : '',
-    OwnerPassword: fdoConfiguration ? fdoConfiguration.OwnerPassword : '',
+    enabled: fdoConfiguration ? fdoConfiguration.enabled : false,
+    ownerURL: fdoConfiguration ? fdoConfiguration.ownerURL : '',
+    ownerUsername: fdoConfiguration ? fdoConfiguration.ownerUsername : '',
+    ownerPassword: fdoConfiguration ? fdoConfiguration.ownerPassword : '',
   };
 
   const edgeComputeFeaturesEnabled = settings.EnableEdgeComputeFeatures;
@@ -62,16 +62,16 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                 <FormControl
                   inputId="edge_enableFDO"
                   label="Enable FDO Management Service"
-                  errors={errors.Enabled}
+                  errors={errors.enabled}
                 >
                   <Switch
                     id="edge_enableFDO"
                     name="edge_enableFDO"
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}
-                    checked={edgeComputeFeaturesEnabled && values.Enabled}
+                    checked={edgeComputeFeaturesEnabled && values.enabled}
                     onChange={(e) =>
-                      setFieldValue('Enabled', e.valueOf())
+                      setFieldValue('enabled', e.valueOf())
                     }
                   />
                 </FormControl>
@@ -80,21 +80,21 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                   When enabled, this will allow Portainer to interact with FDO Services.
                 </TextTip>
 
-                {edgeComputeFeaturesEnabled && values.Enabled && (
+                {edgeComputeFeaturesEnabled && values.enabled && (
                   <>
                     <hr />
 
                     <FormControl
                         inputId="owner_url"
                         label="Owner Service Server"
-                        errors={errors.OwnerURL}
+                        errors={errors.ownerURL}
                     >
                       <Input
                           name="owner_url"
                           id="owner_url"
                           placeholder="http://127.0.0.1:8042"
-                          onChange={(e) => setFieldValue('OwnerURL', e.target.value)}
-                          value={values.OwnerURL}
+                          onChange={(e) => setFieldValue('ownerURL', e.target.value)}
+                          value={values.ownerURL}
                           data-cy="fdo-serverInput"
                       />
                     </FormControl>
@@ -102,14 +102,14 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                     <FormControl
                         inputId="owner_username"
                         label="Owner Service Username"
-                        errors={errors.OwnerUsername}
+                        errors={errors.ownerUsername}
                     >
                       <Input
                           name="owner_username"
                           id="owner_username"
                           placeholder="username"
-                          onChange={(e) => setFieldValue('OwnerUsername', e.target.value)}
-                          value={values.OwnerUsername}
+                          onChange={(e) => setFieldValue('ownerUsername', e.target.value)}
+                          value={values.ownerUsername}
                           data-cy="fdo-usernameInput"
                       />
                     </FormControl>
@@ -117,15 +117,15 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                     <FormControl
                         inputId="owner_password"
                         label="Owner Service Password"
-                        errors={errors.OwnerPassword}
+                        errors={errors.ownerPassword}
                     >
                       <Input
                           type='password'
                           name="owner_password"
                           id="owner_password"
                           placeholder="password"
-                          onChange={(e) => setFieldValue('OwnerPassword', e.target.value)}
-                          value={values.OwnerPassword}
+                          onChange={(e) => setFieldValue('ownerPassword', e.target.value)}
+                          value={values.ownerPassword}
                           data-cy="fdo-passwordInput"
                       />
                     </FormControl>

@@ -1,5 +1,7 @@
 import axios, { parseAxiosError } from 'Portainer/services/axios';
 
+import { EnvironmentId } from "@/portainer/environments/types";
+
 import {
   OpenAMTConfiguration,
   AMTInformation,
@@ -18,10 +20,10 @@ export async function configureAMT(formValues: OpenAMTConfiguration) {
   }
 }
 
-export async function getAMTInfo(endpointId: number) {
+export async function getAMTInfo(environmentId: EnvironmentId) {
   try {
     const { data: amtInformation } = await axios.get<AMTInformation>(
-      `${BASE_URL}/${endpointId}/info`
+      `${BASE_URL}/${environmentId}/info`
     );
 
     return amtInformation;
@@ -33,18 +35,18 @@ export async function getAMTInfo(endpointId: number) {
   }
 }
 
-export async function activateDevice(endpointId: number) {
+export async function activateDevice(environmentId: EnvironmentId) {
   try {
-    await axios.post(`${BASE_URL}/${endpointId}/activate`);
+    await axios.post(`${BASE_URL}/${environmentId}/activate`);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to activate device');
   }
 }
 
-export async function getDevices(endpointId: number) {
+export async function getDevices(environmentId: EnvironmentId) {
   try {
     const { data: devices } = await axios.get<Device[]>(
-      `${BASE_URL}/${endpointId}/devices`
+      `${BASE_URL}/${environmentId}/devices`
     );
 
     return devices;
@@ -54,14 +56,14 @@ export async function getDevices(endpointId: number) {
 }
 
 export async function executeDeviceAction(
-  endpointId: number,
+  environmentId: EnvironmentId,
   deviceGUID: string,
   action: string
 ) {
   try {
     const actionPayload = { action };
     await axios.post(
-      `${BASE_URL}/${endpointId}/devices/${deviceGUID}/action`,
+      `${BASE_URL}/${environmentId}/devices/${deviceGUID}/action`,
       actionPayload
     );
   } catch (e) {
@@ -70,7 +72,7 @@ export async function executeDeviceAction(
 }
 
 export async function enableDeviceFeatures(
-  endpointId: number,
+  environmentId: EnvironmentId,
   deviceGUID: string,
   features: DeviceFeatures
 ) {
@@ -78,7 +80,7 @@ export async function enableDeviceFeatures(
     const featuresPayload = { features };
     const { data: authorizationResponse } =
       await axios.post<AuthorizationResponse>(
-        `${BASE_URL}/${endpointId}/devices/${deviceGUID}/features`,
+        `${BASE_URL}/${environmentId}/devices/${deviceGUID}/features`,
         featuresPayload
       );
     return authorizationResponse;

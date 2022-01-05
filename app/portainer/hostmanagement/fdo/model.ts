@@ -1,8 +1,8 @@
 export interface FDOConfiguration {
-  Enabled: boolean,
-  OwnerURL: string,
-  OwnerUsername: string,
-  OwnerPassword: string,
+  enabled: boolean;
+  ownerURL: string;
+  ownerUsername: string;
+  ownerPassword: string;
 }
 
 export interface DeviceConfiguration {

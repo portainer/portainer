@@ -14,7 +14,7 @@ import styles from './SettingsOpenAMT.module.css';
 import { validationSchema } from './SettingsOpenAMT.validation';
 
 export interface Settings {
-  OpenAMTConfiguration: OpenAMTConfiguration,
+  openAMTConfiguration: OpenAMTConfiguration,
   EnableEdgeComputeFeatures: boolean,
 }
 
@@ -30,8 +30,8 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
     if (file) {
       setCertFile(file);
       const fileContent = await readFileContent(file);
-      setFieldValue("CertFileContent", fileContent);
-      setFieldValue("CertFileName", file.name);
+      setFieldValue("certFileContent", fileContent);
+      setFieldValue("certFileName", file.name);
     }
   }
 
@@ -56,20 +56,20 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
     });
   }
 
-  const openAMTConfiguration = settings ? settings.OpenAMTConfiguration : null;
+  const openAMTConfiguration = settings ? settings.openAMTConfiguration : null;
   const initialValues = {
-    Enabled: openAMTConfiguration ? openAMTConfiguration.Enabled : false,
-    MPSServer: openAMTConfiguration ? openAMTConfiguration.MPSServer : '',
-    MPSUser: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.MPSUser : '',
-    MPSPassword: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.MPSPassword : '',
-    DomainName: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.DomainName : '',
-    CertFileContent: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.CertFileContent : '',
-    CertFileName: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.CertFileName : '',
-    CertFilePassword: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.CertFilePassword : '',
+    enabled: openAMTConfiguration ? openAMTConfiguration.enabled : false,
+    mpsServer: openAMTConfiguration ? openAMTConfiguration.mpsServer : '',
+    mpsUser: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.mpsUser : '',
+    mpsPassword: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.mpsPassword : '',
+    domainName: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.domainName : '',
+    certFileContent: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.certFileContent : '',
+    certFileName: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.certFileName : '',
+    certFilePassword: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.certFilePassword : '',
   };
 
-  if (initialValues.CertFileContent && initialValues.CertFileName && !certFile) {
-    setCertFile(new File([], initialValues.CertFileName));
+  if (initialValues.certFileContent && initialValues.certFileName && !certFile) {
+    setCertFile(new File([], initialValues.certFileName));
   }
 
   const edgeComputeFeaturesEnabled = settings.EnableEdgeComputeFeatures;
@@ -103,16 +103,16 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                 <FormControl
                   inputId="edge_enableOpenAMT"
                   label="Enable edge OpenAMT"
-                  errors={errors.Enabled}
+                  errors={errors.enabled}
                 >
                   <Switch
                     id="edge_enableOpenAMT"
                     name="edge_enableOpenAMT"
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}
-                    checked={edgeComputeFeaturesEnabled && values.Enabled}
+                    checked={edgeComputeFeaturesEnabled && values.enabled}
                     onChange={(e) =>
-                      setFieldValue('Enabled', e.valueOf())
+                      setFieldValue('enabled', e.valueOf())
                     }
                   />
                 </FormControl>
@@ -121,21 +121,21 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                   When enabled, this will allow Portainer to interact with an OpenAMT MPS API.
                 </TextTip>
 
-                {edgeComputeFeaturesEnabled && values.Enabled && (
+                {edgeComputeFeaturesEnabled && values.enabled && (
                   <>
                     <hr />
 
                     <FormControl
                         inputId="mps_server"
                         label="MPS Server"
-                        errors={errors.MPSServer}
+                        errors={errors.mpsServer}
                     >
                       <Input
                           name="mps_server"
                           id="mps_server"
                           placeholder="Enter the MPS Server"
-                          onChange={(e) => setFieldValue('MPSServer', e.target.value)}
-                          value={values.MPSServer}
+                          onChange={(e) => setFieldValue('mpsServer', e.target.value)}
+                          value={values.mpsServer}
                           data-cy="openAMT-serverInput"
                       />
                     </FormControl>
@@ -143,14 +143,14 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     <FormControl
                         inputId="mps_username"
                         label="MPS User"
-                        errors={errors.MPSUser}
+                        errors={errors.mpsUser}
                     >
                       <Input
                           name="mps_username"
                           id="mps_username"
                           placeholder="Enter the MPS User"
-                          onChange={(e) => setFieldValue('MPSUser', e.target.value)}
-                          value={values.MPSUser}
+                          onChange={(e) => setFieldValue('mpsUser', e.target.value)}
+                          value={values.mpsUser}
                           data-cy="openAMT-usernameInput"
                       />
                     </FormControl>
@@ -159,15 +159,15 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         inputId="mps_password"
                         label="MPS Password"
                         tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
-                        errors={errors.MPSPassword}
+                        errors={errors.mpsPassword}
                     >
                       <Input
                           type='password'
                           name="mps_password"
                           id="mps_password"
                           placeholder="Enter the MPS Password"
-                          onChange={(e) => setFieldValue('MPSPassword', e.target.value)}
-                          value={values.MPSPassword}
+                          onChange={(e) => setFieldValue('mpsPassword', e.target.value)}
+                          value={values.mpsPassword}
                           data-cy="openAMT-passwordInput"
                       />
                     </FormControl>
@@ -178,14 +178,14 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         inputId="domain_name"
                         label="Domain Name"
                         tooltip="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
-                        errors={errors.DomainName}
+                        errors={errors.domainName}
                     >
                       <Input
                           name="domain_name"
                           id="domain_name"
                           placeholder="Enter the Domain Name"
-                          onChange={(e) => setFieldValue('DomainName', e.target.value)}
-                          value={values.DomainName}
+                          onChange={(e) => setFieldValue('domainName', e.target.value)}
+                          value={values.domainName}
                           data-cy="openAMT-domainInput"
                       />
                     </FormControl>
@@ -194,7 +194,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         inputId="certificate_file"
                         label="Provisioning Certificate File (.pfx)"
                         tooltip="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy. The certificate must contain the private key."
-                        errors={errors.CertFileContent}
+                        errors={errors.certFileContent}
                     >
                       <FileUploadField
                           title="Upload file"
@@ -208,15 +208,15 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         inputId="certificate_password"
                         label="Provisioning Certificate Password"
                         tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
-                        errors={errors.CertFilePassword}
+                        errors={errors.certFilePassword}
                     >
                       <Input
                           type='password'
                           name="certificate_password"
                           id="certificate_password"
                           placeholder="**********"
-                          onChange={(e) => setFieldValue('CertFilePassword', e.target.value)}
-                          value={values.CertFilePassword}
+                          onChange={(e) => setFieldValue('certFilePassword', e.target.value)}
+                          value={values.certFilePassword}
                           data-cy="openAMT-certPasswordInput"
                       />
                     </FormControl>

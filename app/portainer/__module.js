@@ -405,8 +405,7 @@ angular
         url: '/edge',
         views: {
           'content@': {
-            templateUrl: './views/settings/edge-compute/settingsEdgeCompute.html',
-            controller: 'SettingsEdgeComputeController',
+            component: 'settingsEdgeComputeView',
           },
         },
       };

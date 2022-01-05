@@ -285,7 +285,7 @@ function EndpointController(
         const disconnectedEdge = $scope.state.edgeEndpoint && !endpoint.EdgeID;
         if (EndpointHelper.isDockerEndpoint(endpoint) && !disconnectedEdge) {
           const featureFlagValue = settings && settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt'];
-          const featureEnabled = settings && settings.OpenAMTConfiguration && settings.OpenAMTConfiguration.Enabled;
+          const featureEnabled = settings && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
           $scope.state.showAMTInfo = featureFlagValue && featureEnabled;
         }
       } catch (err) {

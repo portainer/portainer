@@ -1,12 +1,12 @@
 export interface OpenAMTConfiguration {
-  Enabled: boolean,
-  MPSServer: string,
-  MPSUser: string,
-  MPSPassword: string,
-  DomainName: string
-  CertFileName: string,
-  CertFileContent: string,
-  CertFilePassword: string,
+  enabled: boolean;
+  mpsServer: string;
+  mpsUser: string;
+  mpsPassword: string;
+  domainName: string
+  certFileName: string;
+  certFileContent: string;
+  certFilePassword: string;
 }
 
 export interface AMTInformation {
@@ -24,9 +24,9 @@ export interface AuthorizationResponse {
 }
 
 export interface DeviceFeatures {
-  IDER: boolean;
-  KVM: boolean;
-  SOL: boolean;
+  ider: boolean;
+  kvm: boolean;
+  sol: boolean;
   redirection: boolean;
   userConsent: string;
 }

@@ -41,15 +41,15 @@ type (
 
 	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
 	OpenAMTConfiguration struct {
-		Enabled          bool   `json:"Enabled"`
-		MPSServer        string `json:"MPSServer"`
-		MPSUser          string `json:"MPSUser"`
-		MPSPassword      string `json:"MPSPassword"`
-		MPSToken         string `json:"MPSToken"` // retrieved from API
-		CertFileName     string `json:"CertFileName"`
-		CertFileContent  string `json:"CertFileContent"`
-		CertFilePassword string `json:"CertFilePassword"`
-		DomainName       string `json:"DomainName"`
+		Enabled          bool   `json:"enabled"`
+		MPSServer        string `json:"mpsServer"`
+		MPSUser          string `json:"mpsUser"`
+		MPSPassword      string `json:"mpsPassword"`
+		MPSToken         string `json:"mpsToken"` // retrieved from API
+		CertFileName     string `json:"certFileName"`
+		CertFileContent  string `json:"certFileContent"`
+		CertFilePassword string `json:"certFilePassword"`
+		DomainName       string `json:"domainName"`
 	}
 
 	// OpenAMTDeviceInformation represents an AMT managed device information
@@ -74,10 +74,10 @@ type (
 	PowerState int
 
 	FDOConfiguration struct {
-		Enabled       bool   `json:"Enabled"`
-		OwnerURL      string `json:"OwnerURL"`
-		OwnerUsername string `json:"OwnerUsername"`
-		OwnerPassword string `json:"OwnerPassword"`
+		Enabled       bool   `json:"enabled"`
+		OwnerURL      string `json:"ownerURL"`
+		OwnerUsername string `json:"ownerUsername"`
+		OwnerPassword string `json:"ownerPassword"`
 	}
 
 	// CLIFlags represents the available flags on the CLI
@@ -779,8 +779,8 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
-		OpenAMTConfiguration OpenAMTConfiguration `json:"OpenAMTConfiguration" example:""`
-		FDOConfiguration     FDOConfiguration     `json:"FDOConfiguration" example:""`
+		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration" example:""`
+		FDOConfiguration     FDOConfiguration     `json:"fdoConfiguration" example:""`
 		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
