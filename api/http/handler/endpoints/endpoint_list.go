@@ -89,7 +89,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
 	}
 
-	edgeDeviceFilter := false // TODO mrydel retrieve from param
+	edgeDeviceFilter, _ := request.RetrieveBooleanQueryParameter(r, "edgeDeviceFilter", true)
 	filteredEndpoints = filterEndpointsByEdgeDeviceFilter(filteredEndpoints, edgeDeviceFilter)
 
 	if search != "" {
