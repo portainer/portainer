@@ -1,21 +1,21 @@
-import {useState} from "react";
-import {Formik, Field, Form} from 'formik';
+import { useState } from 'react';
+import { Formik, Field, Form } from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
-import { Input } from "@/portainer/components/form-components/Input";
-import { FileUploadField } from "@/portainer/components/form-components/FileUpload";
-import {OpenAMTConfiguration} from "@/portainer/hostmanagement/open-amt/model";
+import { Input } from '@/portainer/components/form-components/Input';
+import { FileUploadField } from '@/portainer/components/form-components/FileUpload';
+import { OpenAMTConfiguration } from '@/portainer/hostmanagement/open-amt/model';
 
 import styles from './SettingsOpenAMT.module.css';
 import { validationSchema } from './SettingsOpenAMT.validation';
 
 export interface Settings {
-  openAMTConfiguration: OpenAMTConfiguration,
-  EnableEdgeComputeFeatures: boolean,
+  openAMTConfiguration: OpenAMTConfiguration;
+  EnableEdgeComputeFeatures: boolean;
 }
 
 interface Props {
@@ -24,14 +24,20 @@ interface Props {
 }
 
 export function SettingsOpenAMT({ settings, onSubmit }: Props) {
-
   const [certFile, setCertFile] = useState<File>();
-  async function handleFileUpload(file: File, setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void) {
+  async function handleFileUpload(
+    file: File,
+    setFieldValue: (
+      field: string,
+      value: unknown,
+      shouldValidate?: boolean
+    ) => void
+  ) {
     if (file) {
       setCertFile(file);
       const fileContent = await readFileContent(file);
-      setFieldValue("certFileContent", fileContent);
-      setFieldValue("certFileName", file.name);
+      setFieldValue('certFileContent', fileContent);
+      setFieldValue('certFileName', file.name);
     }
   }
 
@@ -40,7 +46,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
       const fileReader = new FileReader();
       fileReader.onload = (e) => {
         if (e.target == null || e.target.result == null) {
-          resolve("");
+          resolve('');
           return;
         }
         const base64 = e.target.result.toString();
@@ -60,15 +66,37 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
   const initialValues = {
     enabled: openAMTConfiguration ? openAMTConfiguration.enabled : false,
     mpsServer: openAMTConfiguration ? openAMTConfiguration.mpsServer : '',
-    mpsUser: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.mpsUser : '',
-    mpsPassword: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.mpsPassword : '',
-    domainName: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.domainName : '',
-    certFileContent: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.certFileContent : '',
-    certFileName: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.certFileName : '',
-    certFilePassword: openAMTConfiguration && openAMTConfiguration ? openAMTConfiguration.certFilePassword : '',
+    mpsUser:
+      openAMTConfiguration && openAMTConfiguration
+        ? openAMTConfiguration.mpsUser
+        : '',
+    mpsPassword:
+      openAMTConfiguration && openAMTConfiguration
+        ? openAMTConfiguration.mpsPassword
+        : '',
+    domainName:
+      openAMTConfiguration && openAMTConfiguration
+        ? openAMTConfiguration.domainName
+        : '',
+    certFileContent:
+      openAMTConfiguration && openAMTConfiguration
+        ? openAMTConfiguration.certFileContent
+        : '',
+    certFileName:
+      openAMTConfiguration && openAMTConfiguration
+        ? openAMTConfiguration.certFileName
+        : '',
+    certFilePassword:
+      openAMTConfiguration && openAMTConfiguration
+        ? openAMTConfiguration.certFilePassword
+        : '',
   };
 
-  if (initialValues.certFileContent && initialValues.certFileName && !certFile) {
+  if (
+    initialValues.certFileContent &&
+    initialValues.certFileName &&
+    !certFile
+  ) {
     setCertFile(new File([], initialValues.certFileName));
   }
 
@@ -96,10 +124,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
               isValid,
               dirty,
             }) => (
-              <Form
-                className="form-horizontal"
-                onSubmit={handleSubmit}
-              >
+              <Form className="form-horizontal" onSubmit={handleSubmit}>
                 <FormControl
                   inputId="edge_enableOpenAMT"
                   label="Enable edge OpenAMT"
@@ -111,14 +136,13 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}
                     checked={edgeComputeFeaturesEnabled && values.enabled}
-                    onChange={(e) =>
-                      setFieldValue('enabled', e.valueOf())
-                    }
+                    onChange={(e) => setFieldValue('enabled', e.valueOf())}
                   />
                 </FormControl>
 
-                <TextTip color='blue'>
-                  When enabled, this will allow Portainer to interact with an OpenAMT MPS API.
+                <TextTip color="blue">
+                  When enabled, this will allow Portainer to interact with an
+                  OpenAMT MPS API.
                 </TextTip>
 
                 {edgeComputeFeaturesEnabled && values.enabled && (
@@ -126,107 +150,108 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     <hr />
 
                     <FormControl
-                        inputId="mps_server"
-                        label="MPS Server"
-                        size="medium"
-                        errors={errors.mpsServer}
+                      inputId="mps_server"
+                      label="MPS Server"
+                      size="medium"
+                      errors={errors.mpsServer}
                     >
                       <Field
-                          as={Input}
-                          name="mpsServer"
-                          id="mps_server"
-                          placeholder="Enter the MPS Server"
-                          value={values.mpsServer}
-                          data-cy="openAMT-serverInput"
+                        as={Input}
+                        name="mpsServer"
+                        id="mps_server"
+                        placeholder="Enter the MPS Server"
+                        value={values.mpsServer}
+                        data-cy="openAMT-serverInput"
                       />
                     </FormControl>
 
                     <FormControl
-                        inputId="mps_username"
-                        label="MPS User"
-                        size="medium"
-                        errors={errors.mpsUser}
+                      inputId="mps_username"
+                      label="MPS User"
+                      size="medium"
+                      errors={errors.mpsUser}
                     >
                       <Field
-                          as={Input}
-                          name="mpsUser"
-                          id="mps_username"
-                          placeholder="Enter the MPS User"
-                          value={values.mpsUser}
-                          data-cy="openAMT-usernameInput"
+                        as={Input}
+                        name="mpsUser"
+                        id="mps_username"
+                        placeholder="Enter the MPS User"
+                        value={values.mpsUser}
+                        data-cy="openAMT-usernameInput"
                       />
                     </FormControl>
 
                     <FormControl
-                        inputId="mps_password"
-                        label="MPS Password"
-                        size="medium"
-                        tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
-                        errors={errors.mpsPassword}
+                      inputId="mps_password"
+                      label="MPS Password"
+                      size="medium"
+                      tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
+                      errors={errors.mpsPassword}
                     >
                       <Field
-                          as={Input}
-                          type='password'
-                          name="mpsPassword"
-                          id="mps_password"
-                          placeholder="Enter the MPS Password"
-                          value={values.mpsPassword}
-                          data-cy="openAMT-passwordInput"
+                        as={Input}
+                        type="password"
+                        name="mpsPassword"
+                        id="mps_password"
+                        placeholder="Enter the MPS Password"
+                        value={values.mpsPassword}
+                        data-cy="openAMT-passwordInput"
                       />
                     </FormControl>
 
                     <hr />
 
                     <FormControl
-                        inputId="domain_name"
-                        label="Domain Name"
-                        size="medium"
-                        tooltip="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
-                        errors={errors.domainName}
+                      inputId="domain_name"
+                      label="Domain Name"
+                      size="medium"
+                      tooltip="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
+                      errors={errors.domainName}
                     >
                       <Field
-                          as={Input}
-                          name="domainName"
-                          id="domain_name"
-                          placeholder="Enter the Domain Name"
-                          value={values.domainName}
-                          data-cy="openAMT-domainInput"
+                        as={Input}
+                        name="domainName"
+                        id="domain_name"
+                        placeholder="Enter the Domain Name"
+                        value={values.domainName}
+                        data-cy="openAMT-domainInput"
                       />
                     </FormControl>
 
                     <FormControl
-                        inputId="certificate_file"
-                        label="Provisioning Certificate File (.pfx)"
-                        size="medium"
-                        tooltip="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy. The certificate must contain the private key."
-                        errors={errors.certFileContent}
+                      inputId="certificate_file"
+                      label="Provisioning Certificate File (.pfx)"
+                      size="medium"
+                      tooltip="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy. The certificate must contain the private key."
+                      errors={errors.certFileContent}
                     >
                       <FileUploadField
-                          title="Upload file"
-                          accept=".pfx"
-                          value={certFile}
-                          onChange={(file) => handleFileUpload(file, setFieldValue)}
+                        title="Upload file"
+                        accept=".pfx"
+                        value={certFile}
+                        onChange={(file) =>
+                          handleFileUpload(file, setFieldValue)
+                        }
                       />
                     </FormControl>
 
                     <FormControl
-                        inputId="certificate_password"
-                        label="Provisioning Certificate Password"
-                        size="medium"
-                        tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
-                        errors={errors.certFilePassword}
+                      inputId="certificate_password"
+                      label="Provisioning Certificate Password"
+                      size="medium"
+                      tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
+                      errors={errors.certFilePassword}
                     >
                       <Field
-                          as={Input}
-                          type='password'
-                          name="certFilePassword"
-                          id="certificate_password"
-                          placeholder="**********"
-                          value={values.certFilePassword}
-                          data-cy="openAMT-certPasswordInput"
+                        as={Input}
+                        type="password"
+                        name="certFilePassword"
+                        id="certificate_password"
+                        placeholder="**********"
+                        value={values.certFilePassword}
+                        data-cy="openAMT-certPasswordInput"
                       />
                     </FormControl>
-
                   </>
                 )}
 

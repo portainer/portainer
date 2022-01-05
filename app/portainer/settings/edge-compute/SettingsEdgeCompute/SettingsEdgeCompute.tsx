@@ -36,10 +36,11 @@ const checkinIntervalOptions = [
 ];
 
 export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
-
   const initialValues = {
     EdgeAgentCheckinInterval: settings ? settings.EdgeAgentCheckinInterval : 5,
-    EnableEdgeComputeFeatures: settings ? settings.EnableEdgeComputeFeatures : false,
+    EnableEdgeComputeFeatures: settings
+      ? settings.EnableEdgeComputeFeatures
+      : false,
   };
 
   return (
@@ -104,7 +105,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                   />
                 </FormControl>
 
-                <TextTip color='blue'>
+                <TextTip color="blue">
                   When enabled, this will enable Portainer to execute Edge
                   Device features.
                 </TextTip>

@@ -1,4 +1,4 @@
-import {boolean, number, object} from 'yup';
+import { boolean, number, object } from 'yup';
 
 export function validationSchema() {
   return object().shape({

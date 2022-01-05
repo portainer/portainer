@@ -1,19 +1,19 @@
-import {Formik, Field, Form} from 'formik';
+import { Formik, Field, Form } from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
-import { Input } from "@/portainer/components/form-components/Input";
-import { FDOConfiguration } from "@/portainer/hostmanagement/fdo/model";
+import { Input } from '@/portainer/components/form-components/Input';
+import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
 
 import styles from './SettingsFDO.module.css';
 import { validationSchema } from './SettingsFDO.validation';
 
 export interface Settings {
-  fdoConfiguration: FDOConfiguration,
-  EnableEdgeComputeFeatures: boolean,
+  fdoConfiguration: FDOConfiguration;
+  EnableEdgeComputeFeatures: boolean;
 }
 
 interface Props {
@@ -22,7 +22,6 @@ interface Props {
 }
 
 export function SettingsFDO({ settings, onSubmit }: Props) {
-
   const fdoConfiguration = settings ? settings.fdoConfiguration : null;
   const initialValues = {
     enabled: fdoConfiguration ? fdoConfiguration.enabled : false,
@@ -55,10 +54,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
               isValid,
               dirty,
             }) => (
-              <Form
-                className="form-horizontal"
-                onSubmit={handleSubmit}
-              >
+              <Form className="form-horizontal" onSubmit={handleSubmit}>
                 <FormControl
                   inputId="edge_enableFDO"
                   label="Enable FDO Management Service"
@@ -70,14 +66,13 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}
                     checked={edgeComputeFeaturesEnabled && values.enabled}
-                    onChange={(e) =>
-                      setFieldValue('enabled', e.valueOf())
-                    }
+                    onChange={(e) => setFieldValue('enabled', e.valueOf())}
                   />
                 </FormControl>
 
-                <TextTip color='blue'>
-                  When enabled, this will allow Portainer to interact with FDO Services.
+                <TextTip color="blue">
+                  When enabled, this will allow Portainer to interact with FDO
+                  Services.
                 </TextTip>
 
                 {edgeComputeFeaturesEnabled && values.enabled && (
@@ -85,48 +80,48 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                     <hr />
 
                     <FormControl
-                        inputId="owner_url"
-                        label="Owner Service Server"
-                        errors={errors.ownerURL}
+                      inputId="owner_url"
+                      label="Owner Service Server"
+                      errors={errors.ownerURL}
                     >
                       <Field
-                          as={Input}
-                          name="ownerURL"
-                          id="owner_url"
-                          placeholder="http://127.0.0.1:8042"
-                          value={values.ownerURL}
-                          data-cy="fdo-serverInput"
+                        as={Input}
+                        name="ownerURL"
+                        id="owner_url"
+                        placeholder="http://127.0.0.1:8042"
+                        value={values.ownerURL}
+                        data-cy="fdo-serverInput"
                       />
                     </FormControl>
 
                     <FormControl
-                        inputId="owner_username"
-                        label="Owner Service Username"
-                        errors={errors.ownerUsername}
+                      inputId="owner_username"
+                      label="Owner Service Username"
+                      errors={errors.ownerUsername}
                     >
                       <Field
-                          as={Input}
-                          name="ownerUsername"
-                          id="owner_username"
-                          placeholder="username"
-                          value={values.ownerUsername}
-                          data-cy="fdo-usernameInput"
+                        as={Input}
+                        name="ownerUsername"
+                        id="owner_username"
+                        placeholder="username"
+                        value={values.ownerUsername}
+                        data-cy="fdo-usernameInput"
                       />
                     </FormControl>
 
                     <FormControl
-                        inputId="owner_password"
-                        label="Owner Service Password"
-                        errors={errors.ownerPassword}
+                      inputId="owner_password"
+                      label="Owner Service Password"
+                      errors={errors.ownerPassword}
                     >
                       <Field
-                          as={Input}
-                          type='password'
-                          name="ownerPassword"
-                          id="owner_password"
-                          placeholder="password"
-                          value={values.ownerPassword}
-                          data-cy="fdo-passwordInput"
+                        as={Input}
+                        type="password"
+                        name="ownerPassword"
+                        id="owner_password"
+                        placeholder="password"
+                        value={values.ownerPassword}
+                        data-cy="fdo-passwordInput"
                       />
                     </FormControl>
                   </>
