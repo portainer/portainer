@@ -24,6 +24,7 @@ export function ContainersDatatableContainer({ endpoint, ...props }: Props) {
   };
 
   console.log("ContainersDatatableContainer");
+  console.log(props);
 
   return (
     <EnvironmentProvider environment={endpoint}>

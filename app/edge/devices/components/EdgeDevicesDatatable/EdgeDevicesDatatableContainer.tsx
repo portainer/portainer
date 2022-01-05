@@ -1,4 +1,5 @@
 import { react2angular } from '@/react-tools/react2angular';
+
 import { TableSettingsProvider } from 'Portainer/components/datatables/components/useTableSettings';
 import { SearchBarProvider } from 'Portainer/components/datatables/components/SearchBar';
 
