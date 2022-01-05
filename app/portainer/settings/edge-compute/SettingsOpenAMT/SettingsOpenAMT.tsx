@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Formik, Form} from 'formik';
+import {Formik, Field, Form} from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
@@ -131,11 +131,11 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         size="medium"
                         errors={errors.mpsServer}
                     >
-                      <Input
-                          name="mps_server"
+                      <Field
+                          as={Input}
+                          name="mpsServer"
                           id="mps_server"
                           placeholder="Enter the MPS Server"
-                          onChange={(e) => setFieldValue('mpsServer', e.target.value)}
                           value={values.mpsServer}
                           data-cy="openAMT-serverInput"
                       />
@@ -147,11 +147,11 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         size="medium"
                         errors={errors.mpsUser}
                     >
-                      <Input
-                          name="mps_username"
+                      <Field
+                          as={Input}
+                          name="mpsUser"
                           id="mps_username"
                           placeholder="Enter the MPS User"
-                          onChange={(e) => setFieldValue('mpsUser', e.target.value)}
                           value={values.mpsUser}
                           data-cy="openAMT-usernameInput"
                       />
@@ -164,12 +164,12 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
                         errors={errors.mpsPassword}
                     >
-                      <Input
+                      <Field
+                          as={Input}
                           type='password'
-                          name="mps_password"
+                          name="mpsPassword"
                           id="mps_password"
                           placeholder="Enter the MPS Password"
-                          onChange={(e) => setFieldValue('mpsPassword', e.target.value)}
                           value={values.mpsPassword}
                           data-cy="openAMT-passwordInput"
                       />
@@ -184,11 +184,11 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         tooltip="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
                         errors={errors.domainName}
                     >
-                      <Input
-                          name="domain_name"
+                      <Field
+                          as={Input}
+                          name="domainName"
                           id="domain_name"
                           placeholder="Enter the Domain Name"
-                          onChange={(e) => setFieldValue('domainName', e.target.value)}
                           value={values.domainName}
                           data-cy="openAMT-domainInput"
                       />
@@ -216,12 +216,12 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                         tooltip="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
                         errors={errors.certFilePassword}
                     >
-                      <Input
+                      <Field
+                          as={Input}
                           type='password'
-                          name="certificate_password"
+                          name="certFilePassword"
                           id="certificate_password"
                           placeholder="**********"
-                          onChange={(e) => setFieldValue('certFilePassword', e.target.value)}
                           value={values.certFilePassword}
                           data-cy="openAMT-certPasswordInput"
                       />

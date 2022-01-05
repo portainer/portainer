@@ -1,4 +1,4 @@
-import {Formik, Form} from 'formik';
+import {Formik, Field, Form} from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
@@ -89,11 +89,11 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                         label="Owner Service Server"
                         errors={errors.ownerURL}
                     >
-                      <Input
-                          name="owner_url"
+                      <Field
+                          as={Input}
+                          name="ownerURL"
                           id="owner_url"
                           placeholder="http://127.0.0.1:8042"
-                          onChange={(e) => setFieldValue('ownerURL', e.target.value)}
                           value={values.ownerURL}
                           data-cy="fdo-serverInput"
                       />
@@ -104,11 +104,11 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                         label="Owner Service Username"
                         errors={errors.ownerUsername}
                     >
-                      <Input
-                          name="owner_username"
+                      <Field
+                          as={Input}
+                          name="ownerUsername"
                           id="owner_username"
                           placeholder="username"
-                          onChange={(e) => setFieldValue('ownerUsername', e.target.value)}
                           value={values.ownerUsername}
                           data-cy="fdo-usernameInput"
                       />
@@ -119,12 +119,12 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                         label="Owner Service Password"
                         errors={errors.ownerPassword}
                     >
-                      <Input
+                      <Field
+                          as={Input}
                           type='password'
-                          name="owner_password"
+                          name="ownerPassword"
                           id="owner_password"
                           placeholder="password"
-                          onChange={(e) => setFieldValue('ownerPassword', e.target.value)}
                           value={values.ownerPassword}
                           data-cy="fdo-passwordInput"
                       />
