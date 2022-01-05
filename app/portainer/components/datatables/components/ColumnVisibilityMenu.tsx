@@ -3,12 +3,12 @@ import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { ColumnInstance } from 'react-table';
 
 import { Checkbox } from '@/portainer/components/form-components/Checkbox';
-import type { DockerContainer } from '@/docker/containers/types';
 
 import { useTableContext } from './TableContainer';
 
 interface Props {
-  columns: ColumnInstance<DockerContainer>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnInstance<any>[]; // TODO mrydel
   onChange: (value: string[]) => void;
   value: string[];
 }

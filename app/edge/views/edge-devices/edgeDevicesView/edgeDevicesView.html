@@ -1,6 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Edge Devices">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.jobs" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.devices" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
@@ -9,13 +9,10 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <edge-jobs-datatable
-      title-text="Edge devices"
-      title-icon="fa-clock"
-      dataset="$ctrl.edgeJobs"
-      table-key="edgeJobs"
-      order-by="Name"
-      remove-action="$ctrl.removeAction"
-    ></edge-jobs-datatable>
+    <containers-datatable
+      dataset="endpoints"
+      is-add-action-visible="true"
+      on-refresh="(getEndpoints)"
+    ></containers-datatable>
   </div>
 </div>

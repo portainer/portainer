@@ -23,6 +23,8 @@ export function ContainersDatatableContainer({ endpoint, ...props }: Props) {
     sortBy: { id: 'state', desc: false },
   };
 
+  console.log("ContainersDatatableContainer");
+
   return (
     <EnvironmentProvider environment={endpoint}>
       <TableSettingsProvider defaults={defaultSettings} storageKey="containers">

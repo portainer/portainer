@@ -5,8 +5,9 @@ export enum EnvironmentStatus {
   Down = 2,
 }
 
-export interface Environment {
+export type Environment = {
   Id: EnvironmentId;
+  Name: string;
   Status: EnvironmentStatus;
   PublicURL: string;
 }

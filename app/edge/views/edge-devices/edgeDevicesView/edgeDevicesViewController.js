@@ -1,53 +1,28 @@
-import _ from 'lodash-es';
+angular.module('portainer.edge').controller('EdgeDevicesViewController', EdgeDevicesViewController);
 
-export class EdgeDevicesViewController {
-  /* @ngInject */
-  constructor($async, $state, EdgeJobService, ModalService, Notifications) {
-    this.$async = $async;
-    this.$state = $state;
-    this.EdgeJobService = EdgeJobService;
-    this.ModalService = ModalService;
-    this.Notifications = Notifications;
+/* @ngInject */
+export function EdgeDevicesViewController($scope, EndpointService, ModalService, Notifications) {
+  $scope.getEnvironments = getEnvironments;
 
-    this.removeAction = this.removeAction.bind(this);
-    this.deleteJobsAsync = this.deleteJobsAsync.bind(this);
-    this.deleteJobs = this.deleteJobs.bind(this);
+  console.log("EdgeDevicesViewController");
+  console.log(EndpointService);
+
+  function getEnvironments() {
+    EndpointService.endpoints()
+        .then(function success(data) {
+          console.log("edgeDevices");
+          console.log(data);
+          $scope.edgeDevices = data.value;
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve edge devices');
+          $scope.edgeDevices = [];
+        });
   }
 
-  removeAction(selectedItems) {
-    this.ModalService.confirmDeletion('Do you want to remove the selected edge job(s) ?', (confirmed) => {
-      if (!confirmed) {
-        return;
-      }
-      this.deleteJobs(selectedItems);
-    });
+  function initView() {
+    getEnvironments();
   }
 
-  deleteJobs(edgeJobs) {
-    return this.$async(this.deleteJobsAsync, edgeJobs);
-  }
-
-  async deleteJobsAsync(edgeJobs) {
-    for (let edgeJob of edgeJobs) {
-      try {
-        await this.EdgeJobService.remove(edgeJob.Id);
-        this.Notifications.success('Stack successfully removed', edgeJob.Name);
-        _.remove(this.edgeJobs, edgeJob);
-      } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to remove Edge job ' + edgeJob.Name);
-      }
-    }
-
-    this.$state.reload();
-  }
-
-  async $onInit() {
-    try {
-      const edgeJobs = await this.EdgeJobService.edgeJobs();
-      this.edgeJobs = edgeJobs;
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve Edge jobs');
-      this.edgeJobs = [];
-    }
-  }
+  initView();
 }
