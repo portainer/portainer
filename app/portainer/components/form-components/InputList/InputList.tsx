@@ -18,15 +18,15 @@ type ChangeType = 'delete' | 'create' | 'update';
 export type DefaultType = { value: string };
 
 type OnChangeEvent<T> =
-  | {
-      item: T;
-      type: ChangeType;
-    }
-  | {
-      type: 'move';
-      fromIndex: number;
-      to: number;
-    };
+    | {
+  item: T;
+  type: ChangeType;
+}
+    | {
+  type: 'move';
+  fromIndex: number;
+  to: number;
+};
 
 interface Props<T> {
   label: string;
@@ -41,75 +41,75 @@ interface Props<T> {
 }
 
 export function InputList<T = DefaultType>({
-  label,
-  value,
-  onChange,
-  itemBuilder = defaultItemBuilder as unknown as () => T,
-  item = DefaultItem as unknown as ComponentType<ItemProps<T>>,
-  tooltip,
-  addLabel = 'Add item',
-  itemKeyGetter = (item: T, index: number) => index,
-  movable,
-}: Props<T>) {
+                                             label,
+                                             value,
+                                             onChange,
+                                             itemBuilder = (defaultItemBuilder as unknown) as () => T,
+                                             item = (DefaultItem as unknown) as ComponentType<ItemProps<T>>,
+                                             tooltip,
+                                             addLabel = 'Add item',
+                                             itemKeyGetter = (item: T, index: number) => index,
+                                             movable,
+                                           }: Props<T>) {
   const Item = item;
 
   return (
-    <div className={clsx('form-group', styles.root)}>
-      <div className={clsx('col-sm-12', styles.header)}>
-        <div className={clsx('control-label text-left', styles.label)}>
-          {label}
-          {tooltip && <Tooltip message={tooltip} />}
+      <div className={clsx('form-group', styles.root)}>
+        <div className={clsx('col-sm-12', styles.header)}>
+          <div className={clsx('control-label text-left', styles.label)}>
+            {label}
+            {tooltip && <Tooltip message={tooltip} />}
+          </div>
+          <AddButton
+              label={addLabel}
+              className="space-left"
+              onClick={handleAdd}
+          />
         </div>
-        <AddButton
-          label={addLabel}
-          className="space-left"
-          onClick={handleAdd}
-        />
-      </div>
 
-      <div className={clsx('col-sm-12 form-inline', styles.items)}>
-        {value.map((item, index) => {
-          const key = itemKeyGetter(item, index);
+        <div className={clsx('col-sm-12 form-inline', styles.items)}>
+          {value.map((item, index) => {
+            const key = itemKeyGetter(item, index);
 
-          return (
-            <div key={key} className={clsx(styles.itemLine)}>
-              <Item
-                item={item}
-                onChange={(value: T) => handleChangeItem(key, value)}
-              />
-              <div className={styles.itemActions}>
-                {movable && (
-                  <>
+            return (
+                <div key={key} className={clsx(styles.itemLine)}>
+                  <Item
+                      item={item}
+                      onChange={(value: T) => handleChangeItem(key, value)}
+                  />
+                  <div className={styles.itemActions}>
+                    {movable && (
+                        <>
+                          <Button
+                              size="small"
+                              disabled={index === 0}
+                              onClick={() => handleMoveUp(index)}
+                          >
+                            <i className="fa fa-arrow-up" aria-hidden="true" />
+                          </Button>
+                          <Button
+                              size="small"
+                              type="button"
+                              disabled={index === value.length - 1}
+                              onClick={() => handleMoveDown(index)}
+                          >
+                            <i className="fa fa-arrow-down" aria-hidden="true" />
+                          </Button>
+                        </>
+                    )}
                     <Button
-                      size="small"
-                      disabled={index === 0}
-                      onClick={() => handleMoveUp(index)}
+                        color="danger"
+                        size="small"
+                        onClick={() => handleRemoveItem(key, item)}
                     >
-                      <i className="fa fa-arrow-up" aria-hidden="true" />
+                      <i className="fa fa-trash" aria-hidden="true" />
                     </Button>
-                    <Button
-                      size="small"
-                      type="button"
-                      disabled={index === value.length - 1}
-                      onClick={() => handleMoveDown(index)}
-                    >
-                      <i className="fa fa-arrow-down" aria-hidden="true" />
-                    </Button>
-                  </>
-                )}
-                <Button
-                  color="danger"
-                  size="small"
-                  onClick={() => handleRemoveItem(key, item)}
-                >
-                  <i className="fa fa-trash" aria-hidden="true" />
-                </Button>
-              </div>
-            </div>
-          );
-        })}
+                  </div>
+                </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
   );
 
   function handleMoveUp(index: number) {
@@ -140,11 +140,11 @@ export function InputList<T = DefaultType>({
 
   function handleRemoveItem(key: Key, item: T) {
     onChange(
-      value.filter((item, index) => {
-        const itemKey = itemKeyGetter(item, index);
-        return itemKey !== key;
-      }),
-      { type: 'delete', item }
+        value.filter((item, index) => {
+          const itemKey = itemKeyGetter(item, index);
+          return itemKey !== key;
+        }),
+        { type: 'delete', item }
     );
   }
 
@@ -174,10 +174,10 @@ function defaultItemBuilder(): DefaultType {
 
 function DefaultItem({ item, onChange }: ItemProps<DefaultType>) {
   return (
-    <Input
-      value={item.value}
-      onChange={(e) => onChange({ value: e.target.value })}
-      className={styles.defaultItem}
-    />
+      <Input
+          value={item.value}
+          onChange={(e) => onChange({ value: e.target.value })}
+          className={styles.defaultItem}
+      />
   );
 }
