@@ -106,6 +106,16 @@ angular.module('portainer.edge', [edgeStackModule]).config(function config($stat
     },
   };
 
+  const edgeDevices = {
+    name: 'edge.devices',
+    url: '/devices',
+    views: {
+      'content@': {
+        component: 'edgeDevicesView',
+      },
+    },
+  };
+
   $stateRegistryProvider.register(edge);
 
   $stateRegistryProvider.register(groups);
@@ -119,4 +129,6 @@ angular.module('portainer.edge', [edgeStackModule]).config(function config($stat
   $stateRegistryProvider.register(edgeJobs);
   $stateRegistryProvider.register(edgeJob);
   $stateRegistryProvider.register(edgeJobCreation);
+
+  $stateRegistryProvider.register(edgeDevices);
 });
