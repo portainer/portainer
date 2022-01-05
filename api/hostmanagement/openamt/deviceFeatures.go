@@ -20,7 +20,7 @@ func (service *Service) enableDeviceFeatures(configuration portainer.OpenAMTConf
 	}
 	jsonValue, _ := json.Marshal(payload)
 
-	_, err := service.executeSaveRequest(http.MethodPost, url, configuration.Credentials.MPSToken, jsonValue)
+	_, err := service.executeSaveRequest(http.MethodPost, url, configuration.MPSToken, jsonValue)
 	if err != nil {
 		return err
 	}

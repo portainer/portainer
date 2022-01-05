@@ -46,7 +46,7 @@ func (service *Service) createOrUpdateCIRAConfig(configuration portainer.OpenAMT
 func (service *Service) getCIRAConfig(configuration portainer.OpenAMTConfiguration, configName string) (*CIRAConfig, error) {
 	url := fmt.Sprintf("https://%s/rps/api/v1/admin/ciraconfigs/%s", configuration.MPSServer, configName)
 
-	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
+	responseBody, err := service.executeGetRequest(url, configuration.MPSToken)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (service *Service) saveCIRAConfig(method string, configuration portainer.Op
 	}
 	payload, _ := json.Marshal(config)
 
-	responseBody, err := service.executeSaveRequest(method, url, configuration.Credentials.MPSToken, payload)
+	responseBody, err := service.executeSaveRequest(method, url, configuration.MPSToken, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfig
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", configuration.Credentials.MPSToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", configuration.MPSToken))
 
 	response, err := service.httpsClient.Do(req)
 	if err != nil {

@@ -1,16 +1,18 @@
 import axios, { parseAxiosError } from 'Portainer/services/axios';
 
+import { EnvironmentId } from "@/portainer/environments/types";
+
 import {
-  AMTConfiguration,
+  OpenAMTConfiguration,
   AMTInformation,
   AuthorizationResponse,
   Device,
-  DeviceFeatures
+  DeviceFeatures,
 } from './model';
 
 const BASE_URL = '/open_amt';
 
-export async function configureAMT(formValues : AMTConfiguration) {
+export async function configureAMT(formValues: OpenAMTConfiguration) {
   try {
     await axios.post(`${BASE_URL}/configure`, formValues);
   } catch (e) {
@@ -18,27 +20,34 @@ export async function configureAMT(formValues : AMTConfiguration) {
   }
 }
 
-export async function getAMTInfo(endpointId : number) {
+export async function getAMTInfo(environmentId: EnvironmentId) {
   try {
-    const { data: amtInformation } = await axios.get<AMTInformation>(`${BASE_URL}/${endpointId}/info`);
+    const { data: amtInformation } = await axios.get<AMTInformation>(
+      `${BASE_URL}/${environmentId}/info`
+    );
 
     return amtInformation;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve environment information');
+    throw parseAxiosError(
+      e as Error,
+      'Unable to retrieve environment information'
+    );
   }
 }
 
-export async function activateDevice(endpointId : number) {
+export async function activateDevice(environmentId: EnvironmentId) {
   try {
-    await axios.post(`${BASE_URL}/${endpointId}/activate`);
+    await axios.post(`${BASE_URL}/${environmentId}/activate`);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to activate device');
   }
 }
 
-export async function getDevices(endpointId : number) {
+export async function getDevices(environmentId: EnvironmentId) {
   try {
-    const { data: devices } = await axios.get<Device[]>(`${BASE_URL}/${endpointId}/devices`);
+    const { data: devices } = await axios.get<Device[]>(
+      `${BASE_URL}/${environmentId}/devices`
+    );
 
     return devices;
   } catch (e) {
@@ -46,19 +55,34 @@ export async function getDevices(endpointId : number) {
   }
 }
 
-export async function executeDeviceAction(endpointId : number, deviceGUID : string, action : string) {
+export async function executeDeviceAction(
+  environmentId: EnvironmentId,
+  deviceGUID: string,
+  action: string
+) {
   try {
     const actionPayload = { action };
-    await axios.post(`${BASE_URL}/${endpointId}/devices/${deviceGUID}/action`, actionPayload);
+    await axios.post(
+      `${BASE_URL}/${environmentId}/devices/${deviceGUID}/action`,
+      actionPayload
+    );
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to execute device action');
   }
 }
 
-export async function enableDeviceFeatures(endpointId : number, deviceGUID : string, features : DeviceFeatures) {
+export async function enableDeviceFeatures(
+  environmentId: EnvironmentId,
+  deviceGUID: string,
+  features: DeviceFeatures
+) {
   try {
     const featuresPayload = { features };
-    const { data : authorizationResponse } = await axios.post<AuthorizationResponse>(`${BASE_URL}/${endpointId}/devices/${deviceGUID}/features`, featuresPayload);
+    const { data: authorizationResponse } =
+      await axios.post<AuthorizationResponse>(
+        `${BASE_URL}/${environmentId}/devices/${deviceGUID}/features`,
+        featuresPayload
+      );
     return authorizationResponse;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to enable device features');

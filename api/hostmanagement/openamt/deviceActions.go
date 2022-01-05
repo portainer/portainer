@@ -24,7 +24,7 @@ func (service *Service) executeDeviceAction(configuration portainer.OpenAMTConfi
 	}
 	jsonValue, _ := json.Marshal(payload)
 
-	responseBody, err := service.executeSaveRequest(http.MethodPost, url, configuration.Credentials.MPSToken, jsonValue)
+	responseBody, err := service.executeSaveRequest(http.MethodPost, url, configuration.MPSToken, jsonValue)
 	if err != nil {
 		return err
 	}

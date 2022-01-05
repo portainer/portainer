@@ -29,7 +29,7 @@ type DeviceEnabledFeatures struct {
 func (service *Service) getDevice(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*Device, error) {
 	url := fmt.Sprintf("https://%s/mps/api/v1/devices/%s", configuration.MPSServer, deviceGUID)
 
-	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
+	responseBody, err := service.executeGetRequest(url, configuration.MPSToken)
 	if err != nil {
 		if strings.EqualFold(err.Error(), "invalid value") {
 			return nil, nil
@@ -51,7 +51,7 @@ func (service *Service) getDevice(configuration portainer.OpenAMTConfiguration, 
 func (service *Service) getDevicePowerState(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*DevicePowerState, error) {
 	url := fmt.Sprintf("https://%s/mps/api/v1/amt/power/state/%s", configuration.MPSServer, deviceGUID)
 
-	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
+	responseBody, err := service.executeGetRequest(url, configuration.MPSToken)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (service *Service) getDevicePowerState(configuration portainer.OpenAMTConfi
 func (service *Service) getDeviceEnabledFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*DeviceEnabledFeatures, error) {
 	url := fmt.Sprintf("https://%s/mps/api/v1/amt/features/%s", configuration.MPSServer, deviceGUID)
 
-	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
+	responseBody, err := service.executeGetRequest(url, configuration.MPSToken)
 	if err != nil {
 		return nil, err
 	}

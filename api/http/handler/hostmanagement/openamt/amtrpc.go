@@ -246,8 +246,8 @@ func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings po
 		"-v",
 		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
 		"-profile", openamt.DefaultProfileName,
-		"-d", config.DomainConfiguration.DomainName,
-		"-password", config.Credentials.MPSPassword,
+		"-d", config.DomainName,
+		"-password", config.MPSPassword,
 	}
 
 	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
@@ -267,7 +267,7 @@ func (handler *Handler) deactivateDevice(endpoint *portainer.Endpoint, settings 
 		"-n",
 		"-v",
 		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
-		"-password", config.Credentials.MPSPassword,
+		"-password", config.MPSPassword,
 	}
 	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
