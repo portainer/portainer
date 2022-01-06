@@ -1,20 +1,14 @@
 import {
   useTable,
-    useExpanded,
-  useSortBy,
-  useFilters,
-  useGlobalFilter,
-  usePagination,
+    usePagination,
 } from 'react-table';
-import { useRowSelectColumn } from '@lineup-lite/hooks';
-import {Environment, EnvironmentId} from "Portainer/environments/types";
+import {EnvironmentId} from "Portainer/environments/types";
 import {
   Table,
   TableContainer,
   TableHeaderRow,
   TableRow,
 } from 'Portainer/components/datatables/components';
-import { useRowSelect } from 'Portainer/components/datatables/components/useRowSelect';
 import { Checkbox } from 'Portainer/components/form-components/Checkbox';
 import { Device } from "Portainer/hostmanagement/open-amt/model";
 
@@ -43,6 +37,7 @@ export function AMTDevicesDatatable({
     headerGroups,
     page,
     prepareRow,
+
   } = useTable<Device>(
       {
         defaultCanFilter: false,
@@ -54,12 +49,7 @@ export function AMTDevicesDatatable({
         },
         selectCheckboxComponent: Checkbox,
       },
-      useFilters,
-      useGlobalFilter,
-      useSortBy,
-      useExpanded,
       usePagination,
-      useRowSelectColumn,
   );
 
   const tableProps = getTableProps();
@@ -83,7 +73,7 @@ export function AMTDevicesDatatable({
                     role={role}
                     style={style}
                     headers={headerGroup.headers}
-                    onSortChange={handleSortChange}
+                    onSortChange={() => {}}
                 />
             );
           })}
@@ -97,7 +87,7 @@ export function AMTDevicesDatatable({
             prepareRow(row);
             const { key, className, role, style } = row.getRowProps();
             return (
-                <TableRow<Environment>
+                <TableRow<Device>
                     cells={row.cells}
                     key={key}
                     className={className}

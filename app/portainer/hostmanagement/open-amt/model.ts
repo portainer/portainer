@@ -31,10 +31,10 @@ export interface DeviceFeatures {
   userConsent: string;
 }
 
-export interface Device {
+export type Device = {
   guid: string;
   hostname: string;
   powerState: number;
   connectionStatus: boolean;
-  features: DeviceFeatures;
+  features?: DeviceFeatures;
 }

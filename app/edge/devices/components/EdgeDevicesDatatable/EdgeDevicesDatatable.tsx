@@ -34,11 +34,11 @@ import { useRowSelect } from 'Portainer/components/datatables/components/useRowS
 import { Checkbox } from 'Portainer/components/form-components/Checkbox';
 import { TableFooter } from 'Portainer/components/datatables/components/TableFooter';
 import { SelectedRowsCount } from 'Portainer/components/datatables/components/SelectedRowsCount';
-import {ContainersDatatableContainer} from "Docker/containers/components/ContainersDatatable/ContainersDatatableContainer";
 
 import {EdgeDeviceTableSettings} from "@/edge/devices/types";
 import {EdgeDevicesDatatableSettings} from "@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings";
 import {EdgeDevicesDatatableActions} from "@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions";
+import {AMTDevicesDatatable} from "@/edge/devices/components/AMTDevicesDatatable/AMTDevicesDatatable";
 
 import { useColumns } from './columns';
 
@@ -193,16 +193,21 @@ export function EdgeDevicesDatatable({
                         role={role}
                         style={style}
                     />
-                    {row.isExpanded && ('This is expanded!!!!')}
                     {row.isExpanded && (
-                        <ContainersDatatableContainer
-                            endpoint={row.original}
-                            isAddActionVisible={false}
-                            dataset={[]}
-                            onRefresh={async () => {}}
-                            isHostColumnVisible={false}
-                            autoFocusSearch={false}
-                        />
+                        <tr>
+                            <td />
+                            <td colSpan={10}>
+                                <AMTDevicesDatatable
+                                    environmentId={row.original.Id}
+                                    dataset={[{
+                                        hostname: "hostname", // TODO load from service
+                                        guid: "guid",
+                                        powerState: 1,
+                                        connectionStatus: true,
+                                    }]}
+                                />
+                            </td>
+                        </tr>
                     )}
                 </>
             );
