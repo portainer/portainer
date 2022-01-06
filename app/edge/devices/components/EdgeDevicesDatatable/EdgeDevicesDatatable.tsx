@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import {
   useTable,
+    useExpanded,
   useSortBy,
   useFilters,
   useGlobalFilter,
@@ -33,6 +34,7 @@ import { useRowSelect } from 'Portainer/components/datatables/components/useRowS
 import { Checkbox } from 'Portainer/components/form-components/Checkbox';
 import { TableFooter } from 'Portainer/components/datatables/components/TableFooter';
 import { SelectedRowsCount } from 'Portainer/components/datatables/components/SelectedRowsCount';
+import {ContainersDatatableContainer} from "Docker/containers/components/ContainersDatatable/ContainersDatatableContainer";
 
 import {EdgeDeviceTableSettings} from "@/edge/devices/types";
 import {EdgeDevicesDatatableSettings} from "@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings";
@@ -101,9 +103,10 @@ export function EdgeDevicesDatatable({
       useFilters,
       useGlobalFilter,
       useSortBy,
+      useExpanded,
       usePagination,
       useRowSelect,
-      useRowSelectColumn
+      useRowSelectColumn,
   );
 
   const debouncedSearchValue = useDebounce(searchBarValue);
@@ -182,13 +185,26 @@ export function EdgeDevicesDatatable({
             prepareRow(row);
             const { key, className, role, style } = row.getRowProps();
             return (
-                <TableRow<Environment>
-                    cells={row.cells}
-                    key={key}
-                    className={className}
-                    role={role}
-                    style={style}
-                />
+                <>
+                    <TableRow<Environment>
+                        cells={row.cells}
+                        key={key}
+                        className={className}
+                        role={role}
+                        style={style}
+                    />
+                    {row.isExpanded && ('This is expanded!!!!')}
+                    {row.isExpanded && (
+                        <ContainersDatatableContainer
+                            endpoint={row.original}
+                            isAddActionVisible={false}
+                            dataset={[]}
+                            onRefresh={async () => {}}
+                            isHostColumnVisible={false}
+                            autoFocusSearch={false}
+                        />
+                    )}
+                </>
             );
           })}
           </tbody>

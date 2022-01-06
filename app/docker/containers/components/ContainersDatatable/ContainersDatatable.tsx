@@ -62,10 +62,6 @@ export function ContainersDatatable({
   isHostColumnVisible,
   autoFocusSearch,
 }: ContainerTableProps) {
-
-  console.log("ContainersDatatable:");
-  console.log(dataset);
-
   const { settings, setTableSettings } =
     useTableSettings<ContainersTableSettings>();
   const [searchBarValue, setSearchBarValue] = useSearchBarContext();
