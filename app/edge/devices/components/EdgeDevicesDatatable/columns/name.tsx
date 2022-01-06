@@ -1,6 +1,7 @@
 import { CellProps, Column, TableInstance } from 'react-table';
-import { Environment } from "Portainer/environments/types";
-import {Link} from "Portainer/components/Link";
+import { Environment } from 'Portainer/environments/types';
+import { Link } from 'Portainer/components/Link';
+import { arrowClass } from 'Portainer/components/datatables/utils';
 
 export const name: Column<Environment> = {
   Header: 'Name',
@@ -13,25 +14,21 @@ export const name: Column<Environment> = {
   sortType: 'string',
 };
 
-export function NameCell({
-  value: name,
-  row,
-}: CellProps<TableInstance>) {
+export function NameCell({ value: name, row }: CellProps<TableInstance>) {
   return (
-      // eslint-disable-next-line react/jsx-props-no-spreading
-      <a {...row.getToggleRowExpandedProps({})} >
-        <i className={`fas ${arrowHelper(row.isExpanded)} space-right`} aria-hidden="true" />
-        <Link to="portainer.endpoints.endpoint" params={{ id: row.original.Id }} title={name}>
-          {name}
-        </Link>
-      </a>
+    // eslint-disable-next-line react/jsx-props-no-spreading
+    <div {...row.getToggleRowExpandedProps({})}>
+      <i
+        className={`fas ${arrowClass(row.isExpanded)} space-right`}
+        aria-hidden="true"
+      />
+      <Link
+        to="portainer.endpoints.endpoint"
+        params={{ id: row.original.Id }}
+        title={name}
+      >
+        {name}
+      </Link>
+    </div>
   );
-
-  function arrowHelper(isExpanded: boolean) {
-    if (isExpanded) {
-      return 'fa-angle-down';
-    }
-    return 'fa-angle-right'
-  }
-
 }

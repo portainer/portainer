@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
 import {
   useTable,
-    useExpanded,
+  useExpanded,
   useSortBy,
   useFilters,
   useGlobalFilter,
@@ -9,7 +9,7 @@ import {
   Row,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
-import { Environment } from "Portainer/environments/types";
+import { Environment } from 'Portainer/environments/types';
 import { PaginationControls } from 'Portainer/components/pagination-controls';
 import {
   Table,
@@ -35,34 +35,33 @@ import { Checkbox } from 'Portainer/components/form-components/Checkbox';
 import { TableFooter } from 'Portainer/components/datatables/components/TableFooter';
 import { SelectedRowsCount } from 'Portainer/components/datatables/components/SelectedRowsCount';
 
-import {EdgeDeviceTableSettings} from "@/edge/devices/types";
-import {EdgeDevicesDatatableSettings} from "@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings";
-import {EdgeDevicesDatatableActions} from "@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions";
-import {AMTDevicesDatatable} from "@/edge/devices/components/AMTDevicesDatatable/AMTDevicesDatatable";
+import { EdgeDeviceTableSettings } from '@/edge/devices/types';
+import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings';
+import { EdgeDevicesDatatableActions } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions';
+import { AMTDevicesDatatable } from '@/edge/devices/components/AMTDevicesDatatable/AMTDevicesDatatable';
 
 import { useColumns } from './columns';
 
 export interface EdgeDevicesTableProps {
-    isEnabled: boolean;
-    isFdoEnabled: boolean;
-    isOpenAmtEnabled: boolean;
+  isEnabled: boolean;
+  isFdoEnabled: boolean;
+  isOpenAmtEnabled: boolean;
   dataset: Environment[];
   onRefresh(): Promise<void>;
-    setLoadingMessage(message: string): void;
+  setLoadingMessage(message: string): void;
 }
 
 export function EdgeDevicesDatatable({
-                                         isFdoEnabled,
-                                         isOpenAmtEnabled,
-                                      dataset,
-                                      onRefresh,
-                                         setLoadingMessage,
-                                    }: EdgeDevicesTableProps) {
+  isFdoEnabled,
+  isOpenAmtEnabled,
+  dataset,
+  onRefresh,
+  setLoadingMessage,
+}: EdgeDevicesTableProps) {
+  console.log('EdgeDevicesDatatableContainer props:');
 
-
-    console.log("EdgeDevicesDatatableContainer props:");
-
-  const { settings, setTableSettings } = useTableSettings<EdgeDeviceTableSettings>();
+  const { settings, setTableSettings } =
+    useTableSettings<EdgeDeviceTableSettings>();
   const [searchBarValue, setSearchBarValue] = useSearchBarContext();
 
   const columns = useColumns();
@@ -83,30 +82,30 @@ export function EdgeDevicesDatatable({
     setGlobalFilter,
     state: { pageIndex, pageSize },
   } = useTable<Environment>(
-      {
-        defaultCanFilter: false,
-        columns,
-        data: dataset,
-        filterTypes: { multiple },
-        initialState: {
-          pageSize: settings.pageSize || 10,
-          hiddenColumns: settings.hiddenColumns,
-          sortBy: [settings.sortBy],
-          globalFilter: searchBarValue,
-        },
-        isRowSelectable(row: Row<Environment>) {
-          // return !row.original.IsPortainer; TODO mrydel
-          return row.original.Name !== "";
-        },
-        selectCheckboxComponent: Checkbox,
+    {
+      defaultCanFilter: false,
+      columns,
+      data: dataset,
+      filterTypes: { multiple },
+      initialState: {
+        pageSize: settings.pageSize || 10,
+        hiddenColumns: settings.hiddenColumns,
+        sortBy: [settings.sortBy],
+        globalFilter: searchBarValue,
       },
-      useFilters,
-      useGlobalFilter,
-      useSortBy,
-      useExpanded,
-      usePagination,
-      useRowSelect,
-      useRowSelectColumn,
+      isRowSelectable(row: Row<Environment>) {
+        // return !row.original.IsPortainer; TODO mrydel
+        return row.original.Name !== '';
+      },
+      selectCheckboxComponent: Checkbox,
+    },
+    useFilters,
+    useGlobalFilter,
+    useSortBy,
+    useExpanded,
+    usePagination,
+    useRowSelect,
+    useRowSelectColumn
   );
 
   const debouncedSearchValue = useDebounce(searchBarValue);
@@ -124,109 +123,111 @@ export function EdgeDevicesDatatable({
   const tbodyProps = getTableBodyProps();
 
   return (
-      <TableContainer>
-        <TableTitle icon="fa-plug" label="Edge Devices">
-          <TableTitleActions>
-            <ColumnVisibilityMenu
-                columns={columnsToHide}
-                onChange={handleChangeColumnsVisibility}
-                value={settings.hiddenColumns}
-            />
-
-            <TableSettingsMenu>
-              <EdgeDevicesDatatableSettings />
-            </TableSettingsMenu>
-          </TableTitleActions>
-        </TableTitle>
-
-        <TableActions>
-          <EdgeDevicesDatatableActions
-              selectedItems={selectedFlatRows.map((row) => row.original)}
-              isFDOEnabled={isFdoEnabled}
-              isOpenAMTEnabled={isOpenAmtEnabled}
-              setLoadingMessage={setLoadingMessage}
+    <TableContainer>
+      <TableTitle icon="fa-plug" label="Edge Devices">
+        <TableTitleActions>
+          <ColumnVisibilityMenu
+            columns={columnsToHide}
+            onChange={handleChangeColumnsVisibility}
+            value={settings.hiddenColumns}
           />
-        </TableActions>
 
-        <SearchBar
-            value={searchBarValue}
-            onChange={handleSearchBarChange}
-            autoFocus={false}
+          <TableSettingsMenu>
+            <EdgeDevicesDatatableSettings />
+          </TableSettingsMenu>
+        </TableTitleActions>
+      </TableTitle>
+
+      <TableActions>
+        <EdgeDevicesDatatableActions
+          selectedItems={selectedFlatRows.map((row) => row.original)}
+          isFDOEnabled={isFdoEnabled}
+          isOpenAMTEnabled={isOpenAmtEnabled}
+          setLoadingMessage={setLoadingMessage}
         />
+      </TableActions>
 
-        <Table
-            className={tableProps.className}
-            role={tableProps.role}
-            style={tableProps.style}
-        >
-          <thead>
+      <SearchBar
+        value={searchBarValue}
+        onChange={handleSearchBarChange}
+        autoFocus={false}
+      />
+
+      <Table
+        className={tableProps.className}
+        role={tableProps.role}
+        style={tableProps.style}
+      >
+        <thead>
           {headerGroups.map((headerGroup) => {
             const { key, className, role, style } =
-                headerGroup.getHeaderGroupProps();
+              headerGroup.getHeaderGroupProps();
 
             return (
-                <TableHeaderRow<Environment>
-                    key={key}
-                    className={className}
-                    role={role}
-                    style={style}
-                    headers={headerGroup.headers}
-                    onSortChange={handleSortChange}
-                />
+              <TableHeaderRow<Environment>
+                key={key}
+                className={className}
+                role={role}
+                style={style}
+                headers={headerGroup.headers}
+                onSortChange={handleSortChange}
+              />
             );
           })}
-          </thead>
-          <tbody
-              className={tbodyProps.className}
-              role={tbodyProps.role}
-              style={tbodyProps.style}
-          >
+        </thead>
+        <tbody
+          className={tbodyProps.className}
+          role={tbodyProps.role}
+          style={tbodyProps.style}
+        >
           {page.map((row) => {
             prepareRow(row);
             const { key, className, role, style } = row.getRowProps();
             return (
-                <>
-                    <TableRow<Environment>
-                        cells={row.cells}
-                        key={key}
-                        className={className}
-                        role={role}
-                        style={style}
-                    />
-                    {row.isExpanded && (
-                        <tr>
-                            <td />
-                            <td colSpan={10}>
-                                <AMTDevicesDatatable
-                                    environmentId={row.original.Id}
-                                    dataset={[{
-                                        hostname: "hostname", // TODO load from service
-                                        guid: "guid",
-                                        powerState: 1,
-                                        connectionStatus: true,
-                                    }]}
-                                />
-                            </td>
-                        </tr>
-                    )}
-                </>
+              <Fragment key={key}>
+                <TableRow<Environment>
+                  cells={row.cells}
+                  key={key}
+                  className={className}
+                  role={role}
+                  style={style}
+                />
+                {row.isExpanded && (
+                  <tr>
+                    <td />
+                    <td colSpan={10}>
+                      <AMTDevicesDatatable
+                        environmentId={row.original.Id}
+                        dataset={[
+                          {
+                            hostname: 'hostname', // TODO load from service
+                            guid: 'guid',
+                            powerState: 1,
+                            connectionStatus: true,
+                          },
+                        ]}
+                      />
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             );
           })}
-          </tbody>
-        </Table>
+        </tbody>
+      </Table>
 
-        <TableFooter>
-          <SelectedRowsCount value={selectedFlatRows.length} />
-          <PaginationControls
-              showAll
-              pageLimit={pageSize}
-              page={pageIndex + 1}
-              onPageChange={(p) => gotoPage(p - 1)}
-              totalCount={dataset.length}
-              onPageLimitChange={handlePageSizeChange}
-          />
-        </TableFooter>
-      </TableContainer>
+      <TableFooter>
+        <SelectedRowsCount value={selectedFlatRows.length} />
+        <PaginationControls
+          showAll
+          pageLimit={pageSize}
+          page={pageIndex + 1}
+          onPageChange={(p) => gotoPage(p - 1)}
+          totalCount={dataset.length}
+          onPageLimitChange={handlePageSizeChange}
+        />
+      </TableFooter>
+    </TableContainer>
   );
 
   function handlePageSizeChange(pageSize: number) {

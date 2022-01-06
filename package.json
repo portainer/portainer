@@ -45,7 +45,8 @@
     "test:client": "jest --silent",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -o ./dist/storybook",
-    "analyze-webpack": "webpack --config ./webpack/webpack.analyze.js"
+    "analyze-webpack": "webpack --config ./webpack/webpack.analyze.js",
+    "prepare": "husky install"
   },
   "scriptsComments": {
     "build": "Build the entire app (backend/frontend) in development mode",
@@ -109,8 +110,10 @@
     "js-base64": "^3.7.2",
     "js-yaml": "^3.14.0",
     "jwt-decode": "^3.1.2",
+    "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.1",
+    "msw": "^0.36.3",
     "ng-file-upload": "~12.2.13",
     "parse-duration": "^1.0.2",
     "rc-slider": "^9.7.5",
@@ -201,12 +204,13 @@
     "gruntify-eslint": "^3.1.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^5.5.0",
-    "husky": ">=4",
+    "husky": "^7.0.0",
     "jest": "^27.4.3",
     "lint-staged": ">=10",
     "load-grunt-tasks": "^3.5.2",
     "lodash-webpack-plugin": "^0.11.6",
     "mini-css-extract-plugin": "1",
+    "msw-storybook-addon": "^1.5.0",
     "ngtemplate-loader": "^2.1.0",
     "plop": "^2.6.0",
     "postcss": "7",
@@ -239,10 +243,5 @@
     "**/@uirouter/angularjs": "1.0.11",
     "**/css-loader": "5",
     "**/moment": "^2.21.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }
