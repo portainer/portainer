@@ -8,7 +8,6 @@ import {
   Row,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
-
 import { Environment } from "Portainer/environments/types";
 import { PaginationControls } from 'Portainer/components/pagination-controls';
 import {
@@ -34,6 +33,7 @@ import { useRowSelect } from 'Portainer/components/datatables/components/useRowS
 import { Checkbox } from 'Portainer/components/form-components/Checkbox';
 import { TableFooter } from 'Portainer/components/datatables/components/TableFooter';
 import { SelectedRowsCount } from 'Portainer/components/datatables/components/SelectedRowsCount';
+
 import {EdgeDeviceTableSettings} from "@/edge/devices/types";
 import {EdgeDevicesDatatableSettings} from "@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings";
 import {EdgeDevicesDatatableActions} from "@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions";
@@ -41,19 +41,24 @@ import {EdgeDevicesDatatableActions} from "@/edge/devices/components/EdgeDevices
 import { useColumns } from './columns';
 
 export interface EdgeDevicesTableProps {
-  isAddActionVisible: boolean;
+    isEnabled: boolean;
+    isFdoEnabled: boolean;
+    isOpenAmtEnabled: boolean;
   dataset: Environment[];
   onRefresh(): Promise<void>;
+    setLoadingMessage(message: string): void;
 }
 
 export function EdgeDevicesDatatable({
-                                      isAddActionVisible,
+                                         isFdoEnabled,
+                                         isOpenAmtEnabled,
                                       dataset,
                                       onRefresh,
+                                         setLoadingMessage,
                                     }: EdgeDevicesTableProps) {
 
-  console.log("EdgeDevicesDatatable:");
-  console.log(dataset);
+
+    console.log("EdgeDevicesDatatableContainer props:");
 
   const { settings, setTableSettings } = useTableSettings<EdgeDeviceTableSettings>();
   const [searchBarValue, setSearchBarValue] = useSearchBarContext();
@@ -117,7 +122,7 @@ export function EdgeDevicesDatatable({
 
   return (
       <TableContainer>
-        <TableTitle icon="fa-cubes" label="Containers">
+        <TableTitle icon="fa-plug" label="Edge Devices">
           <TableTitleActions>
             <ColumnVisibilityMenu
                 columns={columnsToHide}
@@ -134,7 +139,9 @@ export function EdgeDevicesDatatable({
         <TableActions>
           <EdgeDevicesDatatableActions
               selectedItems={selectedFlatRows.map((row) => row.original)}
-              isAddActionVisible={isAddActionVisible}
+              isFDOEnabled={isFdoEnabled}
+              isOpenAMTEnabled={isOpenAmtEnabled}
+              setLoadingMessage={setLoadingMessage}
           />
         </TableActions>
 

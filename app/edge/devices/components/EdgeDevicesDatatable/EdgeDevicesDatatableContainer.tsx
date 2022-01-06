@@ -1,7 +1,7 @@
-import { react2angular } from '@/react-tools/react2angular';
-
 import { TableSettingsProvider } from 'Portainer/components/datatables/components/useTableSettings';
 import { SearchBarProvider } from 'Portainer/components/datatables/components/SearchBar';
+
+import { react2angular } from '@/react-tools/react2angular';
 
 import {
     EdgeDevicesDatatable,
@@ -10,15 +10,14 @@ import {
 
 export function EdgeDevicesDatatableContainer({ ...props }: EdgeDevicesTableProps) {
 
-    console.log("EdgeDevicesDatatableContainer:");
-    console.log(props);
+    console.log("EdgeDevicesDatatableContainer props:");
 
     const defaultSettings = {
-    autoRefreshRate: 0,
-    hiddenQuickActions: [],
-    hiddenColumns: [],
-    pageSize: 10,
-    sortBy: { id: 'state', desc: false },
+        autoRefreshRate: 0,
+        hiddenQuickActions: [],
+        hiddenColumns: [],
+        pageSize: 10,
+        sortBy: { id: 'state', desc: false },
   };
 
   return (
@@ -34,13 +33,10 @@ export function EdgeDevicesDatatableContainer({ ...props }: EdgeDevicesTableProp
 export const EdgeDevicesDatatableAngular = react2angular(
   EdgeDevicesDatatableContainer,
   [
-    'endpointService',
-    'httpRequestHelper',
-    'notifications',
-    'modalService',
     'dataset',
     'onRefresh',
-    'isAddActionVisible',
-    'autoFocusSearch',
+      'setLoadingMessage',
+    'isOpenAmtEnabled',
+      'isFdoEnabled',
   ]
 );
