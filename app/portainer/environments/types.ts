@@ -8,6 +8,7 @@ export enum EnvironmentStatus {
 export type Environment = {
   Id: EnvironmentId;
   Name: string;
+  Group: string;
   Status: EnvironmentStatus;
   PublicURL: string;
 }
