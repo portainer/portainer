@@ -2,9 +2,8 @@ import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 import { PaginationControls } from '@/portainer/components/pagination-controls';
-import { usePaginationLimitState } from '@/common/hooks/usePaginationLimitState';
+import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
 import { Environment } from '@/portainer/environments/types';
-import { useDebounce } from '@/common/hooks/useDebounce';
 import { Button } from '@/portainer/components/Button';
 import { type EnvironmentGroup } from '@/portainer/environment-groups/types';
 import { type Tag } from '@/portainer/tags/types';
@@ -19,6 +18,7 @@ import {
   TableTitle,
 } from '@/portainer/components/datatables/components';
 import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
+import { useDebounce } from '@/portainer/hooks/useDebounce';
 
 import { EnvironmentItem } from './EnvironmentItem';
 import { KubeconfigButton } from './KubeconfigButton';

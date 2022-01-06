@@ -4,7 +4,7 @@ import { UIRouterContextComponent } from '@uirouter/react-hybrid';
 import { PropsWithChildren, StrictMode, useState, useEffect } from 'react';
 
 import { UserProvider } from '@/portainer/hooks/useUser';
-import { UIStateProvider } from '@/common/hooks/UIStateProvider';
+import { UIStateProvider } from '@/portainer/hooks/UIStateProvider';
 
 const queryClient = new QueryClient();
 
