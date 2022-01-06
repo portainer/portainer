@@ -1,12 +1,12 @@
-import axios, {AxiosError, AxiosRequestConfig} from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
+import PortainerError from '../error';
 import { get as localStorageGet } from '../hooks/useLocalStorage';
 
 import {
   portainerAgentManagerOperation,
   portainerAgentTargetHeader,
 } from './http-request.helper';
-import PortainerError from "Portainer/error";
 
 const axiosApiInstance = axios.create({ baseURL: '/api' });
 
@@ -42,14 +42,15 @@ export function agentInterceptor(config: AxiosRequestConfig) {
 
 axiosApiInstance.interceptors.request.use(agentInterceptor);
 
-export function parseAxiosError(err : Error, msg : string) {
-  let resultErr = err
+export function parseAxiosError(err: Error, msg = '') {
+  let resultErr = err;
   let resultMsg = msg;
 
-  if ("isAxiosError" in err) {
+  if ('isAxiosError' in err) {
     const axiosError = err as AxiosError;
     resultErr = new Error(`${axiosError.response?.data.message}`);
-    resultMsg = `${msg}: ${axiosError.response?.data.details}`;
+    const msgDetails = axiosError.response?.data.details;
+    resultMsg = msg ? `${msg}: ${msgDetails}` : msgDetails;
   }
 
   return new PortainerError(resultMsg, resultErr);

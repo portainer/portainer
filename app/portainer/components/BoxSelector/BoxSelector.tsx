@@ -21,7 +21,7 @@ export function BoxSelector<T extends number | string>({
   onChange,
 }: Props<T>) {
   return (
-    <div className={clsx('boxselector_wrapper', styles.root)}>
+    <div className={clsx('boxselector_wrapper', styles.root)} role="radiogroup">
       {options.map((option) => (
         <BoxSelectorItem
           key={option.id}
@@ -43,7 +43,7 @@ export function buildOption<T extends number | string>(
   label: string,
   description: string,
   value: T,
-  feature: FeatureId
+  feature?: FeatureId
 ): BoxSelectorOption<T> {
   return { id, icon, label, description, value, feature };
 }

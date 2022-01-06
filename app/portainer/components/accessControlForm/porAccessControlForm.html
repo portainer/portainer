@@ -1,7 +1,5 @@
 <div>
-  <div ng-if="!$ctrl.hideTitle" class="col-sm-12 form-section-title">
-    Access control
-  </div>
+  <div ng-if="!$ctrl.hideTitle" class="col-sm-12 form-section-title"> Access control </div>
   <!-- access-control-switch -->
   <div class="form-group">
     <div class="col-sm-12">
@@ -9,18 +7,18 @@
         Enable access control
         <portainer-tooltip position="bottom" message="When enabled, you can restrict the access and management of this resource."></portainer-tooltip>
       </label>
-      <label class="switch" style="margin-left: 20px;"> <input name="ownership" type="checkbox" ng-model="$ctrl.formData.AccessControlEnabled" /><i></i> </label>
+      <label class="switch" style="margin-left: 20px"> <input name="ownership" type="checkbox" ng-model="$ctrl.formData.AccessControlEnabled" /><i></i> </label>
     </div>
   </div>
   <!-- !access-control-switch -->
   <!-- restricted-access -->
-  <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled" style="margin-bottom: 0;">
+  <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled" style="margin-bottom: 0">
     <div class="boxselector_wrapper">
       <div ng-if="$ctrl.isAdmin">
         <input type="radio" id="access_administrators" ng-model="$ctrl.formData.Ownership" value="administrators" />
         <label for="access_administrators">
           <div class="boxselector_header">
-            <i ng-class="'administrators' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i ng-class="'administrators' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
             Administrators
           </div>
           <p>I want to restrict the management of this resource to administrators only</p>
@@ -30,40 +28,34 @@
         <input type="radio" id="access_restricted" ng-model="$ctrl.formData.Ownership" value="restricted" />
         <label for="access_restricted">
           <div class="boxselector_header">
-            <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
             Restricted
           </div>
-          <p>
-            I want to restrict the management of this resource to a set of users and/or teams
-          </p>
+          <p> I want to restrict the management of this resource to a set of users and/or teams </p>
         </label>
       </div>
       <div ng-if="!$ctrl.isAdmin">
         <input type="radio" id="access_private" ng-model="$ctrl.formData.Ownership" value="private" />
         <label for="access_private">
           <div class="boxselector_header">
-            <i ng-class="'private' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i ng-class="'private' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
             Private
           </div>
-          <p>
-            I want to this resource to be manageable by myself only
-          </p>
+          <p> I want to this resource to be manageable by myself only </p>
         </label>
       </div>
       <div ng-if="!$ctrl.isAdmin && $ctrl.availableTeams.length > 0">
         <input type="radio" id="access_restricted" ng-model="$ctrl.formData.Ownership" value="restricted" />
         <label for="access_restricted">
           <div class="boxselector_header">
-            <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
             Restricted
           </div>
           <p ng-if="$ctrl.availableTeams.length === 1">
             I want any member of my team (<b>{{ $ctrl.availableTeams[0].Name }}</b
             >) to be able to manage this resource
           </p>
-          <p ng-if="$ctrl.availableTeams.length > 1">
-            I want to restrict the management of this resource to one or more of my teams
-          </p>
+          <p ng-if="$ctrl.availableTeams.length > 1"> I want to restrict the management of this resource to one or more of my teams </p>
         </label>
       </div>
     </div>
@@ -88,7 +80,7 @@
           message="As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource."
         ></portainer-tooltip>
       </label>
-      <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted" style="margin-left: 20px;">
+      <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted" style="margin-left: 20px">
         You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
       </span>
       <span
@@ -102,7 +94,7 @@
         helper-elements="filter"
         search-property="Name"
         translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
-        style="margin-left: 20px;"
+        style="margin-left: 20px"
       >
       </span>
     </div>
@@ -119,7 +111,7 @@
           message="You can select which user(s) will be able to manage this resource."
         ></portainer-tooltip>
       </label>
-      <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted" style="margin-left: 20px;">
+      <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted" style="margin-left: 20px">
         You have not yet created any users. Head over to the <a ui-sref="portainer.users">Users view</a> to manage users.
       </span>
       <span
@@ -133,7 +125,7 @@
         helper-elements="filter"
         search-property="Username"
         translation="{nothingSelected: 'Select one or more users', search: 'Search...'}"
-        style="margin-left: 20px;"
+        style="margin-left: 20px"
       >
       </span>
     </div>
