@@ -4,8 +4,6 @@ import {getDevices} from "@/portainer/hostmanagement/open-amt/open-amt.service";
 import {EnvironmentId} from '@/portainer/environments/types';
 
 export function useAMTDevices(environmentId: EnvironmentId) {
-    console.log("useAMTDevices");
-
     const { isLoading, data, isError, error } = useQuery(
         ['amt_devices', environmentId],
         async () => getDevices(environmentId),

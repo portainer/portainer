@@ -14,12 +14,12 @@ export const heartbeat: Column<Environment> = {
 
 function StatusCell({ value: status }: { value: EnvironmentStatus }) {
   return (
-    <span className={clsx('label', `label-${environmentStatusBadge(status)}`)}>
+      <span className={clsx('label', `label-${environmentStatusBadge(status)}`)}>
       {status === EnvironmentStatus.Up ? 'up' : 'down'}
     </span>
   );
 
-  // TODO mryel use from component after home view is merged
+  // TODO mrydel use from component after home view is merged
   function environmentStatusBadge(status: EnvironmentStatus) {
     if (status === EnvironmentStatus.Down) {
       return 'danger';
@@ -27,5 +27,3 @@ function StatusCell({ value: status }: { value: EnvironmentStatus }) {
     return 'success';
   }
 }
-
-

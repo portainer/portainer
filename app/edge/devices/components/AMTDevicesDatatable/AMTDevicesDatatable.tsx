@@ -25,7 +25,7 @@ export function AMTDevicesDatatable({
                                     }: AMTDevicesTableProps) {
 
 
-    const columns = useColumns();
+    const columns = useColumns(); // TODO mrydel pasar environmentId por aca? y un callback para las actions?
 
     const {isLoading, devices, error} = useAMTDevices(environmentId);
 

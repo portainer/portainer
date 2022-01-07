@@ -63,8 +63,6 @@ export function EdgeDevicesDatatable({
 
   const columns = useColumns();
 
-  console.log("EdgeDevicesDatatable");
-
   useRepeater(settings.autoRefreshRate, onRefresh);
 
   const {

@@ -101,6 +101,14 @@
   padding: 10px;
 }
 
+.tableActionsMenu {
+  padding: 0 10px 0 10px;
+}
+
+.tableActionsHeader {
+  color: #337ab7;
+}
+
 .tableMenu .menuHeader {
   font-size: 16px;
 }
@@ -275,6 +283,11 @@
 }
 
 .datatable .table-setting-menu-btn {
+  border: none;
+  background: none;
+}
+
+.actions-menu-btn {
   border: none;
   background: none;
 }
