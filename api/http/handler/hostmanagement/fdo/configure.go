@@ -40,6 +40,16 @@ func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+func fetchProfileContents(profileURL string) ([]byte, error) {
+	resp, err := http.Get(profileURL)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return io.ReadAll(resp.Body)
+}
+
 // @id fdoConfigureDevice
 // @summary configure an FDO device
 // @description configure an FDO device
@@ -70,18 +80,12 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 
 	profileUrl, err := url.Parse(payload.ProfileURL)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: invalid FDO profile URL", Err: err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "fdoConfigureDevice: invalid FDO profile URL", Err: err}
 	}
 
-	resp, err := http.Get(payload.ProfileURL)
+	profileContents, err := fetchProfileContents(payload.ProfileURL)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: could not retrieve the FDO profile", Err: err}
-	}
-	defer resp.Body.Close()
-
-	profileContents, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: could not read the FDO profile contents", Err: err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadGateway, Message: "fdoConfigureDevice: could not retrieve the FDO profile", Err: err}
 	}
 
 	fdoClient, err := handler.newFDOClient()
