@@ -179,6 +179,7 @@ export function EdgeDevicesDatatable({
           {page.map((row) => {
             prepareRow(row);
             const { key, className, role, style } = row.getRowProps();
+
             return (
               <Fragment key={key}>
                 <TableRow<Environment>

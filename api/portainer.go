@@ -57,7 +57,7 @@ type (
 		GUID             string                        `json:"guid"`
 		HostName         string                        `json:"hostname"`
 		ConnectionStatus bool                          `json:"connectionStatus"`
-		PowerState       PowerState                    `json:"powerstate"`
+		PowerState       PowerState                    `json:"powerState"`
 		EnabledFeatures  *OpenAMTDeviceEnabledFeatures `json:"features"`
 	}
 

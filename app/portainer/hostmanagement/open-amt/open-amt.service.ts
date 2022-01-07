@@ -44,6 +44,7 @@ export async function activateDevice(environmentId: EnvironmentId) {
 }
 
 export async function getDevices(environmentId: EnvironmentId) {
+  console.log("getDevices triggered");
   try {
     const { data: devices } = await axios.get<Device[]>(
       `${BASE_URL}/${environmentId}/devices`

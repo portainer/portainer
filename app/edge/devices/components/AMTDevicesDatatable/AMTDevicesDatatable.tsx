@@ -12,6 +12,8 @@ import {
 import { Checkbox } from 'Portainer/components/form-components/Checkbox';
 import { Device } from "Portainer/hostmanagement/open-amt/model";
 
+import {useAMTDevices} from "@/edge/devices/components/AMTDevicesDatatable/useAMTDevices";
+
 import { useColumns } from './columns';
 
 export interface AMTDevicesTableProps {
@@ -24,8 +26,18 @@ export function AMTDevicesDatatable({
                                       dataset,
                                     }: AMTDevicesTableProps) {
 
+    console.log("AMTDevicesDatatable");
     console.log(environmentId);
-  const columns = useColumns();
+    console.log(dataset)
+    const columns = useColumns();
+
+    const {isLoading, data, error} = useAMTDevices(environmentId);
+    console.log(`isLoading: ${  isLoading}`);
+    console.log(data);
+    console.log(`error: ${  error}`);
+    console.log(data);
+
+    const devices = data || [];
 
   const {
     getTableProps,
@@ -38,7 +50,7 @@ export function AMTDevicesDatatable({
       {
         defaultCanFilter: false,
         columns,
-        data: dataset,
+        data: devices,
         initialState: {},
         isRowSelectable() {
           return false

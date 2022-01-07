@@ -4,7 +4,7 @@ import { Device } from "Portainer/hostmanagement/open-amt/model";
 export const powerState: Column<Device> = {
   Header: 'Power State',
   accessor: (row) => parsePowerState(row.powerState),
-  id: 'powerstate',
+  id: 'powerState',
   disableFilters: true,
   canHide: true,
   sortType: 'string',
