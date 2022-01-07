@@ -2,6 +2,7 @@ package fdo
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -16,19 +17,31 @@ import (
 
 type fdoConfigurePayload portainer.FDOConfiguration
 
+func validateURL(u string) error {
+	p, err := url.Parse(u)
+	if err != nil {
+		return err
+	}
+
+	if p.Scheme != "http" && p.Scheme != "https" {
+		return errors.New("invalid scheme provided, must be 'http' or 'https'")
+	}
+
+	if p.Host == "" {
+		return errors.New("invalid host provided")
+	}
+
+	return nil
+}
+
 func (payload *fdoConfigurePayload) Validate(r *http.Request) error {
 	if payload.Enabled {
-		parsedUrl, err := url.Parse(payload.OwnerURL)
-		if err != nil {
-			return err
+		if err := validateURL(payload.OwnerURL); err != nil {
+			return fmt.Errorf("owner server URL: %w", err)
 		}
 
-		if parsedUrl.Scheme != "http" && parsedUrl.Scheme != "https" {
-			return errors.New("invalid scheme provided, must be 'http' or 'https'")
-		}
-
-		if parsedUrl.Host == "" {
-			return errors.New("invalid host provided")
+		if err := validateURL(payload.ProfilesURL); err != nil {
+			return fmt.Errorf("profile list URL: %w", err)
 		}
 	}
 
