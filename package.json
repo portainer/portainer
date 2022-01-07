@@ -212,7 +212,7 @@
     "msw-storybook-addon": "^1.5.0",
     "ngtemplate-loader": "^2.1.0",
     "plop": "^2.6.0",
-    "postcss": "7",
+    "postcss": "8",
     "postcss-loader": "4",
     "prettier": "^2.5.1",
     "react-test-renderer": "^17.0.2",
