@@ -1,6 +1,6 @@
 import axios, { parseAxiosError } from 'Portainer/services/axios';
 
-import { FDOConfiguration, DeviceConfiguration } from './model';
+import { FDOConfiguration, DeviceConfiguration, Profiles } from './model';
 
 const BASE_URL = '/fdo';
 
@@ -20,5 +20,14 @@ export async function configureDevice(
     await axios.post(`${BASE_URL}/configure/${deviceId}`, deviceConfig);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to configure device');
+  }
+}
+
+export async function getProfiles() {
+  try {
+    const { data: profiles } = await axios.get<Profiles>(`${BASE_URL}/profiles`);
+    return profiles.profiles;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to retrieve the profiles')
   }
 }

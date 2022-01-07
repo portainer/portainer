@@ -78,6 +78,7 @@ type (
 		OwnerURL      string `json:"ownerURL"`
 		OwnerUsername string `json:"ownerUsername"`
 		OwnerPassword string `json:"ownerPassword"`
+		ProfilesURL   string `json:"profilesURL"`
 	}
 
 	// CLIFlags represents the available flags on the CLI

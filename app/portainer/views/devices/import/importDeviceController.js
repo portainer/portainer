@@ -1,6 +1,5 @@
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
-
-import { configureDevice } from "Portainer/hostmanagement/fdo/fdo.service";
+import { configureDevice, getProfiles } from "Portainer/hostmanagement/fdo/fdo.service";
 
 angular
   .module('portainer.app')
@@ -33,23 +32,25 @@ angular
       PortainerURL: '',
     };
 
-    $scope.profiles = [{ Id: 1, Name: 'Docker Standalone + Edge Agent' }];
+    $scope.profiles = [];
 
     $scope.onVoucherFileChange = function (file) {
-      if (file) {
-        $scope.state.voucherUploading = true;
-
-        FileUploadService.uploadOwnershipVoucher(file)
-          .then(function success(response) {
-            $scope.state.voucherUploading = false;
-            $scope.state.voucherUploaded = true;
-            $scope.deviceID = response.data.guid;
-          })
-          .catch(function error(err) {
-            $scope.state.voucherUploading = false;
-            Notifications.error('Failure', err, 'Unable to upload Ownership Voucher');
-          });
+      if (!file) {
+        return;
       }
+
+      $scope.state.voucherUploading = true;
+
+      FileUploadService.uploadOwnershipVoucher(file)
+        .then(function success(response) {
+          $scope.state.voucherUploading = false;
+          $scope.state.voucherUploaded = true;
+          $scope.deviceID = response.data.guid;
+        })
+        .catch(function error(err) {
+          $scope.state.voucherUploading = false;
+          Notifications.error('Failure', err, 'Unable to upload Ownership Voucher');
+        });
     };
 
     $scope.onCreateTag = function onCreateTag(tagName) {
@@ -113,7 +114,14 @@ angular
       });
     };
 
-    function initView() {
+    async function initView() {
+      try {
+        $scope.profiles = await getProfiles();
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to load profiles');
+        return;
+      }
+
       $q.all({
         groups: GroupService.groups(),
         tags: TagService.tags(),
