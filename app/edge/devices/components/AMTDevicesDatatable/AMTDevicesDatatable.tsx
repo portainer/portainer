@@ -24,11 +24,7 @@ export function AMTDevicesDatatable({
                                       dataset,
                                     }: AMTDevicesTableProps) {
 
-
-    console.log("AMTDevicesDatatable props:");
     console.log(environmentId);
-    console.log(dataset);
-
   const columns = useColumns();
 
   const {
@@ -59,12 +55,13 @@ export function AMTDevicesDatatable({
       <TableContainer>
 
         <Table
-            className={tableProps.className}
+            className={`${tableProps.className} inner-datatable`}
             role={tableProps.role}
             style={tableProps.style}
         >
           <thead>
           {headerGroups.map((headerGroup) => {
+              // TODO apply styles
             const { key, className, role, style } = headerGroup.getHeaderGroupProps();
             return (
                 <TableHeaderRow<Device>

@@ -8,7 +8,7 @@ import { useTableContext } from './TableContainer';
 
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnInstance<any>[]; // TODO mrydel
+  columns: ColumnInstance<any>[];
   onChange: (value: string[]) => void;
   value: string[];
 }

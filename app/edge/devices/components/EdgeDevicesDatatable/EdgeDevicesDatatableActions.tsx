@@ -20,7 +20,6 @@ export function EdgeDevicesDatatableActions({
                                               setLoadingMessage,
 }: Props) {
   const hasSelectedItem = selectedItems.length === 1;
-  console.log("EdgeDevicesDatatableActions props:");
 
   const router = useRouter();
 
@@ -48,8 +47,6 @@ export function EdgeDevicesDatatableActions({
   );
 
   function onAddNewDeviceClick() {
-    console.log("onAddNewDeviceClick triggered");
-
     prompt({
       title: 'How would you like to add an Edge Device?',
       inputType: 'radio',
@@ -70,8 +67,6 @@ export function EdgeDevicesDatatableActions({
         },
       },
       callback: async (result: string) => {
-        console.log(result);
-
         switch (result) {
           case "1":
             router.stateService.go('portainer.endpoints.importdevice');
@@ -88,7 +83,6 @@ export function EdgeDevicesDatatableActions({
   }
 
   function onAssociateOpenAMTClick(selectedItems: Environment[]) {
-    console.log("onAssociateOpenAMTClick triggered");
     const selectedEnvironment = selectedItems[0];
 
     confirm({

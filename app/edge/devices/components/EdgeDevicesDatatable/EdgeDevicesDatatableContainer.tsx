@@ -9,9 +9,6 @@ import {
 } from './EdgeDevicesDatatable';
 
 export function EdgeDevicesDatatableContainer({ ...props }: EdgeDevicesTableProps) {
-
-    console.log("EdgeDevicesDatatableContainer props:");
-
     const defaultSettings = {
         autoRefreshRate: 0,
         hiddenQuickActions: [],

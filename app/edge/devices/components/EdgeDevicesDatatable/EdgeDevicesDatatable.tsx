@@ -6,7 +6,6 @@ import {
   useFilters,
   useGlobalFilter,
   usePagination,
-  Row,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 import { Environment } from 'Portainer/environments/types';
@@ -58,10 +57,8 @@ export function EdgeDevicesDatatable({
   onRefresh,
   setLoadingMessage,
 }: EdgeDevicesTableProps) {
-  console.log('EdgeDevicesDatatableContainer props:');
 
-  const { settings, setTableSettings } =
-    useTableSettings<EdgeDeviceTableSettings>();
+  const { settings, setTableSettings } = useTableSettings<EdgeDeviceTableSettings>();
   const [searchBarValue, setSearchBarValue] = useSearchBarContext();
 
   const columns = useColumns();
@@ -93,9 +90,8 @@ export function EdgeDevicesDatatable({
         sortBy: [settings.sortBy],
         globalFilter: searchBarValue,
       },
-      isRowSelectable(row: Row<Environment>) {
-        // return !row.original.IsPortainer; TODO mrydel
-        return row.original.Name !== '';
+      isRowSelectable() {
+        return true;
       },
       selectCheckboxComponent: Checkbox,
     },
@@ -200,9 +196,9 @@ export function EdgeDevicesDatatable({
                         environmentId={row.original.Id}
                         dataset={[
                           {
-                            hostname: 'hostname', // TODO load from service
+                            hostname: 'hostname', // TODO mrydel load from service
                             guid: 'guid',
-                            powerState: 1,
+                            powerState: 2,
                             connectionStatus: true,
                           },
                         ]}

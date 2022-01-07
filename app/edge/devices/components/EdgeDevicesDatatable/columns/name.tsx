@@ -10,7 +10,7 @@ export const name: Column<Environment> = {
   Cell: NameCell,
   disableFilters: true,
   Filter: () => null,
-  canHide: true,
+  canHide: false,
   sortType: 'string',
 };
 
