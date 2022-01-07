@@ -2,11 +2,7 @@ import { server, rest } from '@/setup-tests/server';
 import { ResourceControlOwnership as RCO } from '@/portainer/models/resourceControl/resourceControlOwnership';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
-import {
-  renderWithQueryClient,
-  within,
-  waitFor,
-} from '@/react-tools/test-utils';
+import { renderWithQueryClient, within } from '@/react-tools/test-utils';
 import { Team } from '@/portainer/teams/types';
 import { ResourceControlViewModel } from '@/portainer/models/resourceControl/resourceControl';
 import { createMockTeams } from '@/react-tools/test-mocks';
@@ -310,11 +306,9 @@ async function renderComponent(
     </UserContext.Provider>
   );
 
-  await waitFor(async () =>
-    expect(
-      await renderResult.findByLabelText(/Enable access control/)
-    ).toBeVisible()
-  );
+  await expect(
+    renderResult.findByLabelText(/Enable access control/)
+  ).resolves.toBeVisible();
 
   return renderResult;
 }
