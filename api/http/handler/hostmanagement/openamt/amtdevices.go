@@ -38,6 +38,10 @@ func (handler *Handler) openAMTDevices(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
 	}
 
+	if endpoint.AMTDeviceGUID == "" {
+		return response.JSON(w, []portainer.OpenAMTDeviceInformation{})
+	}
+
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}

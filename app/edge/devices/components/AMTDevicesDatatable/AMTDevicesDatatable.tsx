@@ -18,26 +18,16 @@ import { useColumns } from './columns';
 
 export interface AMTDevicesTableProps {
     environmentId: EnvironmentId;
-  dataset: Device[];
 }
 
 export function AMTDevicesDatatable({
                                         environmentId,
-                                      dataset,
                                     }: AMTDevicesTableProps) {
 
-    console.log("AMTDevicesDatatable");
-    console.log(environmentId);
-    console.log(dataset)
+
     const columns = useColumns();
 
-    const {isLoading, data, error} = useAMTDevices(environmentId);
-    console.log(`isLoading: ${  isLoading}`);
-    console.log(data);
-    console.log(`error: ${  error}`);
-    console.log(data);
-
-    const devices = data || [];
+    const {isLoading, devices, error} = useAMTDevices(environmentId);
 
   const {
     getTableProps,
@@ -50,7 +40,7 @@ export function AMTDevicesDatatable({
       {
         defaultCanFilter: false,
         columns,
-        data: devices,
+        data: devices || [],
         initialState: {},
         isRowSelectable() {
           return false
@@ -73,7 +63,6 @@ export function AMTDevicesDatatable({
         >
           <thead>
           {headerGroups.map((headerGroup) => {
-              // TODO apply styles
             const { key, className, role, style } = headerGroup.getHeaderGroupProps();
             return (
                 <TableHeaderRow<Device>
@@ -92,19 +81,37 @@ export function AMTDevicesDatatable({
               role={tbodyProps.role}
               style={tbodyProps.style}
           >
-          {page.map((row) => {
-            prepareRow(row);
-            const { key, className, role, style } = row.getRowProps();
-            return (
-                <TableRow<Device>
-                    cells={row.cells}
-                    key={key}
-                    className={className}
-                    role={role}
-                    style={style}
-                />
-            );
-          })}
+          {(devices && devices.length > 0) && (
+              page.map((row) => {
+                prepareRow(row);
+                const { key, className, role, style } = row.getRowProps();
+                return (
+                    <TableRow<Device>
+                        cells={row.cells}
+                        key={key}
+                        className={className}
+                        role={role}
+                        style={style}
+                    />
+                );
+              })
+          )}
+          {isLoading && (
+              <tr>
+                  <td colSpan={5} className="text-center text-muted">Loading...</td>
+              </tr>
+          )}
+          {(!isLoading && (!devices || devices.length === 0)) &&  (
+              <tr>
+                  <td colSpan={5} className="text-center text-muted">No devices found.</td>
+              </tr>
+          )}
+          {(!isLoading && error) &&  (
+              <tr>
+                  <td colSpan={5} className="text-center text-muted">{{error}}</td>
+              </tr>
+          )}
+
           </tbody>
         </Table>
       </TableContainer>

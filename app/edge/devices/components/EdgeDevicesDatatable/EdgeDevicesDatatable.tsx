@@ -63,6 +63,8 @@ export function EdgeDevicesDatatable({
 
   const columns = useColumns();
 
+  console.log("EdgeDevicesDatatable");
+
   useRepeater(settings.autoRefreshRate, onRefresh);
 
   const {
@@ -195,14 +197,6 @@ export function EdgeDevicesDatatable({
                     <td colSpan={10}>
                       <AMTDevicesDatatable
                         environmentId={row.original.Id}
-                        dataset={[
-                          {
-                            hostname: 'hostname', // TODO mrydel load from service
-                            guid: 'guid',
-                            powerState: 2,
-                            connectionStatus: true,
-                          },
-                        ]}
                       />
                     </td>
                   </tr>

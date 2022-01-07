@@ -6,7 +6,7 @@ import {EnvironmentId} from '@/portainer/environments/types';
 export function useAMTDevices(environmentId: EnvironmentId) {
     console.log("useAMTDevices");
 
-    const { isLoading, data, error } = useQuery(
+    const { isLoading, data, isError, error } = useQuery(
         ['amt_devices', environmentId],
         async () => getDevices(environmentId),
         {
@@ -15,9 +15,12 @@ export function useAMTDevices(environmentId: EnvironmentId) {
         }
     );
 
+    // TODO mrydel isError/error is not working (always false/null)
+    console.log(`isError: ${isError}`);
+
     return {
         isLoading,
-        data,
+        devices: data,
         error,
     };
 }
