@@ -12,9 +12,12 @@ import (
 )
 
 type restorePayload struct {
-	FileContent []byte
-	FileName    string
-	Password    string
+	// Content of the backup
+	FileContent []byte `validate:"required"`
+	// File name
+	FileName string `validate:"required"`
+	// Password to decrypt the backup with
+	Password string
 }
 
 // @id Restore

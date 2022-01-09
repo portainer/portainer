@@ -6,7 +6,6 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/offlinegate"
@@ -55,12 +54,4 @@ func adminAccess(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-func systemWasInitialized(dataStore dataservices.DataStore) (bool, error) {
-	users, err := dataStore.User().UsersByRole(portainer.AdministratorRole)
-	if err != nil {
-		return false, err
-	}
-	return len(users) > 0, nil
 }
