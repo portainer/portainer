@@ -25,6 +25,10 @@ export function CreateContainerInstanceForm() {
     params: { endpointId: environmentId },
   } = useCurrentStateAndParams();
 
+  if (!environmentId) {
+    throw new Error('endpointId url param is required');
+  }
+
   const { user } = useUser();
   const isUserAdmin = isAdmin(user);
 
@@ -180,7 +184,6 @@ export function CreateContainerInstanceForm() {
             <div className="col-sm-12">
               <LoadingButton
                 disabled={!isValid}
-                dataCy="team-createTeamButton"
                 isLoading={isSubmitting}
                 loadingText="Deployment in progress..."
               >
