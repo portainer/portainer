@@ -4,12 +4,14 @@ import { UserViewModel } from '@/portainer/models/user';
 import { Link } from '@/portainer/components/Link';
 
 interface Props {
+  name: string;
   users: UserViewModel[];
   value: number[];
   onChange(value: number[]): void;
+  errors?: string | string[];
 }
 
-export function UsersField({ users, value, onChange }: Props) {
+export function UsersField({ name, users, value, onChange, errors }: Props) {
   return (
     <FormControl
       label="Authorized users"
@@ -19,9 +21,11 @@ export function UsersField({ users, value, onChange }: Props) {
           : undefined
       }
       inputId="users-selector"
+      errors={errors}
     >
       {users.length > 0 ? (
         <UsersSelector
+          name={name}
           users={users}
           onChange={onChange}
           value={value}

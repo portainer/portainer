@@ -3,6 +3,7 @@ import Select from 'react-select';
 import { Team, TeamId } from '@/portainer/teams/types';
 
 interface Props {
+  name?: string;
   value: TeamId[];
   onChange(value: TeamId[]): void;
   teams: Team[];
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function TeamsSelector({
+  name,
   value,
   onChange,
   teams,
@@ -21,6 +23,7 @@ export function TeamsSelector({
 }: Props) {
   return (
     <Select
+      name={name}
       isMulti
       getOptionLabel={(team) => team.Name}
       getOptionValue={(team) => String(team.Id)}

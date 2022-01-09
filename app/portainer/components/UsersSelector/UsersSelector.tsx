@@ -5,6 +5,7 @@ import { UserId } from '@/portainer/users/types';
 import './UsersSelector.css';
 
 interface Props {
+  name?: string;
   value: UserId[];
   onChange(value: UserId[]): void;
   users: UserViewModel[];
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function UsersSelector({
+  name,
   value,
   onChange,
   users,
@@ -24,6 +26,7 @@ export function UsersSelector({
   return (
     <Select
       isMulti
+      name={name}
       getOptionLabel={(user) => user.Username}
       getOptionValue={(user) => user.Id}
       options={users}
