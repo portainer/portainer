@@ -8,8 +8,7 @@ export function useAMTDevices(environmentId: EnvironmentId) {
         ['amt_devices', environmentId],
         async () => getDevices(environmentId),
         {
-            refetchOnMount: 'always',
-            optimisticResults: false,
+            refetchOnWindowFocus: false,
         },
     );
 
