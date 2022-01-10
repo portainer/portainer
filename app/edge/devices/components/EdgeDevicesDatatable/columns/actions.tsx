@@ -14,8 +14,8 @@ export const actions: Column<Environment> = {
   Cell: ActionsCell,
 };
 
-export function ActionsCell({ row: { original: device }, }: CellProps<TableInstance>) {
-  console.log(device);
+export function ActionsCell() {
+
   return (
       <ActionsMenu>
         <div>

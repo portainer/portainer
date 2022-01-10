@@ -55,7 +55,6 @@ export function ActionsCell({ row: { original: device }, }: CellProps<TableInsta
         },
       },
       callback: async (result: boolean) => {
-        console.log(device);
         if (!result) {
           return;
         }
