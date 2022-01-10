@@ -27,21 +27,22 @@ type DbConnection struct {
 	*bolt.DB
 }
 
-func (connection *DbConnection) GetDatabaseFilename(fullpath bool) string {
-
-	if fullpath {
-		if connection.IsEncryptedStore() {
-			return path.Join(connection.Path, EncryptedDatabaseFileName)
-		}
-
-		return path.Join(connection.Path, DatabaseFileName)
-	}
-
+// GetDatabaseFileName get the database filename
+func (connection *DbConnection) GetDatabaseFileName() string {
 	if connection.IsEncryptedStore() {
 		return EncryptedDatabaseFileName
 	}
 
 	return DatabaseFileName
+}
+
+// GetDataseFilePath get the path + filename for the database file
+func (connection *DbConnection) GetDatabaseFilePath() string {
+	if connection.IsEncryptedStore() {
+		return path.Join(connection.Path, EncryptedDatabaseFileName)
+	}
+
+	return path.Join(connection.Path, DatabaseFileName)
 }
 
 // GetStorePath get the filename and path for the database file
@@ -91,10 +92,10 @@ func (connection *DbConnection) Open() error {
 	// 	log.Printf("raw export to %s success", databaseExportPath)
 	// }
 
-	logrus.Infof("Loading PortainerDB: %s", connection.GetDatabaseFilename(false))
+	logrus.Infof("Loading PortainerDB: %s", connection.GetDatabaseFileName())
 
 	// Now we open the db
-	databasePath := connection.GetDatabaseFilename(true)
+	databasePath := connection.GetDatabaseFilePath()
 	db, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return err
@@ -122,7 +123,7 @@ func (connection *DbConnection) BackupTo(w io.Writer) error {
 }
 
 func (connection *DbConnection) ExportRaw(filename string) error {
-	databasePath := connection.GetDatabaseFilename(true)
+	databasePath := connection.GetDatabaseFilePath()
 	if _, err := os.Stat(databasePath); err != nil {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
