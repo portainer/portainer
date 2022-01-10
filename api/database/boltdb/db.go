@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"time"
@@ -56,30 +57,28 @@ func (connection *DbConnection) SetEncrypted(flag bool) {
 
 // Return true if the database is encrypted
 func (connection *DbConnection) IsEncryptedStore() bool {
+	return connection.getEncryptionKey() != nil
+}
 
-	if connection.isEncrypted {
-		return true
+// Return true if the database is encrypted
+func (connection *DbConnection) IsEncryptionRequired() bool {
+
+	encryptedDbFile := false
+	dbFile := path.Join(connection.Path, EncryptedDatabaseFileName)
+	if _, err := os.Stat(dbFile); err == nil {
+		encryptedDbFile = true
 	}
 
-	// otherwise determine whether the database is an encrypted one by whether we have
-	// an EncryptionKey set and the presense of the encrypted database file
-	if connection.EncryptionKey != nil {
-		dbFile := path.Join(connection.Path, EncryptedDatabaseFileName)
-		if _, err := os.Stat(dbFile); err == nil {
-			connection.isEncrypted = true
-			return true
+	if encryptedDbFile {
+		connection.SetEncrypted(true)
+		if connection.EncryptionKey == nil {
+			log.Fatal("Portainer database is encrypted, but no encryption key was loaded")
 		}
 
-		// however, if this is a new db (no existing portainer.db),
-		// indicate this is encrypted from the start
-		dbFile = path.Join(connection.Path, DatabaseFileName)
-		if _, err := os.Stat(dbFile); err != nil {
-			connection.isEncrypted = true
-			return true
-		}
+		return false
 	}
 
-	return false
+	return true
 }
 
 // Open opens and initializes the BoltDB database.
@@ -180,7 +179,7 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 }
 
 func (connection *DbConnection) getEncryptionKey() []byte {
-	if !connection.IsEncryptedStore() {
+	if !connection.isEncrypted {
 		return nil
 	}
 

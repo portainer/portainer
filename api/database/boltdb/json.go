@@ -16,11 +16,16 @@ import (
 var errEncryptedStringTooShort = fmt.Errorf("encrypted string too short")
 
 // MarshalObject encodes an object to binary format
-func (connection *DbConnection) MarshalObject(object interface{}) ([]byte, error) {
-	data, err := json.Marshal(object)
-	if err != nil {
-		logrus.WithError(err).Errorf("failed marshaling object")
-		return data, err
+func (connection *DbConnection) MarshalObject(object interface{}) (data []byte, err error) {
+	// Special case for the VERSION bucket. Here we're not using json
+	if v, ok := object.(string); ok {
+		data = []byte(v)
+	} else {
+		data, err = json.Marshal(object)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed marshaling object")
+			return data, err
+		}
 	}
 	if connection.getEncryptionKey() == nil {
 		return data, nil
@@ -39,7 +44,14 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 	}
 	e := json.Unmarshal(data, object)
 	if e != nil {
-		return errors.Wrap(err, e.Error())
+		// Special case for the VERSION bucket. Here we're not using json
+		// So we need to return it as a string
+		s, ok := object.(*string)
+		if !ok {
+			return errors.Wrap(err, e.Error())
+		}
+
+		*s = string(data)
 	}
 	return err
 }

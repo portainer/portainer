@@ -40,6 +40,11 @@ func NewStore(storePath string, fileService portainer.FileService, connection po
 func (store *Store) Open() (newStore bool, err error) {
 	newStore = true
 
+	encryptionReq := store.connection.IsEncryptionRequired()
+	if encryptionReq {
+		store.encryptDB()
+	}
+
 	err = store.connection.Open()
 	if err != nil {
 		return newStore, err
@@ -69,12 +74,6 @@ func (store *Store) Open() (newStore bool, err error) {
 			logrus.WithError(err).Debugf("open db failed - other")
 		}
 		return newStore, err
-	}
-
-	logrus.Infof("New data store=%t. Is it encrypted=%t.", newStore, store.connection.IsEncryptedStore())
-	if !newStore && !store.connection.IsEncryptedStore() {
-		logrus.Infof("The existing store is NOT encrypted")
-		store.encryptDB()
 	}
 
 	return newStore, nil
@@ -108,6 +107,14 @@ func (store *Store) Rollback(force bool) error {
 }
 
 func (store *Store) encryptDB() error {
+	store.connection.SetEncrypted(false)
+	store.connection.Open()
+
+	err := store.initServices()
+	if err != nil {
+		return err
+	}
+
 	// The DB is not currently encrypted.  First save the encrypted db filename
 	oldFilename := store.connection.GetDatabaseFilePath()
 	logrus.Infof("Encrypting database...")
@@ -116,7 +123,7 @@ func (store *Store) encryptDB() error {
 	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
 
 	logrus.Infof("Exporting database backup to %s", exportFilename)
-	err := store.Export(exportFilename)
+	err = store.Export(exportFilename)
 	if err != nil {
 		logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
 		return err
@@ -124,7 +131,7 @@ func (store *Store) encryptDB() error {
 
 	logrus.Infof("Database backup exported")
 
-	// Close existing un-encrypted db so that we can delete he file later
+	// Close existing un-encrypted db so that we can delete the file later
 	store.connection.Close()
 
 	// Tell the db layer to create an encrypted db when opened
@@ -148,6 +155,9 @@ func (store *Store) encryptDB() error {
 	if err != nil {
 		logrus.Errorf("failed to remove the un-encrypted db file")
 	}
+
+	// Close db connection
+	store.connection.Close()
 
 	logrus.Info("Database successfully encrypted")
 	return nil
