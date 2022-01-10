@@ -71,13 +71,10 @@ interface AuthorizedProps {
   children: ReactNode;
 }
 
-export function Authorized({
-  authorizations,
-  children,
-}: AuthorizedProps): ReactNode {
+export function Authorized({ authorizations, children }: AuthorizedProps) {
   const isAllowed = useAuthorizations(authorizations);
 
-  return isAllowed ? children : null;
+  return isAllowed ? <>{children}</> : null;
 }
 
 interface UserProviderProps {
