@@ -66,18 +66,18 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService, encryptionkey []byte, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase("boltdb", *flags.Data, encryptionkey)
+func initDataStore(storePath string, rollback bool, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
+	connection, err := database.NewDatabase("boltdb", storePath, secretKey)
 	if err != nil {
 		panic(err)
 	}
-	store := datastore.NewStore(*flags.Data, fileService, connection)
-	isNew, err := store.Open()
+	store := datastore.NewStore(storePath, fileService, connection)
+	_, err = store.Open()
 	if err != nil {
 		log.Fatalf("failed opening store: %v", err)
 	}
 
-	if *flags.Rollback {
+	if rollback {
 		err := store.Rollback(false)
 		if err != nil {
 			log.Fatalf("failed rolling back: %s", err)
@@ -86,26 +86,6 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 		log.Println("Exiting rollback")
 		os.Exit(0)
 		return nil
-	}
-
-	// Init sets some defaults - its basically a migration
-	err = store.Init()
-	if err != nil {
-		log.Fatalf("failed initializing data store: %v", err)
-	}
-
-	if isNew {
-		// from MigrateData
-		store.VersionService.StoreDBVersion(portainer.DBVersion)
-
-		// Disabled for now.  Can't use feature flags due to the way that works
-		// EXPERIMENTAL, will only activate if `/data/import.json` exists
-		//importFromJson(fileService, store)
-
-		err := updateSettingsFromFlags(store, flags)
-		if err != nil {
-			log.Fatalf("failed updating settings from flags: %v", err)
-		}
 	}
 
 	storedVersion, err := store.VersionService.DBVersion()
@@ -124,7 +104,7 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 		<-shutdownCtx.Done()
 		defer connection.Close()
 
-		exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
+		exportFilename := path.Join(storePath, fmt.Sprintf("export-%d.json", time.Now().Unix()))
 
 		err := store.Export(exportFilename)
 		if err != nil {
@@ -518,7 +498,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Println("proceeding without encryption key")
 	}
 
-	dataStore := initDataStore(flags, fileService, encryptionKey, shutdownCtx)
+	dataStore := initDataStore(*flags.Data, *flags.Rollback, encryptionKey, fileService, shutdownCtx)
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
 		log.Fatal(err)

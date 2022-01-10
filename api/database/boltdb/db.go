@@ -127,7 +127,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
-	b, err := exportJson(databasePath, connection.getEncryptionKey())
+	b, err := connection.exportJson(databasePath)
 	if err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 		return err
 	}
 
-	return UnmarshalObject(data, object, connection.getEncryptionKey())
+	return connection.UnmarshalObject(data, object)
 }
 
 func (connection *DbConnection) getEncryptionKey() []byte {
@@ -191,7 +191,7 @@ func (connection *DbConnection) UpdateObject(bucketName string, key []byte, obje
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
-		data, err := MarshalObject(object, connection.getEncryptionKey())
+		data, err := connection.MarshalObject(object)
 		if err != nil {
 			return err
 		}
@@ -222,7 +222,7 @@ func (connection *DbConnection) DeleteAllObjects(bucketName string, matching fun
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var obj interface{}
-			err := UnmarshalObject(v, &obj, connection.getEncryptionKey())
+			err := connection.UnmarshalObject(v, &obj)
 			if err != nil {
 				return err
 			}
@@ -264,7 +264,7 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 		seqId, _ := bucket.NextSequence()
 		id, obj := fn(seqId)
 
-		data, err := MarshalObject(obj, connection.getEncryptionKey())
+		data, err := connection.MarshalObject(obj)
 		if err != nil {
 			return err
 		}
@@ -277,7 +277,7 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-		data, err := MarshalObject(obj, connection.getEncryptionKey())
+		data, err := connection.MarshalObject(obj)
 		if err != nil {
 			return err
 		}
@@ -298,7 +298,7 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 			return err
 		}
 
-		data, err := MarshalObject(obj, connection.getEncryptionKey())
+		data, err := connection.MarshalObject(obj)
 		if err != nil {
 			return err
 		}
@@ -312,7 +312,7 @@ func (connection *DbConnection) GetAll(bucketName string, obj interface{}, appen
 		bucket := tx.Bucket([]byte(bucketName))
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObject(v, obj, connection.getEncryptionKey())
+			err := connection.UnmarshalObject(v, obj)
 			if err != nil {
 				return err
 			}
@@ -334,7 +334,7 @@ func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interf
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObjectWithJsoniter(v, obj, connection.getEncryptionKey())
+			err := connection.UnmarshalObjectWithJsoniter(v, obj)
 			if err != nil {
 				return err
 			}

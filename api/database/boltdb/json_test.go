@@ -82,9 +82,11 @@ func Test_MarshalObjectUnencrypted(t *testing.T) {
 		},
 	}
 
+	conn := DbConnection{}
+
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s -> %s", test.object, test.expected), func(t *testing.T) {
-			data, err := MarshalObject(test.object, nil)
+			data, err := conn.MarshalObject(test.object)
 			is.NoError(err)
 			is.Equal(test.expected, string(data))
 		})
@@ -120,10 +122,12 @@ func Test_UnMarshalObjectUnencrypted(t *testing.T) {
 		},
 	}
 
+	conn := DbConnection{}
+
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s -> %s", test.object, test.expected), func(t *testing.T) {
 			var object string
-			err := UnmarshalObject(test.object, &object, nil)
+			err := conn.UnmarshalObject(test.object, &object)
 			is.NoError(err)
 			is.Equal(test.expected, string(object))
 		})
@@ -156,14 +160,15 @@ func Test_ObjectMarshallingEncrypted(t *testing.T) {
 	}
 
 	key := secretToEncryptionKey(passphrase)
+	conn := DbConnection{EncryptionKey: key}
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s -> %s", test.object, test.expected), func(t *testing.T) {
 
-			data, err := MarshalObject(test.object, key)
+			data, err := conn.MarshalObject(test.object)
 			is.NoError(err)
 
 			var object []byte
-			err = UnmarshalObject(data, &object, key)
+			err = conn.UnmarshalObject(data, &object)
 
 			is.NoError(err)
 			is.Equal(test.object, object)

@@ -51,10 +51,27 @@ func (store *Store) Open() (newStore bool, err error) {
 	}
 
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
-	if _, err := store.VersionService.DBVersion(); err == nil {
+	version, err := store.VersionService.DBVersion()
+	logrus.Infof("database version: %d", version)
+
+	if err == nil {
+		newStore = true
+		logrus.WithField("version", version).Infof("Opened existing store")
+	} else {
 		newStore = false
+		if err.Error() == "encrypted string too short" {
+			logrus.WithError(err).Debugf("open db failed - wrong encryption key")
+		}
+		if store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Debugf("open db failed - object not found")
+			return newStore, nil
+		} else {
+			logrus.WithError(err).Debugf("open db failed - other")
+		}
+		return newStore, err
 	}
 
+	logrus.Infof("New data store=%t. Is it encrypted=%t.", newStore, store.connection.IsEncryptedStore())
 	if !newStore && !store.connection.IsEncryptedStore() {
 		logrus.Infof("The existing store is NOT encrypted")
 		store.encryptDB()
