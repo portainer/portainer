@@ -6,6 +6,8 @@ angular.module('portainer.edge').controller('EdgeDevicesViewController', EdgeDev
 export function EdgeDevicesViewController($q, $async, EndpointService, GroupService, SettingsService, ModalService, Notifications) {
     var ctrl = this;
 
+    ctrl.edgeDevices = [];
+
   this.getEnvironments = function() {
       return $async(async () => {
         $q.all({

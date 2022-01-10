@@ -291,3 +291,7 @@
   border: none;
   background: none;
 }
+
+.tableActionsMenu [data-reach-menu-item] {
+  padding: 5px 5px !important;
+}

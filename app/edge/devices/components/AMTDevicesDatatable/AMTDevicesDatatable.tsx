@@ -2,7 +2,6 @@ import {
   useTable,
     usePagination,
 } from 'react-table';
-import {EnvironmentId} from "Portainer/environments/types";
 import {
   Table,
   TableContainer,
@@ -11,23 +10,18 @@ import {
 } from 'Portainer/components/datatables/components';
 import { Checkbox } from 'Portainer/components/form-components/Checkbox';
 import { Device } from "Portainer/hostmanagement/open-amt/model";
+import {useEnvironment} from "Portainer/environments/useEnvironment";
 
 import {useAMTDevices} from "@/edge/devices/components/AMTDevicesDatatable/useAMTDevices";
+import {RowProvider} from "@/edge/devices/components/AMTDevicesDatatable/columns/RowContext";
 
 import { useColumns } from './columns';
 
-export interface AMTDevicesTableProps {
-    environmentId: EnvironmentId;
-}
+export function AMTDevicesDatatable() {
+    const columns = useColumns();
 
-export function AMTDevicesDatatable({
-                                        environmentId,
-                                    }: AMTDevicesTableProps) {
-
-
-    const columns = useColumns(); // TODO mrydel pasar environmentId por aca? y un callback para las actions?
-
-    const {isLoading, devices, error} = useAMTDevices(environmentId);
+    const environment = useEnvironment();
+    const {isLoading, devices, error} = useAMTDevices(environment.Id);
 
   const {
     getTableProps,
@@ -81,18 +75,21 @@ export function AMTDevicesDatatable({
               role={tbodyProps.role}
               style={tbodyProps.style}
           >
-          {(devices && devices.length > 0) && (
+          {(!isLoading && devices && devices.length > 0) && (
               page.map((row) => {
                 prepareRow(row);
                 const { key, className, role, style } = row.getRowProps();
+
                 return (
-                    <TableRow<Device>
-                        cells={row.cells}
-                        key={key}
-                        className={className}
-                        role={role}
-                        style={style}
-                    />
+                    <RowProvider key={key}>
+                        <TableRow<Device>
+                            cells={row.cells}
+                            key={key}
+                            className={className}
+                            role={role}
+                            style={style}
+                        />
+                    </RowProvider>
                 );
               })
           )}

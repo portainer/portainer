@@ -15,7 +15,6 @@ export const name: Column<Environment> = {
 };
 
 export function NameCell({ value: name, row }: CellProps<TableInstance>) {
-  console.log(row.original);
     return (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <div {...row.getToggleRowExpandedProps({})}>

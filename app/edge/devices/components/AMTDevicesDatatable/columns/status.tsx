@@ -1,13 +1,22 @@
-import { Column } from 'react-table';
+import {CellProps, Column, TableInstance} from 'react-table';
+import clsx from "clsx";
 import { Device } from "Portainer/hostmanagement/open-amt/model";
 
 export const status: Column<Device> = {
   Header: 'MPS Status',
-  accessor: (row) => row.connectionStatus ? 'Connected' : 'Disconnected',
   id: 'status',
   disableFilters: true,
   canHide: true,
   sortType: 'string',
+  Cell: StatusCell,
   Filter: () => null,
 };
+
+export function StatusCell({ row: { original: device }, }: CellProps<TableInstance>) {
+  return (
+      <span className={clsx({'text-success': device.connectionStatus})}>
+        {device.connectionStatus ? 'Connected' : 'Disconnected'}
+      </span>
+  )
+}
 

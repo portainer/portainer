@@ -1,8 +1,14 @@
 import {CellProps, Column, TableInstance} from 'react-table';
+import {useRouter} from "@uirouter/react";
 import { Device } from "Portainer/hostmanagement/open-amt/model";
 import { MenuItem } from "@reach/menu-button";
 import { ActionsMenu } from "Portainer/components/datatables/components/ActionsMenu";
 import {confirm} from "Portainer/services/modal.service/confirm";
+import {useEnvironment} from "Portainer/environments/useEnvironment";
+import {executeDeviceAction} from "Portainer/hostmanagement/open-amt/open-amt.service";
+import * as notifications from "Portainer/services/notifications";
+
+import {useRowContext} from "@/edge/devices/components/AMTDevicesDatatable/columns/RowContext";
 
 export const actions: Column<Device> = {
   Header: 'Actions',
@@ -16,30 +22,28 @@ export const actions: Column<Device> = {
 };
 
 export function ActionsCell({ row: { original: device }, }: CellProps<TableInstance>) {
+  const router = useRouter();
+  const environment = useEnvironment();
+  const { isLoading, toggleIsLoading } = useRowContext();
+
   return (
       <ActionsMenu>
         <div className="tableActionsMenu">
           <div className="tableActionsHeader">AMT Functions</div>
           <div>
-            <MenuItem onSelect={() => handlePowerOn()}>Power ON</MenuItem>
-            <MenuItem onSelect={() => {}}>Power OFF</MenuItem>
-            <MenuItem onSelect={() => {}}>Restart</MenuItem>
-            <MenuItem onSelect={() => {}}>KVM</MenuItem>
-          </div>
-
-          <div className="tableActionsHeader">FDO Functions</div>
-          <div>
-            <MenuItem onSelect={() => {}}>Claim</MenuItem>
-            <MenuItem onSelect={() => {}}>Provision</MenuItem>
+            <MenuItem disabled={isLoading} onSelect={() => handleDeviceActionClick('power on')}>Power ON</MenuItem>
+            <MenuItem disabled={isLoading} onSelect={() => handleDeviceActionClick('power off')}>Power OFF</MenuItem>
+            <MenuItem disabled={isLoading} onSelect={() => handleDeviceActionClick('restart')}>Restart</MenuItem>
+            <MenuItem disabled={isLoading} onSelect={() => handleKVMClick()}>KVM</MenuItem>
           </div>
         </div>
       </ActionsMenu>
   )
 
-  function handlePowerOn() {
+  function handleDeviceActionClick(action: string) {
     confirm({
       title: 'Confirm action',
-      message: `Are you sure you want to power on the device?`,
+      message: `Are you sure you want to ${action} the device?`,
       buttons: {
         cancel: {
           label: 'Cancel',
@@ -51,23 +55,29 @@ export function ActionsCell({ row: { original: device }, }: CellProps<TableInsta
         },
       },
       callback: async (result: boolean) => {
-        console.log(result);
-        /*
+        console.log(device);
         if (!result) {
           return;
         }
 
         try {
-          setExecutingAction(deviceGUID, true);
-          await executeDeviceAction(this.endpointId, deviceGUID, action);
-          Notifications.success(`${action} action sent successfully`);
+          toggleIsLoading();
+          await executeDeviceAction(environment.Id, device.guid, action);
+          notifications.success(`${action} action sent successfully`, device.hostname);
+          await router.stateService.reload();
         } catch (err) {
           notifications.error('Failure', err as Error, `Failed to ${action} the device`);
-        } finally {
-          setLoadingMessage('');
-        } */
-
+          toggleIsLoading();
+        }
       },
+    });
+  }
+
+  function handleKVMClick() {
+    router.stateService.go('portainer.endpoints.endpoint.kvm', {
+      id: environment.Id,
+      deviceId: device.guid,
+      deviceName: device.hostname,
     });
   }
 

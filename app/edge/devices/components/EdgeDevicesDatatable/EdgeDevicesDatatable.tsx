@@ -30,9 +30,9 @@ import {
   SearchBar,
 } from 'Portainer/components/datatables/components/SearchBar';
 import { useRowSelect } from 'Portainer/components/datatables/components/useRowSelect';
-import { Checkbox } from 'Portainer/components/form-components/Checkbox';
 import { TableFooter } from 'Portainer/components/datatables/components/TableFooter';
 import { SelectedRowsCount } from 'Portainer/components/datatables/components/SelectedRowsCount';
+import {EnvironmentProvider} from "Portainer/environments/useEnvironment";
 
 import { EdgeDeviceTableSettings } from '@/edge/devices/types';
 import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings';
@@ -93,7 +93,6 @@ export function EdgeDevicesDatatable({
       isRowSelectable() {
         return true;
       },
-      selectCheckboxComponent: Checkbox,
     },
     useFilters,
     useGlobalFilter,
@@ -156,10 +155,7 @@ export function EdgeDevicesDatatable({
       >
         <thead>
           {headerGroups.map((headerGroup) => {
-            const { key, className, role, style } =
-              headerGroup.getHeaderGroupProps({
-                style: {width: '20px'}
-              });
+            const { key, className, role, style } = headerGroup.getHeaderGroupProps();
 
             return (
               <TableHeaderRow<Environment>
@@ -195,9 +191,9 @@ export function EdgeDevicesDatatable({
                   <tr>
                     <td />
                     <td colSpan={10}>
-                      <AMTDevicesDatatable
-                        environmentId={row.original.Id}
-                      />
+                      <EnvironmentProvider environment={row.original}>
+                        <AMTDevicesDatatable/>
+                      </EnvironmentProvider>
                     </td>
                   </tr>
                 )}

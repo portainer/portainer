@@ -11,3 +11,7 @@
   border: none;
   background: none;
 }
+
+.loadingSpinner {
+  margin-left: 5px;
+}

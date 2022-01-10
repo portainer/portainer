@@ -4,7 +4,7 @@ import { DefaultFilter } from 'Portainer/components/datatables/components/Filter
 
 export const group: Column<Environment> = {
   Header: 'Group',
-  accessor: (row) => row.GroupName || '-', // TODO mrydel no anda
+  accessor: (row) => row.GroupName || '-',
   id: 'groupName',
   Filter: DefaultFilter,
   canHide: true,

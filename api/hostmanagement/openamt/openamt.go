@@ -21,7 +21,7 @@ const (
 
 	httpClientTimeout = 5 * time.Minute
 
-	powerUpState  portainer.PowerState = 2
+	powerOnState  portainer.PowerState = 2
 	powerOffState portainer.PowerState = 8
 	restartState  portainer.PowerState = 5
 )

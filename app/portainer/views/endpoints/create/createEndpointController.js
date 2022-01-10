@@ -49,9 +49,6 @@ angular
       ],
     };
 
-    console.log("isEdgeDevice");
-    console.log($scope.state.isEdgeDevice);
-
     const agentVersion = StateManager.getState().application.version;
     const agentShortVersion = getAgentShortVersion(agentVersion);
 
@@ -246,7 +243,6 @@ angular
     async function addEndpoint(name, creationType, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, CheckinInterval) {
       return $async(async () => {
         $scope.state.actionInProgress = true;
-        console.log($scope.state.isEdgeDevice);
         try {
           const endpoint = await EndpointService.createRemoteEndpoint(
             name,
