@@ -1,19 +1,27 @@
+import EndpointHelper from "Portainer/helpers/endpointHelper";
+
 angular.module('portainer.edge').controller('EdgeDevicesViewController', EdgeDevicesViewController);
 
 /* @ngInject */
-export function EdgeDevicesViewController($async, EndpointService, SettingsService, ModalService, Notifications) {
+export function EdgeDevicesViewController($q, $async, EndpointService, GroupService, SettingsService, ModalService, Notifications) {
     var ctrl = this;
 
   this.getEnvironments = function() {
       return $async(async () => {
-          EndpointService.endpoints()
-              .then(function success(data) {
-                  ctrl.edgeDevices = data.value;
-              })
-              .catch(function error(err) {
-                  Notifications.error('Failure', err, 'Unable to retrieve edge devices');
-                  ctrl.edgeDevices = [];
-              });
+        $q.all({
+              endpoints: EndpointService.endpoints(),
+              groups: GroupService.groups(),
+          })
+          .then(function success(data) {
+              var endpoints = data.endpoints.value;
+              var groups = data.groups;
+              EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
+              ctrl.edgeDevices = endpoints;
+          })
+          .catch(function error(err) {
+              Notifications.error('Failure', err, 'Unable to retrieve edge devices');
+              ctrl.edgeDevices = [];
+          });
       })
   }
 
