@@ -1,6 +1,5 @@
 import { ResourceGroupViewModel } from '../models/resource_group';
 import { SubscriptionViewModel } from '../models/subscription';
-import { getContainerInstanceProvider } from './provider.service';
 import { getResourceGroups } from './resource-groups.service';
 import { getSubscriptions } from './subscription.service';
 
@@ -15,25 +14,11 @@ export function AzureService($q, Azure, $async, EndpointProvider, ContainerGroup
     return Azure.delete(id, '2018-04-01');
   };
 
-  service.createContainerGroup = function (model, subscriptionId, resourceGroupName) {
-    return ContainerGroupService.create(model, subscriptionId, resourceGroupName);
-  };
-
   service.subscriptions = async function subscriptions() {
     return $async(async () => {
       const environmentId = EndpointProvider.endpointID();
       const subscriptions = await getSubscriptions(environmentId);
       return subscriptions.map((s) => new SubscriptionViewModel(s));
-    });
-  };
-
-  service.containerInstanceProvider = function (subscriptions) {
-    return $async(async () => {
-      return retrieveResourcesForEachSubscription(subscriptions, async (subscriptionId) => {
-        const environmentId = EndpointProvider.endpointID();
-
-        return await getContainerInstanceProvider(environmentId, subscriptionId);
-      });
     });
   };
 
