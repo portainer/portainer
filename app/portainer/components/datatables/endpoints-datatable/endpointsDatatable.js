@@ -9,6 +9,5 @@ angular.module('portainer.app').component('endpointsDatatable', {
     reverseOrder: '<',
     removeAction: '<',
     retrievePage: '<',
-    setLoadingMessage: '<',
   },
 });
