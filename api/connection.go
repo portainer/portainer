@@ -13,7 +13,8 @@ type Connection interface {
 
 	// TODO: this one is very database specific atm
 	BackupTo(w io.Writer) error
-	GetDatabaseFilename(fullpath bool) string
+	GetDatabaseFileName() string
+	GetDatabaseFilePath() string
 	GetStorePath() string
 
 	IsEncryptedStore() bool

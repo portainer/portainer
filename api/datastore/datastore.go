@@ -92,7 +92,7 @@ func (store *Store) Rollback(force bool) error {
 
 func (store *Store) encryptDB() error {
 	// The DB is not currently encrypted.  First save the encrypted db filename
-	oldFilename := store.connection.GetDatabaseFilename(true)
+	oldFilename := store.connection.GetDatabaseFilePath()
 	logrus.Infof("Encrypting database...")
 
 	// export file path for backup
@@ -123,7 +123,7 @@ func (store *Store) encryptDB() error {
 	err = store.Import(exportFilename)
 	if err != nil {
 		// Remove the new encrypted file that we failed to import
-		os.Remove(store.connection.GetDatabaseFilename(true))
+		os.Remove(store.connection.GetDatabaseFilePath())
 		logrus.Fatal(errors.ErrDBImportFailed.Error())
 	}
 
