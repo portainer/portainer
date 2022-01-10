@@ -72,6 +72,7 @@ export type Environment = {
   Snapshots: DockerSnapshot[];
   Kubernetes: KubernetesSettings;
   PublicURL?: string;
+  IsEdgeDevice?: boolean;
 };
 
 /**

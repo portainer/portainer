@@ -1,7 +1,7 @@
 import EndpointHelper from "Portainer/helpers/endpointHelper";
+import {getEndpoints} from "Portainer/environments/environment.service";
 
 angular.module('portainer.edge').controller('EdgeDevicesViewController', EdgeDevicesViewController);
-
 /* @ngInject */
 export function EdgeDevicesViewController($q, $async, EndpointService, GroupService, SettingsService, ModalService, Notifications) {
     var ctrl = this;
@@ -9,7 +9,7 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
   this.getEnvironments = function() {
       return $async(async () => {
         $q.all({
-              endpoints: EndpointService.endpoints(),
+              endpoints: getEndpoints(0, 100, {edgeDeviceFilter: true}),
               groups: GroupService.groups(),
           })
           .then(function success(data) {

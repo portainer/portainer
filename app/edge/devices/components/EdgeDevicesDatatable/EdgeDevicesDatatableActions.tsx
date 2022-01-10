@@ -69,10 +69,10 @@ export function EdgeDevicesDatatableActions({
       callback: async (result: string) => {
         switch (result) {
           case "1":
-            router.stateService.go('portainer.endpoints.importdevice');
+            router.stateService.go('portainer.endpoints.importDevice');
             break;
           case "2":
-            router.stateService.go('portainer.endpoints.new');
+            router.stateService.go('portainer.endpoints.newEdgeDevice');
             break;
           default:
             break;

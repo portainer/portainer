@@ -20,6 +20,7 @@ interface EndpointsQuery {
   endpointIds?: EnvironmentId[];
   tagsPartialMatch?: boolean;
   groupId?: EnvironmentGroupId;
+  edgeDeviceFilter?: boolean;
 }
 
 export async function getEndpoints(
@@ -32,6 +33,9 @@ export async function getEndpoints(
   }
 
   const url = buildUrl();
+
+  console.log("query");
+  console.log(query);
 
   const params: Record<string, unknown> = { start, limit, ...query };
 
@@ -46,6 +50,9 @@ export async function getEndpoints(
   if (endpointIds) {
     params.endpointIds = arrayToJson(endpointIds);
   }
+
+  console.log("params");
+  console.log(params);
 
   try {
     const response = await axios.get<Environment[]>(url, { params });

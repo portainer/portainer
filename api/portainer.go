@@ -311,6 +311,8 @@ type (
 		AMTDeviceGUID string `json:"AMTDeviceGUID,omitempty" example:"4c4c4544-004b-3910-8037-b6c04f504633"`
 		// LastCheckInDate mark last check-in date on checkin
 		LastCheckInDate int64
+		// IsEdgeDevice marks if the environment was created as an EdgeDevice
+		IsEdgeDevice bool
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4

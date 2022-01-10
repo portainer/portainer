@@ -16,7 +16,6 @@ export const actions: Column<Device> = {
 };
 
 export function ActionsCell({ row: { original: device }, }: CellProps<TableInstance>) {
-  console.log(device);
   return (
       <ActionsMenu>
         <div className="tableActionsMenu">
@@ -38,8 +37,6 @@ export function ActionsCell({ row: { original: device }, }: CellProps<TableInsta
   )
 
   function handlePowerOn() {
-    console.log("handlePowerOn");
-
     confirm({
       title: 'Confirm action',
       message: `Are you sure you want to power on the device?`,
