@@ -1,7 +1,6 @@
 package filesystem
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -9,41 +8,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// temporary function until upgrade to 1.16
-func tempDir(t *testing.T) string {
-	tmpDir, err := os.MkdirTemp("", "dir")
-	assert.NoError(t, err, "MkdirTemp should not fail")
+func Test_movePath_shouldFailIfSourcePathDoesNotExist(t *testing.T) {
+	sourcePath := "missing"
+	desinationPath := t.TempDir()
 
-	return tmpDir
+	err := MoveDirectory(sourcePath, desinationPath)
+	assert.Error(t, err, "move directory should fail when shource path is missing")
 }
 
-func Test_movePath_shouldFailIfOriginalPathDoesntExist(t *testing.T) {
-	tmpDir := tempDir(t)
-	missingPath := path.Join(tmpDir, "missing")
-	targetPath := path.Join(tmpDir, "target")
+func Test_movePath_shouldFailIfDestinationPathExists(t *testing.T) {
+	sourcePath := t.TempDir()
+	desinationPath := t.TempDir()
 
-	defer os.RemoveAll(tmpDir)
-
-	err := MoveDirectory(missingPath, targetPath)
-	assert.Error(t, err, "move directory should fail when target path exists")
+	err := MoveDirectory(sourcePath, desinationPath)
+	assert.Error(t, err, "move directory should fail when destination directory already exists")
 }
 
-func Test_movePath_shouldFailIfTargetPathDoesExist(t *testing.T) {
-	originalPath := tempDir(t)
-	missingPath := tempDir(t)
+func Test_movePath_successWhenSourceExistsAndDestinationIsMissing(t *testing.T) {
+	tmp := t.TempDir()
+	sourcePath := path.Join(tmp, "source")
+	os.Mkdir(sourcePath, 0600)
+	destinationPath := path.Join(tmp, "destination")
 
-	defer os.RemoveAll(originalPath)
-	defer os.RemoveAll(missingPath)
-
-	err := MoveDirectory(originalPath, missingPath)
-	assert.Error(t, err, "move directory should fail when target path exists")
-}
-
-func Test_movePath_success(t *testing.T) {
-	originalPath := tempDir(t)
-
-	defer os.RemoveAll(originalPath)
-
-	err := MoveDirectory(originalPath, fmt.Sprintf("%s-old", originalPath))
+	err := MoveDirectory(sourcePath, destinationPath)
 	assert.NoError(t, err)
 }
