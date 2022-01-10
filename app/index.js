@@ -1,5 +1,7 @@
 import './assets/css';
 
+import './i18n';
+
 import angular from 'angular';
 import { UI_ROUTER_REACT_HYBRID } from '@uirouter/react-hybrid';
 
