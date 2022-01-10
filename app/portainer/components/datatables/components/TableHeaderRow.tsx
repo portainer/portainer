@@ -19,6 +19,7 @@ export function TableHeaderRow<
 }: Props<D> & TableHeaderProps) {
   useTableContext();
 
+  console.log(headers);
   return (
     <tr className={className} role={role} style={style}>
       {headers.map((column) => (
@@ -26,6 +27,9 @@ export function TableHeaderRow<
           headerProps={{
             ...column.getHeaderProps({
               className: column.className,
+              style: {
+                width: (column.id === 'selection' || column.id === 'actions') ? '5px' : '',
+              }
             }),
           }}
           key={column.id}

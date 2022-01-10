@@ -156,7 +156,7 @@ export function EdgeDevicesDatatable({
         <thead>
           {headerGroups.map((headerGroup) => {
             const { key, className, role, style } = headerGroup.getHeaderGroupProps();
-
+            
             return (
               <TableHeaderRow<Environment>
                 key={key}

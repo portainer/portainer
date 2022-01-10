@@ -295,3 +295,7 @@
 .tableActionsMenu [data-reach-menu-item] {
   padding: 5px 5px !important;
 }
+
+.lt-selection > .lt-selection {
+  padding-bottom: 10px;
+}
