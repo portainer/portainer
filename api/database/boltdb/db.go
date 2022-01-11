@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"time"
@@ -60,8 +59,8 @@ func (connection *DbConnection) IsEncryptedStore() bool {
 	return connection.getEncryptionKey() != nil
 }
 
-// Return true if the database is encrypted
-func (connection *DbConnection) IsEncryptionRequired() bool {
+// Return true if the database encryption is required
+func (connection *DbConnection) DoesStoreNeedEncryption() bool {
 
 	encryptedDbFile := false
 	dbFile := path.Join(connection.Path, EncryptedDatabaseFileName)
@@ -72,24 +71,18 @@ func (connection *DbConnection) IsEncryptionRequired() bool {
 	if encryptedDbFile {
 		connection.SetEncrypted(true)
 		if connection.EncryptionKey == nil {
-			log.Fatal("Portainer database is encrypted, but no encryption key was loaded")
+			panic("Portainer database is encrypted, but no encryption key was loaded")
 		}
 
+		// DB is already encrypted and everything checks out. Nothing to migrate
 		return false
 	}
 
-	return true
+	return connection.EncryptionKey != nil
 }
 
 // Open opens and initializes the BoltDB database.
 func (connection *DbConnection) Open() error {
-	// Disabled for now.  Can't use feature flags due to the way that works
-	// databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.json", DatabaseFileName, time.Now().Unix()))
-	// if err := connection.ExportRaw(databaseExportPath); err != nil {
-	// 	log.Printf("raw export to %s error: %s", databaseExportPath, err)
-	// } else {
-	// 	log.Printf("raw export to %s success", databaseExportPath)
-	// }
 
 	logrus.Infof("Loading PortainerDB: %s", connection.GetDatabaseFileName())
 

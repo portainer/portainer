@@ -8,9 +8,10 @@ import (
 	"fmt"
 	"io"
 
+	"log"
+
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var errEncryptedStringTooShort = fmt.Errorf("encrypted string too short")
@@ -23,7 +24,6 @@ func (connection *DbConnection) MarshalObject(object interface{}) (data []byte, 
 	} else {
 		data, err = json.Marshal(object)
 		if err != nil {
-			logrus.WithError(err).Errorf("failed marshaling object")
 			return data, err
 		}
 	}
@@ -39,7 +39,7 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 	if connection.getEncryptionKey() != nil {
 		data, err = decrypt(data, connection.getEncryptionKey())
 		if err != nil {
-			logrus.WithError(err).Errorf("failed decrypting object")
+			log.Println("failed decrypting object")
 		}
 	}
 	e := json.Unmarshal(data, object)
@@ -64,7 +64,6 @@ func (connection *DbConnection) UnmarshalObjectWithJsoniter(data []byte, object 
 		var err error
 		data, err = decrypt(data, connection.getEncryptionKey())
 		if err != nil {
-			logrus.WithError(err).Errorf("failed decrypting object")
 			return err
 		}
 	}
@@ -93,21 +92,18 @@ func encrypt(plaintext []byte, passphrase []byte) (encrypted []byte, err error) 
 	return ciphertextByte, nil
 }
 
-// On error, return the original byte array - it might be unencrypted...
 func decrypt(encrypted []byte, passphrase []byte) (plaintextByte []byte, err error) {
 	if string(encrypted) == "false" {
 		return []byte("false"), nil
 	}
 	block, err := aes.NewCipher(passphrase)
 	if err != nil {
-		logrus.Errorf("Error creating cypher block: %s", err.Error())
-		return encrypted, err
+		return encrypted, errors.Wrap(err, "Error creating cypher block")
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		logrus.Errorf("Error creating GCM: %s", err.Error())
-		return encrypted, err
+		return encrypted, errors.Wrap(err, "Error creating GCM")
 	}
 
 	nonceSize := gcm.NonceSize()
@@ -122,10 +118,8 @@ func decrypt(encrypted []byte, passphrase []byte) (plaintextByte []byte, err err
 		ciphertextByteClean,
 		nil)
 	if err != nil {
-		logrus.Errorf("Error decrypting text: %s", err.Error())
-		return encrypted, err
+		return encrypted, errors.Wrap(err, "Error decrypting text")
 	}
 	
-	logrus.Debugf("decrypted successfully")
 	return plaintextByte, err
 }

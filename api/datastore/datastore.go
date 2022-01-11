@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -8,7 +9,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices/errors"
+	portainerErrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -40,7 +41,7 @@ func NewStore(storePath string, fileService portainer.FileService, connection po
 func (store *Store) Open() (newStore bool, err error) {
 	newStore = true
 
-	encryptionReq := store.connection.IsEncryptionRequired()
+	encryptionReq := store.connection.DoesStoreNeedEncryption()
 	if encryptionReq {
 		store.encryptDB()
 	}
@@ -57,16 +58,14 @@ func (store *Store) Open() (newStore bool, err error) {
 
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
 	version, err := store.VersionService.DBVersion()
-	logrus.Infof("database version: %d", version)
-
-	if err == nil {
-		newStore = true
-		logrus.WithField("version", version).Infof("Opened existing store")
-	} else {
-		newStore = false
-		return newStore, err
+	if err != nil {
+		if errors.Is(err, portainerErrors.ErrObjectNotFound) {
+			return true, nil
+		}
+		return false, err
 	}
 
+	logrus.WithField("version", version).Infof("Opened existing store")
 	return newStore, nil
 }
 
@@ -83,14 +82,14 @@ func (store *Store) BackupTo(w io.Writer) error {
 // CheckCurrentEdition checks if current edition is community edition
 func (store *Store) CheckCurrentEdition() error {
 	if store.edition() != portainer.PortainerCE {
-		return errors.ErrWrongDBEdition
+		return portainerErrors.ErrWrongDBEdition
 	}
 	return nil
 }
 
 // TODO: move the use of this to dataservices.IsErrObjectNotFound()?
 func (store *Store) IsErrObjectNotFound(e error) bool {
-	return e == errors.ErrObjectNotFound
+	return e == portainerErrors.ErrObjectNotFound
 }
 
 func (store *Store) Rollback(force bool) error {
@@ -139,7 +138,7 @@ func (store *Store) encryptDB() error {
 	if err != nil {
 		// Remove the new encrypted file that we failed to import
 		os.Remove(store.connection.GetDatabaseFilePath())
-		logrus.Fatal(errors.ErrDBImportFailed.Error())
+		logrus.Fatal(portainerErrors.ErrDBImportFailed.Error())
 	}
 
 	err = os.Remove(oldFilename)

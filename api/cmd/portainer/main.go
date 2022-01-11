@@ -66,18 +66,18 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(storePath string, rollback bool, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase("boltdb", storePath, secretKey)
+func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
+	connection, err := database.NewDatabase("boltdb", *flags.Data, secretKey)
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
-	store := datastore.NewStore(storePath, fileService, connection)
-	_, err = store.Open()
+	store := datastore.NewStore(*flags.Data, fileService, connection)
+	isNew, err := store.Open()
 	if err != nil {
 		log.Fatalf("failed opening store: %v", err)
 	}
 
-	if rollback {
+	if *flags.Rollback {
 		err := store.Rollback(false)
 		if err != nil {
 			log.Fatalf("failed rolling back: %s", err)
@@ -88,14 +88,30 @@ func initDataStore(storePath string, rollback bool, secretKey []byte, fileServic
 		return nil
 	}
 
-	storedVersion, err := store.VersionService.DBVersion()
+	// Init sets some defaults - its basically a migration
+	err = store.Init()
 	if err != nil {
-		log.Fatalf("Something failed during creation of new database: %v", err)
+		log.Fatalf("failed initializing data store: %v", err)
 	}
-	if storedVersion != portainer.DBVersion {
-		err = store.MigrateData()
+
+	if isNew {
+		// from MigrateData
+		store.VersionService.StoreDBVersion(portainer.DBVersion)
+
+		err := updateSettingsFromFlags(store, flags)
 		if err != nil {
-			log.Fatalf("failed migration: %v", err)
+			log.Fatalf("failed updating settings from flags: %v", err)
+		}
+	} else {
+		storedVersion, err := store.VersionService.DBVersion()
+		if err != nil {
+			log.Fatalf("Something failed during creation of new database: %v", err)
+		}
+		if storedVersion != portainer.DBVersion {
+			err = store.MigrateData()
+			if err != nil {
+				log.Fatalf("failed migration: %v", err)
+			}
 		}
 	}
 
@@ -104,7 +120,7 @@ func initDataStore(storePath string, rollback bool, secretKey []byte, fileServic
 		<-shutdownCtx.Done()
 		defer connection.Close()
 
-		exportFilename := path.Join(storePath, fmt.Sprintf("export-%d.json", time.Now().Unix()))
+		exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
 
 		err := store.Export(exportFilename)
 		if err != nil {
@@ -498,7 +514,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Println("proceeding without encryption key")
 	}
 
-	dataStore := initDataStore(*flags.Data, *flags.Rollback, encryptionKey, fileService, shutdownCtx)
+	dataStore := initDataStore(flags, encryptionKey, fileService, shutdownCtx)
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
 		log.Fatal(err)
