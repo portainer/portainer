@@ -350,9 +350,9 @@ class KubernetesApplicationController {
   async onInit() {
     const endpointId = this.LocalStorage.getEndpointID();
     const endpoints = this.LocalStorage.getEndpoints();
-    const endpoint =  _.find(endpoints, function(item) {
-      return item.Id === endpointId
-    })
+    const endpoint = _.find(endpoints, function (item) {
+      return item.Id === endpointId;
+    });
 
     this.state = {
       activeTab: 0,
@@ -374,8 +374,6 @@ class KubernetesApplicationController {
       useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
       publicUrl: endpoint.PublicURL,
     };
-
-    console.log(this.state.publicUrl);
 
     this.state.activeTab = this.LocalStorage.getActiveTab('application');
 
