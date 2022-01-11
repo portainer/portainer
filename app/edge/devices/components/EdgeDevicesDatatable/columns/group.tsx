@@ -1,6 +1,7 @@
 import { Column } from 'react-table';
-import {Environment} from "Portainer/environments/types";
-import { DefaultFilter } from 'Portainer/components/datatables/components/Filter';
+
+import { Environment } from '@/portainer/environments/types';
+import { DefaultFilter } from '@/portainer/components/datatables/components/Filter';
 
 export const group: Column<Environment> = {
   Header: 'Group',
@@ -9,8 +10,3 @@ export const group: Column<Environment> = {
   Filter: DefaultFilter,
   canHide: true,
 };
-
-
-
-
-

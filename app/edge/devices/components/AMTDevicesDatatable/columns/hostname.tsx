@@ -1,5 +1,5 @@
 import { Column } from 'react-table';
-import { Device } from "Portainer/hostmanagement/open-amt/model";
+import { Device } from '@/portainer/hostmanagement/open-amt/model';
 
 export const hostname: Column<Device> = {
   Header: 'Hostname',
@@ -10,4 +10,3 @@ export const hostname: Column<Device> = {
   sortType: 'string',
   Filter: () => null,
 };
-

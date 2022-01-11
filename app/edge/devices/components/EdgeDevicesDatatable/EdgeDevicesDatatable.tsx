@@ -8,8 +8,8 @@ import {
   usePagination,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
-import { Environment } from 'Portainer/environments/types';
-import { PaginationControls } from 'Portainer/components/pagination-controls';
+import { Environment } from '@/portainer/environments/types';
+import { PaginationControls } from '@/portainer/components/pagination-controls';
 import {
   Table,
   TableActions,
@@ -19,20 +19,20 @@ import {
   TableSettingsMenu,
   TableTitle,
   TableTitleActions,
-} from 'Portainer/components/datatables/components';
-import { multiple } from 'Portainer/components/datatables/components/filter-types';
-import { useTableSettings } from 'Portainer/components/datatables/components/useTableSettings';
-import { ColumnVisibilityMenu } from 'Portainer/components/datatables/components/ColumnVisibilityMenu';
-import { useRepeater } from 'Portainer/components/datatables/components/useRepeater';
-import { useDebounce } from 'Portainer/hooks/useDebounce';
+} from '@/portainer/components/datatables/components';
+import { multiple } from '@/portainer/components/datatables/components/filter-types';
+import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
+import { ColumnVisibilityMenu } from '@/portainer/components/datatables/components/ColumnVisibilityMenu';
+import { useRepeater } from '@/portainer/components/datatables/components/useRepeater';
+import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
   useSearchBarContext,
   SearchBar,
-} from 'Portainer/components/datatables/components/SearchBar';
-import { useRowSelect } from 'Portainer/components/datatables/components/useRowSelect';
-import { TableFooter } from 'Portainer/components/datatables/components/TableFooter';
-import { SelectedRowsCount } from 'Portainer/components/datatables/components/SelectedRowsCount';
-import {EnvironmentProvider} from "Portainer/environments/useEnvironment";
+} from '@/portainer/components/datatables/components/SearchBar';
+import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
+import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
+import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
+import { EnvironmentProvider } from '@/portainer/environments/useEnvironment';
 
 import { EdgeDeviceTableSettings } from '@/edge/devices/types';
 import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings';
@@ -57,8 +57,8 @@ export function EdgeDevicesDatatable({
   onRefresh,
   setLoadingMessage,
 }: EdgeDevicesTableProps) {
-
-  const { settings, setTableSettings } = useTableSettings<EdgeDeviceTableSettings>();
+  const { settings, setTableSettings } =
+    useTableSettings<EdgeDeviceTableSettings>();
   const [searchBarValue, setSearchBarValue] = useSearchBarContext();
 
   const columns = useColumns();
@@ -155,8 +155,9 @@ export function EdgeDevicesDatatable({
       >
         <thead>
           {headerGroups.map((headerGroup) => {
-            const { key, className, role, style } = headerGroup.getHeaderGroupProps();
-            
+            const { key, className, role, style } =
+              headerGroup.getHeaderGroupProps();
+
             return (
               <TableHeaderRow<Environment>
                 key={key}
@@ -192,7 +193,7 @@ export function EdgeDevicesDatatable({
                     <td />
                     <td colSpan={10}>
                       <EnvironmentProvider environment={row.original}>
-                        <AMTDevicesDatatable/>
+                        <AMTDevicesDatatable />
                       </EnvironmentProvider>
                     </td>
                   </tr>

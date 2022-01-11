@@ -1,14 +1,14 @@
-import {CellProps, Column, TableInstance} from 'react-table';
-import {useRouter} from "@uirouter/react";
-import { Device } from "Portainer/hostmanagement/open-amt/model";
-import { MenuItem } from "@reach/menu-button";
-import { ActionsMenu } from "Portainer/components/datatables/components/ActionsMenu";
-import {confirm} from "Portainer/services/modal.service/confirm";
-import {useEnvironment} from "Portainer/environments/useEnvironment";
-import {executeDeviceAction} from "Portainer/hostmanagement/open-amt/open-amt.service";
-import * as notifications from "Portainer/services/notifications";
+import { CellProps, Column, TableInstance } from 'react-table';
+import { useRouter } from '@uirouter/react';
+import { Device } from '@/portainer/hostmanagement/open-amt/model';
+import { MenuItem } from '@reach/menu-button';
+import { ActionsMenu } from '@/portainer/components/datatables/components/ActionsMenu';
+import { confirm } from '@/portainer/services/modal.service/confirm';
+import { useEnvironment } from '@/portainer/environments/useEnvironment';
+import { executeDeviceAction } from '@/portainer/hostmanagement/open-amt/open-amt.service';
+import * as notifications from '@/portainer/services/notifications';
 
-import {useRowContext} from "@/edge/devices/components/AMTDevicesDatatable/columns/RowContext";
+import { useRowContext } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
 
 export const actions: Column<Device> = {
   Header: 'Actions',
@@ -21,24 +21,43 @@ export const actions: Column<Device> = {
   Cell: ActionsCell,
 };
 
-export function ActionsCell({ row: { original: device }, }: CellProps<TableInstance>) {
+export function ActionsCell({
+  row: { original: device },
+}: CellProps<TableInstance>) {
   const router = useRouter();
   const environment = useEnvironment();
   const { isLoading, toggleIsLoading } = useRowContext();
 
   return (
-      <ActionsMenu>
-        <div className="tableActionsMenu">
-          <div className="tableActionsHeader">AMT Functions</div>
-          <div>
-            <MenuItem disabled={isLoading} onSelect={() => handleDeviceActionClick('power on')}>Power ON</MenuItem>
-            <MenuItem disabled={isLoading} onSelect={() => handleDeviceActionClick('power off')}>Power OFF</MenuItem>
-            <MenuItem disabled={isLoading} onSelect={() => handleDeviceActionClick('restart')}>Restart</MenuItem>
-            <MenuItem disabled={isLoading} onSelect={() => handleKVMClick()}>KVM</MenuItem>
-          </div>
+    <ActionsMenu>
+      <div className="tableActionsMenu">
+        <div className="tableActionsHeader">AMT Functions</div>
+        <div>
+          <MenuItem
+            disabled={isLoading}
+            onSelect={() => handleDeviceActionClick('power on')}
+          >
+            Power ON
+          </MenuItem>
+          <MenuItem
+            disabled={isLoading}
+            onSelect={() => handleDeviceActionClick('power off')}
+          >
+            Power OFF
+          </MenuItem>
+          <MenuItem
+            disabled={isLoading}
+            onSelect={() => handleDeviceActionClick('restart')}
+          >
+            Restart
+          </MenuItem>
+          <MenuItem disabled={isLoading} onSelect={() => handleKVMClick()}>
+            KVM
+          </MenuItem>
         </div>
-      </ActionsMenu>
-  )
+      </div>
+    </ActionsMenu>
+  );
 
   function handleDeviceActionClick(action: string) {
     confirm({
@@ -62,10 +81,17 @@ export function ActionsCell({ row: { original: device }, }: CellProps<TableInsta
         try {
           toggleIsLoading();
           await executeDeviceAction(environment.Id, device.guid, action);
-          notifications.success(`${action} action sent successfully`, device.hostname);
+          notifications.success(
+            `${action} action sent successfully`,
+            device.hostname
+          );
           await router.stateService.reload();
         } catch (err) {
-          notifications.error('Failure', err as Error, `Failed to ${action} the device`);
+          notifications.error(
+            'Failure',
+            err as Error,
+            `Failed to ${action} the device`
+          );
           toggleIsLoading();
         }
       },
@@ -79,5 +105,4 @@ export function ActionsCell({ row: { original: device }, }: CellProps<TableInsta
       deviceName: device.hostname,
     });
   }
-
 }

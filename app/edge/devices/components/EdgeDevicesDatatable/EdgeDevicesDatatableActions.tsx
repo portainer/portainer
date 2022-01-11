@@ -1,10 +1,11 @@
-import type {Environment } from 'Portainer/environments/types';
-import { Button } from 'Portainer/components/Button';
-import { confirm } from "Portainer/services/modal.service/confirm";
-import { prompt } from "Portainer/services/modal.service/prompt";
-import * as notifications from 'Portainer/services/notifications';
-import {activateDevice} from "Portainer/hostmanagement/open-amt/open-amt.service";
-import {useRouter} from "@uirouter/react";
+import { useRouter } from '@uirouter/react';
+
+import type { Environment } from '@/portainer/environments/types';
+import { Button } from '@/portainer/components/Button';
+import { confirm } from '@/portainer/services/modal.service/confirm';
+import { prompt } from '@/portainer/services/modal.service/prompt';
+import * as notifications from '@/portainer/services/notifications';
+import { activateDevice } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 
 interface Props {
   selectedItems: Environment[];
@@ -17,7 +18,7 @@ export function EdgeDevicesDatatableActions({
   selectedItems,
   isOpenAMTEnabled,
   isFDOEnabled,
-                                              setLoadingMessage,
+  setLoadingMessage,
 }: Props) {
   const hasSelectedItem = selectedItems.length === 1;
 
@@ -25,7 +26,6 @@ export function EdgeDevicesDatatableActions({
 
   return (
     <div className="actionBar">
-
       {isFDOEnabled && (
         <Button onClick={() => onAddNewDeviceClick()}>
           <i className="fa fa-plus-circle space-right" aria-hidden="true" />
@@ -34,15 +34,14 @@ export function EdgeDevicesDatatableActions({
       )}
 
       {isOpenAMTEnabled && (
-          <Button
-              disabled={!hasSelectedItem}
-              onClick={() => onAssociateOpenAMTClick(selectedItems)}
-          >
-            <i className="fa fa-link space-right" aria-hidden="true" />
-            Associate with OpenAMT
-          </Button>
+        <Button
+          disabled={!hasSelectedItem}
+          onClick={() => onAssociateOpenAMTClick(selectedItems)}
+        >
+          <i className="fa fa-link space-right" aria-hidden="true" />
+          Associate with OpenAMT
+        </Button>
       )}
-
     </div>
   );
 
@@ -68,16 +67,15 @@ export function EdgeDevicesDatatableActions({
       },
       callback: async (result: string) => {
         switch (result) {
-          case "1":
+          case '1':
             router.stateService.go('portainer.endpoints.importDevice');
             break;
-          case "2":
+          case '2':
             router.stateService.go('portainer.endpoints.newEdgeDevice');
             break;
           default:
             break;
         }
-
       },
     });
   }
@@ -104,18 +102,24 @@ export function EdgeDevicesDatatableActions({
         }
 
         try {
-          setLoadingMessage('Activating Active Management Technology on selected device...');
-          await activateDevice(selectedEnvironment.Id)
-          notifications.success('Successfully associated with OpenAMT', selectedEnvironment.Name);
+          setLoadingMessage(
+            'Activating Active Management Technology on selected device...'
+          );
+          await activateDevice(selectedEnvironment.Id);
+          notifications.success(
+            'Successfully associated with OpenAMT',
+            selectedEnvironment.Name
+          );
         } catch (err) {
-          notifications.error('Failure', err as Error, 'Unable to associate with OpenAMT');
+          notifications.error(
+            'Failure',
+            err as Error,
+            'Unable to associate with OpenAMT'
+          );
         } finally {
           setLoadingMessage('');
         }
-
       },
     });
-
   }
-
 }

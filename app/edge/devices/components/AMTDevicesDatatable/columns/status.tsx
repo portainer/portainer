@@ -1,6 +1,6 @@
-import {CellProps, Column, TableInstance} from 'react-table';
-import clsx from "clsx";
-import { Device } from "Portainer/hostmanagement/open-amt/model";
+import { CellProps, Column, TableInstance } from 'react-table';
+import clsx from 'clsx';
+import { Device } from '@/portainer/hostmanagement/open-amt/model';
 
 export const status: Column<Device> = {
   Header: 'MPS Status',
@@ -12,11 +12,12 @@ export const status: Column<Device> = {
   Filter: () => null,
 };
 
-export function StatusCell({ row: { original: device }, }: CellProps<TableInstance>) {
+export function StatusCell({
+  row: { original: device },
+}: CellProps<TableInstance>) {
   return (
-      <span className={clsx({'text-success': device.connectionStatus})}>
-        {device.connectionStatus ? 'Connected' : 'Disconnected'}
-      </span>
-  )
+    <span className={clsx({ 'text-success': device.connectionStatus })}>
+      {device.connectionStatus ? 'Connected' : 'Disconnected'}
+    </span>
+  );
 }
-

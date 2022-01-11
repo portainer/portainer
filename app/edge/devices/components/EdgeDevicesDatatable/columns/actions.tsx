@@ -1,7 +1,8 @@
-import {CellProps, Column, TableInstance} from 'react-table';
-import {Environment} from "Portainer/environments/types";
-import { MenuItem } from "@reach/menu-button";
-import {ActionsMenu} from "Portainer/components/datatables/components/ActionsMenu";
+import { Column } from 'react-table';
+import { MenuItem } from '@reach/menu-button';
+
+import { Environment } from '@/portainer/environments/types';
+import { ActionsMenu } from '@/portainer/components/datatables/components/ActionsMenu';
 
 export const actions: Column<Environment> = {
   Header: 'Actions',
@@ -15,13 +16,12 @@ export const actions: Column<Environment> = {
 };
 
 export function ActionsCell() {
-
   return (
-      <ActionsMenu>
-        <div>
-          <MenuItem onSelect={() => {}}>Browse</MenuItem>
-          <MenuItem onSelect={() => {}}>Refresh Snapshot</MenuItem>
-        </div>
-      </ActionsMenu>
-  )
+    <ActionsMenu>
+      <div>
+        <MenuItem onSelect={() => {}}>Browse</MenuItem>
+        <MenuItem onSelect={() => {}}>Refresh Snapshot</MenuItem>
+      </div>
+    </ActionsMenu>
+  );
 }

@@ -1,7 +1,7 @@
 import angular from 'angular';
 
 import edgeStackModule from './views/edge-stacks';
-import edgeDevicesModule from './devices'
+import edgeDevicesModule from './devices';
 
 angular.module('portainer.edge', [edgeStackModule, edgeDevicesModule]).config(function config($stateRegistryProvider) {
   const edge = {

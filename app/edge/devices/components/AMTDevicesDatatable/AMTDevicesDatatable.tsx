@@ -1,116 +1,113 @@
-import {
-  useTable,
-    usePagination,
-} from 'react-table';
+import { useTable, usePagination } from 'react-table';
 import {
   Table,
   TableContainer,
   TableHeaderRow,
   TableRow,
-} from 'Portainer/components/datatables/components';
-import { Checkbox } from 'Portainer/components/form-components/Checkbox';
-import { Device } from "Portainer/hostmanagement/open-amt/model";
-import {useEnvironment} from "Portainer/environments/useEnvironment";
+} from '@/portainer/components/datatables/components';
+import { Checkbox } from '@/portainer/components/form-components/Checkbox';
+import { Device } from '@/portainer/hostmanagement/open-amt/model';
+import { useEnvironment } from '@/portainer/environments/useEnvironment';
 
-import {useAMTDevices} from "@/edge/devices/components/AMTDevicesDatatable/useAMTDevices";
-import {RowProvider} from "@/edge/devices/components/AMTDevicesDatatable/columns/RowContext";
+import { useAMTDevices } from '@/edge/devices/components/AMTDevicesDatatable/useAMTDevices';
+import { RowProvider } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
 
 import { useColumns } from './columns';
 
 export function AMTDevicesDatatable() {
-    const columns = useColumns();
+  const columns = useColumns();
 
-    const environment = useEnvironment();
-    const {isLoading, devices, error} = useAMTDevices(environment.Id);
+  const environment = useEnvironment();
+  const { isLoading, devices, error } = useAMTDevices(environment.Id);
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-
-  } = useTable<Device>(
+  const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
+    useTable<Device>(
       {
         defaultCanFilter: false,
         columns,
         data: devices || [],
         initialState: {},
         isRowSelectable() {
-          return false
+          return false;
         },
         selectCheckboxComponent: Checkbox,
       },
-      usePagination,
-  );
+      usePagination
+    );
 
   const tableProps = getTableProps();
   const tbodyProps = getTableBodyProps();
 
   return (
-      <TableContainer>
-
-        <Table
-            className={`${tableProps.className} inner-datatable`}
-            role={tableProps.role}
-            style={tableProps.style}
-        >
-          <thead>
+    <TableContainer>
+      <Table
+        className={`${tableProps.className} inner-datatable`}
+        role={tableProps.role}
+        style={tableProps.style}
+      >
+        <thead>
           {headerGroups.map((headerGroup) => {
-            const { key, className, role, style } = headerGroup.getHeaderGroupProps();
+            const { key, className, role, style } =
+              headerGroup.getHeaderGroupProps();
             return (
-                <TableHeaderRow<Device>
+              <TableHeaderRow<Device>
+                key={key}
+                className={className}
+                role={role}
+                style={style}
+                headers={headerGroup.headers}
+                onSortChange={() => {}}
+              />
+            );
+          })}
+        </thead>
+        <tbody
+          className={tbodyProps.className}
+          role={tbodyProps.role}
+          style={tbodyProps.style}
+        >
+          {!isLoading &&
+            devices &&
+            devices.length > 0 &&
+            page.map((row) => {
+              prepareRow(row);
+              const { key, className, role, style } = row.getRowProps();
+
+              return (
+                <RowProvider key={key}>
+                  <TableRow<Device>
+                    cells={row.cells}
                     key={key}
                     className={className}
                     role={role}
                     style={style}
-                    headers={headerGroup.headers}
-                    onSortChange={() => {}}
-                />
-            );
-          })}
-          </thead>
-          <tbody
-              className={tbodyProps.className}
-              role={tbodyProps.role}
-              style={tbodyProps.style}
-          >
-          {(!isLoading && devices && devices.length > 0) && (
-              page.map((row) => {
-                prepareRow(row);
-                const { key, className, role, style } = row.getRowProps();
-
-                return (
-                    <RowProvider key={key}>
-                        <TableRow<Device>
-                            cells={row.cells}
-                            key={key}
-                            className={className}
-                            role={role}
-                            style={style}
-                        />
-                    </RowProvider>
-                );
-              })
-          )}
+                  />
+                </RowProvider>
+              );
+            })}
           {isLoading && (
-              <tr>
-                  <td colSpan={5} className="text-center text-muted">Loading...</td>
-              </tr>
+            <tr>
+              <td colSpan={5} className="text-center text-muted">
+                Loading...
+              </td>
+            </tr>
           )}
-          {(!isLoading && (!devices || devices.length === 0)) &&  (
-              <tr>
-                  <td colSpan={5} className="text-center text-muted">No devices found.</td>
-              </tr>
+          {!isLoading && (!devices || devices.length === 0) && (
+            <tr>
+              <td colSpan={5} className="text-center text-muted">
+                No devices found.
+              </td>
+            </tr>
           )}
-          {(!isLoading && error) &&  (
-              <tr>
-                  <td colSpan={5} className="text-center text-muted">{{error}}</td>
-              </tr>
+          {!isLoading && error && (
+            <tr>
+              <td colSpan={5} className="text-center text-muted">
+                {{ error }}
+              </td>
+            </tr>
           )}
-
-          </tbody>
-        </Table>
-      </TableContainer>
+        </tbody>
+      </Table>
+    </TableContainer>
   );
 }

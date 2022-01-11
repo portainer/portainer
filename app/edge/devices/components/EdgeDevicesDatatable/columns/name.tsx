@@ -1,7 +1,8 @@
 import { CellProps, Column, TableInstance } from 'react-table';
-import { Environment } from 'Portainer/environments/types';
-import { Link } from 'Portainer/components/Link';
-import { arrowClass } from 'Portainer/components/datatables/utils';
+
+import { Environment } from '@/portainer/environments/types';
+import { Link } from '@/portainer/components/Link';
+import { arrowClass } from '@/portainer/components/datatables/utils';
 
 export const name: Column<Environment> = {
   Header: 'Name',
@@ -15,7 +16,7 @@ export const name: Column<Environment> = {
 };
 
 export function NameCell({ value: name, row }: CellProps<TableInstance>) {
-    return (
+  return (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <div {...row.getToggleRowExpandedProps({})}>
       <i
