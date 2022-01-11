@@ -38,7 +38,7 @@
     "format": "prettier --loglevel warn --write \"**/*.{js,css,html,jsx,tsx,ts}\"",
     "lint": "yarn lint:client; yarn lint:server",
     "lint:server": "cd api && golangci-lint run -E exportloopref",
-    "lint:client": "eslint --cache --fix ./**/*.{js,jsx,ts,tsx}",
+    "lint:client": "eslint --cache --fix './**/*.{js,jsx,ts,tsx}'",
     "lint:pr": "make lint-pr",
     "test": "yarn test:client; yarn test:server",
     "test:server": "cd api && go test ./...",
