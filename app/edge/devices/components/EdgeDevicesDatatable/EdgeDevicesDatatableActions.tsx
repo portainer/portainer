@@ -20,7 +20,7 @@ export function EdgeDevicesDatatableActions({
   isFDOEnabled,
   setLoadingMessage,
 }: Props) {
-  const hasSelectedItem = selectedItems.length === 1;
+  const hasSelectedItem = selectedItems.length === 1
 
   const router = useRouter();
 
