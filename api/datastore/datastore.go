@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -59,13 +58,14 @@ func (store *Store) Open() (newStore bool, err error) {
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
 	version, err := store.VersionService.DBVersion()
 	if err != nil {
-		if errors.Is(err, portainerErrors.ErrObjectNotFound) {
-			return true, nil
-		}
-		return false, err
+		return newStore, err
 	}
 
-	logrus.WithField("version", version).Infof("Opened existing store")
+	if version > 0 {
+		logrus.WithField("version", version).Infof("Opened existing store")
+		return false, nil
+	}
+	
 	return newStore, nil
 }
 
