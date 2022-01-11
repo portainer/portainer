@@ -22,7 +22,7 @@ angular.module('portainer.app').controller('AccountController', [
           UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword)
             .then(function success() {
               Notifications.success('Success', 'Password successfully updated');
-              $state.reload();
+              $state.go('portainer.logout');
             })
             .catch(function error(err) {
               Notifications.error('Failure', err, err.msg);
