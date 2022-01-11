@@ -64,15 +64,6 @@ func (store *Store) Open() (newStore bool, err error) {
 		logrus.WithField("version", version).Infof("Opened existing store")
 	} else {
 		newStore = false
-		if err.Error() == "encrypted string too short" {
-			logrus.WithError(err).Debugf("open db failed - wrong encryption key")
-		}
-		if store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Debugf("open db failed - object not found")
-			return newStore, nil
-		} else {
-			logrus.WithError(err).Debugf("open db failed - other")
-		}
 		return newStore, err
 	}
 
