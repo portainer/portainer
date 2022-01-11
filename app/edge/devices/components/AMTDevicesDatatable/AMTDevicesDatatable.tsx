@@ -1,4 +1,5 @@
 import { useTable, usePagination } from 'react-table';
+
 import {
   Table,
   TableContainer,
@@ -8,7 +9,6 @@ import {
 import { Checkbox } from '@/portainer/components/form-components/Checkbox';
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
-
 import { useAMTDevices } from '@/edge/devices/components/AMTDevicesDatatable/useAMTDevices';
 import { RowProvider } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
 

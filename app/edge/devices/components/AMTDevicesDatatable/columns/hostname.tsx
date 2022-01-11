@@ -1,4 +1,5 @@
 import { Column } from 'react-table';
+
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
 
 export const hostname: Column<Device> = {

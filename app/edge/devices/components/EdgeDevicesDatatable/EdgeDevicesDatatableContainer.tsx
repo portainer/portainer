@@ -1,7 +1,6 @@
+import { react2angular } from '@/react-tools/react2angular';
 import { TableSettingsProvider } from '@/portainer/components/datatables/components/useTableSettings';
 import { SearchBarProvider } from '@/portainer/components/datatables/components/SearchBar';
-
-import { react2angular } from '@/react-tools/react2angular';
 
 import {
   EdgeDevicesDatatable,

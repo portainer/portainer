@@ -1,13 +1,13 @@
 import { CellProps, Column, TableInstance } from 'react-table';
 import { useRouter } from '@uirouter/react';
-import { Device } from '@/portainer/hostmanagement/open-amt/model';
 import { MenuItem } from '@reach/menu-button';
+
+import { Device } from '@/portainer/hostmanagement/open-amt/model';
 import { ActionsMenu } from '@/portainer/components/datatables/components/ActionsMenu';
 import { confirm } from '@/portainer/services/modal.service/confirm';
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import { executeDeviceAction } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 import * as notifications from '@/portainer/services/notifications';
-
 import { useRowContext } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
 
 export const actions: Column<Device> = {

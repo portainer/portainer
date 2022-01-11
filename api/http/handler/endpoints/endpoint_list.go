@@ -90,7 +90,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	edgeDeviceFilter, _ := request.RetrieveBooleanQueryParameter(r, "edgeDeviceFilter", true)
-	filteredEndpoints = filterEndpointsByEdgeDeviceFilter(filteredEndpoints, edgeDeviceFilter)
+	filteredEndpoints = filterEndpointsByEdgeDevice(filteredEndpoints, edgeDeviceFilter)
 
 	if search != "" {
 		tags, err := handler.DataStore.Tag().Tags()
@@ -234,7 +234,7 @@ func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []int)
 	return filteredEndpoints
 }
 
-func filterEndpointsByEdgeDeviceFilter(endpoints []portainer.Endpoint, edgeDeviceFilter bool) []portainer.Endpoint {
+func filterEndpointsByEdgeDevice(endpoints []portainer.Endpoint, edgeDeviceFilter bool) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
 	for _, endpoint := range endpoints {

@@ -1,7 +1,7 @@
 import { CellProps, Column, TableInstance } from 'react-table';
 import clsx from 'clsx';
-import { Device } from '@/portainer/hostmanagement/open-amt/model';
 
+import { Device } from '@/portainer/hostmanagement/open-amt/model';
 import { useRowContext } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
 
 import styles from '../AMTDevices.module.css';

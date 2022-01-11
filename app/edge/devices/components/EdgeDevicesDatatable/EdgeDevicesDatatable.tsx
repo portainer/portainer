@@ -8,6 +8,7 @@ import {
   usePagination,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
+
 import { Environment } from '@/portainer/environments/types';
 import { PaginationControls } from '@/portainer/components/pagination-controls';
 import {
@@ -33,7 +34,6 @@ import { useRowSelect } from '@/portainer/components/datatables/components/useRo
 import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
 import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
 import { EnvironmentProvider } from '@/portainer/environments/useEnvironment';
-
 import { EdgeDeviceTableSettings } from '@/edge/devices/types';
 import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings';
 import { EdgeDevicesDatatableActions } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions';

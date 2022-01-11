@@ -1,5 +1,6 @@
 import { CellProps, Column, TableInstance } from 'react-table';
 import clsx from 'clsx';
+
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
 
 export const status: Column<Device> = {
