@@ -21,7 +21,9 @@ export function ActionsMenu({ children }: Props) {
           >
             <i className="fa fa-ellipsis-v" aria-hidden="true" />
           </MenuButton>
-          <MenuList>{children}</MenuList>
+          <MenuList>
+            <div className={styles.tableActionsMenuList}>{children}</div>
+          </MenuList>
         </>
       )}
     </Menu>
