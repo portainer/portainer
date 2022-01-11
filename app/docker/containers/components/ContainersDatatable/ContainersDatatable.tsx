@@ -53,6 +53,7 @@ export interface ContainerTableProps {
   onRefresh(): Promise<void>;
   isHostColumnVisible: boolean;
   autoFocusSearch: boolean;
+  tableKey?: string;
 }
 
 export function ContainersDatatable({

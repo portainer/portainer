@@ -30,20 +30,22 @@ const SearchBarContext = createContext<
 
 interface SearchBarProviderProps {
   defaultValue?: string;
+  storageKey: string;
 }
 
 export function SearchBarProvider({
   children,
+  storageKey,
   defaultValue = '',
 }: PropsWithChildren<SearchBarProviderProps>) {
-  const [value, setValue] = useLocalStorage(
-    'datatable_text_filter_containers',
+  const state = useLocalStorage(
+    `datatable_text_filter_${storageKey}`,
     defaultValue,
     sessionStorage
   );
 
   return (
-    <SearchBarContext.Provider value={[value, setValue]}>
+    <SearchBarContext.Provider value={state}>
       {children}
     </SearchBarContext.Provider>
   );
