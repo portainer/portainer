@@ -14,7 +14,6 @@
         <td>{{ service.metadata.name }}</td>
         <td>{{ service.spec.type }}</td>
         <td>{{ service.spec.clusterIP }}</td>
-
         <td ng-show="service.spec.type === 'LoadBalancer'">
           <div ng-show="service.status.loadBalancer.ingress">
             <a ng-href="http://{{ service.status.loadBalancer.ingress[0].ip }}:{{ service.spec.ports[0].port }}">
