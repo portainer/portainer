@@ -203,7 +203,7 @@
     "gruntify-eslint": "^3.1.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^5.5.0",
-    "husky": ">=4",
+    "husky": "4.2.5",
     "jest": "^27.4.3",
     "lint-staged": ">=10",
     "load-grunt-tasks": "^3.5.2",
