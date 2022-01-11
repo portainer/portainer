@@ -29,7 +29,7 @@ export function TableHeaderRow<
               style: {
                 width:
                   column.id === 'selection' || column.id === 'actions'
-                    ? '5px'
+                    ? column.width
                     : '',
               },
             }),
