@@ -1,6 +1,5 @@
-import { TableSettingsMenuAutoRefresh } from '@/portainer/datatables/components/TableSettingsMenuAutoRefresh';
-import { useTableSettings } from '@/portainer/datatables/components/useTableSettings';
-
+import { TableSettingsMenuAutoRefresh } from '@/portainer/components/datatables/components/TableSettingsMenuAutoRefresh';
+import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
 import { EdgeDeviceTableSettings } from '@/edge/devices/types';
 
 export function EdgeDevicesDatatableSettings() {
