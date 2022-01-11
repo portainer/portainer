@@ -375,6 +375,8 @@ class KubernetesApplicationController {
       publicUrl: endpoint.PublicURL,
     };
 
+    console.log(this.state.publicUrl);
+
     this.state.activeTab = this.LocalStorage.getActiveTab('application');
 
     this.formValues = {
