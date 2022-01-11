@@ -4,8 +4,6 @@ import clsx from 'clsx';
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
 import { useRowContext } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
 
-import styles from '../AMTDevices.module.css';
-
 export const powerState: Column<Device> = {
   Header: 'Power State',
   accessor: (row) => parsePowerState(row.powerState),
@@ -28,7 +26,7 @@ export function PowerStateCell({
       </span>
       <span>
         {isLoading && (
-          <i className={`fa fa-cog fa-spin ${styles.loadingSpinner}`} />
+          <i className="fa fa-cog fa-spin space-left" />
         )}
       </span>
     </>

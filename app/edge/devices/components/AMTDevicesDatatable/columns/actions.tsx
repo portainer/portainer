@@ -2,6 +2,7 @@ import { CellProps, Column, TableInstance } from 'react-table';
 import { useRouter } from '@uirouter/react';
 import { MenuItem } from '@reach/menu-button';
 
+import styles from '@/portainer/components/datatables/components/ActionsMenu.module.css'
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
 import { ActionsMenu } from '@/portainer/components/datatables/components/ActionsMenu';
 import { confirm } from '@/portainer/services/modal.service/confirm';
@@ -9,6 +10,7 @@ import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import { executeDeviceAction } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 import * as notifications from '@/portainer/services/notifications';
 import { useRowContext } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
+
 
 export const actions: Column<Device> = {
   Header: 'Actions',
@@ -30,8 +32,8 @@ export function ActionsCell({
 
   return (
     <ActionsMenu>
-      <div className="tableActionsMenu">
-        <div className="tableActionsHeader">AMT Functions</div>
+      <div className={styles.tableActionsMenu}>
+        <div className={styles.tableActionsHeader}>AMT Functions</div>
         <div>
           <MenuItem
             disabled={isLoading}

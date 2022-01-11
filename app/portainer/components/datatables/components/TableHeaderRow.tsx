@@ -5,7 +5,7 @@ import { TableHeaderCell } from './TableHeaderCell';
 
 interface Props<D extends Record<string, unknown> = Record<string, unknown>> {
   headers: HeaderGroup<D>[];
-  onSortChange(colId: string, desc: boolean): void;
+  onSortChange? (colId: string, desc: boolean): void;
 }
 
 export function TableHeaderRow<
@@ -35,7 +35,9 @@ export function TableHeaderRow<
           canSort={column.canSort}
           onSortClick={(desc) => {
             column.toggleSortBy(desc);
-            onSortChange(column.id, desc);
+            if (onSortChange) {
+              onSortChange(column.id, desc);
+            }
           }}
           isSorted={column.isSorted}
           isSortedDesc={column.isSortedDesc}

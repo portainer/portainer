@@ -7,7 +7,20 @@
   color: #337ab7;
 }
 
+.table-actions-header {
+  color: #337ab7;
+}
+
+.table-actions-menu {
+  padding: 0 10px 0 10px;
+}
+
+.table-actions-menu [data-reach-menu-item] {
+  padding: 5px 5px !important;
+}
+
 .table-actions-menu-btn {
   border: none;
   background: none;
 }
+

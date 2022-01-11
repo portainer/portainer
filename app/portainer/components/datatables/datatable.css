@@ -101,14 +101,6 @@
   padding: 10px;
 }
 
-.tableActionsMenu {
-  padding: 0 10px 0 10px;
-}
-
-.tableActionsHeader {
-  color: #337ab7;
-}
-
 .tableMenu .menuHeader {
   font-size: 16px;
 }
@@ -290,10 +282,6 @@
 .actions-menu-btn {
   border: none;
   background: none;
-}
-
-.tableActionsMenu [data-reach-menu-item] {
-  padding: 5px 5px !important;
 }
 
 .lt-selection > .lt-selection {
