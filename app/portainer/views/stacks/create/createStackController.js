@@ -45,7 +45,7 @@ angular
       AdditionalFiles: [],
       ComposeFilePathInRepository: 'docker-compose.yml',
       AccessControlData: new AccessControlFormData(),
-      RepositoryAutomaticUpdates: true,
+      RepositoryAutomaticUpdates: false,
       RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
       RepositoryFetchInterval: '5m',
       RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
