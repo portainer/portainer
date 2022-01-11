@@ -14,14 +14,23 @@
         <td>{{ service.metadata.name }}</td>
         <td>{{ service.spec.type }}</td>
         <td>{{ service.spec.clusterIP }}</td>
-        <td ng-show="service.spec.type === 'LoadBalancer'">{{ service.spec.externalIP ? service.spec.externalIP : 'pending...' }}</td>
+
+        <td ng-show="service.spec.type === 'LoadBalancer'">
+          <div ng-show="service.spec.externalIP">
+            <a ng-href="http://{{ service.spec.externalIP }}:{{ service.spec.ports[0].port }}">link</a>
+          </div>
+          <div ng-show="!service.spec.externalIP">
+            {{ service.spec.externalIP ? service.spec.externalIP : 'pending...' }}
+          </div>
+        </td>
         <td ng-show="service.spec.type !== 'LoadBalancer'">{{ service.spec.externalIP ? service.spec.externalIP : '-' }}</td>
+
         <td data-cy="k8sAppDetail-containerPort">
           <div ng-repeat="port in service.spec.ports">{{ port.targetPort }}</div>
         </td>
         <td ng-if="!ctrl.portHasIngressRules(port)">
           <div ng-repeat="port in service.spec.ports">
-            <a ng-if="port.nodePort" ng-href="http://{{ $ctrl.publicUrl }}:{{ port.nodePort }}" target="_blank" style="margin-left: 5px;">
+            <a ng-if="$ctrl.publicUrl && port.nodePort" ng-href="http://{{ $ctrl.publicUrl }}:{{ port.nodePort }}" target="_blank" style="margin-left: 5px;">
               <i class="fa fa-external-link-alt" aria-hidden="true"></i>
               <span data-cy="k8sAppDetail-containerPort">
                 {{ port.port }}
@@ -29,8 +38,9 @@
               <span>{{ port.nodePort ? ':' : '' }}</span>
               <span data-cy="k8sAppDetail-nodePort"> {{ port.nodePort }}/{{ port.protocol }} </span>
             </a>
-            <div ng-if="!port.nodePort">
-              <span data-cy="k8sAppDetail-containerPort">
+
+            <div ng-if="!$ctrl.publicUrl">
+              <span data-cy="k8sAppDetail-servicePort">
                 {{ port.port }}
               </span>
               <span>{{ port.nodePort ? ':' : '' }}</span>
