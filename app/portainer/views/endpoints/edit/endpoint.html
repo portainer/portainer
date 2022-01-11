@@ -64,18 +64,21 @@
       <div style="margin-top: 10px;">
         <uib-tabset active="state.deploymentTab">
           <uib-tab index="'kubernetes'" heading="Kubernetes" ng-if="state.platformType === 'linux'">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px;">
-              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
+            <span ng-if="agentSecret != ''" style="display: block; padding: 16px 45px 0px 45px; background-color: var(--bg-code-color);">
+              Note that the environment variable AGENT_SECRET will need to be set to {{ agentSecret }}. Please update the manifest that will be download from the following script.
+            </span>
+            <code style="display: block; padding: 16px 45px;">
+              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts, agentSecret) }}
             </code>
           </uib-tab>
           <uib-tab index="'swarm'" heading="Docker Swarm">
             <code style="display: block; white-space: pre-wrap; padding: 16px 45px;">
-              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
+              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts, agentSecret) }}
             </code>
           </uib-tab>
           <uib-tab index="'standalone'" heading="Docker Standalone">
             <code style="display: block; white-space: pre-wrap; padding: 16px 45px;">
-              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
+              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts, agentSecret) }}
             </code>
           </uib-tab>
         </uib-tabset>
