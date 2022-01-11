@@ -1,11 +1,7 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren } from 'react';
 
-import "./InnerDatatable.css"
+import './InnerDatatable.css';
 
 export function InnerDatatable({ children }: PropsWithChildren<unknown>) {
-  return (
-    <div className="inner-datatable">
-        {children}
-    </div>
-  );
+  return <div className="inner-datatable">{children}</div>;
 }

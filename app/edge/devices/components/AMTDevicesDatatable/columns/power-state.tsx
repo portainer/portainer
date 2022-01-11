@@ -24,11 +24,7 @@ export function PowerStateCell({
       <span className={clsx({ 'text-success': device.powerState === 2 })}>
         {parsePowerState(device.powerState)}
       </span>
-      <span>
-        {isLoading && (
-          <i className="fa fa-cog fa-spin space-left" />
-        )}
-      </span>
+      <span>{isLoading && <i className="fa fa-cog fa-spin space-left" />}</span>
     </>
   );
 }

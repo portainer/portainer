@@ -5,7 +5,7 @@ import { TableHeaderCell } from './TableHeaderCell';
 
 interface Props<D extends Record<string, unknown> = Record<string, unknown>> {
   headers: HeaderGroup<D>[];
-  onSortChange? (colId: string, desc: boolean): void;
+  onSortChange?(colId: string, desc: boolean): void;
 }
 
 export function TableHeaderRow<
@@ -27,8 +27,11 @@ export function TableHeaderRow<
             ...column.getHeaderProps({
               className: column.className,
               style: {
-                width: (column.id === 'selection' || column.id === 'actions') ? '5px' : '',
-              }
+                width:
+                  column.id === 'selection' || column.id === 'actions'
+                    ? '5px'
+                    : '',
+              },
             }),
           }}
           key={column.id}

@@ -71,7 +71,7 @@ export function TableSettingsProvider<T>({
 }
 
 function getContextType<T>() {
-  return (TableSettingsContext as unknown) as Context<
+  return TableSettingsContext as unknown as Context<
     TableSettingsContextInterface<T>
   >;
 }
