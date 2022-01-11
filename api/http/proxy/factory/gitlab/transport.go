@@ -24,7 +24,7 @@ func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, er
 		return nil, errors.New("no gitlab token provided")
 	}
 
-	r, err := http.NewRequest(request.Method, request.URL.String(), nil)
+	r, err := http.NewRequest(request.Method, request.URL.String(), request.Body)
 	if err != nil {
 		return nil, err
 	}
