@@ -50,7 +50,7 @@ import { useColumns } from './columns';
 export interface ContainerTableProps {
   isAddActionVisible: boolean;
   dataset: DockerContainer[];
-  onRefresh(): Promise<void>;
+  onRefresh?(): Promise<void>;
   isHostColumnVisible: boolean;
   autoFocusSearch: boolean;
   tableKey?: string;
@@ -151,7 +151,7 @@ export function ContainersDatatable({
           <TableSettingsMenu
             quickActions={<QuickActionsSettings actions={actions} />}
           >
-            <ContainersDatatableSettings />
+            <ContainersDatatableSettings isRefreshVisible={!!onRefresh} />
           </TableSettingsMenu>
         </TableTitleActions>
       </TableTitle>
