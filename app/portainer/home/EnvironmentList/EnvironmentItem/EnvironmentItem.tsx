@@ -10,7 +10,6 @@ import {
   humanize,
   stripProtocol,
 } from '@/portainer/filters/filters';
-import { idsToTagNames } from '@/portainer/helpers/tagHelper';
 import { type Environment, PlatformType } from '@/portainer/environments/types';
 import {
   getPlatformType,
@@ -149,9 +148,10 @@ function useEnvironmentTags(tagIds?: TagId[]) {
     return 'No tags';
   }
 
-  const tagNames = idsToTagNames(tags, tagIds);
-
-  return tagNames.join(', ');
+  return tagIds
+    .map((id) => tags.find((t) => t.ID === id))
+    .map((t) => t?.Name)
+    .join(', ');
 }
 
 function getSnapshotTime(environment: Environment) {
