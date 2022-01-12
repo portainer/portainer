@@ -290,18 +290,18 @@ function EndpointController(
     let secret = agentSecret == '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
     return `
 docker run -d \\
-    -v /var/run/docker.sock:/var/run/docker.sock \\
-    -v /var/lib/docker/volumes:/var/lib/docker/volumes \\
-    -v /:/host \\
-    -v portainer_agent_data:/data \\
-    --restart always ${secret}\\
-    -e EDGE=1 \\
-    -e EDGE_ID=${edgeId} \\
-    -e EDGE_KEY=${edgeKey} \\
-    -e CAP_HOST_MANAGEMENT=1 \\
-    -e EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0} \\
-    --name portainer_edge_agent \\
-    portainer/agent:${agentVersion}`;
+  -v /var/run/docker.sock:/var/run/docker.sock \\
+  -v /var/lib/docker/volumes:/var/lib/docker/volumes \\
+  -v /:/host \\
+  -v portainer_agent_data:/data \\
+  --restart always ${secret}\\
+  -e EDGE=1 \\
+  -e EDGE_ID=${edgeId} \\
+  -e EDGE_KEY=${edgeKey} \\
+  -e CAP_HOST_MANAGEMENT=1 \\
+  -e EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0} \\
+  --name portainer_edge_agent \\
+  portainer/agent:${agentVersion}`;
   }
 
   function buildWindowsStandaloneCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts, agentSecret) {
