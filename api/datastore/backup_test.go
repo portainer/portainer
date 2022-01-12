@@ -48,7 +48,7 @@ func TestBackup(t *testing.T) {
 		store.VersionService.StoreDBVersion(portainer.DBVersion)
 		store.backupWithOptions(nil)
 
-		backupFileName := path.Join(connection.GetStorePath(), "backups", "common", fmt.Sprintf("portainer.db.%03d.*", portainer.DBVersion))
+		backupFileName := path.Join(connection.GetStorePath(), "backups", "common", fmt.Sprintf("portainer.edb.%03d.*", portainer.DBVersion))
 		if !isFileExist(backupFileName) {
 			t.Errorf("Expect backup file to be created %s", backupFileName)
 		}

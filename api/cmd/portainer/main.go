@@ -66,10 +66,10 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService, encryptionkey []byte, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase("boltdb", *flags.Data, encryptionkey)
+func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
+	connection, err := database.NewDatabase("boltdb", *flags.Data, secretKey)
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 	store := datastore.NewStore(*flags.Data, fileService, connection)
 	isNew, err := store.Open()
@@ -98,24 +98,20 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 		// from MigrateData
 		store.VersionService.StoreDBVersion(portainer.DBVersion)
 
-		// Disabled for now.  Can't use feature flags due to the way that works
-		// EXPERIMENTAL, will only activate if `/data/import.json` exists
-		//importFromJson(fileService, store)
-
 		err := updateSettingsFromFlags(store, flags)
 		if err != nil {
 			log.Fatalf("failed updating settings from flags: %v", err)
 		}
-	}
-
-	storedVersion, err := store.VersionService.DBVersion()
-	if err != nil {
-		log.Fatalf("Something failed during creation of new database: %v", err)
-	}
-	if storedVersion != portainer.DBVersion {
-		err = store.MigrateData()
+	} else {
+		storedVersion, err := store.VersionService.DBVersion()
 		if err != nil {
-			log.Fatalf("failed migration: %v", err)
+			log.Fatalf("Something failed during creation of new database: %v", err)
+		}
+		if storedVersion != portainer.DBVersion {
+			err = store.MigrateData()
+			if err != nil {
+				log.Fatalf("failed migration: %v", err)
+			}
 		}
 	}
 
@@ -518,7 +514,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Println("proceeding without encryption key")
 	}
 
-	dataStore := initDataStore(flags, fileService, encryptionKey, shutdownCtx)
+	dataStore := initDataStore(flags, encryptionKey, fileService, shutdownCtx)
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
 		log.Fatal(err)
