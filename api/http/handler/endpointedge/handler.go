@@ -27,9 +27,9 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		requestBouncer: bouncer,
 	}
 
-	h.Handle("/{id}/edge/stacks/{stackId}",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeStackInspect))).Methods(http.MethodGet)
-	h.Handle("/{id}/edge/jobs/{jobID}/logs",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeJobsLogs))).Methods(http.MethodPost)
+	h.Use(bouncer.PublicAccess)
+
+	h.Handle("/{id}/edge/stacks/{stackId}", httperror.LoggerHandler(h.endpointEdgeStackInspect)).Methods(http.MethodGet)
+	h.Handle("/{id}/edge/jobs/{jobID}/logs", httperror.LoggerHandler(h.endpointEdgeJobsLogs)).Methods(http.MethodPost)
 	return h
 }

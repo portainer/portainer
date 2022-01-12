@@ -66,7 +66,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 	}
 
 	if payload.Endpoints == nil || len(payload.Endpoints) == 0 {
-		return errors.New("Invalid environment payload")
+		return errors.New("Invalid environments payload")
 	}
 
 	if govalidator.IsNull(payload.FileContent) {
@@ -119,7 +119,7 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	payload.CronExpression = cronExpression
 
 	var endpoints []portainer.EndpointID
-	err = request.RetrieveMultiPartFormJSONValue(r, "Environments", &endpoints, false)
+	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
 	if err != nil {
 		return errors.New("Invalid environments")
 	}

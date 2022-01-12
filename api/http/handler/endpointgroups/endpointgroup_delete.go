@@ -47,7 +47,7 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
 	}
 
 	for _, endpoint := range endpoints {

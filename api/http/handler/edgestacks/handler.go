@@ -29,20 +29,20 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
 	}
-	h.Handle("/edge_stacks",
-		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackCreate)))).Methods(http.MethodPost)
-	h.Handle("/edge_stacks",
-		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackList)))).Methods(http.MethodGet)
-	h.Handle("/edge_stacks/{id}",
-		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackInspect)))).Methods(http.MethodGet)
-	h.Handle("/edge_stacks/{id}",
-		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackUpdate)))).Methods(http.MethodPut)
-	h.Handle("/edge_stacks/{id}",
-		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackDelete)))).Methods(http.MethodDelete)
-	h.Handle("/edge_stacks/{id}/file",
-		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackFile)))).Methods(http.MethodGet)
-	h.Handle("/edge_stacks/{id}/status",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.edgeStackStatusUpdate))).Methods(http.MethodPut)
+
+	adminRouter := h.NewRoute().Subrouter()
+	adminRouter.Use(bouncer.AdminAccess, bouncer.EdgeComputeOperation)
+
+	publicRouter := h.NewRoute().Subrouter()
+
+	adminRouter.Handle("/edge_stacks", httperror.LoggerHandler(h.edgeStackCreate)).Methods(http.MethodPost)
+	adminRouter.Handle("/edge_stacks", httperror.LoggerHandler(h.edgeStackList)).Methods(http.MethodGet)
+	adminRouter.Handle("/edge_stacks/{id}", httperror.LoggerHandler(h.edgeStackInspect)).Methods(http.MethodGet)
+	adminRouter.Handle("/edge_stacks/{id}", httperror.LoggerHandler(h.edgeStackUpdate)).Methods(http.MethodPut)
+	adminRouter.Handle("/edge_stacks/{id}", httperror.LoggerHandler(h.edgeStackDelete)).Methods(http.MethodDelete)
+	adminRouter.Handle("/edge_stacks/{id}/file", httperror.LoggerHandler(h.edgeStackFile)).Methods(http.MethodGet)
+
+	publicRouter.Handle("/edge_stacks/{id}/status", httperror.LoggerHandler(h.edgeStackStatusUpdate)).Methods(http.MethodPut)
 	return h
 }
 

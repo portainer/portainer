@@ -59,10 +59,7 @@ func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 // that might be used later to inside the API operation for extra authorization validation
 // and resource filtering.
 func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
-	h = bouncer.mwUpgradeToRestrictedRequest(h)
-	h = bouncer.mwCheckPortainerAuthorizations(h, true)
-	h = bouncer.mwAuthenticatedUser(h)
-	return h
+	return bouncer.RestrictedAccess(h)
 }
 
 // RestrictedAccess defines a security check for restricted API environments(endpoints).
