@@ -14,7 +14,7 @@ export function EnvironmentStats({ environment }: Props) {
     case PlatformType.Kubernetes:
       return (
         <EnvironmentStatsKubernetes
-          snapshots={environment.Kubernetes.Snapshots}
+          snapshots={environment.Kubernetes.Snapshots || []}
         />
       );
     case PlatformType.Docker:
