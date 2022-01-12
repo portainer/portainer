@@ -121,7 +121,7 @@ export function EdgeDevicesDatatable({
     <TableContainer>
       <TableTitle icon="fa-plug" label="Edge Devices">
         <TableTitleActions>
-          <ColumnVisibilityMenu
+          <ColumnVisibilityMenu<Environment>
             columns={columnsToHide}
             onChange={handleChangeColumnsVisibility}
             value={settings.hiddenColumns}

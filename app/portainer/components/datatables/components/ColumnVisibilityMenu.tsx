@@ -6,14 +6,13 @@ import { Checkbox } from '@/portainer/components/form-components/Checkbox';
 
 import { useTableContext } from './TableContainer';
 
-interface Props {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnInstance<any>[];
+interface Props<D extends object> {
+  columns: ColumnInstance<D>[];
   onChange: (value: string[]) => void;
   value: string[];
 }
 
-export function ColumnVisibilityMenu({ columns, onChange, value }: Props) {
+export function ColumnVisibilityMenu<D extends object>({ columns, onChange, value }: Props<D>) {
   useTableContext();
 
   return (
