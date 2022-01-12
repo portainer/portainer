@@ -41,7 +41,7 @@ export function ActionsCell({
   async function handleRefreshSnapshotClick() {
     try {
       await snapshotEndpoint(environment.Id);
-      notifications.success('Success', 'Environments updated');
+      notifications.success('Success', 'Environment updated');
     } catch (err) {
       notifications.error(
           'Failure',

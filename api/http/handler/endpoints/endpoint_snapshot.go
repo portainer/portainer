@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -37,14 +38,14 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 	}
 
 	if !snapshot.SupportDirectSnapshot(endpoint) {
-		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for this environment", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for this environment", errors.New("Snapshots not supported for this environment")}
 	}
 
 	snapshotError := handler.SnapshotService.SnapshotEndpoint(endpoint)
 
 	latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
 	if latestEndpointReference == nil {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", errors.New("Unable to find an environment with the specified identifier inside the database")}
 	}
 
 	latestEndpointReference.Status = portainer.EndpointStatusUp
