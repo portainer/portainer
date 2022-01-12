@@ -284,9 +284,7 @@ function EndpointController(
 
         const disconnectedEdge = $scope.state.edgeEndpoint && !endpoint.EdgeID;
         if (EndpointHelper.isDockerEndpoint(endpoint) && !disconnectedEdge) {
-          const featureFlagValue = settings && settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt'];
-          const featureEnabled = settings && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
-          $scope.state.showAMTInfo = featureFlagValue && featureEnabled;
+          $scope.state.showAMTInfo = settings && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
         }
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve environment details');
