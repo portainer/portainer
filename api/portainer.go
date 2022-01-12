@@ -97,6 +97,9 @@ type (
 		Rollback                  *bool
 		SnapshotInterval          *string
 		BaseURL                   *string
+		InitialMmapSize           *int
+		MaxBatchSize              *int
+		MaxBatchDelay             *time.Duration
 	}
 
 	// CustomTemplate represents a custom template

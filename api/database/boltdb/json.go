@@ -38,5 +38,15 @@ func UnmarshalObject(data []byte, object interface{}) error {
 // decoding at the moment.
 func UnmarshalObjectWithJsoniter(data []byte, object interface{}) error {
 	var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
-	return jsoni.Unmarshal(data, &object)
+	err := jsoni.Unmarshal(data, &object)
+	if err != nil {
+		if s, ok := object.(*string); ok {
+			*s = string(data)
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
 }

@@ -57,6 +57,9 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Logo:                      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
 		Templates:                 kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),
 		BaseURL:                   kingpin.Flag("base-url", "Base URL parameter such as portainer if running portainer as http://yourdomain.com/portainer/.").Short('b').Default(defaultBaseURL).String(),
+		InitialMmapSize:           kingpin.Flag("initial-mmap-size", "Initial mmap size of the database in bytes").Int(),
+		MaxBatchSize:              kingpin.Flag("max-batch-size", "Maximum size of a batch").Int(),
+		MaxBatchDelay:             kingpin.Flag("max-batch-delay", "Maximum delay before a batch starts").Duration(),
 	}
 
 	kingpin.Parse()

@@ -19,6 +19,7 @@ import (
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/docker"
@@ -70,6 +71,15 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 	if err != nil {
 		panic(err)
 	}
+
+	if bconn, ok := connection.(*boltdb.DbConnection); ok {
+		bconn.MaxBatchSize = *flags.MaxBatchSize
+		bconn.MaxBatchDelay = *flags.MaxBatchDelay
+		bconn.InitialMmapSize = *flags.InitialMmapSize
+	} else {
+		panic("unexpected database type")
+	}
+
 	store := datastore.NewStore(*flags.Data, fileService, connection)
 	isNew, err := store.Open()
 	if err != nil {
