@@ -19,7 +19,6 @@ export function TableHeaderRow<
 }: Props<D> & TableHeaderProps) {
   useTableContext();
 
-  console.log(headers);
   return (
     <tr className={className} role={role} style={style}>
       {headers.map((column) => (
