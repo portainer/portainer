@@ -33,7 +33,6 @@ import {
 import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
 import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
 import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
-import { EnvironmentProvider } from '@/portainer/environments/useEnvironment';
 import { EdgeDeviceTableSettings } from '@/edge/devices/types';
 import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings';
 import { EdgeDevicesDatatableActions } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions';
@@ -93,6 +92,7 @@ export function EdgeDevicesDatatable({
       isRowSelectable() {
         return true;
       },
+      selectColumnWidth: 5,
     },
     useFilters,
     useGlobalFilter,
@@ -191,10 +191,8 @@ export function EdgeDevicesDatatable({
                 {row.isExpanded && (
                   <tr>
                     <td />
-                    <td colSpan={10}>
-                      <EnvironmentProvider environment={row.original}>
-                        <AMTDevicesDatatable />
-                      </EnvironmentProvider>
+                    <td colSpan={row.cells.length - 1}>
+                      <AMTDevicesDatatable environmentId={row.original.Id} />
                     </td>
                   </tr>
                 )}

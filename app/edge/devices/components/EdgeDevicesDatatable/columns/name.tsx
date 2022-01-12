@@ -2,7 +2,7 @@ import { CellProps, Column, TableInstance } from 'react-table';
 
 import { Environment } from '@/portainer/environments/types';
 import { Link } from '@/portainer/components/Link';
-import { arrowClass } from '@/portainer/components/datatables/utils';
+import { ExpandingCell } from '@/portainer/components/datatables/components/ExpandingCell';
 
 export const name: Column<Environment> = {
   Header: 'Name',
@@ -17,12 +17,7 @@ export const name: Column<Environment> = {
 
 export function NameCell({ value: name, row }: CellProps<TableInstance>) {
   return (
-    // eslint-disable-next-line react/jsx-props-no-spreading
-    <div {...row.getToggleRowExpandedProps({})}>
-      <i
-        className={`fas ${arrowClass(row.isExpanded)} space-right`}
-        aria-hidden="true"
-      />
+    <ExpandingCell row={row}>
       <Link
         to="portainer.endpoints.endpoint"
         params={{ id: row.original.Id }}
@@ -30,6 +25,6 @@ export function NameCell({ value: name, row }: CellProps<TableInstance>) {
       >
         {name}
       </Link>
-    </div>
+    </ExpandingCell>
   );
 }

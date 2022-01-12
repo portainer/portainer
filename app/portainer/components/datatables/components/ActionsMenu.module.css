@@ -4,11 +4,7 @@
 }
 
 .actions-active {
-  color: #337ab7;
-}
-
-.table-actions-header {
-  color: #337ab7;
+  color: var(--blue-2);
 }
 
 .table-actions-menu-list {
@@ -22,4 +18,8 @@
 .table-actions-menu-btn {
   border: none;
   background: none;
+}
+
+[data-reach-menu-link] {
+  text-decoration: none !important;
 }

@@ -18,3 +18,14 @@ export enum PowerState {
   HIBERNATE = 'Hibernate',
   POWER_CYCLE = 'Power Cycle',
 }
+
+export enum PowerStateCode {
+  ON = 2,
+  SLEEP_LIGHT = 3,
+  SLEEP_DEEP = 4,
+  OFF_HARD = 6,
+  HIBERNATE = 7,
+  OFF_SOFT = 8,
+  POWER_CYCLE = 9,
+  OFF_HARD_GRACEFUL = 13,
+}

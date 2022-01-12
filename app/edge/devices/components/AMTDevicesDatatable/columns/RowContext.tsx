@@ -5,19 +5,28 @@ import {
   useReducer,
   PropsWithChildren,
 } from 'react';
+import { EnvironmentId } from 'Portainer/environments/types';
 
 interface RowContextState {
+  environmentId: EnvironmentId;
   isLoading: boolean;
   toggleIsLoading(): void;
 }
 
 const RowContext = createContext<RowContextState | null>(null);
 
-export function RowProvider({ children }: PropsWithChildren<unknown>) {
+export interface RowProviderProps {
+  environmentId: EnvironmentId;
+}
+
+export function RowProvider({
+  environmentId,
+  children,
+}: PropsWithChildren<RowProviderProps>) {
   const [isLoading, toggleIsLoading] = useReducer((state) => !state, false);
 
   const state = useMemo(
-    () => ({ isLoading, toggleIsLoading }),
+    () => ({ isLoading, toggleIsLoading, environmentId }),
     [isLoading, toggleIsLoading]
   );
 

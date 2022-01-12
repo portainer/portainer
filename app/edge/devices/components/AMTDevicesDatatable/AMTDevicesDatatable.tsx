@@ -8,17 +8,21 @@ import {
 } from '@/portainer/components/datatables/components';
 import { InnerDatatable } from '@/portainer/components/datatables/components/InnerDatatable';
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
-import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import { useAMTDevices } from '@/edge/devices/components/AMTDevicesDatatable/useAMTDevices';
 import { RowProvider } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
+import { EnvironmentId } from '@/portainer/environments/types';
+import PortainerError from '@/portainer/error';
 
 import { useColumns } from './columns';
 
-export function AMTDevicesDatatable() {
+export interface AMTDevicesTableProps {
+  environmentId: EnvironmentId;
+}
+
+export function AMTDevicesDatatable({ environmentId }: AMTDevicesTableProps) {
   const columns = useColumns();
 
-  const environment = useEnvironment();
-  const { isLoading, devices, error } = useAMTDevices(environment.Id);
+  const { isLoading, devices, error } = useAMTDevices(environmentId);
 
   const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
     useTable<Device>(
@@ -66,7 +70,7 @@ export function AMTDevicesDatatable() {
                 const { key, className, role, style } = row.getRowProps();
 
                 return (
-                  <RowProvider key={key}>
+                  <RowProvider key={key} environmentId={environmentId}>
                     <TableRow<Device>
                       cells={row.cells}
                       key={key}
@@ -91,13 +95,13 @@ export function AMTDevicesDatatable() {
   );
 }
 
-function userMessage(isLoading: boolean, error: unknown) {
+function userMessage(isLoading: boolean, error?: PortainerError) {
   if (isLoading) {
     return 'Loading...';
   }
 
   if (error) {
-    return { error };
+    return error.message;
   }
 
   return 'No devices found';

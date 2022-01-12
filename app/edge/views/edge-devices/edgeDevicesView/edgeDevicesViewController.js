@@ -10,22 +10,16 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
 
   this.getEnvironments = function () {
     return $async(async () => {
-      $q.all({
-        endpoints: getEndpoints(0, 100, { edgeDeviceFilter: true }),
-        groups: GroupService.groups(),
-      })
-        .then(function success(data) {
-          var endpoints = data.endpoints.value;
-          var groups = data.groups;
-          EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
-          ctrl.edgeDevices = endpoints;
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve edge devices');
-          ctrl.edgeDevices = [];
-        });
+      try {
+        const [endpointsResponse, groups] = await Promise.all([getEndpoints(0, 100, {edgeDeviceFilter: true}), GroupService.groups()])
+        EndpointHelper.mapGroupNameToEndpoint(endpointsResponse.value, groups);
+        ctrl.edgeDevices = endpointsResponse.value;
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve edge devices');
+        ctrl.edgeDevices = [];
+      }
     });
-  };
+  }
 
   this.getSettings = function () {
     return $async(async () => {
