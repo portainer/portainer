@@ -1,13 +1,13 @@
-<div style="margin-top: 15px;" ng-if="$ctrl.hasIngress">
+<div style="margin-top: 15px" ng-if="$ctrl.hasIngress">
   <table class="table">
     <tbody>
       <tr class="text-muted">
-        <td style="width: 15%;">Ingress name</td>
-        <td style="width: 10%;">Service name</td>
-        <td style="width: 10%;">Host</td>
-        <td style="width: 10%;">Port</td>
-        <td style="width: 10%;">Path</td>
-        <td style="width: 15%;">HTTP Route</td>
+        <td style="width: 15%">Ingress name</td>
+        <td style="width: 10%">Service name</td>
+        <td style="width: 10%">Host</td>
+        <td style="width: 10%">Port</td>
+        <td style="width: 10%">Path</td>
+        <td style="width: 15%">HTTP Route</td>
       </tr>
       <tr ng-repeat="ingress in $ctrl.applicationIngress">
         <td>{{ ingress.IngressName }}</td>
@@ -16,7 +16,7 @@
         <td>{{ ingress.Port }}</td>
         <td>{{ ingress.Path }}</td>
         <td
-          ><a href="http://{{ ingress.Host }}{{ ingress.Path }}">{{ ingress.Host }}{{ ingress.Path }}</a></td
+          ><a target="_blank" href="http://{{ ingress.Host }}{{ ingress.Path }}">{{ ingress.Host }}{{ ingress.Path }}</a></td
         >
       </tr>
     </tbody>
