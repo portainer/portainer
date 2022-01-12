@@ -58,6 +58,10 @@ func (store *Store) Open() (newStore bool, err error) {
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
 	version, err := store.VersionService.DBVersion()
 	if err != nil {
+		if store.IsErrObjectNotFound(err) {
+			return newStore, nil
+		}
+
 		return newStore, err
 	}
 
@@ -65,7 +69,7 @@ func (store *Store) Open() (newStore bool, err error) {
 		logrus.WithField("version", version).Infof("Opened existing store")
 		return false, nil
 	}
-	
+
 	return newStore, nil
 }
 
