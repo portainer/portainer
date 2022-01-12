@@ -11,7 +11,6 @@ angular
     $q,
     $scope,
     $state,
-    $transition$,
     $filter,
     clipboard,
     EndpointService,
@@ -28,7 +27,7 @@ angular
       actionInProgress: false,
       deploymentTab: 0,
       allowCreateTag: Authentication.isAdmin(),
-      isEdgeDevice: $transition$.params().isEdgeDevice,
+      isEdgeDevice: $state.params.isEdgeDevice,
       availableEdgeAgentCheckinOptions: [
         { key: 'Use default interval', value: 0 },
         {
