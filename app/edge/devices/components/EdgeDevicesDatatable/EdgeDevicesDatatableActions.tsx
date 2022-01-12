@@ -26,7 +26,7 @@ export function EdgeDevicesDatatableActions({
 
   return (
     <div className="actionBar">
-      {isFDOEnabled && (
+      {(isFDOEnabled || isOpenAMTEnabled) && (
         <Button onClick={() => onAddNewDeviceClick()}>
           <i className="fa fa-plus-circle space-right" aria-hidden="true" />
           Add new
@@ -46,17 +46,28 @@ export function EdgeDevicesDatatableActions({
   );
 
   async function onAddNewDeviceClick() {
+
+    if (!isFDOEnabled) {
+      router.stateService.go('portainer.endpoints.newEdgeDevice');
+      return;
+    }
+
+    if (!isOpenAMTEnabled) {
+      router.stateService.go('portainer.endpoints.importDevice');
+      return;
+    }
+
     const result = await promptAsync({
       title: 'How would you like to add an Edge Device?',
       inputType: 'radio',
       inputOptions: [
         {
           text: 'Provision bare-metal using Intel FDO',
-          value: '1',
+          value: 'FDO',
         },
         {
           text: 'Deploy agent manually',
-          value: '2',
+          value: 'AMT',
         },
       ],
       buttons: {
@@ -68,10 +79,10 @@ export function EdgeDevicesDatatableActions({
     });
 
     switch (result) {
-      case '1':
+      case 'FDO':
         router.stateService.go('portainer.endpoints.importDevice');
         break;
-      case '2':
+      case 'AMT':
         router.stateService.go('portainer.endpoints.newEdgeDevice');
         break;
       default:
