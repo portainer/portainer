@@ -28,6 +28,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
     ownerURL: fdoConfiguration ? fdoConfiguration.ownerURL : '',
     ownerUsername: fdoConfiguration ? fdoConfiguration.ownerUsername : '',
     ownerPassword: fdoConfiguration ? fdoConfiguration.ownerPassword : '',
+    profilesURL: fdoConfiguration ? fdoConfiguration.profilesURL : '',
   };
 
   const edgeComputeFeaturesEnabled = settings.EnableEdgeComputeFeatures;
@@ -123,6 +124,21 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                         placeholder="password"
                         value={values.ownerPassword}
                         data-cy="fdo-passwordInput"
+                      />
+                    </FormControl>
+
+                    <FormControl
+                      inputId="profiles_url"
+                      label="Profile list URL"
+                      errors={errors.profilesURL}
+                    >
+                      <Field
+                        as={Input}
+                        name="profilesURL"
+                        id="profiles_url"
+                        placeholder="http://example.com/profiles.json"
+                        value={values.profilesURL}
+                        data-cy="fdo-profilesInput"
                       />
                     </FormControl>
                   </>
