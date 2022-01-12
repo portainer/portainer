@@ -16,7 +16,7 @@
         <td>{{ service.spec.clusterIP }}</td>
         <td ng-show="service.spec.type === 'LoadBalancer'">
           <div ng-show="service.status.loadBalancer.ingress">
-            <a ng-href="http://{{ service.status.loadBalancer.ingress[0].ip }}:{{ service.spec.ports[0].port }}">
+            <a target="_blank" ng-href="http://{{ service.status.loadBalancer.ingress[0].ip }}:{{ service.spec.ports[0].port }}">
               <i class="fa fa-external-link-alt" aria-hidden="true"></i>
               <span data-cy="k8sAppDetail-containerPort"> Access </span>
             </a>
