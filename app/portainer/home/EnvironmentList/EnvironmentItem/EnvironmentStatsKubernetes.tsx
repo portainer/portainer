@@ -5,7 +5,7 @@ import { addPlural } from '@/portainer/helpers/strings';
 import { Stat } from './EnvironmentStatsItem';
 
 interface Props {
-  snapshots: KubernetesSnapshot[];
+  snapshots?: KubernetesSnapshot[];
 }
 
 export function EnvironmentStatsKubernetes({ snapshots = [] }: Props) {

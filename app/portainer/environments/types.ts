@@ -51,7 +51,7 @@ export interface KubernetesSnapshot {
 }
 
 export interface KubernetesSettings {
-  Snapshots: KubernetesSnapshot[];
+  Snapshots?: KubernetesSnapshot[] | null;
 }
 
 export type Environment = {

@@ -168,7 +168,8 @@ function getSnapshotTime(environment: Environment) {
         ? isoDateFromTimestamp(environment.Snapshots[0].Time)
         : null;
     case PlatformType.Kubernetes:
-      return environment.Kubernetes.Snapshots.length > 0
+      return environment.Kubernetes.Snapshots &&
+        environment.Kubernetes.Snapshots.length > 0
         ? isoDateFromTimestamp(environment.Kubernetes.Snapshots[0].Time)
         : null;
     default:
