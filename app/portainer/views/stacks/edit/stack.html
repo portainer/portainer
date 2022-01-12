@@ -15,14 +15,14 @@
           <!-- tab-info -->
           <uib-tab index="0">
             <uib-tab-heading> <i class="fa fa-th-list" aria-hidden="true"></i> Stack </uib-tab-heading>
-            <div style="margin-top: 10px">
+            <div style="margin-top: 10px;">
               <!-- stack-information -->
               <div ng-if="external || orphaned">
                 <div class="col-sm-12 form-section-title"> Information </div>
                 <div class="form-group">
                   <span class="small">
                     <p class="text-muted">
-                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                       <span ng-if="external">This stack was created outside of Portainer. Control over this stack is limited.</span>
                       <span ng-if="orphaned">This stack is orphaned. You can reassociate it with the current environment using the "Associate to this environment" feature.</span>
                     </p>
@@ -101,21 +101,20 @@
                         ng-disabled="state.actionInProgress"
                         ng-click="associateStack()"
                         button-spinner="state.actionInProgress"
-                        style="margin-left: -5px"
+                        style="margin-left: -5px;"
                       >
-                        <i class="fa fa-sync" aria-hidden="true" style="margin-right: 3px"></i>
+                        <i class="fa fa-sync" aria-hidden="true" style="margin-right: 3px;"></i>
                         <span ng-hide="state.actionInProgress">Associate</span>
                         <span ng-show="state.actionInProgress">Association in progress...</span>
                       </button>
-                      <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px">{{ state.formValidationError }}</span>
+                      <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
                     </div>
                   </div>
                 </form>
               </div>
               <!-- !associate -->
               <stack-redeploy-git-form
-                ng-if="stack.GitConfig && !stack.FromAppTemplate"
-                ng-show="!state.actionInProgress"
+                ng-if="stack.GitConfig && !stack.FromAppTemplate && !state.actionInProgress"
                 model="stack.GitConfig"
                 stack="stack"
                 authorization="PortainerStackUpdate"
@@ -137,12 +136,12 @@
           <!-- tab-file -->
           <uib-tab index="1" select="showEditor()" ng-if="!external && (!stack.GitConfig || stack.FromAppTemplate)">
             <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
-            <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px" name="stackUpdateForm">
+            <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px;" name="stackUpdateForm">
               <div class="form-group">
-                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion == 2">
+                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px;" ng-if="stackType == 2 && composeSyntaxMaxVersion == 2">
                   This stack will be deployed using the equivalent of <code>docker-compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
                 </span>
-                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion > 2">
+                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px;" ng-if="stackType == 2 && composeSyntaxMaxVersion > 2">
                   This stack will be deployed using <code>docker-compose</code>.
                 </span>
                 <span class="col-sm-12 text-muted small">
@@ -179,7 +178,7 @@
                       Prune services
                       <portainer-tooltip position="bottom" message="Prune services that are no longer referenced."></portainer-tooltip>
                     </label>
-                    <label class="switch" style="margin-left: 20px"> <input name="prune" type="checkbox" ng-model="formValues.Prune" /><i></i> </label>
+                    <label class="switch" style="margin-left: 20px;"> <input name="prune" type="checkbox" ng-model="formValues.Prune" /><i></i> </label>
                   </div>
                 </div>
               </div>
