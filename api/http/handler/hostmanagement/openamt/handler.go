@@ -21,11 +21,7 @@ type Handler struct {
 }
 
 // NewHandler returns a new Handler
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore) (*Handler, error) {
-	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
-		return nil, nil
-	}
-
+func NewHandler(bouncer *security.RequestBouncer) (*Handler, error) {
 	h := &Handler{
 		Router: mux.NewRouter(),
 	}

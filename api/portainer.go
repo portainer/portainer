@@ -1370,17 +1370,8 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
-// Supported feature flags
-const (
-	FeatOpenAMT Feature = "open-amt"
-	FeatFDO     Feature = "fdo"
-)
-
 // List of supported features
-var SupportedFeatureFlags = []Feature{
-	FeatOpenAMT,
-	FeatFDO,
-}
+var SupportedFeatureFlags = []Feature{}
 
 const (
 	_ AuthenticationMethod = iota

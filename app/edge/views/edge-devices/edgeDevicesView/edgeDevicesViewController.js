@@ -26,13 +26,8 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
       try {
         const settings = await SettingsService.settings();
 
-        const openAMTFeatureFlagValue = settings && settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt'];
-        const openAMTFeatureEnabled = settings && settings.EnableEdgeComputeFeatures && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
-        ctrl.isOpenAMTEnabled = openAMTFeatureFlagValue && openAMTFeatureEnabled;
-
-        const fdoFeatureFlagValue = settings && settings.FeatureFlagSettings && settings.FeatureFlagSettings['fdo'];
-        const fdoFeatureEnabled = settings && settings.EnableEdgeComputeFeatures && settings.fdoConfiguration && settings.fdoConfiguration.enabled;
-        ctrl.isFDOEnabled = fdoFeatureFlagValue && fdoFeatureEnabled;
+        ctrl.isOpenAMTEnabled = settings && settings.EnableEdgeComputeFeatures && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
+        ctrl.isFDOEnabled = settings && settings.EnableEdgeComputeFeatures && settings.fdoConfiguration && settings.fdoConfiguration.enabled;
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve settings');
       }

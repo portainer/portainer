@@ -33,9 +33,6 @@ type Service struct {
 
 // NewService initializes a new service.
 func NewService(dataStore dataservices.DataStore) *Service {
-	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
-		return nil
-	}
 	return &Service{
 		httpsClient: &http.Client{
 			Timeout: httpClientTimeout,
