@@ -426,7 +426,7 @@ func (store *Store) Export(filename string) (err error) {
 		backup.Extensions = r
 	}
 
-	if r, err := store.HelmUserRepository().HelmUserRepositorys(); err != nil {
+	if r, err := store.HelmUserRepository().HelmUserRepositories(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
 			logrus.WithError(err).Errorf("Exporting Helm User Repositories")
 		}
