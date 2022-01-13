@@ -103,7 +103,8 @@ angular.module('portainer.app').factory('EndpointService', [
       TLSCAFile,
       TLSCertFile,
       TLSKeyFile,
-      checkinInterval
+      checkinInterval,
+      isEdgeDevice,
     ) {
       var deferred = $q.defer();
 
@@ -125,7 +126,8 @@ angular.module('portainer.app').factory('EndpointService', [
         TLSCAFile,
         TLSCertFile,
         TLSKeyFile,
-        checkinInterval
+        checkinInterval,
+        isEdgeDevice
       )
         .then(function success(response) {
           deferred.resolve(response.data);

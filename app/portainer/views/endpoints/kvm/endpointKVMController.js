@@ -36,9 +36,9 @@ class EndpointKVMController {
 
       try {
         const features = {
-          IDER: true,
-          KVM: true,
-          SOL: true,
+          ider: true,
+          kvm: true,
+          sol: true,
           redirection: true,
           userConsent: 'none',
         };

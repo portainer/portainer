@@ -680,6 +680,7 @@ a[ng-click] {
 .image-zoom-modal .modal-dialog {
   width: 80%;
 }
+
 /*!bootbox override*/
 
 /*angular-multi-select override*/
@@ -900,4 +901,9 @@ json-tree .branch-preview {
 
 .space-x-1 {
   margin-left: 0.25rem;
+}
+
+/* used for bootbox prompt with inputType radio */
+.form-check.radio {
+  margin-left: 15px;
 }

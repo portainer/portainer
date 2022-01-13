@@ -264,6 +264,7 @@ html {
   --bg-multiselect-helpercontainer: var(--white-color);
   --text-input-textarea: var(--white-color);
   --bg-service-datatable-thead: var(--grey-23);
+  --bg-inner-datatable-thead: var(--grey-23);
   --bg-service-datatable-tbody: var(--grey-24);
 }
 
@@ -435,6 +436,7 @@ html {
   --bg-multiselect-helpercontainer: var(--grey-1);
   --text-input-textarea: var(--grey-1);
   --bg-service-datatable-thead: var(--grey-1);
+  --bg-inner-datatable-thead: var(--grey-1);
   --bg-service-datatable-tbody: var(--grey-1);
 }
 
@@ -472,6 +474,7 @@ html {
   --bg-input-sm-color: var(--black-color);
   --bg-item-highlighted-color: var(--black-color);
   --bg-service-datatable-thead: var(--black-color);
+  --bg-inner-datatable-thead: var(--black-color);
   --bg-service-datatable-tbody: var(--black-color);
   --bg-pagination-color: var(--grey-3);
   --bg-pagination-span-color: var(--grey-3);

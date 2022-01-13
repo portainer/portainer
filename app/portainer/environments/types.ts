@@ -58,7 +58,7 @@ export interface KubernetesSettings {
   Snapshots: KubernetesSnapshot[];
 }
 
-export interface Environment {
+export type Environment = {
   Id: EnvironmentId;
   Type: EnvironmentType;
   TagIds: TagId[];
@@ -72,7 +72,8 @@ export interface Environment {
   Snapshots: DockerSnapshot[];
   Kubernetes: KubernetesSettings;
   PublicURL?: string;
-}
+  IsEdgeDevice?: boolean;
+};
 
 /**
  * TS reference of endpoint_create.go#EndpointCreationType iota

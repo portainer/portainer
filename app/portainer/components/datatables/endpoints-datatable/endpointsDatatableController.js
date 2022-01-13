@@ -1,19 +1,11 @@
-import EndpointHelper from '@/portainer/helpers/endpointHelper';
-
-import { activateDevice, getDevices } from 'Portainer/hostmanagement/open-amt/open-amt.service';
-
 angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$scope',
-  '$async',
-  '$state',
   '$controller',
   'DatatableService',
   'PaginationService',
-  'SettingsService',
-  'ModalService',
   'Notifications',
-  function ($scope, $async, $state, $controller, DatatableService, PaginationService, SettingsService, ModalService, Notifications) {
-    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope, $async: $async }));
+  function ($scope, $controller, DatatableService, PaginationService) {
+    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     this.state = Object.assign(this.state, {
       orderBy: this.orderBy,
@@ -21,10 +13,6 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       filteredDataSet: [],
       totalFilteredDataset: 0,
       pageNumber: 1,
-      showAMTInfo: false,
-      amtDevices: {},
-      amtDevicesErrors: {},
-      showFDOInfo: false,
     });
 
     this.paginationChanged = function () {
@@ -63,84 +51,10 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       this.paginationChanged();
     };
 
-    this.setShowIntelInfo = async function () {
-      this.settings = await SettingsService.settings();
-      const openAMTFeatureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['open-amt'];
-      const openAMTFeatureEnabled = this.settings && this.settings.EnableEdgeComputeFeatures && this.settings.openAMTConfiguration && this.settings.openAMTConfiguration.enabled;
-      this.state.showAMTInfo = openAMTFeatureFlagValue && openAMTFeatureEnabled;
-
-      const fdoFeatureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['fdo'];
-      const fdoFeatureEnabled = this.settings && this.settings.EnableEdgeComputeFeatures && this.settings.fdoConfiguration && this.settings.fdoConfiguration.enabled;
-      this.state.showFDOInfo = fdoFeatureFlagValue && fdoFeatureEnabled;
-    };
-
-    this.showAMTNodes = function (item) {
-      return this.state.showAMTInfo && EndpointHelper.isAgentEndpoint(item) && item.AMTDeviceGUID;
-    };
-
-    this.expandItem = function (item, expanded) {
-      if (!this.showAMTNodes(item)) {
-        return;
-      }
-
-      item.Expanded = expanded;
-      this.fetchAMTDeviceInfo(item);
-    };
-
-    this.fetchAMTDeviceInfo = function (endpoint) {
-      $async(async () => {
-        if (!this.showAMTNodes(endpoint) || this.state.amtDevices[endpoint.Id]) {
-          return;
-        }
-
-        try {
-          this.state.amtDevices[endpoint.Id] = await getDevices(endpoint.Id);
-        } catch (e) {
-          console.log(e);
-          this.state.amtDevicesErrors[endpoint.Id] = e.message;
-        }
-      })
-
-    };
-
-    this.associateOpenAMT = function (endpoints) {
-      const setLoadingMessage = this.setLoadingMessage;
-      ModalService.confirm({
-        title: 'Are you sure?',
-        message: 'This operation will associate the selected environments with OpenAMT.',
-        buttons: {
-          confirm: {
-            label: 'Associate',
-            className: 'btn-primary',
-          },
-        },
-        callback: async function onConfirm(confirmed) {
-          if (!confirmed) {
-            return;
-          }
-
-          $scope.$evalAsync(async () => {
-            setLoadingMessage('Activating Active Management Technology on selected devices...');
-            for (let endpoint of endpoints) {
-              try {
-                await activateDevice(endpoint.Id);
-
-                Notifications.success('Successfully associated with OpenAMT', endpoint.Name);
-              } catch (err) {
-                Notifications.error('Failure', err, 'Unable to associate with OpenAMT');
-              }
-            }
-
-            $state.reload();
-          })
-        },
-      });
-    };
-
     /**
      * Overridden
      */
-    this.$onInit = async function () {
+    this.$onInit = function () {
       this.setDefaults();
       this.prepareTableFromDataset();
 
@@ -164,7 +78,6 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
         this.filters.state.open = false;
       }
 
-      await this.setShowIntelInfo();
       this.paginationChanged();
     };
   },

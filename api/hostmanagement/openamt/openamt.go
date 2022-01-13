@@ -11,7 +11,6 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -21,7 +20,7 @@ const (
 
 	httpClientTimeout = 5 * time.Minute
 
-	powerUpState  portainer.PowerState = 2
+	powerOnState  portainer.PowerState = 2
 	powerOffState portainer.PowerState = 8
 	restartState  portainer.PowerState = 5
 )
@@ -32,10 +31,7 @@ type Service struct {
 }
 
 // NewService initializes a new service.
-func NewService(dataStore dataservices.DataStore) *Service {
-	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
-		return nil
-	}
+func NewService() *Service {
 	return &Service{
 		httpsClient: &http.Client{
 			Timeout: httpClientTimeout,

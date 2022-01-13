@@ -113,7 +113,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
               <Form className="form-horizontal" onSubmit={handleSubmit}>
                 <FormControl
                   inputId="edge_enableOpenAMT"
-                  label="Enable edge OpenAMT"
+                  label="Enable OpenAMT"
                   errors={errors.enabled}
                 >
                   <Switch

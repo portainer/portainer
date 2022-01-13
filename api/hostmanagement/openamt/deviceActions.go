@@ -44,8 +44,8 @@ func (service *Service) executeDeviceAction(configuration portainer.OpenAMTConfi
 
 func parseAction(actionRaw string) (portainer.PowerState, error) {
 	switch strings.ToLower(actionRaw) {
-	case "power up":
-		return powerUpState, nil
+	case "power on":
+		return powerOnState, nil
 	case "power off":
 		return powerOffState, nil
 	case "restart":

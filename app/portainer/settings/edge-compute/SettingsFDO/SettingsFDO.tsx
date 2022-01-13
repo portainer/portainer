@@ -59,6 +59,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                 <FormControl
                   inputId="edge_enableFDO"
                   label="Enable FDO Management Service"
+                  size="medium"
                   errors={errors.enabled}
                 >
                   <Switch
