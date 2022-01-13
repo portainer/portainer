@@ -1,140 +1,141 @@
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
-import { configureDevice, getProfiles } from "Portainer/hostmanagement/fdo/fdo.service";
+import { configureDevice, getProfiles } from 'Portainer/hostmanagement/fdo/fdo.service';
 
 angular
   .module('portainer.app')
-  .controller('ImportDeviceController', function ImportDeviceController(
-    $async,
-    $q,
-    $scope,
-    $state,
-    EndpointService,
-    GroupService,
-    TagService,
-    Notifications,
-    Authentication,
-    FileUploadService,
-  ) {
-    $scope.state = {
-      actionInProgress: false,
-      voucherUploading: false,
-      voucherUploaded: false,
-      deviceID: '',
-      allowCreateTag: Authentication.isAdmin(),
-    };
+  .controller(
+    'ImportDeviceController',
+    function ImportDeviceController($async, $q, $scope, $state, EndpointService, GroupService, TagService, Notifications, Authentication, FileUploadService) {
+      $scope.state = {
+        actionInProgress: false,
+        vouchersUploading: false,
+        vouchersUploaded: false,
+        deviceIDs: [],
+        allowCreateTag: Authentication.isAdmin(),
+      };
 
-    $scope.formValues = {
-      DeviceName: '',
-      DeviceProfile: '',
-      GroupId: 1,
-      TagIds: [],
-      VoucherFile: null,
-      PortainerURL: '',
-    };
+      $scope.formValues = {
+        DeviceName: '',
+        DeviceProfile: '',
+        GroupId: 1,
+        TagIds: [],
+        VoucherFiles: null,
+        PortainerURL: '',
+        Suffix: 1,
+      };
 
-    $scope.profiles = [];
+      $scope.profiles = [];
 
-    $scope.onVoucherFileChange = function (file) {
-      if (!file) {
-        return;
-      }
+      $scope.onVoucherFilesChange = function () {
+        $scope.state.vouchersUploading = true;
 
-      $scope.state.voucherUploading = true;
+        let uploads = $scope.formValues.VoucherFiles.map((f) => FileUploadService.uploadOwnershipVoucher(f));
 
-      FileUploadService.uploadOwnershipVoucher(file)
-        .then(function success(response) {
-          $scope.state.voucherUploading = false;
-          $scope.state.voucherUploaded = true;
-          $scope.deviceID = response.data.guid;
-        })
-        .catch(function error(err) {
-          $scope.state.voucherUploading = false;
-          Notifications.error('Failure', err, 'Unable to upload Ownership Voucher');
-        });
-    };
+        $q.all(uploads)
+          .then(function success(responses) {
+            $scope.state.vouchersUploading = false;
+            $scope.state.vouchersUploaded = true;
+            $scope.state.deviceIDs = responses.map((r) => r.data.guid);
+          })
+          .catch(function error(err) {
+            $scope.state.vouchersUploading = false;
+            if ($scope.formValues.VoucherFiles.length == 1) {
+              Notifications.error('Failure', err, 'Unable to upload the Ownership Voucher');
+            } else {
+              Notifications.error('Failure', null, 'Unable to upload the Ownership Vouchers, please check the logs');
+            }
+          });
+      };
 
-    $scope.onCreateTag = function onCreateTag(tagName) {
-      return $async(onCreateTagAsync, tagName);
-    };
+      $scope.onCreateTag = function onCreateTag(tagName) {
+        return $async(onCreateTagAsync, tagName);
+      };
 
-    async function onCreateTagAsync(tagName) {
-      try {
-        const tag = await TagService.createTag(tagName);
-        $scope.availableTags = $scope.availableTags.concat(tag);
-        $scope.formValues.TagIds = $scope.formValues.TagIds.concat(tag.Id);
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to create tag');
-      }
-    }
-
-    $scope.createEndpointAndConfigureDevice = function () {
-      return $async(async () => {
-        $scope.state.actionInProgress = true;
-
+      async function onCreateTagAsync(tagName) {
         try {
-          var endpoint = await EndpointService.createRemoteEndpoint(
-            $scope.formValues.DeviceName,
-            PortainerEndpointCreationTypes.EdgeAgentEnvironment,
-            $scope.formValues.PortainerURL,
-            '',
-            $scope.formValues.GroupId,
-            $scope.formValues.TagIds,
-            false,
-            false,
-            false,
-            null,
-            null,
-            null,
-            null,
-              true,
-          );
+          const tag = await TagService.createTag(tagName);
+          $scope.availableTags = $scope.availableTags.concat(tag);
+          $scope.formValues.TagIds = $scope.formValues.TagIds.concat(tag.Id);
         } catch (err) {
-          this.Notifications.error('Failure', err, 'Unable to create the environment');
+          Notifications.error('Failure', err, 'Unable to create tag');
+        }
+      }
+
+      $scope.createEndpointAndConfigureDevice = function () {
+        return $async(async () => {
+          $scope.state.actionInProgress = true;
+
+          let suffix = $scope.formValues.Suffix;
+
+          for (const dev of $scope.state.deviceIDs) {
+            try {
+              var endpoint = await EndpointService.createRemoteEndpoint(
+                $scope.formValues.DeviceName + suffix,
+                PortainerEndpointCreationTypes.EdgeAgentEnvironment,
+                $scope.formValues.PortainerURL,
+                '',
+                $scope.formValues.GroupId,
+                $scope.formValues.TagIds,
+                false,
+                false,
+                false,
+                null,
+                null,
+                null,
+                null,
+                true
+              );
+            } catch (err) {
+              this.Notifications.error('Failure', err, 'Unable to create the environment');
+              return;
+            } finally {
+              $scope.state.actionInProgress = false;
+            }
+
+            suffix++;
+
+            const config = {
+              edgeKey: endpoint.EdgeKey,
+              name: $scope.formValues.DeviceName,
+              profile: $scope.formValues.DeviceProfile,
+            };
+
+            try {
+              await configureDevice(dev, config);
+            } catch (err) {
+              Notifications.error('Failure', err, 'Unable to import device');
+              return;
+            } finally {
+              $scope.state.actionInProgress = false;
+            }
+          }
+
+          Notifications.success('Device(s) successfully imported');
+          $state.go('edge.devices');
+        });
+      };
+
+      async function initView() {
+        try {
+          $scope.profiles = await getProfiles();
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to load profiles');
           return;
-        } finally {
-          $scope.state.actionInProgress = false;
         }
 
-        const config = {
-          edgeKey: endpoint.EdgeKey,
-          name: $scope.formValues.DeviceName,
-          profile: $scope.formValues.DeviceProfile,
-        };
-
-        try {
-          await configureDevice($scope.deviceID, config);
-          Notifications.success('Device successfully imported');
-        } catch (err) {
-          Notifications.error('Failure', err, 'Unable to import device');
-          return;
-        } finally {
-          $scope.state.actionInProgress = false;
-        }
-
-        $state.go('portainer.home');
-      });
-    };
-
-    async function initView() {
-      try {
-        $scope.profiles = await getProfiles();
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to load profiles');
-        return;
+        $q.all({
+          groups: GroupService.groups(),
+          tags: TagService.tags(),
+        })
+          .then(function success(data) {
+            $scope.groups = data.groups;
+            $scope.availableTags = data.tags;
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to load groups');
+          });
       }
 
-      $q.all({
-        groups: GroupService.groups(),
-        tags: TagService.tags(),
-      })
-        .then(function success(data) {
-          $scope.groups = data.groups;
-          $scope.availableTags = data.tags;
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to load groups');
-        });
+      initView();
     }
-
-    initView();
-  });
+  );
