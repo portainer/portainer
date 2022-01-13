@@ -89,8 +89,10 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
 	}
 
-	edgeDeviceFilter, _ := request.RetrieveBooleanQueryParameter(r, "edgeDeviceFilter", true)
-	filteredEndpoints = filterEndpointsByEdgeDevice(filteredEndpoints, edgeDeviceFilter)
+	edgeDeviceFilter, edgeDeviceFilterErr := request.RetrieveBooleanQueryParameter(r, "edgeDeviceFilter", false)
+	if edgeDeviceFilterErr == nil {
+		filteredEndpoints = filterEndpointsByEdgeDevice(filteredEndpoints, edgeDeviceFilter)
+	}
 
 	if search != "" {
 		tags, err := handler.DataStore.Tag().Tags()

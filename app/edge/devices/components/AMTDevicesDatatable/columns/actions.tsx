@@ -1,4 +1,4 @@
-import { CellProps, Column, TableInstance } from 'react-table';
+import { CellProps, Column } from 'react-table';
 import { useSref } from '@uirouter/react';
 import { MenuItem, MenuLink } from '@reach/menu-button';
 import { useQueryClient } from 'react-query';
@@ -25,9 +25,7 @@ export const actions: Column<Device> = {
   Cell: ActionsCell,
 };
 
-export function ActionsCell({
-  row: { original: device },
-}: CellProps<TableInstance>) {
+export function ActionsCell({ row: { original: device } }: CellProps<Device>) {
   const queryClient = useQueryClient();
 
   const { isLoading, toggleIsLoading, environmentId } = useRowContext();

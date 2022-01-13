@@ -47,7 +47,7 @@ export async function getEndpoints(
   if (endpointIds) {
     params.endpointIds = arrayToJson(endpointIds);
   }
-  
+
   try {
     const response = await axios.get<Environment[]>(url, { params });
 

@@ -1,4 +1,4 @@
-import { CellProps, Column, TableInstance } from 'react-table';
+import { CellProps, Column } from 'react-table';
 import clsx from 'clsx';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
@@ -18,7 +18,7 @@ export const powerState: Column<Device> = {
 
 export function PowerStateCell({
   row: { original: device },
-}: CellProps<TableInstance>) {
+}: CellProps<Device>) {
   const { isLoading } = useRowContext();
   return (
     <>
