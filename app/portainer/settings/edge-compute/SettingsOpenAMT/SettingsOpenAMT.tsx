@@ -86,7 +86,9 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
     setCertFile(new File([], initialValues.certFileName));
   }
 
-  const edgeComputeFeaturesEnabled = settings.EnableEdgeComputeFeatures;
+  const edgeComputeFeaturesEnabled = settings
+    ? settings.EnableEdgeComputeFeatures
+    : false;
 
   return (
     <div className="row">

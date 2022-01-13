@@ -1,14 +1,8 @@
 import { TableSettingsProvider } from '@/portainer/components/datatables/components/useTableSettings';
-import { SearchBarProvider } from '@/portainer/components/datatables/components/SearchBar';
 
-import {
-  FDOProfilesDatatable,
-    FDOProfilesTableProps,
-} from './FDOProfilesDatatable';
+import { FDOProfilesDatatable } from './FDOProfilesDatatable';
 
-export function FDOProfilesDatatableContainer({
-  ...props
-}: FDOProfilesTableProps) {
+export function FDOProfilesDatatableContainer() {
   const defaultSettings = {
     pageSize: 10,
     sortBy: { id: 'name', desc: false },
@@ -16,10 +10,8 @@ export function FDOProfilesDatatableContainer({
 
   return (
     <TableSettingsProvider defaults={defaultSettings} storageKey="edgeDevices">
-      <SearchBarProvider>
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        <FDOProfilesDatatable {...props} />
-      </SearchBarProvider>
+      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+      <FDOProfilesDatatable />
     </TableSettingsProvider>
   );
 }

@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from 'react';
 import { Formik, Field, Form } from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { FormSectionTitle } from "@/portainer/components/form-components/FormSectionTitle";
+import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 import { Input } from '@/portainer/components/form-components/Input';
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
-import { FDOProfilesDatatableContainer } from "@/portainer/settings/edge-compute/FDOProfilesDatatable/FDOProfilesDatatableContainer";
+import { FDOProfilesDatatableContainer } from '@/portainer/settings/edge-compute/FDOProfilesDatatable/FDOProfilesDatatableContainer';
 
 import styles from './SettingsFDO.module.css';
 import { validationSchema } from './SettingsFDO.validation';
@@ -26,18 +26,24 @@ interface Props {
 
 export function SettingsFDO({ settings, onSubmit }: Props) {
   const fdoConfiguration = settings ? settings.fdoConfiguration : null;
+  const initialFDOEnabled = fdoConfiguration ? fdoConfiguration.enabled : false;
 
-  const [isFDOEnabled, setIsFDOEnabled] = useState(fdoConfiguration ? fdoConfiguration.enabled : false);
+  const [isFDOEnabled, setIsFDOEnabled] = useState(initialFDOEnabled);
+  useEffect(() => {
+    setIsFDOEnabled(settings?.fdoConfiguration?.enabled);
+  }, [settings]);
 
   const initialValues = {
-    enabled: isFDOEnabled,
+    enabled: initialFDOEnabled,
     ownerURL: fdoConfiguration ? fdoConfiguration.ownerURL : '',
     ownerUsername: fdoConfiguration ? fdoConfiguration.ownerUsername : '',
     ownerPassword: fdoConfiguration ? fdoConfiguration.ownerPassword : '',
     profilesURL: fdoConfiguration ? fdoConfiguration.profilesURL : '',
   };
 
-  const edgeComputeFeaturesEnabled = settings.EnableEdgeComputeFeatures;
+  const edgeComputeFeaturesEnabled = settings
+    ? settings.EnableEdgeComputeFeatures
+    : false;
 
   return (
     <div className="row">
@@ -167,16 +173,15 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
             )}
           </Formik>
 
-          { isFDOEnabled && (
+          {isFDOEnabled && (
             <>
               <br />
               <FormSectionTitle>Device Profiles</FormSectionTitle>
               <TextTip color="blue">
-                Add, Edit and Manage the list of device profiles available during FDO device setup
+                Add, Edit and Manage the list of device profiles available
+                during FDO device setup
               </TextTip>
-              <FDOProfilesDatatableContainer
-                  isFDOEnabled={isFDOEnabled}
-              />
+              <FDOProfilesDatatableContainer />
             </>
           )}
         </WidgetBody>
@@ -184,15 +189,15 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
     </div>
   );
 
-    async function onChangedEnabled(
-        enabled: boolean,
-        setFieldValue: (
-            field: string,
-            value: unknown,
-            shouldValidate?: boolean
-        ) => void
-    ) {
-      setFieldValue('enabled', enabled)
-      setIsFDOEnabled(enabled)
-    }
+  async function onChangedEnabled(
+    e: boolean,
+    setFieldValue: (
+      field: string,
+      value: unknown,
+      shouldValidate?: boolean
+    ) => void
+  ) {
+    setIsFDOEnabled(e.valueOf());
+    setFieldValue('enabled', e.valueOf());
+  }
 }

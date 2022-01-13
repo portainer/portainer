@@ -4,11 +4,5 @@ import { created } from './created';
 import { name } from './name';
 
 export function useColumns() {
-    return useMemo(
-        () => [
-            name,
-            created,
-        ],
-        []
-    );
+  return useMemo(() => [name, created], []);
 }
