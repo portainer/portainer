@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"io"
 
-	"log"
-
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 )
@@ -39,7 +37,7 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 	if connection.getEncryptionKey() != nil {
 		data, err = decrypt(data, connection.getEncryptionKey())
 		if err != nil {
-			log.Println("failed decrypting object")
+			errors.Wrapf(err, "Failed decrypting object")
 		}
 	}
 	e := json.Unmarshal(data, object)
@@ -120,6 +118,6 @@ func decrypt(encrypted []byte, passphrase []byte) (plaintextByte []byte, err err
 	if err != nil {
 		return encrypted, errors.Wrap(err, "Error decrypting text")
 	}
-	
+
 	return plaintextByte, err
 }
