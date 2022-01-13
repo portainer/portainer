@@ -15,6 +15,7 @@ export interface DeviceConfiguration {
 export interface Profile {
   name: string;
   url: string;
+  created: string;
 }
 
 export interface Profiles {

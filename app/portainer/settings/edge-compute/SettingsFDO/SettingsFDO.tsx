@@ -2,6 +2,7 @@ import { Formik, Field, Form } from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
+import { FormSectionTitle } from "@/portainer/components/form-components/FormSectionTitle";
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
@@ -160,6 +161,14 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
               </Form>
             )}
           </Formik>
+
+          <br />
+          <FormSectionTitle>Device Profiles</FormSectionTitle>
+          <TextTip color="blue">
+            Add, Edit and Manage the list of device profiles available during FDO device setup
+          </TextTip>
+
+
         </WidgetBody>
       </Widget>
     </div>
