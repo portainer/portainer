@@ -45,7 +45,7 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 
 	latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
 	if latestEndpointReference == nil {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", errors.New("Unable to find an environment with the specified identifier inside the database")}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	latestEndpointReference.Status = portainer.EndpointStatusUp
