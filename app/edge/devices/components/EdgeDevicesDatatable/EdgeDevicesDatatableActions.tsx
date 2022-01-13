@@ -6,7 +6,7 @@ import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { promptAsync } from '@/portainer/services/modal.service/prompt';
 import * as notifications from '@/portainer/services/notifications';
 import { activateDevice } from '@/portainer/hostmanagement/open-amt/open-amt.service';
-import { deleteEndpoint } from "@/portainer/environments/environment.service";
+import { deleteEndpoint } from '@/portainer/environments/environment.service';
 
 interface Props {
   selectedItems: Environment[];
@@ -26,9 +26,9 @@ export function EdgeDevicesDatatableActions({
   return (
     <div className="actionBar">
       <Button
-          disabled={selectedItems.length < 1}
-          color="danger"
-          onClick={() => onDeleteEdgeDeviceClick()}
+        disabled={selectedItems.length < 1}
+        color="danger"
+        onClick={() => onDeleteEdgeDeviceClick()}
       >
         <i className="fa fa-trash-alt space-right" aria-hidden="true" />
         Remove
@@ -56,7 +56,8 @@ export function EdgeDevicesDatatableActions({
   async function onDeleteEdgeDeviceClick() {
     const confirmed = await confirmAsync({
       title: 'Are you sure ?',
-      message: 'This action will remove all configurations associated to your environment(s). Continue?',
+      message:
+        'This action will remove all configurations associated to your environment(s). Continue?',
       buttons: {
         confirm: {
           label: 'Remove',
@@ -72,14 +73,18 @@ export function EdgeDevicesDatatableActions({
     for (let i = 0; i < selectedItems.length; i += 1) {
       try {
         const environment = selectedItems[i];
-        await deleteEndpoint(environment.Id)
+        await deleteEndpoint(environment.Id);
 
         notifications.success(
-            'Environment successfully removed',
-            environment.Name
+          'Environment successfully removed',
+          environment.Name
         );
       } catch (err) {
-        notifications.error('Failure', err as Error, 'Unable to remove environment');
+        notifications.error(
+          'Failure',
+          err as Error,
+          'Unable to remove environment'
+        );
       }
     }
     await router.stateService.reload();

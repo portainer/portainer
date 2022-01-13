@@ -13,9 +13,7 @@ export const status: Column<Device> = {
   Filter: () => null,
 };
 
-export function StatusCell({
-  row: { original: device },
-}: CellProps<Device>) {
+export function StatusCell({ row: { original: device } }: CellProps<Device>) {
   return (
     <span className={clsx({ 'text-success': device.connectionStatus })}>
       {device.connectionStatus ? 'Connected' : 'Disconnected'}
