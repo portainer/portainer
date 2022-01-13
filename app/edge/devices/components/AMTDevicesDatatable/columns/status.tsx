@@ -1,4 +1,4 @@
-import { CellProps, Column, TableInstance } from 'react-table';
+import { CellProps, Column } from 'react-table';
 import clsx from 'clsx';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
@@ -15,7 +15,7 @@ export const status: Column<Device> = {
 
 export function StatusCell({
   row: { original: device },
-}: CellProps<TableInstance>) {
+}: CellProps<Device>) {
   return (
     <span className={clsx({ 'text-success': device.connectionStatus })}>
       {device.connectionStatus ? 'Connected' : 'Disconnected'}

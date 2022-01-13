@@ -88,6 +88,12 @@ export enum EnvironmentCreationTypes {
 
 export type EnvironmentGroupId = number;
 
+export enum PlatformType {
+  Docker,
+  Kubernetes,
+  Azure,
+}
+
 export interface EnvironmentSettings {
   // Whether non-administrator should be able to use bind mounts when creating containers
   allowBindMountsForRegularUsers: boolean;
