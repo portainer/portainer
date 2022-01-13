@@ -31,6 +31,11 @@ export default class KubeServicesItemViewController {
     this.servicePorts.splice(index, 1);
   }
 
+  servicePort(index) {
+    const targetPort = this.servicePorts[index].targetPort;
+    this.servicePorts[index].port = targetPort;
+  }
+
   isAdmin() {
     return this.Authentication.isAdmin();
   }
