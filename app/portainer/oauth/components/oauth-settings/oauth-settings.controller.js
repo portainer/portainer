@@ -28,7 +28,7 @@ export default class OAuthSettingsController {
   }
 
   onMicrosoftTenantIDChange() {
-    const tenantID = this.state.microsoftTenantID;
+    const tenantID = this.state.microsoftTenantID || 'TENANT_ID';
 
     this.settings.AuthorizationURI = `https://login.microsoftonline.com/${tenantID}/oauth2/authorize`;
     this.settings.AccessTokenURI = `https://login.microsoftonline.com/${tenantID}/oauth2/token`;
