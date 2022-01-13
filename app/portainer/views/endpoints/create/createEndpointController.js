@@ -22,7 +22,7 @@ angular
     StateManager
   ) {
     $scope.state = {
-      EnvironmentType: 'agent',
+      EnvironmentType: $state.params.isEdgeDevice ? 'edge_agent' : 'agent',
       PlatformType: 'linux',
       actionInProgress: false,
       deploymentTab: 0,

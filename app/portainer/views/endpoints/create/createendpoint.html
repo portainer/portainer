@@ -14,7 +14,7 @@
           <div class="form-group"></div>
           <div class="form-group" style="margin-bottom: 0;">
             <div class="boxselector_wrapper">
-              <div ng-click="resetEndpointURL()">
+              <div ng-show="!state.isEdgeDevice" ng-click="resetEndpointURL()">
                 <input type="radio" id="agent_endpoint" ng-model="state.EnvironmentType" value="agent" />
                 <label for="agent_endpoint" data-cy="endpointCreate-agentSelectButton">
                   <div class="boxselector_header">
