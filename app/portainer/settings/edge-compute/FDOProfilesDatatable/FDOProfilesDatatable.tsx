@@ -1,17 +1,24 @@
-import { useTable, usePagination } from 'react-table';
-
+import {useTable, usePagination, useSortBy} from 'react-table';
+import {useRowSelectColumn} from "@lineup-lite/hooks";
 import {
-    Table,
+    FDOProfilesDatatableActions
+} from "Portainer/settings/edge-compute/FDOProfilesDatatable/FDOProfilesDatatableActions";
+import {SelectedRowsCount} from "Portainer/components/datatables/components/SelectedRowsCount";
+import {PaginationControls} from "Portainer/components/pagination-controls";
+import {TableFooter} from "Portainer/components/datatables/components/TableFooter";
+import {useTableSettings} from "Portainer/components/datatables/components/useTableSettings";
+import {useRowSelect} from "Portainer/components/datatables/components/useRowSelect";
+
+import {EdgeDeviceTableSettings} from "@/edge/devices/types";
+import { Profile } from "@/portainer/hostmanagement/fdo/model";
+import { useFDOProfiles } from "@/portainer/settings/edge-compute/FDOProfilesDatatable/useFDOProfiles";
+import PortainerError from '@/portainer/error';
+import {
+    Table, TableActions,
     TableContainer,
     TableHeaderRow,
-    TableRow,
+    TableRow, TableTitle,
 } from '@/portainer/components/datatables/components';
-import { InnerDatatable } from '@/portainer/components/datatables/components/InnerDatatable';
-import { Device } from '@/portainer/hostmanagement/open-amt/model';
-import { useAMTDevices } from '@/edge/devices/components/AMTDevicesDatatable/useAMTDevices';
-import { RowProvider } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
-
-import PortainerError from '@/portainer/error';
 
 import { useColumns } from './columns';
 
@@ -19,80 +26,125 @@ export interface FDOProfilesTableProps {
     isFDOEnabled: boolean;
 }
 
-export function AMTDevicesDatatable({ isFDOEnabled }: FDOProfilesTableProps) {
+export function FDOProfilesDatatable({ isFDOEnabled }: FDOProfilesTableProps) {
+    console.log(`isFDOEnabled: ${isFDOEnabled}`);
+    const { settings, setTableSettings } = useTableSettings<EdgeDeviceTableSettings>();
     const columns = useColumns();
+    const { isLoading, profiles, error } = useFDOProfiles();
 
-    const { isLoading, devices, error } = useAMTDevices(environmentId);
-
-    const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
-        useTable<Device>(
+    const {
+        getTableProps,
+        getTableBodyProps,
+        headerGroups,
+        page,
+        prepareRow,
+        selectedFlatRows,
+        gotoPage,
+        setPageSize,
+        state: { pageIndex, pageSize },
+    } =
+        useTable<Profile>(
             {
+                defaultCanFilter: false,
                 columns,
-                data: devices || [],
+                data: profiles || [],
+                initialState: {
+                    pageSize: settings.pageSize || 10,
+                    hiddenColumns: settings.hiddenColumns,
+                    sortBy: [settings.sortBy],
+                },
+                isRowSelectable() {
+                    return true;
+                },
+                selectColumnWidth: 5,
             },
-            usePagination
+            useSortBy,
+            usePagination,
+            useRowSelect,
+            useRowSelectColumn
         );
 
     const tableProps = getTableProps();
     const tbodyProps = getTableBodyProps();
 
     return (
-        <InnerDatatable>
-            <TableContainer>
-                <Table
-                    className={tableProps.className}
-                    role={tableProps.role}
-                    style={tableProps.style}
+        <TableContainer>
+            <TableTitle icon="" label="Device Profiles" />
+
+            <TableActions>
+                <FDOProfilesDatatableActions
+                    selectedItems={selectedFlatRows.map((row) => row.original)}
+                    isFDOEnabled={isFDOEnabled}
+                />
+            </TableActions>
+
+            <Table
+                className={tableProps.className}
+                role={tableProps.role}
+                style={tableProps.style}
+            >
+                <thead>
+                {headerGroups.map((headerGroup) => {
+                    const { key, className, role, style } = headerGroup.getHeaderGroupProps();
+                    return (
+                        <TableHeaderRow<Profile>
+                            key={key}
+                            className={className}
+                            role={role}
+                            style={style}
+                            headers={headerGroup.headers}
+                        />
+                    );
+                })}
+                </thead>
+                <tbody
+                    className={tbodyProps.className}
+                    role={tbodyProps.role}
+                    style={tbodyProps.style}
                 >
-                    <thead>
-                    {headerGroups.map((headerGroup) => {
-                        const { key, className, role, style } =
-                            headerGroup.getHeaderGroupProps();
+                {!isLoading && profiles && profiles.length > 0 ? (
+                    page.map((row) => {
+                        prepareRow(row);
+                        const { key, className, role, style } = row.getRowProps();
+
                         return (
-                            <TableHeaderRow<Device>
+                            <TableRow<Profile>
+                                cells={row.cells}
                                 key={key}
                                 className={className}
                                 role={role}
                                 style={style}
-                                headers={headerGroup.headers}
                             />
                         );
-                    })}
-                    </thead>
-                    <tbody
-                        className={tbodyProps.className}
-                        role={tbodyProps.role}
-                        style={tbodyProps.style}
-                    >
-                    {!isLoading && devices && devices.length > 0 ? (
-                        page.map((row) => {
-                            prepareRow(row);
-                            const { key, className, role, style } = row.getRowProps();
+                    })
+                ) : (
+                    <tr>
+                        <td colSpan={5} className="text-center text-muted">
+                            {userMessage(isLoading, error)}
+                        </td>
+                    </tr>
+                )}
+                </tbody>
+            </Table>
 
-                            return (
-                                <RowProvider key={key} environmentId={environmentId}>
-                                    <TableRow<Device>
-                                        cells={row.cells}
-                                        key={key}
-                                        className={className}
-                                        role={role}
-                                        style={style}
-                                    />
-                                </RowProvider>
-                            );
-                        })
-                    ) : (
-                        <tr>
-                            <td colSpan={5} className="text-center text-muted">
-                                {userMessage(isLoading, error)}
-                            </td>
-                        </tr>
-                    )}
-                    </tbody>
-                </Table>
-            </TableContainer>
-        </InnerDatatable>
+            <TableFooter>
+                <SelectedRowsCount value={selectedFlatRows.length} />
+                <PaginationControls
+                    showAll
+                    pageLimit={pageSize}
+                    page={pageIndex + 1}
+                    onPageChange={(p) => gotoPage(p - 1)}
+                    totalCount={profiles ? profiles.length : 0}
+                    onPageLimitChange={handlePageSizeChange}
+                />
+            </TableFooter>
+        </TableContainer>
     );
+
+    function handlePageSizeChange(pageSize: number) {
+        setPageSize(pageSize);
+        setTableSettings((settings) => ({ ...settings, pageSize }));
+    }
 }
 
 function userMessage(isLoading: boolean, error?: PortainerError) {
@@ -104,5 +156,5 @@ function userMessage(isLoading: boolean, error?: PortainerError) {
         return error.message;
     }
 
-    return 'No devices found';
+    return 'No profiles found';
 }

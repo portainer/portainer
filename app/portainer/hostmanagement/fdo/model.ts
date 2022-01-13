@@ -12,7 +12,8 @@ export interface DeviceConfiguration {
   profile: string;
 }
 
-export interface Profile {
+export type Profile = {
+  id: number;
   name: string;
   url: string;
   created: string;

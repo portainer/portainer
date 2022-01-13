@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Formik, Field, Form } from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
@@ -8,6 +9,7 @@ import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 import { Input } from '@/portainer/components/form-components/Input';
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
+import { FDOProfilesDatatableContainer } from "@/portainer/settings/edge-compute/FDOProfilesDatatable/FDOProfilesDatatableContainer";
 
 import styles from './SettingsFDO.module.css';
 import { validationSchema } from './SettingsFDO.validation';
@@ -24,8 +26,11 @@ interface Props {
 
 export function SettingsFDO({ settings, onSubmit }: Props) {
   const fdoConfiguration = settings ? settings.fdoConfiguration : null;
+
+  const [isFDOEnabled, setIsFDOEnabled] = useState(fdoConfiguration ? fdoConfiguration.enabled : false);
+
   const initialValues = {
-    enabled: fdoConfiguration ? fdoConfiguration.enabled : false,
+    enabled: isFDOEnabled,
     ownerURL: fdoConfiguration ? fdoConfiguration.ownerURL : '',
     ownerUsername: fdoConfiguration ? fdoConfiguration.ownerUsername : '',
     ownerPassword: fdoConfiguration ? fdoConfiguration.ownerPassword : '',
@@ -69,7 +74,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}
                     checked={edgeComputeFeaturesEnabled && values.enabled}
-                    onChange={(e) => setFieldValue('enabled', e.valueOf())}
+                    onChange={(e) => onChangedEnabled(e, setFieldValue)}
                   />
                 </FormControl>
 
@@ -162,15 +167,32 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
             )}
           </Formik>
 
-          <br />
-          <FormSectionTitle>Device Profiles</FormSectionTitle>
-          <TextTip color="blue">
-            Add, Edit and Manage the list of device profiles available during FDO device setup
-          </TextTip>
-
-
+          { isFDOEnabled && (
+            <>
+              <br />
+              <FormSectionTitle>Device Profiles</FormSectionTitle>
+              <TextTip color="blue">
+                Add, Edit and Manage the list of device profiles available during FDO device setup
+              </TextTip>
+              <FDOProfilesDatatableContainer
+                  isFDOEnabled={isFDOEnabled}
+              />
+            </>
+          )}
         </WidgetBody>
       </Widget>
     </div>
   );
+
+    async function onChangedEnabled(
+        enabled: boolean,
+        setFieldValue: (
+            field: string,
+            value: unknown,
+            shouldValidate?: boolean
+        ) => void
+    ) {
+      setFieldValue('enabled', enabled)
+      setIsFDOEnabled(enabled)
+    }
 }
