@@ -69,7 +69,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
 	connection, err := database.NewDatabase("boltdb", *flags.Data)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed creating database connection: %s", err)
 	}
 
 	if bconn, ok := connection.(*boltdb.DbConnection); ok {
@@ -77,7 +77,7 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 		bconn.MaxBatchDelay = *flags.MaxBatchDelay
 		bconn.InitialMmapSize = *flags.InitialMmapSize
 	} else {
-		panic("unexpected database type")
+		log.Fatalf("failed creating database connection: expecting a boltdb database type but a different one was received")
 	}
 
 	store := datastore.NewStore(*flags.Data, fileService, connection)
