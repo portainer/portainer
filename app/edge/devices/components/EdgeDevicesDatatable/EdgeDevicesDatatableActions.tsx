@@ -70,23 +70,23 @@ export function EdgeDevicesDatatableActions({
       return;
     }
 
-    for (let i = 0; i < selectedItems.length; i += 1) {
+    await Promise.all(selectedItems.map(async (environment) => {
       try {
-        const environment = selectedItems[i];
         await deleteEndpoint(environment.Id);
 
         notifications.success(
-          'Environment successfully removed',
-          environment.Name
+            'Environment successfully removed',
+            environment.Name
         );
       } catch (err) {
         notifications.error(
-          'Failure',
-          err as Error,
-          'Unable to remove environment'
+            'Failure',
+            err as Error,
+            'Unable to remove environment'
         );
       }
-    }
+    }));
+
     await router.stateService.reload();
   }
 
