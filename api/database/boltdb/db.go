@@ -71,7 +71,7 @@ func (connection *DbConnection) DoesStoreNeedEncryption() bool {
 	if encryptedDbFile {
 		connection.SetEncrypted(true)
 		if connection.EncryptionKey == nil {
-			panic("Portainer database is encrypted, but no encryption key was loaded")
+			logrus.Fatal("Portainer database is encrypted, but no encryption key was loaded")
 		}
 
 		// DB is already encrypted and everything checks out. Nothing to migrate

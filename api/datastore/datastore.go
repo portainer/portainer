@@ -111,7 +111,7 @@ func (store *Store) encryptDB() error {
 
 	// The DB is not currently encrypted.  First save the encrypted db filename
 	oldFilename := store.connection.GetDatabaseFilePath()
-	logrus.Infof("Encrypting database...")
+	logrus.Infof("Encrypting database")
 
 	// export file path for backup
 	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
@@ -119,7 +119,7 @@ func (store *Store) encryptDB() error {
 	logrus.Infof("Exporting database backup to %s", exportFilename)
 	err = store.Export(exportFilename)
 	if err != nil {
-		logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
+		logrus.WithError(err).Debugf("Failed to export to %s", exportFilename)
 		return err
 	}
 
@@ -147,7 +147,12 @@ func (store *Store) encryptDB() error {
 
 	err = os.Remove(oldFilename)
 	if err != nil {
-		logrus.Errorf("failed to remove the un-encrypted db file")
+		logrus.Errorf("Failed to remove the un-encrypted db file")
+	}
+
+	err = os.Remove(exportFilename)
+	if err != nil {
+		logrus.Errorf("Failed to remove the json backup file")
 	}
 
 	// Close db connection
