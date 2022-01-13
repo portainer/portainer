@@ -6,26 +6,26 @@ export interface EdgeDeviceTableSettings {
 }
 
 export enum DeviceAction {
-  POWER_ON = 'power on',
-  POWER_OFF = 'power off',
-  RESTART = 'restart',
+  PowerOn = 'power on',
+  PowerOff = 'power off',
+  Restart = 'restart',
 }
 
 export enum PowerState {
-  RUNNING = 'Running',
-  SLEEP = 'Sleep',
-  OFF = 'Off',
-  HIBERNATE = 'Hibernate',
-  POWER_CYCLE = 'Power Cycle',
+  Running = 'Running',
+  Sleep = 'Sleep',
+  Off = 'Off',
+  Hibernate = 'Hibernate',
+  PowerCycle = 'Power Cycle',
 }
 
 export enum PowerStateCode {
-  ON = 2,
-  SLEEP_LIGHT = 3,
-  SLEEP_DEEP = 4,
-  OFF_HARD = 6,
-  HIBERNATE = 7,
-  OFF_SOFT = 8,
-  POWER_CYCLE = 9,
-  OFF_HARD_GRACEFUL = 13,
+  On = 2,
+  SleepLight = 3,
+  SleepDeep = 4,
+  OffHard = 6,
+  Hibernate = 7,
+  OffSoft = 8,
+  PowerCycle = 9,
+  OffHardGraceful = 13,
 }

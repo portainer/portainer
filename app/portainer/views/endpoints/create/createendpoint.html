@@ -34,28 +34,35 @@
                   <p>Portainer Edge agent</p>
                 </label>
               </div>
+              <div ng-show="!state.isEdgeDevice" ng-click="resetEndpointURL()">
+                <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker" />
+                <label for="docker_endpoint" data-cy="endpointCreate-dockerSelectButton">
+                  <div class="boxselector_header">
+                    <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Docker
+                  </div>
+                  <p>Directly connect to the Docker API</p>
+                </label>
+              </div>
+              <div ng-show="!state.isEdgeDevice" ng-click="resetEndpointURL()">
+                <input type="radio" id="kubernetes_endpoint" ng-model="state.EnvironmentType" value="kubernetes" />
+                <label for="kubernetes_endpoint" data-cy="endpointCreate-kubeSelectButton">
+                  <div class="boxselector_header">
+                    <i class="fas fa-dharmachakra" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Kubernetes
+                  </div>
+                  <p>Local Kubernetes environment</p>
+                </label>
+              </div>
               <div ng-show="!state.isEdgeDevice">
-                <div ng-click="resetEndpointURL()">
-                  <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker" />
-                  <label for="docker_endpoint" data-cy="endpointCreate-dockerSelectButton">
-                    <div class="boxselector_header">
-                      <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Docker
-                    </div>
-                    <p>Directly connect to the Docker API</p>
-                  </label>
-                </div>
-                <div ng-click="resetEndpointURL()">
-                <div>
-                  <input type="radio" id="azure_endpoint" ng-model="state.EnvironmentType" value="azure" />
-                  <label for="azure_endpoint" data-cy="endpointCreate-azureSelectButton">
-                    <div class="boxselector_header">
-                      <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Azure
-                    </div>
-                    <p>Connect to Microsoft Azure ACI</p>
-                  </label>
-                </div>
+                <input type="radio" id="azure_endpoint" ng-model="state.EnvironmentType" value="azure" />
+                <label for="azure_endpoint" data-cy="endpointCreate-azureSelectButton">
+                  <div class="boxselector_header">
+                    <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Azure
+                  </div>
+                  <p>Connect to Microsoft Azure ACI</p>
+                </label>
               </div>
             </div>
           </div>

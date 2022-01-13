@@ -43,19 +43,19 @@ export function ActionsCell({
       <ActionsMenuTitle>AMT Functions</ActionsMenuTitle>
       <MenuItem
         disabled={isLoading}
-        onSelect={() => handleDeviceActionClick(DeviceAction.POWER_ON)}
+        onSelect={() => handleDeviceActionClick(DeviceAction.PowerOn)}
       >
         Power ON
       </MenuItem>
       <MenuItem
         disabled={isLoading}
-        onSelect={() => handleDeviceActionClick(DeviceAction.POWER_OFF)}
+        onSelect={() => handleDeviceActionClick(DeviceAction.PowerOff)}
       >
         Power OFF
       </MenuItem>
       <MenuItem
         disabled={isLoading}
-        onSelect={() => handleDeviceActionClick(DeviceAction.RESTART)}
+        onSelect={() => handleDeviceActionClick(DeviceAction.Restart)}
       >
         Restart
       </MenuItem>

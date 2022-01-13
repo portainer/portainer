@@ -27,7 +27,7 @@ export function RowProvider({
 
   const state = useMemo(
     () => ({ isLoading, toggleIsLoading, environmentId }),
-    [isLoading, toggleIsLoading]
+    [isLoading, toggleIsLoading, environmentId]
   );
 
   return <RowContext.Provider value={state}>{children}</RowContext.Provider>;

@@ -24,7 +24,7 @@ export function PowerStateCell({
     <>
       <span
         className={clsx({
-          'text-success': device.powerState === PowerStateCode.ON,
+          'text-success': device.powerState === PowerStateCode.On,
         })}
       >
         {parsePowerState(device.powerState)}
@@ -34,22 +34,22 @@ export function PowerStateCell({
   );
 }
 
-function parsePowerState(value: number) {
+function parsePowerState(value: PowerStateCode) {
   // https://app.swaggerhub.com/apis-docs/rbheopenamt/mps/1.4.0#/AMT/get_api_v1_amt_power_state__guid_
   switch (value) {
-    case PowerStateCode.ON:
-      return PowerState.RUNNING;
-    case PowerStateCode.SLEEP_LIGHT:
-    case PowerStateCode.SLEEP_DEEP:
-      return PowerState.SLEEP;
-    case PowerStateCode.OFF_HARD:
-    case PowerStateCode.OFF_SOFT:
-    case PowerStateCode.OFF_HARD_GRACEFUL:
-      return PowerState.OFF;
-    case PowerStateCode.HIBERNATE:
-      return PowerState.HIBERNATE;
-    case PowerStateCode.POWER_CYCLE:
-      return PowerState.POWER_CYCLE;
+    case PowerStateCode.On:
+      return PowerState.Running;
+    case PowerStateCode.SleepLight:
+    case PowerStateCode.SleepDeep:
+      return PowerState.Sleep;
+    case PowerStateCode.OffHard:
+    case PowerStateCode.OffSoft:
+    case PowerStateCode.OffHardGraceful:
+      return PowerState.Off;
+    case PowerStateCode.Hibernate:
+      return PowerState.Hibernate;
+    case PowerStateCode.PowerCycle:
+      return PowerState.PowerCycle;
     default:
       return '-';
   }
