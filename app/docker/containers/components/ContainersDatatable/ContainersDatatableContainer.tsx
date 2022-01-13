@@ -13,7 +13,11 @@ interface Props extends ContainerTableProps {
   endpoint: Environment;
 }
 
-export function ContainersDatatableContainer({ endpoint, ...props }: Props) {
+export function ContainersDatatableContainer({
+  endpoint,
+  tableKey = 'containers',
+  ...props
+}: Props) {
   const defaultSettings = {
     autoRefreshRate: 0,
     truncateContainerName: 32,
@@ -25,8 +29,8 @@ export function ContainersDatatableContainer({ endpoint, ...props }: Props) {
 
   return (
     <EnvironmentProvider environment={endpoint}>
-      <TableSettingsProvider defaults={defaultSettings} storageKey="containers">
-        <SearchBarProvider>
+      <TableSettingsProvider defaults={defaultSettings} storageKey={tableKey}>
+        <SearchBarProvider storageKey={tableKey}>
           {/* eslint-disable-next-line react/jsx-props-no-spreading */}
           <ContainersDatatable {...props} />
         </SearchBarProvider>
@@ -40,13 +44,10 @@ export const ContainersDatatableAngular = react2angular(
   [
     'endpoint',
     'isAddActionVisible',
-    'containerService',
-    'httpRequestHelper',
-    'notifications',
-    'modalService',
     'dataset',
     'onRefresh',
     'isHostColumnVisible',
     'autoFocusSearch',
+    'tableKey',
   ]
 );
