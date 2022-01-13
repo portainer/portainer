@@ -76,7 +76,7 @@ angular
         parent: 'root',
         abstract: true,
         resolve: {
-          endpoint: /* @ngInject */ function endpoint($async, $state, $transition$, EndpointService, Notifications) {
+          endpoint: /* @ngInject */ function endpoint($async, $state, $transition$, EndpointProvider, EndpointService, Notifications) {
             return $async(async () => {
               try {
                 const endpointId = +$transition$.params().endpointId;
@@ -86,6 +86,8 @@ angular
                   $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
                   return;
                 }
+
+                EndpointProvider.setCurrentEndpoint(endpoint);
 
                 return endpoint;
               } catch (e) {
