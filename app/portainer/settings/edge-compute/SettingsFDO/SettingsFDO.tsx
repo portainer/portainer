@@ -157,7 +157,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
             )}
           </Formik>
 
-          {isFDOEnabled && (
+          {(edgeComputeFeaturesEnabled && isFDOEnabled) && (
             <>
               <br />
               <FormSectionTitle>Device Profiles</FormSectionTitle>

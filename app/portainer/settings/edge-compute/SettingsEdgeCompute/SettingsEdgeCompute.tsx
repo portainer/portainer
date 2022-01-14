@@ -38,9 +38,7 @@ const checkinIntervalOptions = [
 export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
   const initialValues = {
     EdgeAgentCheckinInterval: settings ? settings.EdgeAgentCheckinInterval : 5,
-    EnableEdgeComputeFeatures: settings
-      ? settings.EnableEdgeComputeFeatures
-      : false,
+    EnableEdgeComputeFeatures: settings ? settings.EnableEdgeComputeFeatures : false,
   };
 
   return (
