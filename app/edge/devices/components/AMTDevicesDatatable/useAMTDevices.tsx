@@ -9,7 +9,7 @@ import * as notifications from '@/portainer/services/notifications';
 export function useAMTDevices(environmentId: EnvironmentId) {
   const { isLoading, data, isError, error } = useQuery(
     ['amt_devices', environmentId],
-    () => getDevices(3432),
+    () => getDevices(environmentId),
     {
       keepPreviousData: true,
     }
@@ -27,7 +27,7 @@ export function useAMTDevices(environmentId: EnvironmentId) {
 
   return {
     isLoading,
-    devices: data,
+    devices: data || [],
     error: isError ? (error as PortainerError) : undefined,
   };
 }
