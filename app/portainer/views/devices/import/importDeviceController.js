@@ -19,7 +19,7 @@ angular
         DeviceProfile: '',
         GroupId: 1,
         TagIds: [],
-        VoucherFiles: null,
+        VoucherFiles: [],
         PortainerURL: '',
         Suffix: 1,
       };
@@ -27,6 +27,10 @@ angular
       $scope.profiles = [];
 
       $scope.onVoucherFilesChange = function () {
+        if ($scope.formValues.VoucherFiles.length < 1) {
+          return;
+        }
+
         $scope.state.vouchersUploading = true;
 
         let uploads = $scope.formValues.VoucherFiles.map((f) => FileUploadService.uploadOwnershipVoucher(f));
@@ -39,7 +43,7 @@ angular
           })
           .catch(function error(err) {
             $scope.state.vouchersUploading = false;
-            if ($scope.formValues.VoucherFiles.length == 1) {
+            if ($scope.formValues.VoucherFiles.length === 1) {
               Notifications.error('Failure', err, 'Unable to upload the Ownership Voucher');
             } else {
               Notifications.error('Failure', null, 'Unable to upload the Ownership Vouchers, please check the logs');
@@ -86,7 +90,7 @@ angular
                 true
               );
             } catch (err) {
-              this.Notifications.error('Failure', err, 'Unable to create the environment');
+              Notifications.error('Failure', err, 'Unable to create the environment');
               return;
             } finally {
               $scope.state.actionInProgress = false;
