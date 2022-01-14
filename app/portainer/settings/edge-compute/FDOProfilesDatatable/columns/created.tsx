@@ -5,7 +5,7 @@ import { Profile } from '@/portainer/hostmanagement/fdo/model';
 
 export const created: Column<Profile> = {
   Header: 'Created',
-  accessor: 'created',
+  accessor: 'dateCreated',
   id: 'created',
   Cell: ({ value }) => isoDateFromTimestamp(value),
   disableFilters: true,

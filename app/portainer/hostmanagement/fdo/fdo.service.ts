@@ -25,9 +25,11 @@ export async function configureDevice(
 
 export async function getProfiles() {
   try {
-    const { data: profiles } = await axios.get<Profiles>(`${BASE_URL}/profiles`);
-    return profiles.profiles;
+    const { data: profiles } = await axios.get<Profiles>(
+      `${BASE_URL}/profiles`
+    );
+    return profiles;
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve the profiles')
+    throw parseAxiosError(e as Error, 'Unable to retrieve the profiles');
   }
 }

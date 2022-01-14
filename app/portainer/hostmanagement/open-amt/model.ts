@@ -3,7 +3,7 @@ export interface OpenAMTConfiguration {
   mpsServer: string;
   mpsUser: string;
   mpsPassword: string;
-  domainName: string
+  domainName: string;
   certFileName: string;
   certFileContent: string;
   certFilePassword: string;
@@ -37,4 +37,4 @@ export type Device = {
   powerState: number;
   connectionStatus: boolean;
   features?: DeviceFeatures;
-}
+};

@@ -10,7 +10,7 @@ export function useFDOProfiles() {
     ['fdo_profiles'],
     () => getProfiles(),
     {
-      retry: false,
+      keepPreviousData: true,
     }
   );
 
@@ -26,7 +26,7 @@ export function useFDOProfiles() {
 
   return {
     isLoading,
-    profiles: data,
+    profiles: data || [],
     error: isError ? (error as PortainerError) : undefined,
   };
 }

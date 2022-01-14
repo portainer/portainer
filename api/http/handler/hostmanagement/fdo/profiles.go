@@ -1,8 +1,10 @@
 package fdo
 
 import (
-	"io"
+	"github.com/portainer/libhttp/response"
+	portainer "github.com/portainer/portainer/api"
 	"net/http"
+	"time"
 
 	httperror "github.com/portainer/libhttp/error"
 )
@@ -21,20 +23,29 @@ import (
 // @failure 500 "Bad gateway"
 // @router /fdo/profiles [get]
 func (handler *Handler) fdoProfiles(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.DataStore.Settings().Settings()
+	/*settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}*/
+
+	// TODO get from DB
+	profiles := []portainer.FDOProfile{
+		{
+			ID:          1,
+			Name:        "Default Device Profile",
+			DateCreated: time.Now().Unix(),
+		},
+		{
+			ID:          2,
+			Name:        "k8s Profile",
+			DateCreated: time.Now().Unix() - 5000,
+		},
+		{
+			ID:          3,
+			Name:        "Swarm Profile",
+			DateCreated: time.Now().Unix() + 5000,
+		},
 	}
 
-	profiles, err := http.Get(settings.FDOConfiguration.ProfilesURL)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadGateway, Message: "Unabled to retrieve the profile list", Err: err}
-	}
-	defer profiles.Body.Close()
-
-	if _, err := io.Copy(w, profiles.Body); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadGateway, Message: "Unabled to retrieve the profile list", Err: err}
-	}
-
-	return nil
+	return response.JSON(w, profiles)
 }

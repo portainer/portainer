@@ -3,7 +3,6 @@ export interface FDOConfiguration {
   ownerURL: string;
   ownerUsername: string;
   ownerPassword: string;
-  profilesURL: string;
 }
 
 export interface DeviceConfiguration {
@@ -15,9 +14,8 @@ export interface DeviceConfiguration {
 export type Profile = {
   id: number;
   name: string;
-  url: string;
-  created: string;
-}
+  dateCreated: string;
+};
 
 export interface Profiles {
   profiles: Profile[];

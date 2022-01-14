@@ -8,7 +8,6 @@ import { useTableSettings } from 'Portainer/components/datatables/components/use
 import { useRowSelect } from 'Portainer/components/datatables/components/useRowSelect';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
-import { useFDOProfiles } from '@/portainer/settings/edge-compute/FDOProfilesDatatable/useFDOProfiles';
 import PortainerError from '@/portainer/error';
 import {
   Table,
@@ -22,11 +21,20 @@ import { FDOProfilesTableSettings } from '@/edge/devices/types';
 
 import { useColumns } from './columns';
 
-export function FDOProfilesDatatable() {
+export interface FDOProfilesDatatableProps {
+  profiles: Profile[];
+  isLoading: boolean;
+  error?: PortainerError;
+}
+
+export function FDOProfilesDatatable({
+  profiles,
+  isLoading,
+  error,
+}: FDOProfilesDatatableProps) {
   const { settings, setTableSettings } =
     useTableSettings<FDOProfilesTableSettings>();
   const columns = useColumns();
-  const { isLoading, profiles, error } = useFDOProfiles();
 
   const {
     getTableProps,
@@ -42,7 +50,7 @@ export function FDOProfilesDatatable() {
     {
       defaultCanFilter: false,
       columns,
-      data: profiles || [],
+      data: profiles,
       initialState: {
         pageSize: settings.pageSize || 10,
         sortBy: [settings.sortBy],

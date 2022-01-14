@@ -78,7 +78,13 @@ type (
 		OwnerURL      string `json:"ownerURL"`
 		OwnerUsername string `json:"ownerUsername"`
 		OwnerPassword string `json:"ownerPassword"`
-		ProfilesURL   string `json:"profilesURL"`
+	}
+
+	FDOProfile struct {
+		ID            int    `json:"id"`
+		Name          string `json:"name"`
+		NumberDevices int    `json:"numberDevices"`
+		DateCreated   int64  `json:"dateCreated"`
 	}
 
 	// CLIFlags represents the available flags on the CLI
