@@ -36,7 +36,7 @@ import { SelectedRowsCount } from '@/portainer/components/datatables/components/
 import { EdgeDeviceTableSettings } from '@/edge/devices/types';
 import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings';
 import { EdgeDevicesDatatableActions } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions';
-import { AMTDevicesDatatable } from '@/edge/devices/components/AMTDevicesDatatable/AMTDevicesDatatable';
+import { AMTDevicesDatatableContainer } from '@/edge/devices/components/AMTDevicesDatatable/AMTDevicesDatatableContainer';
 
 import { useColumns } from './columns';
 
@@ -192,7 +192,7 @@ export function EdgeDevicesDatatable({
                   <tr>
                     <td />
                     <td colSpan={row.cells.length - 1}>
-                      <AMTDevicesDatatable environmentId={row.original.Id} />
+                      <AMTDevicesDatatableContainer environmentId={row.original.Id} />
                     </td>
                   </tr>
                 )}

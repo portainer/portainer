@@ -8,30 +8,25 @@ import {
 } from '@/portainer/components/datatables/components';
 import { InnerDatatable } from '@/portainer/components/datatables/components/InnerDatatable';
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
-import { useAMTDevices } from '@/edge/devices/components/AMTDevicesDatatable/useAMTDevices';
-import { RowProvider } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
-import { EnvironmentId } from '@/portainer/environments/types';
-import PortainerError from '@/portainer/error';
 
 import { useColumns } from './columns';
 
 export interface AMTDevicesTableProps {
-  environmentId: EnvironmentId;
+  devices: Device[];
 }
 
-export function AMTDevicesDatatable({ environmentId }: AMTDevicesTableProps) {
+export function AMTDevicesDatatable({ devices }: AMTDevicesTableProps) {
   const columns = useColumns();
-
-  const { isLoading, devices, error } = useAMTDevices(environmentId);
 
   const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
     useTable<Device>(
       {
         columns,
-        data: devices || [],
+        data: devices,
       },
       usePagination
     );
+
 
   const tableProps = getTableProps();
   const tbodyProps = getTableBodyProps();
@@ -64,45 +59,24 @@ export function AMTDevicesDatatable({ environmentId }: AMTDevicesTableProps) {
             role={tbodyProps.role}
             style={tbodyProps.style}
           >
-            {!isLoading && devices && devices.length > 0 ? (
-              page.map((row) => {
-                prepareRow(row);
-                const { key, className, role, style } = row.getRowProps();
+          {page.map((row) => {
+              prepareRow(row);
+              const { key, className, role, style } = row.getRowProps();
 
-                return (
-                  <RowProvider key={key} environmentId={environmentId}>
-                    <TableRow<Device>
-                      cells={row.cells}
-                      key={key}
-                      className={className}
-                      role={role}
-                      style={style}
-                    />
-                  </RowProvider>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan={5} className="text-center text-muted">
-                  {userMessage(isLoading, error)}
-                </td>
-              </tr>
-            )}
+              return (
+                <TableRow<Device>
+                  cells={row.cells}
+                  key={key}
+                  className={className}
+                  role={role}
+                  style={style}
+                />
+              );
+            })
+            }
           </tbody>
         </Table>
       </TableContainer>
     </InnerDatatable>
   );
-}
-
-function userMessage(isLoading: boolean, error?: PortainerError) {
-  if (isLoading) {
-    return 'Loading...';
-  }
-
-  if (error) {
-    return error.message;
-  }
-
-  return 'No devices found';
 }
