@@ -71,6 +71,18 @@
                     <i class="fa fa-plus space-right" aria-hidden="true"></i>
                     Create template from stack
                   </button>
+                  <button
+                    authorization="PortainerStackUpdate"
+                    ng-if="regular && stackFileContent && !stack.FromAppTemplate && stack.GitConfig"
+                    ng-disabled="state.actionInProgress"
+                    ng-click="detachStackFromGit()"
+                    button-spinner="state.actionInProgress"
+                    class="btn btn-primary btn-xs"
+                  >
+                    <i class="fa fa-arrow-right space-right" aria-hidden="true"></i>
+                    <span ng-hide="state.actionInProgress">Detach from Git</span>
+                    <span ng-show="state.actionInProgress">Detachment in progress...</span>
+                  </button>
                 </div>
               </div>
               <!-- !stack-details -->
@@ -101,8 +113,12 @@
                 </form>
               </div>
               <!-- !associate -->
-
-              <stack-redeploy-git-form ng-if="stack.GitConfig && !stack.FromAppTemplate" model="stack.GitConfig" stack="stack" authorization="PortainerStackUpdate">
+              <stack-redeploy-git-form
+                ng-if="stack.GitConfig && !stack.FromAppTemplate && !state.actionInProgress"
+                model="stack.GitConfig"
+                stack="stack"
+                authorization="PortainerStackUpdate"
+              >
               </stack-redeploy-git-form>
               <stack-duplication-form
                 ng-if="regular && endpoints.length > 0"
