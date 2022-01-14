@@ -210,15 +210,10 @@ func (server *Server) Start() error {
 	var sslHandler = sslhandler.NewHandler(requestBouncer)
 	sslHandler.SSLService = server.SSLService
 
-	openAMTHandler, err := openamt.NewHandler(requestBouncer)
-	if err != nil {
-		return err
-	}
-	if openAMTHandler != nil {
-		openAMTHandler.OpenAMTService = server.OpenAMTService
-		openAMTHandler.DataStore = server.DataStore
-		openAMTHandler.DockerClientFactory = server.DockerClientFactory
-	}
+	openAMTHandler := openamt.NewHandler(requestBouncer)
+	openAMTHandler.OpenAMTService = server.OpenAMTService
+	openAMTHandler.DataStore = server.DataStore
+	openAMTHandler.DockerClientFactory = server.DockerClientFactory
 
 	fdoHandler := fdo.NewHandler(requestBouncer, server.DataStore)
 

@@ -83,6 +83,8 @@ type (
 	FDOProfile struct {
 		ID            int    `json:"id"`
 		Name          string `json:"name"`
+		Content       string `json:"content"` // TODO mrydel validate this is possible
+		URL           string `json:"url"`
 		NumberDevices int    `json:"numberDevices"`
 		DateCreated   int64  `json:"dateCreated"`
 	}
