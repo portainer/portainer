@@ -23,7 +23,7 @@ export default function SettingsEdgeComputeController($q, $async, $state, Notifi
     this.onSubmitOpenAMT = async function(formValues) {
       try {
         await configureAMT(formValues);
-        Notifications.success(`OpenAMT successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
+        Notifications.success(`OpenAMT successfully ${formValues.enabled ? 'enabled' : 'disabled'}`);
         $state.reload();
       } catch (err) {
         Notifications.error('Failure', err, 'Failed applying changes');
@@ -33,7 +33,7 @@ export default function SettingsEdgeComputeController($q, $async, $state, Notifi
     this.onSubmitFDO = async function(formValues) {
         try {
             await configureFDO(formValues);
-            Notifications.success(`FDO successfully ${formValues.Enabled ? 'enabled' : 'disabled'}`);
+            Notifications.success(`FDO successfully ${formValues.enabled ? 'enabled' : 'disabled'}`);
             $state.reload();
         } catch (err) {
             Notifications.error('Failure', err, 'Failed applying changes');
