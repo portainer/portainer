@@ -13,7 +13,7 @@ const (
 	defaultTLSCertPath         = "C:\\certs\\cert.pem"
 	defaultTLSKeyPath          = "C:\\certs\\key.pem"
 	defaultHTTPDisabled        = "false"
-	defaultHTTPEnabled         = "false"
+	defaultHTTPEnabled         = "true"
 	defaultSSL                 = "false"
 	defaultSSLCertPath         = "C:\\certs\\portainer.crt"
 	defaultSSLKeyPath          = "C:\\certs\\portainer.key"
