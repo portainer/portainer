@@ -1,0 +1,94 @@
+<div class="col-sm-12 form-section-title">
+  Publishing the application
+</div>
+
+<div class="form-group">
+  <div class="col-sm-12 form-inline">
+    <div class="col-sm-5" style="padding-left: 0px;">
+      <select class="form-control" ng-model="$ctrl.state.selected" ng-options="item.typeValue as item.typeName for item in $ctrl.state.serviceType"></select>
+      <button type="button" class="btn btn-sm btn-default" style="margin-left: 0;" ng-click="$ctrl.addEntry( $ctrl.state.selected )" data-cy="k8sConfigCreate-createEntryButton">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> Create service
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="col-sm-12 form-inline" style="margin-top: 20px;" ng-repeat="service in $ctrl.formValues.Services">
+    <div ng-if="!$ctrl.formValues.Services[$index].Ingress">
+      <div class="text-muted">
+        <i class="{{ $ctrl.iconStyle(service.Type) }}" aria-hidden="true" style="margin-right: 2px;"></i>
+        {{ $ctrl.serviceType(service.Type) }}
+      </div>
+      <kube-services-item-view
+        service-routes="$ctrl.formValues.Services[$index].IngressRoute"
+        ingress-type="$ctrl.formValues.Services[$index].Ingress"
+        service-type="$ctrl.formValues.Services[$index].Type"
+        service-ports="$ctrl.formValues.Services[$index].Ports"
+        is-edit="$ctrl.isEdit"
+        loadbalancer-enabled="$ctrl.loadbalancerEnabled"
+      ></kube-services-item-view>
+      <button
+        type="button"
+        class="btn btn-sm btn-danger space-right"
+        style="margin-left: 0; margin-top: 10px;"
+        ng-click="$ctrl.deleteService( $index )"
+        data-cy="k8sConfigCreate-removeButton"
+      >
+        <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
+      </button>
+    </div>
+
+    <div ng-if="$ctrl.formValues.Services[$index].Ingress && $ctrl.formValues.OriginalIngresses.length === 0">
+      <div class="text-muted">
+        <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
+        Ingress
+      </div>
+      <div ng-if="$ctrl.isAdmin()" class="small text-warning">
+        <p style="margin-top: 10px;">
+          <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Ingress is not configured in this namespace, select another namespace or click
+          <a ui-sref="portainer.k8sendpoint.kubernetesConfig({id: $ctrl.state.endpointId})">here</a> to configure ingress.
+        </p>
+      </div>
+      <div ng-if="!$ctrl.isAdmin()" class="small text-warning">
+        <p style="margin-top: 10px;">
+          <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Ingress is not configured in this namespace, select another namespace or contact your administrator.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="btn btn-sm btn-danger space-right"
+        style="margin-left: 0; margin-top: 10px;"
+        ng-click="$ctrl.deleteService( $index )"
+        data-cy="k8sConfigCreate-removeButton"
+      >
+        <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
+      </button>
+    </div>
+
+    <div ng-if="$ctrl.formValues.Services[$index].Ingress && $ctrl.formValues.OriginalIngresses.length !== 0">
+      <div class="text-muted">
+        <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
+        Ingress
+      </div>
+      <kube-services-item-view
+        original-ingresses="$ctrl.formValues.OriginalIngresses"
+        service-routes="$ctrl.formValues.Services[$index].IngressRoute"
+        ingress-type="$ctrl.formValues.Services[$index].Ingress"
+        service-type="$ctrl.formValues.Services[$index].Type"
+        service-ports="$ctrl.formValues.Services[$index].Ports"
+        service-name="$ctrl.formValues.Services[$index].Name"
+        multi-item-disable="true"
+      ></kube-services-item-view>
+      <button
+        type="button"
+        class="btn btn-sm btn-danger space-right"
+        style="margin-left: 0; margin-top: 10px;"
+        ng-click="$ctrl.deleteService( $index )"
+        data-cy="k8sConfigCreate-removeButton"
+      >
+        <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
+      </button>
+    </div>
+  </div>
+</div>

@@ -209,6 +209,17 @@
               <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit this application
             </button>
             <button
+              authorization="K8sApplicationDetailsW"
+              ng-if="ctrl.isExternalApplication()"
+              type="button"
+              class="btn btn-sm btn-primary"
+              ui-sref="kubernetes.applications.application.edit"
+              style="margin-left: 0;"
+              data-cy="k8sAppDetail-editAppButton"
+            >
+              <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit External application
+            </button>
+            <button
               ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
               type="button"
               class="btn btn-sm btn-primary"
@@ -249,147 +260,27 @@
           </div>
 
           <div ng-if="ctrl.application.PublishedPorts.length > 0">
-            <!-- LB notice -->
-            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.LOAD_BALANCER">
-              <div class="small text-muted">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application is exposed through a service of type <span class="bold">{{ ctrl.application.ServiceType }}</span
-                >. Refer to the port configuration below to access it.
-              </div>
-              <div style="margin-top: 10px;" class="small text-muted">
-                <span ng-if="!ctrl.application.LoadBalancerIPAddress">
-                  <p> Load balancer status: <i class="fa fa-cog fa-spin" style="margin-left: 2px;"></i> pending </p>
-                  <p>
-                    <u>what does the "pending" status means?</u>
-                    <portainer-tooltip
-                      position="bottom"
-                      message="A pending status means that Portainer delegated the request to the provider responsible for creating the external load balancer. If it stays in pending state for long, this means that this capability might not be supported or you might have an issue with your cluster provider. Contact your cluster administrator for more information."
-                    >
-                    </portainer-tooltip>
-                  </p>
-                </span>
-                <span ng-if="ctrl.application.LoadBalancerIPAddress">
-                  <p> Load balancer status: <i class="fa fa-check green-icon" style="margin-left: 2px;"></i> available </p>
-                  <p>
-                    Load balancer IP address: {{ ctrl.application.LoadBalancerIPAddress }}
-                    <span class="btn btn-primary btn-xs" ng-click="ctrl.copyLoadBalancerIP()" style="margin-left: 5px;">
-                      <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy
-                    </span>
-                    <span id="copyNotificationLB" style="margin-left: 7px; display: none; color: #23ae89;" class="small">
-                      <i class="fa fa-check" aria-hidden="true"></i> copied
-                    </span>
-                  </p>
-                </span>
-              </div>
-            </div>
-
-            <!-- NodePort notice -->
-            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT">
-              <div class="small text-muted">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application is exposed through a service of type <span class="bold">{{ ctrl.application.ServiceType }}</span
-                >. It can be reached using the IP address of any node in your cluster using the port configuration below.
-              </div>
-            </div>
-
-            <!-- ClusterIP notice -->
-            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.CLUSTER_IP && !ctrl.state.useIngress">
-              <div class="small text-muted">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application is exposed through a service of type <span class="bold">{{ ctrl.application.ServiceType }}</span
-                >. It can be reached via the application name <code>{{ ctrl.application.ServiceName }}</code> and the port configuration below.
-                <span class="btn btn-primary btn-xs" ng-click="ctrl.copyApplicationName()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
-                <span id="copyNotificationApplicationName" style="margin-left: 7px; display: none; color: #23ae89;" class="small"
-                  ><i class="fa fa-check" aria-hidden="true"></i> copied</span
-                >
-              </div>
-            </div>
-
-            <!-- Ingress notice -->
-            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.CLUSTER_IP && ctrl.state.useIngress">
+            <!-- Services notice -->
+            <div>
               <div class="small text-muted">
                 <p>
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  This application is exposed through a service of type <span class="bold">{{ ctrl.application.ServiceType }}</span
-                  >. It can be reached via the application name <code>{{ ctrl.application.ServiceName }}</code> and the port configuration below.
-                  <span class="btn btn-primary btn-xs" ng-click="ctrl.copyApplicationName()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
-                  <span id="copyNotificationApplicationName" style="margin-left: 7px; display: none; color: #23ae89;" class="small"
-                    ><i class="fa fa-check" aria-hidden="true"></i> copied</span
-                  >
+                  This application is exposed through service(s) as below:
                 </p>
-                <p>It is also associated to an <span class="bold">Ingress</span> and can be accessed via specific HTTP route(s).</p>
               </div>
             </div>
 
             <!-- table -->
-            <div style="margin-top: 15px;">
-              <table class="table">
-                <tbody>
-                  <tr class="text-muted">
-                    <td style="width: 25%;">Container port</td>
-                    <td style="width: 25%;">Service port</td>
-                    <td style="width: 50%;">HTTP route</td>
-                  </tr>
-                  <tr ng-repeat-start="port in ctrl.application.PublishedPorts">
-                    <td ng-if="!ctrl.portHasIngressRules(port)" data-cy="k8sAppDetail-containerPort">{{ port.TargetPort }}/{{ port.Protocol }}</td>
-                    <td ng-if="!ctrl.portHasIngressRules(port)">
-                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-nodePort">
-                        {{ port.NodePort }}
-                      </span>
-                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-containerPort">
-                        {{ port.Port }}
-                      </span>
-                      <a
-                        ng-if="ctrl.application.LoadBalancerIPAddress"
-                        ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{ port.Port }}"
-                        target="_blank"
-                        style="margin-left: 5px;"
-                        data-cy="k8sAppDetail-accessLink"
-                      >
-                        <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
-                      </a>
-                    </td>
-                    <td ng-if="!ctrl.portHasIngressRules(port)">-</td>
-                  </tr>
-                  <tr ng-repeat-end ng-repeat="rule in port.IngressRules">
-                    <td data-cy="k8sAppDetail-httpRoute">{{ port.TargetPort }}/{{ port.Protocol }}</td>
-                    <td>
-                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-nodePort">
-                        {{ port.NodePort }}
-                      </span>
-                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-port">
-                        {{ port.Port }}
-                      </span>
-                      <a
-                        ng-if="ctrl.application.LoadBalancerIPAddress"
-                        ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{ port.Port }}"
-                        target="_blank"
-                        style="margin-left: 5px;"
-                      >
-                        <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
-                      </a>
-                    </td>
-                    <td>
-                      <span
-                        ng-if="!ctrl.ruleCanBeDisplayed(rule)"
-                        class="text-muted"
-                        tooltip-append-to-body="true"
-                        tooltip-placement="bottom"
-                        tooltip-class="portainer-tooltip"
-                        uib-tooltip="Ingress controller IP address not available yet"
-                        style="cursor: pointer;"
-                        >pending
-                      </span>
-                      <span ng-if="ctrl.ruleCanBeDisplayed(rule)">
-                        <a ng-href="{{ ctrl.buildIngressRuleURL(rule) }}" target="_blank" data-cy="k8sAppDetail-httpRouteLink">
-                          {{ ctrl.buildIngressRuleURL(rule) | stripprotocol }}
-                        </a>
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <kubernetes-application-services-table
+              services="ctrl.application.Services"
+              application="ctrl.application"
+              public-url="ctrl.state.publicUrl"
+            ></kubernetes-application-services-table>
+            <!-- table -->
+
+            <!-- table -->
+            <kubernetes-application-ingress-table application="ctrl.application" public-url="ctrl.state.publicUrl"></kubernetes-application-ingress-table>
+            <!-- table -->
           </div>
           <!-- !ACCESSING APPLICATION -->
           <!-- AUTO SCALING -->
