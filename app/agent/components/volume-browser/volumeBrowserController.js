@@ -36,9 +36,9 @@ export class VolumeBrowserController {
     const newFilePath = this.state.path === '/' ? newName : `${this.state.path}/${newName}`;
 
     try {
-      await this.VolumeBrowserService.rename(this.volumeId, filePath, newFilePath);
+      await this.VolumeBrowserService.rename(this.endpointId, this.volumeId, filePath, newFilePath);
       this.Notifications.success('File successfully renamed', newFilePath);
-      this.files = await this.VolumeBrowserService.ls(this.volumeId, this.state.path);
+      this.files = await this.VolumeBrowserService.ls(this.endpointId, this.volumeId, this.state.path);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to rename file');
     }
@@ -62,7 +62,7 @@ export class VolumeBrowserController {
     const filePath = this.state.path === '/' ? file : `${this.state.path}/${file}`;
 
     try {
-      const data = await this.VolumeBrowserService.get(this.volumeId, filePath);
+      const data = await this.VolumeBrowserService.get(this.endpointId, this.volumeId, filePath);
       const downloadData = new Blob([data.file]);
       this.FileSaver.saveAs(downloadData, file);
     } catch (err) {
@@ -85,9 +85,9 @@ export class VolumeBrowserController {
   }
   async deleteFileAsync(file) {
     try {
-      await this.VolumeBrowserService.delete(this.volumeId, file);
+      await this.VolumeBrowserService.delete(this.endpointId, this.volumeId, file);
       this.Notifications.success('File successfully deleted', file);
-      this.files = await this.VolumeBrowserService.ls(this.volumeId, this.state.path);
+      this.files = await this.VolumeBrowserService.ls(this.endpointId, this.volumeId, this.state.path);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to delete file');
     }
@@ -98,7 +98,7 @@ export class VolumeBrowserController {
   }
   async getFilesForPathAsync(path) {
     try {
-      const files = await this.VolumeBrowserService.ls(this.volumeId, path);
+      const files = await this.VolumeBrowserService.ls(this.endpointId, this.volumeId, path);
       this.state.path = path;
       this.files = files;
     } catch (err) {
@@ -145,7 +145,7 @@ export class VolumeBrowserController {
   async $onInit() {
     this.HttpRequestHelper.setPortainerAgentTargetHeader(this.nodeName);
     try {
-      this.files = await this.VolumeBrowserService.ls(this.volumeId, this.state.path);
+      this.files = await this.VolumeBrowserService.ls(this.endpointId, this.volumeId, this.state.path);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to browse volume');
     }

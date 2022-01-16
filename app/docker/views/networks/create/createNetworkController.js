@@ -14,7 +14,10 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
   'ResourceControlService',
   'FormValidator',
   'HttpRequestHelper',
-  function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper) {
+  'endpoint',
+  function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper, endpoint) {
+    $scope.endpoint = endpoint;
+
     $scope.formValues = {
       DriverOptions: [],
       IPV4: {

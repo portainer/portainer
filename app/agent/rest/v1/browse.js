@@ -4,12 +4,10 @@ import { browseGetResponse } from '../response/browse';
 
 angular.module('portainer.agent').factory('BrowseVersion1', BrowseFactory);
 
-function BrowseFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+function BrowseFactory($resource, API_ENDPOINT_ENDPOINTS) {
   return $resource(
     `${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/browse/:volumeID/:action`,
-    {
-      endpointId: EndpointProvider.endpointID,
-    },
+    {},
     {
       ls: {
         method: 'GET',

@@ -5,7 +5,6 @@ const DEFAULT_PASSWORD = 'K7yJPP5qNK4hf1QsRnfV';
 
 angular.module('portainer.app').factory('Authentication', [
   '$async',
-  '$state',
   'Auth',
   'OAuth',
   'jwtHelper',
@@ -14,7 +13,7 @@ angular.module('portainer.app').factory('Authentication', [
   'EndpointProvider',
   'UserService',
   'ThemeManager',
-  function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService, ThemeManager) {
+  function AuthenticationFactory($async, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService, ThemeManager) {
     'use strict';
 
     var service = {};
@@ -50,7 +49,6 @@ angular.module('portainer.app').factory('Authentication', [
       clearSessionStorage();
       StateManager.clean();
       EndpointProvider.clean();
-      EndpointProvider.setCurrentEndpoint(null);
       LocalStorage.cleanAuthData();
       LocalStorage.storeLoginStateUUID('');
       tryAutoLoginExtension();

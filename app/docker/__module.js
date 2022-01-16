@@ -14,7 +14,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       parent: 'endpoint',
       url: '/docker',
       abstract: true,
-      onEnter: /* @ngInject */ function onEnter(endpoint, $async, $state, EndpointService, EndpointProvider, Notifications, StateManager, SystemService) {
+      onEnter: /* @ngInject */ function onEnter(endpoint, $async, $state, EndpointService, Notifications, StateManager, SystemService) {
         return $async(async () => {
           if (![1, 2, 4].includes(endpoint.Type)) {
             $state.go('portainer.home');
@@ -31,10 +31,6 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
             if (status === EnvironmentStatus.Down) {
               throw new Error('Environment is unreachable.');
             }
-
-            EndpointProvider.setEndpointID(endpoint.Id);
-            EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-            EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
 
             await StateManager.updateEndpointState(endpoint);
           } catch (e) {

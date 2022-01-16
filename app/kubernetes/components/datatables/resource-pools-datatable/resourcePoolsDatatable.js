@@ -2,7 +2,7 @@ angular.module('portainer.kubernetes').component('kubernetesResourcePoolsDatatab
   templateUrl: './resourcePoolsDatatable.html',
   controller: 'KubernetesResourcePoolsDatatableController',
   bindings: {
-    endpoint: '<',
+    restrictDefaultNamespace: '<',
     titleText: '@',
     titleIcon: '@',
     dataset: '<',

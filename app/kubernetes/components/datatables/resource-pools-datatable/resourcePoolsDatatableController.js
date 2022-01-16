@@ -19,7 +19,7 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
     };
 
     this.canManageAccess = function (item) {
-      if (!this.endpoint.Kubernetes.Configuration.RestrictDefaultNamespace) {
+      if (!this.restrictDefaultNamespace) {
         return !KubernetesNamespaceHelper.isDefaultNamespace(item.Namespace.Name) && !this.isSystemNamespace(item);
       } else {
         return !this.isSystemNamespace(item);

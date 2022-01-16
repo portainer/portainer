@@ -1,7 +1,9 @@
 angular.module('portainer.docker').controller('BuildImageController', BuildImageController);
 
 /* @ngInject */
-function BuildImageController($scope, $async, $window, ModalService, BuildService, Notifications, HttpRequestHelper) {
+function BuildImageController($scope, $async, $window, ModalService, BuildService, Notifications, HttpRequestHelper, endpoint) {
+  $scope.endpoint = endpoint;
+
   $scope.state = {
     BuildType: 'editor',
     actionInProgress: false,

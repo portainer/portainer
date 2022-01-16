@@ -13,7 +13,10 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
   'Notifications',
   'FormValidator',
   'HttpRequestHelper',
-  function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, HttpRequestHelper) {
+  'endpoint',
+  function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, HttpRequestHelper, endpoint) {
+    $scope.endpoint = endpoint;
+
     $scope.formValues = {
       Driver: 'local',
       DriverOptions: [],
