@@ -32,7 +32,7 @@ func (s *noopDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portai
 	return nil
 }
 
-func (s *noopDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error {
+func (s *noopDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forceRereate bool) error {
 	return nil
 }
 
