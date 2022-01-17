@@ -35,7 +35,7 @@ func (store *Store) createBackupFolders() {
 }
 
 func (store *Store) databasePath() string {
-	return path.Join(store.connection.GetStorePath(), store.connection.GetDatabaseFilename())
+	return store.connection.GetDatabaseFilePath()
 }
 
 func (store *Store) commonBackupDir() string {
@@ -84,7 +84,7 @@ func (store *Store) setupOptions(options *BackupOptions) *BackupOptions {
 		options.BackupDir = store.commonBackupDir()
 	}
 	if options.BackupFileName == "" {
-		options.BackupFileName = fmt.Sprintf("%s.%s.%s", store.connection.GetDatabaseFilename(), fmt.Sprintf("%03d", options.Version), time.Now().Format("20060102150405"))
+		options.BackupFileName = fmt.Sprintf("%s.%s.%s", store.connection.GetDatabaseFileName(), fmt.Sprintf("%03d", options.Version), time.Now().Format("20060102150405"))
 	}
 	if options.BackupPath == "" {
 		options.BackupPath = path.Join(options.BackupDir, options.BackupFileName)

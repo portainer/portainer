@@ -11,13 +11,15 @@ type Connection interface {
 	// write the db contents to filename as json (the schema needs defining)
 	ExportRaw(filename string) error
 
-	//Rollback(force bool) error
-	//MigrateData(migratorParams *database.MigratorParameters, force bool) error
-
 	// TODO: this one is very database specific atm
 	BackupTo(w io.Writer) error
-	GetDatabaseFilename() string
+	GetDatabaseFileName() string
+	GetDatabaseFilePath() string
 	GetStorePath() string
+
+	IsEncryptedStore() bool
+	NeedsEncryptionMigration() bool
+	SetEncrypted(encrypted bool)
 
 	SetServiceName(bucketName string) error
 	GetObject(bucketName string, key []byte, object interface{}) error

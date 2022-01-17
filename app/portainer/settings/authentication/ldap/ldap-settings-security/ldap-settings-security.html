@@ -4,7 +4,7 @@
 
 <!-- starttls -->
 <div class="form-group" ng-if="!$ctrl.settings.TLSConfig.TLS">
-  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0;">
+  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0">
     Use StartTLS
     <portainer-tooltip
       position="bottom"
@@ -21,7 +21,7 @@
 
 <!-- tls-checkbox -->
 <div class="form-group" ng-if="!$ctrl.settings.StartTLS">
-  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0;">
+  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0">
     Use TLS
     <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the LDAP server."></portainer-tooltip>
   </label>
@@ -35,7 +35,7 @@
 
 <!-- tls-skip-verify -->
 <div class="form-group">
-  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0;">
+  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0">
     Skip verification of server certificate
     <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
   </label>
@@ -61,7 +61,7 @@
     >
       Select file
     </button>
-    <span style="margin-left: 5px;">
+    <span style="margin-left: 5px">
       {{ $ctrl.tlscaCert.name }}
       <i class="fa fa-check green-icon" ng-if="$ctrl.tlscaCert && $ctrl.tlscaCert === $ctrl.settings.TLSConfig.TLSCACert" aria-hidden="true"></i>
       <i class="fa fa-times red-icon" ng-if="!$ctrl.tlscaCert" aria-hidden="true"></i>

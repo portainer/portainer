@@ -100,6 +100,7 @@ type (
 		InitialMmapSize           *int
 		MaxBatchSize              *int
 		MaxBatchDelay             *time.Duration
+		SecretKeyName             *string
 	}
 
 	// CustomTemplate represents a custom template
@@ -1153,7 +1154,7 @@ type (
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
-		Up(ctx context.Context, stack *Stack, endpoint *Endpoint) error
+		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRereate bool) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
 

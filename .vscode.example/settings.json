@@ -1,4 +1,5 @@
 {
   "go.lintTool": "golangci-lint",
-  "go.lintFlags": ["--fast", "-E", "exportloopref"]
+  "go.lintFlags": ["--fast", "-E", "exportloopref"],
+  "gitlens.advanced.blame.customArguments": ["–ignore-revs-file", ".git-blame-ignore-revs"]
 }

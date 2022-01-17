@@ -1,7 +1,5 @@
 <ng-form name="kubernetesConfigurationDataCreationForm">
-  <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
-    Data
-  </div>
+  <div class="col-sm-12 form-section-title" style="margin-top: 10px"> Data </div>
 
   <div class="form-group" ng-if="$ctrl.isCreation">
     <div class="col-sm-12">
@@ -15,21 +13,21 @@
       </p>
     </div>
     <div class="col-sm-12 small text-muted" ng-if="$ctrl.formValues.IsSimple">
-      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
       Switch to advanced mode to copy and paste multiple key/values
     </div>
     <div class="col-sm-12 small text-muted" ng-if="!$ctrl.formValues.IsSimple">
-      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
       Generate a configuration entry per line, use YAML format
     </div>
   </div>
 
   <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
     <div class="col-sm-12">
-      <button type="button" class="btn btn-sm btn-default" style="margin-left: 0;" ng-click="$ctrl.addEntry()" data-cy="k8sConfigCreate-createEntryButton">
+      <button type="button" class="btn btn-sm btn-default" style="margin-left: 0" ng-click="$ctrl.addEntry()" data-cy="k8sConfigCreate-createEntryButton">
         <i class="fa fa-plus-circle" aria-hidden="true"></i> Create entry
       </button>
-      <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addEntryFromFile($file)" style="margin-left: 0;" data-cy="k8sConfigCreate-createConfigsFromFileButton">
+      <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addEntryFromFile($file)" style="margin-left: 0" data-cy="k8sConfigCreate-createConfigsFromFileButton">
         <i class="fa fa-file-upload" aria-hidden="true"></i> Create key/value from file
       </button>
     </div>
@@ -52,7 +50,7 @@
       </div>
       <div
         class="col-sm-11 small text-warning"
-        style="margin-top: 5px;"
+        style="margin-top: 5px"
         ng-show="
           kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid ||
           (!entry.Used && $ctrl.state.duplicateKeys[index] !== undefined) ||
@@ -81,7 +79,7 @@
           required
         ></textarea>
       </div>
-      <div class="col-sm-11 small text-warning" style="margin-top: 5px;" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
+      <div class="col-sm-11 small text-warning" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
         <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$error">
           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
         </ng-messages>
@@ -101,7 +99,7 @@
         <button
           type="button"
           class="btn btn-sm btn-danger space-right"
-          style="margin-left: 0;"
+          style="margin-left: 0"
           ng-disabled="entry.Used"
           ng-click="$ctrl.removeEntry(index, entry)"
           data-cy="k8sConfigDetail-removeEntryButton{{ index }}"
@@ -117,7 +115,7 @@
   </div>
 
   <div class="form-group" ng-if="!$ctrl.formValues.IsSimple">
-    <input type="text" ng-model="$ctrl.formValues.DataYaml" required style="display: none;" />
+    <input type="text" ng-model="$ctrl.formValues.DataYaml" required style="display: none" />
     <code-editor identifier="kubernetes-configuration-editor" value="$ctrl.formValues.DataYaml" read-only="false" yml="true" on-change="($ctrl.editorUpdate)"></code-editor>
   </div>
 </ng-form>

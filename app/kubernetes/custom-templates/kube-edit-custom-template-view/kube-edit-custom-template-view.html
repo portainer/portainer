@@ -33,9 +33,7 @@
 
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData" resource-control="$ctrl.formValues.ResourceControl"></por-access-control-form>
 
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
+          <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button
@@ -48,7 +46,7 @@
                 <span ng-hide="$ctrl.actionInProgress">Update the template</span>
                 <span ng-show="$ctrl.actionInProgress">Update in progress...</span>
               </button>
-              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px;">
+              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px">
                 {{ $ctrl.state.formValidationError }}
               </span>
             </div>

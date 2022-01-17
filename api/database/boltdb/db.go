@@ -11,10 +11,12 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/sirupsen/logrus"
 )
 
 const (
-	DatabaseFileName = "portainer.db"
+	DatabaseFileName          = "portainer.db"
+	EncryptedDatabaseFileName = "portainer.edb"
 )
 
 type DbConnection struct {
@@ -22,31 +24,68 @@ type DbConnection struct {
 	MaxBatchSize    int
 	MaxBatchDelay   time.Duration
 	InitialMmapSize int
+	EncryptionKey   []byte
+	isEncrypted     bool
 
 	*bolt.DB
 }
 
-func (connection *DbConnection) GetDatabaseFilename() string {
+// GetDatabaseFileName get the database filename
+func (connection *DbConnection) GetDatabaseFileName() string {
+	if connection.IsEncryptedStore() {
+		return EncryptedDatabaseFileName
+	}
+
 	return DatabaseFileName
 }
 
+// GetDataseFilePath get the path + filename for the database file
+func (connection *DbConnection) GetDatabaseFilePath() string {
+	if connection.IsEncryptedStore() {
+		return path.Join(connection.Path, EncryptedDatabaseFileName)
+	}
+
+	return path.Join(connection.Path, DatabaseFileName)
+}
+
+// GetStorePath get the filename and path for the database file
 func (connection *DbConnection) GetStorePath() string {
 	return connection.Path
+}
+
+func (connection *DbConnection) SetEncrypted(flag bool) {
+	connection.isEncrypted = flag
+}
+
+// Return true if the database is encrypted
+func (connection *DbConnection) IsEncryptedStore() bool {
+	return connection.getEncryptionKey() != nil
+}
+
+// NeedsEncryptionMigration returns true if database encryption is enabled and
+// we have an un-encrypted DB that requires migration to an encrypted DB
+func (connection *DbConnection) NeedsEncryptionMigration() bool {
+	if connection.EncryptionKey != nil {
+		dbFile := path.Join(connection.Path, DatabaseFileName)
+		if _, err := os.Stat(dbFile); err == nil {
+			return true
+		}
+
+		// This is an existing encrypted store or a new store.
+		// A new store will open encrypted from the outset
+		connection.SetEncrypted(true)
+	}
+
+	return false
 }
 
 // Open opens and initializes the BoltDB database.
 func (connection *DbConnection) Open() error {
 
-	// Disabled for now.  Can't use feature flags due to the way that works
-	// databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.json", DatabaseFileName, time.Now().Unix()))
-	// if err := connection.ExportRaw(databaseExportPath); err != nil {
-	// 	log.Printf("raw export to %s error: %s", databaseExportPath, err)
-	// } else {
-	// 	log.Printf("raw export to %s success", databaseExportPath)
-	// }
+	logrus.Infof("Loading PortainerDB: %s", connection.GetDatabaseFileName())
 
-	databasePath := path.Join(connection.Path, DatabaseFileName)
-
+	// Now we open the db
+	databasePath := connection.GetDatabaseFilePath()
 	db, err := bolt.Open(databasePath, 0600, &bolt.Options{
 		Timeout:         1 * time.Second,
 		InitialMmapSize: connection.InitialMmapSize,
@@ -79,12 +118,12 @@ func (connection *DbConnection) BackupTo(w io.Writer) error {
 }
 
 func (connection *DbConnection) ExportRaw(filename string) error {
-	databasePath := path.Join(connection.Path, DatabaseFileName)
+	databasePath := connection.GetDatabaseFilePath()
 	if _, err := os.Stat(databasePath); err != nil {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
-	b, err := exportJson(databasePath)
+	b, err := connection.exportJson(databasePath)
 	if err != nil {
 		return err
 	}
@@ -132,12 +171,20 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 		return err
 	}
 
-	return UnmarshalObjectWithJsoniter(data, object)
+	return connection.UnmarshalObjectWithJsoniter(data, object)
+}
+
+func (connection *DbConnection) getEncryptionKey() []byte {
+	if !connection.isEncrypted {
+		return nil
+	}
+
+	return connection.EncryptionKey
 }
 
 // UpdateObject is a generic function used to update an object inside a database database.
 func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object interface{}) error {
-	data, err := MarshalObject(object)
+	data, err := connection.MarshalObject(object)
 	if err != nil {
 		return err
 	}
@@ -165,7 +212,7 @@ func (connection *DbConnection) DeleteAllObjects(bucketName string, matching fun
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var obj interface{}
-			err := UnmarshalObject(v, &obj)
+			err := connection.UnmarshalObject(v, &obj)
 			if err != nil {
 				return err
 			}
@@ -207,7 +254,7 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 		seqId, _ := bucket.NextSequence()
 		id, obj := fn(seqId)
 
-		data, err := MarshalObject(obj)
+		data, err := connection.MarshalObject(obj)
 		if err != nil {
 			return err
 		}
@@ -220,8 +267,7 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
 	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-
-		data, err := MarshalObject(obj)
+		data, err := connection.MarshalObject(obj)
 		if err != nil {
 			return err
 		}
@@ -242,7 +288,7 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 			return err
 		}
 
-		data, err := MarshalObject(obj)
+		data, err := connection.MarshalObject(obj)
 		if err != nil {
 			return err
 		}
@@ -254,10 +300,9 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 func (connection *DbConnection) GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObject(v, obj)
+			err := connection.UnmarshalObject(v, obj)
 			if err != nil {
 				return err
 			}
@@ -279,7 +324,7 @@ func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interf
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObjectWithJsoniter(v, obj)
+			err := connection.UnmarshalObjectWithJsoniter(v, obj)
 			if err != nil {
 				return err
 			}

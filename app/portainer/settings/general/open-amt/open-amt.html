@@ -6,8 +6,8 @@
         <form class="form-horizontal" name="openAMTForm">
           <por-switch-field checked="$ctrl.formValues.enableOpenAMT" label="'Enable edge OpenAMT'" on-change="($ctrl.onChangeEnableOpenAMT)"></por-switch-field>
           <span class="small">
-            <p class="text-muted" style="margin-top: 10px;">
-              <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            <p class="text-muted" style="margin-top: 10px">
+              <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
               When enabled, this will allow Portainer to interact with an OpenAMT MPS API.
             </p>
           </span>
@@ -16,9 +16,7 @@
             <hr />
 
             <div class="form-group">
-              <label for="mps_server" class="col-sm-3 control-label text-left">
-                MPS Server
-              </label>
+              <label for="mps_server" class="col-sm-3 control-label text-left"> MPS Server </label>
               <div class="col-sm-8">
                 <input
                   type="text"
@@ -40,9 +38,7 @@
             </div>
 
             <div class="form-group">
-              <label for="mps_user" class="col-sm-3 control-label text-left">
-                MPS User
-              </label>
+              <label for="mps_user" class="col-sm-3 control-label text-left"> MPS User </label>
               <div class="col-sm-8">
                 <input
                   type="text"
@@ -127,10 +123,10 @@
                 ></portainer-tooltip>
               </label>
               <div class="col-sm-8">
-                <button style="margin-left: 0px !important;" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.certFile" ngf-pattern=".pfx" name="certFile">
+                <button style="margin-left: 0px !important" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.certFile" ngf-pattern=".pfx" name="certFile">
                   Upload file
                 </button>
-                <span style="margin-left: 5px;">
+                <span style="margin-left: 5px">
                   {{ $ctrl.formValues.certFile.name }}
                   <i class="fa fa-times red-icon" ng-if="!$ctrl.formValues.certFile" aria-hidden="true"></i>
                 </span>
@@ -181,9 +177,7 @@
             </div>
             <div ng-show="$ctrl.formValues.useWirelessConfig">
               <div class="form-group">
-                <label for="wifi_auth_method" class="col-sm-3 control-label text-left">
-                  Authentication Method
-                </label>
+                <label for="wifi_auth_method" class="col-sm-3 control-label text-left"> Authentication Method </label>
                 <div class="col-sm-8">
                   <select class="form-control" ng-model="$ctrl.formValues.wifiAuthenticationMethod">
                     <option value="4">WPA PSK</option>
@@ -192,9 +186,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="wifi_encrypt_method" class="col-sm-3 control-label text-left">
-                  Encryption Method
-                </label>
+                <label for="wifi_encrypt_method" class="col-sm-3 control-label text-left"> Encryption Method </label>
                 <div class="col-sm-8">
                   <select class="form-control" ng-model="$ctrl.formValues.wifiEncryptionMethod" id="wifi_encrypt_method">
                     <option value="3">TKIP</option>
@@ -203,9 +195,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="wifi_ssid" class="col-sm-3 control-label text-left">
-                  SSID
-                </label>
+                <label for="wifi_ssid" class="col-sm-3 control-label text-left"> SSID </label>
                 <div class="col-sm-8">
                   <input
                     type="text"
@@ -249,7 +239,7 @@
                 <span ng-hide="$ctrl.state.actionInProgress">Save Settings</span>
                 <span ng-show="$ctrl.state.actionInProgress">In progress...</span>
               </button>
-              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px">{{ state.formValidationError }}</span>
             </div>
           </div>
         </form>

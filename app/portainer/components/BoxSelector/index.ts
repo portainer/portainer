@@ -6,6 +6,14 @@ import { BoxSelector, buildOption } from './BoxSelector';
 import { BoxSelectorAngular } from './BoxSelectorAngular';
 
 export { BoxSelector, buildOption };
-const BoxSelectorReact = react2angular(BoxSelector, ['value', 'onChange', 'options', 'radioName']);
+const BoxSelectorReact = react2angular(BoxSelector, [
+  'value',
+  'onChange',
+  'options',
+  'radioName',
+]);
 
-export default angular.module('app.portainer.component.box-selector', []).component('boxSelectorReact', BoxSelectorReact).component('boxSelector', BoxSelectorAngular).name;
+export default angular
+  .module('app.portainer.component.box-selector', [])
+  .component('boxSelectorReact', BoxSelectorReact)
+  .component('boxSelector', BoxSelectorAngular).name;
