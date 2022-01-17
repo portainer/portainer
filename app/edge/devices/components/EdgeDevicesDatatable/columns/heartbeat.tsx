@@ -1,4 +1,4 @@
-import {CellProps, Column} from 'react-table';
+import { CellProps, Column } from 'react-table';
 import clsx from 'clsx';
 
 import { Environment, EnvironmentStatus } from '@/portainer/environments/types';
@@ -17,13 +17,22 @@ export function StatusCell({
 }: CellProps<Environment>) {
   if (environment.EdgeID) {
     return (
-        <span className="label label-default"><s>associated</s></span>
-    )
+      <span className="label label-default">
+        <s>associated</s>
+      </span>
+    );
   }
 
   return (
-    <i className={clsx('fa', 'fa-heartbeat', environmentStatusLabel(environment.Status))} aria-hidden="true"/>
-  )
+    <i
+      className={clsx(
+        'fa',
+        'fa-heartbeat',
+        environmentStatusLabel(environment.Status)
+      )}
+      aria-hidden="true"
+    />
+  );
 
   function environmentStatusLabel(status: EnvironmentStatus) {
     if (status === EnvironmentStatus.Up) {

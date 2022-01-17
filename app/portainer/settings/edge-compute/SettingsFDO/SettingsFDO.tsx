@@ -31,7 +31,9 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
     profilesURL: fdoConfiguration ? fdoConfiguration.profilesURL : '',
   };
 
-  const edgeComputeFeaturesEnabled = settings ? settings.EnableEdgeComputeFeatures : false;
+  const edgeComputeFeaturesEnabled = settings
+    ? settings.EnableEdgeComputeFeatures
+    : false;
 
   return (
     <div className="row">
