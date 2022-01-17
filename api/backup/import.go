@@ -41,7 +41,7 @@ func importJson(jsonFilePath, portainerDbPath string) error {
 		return err
 	}
 
-	connection, err := bolt.Open(portainerDbPath, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	connection, err := bolt.Open(portainerDbPath, 0600, &bolt.Options{Timeout: 2 * time.Second})
 	if err != nil {
 		return err
 	}

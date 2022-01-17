@@ -107,6 +107,10 @@ func (server *Server) Start() error {
 	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, server.APIKeyService)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
+	if server.DataStore.Settings().IsFeatureFlagEnabled(portainer.FeatDBSeed) {
+		rateLimiter.Max = 1000
+		rateLimiter.BanDuration = 1 * time.Second
+	}
 	offlineGate := offlinegate.NewOfflineGate()
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter)
