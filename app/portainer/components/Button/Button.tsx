@@ -4,7 +4,6 @@ import clsx from 'clsx';
 type Type = 'submit' | 'button' | 'reset';
 type Color = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'link';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
-
 export interface Props {
   color?: Color;
   size?: Size;

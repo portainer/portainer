@@ -2,8 +2,9 @@ package registries
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
+
+	"github.com/portainer/portainer/api/internal/endpointutils"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"

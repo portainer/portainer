@@ -2,9 +2,10 @@ package webhooks
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils/access"
-	"net/http"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gofrs/uuid"
