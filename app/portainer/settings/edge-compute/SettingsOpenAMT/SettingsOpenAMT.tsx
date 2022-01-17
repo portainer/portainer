@@ -86,7 +86,9 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
     setCertFile(new File([], initialValues.certFileName));
   }
 
-  const edgeComputeFeaturesEnabled = settings.EnableEdgeComputeFeatures;
+  const edgeComputeFeaturesEnabled = settings
+    ? settings.EnableEdgeComputeFeatures
+    : false;
 
   return (
     <div className="row">
@@ -208,7 +210,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                       inputId="certificate_file"
                       label="Provisioning Certificate File (.pfx)"
                       size="medium"
-                      tooltip="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy. The certificate must contain the private key."
+                      tooltip="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy.<br>The certificate must contain the private key.<br>On AMT 15 based devices you need to use SHA2."
                       errors={errors.certFileContent}
                     >
                       <FileUploadField
