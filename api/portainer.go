@@ -583,7 +583,7 @@ type (
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
 		Quay                    QuayRegistryData                 `json:"Quay"`
-		Ecr                  	EcrData                       	 `json:"Ecr"`
+		Ecr                     EcrData                          `json:"Ecr"`
 		RegistryAccesses        RegistryAccesses                 `json:"RegistryAccesses"`
 
 		// Deprecated fields
@@ -1515,7 +1515,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.11.0"
+	APIVersion = "2.11.1"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 35
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
