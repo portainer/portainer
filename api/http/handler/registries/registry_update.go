@@ -25,13 +25,13 @@ type registryUpdatePayload struct {
 	// Username used to authenticate against this registry. Required when Authentication is true
 	Username *string `example:"registry_user"`
 	// Password used to authenticate against this registry. required when Authentication is true
-	Password         *string `example:"registry_password"`
+	Password *string `example:"registry_password"`
 	// Quay data
-	Quay             *portainer.QuayRegistryData
+	Quay *portainer.QuayRegistryData
 	// Registry access control
 	RegistryAccesses *portainer.RegistryAccesses `json:",omitempty"`
 	// ECR data
-	Ecr              *portainer.EcrData          `json:",omitempty"`
+	Ecr *portainer.EcrData `json:",omitempty"`
 }
 
 func (payload *registryUpdatePayload) Validate(r *http.Request) error {

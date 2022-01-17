@@ -13,7 +13,7 @@ func importFromJson(fileService portainer.FileService, store *datastore.Store) {
 	importFile := "/data/import.json"
 	if exists, _ := fileService.FileExists(importFile); exists {
 		if err := store.Import(importFile); err != nil {
-			logrus.WithError(err).Debugf("import %s failed", importFile)
+			logrus.WithError(err).Debugf("Import %s failed", importFile)
 
 			// TODO: should really rollback on failure, but then we have nothing.
 		} else {
@@ -23,7 +23,7 @@ func importFromJson(fileService portainer.FileService, store *datastore.Store) {
 		// I also suspect that everything from "Init to Init" is potentially a migration
 		err := store.Init()
 		if err != nil {
-			log.Fatalf("failed initializing data store: %v", err)
+			log.Fatalf("Failed initializing data store: %v", err)
 		}
 	}
 }

@@ -4,9 +4,9 @@ import (
 	"errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
+	portainer "github.com/portainer/portainer/api"
 	"strconv"
 	"strings"
-	portainer "github.com/portainer/portainer/api"
 
 	"net/http"
 )

@@ -3,10 +3,13 @@ import { useTableSettings } from '@/portainer/components/datatables/components/u
 import { Checkbox } from '@/portainer/components/form-components/Checkbox';
 import type { ContainersTableSettings } from '@/docker/containers/types';
 
-export function ContainersDatatableSettings() {
-  const { settings, setTableSettings } = useTableSettings<
-    ContainersTableSettings
-  >();
+interface Props {
+  isRefreshVisible: boolean;
+}
+
+export function ContainersDatatableSettings({ isRefreshVisible }: Props) {
+  const { settings, setTableSettings } =
+    useTableSettings<ContainersTableSettings>();
 
   return (
     <>
@@ -22,10 +25,12 @@ export function ContainersDatatableSettings() {
         }
       />
 
-      <TableSettingsMenuAutoRefresh
-        value={settings.autoRefreshRate}
-        onChange={handleRefreshRateChange}
-      />
+      {isRefreshVisible && (
+        <TableSettingsMenuAutoRefresh
+          value={settings.autoRefreshRate}
+          onChange={handleRefreshRateChange}
+        />
+      )}
     </>
   );
 

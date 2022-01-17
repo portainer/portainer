@@ -17,7 +17,7 @@
 <td>
   <a ng-if="!parentCtrl.offlineMode" ui-sref="docker.networks.network({ id: item.Id, nodeName: item.NodeName })" title="{{ item.Name }}">{{ item.Name | truncate: 40 }}</a>
   <span ng-if="parentCtrl.offlineMode">{{ item.Name | truncate: 40 }}</span>
-  <span style="margin-left: 10px;" class="label label-info image-tag space-left" ng-if="item.ResourceControl.System">System</span>
+  <span style="margin-left: 10px" class="label label-info image-tag space-left" ng-if="item.ResourceControl.System">System</span>
 </td>
 <td>{{ item.StackName ? item.StackName : '-' }}</td>
 <td>{{ item.Driver }}</td>

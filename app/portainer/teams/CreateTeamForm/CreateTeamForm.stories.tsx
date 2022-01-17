@@ -11,7 +11,9 @@ const meta: Meta = {
 
 export default meta;
 
-export function Example() {
+export { Example };
+
+function Example() {
   const [message, setMessage] = useState('');
   const { teams, users } = mockExampleData();
 

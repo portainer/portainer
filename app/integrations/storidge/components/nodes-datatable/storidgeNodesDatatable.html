@@ -2,12 +2,12 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar">
         <div class="row">
           <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.addNodeAction()"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add node </button>
-          <div style="margin-bottom: 0px;">
+          <div style="margin-bottom: 0px">
             <span ng-if="$ctrl.addInfo" class="text-muted small">
               To add a node to this cluster, run the following command on your new node
               <code>
@@ -15,7 +15,7 @@
               </code>
               <span class="btn btn-primary btn-sm space-left" ng-click="$ctrl.copyAddNodeCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
               <span>
-                <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+                <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none"></i>
               </span>
             </span>
           </div>
@@ -95,9 +95,7 @@
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">
-              <span style="margin-right: 5px;">
-                Items per page
-              </span>
+              <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>

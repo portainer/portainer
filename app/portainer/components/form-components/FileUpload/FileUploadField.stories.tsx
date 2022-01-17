@@ -12,7 +12,9 @@ interface Args {
   title: string;
 }
 
-export function Example({ title }: Args) {
+export { Example };
+
+function Example({ title }: Args) {
   const [value, setValue] = useState<File>();
   function onChange(value: File) {
     if (value) {

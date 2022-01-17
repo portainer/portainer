@@ -80,13 +80,13 @@ func (handler *Handler) executeServiceWebhook(
 	}
 
 	service.Spec.TaskTemplate.ForceUpdate++
-	
+
 	var imageName = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
 
 	if imageTag != "" {
 		var tagIndex = strings.LastIndex(imageName, ":")
 		if tagIndex == -1 {
-	  		tagIndex = len(imageName)
+			tagIndex = len(imageName)
 		}
 		service.Spec.TaskTemplate.ContainerSpec.Image = imageName[:tagIndex] + ":" + imageTag
 	} else {

@@ -50,7 +50,7 @@ func Test_UpAndDown(t *testing.T) {
 
 	ctx := context.TODO()
 
-	err = w.Up(ctx, stack, endpoint)
+	err = w.Up(ctx, stack, endpoint, false)
 	if err != nil {
 		t.Fatalf("Error calling docker-compose up: %s", err)
 	}

@@ -32,9 +32,7 @@
                   <datatable-sort-icon key="Username" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
                 </a>
               </th>
-              <th>
-                Result
-              </th>
+              <th> Result </th>
             </tr>
           </thead>
           <tbody>
@@ -49,9 +47,7 @@
               <td class="text-center text-muted" colspan="5">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.logs.length === 0">
-              <td class="text-center text-muted" colspan="8">
-                No logs available.
-              </td>
+              <td class="text-center text-muted" colspan="8"> No logs available. </td>
             </tr>
           </tbody>
         </table>
