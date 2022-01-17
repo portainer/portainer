@@ -124,7 +124,7 @@ type (
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
 	HelmUserRepositoryService interface {
-		HelmUserRepositorys() ([]portainer.HelmUserRepository, error)
+		HelmUserRepositories() ([]portainer.HelmUserRepository, error)
 		HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error)
 		Create(record *portainer.HelmUserRepository) error
 		UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, repository *portainer.HelmUserRepository) error
