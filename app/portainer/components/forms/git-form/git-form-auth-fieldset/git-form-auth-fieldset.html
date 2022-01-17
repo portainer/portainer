@@ -9,15 +9,13 @@
     ></por-switch-field>
   </div>
 </div>
-<div class="small text-warning" style="margin: 5px 0 15px 0;" ng-if="$ctrl.model.RepositoryAuthentication && $ctrl.showAuthExplanation">
+<div class="small text-warning" style="margin: 5px 0 15px 0" ng-if="$ctrl.model.RepositoryAuthentication && $ctrl.showAuthExplanation">
   <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
   <span class="text-muted">Enabling authentication will store the credentials and it is advisable to use a git service account</span>
 </div>
 <div ng-if="$ctrl.model.RepositoryAuthentication">
   <div class="form-group">
-    <label for="repository_username" class="control-label text-left inline-label">
-      Username
-    </label>
+    <label for="repository_username" class="control-label text-left inline-label"> Username </label>
     <div class="inline-input">
       <input
         type="text"

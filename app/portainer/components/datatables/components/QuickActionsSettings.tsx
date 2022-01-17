@@ -16,9 +16,8 @@ export interface QuickActionsSettingsType {
 }
 
 export function QuickActionsSettings({ actions }: Props) {
-  const { settings, setTableSettings } = useTableSettings<
-    QuickActionsSettingsType
-  >();
+  const { settings, setTableSettings } =
+    useTableSettings<QuickActionsSettingsType>();
 
   return (
     <>

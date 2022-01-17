@@ -10,7 +10,8 @@ interface InputGroupSubComponents {
   Input: typeof Input;
 }
 
-const InputGroup: typeof MainComponent & InputGroupSubComponents = MainComponent as typeof MainComponent & InputGroupSubComponents;
+const InputGroup: typeof MainComponent & InputGroupSubComponents =
+  MainComponent as typeof MainComponent & InputGroupSubComponents;
 
 InputGroup.Addon = InputGroupAddon;
 InputGroup.ButtonWrapper = InputGroupButtonWrapper;

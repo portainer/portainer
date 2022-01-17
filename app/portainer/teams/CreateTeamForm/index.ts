@@ -4,4 +4,9 @@ import { CreateTeamForm } from './CreateTeamForm';
 
 export { CreateTeamForm };
 
-export const CreateTeamFormAngular = r2a(CreateTeamForm, ['users', 'actionInProgress', 'onSubmit', 'teams']);
+export const CreateTeamFormAngular = r2a(CreateTeamForm, [
+  'users',
+  'actionInProgress',
+  'onSubmit',
+  'teams',
+]);

@@ -7,7 +7,7 @@
           <div ng-if="ctrl.entityType !== 'registry'" class="form-group">
             <span class="col-sm-12 small text-warning">
               <p>
-                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                 Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
               </p>
             </span>
@@ -16,9 +16,7 @@
           <por-access-management-users-selector options="ctrl.availableUsersAndTeams" value="ctrl.formValues.multiselectOutput"></por-access-management-users-selector>
 
           <div class="form-group" ng-if="ctrl.entityType !== 'registry'">
-            <label class="col-sm-3 col-lg-2 control-label text-left">
-              Role
-            </label>
+            <label class="col-sm-3 col-lg-2 control-label text-left"> Role </label>
             <div class="col-sm-9 col-lg-6">
               <div class="flex items-center">
                 <select

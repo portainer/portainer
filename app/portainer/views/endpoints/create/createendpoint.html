@@ -8,17 +8,15 @@
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal" name="endpointCreationForm">
-          <div class="col-sm-12 form-section-title">
-            Environment type
-          </div>
+          <div class="col-sm-12 form-section-title"> Environment type </div>
           <div class="form-group"></div>
-          <div class="form-group" style="margin-bottom: 0;">
+          <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div ng-click="resetEndpointURL()">
                 <input type="radio" id="agent_endpoint" ng-model="state.EnvironmentType" value="agent" />
                 <label for="agent_endpoint" data-cy="endpointCreate-agentSelectButton">
                   <div class="boxselector_header">
-                    <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px"></i>
                     Agent
                   </div>
                   <p>Portainer agent</p>
@@ -28,7 +26,7 @@
                 <input type="radio" id="edge_agent_endpoint" ng-model="state.EnvironmentType" value="edge_agent" />
                 <label for="edge_agent_endpoint" data-cy="endpointCreate-edgeAgentSelectButton">
                   <div class="boxselector_header">
-                    <i class="fa fa-cloud" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-cloud" aria-hidden="true" style="margin-right: 2px"></i>
                     Edge Agent
                   </div>
                   <p>Portainer Edge agent</p>
@@ -38,7 +36,7 @@
                 <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker" />
                 <label for="docker_endpoint" data-cy="endpointCreate-dockerSelectButton">
                   <div class="boxselector_header">
-                    <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px"></i>
                     Docker
                   </div>
                   <p>Directly connect to the Docker API</p>
@@ -48,7 +46,7 @@
                 <input type="radio" id="kubernetes_endpoint" ng-model="state.EnvironmentType" value="kubernetes" />
                 <label for="kubernetes_endpoint" data-cy="endpointCreate-kubeSelectButton">
                   <div class="boxselector_header">
-                    <i class="fas fa-dharmachakra" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fas fa-dharmachakra" aria-hidden="true" style="margin-right: 2px"></i>
                     Kubernetes
                   </div>
                   <p>Local Kubernetes environment</p>
@@ -58,7 +56,7 @@
                 <input type="radio" id="azure_endpoint" ng-model="state.EnvironmentType" value="azure" />
                 <label for="azure_endpoint" data-cy="endpointCreate-azureSelectButton">
                   <div class="boxselector_header">
-                    <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px"></i>
                     Azure
                   </div>
                   <p>Connect to Microsoft Azure ACI</p>
@@ -67,9 +65,7 @@
             </div>
           </div>
           <div ng-if="state.EnvironmentType === 'docker'">
-            <div class="col-sm-12 form-section-title">
-              Important notice
-            </div>
+            <div class="col-sm-12 form-section-title"> Important notice </div>
             <div class="form-group">
               <p class="col-sm-12 text-muted small">
                 You can connect Portainer to a Docker environment via socket or via TCP. You can find more information about how to expose the Docker API over TCP
@@ -86,37 +82,35 @@
             </div>
           </div>
           <div ng-if="state.EnvironmentType === 'agent'">
-            <div class="col-sm-12 form-section-title">
-              Information
-            </div>
+            <div class="col-sm-12 form-section-title"> Information </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 Ensure that you have deployed the Portainer agent in your cluster first. Refer to the platform related command below to deploy it.
-                <div class="input-group input-group-sm" style="margin-top: 10px; margin-bottom: 10px;">
+                <div class="input-group input-group-sm" style="margin-top: 10px; margin-bottom: 10px">
                   <div class="btn-group btn-group-sm">
-                    <label class="btn btn-primary" ng-model="state.PlatformType" uib-btn-radio="'linux'"><i class="fab fa-linux" style="margin-right: 2px;"></i> Linux</label>
-                    <label class="btn btn-primary" ng-model="state.PlatformType" uib-btn-radio="'windows'"><i class="fab fa-windows" style="margin-right: 2px;"></i> Windows</label>
+                    <label class="btn btn-primary" ng-model="state.PlatformType" uib-btn-radio="'linux'"><i class="fab fa-linux" style="margin-right: 2px"></i> Linux</label>
+                    <label class="btn btn-primary" ng-model="state.PlatformType" uib-btn-radio="'windows'"><i class="fab fa-windows" style="margin-right: 2px"></i> Windows</label>
                   </div>
                 </div>
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 10px">
                   <uib-tabset active="state.deploymentTab">
                     <uib-tab index="0" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via load balancer">
-                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.kubeLoadBalancer }}</code>
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px">{{ deployCommands.kubeLoadBalancer }}</code>
                     </uib-tab>
 
                     <uib-tab index="1" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via node port">
-                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.kubeNodePort }}</code>
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px">{{ deployCommands.kubeNodePort }}</code>
                     </uib-tab>
 
                     <uib-tab index="2" heading="Docker Swarm">
-                      <code ng-if="state.PlatformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.agentLinux }}</code>
-                      <code ng-if="state.PlatformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.agentWindows }}</code>
+                      <code ng-if="state.PlatformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 90px">{{ deployCommands.agentLinux }}</code>
+                      <code ng-if="state.PlatformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px">{{ deployCommands.agentWindows }}</code>
                     </uib-tab>
                   </uib-tabset>
-                  <div style="margin-top: 10px;">
+                  <div style="margin-top: 10px">
                     <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy command</span>
                     <span>
-                      <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+                      <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none"></i>
                     </span>
                   </div>
                 </div>
@@ -124,9 +118,7 @@
             </div>
           </div>
           <div ng-if="state.EnvironmentType === 'edge_agent'">
-            <div class="col-sm-12 form-section-title">
-              Information
-            </div>
+            <div class="col-sm-12 form-section-title"> Information </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 <p>
@@ -138,33 +130,25 @@
             </div>
           </div>
           <div ng-if="state.EnvironmentType === 'kubernetes'">
-            <div class="col-sm-12 form-section-title">
-              Important notice
-            </div>
+            <div class="col-sm-12 form-section-title"> Important notice </div>
             <div class="form-group">
-              <p class="col-sm-12 text-muted small">
-                This will allow you to manage the Kubernetes environment where Portainer is running.
-              </p>
+              <p class="col-sm-12 text-muted small"> This will allow you to manage the Kubernetes environment where Portainer is running. </p>
 
               <p class="col-sm-12 text-muted small">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                 In order to manage a remote Kubernetes environment, please use the Agent or Edge agent options.
               </p>
             </div>
           </div>
           <div ng-if="state.EnvironmentType === 'azure'">
-            <div class="col-sm-12 form-section-title">
-              Information
-            </div>
+            <div class="col-sm-12 form-section-title"> Information </div>
             <div class="form-group">
               <div class="col-sm-12">
                 <span class="small">
-                  <p class="text-muted"> <i class="fa fa-flask orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> This feature is experimental. </p>
-                  <p class="text-primary">
-                    Connect to Microsoft Azure to manage Azure Container Instances (ACI).
-                  </p>
+                  <p class="text-muted"> <i class="fa fa-flask orange-icon" aria-hidden="true" style="margin-right: 2px"></i> This feature is experimental. </p>
+                  <p class="text-primary"> Connect to Microsoft Azure to manage Azure Container Instances (ACI). </p>
                   <p class="text-muted">
-                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                     Have a look at
                     <a href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal" target="_blank"
                       >the Azure documentation</a
@@ -175,9 +159,7 @@
               </div>
             </div>
           </div>
-          <div class="col-sm-12 form-section-title">
-            Environment details
-          </div>
+          <div class="col-sm-12 form-section-title"> Environment details </div>
           <!-- name-input -->
           <div class="form-group">
             <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
@@ -204,22 +186,18 @@
           <!-- !name-input -->
           <!-- connect-via-socket-input -->
           <div ng-if="state.EnvironmentType === 'docker'">
-            <div class="form-group" style="padding-left: 15px;">
-              <label for="connect_socket" class="col-sm_12 control-label text-left">
-                Connect via socket
-              </label>
-              <label class="switch" style="margin-left: 20px;">
+            <div class="form-group" style="padding-left: 15px">
+              <label for="connect_socket" class="col-sm_12 control-label text-left"> Connect via socket </label>
+              <label class="switch" style="margin-left: 20px">
                 <input type="checkbox" ng-model="formValues.ConnectSocket" /><i data-cy="endpointCreate-connectSocketSwitch"></i>
               </label>
             </div>
           </div>
 
           <div ng-if="state.EnvironmentType === 'docker' && formValues.ConnectSocket">
-            <div class="form-group" style="padding-left: 15px;">
-              <label for="override_socket" class="col-sm_12 control-label text-left">
-                Override default socket path
-              </label>
-              <label class="switch" style="margin-left: 20px;">
+            <div class="form-group" style="padding-left: 15px">
+              <label for="override_socket" class="col-sm_12 control-label text-left"> Override default socket path </label>
+              <label class="switch" style="margin-left: 20px">
                 <input type="checkbox" ng-model="formValues.OverrideSocket" /><i data-cy="endpointCreate-overrideSocketSwitch"></i>
               </label>
             </div>
@@ -443,14 +421,10 @@
           <!-- endpoint-security -->
           <por-endpoint-security ng-if="state.EnvironmentType === 'docker' && !formValues.ConnectSocket" form-data="formValues.SecurityFormData"></por-endpoint-security>
           <!-- !endpoint-security -->
-          <div class="col-sm-12 form-section-title">
-            Metadata
-          </div>
+          <div class="col-sm-12 form-section-title"> Metadata </div>
           <!-- group -->
           <div class="form-group">
-            <label for="endpoint_group" class="col-sm-3 col-lg-2 control-label text-left">
-              Group
-            </label>
+            <label for="endpoint_group" class="col-sm-3 col-lg-2 control-label text-left"> Group </label>
             <div class="col-sm-9 col-lg-10">
               <select
                 ng-options="group.Id as group.Name for group in groups"
@@ -468,9 +442,7 @@
             </tag-selector>
           </div>
           <!-- !tags -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
+          <div class="col-sm-12 form-section-title"> Actions </div>
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">

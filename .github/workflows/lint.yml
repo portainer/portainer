@@ -1,0 +1,41 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - release/*
+  pull_request:
+    branches:
+      - master
+      - develop
+      - release/*
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      # ESLint and Prettier must be in `package.json`
+      - name: Install Node.js dependencies
+        run: yarn
+
+      - name: Run linters
+        uses: wearerequired/lint-action@v1
+        with:
+          eslint: true
+          eslint_extensions: ts,tsx,js,jsx
+          prettier: true
+          prettier_dir: app/
+          gofmt: true
+          gofmt_dir: api/

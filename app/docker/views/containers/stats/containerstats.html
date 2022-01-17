@@ -20,9 +20,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left">
-              Refresh rate
-            </label>
+            <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left"> Refresh rate </label>
             <div class="col-sm-3 col-md-2">
               <select id="refreshRate" ng-model="state.refreshRate" ng-change="changeUpdateRepeater()" class="form-control">
                 <option value="1">1s</option>
@@ -34,7 +32,7 @@
               </select>
             </div>
             <span>
-              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
             </span>
           </div>
           <div class="form-group" ng-if="state.networkStatsUnavailable">
@@ -58,7 +56,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-chart-area" title-text="Memory usage"></rd-widget-header>
       <rd-widget-body>
-        <div class="chart-container" style="position: relative;">
+        <div class="chart-container" style="position: relative">
           <canvas id="memoryChart" width="770" height="300"></canvas>
         </div>
       </rd-widget-body>
@@ -69,7 +67,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-chart-area" title-text="CPU usage"></rd-widget-header>
       <rd-widget-body>
-        <div class="chart-container" style="position: relative;">
+        <div class="chart-container" style="position: relative">
           <canvas id="cpuChart" width="770" height="300"></canvas>
         </div>
       </rd-widget-body>
@@ -80,7 +78,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-chart-area" title-text="Network usage (aggregate)"></rd-widget-header>
       <rd-widget-body>
-        <div class="chart-container" style="position: relative;">
+        <div class="chart-container" style="position: relative">
           <canvas id="networkChart" width="770" height="300"></canvas>
         </div>
       </rd-widget-body>
@@ -91,7 +89,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-chart-area" title-text="I/O usage (aggregate)"></rd-widget-header>
       <rd-widget-body>
-        <div class="chart-container" style="position: relative;">
+        <div class="chart-container" style="position: relative">
           <canvas id="ioChart" width="770" height="300"></canvas>
         </div>
       </rd-widget-body>
