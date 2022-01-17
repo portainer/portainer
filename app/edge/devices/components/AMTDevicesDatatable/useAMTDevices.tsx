@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import {useEffect, useMemo} from 'react';
 import { useQuery } from 'react-query';
 
 import { getDevices } from '@/portainer/hostmanagement/open-amt/open-amt.service';
@@ -10,9 +10,6 @@ export function useAMTDevices(environmentId: EnvironmentId) {
   const { isLoading, data, isError, error } = useQuery(
     ['amt_devices', environmentId],
     () => getDevices(environmentId),
-    {
-      retry: false,
-    }
   );
 
   useEffect(() => {
@@ -25,9 +22,11 @@ export function useAMTDevices(environmentId: EnvironmentId) {
     }
   }, [isError, error]);
 
+  const devices = useMemo(() => (data || []), [data])
+
   return {
     isLoading,
-    devices: data,
+    devices,
     error: isError ? (error as PortainerError) : undefined,
   };
 }
