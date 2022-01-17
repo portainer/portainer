@@ -1,6 +1,6 @@
 import axios, { parseAxiosError } from 'Portainer/services/axios';
 
-import { FDOConfiguration, DeviceConfiguration, Profiles } from './model';
+import { FDOConfiguration, DeviceConfiguration, Profile } from './model';
 
 const BASE_URL = '/fdo';
 
@@ -23,9 +23,20 @@ export async function configureDevice(
   }
 }
 
+export async function createProfileFromFileContent(
+    profileName: string,
+    profileFileContent: string,
+) {
+  try {
+    await axios.post(`${BASE_URL}/profiles`, payload); // TODO mrydel
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to create profile');
+  }
+}
+
 export async function getProfiles() {
   try {
-    const { data: profiles } = await axios.get<Profiles>(
+    const { data: profiles } = await axios.get<Profile[]>(
       `${BASE_URL}/profiles`
     );
     return profiles;

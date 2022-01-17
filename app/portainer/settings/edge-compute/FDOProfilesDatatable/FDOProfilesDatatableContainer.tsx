@@ -9,6 +9,7 @@ export function FDOProfilesDatatableContainer() {
     sortBy: { id: 'name', desc: false },
   };
 
+  // TODO mrydel use single component (like AMT)
   const { isLoading, profiles, error } = useFDOProfiles();
 
   return (

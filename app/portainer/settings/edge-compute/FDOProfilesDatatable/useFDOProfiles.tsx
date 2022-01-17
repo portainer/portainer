@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import {useEffect, useMemo} from 'react';
 import { useQuery } from 'react-query';
 
 import PortainerError from '@/portainer/error';
@@ -17,6 +17,18 @@ export function useFDOProfiles() {
   useEffect(() => {
     if (isError) {
       notifications.error(
+          'Failure',
+          error as Error,
+          'Failed retrieving FDO profiles'
+      );
+    }
+  }, [isError, error]);
+
+  const profiles = useMemo(() => data || [], [data]);
+
+  useEffect(() => {
+    if (isError) {
+      notifications.error(
         'Failure',
         error as Error,
         'Failed retrieving FDO profiles'
@@ -26,7 +38,7 @@ export function useFDOProfiles() {
 
   return {
     isLoading,
-    profiles: data || [],
+    profiles,
     error: isError ? (error as PortainerError) : undefined,
   };
 }

@@ -16,7 +16,3 @@ export type Profile = {
   name: string;
   dateCreated: string;
 };
-
-export interface Profiles {
-  profiles: Profile[];
-}
