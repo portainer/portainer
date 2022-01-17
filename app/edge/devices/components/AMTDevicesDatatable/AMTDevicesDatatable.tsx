@@ -25,12 +25,10 @@ export function AMTDevicesDatatable({ environmentId }: AMTDevicesTableProps) {
   const { isLoading, devices, error } = useAMTDevices(environmentId);
 
   const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
-    useTable<Device>(
-      {
-        columns,
-        data: devices,
-      },
-    );
+    useTable<Device>({
+      columns,
+      data: devices,
+    });
 
   const tableProps = getTableProps();
   const tbodyProps = getTableBodyProps();
