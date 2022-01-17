@@ -37,7 +37,7 @@ export function EdgeDevicesDatatableActions({
       {(isFDOEnabled || isOpenAMTEnabled) && (
         <Button onClick={() => onAddNewDeviceClick()}>
           <i className="fa fa-plus-circle space-right" aria-hidden="true" />
-          Add new
+          Add Device
         </Button>
       )}
 

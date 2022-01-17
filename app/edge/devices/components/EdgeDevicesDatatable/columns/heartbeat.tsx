@@ -1,29 +1,34 @@
-import { Column } from 'react-table';
+import {CellProps, Column} from 'react-table';
 import clsx from 'clsx';
 
 import { Environment, EnvironmentStatus } from '@/portainer/environments/types';
-import { DefaultFilter } from '@/portainer/components/datatables/components/Filter';
 
 export const heartbeat: Column<Environment> = {
   Header: 'Heartbeat',
-  accessor: (row) => (row.Status === EnvironmentStatus.Up ? 'up' : 'down'),
+  accessor: 'Status',
   id: 'status',
   Cell: StatusCell,
-  Filter: DefaultFilter,
+  disableFilters: true,
   canHide: true,
 };
 
-function StatusCell({ value: status }: { value: string }) {
-  return (
-    <span className={clsx('label', `label-${environmentStatusBadge(status)}`)}>
-      {status}
-    </span>
-  );
+export function StatusCell({
+  row: { original: environment },
+}: CellProps<Environment>) {
+  if (environment.EdgeID) {
+    return (
+        <span className="label label-default"><s>associated</s></span>
+    )
+  }
 
-  function environmentStatusBadge(status: string) {
-    if (status === 'down') {
-      return 'danger';
+  return (
+    <i className={clsx('fa', 'fa-heartbeat', environmentStatusLabel(environment.Status))} aria-hidden="true"/>
+  )
+
+  function environmentStatusLabel(status: EnvironmentStatus) {
+    if (status === EnvironmentStatus.Up) {
+      return 'green-icon';
     }
-    return 'success';
+    return 'orange-icon';
   }
 }
