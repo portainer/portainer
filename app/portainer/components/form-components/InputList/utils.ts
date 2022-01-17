@@ -10,13 +10,23 @@ export function arrayMove<T>(array: Array<T>, from: number, to: number) {
 
   if (diff > 0) {
     // move left
-    return [...array.slice(0, to), item, ...array.slice(to, from), ...array.slice(from + 1, length)];
+    return [
+      ...array.slice(0, to),
+      item,
+      ...array.slice(to, from),
+      ...array.slice(from + 1, length),
+    ];
   }
 
   if (diff < 0) {
     // move right
     const targetIndex = to + 1;
-    return [...array.slice(0, from), ...array.slice(from + 1, targetIndex), item, ...array.slice(targetIndex, length)];
+    return [
+      ...array.slice(0, from),
+      ...array.slice(from + 1, targetIndex),
+      item,
+      ...array.slice(targetIndex, length),
+    ];
   }
 
   return [...array];

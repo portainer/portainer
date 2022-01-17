@@ -37,7 +37,7 @@ export function EdgeDevicesDatatableActions({
       {(isFDOEnabled || isOpenAMTEnabled) && (
         <Button onClick={() => onAddNewDeviceClick()}>
           <i className="fa fa-plus-circle space-right" aria-hidden="true" />
-          Add new
+          Add Device
         </Button>
       )}
 
@@ -70,22 +70,24 @@ export function EdgeDevicesDatatableActions({
       return;
     }
 
-    await Promise.all(selectedItems.map(async (environment) => {
-      try {
-        await deleteEndpoint(environment.Id);
+    await Promise.all(
+      selectedItems.map(async (environment) => {
+        try {
+          await deleteEndpoint(environment.Id);
 
-        notifications.success(
+          notifications.success(
             'Environment successfully removed',
             environment.Name
-        );
-      } catch (err) {
-        notifications.error(
+          );
+        } catch (err) {
+          notifications.error(
             'Failure',
             err as Error,
             'Unable to remove environment'
-        );
-      }
-    }));
+          );
+        }
+      })
+    );
 
     await router.stateService.reload();
   }

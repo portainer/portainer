@@ -33,7 +33,7 @@ func (s StringSet) List() []string {
 	list := make([]string, s.Len())
 
 	i := 0
-	for k, _ := range s {
+	for k := range s {
 		list[i] = k
 		i++
 	}

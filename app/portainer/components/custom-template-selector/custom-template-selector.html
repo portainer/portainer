@@ -1,8 +1,6 @@
 <div>
   <div class="form-group">
-    <label for="stack_template" class="col-sm-1 control-label text-left">
-      Template
-    </label>
+    <label for="stack_template" class="col-sm-1 control-label text-left"> Template </label>
     <div class="col-sm-11">
       <select
         ng-if="$ctrl.templates.length"
@@ -19,9 +17,7 @@
 
   <!-- description -->
   <div ng-if="$ctrl.selectedTemplate.note">
-    <div class="col-sm-12 form-section-title">
-      Information
-    </div>
+    <div class="col-sm-12 form-section-title"> Information </div>
     <div class="form-group">
       <div class="col-sm-12">
         <div class="template-note" ng-bind-html="$ctrl.selectedTemplate.note"></div>

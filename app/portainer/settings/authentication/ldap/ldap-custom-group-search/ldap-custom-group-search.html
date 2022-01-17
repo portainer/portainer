@@ -1,13 +1,9 @@
-<div class="col-sm-12 form-section-title" style="float: initial;">
-  Group search configurations
-</div>
+<div class="col-sm-12 form-section-title" style="float: initial"> Group search configurations </div>
 
-<rd-widget ng-repeat="config in $ctrl.settings | limitTo: (1 - $ctrl.settings)" style="display: block; margin-bottom: 10px;">
+<rd-widget ng-repeat="config in $ctrl.settings | limitTo: (1 - $ctrl.settings)" style="display: block; margin-bottom: 10px">
   <rd-widget-body>
-    <div class="form-group" ng-if="$index > 0" style="margin-bottom: 10px;">
-      <span class="col-sm-12 text-muted small">
-        Extra search configuration
-      </span>
+    <div class="form-group" ng-if="$index > 0" style="margin-bottom: 10px">
+      <span class="col-sm-12 text-muted small"> Extra search configuration </span>
     </div>
 
     <div class="form-group">
@@ -44,13 +40,13 @@
   </rd-widget-body>
 </rd-widget>
 
-<div class="form-group" style="margin-top: 10px;">
+<div class="form-group" style="margin-top: 10px">
   <div class="col-sm-12">
-    <button class="label label-default interactive" style="border: 0;" ng-click="$ctrl.onAddClick()">
+    <button class="label label-default interactive" style="border: 0" ng-click="$ctrl.onAddClick()">
       <i class="fa fa-plus-circle" aria-hidden="true"></i> add group search configuration
     </button>
   </div>
-  <div class="col-sm-12" style="margin-top: 10px;">
+  <div class="col-sm-12" style="margin-top: 10px">
     <button
       class="btn btm-sm btn-primary"
       type="button"

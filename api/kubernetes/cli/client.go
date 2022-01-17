@@ -50,7 +50,7 @@ func (factory *ClientFactory) GetInstanceID() (instanceID string) {
 }
 
 // Remove the cached kube client so a new one can be created
- func (factory *ClientFactory) RemoveKubeClient(endpointID portainer.EndpointID) {
+func (factory *ClientFactory) RemoveKubeClient(endpointID portainer.EndpointID) {
 	factory.endpointClients.Remove(strconv.Itoa(int(endpointID)))
 }
 

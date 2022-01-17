@@ -1,9 +1,7 @@
-<div ng-if="!$ctrl.labels.length">
-  There are no labels for this node.
-</div>
+<div ng-if="!$ctrl.labels.length"> There are no labels for this node. </div>
 
-<div class="col-sm-12 form-inline" style="padding: 0px;" ng-if="$ctrl.labels.length">
-  <div ng-repeat="label in $ctrl.labels" style="margin-top: 2px;">
+<div class="col-sm-12 form-inline" style="padding: 0px" ng-if="$ctrl.labels.length">
+  <div ng-repeat="label in $ctrl.labels" style="margin-top: 2px">
     <div class="input-group col-sm-5 input-group-sm">
       <span class="input-group-addon">name</span>
       <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="$ctrl.updateLabel(label)" />

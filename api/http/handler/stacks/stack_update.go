@@ -49,7 +49,7 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 
 // @id StackUpdate
 // @summary Update a stack
-// @description Update a stack.
+// @description Update a stack, only for file based stacks.
 // @description **Access policy**: authenticated
 // @tags stacks
 // @security ApiKeyAuth
@@ -123,6 +123,15 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		}
 	}
 
+	// Must not be git based stack. stop the auto update job if there is any
+	if stack.AutoUpdate != nil {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		stack.AutoUpdate = nil
+	}
+	if stack.GitConfig != nil {
+		stack.FromAppTemplate = true
+	}
+
 	updateError := handler.updateAndDeployStack(r, stack, endpoint)
 	if updateError != nil {
 		return updateError
@@ -181,7 +190,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return configErr
 	}
 
-	err = handler.deployComposeStack(config)
+	err = handler.deployComposeStack(config, false)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 	}

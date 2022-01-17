@@ -5,9 +5,7 @@
       <form class="form-horizontal" name="stackTemplateForm">
         <!-- description -->
         <div ng-if="$ctrl.template.Note">
-          <div class="col-sm-12 form-section-title">
-            Information
-          </div>
+          <div class="col-sm-12 form-section-title"> Information </div>
           <div class="form-group">
             <div class="col-sm-12">
               <div class="template-note" ng-bind-html="$ctrl.template.Note"></div>
@@ -15,9 +13,7 @@
           </div>
         </div>
         <!-- !description -->
-        <div class="col-sm-12 form-section-title">
-          Configuration
-        </div>
+        <div class="col-sm-12 form-section-title"> Configuration </div>
         <!-- name-input -->
         <div class="form-group">
           <label for="template_name" class="col-sm-2 control-label text-left">Name</label>
@@ -57,9 +53,7 @@
         <por-access-control-form form-data="$ctrl.formValues.AccessControlData"></por-access-control-form>
         <!-- !access-control -->
         <!-- actions -->
-        <div class="col-sm-12 form-section-title">
-          Actions
-        </div>
+        <div class="col-sm-12 form-section-title"> Actions </div>
         <div class="form-group">
           <div class="col-sm-12">
             <button
@@ -73,8 +67,8 @@
               <span ng-show="$ctrl.state.actionInProgress">Deployment in progress...</span>
             </button>
             <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.unselectTemplate($ctrl.template)">Hide</button>
-            <div class="cols-sm-12 small text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px; margin-top: 5px;">{{ $ctrl.state.formValidationError }}</div>
-            <div class="cols-sm-12 small text-danger" ng-if="!$ctrl.state.deployable" style="margin-left: 5px; margin-top: 5px;"
+            <div class="cols-sm-12 small text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px; margin-top: 5px">{{ $ctrl.state.formValidationError }}</div>
+            <div class="cols-sm-12 small text-danger" ng-if="!$ctrl.state.deployable" style="margin-left: 5px; margin-top: 5px"
               >This template type cannot be deployed on this environment.</div
             >
           </div>

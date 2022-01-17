@@ -50,9 +50,9 @@ import { useColumns } from './columns';
 export interface ContainerTableProps {
   isAddActionVisible: boolean;
   dataset: DockerContainer[];
-  onRefresh(): Promise<void>;
+  onRefresh?(): Promise<void>;
   isHostColumnVisible: boolean;
-  autoFocusSearch: boolean;
+  tableKey?: string;
 }
 
 export function ContainersDatatable({
@@ -60,7 +60,6 @@ export function ContainersDatatable({
   dataset,
   onRefresh,
   isHostColumnVisible,
-  autoFocusSearch,
 }: ContainerTableProps) {
   const { settings, setTableSettings } =
     useTableSettings<ContainersTableSettings>();
@@ -150,7 +149,7 @@ export function ContainersDatatable({
           <TableSettingsMenu
             quickActions={<QuickActionsSettings actions={actions} />}
           >
-            <ContainersDatatableSettings />
+            <ContainersDatatableSettings isRefreshVisible={!!onRefresh} />
           </TableSettingsMenu>
         </TableTitleActions>
       </TableTitle>
@@ -163,11 +162,7 @@ export function ContainersDatatable({
         />
       </TableActions>
 
-      <SearchBar
-        value={searchBarValue}
-        onChange={handleSearchBarChange}
-        autoFocus={autoFocusSearch}
-      />
+      <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
 
       <Table
         className={tableProps.className}

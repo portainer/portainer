@@ -2,16 +2,14 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"><i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
+        <div class="toolBarTitle"><i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
         <div class="settings">
           <datatable-columns-visibility columns="$ctrl.columnVisibility.columns" on-change="($ctrl.onColumnVisibilityChange)"></datatable-columns-visibility>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
-                <div class="menuHeader">
-                  Table settings
-                </div>
+                <div class="menuHeader"> Table settings </div>
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox" ng-if="$ctrl.isAdmin">
@@ -23,9 +21,7 @@
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
                     <div ng-if="$ctrl.settings.repeater.autoRefresh">
-                      <label for="settings_refresh_rate">
-                        Refresh rate
-                      </label>
+                      <label for="settings_refresh_rate"> Refresh rate </label>
                       <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
                         <option value="10">10s</option>
                         <option value="30">30s</option>
@@ -34,7 +30,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
                       </span>
                     </div>
                   </div>
@@ -104,9 +100,7 @@
                 </div>
                 <div class="dropdown-menu" uib-dropdown-menu>
                   <div class="tableMenu">
-                    <div class="menuHeader">
-                      Filter by activity
-                    </div>
+                    <div class="menuHeader"> Filter by activity </div>
                     <div class="menuContent">
                       <div class="md-checkbox">
                         <input id="filter_usage_activeStacks" type="checkbox" ng-model="$ctrl.filters.state.showActiveStacks" ng-change="$ctrl.onFilterChange()" />
@@ -170,7 +164,7 @@
                   >{{ item.Name }}</a
                 >
                 <span ng-if="$ctrl.offlineMode">{{ item.Name }}</span>
-                <span ng-if="item.Regular && item.Status == 2" style="margin-left: 10px;" class="label label-warning image-tag space-left">Inactive</span>
+                <span ng-if="item.Regular && item.Status == 2" style="margin-left: 10px" class="label label-warning image-tag space-left">Inactive</span>
               </td>
               <td>{{ item.Type === 1 ? 'Swarm' : 'Compose' }}</td>
               <td>
@@ -182,7 +176,7 @@
                   tooltip-class="portainer-tooltip"
                   uib-tooltip="This stack was created inside an environment that is no longer registered inside Portainer."
                 >
-                  Orphaned <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                  Orphaned <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-left: 2px"></i>
                 </span>
                 <span
                   ng-if="item.External"
@@ -192,7 +186,7 @@
                   tooltip-class="portainer-tooltip"
                   uib-tooltip="This stack was created outside of Portainer. Control over this stack is limited."
                 >
-                  Limited <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                  Limited <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-left: 2px"></i>
                 </span>
                 <span ng-if="item.Regular">Total</span>
               </td>
@@ -228,9 +222,7 @@
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">
-              <span style="margin-right: 5px;">
-                Items per page
-              </span>
+              <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>

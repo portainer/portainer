@@ -720,7 +720,7 @@ class KubernetesCreateApplicationController {
   }
 
   publishViaLoadBalancerEnabled() {
-    return this.state.useLoadBalancer;
+    return this.state.useLoadBalancer && this.state.maxLoadBalancersQuota !== 0;
   }
 
   publishViaIngressEnabled() {
@@ -797,6 +797,14 @@ class KubernetesCreateApplicationController {
     const nonScalable = this.isNonScalable();
     const isPublishingWithoutPorts = this.formValues.IsPublishingService && this.hasNoPublishedPorts();
     return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || isPublishingWithoutPorts;
+  }
+
+  isExternalApplication() {
+    if (this.application) {
+      return KubernetesApplicationHelper.isExternalApplication(this.application);
+    } else {
+      return false;
+    }
   }
 
   disableLoadBalancerEdit() {

@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from 'react';
 
 export function useRepeater(
   refreshRate: number,
-  onRefresh: () => Promise<void>
+  onRefresh?: () => Promise<void>
 ) {
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
 
@@ -17,7 +17,7 @@ export function useRepeater(
 
   const startRepeater = useCallback(
     (refreshRate) => {
-      if (intervalId) {
+      if (intervalId || !onRefresh) {
         return;
       }
 
@@ -27,16 +27,16 @@ export function useRepeater(
         }, refreshRate * 1000)
       );
     },
-    [intervalId]
+    [intervalId, onRefresh]
   );
 
   useEffect(() => {
-    if (!refreshRate) {
+    if (!refreshRate || !onRefresh) {
       stopRepeater();
     } else {
       startRepeater(refreshRate);
     }
 
     return stopRepeater;
-  }, [refreshRate, startRepeater, stopRepeater, intervalId]);
+  }, [refreshRate, startRepeater, stopRepeater, intervalId, onRefresh]);
 }

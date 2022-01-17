@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import { KubernetesPortMapping, KubernetesPortMappingPort } from 'Kubernetes/models/port/models';
-import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 import {
   KubernetesApplicationAutoScalerFormValue,
@@ -275,6 +275,61 @@ class KubernetesApplicationHelper {
     return app;
   }
   /* #endregion */
+
+  /* #region  SERVICES -> SERVICES FORM VALUES */
+  static generateServicesFormValuesFromServices(app) {
+    let services = [];
+    app.Services.forEach(function (service) {
+      const svc = new KubernetesService();
+      svc.Namespace = service.metadata.namespace;
+      svc.Name = service.metadata.name;
+      svc.StackName = service.StackName;
+      svc.ApplicationOwner = app.ApplicationOwner;
+      svc.ApplicationName = app.ApplicationName;
+      svc.Type = service.spec.type;
+      if (service.spec.type === KubernetesServiceTypes.CLUSTER_IP) {
+        svc.Type = 1;
+      } else if (service.spec.type === KubernetesServiceTypes.NODE_PORT) {
+        svc.Type = 2;
+      } else if (service.spec.type === KubernetesServiceTypes.LOAD_BALANCER) {
+        svc.Type = 3;
+      }
+
+      let ports = [];
+      service.spec.ports.forEach(function (port) {
+        const svcport = new KubernetesServicePort();
+        svcport.name = port.name;
+        svcport.port = port.port;
+        svcport.nodePort = port.nodePort;
+        svcport.protocol = port.protocol;
+        svcport.targetPort = port.targetPort;
+
+        app.Ingresses.value.forEach((ingress) => {
+          const ingressMatched = _.find(ingress.Paths, { ServiceName: service.metadata.name });
+          if (ingressMatched) {
+            svcport.ingress = {
+              IngressName: ingressMatched.IngressName,
+              Host: ingressMatched.Host,
+              Path: ingressMatched.Path,
+            };
+            svc.Ingress = true;
+          }
+        });
+
+        ports.push(svcport);
+      });
+      svc.Ports = ports;
+      svc.Selector = app.Raw.spec.selector.matchLabels;
+      services.push(svc);
+    });
+
+    return services;
+  }
+  /* #endregion */
+  static generateSelectorFromService(app) {
+    const selector = app.Raw.spec.selector.matchLabels;
+    return selector;
+  }
 
   /* #region  PUBLISHED PORTS FV <> PUBLISHED PORTS */
   static generatePublishedPortsFormValuesFromPublishedPorts(serviceType, publishedPorts, ingress) {

@@ -15,7 +15,7 @@
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
               <uib-tab-heading data-cy="k8sVolDetail-volTab"> <i class="fa fa-database space-right" aria-hidden="true"></i> Volume </uib-tab-heading>
 
-              <div style="padding: 20px;">
+              <div style="padding: 20px">
                 <table class="table">
                   <tbody>
                     <tr>
@@ -32,7 +32,7 @@
                         <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })" data-cy="k8sVolDetail-volNamespace">{{
                           ctrl.volume.ResourcePool.Namespace.Name
                         }}</a>
-                        <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace()">system</span>
+                        <span style="margin-left: 5px" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace()">system</span>
                       </td>
                     </tr>
                     <tr>
@@ -89,12 +89,12 @@
                                 required
                                 data-cy="k8sVolDetail-increaseSizeInput"
                               />
-                              <span class="input-group-addon" style="padding: 0;">
+                              <span class="input-group-addon" style="padding: 0">
                                 <select
                                   ng-model="ctrl.state.volumeSizeUnit"
                                   ng-change="ctrl.onChangeSize()"
                                   ng-options="unit for unit in ctrl.state.availableSizeUnits"
-                                  style="width: 100%; height: 100%;"
+                                  style="width: 100%; height: 100%"
                                   data-cy="k8sVolDetail-increaseSizeUnits"
                                 ></select>
                               </span>
@@ -114,7 +114,7 @@
                           </div>
 
                           <div class="form-inline">
-                            <div class="small text-warning" style="margin-top: 5px;" ng-show="ctrl.state.errors.volumeSize || kubernetesVolumeUpdateForm.size.$invalid">
+                            <div class="small text-warning" style="margin-top: 5px" ng-show="ctrl.state.errors.volumeSize || kubernetesVolumeUpdateForm.size.$invalid">
                               <div ng-messages="kubernetesVolumeUpdateForm.size.$error">
                                 <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                               </div>
@@ -135,7 +135,7 @@
               <uib-tab-heading data-cy="k8sVolDetail-volEventsTab">
                 <i class="fa fa-history space-right" aria-hidden="true"></i> Events
                 <div ng-if="ctrl.hasEventWarnings()">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
@@ -154,7 +154,7 @@
 
             <uib-tab index="2" ng-if="ctrl.volume.PersistentVolumeClaim.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading data-cy="k8sVolDetail-volYamlTab"> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
-              <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
+              <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="volume-yaml" data="ctrl.volume.PersistentVolumeClaim.Yaml"></kubernetes-yaml-inspector>
               </div>
             </uib-tab>
