@@ -20,6 +20,7 @@ import (
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/docker"
@@ -69,8 +70,17 @@ func initFileService(dataStorePath string) portainer.FileService {
 func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
 	connection, err := database.NewDatabase("boltdb", *flags.Data, secretKey)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("failed creating database connection: %s", err)
 	}
+
+	if bconn, ok := connection.(*boltdb.DbConnection); ok {
+		bconn.MaxBatchSize = *flags.MaxBatchSize
+		bconn.MaxBatchDelay = *flags.MaxBatchDelay
+		bconn.InitialMmapSize = *flags.InitialMmapSize
+	} else {
+		log.Fatalf("failed creating database connection: expecting a boltdb database type but a different one was received")
+	}
+
 	store := datastore.NewStore(*flags.Data, fileService, connection)
 	isNew, err := store.Open()
 	if err != nil {

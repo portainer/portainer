@@ -66,7 +66,17 @@ func (connection *DbConnection) UnmarshalObjectWithJsoniter(data []byte, object 
 		}
 	}
 	var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
-	return jsoni.Unmarshal(data, &object)
+	err := jsoni.Unmarshal(data, &object)
+	if err != nil {
+		if s, ok := object.(*string); ok {
+			*s = string(data)
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 // mmm, don't have a KMS .... aes GCM seems the most likely from

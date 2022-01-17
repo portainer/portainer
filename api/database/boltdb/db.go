@@ -20,9 +20,12 @@ const (
 )
 
 type DbConnection struct {
-	Path          string
-	EncryptionKey []byte
-	isEncrypted   bool
+	Path            string
+	MaxBatchSize    int
+	MaxBatchDelay   time.Duration
+	InitialMmapSize int
+	EncryptionKey   []byte
+	isEncrypted     bool
 
 	*bolt.DB
 }
@@ -83,10 +86,15 @@ func (connection *DbConnection) Open() error {
 
 	// Now we open the db
 	databasePath := connection.GetDatabaseFilePath()
-	db, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(databasePath, 0600, &bolt.Options{
+		Timeout:         1 * time.Second,
+		InitialMmapSize: connection.InitialMmapSize,
+	})
 	if err != nil {
 		return err
 	}
+	db.MaxBatchSize = connection.MaxBatchSize
+	db.MaxBatchDelay = connection.MaxBatchDelay
 	connection.DB = db
 	return nil
 }
@@ -133,7 +141,7 @@ func (connection *DbConnection) ConvertToKey(v int) []byte {
 
 // CreateBucket is a generic function used to create a bucket inside a database database.
 func (connection *DbConnection) SetServiceName(bucketName string) error {
-	return connection.Update(func(tx *bolt.Tx) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
 		if err != nil {
 			return err
@@ -163,7 +171,7 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 		return err
 	}
 
-	return connection.UnmarshalObject(data, object)
+	return connection.UnmarshalObjectWithJsoniter(data, object)
 }
 
 func (connection *DbConnection) getEncryptionKey() []byte {
@@ -176,26 +184,20 @@ func (connection *DbConnection) getEncryptionKey() []byte {
 
 // UpdateObject is a generic function used to update an object inside a database database.
 func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object interface{}) error {
-	return connection.Update(func(tx *bolt.Tx) error {
+	data, err := connection.MarshalObject(object)
+	if err != nil {
+		return err
+	}
+
+	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-
-		data, err := connection.MarshalObject(object)
-		if err != nil {
-			return err
-		}
-
-		err = bucket.Put(key, data)
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return bucket.Put(key, data)
 	})
 }
 
 // DeleteObject is a generic function used to delete an object inside a database database.
 func (connection *DbConnection) DeleteObject(bucketName string, key []byte) error {
-	return connection.Update(func(tx *bolt.Tx) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 		return bucket.Delete(key)
 	})
@@ -204,7 +206,7 @@ func (connection *DbConnection) DeleteObject(bucketName string, key []byte) erro
 // DeleteAllObjects delete all objects where matching() returns (id, ok).
 // TODO: think about how to return the error inside (maybe change ok to type err, and use "notfound"?
 func (connection *DbConnection) DeleteAllObjects(bucketName string, matching func(o interface{}) (id int, ok bool)) error {
-	return connection.Update(func(tx *bolt.Tx) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		cursor := bucket.Cursor()
@@ -231,7 +233,7 @@ func (connection *DbConnection) DeleteAllObjects(bucketName string, matching fun
 func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 	var identifier int
 
-	connection.Update(func(tx *bolt.Tx) error {
+	connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 		id, err := bucket.NextSequence()
 		if err != nil {
@@ -246,7 +248,7 @@ func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 
 // CreateObject creates a new object in the bucket, using the next bucket sequence id
 func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) (int, interface{})) error {
-	return connection.Update(func(tx *bolt.Tx) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		seqId, _ := bucket.NextSequence()
@@ -263,7 +265,7 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 
 // CreateObjectWithId creates a new object in the bucket, using the specified id
 func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
-	return connection.Update(func(tx *bolt.Tx) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 		data, err := connection.MarshalObject(obj)
 		if err != nil {
@@ -277,7 +279,7 @@ func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, ob
 // CreateObjectWithSetSequence creates a new object in the bucket, using the specified id, and sets the bucket sequence
 // avoid this :)
 func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, id int, obj interface{}) error {
-	return connection.Update(func(tx *bolt.Tx) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		// We manually manage sequences for schedules
