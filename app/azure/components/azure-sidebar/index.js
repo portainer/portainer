@@ -1,8 +1,6 @@
-import angular from 'angular';
-
-angular.module('portainer.azure').component('azureSidebar', {
+export const azureSidebar = {
   templateUrl: './azure-sidebar.html',
   bindings: {
     endpointId: '<',
   },
-});
+};
