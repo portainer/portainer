@@ -83,7 +83,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
               data-cy="home-endpointsSearchInput"
             />
 
-            <div className="blocklist">
+            <div className="blocklist" data-cy="home-endpointList">
               {renderItems(
                 isLoading,
                 totalCount,
