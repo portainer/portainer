@@ -40,7 +40,7 @@ func NewStore(storePath string, fileService portainer.FileService, connection po
 func (store *Store) Open() (newStore bool, err error) {
 	newStore = true
 
-	encryptionReq := store.connection.DoesStoreNeedEncryption()
+	encryptionReq := store.connection.NeedsEncryptionMigration()
 	if encryptionReq {
 		store.encryptDB()
 	}
@@ -102,9 +102,12 @@ func (store *Store) Rollback(force bool) error {
 
 func (store *Store) encryptDB() error {
 	store.connection.SetEncrypted(false)
-	store.connection.Open()
+	err := store.connection.Open()
+	if err != nil {
+		return err
+	}
 
-	err := store.initServices()
+	err = store.initServices()
 	if err != nil {
 		return err
 	}

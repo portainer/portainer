@@ -59,26 +59,21 @@ func (connection *DbConnection) IsEncryptedStore() bool {
 	return connection.getEncryptionKey() != nil
 }
 
-// Return true if the database encryption is required
-func (connection *DbConnection) DoesStoreNeedEncryption() bool {
-
-	encryptedDbFile := false
-	dbFile := path.Join(connection.Path, EncryptedDatabaseFileName)
-	if _, err := os.Stat(dbFile); err == nil {
-		encryptedDbFile = true
-	}
-
-	if encryptedDbFile {
-		connection.SetEncrypted(true)
-		if connection.EncryptionKey == nil {
-			logrus.Fatal("Portainer database is encrypted, but no encryption key was loaded")
+// NeedsEncryptionMigration returns true if database encryption is enabled and
+// we have an un-encrypted DB that requires migration to an encrypted DB
+func (connection *DbConnection) NeedsEncryptionMigration() bool {
+	if connection.EncryptionKey != nil {
+		dbFile := path.Join(connection.Path, DatabaseFileName)
+		if _, err := os.Stat(dbFile); err == nil {
+			return true
 		}
 
-		// DB is already encrypted and everything checks out. Nothing to migrate
-		return false
+		// This is an existing encrypted store or a new store.
+		// A new store will open encrypted from the outset
+		connection.SetEncrypted(true)
 	}
 
-	return connection.EncryptionKey != nil
+	return false
 }
 
 // Open opens and initializes the BoltDB database.
