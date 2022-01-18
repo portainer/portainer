@@ -1,22 +1,20 @@
 <div>
-  <div class="col-sm-12 form-section-title">
-    Macvlan configuration
-  </div>
+  <div class="col-sm-12 form-section-title"> Macvlan configuration </div>
   <!-- selector -->
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
-      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
       To create a MACVLAN network you need to create a configuration, then create the network from this configuration.
     </span>
   </div>
   <div class="col-sm-12">
-    <div class="form-group" style="margin-bottom: 0;">
+    <div class="form-group" style="margin-bottom: 0">
       <div class="boxselector_wrapper">
         <div>
           <input type="radio" id="network_config" ng-model="$ctrl.data.Scope" value="local" />
           <label for="network_config">
             <div class="boxselector_header">
-              <i class="fa fa-cog" aria-hidden="true" style="margin-right: 2px;"></i>
+              <i class="fa fa-cog" aria-hidden="true" style="margin-right: 2px"></i>
               Configuration
             </div>
             <p>I want to configure a network before deploying it</p>
@@ -26,7 +24,7 @@
           <input type="radio" id="network_deploy" ng-model="$ctrl.data.Scope" value="swarm" ng-disabled="$ctrl.availableNetworks.length === 0" />
           <label for="network_deploy" ng-class="$ctrl.availableNetworks.length === 0 ? 'boxselector_disabled' : ''">
             <div class="boxselector_header">
-              <i class="fa fa-sitemap" aria-hidden="true" style="margin-right: 2px;"></i>
+              <i class="fa fa-sitemap" aria-hidden="true" style="margin-right: 2px"></i>
               Creation
             </div>
             <p>I want to create a network from a configuration</p>

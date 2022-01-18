@@ -34,7 +34,7 @@ func NewService(connection portainer.Connection) (*Service, error) {
 }
 
 //HelmUserRepository returns an array of all HelmUserRepository
-func (service *Service) HelmUserRepositorys() ([]portainer.HelmUserRepository, error) {
+func (service *Service) HelmUserRepositories() ([]portainer.HelmUserRepository, error) {
 	var repos = make([]portainer.HelmUserRepository, 0)
 
 	err := service.connection.GetAll(

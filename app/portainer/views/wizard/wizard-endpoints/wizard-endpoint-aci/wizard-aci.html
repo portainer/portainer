@@ -3,14 +3,14 @@
   <!-- docker form section-->
   <div class="form-group wizard-form">
     <label for="acir_name" class="col-sm-3 col-lg-2 control-label text-left">Name<span class="wizard-form-required">*</span></label>
-    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px">
       <input type="text" class="form-control" name="aci_name" ng-model="$ctrl.formValues.name" placeholder="e.g. docker-prod01 / kubernetes-cluster01" required auto-focus />
     </div>
   </div>
 
   <div class="form-group">
     <label for="azure_credential_appid" class="col-sm-3 col-lg-2 control-label text-left">Application ID:<span class="wizard-form-required">*</span></label>
-    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px">
       <input
         type="text"
         class="form-control"
@@ -24,7 +24,7 @@
 
   <div class="form-group">
     <label for="azure_credential_tenantid" class="col-sm-3 col-lg-2 control-label text-left">Tenant ID:<span class="wizard-form-required">*</span></label>
-    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px">
       <input
         type="text"
         class="form-control"
@@ -59,7 +59,7 @@
         ng-click="$ctrl.addAciEndpoint()"
         button-spinner="$ctrl.state.actionInProgress"
       >
-        <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plug" style="margin-right: 5px;"></i> Connect </span>
+        <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plug" style="margin-right: 5px"></i> Connect </span>
         <span ng-show="$ctrl.state.actionInProgress">Connecting environment...</span>
       </button>
     </div>

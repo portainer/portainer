@@ -1,7 +1,5 @@
 <form class="form-horizontal" name="registryFormGitlab" ng-submit="$ctrl.retrieveRegistries()">
-  <div class="col-sm-12 form-section-title">
-    Important notice
-  </div>
+  <div class="col-sm-12 form-section-title"> Important notice </div>
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
       <p>
@@ -10,9 +8,7 @@
       </p>
     </span>
   </div>
-  <div class="col-sm-12 form-section-title">
-    Gitlab registry connection details
-  </div>
+  <div class="col-sm-12 form-section-title"> Gitlab registry connection details </div>
   <!-- credentials-user -->
   <div class="form-group">
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
@@ -102,15 +98,11 @@
   </div>
 </form>
 <div class="form-horizontal" ng-if="$ctrl.projects">
-  <div class="col-sm-12 form-section-title">
-    Gitlab projects
-  </div>
+  <div class="col-sm-12 form-section-title"> Gitlab projects </div>
   <div class="form-group">
+    <span class="col-sm-12 text-muted small"> Select the project's registries you want to manage. Portainer will create one registry for each selected project. </span>
     <span class="col-sm-12 text-muted small">
-      Select the project's registries you want to manage. Portainer will create one registry for each selected project.
-    </span>
-    <span class="col-sm-12 text-muted small">
-      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
       If you can't select a project, make sure that registry feature is activated on it.
     </span>
   </div>

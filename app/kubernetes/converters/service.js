@@ -52,10 +52,59 @@ class KubernetesServiceConverter {
     return res;
   }
 
+  static applicationFormValuesToServices(formValues) {
+    let services = [];
+    formValues.Services.forEach(function (service) {
+      const res = new KubernetesService();
+      res.Namespace = formValues.ResourcePool.Namespace.Name;
+      res.Name = service.Name;
+      res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
+      res.ApplicationOwner = formValues.ApplicationOwner;
+      res.ApplicationName = formValues.Name;
+      if (service.Type === KubernetesApplicationPublishingTypes.NODE_PORT) {
+        res.Type = KubernetesServiceTypes.NODE_PORT;
+      } else if (service.Type === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
+        res.Type = KubernetesServiceTypes.LOAD_BALANCER;
+      } else if (service.Type === KubernetesApplicationPublishingTypes.CLUSTER_IP) {
+        res.Type = KubernetesServiceTypes.CLUSTER_IP;
+      }
+      res.Ingress = service.Ingress;
+
+      if (service.Selector !== undefined) {
+        res.Selector = service.Selector;
+      } else {
+        res.Selector = {
+          app: formValues.Name,
+        };
+      }
+
+      let ports = [];
+      service.Ports.forEach(function (port, index) {
+        const res = new KubernetesServicePort();
+        res.name = 'port-' + index;
+        res.port = port.port;
+        if (port.nodePort) {
+          res.nodePort = port.nodePort;
+        }
+        res.protocol = port.protocol;
+        res.targetPort = port.targetPort;
+        res.ingress = port.ingress;
+        ports.push(res);
+      });
+      res.Ports = ports;
+
+      services.push(res);
+    });
+    return services;
+  }
+
   static applicationFormValuesToHeadlessService(formValues) {
     const res = KubernetesServiceConverter.applicationFormValuesToService(formValues);
     res.Name = KubernetesServiceHelper.generateHeadlessServiceName(formValues.Name);
     res.Headless = true;
+    res.Selector = {
+      app: formValues.Name,
+    };
     return res;
   }
 
@@ -70,8 +119,20 @@ class KubernetesServiceConverter {
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = service.StackName;
     payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = service.ApplicationName;
     payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = service.ApplicationOwner;
-    payload.spec.ports = service.Ports;
-    payload.spec.selector.app = service.ApplicationName;
+
+    const ports = [];
+    service.Ports.forEach((port) => {
+      const p = {};
+      p.name = port.name;
+      p.port = port.port;
+      p.nodePort = port.nodePort;
+      p.protocol = port.protocol;
+      p.targetPort = port.targetPort;
+      ports.push(p);
+    });
+    payload.spec.ports = ports;
+
+    payload.spec.selector = service.Selector;
     if (service.Headless) {
       payload.spec.clusterIP = KubernetesServiceHeadlessClusterIP;
       delete payload.spec.ports;

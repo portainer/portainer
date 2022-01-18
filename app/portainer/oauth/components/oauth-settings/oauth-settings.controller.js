@@ -3,6 +3,8 @@ import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 import { FeatureId } from '@/portainer/feature-flags/enums';
 import providers, { getProviderByUrl } from './providers';
 
+const MS_TENANT_ID_PLACEHOLDER = 'TENANT_ID';
+
 export default class OAuthSettingsController {
   /* @ngInject */
   constructor($scope) {
@@ -28,11 +30,12 @@ export default class OAuthSettingsController {
   }
 
   onMicrosoftTenantIDChange() {
-    const tenantID = this.state.microsoftTenantID;
+    const tenantID = this.state.microsoftTenantID || MS_TENANT_ID_PLACEHOLDER;
 
     this.settings.AuthorizationURI = `https://login.microsoftonline.com/${tenantID}/oauth2/authorize`;
     this.settings.AccessTokenURI = `https://login.microsoftonline.com/${tenantID}/oauth2/token`;
     this.settings.ResourceURI = `https://graph.windows.net/${tenantID}/me?api-version=2013-11-08`;
+    this.settings.LogoutURI = `https://login.microsoftonline.com/${tenantID}/oauth2/logout`;
   }
 
   useDefaultProviderConfiguration(providerId) {
@@ -123,8 +126,10 @@ export default class OAuthSettingsController {
       this.state.provider = getProviderByUrl(authUrl);
       if (this.state.provider === 'microsoft') {
         const tenantID = authUrl.match(/login.microsoftonline.com\/(.*?)\//)[1];
-        this.state.microsoftTenantID = tenantID;
-        this.onMicrosoftTenantIDChange();
+        if (tenantID !== MS_TENANT_ID_PLACEHOLDER) {
+          this.state.microsoftTenantID = tenantID;
+          this.onMicrosoftTenantIDChange();
+        }
       }
     }
 

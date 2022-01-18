@@ -99,3 +99,7 @@ overrides:
       'jest/globals': true
     rules:
       'react/jsx-no-constructed-context-values': off
+  - files:
+      - app/**/*.stories.*
+    rules:
+      'no-alert': off

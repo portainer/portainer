@@ -15,16 +15,14 @@
           <!-- tab-info -->
           <uib-tab index="0">
             <uib-tab-heading> <i class="fa fa-th-list" aria-hidden="true"></i> Stack </uib-tab-heading>
-            <div style="margin-top: 10px;">
+            <div style="margin-top: 10px">
               <!-- stack-information -->
               <div ng-if="external || orphaned">
-                <div class="col-sm-12 form-section-title">
-                  Information
-                </div>
+                <div class="col-sm-12 form-section-title"> Information </div>
                 <div class="form-group">
                   <span class="small">
                     <p class="text-muted">
-                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                       <span ng-if="external">This stack was created outside of Portainer. Control over this stack is limited.</span>
                       <span ng-if="orphaned">This stack is orphaned. You can reassociate it with the current environment using the "Associate to this environment" feature.</span>
                     </p>
@@ -34,9 +32,7 @@
               <!-- !stack-information -->
               <!-- stack-details -->
               <div>
-                <div class="col-sm-12 form-section-title">
-                  Stack details
-                </div>
+                <div class="col-sm-12 form-section-title"> Stack details </div>
                 <div class="form-group">
                   {{ stackName }}
 
@@ -75,18 +71,26 @@
                     <i class="fa fa-plus space-right" aria-hidden="true"></i>
                     Create template from stack
                   </button>
+                  <button
+                    authorization="PortainerStackUpdate"
+                    ng-if="regular && stackFileContent && !stack.FromAppTemplate && stack.GitConfig"
+                    ng-disabled="state.actionInProgress"
+                    ng-click="detachStackFromGit()"
+                    button-spinner="state.actionInProgress"
+                    class="btn btn-primary btn-xs"
+                  >
+                    <i class="fa fa-arrow-right space-right" aria-hidden="true"></i>
+                    <span ng-hide="state.actionInProgress">Detach from Git</span>
+                    <span ng-show="state.actionInProgress">Detachment in progress...</span>
+                  </button>
                 </div>
               </div>
               <!-- !stack-details -->
 
               <!-- associate -->
               <div ng-if="orphaned">
-                <div class="col-sm-12 form-section-title">
-                  Associate to this environment
-                </div>
-                <p class="small text-muted">
-                  This feature allows you to reassociate this stack to the current environment.
-                </p>
+                <div class="col-sm-12 form-section-title"> Associate to this environment </div>
+                <p class="small text-muted"> This feature allows you to reassociate this stack to the current environment. </p>
                 <form class="form-horizontal">
                   <por-access-control-form form-data="formValues.AccessControlData" hide-title="true"></por-access-control-form>
                   <div class="form-group">
@@ -97,20 +101,24 @@
                         ng-disabled="state.actionInProgress"
                         ng-click="associateStack()"
                         button-spinner="state.actionInProgress"
-                        style="margin-left: -5px;"
+                        style="margin-left: -5px"
                       >
-                        <i class="fa fa-sync" aria-hidden="true" style="margin-right: 3px;"></i>
+                        <i class="fa fa-sync" aria-hidden="true" style="margin-right: 3px"></i>
                         <span ng-hide="state.actionInProgress">Associate</span>
                         <span ng-show="state.actionInProgress">Association in progress...</span>
                       </button>
-                      <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+                      <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px">{{ state.formValidationError }}</span>
                     </div>
                   </div>
                 </form>
               </div>
               <!-- !associate -->
-
-              <stack-redeploy-git-form ng-if="stack.GitConfig && !stack.FromAppTemplate" model="stack.GitConfig" stack="stack" authorization="PortainerStackUpdate">
+              <stack-redeploy-git-form
+                ng-if="stack.GitConfig && !stack.FromAppTemplate && !state.actionInProgress"
+                model="stack.GitConfig"
+                stack="stack"
+                authorization="PortainerStackUpdate"
+              >
               </stack-redeploy-git-form>
               <stack-duplication-form
                 ng-if="regular && endpoints.length > 0"
@@ -128,12 +136,12 @@
           <!-- tab-file -->
           <uib-tab index="1" select="showEditor()" ng-if="!external && (!stack.GitConfig || stack.FromAppTemplate)">
             <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
-            <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px;" name="stackUpdateForm">
+            <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px" name="stackUpdateForm">
               <div class="form-group">
-                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px;" ng-if="stackType == 2 && composeSyntaxMaxVersion == 2">
+                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion == 2">
                   This stack will be deployed using the equivalent of <code>docker-compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
                 </span>
-                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px;" ng-if="stackType == 2 && composeSyntaxMaxVersion > 2">
+                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion > 2">
                   This stack will be deployed using <code>docker-compose</code>.
                 </span>
                 <span class="col-sm-12 text-muted small">
@@ -154,9 +162,7 @@
               </div>
 
               <div>
-                <div class="col-sm-12 form-section-title">
-                  Webhooks
-                </div>
+                <div class="col-sm-12 form-section-title"> Webhooks </div>
                 <div class="form-group">
                   <div class="col-sm-12">
                     <label class="control-label text-left">
@@ -166,7 +172,7 @@
                         message="Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack."
                       ></portainer-tooltip>
                     </label>
-                    <label class="switch box-selector-item limited business" style="margin-left: 20px;">
+                    <label class="switch box-selector-item limited business" style="margin-left: 20px">
                       <input type="checkbox" ng-model="formValues.EnableWebhook" disabled="disabled" ng-checked="true" /><i></i>
                     </label>
                     <be-feature-indicator feature="stackWebhookFeature"></be-feature-indicator>
@@ -185,24 +191,20 @@
               <!-- !environment-variables -->
               <!-- options -->
               <div ng-if="stack.Type === 1 && applicationState.endpoint.apiVersion >= 1.27" authorization="PortainerStackUpdate">
-                <div class="col-sm-12 form-section-title">
-                  Options
-                </div>
+                <div class="col-sm-12 form-section-title"> Options </div>
                 <div class="form-group">
                   <div class="col-sm-12">
                     <label for="prune" class="control-label text-left">
                       Prune services
                       <portainer-tooltip position="bottom" message="Prune services that are no longer referenced."></portainer-tooltip>
                     </label>
-                    <label class="switch" style="margin-left: 20px;"> <input name="prune" type="checkbox" ng-model="formValues.Prune" /><i></i> </label>
+                    <label class="switch" style="margin-left: 20px"> <input name="prune" type="checkbox" ng-model="formValues.Prune" /><i></i> </label>
                   </div>
                 </div>
               </div>
               <!-- !options -->
               <div authorization="PortainerStackUpdate">
-                <div class="col-sm-12 form-section-title">
-                  Actions
-                </div>
+                <div class="col-sm-12 form-section-title"> Actions </div>
                 <div class="form-group">
                   <div class="col-sm-12">
                     <button
@@ -229,17 +231,7 @@
 
 <div class="row" ng-if="containers && (!orphaned || orphanedRunning)">
   <div class="col-sm-12">
-    <containers-datatable
-      title-text="Containers"
-      title-icon="fa-cubes"
-      dataset="containers"
-      table-key="stack-containers"
-      order-by="Status"
-      show-host-column="false"
-      show-add-action="false"
-      not-auto-focus="true"
-      endpoint-public-url="endpoint.PublicURL"
-    ></containers-datatable>
+    <containers-datatable dataset="containers" endpoint="endpoint" table-key="stack-containers"></containers-datatable>
   </div>
 </div>
 

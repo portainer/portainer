@@ -16,9 +16,7 @@
             </div>
           </div>
           <!-- !name-input -->
-          <div class="col-sm-12 form-section-title">
-            Driver configuration
-          </div>
+          <div class="col-sm-12 form-section-title"> Driver configuration </div>
           <!-- driver-input -->
           <div class="form-group">
             <label for="volume_driver" class="col-sm-2 col-md-1 control-label text-left">Driver</label>
@@ -32,7 +30,7 @@
           <!-- !driver-input -->
           <!-- driver-options -->
           <div class="form-group" ng-hide="formValues.CIFSData.useCIFS || formValues.NFSData.useNFS">
-            <div class="col-sm-12" style="margin-top: 5px;">
+            <div class="col-sm-12" style="margin-top: 5px">
               <label class="control-label text-left">
                 Driver options
                 <portainer-tooltip
@@ -40,13 +38,13 @@
                   message="Driver options are specific to the selected driver. Please refer to the selected driver documentation."
                 ></portainer-tooltip>
               </label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addDriverOption()">
+              <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDriverOption()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> add driver option
               </span>
             </div>
             <!-- driver-options-input-list -->
-            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="option in formValues.DriverOptions" style="margin-top: 2px;">
+            <div class="col-sm-12 form-inline" style="margin-top: 10px">
+              <div ng-repeat="option in formValues.DriverOptions" style="margin-top: 2px">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
                   <input type="text" class="form-control" ng-model="option.name" placeholder="e.g. mountpoint" />
@@ -65,42 +63,34 @@
           <!-- !driver-options -->
           <!-- nfs-management -->
           <div class="form-group col-md-12">
-            <label for="useNFS" class="control-label text-left">
-              Use NFS volume
-            </label>
-            <label class="switch" style="margin-left: 20px;">
+            <label for="useNFS" class="control-label text-left"> Use NFS volume </label>
+            <label class="switch" style="margin-left: 20px">
               <input type="checkbox" name="useNFS" ng-model="formValues.NFSData.useNFS" ng-click="formValues.CIFSData.useCIFS = false" />
               <i></i>
             </label>
-            <div ng-if="formValues.NFSData.useNFS" class="small text-muted" style="margin-top: 10px;"> Ensure <code>nfs-utils</code> are installed on your hosts. </div>
+            <div ng-if="formValues.NFSData.useNFS" class="small text-muted" style="margin-top: 10px"> Ensure <code>nfs-utils</code> are installed on your hosts. </div>
           </div>
           <volumes-nfs-form data="formValues.NFSData" ng-show="formValues.Driver === 'local'"></volumes-nfs-form>
           <!-- !nfs-management -->
           <!-- cifs-management -->
           <div class="form-group col-md-12">
-            <label for="useCIFS" class="control-label text-left">
-              Use CIFS volume
-            </label>
-            <label class="switch" style="margin-left: 20px;">
+            <label for="useCIFS" class="control-label text-left"> Use CIFS volume </label>
+            <label class="switch" style="margin-left: 20px">
               <input type="checkbox" name="useCIFS" ng-model="formValues.CIFSData.useCIFS" ng-click="formValues.NFSData.useNFS = false" />
               <i></i>
             </label>
-            <div ng-if="formValues.CIFSData.useCIFS" class="small text-muted" style="margin-top: 10px;"> Ensure <code>cifs-utils</code> are installed on your hosts. </div>
+            <div ng-if="formValues.CIFSData.useCIFS" class="small text-muted" style="margin-top: 10px"> Ensure <code>cifs-utils</code> are installed on your hosts. </div>
           </div>
           <volumes-cifs-form data="formValues.CIFSData" ng-show="formValues.Driver === 'local'"></volumes-cifs-form>
           <!-- !cifs-management -->
           <!-- storidge -->
           <div ng-if="formValues.Driver === 'cio:latest'">
-            <div class="col-sm-12 form-section-title">
-              Storidge
-            </div>
+            <div class="col-sm-12 form-section-title"> Storidge </div>
             <storidge-profile-selector storidge-profile="formValues.StoridgeProfile"></storidge-profile-selector>
           </div>
           <!-- storidge -->
           <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && formValues.Driver === 'local'">
-            <div class="col-sm-12 form-section-title">
-              Deployment
-            </div>
+            <div class="col-sm-12 form-section-title"> Deployment </div>
             <!-- node-selection -->
             <node-selector model="formValues.NodeName"> </node-selector>
             <!-- !node-selection -->
@@ -109,9 +99,7 @@
           <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
+          <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button
@@ -124,7 +112,7 @@
                 <span ng-hide="state.actionInProgress">Create the volume</span>
                 <span ng-show="state.actionInProgress">Creating volume...</span>
               </button>
-              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px">{{ state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->
