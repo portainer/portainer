@@ -141,6 +141,7 @@ angular.module('portainer.app').controller('TemplatesController', [
       var repositoryOptions = {
         RepositoryURL: template.Repository.url,
         ComposeFilePathInRepository: template.Repository.stackfile,
+        FromAppTemplate: true,
       };
 
       const endpointId = +$state.params.endpointId;
@@ -178,6 +179,7 @@ angular.module('portainer.app').controller('TemplatesController', [
       var repositoryOptions = {
         RepositoryURL: template.Repository.url,
         ComposeFilePathInRepository: template.Repository.stackfile,
+        FromAppTemplate: true,
       };
 
       const endpointId = +$state.params.endpointId;
@@ -274,9 +276,10 @@ angular.module('portainer.app').controller('TemplatesController', [
 
       var endpointMode = $scope.applicationState.endpoint.mode;
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
+      const endpointId = +$state.params.endpointId;
 
       $q.all({
-        templates: TemplateService.templates(),
+        templates: TemplateService.templates(endpointId),
         volumes: VolumeService.getVolumes(),
         networks: NetworkService.networks(
           endpointMode.provider === 'DOCKER_STANDALONE' || endpointMode.provider === 'DOCKER_SWARM_MODE',
@@ -294,7 +297,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         })
         .catch(function error(err) {
           $scope.templates = [];
-          Notifications.error('Failure', err, 'An error occured during apps initialization.');
+          Notifications.error('Failure', err, 'An error occurred during apps initialization.');
         });
     }
 

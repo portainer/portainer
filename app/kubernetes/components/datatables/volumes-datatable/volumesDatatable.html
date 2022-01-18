@@ -2,19 +2,25 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
-        <span class="small text-muted" style="float: left; margin-top: 5px;" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
+        <span class="small text-muted" style="float: left; margin-top: 5px" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
           System resources are hidden, this can be changed in the table settings.
         </span>
         <div class="settings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
+          <span
+            class="setting"
+            ng-class="{ 'setting-active': $ctrl.settings.open }"
+            uib-dropdown
+            dropdown-append-to-body
+            auto-close="disabled"
+            is-open="$ctrl.settings.open"
+            data-cy="k8s-vol-table-settings"
+          >
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
-                <div class="menuHeader">
-                  Table settings
-                </div>
+                <div class="menuHeader"> Table settings </div>
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox" ng-if="$ctrl.isAdmin">
@@ -26,9 +32,7 @@
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
                     <div ng-if="$ctrl.settings.repeater.autoRefresh">
-                      <label for="settings_refresh_rate">
-                        Refresh rate
-                      </label>
+                      <label for="settings_refresh_rate"> Refresh rate </label>
                       <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
                         <option value="10">10s</option>
                         <option value="30">30s</option>
@@ -37,13 +41,13 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
                       </span>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8s-vol-table-settings-close">Close</a>
                 </div>
               </div>
             </div>
@@ -176,9 +180,7 @@
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">
-              <span style="margin-right: 5px;">
-                Items per page
-              </span>
+              <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>

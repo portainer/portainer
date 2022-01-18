@@ -1,14 +1,15 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { useRouter } from '@uirouter/react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Widget, WidgetBody } from '@/portainer/components/widget';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { TextInput } from '@/portainer/components/form-components/Input';
 import { Button } from '@/portainer/components/Button';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 import { Code } from '@/portainer/components/Code';
 import { CopyButton } from '@/portainer/components/Button/CopyButton';
+import { Input } from '@/portainer/components/form-components/Input';
 
 import styles from './CreateAccessToken.module.css';
 
@@ -31,6 +32,8 @@ export function CreateAccessToken({
   onSubmit,
   onError,
 }: PropsWithChildren<Props>) {
+  const { t } = useTranslation();
+
   const router = useRouter();
   const [description, setDescription] = useState('');
   const [errorText, setErrorText] = useState('');
@@ -39,9 +42,14 @@ export function CreateAccessToken({
 
   useEffect(() => {
     if (description.length === 0) {
-      setErrorText('this field is required');
+      setErrorText(
+        t(
+          'users.access-tokens.create.form.description-field.error.required',
+          'this field is required'
+        )
+      );
     } else setErrorText('');
-  }, [description]);
+  }, [description, t]);
 
   async function generateAccessToken() {
     if (isLoading) {
@@ -63,43 +71,55 @@ export function CreateAccessToken({
     <Widget>
       <WidgetBody>
         <div>
-          <FormControl inputId="input" label="Description" errors={errorText}>
-            <TextInput
+          <FormControl
+            inputId="input"
+            label={t(
+              'users.access-tokens.create.form.description-field.label',
+              'Description'
+            )}
+            errors={errorText}
+          >
+            <Input
               id="input"
-              onChange={(value) => setDescription(value)}
-              type="text"
+              onChange={(e) => setDescription(e.target.value)}
               value={description}
             />
           </FormControl>
           <Button
             disabled={!!errorText || !!accessToken}
-            onClick={generateAccessToken}
+            onClick={() => generateAccessToken()}
             className={styles.addButton}
           >
-            Add access token
+            {t('users.access-tokens.create.add-button', 'Add access token')}
           </Button>
         </div>
         {accessToken && (
           <>
-            <FormSectionTitle>New access token</FormSectionTitle>
+            <FormSectionTitle>
+              <Trans i18nKey="users.access-tokens.create.new-access-token.title">
+                New access token
+              </Trans>
+            </FormSectionTitle>
             <TextTip>
-              Please copy the new access token. You won&#39;t be able to view
-              the token again.
+              <Trans i18nKey="users.access-tokens.create.new-access-token.explanation">
+                Please copy the new access token. You won&#39;t be able to view
+                the token again.
+              </Trans>
             </TextTip>
             <Code>{accessToken}</Code>
-            <CopyButton
-              copyText={accessToken}
-              className={styles.copyButton}
-              displayText=""
-            >
-              Copy access token
+            <CopyButton copyText={accessToken} className={styles.copyButton}>
+              <Trans i18nKey="users.access-tokens.create.new-access-token.copy-button">
+                Copy access token
+              </Trans>
             </CopyButton>
             <hr />
             <Button
               type="button"
               onClick={() => router.stateService.go('portainer.account')}
             >
-              Done
+              <Trans i18nKey="users.access-tokens.create.done-button">
+                Done
+              </Trans>
             </Button>
           </>
         )}

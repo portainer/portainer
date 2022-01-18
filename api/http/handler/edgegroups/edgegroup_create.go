@@ -88,7 +88,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 		edgeGroup.Endpoints = endpointIDs
 	}
 
-	err = handler.DataStore.EdgeGroup().CreateEdgeGroup(edgeGroup)
+	err = handler.DataStore.EdgeGroup().Create(edgeGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the Edge group inside the database", err}
 	}

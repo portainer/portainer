@@ -1,7 +1,5 @@
 <ng-form name="$ctrl.gitForm">
-  <div class="col-sm-12 form-section-title">
-    Git repository
-  </div>
+  <div class="col-sm-12 form-section-title"> Git repository </div>
   <git-form-url-field value="$ctrl.model.RepositoryURL" on-change="($ctrl.onChangeURL)"></git-form-url-field>
   <git-form-ref-field value="$ctrl.model.RepositoryReferenceName" on-change="($ctrl.onChangeRefName)"></git-form-ref-field>
   <git-form-compose-path-field

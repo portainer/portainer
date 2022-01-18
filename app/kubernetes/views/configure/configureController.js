@@ -6,8 +6,8 @@ import { KubernetesIngressClass } from 'Kubernetes/ingress/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { K8S_SETUP_DEFAULT } from '@/portainer/feature-flags/feature-ids';
-import { HIDE_AUTO_UPDATE_WINDOW } from 'Portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
+
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
 
@@ -15,6 +15,7 @@ class KubernetesConfigureController {
   constructor(
     $async,
     $state,
+    $scope,
     Notifications,
     KubernetesStorageService,
     EndpointService,
@@ -26,6 +27,7 @@ class KubernetesConfigureController {
   ) {
     this.$async = $async;
     this.$state = $state;
+    this.$scope = $scope;
     this.Notifications = Notifications;
     this.KubernetesStorageService = KubernetesStorageService;
     this.EndpointService = EndpointService;
@@ -39,8 +41,10 @@ class KubernetesConfigureController {
 
     this.onInit = this.onInit.bind(this);
     this.configureAsync = this.configureAsync.bind(this);
-    this.limitedFeature = K8S_SETUP_DEFAULT;
-    this.limitedFeatureAutoWindow = HIDE_AUTO_UPDATE_WINDOW;
+    this.limitedFeature = FeatureId.K8S_SETUP_DEFAULT;
+    this.limitedFeatureAutoWindow = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
+    this.onToggleAutoUpdate = this.onToggleAutoUpdate.bind(this);
+    this.onChangeEnableResourceOverCommit = this.onChangeEnableResourceOverCommit.bind(this);
   }
   /* #endregion */
 
@@ -102,6 +106,15 @@ class KubernetesConfigureController {
     return _.find(this.formValues.IngressClasses, { Type: this.IngressClassTypes.TRAEFIK });
   }
   /* #endregion */
+
+  onChangeEnableResourceOverCommit(enabled) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.EnableResourceOverCommit = enabled;
+      if (enabled) {
+        this.formValues.ResourceOverCommitPercentage = 20;
+      }
+    });
+  }
 
   /* #region  CONFIGURE */
   assignFormValuesToEndpoint(endpoint, storageClasses, ingressClasses) {
@@ -242,6 +255,12 @@ class KubernetesConfigureController {
 
   restrictDefaultToggledOn() {
     return this.formValues.RestrictDefaultNamespace && !this.oldFormValues.RestrictDefaultNamespace;
+  }
+
+  onToggleAutoUpdate(value) {
+    return this.$scope.$evalAsync(() => {
+      this.state.autoUpdateSettings.Enabled = value;
+    });
   }
 
   /* #region  ON INIT */

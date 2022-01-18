@@ -13,7 +13,7 @@
   <information-panel ng-if="state.edgeEndpoint && endpoint.EdgeID" title-text="Edge information">
     <span class="small text-muted">
       <p>
-        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
         This Edge environment is associated to an Edge environment {{ state.kubernetesEndpoint ? '(Kubernetes)' : '(Docker)' }}.
       </p>
       <p>
@@ -41,68 +41,69 @@
   <information-panel ng-if="state.edgeEndpoint && !endpoint.EdgeID" title-text="Deploy an agent">
     <span class="small text-muted">
       <p>
-        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
         Refer to the platform related command below to deploy the Edge agent in your remote cluster.
       </p>
       <p>
         The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u>
       </p>
-      <div class="input-group input-group-sm" style="margin-top: 10px; margin-bottom: 10px;">
+      <div class="input-group input-group-sm" style="margin-top: 10px; margin-bottom: 10px">
         <div class="btn-group btn-group-sm">
-          <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'linux'"><i class="fab fa-linux" style="margin-right: 2px;"></i> Linux</label>
-          <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'windows'"><i class="fab fa-windows" style="margin-right: 2px;"></i> Windows</label>
+          <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'linux'"><i class="fab fa-linux" style="margin-right: 2px"></i> Linux</label>
+          <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'windows'"><i class="fab fa-windows" style="margin-right: 2px"></i> Windows</label>
         </div>
       </div>
+
       <por-switch-field
-        label="Allow self-signed certs"
-        ng-model="state.allowSelfSignedCerts"
-        tooltip="When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS"
+        label="'Allow self-signed certs'"
+        checked="state.allowSelfSignedCerts"
+        tooltip="'When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS'"
+        on-change="(onToggleAllowSelfSignedCerts)"
       ></por-switch-field>
-      <div style="margin-top: 10px;">
+
+      <div style="margin-top: 10px">
         <uib-tabset active="state.deploymentTab">
           <uib-tab index="'kubernetes'" heading="Kubernetes" ng-if="state.platformType === 'linux'">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px;">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
               {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
             </code>
           </uib-tab>
           <uib-tab index="'swarm'" heading="Docker Swarm">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px;">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
               {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
             </code>
           </uib-tab>
           <uib-tab index="'standalone'" heading="Docker Standalone">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px;">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
               {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
             </code>
           </uib-tab>
         </uib-tabset>
-        <div style="margin-top: 10px;">
+        <div style="margin-top: 10px">
           <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentDeploymentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy command</span>
-          <span id="copyNotificationDeploymentCommand" style="margin-left: 7px; display: none; color: #23ae89;"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+          <span id="copyNotificationDeploymentCommand" style="margin-left: 7px; display: none; color: #23ae89"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
         </div>
       </div>
-      <div class="col-sm-12 form-section-title" style="margin-top: 25px;">
-        Join token
-      </div>
+      <div class="col-sm-12 form-section-title" style="margin-top: 25px"> Join token </div>
       <p>
-        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
         For those prestaging the edge agent, use the following join token to associate the Edge agent with this environment.
       </p>
       <p> You can read more about pre-staging in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a> </p>
-      <div style="margin-top: 10px; overflow-wrap: break-word;">
+      <div style="margin-top: 10px; overflow-wrap: break-word">
         <code>
           {{ endpoint.EdgeKey }}
         </code>
-        <div style="margin-top: 10px;">
+        <div style="margin-top: 10px">
           <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentKey()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy token</span>
-          <span id="copyNotificationEdgeKey" style="margin-left: 7px; display: none; color: #23ae89;"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+          <span id="copyNotificationEdgeKey" style="margin-left: 7px; display: none; color: #23ae89"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
         </div>
       </div>
     </span>
   </information-panel>
   <information-panel ng-if="state.kubernetesEndpoint && (!state.edgeEndpoint || (state.edgeEndpoint && endpoint.EdgeID))" title-text="Kubernetes features configuration">
     <span class="small text-muted">
-      <i class="fa fa-tools blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-tools blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
       You should configure the features available in this Kubernetes environment in the
       <a ui-sref="portainer.k8sendpoint.kubernetesConfig({id: endpoint.Id})">Kubernetes configuration</a> view.
     </span>
@@ -114,9 +115,7 @@
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal">
-          <div class="col-sm-12 form-section-title">
-            Configuration
-          </div>
+          <div class="col-sm-12 form-section-title"> Configuration </div>
           <!-- name-input -->
           <div class="form-group">
             <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
@@ -185,14 +184,10 @@
             tenant-id="endpoint.AzureCredentials.TenantID"
             authentication-key="endpoint.AzureCredentials.AuthenticationKey"
           ></azure-endpoint-config>
-          <div class="col-sm-12 form-section-title">
-            Metadata
-          </div>
+          <div class="col-sm-12 form-section-title"> Metadata </div>
           <!-- group -->
           <div class="form-group">
-            <label for="endpoint_group" class="col-sm-3 col-lg-2 control-label text-left">
-              Group
-            </label>
+            <label for="endpoint_group" class="col-sm-3 col-lg-2 control-label text-left"> Group </label>
             <div class="col-sm-9 col-lg-10">
               <select ng-options="group.Id as group.Name for group in groups" ng-model="endpoint.GroupId" id="endpoint_group" class="form-control"></select>
             </div>
@@ -205,9 +200,7 @@
           <!-- !tags -->
           <!-- endpoint-security -->
           <div ng-if="endpointType === 'remote' && !state.azureEndpoint && !state.kubernetesEndpoint && !state.edgeEndpoint && endpoint.Type !== 6">
-            <div class="col-sm-12 form-section-title">
-              Security
-            </div>
+            <div class="col-sm-12 form-section-title"> Security </div>
             <por-endpoint-security form-data="formValues.SecurityFormData" endpoint="endpoint"></por-endpoint-security>
           </div>
           <!-- !endpoint-security -->

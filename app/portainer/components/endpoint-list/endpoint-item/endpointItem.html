@@ -51,15 +51,15 @@
       <div class="blocklist-item-line endpoint-item" ng-if="$ctrl.model.Snapshots[0]">
         <span class="blocklist-item-desc">
           <span>
-            <span style="padding: 0 7px 0 0;">
+            <span style="padding: 0 7px 0 0">
               <i class="fa fa-th-list space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].StackCount }}
               {{ $ctrl.model.Snapshots[0].StackCount === 1 ? 'stack' : 'stacks' }}
             </span>
-            <span style="padding: 0 7px 0 7px;" ng-if="$ctrl.model.Snapshots[0].Swarm">
+            <span style="padding: 0 7px 0 7px" ng-if="$ctrl.model.Snapshots[0].Swarm">
               <i class="fa fa-list-alt space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].ServiceCount }}
               {{ $ctrl.model.Snapshots[0].ServiceCount === 1 ? 'service' : 'services' }}
             </span>
-            <span style="padding: 0 7px 0 7px;">
+            <span style="padding: 0 7px 0 7px">
               <i class="fa fa-cubes space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount }}
               {{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount === 1 ? 'container' : 'containers' }}
               <span ng-if="$ctrl.model.Snapshots[0].RunningContainerCount > 0 || $ctrl.model.Snapshots[0].StoppedContainerCount > 0">
@@ -71,11 +71,11 @@
                 <i class="fa fa-heartbeat orange-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].UnhealthyContainerCount }}
               </span>
             </span>
-            <span style="padding: 0 7px 0 7px;">
+            <span style="padding: 0 7px 0 7px">
               <i class="fa fa-hdd space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].VolumeCount }}
               {{ $ctrl.model.Snapshots[0].VolumeCount === 1 ? 'volume' : 'volumes' }}
             </span>
-            <span style="padding: 0 7px 0 7px;">
+            <span style="padding: 0 7px 0 7px">
               <i class="fa fa-clone space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].ImageCount }}
               {{ $ctrl.model.Snapshots[0].ImageCount === 1 ? 'image' : 'images' }}
             </span>
@@ -84,7 +84,7 @@
         <span class="small text-muted">
           {{ $ctrl.model.Snapshots[0].Swarm ? 'Swarm' : 'Standalone' }} {{ $ctrl.model.Snapshots[0].DockerVersion }}
           <span ng-if="$ctrl.model.Type === 2">+ <i class="fa fa-bolt" aria-hidden="true"></i> Agent</span>
-          <span style="padding: 0 7px 0 0;" ng-if="$ctrl.model.Snapshots[0].Swarm">
+          <span style="padding: 0 7px 0 0" ng-if="$ctrl.model.Snapshots[0].Swarm">
             <i class="fa fa-hdd space-left space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].NodeCount }}
             {{ $ctrl.model.Snapshots[0].NodeCount === 1 ? 'node' : 'nodes' }}
           </span>
@@ -92,23 +92,21 @@
       </div>
 
       <div class="blocklist-item-line endpoint-item" ng-if="!$ctrl.model.Snapshots[0] && $ctrl.model.Type !== 5 && $ctrl.model.Type !== 6 && $ctrl.model.Type !== 7">
-        <span class="blocklist-item-desc">
-          No snapshot available
-        </span>
+        <span class="blocklist-item-desc"> No snapshot available </span>
       </div>
 
       <div class="blocklist-item-line endpoint-item" ng-if="$ctrl.model.Kubernetes.Snapshots[0] && ($ctrl.model.Type === 5 || $ctrl.model.Type === 6 || $ctrl.model.Type === 7)">
         <span class="blocklist-item-desc">
           <span>
-            <span style="padding: 0 7px 0 0;"> <i class="fa fa-microchip space-right" aria-hidden="true"></i>{{ $ctrl.model.Kubernetes.Snapshots[0].TotalCPU }} CPU </span>
-            <span style="padding: 0 7px 0 7px;">
+            <span style="padding: 0 7px 0 0"> <i class="fa fa-microchip space-right" aria-hidden="true"></i>{{ $ctrl.model.Kubernetes.Snapshots[0].TotalCPU }} CPU </span>
+            <span style="padding: 0 7px 0 7px">
               <i class="fa fa-memory space-right" aria-hidden="true"></i>{{ $ctrl.model.Kubernetes.Snapshots[0].TotalMemory | humansize }} RAM
             </span>
           </span>
         </span>
         <span class="small text-muted">
           Kubernetes {{ $ctrl.model.Kubernetes.Snapshots[0].KubernetesVersion }}
-          <span style="padding: 0 0 0 7px;">
+          <span style="padding: 0 0 0 7px">
             <i class="fa fa-hdd space-left space-right" aria-hidden="true"></i>
             {{ $ctrl.model.Kubernetes.Snapshots[0].NodeCount }} {{ $ctrl.model.Kubernetes.Snapshots[0].NodeCount === 1 ? 'node' : 'nodes' }}
           </span>
@@ -116,9 +114,7 @@
       </div>
 
       <div class="blocklist-item-line endpoint-item" ng-if="!$ctrl.model.Kubernetes.Snapshots[0] && ($ctrl.model.Type === 5 || $ctrl.model.Type === 6 || $ctrl.model.Type === 7)">
-        <span class="blocklist-item-desc">
-          -
-        </span>
+        <span class="blocklist-item-desc"> - </span>
       </div>
 
       <div class="blocklist-item-line endpoint-item">

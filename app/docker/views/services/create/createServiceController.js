@@ -165,6 +165,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     $scope.removeConfig = function (index) {
       $scope.formValues.Configs.splice(index, 1);
+      $scope.checkIfConfigDuplicated();
     };
 
     $scope.addSecret = function () {
@@ -173,6 +174,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     $scope.removeSecret = function (index) {
       $scope.formValues.Secrets.splice(index, 1);
+      $scope.checkIfSecretDuplicated();
     };
 
     $scope.addPlacementConstraint = function () {
@@ -213,6 +215,36 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     $scope.removeLogDriverOpt = function (index) {
       $scope.formValues.LogDriverOpts.splice(index, 1);
+    };
+
+    $scope.checkIfSecretDuplicated = function () {
+      $scope.formValues.Secrets.$invalid = false;
+      [...$scope.formValues.Secrets]
+        .sort((a, b) => a.model.Id.localeCompare(b.model.Id))
+        .sort((a, b) => {
+          if (a.model.Id === b.model.Id) {
+            $scope.formValues.Secrets.$invalid = true;
+            $scope.formValues.Secrets.$error = 'Secret ' + a.model.Name + ' cannot be assigned multiple times.';
+          }
+        });
+      if (!$scope.formValues.Secrets.$invalid) {
+        $scope.formValues.Secrets.$error = '';
+      }
+    };
+
+    $scope.checkIfConfigDuplicated = function () {
+      $scope.formValues.Configs.$invalid = false;
+      [...$scope.formValues.Configs]
+        .sort((a, b) => a.model.Id.localeCompare(b.model.Id))
+        .sort((a, b) => {
+          if (a.model.Id === b.model.Id) {
+            $scope.formValues.Configs.$invalid = true;
+            $scope.formValues.Configs.$error = 'Config ' + a.model.Name + ' cannot be assigned multiple times.';
+          }
+        });
+      if (!$scope.formValues.Configs.$invalid) {
+        $scope.formValues.Configs.$error = '';
+      }
     };
 
     function prepareImageConfig(config, input) {
@@ -511,7 +543,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';
-      error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+      error = FormValidator.validateAccessControl(accessControlData, isAdmin) || $scope.formValues.Secrets.$error || $scope.formValues.Configs.$error;
 
       if (error) {
         $scope.state.formValidationError = error;

@@ -1,9 +1,7 @@
 <!-- use registry -->
 <div>
   <div class="form-group" ng-if="$ctrl.model.UseRegistry">
-    <label for="image_registry" class="control-label text-left" ng-class="$ctrl.labelClass">
-      Registry
-    </label>
+    <label for="image_registry" class="control-label text-left" ng-class="$ctrl.labelClass"> Registry </label>
     <div ng-class="$ctrl.inputClass">
       <select
         ng-options="registry as registry.Name for registry in $ctrl.registries track by registry.Id"
@@ -47,8 +45,8 @@
   <div ng-if="!$ctrl.model.UseRegistry">
     <div class="form-group">
       <span class="small">
-        <p class="text-muted" style="margin-left: 15px;">
-          <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        <p class="text-muted" style="margin-left: 15px">
+          <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
           When using advanced mode, image and repository <b>must be</b> publicly available.
         </p>
       </span>

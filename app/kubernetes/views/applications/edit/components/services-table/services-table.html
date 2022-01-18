@@ -1,0 +1,56 @@
+<!-- table -->
+<div style="margin-top: 15px">
+  <table class="table">
+    <tbody>
+      <tr class="text-muted">
+        <td style="width: 15%">Service name</td>
+        <td style="width: 10%">Type</td>
+        <td style="width: 10%">Cluster IP</td>
+        <td style="width: 10%">External IP</td>
+        <td style="width: 10%">Container port</td>
+        <td style="width: 15%">Service port(s)</td>
+      </tr>
+      <tr ng-repeat="service in $ctrl.services">
+        <td>{{ service.metadata.name }}</td>
+        <td>{{ service.spec.type }}</td>
+        <td>{{ service.spec.clusterIP }}</td>
+        <td ng-show="service.spec.type === 'LoadBalancer'">
+          <div ng-show="service.status.loadBalancer.ingress">
+            <a target="_blank" ng-href="http://{{ service.status.loadBalancer.ingress[0].ip }}:{{ service.spec.ports[0].port }}">
+              <i class="fa fa-external-link-alt" aria-hidden="true"></i>
+              <span data-cy="k8sAppDetail-containerPort"> Access </span>
+            </a>
+          </div>
+          <div ng-show="!service.status.loadBalancer.ingress">
+            {{ service.spec.externalIP ? service.spec.externalIP : 'pending...' }}
+          </div>
+        </td>
+        <td ng-show="service.spec.type !== 'LoadBalancer'">{{ service.spec.externalIP ? service.spec.externalIP : '-' }}</td>
+
+        <td data-cy="k8sAppDetail-containerPort">
+          <div ng-repeat="port in service.spec.ports">{{ port.targetPort }}</div>
+        </td>
+        <td ng-if="!ctrl.portHasIngressRules(port)">
+          <div ng-repeat="port in service.spec.ports">
+            <a ng-if="$ctrl.publicUrl && port.nodePort" ng-href="http://{{ $ctrl.publicUrl }}:{{ port.nodePort }}" target="_blank" style="margin-left: 5px">
+              <i class="fa fa-external-link-alt" aria-hidden="true"></i>
+              <span data-cy="k8sAppDetail-containerPort">
+                {{ port.port }}
+              </span>
+              <span>{{ port.nodePort ? ':' : '' }}</span>
+              <span data-cy="k8sAppDetail-nodePort"> {{ port.nodePort }}/{{ port.protocol }} </span>
+            </a>
+
+            <div ng-if="!$ctrl.publicUrl">
+              <span data-cy="k8sAppDetail-servicePort">
+                {{ port.port }}
+              </span>
+              <span>{{ port.nodePort ? ':' : '' }}</span>
+              <span data-cy="k8sAppDetail-nodePort"> {{ port.nodePort }}/{{ port.protocol }} </span>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

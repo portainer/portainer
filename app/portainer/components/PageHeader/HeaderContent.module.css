@@ -1,0 +1,19 @@
+.user-links {
+  margin-right: 25px;
+}
+
+.user-links > * + * {
+  margin-left: 5px;
+}
+
+.link {
+  cursor: pointer;
+}
+
+.link .link-text {
+  text-decoration: underline;
+}
+
+.link .link-icon {
+  margin-right: 2px;
+}

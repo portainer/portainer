@@ -1,0 +1,9 @@
+.alert-visible {
+  opacity: 1;
+  transition: all 250ms linear;
+}
+
+.alert-hidden {
+  opacity: 0;
+  transition: all 250ms ease-out 2s;
+}

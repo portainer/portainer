@@ -14,9 +14,7 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" autocomplete="off">
-            <div class="col-sm-12 form-section-title">
-              Console
-            </div>
+            <div class="col-sm-12 form-section-title"> Console </div>
             <!-- Command -->
             <div class="form-group">
               <label for="console_command" class="col-sm-1 control-label text-left">Command</label>
@@ -43,7 +41,7 @@
                 <button
                   type="button"
                   class="btn btn-primary btn-sm"
-                  style="margin: 0;"
+                  style="margin: 0"
                   ng-if="!ctrl.state.connected"
                   ng-disabled="!ctrl.state.command || ctrl.state.connected"
                   ng-click="ctrl.connectConsole()"
@@ -52,9 +50,7 @@
                   <span ng-hide="ctrl.state.actionInProgress">Connect</span>
                   <span ng-show="ctrl.state.actionInProgress">Connection in progress...</span>
                 </button>
-                <button type="button" class="btn btn-primary btn-sm" style="margin: 0;" ng-if="ctrl.state.connected" ng-click="ctrl.disconnect()">
-                  Disconnect
-                </button>
+                <button type="button" class="btn btn-primary btn-sm" style="margin: 0" ng-if="ctrl.state.connected" ng-click="ctrl.disconnect()"> Disconnect </button>
               </div>
             </div>
           </form>

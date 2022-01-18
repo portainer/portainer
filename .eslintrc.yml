@@ -9,6 +9,7 @@ globals:
 
 extends:
   - 'eslint:recommended'
+  - 'plugin:storybook/recommended'
   - prettier
 
 plugins:
@@ -60,6 +61,7 @@ overrides:
       - 'plugin:@typescript-eslint/recommended'
       - 'plugin:@typescript-eslint/eslint-recommended'
       - 'plugin:promise/recommended'
+      - 'plugin:storybook/recommended'
       - prettier # should be last
     settings:
       react:
@@ -77,12 +79,17 @@ overrides:
       react/forbid-prop-types: off
       react/require-default-props: off
       react/no-array-index-key: off
+      no-underscore-dangle: off
       react/jsx-filename-extension: [0]
       import/no-extraneous-dependencies: ['error', { devDependencies: true }]
       '@typescript-eslint/explicit-module-boundary-types': off
       '@typescript-eslint/no-unused-vars': 'error'
       '@typescript-eslint/no-explicit-any': 'error'
       'jsx-a11y/label-has-associated-control': ['error', { 'assert': 'either' }]
+      'react/function-component-definition': ['error', { 'namedComponents': 'function-declaration' }]
+      'react/jsx-no-bind': off
+      'no-await-in-loop': 'off'
+      'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }]
   - files:
       - app/**/*.test.*
     extends:
@@ -90,3 +97,9 @@ overrides:
       - 'plugin:jest/style'
     env:
       'jest/globals': true
+    rules:
+      'react/jsx-no-constructed-context-values': off
+  - files:
+      - app/**/*.stories.*
+    rules:
+      'no-alert': off

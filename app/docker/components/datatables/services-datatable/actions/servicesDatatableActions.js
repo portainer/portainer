@@ -6,5 +6,6 @@ angular.module('portainer.docker').component('servicesDatatableActions', {
     selectedItemCount: '=',
     showUpdateAction: '<',
     showAddAction: '<',
+    endpointId: '<',
   },
 });

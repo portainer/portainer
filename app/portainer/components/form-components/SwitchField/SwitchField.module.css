@@ -1,0 +1,9 @@
+.root {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.label {
+  padding: 0;
+}

@@ -2,9 +2,10 @@ package webhooks
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils/access"
-	"net/http"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gofrs/uuid"
@@ -12,13 +13,12 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type webhookCreatePayload struct {
 	ResourceID  string
 	EndpointID  int
-	RegistryID portainer.RegistryID
+	RegistryID  portainer.RegistryID
 	WebhookType int
 }
 
@@ -56,7 +56,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	webhook, err := handler.DataStore.Webhook().WebhookByResourceID(payload.ResourceID)
-	if err != nil && err != bolterrors.ErrObjectNotFound {
+	if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusInternalServerError, "An error occurred retrieving webhooks from the database", err}
 	}
 	if webhook != nil {
@@ -90,7 +90,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		WebhookType: portainer.WebhookType(payload.WebhookType),
 	}
 
-	err = handler.DataStore.Webhook().CreateWebhook(webhook)
+	err = handler.DataStore.Webhook().Create(webhook)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the webhook inside the database", err}
 	}

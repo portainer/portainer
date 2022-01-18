@@ -8,19 +8,17 @@
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal">
-          <div class="col-sm-12 form-section-title">
-            Registry provider
-          </div>
+          <div class="col-sm-12 form-section-title"> Registry provider </div>
 
           <div class="form-group"></div>
 
-          <div class="form-group" style="margin-bottom: 0;">
+          <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div>
                 <input type="radio" id="registry_dockerhub" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.DOCKERHUB" />
                 <label for="registry_dockerhub" ng-click="$ctrl.selectDockerHub()">
                   <div class="boxselector_header">
-                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px"></i>
                     DockerHub
                   </div>
                   <p>DockerHub authenticated account</p>
@@ -30,7 +28,7 @@
                 <input type="radio" id="registry_aws_ecr" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.ECR" />
                 <label for="registry_aws_ecr" ng-click="$ctrl.selectEcr()">
                   <div class="boxselector_header">
-                    <i class="fab fa-aws" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fab fa-aws" aria-hidden="true" style="margin-right: 2px"></i>
                     AWS ECR
                   </div>
                   <p>Amazon elastic container registry</p>
@@ -40,7 +38,7 @@
                 <input type="radio" id="registry_quay" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.QUAY" />
                 <label for="registry_quay" ng-click="$ctrl.selectQuayRegistry()">
                   <div class="boxselector_header">
-                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px"></i>
                     Quay.io
                   </div>
                   <p>Quay container registry</p>
@@ -50,7 +48,7 @@
                 <input type="radio" id="registry_proget" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.PROGET" />
                 <label for="registry_proget" ng-click="$ctrl.selectProGetRegistry()">
                   <div class="boxselector_header">
-                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px"></i>
                     ProGet
                   </div>
                   <p>ProGet container registry</p>
@@ -60,7 +58,7 @@
                 <input type="radio" id="registry_azure" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.AZURE" />
                 <label for="registry_azure" ng-click="$ctrl.selectAzureRegistry()">
                   <div class="boxselector_header">
-                    <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px"></i>
                     Azure
                   </div>
                   <p>Azure container registry</p>
@@ -70,7 +68,7 @@
                 <input type="radio" id="registry_gitlab" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.GITLAB" />
                 <label for="registry_gitlab" ng-click="$ctrl.selectGitlabRegistry()">
                   <div class="boxselector_header">
-                    <i class="fab fa-gitlab" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fab fa-gitlab" aria-hidden="true" style="margin-right: 2px"></i>
                     Gitlab
                   </div>
                   <p>Gitlab container registry</p>
@@ -80,7 +78,7 @@
                 <input type="radio" id="registry_custom" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.CUSTOM" />
                 <label for="registry_custom" ng-click="$ctrl.selectCustomRegistry()">
                   <div class="boxselector_header">
-                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px"></i>
                     Custom registry
                   </div>
                   <p>Define your own registry</p>

@@ -141,8 +141,11 @@ export class HostBrowserController {
     return this.$async(this.onFileSelectedForUploadAsync, file);
   }
   async onFileSelectedForUploadAsync(file) {
+    if (!this.endpointId) {
+      throw new Error('missing endpoint id');
+    }
     try {
-      await this.HostBrowserService.upload(this.state.path, file);
+      await this.HostBrowserService.upload(this.endpointId, this.state.path, file);
       this.onFileUploaded();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to upload file');

@@ -3,7 +3,7 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i>
+          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i>
           Edge Stacks
         </div>
         <div class="settings" data-cy="edgeStack-stackTableSettings">
@@ -11,9 +11,7 @@
             <span uib-dropdown-toggle> <i class="fa fa-cog" aria-hidden="true"></i> Settings </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
-                <div class="menuHeader">
-                  Table settings
-                </div>
+                <div class="menuHeader"> Table settings </div>
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox">
@@ -27,9 +25,7 @@
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
                     <div ng-if="$ctrl.settings.repeater.autoRefresh">
-                      <label for="settings_refresh_rate">
-                        Refresh rate
-                      </label>
+                      <label for="settings_refresh_rate"> Refresh rate </label>
                       <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
                         <option value="10">10s</option>
                         <option value="30">30s</option>
@@ -38,15 +34,13 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
                       </span>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">
-                    Close
-                  </a>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;"> Close </a>
                 </div>
               </div>
             </div>
@@ -94,9 +88,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
-                Status
-              </th>
+              <th> Status </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('CreationDate')">
                   Creation Date
@@ -127,9 +119,7 @@
               <td colspan="4" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0" data-cy="edgeStack-noStackRow">
-              <td colspan="4" class="text-center text-muted">
-                No stack available.
-              </td>
+              <td colspan="4" class="text-center text-muted"> No stack available. </td>
             </tr>
           </tbody>
         </table>
@@ -139,9 +129,7 @@
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">
-              <span style="margin-right: 5px;">
-                Items per page
-              </span>
+              <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
