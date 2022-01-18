@@ -273,7 +273,7 @@ angular
               TLSCertFile,
               TLSKeyFile,
               CheckinInterval,
-              $scope.state.isEdgeDevice,
+              $scope.state.isEdgeDevice
             );
 
             Notifications.success('Environment created', name);

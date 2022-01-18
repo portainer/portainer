@@ -33,7 +33,12 @@ export function FileUploadField({
         onChange={changeHandler}
         aria-label="file-input"
       />
-      <Button size="small" color="primary" onClick={handleButtonClick} className={styles.fileButton}>
+      <Button
+        size="small"
+        color="primary"
+        onClick={handleButtonClick}
+        className={styles.fileButton}
+      >
         {title}
       </Button>
 

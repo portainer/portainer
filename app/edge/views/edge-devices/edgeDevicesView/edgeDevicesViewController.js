@@ -1,6 +1,6 @@
 import EndpointHelper from 'Portainer/helpers/endpointHelper';
 import { getEndpoints } from 'Portainer/environments/environment.service';
-import {EnvironmentType} from "Portainer/environments/types";
+import { EnvironmentType } from 'Portainer/environments/types';
 
 angular.module('portainer.edge').controller('EdgeDevicesViewController', EdgeDevicesViewController);
 /* @ngInject */
@@ -12,7 +12,7 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
   this.getEnvironments = function () {
     return $async(async () => {
       try {
-        const [endpointsResponse, groups] = await Promise.all([getEndpoints(0, 100, {types: [EnvironmentType.EdgeAgentOnDocker]}), GroupService.groups()])
+        const [endpointsResponse, groups] = await Promise.all([getEndpoints(0, 100, { types: [EnvironmentType.EdgeAgentOnDocker] }), GroupService.groups()]);
         EndpointHelper.mapGroupNameToEndpoint(endpointsResponse.value, groups);
         ctrl.edgeDevices = endpointsResponse.value;
       } catch (err) {
@@ -20,7 +20,7 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
         ctrl.edgeDevices = [];
       }
     });
-  }
+  };
 
   this.getSettings = function () {
     return $async(async () => {

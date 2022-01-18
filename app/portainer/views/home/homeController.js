@@ -1,5 +1,5 @@
 import EndpointHelper from 'Portainer/helpers/endpointHelper';
-import { getEndpoints } from "Portainer/environments/environment.service";
+import { getEndpoints } from 'Portainer/environments/environment.service';
 
 angular
   .module('portainer.app')

@@ -104,7 +104,7 @@ angular.module('portainer.app').factory('EndpointService', [
       TLSCertFile,
       TLSKeyFile,
       checkinInterval,
-      isEdgeDevice,
+      isEdgeDevice
     ) {
       var deferred = $q.defer();
 

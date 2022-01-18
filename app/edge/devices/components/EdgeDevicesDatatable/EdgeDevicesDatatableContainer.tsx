@@ -20,7 +20,7 @@ export function EdgeDevicesDatatableContainer({
 
   return (
     <TableSettingsProvider defaults={defaultSettings} storageKey="edgeDevices">
-      <SearchBarProvider>
+      <SearchBarProvider storageKey="edgeDevices">
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <EdgeDevicesDatatable {...props} />
       </SearchBarProvider>

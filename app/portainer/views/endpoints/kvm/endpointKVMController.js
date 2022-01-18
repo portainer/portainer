@@ -17,13 +17,13 @@ class EndpointKVMController {
     this.$state.deviceId = $transition$.params().deviceId;
     this.$state.deviceName = $transition$.params().deviceName;
 
-    $scope.maximize = function() {
+    $scope.maximize = function () {
       this.$state.maximized = true;
-    }
+    };
 
-    $scope.minimize = function() {
+    $scope.minimize = function () {
       this.$state.maximized = false;
-    }
+    };
   }
 
   async $onInit() {
@@ -49,7 +49,7 @@ class EndpointKVMController {
       } catch (e) {
         this.Notifications.error('Failure', e, `Failed to load kvm for device`);
       }
-    })
+    });
   }
 }
 

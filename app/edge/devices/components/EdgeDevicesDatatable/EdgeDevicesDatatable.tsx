@@ -142,11 +142,7 @@ export function EdgeDevicesDatatable({
         />
       </TableActions>
 
-      <SearchBar
-        value={searchBarValue}
-        onChange={handleSearchBarChange}
-        autoFocus={false}
-      />
+      <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
 
       <Table
         className={tableProps.className}

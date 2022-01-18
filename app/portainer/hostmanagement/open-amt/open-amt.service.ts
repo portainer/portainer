@@ -1,6 +1,6 @@
 import axios, { parseAxiosError } from 'Portainer/services/axios';
 
-import { EnvironmentId } from "@/portainer/environments/types";
+import { EnvironmentId } from '@/portainer/environments/types';
 
 import {
   OpenAMTConfiguration,
