@@ -18,23 +18,15 @@ import {
   TableTitle,
 } from '@/portainer/components/datatables/components';
 import { FDOProfilesTableSettings } from '@/edge/devices/types';
+import { useFDOProfiles } from "@/portainer/settings/edge-compute/FDOProfilesDatatable/useFDOProfiles";
 
 import { useColumns } from './columns';
 
-export interface FDOProfilesDatatableProps {
-  profiles: Profile[];
-  isLoading: boolean;
-  error?: PortainerError;
-}
-
-export function FDOProfilesDatatable({
-  profiles,
-  isLoading,
-  error,
-}: FDOProfilesDatatableProps) {
-  const { settings, setTableSettings } =
-    useTableSettings<FDOProfilesTableSettings>();
+export function FDOProfilesDatatable() {
+  const { settings, setTableSettings } = useTableSettings<FDOProfilesTableSettings>();
   const columns = useColumns();
+
+    const { isLoading, profiles, error } = useFDOProfiles();
 
   const {
     getTableProps,

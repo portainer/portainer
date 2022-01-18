@@ -27,8 +27,12 @@ export async function createProfileFromFileContent(
     profileName: string,
     profileFileContent: string,
 ) {
+  const payload: Record<string, unknown> = {
+    Name: profileName,
+    ProfileFileContent: profileFileContent,
+  };
   try {
-    await axios.post(`${BASE_URL}/profiles`, payload); // TODO mrydel
+    await axios.post(`${BASE_URL}/profiles`, payload);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to create profile');
   }

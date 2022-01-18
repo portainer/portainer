@@ -25,7 +25,7 @@ function EndpointController(
   Authentication,
   SettingsService,
   ModalService,
-  StateManager,
+  StateManager
 ) {
   const DEPLOYMENT_TABS = {
     SWARM: 'swarm',

@@ -9,9 +9,6 @@ export function useFDOProfiles() {
   const { isLoading, data, isError, error } = useQuery(
     ['fdo_profiles'],
     () => getProfiles(),
-    {
-      keepPreviousData: true,
-    }
   );
 
   useEffect(() => {
@@ -26,15 +23,7 @@ export function useFDOProfiles() {
 
   const profiles = useMemo(() => data || [], [data]);
 
-  useEffect(() => {
-    if (isError) {
-      notifications.error(
-        'Failure',
-        error as Error,
-        'Failed retrieving FDO profiles'
-      );
-    }
-  }, [isError, error]);
+  console.log(profiles);
 
   return {
     isLoading,

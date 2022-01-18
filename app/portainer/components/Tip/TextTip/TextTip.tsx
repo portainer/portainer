@@ -6,12 +6,12 @@ import styles from './TextTip.module.css';
 type Color = 'orange' | 'blue';
 
 export interface Props {
-    color?: Color;
+  color?: Color;
 }
 
 export function TextTip({
-    color = 'orange',
-    children,
+  color = 'orange',
+  children,
 }: PropsWithChildren<Props>) {
   return (
     <p className="text-muted small">

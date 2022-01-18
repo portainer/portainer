@@ -12,7 +12,11 @@ interface Props<D extends object> {
   value: string[];
 }
 
-export function ColumnVisibilityMenu<D extends object>({ columns, onChange, value }: Props<D>) {
+export function ColumnVisibilityMenu<D extends object>({
+  columns,
+  onChange,
+  value,
+}: Props<D>) {
   useTableContext();
 
   return (

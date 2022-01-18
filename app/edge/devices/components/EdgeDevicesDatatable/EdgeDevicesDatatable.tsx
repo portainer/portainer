@@ -142,10 +142,7 @@ export function EdgeDevicesDatatable({
         />
       </TableActions>
 
-      <SearchBar
-        value={searchBarValue}
-        onChange={handleSearchBarChange}
-      />
+      <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
 
       <Table
         className={tableProps.className}
