@@ -9,7 +9,7 @@ export function FDOProfilesDatatableContainer() {
   };
 
   return (
-    <TableSettingsProvider defaults={defaultSettings} storageKey="edgeDevices">
+    <TableSettingsProvider defaults={defaultSettings} storageKey="fdoProfiles">
       <FDOProfilesDatatable />
     </TableSettingsProvider>
   );

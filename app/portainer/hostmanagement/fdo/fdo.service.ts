@@ -52,3 +52,11 @@ export async function getProfiles() {
     throw parseAxiosError(e as Error, 'Unable to retrieve the profiles');
   }
 }
+
+export async function deleteProfile(profileId: number) {
+  try {
+    await axios.delete(`${BASE_URL}/profiles/${profileId}`);
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to delete profile');
+  }
+}

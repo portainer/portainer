@@ -29,6 +29,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 
 	h.Handle("/fdo/profiles", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoProfiles))).Methods(http.MethodGet)
 	h.Handle("/fdo/profiles", bouncer.AdminAccess(httperror.LoggerHandler(h.createProfile))).Methods(http.MethodPost)
+	// h.Handle("/fdo/profiles/{id}", bouncer.AdminAccess(httperror.LoggerHandler(h.updateProfile))).Methods(http.MethodPut)
+	h.Handle("/fdo/profiles/{id}", bouncer.AdminAccess(httperror.LoggerHandler(h.deleteProfile))).Methods(http.MethodDelete)
 	// TODO mrydel update/delete profile
 
 	return h

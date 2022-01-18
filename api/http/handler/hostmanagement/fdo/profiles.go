@@ -61,6 +61,7 @@ func (payload *createProfileFromFileContentPayload) Validate(r *http.Request) er
 // @produce json
 // @success 200 "Success"
 // @failure 400 "Invalid request"
+// @failure 409 "Profile name already exists"
 // @failure 500 "Server error"
 // @router /fdo/profiles [post]
 func (handler *Handler) createProfile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -125,4 +126,29 @@ func (handler *Handler) checkUniqueProfileName(name string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// @id createProfiles
+// @summary creates a new FDO Profile
+// @description creates a new FDO Profile
+// @description **Access policy**: administrator
+// @tags intel
+// @security jwt
+// @produce json
+// @success 200 "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /fdo/profiles/{id} [delete]
+func (handler *Handler) deleteProfile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.New("missing 'id' query parameter")}
+	}
+
+	err = handler.DataStore.FDOProfile().Delete(portainer.FDOProfileID(id))
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to delete Profile", Err: err}
+	}
+
+	return response.Empty(w)
 }
