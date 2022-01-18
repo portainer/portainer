@@ -163,6 +163,8 @@ export function confirmStackUpdate(
   );
   const checkboxLabel = box.find('.form-check-label');
   checkboxLabel.addClass('switch box-selector-item limited business');
+  const switchEle = checkboxLabel.find('i');
+  switchEle.prop('style', 'margin-left:20px');
 }
 
 export function confirmKubeconfigSelection(
