@@ -95,6 +95,7 @@ function EndpointController(
     const command = $scope.dockerCommands[$scope.state.deploymentTab][$scope.state.platformType](
       $scope.agentVersion,
       $scope.agentShortVersion,
+      $scope.agentSecret,
       $scope.randomEdgeID,
       $scope.endpoint.EdgeKey,
       $scope.state.allowSelfSignedCerts
@@ -286,7 +287,7 @@ function EndpointController(
     });
   }
 
-  function buildLinuxStandaloneCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts, agentSecret) {
+  function buildLinuxStandaloneCommand(agentVersion, agentShortVersion, agentSecret, edgeId, edgeKey, allowSelfSignedCerts) {
     let secret = agentSecret == '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
     return `
 docker run -d \\
@@ -304,7 +305,7 @@ docker run -d \\
   portainer/agent:${agentVersion}`;
   }
 
-  function buildWindowsStandaloneCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts, agentSecret) {
+  function buildWindowsStandaloneCommand(agentVersion, agentShortVersion, agentSecret, edgeId, edgeKey, allowSelfSignedCerts) {
     let secret = agentSecret == '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
     return `
 docker run -d \\
@@ -321,7 +322,7 @@ docker run -d \\
   portainer/agent:${agentVersion}`;
   }
 
-  function buildLinuxSwarmCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts, agentSecret) {
+  function buildLinuxSwarmCommand(agentVersion, agentShortVersion, agentSecret, edgeId, edgeKey, allowSelfSignedCerts) {
     let secret = agentSecret == '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
     return `
 docker network create \\
@@ -346,7 +347,7 @@ docker service create \\
   portainer/agent:${agentVersion}`;
   }
 
-  function buildWindowsSwarmCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts, agentSecret) {
+  function buildWindowsSwarmCommand(agentVersion, agentShortVersion, agentSecret, edgeId, edgeKey, allowSelfSignedCerts) {
     let secret = agentSecret == '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
     return `
 docker network create \\
@@ -369,7 +370,7 @@ docker service create \\
   portainer/agent:${agentVersion}`;
   }
 
-  function buildKubernetesCommand(agentVersion, agentShortVersion, edgeId, edgeKey, allowSelfSignedCerts) {
+  function buildKubernetesCommand(agentVersion, agentShortVersion, agentSecret, edgeId, edgeKey, allowSelfSignedCerts) {
     return `
 curl https://downloads.portainer.io/portainer-ce${agentShortVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : ''}
 `;
