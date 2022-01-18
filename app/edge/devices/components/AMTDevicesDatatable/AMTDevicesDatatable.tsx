@@ -1,4 +1,4 @@
-import { useTable } from 'react-table';
+import { usePagination, useTable } from 'react-table';
 
 import {
   Table,
@@ -25,10 +25,13 @@ export function AMTDevicesDatatable({ environmentId }: AMTDevicesTableProps) {
   const { isLoading, devices, error } = useAMTDevices(environmentId);
 
   const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
-    useTable<Device>({
-      columns,
-      data: devices,
-    });
+    useTable<Device>(
+      {
+        columns,
+        data: devices,
+      },
+      usePagination
+    );
 
   const tableProps = getTableProps();
   const tbodyProps = getTableBodyProps();
