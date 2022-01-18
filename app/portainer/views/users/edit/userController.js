@@ -75,7 +75,12 @@ angular.module('portainer.app').controller('UserController', [
       UserService.updateUser($scope.user.Id, { password: $scope.formValues.newPassword })
         .then(function success() {
           Notifications.success('Password successfully updated');
-          $state.go('portainer.logout');
+          
+          if (Authentication.getUserDetails().ID + '' === $transition$.params().id) {
+            $state.go('portainer.logout');
+          } else {
+            $state.reload();
+          }
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update user password');
