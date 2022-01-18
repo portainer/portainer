@@ -657,17 +657,14 @@ func MoveDirectory(originalPath, newPath string) error {
 
 // StoreFDOProfileFileFromBytes creates a subfolder in the FDOProfileStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
-func (service *Service) StoreFDOProfileFileFromBytes(fdoProfileIdentifier, fileName string, data []byte) (string, error) {
-	storePath := JoinPaths(FDOProfileStorePath, fdoProfileIdentifier)
-	err := service.createDirectoryInStore(storePath)
+func (service *Service) StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error) {
+	err := service.createDirectoryInStore(FDOProfileStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	filePath := JoinPaths(storePath, fileName)
-	r := bytes.NewReader(data)
-
-	err = service.createFileInStore(filePath, r)
+	filePath := JoinPaths(FDOProfileStorePath, fdoProfileIdentifier)
+	err = service.createFileInStore(filePath, bytes.NewReader(data))
 	if err != nil {
 		return "", err
 	}

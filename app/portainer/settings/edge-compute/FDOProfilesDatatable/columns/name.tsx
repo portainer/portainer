@@ -18,7 +18,6 @@ export function NameCell({
   value: name,
   row: { original: profile },
 }: CellProps<Profile>) {
-  // TODO mrydel edit view
   const linkProps = useSref('portainer.endpoints.profile.edit', {
     id: profile.id,
   });

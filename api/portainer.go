@@ -1238,7 +1238,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
-		StoreFDOProfileFileFromBytes(fdoProfileIdentifier, fileName string, data []byte) (string, error)
+		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 	}
 
 	// GitService represents a service for managing Git

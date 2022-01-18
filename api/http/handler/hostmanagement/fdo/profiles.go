@@ -136,11 +136,11 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 		Name: payload.Name,
 	}
 
-	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(profile.ID)), payload.Name, []byte(payload.ProfileFileContent))
+	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(profile.ID)), []byte(payload.ProfileFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist profile file on disk", err}
 	}
-	profile.FilePath = filePath // TODO mrydel this is my full path!
+	profile.FilePath = filePath
 	profile.DateCreated = time.Now().Unix()
 
 	err = handler.DataStore.FDOProfile().Create(profile)
@@ -206,11 +206,11 @@ func (handler *Handler) updateProfile(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), Err: errors.New("a profile already exists with this name")}
 	}
 
-	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(profile.ID)), payload.Name, []byte(payload.ProfileFileContent))
+	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(profile.ID)), []byte(payload.ProfileFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update profile", err}
 	}
-	profile.FilePath = filePath // TODO mrydel revisar
+	profile.FilePath = filePath
 	profile.Name = payload.Name
 
 	err = handler.DataStore.FDOProfile().Update(profile.ID, profile)
