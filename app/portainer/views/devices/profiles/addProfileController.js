@@ -4,6 +4,7 @@ import { createProfile } from "@/portainer/hostmanagement/fdo/fdo.service";
 
 angular.module('portainer.app').controller('AddProfileController', function (
     $scope,
+    $async,
     $state,
     $window,
     ModalService,
@@ -33,29 +34,31 @@ angular.module('portainer.app').controller('AddProfileController', function (
 
     $scope.onChangeFormValues = onChangeFormValues;
 
-    $scope.createProfile = async function () {
-        const method = $scope.state.Method;
+    $scope.createProfileAsync = function () {
+        return $async(async () => {
+            const method = $scope.state.Method;
 
-        const name = $scope.formValues.Name;
-        const fileContent = $scope.formValues.ProfileFileContent;
+            const name = $scope.formValues.Name;
+            const fileContent = $scope.formValues.ProfileFileContent;
 
-        if (method !== 'editor' && fileContent === '') {
-            $scope.state.formValidationError = 'Profile file content must not be empty';
-            return;
-        }
+            if (method !== 'editor' && fileContent === '') {
+                $scope.state.formValidationError = 'Profile file content must not be empty';
+                return;
+            }
 
-        $scope.state.actionInProgress = true;
+            $scope.state.actionInProgress = true;
 
-        try {
-            await createProfile(name, method, fileContent);
-            Notifications.success('Profile successfully created');
-            $scope.state.isEditorDirty = false;
-            $state.go('portainer.settings.edgeCompute');
-        } catch (err) {
-            Notifications.error('Failure', err, 'Unable to create Profile');
-        } finally {
-            $scope.state.actionInProgress = false;
-        }
+            try {
+                await createProfile(name, method, fileContent);
+                Notifications.success('Profile successfully created');
+                $scope.state.isEditorDirty = false;
+                $state.go('portainer.settings.edgeCompute');
+            } catch (err) {
+                Notifications.error('Failure', err, 'Unable to create Profile');
+            } finally {
+                $scope.state.actionInProgress = false;
+            }
+        })
     };
 
     $scope.onChangeFileContent = function onChangeFileContent(value) {

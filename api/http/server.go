@@ -215,7 +215,9 @@ func (server *Server) Start() error {
 	openAMTHandler.DataStore = server.DataStore
 	openAMTHandler.DockerClientFactory = server.DockerClientFactory
 
-	fdoHandler := fdo.NewHandler(requestBouncer, server.DataStore)
+	fdoHandler := fdo.NewHandler(requestBouncer)
+	fdoHandler.DataStore = server.DataStore
+	fdoHandler.FileService = server.FileService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore

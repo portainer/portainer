@@ -65,7 +65,7 @@
               || !createProfileForm.$valid
               || !formValues.ProfileFileContent
               || !formValues.Name"
-                      ng-click="createProfile()"
+                      ng-click="createProfileAsync()"
                       button-spinner="state.actionInProgress"
               >
                 <span ng-hide="state.actionInProgress">Save Profile</span>

@@ -73,12 +73,17 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
-	// TODO fetch profile by DB and use it's content
-	/*
-		profile, err := getProfile(payload.ProfileID)
-		etc.
-	*/
-	profile := portainer.FDOProfile{}
+	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(payload.ProfileID))
+	if err != nil {
+		logrus.WithError(err).Error("Profile not found")
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "profile not found", Err: err}
+	}
+
+	fileContent, err := handler.FileService.GetFileContent(profile.FilePath, "")
+	if err != nil {
+		logrus.WithError(err).Info("fdoConfigureDevice: GetFileContent")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: GetFileContent", Err: err}
+	}
 
 	fdoClient, err := handler.newFDOClient()
 	if err != nil {
@@ -142,7 +147,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"module":   []string{"fdo_sys"},
 		"var":      []string{"filedesc"},
 		"filename": []string{deploymentScriptName},
-	}, []byte(profile.Content)); err != nil {
+	}, fileContent); err != nil {
 		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
 	}

@@ -265,6 +265,11 @@ func (store *Store) EndpointRelation() dataservices.EndpointRelationService {
 	return store.EndpointRelationService
 }
 
+// FDOProfile gives access to the FDOProfile data management layer
+func (store *Store) FDOProfile() dataservices.FDOProfileService {
+	return store.FDOProfilesService
+}
+
 // HelmUserRepository access the helm user repository settings
 func (store *Store) HelmUserRepository() dataservices.HelmUserRepositoryService {
 	return store.HelmUserRepositoryService

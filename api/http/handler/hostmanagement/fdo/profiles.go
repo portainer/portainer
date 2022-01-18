@@ -2,6 +2,7 @@ package fdo
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -26,28 +27,9 @@ import (
 // @failure 500 "Bad gateway"
 // @router /fdo/profiles [get]
 func (handler *Handler) fdoProfiles(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	/*settings, err := handler.DataStore.Settings().Settings()
+	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
-	}*/
-
-	// TODO get from DB
-	profiles := []portainer.FDOProfile{
-		{
-			ID:          1,
-			Name:        "Default Device Profile",
-			DateCreated: time.Now().Unix(),
-		},
-		{
-			ID:          2,
-			Name:        "k8s Profile",
-			DateCreated: time.Now().Unix() - 5000,
-		},
-		{
-			ID:          3,
-			Name:        "Swarm Profile",
-			DateCreated: time.Now().Unix() + 5000,
-		},
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 	}
 
 	return response.JSON(w, profiles)
@@ -101,7 +83,13 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	// TODO mrydel check unique
+	isUnique, err := handler.checkUniqueProfileName(payload.Name)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+	}
+	if !isUnique {
+		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), Err: errors.New("a profile already exists with this name")}
+	}
 
 	profileID := handler.DataStore.FDOProfile().GetNextIdentifier()
 	profile := &portainer.FDOProfile{
@@ -109,16 +97,11 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 		Name: payload.Name,
 	}
 
-	profileFolder := strconv.Itoa(int(profile.ID))
-	filePath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(profile.ID)), payload.Name, []byte(payload.ProfileFileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist profile file on disk", err}
 	}
 	profile.FilePath = filePath
-
-	doCleanUp := true
-	defer handler.cleanUp(stack, &doCleanUp)
-
 	profile.DateCreated = time.Now().Unix()
 
 	err = handler.DataStore.FDOProfile().Create(profile)
@@ -126,6 +109,20 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the profile inside the database", err}
 	}
 
-	doCleanUp = false
-	return handler.decorateStackResponse(w, stack, userID)
+	return response.JSON(w, profile)
+}
+
+func (handler *Handler) checkUniqueProfileName(name string) (bool, error) {
+	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
+	if err != nil {
+		return false, err
+	}
+
+	for _, profile := range profiles {
+		if profile.Name == name {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }
