@@ -80,13 +80,15 @@ type (
 		OwnerPassword string `json:"ownerPassword"`
 	}
 
+	// FDOProfileID represents a fdo profile id
+	FDOProfileID int
+
 	FDOProfile struct {
-		ID            int    `json:"id"`
-		Name          string `json:"name"`
-		Content       string `json:"content"` // TODO mrydel validate this is possible
-		URL           string `json:"url"`
-		NumberDevices int    `json:"numberDevices"`
-		DateCreated   int64  `json:"dateCreated"`
+		ID            FDOProfileID `json:"id"`
+		Name          string       `json:"name"`
+		FilePath      string       `json:"filePath"`
+		NumberDevices int          `json:"numberDevices"`
+		DateCreated   int64        `json:"dateCreated"`
 	}
 
 	// CLIFlags represents the available flags on the CLI

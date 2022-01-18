@@ -18,7 +18,7 @@ export function NameCell({
   value: name,
   row: { original: profile },
 }: CellProps<Profile>) {
-  // TODO mrydel
+  // TODO mrydel edit view
   const linkProps = useSref('docker.containers.container', {
     id: profile.id,
   });

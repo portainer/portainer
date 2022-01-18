@@ -1,5 +1,6 @@
 import angular from 'angular';
-import {createProfileFromFileContent} from "Portainer/hostmanagement/fdo/fdo.service";
+
+import { createProfile } from "@/portainer/hostmanagement/fdo/fdo.service";
 
 angular.module('portainer.app').controller('AddProfileController', function (
     $scope,
@@ -45,11 +46,8 @@ angular.module('portainer.app').controller('AddProfileController', function (
 
         $scope.state.actionInProgress = true;
 
-        console.log(name);
-        console.log($scope.formValues.ProfileFileContent);
-
         try {
-            await createProfileFromFileContent(name, fileContent);
+            await createProfile(name, method, fileContent);
             Notifications.success('Profile successfully created');
             $scope.state.isEditorDirty = false;
             $state.go('portainer.settings.edgeCompute');

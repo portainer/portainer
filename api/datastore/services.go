@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"github.com/portainer/portainer/api/dataservices/fdoprofile"
 	"io/ioutil"
 	"strconv"
 
@@ -50,6 +51,7 @@ type Store struct {
 	EndpointService           *endpoint.Service
 	EndpointRelationService   *endpointrelation.Service
 	ExtensionService          *extension.Service
+	FDOProfilesService        *fdoprofile.Service
 	HelmUserRepositoryService *helmuserrepository.Service
 	RegistryService           *registry.Service
 	ResourceControlService    *resourcecontrol.Service
@@ -128,6 +130,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.ExtensionService = extensionService
+
+	fdoProfilesService, err := fdoprofile.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.FDOProfilesService = fdoProfilesService
 
 	helmUserRepositoryService, err := helmuserrepository.NewService(store.connection)
 	if err != nil {

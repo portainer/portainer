@@ -23,8 +23,9 @@ export async function configureDevice(
   }
 }
 
-export async function createProfileFromFileContent(
+export async function createProfile(
     profileName: string,
+    method: string,
     profileFileContent: string,
 ) {
   const payload: Record<string, unknown> = {
@@ -32,7 +33,10 @@ export async function createProfileFromFileContent(
     ProfileFileContent: profileFileContent,
   };
   try {
-    await axios.post(`${BASE_URL}/profiles`, payload);
+    await axios.post(`${BASE_URL}/profiles`, payload,
+{
+        params: { method },
+    });
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to create profile');
   }

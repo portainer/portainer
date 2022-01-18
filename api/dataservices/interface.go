@@ -31,6 +31,7 @@ type (
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
 		EndpointRelation() EndpointRelationService
+		FDOProfile() FDOProfileService
 		HelmUserRepository() HelmUserRepositoryService
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
@@ -119,6 +120,17 @@ type (
 		Create(endpointRelation *portainer.EndpointRelation) error
 		UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error
 		DeleteEndpointRelation(EndpointID portainer.EndpointID) error
+		BucketName() string
+	}
+
+	// FDOProfileService represents a service to manage FDO Profiles
+	FDOProfileService interface {
+		FDOProfiles() ([]portainer.FDOProfile, error)
+		FDOProfile(ID portainer.FDOProfileID) (*portainer.FDOProfile, error)
+		Create(FDOProfile *portainer.FDOProfile) error
+		Update(ID portainer.FDOProfileID, FDOProfile *portainer.FDOProfile) error
+		Delete(ID portainer.FDOProfileID) error
+		GetNextIdentifier() int
 		BucketName() string
 	}
 
