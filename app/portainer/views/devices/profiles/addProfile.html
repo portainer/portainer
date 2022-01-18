@@ -13,15 +13,7 @@
           <div class="form-group">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input
-                      type="text"
-                      class="form-control"
-                      ng-model="formValues.Name"
-                      id="profile_name"
-                      name="profile_name"
-                      placeholder="e.g. myprofile"
-                      auto-focus
-              />
+              <input type="text" class="form-control" ng-model="formValues.Name" id="profile_name" name="profile_name" placeholder="e.g. myprofile" auto-focus />
             </div>
           </div>
           <!-- !name-input -->
@@ -45,12 +37,12 @@
           <!-- !build-method -->
 
           <web-editor-form
-                  ng-if="state.Method === 'editor'"
-                  identifier="profile-creation-editor"
-                  value="formValues.ProfileFileContent"
-                  on-change="(onChangeFileContent)"
-                  ng-required="true"
-                  placeholder="#"
+            ng-if="state.Method === 'editor'"
+            identifier="profile-creation-editor"
+            value="formValues.ProfileFileContent"
+            on-change="(onChangeFileContent)"
+            ng-required="true"
+            placeholder="#"
           >
           </web-editor-form>
 
@@ -59,14 +51,14 @@
             <div class="col-sm-12">
               <a type="button" class="btn btn-default btn-sm" ui-sref="portainer.settings.edgeCompute">Cancel</a>
               <button
-                      type="button"
-                      class="btn btn-primary btn-sm"
-                      ng-disabled="state.actionInProgress
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress
               || !createProfileForm.$valid
               || !formValues.ProfileFileContent
               || !formValues.Name"
-                      ng-click="createProfileAsync()"
-                      button-spinner="state.actionInProgress"
+                ng-click="createProfileAsync()"
+                button-spinner="state.actionInProgress"
               >
                 <span ng-hide="state.actionInProgress">Save Profile</span>
                 <span ng-show="state.actionInProgress">Saving...</span>
