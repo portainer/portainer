@@ -14,5 +14,6 @@ export interface DeviceConfiguration {
 export type Profile = {
   id: number;
   name: string;
+  fileContent: string;
   dateCreated: string;
 };

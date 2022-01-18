@@ -39,8 +39,8 @@ func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
 }
 
 // @id fdoConfigureDevice
-// @summary configure an FDO device
-// @description configure an FDO device
+// @summary configures an FDO device
+// @description configures an FDO device
 // @description **Access policy**: administrator
 // @tags intel
 // @security jwt

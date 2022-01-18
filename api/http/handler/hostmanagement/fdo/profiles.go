@@ -13,7 +13,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-// @id fdoProfiles
+// @id fdoProfilesList
 // @summary retrieves all FDO profiles
 // @description retrieves all FDO profiles
 // @description **Access policy**: administrator
@@ -26,13 +26,51 @@ import (
 // @failure 500 "Server error"
 // @failure 500 "Bad gateway"
 // @router /fdo/profiles [get]
-func (handler *Handler) fdoProfiles(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) fdoProfilesList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 	}
 
 	return response.JSON(w, profiles)
+}
+
+type fdoProfileResponse struct {
+	Name        string `json:"name"`
+	FileContent string `json:"fileContent"`
+}
+
+// @id fdoProfile
+// @summary retrieves a given FDO profile information
+// @description retrieves a given FDO profile information
+// @description **Access policy**: administrator
+// @tags intel
+// @security jwt
+// @produce json
+// @success 200 "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /fdo/profiles/{id} [get]
+func (handler *Handler) fdoProfile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.New("missing 'id' query parameter")}
+	}
+
+	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(id))
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve Profile", Err: err}
+	}
+
+	fileContent, err := handler.FileService.GetFileContent(profile.FilePath, "")
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve Profile file content", Err: err}
+	}
+
+	return response.JSON(w, fdoProfileResponse{
+		Name:        profile.Name,
+		FileContent: string(fileContent),
+	})
 }
 
 type createProfileFromFileContentPayload struct {
@@ -52,7 +90,7 @@ func (payload *createProfileFromFileContentPayload) Validate(r *http.Request) er
 	return nil
 }
 
-// @id createProfiles
+// @id createProfile
 // @summary creates a new FDO Profile
 // @description creates a new FDO Profile
 // @description **Access policy**: administrator
@@ -102,7 +140,7 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist profile file on disk", err}
 	}
-	profile.FilePath = filePath
+	profile.FilePath = filePath // TODO mrydel this is my full path!
 	profile.DateCreated = time.Now().Unix()
 
 	err = handler.DataStore.FDOProfile().Create(profile)
@@ -128,9 +166,79 @@ func (handler *Handler) checkUniqueProfileName(name string) (bool, error) {
 	return true, nil
 }
 
-// @id createProfiles
-// @summary creates a new FDO Profile
-// @description creates a new FDO Profile
+// @id updateProfile
+// @summary updates an existing FDO Profile
+// @description updates an existing FDO Profile
+// @description **Access policy**: administrator
+// @tags intel
+// @security jwt
+// @produce json
+// @success 200 "Success"
+// @failure 400 "Invalid request"
+// @failure 409 "Profile name already exists"
+// @failure 500 "Server error"
+// @router /fdo/profiles/{id} [put]
+func (handler *Handler) updateProfile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.New("missing 'id' query parameter")}
+	}
+
+	var payload createProfileFromFileContentPayload
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+	}
+
+	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(id))
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve Profile", Err: err}
+	}
+	if profile == nil {
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "profile not found", Err: errors.New("profile not found")}
+	}
+
+	isUnique, err := handler.checkUniqueProfileNameForUpdate(payload.Name, id)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+	}
+	if !isUnique {
+		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), Err: errors.New("a profile already exists with this name")}
+	}
+
+	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(profile.ID)), payload.Name, []byte(payload.ProfileFileContent))
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update profile", err}
+	}
+	profile.FilePath = filePath // TODO mrydel revisar
+	profile.Name = payload.Name
+
+	err = handler.DataStore.FDOProfile().Update(profile.ID, profile)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update profile", err}
+	}
+
+	return response.JSON(w, profile)
+}
+
+func (handler *Handler) checkUniqueProfileNameForUpdate(name string, id int) (bool, error) {
+	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
+	if err != nil {
+		return false, err
+	}
+
+	for _, profile := range profiles {
+		if profile.Name == name && int(profile.ID) != id {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+// @id deleteProfile
+// @summary deletes a FDO Profile
+// @description deletes a FDO Profile
 // @description **Access policy**: administrator
 // @tags intel
 // @security jwt

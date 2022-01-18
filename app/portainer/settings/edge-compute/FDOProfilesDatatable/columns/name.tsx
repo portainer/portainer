@@ -19,7 +19,7 @@ export function NameCell({
   row: { original: profile },
 }: CellProps<Profile>) {
   // TODO mrydel edit view
-  const linkProps = useSref('docker.containers.container', {
+  const linkProps = useSref('portainer.endpoints.profile.edit', {
     id: profile.id,
   });
 

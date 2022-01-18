@@ -231,12 +231,23 @@ angular
       };
 
       var addFDOProfile = {
-        name: 'portainer.endpoints.newProfile',
-        url: '/newProfile',
+        name: 'portainer.endpoints.profile',
+        url: '/profile',
         views: {
           'content@': {
             templateUrl: './views/devices/profiles/addProfile.html',
             controller: 'AddProfileController',
+          },
+        },
+      };
+
+      var editFDOProfile = {
+        name: 'portainer.endpoints.profile.edit',
+        url: '/:id',
+        views: {
+          'content@': {
+            templateUrl: './views/devices/profiles/editProfile.html',
+            controller: 'EditProfileController',
           },
         },
       };
@@ -506,6 +517,7 @@ angular
       $stateRegistryProvider.register(endpointCreation);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
+      $stateRegistryProvider.register(editFDOProfile);
       $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);

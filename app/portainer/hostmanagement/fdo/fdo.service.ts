@@ -52,10 +52,37 @@ export async function getProfiles() {
   }
 }
 
+export async function getProfile(profileId: number) {
+  try {
+    const { data: profile } = await axios.get<Profile>(
+      `${BASE_URL}/profiles/${profileId}`
+    );
+    return profile;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to retrieve profile');
+  }
+}
+
 export async function deleteProfile(profileId: number) {
   try {
     await axios.delete(`${BASE_URL}/profiles/${profileId}`);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to delete profile');
+  }
+}
+
+export async function updateProfile(
+  profileId: number,
+  profileName: string,
+  profileFileContent: string
+) {
+  const payload: Record<string, unknown> = {
+    Name: profileName,
+    ProfileFileContent: profileFileContent,
+  };
+  try {
+    await axios.put(`${BASE_URL}/profiles/${profileId}`, payload);
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to update profile');
   }
 }

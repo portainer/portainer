@@ -16,7 +16,7 @@ export function FDOProfilesDatatableActions({ selectedItems }: Props) {
 
   return (
     <div className="actionBar">
-      <Link to="portainer.endpoints.newProfile" className="space-left">
+      <Link to="portainer.endpoints.profile" className="space-left">
         <Button>
           <i className="fa fa-plus-circle space-right" aria-hidden="true" />
           Add New
