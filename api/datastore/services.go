@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"encoding/json"
-	"github.com/portainer/portainer/api/dataservices/fdoprofile"
 	"io/ioutil"
 	"strconv"
 
@@ -18,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/endpointgroup"
 	"github.com/portainer/portainer/api/dataservices/endpointrelation"
 	"github.com/portainer/portainer/api/dataservices/extension"
+	"github.com/portainer/portainer/api/dataservices/fdoprofile"
 	"github.com/portainer/portainer/api/dataservices/helmuserrepository"
 	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/dataservices/resourcecontrol"

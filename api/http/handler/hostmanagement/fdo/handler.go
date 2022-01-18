@@ -1,12 +1,12 @@
 package fdo
 
 import (
-	portainer "github.com/portainer/portainer/api"
 	"net/http"
 
 	"github.com/gorilla/mux"
 
 	httperror "github.com/portainer/libhttp/error"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 )

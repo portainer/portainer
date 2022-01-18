@@ -3,18 +3,21 @@ package fdo
 import (
 	"encoding/hex"
 	"errors"
-	portainer "github.com/portainer/portainer/api"
-	"io"
 	"net/http"
 	"net/url"
 	"strings"
 
-	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/fxamacker/cbor/v2"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	deploymentScriptName = "fdo.sh"
 )
 
 type deviceConfigurePayload struct {
@@ -33,16 +36,6 @@ func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
 	}
 
 	return nil
-}
-
-func fetchProfileContents(profileURL string) ([]byte, error) {
-	resp, err := http.Get(profileURL)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	return io.ReadAll(resp.Body)
 }
 
 // @id fdoConfigureDevice
@@ -139,8 +132,6 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
 	}
 
-	// onboarding script - this would get selected by the profile name
-	deploymentScriptName := "fdo.sh"
 	if err = fdoClient.PutDeviceSVIRaw(url.Values{
 		"guid":     []string{guid},
 		"priority": []string{"1"},
@@ -158,15 +149,15 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw() failed to encode", Err: err}
 	}
 
-	cbor := strings.ToUpper(hex.EncodeToString(b))
-	logrus.WithField("cbor", cbor).WithField("string", deploymentScriptName).Info("converted to CBOR")
+	cborBytes := strings.ToUpper(hex.EncodeToString(b))
+	logrus.WithField("cbor", cborBytes).WithField("string", deploymentScriptName).Info("converted to CBOR")
 
 	if err = fdoClient.PutDeviceSVIRaw(url.Values{
 		"guid":     []string{guid},
 		"priority": []string{"2"},
 		"module":   []string{"fdo_sys"},
 		"var":      []string{"exec"},
-		"bytes":    []string{cbor},
+		"bytes":    []string{cborBytes},
 	}, []byte("")); err != nil {
 		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
