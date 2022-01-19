@@ -37,11 +37,10 @@ func (handler *Handler) updateProfile(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(id))
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Profile", err}
-	}
-	if profile == nil {
-		return &httperror.HandlerError{http.StatusNotFound, "profile not found", errors.New("profile not found")}
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a FDO Profile with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a FDO Profile with the specified identifier inside the database", err}
 	}
 
 	isUnique, err := handler.checkUniqueProfileName(payload.Name, id)

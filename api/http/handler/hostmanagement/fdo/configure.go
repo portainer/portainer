@@ -71,9 +71,10 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}
 
 	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(payload.ProfileID))
-	if err != nil {
-		logrus.WithError(err).Error("Profile not found")
-		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "profile not found", Err: err}
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a FDO Profile with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a FDO Profile with the specified identifier inside the database", err}
 	}
 
 	fileContent, err := handler.FileService.GetFileContent(profile.FilePath, "")

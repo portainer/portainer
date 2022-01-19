@@ -30,11 +30,10 @@ func (handler *Handler) duplicateProfile(w http.ResponseWriter, r *http.Request)
 	}
 
 	originalProfile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(id))
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Profile", err}
-	}
-	if originalProfile == nil {
-		return &httperror.HandlerError{http.StatusNotFound, "profile not found", errors.New("profile not found")}
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a FDO Profile with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a FDO Profile with the specified identifier inside the database", err}
 	}
 
 	fileContent, err := handler.FileService.GetFileContent(originalProfile.FilePath, "")
