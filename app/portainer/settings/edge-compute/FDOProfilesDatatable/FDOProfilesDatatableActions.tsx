@@ -1,11 +1,15 @@
 import { useQueryClient } from 'react-query';
+import { useRouter } from '@uirouter/react';
 
 import { Button } from '@/portainer/components/Button';
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
 import { Link } from '@/portainer/components/Link';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import * as notifications from '@/portainer/services/notifications';
-import { deleteProfile } from '@/portainer/hostmanagement/fdo/fdo.service';
+import {
+  deleteProfile,
+  duplicateProfile,
+} from '@/portainer/hostmanagement/fdo/fdo.service';
 
 interface Props {
   isFDOEnabled: boolean;
@@ -16,6 +20,7 @@ export function FDOProfilesDatatableActions({
   isFDOEnabled,
   selectedItems,
 }: Props) {
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   return (
@@ -29,7 +34,7 @@ export function FDOProfilesDatatableActions({
 
       <Button
         disabled={!isFDOEnabled || selectedItems.length !== 1}
-        onClick={() => {}}
+        onClick={() => onDuplicateProfileClick()}
       >
         <i className="fa fa-plus-circle space-right" aria-hidden="true" />
         Duplicate
@@ -45,6 +50,40 @@ export function FDOProfilesDatatableActions({
       </Button>
     </div>
   );
+
+  async function onDuplicateProfileClick() {
+    const confirmed = await confirmAsync({
+      title: 'Are you sure ?',
+      message: 'This action will duplicate the selected profile. Continue?',
+      buttons: {
+        confirm: {
+          label: 'Confirm',
+          className: 'btn-primary',
+        },
+      },
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const profile = selectedItems[0];
+      const newProfile = await duplicateProfile(profile.id);
+      console.log({ newProfile });
+      notifications.success('Profile successfully duplicated', profile.name);
+      router.stateService.go('portainer.endpoints.profile.edit', {
+        id: newProfile.id,
+      });
+    } catch (err) {
+      console.log(err);
+      notifications.error(
+        'Failure',
+        err as Error,
+        'Unable to duplicate profile'
+      );
+    }
+  }
 
   async function onDeleteProfileClick() {
     const confirmed = await confirmAsync({

@@ -86,3 +86,14 @@ export async function updateProfile(
     throw parseAxiosError(e as Error, 'Unable to update profile');
   }
 }
+
+export async function duplicateProfile(id: number) {
+  try {
+    const { data: profile } = await axios.post<Profile>(
+      `${BASE_URL}/profiles/${id}/duplicate`
+    );
+    return profile;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to duplicate profile');
+  }
+}

@@ -34,7 +34,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 	h.Handle("/fdo/profiles/{id}", bouncer.AdminAccess(httperror.LoggerHandler(h.fdoProfileInspect))).Methods(http.MethodGet)
 	h.Handle("/fdo/profiles/{id}", bouncer.AdminAccess(httperror.LoggerHandler(h.updateProfile))).Methods(http.MethodPut)
 	h.Handle("/fdo/profiles/{id}", bouncer.AdminAccess(httperror.LoggerHandler(h.deleteProfile))).Methods(http.MethodDelete)
-	// TODO mrydel duplicate profile
+	h.Handle("/fdo/profiles/{id}/duplicate", bouncer.AdminAccess(httperror.LoggerHandler(h.duplicateProfile))).Methods(http.MethodPost)
 
 	return h
 }
