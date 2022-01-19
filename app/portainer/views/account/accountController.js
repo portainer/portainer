@@ -19,14 +19,13 @@ angular.module('portainer.app').controller('AccountController', [
     $scope.updatePassword = async function () {
       const confirmed = await ModalService.confirmChangePassword();
       if (confirmed) {
-        UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword)
-          .then(function success() {
-            Notifications.success('Success', 'Password successfully updated');
-            $state.go('portainer.logout');
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, err.msg);
-          });
+        try {
+          await UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword);
+          Notifications.success('Success', 'Password successfully updated');
+          $state.go('portainer.logout');
+        } catch (err) {
+          Notifications.error('Failure', err, err.msg);
+        }
       }
     };
 

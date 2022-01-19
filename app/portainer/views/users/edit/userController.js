@@ -64,11 +64,8 @@ angular.module('portainer.app').controller('UserController', [
     };
 
     $scope.updatePassword = async function () {
-      let promise = Promise.resolve(true);
-      if (Authentication.getUserDetails().ID + '' === $transition$.params().id) {
-        promise = ModalService.confirmChangePassword();
-      }
-      const confirmed = await promise;
+      const isCurrentUser = Authentication.getUserDetails().ID === $scope.user.Id;
+      const confirmed = !isCurrentUser || (await ModalService.confirmChangePassword());
       if (!confirmed) {
         return;
       }
@@ -76,7 +73,7 @@ angular.module('portainer.app').controller('UserController', [
         .then(function success() {
           Notifications.success('Password successfully updated');
 
-          if (Authentication.getUserDetails().ID + '' === $transition$.params().id) {
+          if (isCurrentUser) {
             $state.go('portainer.logout');
           } else {
             $state.reload();
