@@ -35,6 +35,10 @@ func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
 		return errors.New("the device name cannot be empty")
 	}
 
+	if payload.ProfileID < 1 {
+		return errors.New("invalid profile id provided")
+	}
+
 	return nil
 }
 
