@@ -99,6 +99,7 @@
 .tableMenu {
   color: #767676;
   padding: 10px;
+  background-color: var(--bg-dropdown-menu-color) !important;
 }
 
 .tableMenu .menuHeader {
