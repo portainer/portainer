@@ -12,10 +12,10 @@
     <rd-widget>
       <rd-widget-header icon="fa-tachometer-alt" title-text="Cluster capacity"></rd-widget-header>
       <rd-widget-body>
-        <div class="chart-container" style="position: relative;">
+        <div class="chart-container" style="position: relative">
           <canvas id="capacityChart" width="770" height="400"></canvas>
         </div>
-        <div style="margin-top: 10px;" ng-if="info">
+        <div style="margin-top: 10px" ng-if="info">
           <table class="table">
             <tbody>
               <tr>
@@ -27,7 +27,7 @@
                 <td>
                   {{ info.ProvisionedCapacity | humansize }}
                   <span ng-if="+info.ProvisionedCapacity >= +info.TotalCapacity">
-                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px"></i>
                   </span>
                 </td>
               </tr>
@@ -45,10 +45,10 @@
     <rd-widget>
       <rd-widget-header icon="fa-chart-area" title-text="IOPS usage"></rd-widget-header>
       <rd-widget-body>
-        <div class="chart-container" style="position: relative;">
+        <div class="chart-container" style="position: relative">
           <canvas id="iopsChart" width="770" height="400"></canvas>
         </div>
-        <div style="margin-top: 10px;" ng-if="info">
+        <div style="margin-top: 10px" ng-if="info">
           <table class="table">
             <tbody>
               <tr>
@@ -60,7 +60,7 @@
                 <td>
                   {{ info.ProvisionedIOPS | number }}
                   <span ng-if="+info.ProvisionedIOPS >= +info.TotalIOPS">
-                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px"></i>
                   </span>
                 </td>
               </tr>
@@ -78,10 +78,10 @@
     <rd-widget>
       <rd-widget-header icon="fa-chart-area" title-text="Bandwith usage"></rd-widget-header>
       <rd-widget-body>
-        <div class="chart-container" style="position: relative;">
+        <div class="chart-container" style="position: relative">
           <canvas id="bandwithChart" width="770" height="400"></canvas>
         </div>
-        <div style="margin-top: 10px;" ng-if="info">
+        <div style="margin-top: 10px" ng-if="info">
           <table class="table">
             <tbody>
               <tr>
@@ -93,7 +93,7 @@
                 <td>
                   {{ info.ProvisionedBandwidth | humansize }}
                   <span ng-if="+info.ProvisionedBandwidth >= +info.TotalBandwidth">
-                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px"></i>
                   </span>
                 </td>
               </tr>

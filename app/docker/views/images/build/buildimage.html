@@ -11,19 +11,15 @@
           <uib-tab index="0">
             <uib-tab-heading> <i class="fa fa-wrench space-right" aria-hidden="true"></i> Builder </uib-tab-heading>
             <form class="form-horizontal">
-              <div class="col-sm-12 form-section-title">
-                Naming
-              </div>
+              <div class="col-sm-12 form-section-title"> Naming </div>
               <!-- names -->
               <div class="form-group">
-                <span class="col-sm-12 text-muted small">
-                  You can specify multiple names to your image.
-                </span>
+                <span class="col-sm-12 text-muted small"> You can specify multiple names to your image. </span>
               </div>
               <div class="form-group">
                 <div class="col-sm-12">
                   <label class="control-label text-left">Names</label>
-                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addImageName()">
+                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addImageName()">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i> add additional name
                   </span>
                 </div>
@@ -44,8 +40,8 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                      <div ng-repeat="item in formValues.ImageNames track by $index" style="margin-top: 2px;">
+                    <div class="col-sm-12 form-inline" style="margin-top: 10px">
+                      <div ng-repeat="item in formValues.ImageNames track by $index" style="margin-top: 2px">
                         <!-- name-input -->
                         <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">name</span>
@@ -69,17 +65,15 @@
               </div>
               <!-- !name-input-list -->
               <!-- build-method -->
-              <div class="col-sm-12 form-section-title">
-                Build method
-              </div>
+              <div class="col-sm-12 form-section-title"> Build method </div>
               <div class="form-group"></div>
-              <div class="form-group" style="margin-bottom: 0;">
+              <div class="form-group" style="margin-bottom: 0">
                 <div class="boxselector_wrapper">
                   <div>
                     <input type="radio" id="method_editor" ng-model="state.BuildType" value="editor" ng-click="toggleEditor()" />
                     <label for="method_editor">
                       <div class="boxselector_header">
-                        <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
+                        <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px"></i>
                         Web editor
                       </div>
                       <p>Use our Web editor</p>
@@ -89,7 +83,7 @@
                     <input type="radio" id="method_upload" ng-model="state.BuildType" value="upload" ng-click="saveEditorContent()" />
                     <label for="method_upload">
                       <div class="boxselector_header">
-                        <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                        <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px"></i>
                         Upload
                       </div>
                       <p>Upload a tarball or a Dockerfile from your computer</p>
@@ -99,7 +93,7 @@
                     <input type="radio" id="method_url" ng-model="state.BuildType" value="url" ng-click="saveEditorContent()" />
                     <label for="method_url">
                       <div class="boxselector_header">
-                        <i class="fa fa-globe" aria-hidden="true" style="margin-right: 2px;"></i>
+                        <i class="fa fa-globe" aria-hidden="true" style="margin-right: 2px"></i>
                         URL
                       </div>
                       <p>Specify a URL to a file</p>
@@ -110,9 +104,7 @@
               <!-- !build-method -->
               <!-- web-editor -->
               <div ng-show="state.BuildType === 'editor'">
-                <div class="col-sm-12 form-section-title">
-                  Web editor
-                </div>
+                <div class="col-sm-12 form-section-title"> Web editor </div>
                 <div class="form-group">
                   <span class="col-sm-12 text-muted small">
                     You can get more information about Dockerfile format in the
@@ -133,9 +125,7 @@
               <!-- !web-editor -->
               <!-- upload -->
               <div ng-show="state.BuildType === 'upload'">
-                <div class="col-sm-12 form-section-title">
-                  Upload
-                </div>
+                <div class="col-sm-12 form-section-title"> Upload </div>
                 <div class="form-group">
                   <span class="col-sm-12 text-muted small">
                     You can upload a Dockerfile or a tar archive containing a Dockerfile from your computer. When using a tarball, the root folder will be used as the build
@@ -145,7 +135,7 @@
                 <div class="form-group">
                   <div class="col-sm-12">
                     <button class="btn btn-sm btn-primary" ngf-select ngf-min-size="10" ng-model="formValues.UploadFile">Select file</button>
-                    <span style="margin-left: 5px;">
+                    <span style="margin-left: 5px">
                       {{ formValues.UploadFile.name }}
                       <i class="fa fa-times red-icon" ng-if="!formValues.UploadFile" aria-hidden="true"></i>
                     </span>
@@ -153,9 +143,7 @@
                 </div>
                 <div ng-if="formValues.UploadFile.type === 'application/gzip' || formValues.UploadFile.type === 'application/x-tar'">
                   <div class="form-group">
-                    <span class="col-sm-12 text-muted small">
-                      Indicate the path to the Dockerfile within the tarball.
-                    </span>
+                    <span class="col-sm-12 text-muted small"> Indicate the path to the Dockerfile within the tarball. </span>
                   </div>
                   <div class="form-group">
                     <label for="image_path" class="col-sm-2 control-label text-left">Dockerfile path</label>
@@ -168,9 +156,7 @@
               <!-- !upload -->
               <!-- url -->
               <div ng-show="state.BuildType === 'url'">
-                <div class="col-sm-12 form-section-title">
-                  URL
-                </div>
+                <div class="col-sm-12 form-section-title"> URL </div>
                 <div class="form-group">
                   <span class="col-sm-12 text-muted small">
                     Specify the URL to a Dockerfile, a tarball or a public Git repository (suffixed by <b>.git</b>). When using a tarball or a Git repository URL, the root folder
@@ -184,9 +170,7 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <span class="col-sm-12 text-muted small">
-                    Indicate the path to the Dockerfile within the tarball/repository (ignored when using a Dockerfile).
-                  </span>
+                  <span class="col-sm-12 text-muted small"> Indicate the path to the Dockerfile within the tarball/repository (ignored when using a Dockerfile). </span>
                 </div>
                 <div class="form-group">
                   <label for="image_path" class="col-sm-2 control-label text-left">Dockerfile path</label>
@@ -197,17 +181,13 @@
               </div>
               <!-- !url -->
               <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-                <div class="col-sm-12 form-section-title">
-                  Deployment
-                </div>
+                <div class="col-sm-12 form-section-title"> Deployment </div>
                 <!-- node-selection -->
                 <node-selector model="formValues.NodeName"> </node-selector>
                 <!-- !node-selection -->
               </div>
               <!-- actions -->
-              <div class="col-sm-12 form-section-title">
-                Actions
-              </div>
+              <div class="col-sm-12 form-section-title"> Actions </div>
               <div class="form-group">
                 <div class="col-sm-12">
                   <button
@@ -223,7 +203,7 @@
                     <span ng-hide="state.actionInProgress">Build the image</span>
                     <span ng-show="state.actionInProgress">Image building in progress...</span>
                   </button>
-                  <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+                  <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px">{{ state.formValidationError }}</span>
                 </div>
               </div>
               <!-- !actions -->

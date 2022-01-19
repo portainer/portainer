@@ -14,7 +14,6 @@ const CopyPlugin = require('copy-webpack-plugin');
 const pkg = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
-
 module.exports = {
   entry: {
     main: './app',

@@ -69,7 +69,7 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 			endpoint, ok := obj.(*portainer.Endpoint)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Endpoint object")
-				return nil, fmt.Errorf("Failed to convert to Endpoint object: %s", obj)
+				return nil, fmt.Errorf("failed to convert to Endpoint object: %s", obj)
 			}
 			endpoints = append(endpoints, *endpoint)
 			return &portainer.Endpoint{}, nil

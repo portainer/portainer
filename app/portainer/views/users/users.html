@@ -78,17 +78,15 @@
                   message="Administrators have access to Portainer settings management as well as full control over all defined environments and their resources."
                 ></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.Administrator" data-cy="user-adminCheckbox" /><i></i> </label>
+              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="formValues.Administrator" data-cy="user-adminCheckbox" /><i></i> </label>
             </div>
           </div>
           <!-- !admin-checkbox -->
           <!-- teams -->
           <div class="form-group" ng-if="!formValues.Administrator">
             <div class="col-sm-12">
-              <label class="control-label text-left">
-                Add to team(s)
-              </label>
-              <span class="small text-muted" style="margin-left: 20px;" ng-if="teams.length === 0">
+              <label class="control-label text-left"> Add to team(s) </label>
+              <span class="small text-muted" style="margin-left: 20px" ng-if="teams.length === 0">
                 You don't seem to have any teams to add users into. Head over to the <a ui-sref="portainer.teams">Teams view</a> to create some.
               </span>
               <span
@@ -102,7 +100,7 @@
                 helper-elements="filter"
                 search-property="Name"
                 translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
-                style="margin-left: 20px;"
+                style="margin-left: 20px"
                 data-cy="user-teamSelect"
               >
               </span>
@@ -130,7 +128,7 @@
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create user</span>
                 <span ng-show="state.actionInProgress">Creating user...</span>
               </button>
-              <span class="text-danger" ng-if="state.userCreationError" style="margin: 5px;">
+              <span class="text-danger" ng-if="state.userCreationError" style="margin: 5px">
                 <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.userCreationError }}
               </span>
             </div>

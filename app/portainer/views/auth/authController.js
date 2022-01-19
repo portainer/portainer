@@ -249,7 +249,7 @@ class AuthenticationController {
         this.generateOAuthLoginURI();
         return;
       }
-      if(!this.logo){
+      if (!this.logo) {
         await this.StateManager.initialize();
         this.logo = this.StateManager.getState().application.logo;
       }

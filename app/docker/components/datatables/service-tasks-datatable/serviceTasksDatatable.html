@@ -2,7 +2,7 @@
   <table class="table table-condensed table-hover nowrap-cells">
     <thead>
       <tr>
-        <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" style="width: 10%;">
+        <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" style="width: 10%">
           <a ng-click="$ctrl.changeOrderBy('Status.State')">
             Status
             <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status.State' && !$ctrl.state.reverseOrder"></i>
@@ -14,9 +14,7 @@
           </span>
           <div class="dropdown-menu" uib-dropdown-menu>
             <div class="tableMenu">
-              <div class="menuHeader">
-                Filter by state
-              </div>
+              <div class="menuHeader"> Filter by state </div>
               <div class="menuContent">
                 <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
                   <input id="filter_state_{{ $ctrl.serviceId }}_{{ $index }}" type="checkbox" ng-model="filter.display" ng-change="$ctrl.onStateFilterChange()" />
@@ -29,7 +27,7 @@
             </div>
           </div>
         </th>
-        <th style="width: 22%;">Task</th>
+        <th style="width: 22%">Task</th>
         <th>Actions</th>
         <th>
           <a ng-click="$ctrl.changeOrderBy('Slot')">

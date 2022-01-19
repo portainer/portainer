@@ -20,22 +20,16 @@
           <!-- logo -->
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="toggle_logo" class="control-label text-left">
-                Use custom logo
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_logo" ng-model="formValues.customLogo" /><i></i> </label>
+              <label for="toggle_logo" class="control-label text-left"> Use custom logo </label>
+              <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="toggle_logo" ng-model="formValues.customLogo" /><i></i> </label>
             </div>
           </div>
           <div ng-if="formValues.customLogo">
             <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                You can specify the URL to your logo here. For an optimal display, logo dimensions should be 155px by 55px.
-              </span>
+              <span class="col-sm-12 text-muted small"> You can specify the URL to your logo here. For an optimal display, logo dimensions should be 155px by 55px. </span>
             </div>
             <div class="form-group">
-              <label for="logo_url" class="col-sm-1 control-label text-left">
-                URL
-              </label>
+              <label for="logo_url" class="col-sm-1 control-label text-left"> URL </label>
               <div class="col-sm-11">
                 <input type="text" class="form-control" ng-model="settings.LogoURL" id="logo_url" placeholder="https://mycompany.com/logo.png" />
               </div>
@@ -45,21 +39,17 @@
           <!-- analytics -->
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="toggle_enableTelemetry" class="control-label text-left">
-                Allow the collection of anonymous statistics
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" /><i></i> </label>
+              <label for="toggle_enableTelemetry" class="control-label text-left"> Allow the collection of anonymous statistics </label>
+              <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" /><i></i> </label>
             </div>
-            <div class="col-sm-12 text-muted small" style="margin-top: 10px;">
+            <div class="col-sm-12 text-muted small" style="margin-top: 10px">
               You can find more information about this in our
               <a href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.
             </div>
           </div>
           <!-- !analytics -->
           <!-- templates -->
-          <div class="col-sm-12 form-section-title">
-            App Templates
-          </div>
+          <div class="col-sm-12 form-section-title"> App Templates </div>
           <div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
@@ -68,9 +58,7 @@
               </span>
             </div>
             <div class="form-group">
-              <label for="templates_url" class="col-sm-1 control-label text-left">
-                URL
-              </label>
+              <label for="templates_url" class="col-sm-1 control-label text-left"> URL </label>
               <div class="col-sm-11">
                 <input
                   type="text"
@@ -86,9 +74,7 @@
           </div>
           <!-- !templates -->
           <!-- helm charts -->
-          <div class="col-sm-12 form-section-title">
-            Helm Repository
-          </div>
+          <div class="col-sm-12 form-section-title"> Helm Repository </div>
           <div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
@@ -97,9 +83,7 @@
               </span>
             </div>
             <div class="form-group">
-              <label for="helmrepository_url" class="col-sm-1 control-label text-left">
-                URL
-              </label>
+              <label for="helmrepository_url" class="col-sm-1 control-label text-left"> URL </label>
               <div class="col-sm-11">
                 <input type="text" class="form-control" ng-model="settings.HelmRepositoryURL" id="helmrepository_url" placeholder="https://charts.bitnami.com/bitnami" required />
               </div>
@@ -109,9 +93,7 @@
           <!-- host-filesystem -->
 
           <!-- edge -->
-          <div class="col-sm-12 form-section-title">
-            Edge Compute
-          </div>
+          <div class="col-sm-12 form-section-title"> Edge Compute </div>
           <div class="form-group">
             <label for="edge_checkin" class="col-sm-2 control-label text-left">
               Edge agent default poll frequency
@@ -132,23 +114,17 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="toggle_enableEdgeComputeFeatures" class="control-label text-left">
-                Enable edge compute features
-              </label>
-              <label class="switch" style="margin-left: 20px;" data-cy="settings-edgeToggle">
+              <label for="toggle_enableEdgeComputeFeatures" class="control-label text-left"> Enable edge compute features </label>
+              <label class="switch" style="margin-left: 20px" data-cy="settings-edgeToggle">
                 <input type="checkbox" name="toggle_enableEdgeComputeFeatures" ng-model="formValues.enableEdgeComputeFeatures" /><i></i>
               </label>
             </div>
           </div>
           <!-- !edge -->
           <!-- kube -->
-          <div class="col-sm-12 form-section-title">
-            Kubernetes
-          </div>
+          <div class="col-sm-12 form-section-title"> Kubernetes </div>
           <div class="form-group">
-            <label for="edge_checkin" class="col-sm-2 control-label text-left">
-              Kubeconfig expiry
-            </label>
+            <label for="edge_checkin" class="col-sm-2 control-label text-left"> Kubeconfig expiry </label>
             <div class="col-sm-10">
               <select
                 id="kubeconfig_expiry"
@@ -193,9 +169,7 @@
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="addFilteredContainerLabel()" name="addTagForm">
           <div class="form-group">
-            <span class="col-sm-12 text-muted small">
-              You can hide containers with specific labels from Portainer UI. You need to specify the label name and value.
-            </span>
+            <span class="col-sm-12 text-muted small"> You can hide containers with specific labels from Portainer UI. You need to specify the label name and value. </span>
           </div>
           <div class="form-group">
             <label for="header_name" class="col-sm-1 control-label text-left">Name</label>
@@ -253,9 +227,7 @@
       <rd-widget-header icon="fa-download" title-text="Backup Portainer"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="backupPortainer()" name="backupPortainerForm">
-          <div class="col-sm-12 form-section-title">
-            Backup configuration
-          </div>
+          <div class="col-sm-12 form-section-title"> Backup configuration </div>
           <box-selector options="backupOptions" value="formValues.backupFormType" on-change="(onBackupOptionsChange)" radio-name="'backupOptions'"></box-selector>
           <div ng-if="formValues.backupFormType === BACKUP_FORM_TYPES.S3">
             <!-- Schedule automatic backups -->
@@ -365,9 +337,7 @@
               </div>
             </div>
             <!-- !Bucket name -->
-            <div class="col-sm-12 form-section-title">
-              Security settings
-            </div>
+            <div class="col-sm-12 form-section-title"> Security settings </div>
             <!-- Password protect S3 -->
             <div class="form-group">
               <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
@@ -426,9 +396,7 @@
             </div>
           </div>
           <div ng-if="formValues.backupFormType === BACKUP_FORM_TYPES.FILE">
-            <div class="col-sm-12 form-section-title">
-              Security settings
-            </div>
+            <div class="col-sm-12 form-section-title"> Security settings </div>
             <!-- Password protect -->
             <div class="form-group">
               <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>

@@ -34,10 +34,10 @@ func (store *Store) Init() error {
 				AutoCreateUsers: true,
 				TLSConfig:       portainer.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
-					portainer.LDAPSearchSettings{},
+					{},
 				},
 				GroupSearchSettings: []portainer.LDAPGroupSearchSettings{
-					portainer.LDAPGroupSearchSettings{},
+					{},
 				},
 			},
 			OAuthSettings: portainer.OAuthSettings{},

@@ -1,9 +1,7 @@
 <rd-widget>
   <rd-widget-body>
-    <div ng-if="$ctrl.index > 0" style="margin-bottom: 10px;">
-      <span class="text-muted small">
-        Extra search configuration
-      </span>
+    <div ng-if="$ctrl.index > 0" style="margin-bottom: 10px">
+      <span class="text-muted small"> Extra search configuration </span>
       <button
         class="btn btn-sm btn-danger"
         type="button"
@@ -24,18 +22,16 @@
     ></ldap-settings-dn-builder>
 
     <div class="form-group">
-      <label class="col-sm-4 col-md-2 control-label text-left">
-        Group Base DN
-      </label>
+      <label class="col-sm-4 col-md-2 control-label text-left"> Group Base DN </label>
       <div class="col-sm-8 col-md-10">
         {{ $ctrl.config.GroupBaseDN }}
       </div>
     </div>
 
     <div class="form-group">
-      <div class="col-sm-12" style="margin-bottom: 5px;">
+      <div class="col-sm-12" style="margin-bottom: 5px">
         <label class="control-label text-left">Groups</label>
-        <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addGroup()">
+        <span class="label label-default interactive" style="margin-left: 10px" ng-click="$ctrl.addGroup()">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> add another group
         </span>
       </div>
@@ -82,9 +78,7 @@
     </div>
 
     <div class="form-group no-margin-last-child">
-      <label class="col-sm-4 col-md-2 control-label text-left">
-        Group Filter
-      </label>
+      <label class="col-sm-4 col-md-2 control-label text-left"> Group Filter </label>
       <div class="col-sm-8 col-md-10">
         {{ $ctrl.config.GroupFilter }}
       </div>

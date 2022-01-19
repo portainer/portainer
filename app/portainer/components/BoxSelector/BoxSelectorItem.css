@@ -112,6 +112,5 @@
 }
 
 .box-selector-item.limited.business :checked + label {
-  background-color: initial;
   color: initial;
 }

@@ -1,4 +1,12 @@
-import { Context, createContext, ReactNode, useContext, useState } from 'react';
+import {
+  Context,
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
 
@@ -44,26 +52,31 @@ export function TableSettingsProvider<T>({
 
   const [settings, setTableSettings] = useState(storage);
 
-  return (
-    <Context.Provider value={{ settings, setTableSettings: handleChange }}>
-      {children}
-    </Context.Provider>
+  const handleChange = useCallback(
+    (mutation: Partial<T> | ((settings: T) => T)): void => {
+      setTableSettings((settings) => {
+        const newTableSettings =
+          mutation instanceof Function
+            ? mutation(settings)
+            : { ...settings, ...mutation };
+
+        setStorage(newTableSettings);
+
+        return newTableSettings;
+      });
+    },
+    [setStorage]
   );
 
-  function handleChange(partialSettings: T): void;
-  function handleChange(mutation: (settings: T) => T): void;
-  function handleChange(mutation: T | ((settings: T) => T)): void {
-    setTableSettings((settings) => {
-      const newTableSettings =
-        mutation instanceof Function
-          ? mutation(settings)
-          : { ...settings, ...mutation };
+  const contextValue = useMemo(
+    () => ({
+      settings,
+      setTableSettings: handleChange,
+    }),
+    [settings, handleChange]
+  );
 
-      setStorage(newTableSettings);
-
-      return newTableSettings;
-    });
-  }
+  return <Context.Provider value={contextValue}>{children}</Context.Provider>;
 
   function keyBuilder(key: string) {
     return `datatable_TableSettings_${key}`;
@@ -71,7 +84,7 @@ export function TableSettingsProvider<T>({
 }
 
 function getContextType<T>() {
-  return (TableSettingsContext as unknown) as Context<
+  return TableSettingsContext as unknown as Context<
     TableSettingsContextInterface<T>
   >;
 }

@@ -554,9 +554,9 @@ Cypress.Commands.add('modifyResource', (location, action, resourceType, resource
 // Method for modifying all resources in an endpoint with the default names
 Cypress.Commands.add('modifyResources', (location, action) => {
   const associatedResources = {
-    '1': ['Stack', 'Container', 'Network', 'Volume'],
-    '2': ['Stack', 'Service', 'Container', 'Network', 'Volume', 'Config', 'Secret'],
-    '3': ['Application'],
+    1: ['Stack', 'Container', 'Network', 'Volume'],
+    2: ['Stack', 'Service', 'Container', 'Network', 'Volume', 'Config', 'Secret'],
+    3: ['Application'],
   };
   for (var res in associatedResources[ACTIVE_ENDPOINT_TYPE]) {
     let resource = associatedResources[ACTIVE_ENDPOINT_TYPE][res];

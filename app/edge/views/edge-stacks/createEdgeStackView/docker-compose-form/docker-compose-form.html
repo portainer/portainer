@@ -1,6 +1,4 @@
-<div class="col-sm-12 form-section-title">
-  Build method
-</div>
+<div class="col-sm-12 form-section-title"> Build method </div>
 <box-selector radio-name="'method'" value="$ctrl.state.Method" options="$ctrl.methodOptions" on-change="($ctrl.onChangeMethod)"></box-selector>
 
 <web-editor-form
@@ -14,17 +12,13 @@
 >
   <editor-description>
     You can get more information about Compose file format in the
-    <a href="https://docs.docker.com/compose/compose-file/" target="_blank">
-      official documentation
-    </a>
+    <a href="https://docs.docker.com/compose/compose-file/" target="_blank"> official documentation </a>
     .
   </editor-description>
 </web-editor-form>
 
 <file-upload-form ng-if="$ctrl.state.Method === 'upload'" file="$ctrl.formValues.StackFile" on-change="($ctrl.onChangeFile)" ng-required="true">
-  <file-upload-description>
-    You can upload a Compose file from your computer.
-  </file-upload-description>
+  <file-upload-description> You can upload a Compose file from your computer. </file-upload-description>
 </file-upload-form>
 
 <git-form ng-if="$ctrl.state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
@@ -32,9 +26,7 @@
 <!-- template -->
 <div ng-if="$ctrl.state.Method === 'template'">
   <div class="form-group">
-    <label for="stack_template" class="col-sm-1 control-label text-left">
-      Template
-    </label>
+    <label for="stack_template" class="col-sm-1 control-label text-left"> Template </label>
     <div class="col-sm-11">
       <select
         class="form-control"
@@ -48,9 +40,7 @@
   </div>
   <!-- description -->
   <div ng-if="$ctrl.selectedTemplate.note">
-    <div class="col-sm-12 form-section-title">
-      Information
-    </div>
+    <div class="col-sm-12 form-section-title"> Information </div>
     <div class="form-group">
       <div class="col-sm-12">
         <div class="template-note" ng-bind-html="$ctrl.selectedTemplate.note"></div>

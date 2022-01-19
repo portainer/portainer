@@ -5,7 +5,7 @@ export default {
     authUrl: 'https://login.microsoftonline.com/TENANT_ID/oauth2/authorize',
     accessTokenUrl: 'https://login.microsoftonline.com/TENANT_ID/oauth2/token',
     resourceUrl: 'https://graph.windows.net/TENANT_ID/me?api-version=2013-11-08',
-    logoutUrl: `https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=${window.location.origin}${baseHref()}#!/auth`,
+    logoutUrl: `https://login.microsoftonline.com/TENANT_ID/oauth2/logout`,
     userIdentifier: 'userPrincipalName',
     scopes: 'id,email,name',
   },

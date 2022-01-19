@@ -1,15 +1,13 @@
-<kubernetes-view-header id="view-top" title="Helm" state="kubernetes.templates.helm" view-ready="true">
-  Charts
-</kubernetes-view-header>
+<kubernetes-view-header id="view-top" title="Helm" state="kubernetes.templates.helm" view-ready="true"> Charts </kubernetes-view-header>
 
 <information-panel title-text="Information" ng-if="!$ctrl.state.chart">
   <span class="small text-muted">
     <p>
-      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
       This is a first version for Helm charts, for more information see this <a href="https://www.portainer.io/blog/portainer-now-with-helm-support" target="_blank">blog post</a>.
     </p>
     <p ng-if="$ctrl.state.globalRepository === ''">
-      <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
       <span>The Global Helm Repository is not configured.</span>
       <a ng-if="$ctrl.state.isAdmin" ui-sref="portainer.settings">Configure Global Helm Repository in Settings</a>
     </p>
@@ -25,9 +23,7 @@
         <form class="form-horizontal" name="$ctrl.helmTemplateCreationForm">
           <!-- description -->
           <div>
-            <div class="col-sm-12 form-section-title">
-              Description
-            </div>
+            <div class="col-sm-12 form-section-title"> Description </div>
             <div class="form-group">
               <div class="col-sm-12">
                 <div class="template-note" ng-bind-html="$ctrl.state.chart.description"></div>
@@ -35,9 +31,7 @@
             </div>
           </div>
           <!-- !description -->
-          <div class="col-sm-12 form-section-title">
-            Configuration
-          </div>
+          <div class="col-sm-12 form-section-title"> Configuration </div>
           <!-- namespace-input -->
           <div class="form-group" ng-if="$ctrl.state.resourcePool">
             <label for="resource-pool-selector" class="col-sm-2 control-label text-left">Namespace</label>
@@ -55,7 +49,7 @@
 
           <div class="form-group" ng-if="!$ctrl.state.resourcePool">
             <div class="col-sm-12 small text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
               You do not have access to any namespace. Contact your administrator to get access to a namespace.
             </div>
           </div>
@@ -102,9 +96,7 @@
           <div ng-if="$ctrl.state.showCustomValues">
             <!-- web-editor -->
             <div>
-              <div class="col-sm-12 form-section-title">
-                Web editor
-              </div>
+              <div class="col-sm-12 form-section-title"> Web editor </div>
               <div class="form-group">
                 <span class="col-sm-12 text-muted small">
                   You can get more information about Helm values file format in the
@@ -127,9 +119,7 @@
           </div>
           <!-- !values override -->
           <!-- helm actions -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
+          <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button
