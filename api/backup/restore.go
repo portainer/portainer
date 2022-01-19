@@ -42,7 +42,8 @@ func RestoreArchive(archive io.Reader, password string, filestorePath string, ga
 		return errors.Wrap(err, "Failed to stop db")
 	}
 
-	if err = restoreFiles(restorePath, filestorePath); err != nil {
+	dbFile := datastore.Connection().GetDatabaseFileName()
+	if err = restoreFiles(restorePath, filestorePath, dbFile); err != nil {
 		return errors.Wrap(err, "failed to restore the system state")
 	}
 
@@ -58,12 +59,13 @@ func extractArchive(r io.Reader, destinationDirPath string) error {
 	return archive.ExtractTarGz(r, destinationDirPath)
 }
 
-func restoreFiles(srcDir string, destinationDir string) error {
+func restoreFiles(srcDir string, destinationDir string, databaseFile string) error {
 	for _, filename := range filesToRestore {
 		err := filesystem.CopyPath(filepath.Join(srcDir, filename), destinationDir)
 		if err != nil {
 			return err
 		}
 	}
-	return nil
+
+	return filesystem.CopyPath(filepath.Join(srcDir, databaseFile), destinationDir)
 }
