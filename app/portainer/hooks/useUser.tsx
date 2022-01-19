@@ -33,12 +33,19 @@ export function useUser() {
   return context;
 }
 
-export function useAuthorizations(authorizations: string | string[]) {
+export function useAuthorizations(
+  authorizations: string | string[],
+  adminOnlyCE = false
+) {
   const authorizationsArray =
     typeof authorizations === 'string' ? [authorizations] : authorizations;
 
   const { user } = useUser();
   const { params } = useCurrentStateAndParams();
+
+  if (process.env.PORTAINER_EDITION === 'CE') {
+    return !adminOnlyCE || isAdmin(user);
+  }
 
   const { endpointId } = params;
   if (!endpointId) {
@@ -118,6 +125,6 @@ export function UserProvider({ children }: UserProviderProps) {
   }
 }
 
-function isAdmin(user: UserViewModel): boolean {
-  return user.Role === 1;
+function isAdmin(user?: UserViewModel | null) {
+  return !!user && user.Role === 1;
 }
