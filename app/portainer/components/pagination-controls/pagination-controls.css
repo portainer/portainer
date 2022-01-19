@@ -67,6 +67,4 @@
   z-index: 3;
   color: #fff;
   cursor: default;
-  background-color: var(--text-pagination-span-color);
-  border-color: var(--text-pagination-span-color);
 }
