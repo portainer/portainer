@@ -24,6 +24,7 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 	// 4) portainer.db  + no key  => False
 	// 5) NoDB (new)    + key     => False
 	// 6) NoDB (new)    + no key  => False
+	// 7) portainer.db & portainer.edb (key not important) => ERROR Fatal!
 
 	is := assert.New(t)
 
@@ -32,7 +33,7 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//defer os.RemoveAll(dir)
+	defer os.RemoveAll(dir)
 
 	cases := []struct {
 		name           string
@@ -46,13 +47,6 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 			dbname:         EncryptedDatabaseFileName,
 			key:            true,
 			expectFatal:    false,
-			expectedResult: false,
-		},
-		{
-			name:           "portainer.edb + no key",
-			dbname:         EncryptedDatabaseFileName,
-			key:            false,
-			expectFatal:    true,
 			expectedResult: false,
 		},
 		{
@@ -83,36 +77,62 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 			expectFatal:    false,
 			expectedResult: false,
 		},
+
+		// fatal ones
+		{
+			name:           "portainer.edb + no key",
+			dbname:         EncryptedDatabaseFileName,
+			key:            false,
+			expectFatal:    true,
+			expectedResult: false,
+		},
+		{
+			name:           "portainer.db & portainer.edb",
+			dbname:         "both",
+			key:            true,
+			expectFatal:    true,
+			expectedResult: false,
+		},
 	}
 
-	defer func() { logrus.StandardLogger().ExitFunc = nil }()
-	var fatal bool
-	logrus.StandardLogger().ExitFunc = func(int) { fatal = true }
+	for _, tc := range cases {
+		tc := tc
 
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			fatal = false
+		defer func() { logrus.StandardLogger().ExitFunc = nil }()
+		var fatal bool
+		logrus.StandardLogger().ExitFunc = func(int) { fatal = true }
+
+		t.Run(tc.name, func(t *testing.T) {
 
 			connection := DbConnection{Path: dir}
 
-			if c.dbname != "" {
-				dbFile := path.Join(connection.Path, c.dbname)
+			if tc.dbname == "both" {
+				// Special case.  If portainer.db and portainer.edb exist.
+				dbFile1 := path.Join(connection.Path, DatabaseFileName)
+				f, _ := os.Create(dbFile1)
+				f.Close()
+				defer os.Remove(dbFile1)
+
+				dbFile2 := path.Join(connection.Path, EncryptedDatabaseFileName)
+				f, _ = os.Create(dbFile2)
+				f.Close()
+				defer os.Remove(dbFile2)
+			} else if tc.dbname != "" {
+				dbFile := path.Join(connection.Path, tc.dbname)
 				f, _ := os.Create(dbFile)
-
-				defer f.Close()
+				f.Close()
 				defer os.Remove(dbFile)
-
-				connection.Path = dir
 			}
 
-			if c.key {
+			if tc.key {
 				connection.EncryptionKey = []byte("secret")
 			}
 
+			fatal = false
 			result := connection.NeedsEncryptionMigration()
 
-			is.Equal(c.expectFatal, fatal, "A Fatal Error was logged that was not expected")
-			is.Equal(result, c.expectedResult, "Failed test %s", c.name)
+			is.Equal(tc.expectFatal, fatal, "Fatal Error failure. Test: %s", tc.name)
+			is.Equal(result, tc.expectedResult, "Failed test: %s", tc.name)
 		})
 	}
 }
