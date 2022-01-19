@@ -75,20 +75,33 @@ func (connection *DbConnection) NeedsEncryptionMigration() bool {
 	// 4) portainer.db  + no key  => False
 	// 5) NoDB (new)    + key     => False
 	// 6) NoDB (new)    + no key  => False
+	// 7) portainer.db & portainer.edb => ERROR Fatal!
 
 	// If we have a loaded encryption key, always set encrypted
 	if connection.EncryptionKey != nil {
-		fmt.Println("We have a key, set encrypted")
 		connection.SetEncrypted(true)
 	}
 
 	// Check for portainer.db
 	dbFile := path.Join(connection.Path, DatabaseFileName)
-	if _, err := os.Stat(dbFile); err == nil {
-		fmt.Println("portainer.db exists")
+	_, err := os.Stat(dbFile)
+	haveDbFile := err == nil
+
+	// Check for portainer.edb
+	edbFile := path.Join(connection.Path, EncryptedDatabaseFileName)
+	_, err = os.Stat(edbFile)
+	haveEdbFile := err == nil
+
+	if haveDbFile && haveEdbFile {
+		logrus.Fatal("Portainer has detected both an encrypted and un-encrypted database and cannot start.  Only one database should exist")
+
+		// Normally logrus.Fatal will call os.Exit. But we need this for go test. Do not remove!
+		return false
+	}
+
+	if haveDbFile {
 		if connection.EncryptionKey != nil {
 			// 3
-			fmt.Println("We have a key, needs migration is returning true")
 			return true // needs migration
 		}
 
@@ -96,11 +109,13 @@ func (connection *DbConnection) NeedsEncryptionMigration() bool {
 		return false
 	}
 
-	dbFile = path.Join(connection.Path, EncryptedDatabaseFileName)
-	if _, err := os.Stat(dbFile); err == nil {
+	if haveEdbFile {
 		if connection.EncryptionKey == nil {
 			// 2
 			logrus.Fatal("The portainer database is encrypted, but no secret was loaded")
+
+			// Normally logrus.Fatal will call os.Exit. But we need this for go test. Do not remove!
+			return false
 		}
 
 		// 1
