@@ -2,6 +2,7 @@ package boltdb
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,13 +11,18 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api/dataservices/errors"
+	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/sirupsen/logrus"
 )
 
 const (
 	DatabaseFileName          = "portainer.db"
 	EncryptedDatabaseFileName = "portainer.edb"
+)
+
+var (
+	ErrHaveEncryptedAndUnencrypted = errors.New("Portainer has detected both an encrypted and un-encrypted database and cannot start.  Only one database should exist")
+	ErrHaveEncryptedWithNoKey      = errors.New("The portainer database is encrypted, but no secret was loaded")
 )
 
 type DbConnection struct {
@@ -64,7 +70,7 @@ func (connection *DbConnection) IsEncryptedStore() bool {
 
 // NeedsEncryptionMigration returns true if database encryption is enabled and
 // we have an un-encrypted DB that requires migration to an encrypted DB
-func (connection *DbConnection) NeedsEncryptionMigration() bool {
+func (connection *DbConnection) NeedsEncryptionMigration() (bool, error) {
 
 	// Cases:  Note, we need to check both portainer.db and portainer.edb
 	// to determine if it's a new store.   We only need to differentiate between cases 2,3 and 5
@@ -93,36 +99,22 @@ func (connection *DbConnection) NeedsEncryptionMigration() bool {
 	haveEdbFile := err == nil
 
 	if haveDbFile && haveEdbFile {
-		logrus.Fatal("Portainer has detected both an encrypted and un-encrypted database and cannot start.  Only one database should exist")
-
-		// Normally logrus.Fatal will call os.Exit. But we need this for go test. Do not remove!
-		return false
+		// 7 - encrypted and unencrypted db?
+		return false, ErrHaveEncryptedAndUnencrypted
 	}
 
-	if haveDbFile {
-		if connection.EncryptionKey != nil {
-			// 3
-			return true // needs migration
-		}
-
-		// 4
-		return false
+	if haveDbFile && connection.EncryptionKey != nil {
+		// 3 - needs migration
+		return true, nil
 	}
 
-	if haveEdbFile {
-		if connection.EncryptionKey == nil {
-			// 2
-			logrus.Fatal("The portainer database is encrypted, but no secret was loaded")
-
-			// Normally logrus.Fatal will call os.Exit. But we need this for go test. Do not remove!
-			return false
-		}
-
-		// 1
+	if haveEdbFile && connection.EncryptionKey == nil {
+		// 2 - encrypted db, but no key?
+		return false, ErrHaveEncryptedWithNoKey
 	}
 
-	// 1, 5, 6
-	return false
+	// 1, 4, 5, 6
+	return false, nil
 }
 
 // Open opens and initializes the BoltDB database.
@@ -205,7 +197,7 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 
 		value := bucket.Get(key)
 		if value == nil {
-			return errors.ErrObjectNotFound
+			return dserrors.ErrObjectNotFound
 		}
 
 		data = make([]byte, len(value))

@@ -18,7 +18,7 @@ type Connection interface {
 	GetStorePath() string
 
 	IsEncryptedStore() bool
-	NeedsEncryptionMigration() bool
+	NeedsEncryptionMigration() (bool, error)
 	SetEncrypted(encrypted bool)
 
 	SetServiceName(bucketName string) error

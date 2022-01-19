@@ -1,18 +1,15 @@
 package boltdb
 
 import (
-	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"testing"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_NeedsEncryptionMigration(t *testing.T) {
-	// Test the specific scenarios mentioend in NeedsEncryptionMigration
+	// Test the specific scenarios mentioned in NeedsEncryptionMigration
 
 	// i.e.
 	// Cases:  Note, we need to check both portainer.db and portainer.edb
@@ -27,80 +24,70 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 	// 7) portainer.db & portainer.edb (key not important) => ERROR Fatal!
 
 	is := assert.New(t)
-
-	// Create temp dir for our tests
-	dir, err := ioutil.TempDir("", "test_NeedsEncryptionmigration")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	cases := []struct {
-		name           string
-		dbname         string
-		key            bool
-		expectFatal    bool
-		expectedResult bool
+		name         string
+		dbname       string
+		key          bool
+		expectError  error
+		expectResult bool
 	}{
 		{
-			name:           "portainer.edb + key",
-			dbname:         EncryptedDatabaseFileName,
-			key:            true,
-			expectFatal:    false,
-			expectedResult: false,
+			name:         "portainer.edb + key",
+			dbname:       EncryptedDatabaseFileName,
+			key:          true,
+			expectError:  nil,
+			expectResult: false,
 		},
 		{
-			name:           "portainer.db + key (migration needed)",
-			dbname:         DatabaseFileName,
-			key:            true,
-			expectFatal:    false,
-			expectedResult: true,
+			name:         "portainer.db + key (migration needed)",
+			dbname:       DatabaseFileName,
+			key:          true,
+			expectError:  nil,
+			expectResult: true,
 		},
 		{
-			name:           "portainer.db + no key",
-			dbname:         DatabaseFileName,
-			key:            false,
-			expectFatal:    false,
-			expectedResult: false,
+			name:         "portainer.db + no key",
+			dbname:       DatabaseFileName,
+			key:          false,
+			expectError:  nil,
+			expectResult: false,
 		},
 		{
-			name:           "NoDB (new) + key",
-			dbname:         "",
-			key:            false,
-			expectFatal:    false,
-			expectedResult: false,
+			name:         "NoDB (new) + key",
+			dbname:       "",
+			key:          false,
+			expectError:  nil,
+			expectResult: false,
 		},
 		{
-			name:           "NoDB (new) + no key",
-			dbname:         "",
-			key:            false,
-			expectFatal:    false,
-			expectedResult: false,
+			name:         "NoDB (new) + no key",
+			dbname:       "",
+			key:          false,
+			expectError:  nil,
+			expectResult: false,
 		},
 
-		// fatal ones
+		// error tests
 		{
-			name:           "portainer.edb + no key",
-			dbname:         EncryptedDatabaseFileName,
-			key:            false,
-			expectFatal:    true,
-			expectedResult: false,
+			name:         "portainer.edb + no key",
+			dbname:       EncryptedDatabaseFileName,
+			key:          false,
+			expectError:  ErrHaveEncryptedWithNoKey,
+			expectResult: false,
 		},
 		{
-			name:           "portainer.db & portainer.edb",
-			dbname:         "both",
-			key:            true,
-			expectFatal:    true,
-			expectedResult: false,
+			name:         "portainer.db & portainer.edb",
+			dbname:       "both",
+			key:          true,
+			expectError:  ErrHaveEncryptedAndUnencrypted,
+			expectResult: false,
 		},
 	}
 
 	for _, tc := range cases {
 		tc := tc
-
-		defer func() { logrus.StandardLogger().ExitFunc = nil }()
-		var fatal bool
-		logrus.StandardLogger().ExitFunc = func(int) { fatal = true }
 
 		t.Run(tc.name, func(t *testing.T) {
 
@@ -128,11 +115,10 @@ func Test_NeedsEncryptionMigration(t *testing.T) {
 				connection.EncryptionKey = []byte("secret")
 			}
 
-			fatal = false
-			result := connection.NeedsEncryptionMigration()
+			result, err := connection.NeedsEncryptionMigration()
 
-			is.Equal(tc.expectFatal, fatal, "Fatal Error failure. Test: %s", tc.name)
-			is.Equal(result, tc.expectedResult, "Failed test: %s", tc.name)
+			is.Equal(tc.expectError, err, "Fatal Error failure. Test: %s", tc.name)
+			is.Equal(result, tc.expectResult, "Failed test: %s", tc.name)
 		})
 	}
 }
