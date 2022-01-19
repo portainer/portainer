@@ -1,12 +1,15 @@
+import { useEffect, useState } from 'react';
 import { Formik, Field, Form } from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
+import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 import { Input } from '@/portainer/components/form-components/Input';
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
+import { FDOProfilesDatatableContainer } from '@/portainer/settings/edge-compute/FDOProfilesDatatable/FDOProfilesDatatableContainer';
 
 import styles from './SettingsFDO.module.css';
 import { validationSchema } from './SettingsFDO.validation';
@@ -23,12 +26,18 @@ interface Props {
 
 export function SettingsFDO({ settings, onSubmit }: Props) {
   const fdoConfiguration = settings ? settings.fdoConfiguration : null;
+  const initialFDOEnabled = fdoConfiguration ? fdoConfiguration.enabled : false;
+
+  const [isFDOEnabled, setIsFDOEnabled] = useState(initialFDOEnabled);
+  useEffect(() => {
+    setIsFDOEnabled(settings?.fdoConfiguration?.enabled);
+  }, [settings]);
+
   const initialValues = {
-    enabled: fdoConfiguration ? fdoConfiguration.enabled : false,
+    enabled: initialFDOEnabled,
     ownerURL: fdoConfiguration ? fdoConfiguration.ownerURL : '',
     ownerUsername: fdoConfiguration ? fdoConfiguration.ownerUsername : '',
     ownerPassword: fdoConfiguration ? fdoConfiguration.ownerPassword : '',
-    profilesURL: fdoConfiguration ? fdoConfiguration.profilesURL : '',
   };
 
   const edgeComputeFeaturesEnabled = settings
@@ -70,7 +79,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}
                     checked={edgeComputeFeaturesEnabled && values.enabled}
-                    onChange={(e) => setFieldValue('enabled', e.valueOf())}
+                    onChange={(e) => onChangedEnabled(e, setFieldValue)}
                   />
                 </FormControl>
 
@@ -128,21 +137,6 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                         data-cy="fdo-passwordInput"
                       />
                     </FormControl>
-
-                    <FormControl
-                      inputId="profiles_url"
-                      label="Profile list URL"
-                      errors={errors.profilesURL}
-                    >
-                      <Field
-                        as={Input}
-                        name="profilesURL"
-                        id="profiles_url"
-                        placeholder="http://example.com/profiles.json"
-                        value={values.profilesURL}
-                        data-cy="fdo-profilesInput"
-                      />
-                    </FormControl>
                   </>
                 )}
 
@@ -162,8 +156,31 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
               </Form>
             )}
           </Formik>
+
+          {edgeComputeFeaturesEnabled && isFDOEnabled && (
+            <div className={styles.fdoTable}>
+              <FormSectionTitle>Device Profiles</FormSectionTitle>
+              <TextTip color="blue">
+                Add, Edit and Manage the list of device profiles available
+                during FDO device setup
+              </TextTip>
+              <FDOProfilesDatatableContainer isFDOEnabled={initialFDOEnabled} />
+            </div>
+          )}
         </WidgetBody>
       </Widget>
     </div>
   );
+
+  async function onChangedEnabled(
+    e: boolean,
+    setFieldValue: (
+      field: string,
+      value: unknown,
+      shouldValidate?: boolean
+    ) => void
+  ) {
+    setIsFDOEnabled(e);
+    setFieldValue('enabled', e);
+  }
 }

@@ -124,7 +124,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                     className="space-right"
                     disabled={!edgeComputeFeaturesEnabled}
                     checked={edgeComputeFeaturesEnabled && values.enabled}
-                    onChange={(e) => setFieldValue('enabled', e.valueOf())}
+                    onChange={(e) => setFieldValue('enabled', e)}
                   />
                 </FormControl>
 

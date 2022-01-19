@@ -230,6 +230,26 @@ angular
         },
       };
 
+      var addFDOProfile = {
+        name: 'portainer.endpoints.profile',
+        url: '/profile',
+        views: {
+          'content@': {
+            component: 'addProfileView',
+          },
+        },
+      };
+
+      var editFDOProfile = {
+        name: 'portainer.endpoints.profile.edit',
+        url: '/:id',
+        views: {
+          'content@': {
+            component: 'editProfileView',
+          },
+        },
+      };
+
       var endpointAccess = {
         name: 'portainer.endpoints.endpoint.access',
         url: '/access',
@@ -494,6 +514,8 @@ angular
       $stateRegistryProvider.register(edgeDeviceCreation);
       $stateRegistryProvider.register(endpointCreation);
       $stateRegistryProvider.register(deviceImport);
+      $stateRegistryProvider.register(addFDOProfile);
+      $stateRegistryProvider.register(editFDOProfile);
       $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
