@@ -96,6 +96,10 @@ func (store *Store) IsErrObjectNotFound(e error) bool {
 	return e == portainerErrors.ErrObjectNotFound
 }
 
+func (store *Store) Connection() portainer.Connection {
+	return store.connection
+}
+
 func (store *Store) Rollback(force bool) error {
 	return store.connectionRollback(force)
 }
