@@ -65,17 +65,48 @@ func (connection *DbConnection) IsEncryptedStore() bool {
 // NeedsEncryptionMigration returns true if database encryption is enabled and
 // we have an un-encrypted DB that requires migration to an encrypted DB
 func (connection *DbConnection) NeedsEncryptionMigration() bool {
-	if connection.EncryptionKey != nil {
-		dbFile := path.Join(connection.Path, DatabaseFileName)
-		if _, err := os.Stat(dbFile); err == nil {
-			return true
-		}
 
-		// This is an existing encrypted store or a new store.
-		// A new store will open encrypted from the outset
+	// Cases:  Note, we need to check both portainer.db and portainer.edb
+	// to determine if it's a new store.   We only need to differentiate between cases 2,3 and 5
+
+	// 1) portainer.edb + key     => False
+	// 2) portainer.edb + no key  => ERROR Fatal!
+	// 3) portainer.db  + key     => True  (needs migration)
+	// 4) portainer.db  + no key  => False
+	// 5) NoDB (new)    + key     => False
+	// 6) NoDB (new)    + no key  => False
+
+	// If we have a loaded encryption key, always set encrypted
+	if connection.EncryptionKey != nil {
+		fmt.Println("We have a key, set encrypted")
 		connection.SetEncrypted(true)
 	}
 
+	// Check for portainer.db
+	dbFile := path.Join(connection.Path, DatabaseFileName)
+	if _, err := os.Stat(dbFile); err == nil {
+		fmt.Println("portainer.db exists")
+		if connection.EncryptionKey != nil {
+			// 3
+			fmt.Println("We have a key, needs migration is returning true")
+			return true // needs migration
+		}
+
+		// 4
+		return false
+	}
+
+	dbFile = path.Join(connection.Path, EncryptedDatabaseFileName)
+	if _, err := os.Stat(dbFile); err == nil {
+		if connection.EncryptionKey == nil {
+			// 2
+			logrus.Fatal("The portainer database is encrypted, but no secret was loaded")
+		}
+
+		// 1
+	}
+
+	// 1, 5, 6
 	return false
 }
 
