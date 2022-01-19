@@ -92,6 +92,8 @@ export function EdgeDevicesDatatable({
       isRowSelectable() {
         return true;
       },
+      autoResetExpanded: false,
+      autoResetSelectedRows: false,
       selectColumnWidth: 5,
     },
     useFilters,
