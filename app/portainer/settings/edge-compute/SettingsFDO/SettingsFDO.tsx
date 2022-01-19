@@ -158,15 +158,14 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
           </Formik>
 
           {edgeComputeFeaturesEnabled && isFDOEnabled && (
-            <>
-              <br />
+            <div className={styles.fdoTable}>
               <FormSectionTitle>Device Profiles</FormSectionTitle>
               <TextTip color="blue">
                 Add, Edit and Manage the list of device profiles available
                 during FDO device setup
               </TextTip>
-              <FDOProfilesDatatableContainer />
-            </>
+              <FDOProfilesDatatableContainer isFDOEnabled={initialFDOEnabled} />
+            </div>
           )}
         </WidgetBody>
       </Widget>
@@ -181,7 +180,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
       shouldValidate?: boolean
     ) => void
   ) {
-    setIsFDOEnabled(e.valueOf());
-    setFieldValue('enabled', e.valueOf());
+    setIsFDOEnabled(e);
+    setFieldValue('enabled', e);
   }
 }

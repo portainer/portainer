@@ -24,13 +24,13 @@ export async function configureDevice(
 }
 
 export async function createProfile(
-  profileName: string,
+  name: string,
   method: string,
   profileFileContent: string
 ) {
-  const payload: Record<string, unknown> = {
-    Name: profileName,
-    ProfileFileContent: profileFileContent,
+  const payload = {
+    name,
+    profileFileContent,
   };
   try {
     await axios.post(`${BASE_URL}/profiles`, payload, {
@@ -72,16 +72,16 @@ export async function deleteProfile(profileId: number) {
 }
 
 export async function updateProfile(
-  profileId: number,
-  profileName: string,
+  id: number,
+  name: string,
   profileFileContent: string
 ) {
-  const payload: Record<string, unknown> = {
-    Name: profileName,
-    ProfileFileContent: profileFileContent,
+  const payload = {
+    name,
+    profileFileContent,
   };
   try {
-    await axios.put(`${BASE_URL}/profiles/${profileId}`, payload);
+    await axios.put(`${BASE_URL}/profiles/${id}`, payload);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to update profile');
   }

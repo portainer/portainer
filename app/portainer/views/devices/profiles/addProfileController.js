@@ -9,13 +9,13 @@ angular.module('portainer.app').controller('AddProfileController', function ($sc
   };
 
   $scope.state = {
-    Method: 'editor',
+    method: 'editor',
     actionInProgress: false,
     isEditorDirty: false,
   };
 
   $window.onbeforeunload = () => {
-    if ($scope.state.Method === 'editor' && $scope.formValues.ProfileFileContent && $scope.state.isEditorDirty) {
+    if ($scope.state.method === 'editor' && $scope.formValues.ProfileFileContent && $scope.state.isEditorDirty) {
       return '';
     }
   };
@@ -28,7 +28,7 @@ angular.module('portainer.app').controller('AddProfileController', function ($sc
 
   $scope.createProfileAsync = function () {
     return $async(async () => {
-      const method = $scope.state.Method;
+      const method = $scope.state.method;
 
       const name = $scope.formValues.Name;
       const fileContent = $scope.formValues.ProfileFileContent;

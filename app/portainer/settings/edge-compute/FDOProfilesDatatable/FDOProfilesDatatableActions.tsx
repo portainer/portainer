@@ -8,28 +8,35 @@ import * as notifications from '@/portainer/services/notifications';
 import { deleteProfile } from '@/portainer/hostmanagement/fdo/fdo.service';
 
 interface Props {
+  isFDOEnabled: boolean;
   selectedItems: Profile[];
 }
 
-export function FDOProfilesDatatableActions({ selectedItems }: Props) {
+export function FDOProfilesDatatableActions({
+  isFDOEnabled,
+  selectedItems,
+}: Props) {
   const queryClient = useQueryClient();
 
   return (
     <div className="actionBar">
       <Link to="portainer.endpoints.profile" className="space-left">
-        <Button>
+        <Button disabled={!isFDOEnabled}>
           <i className="fa fa-plus-circle space-right" aria-hidden="true" />
           Add New
         </Button>
       </Link>
 
-      <Button disabled={selectedItems.length !== 1} onClick={() => {}}>
+      <Button
+        disabled={!isFDOEnabled || selectedItems.length !== 1}
+        onClick={() => {}}
+      >
         <i className="fa fa-plus-circle space-right" aria-hidden="true" />
         Duplicate
       </Button>
 
       <Button
-        disabled={selectedItems.length < 1}
+        disabled={!isFDOEnabled || selectedItems.length < 1}
         color="danger"
         onClick={() => onDeleteProfileClick()}
       >

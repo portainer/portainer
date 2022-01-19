@@ -22,7 +22,13 @@ import { useFDOProfiles } from '@/portainer/settings/edge-compute/FDOProfilesDat
 
 import { useColumns } from './columns';
 
-export function FDOProfilesDatatable() {
+export interface FDOProfilesDatatableProps {
+  isFDOEnabled: boolean;
+}
+
+export function FDOProfilesDatatable({
+  isFDOEnabled,
+}: FDOProfilesDatatableProps) {
   const { settings, setTableSettings } =
     useTableSettings<FDOProfilesTableSettings>();
   const columns = useColumns();
@@ -49,7 +55,7 @@ export function FDOProfilesDatatable() {
         sortBy: [settings.sortBy],
       },
       isRowSelectable() {
-        return true;
+        return isFDOEnabled;
       },
       selectColumnWidth: 5,
     },
@@ -68,6 +74,7 @@ export function FDOProfilesDatatable() {
 
       <TableActions>
         <FDOProfilesDatatableActions
+          isFDOEnabled={isFDOEnabled}
           selectedItems={selectedFlatRows.map((row) => row.original)}
         />
       </TableActions>

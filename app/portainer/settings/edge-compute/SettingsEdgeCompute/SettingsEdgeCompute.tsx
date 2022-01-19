@@ -100,7 +100,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                     className="space-right"
                     checked={values.EnableEdgeComputeFeatures}
                     onChange={(e) =>
-                      setFieldValue('EnableEdgeComputeFeatures', e.valueOf())
+                      setFieldValue('EnableEdgeComputeFeatures', e)
                     }
                   />
                 </FormControl>

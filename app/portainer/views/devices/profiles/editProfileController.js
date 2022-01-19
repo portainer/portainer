@@ -8,14 +8,14 @@ angular.module('portainer.app').controller('EditProfileController', function ($s
   };
 
   $scope.state = {
-    ProfileID: $state.params.id,
-    Method: 'editor',
+    profileID: $state.params.id,
+    method: 'editor',
     actionInProgress: false,
     isEditorDirty: false,
   };
 
   $window.onbeforeunload = () => {
-    if ($scope.state.Method === 'editor' && $scope.formValues.ProfileFileContent && $scope.state.isEditorDirty) {
+    if ($scope.state.method === 'editor' && $scope.formValues.ProfileFileContent && $scope.state.isEditorDirty) {
       return '';
     }
   };
@@ -28,7 +28,7 @@ angular.module('portainer.app').controller('EditProfileController', function ($s
 
   $scope.updateProfileAsync = function () {
     return $async(async () => {
-      const method = $scope.state.Method;
+      const method = $scope.state.method;
 
       const name = $scope.formValues.Name;
       const fileContent = $scope.formValues.ProfileFileContent;
@@ -41,7 +41,7 @@ angular.module('portainer.app').controller('EditProfileController', function ($s
       $scope.state.actionInProgress = true;
 
       try {
-        await updateProfile($scope.state.ProfileID, name, fileContent);
+        await updateProfile($scope.state.profileID, name, fileContent);
         Notifications.success('Profile successfully updated');
         $scope.state.isEditorDirty = false;
         $state.go('portainer.settings.edgeCompute');
@@ -65,9 +65,7 @@ angular.module('portainer.app').controller('EditProfileController', function ($s
   async function initView() {
     return $async(async () => {
       try {
-        const profile = await getProfile($scope.state.ProfileID);
-        console.log('profile');
-        console.log(profile);
+        const profile = await getProfile($scope.state.profileID);
 
         $scope.formValues = {
           Name: profile.name,
