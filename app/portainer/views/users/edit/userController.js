@@ -66,7 +66,7 @@ angular.module('portainer.app').controller('UserController', [
     $scope.updatePassword = async function () {
       let promise = Promise.resolve(true);
       if (Authentication.getUserDetails().ID + '' === $transition$.params().id) {
-        promise = new Promise((resolve) => ModalService.confirmChangePassword(resolve));
+        promise = ModalService.confirmChangePassword();
       }
       const confirmed = await promise;
       if (!confirmed) {

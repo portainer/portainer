@@ -16,19 +16,18 @@ angular.module('portainer.app').controller('AccountController', [
       userTheme: '',
     };
 
-    $scope.updatePassword = function () {
-      ModalService.confirmChangePassword(function (confirmed) {
-        if (confirmed) {
-          UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword)
-            .then(function success() {
-              Notifications.success('Success', 'Password successfully updated');
-              $state.go('portainer.logout');
-            })
-            .catch(function error(err) {
-              Notifications.error('Failure', err, err.msg);
-            });
-        }
-      });
+    $scope.updatePassword = async function () {
+      const confirmed = await ModalService.confirmChangePassword();
+      if (confirmed) {
+        UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword)
+          .then(function success() {
+            Notifications.success('Success', 'Password successfully updated');
+            $state.go('portainer.logout');
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, err.msg);
+          });
+      }
     };
 
     $scope.removeAction = (selectedTokens) => {
