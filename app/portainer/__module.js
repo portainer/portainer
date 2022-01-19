@@ -235,8 +235,7 @@ angular
         url: '/profile',
         views: {
           'content@': {
-            templateUrl: './views/devices/profiles/addProfile.html',
-            controller: 'AddProfileController',
+            component: 'addProfileView',
           },
         },
       };
@@ -246,8 +245,7 @@ angular
         url: '/:id',
         views: {
           'content@': {
-            templateUrl: './views/devices/profiles/editProfile.html',
-            controller: 'EditProfileController',
+            component: 'editProfileView',
           },
         },
       };

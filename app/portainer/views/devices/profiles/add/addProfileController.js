@@ -1,8 +1,10 @@
 import angular from 'angular';
 
-import { createProfile } from '@/portainer/hostmanagement/fdo/fdo.service';
+import { createProfile } from 'Portainer/hostmanagement/fdo/fdo.service';
 
-angular.module('portainer.app').controller('AddProfileController', function ($scope, $async, $state, $window, ModalService, Authentication, Notifications) {
+angular.module('portainer.app').controller('AddProfileController', AddProfileController);
+
+export default function AddProfileController($scope, $async, $state, $window, ModalService, Authentication, Notifications) {
   $scope.formValues = {
     Name: '',
     ProfileFileContent: '',
@@ -61,4 +63,4 @@ angular.module('portainer.app').controller('AddProfileController', function ($sc
   function onChangeFormValues(newValues) {
     $scope.formValues = newValues;
   }
-});
+}

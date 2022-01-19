@@ -1,7 +1,9 @@
 import angular from 'angular';
 import { getProfile, updateProfile } from 'Portainer/hostmanagement/fdo/fdo.service';
 
-angular.module('portainer.app').controller('EditProfileController', function ($scope, $async, $state, $window, ModalService, Authentication, Notifications) {
+angular.module('portainer.app').controller('EditProfileController', EditProfileController);
+
+export default function EditProfileController($scope, $async, $state, $window, ModalService, Authentication, Notifications) {
   $scope.formValues = {
     Name: '',
     ProfileFileContent: '',
@@ -79,4 +81,4 @@ angular.module('portainer.app').controller('EditProfileController', function ($s
   }
 
   initView();
-});
+}
