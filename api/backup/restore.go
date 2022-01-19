@@ -15,7 +15,7 @@ import (
 	"github.com/portainer/portainer/api/http/offlinegate"
 )
 
-var filesToRestore = append(filesToBackup, "portainer.db")
+var filesToRestore = filesToBackup
 
 // Restores system state from backup archive, will trigger system shutdown, when finished.
 func RestoreArchive(archive io.Reader, password string, filestorePath string, gate *offlinegate.OfflineGate, datastore dataservices.DataStore, shutdownTrigger context.CancelFunc) error {
