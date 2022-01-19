@@ -62,7 +62,7 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	isUnique, err := handler.checkUniqueProfileName(payload.Name)
+	isUnique, err := handler.checkUniqueProfileName(payload.Name, -1)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
@@ -89,19 +89,4 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 	}
 
 	return response.JSON(w, profile)
-}
-
-func (handler *Handler) checkUniqueProfileName(name string) (bool, error) {
-	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
-	if err != nil {
-		return false, err
-	}
-
-	for _, profile := range profiles {
-		if profile.Name == name {
-			return false, nil
-		}
-	}
-
-	return true, nil
 }

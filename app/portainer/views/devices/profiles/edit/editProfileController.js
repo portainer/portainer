@@ -5,8 +5,8 @@ angular.module('portainer.app').controller('EditProfileController', EditProfileC
 
 export default function EditProfileController($scope, $async, $state, $window, ModalService, Authentication, Notifications) {
   $scope.formValues = {
-    Name: '',
-    ProfileFileContent: '',
+    name: '',
+    profileFileContent: '',
   };
 
   $scope.state = {
@@ -17,7 +17,7 @@ export default function EditProfileController($scope, $async, $state, $window, M
   };
 
   $window.onbeforeunload = () => {
-    if ($scope.state.method === 'editor' && $scope.formValues.ProfileFileContent && $scope.state.isEditorDirty) {
+    if ($scope.state.method === 'editor' && $scope.formValues.profileFileContent && $scope.state.isEditorDirty) {
       return '';
     }
   };
@@ -32,8 +32,8 @@ export default function EditProfileController($scope, $async, $state, $window, M
     return $async(async () => {
       const method = $scope.state.method;
 
-      const name = $scope.formValues.Name;
-      const fileContent = $scope.formValues.ProfileFileContent;
+      const name = $scope.formValues.name;
+      const fileContent = $scope.formValues.profileFileContent;
 
       if (method !== 'editor' && fileContent === '') {
         $scope.state.formValidationError = 'Profile file content must not be empty';
@@ -56,7 +56,7 @@ export default function EditProfileController($scope, $async, $state, $window, M
   };
 
   $scope.onChangeFileContent = function onChangeFileContent(value) {
-    $scope.formValues.ProfileFileContent = value;
+    $scope.formValues.profileFileContent = value;
     $scope.state.isEditorDirty = true;
   };
 
@@ -70,8 +70,8 @@ export default function EditProfileController($scope, $async, $state, $window, M
         const profile = await getProfile($scope.state.profileID);
 
         $scope.formValues = {
-          Name: profile.name,
-          ProfileFileContent: profile.fileContent,
+          name: profile.name,
+          profileFileContent: profile.fileContent,
         };
         $scope.state.isEditorDirty = false;
       } catch (err) {

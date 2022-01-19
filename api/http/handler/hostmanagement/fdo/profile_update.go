@@ -44,7 +44,7 @@ func (handler *Handler) updateProfile(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusNotFound, "profile not found", errors.New("profile not found")}
 	}
 
-	isUnique, err := handler.checkUniqueProfileNameForUpdate(payload.Name, id)
+	isUnique, err := handler.checkUniqueProfileName(payload.Name, id)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
@@ -65,19 +65,4 @@ func (handler *Handler) updateProfile(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	return response.JSON(w, profile)
-}
-
-func (handler *Handler) checkUniqueProfileNameForUpdate(name string, id int) (bool, error) {
-	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
-	if err != nil {
-		return false, err
-	}
-
-	for _, profile := range profiles {
-		if profile.Name == name && int(profile.ID) != id {
-			return false, nil
-		}
-	}
-
-	return true, nil
 }

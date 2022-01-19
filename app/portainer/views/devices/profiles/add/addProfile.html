@@ -13,7 +13,7 @@
           <div class="form-group">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="profile_name" name="profile_name" placeholder="e.g. myprofile" auto-focus />
+              <input type="text" class="form-control" ng-model="formValues.name" id="profile_name" name="profile_name" placeholder="e.g. myprofile" auto-focus />
             </div>
           </div>
           <!-- !name-input -->
@@ -39,7 +39,7 @@
           <web-editor-form
             ng-if="state.method === 'editor'"
             identifier="profile-creation-editor"
-            value="formValues.ProfileFileContent"
+            value="formValues.profileFileContent"
             on-change="(onChangeFileContent)"
             ng-required="true"
             placeholder="#"
@@ -55,8 +55,8 @@
                 class="btn btn-primary btn-sm"
                 ng-disabled="state.actionInProgress
               || !createProfileForm.$valid
-              || !formValues.ProfileFileContent
-              || !formValues.Name"
+              || !formValues.profileFileContent
+              || !formValues.name"
                 ng-click="createProfileAsync()"
                 button-spinner="state.actionInProgress"
               >
