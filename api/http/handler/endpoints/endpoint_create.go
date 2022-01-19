@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofrs/uuid"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -337,6 +338,20 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		EdgeCheckinInterval: payload.EdgeCheckinInterval,
 		Kubernetes:          portainer.KubernetesDefault(),
 		IsEdgeDevice:        payload.IsEdgeDevice,
+	}
+
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
+	}
+
+	if settings.DisableTrustOnFirstConnect {
+		edgeID, err := uuid.NewV4()
+		if err != nil {
+			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Cannot generate the Edge ID", err}
+		}
+
+		endpoint.EdgeID = edgeID.String()
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)

@@ -42,6 +42,8 @@ type settingsUpdatePayload struct {
 	HelmRepositoryURL *string `example:"https://charts.bitnami.com/bitnami"`
 	// Kubectl Shell Image
 	KubectlShellImage *string `example:"portainer/kubectl-shell:latest"`
+	// DisableTrustOnFirstConnect makes Portainer store the Edge ID instead of accepting anyone
+	DisableTrustOnFirstConnect *bool `example:"false"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -160,6 +162,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.EnableEdgeComputeFeatures != nil {
 		settings.EnableEdgeComputeFeatures = *payload.EnableEdgeComputeFeatures
+	}
+
+	if payload.DisableTrustOnFirstConnect != nil {
+		settings.DisableTrustOnFirstConnect = *payload.DisableTrustOnFirstConnect
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {

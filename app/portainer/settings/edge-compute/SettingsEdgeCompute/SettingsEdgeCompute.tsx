@@ -13,6 +13,7 @@ import { validationSchema } from './SettingsEdgeCompute.validation';
 export interface FormValues {
   EdgeAgentCheckinInterval: number;
   EnableEdgeComputeFeatures: boolean;
+  DisableTrustOnFirstConnect: boolean;
 }
 
 interface Props {
@@ -40,6 +41,9 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
     EdgeAgentCheckinInterval: settings ? settings.EdgeAgentCheckinInterval : 5,
     EnableEdgeComputeFeatures: settings
       ? settings.EnableEdgeComputeFeatures
+      : false,
+    DisableTrustOnFirstConnect: settings
+      ? settings.DisableTrustOnFirstConnect
       : false,
   };
 
@@ -109,6 +113,23 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                   When enabled, this will enable Portainer to execute Edge
                   Device features.
                 </TextTip>
+
+                <FormControl
+                  inputId="edge_tofc"
+                  label="Disable trust on first connect"
+                  size="medium"
+                  errors={errors.DisableTrustOnFirstConnect}
+                >
+                  <Switch
+                    id="edge_disable_tofc"
+                    name="edge_disable_tofc"
+                    className="space-right"
+                    checked={values.DisableTrustOnFirstConnect}
+                    onChange={(e) =>
+                      setFieldValue('DisableTrustOnFirstConnect', e.valueOf())
+                    }
+                  />
+                </FormControl>
 
                 <div className="form-group">
                   <div className="col-sm-12">
