@@ -544,6 +544,7 @@ html {
   --text-button-hover-color: var(--white-color);
   --text-btn-default-color: var(--white-color);
   --text-small-select-color: var(--white-color);
+  --text-multiselect-item-color: var(--white-color);
 
   --border-color: var(--grey-55);
   --border-widget-color: var(--white-color);
