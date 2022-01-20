@@ -1,11 +1,11 @@
 import { UsersSelector } from '@/portainer/components/UsersSelector';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { UserViewModel } from '@/portainer/models/user';
 import { Link } from '@/portainer/components/Link';
+import { User } from '@/portainer/users/types';
 
 interface Props {
   name: string;
-  users: UserViewModel[];
+  users: User[];
   value: number[];
   onChange(value: number[]): void;
   errors?: string | string[];

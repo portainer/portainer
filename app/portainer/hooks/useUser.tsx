@@ -9,14 +9,13 @@ import {
   useMemo,
 } from 'react';
 
-import { getUser } from '@/portainer/services/api/userService';
-
-import { UserViewModel } from '../models/user';
+import { getUser } from '../users/user.service';
+import { User } from '../users/types';
 
 import { useLocalStorage } from './useLocalStorage';
 
 interface State {
-  user?: UserViewModel | null;
+  user?: User | null;
 }
 
 export const UserContext = createContext<State | null>(null);
@@ -41,16 +40,16 @@ export function useAuthorizations(
   const { user } = useUser();
   const { params } = useCurrentStateAndParams();
 
+  if (!user) {
+    return false;
+  }
+
   if (process.env.PORTAINER_EDITION === 'CE') {
     return !adminOnlyCE || isAdmin(user);
   }
 
   const { endpointId } = params;
   if (!endpointId) {
-    return false;
-  }
-
-  if (!user) {
     return false;
   }
 
@@ -88,7 +87,7 @@ interface UserProviderProps {
 
 export function UserProvider({ children }: UserProviderProps) {
   const [jwt] = useLocalStorage('JWT', '');
-  const [user, setUser] = useState<UserViewModel | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (jwt !== '') {
@@ -120,7 +119,12 @@ export function UserProvider({ children }: UserProviderProps) {
   }
 }
 
-export function isAdmin(user?: UserViewModel | null): boolean {
+export function useIsAdmin() {
+  const { user } = useUser();
+  return isAdmin(user);
+}
+
+export function isAdmin(user?: User | null): boolean {
   return !!user && user.Role === 1;
 }
 

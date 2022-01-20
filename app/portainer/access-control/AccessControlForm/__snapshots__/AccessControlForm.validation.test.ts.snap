@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`when ownership is restricted and no teams or users, should be invalid 1`] = `"You must specify at least one team or user."`;
+
+exports[`when ownership is restricted and no teams or users, should be invalid 2`] = `"You must specify at least one team."`;

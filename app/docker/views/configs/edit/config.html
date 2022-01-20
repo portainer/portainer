@@ -59,7 +59,14 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel ng-if="config" resource-id="config.Id" resource-control="config.ResourceControl" resource-type="'config'"> </por-access-control-panel>
+<access-control-panel
+  ng-if="config"
+  resource-id="config.Id"
+  resource-control="config.ResourceControl"
+  resource-type="resourceType"
+  on-update-success="(onUpdateResourceControlSuccess)"
+>
+</access-control-panel>
 <!-- !access-control-panel -->
 
 <div class="row" ng-if="config">

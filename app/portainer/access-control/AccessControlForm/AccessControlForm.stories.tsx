@@ -3,11 +3,11 @@ import { useMemo, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 import { UserContext } from '@/portainer/hooks/useUser';
-import { ResourceControlOwnership } from '@/portainer/models/resourceControl/resourceControlOwnership';
 import { UserViewModel } from '@/portainer/models/user';
 
+import { parseAccessControlFormData } from '../utils';
+
 import { AccessControlForm } from './AccessControlForm';
-import { AccessControlFormData } from './model';
 
 const meta: Meta = {
   title: 'Components/AccessControlForm',
@@ -30,11 +30,8 @@ interface Args {
 }
 
 function Template({ userRole }: Args) {
-  const defaults = new AccessControlFormData();
-  defaults.ownership =
-    userRole === Role.Admin
-      ? ResourceControlOwnership.ADMINISTRATORS
-      : ResourceControlOwnership.PRIVATE;
+  const isAdmin = userRole === Role.Admin;
+  const defaults = parseAccessControlFormData(isAdmin);
 
   const [value, setValue] = useState(defaults);
 
@@ -46,7 +43,7 @@ function Template({ userRole }: Args) {
   return (
     <QueryClientProvider client={testQueryClient}>
       <UserContext.Provider value={userProviderState}>
-        <AccessControlForm values={value} onChange={setValue} />
+        <AccessControlForm values={value} onChange={setValue} errors={{}} />
       </UserContext.Provider>
     </QueryClientProvider>
   );

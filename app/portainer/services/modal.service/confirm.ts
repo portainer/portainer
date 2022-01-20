@@ -55,21 +55,6 @@ export function confirm(options: ConfirmOptions) {
   applyBoxCSS(box);
 }
 
-export function confirmAccessControlUpdate(callback: ConfirmCallback) {
-  confirm({
-    title: 'Are you sure ?',
-    message:
-      'Changing the ownership of this resource will potentially restrict its management to some users.',
-    buttons: {
-      confirm: {
-        label: 'Change ownership',
-        className: 'btn-primary',
-      },
-    },
-    callback,
-  });
-}
-
 export function confirmImageForceRemoval(callback: ConfirmCallback) {
   confirm({
     title: 'Are you sure?',

@@ -1,4 +1,4 @@
-import { ResourceControlViewModel } from '@/portainer/models/resourceControl/resourceControl';
+import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 
 export type DockerContainerStatus =
   | 'paused'
