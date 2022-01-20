@@ -66,7 +66,7 @@
             <!-- !image-and-registry -->
           </div>
           <!-- create-webhook -->
-          <div>
+          <div ng-if="isAdmin && endpoint.Type !== 4">
             <div class="col-sm-12 form-section-title"> Webhooks </div>
             <div class="form-group">
               <div class="col-sm-12">
