@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -78,9 +77,6 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 		})
 	if err == stop {
 		return resourceControl, nil
-	}
-	if err == nil {
-		return nil, errors.ErrObjectNotFound
 	}
 
 	return nil, err
