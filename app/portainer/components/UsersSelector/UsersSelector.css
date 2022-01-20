@@ -1,6 +1,6 @@
 .selector__control {
   border: 1px solid var(--border-multiselect) !important;
-  background-color: var(--bg-multiselected-color) !important;
+  background-color: var(--bg-multiselect-color) !important;
 }
 
 .selector__multi-value {
@@ -12,11 +12,12 @@
 }
 
 .selector__menu {
-  background-color: var(--bg-multiselected-color) !important;
+  background-color: var(--bg-multiselect-color) !important;
   border: 1px solid var(--border-multiselect) !important;
 }
 
 .selector__option {
-  background-color: var(--bg-multiselected-color) !important;
+  background-color: var(--bg-multiselect-color) !important;
   border: 1px solid var(--border-multiselect) !important;
+  border: 1px solid red;
 }
