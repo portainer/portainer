@@ -11,6 +11,7 @@ export interface ButtonsOptions {
 }
 
 export function confirmButtons(options: ButtonsOptions) {
+  console.log({ options });
   return {
     confirm: {
       label: sanitize(options.confirm.label),
