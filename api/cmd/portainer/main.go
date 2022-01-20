@@ -106,11 +106,6 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	if isNew {
 		// from MigrateData
 		store.VersionService.StoreDBVersion(portainer.DBVersion)
-
-		err := updateSettingsFromFlags(store, flags)
-		if err != nil {
-			logrus.Fatalf("Failed updating settings from flags: %v", err)
-		}
 	} else {
 		storedVersion, err := store.VersionService.DBVersion()
 		if err != nil {
@@ -122,6 +117,11 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 				logrus.Fatalf("Failed migration: %v", err)
 			}
 		}
+	}
+
+	err = updateSettingsFromFlags(store, flags)
+	if err != nil {
+		logrus.Fatalf("Failed updating settings from flags: %v", err)
 	}
 
 	// this is for the db restore functionality - needs more tests.
