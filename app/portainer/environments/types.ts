@@ -73,6 +73,7 @@ export type Environment = {
   Kubernetes: KubernetesSettings;
   PublicURL?: string;
   IsEdgeDevice?: boolean;
+  AMTDeviceGUID?: string;
 };
 
 /**
