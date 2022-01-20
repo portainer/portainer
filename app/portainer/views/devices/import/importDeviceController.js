@@ -71,7 +71,7 @@ angular
 
           let suffix = $scope.formValues.Suffix;
 
-          for (const dev of $scope.state.deviceIDs) {
+          for (const deviceID of $scope.state.deviceIDs) {
             try {
               var endpoint = await EndpointService.createRemoteEndpoint(
                 $scope.formValues.DeviceName + suffix,
@@ -92,8 +92,6 @@ angular
             } catch (err) {
               Notifications.error('Failure', err, 'Unable to create the environment');
               return;
-            } finally {
-              $scope.state.actionInProgress = false;
             }
 
             suffix++;
@@ -105,7 +103,7 @@ angular
             };
 
             try {
-              await configureDevice(dev, config);
+              await configureDevice(deviceID, config);
             } catch (err) {
               Notifications.error('Failure', err, 'Unable to import device');
               return;

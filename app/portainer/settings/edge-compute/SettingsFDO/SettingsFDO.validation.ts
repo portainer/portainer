@@ -14,9 +14,5 @@ export function validationSchema() {
       is: true,
       then: string().required('Field is required'),
     }),
-    profilesURL: string().when('enabled', {
-      is: true,
-      then: string().required('Field is required'),
-    }),
   });
 }

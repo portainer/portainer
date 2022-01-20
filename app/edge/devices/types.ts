@@ -5,6 +5,11 @@ export interface EdgeDeviceTableSettings {
   sortBy: { id: string; desc: boolean };
 }
 
+export interface FDOProfilesTableSettings {
+  pageSize: number;
+  sortBy: { id: string; desc: boolean };
+}
+
 export enum DeviceAction {
   PowerOn = 'power on',
   PowerOff = 'power off',

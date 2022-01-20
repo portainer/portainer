@@ -3,26 +3,28 @@ package fdo
 import (
 	"encoding/hex"
 	"errors"
-	"fmt"
-	"io"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 
-	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/fxamacker/cbor/v2"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	deploymentScriptName = "fdo.sh"
+)
+
 type deviceConfigurePayload struct {
-	EdgeID     string `json:"edgeID"`
-	EdgeKey    string `json:"edgeKey"`
-	Name       string `json:"name"`
-	ProfileURL string `json:"profile"`
+	EdgeID    string `json:"edgeID"`
+	EdgeKey   string `json:"edgeKey"`
+	Name      string `json:"name"`
+	ProfileID int    `json:"profile"`
 }
 
 func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
@@ -38,26 +40,16 @@ func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
 		return errors.New("the device name cannot be empty")
 	}
 
-	if err := validateURL(payload.ProfileURL); err != nil {
-		return fmt.Errorf("FDO profile URL: %w", err)
+	if payload.ProfileID < 1 {
+		return errors.New("invalid profile id provided")
 	}
 
 	return nil
 }
 
-func fetchProfileContents(profileURL string) ([]byte, error) {
-	resp, err := http.Get(profileURL)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	return io.ReadAll(resp.Body)
-}
-
 // @id fdoConfigureDevice
-// @summary configure an FDO device
-// @description configure an FDO device
+// @summary configures an FDO device
+// @description configures an FDO device
 // @description **Access policy**: administrator
 // @tags intel
 // @security jwt
@@ -83,14 +75,17 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
-	profileUrl, err := url.Parse(payload.ProfileURL)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "fdoConfigureDevice: invalid FDO profile URL", Err: err}
+	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(payload.ProfileID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a FDO Profile with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a FDO Profile with the specified identifier inside the database", err}
 	}
 
-	profileContents, err := fetchProfileContents(payload.ProfileURL)
+	fileContent, err := handler.FileService.GetFileContent(profile.FilePath, "")
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadGateway, Message: "fdoConfigureDevice: could not retrieve the FDO profile", Err: err}
+		logrus.WithError(err).Info("fdoConfigureDevice: GetFileContent")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: GetFileContent", Err: err}
 	}
 
 	fdoClient, err := handler.newFDOClient()
@@ -158,15 +153,13 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
 	}
 
-	// onboarding script - this would get selected by the profile name
-	deploymentScriptName := path.Base(profileUrl.Path)
 	if err = fdoClient.PutDeviceSVIRaw(url.Values{
 		"guid":     []string{guid},
 		"priority": []string{"1"},
 		"module":   []string{"fdo_sys"},
 		"var":      []string{"filedesc"},
 		"filename": []string{deploymentScriptName},
-	}, profileContents); err != nil {
+	}, fileContent); err != nil {
 		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
 	}
@@ -177,15 +170,15 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw() failed to encode", Err: err}
 	}
 
-	cbor := strings.ToUpper(hex.EncodeToString(b))
-	logrus.WithField("cbor", cbor).WithField("string", deploymentScriptName).Info("converted to CBOR")
+	cborBytes := strings.ToUpper(hex.EncodeToString(b))
+	logrus.WithField("cbor", cborBytes).WithField("string", deploymentScriptName).Info("converted to CBOR")
 
 	if err = fdoClient.PutDeviceSVIRaw(url.Values{
 		"guid":     []string{guid},
 		"priority": []string{"2"},
 		"module":   []string{"fdo_sys"},
 		"var":      []string{"exec"},
-		"bytes":    []string{cbor},
+		"bytes":    []string{cborBytes},
 	}, []byte("")); err != nil {
 		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}

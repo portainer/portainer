@@ -78,7 +78,17 @@ type (
 		OwnerURL      string `json:"ownerURL"`
 		OwnerUsername string `json:"ownerUsername"`
 		OwnerPassword string `json:"ownerPassword"`
-		ProfilesURL   string `json:"profilesURL"`
+	}
+
+	// FDOProfileID represents a fdo profile id
+	FDOProfileID int
+
+	FDOProfile struct {
+		ID            FDOProfileID `json:"id"`
+		Name          string       `json:"name"`
+		FilePath      string       `json:"filePath"`
+		NumberDevices int          `json:"numberDevices"`
+		DateCreated   int64        `json:"dateCreated"`
 	}
 
 	// CLIFlags represents the available flags on the CLI
@@ -1230,6 +1240,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
+		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 	}
 
 	// GitService represents a service for managing Git

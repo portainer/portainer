@@ -39,10 +39,6 @@ func (payload *fdoConfigurePayload) Validate(r *http.Request) error {
 		if err := validateURL(payload.OwnerURL); err != nil {
 			return fmt.Errorf("owner server URL: %w", err)
 		}
-
-		if err := validateURL(payload.ProfilesURL); err != nil {
-			return fmt.Errorf("profile list URL: %w", err)
-		}
 	}
 
 	return nil

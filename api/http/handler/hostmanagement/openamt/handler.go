@@ -21,7 +21,7 @@ type Handler struct {
 }
 
 // NewHandler returns a new Handler
-func NewHandler(bouncer *security.RequestBouncer) (*Handler, error) {
+func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
 	}
@@ -33,5 +33,5 @@ func NewHandler(bouncer *security.RequestBouncer) (*Handler, error) {
 	h.Handle("/open_amt/{id}/devices/{deviceId}/action", bouncer.AdminAccess(httperror.LoggerHandler(h.deviceAction))).Methods(http.MethodPost)
 	h.Handle("/open_amt/{id}/devices/{deviceId}/features", bouncer.AdminAccess(httperror.LoggerHandler(h.deviceFeatures))).Methods(http.MethodPost)
 
-	return h, nil
+	return h
 }
