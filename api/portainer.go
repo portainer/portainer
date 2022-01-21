@@ -325,6 +325,8 @@ type (
 		LastCheckInDate int64
 		// IsEdgeDevice marks if the environment was created as an EdgeDevice
 		IsEdgeDevice bool
+		// Whether the device has been trusted or not by the user
+		UserTrusted bool
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4

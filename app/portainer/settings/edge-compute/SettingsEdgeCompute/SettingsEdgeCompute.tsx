@@ -135,7 +135,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
 
                 <FormControl
                   inputId="edge_tofc"
-                  label="Disable trust on first connect"
+                  label="Trust on first connect"
                   size="medium"
                   errors={errors.DisableTrustOnFirstConnect}
                 >
@@ -143,9 +143,9 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                     id="edge_disable_tofc"
                     name="edge_disable_tofc"
                     className="space-right"
-                    checked={values.DisableTrustOnFirstConnect}
+                    checked={!values.DisableTrustOnFirstConnect}
                     onChange={(e) =>
-                      setFieldValue('DisableTrustOnFirstConnect', e.valueOf())
+                      setFieldValue('DisableTrustOnFirstConnect', !e.valueOf())
                     }
                   />
                 </FormControl>

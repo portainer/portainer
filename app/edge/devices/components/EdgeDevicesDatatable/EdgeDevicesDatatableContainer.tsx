@@ -36,5 +36,6 @@ export const EdgeDevicesDatatableAngular = react2angular(
     'setLoadingMessage',
     'isOpenAmtEnabled',
     'isFdoEnabled',
+    'disableTrustOnFirstConnect',
   ]
 );

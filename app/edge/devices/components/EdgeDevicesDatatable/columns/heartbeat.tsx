@@ -2,6 +2,7 @@ import { CellProps, Column } from 'react-table';
 import clsx from 'clsx';
 
 import { Environment, EnvironmentStatus } from '@/portainer/environments/types';
+import { useRowContext } from '@/edge/devices/components/EdgeDevicesDatatable/columns/RowContext';
 
 export const heartbeat: Column<Environment> = {
   Header: 'Heartbeat',
@@ -15,6 +16,12 @@ export const heartbeat: Column<Environment> = {
 export function StatusCell({
   row: { original: environment },
 }: CellProps<Environment>) {
+  const { disableTrustOnFirstConnect } = useRowContext();
+
+  if (disableTrustOnFirstConnect && !environment.UserTrusted) {
+    return <span className="label label-default">untrusted</span>;
+  }
+
   if (!environment.LastCheckInDate) {
     return (
       <span className="label label-default">

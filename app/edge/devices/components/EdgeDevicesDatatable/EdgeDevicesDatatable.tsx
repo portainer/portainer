@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   useTable,
   useExpanded,
@@ -38,12 +38,14 @@ import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevi
 import { EdgeDevicesDatatableActions } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions';
 import { AMTDevicesDatatable } from '@/edge/devices/components/AMTDevicesDatatable/AMTDevicesDatatable';
 
+import { RowProvider } from './columns/RowContext';
 import { useColumns } from './columns';
 
 export interface EdgeDevicesTableProps {
   isEnabled: boolean;
   isFdoEnabled: boolean;
   isOpenAmtEnabled: boolean;
+  disableTrustOnFirstConnect: boolean;
   dataset: Environment[];
   onRefresh(): Promise<void>;
   setLoadingMessage(message: string): void;
@@ -52,6 +54,7 @@ export interface EdgeDevicesTableProps {
 export function EdgeDevicesDatatable({
   isFdoEnabled,
   isOpenAmtEnabled,
+  disableTrustOnFirstConnect,
   dataset,
   onRefresh,
   setLoadingMessage,
@@ -178,7 +181,10 @@ export function EdgeDevicesDatatable({
             const { key, className, role, style } = row.getRowProps();
 
             return (
-              <Fragment key={key}>
+              <RowProvider
+                key={key}
+                disableTrustOnFirstConnect={disableTrustOnFirstConnect}
+              >
                 <TableRow<Environment>
                   cells={row.cells}
                   key={key}
@@ -194,7 +200,7 @@ export function EdgeDevicesDatatable({
                     </td>
                   </tr>
                 )}
-              </Fragment>
+              </RowProvider>
             );
           })}
         </tbody>
