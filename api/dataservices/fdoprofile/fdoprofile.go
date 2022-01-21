@@ -67,12 +67,10 @@ func (service *Service) FDOProfile(ID portainer.FDOProfileID) (*portainer.FDOPro
 
 // Create assign an ID to a new FDO Profile and saves it.
 func (service *Service) Create(FDOProfile *portainer.FDOProfile) error {
-	return service.connection.CreateObject(
+	return service.connection.CreateObjectWithId(
 		BucketName,
-		func(id uint64) (int, interface{}) {
-			FDOProfile.ID = portainer.FDOProfileID(id)
-			return int(FDOProfile.ID), FDOProfile
-		},
+		int(FDOProfile.ID),
+		FDOProfile,
 	)
 }
 
