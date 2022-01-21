@@ -8,9 +8,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/sirupsen/logrus"
 
 	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
@@ -128,16 +125,6 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	go func() {
 		<-shutdownCtx.Done()
 		defer connection.Close()
-
-		exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
-
-		err := store.Export(exportFilename)
-		if err != nil {
-			logrus.WithError(err).Debugf("Failed to export to %s", exportFilename)
-		} else {
-			logrus.Debugf("exported to %s", exportFilename)
-		}
-		connection.Close()
 	}()
 	return store
 }
