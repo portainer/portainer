@@ -2,9 +2,7 @@ package boltdb
 
 import (
 	"encoding/binary"
-
 	"errors"
-
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,9 +11,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
-
 	"github.com/sirupsen/logrus"
 )
 
