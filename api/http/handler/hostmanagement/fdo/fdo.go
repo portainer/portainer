@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -96,5 +97,67 @@ func (handler *Handler) fdoConfigure(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error saving FDO settings", Err: err}
 	}
 
+	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Error saving FDO settings", Err: err}
+	}
+	if len(profiles) == 0 {
+		err = handler.addDefaultProfile()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+		}
+	}
+
 	return response.Empty(w)
 }
+
+func (handler *Handler) addDefaultProfile() error {
+	profileID := handler.DataStore.FDOProfile().GetNextIdentifier()
+	profile := &portainer.FDOProfile{
+		ID:   portainer.FDOProfileID(profileID),
+		Name: "Docker Standalone + Edge",
+	}
+
+	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(profile.ID)), []byte(defaultProfileFileContent))
+	if err != nil {
+		return err
+	}
+	profile.FilePath = filePath
+	profile.DateCreated = time.Now().Unix()
+
+	err = handler.DataStore.FDOProfile().Create(profile)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+const defaultProfileFileContent = `
+#!/bin/bash -ex
+
+env > env.log
+
+export AGENT_IMAGE=portainer/agent:2.9.3
+export GUID=$(cat DEVICE_GUID.txt)
+export DEVICE_NAME=$(cat DEVICE_name.txt)
+export EDGE_KEY=$(cat DEVICE_edgekey.txt)
+export AGENTVOLUME=$(pwd)/data/portainer_agent_data/
+
+mkdir -p ${AGENTVOLUME}
+
+docker pull ${AGENT_IMAGE}
+
+docker run -d \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+    -v /:/host \
+    -v ${AGENTVOLUME}:/data \
+    --restart always \
+    -e EDGE=1 \
+    -e EDGE_ID=${GUID} \
+    -e EDGE_KEY=${EDGE_KEY} \
+    -e CAP_HOST_MANAGEMENT=1 \
+    -e EDGE_INSECURE_POLL=1 \
+    --name portainer_edge_agent \
+    ${AGENT_IMAGE}
+`
