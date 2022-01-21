@@ -6,6 +6,7 @@ export interface FDOConfiguration {
 }
 
 export interface DeviceConfiguration {
+  edgeID: string;
   edgeKey: string;
   name: string;
   profile: string;

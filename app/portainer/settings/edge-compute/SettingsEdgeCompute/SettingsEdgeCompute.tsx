@@ -14,6 +14,7 @@ export interface FormValues {
   EdgeAgentCheckinInterval: number;
   EnableEdgeComputeFeatures: boolean;
   DisableTrustOnFirstConnect: boolean;
+  EnforceEdgeID: boolean;
 }
 
 interface Props {
@@ -45,6 +46,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
     DisableTrustOnFirstConnect: settings
       ? settings.DisableTrustOnFirstConnect
       : false,
+    EnforceEdgeID: settings ? settings.EnforceEdgeID : false,
   };
 
   return (
@@ -113,6 +115,23 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                   When enabled, this will enable Portainer to execute Edge
                   Device features.
                 </TextTip>
+
+                <FormControl
+                  inputId="edge_enforce_id"
+                  label="Enforce environment ID"
+                  size="medium"
+                  errors={errors.EnforceEdgeID}
+                >
+                  <Switch
+                    id="edge_enforce_id"
+                    name="edge_enforce_id"
+                    className="space-right"
+                    checked={values.EnforceEdgeID}
+                    onChange={(e) =>
+                      setFieldValue('EnforceEdgeID', e.valueOf())
+                    }
+                  />
+                </FormControl>
 
                 <FormControl
                   inputId="edge_tofc"

@@ -814,8 +814,10 @@ type (
 		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
 		// KubectlImage, defaults to portainer/kubectl-shell
 		KubectlShellImage string `json:"KubectlShellImage" example:"portainer/kubectl-shell"`
-		// DisableTrustOnFirstConnect makes Portainer store the Edge ID instead of accepting anyone
+		// DisableTrustOnFirstConnect makes Portainer require explicit user trust of the edge agent before accepting the connection
 		DisableTrustOnFirstConnect bool `json:"DisableTrustOnFirstConnect" example:"false"`
+		// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
+		EnforceEdgeID bool `json:"EnforceEdgeID" example:"false"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool

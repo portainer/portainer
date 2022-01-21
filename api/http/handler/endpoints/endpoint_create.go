@@ -345,7 +345,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}
 
-	if settings.DisableTrustOnFirstConnect {
+	if settings.EnforceEdgeID {
 		edgeID, err := uuid.NewV4()
 		if err != nil {
 			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Cannot generate the Edge ID", err}

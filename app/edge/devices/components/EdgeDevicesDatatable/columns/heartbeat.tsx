@@ -15,7 +15,7 @@ export const heartbeat: Column<Environment> = {
 export function StatusCell({
   row: { original: environment },
 }: CellProps<Environment>) {
-  if (!environment.EdgeID) {
+  if (!environment.LastCheckInDate) {
     return (
       <span className="label label-default">
         <s>associated</s>

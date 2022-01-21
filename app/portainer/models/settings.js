@@ -16,12 +16,14 @@ export function SettingsViewModel(data) {
   this.KubeconfigExpiry = data.KubeconfigExpiry;
   this.HelmRepositoryURL = data.HelmRepositoryURL;
   this.DisableTrustOnFirstConnect = data.DisableTrustOnFirstConnect;
+  this.EnforceEdgeID = data.EnforceEdgeID;
 }
 
 export function PublicSettingsViewModel(settings) {
   this.AuthenticationMethod = settings.AuthenticationMethod;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.DisableTrustOnFirstConnect = settings.DisableTrustOnFirstConnect;
+  this.EnforceEdgeID = settings.EnforceEdgeID;
   this.FeatureFlagSettings = settings.FeatureFlagSettings;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;

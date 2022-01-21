@@ -97,6 +97,7 @@ angular
             suffix++;
 
             const config = {
+              edgeID: endpoint.EdgeID,
               edgeKey: endpoint.EdgeKey,
               name: $scope.formValues.DeviceName,
               profile: $scope.formValues.DeviceProfile,
