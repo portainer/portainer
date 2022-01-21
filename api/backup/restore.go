@@ -67,20 +67,19 @@ func restoreFiles(srcDir string, destinationDir string) error {
 		}
 	}
 
-	// yuck.  This is very boltdb specific once again.  I think maybe these backup/restore options should be moved into bolt
-	// refactor for another day
+	// TODO:  This is very boltdb module specific once again due to the filename.  Move to bolt module? Refactor for another day
 
-	// Prevents copying portainer.edb to portainer.db
+	// Prevent the possibility of having both databases.  Remove any default new instance
 	os.Remove(filepath.Join(destinationDir, boltdb.DatabaseFileName))
+	os.Remove(filepath.Join(destinationDir, boltdb.EncryptedDatabaseFileName))
 
-	err := filesystem.CopyPath(filepath.Join(srcDir, boltdb.DatabaseFileName), destinationDir)
+	// Now copy the database.  It'll be either portainer.db or portainer.edb
+
+	// Note: CopyPath does not return an error if the source file doesn't exist
+	err := filesystem.CopyPath(filepath.Join(srcDir, boltdb.EncryptedDatabaseFileName), destinationDir)
 	if err != nil {
-		// Copyfile will not error if the file doesn't exist. So if it does exist and we error,
-		// it's safe to say the source file exists and we can't copy it.  So return the error
 		return err
 	}
 
-	// If the file doesn't exist we also get no error
-	filesystem.CopyPath(filepath.Join(srcDir, boltdb.EncryptedDatabaseFileName), destinationDir)
-	return errors.New("Something happened!")
+	return filesystem.CopyPath(filepath.Join(srcDir, boltdb.DatabaseFileName), destinationDir)
 }
