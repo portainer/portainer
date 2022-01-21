@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "2.11.0",
+  "version": "2.11.1",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -121,12 +121,12 @@
     "rc-slider": "^9.7.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-i18next": "^11.12.0",
-    "react-is": "^17.0.2",
     "react-query": "^3.34.3",
+    "react-is": "^17.0.2",
     "react-select": "^5.2.1",
     "react-table": "^7.7.0",
     "react-tooltip": "^4.2.21",
+    "react-i18next": "^11.12.0",
     "sanitize-html": "^2.5.3",
     "spinkit": "^2.0.1",
     "splitargs": "github:deviantony/splitargs#semver:~0.2.0",

@@ -4,6 +4,7 @@ import (
 	"io"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/errors"
 )
@@ -32,6 +33,7 @@ type testDatastore struct {
 	user                    dataservices.UserService
 	version                 dataservices.VersionService
 	webhook                 dataservices.WebhookService
+	connection              portainer.Connection
 }
 
 func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
@@ -79,6 +81,10 @@ func (d *testDatastore) IsErrObjectNotFound(e error) bool {
 	return false
 }
 
+func (d *testDatastore) Connection() portainer.Connection {
+	return d.connection
+}
+
 func (d *testDatastore) Export(filename string) (err error) {
 	return nil
 }
@@ -91,10 +97,12 @@ type datastoreOption = func(d *testDatastore)
 // NewDatastore creates new instance of testDatastore.
 // Will apply options before returning, opts will be applied from left to right.
 func NewDatastore(options ...datastoreOption) *testDatastore {
-	d := testDatastore{}
+	conn, _ := database.NewDatabase("boltdb", "", nil)
+	d := testDatastore{connection: conn}
 	for _, o := range options {
 		o(&d)
 	}
+
 	return &d
 }
 

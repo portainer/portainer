@@ -23,7 +23,7 @@ type (
 		BackupTo(w io.Writer) error
 		Export(filename string) (err error)
 		IsErrObjectNotFound(err error) bool
-
+		Connection() portainer.Connection
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService

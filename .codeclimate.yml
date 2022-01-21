@@ -22,7 +22,7 @@ checks:
     enabled: false
 plugins:
   gofmt:
-    enabled: true
+    enabled: false
   eslint:
     enabled: true
     channel: "eslint-5"

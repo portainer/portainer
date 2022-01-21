@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"io/ioutil"
 	"net/http"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"golang.org/x/sync/errgroup"
 )
 
 const (

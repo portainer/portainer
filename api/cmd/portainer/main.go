@@ -4,14 +4,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"log"
+	"github.com/sirupsen/logrus"
 	"os"
 	"path"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/sirupsen/logrus"
 
 	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
@@ -20,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/docker"
@@ -48,12 +46,12 @@ func initCLI() *portainer.CLIFlags {
 	var cliService portainer.CLIService = &cli.Service{}
 	flags, err := cliService.ParseFlags(portainer.APIVersion)
 	if err != nil {
-		log.Fatalf("Failed parsing flags: %v", err)
+		logrus.Fatalf("Failed parsing flags: %v", err)
 	}
 
 	err = cliService.ValidateFlags(flags)
 	if err != nil {
-		log.Fatalf("Failed validating flags:%v", err)
+		logrus.Fatalf("Failed validating flags:%v", err)
 	}
 	return flags
 }
@@ -61,7 +59,7 @@ func initCLI() *portainer.CLIFlags {
 func initFileService(dataStorePath string) portainer.FileService {
 	fileService, err := filesystem.NewService(dataStorePath, "")
 	if err != nil {
-		log.Fatalf("Failed creating file service: %v", err)
+		logrus.Fatalf("Failed creating file service: %v", err)
 	}
 	return fileService
 }
@@ -69,21 +67,30 @@ func initFileService(dataStorePath string) portainer.FileService {
 func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
 	connection, err := database.NewDatabase("boltdb", *flags.Data, secretKey)
 	if err != nil {
-		panic(err.Error())
+		logrus.Fatalf("failed creating database connection: %s", err)
 	}
+
+	if bconn, ok := connection.(*boltdb.DbConnection); ok {
+		bconn.MaxBatchSize = *flags.MaxBatchSize
+		bconn.MaxBatchDelay = *flags.MaxBatchDelay
+		bconn.InitialMmapSize = *flags.InitialMmapSize
+	} else {
+		logrus.Fatalf("failed creating database connection: expecting a boltdb database type but a different one was received")
+	}
+
 	store := datastore.NewStore(*flags.Data, fileService, connection)
 	isNew, err := store.Open()
 	if err != nil {
-		log.Fatalf("Failed opening store: %v", err)
+		logrus.Fatalf("Failed opening store: %v", err)
 	}
 
 	if *flags.Rollback {
 		err := store.Rollback(false)
 		if err != nil {
-			log.Fatalf("Failed rolling back: %v", err)
+			logrus.Fatalf("Failed rolling back: %v", err)
 		}
 
-		log.Println("Exiting rollback")
+		logrus.Println("Exiting rollback")
 		os.Exit(0)
 		return nil
 	}
@@ -91,7 +98,7 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	// Init sets some defaults - its basically a migration
 	err = store.Init()
 	if err != nil {
-		log.Fatalf("Failed initializing data store: %v", err)
+		logrus.Fatalf("Failed initializing data store: %v", err)
 	}
 
 	if isNew {
@@ -100,17 +107,17 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 
 		err := updateSettingsFromFlags(store, flags)
 		if err != nil {
-			log.Fatalf("Failed updating settings from flags: %v", err)
+			logrus.Fatalf("Failed updating settings from flags: %v", err)
 		}
 	} else {
 		storedVersion, err := store.VersionService.DBVersion()
 		if err != nil {
-			log.Fatalf("Something Failed during creation of new database: %v", err)
+			logrus.Fatalf("Something Failed during creation of new database: %v", err)
 		}
 		if storedVersion != portainer.DBVersion {
 			err = store.MigrateData()
 			if err != nil {
-				log.Fatalf("Failed migration: %v", err)
+				logrus.Fatalf("Failed migration: %v", err)
 			}
 		}
 	}
@@ -119,37 +126,21 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	go func() {
 		<-shutdownCtx.Done()
 		defer connection.Close()
-
-		exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
-
-		err := store.Export(exportFilename)
-		if err != nil {
-			logrus.WithError(err).Debugf("Failed to export to %s", exportFilename)
-		} else {
-			logrus.Debugf("exported to %s", exportFilename)
-		}
-		connection.Close()
 	}()
+
 	return store
 }
 
 func initComposeStackManager(assetsPath string, configPath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
 	composeWrapper, err := exec.NewComposeStackManager(assetsPath, configPath, proxyManager)
 	if err != nil {
-		log.Fatalf("Failed creating compose manager: %v", err)
+		logrus.Fatalf("Failed creating compose manager: %v", err)
 	}
 
 	return composeWrapper
 }
 
-func initSwarmStackManager(
-	assetsPath string,
-	configPath string,
-	signatureService portainer.DigitalSignatureService,
-	fileService portainer.FileService,
-	reverseTunnelService portainer.ReverseTunnelService,
-	dataStore dataservices.DataStore,
-) (portainer.SwarmStackManager, error) {
+func initSwarmStackManager(assetsPath string, configPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService, dataStore dataservices.DataStore) (portainer.SwarmStackManager, error) {
 	return exec.NewSwarmStackManager(assetsPath, configPath, signatureService, fileService, reverseTunnelService, dataStore)
 }
 
@@ -313,9 +304,9 @@ func enableFeaturesFromFlags(dataStore dataservices.DataStore, flags *portainer.
 		}
 
 		if featureState {
-			log.Printf("Feature %v : on", *correspondingFeature)
+			logrus.Printf("Feature %v : on", *correspondingFeature)
 		} else {
-			log.Printf("Feature %v : off", *correspondingFeature)
+			logrus.Printf("Feature %v : off", *correspondingFeature)
 		}
 
 		settings.FeatureFlagSettings[*correspondingFeature] = featureState
@@ -344,7 +335,7 @@ func generateAndStoreKeyPair(fileService portainer.FileService, signatureService
 func initKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
 	existingKeyPair, err := fileService.KeyPairFilesExist()
 	if err != nil {
-		log.Fatalf("Failed checking for existing key pair: %v", err)
+		logrus.Fatalf("Failed checking for existing key pair: %v", err)
 	}
 
 	if existingKeyPair {
@@ -415,7 +406,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore dataservices.
 
 	err := snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
-		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		logrus.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
 	return dataStore.Endpoint().Create(endpoint)
@@ -461,7 +452,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore dataservices.DataStor
 
 	err := snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
-		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		logrus.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
 	return dataStore.Endpoint().Create(endpoint)
@@ -478,7 +469,7 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, s
 	}
 
 	if len(endpoints) > 0 {
-		log.Println("Instance already has defined environments. Skipping the environment defined via CLI.")
+		logrus.Println("Instance already has defined environments. Skipping the environment defined via CLI.")
 		return nil
 	}
 
@@ -492,9 +483,9 @@ func loadEncryptionSecretKey(keyfilename string) []byte {
 	content, err := os.ReadFile(path.Join("/run/secrets", keyfilename))
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Printf("Encryption key file `%s` not present", keyfilename)
+			logrus.Printf("Encryption key file `%s` not present", keyfilename)
 		} else {
-			log.Printf("Error reading encryption key file: %v", err)
+			logrus.Printf("Error reading encryption key file: %v", err)
 		}
 
 		return nil
@@ -511,33 +502,33 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	fileService := initFileService(*flags.Data)
 	encryptionKey := loadEncryptionSecretKey(*flags.SecretKeyName)
 	if encryptionKey == nil {
-		log.Println("proceeding without encryption key")
+		logrus.Println("Proceeding without encryption key")
 	}
 
 	dataStore := initDataStore(flags, encryptionKey, fileService, shutdownCtx)
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 	instanceID, err := dataStore.Version().InstanceID()
 	if err != nil {
-		log.Fatalf("Failed getting instance id: %v", err)
+		logrus.Fatalf("Failed getting instance id: %v", err)
 	}
 
 	apiKeyService := initAPIKeyService(dataStore)
 
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 	jwtService, err := initJWTService(settings.UserSessionTimeout, dataStore)
 	if err != nil {
-		log.Fatalf("Failed initializing JWT service: %v", err)
+		logrus.Fatalf("Failed initializing JWT service: %v", err)
 	}
 
 	err = enableFeaturesFromFlags(dataStore, flags)
 	if err != nil {
-		log.Fatalf("Failed enabling feature flag: %v", err)
+		logrus.Fatalf("Failed enabling feature flag: %v", err)
 	}
 
 	ldapService := initLDAPService()
@@ -551,17 +542,17 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.Data, *flags.SSLCert, *flags.SSLKey, fileService, dataStore, shutdownTrigger)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	sslSettings, err := sslService.GetSSLSettings()
 	if err != nil {
-		log.Fatalf("Failed to get ssl settings: %s", err)
+		logrus.Fatalf("Failed to get ssl settings: %s", err)
 	}
 
 	err = initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
-		log.Fatalf("Failed initializing key pair: %v", err)
+		logrus.Fatalf("Failed initializing key pair: %v", err)
 	}
 
 	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx)
@@ -571,7 +562,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx)
 	if err != nil {
-		log.Fatalf("Failed initializing snapshot service: %v", err)
+		logrus.Fatalf("Failed initializing snapshot service: %v", err)
 	}
 	snapshotService.Start()
 
@@ -592,37 +583,37 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, dockerConfigPath, digitalSignatureService, fileService, reverseTunnelService, dataStore)
 	if err != nil {
-		log.Fatalf("Failed initializing swarm stack manager: %v", err)
+		logrus.Fatalf("Failed initializing swarm stack manager: %v", err)
 	}
 
 	kubernetesDeployer := initKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, digitalSignatureService, proxyManager, *flags.Assets)
 
 	helmPackageManager, err := initHelmPackageManager(*flags.Assets)
 	if err != nil {
-		log.Fatalf("Failed initializing helm package manager: %v", err)
+		logrus.Fatalf("Failed initializing helm package manager: %v", err)
 	}
 
 	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)
 	if err != nil {
-		log.Fatalf("Failed loading edge jobs from database: %v", err)
+		logrus.Fatalf("Failed loading edge jobs from database: %v", err)
 	}
 
 	applicationStatus := initStatus(instanceID)
 
 	err = initEndpoint(flags, dataStore, snapshotService)
 	if err != nil {
-		log.Fatalf("Failed initializing environment: %v", err)
+		logrus.Fatalf("Failed initializing environment: %v", err)
 	}
 
 	adminPasswordHash := ""
 	if *flags.AdminPasswordFile != "" {
 		content, err := fileService.GetFileContent(*flags.AdminPasswordFile, "")
 		if err != nil {
-			log.Fatalf("Failed getting admin password file: %v", err)
+			logrus.Fatalf("Failed getting admin password file: %v", err)
 		}
 		adminPasswordHash, err = cryptoService.Hash(strings.TrimSuffix(string(content), "\n"))
 		if err != nil {
-			log.Fatalf("Failed hashing admin password: %v", err)
+			logrus.Fatalf("Failed hashing admin password: %v", err)
 		}
 	} else if *flags.AdminPassword != "" {
 		adminPasswordHash = *flags.AdminPassword
@@ -631,11 +622,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	if adminPasswordHash != "" {
 		users, err := dataStore.User().UsersByRole(portainer.AdministratorRole)
 		if err != nil {
-			log.Fatalf("Failed getting admin user: %v", err)
+			logrus.Fatalf("Failed getting admin user: %v", err)
 		}
 
 		if len(users) == 0 {
-			log.Println("Created admin user with the given password.")
+			logrus.Println("Created admin user with the given password.")
 			user := &portainer.User{
 				Username: "admin",
 				Role:     portainer.AdministratorRole,
@@ -643,21 +634,21 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 			}
 			err := dataStore.User().Create(user)
 			if err != nil {
-				log.Fatalf("Failed creating admin user: %v", err)
+				logrus.Fatalf("Failed creating admin user: %v", err)
 			}
 		} else {
-			log.Println("Instance already has an administrator user defined. Skipping admin password related flags.")
+			logrus.Println("Instance already has an administrator user defined. Skipping admin password related flags.")
 		}
 	}
 
 	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotService)
 	if err != nil {
-		log.Fatalf("Failed starting tunnel server: %v", err)
+		logrus.Fatalf("Failed starting tunnel server: %v", err)
 	}
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {
-		log.Fatalf("Failed to fetch ssl settings from DB")
+		logrus.Fatalf("Failed to fetch ssl settings from DB")
 	}
 
 	scheduler := scheduler.NewScheduler(shutdownCtx)
@@ -708,8 +699,8 @@ func main() {
 
 	for {
 		server := buildServer(flags)
-		log.Printf("[INFO] [cmd,main] Starting Portainer version %s\n", portainer.APIVersion)
+		logrus.Printf("[INFO] [cmd,main] Starting Portainer version %s\n", portainer.APIVersion)
 		err := server.Start()
-		log.Printf("[INFO] [cmd,main] Http server exited: %v\n", err)
+		logrus.Printf("[INFO] [cmd,main] Http server exited: %v\n", err)
 	}
 }
