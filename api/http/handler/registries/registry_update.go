@@ -2,7 +2,6 @@ package registries
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 
 	"github.com/portainer/portainer/api/internal/endpointutils"

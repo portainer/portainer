@@ -2,8 +2,6 @@ package webhooks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/registryutils/access"
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/security"
