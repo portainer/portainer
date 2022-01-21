@@ -28,7 +28,7 @@ export function FDOProfilesDatatableActions({
       <Link to="portainer.endpoints.profile" className="space-left">
         <Button disabled={!isFDOEnabled}>
           <i className="fa fa-plus-circle space-right" aria-hidden="true" />
-          Add New
+          Add Profile
         </Button>
       </Link>
 
