@@ -37,15 +37,18 @@ import { EdgeDeviceTableSettings } from '@/edge/devices/types';
 import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings';
 import { EdgeDevicesDatatableActions } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions';
 import { AMTDevicesDatatable } from '@/edge/devices/components/AMTDevicesDatatable/AMTDevicesDatatable';
+import { TextTip } from '@/portainer/components/Tip/TextTip';
 
 import { RowProvider } from './columns/RowContext';
 import { useColumns } from './columns';
+import styles from './EdgeDevicesDatatable.module.css';
 
 export interface EdgeDevicesTableProps {
   isEnabled: boolean;
   isFdoEnabled: boolean;
   isOpenAmtEnabled: boolean;
   disableTrustOnFirstConnect: boolean;
+  mpsServer: string;
   dataset: Environment[];
   onRefresh(): Promise<void>;
   setLoadingMessage(message: string): void;
@@ -55,6 +58,7 @@ export function EdgeDevicesDatatable({
   isFdoEnabled,
   isOpenAmtEnabled,
   disableTrustOnFirstConnect,
+  mpsServer,
   dataset,
   onRefresh,
   setLoadingMessage,
@@ -122,6 +126,11 @@ export function EdgeDevicesDatatable({
   const tableProps = getTableProps();
   const tbodyProps = getTableBodyProps();
 
+  const someDeviceHasAMTActivated = dataset.some(
+    (environment) =>
+      environment.AMTDeviceGUID && environment.AMTDeviceGUID !== ''
+  );
+
   return (
     <TableContainer>
       <TableTitle icon="fa-plug" label="Edge Devices">
@@ -146,6 +155,19 @@ export function EdgeDevicesDatatable({
           setLoadingMessage={setLoadingMessage}
         />
       </TableActions>
+
+      {someDeviceHasAMTActivated && (
+        <div className={styles.kvmTip}>
+          <TextTip color="blue">
+            For the KVM function to work you need to have the MPS server added
+            to your trusted site list, browse to this{' '}
+            <a href={`https://${mpsServer}`} target="_blank" rel="noreferrer">
+              site
+            </a>{' '}
+            and add to your trusted site list
+          </TextTip>
+        </div>
+      )}
 
       <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
 

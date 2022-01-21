@@ -34,8 +34,9 @@ export const EdgeDevicesDatatableAngular = react2angular(
     'dataset',
     'onRefresh',
     'setLoadingMessage',
-    'isOpenAmtEnabled',
     'isFdoEnabled',
     'disableTrustOnFirstConnect',
+    'isOpenAmtEnabled',
+    'mpsServer',
   ]
 );

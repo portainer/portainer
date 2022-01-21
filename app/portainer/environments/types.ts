@@ -74,6 +74,7 @@ export type Environment = {
   PublicURL?: string;
   IsEdgeDevice?: boolean;
   UserTrusted: boolean;
+  AMTDeviceGUID?: string;
 };
 
 /**

@@ -27,9 +27,10 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
       try {
         const settings = await SettingsService.settings();
 
-        ctrl.isOpenAMTEnabled = settings && settings.EnableEdgeComputeFeatures && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
         ctrl.isFDOEnabled = settings && settings.EnableEdgeComputeFeatures && settings.fdoConfiguration && settings.fdoConfiguration.enabled;
         ctrl.disableTrustOnFirstConnect = settings && settings.EnableEdgeComputeFeatures && settings.DisableTrustOnFirstConnect;
+        ctrl.isOpenAMTEnabled = settings && settings.EnableEdgeComputeFeatures && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
+        ctrl.mpsServer = ctrl.isOpenAMTEnabled ? settings.openAMTConfiguration.mpsServer : '';
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve settings');
       }
