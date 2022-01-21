@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
@@ -65,5 +66,21 @@ func restoreFiles(srcDir string, destinationDir string) error {
 			return err
 		}
 	}
-	return nil
+
+	// yuck.  This is very boltdb specific once again.  I think maybe these backup/restore options should be moved into bolt
+	// refactor for another day
+
+	// Prevents copying portainer.edb to portainer.db
+	os.Remove(filepath.Join(destinationDir, boltdb.DatabaseFileName))
+
+	err := filesystem.CopyPath(filepath.Join(srcDir, boltdb.DatabaseFileName), destinationDir)
+	if err != nil {
+		// Copyfile will not error if the file doesn't exist. So if it does exist and we error,
+		// it's safe to say the source file exists and we can't copy it.  So return the error
+		return err
+	}
+
+	// If the file doesn't exist we also get no error
+	filesystem.CopyPath(filepath.Join(srcDir, boltdb.EncryptedDatabaseFileName), destinationDir)
+	return errors.New("Something happened!")
 }
