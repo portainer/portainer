@@ -21,12 +21,17 @@ const (
 )
 
 type deviceConfigurePayload struct {
+	EdgeID    string `json:"edgeID"`
 	EdgeKey   string `json:"edgeKey"`
 	Name      string `json:"name"`
 	ProfileID int    `json:"profile"`
 }
 
 func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
+	if payload.EdgeID == "" {
+		return errors.New("invalid edge ID provided")
+	}
+
 	if payload.EdgeKey == "" {
 		return errors.New("invalid edge key provided")
 	}
@@ -99,6 +104,17 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}, []byte("")); err != nil {
 		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+	}
+
+	if err = fdoClient.PutDeviceSVIRaw(url.Values{
+		"guid":     []string{guid},
+		"priority": []string{"1"},
+		"module":   []string{"fdo_sys"},
+		"var":      []string{"filedesc"},
+		"filename": []string{"DEVICE_edgeid.txt"},
+	}, []byte(payload.EdgeID)); err != nil {
+		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(edgeid)")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(edgeid)", Err: err}
 	}
 
 	// write down the edgekey

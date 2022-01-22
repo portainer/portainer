@@ -325,6 +325,8 @@ type (
 		LastCheckInDate int64
 		// IsEdgeDevice marks if the environment was created as an EdgeDevice
 		IsEdgeDevice bool
+		// Whether the device has been trusted or not by the user
+		UserTrusted bool
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -814,6 +816,10 @@ type (
 		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
 		// KubectlImage, defaults to portainer/kubectl-shell
 		KubectlShellImage string `json:"KubectlShellImage" example:"portainer/kubectl-shell"`
+		// DisableTrustOnFirstConnect makes Portainer require explicit user trust of the edge agent before accepting the connection
+		DisableTrustOnFirstConnect bool `json:"DisableTrustOnFirstConnect" example:"false"`
+		// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
+		EnforceEdgeID bool `json:"EnforceEdgeID" example:"false"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool

@@ -46,6 +46,8 @@ type endpointUpdatePayload struct {
 	EdgeCheckinInterval *int `example:"5"`
 	// Associated Kubernetes data
 	Kubernetes *portainer.KubernetesData
+	// Whether the device has been trusted or not by the user
+	UserTrusted *bool
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -268,6 +270,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 			}
 		}
+	}
+
+	if payload.UserTrusted != nil {
+		endpoint.UserTrusted = *payload.UserTrusted
 	}
 
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
