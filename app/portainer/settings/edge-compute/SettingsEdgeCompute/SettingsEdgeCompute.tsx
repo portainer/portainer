@@ -13,6 +13,8 @@ import { validationSchema } from './SettingsEdgeCompute.validation';
 export interface FormValues {
   EdgeAgentCheckinInterval: number;
   EnableEdgeComputeFeatures: boolean;
+  DisableTrustOnFirstConnect: boolean;
+  EnforceEdgeID: boolean;
 }
 
 interface Props {
@@ -41,6 +43,10 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
     EnableEdgeComputeFeatures: settings
       ? settings.EnableEdgeComputeFeatures
       : false,
+    DisableTrustOnFirstConnect: settings
+      ? settings.DisableTrustOnFirstConnect
+      : false,
+    EnforceEdgeID: settings ? settings.EnforceEdgeID : false,
   };
 
   return (
@@ -109,6 +115,40 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                   When enabled, this will enable Portainer to execute Edge
                   Device features.
                 </TextTip>
+
+                <FormControl
+                  inputId="edge_enforce_id"
+                  label="Enforce environment ID"
+                  size="medium"
+                  errors={errors.EnforceEdgeID}
+                >
+                  <Switch
+                    id="edge_enforce_id"
+                    name="edge_enforce_id"
+                    className="space-right"
+                    checked={values.EnforceEdgeID}
+                    onChange={(e) =>
+                      setFieldValue('EnforceEdgeID', e.valueOf())
+                    }
+                  />
+                </FormControl>
+
+                <FormControl
+                  inputId="edge_tofc"
+                  label="Trust on first connect"
+                  size="medium"
+                  errors={errors.DisableTrustOnFirstConnect}
+                >
+                  <Switch
+                    id="edge_disable_tofc"
+                    name="edge_disable_tofc"
+                    className="space-right"
+                    checked={!values.DisableTrustOnFirstConnect}
+                    onChange={(e) =>
+                      setFieldValue('DisableTrustOnFirstConnect', !e.valueOf())
+                    }
+                  />
+                </FormControl>
 
                 <div className="form-group">
                   <div className="col-sm-12">

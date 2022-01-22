@@ -97,7 +97,7 @@ function EndpointController(
     const command = $scope.dockerCommands[$scope.state.deploymentTab][$scope.state.platformType](
       $scope.agentVersion,
       $scope.agentShortVersion,
-      $scope.randomEdgeID,
+      $scope.endpoint.EdgeID,
       $scope.endpoint.EdgeKey,
       $scope.state.allowSelfSignedCerts
     );
@@ -271,7 +271,7 @@ function EndpointController(
 
         if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
           $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
-          $scope.randomEdgeID = uuidv4();
+          endpoint.EdgeID = endpoint.EdgeID || uuidv4();
 
           $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
         }

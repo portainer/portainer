@@ -167,6 +167,10 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
+    service.trust = function (id) {
+      Endpoints.updateEndpoint({ id }, { UserTrusted: true }).$promise;
+    };
+
     function updateRegistryAccess(id, registryId, endpointAccesses) {
       return Endpoints.updateRegistryAccess({ registryId, id }, endpointAccesses).$promise;
     }

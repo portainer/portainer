@@ -223,3 +223,14 @@ export async function updateSettings(
     throw parseAxiosError(e as Error);
   }
 }
+
+export async function trustEndpoint(id: EnvironmentId) {
+  try {
+    const { data: endpoint } = await axios.put<Environment>(buildUrl(id), {
+      UserTrusted: true,
+    });
+    return endpoint;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to update environment');
+  }
+}
