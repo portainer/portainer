@@ -15,7 +15,7 @@ import (
 // Handler is the HTTP handler used to handle webhook operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer     *security.RequestBouncer
+	requestBouncer      *security.RequestBouncer
 	DataStore           dataservices.DataStore
 	DockerClientFactory *docker.ClientFactory
 }
@@ -23,7 +23,7 @@ type Handler struct {
 // NewHandler creates a handler to manage webhooks operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
 	}
 	h.Handle("/webhooks",
@@ -60,7 +60,7 @@ func (handler *Handler) checkResourceAccess(r *http.Request, resourceID string, 
 	return nil
 }
 
-func (handler *Handler) checkAuthorization(r *http.Request, endpoint *portainer.Endpoint,  authorizations []portainer.Authorization) (bool, *httperror.HandlerError)  {
+func (handler *Handler) checkAuthorization(r *http.Request, endpoint *portainer.Endpoint, authorizations []portainer.Authorization) (bool, *httperror.HandlerError) {
 	err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
 		return false, &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access environment", Err: err}
