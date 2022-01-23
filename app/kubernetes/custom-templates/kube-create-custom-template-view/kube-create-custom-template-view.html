@@ -11,9 +11,7 @@
           <custom-template-common-fields form-values="$ctrl.formValues"></custom-template-common-fields>
 
           <!-- build-method -->
-          <div class="col-sm-12 form-section-title">
-            Build method
-          </div>
+          <div class="col-sm-12 form-section-title"> Build method </div>
           <box-selector radio-name="'method'" value="$ctrl.state.method" options="$ctrl.methodOptions" on-change="($ctrl.onChangeMethod)"></box-selector>
 
           <web-editor-form
@@ -35,17 +33,13 @@
           </web-editor-form>
 
           <file-upload-form ng-if="$ctrl.state.method === 'upload'" file="$ctrl.formValues.File" on-change="($ctrl.onChangeFile)" ng-required="true">
-            <file-upload-description>
-              You can upload a Manifest file from your computer.
-            </file-upload-description>
+            <file-upload-description> You can upload a Manifest file from your computer. </file-upload-description>
           </file-upload-form>
 
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData"></por-access-control-form>
 
           <!-- actions -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
+          <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button
@@ -58,7 +52,7 @@
                 <span ng-hide="$ctrl.state.actionInProgress">Create custom template</span>
                 <span ng-show="$ctrl.state.actionInProgress">Creation in progress...</span>
               </button>
-              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px;">
+              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px">
                 {{ $ctrl.state.formValidationError }}
               </span>
             </div>

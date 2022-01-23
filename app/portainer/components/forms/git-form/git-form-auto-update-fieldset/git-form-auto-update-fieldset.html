@@ -4,14 +4,12 @@
       <por-switch-field name="'autoUpdate'" checked="$ctrl.model.RepositoryAutomaticUpdates" label="'Automatic Updates'" on-change="($ctrl.onChangeAutoUpdate)"></por-switch-field>
     </div>
   </div>
-  <div class="small text-warning" style="margin: 5px 0 10px 0;" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
+  <div class="small text-warning" style="margin: 5px 0 10px 0" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
     <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
     <span class="text-muted">Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption.</span>
   </div>
   <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
-    <label for="repository_mechanism" class="col-sm-1 control-label text-left">
-      Mechanism
-    </label>
+    <label for="repository_mechanism" class="col-sm-1 control-label text-left"> Mechanism </label>
     <div class="col-sm-11">
       <div class="input-group col-sm-10 input-group-sm">
         <div class="btn-group btn-group-sm">
@@ -27,23 +25,19 @@
   </div>
 
   <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates && $ctrl.model.RepositoryMechanism === 'Webhook'">
-    <label for="repository_mechanism" class="col-sm-1 control-label text-left">
-      Webhook
-    </label>
+    <label for="repository_mechanism" class="col-sm-1 control-label text-left"> Webhook </label>
     <div class="col-sm-11">
       <span class="text-muted"> {{ $ctrl.model.RepositoryWebhookURL | truncatelr }} </span>
       <button type="button" class="btn btn-sm btn-primary btn-sm space-left" ng-if="$ctrl.model.RepositoryWebhookURL" ng-click="$ctrl.copyWebhook()">
         <span><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy link</span>
       </button>
       <span>
-        <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+        <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none"></i>
       </span>
     </div>
   </div>
   <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates && $ctrl.model.RepositoryMechanism === 'Interval'">
-    <label for="repository_fetch_interval" class="col-sm-1 control-label text-left">
-      Fetch interval
-    </label>
+    <label for="repository_fetch_interval" class="col-sm-1 control-label text-left"> Fetch interval </label>
     <div class="col-sm-11">
       <input
         type="text"
@@ -68,7 +62,7 @@
       ></por-switch-field>
     </div>
   </div>
-  <div class="small text-warning" style="margin: 5px 0 10px 0;" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
+  <div class="small text-warning" style="margin: 5px 0 10px 0" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
     <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true"></i>
     <span class="text-muted">When enabled, enforces automatic deployment at each interval or webhook invocation.</span>
   </div>
@@ -81,7 +75,7 @@
       </div>
     </div>
   </div>
-  <div class="small text-warning" style="margin: 5px 0 10px 0;" ng-if="!$ctrl.model.RepositoryAutomaticUpdates">
+  <div class="small text-warning" style="margin: 5px 0 10px 0" ng-if="!$ctrl.model.RepositoryAutomaticUpdates">
     <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true"></i>
     <span class="text-muted">When enabled, updates from the git repository will occur automatically at an interval or webhook.</span>
   </div>

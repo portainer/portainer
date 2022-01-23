@@ -2,111 +2,100 @@ import EndpointHelper from 'Portainer/helpers/endpointHelper';
 
 angular
   .module('portainer.app')
-  .controller('HomeController', function (
-    $q,
-    $scope,
-    $state,
-    TagService,
-    Authentication,
-    EndpointService,
-    GroupService,
-    Notifications,
-    EndpointProvider,
-    StateManager,
-    ModalService,
-    MotdService
-  ) {
-    $scope.state = {
-      connectingToEdgeEndpoint: false,
-      homepageLoadTime: '',
-    };
+  .controller(
+    'HomeController',
+    function ($q, $scope, $state, TagService, Authentication, EndpointService, GroupService, Notifications, EndpointProvider, StateManager, ModalService, MotdService) {
+      $scope.state = {
+        connectingToEdgeEndpoint: false,
+        homepageLoadTime: '',
+      };
 
-    $scope.goToEdit = function (id) {
-      $state.go('portainer.endpoints.endpoint', { id: id });
-    };
+      $scope.goToEdit = function (id) {
+        $state.go('portainer.endpoints.endpoint', { id: id });
+      };
 
-    $scope.goToDashboard = function (endpoint) {
-      if (endpoint.Type === 3) {
-        $state.go('azure.dashboard', { endpointId: endpoint.Id });
-        return;
-      }
-      if (endpoint.Type === 4 || endpoint.Type === 7) {
-        if (!endpoint.EdgeID) {
-          $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+      $scope.goToDashboard = function (endpoint) {
+        if (endpoint.Type === 3) {
+          $state.go('azure.dashboard', { endpointId: endpoint.Id });
           return;
         }
-        $scope.state.connectingToEdgeEndpoint = true;
-      }
-      if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
-        $state.go('kubernetes.dashboard', { endpointId: endpoint.Id });
-        return;
-      }
-      $state.go('docker.dashboard', { endpointId: endpoint.Id });
-    };
-
-    $scope.dismissImportantInformation = function (hash) {
-      StateManager.dismissImportantInformation(hash);
-    };
-
-    $scope.dismissInformationPanel = function (id) {
-      StateManager.dismissInformationPanel(id);
-    };
-
-    $scope.triggerSnapshot = function () {
-      ModalService.confirmEndpointSnapshot(function (result) {
-        if (!result) {
+        if (endpoint.Type === 4 || endpoint.Type === 7) {
+          if (!endpoint.EdgeID) {
+            $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+            return;
+          }
+          $scope.state.connectingToEdgeEndpoint = true;
+        }
+        if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
+          $state.go('kubernetes.dashboard', { endpointId: endpoint.Id });
           return;
         }
-        triggerSnapshot();
-      });
-    };
+        $state.go('docker.dashboard', { endpointId: endpoint.Id });
+      };
 
-    function triggerSnapshot() {
-      EndpointService.snapshotEndpoints()
-        .then(function success() {
-          Notifications.success('Success', 'Environments updated');
-          $state.reload();
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'An error occured during environment snapshot');
+      $scope.dismissImportantInformation = function (hash) {
+        StateManager.dismissImportantInformation(hash);
+      };
+
+      $scope.dismissInformationPanel = function (id) {
+        StateManager.dismissInformationPanel(id);
+      };
+
+      $scope.triggerSnapshot = function () {
+        ModalService.confirmEndpointSnapshot(function (result) {
+          if (!result) {
+            return;
+          }
+          triggerSnapshot();
         });
-    }
+      };
 
-    $scope.getPaginatedEndpoints = getPaginatedEndpoints;
-    function getPaginatedEndpoints(lastId, limit, search) {
-      const deferred = $q.defer();
-      $q.all({
-        endpoints: EndpointService.endpoints(lastId, limit, { search }),
-        groups: GroupService.groups(),
-      })
-        .then(function success(data) {
-          var endpoints = data.endpoints.value;
-          var groups = data.groups;
-          EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
-          EndpointProvider.setEndpoints(endpoints);
-          deferred.resolve({ endpoints: endpoints, totalCount: data.endpoints.totalCount });
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve environment information');
-        });
-      return deferred.promise;
-    }
-
-    async function initView() {
-      $scope.state.homepageLoadTime = Math.floor(Date.now() / 1000);
-      $scope.isAdmin = Authentication.isAdmin();
-
-      MotdService.motd().then(function success(data) {
-        $scope.motd = data;
-      });
-
-      try {
-        const tags = TagService.tags();
-        $scope.tags = tags;
-      } catch (err) {
-        Notifications.error('Failed loading page data', err);
+      function triggerSnapshot() {
+        EndpointService.snapshotEndpoints()
+          .then(function success() {
+            Notifications.success('Success', 'Environments updated');
+            $state.reload();
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'An error occured during environment snapshot');
+          });
       }
-    }
 
-    initView();
-  });
+      $scope.getPaginatedEndpoints = getPaginatedEndpoints;
+      function getPaginatedEndpoints(lastId, limit, search) {
+        const deferred = $q.defer();
+        $q.all({
+          endpoints: EndpointService.endpoints(lastId, limit, { search }),
+          groups: GroupService.groups(),
+        })
+          .then(function success(data) {
+            var endpoints = data.endpoints.value;
+            var groups = data.groups;
+            EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
+            EndpointProvider.setEndpoints(endpoints);
+            deferred.resolve({ endpoints: endpoints, totalCount: data.endpoints.totalCount });
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to retrieve environment information');
+          });
+        return deferred.promise;
+      }
+
+      async function initView() {
+        $scope.state.homepageLoadTime = Math.floor(Date.now() / 1000);
+        $scope.isAdmin = Authentication.isAdmin();
+
+        MotdService.motd().then(function success(data) {
+          $scope.motd = data;
+        });
+
+        try {
+          $scope.tags = await TagService.tags();
+        } catch (err) {
+          Notifications.error('Failed loading page data', err);
+        }
+      }
+
+      initView();
+    }
+  );

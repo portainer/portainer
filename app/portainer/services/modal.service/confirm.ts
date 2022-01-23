@@ -115,6 +115,21 @@ export function confirmDeletion(message: string, callback: ConfirmCallback) {
   });
 }
 
+export function confirmDetachment(message: string, callback: ConfirmCallback) {
+  const messageSanitized = sanitize(message);
+  confirm({
+    title: 'Are you sure ?',
+    message: messageSanitized,
+    buttons: {
+      confirm: {
+        label: 'Detach',
+        className: 'btn-danger',
+      },
+    },
+    callback,
+  });
+}
+
 export function confirmDeassociate(callback: ConfirmCallback) {
   const message =
     '<p>De-associating this Edge environment will mark it as non associated and will clear the registered Edge ID.</p>' +
@@ -201,5 +216,19 @@ export function confirmImageExport(callback: ConfirmCallback) {
       },
     },
     callback,
+  });
+}
+
+export function confirmChangePassword() {
+  return confirmAsync({
+    title: 'Are you sure?',
+    message:
+      'You will be logged out after the password change. Do you want to change your password?',
+    buttons: {
+      confirm: {
+        label: 'Change',
+        className: 'btn-primary',
+      },
+    },
   });
 }

@@ -84,7 +84,7 @@ type (
 	EdgeStackService interface {
 		EdgeStacks() ([]portainer.EdgeStack, error)
 		EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStack, error)
-		Create(edgeStack *portainer.EdgeStack) error
+		Create(id portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error
 		UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error
 		DeleteEdgeStack(ID portainer.EdgeStackID) error
 		GetNextIdentifier() int
@@ -124,7 +124,7 @@ type (
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
 	HelmUserRepositoryService interface {
-		HelmUserRepositorys() ([]portainer.HelmUserRepository, error)
+		HelmUserRepositories() ([]portainer.HelmUserRepository, error)
 		HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error)
 		Create(record *portainer.HelmUserRepository) error
 		UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, repository *portainer.HelmUserRepository) error

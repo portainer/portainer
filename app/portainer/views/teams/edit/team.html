@@ -82,7 +82,7 @@
               >
                 <td>
                   {{ user.Username }}
-                  <span style="margin-left: 5px;">
+                  <span style="margin-left: 5px">
                     <a ng-click="addUser(user)"><i class="fa fa-plus-circle space-right" aria-hidden="true"></i>Add</a>
                   </span>
                 </td>
@@ -154,19 +154,19 @@
               >
                 <td>
                   {{ user.Username }}
-                  <span style="margin-left: 5px;" ng-if="isAdmin || user.TeamRole === 'Member'">
+                  <span style="margin-left: 5px" ng-if="isAdmin || user.TeamRole === 'Member'">
                     <a ng-click="removeUser(user)"><i class="fa fa-minus-circle space-right" aria-hidden="true"></i>Remove</a>
                   </span>
                 </td>
                 <td>
-                  <i ng-if="user.TeamRole === 'Leader'" class="fa fa-user-plus" aria-hidden="true" style="margin-right: 2px;"></i>
-                  <i ng-if="user.TeamRole === 'Member'" class="fa fa-user" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <i ng-if="user.TeamRole === 'Leader'" class="fa fa-user-plus" aria-hidden="true" style="margin-right: 2px"></i>
+                  <i ng-if="user.TeamRole === 'Member'" class="fa fa-user" aria-hidden="true" style="margin-right: 2px"></i>
                   {{ user.TeamRole }}
-                  <span style="margin-left: 5px;" ng-if="isAdmin">
-                    <a style="margin-left: 5px;" ng-click="promoteToLeader(user)" ng-if="user.TeamRole === 'Member'"
+                  <span style="margin-left: 5px" ng-if="isAdmin">
+                    <a style="margin-left: 5px" ng-click="promoteToLeader(user)" ng-if="user.TeamRole === 'Member'"
                       ><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Leader</a
                     >
-                    <a style="margin-left: 5px;" ng-click="demoteToMember(user)" ng-if="user.TeamRole === 'Leader'"
+                    <a style="margin-left: 5px" ng-click="demoteToMember(user)" ng-if="user.TeamRole === 'Leader'"
                       ><i class="fa fa-user-times space-right" aria-hidden="true"></i>Member</a
                     >
                   </span>

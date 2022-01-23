@@ -6,6 +6,7 @@ import settingsModule from './settings';
 import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
 import servicesModule from './services';
+import teamsModule from './teams';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -32,6 +33,7 @@ angular
     userActivityModule,
     'portainer.shared.datatable',
     servicesModule,
+    teamsModule,
   ])
   .config([
     '$stateRegistryProvider',

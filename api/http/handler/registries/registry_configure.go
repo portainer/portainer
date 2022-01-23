@@ -21,7 +21,7 @@ type registryConfigurePayload struct {
 	// Password used to authenticate against this registry. required when Authentication is true
 	Password string `example:"registry_password"`
 	// ECR region
-	Region  string
+	Region string
 	// Use TLS
 	TLS bool `example:"true"`
 	// Skip the verification of the server TLS certificate

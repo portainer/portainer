@@ -137,6 +137,7 @@ export function confirmKubeconfigSelection(
   );
   const box = prompt({
     title: 'Download kubeconfig file',
+    inputType: 'checkbox',
     inputOptions: options,
     buttons: {
       confirm: {

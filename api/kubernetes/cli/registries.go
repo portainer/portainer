@@ -16,8 +16,8 @@ import (
 
 const (
 	secretDockerConfigKey = ".dockerconfigjson"
-	labelRegistryType = "io.portainer.kubernetes.registry.type"
-	annotationRegistryID = "portainer.io/registry.id"
+	labelRegistryType     = "io.portainer.kubernetes.registry.type"
+	annotationRegistryID  = "portainer.io/registry.id"
 )
 
 type (

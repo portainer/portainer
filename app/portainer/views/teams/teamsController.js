@@ -30,15 +30,11 @@ angular.module('portainer.app').controller('TeamsController', [
       form.team_name.$setValidity('validName', valid);
     };
 
-    $scope.addTeam = function () {
-      var teamName = $scope.formValues.Name;
-      var leaderIds = [];
-      angular.forEach($scope.formValues.Leaders, function (user) {
-        leaderIds.push(user.Id);
-      });
+    $scope.addTeam = function (formValues) {
+      const teamName = formValues.name;
 
       $scope.state.actionInProgress = true;
-      TeamService.createTeam(teamName, leaderIds)
+      TeamService.createTeam(teamName, formValues.leaders)
         .then(function success() {
           Notifications.success('Team successfully created', teamName);
           $state.reload();
