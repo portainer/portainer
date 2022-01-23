@@ -1,7 +1,7 @@
 package webhooks
 
 import (
-	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/security"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -34,17 +34,11 @@ func (handler *Handler) webhookList(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: filters", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(filters.EndpointID))
-	if dataservices.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
 	}
-
-	authorizations := []portainer.Authorization{portainer.OperationPortainerWebhookList}
-
-	isAuthorized, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
-	if handlerErr != nil || !isAuthorized {
+	if !securityContext.IsAdmin {
 		return response.JSON(w, []portainer.Webhook{})
 	}
 

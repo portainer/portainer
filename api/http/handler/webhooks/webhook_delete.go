@@ -1,7 +1,7 @@
 package webhooks
 
 import (
-	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/security"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -26,25 +26,13 @@ func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid webhook id", err}
 	}
 
-	webhook, err := handler.DataStore.Webhook().Webhook(portainer.WebhookID(id))
-	if dataservices.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find a webhook with this token", Err: err}
-	} else if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve webhook from the database", Err: err}
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(webhook.EndpointID)
-	if dataservices.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
-	} else if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
-	}
-
-	authorizations := []portainer.Authorization{portainer.OperationPortainerWebhookDelete}
-
-	_, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
-	if handlerErr != nil {
-		return handlerErr
+	if !securityContext.IsAdmin {
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Not authorized to delete a webhook", Err: err}
 	}
 
 	err = handler.DataStore.Webhook().DeleteWebhook(portainer.WebhookID(id))

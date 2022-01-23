@@ -2,7 +2,6 @@ package webhooks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils/access"
 	"net/http"
@@ -65,18 +64,13 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 
 	endpointID := portainer.EndpointID(payload.EndpointID)
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
-	if dataservices.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
-	} else if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
 	}
 
-	authorizations := []portainer.Authorization{portainer.OperationPortainerWebhookCreate}
-
-	_, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
-	if handlerErr != nil {
-		return handlerErr
+	if !securityContext.IsAdmin {
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Not authorized to create a webhook", Err: err}
 	}
 
 	if payload.RegistryID != 0 {
