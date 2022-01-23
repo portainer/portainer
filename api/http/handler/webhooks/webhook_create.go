@@ -18,7 +18,7 @@ import (
 type webhookCreatePayload struct {
 	ResourceID  string
 	EndpointID  int
-	RegistryID portainer.RegistryID
+	RegistryID  portainer.RegistryID
 	WebhookType int
 }
 
@@ -73,21 +73,10 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	authorizations := []portainer.Authorization{portainer.OperationPortainerWebhookCreate}
-	var resourceType portainer.ResourceControlType
-	if portainer.WebhookType(payload.WebhookType) == portainer.ServiceWebhook {
-		resourceType = portainer.ServiceResourceControl
-		authorizations = append(authorizations, portainer.OperationDockerServiceUpdate)
-	}
 
-	isAuthorized, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
+	_, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
 	if handlerErr != nil {
 		return handlerErr
-	}
-	if !isAuthorized && resourceType != 0{
-		handlerErr := handler.checkResourceAccess(r, payload.ResourceID, resourceType)
-		if handlerErr != nil {
-			return handlerErr
-		}
 	}
 
 	if payload.RegistryID != 0 {

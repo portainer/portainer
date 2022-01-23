@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"github.com/portainer/portainer/api/dataservices"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -31,6 +32,20 @@ func (handler *Handler) webhookList(w http.ResponseWriter, r *http.Request) *htt
 	err := request.RetrieveJSONQueryParameter(r, "filters", &filters, true)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: filters", err}
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(filters.EndpointID))
+	if dataservices.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+	}
+
+	authorizations := []portainer.Authorization{portainer.OperationPortainerWebhookList}
+
+	isAuthorized, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
+	if handlerErr != nil || !isAuthorized {
+		return response.JSON(w, []portainer.Webhook{})
 	}
 
 	webhooks, err := handler.DataStore.Webhook().Webhooks()

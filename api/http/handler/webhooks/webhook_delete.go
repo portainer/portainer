@@ -41,21 +41,10 @@ func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	authorizations := []portainer.Authorization{portainer.OperationPortainerWebhookDelete}
-	var resourceType portainer.ResourceControlType
-	if portainer.WebhookType(webhook.WebhookType) == portainer.ServiceWebhook {
-		resourceType = portainer.ServiceResourceControl
-		authorizations = append(authorizations, portainer.OperationDockerServiceUpdate)
-	}
 
-	isAuthorized, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
+	_, handlerErr := handler.checkAuthorization(r, endpoint, authorizations)
 	if handlerErr != nil {
 		return handlerErr
-	}
-	if !isAuthorized && resourceType != 0{
-		handlerErr := handler.checkResourceAccess(r, webhook.ResourceID, resourceType)
-		if handlerErr != nil {
-			return handlerErr
-		}
 	}
 
 	err = handler.DataStore.Webhook().DeleteWebhook(portainer.WebhookID(id))
