@@ -41,30 +41,54 @@ type (
 
 	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
 	OpenAMTConfiguration struct {
-		Enabled               bool                   `json:"Enabled"`
-		MPSServer             string                 `json:"MPSServer"`
-		Credentials           MPSCredentials         `json:"Credentials"`
-		DomainConfiguration   DomainConfiguration    `json:"DomainConfiguration"`
-		WirelessConfiguration *WirelessConfiguration `json:"WirelessConfiguration"`
+		Enabled          bool   `json:"enabled"`
+		MPSServer        string `json:"mpsServer"`
+		MPSUser          string `json:"mpsUser"`
+		MPSPassword      string `json:"mpsPassword"`
+		MPSToken         string `json:"mpsToken"` // retrieved from API
+		CertFileName     string `json:"certFileName"`
+		CertFileContent  string `json:"certFileContent"`
+		CertFilePassword string `json:"certFilePassword"`
+		DomainName       string `json:"domainName"`
 	}
 
-	MPSCredentials struct {
-		MPSUser     string `json:"MPSUser"`
-		MPSPassword string `json:"MPSPassword"`
-		MPSToken    string `json:"MPSToken"` // retrieved from API
+	// OpenAMTDeviceInformation represents an AMT managed device information
+	OpenAMTDeviceInformation struct {
+		GUID             string                        `json:"guid"`
+		HostName         string                        `json:"hostname"`
+		ConnectionStatus bool                          `json:"connectionStatus"`
+		PowerState       PowerState                    `json:"powerState"`
+		EnabledFeatures  *OpenAMTDeviceEnabledFeatures `json:"features"`
 	}
 
-	DomainConfiguration struct {
-		CertFileText string `json:"CertFileText"`
-		CertPassword string `json:"CertPassword"`
-		DomainName   string `json:"DomainName"`
+	// OpenAMTDeviceEnabledFeatures represents an AMT managed device features information
+	OpenAMTDeviceEnabledFeatures struct {
+		Redirection bool   `json:"redirection"`
+		KVM         bool   `json:"KVM"`
+		SOL         bool   `json:"SOL"`
+		IDER        bool   `json:"IDER"`
+		UserConsent string `json:"userConsent"`
 	}
 
-	WirelessConfiguration struct {
-		AuthenticationMethod string `json:"AuthenticationMethod"`
-		EncryptionMethod     string `json:"EncryptionMethod"`
-		SSID                 string `json:"SSID"`
-		PskPass              string `json:"PskPass"`
+	// PowerState represents an AMT managed device power state
+	PowerState int
+
+	FDOConfiguration struct {
+		Enabled       bool   `json:"enabled"`
+		OwnerURL      string `json:"ownerURL"`
+		OwnerUsername string `json:"ownerUsername"`
+		OwnerPassword string `json:"ownerPassword"`
+	}
+
+	// FDOProfileID represents a fdo profile id
+	FDOProfileID int
+
+	FDOProfile struct {
+		ID            FDOProfileID `json:"id"`
+		Name          string       `json:"name"`
+		FilePath      string       `json:"filePath"`
+		NumberDevices int          `json:"numberDevices"`
+		DateCreated   int64        `json:"dateCreated"`
 	}
 
 	// CLIFlags represents the available flags on the CLI
@@ -298,8 +322,14 @@ type (
 		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
 		// Environment(Endpoint) specific security settings
 		SecuritySettings EndpointSecuritySettings
+		// The identifier of the AMT Device associated with this environment(endpoint)
+		AMTDeviceGUID string `json:"AMTDeviceGUID,omitempty" example:"4c4c4544-004b-3910-8037-b6c04f504633"`
 		// LastCheckInDate mark last check-in date on checkin
 		LastCheckInDate int64
+		// IsEdgeDevice marks if the environment was created as an EdgeDevice
+		IsEdgeDevice bool
+		// Whether the device has been trusted or not by the user
+		UserTrusted bool
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -768,7 +798,8 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
-		OpenAMTConfiguration OpenAMTConfiguration `json:"OpenAMTConfiguration" example:""`
+		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration" example:""`
+		FDOConfiguration     FDOConfiguration     `json:"fdoConfiguration" example:""`
 		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
@@ -788,6 +819,10 @@ type (
 		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
 		// KubectlImage, defaults to portainer/kubectl-shell
 		KubectlShellImage string `json:"KubectlShellImage" example:"portainer/kubectl-shell"`
+		// DisableTrustOnFirstConnect makes Portainer require explicit user trust of the edge agent before accepting the connection
+		DisableTrustOnFirstConnect bool `json:"DisableTrustOnFirstConnect" example:"false"`
+		// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
+		EnforceEdgeID bool `json:"EnforceEdgeID" example:"false"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -1212,6 +1247,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
+		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 	}
 
 	// GitService represents a service for managing Git
@@ -1222,7 +1258,10 @@ type (
 
 	// OpenAMTService represents a service for managing OpenAMT
 	OpenAMTService interface {
-		ConfigureDefault(configuration OpenAMTConfiguration) error
+		Configure(configuration OpenAMTConfiguration) error
+		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
+		EnableDeviceFeatures(configuration OpenAMTConfiguration, deviceGUID string, features OpenAMTDeviceEnabledFeatures) (string, error)
+		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
 	}
 
 	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
@@ -1352,17 +1391,8 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
-// Supported feature flags
-const (
-	FeatOpenAMT Feature = "open-amt"
-	FeatFDO     Feature = "fdo"
-)
-
 // List of supported features
-var SupportedFeatureFlags = []Feature{
-	FeatOpenAMT,
-	FeatFDO,
-}
+var SupportedFeatureFlags = []Feature{}
 
 const (
 	_ AuthenticationMethod = iota

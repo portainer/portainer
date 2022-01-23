@@ -140,7 +140,7 @@ export function ContainersDatatable({
     <TableContainer>
       <TableTitle icon="fa-cubes" label="Containers">
         <TableTitleActions>
-          <ColumnVisibilityMenu
+          <ColumnVisibilityMenu<DockerContainer>
             columns={columnsToHide}
             onChange={handleChangeColumnsVisibility}
             value={settings.hiddenColumns}

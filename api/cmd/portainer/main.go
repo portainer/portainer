@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"os"
 	"path"
 	"strconv"
@@ -126,6 +127,7 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		<-shutdownCtx.Done()
 		defer connection.Close()
 	}()
+
 	return store
 }
 
@@ -138,14 +140,7 @@ func initComposeStackManager(assetsPath string, configPath string, reverseTunnel
 	return composeWrapper
 }
 
-func initSwarmStackManager(
-	assetsPath string,
-	configPath string,
-	signatureService portainer.DigitalSignatureService,
-	fileService portainer.FileService,
-	reverseTunnelService portainer.ReverseTunnelService,
-	dataStore dataservices.DataStore,
-) (portainer.SwarmStackManager, error) {
+func initSwarmStackManager(assetsPath string, configPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService, dataStore dataservices.DataStore) (portainer.SwarmStackManager, error) {
 	return exec.NewSwarmStackManager(assetsPath, configPath, signatureService, fileService, reverseTunnelService, dataStore)
 }
 
@@ -540,7 +535,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	oauthService := initOAuthService()
 	gitService := initGitService()
 
-	openAMTService := openamt.NewService(dataStore)
+	openAMTService := openamt.NewService()
 
 	cryptoService := initCryptoService()
 	digitalSignatureService := initDigitalSignatureService()

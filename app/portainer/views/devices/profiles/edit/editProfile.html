@@ -1,0 +1,73 @@
+<rd-header>
+  <rd-header-title title-text="Edit profile"></rd-header-title>
+  <rd-header-content> <a ui-sref="portainer.settings">Settings</a> &gt; Edge Compute </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal" name="editProfileForm">
+          <!-- name-input -->
+          <div class="col-sm-12 form-section-title">Device Profile Details </div>
+          <div class="form-group">
+            <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="formValues.name" id="profile_name" name="profile_name" placeholder="e.g. myprofile" auto-focus />
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- build-method -->
+          <div class="col-sm-12 form-section-title"> Profile configuration </div>
+          <div class="form-group"></div>
+          <div class="form-group" style="margin-bottom: 0">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="method_editor" ng-model="state.method" value="editor" />
+                <label for="method_editor">
+                  <div class="boxselector_header">
+                    <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px"></i>
+                    Web editor
+                  </div>
+                  <p>Use our Web editor</p>
+                </label>
+              </div>
+            </div>
+          </div>
+          <!-- !build-method -->
+
+          <web-editor-form
+            ng-if="state.method === 'editor'"
+            identifier="profile-creation-editor"
+            value="formValues.profileFileContent"
+            on-change="(onChangeFileContent)"
+            ng-required="true"
+            placeholder="#"
+          >
+          </web-editor-form>
+
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <a type="button" class="btn btn-default btn-sm" ui-sref="portainer.settings.edgeCompute">Cancel</a>
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress
+              || !editProfileForm.$valid
+              || !formValues.profileFileContent
+              || !formValues.name"
+                ng-click="updateProfileAsync()"
+                button-spinner="state.actionInProgress"
+              >
+                <span ng-hide="state.actionInProgress">Update Profile</span>
+                <span ng-show="state.actionInProgress">Saving...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

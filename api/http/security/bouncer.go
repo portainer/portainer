@@ -2,6 +2,7 @@ package security
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -132,6 +133,19 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 
 	if endpoint.EdgeID != "" && endpoint.EdgeID != edgeIdentifier {
 		return errors.New("invalid Edge identifier")
+	}
+
+	if endpoint.LastCheckInDate > 0 || endpoint.UserTrusted {
+		return nil
+	}
+
+	settings, err := bouncer.dataStore.Settings().Settings()
+	if err != nil {
+		return fmt.Errorf("could not retrieve the settings: %w", err)
+	}
+
+	if settings.DisableTrustOnFirstConnect {
+		return errors.New("the device has not been trusted yet")
 	}
 
 	return nil

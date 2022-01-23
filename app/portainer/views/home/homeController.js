@@ -1,4 +1,5 @@
 import EndpointHelper from 'Portainer/helpers/endpointHelper';
+import { getEndpoints } from 'Portainer/environments/environment.service';
 
 angular
   .module('portainer.app')
@@ -65,7 +66,7 @@ angular
       function getPaginatedEndpoints(lastId, limit, search) {
         const deferred = $q.defer();
         $q.all({
-          endpoints: EndpointService.endpoints(lastId, limit, { search }),
+          endpoints: getEndpoints(lastId, limit, { search, edgeDeviceFilter: false }),
           groups: GroupService.groups(),
         })
           .then(function success(data) {
