@@ -13,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/tunnelserver"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
@@ -90,10 +90,7 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 
 	// Backup database
 	dbBackupPath := path.Join(storePath, dbBackupFileName)
-	dbBackupFileExists, err := fileService.FileExists(dbBackupPath)
-	if !dbBackupFileExists || err != nil {
-		simpleCopyFile(databasePath, dbBackupPath)
-	}
+	simpleCopyFile(databasePath, dbBackupPath)
 
 	return store, nil
 }
