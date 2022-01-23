@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -37,7 +38,7 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 	}
 
 	if !snapshot.SupportDirectSnapshot(endpoint) {
-		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for this environment", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for this environment", errors.New("Snapshots not supported for this environment")}
 	}
 
 	snapshotError := handler.SnapshotService.SnapshotEndpoint(endpoint)

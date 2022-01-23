@@ -554,7 +554,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	oauthService := initOAuthService()
 	gitService := initGitService()
 
-	openAMTService := openamt.NewService(dataStore)
+	openAMTService := openamt.NewService()
 
 	cryptoService := initCryptoService()
 	digitalSignatureService := initDigitalSignatureService()

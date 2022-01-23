@@ -20,6 +20,7 @@ interface EndpointsQuery {
   endpointIds?: EnvironmentId[];
   tagsPartialMatch?: boolean;
   groupId?: EnvironmentGroupId;
+  edgeDeviceFilter?: boolean;
 }
 
 export async function getEndpoints(
@@ -220,5 +221,16 @@ export async function updateSettings(
     await axios.put(buildUrl(id, 'settings'), settings);
   } catch (e) {
     throw parseAxiosError(e as Error);
+  }
+}
+
+export async function trustEndpoint(id: EnvironmentId) {
+  try {
+    const { data: endpoint } = await axios.put<Environment>(buildUrl(id), {
+      UserTrusted: true,
+    });
+    return endpoint;
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to update environment');
   }
 }

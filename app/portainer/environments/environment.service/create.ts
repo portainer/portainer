@@ -94,6 +94,7 @@ interface EndpointOptions {
   checkinInterval?: number;
   azure?: AzureSettings;
   tls?: TLSSettings;
+  isEdgeDevice?: boolean;
 }
 
 export async function createRemoteEndpoint(
@@ -134,6 +135,7 @@ async function createEndpoint(
       GroupID: options.groupId,
       TagIds: arrayToJson(options.tagIds),
       CheckinInterval: options.checkinInterval,
+      IsEdgeDevice: options.isEdgeDevice,
     };
 
     const { tls, azure } = options;

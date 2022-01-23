@@ -1,0 +1,25 @@
+.actions {
+  float: right;
+  margin: 5px 10px 0 0;
+}
+
+.actions-active {
+  color: var(--blue-2);
+}
+
+.table-actions-menu-list {
+  padding: 0 10px 0 10px;
+}
+
+.table-actions-menu-list [data-reach-menu-item] {
+  padding: 5px 5px !important;
+}
+
+.table-actions-menu-btn {
+  border: none;
+  background: none;
+}
+
+[data-reach-menu-link] {
+  text-decoration: none !important;
+}

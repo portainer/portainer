@@ -1,0 +1,27 @@
+<rd-header>
+  <rd-header-title title-text="KVM Control"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.endpoints">Environments</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: $state.endpoint.Id})">{{ $state.endpoint.Name }}</a> &gt;
+    {{ $state.deviceName }} > KVM Control
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="datatable" ng-class="{ 'kvm-maximized': $state.maximized }">
+      <rd-widget>
+        <rd-widget-body classes="no-padding">
+          <div class="toolBar">
+            <div class="toolBarTitle">KVM Control</div>
+            <i class="interactive fa fa-times fa-lg pull-right" aria-hidden="true" ui-sref="edge.devices"></i>
+            <i ng-click="maximize()" title="Maximize" class="interactive fa fa-window-maximize fa-lg pull-right" style="margin-right: 10px" aria-hidden="true"></i>
+            <i ng-click="minimize()" title="Minimize" class="interactive fa fa-window-minimize fa-lg pull-right" style="margin-right: 10px" aria-hidden="true"></i>
+          </div>
+          <div class="actionBar">
+            <kvm-control device-id="$state.deviceId" server="$state.mpsServer" token="$state.mpsToken"> </kvm-control>
+          </div>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

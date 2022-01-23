@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/endpointgroup"
 	"github.com/portainer/portainer/api/dataservices/endpointrelation"
 	"github.com/portainer/portainer/api/dataservices/extension"
+	"github.com/portainer/portainer/api/dataservices/fdoprofile"
 	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/dataservices/resourcecontrol"
 	"github.com/portainer/portainer/api/dataservices/role"
@@ -26,12 +27,12 @@ var migrateLog = plog.NewScopedLog("database, migrate")
 type (
 	// Migrator defines a service to migrate data after a Portainer version update.
 	Migrator struct {
-		currentDBVersion int
-
+		currentDBVersion        int
 		endpointGroupService    *endpointgroup.Service
 		endpointService         *endpoint.Service
 		endpointRelationService *endpointrelation.Service
 		extensionService        *extension.Service
+		fdoProfilesService      *fdoprofile.Service
 		registryService         *registry.Service
 		resourceControlService  *resourcecontrol.Service
 		roleService             *role.Service
@@ -54,6 +55,7 @@ type (
 		EndpointService         *endpoint.Service
 		EndpointRelationService *endpointrelation.Service
 		ExtensionService        *extension.Service
+		FDOProfilesService      *fdoprofile.Service
 		RegistryService         *registry.Service
 		ResourceControlService  *resourcecontrol.Service
 		RoleService             *role.Service
@@ -78,6 +80,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		endpointService:         parameters.EndpointService,
 		endpointRelationService: parameters.EndpointRelationService,
 		extensionService:        parameters.ExtensionService,
+		fdoProfilesService:      parameters.FDOProfilesService,
 		registryService:         parameters.RegistryService,
 		resourceControlService:  parameters.ResourceControlService,
 		roleService:             parameters.RoleService,
