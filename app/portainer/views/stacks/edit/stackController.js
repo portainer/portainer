@@ -222,11 +222,13 @@ angular.module('portainer.app').controller('StackController', [
 
     $scope.deployStack = function () {
       const stack = $scope.stack;
-      const tplCrop = '<div  style="position: absolute; right: 110px; top: 28px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
+      const tplCrop =
+        '<div>Do you want to force an update of the stack?</div>' +
+        '<div  style="position: absolute; right: 110px; top: 48px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
       const template = angular.element(tplCrop);
       const html = $compile(template)($scope);
       // 'Do you want to force an update of the stack?'
-      ModalService.confirmStackUpdate(html, true, true, function (result) {
+      ModalService.confirmStackUpdate(html, true, true, null, function (result) {
         if (!result) {
           return;
         }

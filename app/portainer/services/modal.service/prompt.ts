@@ -132,6 +132,7 @@ export function confirmStackUpdate(
   message: string,
   defaultDisabled: boolean,
   defaultToggle: boolean,
+  confirmButtonClassName: string | undefined,
   callback: PromptCallback
 ) {
   const box = prompt({
@@ -146,7 +147,7 @@ export function confirmStackUpdate(
     buttons: {
       confirm: {
         label: 'Update',
-        className: 'btn-primary',
+        className: confirmButtonClassName || 'btn-primary',
       },
     },
     callback,
