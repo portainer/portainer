@@ -1,7 +1,9 @@
 package bolt
 
 import (
+	"io"
 	"log"
+	"os"
 	"path"
 	"time"
 
@@ -11,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/tunnelserver"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
@@ -34,6 +36,7 @@ import (
 
 const (
 	databaseFileName = "portainer.db"
+	dbBackupFileName = "portainer-1-24-backup.db"
 )
 
 // Store defines the implementation of portainer.DataStore using
@@ -85,7 +88,31 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 		store.checkForDataMigration = true
 	}
 
+	// Backup database
+	dbBackupPath := path.Join(storePath, dbBackupFileName)
+	dbBackupFileExists, err := fileService.FileExists(dbBackupPath)
+	if !dbBackupFileExists || err != nil {
+		simpleCopyFile(databasePath, dbBackupPath)
+	}
+
 	return store, nil
+}
+
+func simpleCopyFile(src, dst string) (int64, error) {
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
 }
 
 // Open opens and initializes the BoltDB database.
