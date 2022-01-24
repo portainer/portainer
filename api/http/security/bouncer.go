@@ -12,6 +12,8 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 type (
@@ -36,6 +38,15 @@ type (
 )
 
 const apiKeyHeader = "X-API-KEY"
+
+var (
+	opsProcessed = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "portainer_bouncer_results",
+		Help: "The total number of request access success/failures",
+	},
+		[]string{"permission", "path"},
+	)
+)
 
 // NewRequestBouncer initializes a new RequestBouncer
 func NewRequestBouncer(dataStore dataservices.DataStore, jwtService dataservices.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
@@ -96,58 +107,71 @@ func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler 
 func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "error"}).Inc()
 		return err
 	}
 
 	if tokenData.Role == portainer.AdministratorRole {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "admin"}).Inc()
 		return nil
 	}
 
 	memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 	if err != nil {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "error"}).Inc()
 		return err
 	}
 
 	group, err := bouncer.dataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "error"}).Inc()
 		return err
 	}
 
 	if !authorizedEndpointAccess(endpoint, group, tokenData.ID, memberships) {
+		opsProcessed.With(prometheus.Labels{"permission": "denied"}).Inc()
 		return httperrors.ErrEndpointAccessDenied
 	}
 
+	opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "ok"}).Inc()
 	return nil
 }
 
 // AuthorizedEdgeEndpointOperation verifies that the request was received from a valid Edge environment(endpoint)
 func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
 	if endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment && endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_error"}).Inc()
 		return errors.New("Invalid environment type")
 	}
 
 	edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
 	if edgeIdentifier == "" {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_noiderror"}).Inc()
 		return errors.New("missing Edge identifier")
 	}
 
 	if endpoint.EdgeID != "" && endpoint.EdgeID != edgeIdentifier {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_iderror"}).Inc()
 		return errors.New("invalid Edge identifier")
 	}
 
 	if endpoint.LastCheckInDate > 0 || endpoint.UserTrusted {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_ok"}).Inc()
 		return nil
 	}
 
 	settings, err := bouncer.dataStore.Settings().Settings()
 	if err != nil {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_error"}).Inc()
 		return fmt.Errorf("could not retrieve the settings: %w", err)
 	}
 
 	if settings.DisableTrustOnFirstConnect {
+		opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_untrusted"}).Inc()
 		return errors.New("the device has not been trusted yet")
 	}
 
+	opsProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_ok"}).Inc()
 	return nil
 }
 

@@ -166,6 +166,8 @@ function shell_run_container() {
       -p 8000:8000 \
       -p 9000:9000 \
       -p 9443:9443 \
+      --net caddy_proxy \
+      --label virtual.port=9000 \
       -v ${portainerRoot}/dist:/app \
       -v ${portainerData}:/data \
       -v /var/run/docker.sock:/var/run/docker.sock:z \

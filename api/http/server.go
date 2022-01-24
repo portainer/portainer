@@ -34,6 +34,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
+	"github.com/portainer/portainer/api/http/handler/metrics"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
@@ -263,6 +264,11 @@ func (server *Server) Start() error {
 	webhookHandler.DataStore = server.DataStore
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
+	var metricsHandler *metrics.Handler
+	if server.DataStore.Settings().IsFeatureFlagEnabled("dev-metrics") {
+		metricsHandler = metrics.NewHandler(requestBouncer)
+	}
+
 	server.Handler = &handler.Handler{
 		RoleHandler:            roleHandler,
 		AuthHandler:            authHandler,
@@ -299,6 +305,7 @@ func (server *Server) Start() error {
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
+		MetricsHandler:         metricsHandler,
 	}
 
 	handler := offlineGate.WaitingMiddleware(time.Minute, server.Handler)
