@@ -1,3 +1,5 @@
+import uuidv4 from 'uuid/v4';
+
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 import { configureDevice, getProfiles } from 'Portainer/hostmanagement/fdo/fdo.service';
 
@@ -97,7 +99,7 @@ angular
             suffix++;
 
             const config = {
-              edgeID: endpoint.EdgeID,
+              edgeID: endpoint.EdgeID || uuidv4(),
               edgeKey: endpoint.EdgeKey,
               name: $scope.formValues.DeviceName,
               profile: $scope.formValues.DeviceProfile,
