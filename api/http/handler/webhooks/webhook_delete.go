@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"errors"
 	"github.com/portainer/portainer/api/http/security"
 	"net/http"
 
@@ -32,7 +33,7 @@ func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if !securityContext.IsAdmin {
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Not authorized to delete a webhook", Err: err}
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Not authorized to delete a webhook", Err: errors.New("not authorized to delete a webhook")}
 	}
 
 	err = handler.DataStore.Webhook().DeleteWebhook(portainer.WebhookID(id))
