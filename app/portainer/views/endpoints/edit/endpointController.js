@@ -297,11 +297,9 @@ function EndpointController(
           try {
             $scope.endpoint.ManagementInfo = JSON.parse(amtInfo.RawOutput);
           } catch (err) {
-            console.log('Failure', err, 'Unable to JSON parse AMT info: ' + amtInfo.RawOutput);
             clearAMTManagementInfo(amtInfo.RawOutput);
           }
         } catch (err) {
-          console.log('Failure', err);
           clearAMTManagementInfo('Unable to retrieve AMT environment details');
         }
       }
