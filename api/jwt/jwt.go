@@ -121,6 +121,14 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 
 	if err == nil && parsedToken != nil {
 		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
+
+			user, err := service.dataStore.User().User(portainer.UserID(cl.UserID))
+			if err != nil {
+				return nil, errInvalidJWTToken
+			}
+			if user.TokenIssueAt > cl.StandardClaims.IssuedAt {
+				return nil, errInvalidJWTToken
+			}
 			return &portainer.TokenData{
 				ID:       portainer.UserID(cl.UserID),
 				Username: cl.Username,
@@ -162,6 +170,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		Scope:    scope,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiresAt,
+			IssuedAt:  time.Now().Unix(),
 		},
 	}
 

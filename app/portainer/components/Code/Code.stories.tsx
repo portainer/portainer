@@ -19,9 +19,8 @@ Primary.args = {
   children: 'curl -X GET http://ultra-sound-money.eth',
 };
 
-export const MultiLineWithChildren: Story<PropsWithChildren<
-  unknown
->> = Template.bind({});
+export const MultiLineWithChildren: Story<PropsWithChildren<unknown>> =
+  Template.bind({});
 MultiLineWithChildren.args = {
   children: 'curl -X\n GET http://example-with-children.crypto',
 };

@@ -68,7 +68,7 @@ func (handler *Handler) executeServiceWebhook(
 	registryID portainer.RegistryID,
 	imageTag string,
 ) *httperror.HandlerError {
-	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "")
+	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "", nil)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating docker client", err}
 	}
@@ -80,13 +80,13 @@ func (handler *Handler) executeServiceWebhook(
 	}
 
 	service.Spec.TaskTemplate.ForceUpdate++
-	
+
 	var imageName = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
 
 	if imageTag != "" {
 		var tagIndex = strings.LastIndex(imageName, ":")
 		if tagIndex == -1 {
-	  		tagIndex = len(imageName)
+			tagIndex = len(imageName)
 		}
 		service.Spec.TaskTemplate.ContainerSpec.Image = imageName[:tagIndex] + ":" + imageTag
 	} else {

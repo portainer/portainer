@@ -10,6 +10,7 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
+const CopyPlugin = require('copy-webpack-plugin');
 const pkg = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
@@ -97,7 +98,7 @@ module.exports = {
     },
   },
   plugins: [
-    new Dotenv(),
+    new Dotenv({ defaults: true }),
     new ESLintPlugin(),
     new HtmlWebpackPlugin({
       template: './app/index.html',
@@ -134,6 +135,14 @@ module.exports = {
       collections: true,
       paths: true,
     }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'translations',
+          to: 'locales',
+        },
+      ],
+    }),
   ],
   optimization: {
     moduleIds: 'deterministic',
@@ -159,6 +168,7 @@ module.exports = {
       Kubernetes: path.resolve(projectRoot, 'app/kubernetes'),
       Portainer: path.resolve(projectRoot, 'app/portainer'),
       '@': path.resolve(projectRoot, 'app'),
+      'lodash-es': 'lodash',
     },
     extensions: ['.js', '.ts', '.tsx'],
     plugins: [

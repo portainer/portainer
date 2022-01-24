@@ -30,6 +30,15 @@ interface PromptOptions {
   callback: PromptCallback;
 }
 
+export async function promptAsync(options: Omit<PromptOptions, 'callback'>) {
+  return new Promise((resolve) => {
+    prompt({
+      ...options,
+      callback: (result: string | string[]) => resolve(result),
+    });
+  });
+}
+
 export function prompt(options: PromptOptions) {
   const box = bootbox.prompt({
     title: options.title,
@@ -137,6 +146,7 @@ export function confirmKubeconfigSelection(
   );
   const box = prompt({
     title: 'Download kubeconfig file',
+    inputType: 'checkbox',
     inputOptions: options,
     buttons: {
       confirm: {

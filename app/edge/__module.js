@@ -1,8 +1,9 @@
 import angular from 'angular';
 
 import edgeStackModule from './views/edge-stacks';
+import edgeDevicesModule from './devices';
 
-angular.module('portainer.edge', [edgeStackModule]).config(function config($stateRegistryProvider) {
+angular.module('portainer.edge', [edgeStackModule, edgeDevicesModule]).config(function config($stateRegistryProvider) {
   const edge = {
     name: 'edge',
     url: '/edge',
@@ -106,6 +107,16 @@ angular.module('portainer.edge', [edgeStackModule]).config(function config($stat
     },
   };
 
+  const edgeDevices = {
+    name: 'edge.devices',
+    url: '/devices',
+    views: {
+      'content@': {
+        component: 'edgeDevicesView',
+      },
+    },
+  };
+
   $stateRegistryProvider.register(edge);
 
   $stateRegistryProvider.register(groups);
@@ -119,4 +130,6 @@ angular.module('portainer.edge', [edgeStackModule]).config(function config($stat
   $stateRegistryProvider.register(edgeJobs);
   $stateRegistryProvider.register(edgeJob);
   $stateRegistryProvider.register(edgeJobCreation);
+
+  $stateRegistryProvider.register(edgeDevices);
 });

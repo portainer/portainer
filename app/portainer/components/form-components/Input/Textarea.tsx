@@ -1,31 +1,15 @@
-import { BaseInput } from './BaseInput';
-import { ChangeProps, InputProps } from './types';
+import clsx from 'clsx';
+import { TextareaHTMLAttributes } from 'react';
 
-interface Props extends InputProps, ChangeProps<string> {
-  rows?: number;
-}
-
-export function Textarea({
-  rows,
+export function TextArea({
   className,
-  onChange,
-  value,
-  id,
-  placeholder,
-  disabled,
-  required,
-}: Props & InputProps) {
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
-    <BaseInput
-      component="textarea"
-      id={id}
-      rows={rows}
-      className={className}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      disabled={disabled}
-      required={required}
+    <textarea
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+      className={clsx('form-control', className)}
     />
   );
 }

@@ -1,5 +1,7 @@
 import './assets/css';
 
+import './i18n';
+
 import angular from 'angular';
 import { UI_ROUTER_REACT_HYBRID } from '@uirouter/react-hybrid';
 
@@ -18,7 +20,7 @@ import { configApp } from './config';
 import { init as initFeatureService } from './portainer/feature-flags/feature-flags.service';
 import { Edition } from './portainer/feature-flags/enums';
 
-initFeatureService(Edition.CE);
+initFeatureService(Edition[process.env.PORTAINER_EDITION]);
 
 angular
   .module('portainer', [

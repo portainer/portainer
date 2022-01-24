@@ -15,18 +15,18 @@
           <!-- login form -->
           <form class="simple-box-form form-horizontal">
             <div class="form-group">
-              <div class="col-sm-12" style="display: flex; justify-content: center;" ng-if="ctrl.state.showOAuthLogin">
+              <div class="col-sm-12" style="display: flex; justify-content: center" ng-if="ctrl.state.showOAuthLogin">
                 <a ng-href="{{ ctrl.OAuthLoginURI }}">
-                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'Microsoft'">
+                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px" ng-if="ctrl.state.OAuthProvider === 'Microsoft'">
                     <i class="fab fa-microsoft" aria-hidden="true"></i> Login with Microsoft
                   </div>
-                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'Google'">
+                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px" ng-if="ctrl.state.OAuthProvider === 'Google'">
                     <i class="fab fa-google" aria-hidden="true"></i> Login with Google
                   </div>
-                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'Github'">
+                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px" ng-if="ctrl.state.OAuthProvider === 'Github'">
                     <i class="fab fa-github" aria-hidden="true"></i> Login with Github
                   </div>
-                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'OAuth'">
+                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px" ng-if="ctrl.state.OAuthProvider === 'OAuth'">
                     <i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login with OAuth
                   </div>
                 </a>
@@ -35,17 +35,15 @@
 
             <!-- divider -->
             <div class="form-group" ng-if="ctrl.state.showOAuthLogin">
-              <div class="col-sm-12" style="display: flex; align-items: center; justify-content: center;">
-                <div class="striketext small text-muted" style="display: flex; align-items: center; justify-content: center; width: 90%;">or</div>
+              <div class="col-sm-12" style="display: flex; align-items: center; justify-content: center">
+                <div class="striketext small text-muted" style="display: flex; align-items: center; justify-content: center; width: 90%">or</div>
               </div>
             </div>
 
             <!-- use internal auth button -->
             <div class="form-group" ng-if="ctrl.state.showOAuthLogin && !ctrl.state.showStandardLogin">
-              <div class="col-sm-12" style="display: flex; justify-content: center;">
-                <div class="btn btn-sm btn-primary pull-left" style="margin-left: 2px;" ng-click="ctrl.toggleStandardLogin()">
-                  Use internal authentication
-                </div>
+              <div class="col-sm-12" style="display: flex; justify-content: center">
+                <div class="btn btn-sm btn-primary pull-left" style="margin-left: 2px" ng-click="ctrl.toggleStandardLogin()"> Use internal authentication </div>
               </div>
             </div>
 
@@ -63,7 +61,7 @@
 
             <div class="form-group" ng-if="ctrl.state.showStandardLogin">
               <!-- login button -->
-              <div class="col-sm-12" style="display: flex; align-items: center; justify-content: center;">
+              <div class="col-sm-12" style="display: flex; align-items: center; justify-content: center">
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm pull-right"
@@ -82,7 +80,7 @@
 
           <!-- error message -->
           <div class="pull-right" ng-if="ctrl.state.AuthenticationError">
-            <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-right: 2px"></i>
             <span class="small text-danger">{{ ctrl.state.AuthenticationError }}</span>
           </div>
         </div>

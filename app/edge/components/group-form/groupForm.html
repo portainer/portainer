@@ -1,8 +1,6 @@
 <form class="form-horizontal" name="EdgeGroupForm" ng-submit="$ctrl.formAction()">
   <div class="form-group">
-    <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left">
-      Name
-    </label>
+    <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left"> Name </label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="group_name" name="group_name" ng-model="$ctrl.model.Name" required auto-focus data-cy="edgeGroupCreate-groupNameInput" />
     </div>
@@ -18,16 +16,14 @@
     </div>
   </div>
 
-  <div class="col-sm-12 form-section-title">
-    Group type
-  </div>
+  <div class="col-sm-12 form-section-title"> Group type </div>
   <div class="form-group col-sm-12">
     <div class="boxselector_wrapper">
       <div class="boxselector">
         <input type="radio" id="static-group" ng-model="$ctrl.model.Dynamic" ng-value="false" ng-checked="!$ctrl.model.Dynamic" />
         <label for="static-group">
           <div class="boxselector_header">
-            <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px"></i>
             Static
           </div>
           <p>Manually select Edge environments</p>
@@ -37,7 +33,7 @@
         <input type="radio" id="dynamic-group" ng-model="$ctrl.model.Dynamic" ng-value="true" ng-checked="$ctrl.model.Dynamic" />
         <label for="dynamic-group">
           <div class="boxselector_header">
-            <i class="fa fa-tags" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i class="fa fa-tags" aria-hidden="true" style="margin-right: 2px"></i>
             Dynamic
           </div>
           <p>Automatically associate environments via tags</p>
@@ -50,9 +46,7 @@
   <div ng-if="!$ctrl.model.Dynamic">
     <div ng-if="!$ctrl.noEndpoints">
       <!-- environments -->
-      <div class="col-sm-12 form-section-title">
-        Associated environments
-      </div>
+      <div class="col-sm-12 form-section-title"> Associated environments </div>
       <div class="form-group">
         <associated-endpoints-selector
           endpoint-ids="$ctrl.model.Endpoints"
@@ -74,16 +68,14 @@
 
   <!-- DynamicGroup -->
   <div ng-if="$ctrl.model.Dynamic">
-    <div class="col-sm-12 form-section-title">
-      Tags
-    </div>
+    <div class="col-sm-12 form-section-title"> Tags </div>
     <div ng-if="$ctrl.tags.length" class="form-group col-sm-12">
       <div class="boxselector_wrapper">
         <div class="boxselector">
           <input type="radio" id="or-selector" ng-model="$ctrl.model.PartialMatch" ng-value="true" ng-checked="$ctrl.model.PartialMatch" />
           <label for="or-selector">
             <div class="boxselector_header">
-              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px;"></i>
+              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px"></i>
               Partial match
             </div>
             <p>Associate any environment matching at least one of the selected tags</p>
@@ -93,7 +85,7 @@
           <input type="radio" id="and-selector" ng-model="$ctrl.model.PartialMatch" ng-value="false" ng-checked="!$ctrl.model.PartialMatch" />
           <label for="and-selector">
             <div class="boxselector_header">
-              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px;"></i>
+              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px"></i>
               Full match
             </div>
             <p>Associate any environment matching all of the selected tags</p>
@@ -107,9 +99,7 @@
         No tags available. Head over to the <a ui-sref="portainer.tags">Tags view</a> to add tags
       </div>
     </div>
-    <div class="col-sm-12 form-section-title">
-      Associated environments by tags
-    </div>
+    <div class="col-sm-12 form-section-title"> Associated environments by tags </div>
     <div class="col-sm-12 form-group">
       <group-association-table
         loaded="$ctrl.loaded"
@@ -130,9 +120,7 @@
   <!-- !DynamicGroup -->
 
   <!-- actions -->
-  <div class="col-sm-12 form-section-title">
-    Actions
-  </div>
+  <div class="col-sm-12 form-section-title"> Actions </div>
   <div class="form-group">
     <div class="col-sm-12">
       <button

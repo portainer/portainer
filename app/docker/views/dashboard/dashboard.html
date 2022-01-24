@@ -20,12 +20,12 @@
 >
   <span class="small">
     <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'MANAGER'">
-      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
       Portainer is connected to a node that is part of a Swarm cluster. Some resources located on other nodes in the cluster might not be available for management, have a look at
       <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">our agent setup</a> for more details.
     </p>
     <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'WORKER'">
-      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
       Portainer is connected to a worker node. Swarm management features will not be available.
     </p>
   </span>
@@ -107,11 +107,11 @@
           <div class="widget-icon blue pull-left">
             <i class="fa fa-cubes"></i>
           </div>
-          <div class="pull-right" style="padding-left: 5px;">
+          <div class="pull-right" style="padding-left: 5px">
             <div><i class="fa fa-power-off space-right green-icon"></i>{{ containers | runningcontainers }} running</div>
             <div><i class="fa fa-power-off space-right red-icon"></i>{{ containers | stoppedcontainers }} stopped</div>
           </div>
-          <div class="pull-right" style="padding-right: 5px;">
+          <div class="pull-right" style="padding-right: 5px">
             <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | healthycontainers }} healthy</div>
             <div><i class="fa fa-heartbeat space-right orange-icon"></i>{{ containers | unhealthycontainers }} unhealthy</div>
           </div>

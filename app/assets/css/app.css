@@ -82,6 +82,13 @@ input[type='checkbox'] {
   margin-top: -1px;
 }
 
+.md-checkbox input[type='checkbox']:indeterminate + label:before {
+  content: '-';
+  align-content: center;
+  line-height: 16px;
+  text-align: center;
+}
+
 a[ng-click] {
   cursor: pointer;
 }
@@ -453,7 +460,7 @@ a[ng-click] {
 
 .bootbox-checkbox-list {
   max-height: 200px;
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: var(--white-color);
   border: 1px solid var(--grey-48);
   border-radius: 4px;
@@ -673,6 +680,7 @@ a[ng-click] {
 .image-zoom-modal .modal-dialog {
   width: 80%;
 }
+
 /*!bootbox override*/
 
 /*angular-multi-select override*/
@@ -884,4 +892,18 @@ json-tree .branch-preview {
 .text-wrap {
   word-break: break-all;
   white-space: normal;
+}
+
+.icon-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.space-x-1 {
+  margin-left: 0.25rem;
+}
+
+/* used for bootbox prompt with inputType radio */
+.form-check.radio {
+  margin-left: 15px;
 }

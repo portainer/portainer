@@ -23,9 +23,7 @@
             </div>
           </div>
           <!-- !name-input -->
-          <div class="col-sm-12 form-section-title">
-            Profile configuration
-          </div>
+          <div class="col-sm-12 form-section-title"> Profile configuration </div>
           <!-- directory -->
           <div class="form-group" ng-class="{ 'has-error': storidgeCreateProfileForm.profile_directory.$invalid }">
             <label for="profile_directory" class="col-sm-2 col-lg-1 control-label text-left">Directory</label>
@@ -110,17 +108,13 @@
           <!-- !Filesystem -->
           <!-- snapshotEnabled -->
           <div class="form-group">
-            <label for="profile_snapshotEnabled" class="col-sm-2 col-lg-1 control-label text-left">
-              Enable snapshots
-            </label>
-            <label class="switch" style="margin-left: 20px;"> <input name="profile_snapshotEnabled" type="checkbox" ng-model="model.SnapshotEnabled" /><i></i> </label>
+            <label for="profile_snapshotEnabled" class="col-sm-2 col-lg-1 control-label text-left"> Enable snapshots </label>
+            <label class="switch" style="margin-left: 20px"> <input name="profile_snapshotEnabled" type="checkbox" ng-model="model.SnapshotEnabled" /><i></i> </label>
           </div>
           <!-- !snapshotEnabled -->
           <!-- snapshotMax -->
           <div class="form-group" ng-if="model.SnapshotEnabled">
-            <label for="profile_snapshotMax" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px;">
-              Snapshot max
-            </label>
+            <label for="profile_snapshotMax" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px"> Snapshot max </label>
             <div class="col-sm-4">
               <slider model="model.SnapshotMax" floor="1" ceil="100" step="1"></slider>
             </div>
@@ -128,27 +122,21 @@
               <input type="number" min="1" class="form-control" ng-model="model.SnapshotMax" id="profile_snapshotMax" />
             </div>
             <div class="col-sm-4">
-              <p class="small text-muted" style="margin-top: 7px;">
-                Snapshot max (<b>count</b>)
-              </p>
+              <p class="small text-muted" style="margin-top: 7px"> Snapshot max (<b>count</b>) </p>
             </div>
           </div>
           <!-- !snapshotMax -->
           <!-- snapshotEnabled -->
           <div class="form-group" ng-if="model.SnapshotEnabled">
-            <label for="profile_recurringSnapshotEnabled" class="col-sm-2 col-lg-1 control-label text-left">
-              Enable periodic snapshots
-            </label>
-            <label class="switch" style="margin-left: 20px;">
+            <label for="profile_recurringSnapshotEnabled" class="col-sm-2 col-lg-1 control-label text-left"> Enable periodic snapshots </label>
+            <label class="switch" style="margin-left: 20px">
               <input name="profile_recurringSnapshotEnabled" type="checkbox" ng-model="state.RecurringSnapshotEnabled" /><i></i>
             </label>
           </div>
           <!-- !snapshotEnabled -->
           <!-- snapshotInterval -->
           <div class="form-group" ng-if="model.SnapshotEnabled && state.RecurringSnapshotEnabled">
-            <label for="profile_snapshotInterval" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px;">
-              Snapshot interval
-            </label>
+            <label for="profile_snapshotInterval" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px"> Snapshot interval </label>
             <div class="col-sm-4">
               <slider model="model.SnapshotInterval" floor="1" ceil="2880" step="1"></slider>
             </div>
@@ -156,18 +144,14 @@
               <input type="number" min="1" class="form-control" ng-model="model.SnapshotInterval" id="profile_snapshotInterval" />
             </div>
             <div class="col-sm-4">
-              <p class="small text-muted" style="margin-top: 7px;">
-                Snapshot interval (<b>minutes</b>)
-              </p>
+              <p class="small text-muted" style="margin-top: 7px"> Snapshot interval (<b>minutes</b>) </p>
             </div>
           </div>
           <!-- !snapshotInterval -->
           <!-- encryptionEnabled -->
           <div class="form-group">
-            <label for="profile_encryptionEnabled" class="col-sm-2 col-lg-1 control-label text-left">
-              Enable encryption
-            </label>
-            <label class="switch" style="margin-left: 20px;"> <input name="profile_encryptionEnabled" type="checkbox" ng-model="model.EncryptionEnabled" /><i></i> </label>
+            <label for="profile_encryptionEnabled" class="col-sm-2 col-lg-1 control-label text-left"> Enable encryption </label>
+            <label class="switch" style="margin-left: 20px"> <input name="profile_encryptionEnabled" type="checkbox" ng-model="model.EncryptionEnabled" /><i></i> </label>
           </div>
           <!-- !encryptionEnabled -->
           <!-- interfaceType -->
@@ -211,13 +195,13 @@
           <!-- !interfaceConf -->
           <!-- labels -->
           <div class="form-group">
-            <div class="col-sm-12" style="margin-top: 5px;">
+            <div class="col-sm-12" style="margin-top: 5px">
               <label class="control-label text-left">Labels</label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addLabel()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> add label </span>
+              <span class="label label-default interactive" style="margin-left: 10px" ng-click="addLabel()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> add label </span>
             </div>
             <!-- labels-input-list -->
-            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="label in formValues.Labels" style="margin-top: 2px;">
+            <div class="col-sm-12 form-inline" style="margin-top: 10px">
+              <div ng-repeat="label in formValues.Labels" style="margin-top: 2px">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
                   <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
@@ -236,16 +220,12 @@
           <!-- !labels -->
           <!-- iops -->
           <div ng-if="!state.LimitBandwidth || state.NoLimit">
-            <div class="col-sm-12 form-section-title">
-              IOPS
-            </div>
+            <div class="col-sm-12 form-section-title"> IOPS </div>
             <div class="form-group">
               <div class="col-md-1 col-sm-2">
-                <label for="permissions" class="control-label text-left">
-                  Limit IOPS
-                </label>
+                <label for="permissions" class="control-label text-left"> Limit IOPS </label>
               </div>
-              <label class="switch" style="margin-left: 20px;">
+              <label class="switch" style="margin-left: 20px">
                 <input type="checkbox" ng-model="state.LimitIOPS" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)" /><i></i>
               </label>
             </div>
@@ -281,16 +261,12 @@
           <!-- !iops -->
           <!-- bandwidth -->
           <div ng-if="!state.LimitIOPS || state.NoLimit">
-            <div class="col-sm-12 form-section-title">
-              Bandwidth
-            </div>
+            <div class="col-sm-12 form-section-title"> Bandwidth </div>
             <div class="form-group">
               <div class="col-md-1 col-sm-2">
-                <label for="permissions" class="control-label text-left">
-                  Limit bandwidth
-                </label>
+                <label for="permissions" class="control-label text-left"> Limit bandwidth </label>
               </div>
-              <label class="switch" style="margin-left: 20px;">
+              <label class="switch" style="margin-left: 20px">
                 <input type="checkbox" ng-model="state.LimitBandwidth" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)" /><i></i>
               </label>
             </div>
@@ -324,9 +300,7 @@
             </div>
           </div>
           <!-- !bandwidth -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
+          <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button

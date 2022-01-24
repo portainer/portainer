@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { ScheduleCreateRequest, ScheduleUpdateRequest } from 'Portainer/models/schedule';
+import { ScheduleCreateRequest, ScheduleUpdateRequest } from '@/portainer/models/schedule';
 
 function EdgeJobService(EdgeJobs, EdgeJobResults, FileUploadService) {
   var service = {};

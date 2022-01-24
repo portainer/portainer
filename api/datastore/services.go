@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/endpointgroup"
 	"github.com/portainer/portainer/api/dataservices/endpointrelation"
 	"github.com/portainer/portainer/api/dataservices/extension"
+	"github.com/portainer/portainer/api/dataservices/fdoprofile"
 	"github.com/portainer/portainer/api/dataservices/helmuserrepository"
 	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/dataservices/resourcecontrol"
@@ -50,6 +51,7 @@ type Store struct {
 	EndpointService           *endpoint.Service
 	EndpointRelationService   *endpointrelation.Service
 	ExtensionService          *extension.Service
+	FDOProfilesService        *fdoprofile.Service
 	HelmUserRepositoryService *helmuserrepository.Service
 	RegistryService           *registry.Service
 	ResourceControlService    *resourcecontrol.Service
@@ -128,6 +130,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.ExtensionService = extensionService
+
+	fdoProfilesService, err := fdoprofile.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.FDOProfilesService = fdoProfilesService
 
 	helmUserRepositoryService, err := helmuserrepository.NewService(store.connection)
 	if err != nil {
@@ -257,6 +265,11 @@ func (store *Store) EndpointRelation() dataservices.EndpointRelationService {
 	return store.EndpointRelationService
 }
 
+// FDOProfile gives access to the FDOProfile data management layer
+func (store *Store) FDOProfile() dataservices.FDOProfileService {
+	return store.FDOProfilesService
+}
+
 // HelmUserRepository access the helm user repository settings
 func (store *Store) HelmUserRepository() dataservices.HelmUserRepositoryService {
 	return store.HelmUserRepositoryService
@@ -363,118 +376,184 @@ func (store *Store) Export(filename string) (err error) {
 	backup := storeExport{}
 
 	if c, err := store.CustomTemplate().CustomTemplates(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Custom Templates")
+		}
 	} else {
 		backup.CustomTemplate = c
 	}
+
 	if e, err := store.EdgeGroup().EdgeGroups(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Edge Groups")
+		}
 	} else {
 		backup.EdgeGroup = e
 	}
+
 	if e, err := store.EdgeJob().EdgeJobs(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Edge Jobs")
+		}
 	} else {
 		backup.EdgeJob = e
 	}
+
 	if e, err := store.EdgeStack().EdgeStacks(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Edge Stacks")
+		}
 	} else {
 		backup.EdgeStack = e
 	}
+
 	if e, err := store.Endpoint().Endpoints(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Endpoints")
+		}
 	} else {
 		backup.Endpoint = e
 	}
+
 	if e, err := store.EndpointGroup().EndpointGroups(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Endpoint Groups")
+		}
 	} else {
 		backup.EndpointGroup = e
 	}
+
 	if r, err := store.EndpointRelation().EndpointRelations(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Endpoint Relations")
+		}
 	} else {
 		backup.EndpointRelation = r
 	}
+
 	if r, err := store.ExtensionService.Extensions(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Extensions")
+		}
 	} else {
 		backup.Extensions = r
 	}
-	if r, err := store.HelmUserRepository().HelmUserRepositorys(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+
+	if r, err := store.HelmUserRepository().HelmUserRepositories(); err != nil {
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Helm User Repositories")
+		}
 	} else {
 		backup.HelmUserRepository = r
 	}
+
 	if r, err := store.Registry().Registries(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Registries")
+		}
 	} else {
 		backup.Registry = r
 	}
+
 	if c, err := store.ResourceControl().ResourceControls(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Resource Controls")
+		}
 	} else {
 		backup.ResourceControl = c
 	}
+
 	if role, err := store.Role().Roles(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Roles")
+		}
 	} else {
 		backup.Role = role
 	}
+
 	if r, err := store.ScheduleService.Schedules(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Schedules")
+		}
 	} else {
 		backup.Schedules = r
 	}
+
 	if settings, err := store.Settings().Settings(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Settings")
+		}
 	} else {
 		backup.Settings = *settings
 	}
+
 	if settings, err := store.SSLSettings().Settings(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting SSL Settings")
+		}
 	} else {
 		backup.SSLSettings = *settings
 	}
+
 	if t, err := store.Stack().Stacks(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Stacks")
+		}
 	} else {
 		backup.Stack = t
 	}
+
 	if t, err := store.Tag().Tags(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Tags")
+		}
 	} else {
 		backup.Tag = t
 	}
+
 	if t, err := store.TeamMembership().TeamMemberships(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Team Memberships")
+		}
 	} else {
 		backup.TeamMembership = t
 	}
+
 	if t, err := store.Team().Teams(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Teams")
+		}
 	} else {
 		backup.Team = t
 	}
+
 	if info, err := store.TunnelServer().Info(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Tunnel Server")
+		}
 	} else {
 		backup.TunnelServer = *info
 	}
+
 	if users, err := store.User().Users(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Users")
+		}
 	} else {
 		backup.User = users
 	}
+
 	if webhooks, err := store.Webhook().Webhooks(); err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Webhooks")
+		}
 	} else {
 		backup.Webhook = webhooks
 	}
+
 	v, err := store.Version().DBVersion()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
+	if err != nil && !store.IsErrObjectNotFound(err) {
+		logrus.WithError(err).Errorf("Exporting DB version")
 	}
 	instance, _ := store.Version().InstanceID()
 	backup.Version = map[string]string{
@@ -518,50 +597,66 @@ func (store *Store) Import(filename string) (err error) {
 	for _, v := range backup.CustomTemplate {
 		store.CustomTemplate().UpdateCustomTemplate(v.ID, &v)
 	}
+
 	for _, v := range backup.EdgeGroup {
 		store.EdgeGroup().UpdateEdgeGroup(v.ID, &v)
 	}
+
 	for _, v := range backup.EdgeJob {
 		store.EdgeJob().UpdateEdgeJob(v.ID, &v)
 	}
+
 	for _, v := range backup.EdgeStack {
 		store.EdgeStack().UpdateEdgeStack(v.ID, &v)
 	}
+
 	for _, v := range backup.Endpoint {
 		store.Endpoint().UpdateEndpoint(v.ID, &v)
 	}
+
 	for _, v := range backup.EndpointGroup {
 		store.EndpointGroup().UpdateEndpointGroup(v.ID, &v)
 	}
+
 	for _, v := range backup.EndpointRelation {
 		store.EndpointRelation().UpdateEndpointRelation(v.EndpointID, &v)
 	}
+
 	for _, v := range backup.HelmUserRepository {
 		store.HelmUserRepository().UpdateHelmUserRepository(v.ID, &v)
 	}
+
 	for _, v := range backup.Registry {
 		store.Registry().UpdateRegistry(v.ID, &v)
 	}
+
 	for _, v := range backup.ResourceControl {
 		store.ResourceControl().UpdateResourceControl(v.ID, &v)
 	}
+
 	for _, v := range backup.Role {
 		store.Role().UpdateRole(v.ID, &v)
 	}
+
 	store.Settings().UpdateSettings(&backup.Settings)
 	store.SSLSettings().UpdateSettings(&backup.SSLSettings)
+
 	for _, v := range backup.Stack {
 		store.Stack().UpdateStack(v.ID, &v)
 	}
+
 	for _, v := range backup.Tag {
 		store.Tag().UpdateTag(v.ID, &v)
 	}
+
 	for _, v := range backup.TeamMembership {
 		store.TeamMembership().UpdateTeamMembership(v.ID, &v)
 	}
+
 	for _, v := range backup.Team {
 		store.Team().UpdateTeam(v.ID, &v)
 	}
+
 	store.TunnelServer().UpdateInfo(&backup.TunnelServer)
 
 	for _, user := range backup.User {
@@ -570,10 +665,9 @@ func (store *Store) Import(filename string) (err error) {
 		}
 	}
 
-	// backup[store.Webhook().BucketName()], err = store.Webhook().Webhooks()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
+	for _, v := range backup.Webhook {
+		store.Webhook().UpdateWebhook(v.ID, &v)
+	}
 
 	return nil
 }
