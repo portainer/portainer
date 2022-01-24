@@ -24,11 +24,12 @@ angular
       StateManager
     ) {
       $scope.state = {
-        EnvironmentType: 'agent',
+        EnvironmentType: $state.params.isEdgeDevice ? 'edge_agent' : 'agent',
         PlatformType: 'linux',
         actionInProgress: false,
         deploymentTab: 0,
         allowCreateTag: Authentication.isAdmin(),
+        isEdgeDevice: $state.params.isEdgeDevice,
         availableEdgeAgentCheckinOptions: [
           { key: 'Use default interval', value: 0 },
           {
@@ -271,7 +272,8 @@ angular
               TLSCAFile,
               TLSCertFile,
               TLSKeyFile,
-              CheckinInterval
+              CheckinInterval,
+              $scope.state.isEdgeDevice
             );
 
             Notifications.success('Environment created', name);

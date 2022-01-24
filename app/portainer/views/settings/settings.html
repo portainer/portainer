@@ -91,40 +91,10 @@
           </div>
           <!-- !helm charts -->
           <!-- host-filesystem -->
-
-          <!-- edge -->
-          <div class="col-sm-12 form-section-title"> Edge Compute </div>
-          <div class="form-group">
-            <label for="edge_checkin" class="col-sm-2 control-label text-left">
-              Edge agent default poll frequency
-              <portainer-tooltip
-                position="bottom"
-                message="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
-              ></portainer-tooltip>
-            </label>
-            <div class="col-sm-10">
-              <select
-                id="edge_checkin"
-                class="form-control"
-                ng-model="settings.EdgeAgentCheckinInterval"
-                ng-options="+(opt.value) as opt.key for opt in state.availableEdgeAgentCheckinOptions"
-                data-cy="settings-pollFrequencySelect"
-              ></select>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_enableEdgeComputeFeatures" class="control-label text-left"> Enable edge compute features </label>
-              <label class="switch" style="margin-left: 20px" data-cy="settings-edgeToggle">
-                <input type="checkbox" name="toggle_enableEdgeComputeFeatures" ng-model="formValues.enableEdgeComputeFeatures" /><i></i>
-              </label>
-            </div>
-          </div>
-          <!-- !edge -->
           <!-- kube -->
           <div class="col-sm-12 form-section-title"> Kubernetes </div>
           <div class="form-group">
-            <label for="edge_checkin" class="col-sm-2 control-label text-left"> Kubeconfig expiry </label>
+            <label for="kubeconfig_expiry" class="col-sm-2 control-label text-left"> Kubeconfig expiry </label>
             <div class="col-sm-10">
               <select
                 id="kubeconfig_expiry"
@@ -159,8 +129,6 @@
 </div>
 
 <ssl-certificate-settings></ssl-certificate-settings>
-
-<open-amt-settings ng-if="settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt']"></open-amt-settings>
 
 <div class="row">
   <div class="col-sm-12">

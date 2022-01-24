@@ -11,13 +11,18 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/dataservices"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
-	DefaultCIRAConfigName     = "ciraConfigDefault"
-	DefaultWirelessConfigName = "wirelessProfileDefault"
-	DefaultProfileName        = "profileAMTDefault"
+	DefaultCIRAConfigName = "ciraConfigDefault"
+	DefaultProfileName    = "profileAMTDefault"
+
+	httpClientTimeout = 5 * time.Minute
+
+	powerOnState  portainer.PowerState = 2
+	powerOffState portainer.PowerState = 8
+	restartState  portainer.PowerState = 5
 )
 
 // Service represents a service for managing an OpenAMT server.
@@ -26,13 +31,10 @@ type Service struct {
 }
 
 // NewService initializes a new service.
-func NewService(dataStore dataservices.DataStore) *Service {
-	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
-		return nil
-	}
+func NewService() *Service {
 	return &Service{
 		httpsClient: &http.Client{
-			Timeout: time.Second * time.Duration(5),
+			Timeout: httpClientTimeout,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
@@ -63,28 +65,19 @@ func parseError(responseBody []byte) error {
 	return nil
 }
 
-func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfiguration) error {
-	token, err := service.executeAuthenticationRequest(configuration)
+func (service *Service) Configure(configuration portainer.OpenAMTConfiguration) error {
+	token, err := service.Authorization(configuration)
 	if err != nil {
 		return err
 	}
-	configuration.Credentials.MPSToken = token.Token
+	configuration.MPSToken = token
 
 	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, DefaultCIRAConfigName)
 	if err != nil {
 		return err
 	}
 
-	wirelessConfigName := ""
-	if configuration.WirelessConfiguration != nil {
-		wirelessConfig, err := service.createOrUpdateWirelessConfig(configuration, DefaultWirelessConfigName)
-		if err != nil {
-			return err
-		}
-		wirelessConfigName = wirelessConfig.ProfileName
-	}
-
-	_, err = service.createOrUpdateAMTProfile(configuration, DefaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
+	_, err = service.createOrUpdateAMTProfile(configuration, DefaultProfileName, ciraConfig.ConfigName)
 	if err != nil {
 		return err
 	}
@@ -119,7 +112,7 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 		if errorResponse != nil {
 			return nil, errorResponse
 		}
-		return nil, errors.New(fmt.Sprintf("unexpected status code %s", response.Status))
+		return nil, fmt.Errorf("unexpected status code %s", response.Status)
 	}
 
 	return responseBody, nil
@@ -151,8 +144,110 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 		if errorResponse != nil {
 			return nil, errorResponse
 		}
-		return nil, errors.New(fmt.Sprintf("unexpected status code %s", response.Status))
+		return nil, fmt.Errorf("unexpected status code %s", response.Status)
 	}
 
 	return responseBody, nil
+}
+
+func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*portainer.OpenAMTDeviceInformation, error) {
+	token, err := service.Authorization(configuration)
+	if err != nil {
+		return nil, err
+	}
+	configuration.MPSToken = token
+
+	var g errgroup.Group
+	var resultDevice *Device
+	var resultPowerState *DevicePowerState
+	var resultEnabledFeatures *DeviceEnabledFeatures
+
+	g.Go(func() error {
+		device, err := service.getDevice(configuration, deviceGUID)
+		if err != nil {
+			return err
+		}
+		if device == nil {
+			return fmt.Errorf("device %s not found", deviceGUID)
+		}
+		resultDevice = device
+		return nil
+	})
+
+	g.Go(func() error {
+		powerState, err := service.getDevicePowerState(configuration, deviceGUID)
+		if err != nil {
+			return err
+		}
+		resultPowerState = powerState
+		return nil
+	})
+
+	g.Go(func() error {
+		enabledFeatures, err := service.getDeviceEnabledFeatures(configuration, deviceGUID)
+		if err != nil {
+			return err
+		}
+		resultEnabledFeatures = enabledFeatures
+		return nil
+	})
+
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+
+	deviceInformation := &portainer.OpenAMTDeviceInformation{
+		GUID:             resultDevice.GUID,
+		HostName:         resultDevice.HostName,
+		ConnectionStatus: resultDevice.ConnectionStatus,
+	}
+	if resultPowerState != nil {
+		deviceInformation.PowerState = resultPowerState.State
+	}
+	if resultEnabledFeatures != nil {
+		deviceInformation.EnabledFeatures = &portainer.OpenAMTDeviceEnabledFeatures{
+			Redirection: resultEnabledFeatures.Redirection,
+			KVM:         resultEnabledFeatures.KVM,
+			SOL:         resultEnabledFeatures.SOL,
+			IDER:        resultEnabledFeatures.IDER,
+			UserConsent: resultEnabledFeatures.UserConsent,
+		}
+	}
+
+	return deviceInformation, nil
+}
+
+func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfiguration, deviceGUID string, action string) error {
+	parsedAction, err := parseAction(action)
+	if err != nil {
+		return err
+	}
+
+	token, err := service.Authorization(configuration)
+	if err != nil {
+		return err
+	}
+	configuration.MPSToken = token
+
+	err = service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *Service) EnableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string, features portainer.OpenAMTDeviceEnabledFeatures) (string, error) {
+	token, err := service.Authorization(configuration)
+	if err != nil {
+		return "", err
+	}
+	configuration.MPSToken = token
+
+	err = service.enableDeviceFeatures(configuration, deviceGUID, features)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }

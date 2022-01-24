@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofrs/uuid"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -37,6 +38,7 @@ type endpointCreatePayload struct {
 	AzureAuthenticationKey string
 	TagIDs                 []portainer.TagID
 	EdgeCheckinInterval    int
+	IsEdgeDevice           bool
 }
 
 type endpointCreationEnum int
@@ -143,6 +145,9 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 
 	checkinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
 	payload.EdgeCheckinInterval = checkinInterval
+
+	isEdgeDevice, _ := request.RetrieveBooleanMultiPartFormValue(r, "IsEdgeDevice", true)
+	payload.IsEdgeDevice = isEdgeDevice
 
 	return nil
 }
@@ -332,6 +337,21 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		EdgeKey:             edgeKey,
 		EdgeCheckinInterval: payload.EdgeCheckinInterval,
 		Kubernetes:          portainer.KubernetesDefault(),
+		IsEdgeDevice:        payload.IsEdgeDevice,
+	}
+
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
+	}
+
+	if settings.EnforceEdgeID {
+		edgeID, err := uuid.NewV4()
+		if err != nil {
+			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Cannot generate the Edge ID", err}
+		}
+
+		endpoint.EdgeID = edgeID.String()
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
@@ -370,6 +390,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
+		IsEdgeDevice:       payload.IsEdgeDevice,
 	}
 
 	err := handler.snapshotAndPersistEndpoint(endpoint)
@@ -435,6 +456,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
+		IsEdgeDevice:       payload.IsEdgeDevice,
 	}
 
 	err := handler.storeTLSFiles(endpoint, payload)

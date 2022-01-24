@@ -29,11 +29,6 @@ func Test_enableFeaturesFromFlags(t *testing.T) {
 		isSupported bool
 	}{
 		{"test", false},
-		{"openamt", false},
-		{"open-amt", true},
-		{"oPeN-amT", true},
-		{"fdo", true},
-		{"FDO", true},
 	}
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s succeeds:%v", test.featureFlag, test.isSupported), func(t *testing.T) {

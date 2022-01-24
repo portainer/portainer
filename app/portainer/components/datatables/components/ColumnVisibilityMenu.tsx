@@ -3,17 +3,20 @@ import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { ColumnInstance } from 'react-table';
 
 import { Checkbox } from '@/portainer/components/form-components/Checkbox';
-import type { DockerContainer } from '@/docker/containers/types';
 
 import { useTableContext } from './TableContainer';
 
-interface Props {
-  columns: ColumnInstance<DockerContainer>[];
+interface Props<D extends object> {
+  columns: ColumnInstance<D>[];
   onChange: (value: string[]) => void;
   value: string[];
 }
 
-export function ColumnVisibilityMenu({ columns, onChange, value }: Props) {
+export function ColumnVisibilityMenu<D extends object>({
+  columns,
+  onChange,
+  value,
+}: Props<D>) {
   useTableContext();
 
   return (
