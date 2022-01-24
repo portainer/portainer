@@ -96,9 +96,16 @@
   padding: 15px 0;
 }
 
+[data-reach-menu-list],
+[data-reach-menu-items] {
+  padding: 0px;
+  border: 1px var(--bg-dropdown-menu-color);
+}
+
 .tableMenu {
   color: #767676;
   padding: 10px;
+  background-color: var(--bg-dropdown-menu-color) !important;
 }
 
 .tableMenu .menuHeader {

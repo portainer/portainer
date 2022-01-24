@@ -365,7 +365,7 @@ html {
   --text-blocklist-item-selected-color: var(--white-color);
   --text-progress-bar-color: var(--white-color);
   --text-pagination-color: var(--white-color);
-  --text-pagination-span-color: var(--white-color);
+  --text-pagination-span-color: var(--blue-2);
   --text-pagination-span-hover-color: var(--white-color);
   --text-ui-select-color: var(--white-color);
   --text-ui-select-hover-color: var(--white-color);
@@ -547,6 +547,8 @@ html {
   --text-button-hover-color: var(--white-color);
   --text-btn-default-color: var(--white-color);
   --text-small-select-color: var(--white-color);
+  --text-multiselect-item-color: var(--white-color);
+  --text-pagination-span-color: var(--blue-2);
 
   --border-color: var(--grey-55);
   --border-widget-color: var(--white-color);

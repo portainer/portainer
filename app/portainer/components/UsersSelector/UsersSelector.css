@@ -1,0 +1,22 @@
+.selector__control {
+  border: 1px solid var(--border-multiselect) !important;
+  background-color: var(--bg-multiselect-color) !important;
+}
+
+.selector__multi-value {
+  background-color: var(--bg-multiselect-checkboxcontainer) !important;
+}
+
+.selector__multi-value__label {
+  color: var(--text-multiselect-item-color) !important;
+}
+
+.selector__menu {
+  background-color: var(--bg-multiselect-color) !important;
+  border: 1px solid var(--border-multiselect) !important;
+}
+
+.selector__option {
+  background-color: var(--bg-multiselect-color) !important;
+  border: 1px solid var(--border-multiselect) !important;
+}
