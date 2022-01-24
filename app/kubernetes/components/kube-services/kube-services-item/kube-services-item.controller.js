@@ -23,7 +23,7 @@ export default class KubeServicesItemViewController {
       const route = new KubernetesIngressServiceRoute();
       route.ServiceName = this.serviceName;
 
-      if (this.serviceType === KubernetesApplicationPublishingTypes.CLUSTER_IP) {
+      if (this.serviceType === KubernetesApplicationPublishingTypes.CLUSTER_IP && this.originalIngresses.length > 0) {
         if (!route.IngressName) {
           route.IngressName = this.originalIngresses[0].Name;
         }
