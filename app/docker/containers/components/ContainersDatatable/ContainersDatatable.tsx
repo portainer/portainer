@@ -191,19 +191,27 @@ export function ContainersDatatable({
           role={tbodyProps.role}
           style={tbodyProps.style}
         >
-          {page.map((row) => {
-            prepareRow(row);
-            const { key, className, role, style } = row.getRowProps();
-            return (
-              <TableRow<DockerContainer>
-                cells={row.cells}
-                key={key}
-                className={className}
-                role={role}
-                style={style}
-              />
-            );
-          })}
+          {page.length > 0 ? (
+            page.map((row) => {
+              prepareRow(row);
+              const { key, className, role, style } = row.getRowProps();
+              return (
+                <TableRow<DockerContainer>
+                  cells={row.cells}
+                  key={key}
+                  className={className}
+                  role={role}
+                  style={style}
+                />
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={columns.length} className="text-center text-muted">
+                No container available.
+              </td>
+            </tr>
+          )}
         </tbody>
       </Table>
 
