@@ -98,7 +98,7 @@ module.exports = {
     },
   },
   plugins: [
-    new Dotenv(),
+    new Dotenv({ defaults: true }),
     new ESLintPlugin(),
     new HtmlWebpackPlugin({
       template: './app/index.html',
