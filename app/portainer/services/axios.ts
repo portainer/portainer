@@ -8,7 +8,7 @@ import {
   portainerAgentTargetHeader,
 } from './http-request.helper';
 
-const axiosApiInstance = axios.create({ baseURL: '/api' });
+const axiosApiInstance = axios.create({ baseURL: 'api' });
 
 export default axiosApiInstance;
 
