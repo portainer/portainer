@@ -44,7 +44,7 @@ export function prompt(options: PromptOptions) {
     title: options.title,
     inputType: options.inputType,
     inputOptions: options.inputOptions,
-    buttons: confirmButtons(options.buttons),
+    buttons: options.buttons ? confirmButtons(options.buttons) : undefined,
     // casting is done because ts definition expects string=>any, but library code can emit different values, based on inputType
     callback: options.callback as (value: string) => void,
     value: options.value,
