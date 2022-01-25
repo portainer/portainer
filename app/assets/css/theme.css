@@ -339,7 +339,7 @@ html {
   --text-body-color: var(--white-color);
   --text-sidebar-title-color: var(--grey-8);
   --text-widget-header-color: var(--white-color);
-  --text-form-control-color: var(--grey-8);
+  --text-form-control-color: var(--white-color);
   --text-muted-color: var(--grey-8);
   --text-link-color: var(--blue-9);
   --text-link-hover-color: var(--blue-2);
