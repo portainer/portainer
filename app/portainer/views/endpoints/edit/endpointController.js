@@ -12,7 +12,6 @@ angular.module('portainer.app').controller('EndpointController', EndpointControl
 /* @ngInject */
 function EndpointController(
   $async,
-  $q,
   $scope,
   $state,
   $transition$,
