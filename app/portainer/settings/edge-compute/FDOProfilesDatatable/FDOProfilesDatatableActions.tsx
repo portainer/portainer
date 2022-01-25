@@ -70,13 +70,11 @@ export function FDOProfilesDatatableActions({
     try {
       const profile = selectedItems[0];
       const newProfile = await duplicateProfile(profile.id);
-      console.log({ newProfile });
       notifications.success('Profile successfully duplicated', profile.name);
       router.stateService.go('portainer.endpoints.profile.edit', {
         id: newProfile.id,
       });
     } catch (err) {
-      console.log(err);
       notifications.error(
         'Failure',
         err as Error,
