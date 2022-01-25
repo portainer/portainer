@@ -102,11 +102,18 @@ class KubernetesCreateResourcePoolController {
   /* #endregion */
 
   isCreateButtonDisabled() {
-    return this.state.actionInProgress || (this.formValues.HasQuota && !this.isQuotaValid()) || this.state.isAlreadyExist || this.state.duplicates.ingressHosts.hasRefs;
+    return (
+      this.state.actionInProgress ||
+      (this.formValues.HasQuota && !this.isQuotaValid()) ||
+      this.state.isAlreadyExist ||
+      this.state.hasPrefixKube ||
+      this.state.duplicates.ingressHosts.hasRefs
+    );
   }
 
   onChangeName() {
     this.state.isAlreadyExist = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.formValues.Name) !== undefined;
+    this.state.hasPrefixKube = /^kube-/.test(this.formValues.Name);
   }
 
   isQuotaValid() {
@@ -200,6 +207,7 @@ class KubernetesCreateResourcePoolController {
           sliderMaxCpu: 0,
           viewReady: false,
           isAlreadyExist: false,
+          hasPrefixKube: false,
           canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
           duplicates: {
             ingressHosts: new KubernetesFormValidationReferences(),

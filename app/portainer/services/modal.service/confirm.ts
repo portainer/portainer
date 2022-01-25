@@ -218,3 +218,17 @@ export function confirmImageExport(callback: ConfirmCallback) {
     callback,
   });
 }
+
+export function confirmChangePassword() {
+  return confirmAsync({
+    title: 'Are you sure?',
+    message:
+      'You will be logged out after the password change. Do you want to change your password?',
+    buttons: {
+      confirm: {
+        label: 'Change',
+        className: 'btn-primary',
+      },
+    },
+  });
+}

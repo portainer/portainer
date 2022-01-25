@@ -35,6 +35,8 @@ const (
 	ManifestFileDefaultName = "k8s-deployment.yml"
 	// EdgeStackStorePath represents the subfolder where edge stack files are stored in the file store folder.
 	EdgeStackStorePath = "edge_stacks"
+	// FDOProfileStorePath represents the subfolder where FDO profiles files are stored in the file store folder.
+	FDOProfileStorePath = "fdo_profiles"
 	// PrivateKeyFile represents the name on disk of the file containing the private key.
 	PrivateKeyFile = "portainer.key"
 	// PublicKeyFile represents the name on disk of the file containing the public key.
@@ -651,4 +653,21 @@ func MoveDirectory(originalPath, newPath string) error {
 	}
 
 	return os.Rename(originalPath, newPath)
+}
+
+// StoreFDOProfileFileFromBytes creates a subfolder in the FDOProfileStorePath and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error) {
+	err := service.createDirectoryInStore(FDOProfileStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	filePath := JoinPaths(FDOProfileStorePath, fdoProfileIdentifier)
+	err = service.createFileInStore(filePath, bytes.NewReader(data))
+	if err != nil {
+		return "", err
+	}
+
+	return service.wrapFileStore(filePath), nil
 }

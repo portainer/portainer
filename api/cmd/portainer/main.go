@@ -107,11 +107,6 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 	if isNew {
 		// from MigrateData
 		store.VersionService.StoreDBVersion(portainer.DBVersion)
-
-		err := updateSettingsFromFlags(store, flags)
-		if err != nil {
-			log.Fatalf("Failed updating settings from flags: %v", err)
-		}
 	} else {
 		storedVersion, err := store.VersionService.DBVersion()
 		if err != nil {
@@ -123,6 +118,11 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 				log.Fatalf("Failed migration: %v", err)
 			}
 		}
+	}
+
+	err = updateSettingsFromFlags(store, flags)
+	if err != nil {
+		log.Fatalf("Failed updating settings from flags: %v", err)
 	}
 
 	// this is for the db restore functionality - needs more tests.
@@ -554,7 +554,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	oauthService := initOAuthService()
 	gitService := initGitService()
 
-	openAMTService := openamt.NewService(dataStore)
+	openAMTService := openamt.NewService()
 
 	cryptoService := initCryptoService()
 	digitalSignatureService := initDigitalSignatureService()

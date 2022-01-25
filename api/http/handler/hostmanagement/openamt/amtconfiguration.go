@@ -16,23 +16,19 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-type openAMTConfigureDefaultPayload struct {
-	EnableOpenAMT            bool
-	MPSServer                string
-	MPSUser                  string
-	MPSPassword              string
-	CertFileText             string
-	CertPassword             string
-	DomainName               string
-	UseWirelessConfig        bool
-	WifiAuthenticationMethod string
-	WifiEncryptionMethod     string
-	WifiSSID                 string
-	WifiPskPass              string
+type openAMTConfigurePayload struct {
+	Enabled          bool
+	MPSServer        string
+	MPSUser          string
+	MPSPassword      string
+	DomainName       string
+	CertFileName     string
+	CertFileContent  string
+	CertFilePassword string
 }
 
-func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
-	if payload.EnableOpenAMT {
+func (payload *openAMTConfigurePayload) Validate(r *http.Request) error {
+	if payload.Enabled {
 		if payload.MPSServer == "" {
 			return errors.New("MPS Server must be provided")
 		}
@@ -45,32 +41,21 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 		if payload.DomainName == "" {
 			return errors.New("domain name must be provided")
 		}
-		if payload.CertFileText == "" {
+		if payload.CertFileContent == "" {
 			return errors.New("certificate file must be provided")
 		}
-		if payload.CertPassword == "" {
-			return errors.New("certificate password must be provided")
+		if payload.CertFileName == "" {
+			return errors.New("certificate file name must be provided")
 		}
-		if payload.UseWirelessConfig {
-			if payload.WifiAuthenticationMethod == "" {
-				return errors.New("wireless authentication method must be provided")
-			}
-			if payload.WifiEncryptionMethod == "" {
-				return errors.New("wireless encryption method must be provided")
-			}
-			if payload.WifiSSID == "" {
-				return errors.New("wireless config SSID must be provided")
-			}
-			if payload.WifiPskPass == "" {
-				return errors.New("wireless config PSK passphrase must be provided")
-			}
+		if payload.CertFilePassword == "" {
+			return errors.New("certificate password must be provided")
 		}
 	}
 
 	return nil
 }
 
-// @id OpenAMTConfigureDefault
+// @id OpenAMTConfigure
 // @summary Enable Portainer's OpenAMT capabilities
 // @description Enable Portainer's OpenAMT capabilities
 // @description **Access policy**: administrator
@@ -78,22 +63,22 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param body body openAMTConfigureDefaultPayload true "OpenAMT Settings"
+// @param body body openAMTConfigurePayload true "OpenAMT Settings"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
 // @router /open_amt [post]
-func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload openAMTConfigureDefaultPayload
+func (handler *Handler) openAMTConfigure(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload openAMTConfigurePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		logrus.WithError(err).Error("Invalid request payload")
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
-	if payload.EnableOpenAMT {
-		certificateErr := validateCertificate(payload.CertFileText, payload.CertPassword)
+	if payload.Enabled {
+		certificateErr := validateCertificate(payload.CertFileContent, payload.CertFilePassword)
 		if certificateErr != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error validating certificate", Err: certificateErr}
 		}
@@ -143,31 +128,19 @@ func isValidIssuer(issuer string) bool {
 		strings.Contains(formattedIssuer, "godaddy")
 }
 
-func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigureDefaultPayload) error {
+func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigurePayload) error {
 	configuration := portainer.OpenAMTConfiguration{
-		Enabled:   true,
-		MPSServer: configurationPayload.MPSServer,
-		Credentials: portainer.MPSCredentials{
-			MPSUser:     configurationPayload.MPSUser,
-			MPSPassword: configurationPayload.MPSPassword,
-		},
-		DomainConfiguration: portainer.DomainConfiguration{
-			CertFileText: configurationPayload.CertFileText,
-			CertPassword: configurationPayload.CertPassword,
-			DomainName:   configurationPayload.DomainName,
-		},
+		Enabled:          true,
+		MPSServer:        configurationPayload.MPSServer,
+		MPSUser:          configurationPayload.MPSUser,
+		MPSPassword:      configurationPayload.MPSPassword,
+		CertFileContent:  configurationPayload.CertFileContent,
+		CertFileName:     configurationPayload.CertFileName,
+		CertFilePassword: configurationPayload.CertFilePassword,
+		DomainName:       configurationPayload.DomainName,
 	}
 
-	if configurationPayload.UseWirelessConfig {
-		configuration.WirelessConfiguration = &portainer.WirelessConfiguration{
-			AuthenticationMethod: configurationPayload.WifiAuthenticationMethod,
-			EncryptionMethod:     configurationPayload.WifiEncryptionMethod,
-			SSID:                 configurationPayload.WifiSSID,
-			PskPass:              configurationPayload.WifiPskPass,
-		}
-	}
-
-	err := handler.OpenAMTService.ConfigureDefault(configuration)
+	err := handler.OpenAMTService.Configure(configuration)
 	if err != nil {
 		logrus.WithError(err).Error("error configuring OpenAMT server")
 		return err
@@ -189,7 +162,7 @@ func (handler *Handler) saveConfiguration(configuration portainer.OpenAMTConfigu
 		return err
 	}
 
-	configuration.Credentials.MPSToken = ""
+	configuration.MPSToken = ""
 
 	settings.OpenAMTConfiguration = configuration
 	err = handler.DataStore.Settings().UpdateSettings(settings)

@@ -10,7 +10,7 @@
 </rd-header>
 
 <div class="row">
-  <information-panel ng-if="state.edgeEndpoint && endpoint.EdgeID" title-text="Edge information">
+  <information-panel ng-if="state.edgeEndpoint && endpoint.EdgeID && endpoint.LastCheckInDate" title-text="Edge information">
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
@@ -38,7 +38,7 @@
       </p>
     </span>
   </information-panel>
-  <information-panel ng-if="state.edgeEndpoint && !endpoint.EdgeID" title-text="Deploy an agent">
+  <information-panel ng-if="state.edgeEndpoint && !endpoint.LastCheckInDate" title-text="Deploy an agent">
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
@@ -68,23 +68,17 @@
               Note that the environment variable AGENT_SECRET will need to be set to {{ agentSecret }}. Please update the manifest that will be download from the following script.
             </span>
             <code style="display: block; padding: 16px 45px">
-              {{
-                dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
-              }}
+              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
             </code>
           </uib-tab>
           <uib-tab index="'swarm'" heading="Docker Swarm">
             <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
-              {{
-                dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
-              }}
+              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
             </code>
           </uib-tab>
           <uib-tab index="'standalone'" heading="Docker Standalone">
             <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
-              {{
-                dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
-              }}
+              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
             </code>
           </uib-tab>
         </uib-tabset>
@@ -213,6 +207,67 @@
             <por-endpoint-security form-data="formValues.SecurityFormData" endpoint="endpoint"></por-endpoint-security>
           </div>
           <!-- !endpoint-security -->
+          <!-- open-amt info -->
+          <div ng-if="state.showAMTInfo">
+            <div class="col-sm-12 form-section-title"> Open Active Management Technology </div>
+
+            <div class="form-group">
+              <label for="endpoint_managementinfoVersion" class="col-sm-3 col-lg-2 control-label text-left"> AMT Version </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" ng-disabled="true" class="form-control" id="endpoint_managementinfoVersion" ng-model="endpoint.ManagementInfo['AMT']" placeholder="Loading..." />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endpoint_managementinfoUUID" class="col-sm-3 col-lg-2 control-label text-left"> UUID </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" ng-disabled="true" class="form-control" id="endpoint_managementinfoUUID" ng-model="endpoint.ManagementInfo['UUID']" placeholder="Loading..." />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endpoint_managementinfoBuildNumber" class="col-sm-3 col-lg-2 control-label text-left"> Build Number </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  ng-disabled="true"
+                  class="form-control"
+                  id="endpoint_managementinfoBuildNumber"
+                  ng-model="endpoint.ManagementInfo['Build Number']"
+                  placeholder="Loading..."
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endpoint_managementinfoControlMode" class="col-sm-3 col-lg-2 control-label text-left"> Control Mode </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  ng-disabled="true"
+                  class="form-control"
+                  id="endpoint_managementinfoControlMode"
+                  ng-model="endpoint.ManagementInfo['Control Mode']"
+                  placeholder="Loading..."
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endpoint_managementinfoDNSSuffix" class="col-sm-3 col-lg-2 control-label text-left"> DNS Suffix </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  ng-disabled="true"
+                  class="form-control"
+                  id="endpoint_managementinfoDNSSuffix"
+                  ng-model="endpoint.ManagementInfo['DNS Suffix']"
+                  placeholder="Loading..."
+                />
+              </div>
+            </div>
+          </div>
+          <!-- !open-amt info -->
           <div class="form-group">
             <div class="col-sm-12">
               <button

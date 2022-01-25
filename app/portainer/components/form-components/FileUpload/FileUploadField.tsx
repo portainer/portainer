@@ -8,6 +8,7 @@ import styles from './FileUploadField.module.css';
 export interface Props {
   onChange(value: File): void;
   value?: File;
+  accept?: string;
   title?: string;
   required?: boolean;
 }
@@ -15,6 +16,7 @@ export interface Props {
 export function FileUploadField({
   onChange,
   value,
+  accept,
   title = 'Select a file',
   required = false,
 }: Props) {
@@ -25,12 +27,18 @@ export function FileUploadField({
       <input
         ref={fileRef}
         type="file"
+        accept={accept}
         required={required}
         className={styles.fileInput}
         onChange={changeHandler}
         aria-label="file-input"
       />
-      <Button size="small" color="primary" onClick={handleButtonClick}>
+      <Button
+        size="small"
+        color="primary"
+        onClick={handleButtonClick}
+        className={styles.fileButton}
+      >
         {title}
       </Button>
 

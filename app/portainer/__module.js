@@ -205,6 +205,51 @@ angular
         },
       };
 
+      var edgeDeviceCreation = {
+        name: 'portainer.endpoints.newEdgeDevice',
+        url: '/newEdgeDevice',
+        params: {
+          isEdgeDevice: true,
+        },
+        views: {
+          'content@': {
+            templateUrl: './views/endpoints/create/createendpoint.html',
+            controller: 'CreateEndpointController',
+          },
+        },
+      };
+
+      var deviceImport = {
+        name: 'portainer.endpoints.importDevice',
+        url: '/device',
+        views: {
+          'content@': {
+            templateUrl: './views/devices/import/importDevice.html',
+            controller: 'ImportDeviceController',
+          },
+        },
+      };
+
+      var addFDOProfile = {
+        name: 'portainer.endpoints.profile',
+        url: '/profile',
+        views: {
+          'content@': {
+            component: 'addProfileView',
+          },
+        },
+      };
+
+      var editFDOProfile = {
+        name: 'portainer.endpoints.profile.edit',
+        url: '/:id',
+        views: {
+          'content@': {
+            component: 'editProfileView',
+          },
+        },
+      };
+
       var endpointAccess = {
         name: 'portainer.endpoints.endpoint.access',
         url: '/access',
@@ -213,6 +258,17 @@ angular
             templateUrl: './views/endpoints/access/endpointAccess.html',
             controller: 'EndpointAccessController',
             controllerAs: 'ctrl',
+          },
+        },
+      };
+
+      var endpointKVM = {
+        name: 'portainer.endpoints.endpoint.kvm',
+        url: '/kvm?deviceId&deviceName',
+        views: {
+          'content@': {
+            templateUrl: './views/endpoints/kvm/endpointKVM.html',
+            controller: 'EndpointKVMController',
           },
         },
       };
@@ -378,6 +434,16 @@ angular
         },
       };
 
+      var settingsEdgeCompute = {
+        name: 'portainer.settings.edgeCompute',
+        url: '/edge',
+        views: {
+          'content@': {
+            component: 'settingsEdgeComputeView',
+          },
+        },
+      };
+
       var tags = {
         name: 'portainer.tags',
         url: '/tags',
@@ -444,7 +510,12 @@ angular
       $stateRegistryProvider.register(endpoint);
       $stateRegistryProvider.register(k8sendpoint);
       $stateRegistryProvider.register(endpointAccess);
+      $stateRegistryProvider.register(endpointKVM);
+      $stateRegistryProvider.register(edgeDeviceCreation);
       $stateRegistryProvider.register(endpointCreation);
+      $stateRegistryProvider.register(deviceImport);
+      $stateRegistryProvider.register(addFDOProfile);
+      $stateRegistryProvider.register(editFDOProfile);
       $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
@@ -461,6 +532,7 @@ angular
       $stateRegistryProvider.register(registryCreation);
       $stateRegistryProvider.register(settings);
       $stateRegistryProvider.register(settingsAuthentication);
+      $stateRegistryProvider.register(settingsEdgeCompute);
       $stateRegistryProvider.register(tags);
       $stateRegistryProvider.register(users);
       $stateRegistryProvider.register(user);

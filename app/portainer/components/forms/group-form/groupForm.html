@@ -56,6 +56,7 @@
               entry-click="$ctrl.associateEndpoint"
               pagination-state="$ctrl.state.available"
               empty-dataset-message="No environment available"
+              cy-value="available-endpoints"
             ></group-association-table>
           </div>
         </div>
@@ -74,6 +75,7 @@
               pagination-state="$ctrl.state.associated"
               empty-dataset-message="No associated environment"
               has-backend-pagination="this.pageType !== 'create'"
+              cy-value="associated-endpoints"
             ></group-association-table>
           </div>
         </div>

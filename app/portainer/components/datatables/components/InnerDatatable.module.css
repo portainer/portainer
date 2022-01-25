@@ -1,0 +1,3 @@
+.inner-datatable thead {
+  background-color: var(--bg-inner-datatable-thead) !important;
+}
