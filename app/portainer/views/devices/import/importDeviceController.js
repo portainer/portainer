@@ -91,6 +91,7 @@ angular
               );
             } catch (err) {
               Notifications.error('Failure', err, 'Unable to create the environment');
+              $scope.state.actionInProgress = false;
               return;
             }
 
