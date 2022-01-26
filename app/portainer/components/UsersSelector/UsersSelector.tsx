@@ -1,8 +1,5 @@
-import Select from 'react-select';
-
 import { User, UserId } from '@/portainer/users/types';
-
-import styles from './UsersSelector.module.css';
+import { Select } from '@/portainer/components/form-components/ReactSelect';
 
 interface Props {
   name?: string;
@@ -30,8 +27,6 @@ export function UsersSelector({
       getOptionLabel={(user) => user.Username}
       getOptionValue={(user) => `${user.Id}`}
       options={users}
-      className={styles.root}
-      classNamePrefix="selector"
       value={users.filter((user) => value.includes(user.Id))}
       closeMenuOnSelect={false}
       onChange={(selectedUsers) =>
