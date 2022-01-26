@@ -122,8 +122,10 @@
                   <div class="col-sm-12 small text-warning">
                     <div ng-messages="kubernetesApplicationCreationForm.application_name.$error">
                       <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-                      <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', and contain at most 63
-                       characters, and must start and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p>
+                      <p ng-message="pattern"
+                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', and contain at most 63
+                        characters, and must start and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p
+                      >
                     </div>
                     <p ng-if="ctrl.state.alreadyExists"
                       ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An application with the same name already exists inside the selected namespace.</p
