@@ -50,7 +50,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		SSLCert:                   kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").String(),
 		SSLKey:                    kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").String(),
 		Rollback:                  kingpin.Flag("rollback", "Rollback the database store to the previous version").Bool(),
-		SnapshotInterval:          kingpin.Flag("snapshot-interval", "Duration between each environment snapshot job").Default(defaultSnapshotInterval).String(),
+		SnapshotInterval:          kingpin.Flag("snapshot-interval", "Duration between each environment snapshot job").String(),
 		AdminPassword:             kingpin.Flag("admin-password", "Hashed admin password").String(),
 		AdminPasswordFile:         kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
 		Labels:                    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
@@ -129,7 +129,7 @@ func validateEndpointURL(endpointURL string) error {
 }
 
 func validateSnapshotInterval(snapshotInterval string) error {
-	if snapshotInterval != defaultSnapshotInterval {
+	if snapshotInterval != "" {
 		_, err := time.ParseDuration(snapshotInterval)
 		if err != nil {
 			return errInvalidSnapshotInterval

@@ -7,6 +7,30 @@ import (
 
 // Init creates the default data set.
 func (store *Store) Init() error {
+	err := store.checkOrCreateInstanceID()
+	if err != nil {
+		return err
+	}
+
+	err = store.checkOrCreateDefaultSettings()
+	if err != nil {
+		return err
+	}
+
+	err = store.checkOrCreateDefaultSSLSettings()
+	if err != nil {
+		return err
+	}
+
+	err = store.checkOrCreateDefaultData()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (store *Store) checkOrCreateInstanceID() error {
 	instanceID, err := store.VersionService.InstanceID()
 	if store.IsErrObjectNotFound(err) {
 		uid, err := uuid.NewV4()
@@ -15,18 +39,17 @@ func (store *Store) Init() error {
 		}
 
 		instanceID = uid.String()
-		err = store.VersionService.StoreInstanceID(instanceID)
-		if err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
+		return store.VersionService.StoreInstanceID(instanceID)
 	}
+	return err
+}
 
+func (store *Store) checkOrCreateDefaultSettings() error {
 	// TODO: these need to also be applied when importing
 	settings, err := store.SettingsService.Settings()
 	if store.IsErrObjectNotFound(err) {
 		defaultSettings := &portainer.Settings{
+			EnableTelemetry:      true,
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			BlackListedLabels:    make([]portainer.Pair, 0),
 			LDAPSettings: portainer.LDAPSettings{
@@ -40,8 +63,10 @@ func (store *Store) Init() error {
 					{},
 				},
 			},
-			OAuthSettings: portainer.OAuthSettings{},
-
+			OAuthSettings: portainer.OAuthSettings{
+				SSO: true,
+			},
+			SnapshotInterval:         portainer.DefaultSnapshotInterval,
 			EdgeAgentCheckinInterval: portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 			TemplatesURL:             portainer.DefaultTemplatesURL,
 			HelmRepositoryURL:        portainer.DefaultHelmRepositoryURL,
@@ -50,35 +75,33 @@ func (store *Store) Init() error {
 			KubectlShellImage:        portainer.DefaultKubectlShellImage,
 		}
 
-		err = store.SettingsService.UpdateSettings(defaultSettings)
-		if err != nil {
-			return err
-		}
-	} else if err != nil {
+		return store.SettingsService.UpdateSettings(defaultSettings)
+	}
+	if err != nil {
 		return err
-	} else if err == nil {
-		if settings.UserSessionTimeout == "" {
-			settings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
-			store.Settings().UpdateSettings(settings)
-		}
 	}
 
-	_, err = store.SSLSettings().Settings()
-	if err != nil {
-		if !store.IsErrObjectNotFound(err) {
-			return err
-		}
+	if settings.UserSessionTimeout == "" {
+		settings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
+		return store.Settings().UpdateSettings(settings)
+	}
+	return nil
+}
 
+func (store *Store) checkOrCreateDefaultSSLSettings() error {
+	_, err := store.SSLSettings().Settings()
+
+	if store.IsErrObjectNotFound(err) {
 		defaultSSLSettings := &portainer.SSLSettings{
 			HTTPEnabled: true,
 		}
 
-		err = store.SSLSettings().UpdateSettings(defaultSSLSettings)
-		if err != nil {
-			return err
-		}
+		return store.SSLSettings().UpdateSettings(defaultSSLSettings)
 	}
+	return err
+}
 
+func (store *Store) checkOrCreateDefaultData() error {
 	groups, err := store.EndpointGroupService.EndpointGroups()
 	if err != nil {
 		return err
@@ -99,6 +122,5 @@ func (store *Store) Init() error {
 			return err
 		}
 	}
-
 	return nil
 }
