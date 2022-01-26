@@ -116,9 +116,10 @@ class KubernetesVolumeController {
   }
 
   async getVolumeAsync() {
+    const storageClasses = this.endpoint.Kubernetes.Configuration.StorageClasses;
     try {
       const [volume, applications] = await Promise.all([
-        this.KubernetesVolumeService.get(this.state.namespace, this.state.name),
+        this.KubernetesVolumeService.get(this.state.namespace, storageClasses, this.state.name),
         this.KubernetesApplicationService.get(this.state.namespace),
       ]);
       volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);

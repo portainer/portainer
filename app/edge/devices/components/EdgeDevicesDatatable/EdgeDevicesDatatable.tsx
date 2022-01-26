@@ -27,7 +27,7 @@ import { ColumnVisibilityMenu } from '@/portainer/components/datatables/componen
 import { useRepeater } from '@/portainer/components/datatables/components/useRepeater';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
-  useSearchBarContext,
+  useSearchBarState,
   SearchBar,
 } from '@/portainer/components/datatables/components/SearchBar';
 import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
@@ -65,7 +65,7 @@ export function EdgeDevicesDatatable({
 }: EdgeDevicesTableProps) {
   const { settings, setTableSettings } =
     useTableSettings<EdgeDeviceTableSettings>();
-  const [searchBarValue, setSearchBarValue] = useSearchBarContext();
+  const [searchBarValue, setSearchBarValue] = useSearchBarState('edgeDevices');
 
   const columns = useColumns();
 

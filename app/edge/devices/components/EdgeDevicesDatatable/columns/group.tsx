@@ -5,7 +5,7 @@ import { DefaultFilter } from '@/portainer/components/datatables/components/Filt
 
 export const group: Column<Environment> = {
   Header: 'Group',
-  accessor: (row) => row.GroupName || '-',
+  accessor: (row) => row.GroupId || '-',
   id: 'groupName',
   Filter: DefaultFilter,
   canHide: true,

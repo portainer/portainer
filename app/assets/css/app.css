@@ -375,10 +375,6 @@ a[ng-click] {
   background-color: var(--white-color) fff;
 }
 
-.pagination-controls {
-  margin-left: 10px;
-}
-
 .user-box {
   margin-right: 25px;
 }
@@ -830,6 +826,18 @@ json-tree .branch-preview {
 
 .items-center {
   align-items: center;
+}
+
+.space-x-2 > * + * {
+  margin-left: 0.5rem;
+}
+
+.space-x-3 > * + * {
+  margin-left: 0.75rem;
+}
+
+.space-x-4 > * + * {
+  margin-left: 1rem;
 }
 
 .space-y-8 > * + * {

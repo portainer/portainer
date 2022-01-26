@@ -1,6 +1,5 @@
 import { react2angular } from '@/react-tools/react2angular';
 import { TableSettingsProvider } from '@/portainer/components/datatables/components/useTableSettings';
-import { SearchBarProvider } from '@/portainer/components/datatables/components/SearchBar';
 
 import {
   EdgeDevicesDatatable,
@@ -20,10 +19,8 @@ export function EdgeDevicesDatatableContainer({
 
   return (
     <TableSettingsProvider defaults={defaultSettings} storageKey="edgeDevices">
-      <SearchBarProvider storageKey="edgeDevices">
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        <EdgeDevicesDatatable {...props} />
-      </SearchBarProvider>
+      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+      <EdgeDevicesDatatable {...props} />
     </TableSettingsProvider>
   );
 }
