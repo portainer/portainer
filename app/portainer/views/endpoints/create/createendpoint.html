@@ -96,7 +96,7 @@
                   <uib-tabset active="state.deploymentTab">
                     <uib-tab index="0" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via load balancer">
                       <span ng-if="agentSecret != ''" style="display: block; padding: 16px 45px 0px 45px; background-color: var(--bg-code-color)">
-                        Note that the environment variable AGENT_SECRET will need to be set to {{ agentSecret }}. Please update the manifest that will be download from the
+                        Note that the environment variable AGENT_SECRET will need to be set to {{ agentSecret }}. Please update the manifest that will be downloaded from the
                         following script.
                       </span>
                       <code style="display: block; padding: 16px 45px">{{ deployCommands.kubeLoadBalancer }}</code>
@@ -104,7 +104,7 @@
 
                     <uib-tab index="1" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via node port">
                       <span ng-if="agentSecret != ''" style="display: block; padding: 16px 45px 0px 45px; background-color: var(--bg-code-color)">
-                        Note that the environment variable AGENT_SECRET will need to be set to {{ agentSecret }}. Please update the manifest that will be download from the
+                        Note that the environment variable AGENT_SECRET will need to be set to {{ agentSecret }}. Please update the manifest that will be downloaded from the
                         following script.
                       </span>
                       <code style="display: block; padding: 16px 45px">{{ deployCommands.kubeNodePort }}</code>
