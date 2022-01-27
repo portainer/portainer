@@ -7,10 +7,11 @@ import * as notifications from '@/portainer/services/notifications';
 
 const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
-export function useEnvironments(
+export function useEnvironmentList(
   page: number,
   pageLimit: number,
-  textFilter: string
+  textFilter: string,
+  refetchOffline = false
 ) {
   const { isLoading, data, isError, error } = useQuery(
     ['environments', page, pageLimit, textFilter],
@@ -21,18 +22,15 @@ export function useEnvironments(
     {
       keepPreviousData: true,
       refetchInterval: (data) => {
-        if (!data) {
+        if (!data || !refetchOffline) {
           return false;
         }
-        const { value } = data;
-        const hasOfflineEnvironment = value.some(
+
+        const hasOfflineEnvironment = data.value.some(
           (env) => env.Status === EnvironmentStatus.Down
         );
-        if (hasOfflineEnvironment) {
-          return ENVIRONMENTS_POLLING_INTERVAL;
-        }
 
-        return false;
+        return hasOfflineEnvironment && ENVIRONMENTS_POLLING_INTERVAL;
       },
     }
   );

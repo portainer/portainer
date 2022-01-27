@@ -17,10 +17,10 @@ import {
 } from '@/portainer/components/datatables/components';
 import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
+import { useEnvironmentList } from '@/portainer/environments/queries';
 
 import { EnvironmentItem } from './EnvironmentItem';
 import { KubeconfigButton } from './KubeconfigButton';
-import { useEnvironments } from './useEnvironmentsList';
 import styles from './EnvironmentList.module.css';
 import { NoEnvironmentsInfoPanel } from './NoEnvironmentsInfoPanel';
 
@@ -46,7 +46,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   }, [searchBarValue]);
 
   const { isLoading, environments, totalCount, totalAvailable } =
-    useEnvironments(page, pageLimit, debouncedTextFilter);
+    useEnvironmentList(page, pageLimit, debouncedTextFilter, true);
 
   return (
     <>
