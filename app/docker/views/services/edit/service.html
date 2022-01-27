@@ -74,7 +74,7 @@
               <td>Image</td>
               <td>{{ service.Image }}</td>
             </tr>
-            <tr ng-if="applicationState.endpoint.type !== 4">
+            <tr ng-if="isAdmin && applicationState.endpoint.type !== 4">
               <td colspan="{{ webhookURL ? '1' : '2' }}">
                 Service webhook
                 <portainer-tooltip

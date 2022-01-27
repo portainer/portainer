@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/security"
@@ -51,6 +52,15 @@ func (handler *Handler) webhookUpdate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a webhooks with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a webhooks with the specified identifier inside the database", err}
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
+	}
+
+	if !securityContext.IsAdmin {
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Not authorized to update a webhook", Err: errors.New("not authorized to update a webhook")}
 	}
 
 	if payload.RegistryID != 0 {

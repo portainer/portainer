@@ -64,6 +64,15 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 
 	endpointID := portainer.EndpointID(payload.EndpointID)
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
+	}
+
+	if !securityContext.IsAdmin {
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Not authorized to create a webhook", Err: errors.New("not authorized to create a webhook")}
+	}
+
 	if payload.RegistryID != 0 {
 		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
