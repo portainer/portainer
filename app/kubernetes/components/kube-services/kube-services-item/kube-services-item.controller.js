@@ -9,22 +9,34 @@ export default class KubeServicesItemViewController {
   constructor(EndpointProvider, Authentication) {
     this.EndpointProvider = EndpointProvider;
     this.Authentication = Authentication;
+    this.KubernetesApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
   }
 
   addPort() {
-    const p = new KubernetesServicePort();
-    p.nodePort = '';
-    p.port = '';
-    p.targetPort = '';
-    p.protocol = 'TCP';
+    const port = new KubernetesServicePort();
+    port.nodePort = '';
+    port.port = '';
+    port.targetPort = '';
+    port.protocol = 'TCP';
 
     if (this.ingressType) {
-      const r = new KubernetesIngressServiceRoute();
-      r.ServiceName = this.serviceName;
-      p.ingress = r;
-      p.Ingress = true;
+      const route = new KubernetesIngressServiceRoute();
+      route.ServiceName = this.serviceName;
+
+      if (this.serviceType === KubernetesApplicationPublishingTypes.CLUSTER_IP && this.originalIngresses.length > 0) {
+        if (!route.IngressName) {
+          route.IngressName = this.originalIngresses[0].Name;
+        }
+
+        if (!route.Host) {
+          route.Host = this.originalIngresses[0].Hosts[0];
+        }
+      }
+
+      port.ingress = route;
+      port.Ingress = true;
     }
-    this.servicePorts.push(p);
+    this.servicePorts.push(port);
   }
 
   removePort(index) {
@@ -68,8 +80,6 @@ export default class KubeServicesItemViewController {
     if (this.servicePorts.length === 0) {
       this.addPort();
     }
-
-    this.KubernetesApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
 
     this.state = {
       duplicates: {
