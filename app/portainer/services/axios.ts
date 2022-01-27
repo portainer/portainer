@@ -13,13 +13,11 @@ const axiosApiInstance = axios.create({ baseURL: '/api' });
 export default axiosApiInstance;
 
 axiosApiInstance.interceptors.request.use(async (config) => {
-  const newConfig = { ...config };
+  const newConfig = { headers: config.headers || {}, ...config };
 
   const jwt = localStorageGet('JWT', '');
   if (jwt) {
-    newConfig.headers = {
-      Authorization: `Bearer ${jwt}`,
-    };
+    newConfig.headers.Authorization = `Bearer ${jwt}`;
   }
 
   return newConfig;
@@ -31,8 +29,11 @@ export function agentInterceptor(config: AxiosRequestConfig) {
   }
 
   const newConfig = { headers: config.headers || {}, ...config };
+  const target = portainerAgentTargetHeader();
+  if (target) {
+    newConfig.headers['X-PortainerAgent-Target'] = target;
+  }
 
-  newConfig.headers['X-PortainerAgent-Target'] = portainerAgentTargetHeader();
   if (portainerAgentManagerOperation()) {
     newConfig.headers['X-PortainerAgent-ManagerOperation'] = '1';
   }
