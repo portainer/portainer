@@ -96,7 +96,7 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		return nil
 	}
 
-	// Init sets some defaults - its basically a migration
+	// Init sets some defaults - it's basically a migration
 	err = store.Init()
 	if err != nil {
 		logrus.Fatalf("Failed initializing data store: %v", err)
@@ -210,11 +210,11 @@ func initKubernetesClientFactory(signatureService portainer.DigitalSignatureServ
 	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID, dataStore)
 }
 
-func initSnapshotService(snapshotInterval string, dataStore dataservices.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (portainer.SnapshotService, error) {
+func initSnapshotService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (portainer.SnapshotService, error) {
 	dockerSnapshotter := docker.NewSnapshotter(dockerClientFactory)
 	kubernetesSnapshotter := kubernetes.NewSnapshotter(kubernetesClientFactory)
 
-	snapshotService, err := snapshot.NewService(snapshotInterval, dataStore, dockerSnapshotter, kubernetesSnapshotter, shutdownCtx)
+	snapshotService, err := snapshot.NewService(snapshotIntervalFromFlag, dataStore, dockerSnapshotter, kubernetesSnapshotter, shutdownCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -235,11 +235,17 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 		return err
 	}
 
-	settings.LogoURL = *flags.Logo
-	settings.SnapshotInterval = *flags.SnapshotInterval
-	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
-	settings.EnableTelemetry = true
-	settings.OAuthSettings.SSO = true
+	if *flags.SnapshotInterval != "" {
+		settings.SnapshotInterval = *flags.SnapshotInterval
+	}
+
+	if *flags.Logo != "" {
+		settings.LogoURL = *flags.Logo
+	}
+
+	if *flags.EnableEdgeComputeFeatures {
+		settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
+	}
 
 	if *flags.Templates != "" {
 		settings.TemplatesURL = *flags.Templates
