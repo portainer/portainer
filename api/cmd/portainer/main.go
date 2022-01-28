@@ -4,11 +4,12 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
 	"path"
 	"strconv"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
@@ -40,7 +41,6 @@ import (
 	"github.com/portainer/portainer/api/oauth"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks"
-	"github.com/sirupsen/logrus"
 )
 
 func initCLI() *portainer.CLIFlags {
