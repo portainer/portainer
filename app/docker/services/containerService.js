@@ -199,8 +199,10 @@ function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointPro
   return service;
 
   function withEndpointId(func) {
-    const endpointId = EndpointProvider.endpointID();
+    return function (...args) {
+      const endpointId = EndpointProvider.endpointID();
 
-    return func.bind(null, endpointId);
+      return func(endpointId, ...args);
+    };
   }
 }
