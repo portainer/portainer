@@ -27,6 +27,27 @@ export async function getResourceGroups(
   }
 }
 
+export async function getResourceGroup(
+  environmentId: EnvironmentId,
+  subscriptionId: string,
+  resourceGroupName: string
+) {
+  try {
+    const { data } = await axios.get<ResourceGroup>(
+      buildUrl(environmentId, subscriptionId, resourceGroupName),
+      { params: { 'api-version': '2018-02-01' } }
+    );
+
+    return data;
+  } catch (err) {
+    throw parseAxiosError(
+      err as Error,
+      'Unable to retrieve resource group',
+      azureErrorParser
+    );
+  }
+}
+
 function buildUrl(
   environmentId: EnvironmentId,
   subscriptionId: string,

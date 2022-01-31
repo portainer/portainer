@@ -1,23 +1,4 @@
-import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
-
-export function ContainerGroupDefaultModel() {
-  this.Location = '';
-  this.OSType = 'Linux';
-  this.Name = '';
-  this.Image = '';
-  this.AllocatePublicIP = true;
-  this.Ports = [
-    {
-      container: 80,
-      host: 80,
-      protocol: 'TCP',
-    },
-  ];
-  this.CPU = 1;
-  this.Memory = 1;
-  this.AccessControlData = new AccessControlFormData();
-}
 
 export function ContainerGroupViewModel(data) {
   const addressPorts = data.properties.ipAddress ? data.properties.ipAddress.ports : [];

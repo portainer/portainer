@@ -17,9 +17,9 @@ jest.mock('@uirouter/react', () => ({
 }));
 
 test('dashboard items should render correctly', async () => {
-  const { getByLabelText } = await renderComponent();
+  const { findByLabelText } = await renderComponent();
 
-  const subscriptionsItem = getByLabelText('Subscriptions');
+  const subscriptionsItem = await findByLabelText('Subscriptions');
   expect(subscriptionsItem).toBeVisible();
 
   const subscriptionElements = within(subscriptionsItem);
@@ -29,7 +29,7 @@ test('dashboard items should render correctly', async () => {
     'Subscriptions'
   );
 
-  const resourceGroupsItem = getByLabelText('Resource groups');
+  const resourceGroupsItem = await findByLabelText('Resource groups');
   expect(resourceGroupsItem).toBeVisible();
 
   const resourceGroupElements = within(resourceGroupsItem);
@@ -43,32 +43,38 @@ test('dashboard items should render correctly', async () => {
 });
 
 test('when there are no subscriptions, should show 0 subscriptions and 0 resource groups', async () => {
-  const { getByLabelText } = await renderComponent();
+  const { findByLabelText } = await renderComponent();
 
-  const subscriptionElements = within(getByLabelText('Subscriptions'));
+  const subscriptionElements = within(await findByLabelText('Subscriptions'));
   expect(subscriptionElements.getByLabelText('value')).toHaveTextContent('0');
 
-  const resourceGroupElements = within(getByLabelText('Resource groups'));
+  const resourceGroupElements = within(
+    await findByLabelText('Resource groups')
+  );
   expect(resourceGroupElements.getByLabelText('value')).toHaveTextContent('0');
 });
 
 test('when there is subscription & resource group data, should display these', async () => {
-  const { getByLabelText } = await renderComponent(1, { 'subscription-1': 2 });
+  const { findByLabelText } = await renderComponent(1, { 'subscription-1': 2 });
 
-  const subscriptionElements = within(getByLabelText('Subscriptions'));
+  const subscriptionElements = within(await findByLabelText('Subscriptions'));
   expect(subscriptionElements.getByLabelText('value')).toHaveTextContent('1');
 
-  const resourceGroupElements = within(getByLabelText('Resource groups'));
+  const resourceGroupElements = within(
+    await findByLabelText('Resource groups')
+  );
   expect(resourceGroupElements.getByLabelText('value')).toHaveTextContent('2');
 });
 
 test('should correctly show total number of resource groups across multiple subscriptions', async () => {
-  const { getByLabelText } = await renderComponent(2, {
+  const { findByLabelText } = await renderComponent(2, {
     'subscription-1': 2,
     'subscription-2': 3,
   });
 
-  const resourceGroupElements = within(getByLabelText('Resource groups'));
+  const resourceGroupElements = within(
+    await findByLabelText('Resource groups')
+  );
   expect(resourceGroupElements.getByLabelText('value')).toHaveTextContent('5');
 });
 
@@ -84,13 +90,13 @@ test('when only subscriptions fail to load, dont show the dashboard', async () =
 });
 
 test('when only resource groups fail to load, still show the subscriptions', async () => {
-  const { queryByLabelText } = await renderComponent(
+  const { queryByLabelText, findByLabelText } = await renderComponent(
     1,
     { 'subscription-1': 1 },
     200,
     500
   );
-  expect(queryByLabelText('Subscriptions')).toBeInTheDocument();
+  await expect(findByLabelText('Subscriptions')).resolves.toBeInTheDocument();
   expect(queryByLabelText('Resource groups')).not.toBeInTheDocument();
 });
 

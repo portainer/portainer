@@ -1,19 +1,19 @@
 import { Field, Form, Formik } from 'formik';
-import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { useRouter } from '@uirouter/react';
 
 import { FormControl } from '@/portainer/components/form-components/FormControl';
 import { Input, Select } from '@/portainer/components/form-components/Input';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
-import { InputListError } from '@/portainer/components/form-components/InputList/InputList';
 import { ContainerInstanceFormValues } from '@/azure/types';
 import * as notifications from '@/portainer/services/notifications';
 import { useUser } from '@/portainer/hooks/useUser';
 import { AccessControlForm } from '@/portainer/access-control/AccessControlForm';
+import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 
 import { validationSchema } from './CreateContainerInstanceForm.validation';
-import { PortMapping, PortsMappingField } from './PortsMappingField';
-import { useLoadFormState } from './useLoadFormState';
+import { PortsMappingField } from './PortsMappingField';
+import { useFormState, useLoadFormState } from './useLoadFormState';
 import {
   getSubscriptionLocations,
   getSubscriptionResourceGroups,
@@ -21,18 +21,17 @@ import {
 import { useCreateInstance } from './useCreateInstanceMutation';
 
 export function CreateContainerInstanceForm() {
-  const {
-    params: { endpointId: environmentId },
-  } = useCurrentStateAndParams();
-
-  if (!environmentId) {
-    throw new Error('endpointId url param is required');
-  }
-
+  const environmentId = useEnvironmentId();
   const { isAdmin } = useUser();
 
-  const { initialValues, isLoading, providers, subscriptions, resourceGroups } =
-    useLoadFormState(environmentId, isAdmin);
+  const { providers, subscriptions, resourceGroups, isLoading } =
+    useLoadFormState(environmentId);
+
+  const { initialValues, subscriptionOptions } = useFormState(
+    subscriptions,
+    resourceGroups,
+    providers
+  );
 
   const router = useRouter();
 
@@ -70,7 +69,7 @@ export function CreateContainerInstanceForm() {
               name="subscription"
               as={Select}
               id="subscription-input"
-              options={subscriptions}
+              options={subscriptionOptions}
             />
           </FormControl>
 
@@ -142,7 +141,7 @@ export function CreateContainerInstanceForm() {
           <PortsMappingField
             value={values.ports}
             onChange={(value) => setFieldValue('ports', value)}
-            errors={errors.ports as InputListError<PortMapping>[]}
+            errors={errors.ports}
           />
 
           <div className="form-group">

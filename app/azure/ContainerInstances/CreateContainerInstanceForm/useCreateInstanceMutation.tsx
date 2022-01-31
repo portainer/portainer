@@ -52,7 +52,7 @@ export function useCreateInstance(
 
         const accessControlData = values.accessControl;
         await applyResourceControl(accessControlData, resourceControl);
-        queryClient.invalidateQueries(['azure', 'container-instances']);
+        return queryClient.invalidateQueries(['azure', 'container-instances']);
       },
     }
   );

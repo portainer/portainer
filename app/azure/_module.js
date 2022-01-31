@@ -51,7 +51,7 @@ angular
         url: '/:id',
         views: {
           'content@': {
-            component: 'containerInstanceDetails',
+            component: 'containerInstanceView',
           },
         },
       };

@@ -22,6 +22,29 @@ export async function createContainerGroup(
   }
 }
 
+export async function getContainerGroup(
+  environmentId: EnvironmentId,
+  subscriptionId: string,
+  resourceGroupName: string,
+  containerGroupName: string
+) {
+  try {
+    const { data } = await axios.get<ContainerGroup>(
+      buildUrl(
+        environmentId,
+        subscriptionId,
+        resourceGroupName,
+        containerGroupName
+      ),
+      { params: { 'api-version': '2018-04-01' } }
+    );
+
+    return data;
+  } catch (e) {
+    throw parseAxiosError(e as Error);
+  }
+}
+
 function buildUrl(
   environmentId: EnvironmentId,
   subscriptionId: string,

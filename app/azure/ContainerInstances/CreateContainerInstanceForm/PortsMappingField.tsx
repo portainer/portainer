@@ -12,18 +12,26 @@ import styles from './PortsMappingField.module.css';
 type Protocol = 'TCP' | 'UDP';
 
 export interface PortMapping {
-  host: string;
-  container: string;
+  host?: number;
+  container?: number;
   protocol: Protocol;
 }
 
 interface Props {
   value: PortMapping[];
   onChange(value: PortMapping[]): void;
-  errors?: InputListError<PortMapping>[] | string;
+  errors?: InputListError<PortMapping>;
+  disabled?: boolean;
+  readOnly?: boolean;
 }
 
-export function PortsMappingField({ value, onChange, errors }: Props) {
+export function PortsMappingField({
+  value,
+  onChange,
+  errors,
+  disabled,
+  readOnly,
+}: Props) {
   return (
     <>
       <InputList<PortMapping>
@@ -31,9 +39,15 @@ export function PortsMappingField({ value, onChange, errors }: Props) {
         value={value}
         onChange={onChange}
         addLabel="map additional port"
-        itemBuilder={() => ({ host: '', container: '', protocol: 'TCP' })}
+        itemBuilder={() => ({
+          host: 0,
+          container: 0,
+          protocol: 'TCP',
+        })}
         item={Item}
         errors={errors}
+        disabled={disabled}
+        readOnly={readOnly}
       />
       {typeof errors === 'string' && (
         <div className="form-group col-md-12">
@@ -44,7 +58,13 @@ export function PortsMappingField({ value, onChange, errors }: Props) {
   );
 }
 
-function Item({ onChange, item, error }: ItemProps<PortMapping>) {
+function Item({
+  onChange,
+  item,
+  error,
+  disabled,
+  readOnly,
+}: ItemProps<PortMapping>) {
   return (
     <div className={styles.item}>
       <div className={styles.inputs}>
@@ -53,7 +73,12 @@ function Item({ onChange, item, error }: ItemProps<PortMapping>) {
           <InputGroup.Input
             placeholder="e.g. 80"
             value={item.host}
-            onChange={(e) => handleChange('host', e.target.value)}
+            onChange={(e) =>
+              handleChange('host', parseInt(e.target.value || '0', 10))
+            }
+            disabled={disabled}
+            readOnly={readOnly}
+            type="number"
           />
         </InputGroup>
 
@@ -66,7 +91,12 @@ function Item({ onChange, item, error }: ItemProps<PortMapping>) {
           <InputGroup.Input
             placeholder="e.g. 80"
             value={item.container}
-            onChange={(e) => handleChange('container', e.target.value)}
+            onChange={(e) =>
+              handleChange('container', parseInt(e.target.value || '0', 10))
+            }
+            disabled={disabled}
+            readOnly={readOnly}
+            type="number"
           />
         </InputGroup>
 
@@ -74,6 +104,8 @@ function Item({ onChange, item, error }: ItemProps<PortMapping>) {
           onChange={(value) => handleChange('protocol', value)}
           value={item.protocol}
           options={[{ value: 'TCP' }, { value: 'UDP' }]}
+          disabled={disabled}
+          readOnly={readOnly}
         />
       </div>
       {!!error && (
@@ -84,7 +116,7 @@ function Item({ onChange, item, error }: ItemProps<PortMapping>) {
     </div>
   );
 
-  function handleChange(name: string, value: string) {
+  function handleChange(name: keyof PortMapping, value: string | number) {
     onChange({ ...item, [name]: value });
   }
 }

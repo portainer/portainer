@@ -18,31 +18,8 @@ angular.module('portainer.azure').factory('ContainerGroup', [
       }
     );
 
-    var withResourceGroup = $resource(
-      API_ENDPOINT_ENDPOINTS +
-        '/:endpointId/azure/subscriptions/:subscriptionId/resourceGroups/:resourceGroupName/providers/Microsoft.ContainerInstance/containerGroups/:containerGroupName',
-      {
-        endpointId: EndpointProvider.endpointID,
-        'api-version': '2018-04-01',
-      },
-      {
-        create: {
-          method: 'PUT',
-          params: {
-            subscriptionId: '@subscriptionId',
-            resourceGroupName: '@resourceGroupName',
-            containerGroupName: '@containerGroupName',
-          },
-        },
-        get: {
-          method: 'GET',
-        },
-      }
-    );
-
     resource.query = base.query;
-    resource.create = withResourceGroup.create;
-    resource.get = withResourceGroup.get;
+
     return resource;
   },
 ]);

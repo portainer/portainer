@@ -18,7 +18,7 @@ interface Props {
   resourceType: ResourceControlType;
   resourceId: ResourceId;
   disableOwnershipChange?: boolean;
-  onUpdateSuccess(): void;
+  onUpdateSuccess(): Promise<void>;
 }
 
 export function AccessControlPanel({
@@ -78,8 +78,8 @@ export function AccessControlPanel({
     </div>
   );
 
-  function handleUpdateSuccess() {
-    onUpdateSuccess();
+  async function handleUpdateSuccess() {
+    await onUpdateSuccess();
     toggleEditMode();
   }
 

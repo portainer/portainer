@@ -1,5 +1,6 @@
 import { ComponentType } from 'react';
 import clsx from 'clsx';
+import { FormikErrors } from 'formik';
 
 import { AddButton, Button } from '@/portainer/components/Button';
 import { Tooltip } from '@/portainer/components/Tip/Tooltip';
@@ -10,12 +11,14 @@ import { FormError } from '../FormError';
 import styles from './InputList.module.css';
 import { arrayMove } from './utils';
 
-export type InputListError<T> = Record<keyof T, string>;
+export type InputListError<T> = string | string[] | FormikErrors<T>[];
 
 export interface ItemProps<T> {
   item: T;
   onChange(value: T): void;
-  error?: InputListError<T>;
+  error?: string | FormikErrors<T>;
+  disabled?: boolean;
+  readOnly?: boolean;
 }
 type Key = string | number;
 type ChangeType = 'delete' | 'create' | 'update';
@@ -42,7 +45,9 @@ interface Props<T> {
   addLabel?: string;
   itemKeyGetter?(item: T, index: number): Key;
   movable?: boolean;
-  errors?: InputListError<T>[] | string;
+  disabled?: boolean;
+  errors?: InputListError<T>;
+  readOnly?: boolean;
 }
 
 export function InputList<T = DefaultType>({
@@ -56,6 +61,8 @@ export function InputList<T = DefaultType>({
   itemKeyGetter = (item: T, index: number) => index,
   movable,
   errors,
+  disabled,
+  readOnly,
 }: Props<T>) {
   const Item = item;
 
@@ -66,11 +73,14 @@ export function InputList<T = DefaultType>({
           {label}
           {tooltip && <Tooltip message={tooltip} />}
         </div>
-        <AddButton
-          label={addLabel}
-          className="space-left"
-          onClick={handleAdd}
-        />
+        {!readOnly && (
+          <AddButton
+            label={addLabel}
+            className="space-left"
+            onClick={handleAdd}
+            disabled={disabled}
+          />
+        )}
       </div>
 
       <div className={clsx('col-sm-12 form-inline', styles.items)}>
@@ -87,13 +97,15 @@ export function InputList<T = DefaultType>({
                 item={item}
                 onChange={(value: T) => handleChangeItem(key, value)}
                 error={error}
+                disabled={disabled}
+                readOnly={readOnly}
               />
               <div className={styles.itemActions}>
-                {movable && (
+                {!readOnly && movable && (
                   <>
                     <Button
                       size="small"
-                      disabled={index === 0}
+                      disabled={disabled || index === 0}
                       onClick={() => handleMoveUp(index)}
                     >
                       <i className="fa fa-arrow-up" aria-hidden="true" />
@@ -101,20 +113,23 @@ export function InputList<T = DefaultType>({
                     <Button
                       size="small"
                       type="button"
-                      disabled={index === value.length - 1}
+                      disabled={disabled || index === value.length - 1}
                       onClick={() => handleMoveDown(index)}
                     >
                       <i className="fa fa-arrow-down" aria-hidden="true" />
                     </Button>
                   </>
                 )}
-                <Button
-                  color="danger"
-                  size="small"
-                  onClick={() => handleRemoveItem(key, item)}
-                >
-                  <i className="fa fa-trash" aria-hidden="true" />
-                </Button>
+                {!readOnly && (
+                  <Button
+                    color="danger"
+                    size="small"
+                    onClick={() => handleRemoveItem(key, item)}
+                    disabled={disabled}
+                  >
+                    <i className="fa fa-trash" aria-hidden="true" />
+                  </Button>
+                )}
               </div>
             </div>
           );
@@ -183,13 +198,21 @@ function defaultItemBuilder(): DefaultType {
   return { value: '' };
 }
 
-function DefaultItem({ item, onChange, error }: ItemProps<DefaultType>) {
+function DefaultItem({
+  item,
+  onChange,
+  error,
+  disabled,
+  readOnly,
+}: ItemProps<DefaultType>) {
   return (
     <>
       <Input
         value={item.value}
         onChange={(e) => onChange({ value: e.target.value })}
         className={styles.defaultItem}
+        disabled={disabled}
+        readOnly={readOnly}
       />
       <FormError>{error}</FormError>
     </>

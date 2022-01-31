@@ -24,12 +24,6 @@ angular.module('portainer.azure').factory('ContainerGroupService', [
       return deferred.promise;
     };
 
-    service.containerGroup = containerGroup;
-    async function containerGroup(subscriptionId, resourceGroupName, containerGroupName) {
-      const containerGroup = await ContainerGroup.get({ subscriptionId, resourceGroupName, containerGroupName }).$promise;
-      return new ContainerGroupViewModel(containerGroup);
-    }
-
     return service;
   },
 ]);

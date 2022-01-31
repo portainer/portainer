@@ -22,7 +22,7 @@ export interface ContainerInstanceFormValues {
 }
 
 interface PortainerMetadata {
-  ResourceControl: ResourceControlResponse;
+  ResourceControl?: ResourceControlResponse;
 }
 
 interface Container {
@@ -48,6 +48,7 @@ interface ContainerGroupProperties {
     dnsNameLabelReusePolicy: string;
     ports: { port: number; protocol: 'TCP' | 'UDP' }[];
     type: 'Public' | 'Private';
+    ip: string;
   };
   osType: OS;
 }
@@ -58,7 +59,7 @@ export interface ContainerGroup {
   location: string;
   type: string;
   properties: ContainerGroupProperties;
-  Portainer: PortainerMetadata;
+  Portainer?: PortainerMetadata;
 }
 
 export interface Subscription {
