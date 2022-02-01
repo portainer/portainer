@@ -1,4 +1,6 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import axiosOrigin, { AxiosError, AxiosRequestConfig } from 'axios';
+import { loadProgressBar } from 'axios-progress-bar';
+import 'axios-progress-bar/dist/nprogress.css';
 
 import PortainerError from '../error';
 import { get as localStorageGet } from '../hooks/useLocalStorage';
@@ -8,11 +10,13 @@ import {
   portainerAgentTargetHeader,
 } from './http-request.helper';
 
-const axiosApiInstance = axios.create({ baseURL: 'api' });
+const axios = axiosOrigin.create({ baseURL: 'api' });
 
-export default axiosApiInstance;
+loadProgressBar(undefined, axios);
 
-axiosApiInstance.interceptors.request.use(async (config) => {
+export default axios;
+
+axios.interceptors.request.use(async (config) => {
   const newConfig = { headers: config.headers || {}, ...config };
 
   const jwt = localStorageGet('JWT', '');
@@ -41,18 +45,28 @@ export function agentInterceptor(config: AxiosRequestConfig) {
   return newConfig;
 }
 
-axiosApiInstance.interceptors.request.use(agentInterceptor);
+axios.interceptors.request.use(agentInterceptor);
 
-export function parseAxiosError(err: Error, msg = '') {
+export function parseAxiosError(
+  err: Error,
+  msg = '',
+  parseError = defaultErrorParser
+) {
   let resultErr = err;
   let resultMsg = msg;
 
   if ('isAxiosError' in err) {
-    const axiosError = err as AxiosError;
-    resultErr = new Error(`${axiosError.response?.data.message}`);
-    const msgDetails = axiosError.response?.data.details;
-    resultMsg = msg ? `${msg}: ${msgDetails}` : msgDetails;
+    const { error, details } = parseError(err as AxiosError);
+    resultErr = error;
+    resultMsg = msg ? `${msg}: ${details}` : details;
   }
 
   return new PortainerError(resultMsg, resultErr);
+}
+
+function defaultErrorParser(axiosError: AxiosError) {
+  const message = axiosError.response?.data.message;
+  const details = axiosError.response?.data.details || message;
+  const error = new Error(message);
+  return { error, details };
 }

@@ -3,6 +3,8 @@ import clsx from 'clsx';
 
 import { Tooltip } from '@/portainer/components/Tip/Tooltip';
 
+import { FormError } from '../FormError';
+
 import styles from './FormControl.module.css';
 
 type Size = 'small' | 'medium' | 'large';
@@ -40,13 +42,7 @@ export function FormControl({
 
       {errors && (
         <div className="form-group col-md-12">
-          <div className="small text-warning">
-            <i
-              className="fa fa-exclamation-triangle space-right"
-              aria-hidden="true"
-            />
-            {errors}
-          </div>
+          <FormError>{errors}</FormError>
         </div>
       )}
     </div>

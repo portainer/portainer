@@ -1,9 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`when access control is enabled, ownership is restricted and no teams or users, should be invalid 1`] = `"You must specify at least one team"`;
+exports[`when access control is enabled, ownership is restricted and no teams or users, should be invalid 1`] = `"You must specify at least one team or user."`;
 
-exports[`when access control is enabled, ownership is restricted and no teams or users, should be invalid 2`] = `"You must specify at least one team"`;
-
-exports[`when access control is enabled, ownership is restricted, user is admin but no users, should be valid 1`] = `"You must specify at least one user."`;
+exports[`when access control is enabled, ownership is restricted and no teams or users, should be invalid 2`] = `"You must specify at least one team."`;
 
 exports[`when only access control is enabled, should be invalid 1`] = `"ownership is a required field"`;
