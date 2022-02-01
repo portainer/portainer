@@ -74,9 +74,11 @@ angular
           let suffix = $scope.formValues.Suffix;
 
           for (const deviceID of $scope.state.deviceIDs) {
+            let deviceName = $scope.formValues.DeviceName + suffix;
+
             try {
               var endpoint = await EndpointService.createRemoteEndpoint(
-                $scope.formValues.DeviceName + suffix,
+                deviceName,
                 PortainerEndpointCreationTypes.EdgeAgentEnvironment,
                 $scope.formValues.PortainerURL,
                 '',
@@ -102,7 +104,7 @@ angular
             const config = {
               edgeID: endpoint.EdgeID || uuidv4(),
               edgeKey: endpoint.EdgeKey,
-              name: $scope.formValues.DeviceName,
+              name: deviceName,
               profile: $scope.formValues.DeviceProfile,
             };
 
