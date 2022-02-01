@@ -30,8 +30,8 @@ import { ColumnVisibilityMenu } from '@/portainer/components/datatables/componen
 import { useRepeater } from '@/portainer/components/datatables/components/useRepeater';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
-  useSearchBarState,
   SearchBar,
+  useSearchBarState,
 } from '@/portainer/components/datatables/components/SearchBar';
 import type {
   ContainersTableSettings,

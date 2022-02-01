@@ -13,6 +13,8 @@ import { confirmAsync } from '../services/modal.service/confirm';
 import { EnvironmentList } from './EnvironmentList';
 import { EdgeLoadingSpinner } from './EdgeLoadingSpinner';
 import { MotdPanel } from './MotdPanel';
+import { LicenseNodePanel } from './LicenseNodePanel';
+import { BackupFailedPanel } from './BackupFailedPanel';
 
 export function HomeView() {
   const [connectingToEdgeEndpoint, setConnectingToEdgeEndpoint] =
@@ -27,7 +29,11 @@ export function HomeView() {
         breadcrumbs={[{ label: 'Environments' }]}
       />
 
+      {process.env.PORTAINER_EDITION !== 'CE' && <LicenseNodePanel />}
+
       <MotdPanel />
+
+      {process.env.PORTAINER_EDITION !== 'CE' && <BackupFailedPanel />}
 
       {connectingToEdgeEndpoint ? (
         <EdgeLoadingSpinner />

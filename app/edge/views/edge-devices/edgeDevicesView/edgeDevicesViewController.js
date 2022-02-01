@@ -11,7 +11,7 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
   this.getEnvironments = function () {
     return $async(async () => {
       try {
-        const [endpointsResponse] = await Promise.all([getEndpoints(0, 100, { types: [EnvironmentType.EdgeAgentOnDocker] })]);
+        const endpointsResponse = await getEndpoints(0, 100, { types: [EnvironmentType.EdgeAgentOnDocker] });
         ctrl.edgeDevices = endpointsResponse.value;
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve edge devices');
