@@ -43,7 +43,6 @@ import (
 	"github.com/portainer/portainer/api/oauth"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks"
-	"github.com/sirupsen/logrus"
 )
 
 func initCLI() *portainer.CLIFlags {
