@@ -1798,8 +1798,6 @@ const (
 	OperationPortainerWebhookCreate         Authorization = "PortainerWebhookCreate"
 	OperationPortainerWebhookDelete         Authorization = "PortainerWebhookDelete"
 
-	OperationIntegrationStoridgeAdmin Authorization = "IntegrationStoridgeAdmin"
-
 	OperationDockerUndefined      Authorization = "DockerUndefined"
 	OperationDockerAgentUndefined Authorization = "DockerAgentUndefined"
 	OperationPortainerUndefined   Authorization = "PortainerUndefined"
@@ -1809,6 +1807,7 @@ const (
 	// Deprecated operations
 	OperationPortainerEndpointExtensionAdd    Authorization = "PortainerEndpointExtensionAdd"
 	OperationPortainerEndpointExtensionRemove Authorization = "PortainerEndpointExtensionRemove"
+	OperationIntegrationStoridgeAdmin         Authorization = "IntegrationStoridgeAdmin"
 )
 
 const (
