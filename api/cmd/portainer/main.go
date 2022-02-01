@@ -267,8 +267,8 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 
 	if *flags.HTTPDisabled {
 		sslSettings.HTTPEnabled = false
-	} else {
-		sslSettings.HTTPEnabled = *flags.HTTPEnabled || sslSettings.HTTPEnabled
+	} else if *flags.HTTPEnabled {
+		sslSettings.HTTPEnabled = true
 	}
 
 	err = dataStore.SSLSettings().UpdateSettings(sslSettings)
