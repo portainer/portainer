@@ -111,7 +111,12 @@ export function CreateContainerInstanceForm() {
           <FormSectionTitle>Container configuration</FormSectionTitle>
 
           <FormControl label="Name" inputId="name-input" errors={errors.name}>
-            <Field name="name" as={Input} id="name-input" />
+            <Field
+              name="name"
+              as={Input}
+              id="name-input"
+              placeholder="e.g. myContainer"
+            />
           </FormControl>
 
           <FormControl
@@ -119,7 +124,12 @@ export function CreateContainerInstanceForm() {
             inputId="image-input"
             errors={errors.image}
           >
-            <Field name="image" as={Input} id="image-input" />
+            <Field
+              name="image"
+              as={Input}
+              id="image-input"
+              placeholder="e.g. nginx:alpine"
+            />
           </FormControl>
 
           <FormControl label="OS" inputId="os-input" errors={errors.os}>
