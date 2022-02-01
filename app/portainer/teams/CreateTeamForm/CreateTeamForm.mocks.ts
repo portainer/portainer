@@ -24,8 +24,6 @@ export function mockExampleData() {
       EndpointAuthorizations: {},
       PortainerAuthorizations: {
         PortainerDockerHubInspect: true,
-        PortainerEndpointExtensionAdd: true,
-        PortainerEndpointExtensionRemove: true,
         PortainerEndpointGroupInspect: true,
         PortainerEndpointGroupList: true,
         PortainerEndpointInspect: true,
@@ -51,8 +49,6 @@ export function mockExampleData() {
       EndpointAuthorizations: {},
       PortainerAuthorizations: {
         PortainerDockerHubInspect: true,
-        PortainerEndpointExtensionAdd: true,
-        PortainerEndpointExtensionRemove: true,
         PortainerEndpointGroupInspect: true,
         PortainerEndpointGroupList: true,
         PortainerEndpointInspect: true,
