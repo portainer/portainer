@@ -5,6 +5,7 @@ import {
 import { Environment } from '@/portainer/environments/types';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
+import { Tag } from '@/portainer/tags/types';
 import { renderWithQueryClient } from '@/react-tools/test-utils';
 import { server, rest } from '@/setup-tests/server';
 
@@ -52,17 +53,19 @@ test('shows group name', async () => {
 
 function renderComponent(
   env: Environment,
-  group?: Partial<EnvironmentGroup>,
-  isAdmin = false
+  group: Partial<EnvironmentGroup> = { Name: 'group' },
+  isAdmin = false,
+  tags: Tag[] = []
 ) {
   const user = new UserViewModel({ Username: 'test', Role: isAdmin ? 1 : 2 });
-  if (group) {
-    server.use(
-      rest.get('/api/endpoint_groups/:groupId', (req, res, ctx) =>
-        res(ctx.json(group))
-      )
-    );
-  }
+
+  server.use(
+    rest.get('/api/endpoint_groups/:groupId', (req, res, ctx) =>
+      res(ctx.json(group))
+    ),
+    rest.get('/api/tags', (req, res, ctx) => res(ctx.json(tags)))
+  );
+
   return renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
       <EnvironmentItem

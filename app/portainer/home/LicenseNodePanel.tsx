@@ -39,8 +39,6 @@ function useNodesValid() {
     return true;
   }
 
-  console.log(info, nodesCount);
-
   return nodesCount <= info.nodes;
 }
 
