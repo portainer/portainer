@@ -26,7 +26,7 @@ func NewSnapshotter(clientFactory *ClientFactory) *Snapshotter {
 
 // CreateSnapshot creates a snapshot of a specific Docker environment(endpoint)
 func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*portainer.DockerSnapshot, error) {
-	cli, err := snapshotter.clientFactory.CreateClient(endpoint, "")
+	cli, err := snapshotter.clientFactory.CreateClient(endpoint, "", nil)
 	if err != nil {
 		return nil, err
 	}

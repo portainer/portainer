@@ -8,7 +8,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-lock" title-text="Change user password"></rd-widget-header>
       <rd-widget-body>
-        <form class="form-horizontal" style="margin-top: 15px;">
+        <form class="form-horizontal" style="margin-top: 15px">
           <!-- current-password-input -->
           <div class="form-group">
             <label for="current_password" class="col-sm-2 control-label text-left">Current password</label>
@@ -65,11 +65,11 @@
                 ng-click="updatePassword()"
                 >Update password</button
               >
-              <span class="text-muted small" style="margin-left: 5px;" ng-if="AuthenticationMethod === 2 && userID !== 1">
+              <span class="text-muted small" style="margin-left: 5px" ng-if="AuthenticationMethod === 2 && userID !== 1">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 You cannot change your password when using LDAP authentication.
               </span>
-              <span class="text-muted small" style="margin-left: 5px;" ng-if="AuthenticationMethod === 3 && userID !== 1">
+              <span class="text-muted small" style="margin-left: 5px" ng-if="AuthenticationMethod === 3 && userID !== 1">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 You cannot change your password when using OAuth authentication.
               </span>

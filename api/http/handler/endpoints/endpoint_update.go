@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/tag"
@@ -47,6 +46,8 @@ type endpointUpdatePayload struct {
 	EdgeCheckinInterval *int `example:"5"`
 	// Associated Kubernetes data
 	Kubernetes *portainer.KubernetesData
+	// Whether the device has been trusted or not by the user
+	UserTrusted *bool
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -82,7 +83,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == errors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
@@ -269,6 +270,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 			}
 		}
+	}
+
+	if payload.UserTrusted != nil {
+		endpoint.UserTrusted = *payload.UserTrusted
 	}
 
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)

@@ -12,30 +12,26 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <!-- toggle -->
-          <div style="padding-bottom: 12px;">
+          <div style="padding-bottom: 12px">
             <a ng-click="togglePanel()">
               <i ng-class="{ true: 'glyphicon glyphicon-chevron-down', false: 'glyphicon glyphicon-chevron-right' }[state.showInitPassword]" aria-hidden="true"></i
-              ><span style="padding-left: 10px;">New Portainer installation</span>
+              ><span style="padding-left: 10px">New Portainer installation</span>
             </a>
           </div>
           <!-- !toggle -->
 
           <!-- init password form -->
-          <form class="simple-box-form form-horizontal" style="padding-left: 30px;" ng-if="state.showInitPassword">
+          <form class="simple-box-form form-horizontal" style="padding-left: 30px" ng-if="state.showInitPassword">
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
-                <span class="small text-muted">
-                  Please create the initial administrator user.
-                </span>
+                <span class="small text-muted"> Please create the initial administrator user. </span>
               </div>
             </div>
             <!-- !note -->
             <!-- username-input -->
             <div class="form-group">
-              <label for="username" class="col-sm-4 control-label text-left">
-                Username
-              </label>
+              <label for="username" class="col-sm-4 control-label text-left"> Username </label>
               <div class="col-sm-8">
                 <input type="text" class="form-control" id="username" ng-model="formValues.Username" placeholder="e.g. admin" />
               </div>
@@ -95,7 +91,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" />
-                <span class="text-muted small" style="margin-left: 2px;"
+                <span class="text-muted small" style="margin-left: 2px"
                   >Allow collection of anonymous statistics. You can find more information about this in our
                   <a href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.</span
                 >
@@ -112,16 +108,16 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <!-- toggle -->
-          <div style="padding-bottom: 12px;">
+          <div style="padding-bottom: 12px">
             <a ng-click="togglePanel()">
               <i ng-class="{ true: 'glyphicon glyphicon-chevron-down', false: 'glyphicon glyphicon-chevron-right' }[state.showRestorePortainer]" aria-hidden="true"></i
-              ><span style="padding-left: 10px;">Restore Portainer from backup</span>
+              ><span style="padding-left: 10px">Restore Portainer from backup</span>
             </a>
           </div>
           <!-- !toggle -->
 
           <!-- restore form -->
-          <form class="simple-box-form form-horizontal" style="padding-left: 30px;" ng-if="state.showRestorePortainer">
+          <form class="simple-box-form form-horizontal" style="padding-left: 30px" ng-if="state.showRestorePortainer">
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-9">
@@ -135,9 +131,9 @@
               <div class="boxselector_wrapper">
                 <div>
                   <input type="radio" id="restore_file" checked="checked" />
-                  <label for="restore_file" style="padding-bottom: 20px;">
+                  <label for="restore_file" style="padding-bottom: 20px">
                     <div class="boxselector_header">
-                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px"></i>
                       Upload backup file
                     </div>
                     <p></p>
@@ -145,9 +141,9 @@
                 </div>
                 <div>
                   <input type="radio" id="restore_s3" disabled />
-                  <label for="restore_s3" class="boxselector_disabled" style="background-color: #ffffff;">
+                  <label for="restore_s3" class="boxselector_disabled" style="background-color: #ffffff">
                     <div class="boxselector_header">
-                      <i class="fa fa-download" aria-hidden="true" style="margin-right: 2px;"></i>
+                      <i class="fa fa-download" aria-hidden="true" style="margin-right: 2px"></i>
                       Retrieve from S3
                     </div>
                     <p>This feature is available in <a href="https://www.portainer.io/business-upsell?from=restore-s3-form" target="_blank"> Portainer Business Edition</a></p>
@@ -158,9 +154,7 @@
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
-                <span class="small text-muted">
-                  You can upload a backup file from your computer.
-                </span>
+                <span class="small text-muted"> You can upload a backup file from your computer. </span>
               </div>
             </div>
             <!-- !note -->
@@ -176,7 +170,7 @@
                   auto-focus
                   >Select file</button
                 >
-                <span style="margin-left: 5px;">
+                <span style="margin-left: 5px">
                   {{ formValues.BackupFile.name }}
                   <i class="fa fa-times red-icon" ng-if="!formValues.BackupFile" aria-hidden="true"></i>
                 </span>
@@ -200,14 +194,10 @@
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
-                <span class="small text-muted">
-                  You are about to restore Portainer from this backup.
-                </span>
+                <span class="small text-muted"> You are about to restore Portainer from this backup. </span>
               </div>
               <div class="col-sm-12">
-                <span class="small text-muted">
-                  After restoring has completed, please log in as a user that was known by the Portainer that was restored.
-                </span>
+                <span class="small text-muted"> After restoring has completed, please log in as a user that was known by the Portainer that was restored. </span>
               </div>
             </div>
             <!-- !note -->

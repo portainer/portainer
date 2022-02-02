@@ -8,11 +8,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/portainer/portainer/api/datastore"
+
 	"github.com/portainer/libhelm/binary/test"
 	"github.com/portainer/libhelm/options"
 	"github.com/portainer/libhelm/release"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
@@ -24,13 +25,13 @@ import (
 func Test_helmInstall(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
-	err := store.Endpoint().CreateEndpoint(&portainer.Endpoint{ID: 1})
+	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})
 	is.NoError(err, "error creating environment")
 
-	err = store.User().CreateUser(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
+	err = store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	is.NoError(err, "error creating a user")
 
 	jwtService, err := jwt.NewService("1h", store)

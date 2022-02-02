@@ -2,14 +2,14 @@ package registries
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
+
+	"github.com/portainer/portainer/api/internal/endpointutils"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -26,13 +26,13 @@ type registryUpdatePayload struct {
 	// Username used to authenticate against this registry. Required when Authentication is true
 	Username *string `example:"registry_user"`
 	// Password used to authenticate against this registry. required when Authentication is true
-	Password         *string `example:"registry_password"`
+	Password *string `example:"registry_password"`
 	// Quay data
-	Quay             *portainer.QuayRegistryData
+	Quay *portainer.QuayRegistryData
 	// Registry access control
 	RegistryAccesses *portainer.RegistryAccesses `json:",omitempty"`
 	// ECR data
-	Ecr              *portainer.EcrData          `json:",omitempty"`
+	Ecr *portainer.EcrData `json:",omitempty"`
 }
 
 func (payload *registryUpdatePayload) Validate(r *http.Request) error {
@@ -72,7 +72,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}

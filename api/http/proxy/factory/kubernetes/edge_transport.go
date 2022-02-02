@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
@@ -15,7 +16,7 @@ type edgeTransport struct {
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer Edge agent
-func NewEdgeTransport(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, endpoint *portainer.Endpoint, tokenManager *tokenManager, k8sClientFactory *cli.ClientFactory) *edgeTransport {
+func NewEdgeTransport(dataStore dataservices.DataStore, signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, endpoint *portainer.Endpoint, tokenManager *tokenManager, k8sClientFactory *cli.ClientFactory) *edgeTransport {
 	transport := &edgeTransport{
 		baseTransport: newBaseTransport(
 			&http.Transport{},

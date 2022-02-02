@@ -5,9 +5,7 @@
 <rd-widget ng-repeat="config in $ctrl.settings.AdminGroupSearchSettings | limitTo: (1 - $ctrl.settings.AdminGroupSearchSettings)">
   <rd-widget-body>
     <div class="form-group m-b-10" ng-if="$index > 0">
-      <span class="col-sm-12 text-muted small">
-        Extra search configuration
-      </span>
+      <span class="col-sm-12 text-muted small"> Extra search configuration </span>
     </div>
 
     <div class="form-group">
@@ -104,9 +102,7 @@
 
 <div class="form-group">
   <div class="col-sm-12">
-    <label for="admin-auto-populate" class="control-label text-left text-muted" ng-class="{ 'text-muted': !$ctrl.enableAssignAdminGroup }">
-      Assign admin rights to group(s)
-    </label>
+    <label for="admin-auto-populate" class="control-label text-left text-muted" ng-class="{ 'text-muted': !$ctrl.enableAssignAdminGroup }"> Assign admin rights to group(s) </label>
     <label class="switch m-l-20" ng-class="{ 'business limited': $ctrl.isLimitedFeatureSelfContained }">
       <input id="admin-auto-populate" ng-disabled="!$ctrl.enableAssignAdminGroup" name="admin-auto-populate" type="checkbox" ng-model="$ctrl.settings.AdminAutoPopulate" /><i></i>
     </label>
@@ -115,9 +111,7 @@
 
 <div class="form-group" ng-if="$ctrl.settings.AdminAutoPopulate">
   <div class="col-sm-12">
-    <label for="group-access" class="control-label text-left">
-      Select Group(s)
-    </label>
+    <label for="group-access" class="control-label text-left"> Select Group(s) </label>
     <span
       class="m-l-20"
       isteven-multi-select

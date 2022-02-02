@@ -34,34 +34,26 @@
           </tbody>
         </table>
         <form class="form-horizontal">
-          <div class="col-sm-12 form-section-title">
-            Options
-          </div>
+          <div class="col-sm-12 form-section-title"> Options </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <label class="control-label text-left">
-                Only display running tasks
-              </label>
-              <label class="switch" style="margin-left: 20px;">
+              <label class="control-label text-left"> Only display running tasks </label>
+              <label class="switch" style="margin-left: 20px">
                 <input type="checkbox" ng-model="state.DisplayOnlyRunningTasks" ng-change="changeDisplayOnlyRunningTasks()" /><i></i>
               </label>
             </div>
             <div class="col-sm-12">
-              <label class="control-label text-left">
-                Display node labels
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="state.DisplayNodeLabels" ng-change="changeDisplayNodeLabels()" /><i></i> </label>
+              <label class="control-label text-left"> Display node labels </label>
+              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="state.DisplayNodeLabels" ng-change="changeDisplayNodeLabels()" /><i></i> </label>
             </div>
           </div>
         </form>
         <form class="form-horizontal">
-          <div class="col-sm-12 form-section-title">
-            Refresh
-          </div>
+          <div class="col-sm-12 form-section-title"> Refresh </div>
           <div class="form-group">
             <label for="refreshRate" class="col-sm-1 margin-sm-top control-label text-left">
               Rate
-              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="display: none;"></i>
+              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="display: none"></i>
             </label>
             <div class="col-sm-2">
               <select id="refreshRate" ng-model="state.refreshRate" ng-change="changeUpdateRepeater()" class="form-control">

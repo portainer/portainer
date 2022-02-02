@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -125,7 +126,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 		instanceID := handler.kubernetesClientFactory.GetInstanceID()
 		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instanceID)
 
-		configClusters[idx] = buildCluster(r, endpoint)
+		configClusters[idx] = buildCluster(r, handler.BaseURL, endpoint)
 		configContexts[idx] = buildContext(serviceAccountName, endpoint)
 		if !authInfosSet[serviceAccountName] {
 			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccountName, bearerToken))
@@ -143,8 +144,11 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 	}, nil
 }
 
-func buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
-	proxyURL := fmt.Sprintf("https://%s/api/endpoints/%d/kubernetes", r.Host, endpoint.ID)
+func buildCluster(r *http.Request, baseURL string, endpoint portainer.Endpoint) clientV1.NamedCluster {
+	if baseURL != "/" {
+		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
+	}
+	proxyURL := fmt.Sprintf("https://%s%sapi/endpoints/%d/kubernetes", r.Host, baseURL, endpoint.ID)
 	return clientV1.NamedCluster{
 		Name: buildClusterName(endpoint.Name),
 		Cluster: clientV1.Cluster{

@@ -8,7 +8,9 @@ export default {
   title: 'Components/Form/InputGroup',
 } as Meta;
 
-export function BasicExample() {
+export { BasicExample, Addons, Sizing };
+
+function BasicExample() {
   const [value1, setValue1] = useState('');
   const [valueNumber, setValueNumber] = useState(0);
 
@@ -18,7 +20,7 @@ export function BasicExample() {
         <InputGroup.Addon>@</InputGroup.Addon>
         <InputGroup.Input
           value={value1}
-          onChange={setValue1}
+          onChange={(e) => setValue1(e.target.value)}
           placeholder="Username"
           aria-describedby="basic-addon1"
         />
@@ -27,7 +29,7 @@ export function BasicExample() {
       <InputGroup>
         <InputGroup.Input
           value={value1}
-          onChange={setValue1}
+          onChange={(e) => setValue1(e.target.value)}
           placeholder="Recipient's username"
           aria-describedby="basic-addon2"
         />
@@ -36,9 +38,10 @@ export function BasicExample() {
 
       <InputGroup>
         <InputGroup.Addon>$</InputGroup.Addon>
-        <InputGroup.NumberInput
+        <InputGroup.Input
+          type="number"
           value={valueNumber}
-          onChange={setValueNumber}
+          onChange={(e) => setValueNumber(parseInt(e.target.value, 10))}
           aria-label="Amount (to the nearest dollar)"
         />
         <InputGroup.Addon>.00</InputGroup.Addon>
@@ -49,7 +52,7 @@ export function BasicExample() {
         <InputGroup.Addon>https://example.com/users/</InputGroup.Addon>
         <InputGroup.Input
           value={value1}
-          onChange={setValue1}
+          onChange={(e) => setValue1(e.target.value)}
           id="basic-url"
           aria-describedby="basic-addon3"
         />
@@ -58,7 +61,7 @@ export function BasicExample() {
   );
 }
 
-export function Addons() {
+function Addons() {
   const [value1, setValue1] = useState('');
   const [value2, setValue2] = useState('');
   return (
@@ -70,12 +73,18 @@ export function Addons() {
               Go!
             </button>
           </InputGroup.ButtonWrapper>
-          <InputGroup.Input value={value1} onChange={setValue1} />
+          <InputGroup.Input
+            value={value1}
+            onChange={(e) => setValue1(e.target.value)}
+          />
         </InputGroup>
       </div>
       <div className="col-lg-6">
         <InputGroup>
-          <InputGroup.Input value={value2} onChange={setValue2} />
+          <InputGroup.Input
+            value={value2}
+            onChange={(e) => setValue2(e.target.value)}
+          />
           <InputGroup.Addon>
             <input type="checkbox" />
           </InputGroup.Addon>
@@ -85,23 +94,32 @@ export function Addons() {
   );
 }
 
-export function Sizing() {
+function Sizing() {
   const [value, setValue] = useState('');
   return (
     <div className="space-y-8">
       <InputGroup size="small">
         <InputGroup.Addon>Small</InputGroup.Addon>
-        <InputGroup.Input value={value} onChange={setValue} />
+        <InputGroup.Input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
       </InputGroup>
 
       <InputGroup>
         <InputGroup.Addon>Default</InputGroup.Addon>
-        <InputGroup.Input value={value} onChange={setValue} />
+        <InputGroup.Input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
       </InputGroup>
 
       <InputGroup size="large">
         <InputGroup.Addon>Large</InputGroup.Addon>
-        <InputGroup.Input value={value} onChange={setValue} />
+        <InputGroup.Input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
       </InputGroup>
     </div>
   );

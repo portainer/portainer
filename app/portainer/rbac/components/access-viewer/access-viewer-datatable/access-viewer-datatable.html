@@ -34,10 +34,10 @@
             >{{ item.TeamName ? 'Team' : 'User' }} <code ng-if="item.TeamName">{{ item.TeamName }}</code> access defined on {{ item.AccessLocation }}
             <code ng-if="item.GroupName">{{ item.GroupName }}</code>
             <a ng-if="!item.GroupName" ui-sref="portainer.endpoints.endpoint.access({id: item.EndpointId})"
-              ><i style="margin-left: 5px;" class="fa fa-users" aria-hidden="true"></i> Manage access
+              ><i style="margin-left: 5px" class="fa fa-users" aria-hidden="true"></i> Manage access
             </a>
             <a ng-if="item.GroupName" ui-sref="portainer.groups.group.access({id: item.GroupId})"
-              ><i style="margin-left: 5px;" class="fa fa-users" aria-hidden="true"></i> Manage access
+              ><i style="margin-left: 5px" class="fa fa-users" aria-hidden="true"></i> Manage access
             </a>
           </td>
         </tr>
@@ -55,9 +55,7 @@
     <div class="paginationControls">
       <form class="form-inline">
         <span class="limitSelector">
-          <span style="margin-right: 5px;">
-            Items per page
-          </span>
+          <span style="margin-right: 5px"> Items per page </span>
           <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
             <option value="0">All</option>
             <option value="10">10</option>

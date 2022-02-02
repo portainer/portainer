@@ -1,6 +1,4 @@
-<kubernetes-view-header title="Volume list" state="kubernetes.volumes" view-ready="ctrl.state.viewReady">
-  Volumes
-</kubernetes-view-header>
+<kubernetes-view-header title="Volume list" state="kubernetes.volumes" view-ready="ctrl.state.viewReady"> Volumes </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -18,6 +16,7 @@
                 order-by="PersistentVolumeClaim.Name"
                 remove-action="ctrl.removeAction"
                 refresh-callback="ctrl.getVolumes"
+                data-cy="k8s-volumes-datatable"
               >
               </kubernetes-volumes-datatable>
             </uib-tab>

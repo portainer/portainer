@@ -36,15 +36,15 @@
             <!-- !command-list -->
             <div class="form-group col-lg-12">
               <label for="command" class="text-left control-label">Use custom command</label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.isCustomCommand" /><i></i> </label>
+              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="formValues.isCustomCommand" /><i></i> </label>
             </div>
             <div class="form-group">
-              <label for="username" class="col-lg-1 text-left col-sm-2 control-label">
+              <label class="col-lg-1 text-left col-sm-2 control-label">
                 User
                 <portainer-tooltip position="bottom" message="Format is one of: user, user:group, uid or uid:gid"></portainer-tooltip>
               </label>
               <div class="col-lg-11 col-sm-10">
-                <input class="form-control" type="text" name="username" ng-model="formValues.user" placeholder="root" />
+                <input class="form-control" type="text" ng-model="formValues.user" placeholder="root" />
               </div>
             </div>
             <div class="form-group">

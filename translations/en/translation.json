@@ -1,0 +1,30 @@
+{
+  "reactExample": {
+    "registries": {
+      "link": "Registries <strong>Link</strong>",
+      "useSref": "Registries useSref"
+    }
+  },
+  "users": {
+    "access-tokens": {
+      "create": {
+        "add-button": "Add access token",
+        "description-field-label": "Description",
+        "done-button": "Done",
+        "form": {
+          "description-field": {
+            "error": {
+              "required": "this field is required"
+            },
+            "label": "Description"
+          }
+        },
+        "new-access-token": {
+          "copy-button": "Copy access token",
+          "explanation": "Please copy the new access token. You won't be able to view the token again.",
+          "title": "New access token"
+        }
+      }
+    }
+  }
+}
