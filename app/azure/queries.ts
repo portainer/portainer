@@ -64,5 +64,7 @@ export function useResourceGroups(
       )
     ),
     isLoading: queries.some((q) => q.isLoading),
+    error: new Error('Unable to retrieve Azure resource groups'),
+    isError: queries.some((q) => q.isError),
   };
 }
