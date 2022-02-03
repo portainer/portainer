@@ -55,11 +55,13 @@ export function DashboardView() {
             icon="fa fa-th-list"
             comment="Subscriptions"
           />
-          <DashboardItem
-            value={aggregateResourceGroups(resourceGroups).length}
-            icon="fa fa-th-list"
-            comment="Resource groups"
-          />
+          {!isErrorResourceGroups && (
+            <DashboardItem
+              value={aggregateResourceGroups(resourceGroups).length}
+              icon="fa fa-th-list"
+              comment="Resource groups"
+            />
+          )}
         </div>
       )}
     </>
