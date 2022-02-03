@@ -22,7 +22,7 @@ export function aggregateResourceGroups(
     return [];
   }
 
-  let aggregatedResources: unknown[] = [];
+  let aggregatedResources: ResourceGroup[] = [];
   Object.keys(resourceGroups).forEach((key) => {
     aggregatedResources = aggregatedResources.concat(resourceGroups[key]);
   });
