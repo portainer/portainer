@@ -11,13 +11,14 @@ import { ContainerInstanceFormValues } from '@/azure/types';
 import * as notifications from '@/portainer/services/notifications';
 import { isAdmin, useUser } from '@/portainer/hooks/useUser';
 
-import { validationSchema } from './CreateContainerInstanceForm.validation';
-import { PortMapping, PortsMappingField } from './PortsMappingField';
-import { useLoadFormState } from './useLoadFormState';
 import {
   getSubscriptionLocations,
   getSubscriptionResourceGroups,
-} from './utils';
+} from '../../utils';
+
+import { validationSchema } from './CreateContainerInstanceForm.validation';
+import { PortMapping, PortsMappingField } from './PortsMappingField';
+import { useLoadFormState } from './useLoadFormState';
 import { useCreateInstance } from './useCreateInstanceMutation';
 
 export function CreateContainerInstanceForm() {

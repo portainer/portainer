@@ -11,7 +11,7 @@ import {
 import { UserId } from '@/portainer/users/types';
 import { applyResourceControl } from '@/portainer/resource-control/resource-control.service';
 
-import { getSubscriptionResourceGroups } from './utils';
+import { getSubscriptionResourceGroups } from '../../utils';
 
 export function useCreateInstance(
   resourceGroups: {

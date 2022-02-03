@@ -3,6 +3,7 @@ import { PageHeader } from '@/portainer/components/PageHeader';
 import { Widget, WidgetBody } from '@/portainer/components/widget';
 import { r2a } from '@/react-tools/react2angular';
 
+import { aggregateResourceGroups } from '../utils';
 import { useResourceGroups, useSubscriptions } from '../queries';
 
 export function DashboardView() {
@@ -12,12 +13,6 @@ export function DashboardView() {
   const { resourceGroups, isLoading: isLoadingResourceGroups } =
     useResourceGroups(environmentId, subscriptions);
   const isLoading = isLoadingSubscriptions || isLoadingResourceGroups;
-
-  // Inspired by azureService.aggregate
-  let aggregatedResources: unknown[] = [];
-  Object.keys(resourceGroups).forEach((key) => {
-    aggregatedResources = aggregatedResources.concat(resourceGroups[key]);
-  });
 
   if (isLoading) {
     return null;
@@ -46,7 +41,9 @@ export function DashboardView() {
                 <div className="widget-icon blue pull-left">
                   <i className="fa fa-th-list" />
                 </div>
-                <div className="title">{aggregatedResources.length}</div>
+                <div className="title">
+                  {aggregateResourceGroups(resourceGroups).length}
+                </div>
                 <div className="comment">Resource groups</div>
               </WidgetBody>
             </Widget>

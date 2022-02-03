@@ -14,7 +14,7 @@ import { parseFromResourceControl } from '@/portainer/components/accessControlFo
 import {
   getSubscriptionLocations,
   getSubscriptionResourceGroups,
-} from './utils';
+} from '../../utils';
 
 export function useLoadFormState(
   environmentId: EnvironmentId,

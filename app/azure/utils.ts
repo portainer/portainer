@@ -15,6 +15,20 @@ export function getSubscriptionResourceGroups(
   }));
 }
 
+export function aggregateResourceGroups(
+  resourceGroups?: Record<string, ResourceGroup[]>
+) {
+  if (!resourceGroups) {
+    return [];
+  }
+
+  let aggregatedResources: unknown[] = [];
+  Object.keys(resourceGroups).forEach((key) => {
+    aggregatedResources = aggregatedResources.concat(resourceGroups[key]);
+  });
+  return aggregatedResources;
+}
+
 export function getSubscriptionLocations(
   subscriptionId?: string,
   containerInstanceProviders?: Record<string, ProviderViewModel | undefined>
