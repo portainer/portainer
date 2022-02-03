@@ -1,10 +1,11 @@
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
-import { Widget, WidgetBody } from '@/portainer/components/widget';
 import { r2a } from '@/react-tools/react2angular';
 
 import { aggregateResourceGroups } from '../utils';
 import { useResourceGroups, useSubscriptions } from '../queries';
+
+import { DashboardItem } from './DashboardItem';
 
 export function DashboardView() {
   const environmentId = useEnvironmentId();
@@ -24,30 +25,16 @@ export function DashboardView() {
 
       {subscriptions && (
         <div className="row">
-          <div className="col-sm-12 col-md-6">
-            <Widget>
-              <WidgetBody>
-                <div className="widget-icon blue pull-left">
-                  <i className="fa fa-th-list" />
-                </div>
-                <div className="title">{subscriptions.length}</div>
-                <div className="comment">Subscriptions</div>
-              </WidgetBody>
-            </Widget>
-          </div>
-          <div className="col-sm-12 col-md-6">
-            <Widget>
-              <WidgetBody>
-                <div className="widget-icon blue pull-left">
-                  <i className="fa fa-th-list" />
-                </div>
-                <div className="title">
-                  {aggregateResourceGroups(resourceGroups).length}
-                </div>
-                <div className="comment">Resource groups</div>
-              </WidgetBody>
-            </Widget>
-          </div>
+          <DashboardItem
+            value={subscriptions.length}
+            icon="fa fa-th-list"
+            comment="Subscriptions"
+          />
+          <DashboardItem
+            value={aggregateResourceGroups(resourceGroups).length}
+            icon="fa fa-th-list"
+            comment="Resource groups"
+          />
         </div>
       )}
     </>
