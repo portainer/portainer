@@ -1,16 +1,14 @@
 import { PropsWithChildren } from 'react';
-import { Row, TableInstance } from 'react-table';
+import { Row } from 'react-table';
 
-interface Props {
-  row: Row<TableInstance>;
+interface Props<D extends Record<string, unknown> = Record<string, unknown>> {
+  row: Row<D>;
   showExpandArrow: boolean;
 }
 
-export function ExpandingCell({
-  row,
-  showExpandArrow,
-  children,
-}: PropsWithChildren<Props>) {
+export function ExpandingCell<
+  D extends Record<string, unknown> = Record<string, unknown>
+>({ row, showExpandArrow, children }: PropsWithChildren<Props<D>>) {
   return (
     <>
       {showExpandArrow && (

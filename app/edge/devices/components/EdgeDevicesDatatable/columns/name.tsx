@@ -1,4 +1,4 @@
-import { CellProps, Column, TableInstance } from 'react-table';
+import { CellProps, Column } from 'react-table';
 
 import { Environment } from '@/portainer/environments/types';
 import { Link } from '@/portainer/components/Link';
@@ -15,17 +15,18 @@ export const name: Column<Environment> = {
   sortType: 'string',
 };
 
-export function NameCell({ row }: CellProps<TableInstance>) {
-  const showExpandedRow =
-    row.original.AMTDeviceGUID && row.original.AMTDeviceGUID.length > 0;
+export function NameCell({ value: name, row }: CellProps<Environment>) {
+  const showExpandedRow = !!(
+    row.original.AMTDeviceGUID && row.original.AMTDeviceGUID.length > 0
+  );
   return (
     <ExpandingCell row={row} showExpandArrow={showExpandedRow}>
       <Link
         to="portainer.endpoints.endpoint"
         params={{ id: row.original.Id }}
-        title={row.original.Name}
+        title={name}
       >
-        {row.original.Name}
+        {name}
       </Link>
     </ExpandingCell>
   );
