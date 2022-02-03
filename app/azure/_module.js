@@ -1,8 +1,9 @@
 import angular from 'angular';
 
+import { dashboardModule } from './Dashboard';
 import { containerInstancesModule } from './ContainerInstances';
 
-angular.module('portainer.azure', ['portainer.app', containerInstancesModule]).config([
+angular.module('portainer.azure', ['portainer.app', dashboardModule, containerInstancesModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -67,8 +68,7 @@ angular.module('portainer.azure', ['portainer.app', containerInstancesModule]).c
       url: '/dashboard',
       views: {
         'content@': {
-          templateUrl: './views/dashboard/dashboard.html',
-          controller: 'AzureDashboardController',
+          component: 'dashboardView',
         },
       },
     };
