@@ -15,15 +15,17 @@ export const name: Column<Environment> = {
   sortType: 'string',
 };
 
-export function NameCell({ value: name, row }: CellProps<TableInstance>) {
+export function NameCell({ row }: CellProps<TableInstance>) {
+  const showExpandedRow =
+    row.original.AMTDeviceGUID && row.original.AMTDeviceGUID.length > 0;
   return (
-    <ExpandingCell row={row}>
+    <ExpandingCell row={row} showExpandArrow={showExpandedRow}>
       <Link
         to="portainer.endpoints.endpoint"
         params={{ id: row.original.Id }}
-        title={name}
+        title={row.original.Name}
       >
-        {name}
+        {row.original.Name}
       </Link>
     </ExpandingCell>
   );
