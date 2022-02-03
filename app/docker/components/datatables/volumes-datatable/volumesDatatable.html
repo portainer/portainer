@@ -21,7 +21,7 @@
             data-cy="volume-searchInput"
           />
         </div>
-        <div class="actionBar !gap-3" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
+        <div class="actionBar !gap-3" authorization="DockerVolumeDelete, DockerVolumeCreate">
           <button
             type="button"
             class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
@@ -84,7 +84,7 @@
           <thead>
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" class="flex gap-1">
-                <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
+                <span class="md-checkbox" authorization="DockerVolumeDelete, DockerVolumeCreate">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -182,17 +182,14 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
+                <span class="md-checkbox" authorization="DockerVolumeDelete, DockerVolumeCreate">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ng-if="!$ctrl.offlineMode" ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{
-                  item.Id | truncate: 40
-                }}</a>
-                <span ng-if="$ctrl.offlineMode">{{ item.Id | truncate: 40 }}</span>
+                <a ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate: 40 }}</a>
 
                 <button
-                  ng-if="$ctrl.showBrowseAction && !$ctrl.offlineMode"
+                  ng-if="$ctrl.showBrowseAction"
                   type="button"
                   ui-sref="docker.volumes.volume.browse({ id: item.Id, nodeName: item.NodeName })"
                   class="btn btn-xs btn-primary space-left"

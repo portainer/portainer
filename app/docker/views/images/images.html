@@ -1,6 +1,6 @@
 <page-header title="'Image list'" breadcrumbs="['Images']" reload="true"> </page-header>
 
-<div class="row" ng-if="!offlineMode" authorization="DockerImageCreate">
+<div class="row" authorization="DockerImageCreate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="download" feather-icon="true" title-text="Pull image "> </rd-widget-header>
@@ -44,7 +44,6 @@
     </rd-widget>
   </div>
 </div>
-<information-panel-offline ng-if="offlineMode"></information-panel-offline>
 <div class="row">
   <div class="col-sm-12">
     <images-datatable
@@ -58,7 +57,6 @@
       remove-action="removeAction"
       force-remove-action="confirmRemovalAction"
       export-in-progress="state.exportInProgress"
-      offline-mode="offlineMode"
       refresh-callback="getImages"
     ></images-datatable>
   </div>

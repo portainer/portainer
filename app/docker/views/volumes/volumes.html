@@ -1,6 +1,5 @@
 <page-header title="'Volume list'" breadcrumbs="['Volumes']" reload="true"> </page-header>
 
-<information-panel-offline ng-if="offlineMode"></information-panel-offline>
 <div class="row">
   <div class="col-sm-12">
     <volumes-datatable
@@ -12,7 +11,6 @@
       remove-action="removeAction"
       show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
       show-browse-action="showBrowseAction"
-      offline-mode="offlineMode"
       refresh-callback="getVolumes"
     ></volumes-datatable>
   </div>

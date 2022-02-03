@@ -11,7 +11,6 @@ angular.module('portainer.docker').component('volumesDatatable', {
     showHostColumn: '<',
     removeAction: '<',
     showBrowseAction: '<',
-    offlineMode: '<',
     refreshCallback: '<',
   },
 });

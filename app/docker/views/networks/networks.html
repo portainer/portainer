@@ -1,6 +1,5 @@
 <page-header title="'Network list'" breadcrumbs="['Networks']" reload="true"> </page-header>
 
-<information-panel-offline ng-if="offlineMode"></information-panel-offline>
 <div class="row">
   <div class="col-sm-12">
     <networks-datatable
@@ -11,7 +10,6 @@
       order-by="Name"
       remove-action="removeAction"
       show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
-      offline-mode="offlineMode"
       refresh-callback="getNetworks"
     ></networks-datatable>
   </div>
