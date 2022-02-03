@@ -97,7 +97,6 @@ function EndpointController(
   function copyEdgeAgentDeploymentCommand() {
     const command = $scope.dockerCommands[$scope.state.deploymentTab][$scope.state.platformType](
       $scope.agentVersion,
-      $scope.agentShortVersion,
       $scope.endpoint.EdgeID,
       $scope.endpoint.EdgeKey,
       $scope.state.allowSelfSignedCerts
