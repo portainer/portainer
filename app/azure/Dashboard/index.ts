@@ -2,6 +2,6 @@ import angular from 'angular';
 
 import { DashboardViewAngular } from './DashboardView';
 
-export default angular
+export const dashboardModule = angular
   .module('portainer.azure.dashboard', [])
   .component('dashboardView', DashboardViewAngular).name;
