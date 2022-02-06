@@ -116,18 +116,21 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.HelmRepositoryURL != nil {
-		newHelmRepo := strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
+		if *payload.HelmRepositoryURL != "" {
+			newHelmRepo := strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
 
-		if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
-			err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusBadRequest, "Invalid Helm repository URL. Must correspond to a valid URL format", err}
+			if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
+				err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusBadRequest, "Invalid Helm repository URL. Must correspond to a valid URL format", err}
+				}
+
+				settings.HelmRepositoryURL = newHelmRepo
 			}
-		}
 
-		settings.HelmRepositoryURL = newHelmRepo
-	} else {
-		settings.HelmRepositoryURL = ""
+		} else {
+			settings.HelmRepositoryURL = ""
+		}
 	}
 
 	if payload.BlackListedLabels != nil {
