@@ -11,7 +11,6 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -157,60 +156,39 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 	}
 	configuration.MPSToken = token
 
-	var g errgroup.Group
-	var resultDevice *Device
-	var resultPowerState *DevicePowerState
-	var resultEnabledFeatures *DeviceEnabledFeatures
+	device, err := service.getDevice(configuration, deviceGUID)
+	if err != nil {
+		return nil, err
+	}
+	if device == nil {
+		return nil, fmt.Errorf("device %s not found", deviceGUID)
+	}
 
-	g.Go(func() error {
-		device, err := service.getDevice(configuration, deviceGUID)
-		if err != nil {
-			return err
-		}
-		if device == nil {
-			return fmt.Errorf("device %s not found", deviceGUID)
-		}
-		resultDevice = device
-		return nil
-	})
+	powerState, err := service.getDevicePowerState(configuration, deviceGUID)
+	if err != nil {
+		return nil, err
+	}
 
-	g.Go(func() error {
-		powerState, err := service.getDevicePowerState(configuration, deviceGUID)
-		if err != nil {
-			return err
-		}
-		resultPowerState = powerState
-		return nil
-	})
-
-	g.Go(func() error {
-		enabledFeatures, err := service.getDeviceEnabledFeatures(configuration, deviceGUID)
-		if err != nil {
-			return err
-		}
-		resultEnabledFeatures = enabledFeatures
-		return nil
-	})
-
-	if err := g.Wait(); err != nil {
+	enabledFeatures, err := service.getDeviceEnabledFeatures(configuration, deviceGUID)
+	if err != nil {
 		return nil, err
 	}
 
 	deviceInformation := &portainer.OpenAMTDeviceInformation{
-		GUID:             resultDevice.GUID,
-		HostName:         resultDevice.HostName,
-		ConnectionStatus: resultDevice.ConnectionStatus,
+		GUID:             device.GUID,
+		HostName:         device.HostName,
+		ConnectionStatus: device.ConnectionStatus,
 	}
-	if resultPowerState != nil {
-		deviceInformation.PowerState = resultPowerState.State
+	if powerState != nil {
+		deviceInformation.PowerState = powerState.State
 	}
-	if resultEnabledFeatures != nil {
+	if enabledFeatures != nil {
 		deviceInformation.EnabledFeatures = &portainer.OpenAMTDeviceEnabledFeatures{
-			Redirection: resultEnabledFeatures.Redirection,
-			KVM:         resultEnabledFeatures.KVM,
-			SOL:         resultEnabledFeatures.SOL,
-			IDER:        resultEnabledFeatures.IDER,
-			UserConsent: resultEnabledFeatures.UserConsent,
+			Redirection: enabledFeatures.Redirection,
+			KVM:         enabledFeatures.KVM,
+			SOL:         enabledFeatures.SOL,
+			IDER:        enabledFeatures.IDER,
+			UserConsent: enabledFeatures.UserConsent,
 		}
 	}
 

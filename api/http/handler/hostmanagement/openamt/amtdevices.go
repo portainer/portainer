@@ -158,12 +158,7 @@ func (handler *Handler) deviceFeatures(w http.ResponseWriter, r *http.Request) *
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
-
-	_, err = handler.OpenAMTService.DeviceInformation(settings.OpenAMTConfiguration, deviceID)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve device information", err}
-	}
-
+	
 	token, err := handler.OpenAMTService.EnableDeviceFeatures(settings.OpenAMTConfiguration, deviceID, payload.Features)
 	if err != nil {
 		logrus.WithError(err).Error("Error executing device action")
