@@ -63,10 +63,16 @@ func initStore(dataStorePath string, fileService portainer.FileService) *bolt.St
 		log.Fatal(err)
 	}
 
+	err = store.Backup1_24db()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = store.MigrateData()
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return store
 }
 

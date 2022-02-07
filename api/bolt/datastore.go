@@ -88,42 +88,7 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 		store.checkForDataMigration = true
 	}
 
-	// Backup database
-	if err := backup1_24db(storePath); err != nil {
-		log.Printf("failed to backup for 1.24: %v\n", err)
-	}
-
 	return store, nil
-}
-
-func backup1_24db(storePath string) error {
-	if portainer.DBVersion != 24 {
-		return nil
-	}
-
-	databasePath := path.Join(storePath, databaseFileName)
-	dbBackupPath := path.Join(storePath, dbBackupFileName)
-
-	source, err := os.Open(databasePath)
-	if err != nil {
-		return err
-	}
-
-	defer source.Close()
-
-	destination, err := os.Create(dbBackupPath)
-	if err != nil {
-		return err
-	}
-
-	defer destination.Close()
-
-	_, err = io.Copy(destination, source)
-	if err == nil {
-		log.Println("backup for 1.24 finished successfully.")
-	}
-
-	return err
 }
 
 // Open opens and initializes the BoltDB database.
@@ -321,4 +286,39 @@ func (store *Store) initServices() error {
 	store.ScheduleService = scheduleService
 
 	return nil
+}
+
+func (store *Store) Backup1_24db() error {
+	version, err := store.VersionService.DBVersion()
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return err
+	}
+
+	if version != 24 {
+		return nil
+	}
+
+	databasePath := path.Join(store.path, databaseFileName)
+	dbBackupPath := path.Join(store.path, dbBackupFileName)
+
+	source, err := os.Open(databasePath)
+	if err != nil {
+		return err
+	}
+
+	defer source.Close()
+
+	destination, err := os.Create(dbBackupPath)
+	if err != nil {
+		return err
+	}
+
+	defer destination.Close()
+
+	_, err = io.Copy(destination, source)
+	if err == nil {
+		log.Println("backup for 1.24 finished successfully.")
+	}
+
+	return err
 }
