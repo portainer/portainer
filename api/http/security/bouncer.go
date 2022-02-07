@@ -1,8 +1,10 @@
 package security
 
 import (
+	"crypto/x509"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -146,15 +148,40 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 
 // AuthorizedEdgeEndpointOperation verifies that the request was received from a valid Edge environment(endpoint)
 func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
-	// TODO: if we're using "require cacert edge requests", reject any that are not signed by the cacert
 	// tls.RequireAndVerifyClientCert would be nice, but that would require the same certs for browser and api use
-	if len(r.TLS.PeerCertificates) > 0 {
+	sslsettings, _ := bouncer.dataStore.SSLSettings().Settings()
+	if sslsettings.CacertPath != "" {
+		// if a caCert is set, then reject any requests that don't have a client Auth cert signed with it
+		if len(r.TLS.PeerCertificates) == 0 {
+			logrus.Error("No clientAuth Agent certificate offered")
+			return errors.New("No clientAuth Agent certificate offered")
+		}
+
+		caChainIdx := len(r.TLS.VerifiedChains)
+		chainCaCert := r.TLS.VerifiedChains[0][caChainIdx]
+
+		caCert, _ := ioutil.ReadFile(sslsettings.CacertPath)
+		certPool := x509.NewCertPool()
+		certPool.AppendCertsFromPEM(caCert)
+
 		logrus.
-			WithField("tls DNSNames", r.TLS.PeerCertificates[0].DNSNames).
-			WithField("tls Issuer", r.TLS.PeerCertificates[0].Issuer.String()).
-			// ATM, i'm thinking Subject CN=<client> could be the default endpoint name
-			WithField("tls Subject", r.TLS.PeerCertificates[0].Subject.String()).
-			Debugf("TLS client request")
+			WithField("chain Subject", chainCaCert.Subject.String()).
+			WithField("tls DNSNames", chainCaCert.DNSNames).
+			Debugf("TLS client chain")
+
+		opts := x509.VerifyOptions{
+			//DNSName: name,	// Not normally used on server side - important on the client side
+			Roots:     certPool, // as used in ListenAndServe
+			KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+		}
+		remoteCert := r.TLS.PeerCertificates[0]
+
+		if _, err := remoteCert.Verify(opts); err != nil {
+			logrus.WithError(err).Error("Agent certificate not signed by the CACert")
+			return errors.New("Agent certificate wasn't signed by required CA Cert")
+		}
+
+		// TODO: test revoke cert list.
 	}
 
 	if endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment && endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
