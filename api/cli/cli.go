@@ -47,6 +47,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		HTTPDisabled:              kingpin.Flag("http-disabled", "Serve portainer only on https").Default(defaultHTTPDisabled).Bool(),
 		HTTPEnabled:               kingpin.Flag("http-enabled", "Serve portainer on http").Default(defaultHTTPEnabled).Bool(),
 		SSL:                       kingpin.Flag("ssl", "Secure Portainer instance using SSL (deprecated)").Default(defaultSSL).Bool(),
+		SSLCacert:                 kingpin.Flag("sslcacert", "Path to the SSL CA certificate used to validate the edge agent cert").String(),
 		SSLCert:                   kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").String(),
 		SSLKey:                    kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").String(),
 		Rollback:                  kingpin.Flag("rollback", "Rollback the database store to the previous version").Bool(),

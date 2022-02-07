@@ -116,6 +116,7 @@ type (
 		HTTPDisabled              *bool
 		HTTPEnabled               *bool
 		SSL                       *bool
+		SSLCacert                 *string
 		SSLCert                   *string
 		SSLKey                    *string
 		Rollback                  *bool
@@ -837,6 +838,7 @@ type (
 	SSLSettings struct {
 		CertPath    string `json:"certPath"`
 		KeyPath     string `json:"keyPath"`
+		CacertPath  string `json:"cacertPath"`
 		SelfSigned  bool   `json:"selfSigned"`
 		HTTPEnabled bool   `json:"httpEnabled"`
 	}
@@ -1236,6 +1238,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
+		CopySSLCacert(cacertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 	}
 

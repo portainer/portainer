@@ -14,6 +14,7 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/sirupsen/logrus"
 )
 
 type (
@@ -145,6 +146,17 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 
 // AuthorizedEdgeEndpointOperation verifies that the request was received from a valid Edge environment(endpoint)
 func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
+	// TODO: if we're using "require cacert edge requests", reject any that are not signed by the cacert
+	// tls.RequireAndVerifyClientCert would be nice, but that would require the same certs for browser and api use
+	if len(r.TLS.PeerCertificates) > 0 {
+		logrus.
+			WithField("tls DNSNames", r.TLS.PeerCertificates[0].DNSNames).
+			WithField("tls Issuer", r.TLS.PeerCertificates[0].Issuer.String()).
+			// ATM, i'm thinking Subject CN=<client> could be the default endpoint name
+			WithField("tls Subject", r.TLS.PeerCertificates[0].Subject.String()).
+			Debugf("TLS client request")
+	}
+
 	if endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment && endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
 		agentApiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_error"}).Inc()
 		return errors.New("Invalid environment type")

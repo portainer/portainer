@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"log"
 	"net/http"
@@ -62,6 +63,7 @@ import (
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
 	stackdeployer "github.com/portainer/portainer/api/stacks"
+	"github.com/sirupsen/logrus"
 )
 
 // Server implements the portainer.Server interface
@@ -335,6 +337,17 @@ func (server *Server) Start() error {
 	httpsServer.TLSConfig = crypto.CreateServerTLSConfiguration()
 	httpsServer.TLSConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 		return server.SSLService.GetRawCertificate(), nil
+	}
+
+	if caCert := server.SSLService.GetCacertificatePem(); len(caCert) > 0 {
+		logrus.Debugf("using CA certificate for %s", server.BindAddressHTTPS)
+		certPool := x509.NewCertPool()
+		certPool.AppendCertsFromPEM(caCert)
+
+		httpsServer.TLSConfig.ClientCAs = certPool
+		// can't use tls.RequireAndVerifyClientCert, and this port is also used for the browser (though it would be a strong feature to allow the user to enable)
+		httpsServer.TLSConfig.ClientAuth = tls.VerifyClientCertIfGiven
+		httpsServer.TLSConfig.BuildNameToCertificate()
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)

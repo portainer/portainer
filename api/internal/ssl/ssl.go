@@ -3,6 +3,7 @@ package ssl
 import (
 	"context"
 	"crypto/tls"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -31,7 +32,7 @@ func NewService(fileService portainer.FileService, dataStore dataservices.DataSt
 }
 
 // Init initializes the service
-func (service *Service) Init(host, certPath, keyPath string) error {
+func (service *Service) Init(host, certPath, keyPath, cacertPath string) error {
 	pathSupplied := certPath != "" && keyPath != ""
 	if pathSupplied {
 		newCertPath, newKeyPath, err := service.fileService.CopySSLCertPair(certPath, keyPath)
@@ -39,7 +40,19 @@ func (service *Service) Init(host, certPath, keyPath string) error {
 			return errors.Wrap(err, "failed copying supplied certs")
 		}
 
-		return service.cacheInfo(newCertPath, newKeyPath, false)
+		newCacertPath := ""
+		if cacertPath != "" {
+			newCacertPath, err = service.fileService.CopySSLCacert(cacertPath)
+			if err != nil {
+				return errors.Wrap(err, "failed copying supplied cacert")
+			}
+		}
+
+		return service.cacheInfo(newCertPath, newKeyPath, newCacertPath, false)
+	}
+	if cacertPath != "" {
+		return errors.Errorf("supplying a CA cert path (%s) requires an SSL cert and key file", cacertPath)
+
 	}
 
 	settings, err := service.GetSSLSettings()
@@ -68,8 +81,22 @@ func (service *Service) Init(host, certPath, keyPath string) error {
 		return errors.Wrap(err, "failed generating self signed certs")
 	}
 
-	return service.cacheInfo(certPath, keyPath, true)
+	return service.cacheInfo(certPath, keyPath, "", true)
 
+}
+
+// GetRawCertificate gets the raw certificate
+func (service *Service) GetCacertificatePem() (pemData []byte) {
+	settings, _ := service.GetSSLSettings()
+	if settings.CacertPath == "" {
+		return pemData
+	}
+	caCert, err := ioutil.ReadFile(settings.CacertPath)
+	if err != nil {
+		log.Printf("reading ca cert: %s", err)
+		return pemData
+	}
+	return caCert
 }
 
 // GetRawCertificate gets the raw certificate
@@ -98,7 +125,13 @@ func (service *Service) SetCertificates(certData, keyData []byte) error {
 		return err
 	}
 
-	service.cacheInfo(certPath, keyPath, false)
+	settings, err := service.dataStore.SSLSettings().Settings()
+	if err != nil {
+		return err
+	}
+	// Don't unset the settings.CacertPath when uploading a new cert from the UI
+	// TODO: should also add UI to update thecacert, or to disable it..
+	service.cacheInfo(certPath, keyPath, settings.CacertPath, false)
 
 	service.shutdownTrigger()
 
@@ -127,6 +160,7 @@ func (service *Service) SetHTTPEnabled(httpEnabled bool) error {
 	return nil
 }
 
+//TODO: why is this being cached in memory? is it actually loaded more than once?
 func (service *Service) cacheCertificate(certPath, keyPath string) error {
 	rawCert, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
@@ -138,7 +172,7 @@ func (service *Service) cacheCertificate(certPath, keyPath string) error {
 	return nil
 }
 
-func (service *Service) cacheInfo(certPath, keyPath string, selfSigned bool) error {
+func (service *Service) cacheInfo(certPath, keyPath, cacertPath string, selfSigned bool) error {
 	err := service.cacheCertificate(certPath, keyPath)
 	if err != nil {
 		return err
@@ -151,6 +185,7 @@ func (service *Service) cacheInfo(certPath, keyPath string, selfSigned bool) err
 
 	settings.CertPath = certPath
 	settings.KeyPath = keyPath
+	settings.CacertPath = cacertPath
 	settings.SelfSigned = selfSigned
 
 	err = service.dataStore.SSLSettings().UpdateSettings(settings)
