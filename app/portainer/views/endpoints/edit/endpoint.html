@@ -69,23 +69,17 @@
               script.
             </span>
             <code style="display: block; padding: 16px 45px">
-              {{
-                dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
-              }}
+              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
             </code>
           </uib-tab>
           <uib-tab index="'swarm'" heading="Docker Swarm">
             <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
-              {{
-                dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
-              }}
+              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
             </code>
           </uib-tab>
           <uib-tab index="'standalone'" heading="Docker Standalone">
             <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
-              {{
-                dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
-              }}
+              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, agentSecret, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
             </code>
           </uib-tab>
         </uib-tabset>
