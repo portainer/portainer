@@ -89,25 +89,41 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 	}
 
 	// Backup database
-	dbBackupPath := path.Join(storePath, dbBackupFileName)
-	simpleCopyFile(databasePath, dbBackupPath)
+	if err := backup1_24db(storePath); err != nil {
+		log.Printf("failed to backup for 1.24: %v\n", err)
+	}
 
 	return store, nil
 }
 
-func simpleCopyFile(src, dst string) (int64, error) {
-	source, err := os.Open(src)
-	if err != nil {
-		return 0, err
+func backup1_24db(storePath string) error {
+	if portainer.DBVersion != 24 {
+		return nil
 	}
+
+	databasePath := path.Join(storePath, databaseFileName)
+	dbBackupPath := path.Join(storePath, dbBackupFileName)
+
+	source, err := os.Open(databasePath)
+	if err != nil {
+		return err
+	}
+
 	defer source.Close()
-	destination, err := os.Create(dst)
+
+	destination, err := os.Create(dbBackupPath)
 	if err != nil {
-		return 0, err
+		return err
 	}
+
 	defer destination.Close()
-	nBytes, err := io.Copy(destination, source)
-	return nBytes, err
+
+	_, err = io.Copy(destination, source)
+	if err == nil {
+		log.Println("backup for 1.24 finished successfully.")
+	}
+
+	return err
 }
 
 // Open opens and initializes the BoltDB database.
