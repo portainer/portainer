@@ -233,7 +233,6 @@ angular.module('portainer.app').factory('ModalService', [
         <br/><br/>Please upgrade immediately by using the tag <code>portainer/portainer-ce-2.0.1</code>
         <br/><br/>If you decide to stay on version 1, please use the tag <code>portainer/portainer:1.24.2</code> to prevent automatically upgrading to version 2.`,
         onEscape: false,
-        backdrop: false,
         buttons: {
           Close: {
             label: 'Close',
