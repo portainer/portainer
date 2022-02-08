@@ -2,7 +2,7 @@ import { useReducer } from 'react';
 
 import { Button } from '@/portainer/components/Button';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
-import { useIsAdmin, useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/portainer/hooks/useUser';
 import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, Role } from '@/portainer/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
@@ -29,12 +29,12 @@ export function AccessControlPanel({
   onUpdateSuccess,
 }: Props) {
   const [isEditMode, toggleEditMode] = useReducer((state) => !state, false);
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useUser();
 
   const isInherited = checkIfInherited();
 
   const { isPartOfRestrictedUsers, isLeaderOfAnyRestrictedTeams } =
-    useRestrictions(isAdmin, resourceControl);
+    useRestrictions(resourceControl);
 
   const isEditDisabled =
     disableOwnershipChange ||
@@ -102,11 +102,8 @@ export function AccessControlPanel({
   }
 }
 
-function useRestrictions(
-  isAdmin: boolean,
-  resourceControl?: ResourceControlViewModel
-) {
-  const { user } = useUser();
+function useRestrictions(resourceControl?: ResourceControlViewModel) {
+  const { user, isAdmin } = useUser();
 
   const memberships = useUserMembership(user?.Id);
 

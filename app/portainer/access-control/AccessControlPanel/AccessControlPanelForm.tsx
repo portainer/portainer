@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { useMutation } from 'react-query';
 import { object } from 'yup';
 
-import { useIsAdmin } from '@/portainer/hooks/useUser';
+import { useUser } from '@/portainer/hooks/useUser';
 import { Button } from '@/portainer/components/Button';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
@@ -37,7 +37,7 @@ export function AccessControlPanelForm({
   onCancelClick,
   onUpdateSuccess,
 }: Props) {
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useUser();
 
   const updateAccess = useMutation(
     (variables: AccessControlFormData) =>

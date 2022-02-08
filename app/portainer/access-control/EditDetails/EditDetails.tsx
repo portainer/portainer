@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { FormikErrors } from 'formik';
 
 import { BoxSelector } from '@/portainer/components/BoxSelector';
-import { isAdmin as isUserAdmin, useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/portainer/hooks/useUser';
 import { FormError } from '@/portainer/components/form-components/FormError';
 
 import { ResourceControlOwnership, AccessControlFormData } from '../types';
@@ -27,8 +27,7 @@ export function EditDetails({
   errors,
   formNamespace,
 }: Props) {
-  const { user } = useUser();
-  const isAdmin = !!user && isUserAdmin(user);
+  const { user, isAdmin } = useUser();
 
   const { users, teams, isLoading } = useLoadState();
   const options = useOptions(isAdmin, teams, isPublicVisible);

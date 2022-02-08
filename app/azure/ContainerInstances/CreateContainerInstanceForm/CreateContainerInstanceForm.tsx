@@ -8,7 +8,7 @@ import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { InputListError } from '@/portainer/components/form-components/InputList/InputList';
 import { ContainerInstanceFormValues } from '@/azure/types';
 import * as notifications from '@/portainer/services/notifications';
-import { useIsAdmin } from '@/portainer/hooks/useUser';
+import { useUser } from '@/portainer/hooks/useUser';
 import { AccessControlForm } from '@/portainer/access-control/AccessControlForm';
 
 import { validationSchema } from './CreateContainerInstanceForm.validation';
@@ -29,7 +29,7 @@ export function CreateContainerInstanceForm() {
     throw new Error('endpointId url param is required');
   }
 
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useUser();
 
   const { initialValues, isLoading, providers, subscriptions, resourceGroups } =
     useLoadFormState(environmentId, isAdmin);

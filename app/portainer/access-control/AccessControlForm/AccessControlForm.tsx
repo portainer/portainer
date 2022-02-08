@@ -22,8 +22,7 @@ export function AccessControlForm({
   formNamespace,
   errors,
 }: Props) {
-  const { user } = useUser();
-  const isAdmin = user?.Role === 1;
+  const { isAdmin } = useUser();
 
   const accessControlEnabled =
     values.ownership !== ResourceControlOwnership.PUBLIC;
