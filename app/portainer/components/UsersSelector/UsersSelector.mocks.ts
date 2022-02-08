@@ -9,8 +9,6 @@ export function createMockUser(id: number, username: string): UserViewModel {
     EndpointAuthorizations: {},
     PortainerAuthorizations: {
       PortainerDockerHubInspect: true,
-      PortainerEndpointExtensionAdd: true,
-      PortainerEndpointExtensionRemove: true,
       PortainerEndpointGroupInspect: true,
       PortainerEndpointGroupList: true,
       PortainerEndpointInspect: true,
