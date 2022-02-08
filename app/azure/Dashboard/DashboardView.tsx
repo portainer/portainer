@@ -39,24 +39,25 @@ export function DashboardView() {
     return null;
   }
 
+  const subscriptionsCount = subscriptionsQuery?.data?.length;
+  const resourceGroupsCount = Object.values(
+    resourceGroupsQuery?.resourceGroups
+  ).flatMap((x) => Object.values(x)).length;
+
   return (
     <>
       <PageHeader title="Home" breadcrumbs={[{ label: 'Dashboard' }]} />
 
-      {subscriptionsQuery.data && (
+      {!subscriptionsQuery.isError && (
         <div className="row">
           <DashboardItem
-            value={subscriptionsQuery.data.length}
+            value={subscriptionsCount as number}
             icon="fa fa-th-list"
             comment="Subscriptions"
           />
           {!resourceGroupsQuery.isError && (
             <DashboardItem
-              value={
-                Object.values(resourceGroupsQuery.resourceGroups).flatMap((x) =>
-                  Object.values(x)
-                ).length
-              }
+              value={resourceGroupsCount as number}
               icon="fa fa-th-list"
               comment="Resource groups"
             />
