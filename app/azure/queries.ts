@@ -65,9 +65,6 @@ export function useResourceGroups(
     ),
     isLoading: queries.some((q) => q.isLoading),
     isError: queries.some((q) => q.isError),
-    queryErrors: queries.map((q, index) => ({
-      subscriptionId: subscriptions[index].subscriptionId,
-      error: (q.error as Error) || null,
-    })),
+    error: queries.find((q) => q.error)?.error || null,
   };
 }

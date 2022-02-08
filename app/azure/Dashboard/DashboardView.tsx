@@ -23,13 +23,11 @@ export function DashboardView() {
     environmentId,
     subscriptionsQuery.data
   );
-  if (resourceGroupsQuery.isError && resourceGroupsQuery.queryErrors) {
-    resourceGroupsQuery.queryErrors.forEach((e) =>
-      notifyError(
-        'Failure',
-        e.error as PortainerError,
-        `Unable to retrieve resource groups for ${e.subscriptionId} resource group`
-      )
+  if (resourceGroupsQuery.isError && resourceGroupsQuery.error) {
+    notifyError(
+      'Failure',
+      resourceGroupsQuery.error as PortainerError,
+      `Unable to retrieve resource groups`
     );
   }
 
