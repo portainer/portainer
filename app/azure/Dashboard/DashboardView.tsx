@@ -1,45 +1,40 @@
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
+import { DashboardItem } from '@/portainer/components/DashboardItem';
 import { error as notifyError } from '@/portainer/services/notifications';
+import PortainerError from '@/portainer/error';
 import { r2a } from '@/react-tools/react2angular';
 
-import { aggregateResourceGroups } from '../utils';
 import { useResourceGroups, useSubscriptions } from '../queries';
-
-import { DashboardItem } from './DashboardItem';
 
 export function DashboardView() {
   const environmentId = useEnvironmentId();
 
-  const {
-    data: subscriptions,
-    isLoading: isLoadingSubscriptions,
-    error: subscriptionsError,
-    isError: isErrorSubscriptions,
-  } = useSubscriptions(environmentId);
-  if (isErrorSubscriptions) {
+  const subscriptionsQuery = useSubscriptions(environmentId);
+  if (subscriptionsQuery.isError) {
     notifyError(
       'Failure',
-      subscriptionsError as Error,
+      subscriptionsQuery.error as PortainerError,
       'Unable to retrieve subscriptions'
     );
   }
 
-  const {
-    resourceGroups,
-    isLoading: isLoadingResourceGroups,
-    error: resourceGroupsError,
-    isError: isErrorResourceGroups,
-  } = useResourceGroups(environmentId, subscriptions);
-  if (isErrorResourceGroups) {
-    notifyError(
-      'Failure',
-      resourceGroupsError as Error,
-      'Unable to retrieve resource groups'
+  const resourceGroupsQuery = useResourceGroups(
+    environmentId,
+    subscriptionsQuery.data
+  );
+  if (resourceGroupsQuery.isError && resourceGroupsQuery.queryErrors) {
+    resourceGroupsQuery.queryErrors.forEach((err) =>
+      notifyError(
+        'Failure',
+        err[1] as PortainerError,
+        `Unable to retrieve resource groups for ${err[0]} resource group`
+      )
     );
   }
 
-  const isLoading = isLoadingSubscriptions || isLoadingResourceGroups;
+  const isLoading =
+    subscriptionsQuery.isLoading || resourceGroupsQuery.isLoading;
   if (isLoading) {
     return null;
   }
@@ -48,16 +43,20 @@ export function DashboardView() {
     <>
       <PageHeader title="Home" breadcrumbs={[{ label: 'Dashboard' }]} />
 
-      {subscriptions && (
+      {subscriptionsQuery.data && (
         <div className="row">
           <DashboardItem
-            value={subscriptions.length}
+            value={subscriptionsQuery.data.length}
             icon="fa fa-th-list"
             comment="Subscriptions"
           />
-          {!isErrorResourceGroups && (
+          {!resourceGroupsQuery.isError && (
             <DashboardItem
-              value={aggregateResourceGroups(resourceGroups).length}
+              value={
+                Object.values(resourceGroupsQuery.resourceGroups).flatMap((x) =>
+                  Object.values(x)
+                ).length
+              }
               icon="fa fa-th-list"
               comment="Resource groups"
             />
