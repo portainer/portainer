@@ -21,6 +21,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	"github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
+	"github.com/portainer/portainer/api/http/handler/metrics"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
@@ -77,6 +78,7 @@ type Handler struct {
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
 	WebhookHandler         *webhooks.Handler
+	MetricsHandler         *metrics.Handler
 }
 
 // @title PortainerCE API
@@ -243,6 +245,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/storybook"):
 		http.StripPrefix("/storybook", h.StorybookHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/metrics"):
+		if h.MetricsHandler != nil {
+			h.MetricsHandler.ServeHTTP(w, r)
+		}
 	case strings.HasPrefix(r.URL.Path, "/"):
 		h.FileHandler.ServeHTTP(w, r)
 	}
