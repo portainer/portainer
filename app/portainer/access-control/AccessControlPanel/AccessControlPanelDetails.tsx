@@ -185,11 +185,7 @@ function useAuthorizedTeams(authorizedTeamIds: TeamId[]) {
     return _.compact(
       authorizedTeamIds.map((id) => {
         const team = teams.find((u) => u.Id === id);
-        if (!team) {
-          return null;
-        }
-
-        return team.Name;
+        return team?.Name;
       })
     );
   });
@@ -204,11 +200,7 @@ function useAuthorizedUsers(authorizedUserIds: UserId[]) {
     return _.compact(
       authorizedUserIds.map((id) => {
         const user = users.find((u) => u.Id === id);
-        if (!user) {
-          return null;
-        }
-
-        return user.Username;
+        return user?.Username;
       })
     );
   });
