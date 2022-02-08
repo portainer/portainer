@@ -30,6 +30,7 @@ export function EdgeDevicesDatatableContainer({
 export const EdgeDevicesDatatableAngular = react2angular(
   EdgeDevicesDatatableContainer,
   [
+    'groups',
     'dataset',
     'onRefresh',
     'setLoadingMessage',

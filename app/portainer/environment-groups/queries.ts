@@ -4,7 +4,11 @@ import { useQuery } from 'react-query';
 import { error as notifyError } from '@/portainer/services/notifications';
 
 import { EnvironmentGroup, EnvironmentGroupId } from './types';
-import { getGroup } from './environment-groups.service';
+import { getGroup, getGroups } from './environment-groups.service';
+
+export function useGroups() {
+  return useQuery<EnvironmentGroup[]>(['environment-groups'], getGroups);
+}
 
 export function useGroup<T = EnvironmentGroup>(
   groupId: EnvironmentGroupId,

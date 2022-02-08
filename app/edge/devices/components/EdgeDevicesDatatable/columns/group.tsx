@@ -1,9 +1,9 @@
-import { CellProps, Column } from 'react-table';
+import { Column } from 'react-table';
 
 import { Environment } from '@/portainer/environments/types';
 import { DefaultFilter } from '@/portainer/components/datatables/components/Filter';
-import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
-import { useGroup } from '@/portainer/environment-groups/queries';
+
+import { useRowContext } from './RowContext';
 
 export const group: Column<Environment> = {
   Header: 'Group',
@@ -14,8 +14,8 @@ export const group: Column<Environment> = {
   canHide: true,
 };
 
-function GroupCell({ value }: CellProps<Environment, EnvironmentGroupId>) {
-  const groupName = useGroup(value, (group) => group.Name);
+function GroupCell() {
+  const { groupName } = useRowContext();
 
   return groupName;
 }

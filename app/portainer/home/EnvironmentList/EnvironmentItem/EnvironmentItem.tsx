@@ -16,7 +16,6 @@ import type { TagId } from '@/portainer/tags/types';
 import { Button } from '@/portainer/components/Button';
 import { Link } from '@/portainer/components/Link';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
-import { useGroup } from '@/portainer/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
@@ -28,6 +27,7 @@ import { EnvironmentStatusBadge } from './EnvironmentStatusBadge';
 interface Props {
   homepageLoadTime?: number;
   environment: Environment;
+  groupName?: string;
   onClick(environment: Environment): void;
 }
 
@@ -35,13 +35,13 @@ export function EnvironmentItem({
   environment,
   onClick,
   homepageLoadTime,
+  groupName,
 }: Props) {
   const isAdmin = useIsAdmin();
   const isEdge = isEdgeEnvironment(environment.Type);
 
   const snapshotTime = getSnapshotTime(environment);
 
-  const groupName = useGroup(environment.GroupId, (group) => group.Name);
   const tags = useEnvironmentTagNames(environment.TagIds);
   const route = getRoute(environment);
 

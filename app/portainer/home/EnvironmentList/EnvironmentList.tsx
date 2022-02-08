@@ -18,6 +18,7 @@ import {
 import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import { useEnvironmentList } from '@/portainer/environments/queries';
+import { useGroups } from '@/portainer/environment-groups/queries';
 
 import { EnvironmentItem } from './EnvironmentItem';
 import { KubeconfigButton } from './KubeconfigButton';
@@ -44,6 +45,8 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   useEffect(() => {
     setPage(1);
   }, [searchBarValue]);
+
+  const groupsQuery = useGroups();
 
   const { isLoading, environments, totalCount, totalAvailable } =
     useEnvironmentList(page, pageLimit, debouncedTextFilter, true);
@@ -91,6 +94,9 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                   <EnvironmentItem
                     key={env.Id}
                     environment={env}
+                    groupName={
+                      groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
+                    }
                     onClick={onClickItem}
                     homepageLoadTime={homepageLoadTime}
                   />
