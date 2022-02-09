@@ -4,6 +4,10 @@ import { error, success, warning } from './notifications';
 
 jest.mock('toastr');
 
+afterEach(() => {
+  jest.resetAllMocks();
+});
+
 it('calling success should show success message', () => {
   const title = 'title';
   const text = 'text';
@@ -14,6 +18,9 @@ it('calling success should show success message', () => {
 });
 
 it('calling error with Error should show error message', () => {
+  const consoleErrorFn = jest
+    .spyOn(console, 'error')
+    .mockImplementation(() => jest.fn());
   const title = 'title';
   const errorMessage = 'message';
   const fallback = 'fallback';
@@ -25,9 +32,14 @@ it('calling error with Error should show error message', () => {
     title,
     expect.anything()
   );
+
+  consoleErrorFn.mockRestore();
 });
 
 it('calling error without Error should show fallback message', () => {
+  const consoleErrorFn = jest
+    .spyOn(console, 'error')
+    .mockImplementation(() => jest.fn());
   const title = 'title';
 
   const fallback = 'fallback';
@@ -35,6 +47,7 @@ it('calling error without Error should show fallback message', () => {
   error(title, undefined, fallback);
 
   expect(toastr.error).toHaveBeenCalledWith(fallback, title, expect.anything());
+  consoleErrorFn.mockRestore();
 });
 
 it('calling warning should show warning message', () => {

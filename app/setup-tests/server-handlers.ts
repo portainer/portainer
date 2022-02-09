@@ -36,6 +36,7 @@ export const handlers = [
   rest.get('/api/backup/s3/status', (req, res, ctx) =>
     res(ctx.json({ Failed: false }))
   ),
+  rest.get('/api/endpoint_groups', (req, res, ctx) => res(ctx.json([]))),
   rest.get('/api/endpoint_groups/:groupId', (req, res, ctx) => {
     if (req.params.groupId instanceof Array) {
       throw new Error('should be string');

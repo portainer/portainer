@@ -59,18 +59,14 @@ function renderComponent(
 ) {
   const user = new UserViewModel({ Username: 'test', Role: isAdmin ? 1 : 2 });
 
-  server.use(
-    rest.get('/api/endpoint_groups/:groupId', (req, res, ctx) =>
-      res(ctx.json(group))
-    ),
-    rest.get('/api/tags', (req, res, ctx) => res(ctx.json(tags)))
-  );
+  server.use(rest.get('/api/tags', (req, res, ctx) => res(ctx.json(tags))));
 
   return renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
       <EnvironmentItem
         onClick={() => {}}
         environment={env}
+        groupName={group.Name}
         homepageLoadTime={0}
       />
     </UserContext.Provider>
