@@ -12,10 +12,14 @@ export function DashboardItem({ value, icon, comment }: Props) {
       <Widget>
         <WidgetBody>
           <div className="widget-icon blue pull-left">
-            <i className={icon} />
+            <i className={icon} aria-hidden="true" aria-label="icon" />
           </div>
-          <div className="title">{value}</div>
-          <div className="comment">{comment}</div>
+          <div className="title" aria-label="value">
+            {value}
+          </div>
+          <div className="comment" aria-label="resourceType">
+            {comment}
+          </div>
         </WidgetBody>
       </Widget>
     </div>
