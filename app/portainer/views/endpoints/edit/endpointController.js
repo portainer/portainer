@@ -441,7 +441,7 @@ function EndpointController(
 
   function buildKubernetesCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     return `
-curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : ''} ${
+curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${
       $scope.formValues.EnvVarSource
     }
 `;
