@@ -83,12 +83,6 @@
           </div>
           <volumes-cifs-form data="formValues.CIFSData" ng-show="formValues.Driver === 'local'"></volumes-cifs-form>
           <!-- !cifs-management -->
-          <!-- storidge -->
-          <div ng-if="formValues.Driver === 'cio:latest'">
-            <div class="col-sm-12 form-section-title"> Storidge </div>
-            <storidge-profile-selector storidge-profile="formValues.StoridgeProfile"></storidge-profile-selector>
-          </div>
-          <!-- storidge -->
           <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && formValues.Driver === 'local'">
             <div class="col-sm-12 form-section-title"> Deployment </div>
             <!-- node-selection -->

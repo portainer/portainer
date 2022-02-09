@@ -51,32 +51,6 @@
   </div>
 </div>
 
-<div class="row" ng-if="isCioDriver">
-  <div class="col-sm-12">
-    <volume-storidge-info volume="storidgeVolume"> </volume-storidge-info>
-  </div>
-</div>
-
-<div class="row" ng-if="isCioDriver">
-  <div class="col-sm-12">
-    <storidge-snapshot-creation volume-id="storidgeVolume.Vdisk" ng-if="storidgeVolume.SnapshotEnabled"> </storidge-snapshot-creation>
-  </div>
-</div>
-
-<div class="row" ng-if="isCioDriver && storidgeVolume.SnapshotEnabled">
-  <div class="col-sm-12">
-    <storidge-snapshots-datatable
-      title-text="Snapshots"
-      title-icon="fa-camera"
-      dataset="storidgeSnapshots"
-      table-key="storidgeSnapshots"
-      order-by="Id"
-      remove-action="removeSnapshot"
-    >
-    </storidge-snapshots-datatable>
-  </div>
-</div>
-
 <!-- access-control-panel -->
 <por-access-control-panel ng-if="volume" resource-id="volume.ResourceId" resource-control="volume.ResourceControl" resource-type="'volume'"> </por-access-control-panel>
 <!-- !access-control-panel -->

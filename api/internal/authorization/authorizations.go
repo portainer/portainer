@@ -153,7 +153,6 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 		portainer.OperationPortainerWebhookList:               true,
 		portainer.OperationPortainerWebhookCreate:             true,
 		portainer.OperationPortainerWebhookDelete:             true,
-		portainer.OperationIntegrationStoridgeAdmin:           true,
 		portainer.EndpointResourcesAccess:                     true,
 	}
 }
@@ -412,21 +411,19 @@ func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizatio
 // DefaultPortainerAuthorizations returns the default Portainer authorizations used by non-admin users.
 func DefaultPortainerAuthorizations() portainer.Authorizations {
 	return map[portainer.Authorization]bool{
-		portainer.OperationPortainerDockerHubInspect:        true,
-		portainer.OperationPortainerEndpointGroupList:       true,
-		portainer.OperationPortainerEndpointList:            true,
-		portainer.OperationPortainerEndpointInspect:         true,
-		portainer.OperationPortainerEndpointExtensionAdd:    true,
-		portainer.OperationPortainerEndpointExtensionRemove: true,
-		portainer.OperationPortainerMOTD:                    true,
-		portainer.OperationPortainerRegistryList:            true,
-		portainer.OperationPortainerRegistryInspect:         true,
-		portainer.OperationPortainerTeamList:                true,
-		portainer.OperationPortainerTemplateList:            true,
-		portainer.OperationPortainerTemplateInspect:         true,
-		portainer.OperationPortainerUserList:                true,
-		portainer.OperationPortainerUserInspect:             true,
-		portainer.OperationPortainerUserMemberships:         true,
+		portainer.OperationPortainerDockerHubInspect:  true,
+		portainer.OperationPortainerEndpointGroupList: true,
+		portainer.OperationPortainerEndpointList:      true,
+		portainer.OperationPortainerEndpointInspect:   true,
+		portainer.OperationPortainerMOTD:              true,
+		portainer.OperationPortainerRegistryList:      true,
+		portainer.OperationPortainerRegistryInspect:   true,
+		portainer.OperationPortainerTeamList:          true,
+		portainer.OperationPortainerTemplateList:      true,
+		portainer.OperationPortainerTemplateInspect:   true,
+		portainer.OperationPortainerUserList:          true,
+		portainer.OperationPortainerUserInspect:       true,
+		portainer.OperationPortainerUserMemberships:   true,
 	}
 }
 

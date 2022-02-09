@@ -34,7 +34,5 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToDockerAPI)))
 	h.PathPrefix("/{id}/agent/kubernetes").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToKubernetesAPI)))
-	h.PathPrefix("/{id}/storidge").Handler(
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToStoridgeAPI)))
 	return h
 }
