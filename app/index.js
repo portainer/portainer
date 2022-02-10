@@ -47,7 +47,6 @@ angular
     'portainer.docker',
     'portainer.kubernetes',
     'portainer.edge',
-    'portainer.integrations',
     'rzModule',
     'moment-picker',
     'angulartics',
