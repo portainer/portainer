@@ -20,3 +20,21 @@ export function createMockTeams(count: number) {
     Name: `team${value}`,
   }));
 }
+
+export function createMockSubscriptions(count: number) {
+  const subscriptions = _.range(1, count + 1).map((x) => ({
+    id: `/subscriptions/subscription-${x}`,
+    subscriptionId: `subscription-${x}`,
+  }));
+
+  return { value: subscriptions };
+}
+
+export function createMockResourceGroups(subscription: string, count: number) {
+  const resourceGroups = _.range(1, count + 1).map((x) => ({
+    id: `/subscriptions/${subscription}}/resourceGroups/resourceGroup-${x}`,
+    name: `resourcegroup-${x}`,
+  }));
+
+  return { value: resourceGroups };
+}

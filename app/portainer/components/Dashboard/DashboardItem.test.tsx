@@ -24,6 +24,24 @@ test('should show provided comment', async () => {
   expect(title).toHaveTextContent('Test');
 });
 
-function renderComponent(value = 0, icon = '', comment = '') {
-  return render(<DashboardItem value={value} icon={icon} comment={comment} />);
+test('should have provided accesibility label', async () => {
+  const { getByLabelText } = renderComponent(0, '', '', 'test-label');
+
+  expect(getByLabelText('test-label')).toBeTruthy();
+});
+
+function renderComponent(
+  value = 0,
+  icon = '',
+  comment = '',
+  accessibilityLabel = ''
+) {
+  return render(
+    <DashboardItem
+      value={value}
+      icon={icon}
+      comment={comment}
+      accessibilityLabel={accessibilityLabel}
+    />
+  );
 }

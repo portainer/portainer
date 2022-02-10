@@ -58,12 +58,14 @@ export function DashboardView() {
             value={subscriptionsCount as number}
             icon="fa fa-th-list"
             comment="Subscriptions"
+            accessibilityLabel="subscriptions"
           />
           {!resourceGroupsQuery.isError && (
             <DashboardItem
               value={resourceGroupsCount as number}
               icon="fa fa-th-list"
               comment="Resource groups"
+              accessibilityLabel="resourceGroups"
             />
           )}
         </div>
