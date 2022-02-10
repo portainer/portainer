@@ -58,7 +58,7 @@ export interface KubernetesSettings {
   Snapshots: KubernetesSnapshot[];
 }
 
-export interface Environment {
+export type Environment = {
   Id: EnvironmentId;
   Type: EnvironmentType;
   TagIds: TagId[];
@@ -72,7 +72,10 @@ export interface Environment {
   Snapshots: DockerSnapshot[];
   Kubernetes: KubernetesSettings;
   PublicURL?: string;
-}
+  IsEdgeDevice?: boolean;
+  UserTrusted: boolean;
+  AMTDeviceGUID?: string;
+};
 
 /**
  * TS reference of endpoint_create.go#EndpointCreationType iota
@@ -86,6 +89,12 @@ export enum EnvironmentCreationTypes {
 }
 
 export type EnvironmentGroupId = number;
+
+export enum PlatformType {
+  Docker,
+  Kubernetes,
+  Azure,
+}
 
 export interface EnvironmentSettings {
   // Whether non-administrator should be able to use bind mounts when creating containers

@@ -1,0 +1,13 @@
+.item {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.item .inputs {
+}
+
+.item .errors {
+  position: absolute;
+  bottom: -20px;
+}

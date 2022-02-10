@@ -2,8 +2,10 @@ import Select from 'react-select';
 
 import { UserViewModel } from '@/portainer/models/user';
 import { UserId } from '@/portainer/users/types';
+import './UsersSelector.css';
 
 interface Props {
+  name?: string;
   value: UserId[];
   onChange(value: UserId[]): void;
   users: UserViewModel[];
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export function UsersSelector({
+  name,
   value,
   onChange,
   users,
@@ -23,9 +26,11 @@ export function UsersSelector({
   return (
     <Select
       isMulti
+      name={name}
       getOptionLabel={(user) => user.Username}
       getOptionValue={(user) => user.Id}
       options={users}
+      classNamePrefix="selector"
       value={users.filter((user) => value.includes(user.Id))}
       closeMenuOnSelect={false}
       onChange={(selectedUsers) =>

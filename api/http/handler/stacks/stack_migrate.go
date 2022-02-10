@@ -156,6 +156,14 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack changes inside the database", Err: err}
 	}
 
+	if resourceControl != nil {
+		resourceControl.ResourceID = stackutils.ResourceControlID(stack.EndpointID, stack.Name)
+		err := handler.DataStore.ResourceControl().UpdateResourceControl(resourceControl.ID, resourceControl)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the resource control changes", err}
+		}
+	}
+
 	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
 		// sanitize password in the http response to minimise possible security leaks
 		stack.GitConfig.Authentication.Password = ""

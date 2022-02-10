@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { SelectHTMLAttributes } from 'react';
 
-interface Option<T extends string | number> {
+export interface Option<T extends string | number> {
   value: T;
   label: string;
 }

@@ -30,6 +30,7 @@ func (store *Store) MigrateData() error {
 		EndpointService:         store.EndpointService,
 		EndpointRelationService: store.EndpointRelationService,
 		ExtensionService:        store.ExtensionService,
+		FDOProfilesService:      store.FDOProfilesService,
 		RegistryService:         store.RegistryService,
 		ResourceControlService:  store.ResourceControlService,
 		RoleService:             store.RoleService,

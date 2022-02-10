@@ -37,9 +37,9 @@ func (service *Service) createOrUpdateDomain(configuration portainer.OpenAMTConf
 }
 
 func (service *Service) getDomain(configuration portainer.OpenAMTConfiguration) (*Domain, error) {
-	url := fmt.Sprintf("https://%s/rps/api/v1/admin/domains/%s", configuration.MPSServer, configuration.DomainConfiguration.DomainName)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/domains/%s", configuration.MPSServer, configuration.DomainName)
 
-	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
+	responseBody, err := service.executeGetRequest(url, configuration.MPSToken)
 	if err != nil {
 		return nil, err
 	}
@@ -59,15 +59,15 @@ func (service *Service) saveDomain(method string, configuration portainer.OpenAM
 	url := fmt.Sprintf("https://%s/rps/api/v1/admin/domains", configuration.MPSServer)
 
 	profile := Domain{
-		DomainName:                    configuration.DomainConfiguration.DomainName,
-		DomainSuffix:                  configuration.DomainConfiguration.DomainName,
-		ProvisioningCert:              configuration.DomainConfiguration.CertFileText,
-		ProvisioningCertPassword:      configuration.DomainConfiguration.CertPassword,
+		DomainName:                    configuration.DomainName,
+		DomainSuffix:                  configuration.DomainName,
+		ProvisioningCert:              configuration.CertFileContent,
+		ProvisioningCertPassword:      configuration.CertFilePassword,
 		ProvisioningCertStorageFormat: "string",
 	}
 	payload, _ := json.Marshal(profile)
 
-	responseBody, err := service.executeSaveRequest(method, url, configuration.Credentials.MPSToken, payload)
+	responseBody, err := service.executeSaveRequest(method, url, configuration.MPSToken, payload)
 	if err != nil {
 		return nil, err
 	}

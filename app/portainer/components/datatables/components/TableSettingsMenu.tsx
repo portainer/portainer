@@ -5,7 +5,7 @@ import { PropsWithChildren, ReactNode } from 'react';
 import { useTableContext } from './TableContainer';
 
 interface Props {
-  quickActions: ReactNode;
+  quickActions?: ReactNode;
 }
 
 export function TableSettingsMenu({

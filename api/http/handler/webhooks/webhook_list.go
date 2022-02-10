@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"github.com/portainer/portainer/api/http/security"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -31,6 +32,14 @@ func (handler *Handler) webhookList(w http.ResponseWriter, r *http.Request) *htt
 	err := request.RetrieveJSONQueryParameter(r, "filters", &filters, true)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: filters", err}
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
+	}
+	if !securityContext.IsAdmin {
+		return response.JSON(w, []portainer.Webhook{})
 	}
 
 	webhooks, err := handler.DataStore.Webhook().Webhooks()

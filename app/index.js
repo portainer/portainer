@@ -20,7 +20,7 @@ import { configApp } from './config';
 import { init as initFeatureService } from './portainer/feature-flags/feature-flags.service';
 import { Edition } from './portainer/feature-flags/enums';
 
-initFeatureService(Edition.CE);
+initFeatureService(Edition[process.env.PORTAINER_EDITION]);
 
 angular
   .module('portainer', [
@@ -47,7 +47,6 @@ angular
     'portainer.docker',
     'portainer.kubernetes',
     'portainer.edge',
-    'portainer.integrations',
     'rzModule',
     'moment-picker',
     'angulartics',

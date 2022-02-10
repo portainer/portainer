@@ -1,72 +1,75 @@
-angular.module('portainer.azure').factory('AzureService', [
-  '$q',
-  'Azure',
-  'SubscriptionService',
-  'ResourceGroupService',
-  'ContainerGroupService',
-  'ProviderService',
-  function AzureServiceFactory($q, Azure, SubscriptionService, ResourceGroupService, ContainerGroupService, ProviderService) {
-    'use strict';
-    var service = {};
+import { ResourceGroupViewModel } from '../models/resource_group';
+import { SubscriptionViewModel } from '../models/subscription';
+import { getResourceGroups } from './resource-groups.service';
+import { getSubscriptions } from './subscription.service';
 
-    service.deleteContainerGroup = function (id) {
-      return Azure.delete(id, '2018-04-01');
-    };
+angular.module('portainer.azure').factory('AzureService', AzureService);
 
-    service.createContainerGroup = function (model, subscriptionId, resourceGroupName) {
-      return ContainerGroupService.create(model, subscriptionId, resourceGroupName);
-    };
+/* @ngInject */
+export function AzureService($q, Azure, $async, EndpointProvider, ContainerGroupService) {
+  'use strict';
+  var service = {};
 
-    service.subscriptions = function () {
-      return SubscriptionService.subscriptions();
-    };
+  service.deleteContainerGroup = function (id) {
+    return Azure.delete(id, '2018-04-01');
+  };
 
-    service.containerInstanceProvider = function (subscriptions) {
-      return retrieveResourcesForEachSubscription(subscriptions, ProviderService.containerInstanceProvider);
-    };
+  service.subscriptions = async function subscriptions() {
+    return $async(async () => {
+      const environmentId = EndpointProvider.endpointID();
+      const subscriptions = await getSubscriptions(environmentId);
+      return subscriptions.map((s) => new SubscriptionViewModel(s));
+    });
+  };
 
-    service.resourceGroups = function (subscriptions) {
-      return retrieveResourcesForEachSubscription(subscriptions, ResourceGroupService.resourceGroups);
-    };
+  service.resourceGroups = function resourceGroups(subscriptions) {
+    return $async(async () => {
+      return retrieveResourcesForEachSubscription(subscriptions, async (subscriptionId) => {
+        const environmentId = EndpointProvider.endpointID();
 
-    service.containerGroups = function (subscriptions) {
-      return retrieveResourcesForEachSubscription(subscriptions, ContainerGroupService.containerGroups);
-    };
-
-    service.aggregate = function (resourcesBySubcription) {
-      var aggregatedResources = [];
-      Object.keys(resourcesBySubcription).forEach(function (key) {
-        aggregatedResources = aggregatedResources.concat(resourcesBySubcription[key]);
+        const resourceGroups = await getResourceGroups(environmentId, subscriptionId);
+        return resourceGroups.map((r) => new ResourceGroupViewModel(r, subscriptionId));
       });
-      return aggregatedResources;
-    };
+    });
+  };
 
-    function retrieveResourcesForEachSubscription(subscriptions, resourceQuery) {
-      var deferred = $q.defer();
+  service.containerGroups = function (subscriptions) {
+    return retrieveResourcesForEachSubscription(subscriptions, ContainerGroupService.containerGroups);
+  };
 
-      var resources = {};
+  service.aggregate = function (resourcesBySubscription) {
+    var aggregatedResources = [];
+    Object.keys(resourcesBySubscription).forEach(function (key) {
+      aggregatedResources = aggregatedResources.concat(resourcesBySubscription[key]);
+    });
+    return aggregatedResources;
+  };
 
-      var resourceQueries = [];
-      for (var i = 0; i < subscriptions.length; i++) {
-        var subscription = subscriptions[i];
-        resourceQueries.push(resourceQuery(subscription.Id));
-      }
+  function retrieveResourcesForEachSubscription(subscriptions, resourceQuery) {
+    var deferred = $q.defer();
 
-      $q.all(resourceQueries)
-        .then(function success(data) {
-          for (var i = 0; i < data.length; i++) {
-            var result = data[i];
-            resources[subscriptions[i].Id] = result;
-          }
-          deferred.resolve(resources);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve resources', err: err });
-        });
+    var resources = {};
 
-      return deferred.promise;
+    var resourceQueries = [];
+    for (var i = 0; i < subscriptions.length; i++) {
+      var subscription = subscriptions[i];
+      resourceQueries.push(resourceQuery(subscription.Id));
     }
 
-    return service;
-  },
-]);
+    $q.all(resourceQueries)
+      .then(function success(data) {
+        for (var i = 0; i < data.length; i++) {
+          var result = data[i];
+          resources[subscriptions[i].Id] = result;
+        }
+        deferred.resolve(resources);
+      })
+      .catch(function error(err) {
+        deferred.reject({ msg: 'Unable to retrieve resources', err: err });
+      });
+
+    return deferred.promise;
+  }
+
+  return service;
+}

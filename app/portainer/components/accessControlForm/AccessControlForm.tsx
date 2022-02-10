@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { useEffect, useState, useCallback } from 'react';
+import { FormikErrors } from 'formik';
 
 import { ResourceControlOwnership as RCO } from '@/portainer/models/resourceControl/resourceControlOwnership';
 import { BoxSelector, buildOption } from '@/portainer/components/BoxSelector';
@@ -10,6 +11,8 @@ import { BoxSelectorOption } from '@/portainer/components/BoxSelector/types';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { SwitchField } from '@/portainer/components/form-components/SwitchField';
 
+import { FormError } from '../form-components/FormError';
+
 import { AccessControlFormData } from './model';
 import { UsersField } from './UsersField';
 import { TeamsField } from './TeamsField';
@@ -19,9 +22,17 @@ export interface Props {
   values: AccessControlFormData;
   onChange(values: AccessControlFormData): void;
   hideTitle?: boolean;
+  errors?: FormikErrors<AccessControlFormData>;
+  formNamespace?: string;
 }
 
-export function AccessControlForm({ values, onChange, hideTitle }: Props) {
+export function AccessControlForm({
+  values,
+  onChange,
+  hideTitle,
+  errors,
+  formNamespace,
+}: Props) {
   const { users, teams, isLoading } = useLoadState();
 
   const { user } = useUser();
@@ -49,7 +60,7 @@ export function AccessControlForm({ values, onChange, hideTitle }: Props) {
         <div className="col-sm-12">
           <SwitchField
             checked={values.accessControlEnabled}
-            name="ownership"
+            name={withNamespace('accessControlEnabled')}
             label="Enable access control"
             tooltip="When enabled, you can restrict the access and management of this resource."
             onChange={(accessControlEnabled) =>
@@ -63,7 +74,7 @@ export function AccessControlForm({ values, onChange, hideTitle }: Props) {
         <>
           <div className="form-group">
             <BoxSelector
-              radioName="access-control"
+              radioName={withNamespace('ownership')}
               value={values.ownership}
               options={options}
               onChange={(ownership) => handleChange({ ownership })}
@@ -73,16 +84,19 @@ export function AccessControlForm({ values, onChange, hideTitle }: Props) {
             <div aria-label="extra-options">
               {isAdmin && (
                 <UsersField
+                  name={withNamespace('authorizedUsers')}
                   users={users}
                   onChange={(authorizedUsers) =>
                     handleChange({ authorizedUsers })
                   }
                   value={values.authorizedUsers}
+                  errors={errors?.authorizedUsers}
                 />
               )}
 
               {(isAdmin || teams.length > 1) && (
                 <TeamsField
+                  name={withNamespace('authorizedTeams')}
                   teams={teams}
                   overrideTooltip={
                     !isAdmin && teams.length > 1
@@ -93,7 +107,14 @@ export function AccessControlForm({ values, onChange, hideTitle }: Props) {
                     handleChange({ authorizedTeams })
                   }
                   value={values.authorizedTeams}
+                  errors={errors?.authorizedTeams}
                 />
+              )}
+
+              {typeof errors === 'string' && (
+                <div className="form-group col-md-12">
+                  <FormError>{errors}</FormError>
+                </div>
               )}
             </div>
           )}
@@ -101,6 +122,10 @@ export function AccessControlForm({ values, onChange, hideTitle }: Props) {
       )}
     </>
   );
+
+  function withNamespace(name: string) {
+    return formNamespace ? `${formNamespace}.${name}` : name;
+  }
 }
 
 function useOptions(isAdmin: boolean, teams?: Team[]) {

@@ -23,19 +23,37 @@ type Service struct {
 }
 
 // NewService creates a new instance of a service
-func NewService(snapshotInterval string, dataStore dataservices.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
-	snapshotFrequency, err := time.ParseDuration(snapshotInterval)
+func NewService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
+	snapshotFrequency, err := parseSnapshotFrequency(snapshotIntervalFromFlag, dataStore)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
 		dataStore:                 dataStore,
-		snapshotIntervalInSeconds: snapshotFrequency.Seconds(),
+		snapshotIntervalInSeconds: snapshotFrequency,
 		dockerSnapshotter:         dockerSnapshotter,
 		kubernetesSnapshotter:     kubernetesSnapshotter,
 		shutdownCtx:               shutdownCtx,
 	}, nil
+}
+
+func parseSnapshotFrequency(snapshotInterval string, dataStore dataservices.DataStore) (float64, error) {
+	if snapshotInterval == "" {
+		settings, err := dataStore.Settings().Settings()
+		if err != nil {
+			return 0, err
+		}
+		snapshotInterval = settings.SnapshotInterval
+		if snapshotInterval == "" {
+			snapshotInterval = portainer.DefaultSnapshotInterval
+		}
+	}
+	snapshotFrequency, err := time.ParseDuration(snapshotInterval)
+	if err != nil {
+		return 0, err
+	}
+	return snapshotFrequency.Seconds(), nil
 }
 
 // Start will start a background routine to execute periodic snapshots of environments(endpoints)

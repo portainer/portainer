@@ -26,7 +26,6 @@ function StateManagerFactory(
       dismissedInfoPanels: {},
       dismissedInfoHash: '',
     },
-    extensions: [],
   };
 
   manager.setVersionInfo = function (versionInfo) {
@@ -153,20 +152,7 @@ function StateManagerFactory(
     return cacheValidity < APPLICATION_CACHE_VALIDITY;
   }
 
-  function assignExtensions(endpointExtensions) {
-    var extensions = [];
-
-    for (var i = 0; i < endpointExtensions.length; i++) {
-      var extension = endpointExtensions[i];
-      if (extension.Type === 1) {
-        extensions.push('storidge');
-      }
-    }
-
-    return extensions;
-  }
-
-  manager.updateEndpointState = function (endpoint, extensions) {
+  manager.updateEndpointState = function (endpoint) {
     var deferred = $q.defer();
 
     if (endpoint.Type === 3) {
@@ -196,7 +182,6 @@ function StateManagerFactory(
         state.endpoint.name = endpoint.Name;
         state.endpoint.type = endpoint.Type;
         state.endpoint.apiVersion = endpointAPIVersion;
-        state.endpoint.extensions = assignExtensions(extensions);
 
         if (endpointMode.agentProxy && endpoint.Status === 1) {
           return AgentPingService.ping().then(function onPingSuccess(data) {

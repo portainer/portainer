@@ -29,7 +29,7 @@ type (
 	}
 )
 
-func (service *Service) createOrUpdateAMTProfile(configuration portainer.OpenAMTConfiguration, profileName string, ciraConfigName string, wirelessConfig string) (*Profile, error) {
+func (service *Service) createOrUpdateAMTProfile(configuration portainer.OpenAMTConfiguration, profileName string, ciraConfigName string) (*Profile, error) {
 	profile, err := service.getAMTProfile(configuration, profileName)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (service *Service) createOrUpdateAMTProfile(configuration portainer.OpenAMT
 		method = http.MethodPatch
 	}
 
-	profile, err = service.saveAMTProfile(method, configuration, profileName, ciraConfigName, wirelessConfig)
+	profile, err = service.saveAMTProfile(method, configuration, profileName, ciraConfigName)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (service *Service) createOrUpdateAMTProfile(configuration portainer.OpenAMT
 func (service *Service) getAMTProfile(configuration portainer.OpenAMTConfiguration, profileName string) (*Profile, error) {
 	url := fmt.Sprintf("https://%s/rps/api/v1/admin/profiles/%s", configuration.MPSServer, profileName)
 
-	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
+	responseBody, err := service.executeGetRequest(url, configuration.MPSToken)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (service *Service) getAMTProfile(configuration portainer.OpenAMTConfigurati
 	return &result, nil
 }
 
-func (service *Service) saveAMTProfile(method string, configuration portainer.OpenAMTConfiguration, profileName string, ciraConfigName string, wirelessConfig string) (*Profile, error) {
+func (service *Service) saveAMTProfile(method string, configuration portainer.OpenAMTConfiguration, profileName string, ciraConfigName string) (*Profile, error) {
 	url := fmt.Sprintf("https://%s/rps/api/v1/admin/profiles", configuration.MPSServer)
 
 	profile := Profile{
@@ -74,23 +74,15 @@ func (service *Service) saveAMTProfile(method string, configuration portainer.Op
 		Activation:                 "acmactivate",
 		GenerateRandomAMTPassword:  false,
 		GenerateRandomMEBxPassword: false,
-		AMTPassword:                configuration.Credentials.MPSPassword,
-		MEBXPassword:               configuration.Credentials.MPSPassword,
+		AMTPassword:                configuration.MPSPassword,
+		MEBXPassword:               configuration.MPSPassword,
 		CIRAConfigName:             &ciraConfigName,
 		Tags:                       []string{},
 		DHCPEnabled:                true,
 	}
-	if wirelessConfig != "" {
-		profile.WIFIConfigs = []ProfileWifiConfig{
-			{
-				Priority:    1,
-				ProfileName: DefaultWirelessConfigName,
-			},
-		}
-	}
 	payload, _ := json.Marshal(profile)
 
-	responseBody, err := service.executeSaveRequest(method, url, configuration.Credentials.MPSToken, payload)
+	responseBody, err := service.executeSaveRequest(method, url, configuration.MPSToken, payload)
 	if err != nil {
 		return nil, err
 	}

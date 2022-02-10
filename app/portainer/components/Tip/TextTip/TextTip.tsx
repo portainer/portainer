@@ -3,14 +3,23 @@ import clsx from 'clsx';
 
 import styles from './TextTip.module.css';
 
-export function TextTip({ children }: PropsWithChildren<unknown>) {
+type Color = 'orange' | 'blue';
+
+export interface Props {
+  color?: Color;
+}
+
+export function TextTip({
+  color = 'orange',
+  children,
+}: PropsWithChildren<Props>) {
   return (
     <p className="text-muted small">
       <i
         aria-hidden="true"
         className={clsx(
           'fa fa-exclamation-circle',
-          'orange-icon',
+          `${color}-icon`,
           styles.textMargin
         )}
       />

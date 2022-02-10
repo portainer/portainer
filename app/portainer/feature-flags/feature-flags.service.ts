@@ -10,7 +10,7 @@ const state: ServiceState = {
   features: <Record<FeatureId, Edition>>{},
 };
 
-export async function init(edition: Edition = Edition.CE) {
+export async function init(edition: Edition) {
   // will be loaded on runtime
   const currentEdition = edition;
   const features = {
