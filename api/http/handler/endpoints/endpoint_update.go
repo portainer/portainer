@@ -309,6 +309,13 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			edgeStackSet[edgeStackID] = true
 		}
 
+		for _, stack := range edgeStacks {
+			if !edgeStackSet[stack.ID] {
+				delete(stack.Status, endpoint.ID)
+				handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, &stack)
+			}
+		}
+
 		relation.EdgeStacks = edgeStackSet
 
 		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
