@@ -3,6 +3,7 @@ import { CellProps, Column } from 'react-table';
 import { Environment } from '@/portainer/environments/types';
 import { Link } from '@/portainer/components/Link';
 import { ExpandingCell } from '@/portainer/components/datatables/components/ExpandingCell';
+import { useRowContext } from '@/edge/devices/components/EdgeDevicesDatatable/columns/RowContext';
 
 export const name: Column<Environment> = {
   Header: 'Name',
@@ -16,8 +17,11 @@ export const name: Column<Environment> = {
 };
 
 export function NameCell({ value: name, row }: CellProps<Environment>) {
+  const { isOpenAmtEnabled } = useRowContext();
   const showExpandedRow = !!(
-    row.original.AMTDeviceGUID && row.original.AMTDeviceGUID.length > 0
+    isOpenAmtEnabled &&
+    row.original.AMTDeviceGUID &&
+    row.original.AMTDeviceGUID.length > 0
   );
   return (
     <ExpandingCell row={row} showExpandArrow={showExpandedRow}>
