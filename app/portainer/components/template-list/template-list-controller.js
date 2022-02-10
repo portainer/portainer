@@ -23,7 +23,7 @@ function TemplateListController($async, $state, DatatableService, Notifications,
       case 2: // swarm stack
         return ctrl.showSwarmStacks;
       case 3: // docker compose
-        return ctrl.state.showContainerTemplates;
+        return !ctrl.showSwarmStacks;
       case 4: // ACI
         return false;
     }
