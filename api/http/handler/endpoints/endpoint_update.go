@@ -175,15 +175,11 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.Status != nil {
-		switch *payload.Status {
-		case 1:
+		switch portainer.EndpointStatus(*payload.Status) {
+		case portainer.EndpointStatusUp:
 			endpoint.Status = portainer.EndpointStatusUp
-			break
-		case 2:
+		case portainer.EndpointStatusDown:
 			endpoint.Status = portainer.EndpointStatusDown
-			break
-		default:
-			break
 		}
 	}
 
