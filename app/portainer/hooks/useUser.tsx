@@ -27,7 +27,10 @@ export function useUser() {
     throw new Error('should be nested under UserProvider');
   }
 
-  return { ...context, isAdmin: isAdmin(context.user) };
+  return useMemo(
+    () => ({ user: context.user, isAdmin: isAdmin(context.user) }),
+    [context.user]
+  );
 }
 
 export function useAuthorizations(
@@ -97,10 +100,7 @@ export function UserProvider({ children }: UserProviderProps) {
     }
   }, [jwt]);
 
-  const providerState = useMemo(
-    () => ({ user, isAdmin: isAdmin(user) }),
-    [user]
-  );
+  const providerState = useMemo(() => ({ user }), [user]);
 
   if (jwt === '') {
     return null;
