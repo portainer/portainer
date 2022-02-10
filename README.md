@@ -42,10 +42,10 @@ View [this](https://www.portainer.io/products) table to see all of the Portainer
 
 Portainer CE is an open source project and is supported by the community. You can buy a supported version of Portainer at portainer.io
 
-Learn more about Portainers community support channels [here.](https://www.portainer.io/community_help)
+Learn more about Portainer's community support channels [here.](https://www.portainer.io/community_help)
 
 - Issues: https://github.com/portainer/portainer/issues
-- Slack (chat): [https://portainer.slack.com/](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA)
+- Slack (chat): [https://portainer.io/slack](https://portainer.io/slack)
 
 You can join the Portainer Community by visiting community.portainer.io. This will give you advance notice of events, content and other related Portainer content.
 
