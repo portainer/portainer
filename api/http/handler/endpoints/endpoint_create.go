@@ -188,17 +188,17 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return endpointCreationError
 	}
 
-	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+	endpointGroup, err := handler.dataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment group inside the database", err}
 	}
 
-	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
+	edgeGroups, err := handler.dataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
 	}
 
-	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
+	edgeStacks, err := handler.dataStore.EdgeStack().EdgeStacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
 	}
@@ -269,7 +269,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate against Azure", err}
 	}
 
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	endpointID := handler.dataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
 		ID:                 portainer.EndpointID(endpointID),
 		Name:               payload.Name,
@@ -296,7 +296,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 }
 
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	endpointID := handler.dataStore.Endpoint().GetNextIdentifier()
 
 	portainerURL, err := url.Parse(payload.URL)
 	if err != nil {
@@ -352,7 +352,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		}
 	}
 
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	endpointID := handler.dataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
@@ -416,7 +416,7 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 }
 
 func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload, endpointType portainer.EndpointType) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	endpointID := handler.dataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
@@ -481,20 +481,20 @@ func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.
 		AllowStackManagementForRegularUsers:       true,
 	}
 
-	err := handler.DataStore.Endpoint().Create(endpoint)
+	err := handler.dataStore.Endpoint().Create(endpoint)
 	if err != nil {
 		return err
 	}
 
 	for _, tagID := range endpoint.TagIDs {
-		tag, err := handler.DataStore.Tag().Tag(tagID)
+		tag, err := handler.dataStore.Tag().Tag(tagID)
 		if err != nil {
 			return err
 		}
 
 		tag.Endpoints[endpoint.ID] = true
 
-		err = handler.DataStore.Tag().UpdateTag(tagID, tag)
+		err = handler.dataStore.Tag().UpdateTag(tagID, tag)
 		if err != nil {
 			return err
 		}

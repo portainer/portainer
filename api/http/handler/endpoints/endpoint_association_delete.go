@@ -35,7 +35,7 @@ func (handler *Handler) endpointAssociationDelete(w http.ResponseWriter, r *http
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
+	if handler.dataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
@@ -54,7 +54,7 @@ func (handler *Handler) endpointAssociationDelete(w http.ResponseWriter, r *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Invalid EdgeKey", err}
 	}
 
-	err = handler.DataStore.Endpoint().UpdateEndpoint(portainer.EndpointID(endpointID), endpoint)
+	err = handler.dataStore.Endpoint().UpdateEndpoint(portainer.EndpointID(endpointID), endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed persisting environment in database", err}
 	}
