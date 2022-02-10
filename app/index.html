@@ -7,9 +7,13 @@
     <meta name="author" content="<%= author %>" />
     <base id="base" />
     <script>
-      var path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-      var basePath = path ? '/' + path + '/' : '/';
-      document.getElementById('base').href = basePath;
+      if (window.origin == 'file://') {
+        document.getElementById('base').href = 'http://localhost:9000/';
+      } else {
+        var path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+        var basePath = path ? '/' + path + '/' : '/';
+        document.getElementById('base').href = basePath;
+      }
     </script>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -62,9 +66,12 @@
           </div>
 
           <!-- Main Content -->
-          <div id="view" ui-view="content" ng-if="!applicationState.loading"></div> </div
-        ><!-- End Page Content --> </div
-      ><!-- End Content Wrapper --> </div
-    ><!-- End Page Wrapper -->
-  </body></html
->
+          <div id="view" ui-view="content" ng-if="!applicationState.loading"></div>
+        </div>
+        <!-- End Page Content -->
+      </div>
+      <!-- End Content Wrapper -->
+    </div>
+    <!-- End Page Wrapper -->
+  </body>
+</html>
