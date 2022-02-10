@@ -17,54 +17,73 @@ jest.mock('@uirouter/react', () => ({
 }));
 
 test('when there are no errors, load dashboard correctly', async () => {
-  const { getByLabelText } = await renderComponent();
+  const { getByLabelText } = await renderComponent(1, {
+    'subscription-1': 2,
+  });
 
   const subscriptionsItem = getByLabelText('subscriptions');
   expect(subscriptionsItem).toBeVisible();
 
   const subscriptionElements = within(subscriptionsItem);
-  expect(await subscriptionElements.findByLabelText('value')).toHaveTextContent(
-    '1'
+  expect(subscriptionElements.getByLabelText('value')).toHaveTextContent('1');
+  expect(subscriptionElements.getByLabelText('icon')).toHaveClass('fa-th-list');
+  expect(subscriptionElements.getByLabelText('resourceType')).toHaveTextContent(
+    'Subscriptions'
   );
-  expect(await subscriptionElements.findByLabelText('icon')).toHaveClass(
-    'fa-th-list'
-  );
-  expect(
-    await subscriptionElements.findByLabelText('resourceType')
-  ).toHaveTextContent('Subscriptions');
 
   const resourceGroupsItem = getByLabelText('resourceGroups');
   expect(resourceGroupsItem).toBeVisible();
 
   const resourceGroupElements = within(resourceGroupsItem);
-  expect(
-    await resourceGroupElements.findByLabelText('value')
-  ).toHaveTextContent('2');
-  expect(await resourceGroupElements.findByLabelText('icon')).toHaveClass(
+  expect(resourceGroupElements.getByLabelText('value')).toHaveTextContent('2');
+  expect(resourceGroupElements.getByLabelText('icon')).toHaveClass(
     'fa-th-list'
   );
   expect(
-    await resourceGroupElements.findByLabelText('resourceType')
-  ).toHaveTextContent(/Resource groups/);
+    resourceGroupElements.getByLabelText('resourceType')
+  ).toHaveTextContent('Resource groups');
 });
 
 // test('when only subscriptions fail to load, dont show the dashboard', async () => {});
 
 // test('when only resource groups fail to load, still show the subscriptions', async () => {});
 
-async function renderComponent() {
+async function renderComponent(
+  subscriptionsCount = 0,
+  resourceGroups: Record<string, number> = {},
+  subscriptionsStatus = 200,
+  resourceGroupsStatus = 200
+) {
   const user = new UserViewModel({ Username: 'user' });
   const state = { user };
 
   server.use(
     rest.get(
-      '/api/endpoints/1/azure/subscriptions?api-version=2016-06-01',
-      (req, res, ctx) => res(ctx.json(createMockSubscriptions(1)))
+      '/api/endpoints/:endpointId/azure/subscriptions',
+      (req, res, ctx) =>
+        res(
+          ctx.json(createMockSubscriptions(subscriptionsCount)),
+          ctx.status(subscriptionsStatus)
+        )
     ),
     rest.get(
-      '/api/endpoints/1/azure/subscriptions/subscription-1/resourcegroups?api-version=2018-02-01',
-      (req, res, ctx) =>
-        res(ctx.json(createMockResourceGroups('subscription-1', 2)))
+      '/api/endpoints/:endpointId/azure/subscriptions/:subscriptionId/resourcegroups',
+      (req, res, ctx) => {
+        if (typeof req.params.subscriptionId !== 'string') {
+          throw new Error("Provided subscriptionId must be of type: 'string'");
+        }
+
+        const { subscriptionId } = req.params;
+        return res(
+          ctx.json(
+            createMockResourceGroups(
+              req.params.subscriptionId,
+              resourceGroups[subscriptionId] || 0
+            )
+          ),
+          ctx.status(resourceGroupsStatus)
+        );
+      }
     )
   );
   const renderResult = renderWithQueryClient(
@@ -73,9 +92,7 @@ async function renderComponent() {
     </UserContext.Provider>
   );
 
-  await expect(
-    renderResult.findByLabelText('subscriptions')
-  ).resolves.toBeVisible();
+  await expect(renderResult.findByText(/Home/)).resolves.toBeVisible();
 
   return renderResult;
 }
