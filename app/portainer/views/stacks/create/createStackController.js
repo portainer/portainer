@@ -34,6 +34,7 @@ angular
       $scope.buildAnalyticsProperties = buildAnalyticsProperties;
       $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
       $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
+      $scope.isAdmin = Authentication.isAdmin();
 
       $scope.formValues = {
         Name: '',

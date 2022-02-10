@@ -55,6 +55,7 @@ angular.module('portainer.app').controller('StackController', [
     endpoint
   ) {
     $scope.endpoint = endpoint;
+    $scope.isAdmin = Authentication.isAdmin();
     $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
     $scope.stackPullImageFeature = FeatureId.STACK_PULL_IMAGE;
     $scope.state = {
