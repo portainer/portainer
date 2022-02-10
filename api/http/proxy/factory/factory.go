@@ -2,10 +2,9 @@ package factory
 
 import (
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 
 	"github.com/portainer/portainer/api/kubernetes/cli"
@@ -18,7 +17,7 @@ const azureAPIBaseURL = "https://management.azure.com"
 type (
 	// ProxyFactory is a factory to create reverse proxies
 	ProxyFactory struct {
-		dataStore                   portainer.DataStore
+		dataStore                   dataservices.DataStore
 		signatureService            portainer.DigitalSignatureService
 		reverseTunnelService        portainer.ReverseTunnelService
 		dockerClientFactory         *docker.ClientFactory
@@ -28,7 +27,7 @@ type (
 )
 
 // NewProxyFactory returns a pointer to a new instance of a ProxyFactory
-func NewProxyFactory(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *ProxyFactory {
+func NewProxyFactory(dataStore dataservices.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *ProxyFactory {
 	return &ProxyFactory{
 		dataStore:                   dataStore,
 		signatureService:            signatureService,
@@ -37,18 +36,6 @@ func NewProxyFactory(dataStore portainer.DataStore, signatureService portainer.D
 		kubernetesClientFactory:     kubernetesClientFactory,
 		kubernetesTokenCacheManager: kubernetesTokenCacheManager,
 	}
-}
-
-// NewLegacyExtensionProxy returns a new HTTP proxy to a legacy extension server (Storidge)
-func (factory *ProxyFactory) NewLegacyExtensionProxy(extensionAPIURL string) (http.Handler, error) {
-	extensionURL, err := url.Parse(extensionAPIURL)
-	if err != nil {
-		return nil, err
-	}
-
-	extensionURL.Scheme = "http"
-	proxy := httputil.NewSingleHostReverseProxy(extensionURL)
-	return proxy, nil
 }
 
 // NewEndpointProxy returns a new reverse proxy (filesystem based or HTTP) to an environment(endpoint) API server

@@ -12,15 +12,16 @@ import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHel
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 
-import { K8S_RESOURCE_POOL_LB_QUOTA, K8S_RESOURCE_POOL_STORAGE_QUOTA } from '@/portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 
 class KubernetesCreateResourcePoolController {
   /* #region  CONSTRUCTOR */
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService, KubernetesIngressService, Authentication, EndpointService) {
+  constructor($async, $state, $scope, Notifications, KubernetesNodeService, KubernetesResourcePoolService, KubernetesIngressService, Authentication, EndpointService) {
     Object.assign(this, {
       $async,
       $state,
+      $scope,
       Notifications,
       KubernetesNodeService,
       KubernetesResourcePoolService,
@@ -30,10 +31,24 @@ class KubernetesCreateResourcePoolController {
     });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
-    this.LBQuotaFeatureId = K8S_RESOURCE_POOL_LB_QUOTA;
-    this.StorageQuotaFeatureId = K8S_RESOURCE_POOL_STORAGE_QUOTA;
+    this.LBQuotaFeatureId = FeatureId.K8S_RESOURCE_POOL_LB_QUOTA;
+
+    this.onToggleStorageQuota = this.onToggleStorageQuota.bind(this);
+    this.onToggleLoadBalancerQuota = this.onToggleLoadBalancerQuota.bind(this);
   }
   /* #endregion */
+
+  onToggleStorageQuota(storageClassName, enabled) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.StorageClasses = this.formValues.StorageClasses.map((sClass) => (sClass.Name !== storageClassName ? sClass : { ...sClass, Selected: enabled }));
+    });
+  }
+
+  onToggleLoadBalancerQuota(enabled) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.UseLoadBalancersQuota = enabled;
+    });
+  }
 
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;
@@ -87,11 +102,18 @@ class KubernetesCreateResourcePoolController {
   /* #endregion */
 
   isCreateButtonDisabled() {
-    return this.state.actionInProgress || (this.formValues.HasQuota && !this.isQuotaValid()) || this.state.isAlreadyExist || this.state.duplicates.ingressHosts.hasRefs;
+    return (
+      this.state.actionInProgress ||
+      (this.formValues.HasQuota && !this.isQuotaValid()) ||
+      this.state.isAlreadyExist ||
+      this.state.hasPrefixKube ||
+      this.state.duplicates.ingressHosts.hasRefs
+    );
   }
 
   onChangeName() {
     this.state.isAlreadyExist = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.formValues.Name) !== undefined;
+    this.state.hasPrefixKube = /^kube-/.test(this.formValues.Name);
   }
 
   isQuotaValid() {
@@ -185,6 +207,7 @@ class KubernetesCreateResourcePoolController {
           sliderMaxCpu: 0,
           viewReady: false,
           isAlreadyExist: false,
+          hasPrefixKube: false,
           canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
           duplicates: {
             ingressHosts: new KubernetesFormValidationReferences(),

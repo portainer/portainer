@@ -2,6 +2,7 @@ package security
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -9,15 +10,15 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 )
 
 type (
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
-		dataStore     portainer.DataStore
-		jwtService    portainer.JWTService
+		dataStore     dataservices.DataStore
+		jwtService    dataservices.JWTService
 		apiKeyService apikey.APIKeyService
 	}
 
@@ -37,7 +38,7 @@ type (
 const apiKeyHeader = "X-API-KEY"
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
+func NewRequestBouncer(dataStore dataservices.DataStore, jwtService dataservices.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
 	return &RequestBouncer{
 		dataStore:     dataStore,
 		jwtService:    jwtService,
@@ -134,6 +135,19 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 		return errors.New("invalid Edge identifier")
 	}
 
+	if endpoint.LastCheckInDate > 0 || endpoint.UserTrusted {
+		return nil
+	}
+
+	settings, err := bouncer.dataStore.Settings().Settings()
+	if err != nil {
+		return fmt.Errorf("could not retrieve the settings: %w", err)
+	}
+
+	if settings.DisableTrustOnFirstConnect {
+		return errors.New("the device has not been trusted yet")
+	}
+
 	return nil
 }
 
@@ -172,7 +186,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		}
 
 		_, err = bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && err == bolterrors.ErrObjectNotFound {
+		if err != nil && bouncer.dataStore.IsErrObjectNotFound(err) {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
 		} else if err != nil {
@@ -224,9 +238,12 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 			return
 		}
 
-		user, _ := bouncer.dataStore.User().User(token.ID)
-		if user == nil {
-			httperror.WriteError(w, http.StatusUnauthorized, "An authorisation token is invalid", httperrors.ErrUnauthorized)
+		_, err := bouncer.dataStore.User().User(token.ID)
+		if err != nil && bouncer.dataStore.IsErrObjectNotFound(err) {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
+			return
+		} else if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
 			return
 		}
 

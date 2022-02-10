@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/react';
 import { useState } from 'react';
 
-import { TextInput, Select } from '../Input';
+import { Input, Select } from '../Input';
 
 import { FormControl } from './FormControl';
 
@@ -14,12 +14,19 @@ interface TextFieldProps {
   tooltip?: string;
 }
 
-export function TextField({ label, tooltip = '' }: TextFieldProps) {
+export { TextField, SelectField };
+
+function TextField({ label, tooltip = '' }: TextFieldProps) {
   const [value, setValue] = useState('');
   const inputId = 'input';
   return (
     <FormControl inputId={inputId} label={label} tooltip={tooltip}>
-      <TextInput id={inputId} type="text" value={value} onChange={setValue} />
+      <Input
+        id={inputId}
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
     </FormControl>
   );
 }
@@ -29,7 +36,7 @@ TextField.args = {
   tooltip: '',
 };
 
-export function SelectField({ label, tooltip = '' }: TextFieldProps) {
+function SelectField({ label, tooltip = '' }: TextFieldProps) {
   const options = [
     { value: 1, label: 'one' },
     { value: 2, label: 'two' },
@@ -41,7 +48,7 @@ export function SelectField({ label, tooltip = '' }: TextFieldProps) {
       <Select
         className="form-control"
         value={value}
-        onChange={(value) => setValue(value)}
+        onChange={(e) => setValue(parseInt(e.target.value, 10))}
         options={options}
       />
     </FormControl>

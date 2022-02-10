@@ -20,6 +20,10 @@
   display: flex;
 }
 
+.item-line.has-error {
+  margin-bottom: 20px;
+}
+
 .item-actions {
   display: flex;
   margin-left: 2px;

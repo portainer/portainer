@@ -82,6 +82,13 @@ input[type='checkbox'] {
   margin-top: -1px;
 }
 
+.md-checkbox input[type='checkbox']:indeterminate + label:before {
+  content: '-';
+  align-content: center;
+  line-height: 16px;
+  text-align: center;
+}
+
 a[ng-click] {
   cursor: pointer;
 }
@@ -453,10 +460,15 @@ a[ng-click] {
 
 .bootbox-checkbox-list {
   max-height: 200px;
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: var(--white-color);
   border: 1px solid var(--grey-48);
   border-radius: 4px;
+}
+
+:root[theme='dark'] .bootbox-checkbox-list,
+:root[theme='highcontrast'] .bootbox-checkbox-list {
+  background-color: var(--black-color);
 }
 
 .small-select {
@@ -591,10 +603,6 @@ a[ng-click] {
   background-color: var(--bg-log-line-selected-color);
 }
 
-.row.header .meta .page {
-  padding-top: 7px;
-}
-
 .tag:not(.token) {
   padding: 2px 6px;
   color: white;
@@ -672,6 +680,7 @@ a[ng-click] {
 .image-zoom-modal .modal-dialog {
   width: 80%;
 }
+
 /*!bootbox override*/
 
 /*angular-multi-select override*/
@@ -733,19 +742,6 @@ a[ng-click] {
   opacity: 0.9;
 }
 /*!toaster override*/
-
-/*angular-loading-bar override*/
-#loadingbar-placeholder {
-  margin-bottom: 0;
-  height: 3px;
-}
-
-#loading-bar .bar {
-  position: relative;
-  height: 3px;
-  background: var(--blue-3);
-}
-/*!angular-loading-bar override*/
 
 .monospaced {
   font-family: monospace;
@@ -896,4 +892,18 @@ json-tree .branch-preview {
 .text-wrap {
   word-break: break-all;
   white-space: normal;
+}
+
+.icon-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.space-x-1 {
+  margin-left: 0.25rem;
+}
+
+/* used for bootbox prompt with inputType radio */
+.form-check.radio {
+  margin-left: 15px;
 }

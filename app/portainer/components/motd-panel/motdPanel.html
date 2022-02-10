@@ -7,10 +7,10 @@
         </style>
         <div ng-style="{{ $ctrl.motd.ContentLayout ? $ctrl.motd.ContentLayout : {} }}">
           <div class="col-sm-12 form-section-title">
-            <span style="float: left;">
+            <span style="float: left">
               {{ $ctrl.motd.Title }}
             </span>
-            <span class="small" style="float: right;" ng-if="$ctrl.dismissAction">
+            <span class="small" style="float: right" ng-if="$ctrl.dismissAction">
               <a ng-click="$ctrl.dismissAction()"><i class="fa fa-times"></i> dismiss</a>
             </span>
           </div>

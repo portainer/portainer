@@ -10,7 +10,7 @@ function KubernetesConfigFactory($http, EndpointProvider, API_ENDPOINT_KUBERNETE
     return $http({
       method: 'GET',
       url: `${API_ENDPOINT_KUBERNETES}/config`,
-      params: { ids: environmentIDs.map((x) => parseInt(x)) },
+      params: { ids: JSON.stringify(environmentIDs.map((x) => parseInt(x))) },
       responseType: 'blob',
       headers: {
         Accept: 'text/yaml',

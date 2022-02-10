@@ -5,18 +5,19 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/portainer/portainer/api/datastore"
+
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_webhookInvoke(t *testing.T) {
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	webhookID := newGuidString(t)
-	store.StackService.CreateStack(&portainer.Stack{
+	store.StackService.Create(&portainer.Stack{
 		AutoUpdate: &portainer.StackAutoUpdate{
 			Webhook: webhookID,
 		},

@@ -6,7 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 
 	"github.com/gorilla/mux"
-	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -14,7 +14,7 @@ import (
 type Handler struct {
 	*mux.Router
 	requestBouncer *security.RequestBouncer
-	DataStore      portainer.DataStore
+	DataStore      dataservices.DataStore
 }
 
 // NewHandler creates a handler to manage environment(endpoint) operations.

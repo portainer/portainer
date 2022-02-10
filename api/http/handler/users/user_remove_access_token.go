@@ -8,7 +8,6 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -50,10 +49,19 @@ func (handler *Handler) userRemoveAccessToken(w http.ResponseWriter, r *http.Req
 
 	_, err = handler.DataStore.User().User(portainer.UserID(userID))
 	if err != nil {
-		if err == bolterrors.ErrObjectNotFound {
+		if handler.DataStore.IsErrObjectNotFound(err) {
 			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 		}
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
+	}
+
+	// check if the key exists and the key belongs to the user
+	apiKey, err := handler.apiKeyService.GetAPIKey(portainer.APIKeyID(apiKeyID))
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "API Key not found", err}
+	}
+	if apiKey.UserID != portainer.UserID(userID) {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to remove api-key", httperrors.ErrUnauthorized}
 	}
 
 	err = handler.apiKeyService.DeleteAPIKey(portainer.APIKeyID(apiKeyID))

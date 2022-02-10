@@ -4,6 +4,8 @@ import uuidv4 from 'uuid/v4';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
+import EndpointHelper from '@/portainer/helpers/endpointHelper';
+import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
@@ -19,7 +21,6 @@ function EndpointController(
   EndpointService,
   GroupService,
   TagService,
-  EndpointProvider,
   Notifications,
   Authentication,
   SettingsService,
@@ -66,6 +67,7 @@ function EndpointController(
       { key: '1 day', value: 86400 },
     ],
     allowSelfSignedCerts: true,
+    showAMTInfo: false,
   };
 
   $scope.agentVersion = StateManager.getState().application.version;
@@ -95,7 +97,7 @@ function EndpointController(
     const command = $scope.dockerCommands[$scope.state.deploymentTab][$scope.state.platformType](
       $scope.agentVersion,
       $scope.agentShortVersion,
-      $scope.randomEdgeID,
+      $scope.endpoint.EdgeID,
       $scope.endpoint.EdgeKey,
       $scope.state.allowSelfSignedCerts
     );
@@ -110,6 +112,12 @@ function EndpointController(
 
   $scope.onCreateTag = function onCreateTag(tagName) {
     return $async(onCreateTagAsync, tagName);
+  };
+
+  $scope.onToggleAllowSelfSignedCerts = function onToggleAllowSelfSignedCerts(checked) {
+    return $scope.$evalAsync(() => {
+      $scope.state.allowSelfSignedCerts = checked;
+    });
   };
 
   async function onCreateTagAsync(tagName) {
@@ -191,7 +199,6 @@ function EndpointController(
     EndpointService.updateEndpoint(endpoint.Id, payload).then(
       function success() {
         Notifications.success('Environment updated', $scope.endpoint.Name);
-        EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
         $state.go('portainer.endpoints', {}, { reload: true });
       },
       function error(err) {
@@ -264,7 +271,7 @@ function EndpointController(
 
         if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
           $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
-          $scope.randomEdgeID = uuidv4();
+          endpoint.EdgeID = endpoint.EdgeID || uuidv4();
 
           $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
         }
@@ -274,10 +281,37 @@ function EndpointController(
         $scope.availableTags = tags;
 
         configureState();
+
+        const disconnectedEdge = $scope.state.edgeEndpoint && !endpoint.EdgeID;
+        if (EndpointHelper.isDockerEndpoint(endpoint) && !disconnectedEdge) {
+          $scope.state.showAMTInfo = settings && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
+        }
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve environment details');
       }
+
+      if ($scope.state.showAMTInfo) {
+        try {
+          $scope.endpoint.ManagementInfo = {};
+          const amtInfo = await getAMTInfo($state.params.id);
+          try {
+            $scope.endpoint.ManagementInfo = JSON.parse(amtInfo.RawOutput);
+          } catch (err) {
+            clearAMTManagementInfo(amtInfo.RawOutput);
+          }
+        } catch (err) {
+          clearAMTManagementInfo('Unable to retrieve AMT environment details');
+        }
+      }
     });
+  }
+
+  function clearAMTManagementInfo(versionValue) {
+    $scope.endpoint.ManagementInfo['AMT'] = versionValue;
+    $scope.endpoint.ManagementInfo['UUID'] = '-';
+    $scope.endpoint.ManagementInfo['Control Mode'] = '-';
+    $scope.endpoint.ManagementInfo['Build Number'] = '-';
+    $scope.endpoint.ManagementInfo['DNS Suffix'] = '-';
   }
 
   function buildLinuxStandaloneCommand(agentVersion, agentShortVersion, edgeId, edgeKey, allowSelfSignedCerts) {

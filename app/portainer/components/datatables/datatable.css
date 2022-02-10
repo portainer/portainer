@@ -96,9 +96,16 @@
   padding: 15px 0;
 }
 
+[data-reach-menu-list],
+[data-reach-menu-items] {
+  padding: 0px;
+  border: 1px var(--bg-dropdown-menu-color);
+}
+
 .tableMenu {
   color: #767676;
   padding: 10px;
+  background-color: var(--bg-dropdown-menu-color) !important;
 }
 
 .tableMenu .menuHeader {
@@ -126,6 +133,10 @@
   color: #767676;
   cursor: pointer;
   font-size: 12px !important;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 
 .widget .widget-body table thead th .filter-active {
@@ -251,4 +262,26 @@
   top: 4px;
   transform: scale(0);
   width: 8px;
+}
+
+.table th.selection,
+.table td.selection {
+  width: 30px;
+}
+
+.table th button.sortable {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--text-link-color);
+}
+
+.table th button.sortable:hover .sortable-label {
+  text-decoration: underline;
+}
+
+.datatable .table-setting-menu-btn {
+  border: none;
+  background: none;
 }

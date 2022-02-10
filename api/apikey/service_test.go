@@ -8,7 +8,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,7 +20,7 @@ func Test_SatisfiesAPIKeyServiceInterface(t *testing.T) {
 func Test_GenerateApiKey(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -71,10 +71,30 @@ func Test_GenerateApiKey(t *testing.T) {
 	})
 }
 
+func Test_GetAPIKey(t *testing.T) {
+	is := assert.New(t)
+
+	_, store, teardown := datastore.MustNewTestStore(true)
+	defer teardown()
+
+	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
+
+	t.Run("Successfully returns all API keys", func(t *testing.T) {
+		user := portainer.User{ID: 1}
+		_, apiKey, err := service.GenerateApiKey(user, "test-1")
+		is.NoError(err)
+
+		apiKeyGot, err := service.GetAPIKey(apiKey.ID)
+		is.NoError(err)
+
+		is.Equal(apiKey, apiKeyGot)
+	})
+}
+
 func Test_GetAPIKeys(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -95,7 +115,7 @@ func Test_GetAPIKeys(t *testing.T) {
 func Test_GetDigestUserAndKey(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -131,14 +151,14 @@ func Test_GetDigestUserAndKey(t *testing.T) {
 func Test_UpdateAPIKey(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
 
 	t.Run("Successfully updates the api-key LastUsed time", func(t *testing.T) {
 		user := portainer.User{ID: 1}
-		store.User().CreateUser(&user)
+		store.User().Create(&user)
 		_, apiKey, err := service.GenerateApiKey(user, "test-x")
 		is.NoError(err)
 
@@ -179,7 +199,7 @@ func Test_UpdateAPIKey(t *testing.T) {
 func Test_DeleteAPIKey(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -220,7 +240,7 @@ func Test_DeleteAPIKey(t *testing.T) {
 func Test_InvalidateUserKeyCache(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())

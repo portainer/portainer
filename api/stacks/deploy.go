@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,7 +21,9 @@ func (e *StackAuthorMissingErr) Error() string {
 	return fmt.Sprintf("stack's %v author %s is missing", e.stackID, e.authorName)
 }
 
-func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, datastore portainer.DataStore, gitService portainer.GitService) error {
+// RedeployWhenChanged pull and redeploy the stack when git repo changed
+// Stack will always be redeployed if force deployment is set to true
+func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) error {
 	logger := log.WithFields(log.Fields{"stackID": stackID})
 	logger.Debug("redeploying stack")
 
@@ -86,7 +89,7 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 	switch stack.Type {
 	case portainer.DockerComposeStack:
-		err := deployer.DeployComposeStack(stack, endpoint, registries)
+		err := deployer.DeployComposeStack(stack, endpoint, registries, false)
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
 		}
@@ -114,7 +117,7 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	return nil
 }
 
-func getUserRegistries(datastore portainer.DataStore, user *portainer.User, endpointID portainer.EndpointID) ([]portainer.Registry, error) {
+func getUserRegistries(datastore dataservices.DataStore, user *portainer.User, endpointID portainer.EndpointID) ([]portainer.Registry, error) {
 	registries, err := datastore.Registry().Registries()
 	if err != nil {
 		return nil, errors.WithMessage(err, "unable to retrieve registries from the database")

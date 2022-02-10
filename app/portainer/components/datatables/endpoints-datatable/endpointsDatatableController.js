@@ -3,6 +3,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$controller',
   'DatatableService',
   'PaginationService',
+  'Notifications',
   function ($scope, $controller, DatatableService, PaginationService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 

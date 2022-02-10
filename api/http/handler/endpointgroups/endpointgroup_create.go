@@ -60,7 +60,7 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 		TagIDs:             payload.TagIDs,
 	}
 
-	err = handler.DataStore.EndpointGroup().CreateEndpointGroup(endpointGroup)
+	err = handler.DataStore.EndpointGroup().Create(endpointGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the environment group inside the database", err}
 	}

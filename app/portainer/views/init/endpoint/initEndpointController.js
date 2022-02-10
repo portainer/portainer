@@ -9,12 +9,11 @@ require('./includes/agent.html');
 
 class InitEndpointController {
   /* @ngInject */
-  constructor($async, $scope, $state, EndpointService, EndpointProvider, StateManager, Notifications) {
+  constructor($async, $scope, $state, EndpointService, StateManager, Notifications) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
     this.EndpointService = EndpointService;
-    this.EndpointProvider = EndpointProvider;
     this.StateManager = StateManager;
     this.Notifications = Notifications;
 

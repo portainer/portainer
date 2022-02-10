@@ -1,0 +1,72 @@
+.pagination-controls {
+  margin-left: 10px;
+}
+
+.paginationControls form.form-inline {
+  display: flex;
+}
+
+.pagination > li:first-child > button {
+  margin-left: 0;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.pagination > .disabled > span,
+.pagination > .disabled > span:hover,
+.pagination > .disabled > span:focus,
+.pagination > .disabled > button,
+.pagination > .disabled > button:hover,
+.pagination > .disabled > button:focus,
+.pagination > .disabled > a,
+.pagination > .disabled > a:hover,
+.pagination > .disabled > a:focus {
+  color: var(--text-pagination-color);
+  background-color: var(--bg-pagination-color);
+  border-color: var(--border-pagination-color);
+}
+
+.pagination > li > button {
+  position: relative;
+  float: left;
+  padding: 6px 12px;
+  margin-left: -1px !important;
+  line-height: 1.42857143;
+  text-decoration: none;
+  border: 1px solid #ddd;
+}
+
+.pagination > li > a,
+.pagination > li > button,
+.pagination > li > span {
+  background-color: var(--bg-pagination-span-color);
+  border-color: var(--border-pagination-span-color);
+  color: var(--text-pagination-span-color);
+}
+
+.pagination > li > a:hover,
+.pagination > li > button:hover,
+.pagination > li > span:hover,
+.pagination > li > a:focus,
+.pagination > li > button:focus,
+.pagination > li > span:focus {
+  background-color: var(--bg-pagination-hover-color);
+  border-color: var(--border-pagination-hover-color);
+  color: var(--text-pagination-span-hover-color);
+}
+
+.pagination > .active > a,
+.pagination > .active > span,
+.pagination > .active > button,
+.pagination > .active > a:hover,
+.pagination > .active > span:hover,
+.pagination > .active > button:hover,
+.pagination > .active > a:focus,
+.pagination > .active > span:focus,
+.pagination > .active > button:focus {
+  z-index: 3;
+  color: #fff;
+  cursor: default;
+  background-color: var(--text-pagination-span-color);
+  border-color: var(--text-pagination-span-color);
+}

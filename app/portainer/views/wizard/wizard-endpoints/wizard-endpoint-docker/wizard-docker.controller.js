@@ -1,18 +1,68 @@
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from 'Portainer/components/endpointSecurity/porEndpointSecurityModel';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
-import { buildOption } from '@/portainer/components/box-selector';
+import { buildOption } from '@/portainer/components/BoxSelector';
 
 export default class WizardDockerController {
   /* @ngInject */
-  constructor($async, EndpointService, StateManager, Notifications, clipboard, $filter, NameValidator) {
+  constructor($async, $scope, EndpointService, StateManager, Notifications, clipboard, $filter, NameValidator) {
     this.$async = $async;
+    this.$scope = $scope;
     this.EndpointService = EndpointService;
     this.StateManager = StateManager;
     this.Notifications = Notifications;
     this.clipboard = clipboard;
     this.$filter = $filter;
     this.NameValidator = NameValidator;
+
+    this.state = {
+      endpointType: 'agent',
+      ConnectSocket: false,
+      actionInProgress: false,
+      endpoints: [],
+      availableOptions: [
+        buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent'),
+        buildOption('API', 'fa fa-cloud', 'API', '', 'api'),
+        buildOption('Socket', 'fab fa-docker', 'Socket', '', 'socket'),
+      ],
+    };
+
+    this.formValues = {
+      name: '',
+      url: '',
+      publicURL: '',
+      groupId: 1,
+      tagIds: [],
+      environmentUrl: '',
+      dockerApiurl: '',
+      socketPath: '',
+      overrideSocket: false,
+      skipCertification: false,
+      tls: false,
+      securityFormData: new EndpointSecurityFormData(),
+    };
+
+    this.command = {};
+
+    this.onChangeEndpointType = this.onChangeEndpointType.bind(this);
+    this.onToggleSkipCert = this.onToggleSkipCert.bind(this);
+    this.onToggleTls = this.onToggleTls.bind(this);
+  }
+
+  onChangeEndpointType(endpointType) {
+    this.state.endpointType = endpointType;
+  }
+
+  onToggleTls(checked) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.tls = checked;
+    });
+  }
+
+  onToggleSkipCert(checked) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.skipCertification = checked;
+    });
   }
 
   copyLinuxCommand() {
@@ -173,33 +223,6 @@ export default class WizardDockerController {
 
   $onInit() {
     return this.$async(async () => {
-      this.state = {
-        endpointType: 'agent',
-        ConnectSocket: false,
-        actionInProgress: false,
-        endpoints: [],
-        availableOptions: [
-          buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent'),
-          buildOption('API', 'fa fa-cloud', 'API', '', 'api'),
-          buildOption('Socket', 'fab fa-docker', 'Socket', '', 'socket'),
-        ],
-      };
-
-      this.formValues = {
-        name: '',
-        url: '',
-        publicURL: '',
-        groupId: 1,
-        tagIds: [],
-        environmentUrl: '',
-        dockerApiurl: '',
-        socketPath: '',
-        overrideSocket: false,
-        skipCertification: false,
-        tls: false,
-        securityFormData: new EndpointSecurityFormData(),
-      };
-
       const agentVersion = this.StateManager.getState().application.version;
       const agentShortVersion = getAgentShortVersion(agentVersion);
 

@@ -32,7 +32,19 @@ export function CopyButton({
   function onClick() {
     // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard
     // https://caniuse.com/?search=clipboard
-    navigator.clipboard.writeText(copyText);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(copyText);
+    } else {
+      // https://stackoverflow.com/a/57192718
+      const inputEl = document.createElement('input');
+      inputEl.value = copyText;
+      inputEl.type = 'text';
+      document.body.appendChild(inputEl);
+      inputEl.select();
+      document.execCommand('copy');
+      inputEl.type = 'hidden';
+      document.body.removeChild(inputEl);
+    }
     setIsFading(true);
   }
 

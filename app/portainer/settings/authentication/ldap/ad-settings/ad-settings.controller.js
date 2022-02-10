@@ -1,14 +1,15 @@
 import _ from 'lodash-es';
-import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
+
+import { FeatureId } from '@/portainer/feature-flags/enums';
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 
 export default class AdSettingsController {
   /* @ngInject */
-  constructor(LDAPService, featureService) {
+  constructor(LDAPService) {
     this.LDAPService = LDAPService;
-    this.featureService = featureService;
 
     this.domainSuffix = '';
-    this.limitedFeatureId = HIDE_INTERNAL_AUTH;
+    this.limitedFeatureId = FeatureId.HIDE_INTERNAL_AUTH;
     this.onTlscaCertChange = this.onTlscaCertChange.bind(this);
     this.searchUsers = this.searchUsers.bind(this);
     this.searchGroups = this.searchGroups.bind(this);
@@ -57,7 +58,7 @@ export default class AdSettingsController {
   }
 
   isSaveSettingButtonDisabled() {
-    return this.featureService.isLimitedToBE(this.limitedFeatureId) || !this.isLdapFormValid();
+    return isLimitedToBE(this.limitedFeatureId) || !this.isLdapFormValid();
   }
 
   $onInit() {

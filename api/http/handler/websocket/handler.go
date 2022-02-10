@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
@@ -13,7 +14,7 @@ import (
 // Handler is the HTTP handler used to handle websocket operations.
 type Handler struct {
 	*mux.Router
-	DataStore                   portainer.DataStore
+	DataStore                   dataservices.DataStore
 	SignatureService            portainer.DigitalSignatureService
 	ReverseTunnelService        portainer.ReverseTunnelService
 	KubernetesClientFactory     *cli.ClientFactory
@@ -25,9 +26,9 @@ type Handler struct {
 // NewHandler creates a handler to manage websocket operations.
 func NewHandler(kubernetesTokenCacheManager *kubernetes.TokenCacheManager, bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router:             mux.NewRouter(),
-		connectionUpgrader: websocket.Upgrader{},
-		requestBouncer:     bouncer,
+		Router:                      mux.NewRouter(),
+		connectionUpgrader:          websocket.Upgrader{},
+		requestBouncer:              bouncer,
 		kubernetesTokenCacheManager: kubernetesTokenCacheManager,
 	}
 	h.PathPrefix("/websocket/exec").Handler(

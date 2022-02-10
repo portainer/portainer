@@ -3,13 +3,13 @@ package users
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -77,7 +77,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
@@ -85,7 +85,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	if payload.Username != "" && payload.Username != user.Username {
 		sameNameUser, err := handler.DataStore.User().UserByUsername(payload.Username)
-		if err != nil && err != bolterrors.ErrObjectNotFound {
+		if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 		}
 		if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
@@ -100,6 +100,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errCryptoHashFailure}
 		}
+		user.TokenIssueAt = time.Now().Unix()
 	}
 
 	if payload.Role != 0 {
@@ -117,6 +118,5 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	// remove all of the users persisted API keys
 	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
-
 	return response.JSON(w, user)
 }

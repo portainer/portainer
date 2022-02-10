@@ -24,26 +24,6 @@ angular.module('portainer.docker').factory('Container', [
           method: 'GET',
           params: { action: 'json' },
         },
-        stop: {
-          method: 'POST',
-          params: { id: '@id', action: 'stop' },
-        },
-        restart: {
-          method: 'POST',
-          params: { id: '@id', action: 'restart' },
-        },
-        kill: {
-          method: 'POST',
-          params: { id: '@id', action: 'kill' },
-        },
-        pause: {
-          method: 'POST',
-          params: { id: '@id', action: 'pause' },
-        },
-        unpause: {
-          method: 'POST',
-          params: { id: '@id', action: 'unpause' },
-        },
         logs: {
           method: 'GET',
           params: { id: '@id', action: 'logs' },
@@ -60,26 +40,11 @@ angular.module('portainer.docker').factory('Container', [
           params: { id: '@id', action: 'top' },
           ignoreLoadingBar: true,
         },
-        start: {
-          method: 'POST',
-          params: { id: '@id', action: 'start' },
-          transformResponse: genericHandler,
-        },
         create: {
           method: 'POST',
           params: { action: 'create' },
           transformResponse: genericHandler,
           ignoreLoadingBar: true,
-        },
-        remove: {
-          method: 'DELETE',
-          params: { id: '@id', v: '@v', force: '@force' },
-          transformResponse: genericHandler,
-        },
-        rename: {
-          method: 'POST',
-          params: { id: '@id', action: 'rename', name: '@name' },
-          transformResponse: genericHandler,
         },
         exec: {
           method: 'POST',

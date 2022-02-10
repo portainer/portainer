@@ -10,24 +10,20 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesClusterSetupForm">
-            <div class="col-sm-12 form-section-title">
-              Networking
-            </div>
+            <div class="col-sm-12 form-section-title"> Networking </div>
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 Enabling the load balancer feature will allow users to expose application they deploy over an external IP address assigned by cloud provider.
-                <p style="margin-top: 2px;">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <p style="margin-top: 2px">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                   Ensure that your cloud provider allows you to create load balancers if you want to use this feature. Might incur costs.
                 </p>
               </span>
 
               <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Allow users to use external load balancer
-                </label>
-                <label class="switch" style="margin-left: 20px;">
+                <label class="control-label text-left"> Allow users to use external load balancer </label>
+                <label class="switch" style="margin-left: 20px">
                   <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><i data-cy="kubeSetup-loadBalancerToggle"></i>
                 </label>
               </div>
@@ -36,8 +32,8 @@
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 Configuring ingress controllers will allow users to expose application they deploy over a HTTP route.<br />
-                <p style="margin-top: 2px;">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <p style="margin-top: 2px">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                   Ingress classes must be manually specified for each controller you want to use in the cluster. Make sure that each controller is running inside your cluster.
                 </p>
               </span>
@@ -45,13 +41,13 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">Ingress controller</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addIngressClass()" data-cy="kubeSetup-congifIngressButton">
+                <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addIngressClass()" data-cy="kubeSetup-congifIngressButton">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> configure ingress controller
                 </span>
               </div>
 
-              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div ng-repeat-start="ingressClass in ctrl.formValues.IngressClasses" style="margin-top: 2px;">
+              <div class="col-sm-12 form-inline" style="margin-top: 10px">
+                <div ng-repeat-start="ingressClass in ctrl.formValues.IngressClasses" style="margin-top: 2px">
                   <div class="col-sm-7 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
                     <span class="input-group-addon">Ingress class</span>
                     <input
@@ -106,7 +102,7 @@
                   <div class="col-sm-7 input-group">
                     <div
                       class="small text-warning"
-                      style="margin-top: 5px;"
+                      style="margin-top: 5px"
                       ng-if="kubernetesClusterSetupForm['ingress_class_name_' + $index].$invalid || ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined"
                     >
                       <div ng-messages="kubernetesClusterSetupForm['ingress_class_name_'+$index].$error">
@@ -122,7 +118,7 @@
                     </div>
                   </div>
                   <div class="col-sm-3 input-group">
-                    <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesClusterSetupForm['ingress_class_type_' + $index].$invalid">
+                    <div class="small text-warning" style="margin-top: 5px" ng-if="kubernetesClusterSetupForm['ingress_class_type_' + $index].$invalid">
                       <div ng-messages="kubernetesClusterSetupForm['ingress_class_type_'+$index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Ingress class type is required.</p>
                       </div>
@@ -135,33 +131,30 @@
             <div class="form-group" ng-if="ctrl.hasTraefikIngress()">
               <span class="col-sm-12 text-muted small">
                 <p>
-                  <i class="fa fa-flask blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <i class="fa fa-flask blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                   Traefik support is experimental.
                 </p>
               </span>
             </div>
 
             <!-- auto update window -->
-            <div class="col-sm-12 form-section-title">
-              Change Window Setting
-            </div>
+            <div class="col-sm-12 form-section-title"> Change Window Setting </div>
 
             <div class="form-group">
               <div class="col-sm-12">
                 <por-switch-field
-                  ng-model="$ctrl.state.autoUpdateSettings.Enabled"
-                  name="disableSysctlSettingForRegularUsers"
-                  label="Enable Change Window"
-                  feature="ctrl.limitedFeatureAutoWindow"
-                  tooltip="Specify a timeframe during which automatic updates can occur in this environment."
+                  checked="ctrl.state.autoUpdateSettings.Enabled"
+                  name="'disableSysctlSettingForRegularUsers'"
+                  label="'Enable Change Window'"
+                  feature-id="ctrl.limitedFeatureAutoWindow"
+                  tooltip="'Specify a timeframe during which automatic updates can occur in this environment.'"
+                  on-change="(ctrl.onToggleAutoUpdate)"
                 >
                 </por-switch-field>
               </div>
             </div>
 
-            <div class="col-sm-12 form-section-title">
-              Security
-            </div>
+            <div class="col-sm-12 form-section-title"> Security </div>
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
@@ -170,25 +163,21 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Restrict access to the default namespace
-                </label>
-                <label class="switch" style="margin-left: 20px;">
+                <label class="control-label text-left"> Restrict access to the default namespace </label>
+                <label class="switch" style="margin-left: 20px">
                   <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><i data-cy="kubeSetup-restrictDefaultNsToggle"></i>
                 </label>
               </div>
             </div>
 
-            <div class="col-sm-12 form-section-title">
-              Resources and Metrics
-            </div>
+            <div class="col-sm-12 form-section-title"> Resources and Metrics </div>
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 By ENABLING resource over-commit, you are able to assign more resources to namespaces than is physically available in the cluster. This may lead to unexpected
                 deployment failures if there is insufficient resource to service demand.
-                <p style="margin-top: 2px;">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <p style="margin-top: 2px">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                   By DISABLING resource over-commit (highly recommended), you are only able to assign resources to namespaces that are less (in aggregate) than the cluster total
                   minus any system resource reservation.
                 </p>
@@ -197,12 +186,12 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <por-switch-field
-                  label="Allow resource over-commit"
-                  name="resource-over-commit-switch"
-                  feature="ctrl.limitedFeature"
-                  ng-model="ctrl.formValues.EnableResourceOverCommit"
-                  ng-change="ctrl.onChangeEnableResourceOverCommit()"
-                  ng-data-cy="kubeSetup-resourceOverCommitToggle"
+                  data-cy="'kubeSetup-resourceOverCommitToggle'"
+                  label="'Allow resource over-commit'"
+                  name="'resource-over-commit-switch'"
+                  feature-id="ctrl.limitedFeature"
+                  checked="ctrl.formValues.EnableResourceOverCommit"
+                  on-change="(ctrl.onChangeEnableResourceOverCommit)"
                 ></por-switch-field>
               </div>
             </div>
@@ -210,8 +199,8 @@
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 Enabling this feature will allow users to use specific features like autoscaling and to see container and node resource usage.
-                <p style="margin-top: 2px;">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <p style="margin-top: 2px">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                   Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> or
                   <a href="https://github.com/kubernetes-sigs/prometheus-adapter" target="_blank">prometheus</a> is running inside your cluster.
                 </p>
@@ -219,40 +208,36 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Enable features using the metrics API
-                </label>
-                <label class="switch" style="margin-left: 20px;">
+                <label class="control-label text-left"> Enable features using the metrics API </label>
+                <label class="switch" style="margin-left: 20px">
                   <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" /><i data-cy="kubeSetup-metricsToggle"></i>
                 </label>
               </div>
-              <div ng-if="ctrl.state.metrics.pending && ctrl.state.metrics.userClick" class="col-sm-12 small text-muted" style="margin-top: 5px;">
-                Checking metrics API... <i class="fa fa-spinner fa-spin" style="margin-left: 2px;"></i>
+              <div ng-if="ctrl.state.metrics.pending && ctrl.state.metrics.userClick" class="col-sm-12 small text-muted" style="margin-top: 5px">
+                Checking metrics API... <i class="fa fa-spinner fa-spin" style="margin-left: 2px"></i>
               </div>
               <div
                 ng-if="!ctrl.state.metrics.pending && ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
                 class="col-sm-12 small text-muted"
-                style="margin-top: 5px;"
+                style="margin-top: 5px"
               >
-                <i class="fa fa-check green-icon" aria-hidden="true" style="margin-right: 2px;"></i> Successfully reached metrics API
+                <i class="fa fa-check green-icon" aria-hidden="true" style="margin-right: 2px"></i> Successfully reached metrics API
               </div>
               <div
                 ng-if="!ctrl.state.metrics.pending && !ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
                 class="col-sm-12 small text-muted"
-                style="margin-top: 5px;"
+                style="margin-top: 5px"
               >
-                <i class="fa fa-times red-icon" aria-hidden="true" style="margin-right: 2px;"></i> Unable to reach metrics API, make sure metrics server is properly deployed inside
+                <i class="fa fa-times red-icon" aria-hidden="true" style="margin-right: 2px"></i> Unable to reach metrics API, make sure metrics server is properly deployed inside
                 that cluster.
               </div>
             </div>
 
-            <div class="col-sm-12 form-section-title">
-              Available storage options
-            </div>
+            <div class="col-sm-12 form-section-title"> Available storage options </div>
 
             <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
               <div class="col-sm-12 small text-muted">
-                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                 Unable to detect any storage class available to persist data. Users won't be able to persist application data inside this cluster.
               </div>
             </div>
@@ -271,8 +256,8 @@
             </div>
 
             <div class="form-group" ng-if="ctrl.storageClassAvailable()">
-              <div style="margin-top: 10px;" class="col-sm-12">
-                <table class="table" style="table-layout: fixed;">
+              <div style="margin-top: 10px" class="col-sm-12">
+                <table class="table" style="table-layout: fixed">
                   <tbody>
                     <tr class="text-muted">
                       <td>Storage</td>
@@ -281,8 +266,8 @@
                     </tr>
                     <tr ng-repeat="class in ctrl.StorageClasses">
                       <td>
-                        <div style="margin: 5px;">
-                          <label class="switch" style="margin-right: 10px;">
+                        <div style="margin: 5px">
+                          <label class="switch" style="margin-right: 10px">
                             <input type="checkbox" ng-model="class.selected" /><i data-cy="kubeSetup-storageToggle{{ class.Name }}"></i>
                           </label>
                           <span>{{ class.Name }}</span>
@@ -304,7 +289,7 @@
                         </span>
                       </td>
                       <td>
-                        <div style="margin: 5px;">
+                        <div style="margin: 5px">
                           <label class="switch"
                             ><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><i data-cy="kubeSetup-storageExpansionToggle{{ class.Name }}"></i>
                           </label>
@@ -315,16 +300,14 @@
                 </table>
               </div>
               <div class="col-sm-12">
-                <span ng-if="!ctrl.hasValidStorageConfiguration()" style="margin-left: 5px;" class="text-muted small">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <span ng-if="!ctrl.hasValidStorageConfiguration()" style="margin-left: 5px" class="text-muted small">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                   Shared access policy configuration required
                 </span>
               </div>
             </div>
 
-            <div class="col-sm-12 form-section-title">
-              Actions
-            </div>
+            <div class="col-sm-12 form-section-title"> Actions </div>
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">

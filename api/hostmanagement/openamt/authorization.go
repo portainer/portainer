@@ -14,39 +14,39 @@ type authenticationResponse struct {
 	Token string `json:"token"`
 }
 
-func (service *Service) executeAuthenticationRequest(configuration portainer.OpenAMTConfiguration) (*authenticationResponse, error) {
+func (service *Service) Authorization(configuration portainer.OpenAMTConfiguration) (string, error) {
 	loginURL := fmt.Sprintf("https://%s/mps/login/api/v1/authorize", configuration.MPSServer)
 
 	payload := map[string]string{
-		"username": configuration.Credentials.MPSUser,
-		"password": configuration.Credentials.MPSPassword,
+		"username": configuration.MPSUser,
+		"password": configuration.MPSPassword,
 	}
 	jsonValue, _ := json.Marshal(payload)
 
 	req, err := http.NewRequest(http.MethodPost, loginURL, bytes.NewBuffer(jsonValue))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	response, err := service.httpsClient.Do(req)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	responseBody, readErr := ioutil.ReadAll(response.Body)
 	if readErr != nil {
-		return nil, readErr
+		return "", readErr
 	}
 	errorResponse := parseError(responseBody)
 	if errorResponse != nil {
-		return nil, errorResponse
+		return "", errorResponse
 	}
 
 	var token authenticationResponse
 	err = json.Unmarshal(responseBody, &token)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return &token, nil
+	return token.Token, nil
 }
