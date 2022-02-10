@@ -44,6 +44,16 @@ test('when there are no errors, load dashboard correctly', async () => {
   ).toHaveTextContent('Resource groups');
 });
 
+test('should correctly show total number of resource groups across multiple subscriptions', async () => {
+  const { getByLabelText } = await renderComponent(2, {
+    'subscription-1': 2,
+    'subscription-2': 3,
+  });
+
+  const resourceGroupElements = within(getByLabelText('resourceGroups'));
+  expect(resourceGroupElements.getByLabelText('value')).toHaveTextContent('5');
+});
+
 // test('when only subscriptions fail to load, dont show the dashboard', async () => {});
 
 // test('when only resource groups fail to load, still show the subscriptions', async () => {});
