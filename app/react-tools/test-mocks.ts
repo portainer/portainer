@@ -32,7 +32,7 @@ export function createMockSubscriptions(count: number) {
 
 export function createMockResourceGroups(subscription: string, count: number) {
   const resourceGroups = _.range(1, count + 1).map((x) => ({
-    id: `/subscriptions/${subscription}}/resourceGroups/resourceGroup-${x}`,
+    id: `/subscriptions/${subscription}/resourceGroups/resourceGroup-${x}`,
     name: `resourcegroup-${x}`,
   }));
 
