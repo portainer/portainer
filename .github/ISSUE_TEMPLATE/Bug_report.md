@@ -47,7 +47,7 @@ You can see how [here](https://documentation.portainer.io/r/portainer-logs)
 - Platform (windows/linux):
 - Command used to start Portainer (`docker run -p 9443:9443 portainer/portainer`):
 - Browser:
-- Use Case (delete as appropriate): Using Portainer at Home, Using Portainer in a Commerical setup.
+- Use Case (delete as appropriate): Using Portainer at Home, Using Portainer in a Commercial setup.
 - Have you reviewed our technical documentation and knowledge base? Yes/No
 
 **Additional context**
