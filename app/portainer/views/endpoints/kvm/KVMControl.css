@@ -1,7 +1,3 @@
-.canvas-container .header {
-  display: none;
-}
-
 .canvas-container {
   display: contents;
 }
