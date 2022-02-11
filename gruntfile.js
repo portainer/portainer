@@ -159,6 +159,7 @@ function shell_run_container() {
   const portainerData = '${PORTAINER_DATA:-/tmp/portainer}';
   const portainerRoot = process.env.PORTAINER_PROJECT ? process.env.PORTAINER_PROJECT : process.env.PWD;
   const portainerFlags = '${PORTAINER_FLAGS:-}';
+  const portainerDockerFlags = '${PORTAINER_DOCKER_FLAGS:-}';
 
   return `
     docker rm -f portainer
@@ -166,8 +167,7 @@ function shell_run_container() {
       -p 8000:8000 \
       -p 9000:9000 \
       -p 9443:9443 \
-      --net caddy_proxy \
-      --label virtual.port=9000 \
+      ${portainerDockerFlags} \
       -v ${portainerRoot}/dist:/app \
       -v ${portainerData}:/data \
       -v /var/run/docker.sock:/var/run/docker.sock:z \
