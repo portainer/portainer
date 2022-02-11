@@ -27,6 +27,7 @@ export async function init(edition: Edition) {
     [FeatureId.TEAM_MEMBERSHIP]: Edition.BE,
     [FeatureId.FORCE_REDEPLOYMENT]: Edition.BE,
     [FeatureId.HIDE_AUTO_UPDATE_WINDOW]: Edition.BE,
+    [FeatureId.POD_SECURITY_POLICY_CONSTRAINT]: Edition.BE,
   };
 
   state.currentEdition = currentEdition;

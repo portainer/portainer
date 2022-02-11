@@ -23,4 +23,5 @@ export enum FeatureId {
   ACTIVITY_AUDIT = 'activity-audit',
   FORCE_REDEPLOYMENT = 'force-redeployment',
   HIDE_AUTO_UPDATE_WINDOW = 'hide-auto-update-window',
+  POD_SECURITY_POLICY_CONSTRAINT = 'pos-security-policy-constraint',
 }

@@ -68,18 +68,28 @@
   path="kubernetes.cluster"
   path-params="{ endpointId: $ctrl.endpointId }"
   is-sidebar-open="$ctrl.isSidebarOpen"
-  children-paths="['kubernetes.cluster', 'portainer.k8sendpoint.kubernetesConfig', 'kubernetes.registries', 'kubernetes.registries.access']"
+  children-paths="['kubernetes.cluster', 'portainer.k8sendpoint.kubernetesConfig', 'portainer.k8sendpoint.securityConstraint', 'kubernetes.registries', 'kubernetes.registries.access']"
   data-cy="k8sSidebar-cluster"
 >
   <div ng-if="$ctrl.adminAccess">
     <sidebar-menu-item
-      authorization="K8sClusterSetupRW"
+      authorization="K8sClusterSecurityPolicyRW"
       path="portainer.k8sendpoint.kubernetesConfig"
       path-params="{ id: $ctrl.endpointId }"
       class-name="sidebar-sublist"
       data-cy="k8sSidebar-setup"
     >
       Setup
+    </sidebar-menu-item>
+
+    <sidebar-menu-item
+      authorization="K8sClusterSetupRW"
+      path="portainer.k8sendpoint.securityConstraint"
+      path-params="{ id: $ctrl.endpointId }"
+      class-name="sidebar-sublist"
+      data-cy="k8sSidebar-security-constraints"
+    >
+      Security constraints
     </sidebar-menu-item>
 
     <sidebar-menu-item

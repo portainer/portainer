@@ -1,0 +1,27 @@
+<kubernetes-view-header title="Kubernetes security constraints" state="portainer.k8sendpoint.securityConstraint" view-ready="state.viewReady">
+  <a ui-sref="portainer.endpoints">Environments</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a> &gt; Security constraints
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="state.viewReady">
+  <div class="row">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal" name="kubernetesSecurityConstraintForm">
+            <div class="col-sm-12 form-section-title"> Pod security constraints</div>
+            <!--  main toggle  -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left"> Enable pod security constraints </label>
+                <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="formValues.enabled" /><i></i> </label>
+                <be-feature-indicator feature="limitedFeaturePodSecurityPolicy"></be-feature-indicator>
+              </div>
+            </div>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>
