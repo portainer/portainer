@@ -8,6 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 )
 
 // @id RegistryInspect
@@ -39,6 +40,14 @@ func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
-	hideFields(registry, false)
+	hasAccess, isAdmin, err := handler.userHasRegistryAccess(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+	if !hasAccess {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
+	}
+
+	hideFields(registry, !isAdmin)
 	return response.JSON(w, registry)
 }

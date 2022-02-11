@@ -113,13 +113,7 @@
       Setup
     </sidebar-menu-item>
 
-    <sidebar-menu-item
-      authorization="PortainerRegistryList"
-      path="docker.registries"
-      path-params="{ endpointId: $ctrl.endpointId }"
-      class-name="sidebar-sublist"
-      data-cy="dockerSidebar-registries"
-    >
+    <sidebar-menu-item path="docker.registries" path-params="{ endpointId: $ctrl.endpointId }" class-name="sidebar-sublist" data-cy="dockerSidebar-registries">
       Registries
     </sidebar-menu-item>
   </div>
@@ -134,25 +128,18 @@
   is-sidebar-open="$ctrl.isSidebarOpen"
   children-paths="['docker.registries', 'docker.registries.access', 'docker.featuresConfiguration']"
 >
-  <div ng-if="$ctrl.adminAccess">
-    <sidebar-menu-item
-      authorization="PortainerEndpointUpdateSettings"
-      path="docker.featuresConfiguration"
-      path-params="{ endpointId: $ctrl.endpointId }"
-      class-name="sidebar-sublist"
-      data-cy="swarmSidebar-setup"
-    >
-      Setup
-    </sidebar-menu-item>
+  <sidebar-menu-item
+    ng-if="$ctrl.adminAccess"
+    authorization="PortainerEndpointUpdateSettings"
+    path="docker.featuresConfiguration"
+    path-params="{ endpointId: $ctrl.endpointId }"
+    class-name="sidebar-sublist"
+    data-cy="swarmSidebar-setup"
+  >
+    Setup
+  </sidebar-menu-item>
 
-    <sidebar-menu-item
-      authorization="PortainerRegistryList"
-      path="docker.registries"
-      path-params="{ endpointId: $ctrl.endpointId }"
-      class-name="sidebar-sublist"
-      data-cy="swarmSidebar-registries"
-    >
-      Registries
-    </sidebar-menu-item>
-  </div>
+  <sidebar-menu-item path="docker.registries" path-params="{ endpointId: $ctrl.endpointId }" class-name="sidebar-sublist" data-cy="swarmSidebar-registries">
+    Registries
+  </sidebar-menu-item>
 </sidebar-menu>
