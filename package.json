@@ -129,6 +129,7 @@
     "react-table": "^7.7.0",
     "react-tooltip": "^4.2.21",
     "sanitize-html": "^2.5.3",
+    "simple-duration": "^1.0.1",
     "spinkit": "^2.0.1",
     "splitargs": "github:deviantony/splitargs#semver:~0.2.0",
     "strip-ansi": "^6.0.0",

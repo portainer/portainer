@@ -16686,6 +16686,13 @@ signal-exit@^3.0.0, signal-exit@^3.0.2, signal-exit@^3.0.3:
   resolved "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.3.tgz"
   integrity sha512-VUJ49FC8U1OxwZLxIbTTrDvLnf/6TDgxZcK8wxR8zs13xpx7xbG60ndBlhNrFi2EMuFRoeDoJO7wthSLq42EjA==
 
+simple-duration@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/simple-duration/-/simple-duration-1.0.1.tgz#11df05127bfdf110e349301d59e8062130f086fe"
+  integrity sha512-/R3wxM49A2zvAwm4wgTI5dpJE/+MNca+XGlX5vxQkDZ+3Kl3EOxUZJ9anXz4R0tcTnhtU2ruopFZ1npsIGI+nw==
+  dependencies:
+    lodash "^4.17.15"
+
 simple-is@~0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/simple-is/-/simple-is-0.2.0.tgz"
