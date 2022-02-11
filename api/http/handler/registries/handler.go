@@ -1,11 +1,11 @@
 package registries
 
 import (
-	"github.com/portainer/libhttp/request"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
