@@ -109,7 +109,7 @@
         <div class="panel-body">
           <!-- toggle -->
           <div style="padding-bottom: 12px">
-            <a ng-click="togglePanel()">
+            <a ng-click="togglePanel()" data-cy="init-installPortainerFromBackup">
               <i ng-class="{ true: 'glyphicon glyphicon-chevron-down', false: 'glyphicon glyphicon-chevron-right' }[state.showRestorePortainer]" aria-hidden="true"></i
               ><span style="padding-left: 10px">Restore Portainer from backup</span>
             </a>
@@ -131,7 +131,7 @@
               <div class="boxselector_wrapper">
                 <div>
                   <input type="radio" id="restore_file" checked="checked" />
-                  <label for="restore_file" style="padding-bottom: 20px">
+                  <label for="restore_file" style="padding-bottom: 20px" data-cy="init-selectLocalFile">
                     <div class="boxselector_header">
                       <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px"></i>
                       Upload backup file
@@ -168,6 +168,7 @@
                   ngf-accept="'application/x-tar,application/x-gzip'"
                   ng-model="formValues.BackupFile"
                   auto-focus
+                  data-cy="init-selectBackupFileButton"
                   >Select file</button
                 >
                 <span style="margin-left: 5px">
@@ -187,7 +188,7 @@
                 ></portainer-tooltip>
               </label>
               <div class="col-sm-4">
-                <input type="password" class="form-control" ng-model="formValues.Password" id="password" />
+                <input type="password" class="form-control" ng-model="formValues.Password" id="password" data-cy="init-backupPasswordInput" />
               </div>
             </div>
             <!-- !password-input -->
@@ -210,6 +211,7 @@
                   ng-disabled="!formValues.BackupFile || state.backupInProgress"
                   ng-click="uploadBackup()"
                   button-spinner="state.backupInProgress"
+                  data-cy="init-restorePortainerButton"
                 >
                   <span ng-hide="state.backupInProgress">Restore Portainer</span>
                   <span ng-show="state.backupInProgress">Restoring Portainer...</span>
