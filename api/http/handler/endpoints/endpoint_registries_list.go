@@ -151,24 +151,6 @@ func registryAccessPoliciesContainsNamespace(registryAccess portainer.RegistryAc
 	return false
 }
 
-func filterRegistriesByNamespace(registries []portainer.Registry, endpointId portainer.EndpointID, namespace string) []portainer.Registry {
-	if namespace == "" {
-		return registries
-	}
-
-	filteredRegistries := []portainer.Registry{}
-
-	for _, registry := range registries {
-		for _, authorizedNamespace := range registry.RegistryAccesses[endpointId].Namespaces {
-			if authorizedNamespace == namespace {
-				filteredRegistries = append(filteredRegistries, registry)
-			}
-		}
-	}
-
-	return filteredRegistries
-}
-
 func (handler *Handler) filterKubernetesRegistriesByUserRole(r *http.Request, registries []portainer.Registry, endpoint *portainer.Endpoint, user *portainer.User) ([]portainer.Registry, *httperror.HandlerError) {
 	err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err == security.ErrAuthorizationRequired {
@@ -179,7 +161,6 @@ func (handler *Handler) filterKubernetesRegistriesByUserRole(r *http.Request, re
 	}
 
 	userNamespaces, err := handler.userNamespaces(endpoint, user)
-	//userNamespaces, err := []string{}, nil
 	if err != nil {
 		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "unable to retrieve user namespaces", Err: err}
 	}
