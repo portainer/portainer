@@ -16,7 +16,7 @@ function TemplateListController($async, $state, DatatableService, Notifications,
     DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
   };
 
-  this.filterByType = function (item) {
+  this.filterByTemplateType = function (item) {
     switch (item.Type) {
       case 1: // container
         return ctrl.state.showContainerTemplates;
@@ -35,7 +35,7 @@ function TemplateListController($async, $state, DatatableService, Notifications,
 
     for (var i = 0; i < ctrl.templates.length; i++) {
       var template = ctrl.templates[i];
-      if (this.filterByType(template)) {
+      if (this.filterByTemplateType(template)) {
         availableCategories = availableCategories.concat(template.Categories);
       }
     }
