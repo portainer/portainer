@@ -440,11 +440,9 @@ function EndpointController(
   }
 
   function buildKubernetesCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
-    return `
-curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${
-      $scope.formValues.EnvVarSource
-    }
-`;
+    // return `curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${$scope.formValues.EnvVarSource}`;
+    return `curl https://raw.githubusercontent.com/portainer/k8s/c3f578516fd10e4493a3720582fa7fa08a2a3777/deploy/manifests/agent/portainer-ce211-edge-agent-setup.sh
+    | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${$scope.formValues.EnvVarSource}`;
   }
 
   initView();
