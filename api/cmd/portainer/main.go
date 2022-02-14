@@ -599,7 +599,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	kubernetesTokenCacheManager := kubeproxy.NewTokenCacheManager()
 
-	kubeConfigService := kubernetes.NewKubeConfigCAService(*flags.AddrHTTPS, sslSettings.CertPath)
+	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService(*flags.AddrHTTPS, sslSettings.CertPath)
 
 	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
 
@@ -706,7 +706,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		OpenAMTService:              openAMTService,
 		ProxyManager:                proxyManager,
 		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
-		KubeConfigService:           kubeConfigService,
+		KubeClusterAccessService:    kubeClusterAccessService,
 		SignatureService:            digitalSignatureService,
 		SnapshotService:             snapshotService,
 		SSLService:                  sslService,
@@ -716,7 +716,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
-		BaseURL:                     *flags.BaseURL,
 	}
 }
 
