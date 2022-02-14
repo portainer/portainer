@@ -43,6 +43,7 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 
 	snapshotError := handler.SnapshotService.SnapshotEndpoint(endpoint)
 
+	// TODO: so huh? why are we getting the endpoint a second time? if there's a reason to do this - please add that as a comment!
 	latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
 	if latestEndpointReference == nil {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
