@@ -69,7 +69,7 @@ func (handler *Handler) endpointAsync(w http.ResponseWriter, r *http.Request) *h
 		// portainer.HTTPResponseAgentPlatform tells us what platform it is too...
 		logrus.WithField("portainer.PortainerAgentEdgeIDHeader", edgeIdentifier).Debug("edge id not found in existing endpoints!")
 	}
-	// TODO: if agent mTLS is on, drop the connection if the client cert isn't CA'd (or if its revoked)
+	// if agent mTLS is on, drop the connection if the client cert isn't CA'd (or if its revoked)
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
