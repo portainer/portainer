@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 import * as envVarsUtils from '@/portainer/helpers/env-vars';
+import { FeatureId } from 'Portainer/feature-flags/enums';
 import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '../../../models/container';
@@ -65,7 +66,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $scope.create = create;
     $scope.update = update;
     $scope.endpoint = endpoint;
-
+    $scope.containerWebhookFeature = FeatureId.CONTAINER_WEBHOOK;
     $scope.formValues = {
       alwaysPull: true,
       Console: 'none',
