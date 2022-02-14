@@ -320,19 +320,17 @@ function EndpointController(
   }
 
   function buildEnvironmentSubCommand() {
-    let env = [];
-
-    if ($scope.formValues.EnvVarSource !== '') {
-      env = $scope.formValues.EnvVarSource.split(',')
-        .map(function (s) {
-          if (s !== '') {
-            return `-e ${s} \\`;
-          }
-        })
-        .filter((s) => s !== undefined);
+    if ($scope.formValues.EnvVarSource === '') {
+      return [];
     }
 
-    return env;
+    return $scope.formValues.EnvVarSource.split(',')
+      .map(function (s) {
+        if (s !== '') {
+          return `-e ${s} \\`;
+        }
+      })
+      .filter((s) => s !== undefined);
   }
 
   function buildLinuxStandaloneCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
