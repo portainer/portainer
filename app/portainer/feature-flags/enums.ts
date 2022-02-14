@@ -23,5 +23,8 @@ export enum FeatureId {
   ACTIVITY_AUDIT = 'activity-audit',
   FORCE_REDEPLOYMENT = 'force-redeployment',
   HIDE_AUTO_UPDATE_WINDOW = 'hide-auto-update-window',
+  STACK_PULL_IMAGE = 'stack-pull-image',
+  STACK_WEBHOOK = 'stack-webhook',
+  CONTAINER_WEBHOOK = 'container-webhook',
   POD_SECURITY_POLICY_CONSTRAINT = 'pos-security-policy-constraint',
 }
