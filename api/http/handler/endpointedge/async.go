@@ -34,9 +34,9 @@ type AsyncResponse struct {
 	Commands             interface{} `json: optional` // todo
 }
 
-// for testing:
-// sven@p1:~/src/portainer/portainer$ curl -k -X POST --header "X-PortainerAgent-EdgeID: 7e2b0143-c511-43c3-844c-a7a91ab0bedc" --data '{"CommandId": "okok", "Snapshot": {}}'  https://p1:9443/api/endpoints/edge/async/
-// {"CommandInterval":0,"PingInterval":0,"SnapshotInterval":0,"ServerCommandId":"8888","SendDiffSnapshotTime":"0001-01-01T00:00:00Z","Commands":{}}
+// for testing with mTLS..:
+//sven@p1:~/src/portainer/portainer$ curl -k --cacert ~/.config/portainer/certs/ca.pem --cert ~/.config/portainer/certs/agent-cert.pem --key ~/.config/portainer/certs/agent-key.pem -X POST --header "X-PortainerAgent-EdgeID: 7e2b0143-c511-43c3-844c-a7a91ab0bedc" --data '{"CommandId": "okok", "Snapshot": {}}'  https://p1:9443/api/endpoints/edge/async/
+//{"CommandInterval":0,"PingInterval":0,"SnapshotInterval":0,"ServerCommandId":"8888","SendDiffSnapshotTime":"0001-01-01T00:00:00Z","Commands":{}}
 
 // @id endpointAsync
 // @summary Get environment(endpoint) status
@@ -68,6 +68,11 @@ func (handler *Handler) endpointAsync(w http.ResponseWriter, r *http.Request) *h
 		// create new untrusted environment
 		// portainer.HTTPResponseAgentPlatform tells us what platform it is too...
 		logrus.WithField("portainer.PortainerAgentEdgeIDHeader", edgeIdentifier).Debug("edge id not found in existing endpoints!")
+	}
+	// TODO: if agent mTLS is on, drop the connection if the client cert isn't CA'd (or if its revoked)
+	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	// Any request we can identify as coming from a valid agent is treated as a Ping
