@@ -16,6 +16,18 @@ angular.module('portainer.app').controller('RegistryController', [
 
     $scope.RegistryTypes = RegistryTypes;
 
+    $scope.passwordLabel = () => {
+      const type = $scope.registry.Type;
+      switch (type) {
+        case RegistryTypes.ECR:
+          return 'AWS Secret Access Key';
+        case RegistryTypes.DOCKERHUB:
+          return 'Access token';
+        default:
+          return 'Password';
+      }
+    };
+
     $scope.updateRegistry = function () {
       var registry = $scope.registry;
       registry.Password = $scope.formValues.Password;
