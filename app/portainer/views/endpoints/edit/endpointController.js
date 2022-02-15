@@ -403,8 +403,7 @@ docker service create \\
 
   function buildKubernetesCommand(agentVersion, agentShortVersion, agentSecret, edgeId, edgeKey, allowSelfSignedCerts) {
     return `
-curl https://downloads.portainer.io/portainer-ce${agentShortVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : ''}
-`;
+curl https://downloads.portainer.io/portainer-ce${agentShortVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${agentSecret}`;
   }
 
   initView();

@@ -335,7 +335,8 @@ docker service create \\
   --constraint 'node.platform.os == linux' \\
   --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \\
   --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
-  portainer/agent:${agentVersion}`;
+  portainer/agent:${agentVersion}
+  `;
       }
 
       function agentWindowsSwarmCommand(agentSecret) {
@@ -352,7 +353,8 @@ docker service create \\
   --constraint 'node.platform.os == windows' \\
   --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
   --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
-  portainer/agent:${agentVersion}`;
+  portainer/agent:${agentVersion}
+  `;
       }
 
       initView();
