@@ -42,11 +42,6 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
-	if err != nil {
-		return handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
-	}
-
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
 		return handler.handlerDBErr(err, "Unable to find an environment with the specified identifier inside the database")
@@ -55,6 +50,11 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+	}
+
+	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
+	if err != nil {
+		return handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}
 
 	delete(stack.Status, endpoint.ID)
