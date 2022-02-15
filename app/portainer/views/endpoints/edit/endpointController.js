@@ -388,6 +388,7 @@ function EndpointController(
       '',
 
       'docker service create \\',
+      '--name portainer_edge_agent \\',
       '--network portainer_agent_network \\',
       '-e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent \\',
       '-e EDGE=1 \\',
@@ -418,6 +419,7 @@ function EndpointController(
       '',
 
       'docker service create \\',
+      '--name portainer_edge_agent \\',
       '--network portainer_agent_network \\',
       '-e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent \\',
       '-e EDGE=1 \\',
