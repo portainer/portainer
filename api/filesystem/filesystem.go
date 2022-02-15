@@ -354,6 +354,9 @@ func (service *Service) DeleteTLSFile(folder string, fileType portainer.TLSFileT
 
 // GetFileContent returns the content of a file as bytes.
 func (service *Service) GetFileContent(trustedRoot, filePath string) ([]byte, error) {
+	if trustedRoot == "" {
+		trustedRoot = "/"
+	}
 	content, err := os.ReadFile(JoinPaths(trustedRoot, filePath))
 	if err != nil {
 		if filePath == "" {
