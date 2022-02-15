@@ -9,6 +9,16 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+func (handler *Handler) handlerDBErr(err error, msg string) *httperror.HandlerError {
+	httpErr := &httperror.HandlerError{http.StatusInternalServerError, msg, err}
+
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		httpErr.StatusCode = http.StatusNotFound
+	}
+
+	return httpErr
+}
+
 // @id EdgeStackStatusDelete
 // @summary Delete an EdgeStack status
 // @description Authorized only if the request is done by an Edge Environment(Endpoint)
@@ -34,12 +44,12 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 
 	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
+		return handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return handler.handlerDBErr(err, "Unable to find an environment with the specified identifier inside the database")
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
@@ -51,7 +61,7 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Unable to persist the stack changes inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
 	}
 
 	return response.JSON(w, stack)
