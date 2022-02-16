@@ -267,6 +267,19 @@ func (connection *DbConnection) DeleteAllObjects(bucketName string, matching fun
 	})
 }
 
+// GetIdentifier is a generic function used to retrieve the current value of identifier from the bucket
+func (connection *DbConnection) GetIdentifier(bucketName string) int {
+	var identifier int
+
+	connection.Batch(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+		identifier = int(bucket.Sequence())
+		return nil
+	})
+
+	return identifier
+}
+
 // GetNextIdentifier is a generic function that returns the specified bucket identifier incremented by 1.
 func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 	var identifier int
@@ -282,6 +295,14 @@ func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 	})
 
 	return identifier
+}
+
+// SetIdentifier is a generic function used to set the current value of identifier in the bucket
+func (connection *DbConnection) SetIdentifier(bucketName string, identifier int) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+		return bucket.SetSequence(uint64(identifier))
+	})
 }
 
 // CreateObject creates a new object in the bucket, using the next bucket sequence id
