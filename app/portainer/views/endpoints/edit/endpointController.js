@@ -93,6 +93,10 @@ function EndpointController(
     EnvVarSource: '',
   };
 
+  $scope.isKubernetesDeploymentTabSelected = function () {
+    return $scope.state.deploymentTab === DEPLOYMENT_TABS.KUBERNETES;
+  };
+
   $scope.copyEdgeAgentDeploymentCommand = copyEdgeAgentDeploymentCommand;
   function copyEdgeAgentDeploymentCommand() {
     let agentVersion = $scope.agentVersion;
@@ -336,7 +340,7 @@ function EndpointController(
   function buildLinuxStandaloneCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     const env = buildEnvironmentSubCommand();
 
-    let command = [
+    return [
       'docker run -d \\',
       '-v /var/run/docker.sock:/var/run/docker.sock \\',
       '-v /var/lib/docker/volumes:/var/lib/docker/volumes \\',
@@ -351,15 +355,13 @@ function EndpointController(
       ...env,
       '--name portainer_edge_agent \\',
       `portainer/agent:${agentVersion}`,
-    ];
-
-    return command.join('\r\n');
+    ].join('\r\n');
   }
 
   function buildWindowsStandaloneCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     const env = buildEnvironmentSubCommand();
 
-    let command = [
+    return [
       'docker run -d \\',
       '--mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\',
       '--mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\',
@@ -373,15 +375,13 @@ function EndpointController(
       ...env,
       '--name portainer_edge_agent \\',
       `portainer/agent:${agentVersion}`,
-    ];
-
-    return command.join('\r\n');
+    ].join('\r\n');
   }
 
   function buildLinuxSwarmCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     const env = buildEnvironmentSubCommand();
 
-    let command = [
+    return [
       'docker network create \\',
       '--driver overlay \\',
       'portainer_agent_network;',
@@ -404,15 +404,13 @@ function EndpointController(
       '--mount type=bind,src=//,dst=/host \\',
       '--mount type=volume,src=portainer_agent_data,dst=/data \\',
       `portainer/agent:${agentVersion}`,
-    ];
-
-    return command.join('\r\n');
+    ].join('\r\n');
   }
 
   function buildWindowsSwarmCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     const env = buildEnvironmentSubCommand();
 
-    let command = [
+    return [
       'docker network create \\',
       '--driver overlay \\',
       'portainer_agent_network;',
@@ -434,16 +432,11 @@ function EndpointController(
       '--mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\',
       '--mount type=volume,src=portainer_agent_data,dst=C:\\data \\',
       `portainer/agent:${agentVersion}`,
-    ];
-
-    return command.join('\r\n');
+    ].join('\r\n');
   }
 
   function buildKubernetesCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
-    // return `curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${$scope.formValues.EnvVarSource}`;
-    return `curl https://raw.githubusercontent.com/portainer/k8s/c3f578516fd10e4493a3720582fa7fa08a2a3777/deploy/manifests/agent/portainer-ce211-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${
-      allowSelfSignedCerts ? '1' : '0'
-    } ${$scope.formValues.EnvVarSource}`;
+    return `curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'}`;
   }
 
   initView();
