@@ -298,10 +298,10 @@ func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 }
 
 // SetIdentifier is a generic function used to set the current value of identifier in the bucket
-func (connection *DbConnection) SetIdentifier(bucketName string, identifier int) error {
+func (connection *DbConnection) SetIdentifier(bucketName string, id int) error {
 	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-		return bucket.SetSequence(uint64(identifier))
+		return bucket.SetSequence(uint64(id))
 	})
 }
 
