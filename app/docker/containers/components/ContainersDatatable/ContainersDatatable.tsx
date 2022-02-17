@@ -100,7 +100,6 @@ export function ContainersDatatable({
       isRowSelectable(row: Row<DockerContainer>) {
         return !row.original.IsPortainer;
       },
-      autoResetExpanded: false,
       autoResetSelectedRows: false,
       selectCheckboxComponent: Checkbox,
     },
