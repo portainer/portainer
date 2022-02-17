@@ -325,20 +325,6 @@ function EndpointController(
   }
 
   function buildEnvironmentSubCommand() {
-    if ($scope.formValues.EnvVarSource === '') {
-      return [];
-    }
-
-    return $scope.formValues.EnvVarSource.split(',')
-      .map(function (s) {
-        if (s !== '') {
-          return `-e ${s} \\`;
-        }
-      })
-      .filter((s) => s !== undefined);
-  }
-
-  function buildEnvironmentSubCommand() {
     let env = [];
     if ($scope.formValues.EnvVarSource != '') {
       env = $scope.formValues.EnvVarSource.split(',')
@@ -350,9 +336,9 @@ function EndpointController(
         .filter((s) => s !== undefined);
     }
     if ($scope.agentSecret != '') {
-      env.push(`-e AGENT_SECRET=${$scope.agentSecret} \\`)
+      env.push(`-e AGENT_SECRET=${$scope.agentSecret} \\`);
     }
-    return env
+    return env;
   }
 
   function buildLinuxStandaloneCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
@@ -454,7 +440,9 @@ function EndpointController(
   }
 
   function buildKubernetesCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
-    return `curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${$scope.agentSecret}`;
+    return `curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${
+      $scope.agentSecret
+    }`;
   }
 
   initView();
