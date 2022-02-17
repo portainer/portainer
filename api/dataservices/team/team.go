@@ -121,3 +121,13 @@ func (service *Service) DeleteTeam(ID portainer.TeamID) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
+
+// GetIdentifier returns the current max identifier for the datastore
+func (service *Service) GetIdentifier() int {
+	return service.connection.GetIdentifier(BucketName)
+}
+
+// SetIdentifier sets the current max identifier for the datastore
+func (service *Service) SetIdentifier(id int) error {
+	return service.connection.SetIdentifier(BucketName, id)
+}

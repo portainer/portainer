@@ -369,11 +369,15 @@ type storeExport struct {
 	User               []portainer.User               `json:"users,omitempty"`
 	Version            map[string]string              `json:"version,omitempty"`
 	Webhook            []portainer.Webhook            `json:"webhooks,omitempty"`
+
+	// keeps track of the current max id
+	Identifiers map[string]int `json:"identifiers,omitempty"`
 }
 
 func (store *Store) Export(filename string) (err error) {
 
 	backup := storeExport{}
+	backup.Identifiers = make(map[string]int)
 
 	if c, err := store.CustomTemplate().CustomTemplates(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
@@ -381,6 +385,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.CustomTemplate = c
+		bucketName := store.CustomTemplate().BucketName()
+		backup.Identifiers[bucketName] = store.CustomTemplate().GetIdentifier()
 	}
 
 	if e, err := store.EdgeGroup().EdgeGroups(); err != nil {
@@ -389,6 +395,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.EdgeGroup = e
+		bucketName := store.EdgeGroup().BucketName()
+		backup.Identifiers[bucketName] = store.EdgeGroup().GetIdentifier()
 	}
 
 	if e, err := store.EdgeJob().EdgeJobs(); err != nil {
@@ -397,6 +405,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.EdgeJob = e
+		bucketName := store.EdgeJob().BucketName()
+		backup.Identifiers[bucketName] = store.EdgeJob().GetIdentifier()
 	}
 
 	if e, err := store.EdgeStack().EdgeStacks(); err != nil {
@@ -405,6 +415,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.EdgeStack = e
+		bucketName := store.EdgeStack().BucketName()
+		backup.Identifiers[bucketName] = store.EdgeStack().GetIdentifier()
 	}
 
 	if e, err := store.Endpoint().Endpoints(); err != nil {
@@ -413,6 +425,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.Endpoint = e
+		bucketName := store.Endpoint().BucketName()
+		backup.Identifiers[bucketName] = store.Endpoint().GetIdentifier()
 	}
 
 	if e, err := store.EndpointGroup().EndpointGroups(); err != nil {
@@ -421,6 +435,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.EndpointGroup = e
+		bucketName := store.EndpointGroup().BucketName()
+		backup.Identifiers[bucketName] = store.EndpointGroup().GetIdentifier()
 	}
 
 	if r, err := store.EndpointRelation().EndpointRelations(); err != nil {
@@ -429,6 +445,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.EndpointRelation = r
+		bucketName := store.EndpointRelation().BucketName()
+		backup.Identifiers[bucketName] = store.EndpointRelation().GetIdentifier()
 	}
 
 	if r, err := store.ExtensionService.Extensions(); err != nil {
@@ -445,6 +463,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.HelmUserRepository = r
+		bucketName := store.HelmUserRepository().BucketName()
+		backup.Identifiers[bucketName] = store.HelmUserRepository().GetIdentifier()
 	}
 
 	if r, err := store.Registry().Registries(); err != nil {
@@ -453,6 +473,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.Registry = r
+		bucketName := store.Registry().BucketName()
+		backup.Identifiers[bucketName] = store.Registry().GetIdentifier()
 	}
 
 	if c, err := store.ResourceControl().ResourceControls(); err != nil {
@@ -461,6 +483,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.ResourceControl = c
+		bucketName := store.ResourceControl().BucketName()
+		backup.Identifiers[bucketName] = store.ResourceControl().GetIdentifier()
 	}
 
 	if role, err := store.Role().Roles(); err != nil {
@@ -469,6 +493,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.Role = role
+		bucketName := store.Role().BucketName()
+		backup.Identifiers[bucketName] = store.Role().GetIdentifier()
 	}
 
 	if r, err := store.ScheduleService.Schedules(); err != nil {
@@ -477,6 +503,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.Schedules = r
+		bucketName := store.ScheduleService.BucketName()
+		backup.Identifiers[bucketName] = store.ScheduleService.GetIdentifier()
 	}
 
 	if settings, err := store.Settings().Settings(); err != nil {
@@ -509,6 +537,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.Tag = t
+		bucketName := store.Tag().BucketName()
+		backup.Identifiers[bucketName] = store.Tag().GetIdentifier()
 	}
 
 	if t, err := store.TeamMembership().TeamMemberships(); err != nil {
@@ -517,6 +547,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.TeamMembership = t
+		bucketName := store.TeamMembership().BucketName()
+		backup.Identifiers[bucketName] = store.TeamMembership().GetIdentifier()
 	}
 
 	if t, err := store.Team().Teams(); err != nil {
@@ -525,6 +557,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.Team = t
+		bucketName := store.Team().BucketName()
+		backup.Identifiers[bucketName] = store.Team().GetIdentifier()
 	}
 
 	if info, err := store.TunnelServer().Info(); err != nil {
@@ -541,6 +575,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.User = users
+		bucketName := store.User().BucketName()
+		backup.Identifiers[bucketName] = store.User().GetIdentifier()
 	}
 
 	if webhooks, err := store.Webhook().Webhooks(); err != nil {
@@ -549,6 +585,8 @@ func (store *Store) Export(filename string) (err error) {
 		}
 	} else {
 		backup.Webhook = webhooks
+		bucketName := store.Webhook().BucketName()
+		backup.Identifiers[bucketName] = store.Webhook().GetIdentifier()
 	}
 
 	v, err := store.Version().DBVersion()
@@ -569,6 +607,7 @@ func (store *Store) Export(filename string) (err error) {
 }
 
 func (store *Store) Import(filename string) (err error) {
+	var bucketName string
 	backup := storeExport{}
 
 	s, err := ioutil.ReadFile(filename)
@@ -597,46 +636,68 @@ func (store *Store) Import(filename string) (err error) {
 	for _, v := range backup.CustomTemplate {
 		store.CustomTemplate().UpdateCustomTemplate(v.ID, &v)
 	}
+	bucketName = store.CustomTemplate().BucketName()
+	store.CustomTemplate().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.EdgeGroup {
 		store.EdgeGroup().UpdateEdgeGroup(v.ID, &v)
 	}
+	bucketName = store.EdgeGroup().BucketName()
+	store.EdgeGroup().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.EdgeJob {
 		store.EdgeJob().UpdateEdgeJob(v.ID, &v)
 	}
+	bucketName = store.EdgeJob().BucketName()
+	store.EdgeJob().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.EdgeStack {
 		store.EdgeStack().UpdateEdgeStack(v.ID, &v)
 	}
+	bucketName = store.EdgeStack().BucketName()
+	store.EdgeStack().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.Endpoint {
 		store.Endpoint().UpdateEndpoint(v.ID, &v)
 	}
+	bucketName = store.Endpoint().BucketName()
+	store.Endpoint().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.EndpointGroup {
 		store.EndpointGroup().UpdateEndpointGroup(v.ID, &v)
 	}
+	bucketName = store.EndpointGroup().BucketName()
+	store.EndpointGroup().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.EndpointRelation {
 		store.EndpointRelation().UpdateEndpointRelation(v.EndpointID, &v)
 	}
+	bucketName = store.EndpointRelation().BucketName()
+	store.EndpointRelation().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.HelmUserRepository {
 		store.HelmUserRepository().UpdateHelmUserRepository(v.ID, &v)
 	}
+	bucketName = store.HelmUserRepository().BucketName()
+	store.HelmUserRepository().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.Registry {
 		store.Registry().UpdateRegistry(v.ID, &v)
 	}
+	bucketName = store.Registry().BucketName()
+	store.Registry().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.ResourceControl {
 		store.ResourceControl().UpdateResourceControl(v.ID, &v)
 	}
+	bucketName = store.ResourceControl().BucketName()
+	store.ResourceControl().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.Role {
 		store.Role().UpdateRole(v.ID, &v)
 	}
+	bucketName = store.Role().BucketName()
+	store.Role().SetIdentifier(backup.Identifiers[bucketName])
 
 	store.Settings().UpdateSettings(&backup.Settings)
 	store.SSLSettings().UpdateSettings(&backup.SSLSettings)
@@ -648,10 +709,14 @@ func (store *Store) Import(filename string) (err error) {
 	for _, v := range backup.Tag {
 		store.Tag().UpdateTag(v.ID, &v)
 	}
+	bucketName = store.Tag().BucketName()
+	store.Tag().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.TeamMembership {
 		store.TeamMembership().UpdateTeamMembership(v.ID, &v)
 	}
+	bucketName = store.TeamMembership().BucketName()
+	store.TeamMembership().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.Team {
 		store.Team().UpdateTeam(v.ID, &v)
@@ -664,6 +729,8 @@ func (store *Store) Import(filename string) (err error) {
 			logrus.WithField("user", user).WithError(err).Errorf("User: Failed to Update Database")
 		}
 	}
+	bucketName = store.User().BucketName()
+	store.User().SetIdentifier(backup.Identifiers[bucketName])
 
 	for _, v := range backup.Webhook {
 		store.Webhook().UpdateWebhook(v.ID, &v)

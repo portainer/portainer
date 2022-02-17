@@ -147,3 +147,13 @@ func (service *Service) UpdateWebhook(ID portainer.WebhookID, webhook *portainer
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, webhook)
 }
+
+// GetIdentifier returns the current max identifier for the datastore
+func (service *Service) GetIdentifier() int {
+	return service.connection.GetIdentifier(BucketName)
+}
+
+// SetIdentifier sets the current max identifier for the datastore
+func (service *Service) SetIdentifier(id int) error {
+	return service.connection.SetIdentifier(BucketName, id)
+}

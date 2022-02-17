@@ -2,6 +2,7 @@ package fdoprofile
 
 import (
 	"fmt"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/sirupsen/logrus"
 )
@@ -89,4 +90,14 @@ func (service *Service) Delete(ID portainer.FDOProfileID) error {
 // GetNextIdentifier returns the next identifier for a FDO Profile.
 func (service *Service) GetNextIdentifier() int {
 	return service.connection.GetNextIdentifier(BucketName)
+}
+
+// GetIdentifier returns the current max identifier for the datastore
+func (service *Service) GetIdentifier() int {
+	return service.connection.GetIdentifier(BucketName)
+}
+
+// SetIdentifier sets the current max identifier for the datastore
+func (service *Service) SetIdentifier(id int) error {
+	return service.connection.SetIdentifier(BucketName, id)
 }
