@@ -127,8 +127,6 @@ type stubUserService struct {
 }
 
 func (s *stubUserService) BucketName() string                                      { return "users" }
-func (s *stubUserService) GetIdentifier() int                                      { return 0 }
-func (s *stubUserService) SetIdentifier(id int) error                              { return nil }
 func (s *stubUserService) User(ID portainer.UserID) (*portainer.User, error)       { return nil, nil }
 func (s *stubUserService) UserByUsername(username string) (*portainer.User, error) { return nil, nil }
 func (s *stubUserService) Users() ([]portainer.User, error)                        { return s.users, nil }
@@ -151,8 +149,6 @@ type stubEdgeJobService struct {
 }
 
 func (s *stubEdgeJobService) BucketName() string                     { return "edgejob" }
-func (s *stubEdgeJobService) GetIdentifier() int                     { return 0 }
-func (s *stubEdgeJobService) SetIdentifier(id int) error             { return nil }
 func (s *stubEdgeJobService) EdgeJobs() ([]portainer.EdgeJob, error) { return s.jobs, nil }
 func (s *stubEdgeJobService) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
 	return nil, nil
@@ -175,9 +171,7 @@ type stubEndpointRelationService struct {
 	relations []portainer.EndpointRelation
 }
 
-func (s *stubEndpointRelationService) BucketName() string         { return "endpoint_relation" }
-func (s *stubEndpointRelationService) GetIdentifier() int         { return 0 }
-func (s *stubEndpointRelationService) SetIdentifier(id int) error { return nil }
+func (s *stubEndpointRelationService) BucketName() string { return "endpoint_relation" }
 func (s *stubEndpointRelationService) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	return s.relations, nil
 }
@@ -218,9 +212,7 @@ type stubEndpointService struct {
 	endpoints []portainer.Endpoint
 }
 
-func (s *stubEndpointService) BucketName() string         { return "endpoint" }
-func (s *stubEndpointService) GetIdentifier() int         { return 0 }
-func (s *stubEndpointService) SetIdentifier(id int) error { return nil }
+func (s *stubEndpointService) BucketName() string { return "endpoint" }
 func (s *stubEndpointService) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	for _, endpoint := range s.endpoints {
 		if endpoint.ID == ID {
