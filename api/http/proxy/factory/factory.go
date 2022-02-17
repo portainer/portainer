@@ -2,8 +2,6 @@ package factory
 
 import (
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -38,18 +36,6 @@ func NewProxyFactory(dataStore dataservices.DataStore, signatureService portaine
 		kubernetesClientFactory:     kubernetesClientFactory,
 		kubernetesTokenCacheManager: kubernetesTokenCacheManager,
 	}
-}
-
-// NewLegacyExtensionProxy returns a new HTTP proxy to a legacy extension server (Storidge)
-func (factory *ProxyFactory) NewLegacyExtensionProxy(extensionAPIURL string) (http.Handler, error) {
-	extensionURL, err := url.Parse(extensionAPIURL)
-	if err != nil {
-		return nil, err
-	}
-
-	extensionURL.Scheme = "http"
-	proxy := httputil.NewSingleHostReverseProxy(extensionURL)
-	return proxy, nil
 }
 
 // NewEndpointProxy returns a new reverse proxy (filesystem based or HTTP) to an environment(endpoint) API server

@@ -37,7 +37,7 @@ func (connection *DbConnection) UnmarshalObject(data []byte, object interface{})
 	if connection.getEncryptionKey() != nil {
 		data, err = decrypt(data, connection.getEncryptionKey())
 		if err != nil {
-			errors.Wrapf(err, "Failed decrypting object")
+			return errors.Wrap(err, "Failed decrypting object")
 		}
 	}
 	e := json.Unmarshal(data, object)

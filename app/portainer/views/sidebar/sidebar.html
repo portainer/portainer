@@ -39,26 +39,6 @@
         ></docker-sidebar>
       </div>
 
-      <sidebar-section title="Integrations" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0" authorization="IntegrationStoridgeAdmin">
-        <sidebar-menu
-          ng-if="
-            applicationState.endpoint.mode &&
-            applicationState.endpoint.extensions.indexOf('storidge') !== -1 &&
-            applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' &&
-            applicationState.endpoint.mode.role === 'MANAGER'
-          "
-          icon-class="fa-bolt fa-fw"
-          label="Storidge"
-          path="storidge.cluster"
-          is-sidebar-open="toggle"
-          children-paths="['storidge.cluster', 'storidge.profiles', 'storidge.monitor', 'storidge.profiles.new', 'storidge.profiles.profile', 'storidge.drives', 'storidge.drives.drive', 'storidge.cluster.node']"
-        >
-          <sidebar-menu-item path="storidge.monitor" class-name="sidebar-sublist">Monitor</sidebar-menu-item>
-          <sidebar-menu-item path="storidge.profiles" class-name="sidebar-sublist">Profiles</sidebar-menu-item>
-          <sidebar-menu-item path="storidge.drives" class-name="sidebar-sublist">Drives</sidebar-menu-item>
-        </sidebar-menu>
-      </sidebar-section>
-
       <sidebar-section title="Edge compute" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
         <sidebar-menu-item path="edge.devices" icon-class="fas fa-laptop-code fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-edgeDevices">
           Edge Devices

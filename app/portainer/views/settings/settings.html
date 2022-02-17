@@ -85,7 +85,7 @@
             <div class="form-group">
               <label for="helmrepository_url" class="col-sm-1 control-label text-left"> URL </label>
               <div class="col-sm-11">
-                <input type="text" class="form-control" ng-model="settings.HelmRepositoryURL" id="helmrepository_url" placeholder="https://charts.bitnami.com/bitnami" required />
+                <input type="text" class="form-control" ng-model="settings.HelmRepositoryURL" id="helmrepository_url" placeholder="https://charts.bitnami.com/bitnami" />
               </div>
             </div>
           </div>
@@ -310,7 +310,7 @@
             <div class="form-group">
               <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
               <div class="col-sm-1">
-                <label class="switch">
+                <label class="switch" data-cy="settings-s3PasswordToggle">
                   <input type="checkbox" id="password_protect_s3" name="password_protect_s3" ng-model="formValues.passwordProtectS3" disabled /><i></i>
                 </label>
               </div>
@@ -320,7 +320,7 @@
             <div class="form-group" ng-if="formValues.passwordProtectS3">
               <label for="password" class="col-sm-1 control-label text-left">Password</label>
               <div class="col-sm-3">
-                <input type="password" class="form-control" ng-model="formValues.passwordS3" id="password_S3" name="password_S3" required />
+                <input type="password" class="form-control" ng-model="formValues.passwordS3" id="password_S3" name="password_S3" required data-cy="settings-backups3pw" />
               </div>
             </div>
             <div class="form-group col-md-12" ng-show="backupPortainerForm.password_S3.$invalid">
@@ -369,7 +369,9 @@
             <div class="form-group">
               <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
               <div class="col-sm-1">
-                <label class="switch"> <input type="checkbox" id="password_protect" name="password_protect" ng-model="formValues.passwordProtect" /><i></i> </label>
+                <label class="switch" data-cy="settings-passwordProtectLocal">
+                  <input type="checkbox" id="password_protect" name="password_protect" ng-model="formValues.passwordProtect" /><i></i>
+                </label>
               </div>
             </div>
             <!-- !Password protect -->
@@ -378,7 +380,7 @@
             <div class="form-group" ng-if="formValues.passwordProtect">
               <label for="password" class="col-sm-1 control-label text-left">Password</label>
               <div class="col-sm-3">
-                <input type="password" class="form-control" ng-model="formValues.password" id="password" name="password" required />
+                <input type="password" class="form-control" ng-model="formValues.password" id="password" name="password" required data-cy="settings-backupLocalPassword" />
               </div>
             </div>
             <div class="form-group col-md-12" ng-show="backupPortainerForm.password.$invalid">
@@ -399,6 +401,7 @@
                   ng-click="downloadBackup()"
                   ng-disabled="backupPortainerForm.$invalid || state.backupInProgress || state.featureLimited"
                   button-spinner="state.backupInProgress"
+                  data-cy="settings-downloadLocalBackup"
                 >
                   <span ng-hide="state.backupInProgress">Download backup</span>
                   <span ng-show="state.backupInProgress">Downloading backup</span>

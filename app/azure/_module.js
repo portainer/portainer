@@ -1,4 +1,8 @@
-angular.module('portainer.azure', ['portainer.app']).config([
+import angular from 'angular';
+
+import { containerInstancesModule } from './ContainerInstances';
+
+angular.module('portainer.azure', ['portainer.app', containerInstancesModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -18,7 +22,7 @@ angular.module('portainer.azure', ['portainer.app']).config([
             EndpointProvider.setEndpointID(endpoint.Id);
             EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
             EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-            await StateManager.updateEndpointState(endpoint, []);
+            await StateManager.updateEndpointState(endpoint);
           } catch (e) {
             Notifications.error('Failed loading environment', e);
             $state.go('portainer.home', {}, { reload: true });
@@ -53,8 +57,7 @@ angular.module('portainer.azure', ['portainer.app']).config([
       url: '/new/',
       views: {
         'content@': {
-          templateUrl: './views/containerinstances/create/createcontainerinstance.html',
-          controller: 'AzureCreateContainerInstanceController',
+          component: 'createContainerInstanceView',
         },
       },
     };

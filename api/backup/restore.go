@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
@@ -65,5 +66,20 @@ func restoreFiles(srcDir string, destinationDir string) error {
 			return err
 		}
 	}
-	return nil
+
+	// TODO:  This is very boltdb module specific once again due to the filename.  Move to bolt module? Refactor for another day
+
+	// Prevent the possibility of having both databases.  Remove any default new instance
+	os.Remove(filepath.Join(destinationDir, boltdb.DatabaseFileName))
+	os.Remove(filepath.Join(destinationDir, boltdb.EncryptedDatabaseFileName))
+
+	// Now copy the database.  It'll be either portainer.db or portainer.edb
+
+	// Note: CopyPath does not return an error if the source file doesn't exist
+	err := filesystem.CopyPath(filepath.Join(srcDir, boltdb.EncryptedDatabaseFileName), destinationDir)
+	if err != nil {
+		return err
+	}
+
+	return filesystem.CopyPath(filepath.Join(srcDir, boltdb.DatabaseFileName), destinationDir)
 }

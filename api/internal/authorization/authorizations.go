@@ -153,7 +153,6 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 		portainer.OperationPortainerWebhookList:               true,
 		portainer.OperationPortainerWebhookCreate:             true,
 		portainer.OperationPortainerWebhookDelete:             true,
-		portainer.OperationIntegrationStoridgeAdmin:           true,
 		portainer.EndpointResourcesAccess:                     true,
 	}
 }
@@ -412,21 +411,19 @@ func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizatio
 // DefaultPortainerAuthorizations returns the default Portainer authorizations used by non-admin users.
 func DefaultPortainerAuthorizations() portainer.Authorizations {
 	return map[portainer.Authorization]bool{
-		portainer.OperationPortainerDockerHubInspect:        true,
-		portainer.OperationPortainerEndpointGroupList:       true,
-		portainer.OperationPortainerEndpointList:            true,
-		portainer.OperationPortainerEndpointInspect:         true,
-		portainer.OperationPortainerEndpointExtensionAdd:    true,
-		portainer.OperationPortainerEndpointExtensionRemove: true,
-		portainer.OperationPortainerMOTD:                    true,
-		portainer.OperationPortainerRegistryList:            true,
-		portainer.OperationPortainerRegistryInspect:         true,
-		portainer.OperationPortainerTeamList:                true,
-		portainer.OperationPortainerTemplateList:            true,
-		portainer.OperationPortainerTemplateInspect:         true,
-		portainer.OperationPortainerUserList:                true,
-		portainer.OperationPortainerUserInspect:             true,
-		portainer.OperationPortainerUserMemberships:         true,
+		portainer.OperationPortainerDockerHubInspect:  true,
+		portainer.OperationPortainerEndpointGroupList: true,
+		portainer.OperationPortainerEndpointList:      true,
+		portainer.OperationPortainerEndpointInspect:   true,
+		portainer.OperationPortainerMOTD:              true,
+		portainer.OperationPortainerRegistryList:      true,
+		portainer.OperationPortainerRegistryInspect:   true,
+		portainer.OperationPortainerTeamList:          true,
+		portainer.OperationPortainerTemplateList:      true,
+		portainer.OperationPortainerTemplateInspect:   true,
+		portainer.OperationPortainerUserList:          true,
+		portainer.OperationPortainerUserInspect:       true,
+		portainer.OperationPortainerUserMemberships:   true,
 	}
 }
 
@@ -602,4 +599,22 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 	}
 
 	return authorizations
+}
+
+func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpointID portainer.EndpointID, authorizations []portainer.Authorization) (bool, error) {
+	user, err := service.dataStore.User().User(userID)
+	if err != nil {
+		return false, err
+	}
+	if user.Role == portainer.AdministratorRole {
+		return true, nil
+	}
+
+	for _, authorization := range authorizations {
+		_, authorized := user.EndpointAuthorizations[endpointID][authorization]
+		if authorized {
+			return true, nil
+		}
+	}
+	return false, nil
 }

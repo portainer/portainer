@@ -4,13 +4,22 @@ import { Link } from '@/portainer/components/Link';
 import { Team } from '@/portainer/teams/types';
 
 interface Props {
+  name: string;
   teams: Team[];
   value: number[];
   overrideTooltip?: string;
   onChange(value: number[]): void;
+  errors?: string | string[];
 }
 
-export function TeamsField({ teams, value, overrideTooltip, onChange }: Props) {
+export function TeamsField({
+  name,
+  teams,
+  value,
+  overrideTooltip,
+  onChange,
+  errors,
+}: Props) {
   return (
     <FormControl
       label="Authorized teams"
@@ -21,9 +30,11 @@ export function TeamsField({ teams, value, overrideTooltip, onChange }: Props) {
           : undefined
       }
       inputId="teams-selector"
+      errors={errors}
     >
       {teams.length > 0 ? (
         <TeamsSelector
+          name={name}
           teams={teams}
           onChange={onChange}
           value={value}

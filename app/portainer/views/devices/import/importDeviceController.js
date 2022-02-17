@@ -1,3 +1,5 @@
+import uuidv4 from 'uuid/v4';
+
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 import { configureDevice, getProfiles } from 'Portainer/hostmanagement/fdo/fdo.service';
 
@@ -72,9 +74,11 @@ angular
           let suffix = $scope.formValues.Suffix;
 
           for (const deviceID of $scope.state.deviceIDs) {
+            let deviceName = $scope.formValues.DeviceName + suffix;
+
             try {
               var endpoint = await EndpointService.createRemoteEndpoint(
-                $scope.formValues.DeviceName + suffix,
+                deviceName,
                 PortainerEndpointCreationTypes.EdgeAgentEnvironment,
                 $scope.formValues.PortainerURL,
                 '',
@@ -91,15 +95,16 @@ angular
               );
             } catch (err) {
               Notifications.error('Failure', err, 'Unable to create the environment');
+              $scope.state.actionInProgress = false;
               return;
             }
 
             suffix++;
 
             const config = {
-              edgeID: endpoint.EdgeID,
+              edgeID: endpoint.EdgeID || uuidv4(),
               edgeKey: endpoint.EdgeKey,
-              name: $scope.formValues.DeviceName,
+              name: deviceName,
               profile: $scope.formValues.DeviceProfile,
             };
 

@@ -2,7 +2,7 @@
 
 Thanks for opening an issue on Portainer !
 
-Do you need help or have a question? Come chat with us on Slack http://portainer.io/slack/ or gitter https://gitter.im/portainer/Lobby.
+Do you need help or have a question? Come chat with us on Slack https://portainer.io/slack/ or gitter https://gitter.im/portainer/Lobby.
 
 If you are reporting a new issue, make sure that we do not have any duplicates
 already open. You can ensure this by searching the issue list for this

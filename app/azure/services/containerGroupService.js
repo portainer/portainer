@@ -1,4 +1,4 @@
-import { ContainerGroupViewModel, CreateContainerGroupRequest } from '../models/container_group';
+import { ContainerGroupViewModel } from '../models/container_group';
 
 angular.module('portainer.azure').factory('ContainerGroupService', [
   '$q',
@@ -29,18 +29,6 @@ angular.module('portainer.azure').factory('ContainerGroupService', [
       const containerGroup = await ContainerGroup.get({ subscriptionId, resourceGroupName, containerGroupName }).$promise;
       return new ContainerGroupViewModel(containerGroup);
     }
-
-    service.create = function (model, subscriptionId, resourceGroupName) {
-      var payload = new CreateContainerGroupRequest(model);
-      return ContainerGroup.create(
-        {
-          subscriptionId: subscriptionId,
-          resourceGroupName: resourceGroupName,
-          containerGroupName: model.Name,
-        },
-        payload
-      ).$promise;
-    };
 
     return service;
   },

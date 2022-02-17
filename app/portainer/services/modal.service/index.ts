@@ -22,6 +22,7 @@ import {
   confirmContainerDeletion,
   confirmContainerRecreation,
   confirmServiceForceUpdate,
+  confirmStackUpdate,
   confirmKubeconfigSelection,
   selectRegistry,
 } from './prompt';
@@ -57,6 +58,7 @@ export function ModalServiceAngular() {
     confirmChangePassword,
     confirmImageExport,
     confirmServiceForceUpdate,
+    confirmStackUpdate,
     selectRegistry,
     confirmContainerDeletion,
     confirmKubeconfigSelection,
