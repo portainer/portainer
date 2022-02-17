@@ -160,10 +160,10 @@ func (store *Store) encryptDB() error {
 		logrus.Errorf("Failed to remove the un-encrypted db file")
 	}
 
-	err = os.Remove(exportFilename)
-	if err != nil {
-		logrus.Errorf("Failed to remove the json backup file")
-	}
+	// err = os.Remove(exportFilename)
+	// if err != nil {
+	// 	logrus.Errorf("Failed to remove the json backup file")
+	// }
 
 	// Close db connection
 	store.connection.Close()

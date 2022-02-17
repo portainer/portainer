@@ -58,8 +58,6 @@ type (
 		UpdateCustomTemplate(ID portainer.CustomTemplateID, customTemplate *portainer.CustomTemplate) error
 		DeleteCustomTemplate(ID portainer.CustomTemplateID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// EdgeGroupService represents a service to manage Edge groups
@@ -70,8 +68,6 @@ type (
 		UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error
 		DeleteEdgeGroup(ID portainer.EdgeGroupID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// EdgeJobService represents a service to manage Edge jobs
@@ -83,8 +79,6 @@ type (
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// EdgeStackService represents a service to manage Edge stacks
@@ -96,8 +90,6 @@ type (
 		DeleteEdgeStack(ID portainer.EdgeStackID) error
 		GetNextIdentifier() int
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// EndpointService represents a service for managing environment(endpoint) data
@@ -109,8 +101,6 @@ type (
 		DeleteEndpoint(ID portainer.EndpointID) error
 		GetNextIdentifier() int
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// EndpointGroupService represents a service for managing environment(endpoint) group data
@@ -121,8 +111,6 @@ type (
 		UpdateEndpointGroup(ID portainer.EndpointGroupID, group *portainer.EndpointGroup) error
 		DeleteEndpointGroup(ID portainer.EndpointGroupID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// EndpointRelationService represents a service for managing environment(endpoint) relations data
@@ -133,8 +121,6 @@ type (
 		UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error
 		DeleteEndpointRelation(EndpointID portainer.EndpointID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// FDOProfileService represents a service to manage FDO Profiles
@@ -146,8 +132,6 @@ type (
 		Delete(ID portainer.FDOProfileID) error
 		GetNextIdentifier() int
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
@@ -158,8 +142,6 @@ type (
 		UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, repository *portainer.HelmUserRepository) error
 		DeleteHelmUserRepository(ID portainer.HelmUserRepositoryID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// JWTService represents a service for managing JWT tokens
@@ -179,8 +161,6 @@ type (
 		UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error
 		DeleteRegistry(ID portainer.RegistryID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// ResourceControlService represents a service for managing resource control data
@@ -192,8 +172,6 @@ type (
 		UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error
 		DeleteResourceControl(ID portainer.ResourceControlID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// RoleService represents a service for managing user roles
@@ -203,8 +181,6 @@ type (
 		Create(role *portainer.Role) error
 		UpdateRole(ID portainer.RoleID, role *portainer.Role) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// APIKeyRepositoryService
@@ -215,8 +191,6 @@ type (
 		DeleteAPIKey(ID portainer.APIKeyID) error
 		GetAPIKeysByUserID(userID portainer.UserID) ([]portainer.APIKey, error)
 		GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, error)
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// ScheduleService represents a service for managing scheduled jobs
@@ -228,8 +202,6 @@ type (
 		SchedulesByJobType(jobType portainer.JobType) ([]portainer.Schedule, error)
 		CreateSchedule(schedule *portainer.Schedule) error
 		GetNextIdentifier() int
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// SettingsService represents a service for managing application settings
@@ -260,8 +232,6 @@ type (
 		StackByWebhookID(ID string) (*portainer.Stack, error)
 		RefreshableStacks() ([]portainer.Stack, error)
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// TagService represents a service for managing tag data
@@ -272,8 +242,6 @@ type (
 		UpdateTag(ID portainer.TagID, tag *portainer.Tag) error
 		DeleteTag(ID portainer.TagID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// TeamService represents a service for managing user data
@@ -285,8 +253,6 @@ type (
 		UpdateTeam(ID portainer.TeamID, team *portainer.Team) error
 		DeleteTeam(ID portainer.TeamID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// TeamMembershipService represents a service for managing team membership data
@@ -301,8 +267,6 @@ type (
 		DeleteTeamMembershipByUserID(userID portainer.UserID) error
 		DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// TunnelServerService represents a service for managing data associated to the tunnel server
@@ -322,8 +286,6 @@ type (
 		UpdateUser(ID portainer.UserID, user *portainer.User) error
 		DeleteUser(ID portainer.UserID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 
 	// VersionService represents a service for managing version data
@@ -346,8 +308,6 @@ type (
 		WebhookByToken(token string) (*portainer.Webhook, error)
 		DeleteWebhook(ID portainer.WebhookID) error
 		BucketName() string
-		GetIdentifier() int
-		SetIdentifier(id int) error
 	}
 )
 

@@ -197,13 +197,3 @@ func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
 
 	return stacks, err
 }
-
-// GetIdentifier returns the current max identifier for the datastore
-func (service *Service) GetIdentifier() int {
-	return service.connection.GetIdentifier(BucketName)
-}
-
-// SetIdentifier sets the current max identifier for the datastore
-func (service *Service) SetIdentifier(id int) error {
-	return service.connection.SetIdentifier(BucketName, id)
-}

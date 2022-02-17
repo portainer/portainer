@@ -89,13 +89,3 @@ func (service *Service) Create(customTemplate *portainer.CustomTemplate) error {
 func (service *Service) GetNextIdentifier() int {
 	return service.connection.GetNextIdentifier(BucketName)
 }
-
-// GetIdentifier returns the current max identifier for the datastore
-func (service *Service) GetIdentifier() int {
-	return service.connection.GetIdentifier(BucketName)
-}
-
-// SetIdentifier sets the current max identifier for the datastore
-func (service *Service) SetIdentifier(id int) error {
-	return service.connection.SetIdentifier(BucketName, id)
-}
