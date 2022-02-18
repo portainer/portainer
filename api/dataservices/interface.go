@@ -193,17 +193,6 @@ type (
 		GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, error)
 	}
 
-	// ScheduleService represents a service for managing scheduled jobs
-	ScheduleService interface {
-		Schedule(ID portainer.ScheduleID) (*portainer.Schedule, error)
-		UpdateSchedule(ID portainer.ScheduleID, schedule *portainer.Schedule) error
-		DeleteSchedule(ID portainer.ScheduleID) error
-		Schedules() ([]portainer.Schedule, error)
-		SchedulesByJobType(jobType portainer.JobType) ([]portainer.Schedule, error)
-		CreateSchedule(schedule *portainer.Schedule) error
-		GetNextIdentifier() int
-	}
-
 	// SettingsService represents a service for managing application settings
 	SettingsService interface {
 		Settings() (*portainer.Settings, error)
