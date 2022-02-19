@@ -1,4 +1,5 @@
 const angularComponents = require('./plop/ng-component/angular-component-plop-config');
+const reactComponent = require('./plop/react-component/react-component-plop-config');
 
 module.exports = function (
   /** @type {import('plop').NodePlopAPI} */
@@ -8,4 +9,5 @@ module.exports = function (
   const cwd = process.env.INIT_CWD;
   plop.addHelper('cwd', () => cwd);
   plop.setGenerator('ng-component', angularComponents(cwd));
+  plop.setGenerator('component', reactComponent());
 };
