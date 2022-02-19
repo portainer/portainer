@@ -28,6 +28,10 @@
   display: flex;
 }
 
+.env-item-textarea {
+  resize: vertical;
+}
+
 .env-item .env-item-value .input-group {
   flex: 1;
 }

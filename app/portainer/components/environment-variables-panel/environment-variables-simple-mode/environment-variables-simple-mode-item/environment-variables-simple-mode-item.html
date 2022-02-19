@@ -29,15 +29,7 @@
     <div class="w-full env-item-value">
       <div class="input-group input-group-sm">
         <span class="input-group-addon">value</span>
-        <input
-          type="text"
-          class="form-control"
-          ng-model="$ctrl.variable.value"
-          placeholder="e.g. bar"
-          ng-trim="false"
-          name="value"
-          ng-change="$ctrl.onChangeValue($ctrl.variable.value)"
-        />
+        <textarea class="form-control env-item-textarea" rows="1" ng-model="$ctrl.variable.value" placeholder="e.g. bar" ng-trim="false" name="value"> </textarea>
       </div>
       <button class="btn btn-sm btn-primary" type="button" ng-click="$ctrl.removeValue()"> <i class="fa fa-minus" aria-hidden="true"></i> Remove value </button>
     </div>

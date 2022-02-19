@@ -279,7 +279,7 @@
                 <table class="table table-bordered table-condensed">
                   <tr ng-repeat="var in container.Config.Env track by $index">
                     <td>{{ var|key: '=' }}</td>
-                    <td>{{ var|value: '=' }}</td>
+                    <td style="max-width: 120rem">{{ var|value: '=' }}</td>
                   </tr>
                 </table>
               </td>
