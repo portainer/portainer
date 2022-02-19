@@ -17,17 +17,17 @@ module.exports = (cwd) => ({
     {
       type: 'add',
       path: `{{cwd}}/{{dashCase name}}/index.js`,
-      templateFile: './plop-templates/component.js.hbs',
+      templateFile: './plop/ng-component/component.js.hbs',
     },
     {
       type: 'add',
       path: `{{cwd}}/{{dashCase name}}/{{dashCase name}}.controller.js`,
-      templateFile: './plop-templates/component-controller.js.hbs',
+      templateFile: './plop/ng-component/component-controller.js.hbs',
     },
     {
       type: 'add',
       path: `{{cwd}}/{{dashCase name}}/{{dashCase name}}.html`,
-      templateFile: './plop-templates/component.html.hbs',
+      templateFile: './plop/ng-component/component.html.hbs',
     },
   ], // array of actions
 });
