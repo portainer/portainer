@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import _ from 'lodash';
 
 import { ProviderResponse } from '../types';
 

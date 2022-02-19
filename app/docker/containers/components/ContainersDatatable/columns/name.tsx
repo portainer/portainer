@@ -1,5 +1,5 @@
 import { CellProps, Column, TableInstance } from 'react-table';
-import _ from 'lodash-es';
+import _ from 'lodash';
 import { useSref } from '@uirouter/react';
 
 import { useEnvironment } from '@/portainer/environments/useEnvironment';

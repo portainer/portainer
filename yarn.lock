@@ -3324,17 +3324,10 @@
     "@types/interpret" "*"
     "@types/node" "*"
 
-"@types/lodash-es@^4.17.5":
-  version "4.17.6"
-  resolved "https://registry.yarnpkg.com/@types/lodash-es/-/lodash-es-4.17.6.tgz#c2ed4c8320ffa6f11b43eb89e9eaeec65966a0a0"
-  integrity sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==
-  dependencies:
-    "@types/lodash" "*"
-
-"@types/lodash@*", "@types/lodash@^4.14.175":
-  version "4.14.178"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.178.tgz#341f6d2247db528d4a13ddbb374bcdc80406f4f8"
-  integrity sha512-0d5Wd09ItQWH1qFbEyQ7oTQ3GZrMfth5JkbN3EvTKLXcHLRDSXeLnlvlOn0wvxVIwK5o2M8JzP/OWz7T3NRsbw==
+"@types/lodash@^4.14.175":
+  version "4.14.177"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.177.tgz#f70c0d19c30fab101cad46b52be60363c43c4578"
+  integrity sha512-0fDwydE2clKe9MNfvXHBHF9WEahRuj+msTuQqOmAApNORFvhMYZKNGGJdCzuhheVjMps/ti0Ak/iJPACMaevvw==
 
 "@types/mdast@^3.0.0":
   version "3.0.10"
@@ -4271,11 +4264,6 @@ angular-messages@1.8.2:
   resolved "https://registry.yarnpkg.com/angular-messages/-/angular-messages-1.8.2.tgz#47f0cf913030bc2231423ab9388acc14dd931837"
   integrity sha512-M1qNh/30cLJi4yJJ+3YB8saPonRcavz5Dquqz0T/aUySKJhIkUoeCkmF+BcLH4SJ5PBp04yy4CZUUeNRVi7jZA==
 
-angular-mocks@1.6.1:
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.6.1.tgz#2f44a1b3ac608e93751305bce176c274221d8abd"
-  integrity sha1-L0Shs6xgjpN1EwW84XbCdCIdir0=
-
 angular-mocks@1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.8.2.tgz#dc022420b86978cf317a8447c116c0be73a853bf"
@@ -4289,9 +4277,9 @@ angular-moment-picker@^0.10.2:
     angular "^1.3"
     moment "^2.16.0"
 
-"angular-multiselect@github:portainer/angular-multi-select#semver:~v4.0.1":
+"angular-multiselect@github:portainer/angular-multi-select":
   version "4.0.0"
-  resolved "https://codeload.github.com/portainer/angular-multi-select/tar.gz/52e8ab9f2ece53db660893172f716346926c9ae8"
+  resolved "https://codeload.github.com/portainer/angular-multi-select/tar.gz/5f6cb6f966b0bd89f211338fc41dcf70ecacbde7"
   dependencies:
     angular-mocks "1.6.1"
     angular-sanitize "1.6.1"
@@ -4300,11 +4288,6 @@ angular-resource@1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/angular-resource/-/angular-resource-1.8.2.tgz#fc1f1adb93dfb83e295d1cfff2a48cec4296e20a"
   integrity sha512-CbTu8ypkVZMBLm+Wd+jI9xR7QEVCeUgN8WXsr9Yi9l0s/8ZQa5kEIuYX3F/75Ej8Xs1Jp9DoKjAyvACI6Q8IJA==
-
-angular-sanitize@1.6.1:
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.6.1.tgz#cacffec3199ed66297afbb1ef366ec66616b3b3f"
-  integrity sha1-ys/+wxme1mKXr7se82bsZmFrOz8=
 
 angular-sanitize@1.8.2:
   version "1.8.2"

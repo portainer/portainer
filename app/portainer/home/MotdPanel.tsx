@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import _ from 'lodash-es';
+import _ from 'lodash';
 
 import { useUIState } from '@/portainer/hooks/UIStateProvider';
 
