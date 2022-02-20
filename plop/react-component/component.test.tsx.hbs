@@ -1,0 +1,14 @@
+import { render } from '@/react-tools/test-utils';
+
+import { {{pascalCase name}} } from './{{pascalCase name}}'
+
+
+test('renders correctly', () => {
+  const queries = renderComponent();
+
+  expect(queries).toBeTruthy();
+})
+
+function renderComponent() {
+  return render(<{{pascalCase name}} />)
+}
