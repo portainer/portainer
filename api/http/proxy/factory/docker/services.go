@@ -138,5 +138,6 @@ func (transport *Transport) decorateServiceCreationOperation(request *http.Reque
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 	}
 
-	return transport.replaceRegistryAuthenticationHeader(request)
+	transport.replaceRegistryAuthenticationHeader(request)
+	return transport.decorateGenericResourceCreationOperation(request, serviceObjectIdentifier, portainer.ServiceResourceControl)
 }

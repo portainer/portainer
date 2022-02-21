@@ -348,11 +348,18 @@ angular.module('portainer.docker').controller('ServiceController', [
       }
     };
 
-    $scope.updateWebhookRegistryId = function () {
-      const newRegistryID = _.get($scope.formValues.RegistryModel, 'Registry.Id', 0);
-      const registryChanged = $scope.initialRegistryID != newRegistryID;
+    function getSelectedRegistryId(registryModel = $scope.formValues.RegistryModel) {
+      return _.get(registryModel, 'Registry.Id', 0);
+    }
 
-      if ($scope.WebhookExists && registryChanged) {
+    function hasRegistryChanged() {
+      const newRegistryID = getSelectedRegistryId();
+      return $scope.initialRegistryID != newRegistryID;
+    }
+
+    $scope.updateWebhookRegistryId = function () {
+      if ($scope.WebhookExists && hasRegistryChanged()) {
+        const newRegistryID = getSelectedRegistryId();
         WebhookService.updateServiceWebhook($scope.webhookID, newRegistryID).catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update webhook');
         });
@@ -396,7 +403,7 @@ angular.module('portainer.docker').controller('ServiceController', [
         if (key === 'Image') {
           const originalImage = service ? service.Model.Spec.TaskTemplate.ContainerSpec.Image : null;
           const currentImage = ImageHelper.createImageConfigForContainer($scope.formValues.RegistryModel).fromImage;
-          hasChanges = hasChanges || originalImage !== currentImage;
+          hasChanges = hasChanges || originalImage !== currentImage || hasRegistryChanged();
         } else {
           hasChanges = hasChanges || previousServiceValues.indexOf(key) >= 0;
         }
@@ -420,6 +427,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       if ($scope.hasChanges(service, ['Image'])) {
         const image = ImageHelper.createImageConfigForContainer($scope.formValues.RegistryModel);
         config.TaskTemplate.ContainerSpec.Image = image.fromImage;
+        config.registryId = getSelectedRegistryId();
       } else {
         config.TaskTemplate.ContainerSpec.Image = service.Image;
       }
@@ -559,8 +567,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     $scope.updateService = function updateService(service) {
-      let config = {};
-      service, (config = buildChanges(service));
+      const config = buildChanges(service);
       ServiceService.update(service, config).then(
         function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
@@ -622,6 +629,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       var config = ServiceHelper.serviceToConfig(service.Model);
       if (pullImage) {
         config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
+        config.registryId = getSelectedRegistryId();
       }
 
       // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
@@ -781,7 +789,7 @@ angular.module('portainer.docker').controller('ServiceController', [
           const image = $scope.service.Model.Spec.TaskTemplate.ContainerSpec.Image;
           RegistryService.retrievePorRegistryModelFromRepository(image, endpoint.Id).then((model) => {
             $scope.formValues.RegistryModel = model;
-            $scope.initialRegistryID = _.get(model, 'Registry.Id', 0);
+            $scope.initialRegistryID = getSelectedRegistryId(model);
           });
 
           // Default values

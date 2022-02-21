@@ -1,5 +1,6 @@
 angular.module('portainer.docker').controller('ServicesDatatableActionsController', [
   '$q',
+  '$async',
   '$state',
   'ServiceService',
   'ServiceHelper',
@@ -7,7 +8,8 @@ angular.module('portainer.docker').controller('ServicesDatatableActionsControlle
   'ModalService',
   'ImageHelper',
   'WebhookService',
-  function ($q, $state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService) {
+  'RegistryService',
+  function ($q, $async, $state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService, RegistryService) {
     const ctrl = this;
 
     this.scaleAction = function scaleService(service) {
@@ -54,29 +56,35 @@ angular.module('portainer.docker').controller('ServicesDatatableActionsControlle
     };
 
     function forceUpdateServices(services, pullImage) {
-      var actionCount = services.length;
-      angular.forEach(services, function (service) {
-        var config = ServiceHelper.serviceToConfig(service.Model);
-        if (pullImage) {
-          config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
-        }
-
-        // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
-        // value or an increment of the counter value to force an update.
-        config.TaskTemplate.ForceUpdate++;
-        ServiceService.update(service, config)
-          .then(function success() {
-            Notifications.success('Service successfully updated', service.Name);
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to force update service' + service.Name);
-          })
-          .finally(function final() {
-            --actionCount;
-            if (actionCount === 0) {
-              $state.reload();
+      return $async(() => {
+        let actionCount = services.length;
+        return Promise.all(
+          services.map(async function (service) {
+            const config = ServiceHelper.serviceToConfig(service.Model);
+            if (pullImage) {
+              const registryModel = await RegistryService.retrievePorRegistryModelFromRepository(config.TaskTemplate.ContainerSpec.Image, ctrl.endpointId);
+              config.TaskTemplate.ContainerSpec.Image = registryModel.Image;
+              config.registryId = registryModel.Id;
             }
-          });
+
+            // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
+            // value or an increment of the counter value to force an update.
+            config.TaskTemplate.ForceUpdate++;
+            ServiceService.update(service, config)
+              .then(function success() {
+                Notifications.success('Service successfully updated', service.Name);
+              })
+              .catch(function error(err) {
+                Notifications.error('Failure', err, 'Unable to force update service' + service.Name);
+              })
+              .finally(function final() {
+                --actionCount;
+                if (actionCount === 0) {
+                  $state.reload();
+                }
+              });
+          })
+        );
       });
     }
 
