@@ -13,15 +13,23 @@ interface StoryProps {
   icon: string;
   comment: string;
   accessibilityLabel: string;
+  link: string;
 }
 
-function Template({ value, icon, comment, accessibilityLabel }: StoryProps) {
+function Template({
+  value,
+  icon,
+  comment,
+  accessibilityLabel,
+  link,
+}: StoryProps) {
   return (
     <DashboardItem
       value={value}
       icon={icon}
       comment={comment}
       accessibilityLabel={accessibilityLabel}
+      link={link}
     />
   );
 }
@@ -32,4 +40,13 @@ Primary.args = {
   icon: 'fa fa-th-list',
   comment: 'Resource',
   accessibilityLabel: 'dashboardItem',
+};
+
+export const WithLink: Story<StoryProps> = Template.bind({});
+WithLink.args = {
+  value: 1,
+  icon: 'fa fa-th-list',
+  comment: 'Resource',
+  accessibilityLabel: 'dashboardItem',
+  link: 'example.page',
 };

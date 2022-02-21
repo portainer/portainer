@@ -1,3 +1,4 @@
+import { Link } from '@/portainer/components/Link';
 import { Widget, WidgetBody } from '@/portainer/components/widget';
 
 interface Props {
@@ -5,6 +6,7 @@ interface Props {
   icon: string;
   comment: string;
   accessibilityLabel: string;
+  link?: string;
 }
 
 export function DashboardItem({
@@ -12,8 +14,9 @@ export function DashboardItem({
   icon,
   comment,
   accessibilityLabel,
+  link,
 }: Props) {
-  return (
+  const element = (
     <div className="col-sm-12 col-md-6" aria-label={accessibilityLabel}>
       <Widget>
         <WidgetBody>
@@ -30,4 +33,6 @@ export function DashboardItem({
       </Widget>
     </div>
   );
+
+  return <>{link ? <Link to={link}>{element}</Link> : element}</>;
 }
