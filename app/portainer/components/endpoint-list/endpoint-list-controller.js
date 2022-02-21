@@ -75,7 +75,7 @@ angular.module('portainer.app').controller('EndpointListController', [
       }
     };
 
-    this.$onDestory = function () {
+    this.$onDestroy = function () {
       this.clearPollTimeout();
     };
 
