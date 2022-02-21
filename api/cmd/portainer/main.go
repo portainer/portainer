@@ -283,6 +283,7 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 		return err
 	}
 
+	settings.AgentSecret = ""
 	sslSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {
 		return err

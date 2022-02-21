@@ -27,9 +27,8 @@ func (handler *Handler) settingsInspect(w http.ResponseWriter, r *http.Request) 
 
 	if agentKey, ok := os.LookupEnv("AGENT_SECRET"); ok {
 		settings.AgentSecret = agentKey
-	} else {
-		settings.AgentSecret = ""
 	}
+	
 	hideFields(settings)
 	return response.JSON(w, settings)
 }
