@@ -4,17 +4,11 @@ interface Props {
   value: number;
   icon: string;
   comment: string;
-  accessibilityLabel: string;
 }
 
-export function DashboardItem({
-  value,
-  icon,
-  comment,
-  accessibilityLabel,
-}: Props) {
+export function DashboardItem({ value, icon, comment }: Props) {
   return (
-    <div className="col-sm-12 col-md-6" aria-label={accessibilityLabel}>
+    <div className="col-sm-12 col-md-6" aria-label={comment}>
       <Widget>
         <WidgetBody>
           <div className="widget-icon blue pull-left">
