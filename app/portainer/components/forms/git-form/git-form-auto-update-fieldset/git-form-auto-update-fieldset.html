@@ -51,7 +51,7 @@
       />
     </div>
   </div>
-  <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
+  <div class="form-group" ng-if="$ctrl.model.ShowForcePullImage && $ctrl.model.RepositoryAutomaticUpdates">
     <div class="col-sm-12">
       <por-switch-field name="forcePullImage" feature-id="$ctrl.stackPullImageFeature" checked="$ctrl.model.ForcePullImage" label="'Pull latest image'"> </por-switch-field>
     </div>
