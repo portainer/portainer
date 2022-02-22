@@ -65,7 +65,7 @@
             <tr ng-if="$ctrl.resourceControl.Type === $ctrl.RCTI.STACK && $ctrl.resourceType !== $ctrl.RCTS.STACK">
               <td colspan="2">
                 <i class="fa fa-info-circle" aria-hidden="true" style="margin-right: 2px"></i>
-                Access control on this resource is inherited from the following stack: {{ $ctrl.resourceControl.ResourceId }}
+                Access control on this resource is inherited from the following stack: {{ $ctrl.removeEndpointId($ctrl.resourceControl.ResourceId) }}
                 <portainer-tooltip
                   message="Access control applied on a stack is also applied on each resource in the stack."
                   position="bottom"
