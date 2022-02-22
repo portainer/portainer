@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/middlewares"
 )
 
 func (handler *Handler) handlerDBErr(err error, msg string) *httperror.HandlerError {
@@ -37,14 +38,9 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
 
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "endpoint_id")
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
-	}
-
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err != nil {
-		return handler.handlerDBErr(err, "Unable to find an environment with the specified identifier inside the database")
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a valid endpoint from the handler context", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
