@@ -22,7 +22,6 @@ type Handler struct {
 	FileService        portainer.FileService
 	GitService         portainer.GitService
 	KubernetesDeployer portainer.KubernetesDeployer
-	Endpoint           *portainer.Endpoint
 }
 
 // NewHandler creates a handler to manage environment(endpoint) group operations.
