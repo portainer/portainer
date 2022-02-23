@@ -3,6 +3,7 @@ package registries
 import (
 	"errors"
 	"fmt"
+	registry2 "github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -25,7 +26,7 @@ type registryCreatePayload struct {
 	//	5 (ProGet registry),
 	//	6 (DockerHub)
 	//	7 (ECR)
-	Type portainer.RegistryType `example:"1" validate:"required" enums:"1,2,3,4,5,6,7"`
+	Type registry2.RegistryType `example:"1" validate:"required" enums:"1,2,3,4,5,6,7"`
 	// URL or IP address of the Docker registry
 	URL string `example:"registry.mydomain.tld:2375/feed" validate:"required"`
 	// BaseURL required for ProGet registry
@@ -37,11 +38,11 @@ type registryCreatePayload struct {
 	// Password used to authenticate against this registry. required when Authentication is true
 	Password string `example:"registry_password"`
 	// Gitlab specific details, required when type = 4
-	Gitlab portainer.GitlabRegistryData
+	Gitlab registry2.GitlabRegistryData
 	// Quay specific details, required when type = 1
-	Quay portainer.QuayRegistryData
+	Quay registry2.QuayRegistryData
 	// ECR specific details, required when type = 7
-	Ecr portainer.EcrData
+	Ecr registry2.EcrData
 }
 
 func (payload *registryCreatePayload) Validate(_ *http.Request) error {
@@ -105,8 +106,8 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	registry := &portainer.Registry{
-		Type:             portainer.RegistryType(payload.Type),
+	registry := &registry2.Registry{
+		Type:             registry2.RegistryType(payload.Type),
 		Name:             payload.Name,
 		URL:              payload.URL,
 		BaseURL:          payload.BaseURL,
@@ -115,7 +116,7 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Password:         payload.Password,
 		Gitlab:           payload.Gitlab,
 		Quay:             payload.Quay,
-		RegistryAccesses: portainer.RegistryAccesses{},
+		RegistryAccesses: registry2.RegistryAccesses{},
 		Ecr:              payload.Ecr,
 	}
 

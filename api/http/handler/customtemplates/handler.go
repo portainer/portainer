@@ -1,6 +1,7 @@
 package customtemplates
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -48,7 +49,7 @@ func userCanAccessTemplate(customTemplate portainer.CustomTemplate, securityCont
 		return true
 	}
 
-	userTeamIDs := make([]portainer.TeamID, 0)
+	userTeamIDs := make([]database.TeamID, 0)
 	for _, membership := range securityContext.UserMemberships {
 		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}

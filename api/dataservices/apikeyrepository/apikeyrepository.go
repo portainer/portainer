@@ -33,7 +33,7 @@ func NewService(connection database.Connection) (*Service, error) {
 }
 
 // GetAPIKeysByUserID returns a slice containing all the APIKeys a user has access to.
-func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer.APIKey, error) {
+func (service *Service) GetAPIKeysByUserID(userID database.UserID) ([]portainer.APIKey, error) {
 	var result = make([]portainer.APIKey, 0)
 
 	err := service.connection.GetAll(

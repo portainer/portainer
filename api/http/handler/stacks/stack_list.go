@@ -75,7 +75,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user information from the database", err}
 		}
 
-		userTeamIDs := make([]portainer.TeamID, 0)
+		userTeamIDs := make([]database.TeamID, 0)
 		for _, membership := range securityContext.UserMemberships {
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}

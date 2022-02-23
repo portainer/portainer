@@ -1,12 +1,12 @@
 package teams
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -38,11 +38,11 @@ func (handler *Handler) teamInspect(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	if !security.AuthorizedTeamManagement(portainer.TeamID(teamID), securityContext) {
+	if !security.AuthorizedTeamManagement(database.TeamID(teamID), securityContext) {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to team", errors.ErrResourceAccessDenied}
 	}
 
-	team, err := handler.DataStore.Team().Team(portainer.TeamID(teamID))
+	team, err := handler.DataStore.Team().Team(database.TeamID(teamID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team with the specified identifier inside the database", err}
 	} else if err != nil {

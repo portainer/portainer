@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/database"
 	"strconv"
 	"sync"
 	"testing"
@@ -173,7 +174,7 @@ func Test_ToggleSystemState(t *testing.T) {
 		assert.Equal(t, "true", labelValue)
 
 		expectedPolicies := map[string]portainer.K8sNamespaceAccessPolicy{
-			"ns2": {UserAccessPolicies: portainer.UserAccessPolicies{2: {RoleID: 0}}},
+			"ns2": {UserAccessPolicies: database.UserAccessPolicies{2: {RoleID: 0}}},
 		}
 		actualPolicies, err := kcl.GetNamespaceAccessPolicies()
 		assert.NoError(t, err, "failed to fetch policies")

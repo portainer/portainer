@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices/edgejob"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"io"
 	"time"
 
@@ -12,11 +13,6 @@ import (
 )
 
 type (
-	// AccessPolicy represent a policy that can be associated to a user or team
-	AccessPolicy struct {
-		// Role identifier. Reference the role that will be associated to this access policy
-		RoleID RoleID `json:"RoleId" example:"1"`
-	}
 
 	// AgentPlatform represents a platform type for an Agent
 	AgentPlatform int
@@ -142,7 +138,7 @@ type (
 		// Path to the Stack file
 		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
 		// User identifier who created this template
-		CreatedByUserID UserID `json:"CreatedByUserId" example:"3"`
+		CreatedByUserID database.UserID `json:"CreatedByUserId" example:"3"`
 		// A note that will be displayed in the UI. Supports HTML content
 		Note string `json:"Note" example:"This is my <b>custom</b> template"`
 		// Platform associated to the template.
@@ -263,9 +259,9 @@ type (
 		// Environment(Endpoint) group identifier
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
-		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
-		TLSConfig        TLSConfiguration `json:"TLSConfig"`
-		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" example:""`
+		PublicURL        string                    `json:"PublicURL" example:"docker.mydomain.tld:2375"`
+		TLSConfig        database.TLSConfiguration `json:"TLSConfig"`
+		AzureCredentials AzureCredentials          `json:"AzureCredentials,omitempty" example:""`
 		// List of tag identifiers to which this environment(endpoint) is associated
 		TagIDs []TagID `json:"TagIds"`
 		// The status of the environment(endpoint) (1 - up, 2 - down)
@@ -273,9 +269,9 @@ type (
 		// List of snapshots
 		Snapshots []DockerSnapshot `json:"Snapshots" example:""`
 		// List of user identifiers authorized to connect to this environment(endpoint)
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		UserAccessPolicies database.UserAccessPolicies `json:"UserAccessPolicies"`
 		// List of team identifiers authorized to connect to this environment(endpoint)
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
+		TeamAccessPolicies database.TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
 		// The identifier of the edge agent associated with this environment(endpoint)
 		EdgeID string `json:"EdgeID,omitempty" example:""`
 		// The key which is used to map the agent to Portainer
@@ -305,8 +301,8 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+		AuthorizedUsers []database.UserID `json:"AuthorizedUsers"`
+		AuthorizedTeams []database.TeamID `json:"AuthorizedTeams"`
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
@@ -322,9 +318,9 @@ type (
 		// Environment(Endpoint) group name
 		Name string `json:"Name" example:"my-environment-group"`
 		// Description associated to the environment(endpoint) group
-		Description        string             `json:"Description" example:"Environment(Endpoint) group description"`
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" example:""`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
+		Description        string                      `json:"Description" example:"Environment(Endpoint) group description"`
+		UserAccessPolicies database.UserAccessPolicies `json:"UserAccessPolicies" example:""`
+		TeamAccessPolicies database.TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
 		// List of tags associated to this environment(endpoint) group
 		TagIDs []TagID `json:"TagIds"`
 
@@ -332,8 +328,8 @@ type (
 		Labels []Pair `json:"Labels"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+		AuthorizedUsers []database.UserID `json:"AuthorizedUsers"`
+		AuthorizedTeams []database.TeamID `json:"AuthorizedTeams"`
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
@@ -407,13 +403,6 @@ type (
 	// Feature represents a feature that can be enabled or disabled via feature flags
 	Feature string
 
-	// GitlabRegistryData represents data required for gitlab registry to work
-	GitlabRegistryData struct {
-		ProjectID   int    `json:"ProjectId"`
-		InstanceURL string `json:"InstanceURL"`
-		ProjectPath string `json:"ProjectPath"`
-	}
-
 	HelmUserRepositoryID int
 
 	// HelmUserRepositories stores a Helm repository URL for the given user
@@ -421,20 +410,9 @@ type (
 		// Membership Identifier
 		ID HelmUserRepositoryID `json:"Id" example:"1"`
 		// User identifier
-		UserID UserID `json:"UserId" example:"1"`
+		UserID database.UserID `json:"UserId" example:"1"`
 		// Helm repository URL
 		URL string `json:"URL" example:"https://charts.bitnami.com/bitnami"`
-	}
-
-	// QuayRegistryData represents data required for Quay registry to work
-	QuayRegistryData struct {
-		UseOrganisation  bool   `json:"UseOrganisation"`
-		OrganisationName string `json:"OrganisationName"`
-	}
-
-	// EcrData represents data required for ECR registry
-	EcrData struct {
-		Region string `json:"Region" example:"ap-southeast-2"`
 	}
 
 	// JobType represents a job type
@@ -448,8 +426,8 @@ type (
 	K8sNodesLimits map[string]*K8sNodeLimits
 
 	K8sNamespaceAccessPolicy struct {
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+		UserAccessPolicies database.UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies database.TeamAccessPolicies `json:"TeamAccessPolicies"`
 	}
 
 	// KubernetesData contains all the Kubernetes related environment(endpoint) information
@@ -527,8 +505,8 @@ type (
 		// Password of the account that will be used to search users
 		Password string `json:"Password,omitempty" example:"readonly-password"`
 		// URL or IP address of the LDAP server
-		URL       string           `json:"URL" example:"myldap.domain.tld:389"`
-		TLSConfig TLSConfiguration `json:"TLSConfig"`
+		URL       string                    `json:"URL" example:"myldap.domain.tld:389"`
+		TLSConfig database.TLSConfiguration `json:"TLSConfig"`
 		// Whether LDAP connection should use StartTLS
 		StartTLS            bool                      `json:"StartTLS" example:"true"`
 		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
@@ -556,19 +534,19 @@ type (
 
 	// OAuthSettings represents the settings used to authorize with an authorization server
 	OAuthSettings struct {
-		ClientID             string `json:"ClientID"`
-		ClientSecret         string `json:"ClientSecret,omitempty"`
-		AccessTokenURI       string `json:"AccessTokenURI"`
-		AuthorizationURI     string `json:"AuthorizationURI"`
-		ResourceURI          string `json:"ResourceURI"`
-		RedirectURI          string `json:"RedirectURI"`
-		UserIdentifier       string `json:"UserIdentifier"`
-		Scopes               string `json:"Scopes"`
-		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
-		DefaultTeamID        TeamID `json:"DefaultTeamID"`
-		SSO                  bool   `json:"SSO"`
-		LogoutURI            string `json:"LogoutURI"`
-		KubeSecretKey        []byte `json:"KubeSecretKey"`
+		ClientID             string          `json:"ClientID"`
+		ClientSecret         string          `json:"ClientSecret,omitempty"`
+		AccessTokenURI       string          `json:"AccessTokenURI"`
+		AuthorizationURI     string          `json:"AuthorizationURI"`
+		ResourceURI          string          `json:"ResourceURI"`
+		RedirectURI          string          `json:"RedirectURI"`
+		UserIdentifier       string          `json:"UserIdentifier"`
+		Scopes               string          `json:"Scopes"`
+		OAuthAutoCreateUsers bool            `json:"OAuthAutoCreateUsers"`
+		DefaultTeamID        database.TeamID `json:"DefaultTeamID"`
+		SSO                  bool            `json:"SSO"`
+		LogoutURI            string          `json:"LogoutURI"`
+		KubeSecretKey        []byte          `json:"KubeSecretKey"`
 	}
 
 	// Pair defines a key/value string pair
@@ -576,74 +554,6 @@ type (
 		Name  string `json:"name" example:"name"`
 		Value string `json:"value" example:"value"`
 	}
-
-	// Registry represents a Docker registry with all the info required
-	// to connect to it
-	Registry struct {
-		// Registry Identifier
-		ID RegistryID `json:"Id" example:"1"`
-		// Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab, 5 - ProGet, 6 - DockerHub, 7 - ECR)
-		Type RegistryType `json:"Type" enums:"1,2,3,4,5,6,7"`
-		// Registry Name
-		Name string `json:"Name" example:"my-registry"`
-		// URL or IP address of the Docker registry
-		URL string `json:"URL" example:"registry.mydomain.tld:2375"`
-		// Base URL, introduced for ProGet registry
-		BaseURL string `json:"BaseURL" example:"registry.mydomain.tld:2375"`
-		// Is authentication against this registry enabled
-		Authentication bool `json:"Authentication" example:"true"`
-		// Username or AccessKeyID used to authenticate against this registry
-		Username string `json:"Username" example:"registry user"`
-		// Password or SecretAccessKey used to authenticate against this registry
-		Password                string                           `json:"Password,omitempty" example:"registry_password"`
-		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
-		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
-		Quay                    QuayRegistryData                 `json:"Quay"`
-		Ecr                     EcrData                          `json:"Ecr"`
-		RegistryAccesses        RegistryAccesses                 `json:"RegistryAccesses"`
-
-		// Deprecated fields
-		// Deprecated in DBVersion == 31
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
-		// Deprecated in DBVersion == 31
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
-
-		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		// Deprecated in DBVersion == 18
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
-
-		// Stores temporary access token
-		AccessToken       string `json:"AccessToken,omitempty"`
-		AccessTokenExpiry int64  `json:"AccessTokenExpiry,omitempty"`
-	}
-
-	RegistryAccesses map[database.EndpointID]RegistryAccessPolicies
-
-	RegistryAccessPolicies struct {
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
-		Namespaces         []string           `json:"Namespaces"`
-	}
-
-	// RegistryID represents a registry identifier
-	RegistryID int
-
-	// RegistryManagementConfiguration represents a configuration that can be used to query
-	// the registry API via the registry management extension.
-	RegistryManagementConfiguration struct {
-		Type              RegistryType     `json:"Type"`
-		Authentication    bool             `json:"Authentication"`
-		Username          string           `json:"Username"`
-		Password          string           `json:"Password"`
-		TLSConfig         TLSConfiguration `json:"TLSConfig"`
-		Ecr               EcrData          `json:"Ecr"`
-		AccessToken       string           `json:"AccessToken,omitempty"`
-		AccessTokenExpiry int64            `json:"AccessTokenExpiry,omitempty"`
-	}
-
-	// RegistryType represents a type of registry
-	RegistryType int
 
 	// ResourceAccessLevel represents the level of control associated to a resource
 	ResourceAccessLevel int
@@ -670,7 +580,7 @@ type (
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 2
-		OwnerID     UserID              `json:"OwnerId,omitempty"`
+		OwnerID     database.UserID     `json:"OwnerId,omitempty"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
 	}
 
@@ -684,7 +594,7 @@ type (
 	// to a team.
 	Role struct {
 		// Role Identifier
-		ID RoleID `json:"Id" example:"1"`
+		ID database.RoleID `json:"Id" example:"1"`
 		// Role name
 		Name string `json:"Name" example:"HelpDesk"`
 		// Role description
@@ -694,21 +604,18 @@ type (
 		Priority       int            `json:"Priority"`
 	}
 
-	// RoleID represents a role identifier
-	RoleID int
-
 	// APIKeyID represents an API key identifier
 	APIKeyID int
 
 	// APIKey represents an API key
 	APIKey struct {
-		ID          APIKeyID `json:"id" example:"1"`
-		UserID      UserID   `json:"userId" example:"1"`
-		Description string   `json:"description" example:"portainer-api-key"`
-		Prefix      string   `json:"prefix"`           // API key identifier (7 char prefix)
-		DateCreated int64    `json:"dateCreated"`      // Unix timestamp (UTC) when the API key was created
-		LastUsed    int64    `json:"lastUsed"`         // Unix timestamp (UTC) when the API key was last used
-		Digest      []byte   `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
+		ID          APIKeyID        `json:"id" example:"1"`
+		UserID      database.UserID `json:"userId" example:"1"`
+		Description string          `json:"description" example:"portainer-api-key"`
+		Prefix      string          `json:"prefix"`           // API key identifier (7 char prefix)
+		DateCreated int64           `json:"dateCreated"`      // Unix timestamp (UTC) when the API key was created
+		LastUsed    int64           `json:"lastUsed"`         // Unix timestamp (UTC) when the API key was last used
+		Digest      []byte          `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
 	}
 
 	// Schedule represents a scheduled job.
@@ -894,25 +801,19 @@ type (
 	// Team represents a list of user accounts
 	Team struct {
 		// Team Identifier
-		ID TeamID `json:"Id" example:"1"`
+		ID database.TeamID `json:"Id" example:"1"`
 		// Team name
 		Name string `json:"Name" example:"developers"`
 	}
-
-	// TeamAccessPolicies represent the association of an access policy and a team
-	TeamAccessPolicies map[TeamID]AccessPolicy
-
-	// TeamID represents a team identifier
-	TeamID int
 
 	// TeamMembership represents a membership association between a user and a team
 	TeamMembership struct {
 		// Membership Identifier
 		ID TeamMembershipID `json:"Id" example:"1"`
 		// User identifier
-		UserID UserID `json:"UserID" example:"1"`
+		UserID database.UserID `json:"UserID" example:"1"`
 		// Team identifier
-		TeamID TeamID `json:"TeamID" example:"1"`
+		TeamID database.TeamID `json:"TeamID" example:"1"`
 		// Team role (1 for team leader and 2 for team member)
 		Role MembershipRole `json:"Role" example:"1"`
 	}
@@ -922,7 +823,7 @@ type (
 
 	// TeamResourceAccess represents the level of control on a resource for a specific team
 	TeamResourceAccess struct {
-		TeamID      TeamID              `json:"TeamId"`
+		TeamID      database.TeamID     `json:"TeamId"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
@@ -1042,27 +943,13 @@ type (
 		ReadOnly bool `json:"readonly,omitempty" example:"true"`
 	}
 
-	// TLSConfiguration represents a TLS configuration
-	TLSConfiguration struct {
-		// Use TLS
-		TLS bool `json:"TLS" example:"true"`
-		// Skip the verification of the server TLS certificate
-		TLSSkipVerify bool `json:"TLSSkipVerify" example:"false"`
-		// Path to the TLS CA certificate file
-		TLSCACertPath string `json:"TLSCACert,omitempty" example:"/data/tls/ca.pem"`
-		// Path to the TLS client certificate file
-		TLSCertPath string `json:"TLSCert,omitempty" example:"/data/tls/cert.pem"`
-		// Path to the TLS client key file
-		TLSKeyPath string `json:"TLSKey,omitempty" example:"/data/tls/key.pem"`
-	}
-
 	// TLSFileType represents a type of TLS file required to connect to a Docker environment(endpoint).
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID       UserID
+		ID       database.UserID
 		Username string
 		Role     UserRole
 	}
@@ -1084,9 +971,9 @@ type (
 	// User represents a user account
 	User struct {
 		// User Identifier
-		ID       UserID `json:"Id" example:"1"`
-		Username string `json:"Username" example:"bob"`
-		Password string `json:"Password,omitempty" swaggerignore:"true"`
+		ID       database.UserID `json:"Id" example:"1"`
+		Username string          `json:"Username" example:"bob"`
+		Password string          `json:"Password,omitempty" swaggerignore:"true"`
 		// User Theme
 		UserTheme string `example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)
@@ -1099,15 +986,9 @@ type (
 		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
 	}
 
-	// UserAccessPolicies represent the association of an access policy and a user
-	UserAccessPolicies map[UserID]AccessPolicy
-
-	// UserID represents a user identifier
-	UserID int
-
 	// UserResourceAccess represents the level of control on a resource for a specific user
 	UserResourceAccess struct {
-		UserID      UserID              `json:"UserId"`
+		UserID      database.UserID     `json:"UserId"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
@@ -1122,7 +1003,7 @@ type (
 		Token       string              `json:"Token"`
 		ResourceID  string              `json:"ResourceId"`
 		EndpointID  database.EndpointID `json:"EndpointId"`
-		RegistryID  RegistryID          `json:"RegistryId"`
+		RegistryID  registry.RegistryID `json:"RegistryId"`
 		WebhookType WebhookType         `json:"Type"`
 	}
 
@@ -1228,16 +1109,16 @@ type (
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
-		DeleteRegistrySecret(registry *Registry, namespace string) error
-		CreateRegistrySecret(registry *Registry, namespace string) error
+		DeleteRegistrySecret(registry *registry.Registry, namespace string) error
+		CreateRegistrySecret(registry *registry.Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
 		ToggleSystemState(namespace string, isSystem bool) error
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes environment(endpoint)
 	KubernetesDeployer interface {
-		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
-		Remove(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
+		Deploy(userID database.UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
+		Remove(userID database.UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 
@@ -1290,7 +1171,7 @@ type (
 
 	// SwarmStackManager represents a service to manage Swarm stacks
 	SwarmStackManager interface {
-		Login(registries []Registry, endpoint *Endpoint) error
+		Login(registries []registry.Registry, endpoint *Endpoint) error
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
@@ -1453,7 +1334,7 @@ const (
 )
 
 const (
-	_ RegistryType = iota
+	_ registry.RegistryType = iota
 	// QuayRegistry represents a Quay.io registry
 	QuayRegistry
 	// AzureRegistry represents an ACR registry

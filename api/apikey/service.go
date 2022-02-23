@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"time"
 
 	"github.com/pkg/errors"
@@ -70,7 +71,7 @@ func (a *apiKeyService) GetAPIKey(apiKeyID portainer.APIKeyID) (*portainer.APIKe
 }
 
 // GetAPIKeys returns all the API keys associated to a user.
-func (a *apiKeyService) GetAPIKeys(userID portainer.UserID) ([]portainer.APIKey, error) {
+func (a *apiKeyService) GetAPIKeys(userID database.UserID) ([]portainer.APIKey, error) {
 	return a.apiKeyRepository.GetAPIKeysByUserID(userID)
 }
 
@@ -122,6 +123,6 @@ func (a *apiKeyService) DeleteAPIKey(apiKeyID portainer.APIKeyID) error {
 	return a.apiKeyRepository.DeleteAPIKey(apiKeyID)
 }
 
-func (a *apiKeyService) InvalidateUserKeyCache(userId portainer.UserID) bool {
+func (a *apiKeyService) InvalidateUserKeyCache(userId database.UserID) bool {
 	return a.cache.InvalidateUserKeyCache(userId)
 }

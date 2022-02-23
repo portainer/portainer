@@ -3,6 +3,7 @@ package datastore
 import (
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"runtime"
 	"strings"
 	"testing"
@@ -92,11 +93,11 @@ func newEndpoint(endpointType portainer.EndpointType, id database.EndpointID, na
 		Type:      endpointType,
 		GroupID:   portainer.EndpointGroupID(1),
 		PublicURL: "",
-		TLSConfig: portainer.TLSConfiguration{
+		TLSConfig: database.TLSConfiguration{
 			TLS: false,
 		},
-		UserAccessPolicies: portainer.UserAccessPolicies{},
-		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		UserAccessPolicies: database.UserAccessPolicies{},
+		TeamAccessPolicies: database.TeamAccessPolicies{},
 		TagIDs:             []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
@@ -104,7 +105,7 @@ func newEndpoint(endpointType portainer.EndpointType, id database.EndpointID, na
 	}
 
 	if TLS {
-		endpoint.TLSConfig = portainer.TLSConfiguration{
+		endpoint.TLSConfig = database.TLSConfiguration{
 			TLS:           true,
 			TLSSkipVerify: true,
 		}
@@ -329,17 +330,17 @@ func (store *Store) testRegistries(t *testing.T) {
 	regService := store.RegistryService
 	is.NotNil(regService, "RegistryService shouldn't be nil")
 
-	reg1 := &portainer.Registry{
+	reg1 := &registry.Registry{
 		ID:   1,
 		Type: portainer.DockerHubRegistry,
 		Name: "Dockerhub Registry Test",
 	}
 
-	reg2 := &portainer.Registry{
+	reg2 := &registry.Registry{
 		ID:   2,
 		Type: portainer.GitlabRegistry,
 		Name: "Gitlab Registry Test",
-		Gitlab: portainer.GitlabRegistryData{
+		Gitlab: registry.GitlabRegistryData{
 			ProjectID:   12345,
 			InstanceURL: "http://gitlab.com/12345",
 			ProjectPath: "mytestproject",

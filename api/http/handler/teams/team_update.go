@@ -1,12 +1,12 @@
 package teams
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
 )
 
 type teamUpdatePayload struct {
@@ -48,7 +48,7 @@ func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	team, err := handler.DataStore.Team().Team(portainer.TeamID(teamID))
+	team, err := handler.DataStore.Team().Team(database.TeamID(teamID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team with the specified identifier inside the database", err}
 	} else if err != nil {

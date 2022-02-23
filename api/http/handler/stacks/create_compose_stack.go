@@ -2,6 +2,8 @@ package stacks
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"log"
 	"net/http"
 	"strconv"
@@ -39,7 +41,7 @@ func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) err
 	}
 	return nil
 }
-func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID, stack *portainer.Stack) error {
+func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID database.UserID, stack *portainer.Stack) error {
 	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 	if err != nil {
 		return err
@@ -70,7 +72,7 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID database.UserID) *httperror.HandlerError {
 	var payload composeStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -189,7 +191,7 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID database.UserID) *httperror.HandlerError {
 	var payload composeStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -337,7 +339,7 @@ func decodeRequestForm(r *http.Request) (*composeStackFromFileUploadPayload, err
 	return payload, nil
 }
 
-func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID database.UserID) *httperror.HandlerError {
 	payload, err := decodeRequestForm(r)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
@@ -413,7 +415,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 type composeStackDeploymentConfig struct {
 	stack      *portainer.Stack
 	endpoint   *portainer.Endpoint
-	registries []portainer.Registry
+	registries []registry.Registry
 	isAdmin    bool
 	user       *portainer.User
 }

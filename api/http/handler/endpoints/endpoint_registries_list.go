@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -88,7 +89,7 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 	return response.JSON(w, registries)
 }
 
-func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, namespace string, userId portainer.UserID, memberships []portainer.TeamMembership, isAdmin bool) (bool, error) {
+func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, namespace string, userId database.UserID, memberships []portainer.TeamMembership, isAdmin bool) (bool, error) {
 	if isAdmin || namespace == "" {
 		return true, nil
 	}
@@ -115,12 +116,12 @@ func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, name
 	return security.AuthorizedAccess(userId, memberships, namespacePolicy.UserAccessPolicies, namespacePolicy.TeamAccessPolicies), nil
 }
 
-func filterRegistriesByNamespace(registries []portainer.Registry, endpointId database.EndpointID, namespace string) []portainer.Registry {
+func filterRegistriesByNamespace(registries []registry.Registry, endpointId database.EndpointID, namespace string) []registry.Registry {
 	if namespace == "" {
 		return registries
 	}
 
-	filteredRegistries := []portainer.Registry{}
+	filteredRegistries := []registry.Registry{}
 
 	for _, registry := range registries {
 		for _, authorizedNamespace := range registry.RegistryAccesses[endpointId].Namespaces {
@@ -133,7 +134,7 @@ func filterRegistriesByNamespace(registries []portainer.Registry, endpointId dat
 	return filteredRegistries
 }
 
-func hideRegistryFields(registry *portainer.Registry, hideAccesses bool) {
+func hideRegistryFields(registry *registry.Registry, hideAccesses bool) {
 	registry.Password = ""
 	registry.ManagementConfiguration = nil
 	if hideAccesses {

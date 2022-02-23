@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	registry2 "github.com/portainer/portainer/api/dataservices/registry"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -165,12 +166,12 @@ func decorateAgentDockerHubRequest(r *http.Request, dataStore dataservices.DataS
 
 	r.URL.Path = strings.TrimSuffix(requestPath, "/")
 
-	registry := &portainer.Registry{
+	registry := &registry2.Registry{
 		Type: portainer.DockerHubRegistry,
 	}
 
 	if registryID != 0 {
-		registry, err = dataStore.Registry().Registry(portainer.RegistryID(registryID))
+		registry, err = dataStore.Registry().Registry(registry2.RegistryID(registryID))
 		if err != nil {
 			return fmt.Errorf("failed fetching registry: %w", err)
 		}

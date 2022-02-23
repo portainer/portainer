@@ -55,7 +55,7 @@ func (service *Service) HelmUserRepositories() ([]portainer.HelmUserRepository, 
 }
 
 // HelmUserRepositoryByUserID return an array containing all the HelmUserRepository objects where the specified userID is present.
-func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error) {
+func (service *Service) HelmUserRepositoryByUserID(userID database.UserID) ([]portainer.HelmUserRepository, error) {
 	var result = make([]portainer.HelmUserRepository, 0)
 
 	err := service.connection.GetAll(

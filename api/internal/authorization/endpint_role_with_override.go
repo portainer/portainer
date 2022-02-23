@@ -1,6 +1,9 @@
 package authorization
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
+)
 
 // CleanNAPWithOverridePolicies Clean Namespace Access Policies with override policies
 func (service *Service) CleanNAPWithOverridePolicies(
@@ -54,7 +57,7 @@ func (service *Service) CleanNAPWithOverridePolicies(
 }
 
 func (service *Service) getUserEndpointAccessWithPolicies(
-	userID portainer.UserID,
+	userID database.UserID,
 	endpoint *portainer.Endpoint,
 	endpointGroup *portainer.EndpointGroup,
 ) (bool, error) {
@@ -83,9 +86,9 @@ func (service *Service) getUserEndpointAccessWithPolicies(
 }
 
 func userAccess(
-	userID portainer.UserID,
-	userAccessPolicies portainer.UserAccessPolicies,
-	teamAccessPolicies portainer.TeamAccessPolicies,
+	userID database.UserID,
+	userAccessPolicies database.UserAccessPolicies,
+	teamAccessPolicies database.TeamAccessPolicies,
 	memberships []portainer.TeamMembership,
 ) bool {
 	if _, ok := userAccessPolicies[userID]; ok {
@@ -102,7 +105,7 @@ func userAccess(
 }
 
 func (service *Service) getTeamEndpointAccessWithPolicies(
-	teamID portainer.TeamID,
+	teamID database.TeamID,
 	endpoint *portainer.Endpoint,
 	endpointGroup *portainer.EndpointGroup,
 ) (bool, error) {
@@ -126,8 +129,8 @@ func (service *Service) getTeamEndpointAccessWithPolicies(
 }
 
 func teamAccess(
-	teamID portainer.TeamID,
-	teamAccessPolicies portainer.TeamAccessPolicies,
+	teamID database.TeamID,
+	teamAccessPolicies database.TeamAccessPolicies,
 ) bool {
 	_, ok := teamAccessPolicies[teamID]
 	return ok

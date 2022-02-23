@@ -1,10 +1,10 @@
 package kubernetes
 
 import (
+	registry2 "github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 
 	"github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
 )
 
 func (transport *baseTransport) proxyNamespaceDeleteOperation(request *http.Request, namespace string) (*http.Response, error) {
@@ -32,7 +32,7 @@ func (transport *baseTransport) proxyNamespaceDeleteOperation(request *http.Requ
 			}
 
 			if len(namespaces) != len(registryAccessPolicies.Namespaces) {
-				updatedAccessPolicies := portainer.RegistryAccessPolicies{
+				updatedAccessPolicies := registry2.RegistryAccessPolicies{
 					Namespaces:         namespaces,
 					UserAccessPolicies: registryAccessPolicies.UserAccessPolicies,
 					TeamAccessPolicies: registryAccessPolicies.TeamAccessPolicies,

@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"os"
 	"sync"
 
@@ -13,8 +14,8 @@ import (
 )
 
 type StackDeployer interface {
-	DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool) error
-	DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forceRereate bool) error
+	DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []registry.Registry, prune bool) error
+	DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []registry.Registry, forceRereate bool) error
 	DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error
 }
 
@@ -35,7 +36,7 @@ func NewStackDeployer(swarmStackManager portainer.SwarmStackManager, composeStac
 	}
 }
 
-func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool) error {
+func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []registry.Registry, prune bool) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -45,7 +46,7 @@ func (d *stackDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *porta
 	return d.swarmStackManager.Deploy(stack, prune, endpoint)
 }
 
-func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forceRereate bool) error {
+func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []registry.Registry, forceRereate bool) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 

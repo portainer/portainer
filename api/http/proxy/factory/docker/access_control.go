@@ -74,8 +74,8 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 	}
 
 	if len(teamNames) > 0 || len(userNames) > 0 {
-		teamIDs := make([]portainer.TeamID, 0)
-		userIDs := make([]portainer.UserID, 0)
+		teamIDs := make([]database.TeamID, 0)
+		userIDs := make([]database.UserID, 0)
 
 		for _, name := range teamNames {
 			team, err := transport.dataStore.Team().TeamByName(name)
@@ -110,7 +110,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 	return nil, nil
 }
 
-func (transport *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
+func (transport *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID database.UserID) (*portainer.ResourceControl, error) {
 	resourceControl := authorization.NewPrivateResourceControl(resourceIdentifier, resourceType, userID)
 
 	err := transport.dataStore.ResourceControl().Create(resourceControl)

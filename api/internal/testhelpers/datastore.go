@@ -129,15 +129,15 @@ type stubUserService struct {
 }
 
 func (s *stubUserService) BucketName() string                                      { return "users" }
-func (s *stubUserService) User(ID portainer.UserID) (*portainer.User, error)       { return nil, nil }
+func (s *stubUserService) User(ID database.UserID) (*portainer.User, error)        { return nil, nil }
 func (s *stubUserService) UserByUsername(username string) (*portainer.User, error) { return nil, nil }
 func (s *stubUserService) Users() ([]portainer.User, error)                        { return s.users, nil }
 func (s *stubUserService) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {
 	return s.users, nil
 }
-func (s *stubUserService) Create(user *portainer.User) error                          { return nil }
-func (s *stubUserService) UpdateUser(ID portainer.UserID, user *portainer.User) error { return nil }
-func (s *stubUserService) DeleteUser(ID portainer.UserID) error                       { return nil }
+func (s *stubUserService) Create(user *portainer.User) error                         { return nil }
+func (s *stubUserService) UpdateUser(ID database.UserID, user *portainer.User) error { return nil }
+func (s *stubUserService) DeleteUser(ID database.UserID) error                       { return nil }
 
 // WithUsers testDatastore option that will instruct testDatastore to return provided users
 func WithUsers(us []portainer.User) datastoreOption {

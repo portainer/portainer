@@ -2,6 +2,7 @@ package teammemberships
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -63,26 +64,26 @@ func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	if !security.AuthorizedTeamManagement(portainer.TeamID(payload.TeamID), securityContext) {
+	if !security.AuthorizedTeamManagement(database.TeamID(payload.TeamID), securityContext) {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to manage team memberships", httperrors.ErrResourceAccessDenied}
 	}
 
-	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(portainer.UserID(payload.UserID))
+	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(database.UserID(payload.UserID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve team memberships from the database", err}
 	}
 
 	if len(memberships) > 0 {
 		for _, membership := range memberships {
-			if membership.UserID == portainer.UserID(payload.UserID) && membership.TeamID == portainer.TeamID(payload.TeamID) {
+			if membership.UserID == database.UserID(payload.UserID) && membership.TeamID == database.TeamID(payload.TeamID) {
 				return &httperror.HandlerError{http.StatusConflict, "Team membership already registered", errors.New("Team membership already exists for this user and team")}
 			}
 		}
 	}
 
 	membership := &portainer.TeamMembership{
-		UserID: portainer.UserID(payload.UserID),
-		TeamID: portainer.TeamID(payload.TeamID),
+		UserID: database.UserID(payload.UserID),
+		TeamID: database.TeamID(payload.TeamID),
 		Role:   portainer.MembershipRole(payload.Role),
 	}
 

@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"path"
 	"strconv"
@@ -29,8 +30,8 @@ type (
 
 	azureRequestContext struct {
 		isAdmin          bool
-		userID           portainer.UserID
-		userTeamIDs      []portainer.TeamID
+		userID           database.UserID
+		userTeamIDs      []database.TeamID
 		resourceControls []portainer.ResourceControl
 	}
 )

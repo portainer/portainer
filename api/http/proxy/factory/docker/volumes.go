@@ -157,7 +157,7 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 	return response, err
 }
 
-func (transport *Transport) decorateVolumeCreationResponse(response *http.Response, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
+func (transport *Transport) decorateVolumeCreationResponse(response *http.Response, resourceType portainer.ResourceControlType, userID database.UserID) error {
 	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err

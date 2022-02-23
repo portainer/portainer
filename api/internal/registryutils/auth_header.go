@@ -3,7 +3,7 @@ package registryutils
 import (
 	"encoding/base64"
 	"encoding/json"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/registry"
 )
 
 type (
@@ -15,7 +15,7 @@ type (
 )
 
 // GetRegistryAuthHeader generate the X-Registry-Auth header from registry
-func GetRegistryAuthHeader(registry *portainer.Registry) (header string, err error) {
+func GetRegistryAuthHeader(registry *registry.Registry) (header string, err error) {
 	authHeader := authHeader{
 		ServerAddress: registry.URL,
 	}

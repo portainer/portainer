@@ -375,7 +375,7 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 }
 
 func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
-	tlsConfiguration := portainer.TLSConfiguration{
+	tlsConfiguration := database.TLSConfiguration{
 		TLS:           *flags.TLS,
 		TLSSkipVerify: *flags.TLSSkipVerify,
 	}

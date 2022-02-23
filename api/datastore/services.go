@@ -356,7 +356,7 @@ type storeExport struct {
 	EndpointRelation   []portainer.EndpointRelation   `json:"endpoint_relations,omitempty"`
 	Extensions         []portainer.Extension          `json:"extension,omitempty"`
 	HelmUserRepository []portainer.HelmUserRepository `json:"helm_user_repository,omitempty"`
-	Registry           []portainer.Registry           `json:"registries,omitempty"`
+	Registry           []registry.Registry            `json:"registries,omitempty"`
 	ResourceControl    []portainer.ResourceControl    `json:"resource_control,omitempty"`
 	Role               []portainer.Role               `json:"roles,omitempty"`
 	Schedules          []portainer.Schedule           `json:"schedules,omitempty"`

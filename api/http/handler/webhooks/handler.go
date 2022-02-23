@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
@@ -49,7 +50,7 @@ func (handler *Handler) checkResourceAccess(r *http.Request, resourceID string, 
 	if rc == nil || err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the resource", Err: err}
 	}
-	userTeamIDs := make([]portainer.TeamID, 0)
+	userTeamIDs := make([]database.TeamID, 0)
 	for _, membership := range securityContext.UserMemberships {
 		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}

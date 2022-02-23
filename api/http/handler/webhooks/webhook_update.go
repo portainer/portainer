@@ -2,6 +2,7 @@ package webhooks
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/security"
@@ -14,7 +15,7 @@ import (
 )
 
 type webhookUpdatePayload struct {
-	RegistryID portainer.RegistryID
+	RegistryID registry.RegistryID
 }
 
 func (payload *webhookUpdatePayload) Validate(r *http.Request) error {

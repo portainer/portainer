@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/database"
 	"sync"
 	"testing"
 
@@ -22,15 +23,15 @@ func Test_NamespaceAccessPoliciesDeleteNamespace_updatesPortainerConfig_whenConf
 			name:              "doesn't change config, when designated namespace absent",
 			namespaceToDelete: "missing-namespace",
 			expectedConfig: map[string]portainer.K8sNamespaceAccessPolicy{
-				"ns1": {UserAccessPolicies: portainer.UserAccessPolicies{2: {RoleID: 0}}},
-				"ns2": {UserAccessPolicies: portainer.UserAccessPolicies{2: {RoleID: 0}}},
+				"ns1": {UserAccessPolicies: database.UserAccessPolicies{2: {RoleID: 0}}},
+				"ns2": {UserAccessPolicies: database.UserAccessPolicies{2: {RoleID: 0}}},
 			},
 		},
 		{
 			name:              "removes designated namespace from config, when namespace is present",
 			namespaceToDelete: "ns2",
 			expectedConfig: map[string]portainer.K8sNamespaceAccessPolicy{
-				"ns1": {UserAccessPolicies: portainer.UserAccessPolicies{2: {RoleID: 0}}},
+				"ns1": {UserAccessPolicies: database.UserAccessPolicies{2: {RoleID: 0}}},
 			},
 		},
 	}

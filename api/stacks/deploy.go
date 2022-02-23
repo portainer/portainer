@@ -3,6 +3,7 @@ package stacks
 import (
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"strings"
 	"time"
 
@@ -118,7 +119,7 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	return nil
 }
 
-func getUserRegistries(datastore dataservices.DataStore, user *portainer.User, endpointID database.EndpointID) ([]portainer.Registry, error) {
+func getUserRegistries(datastore dataservices.DataStore, user *portainer.User, endpointID database.EndpointID) ([]registry.Registry, error) {
 	registries, err := datastore.Registry().Registries()
 	if err != nil {
 		return nil, errors.WithMessage(err, "unable to retrieve registries from the database")
@@ -133,7 +134,7 @@ func getUserRegistries(datastore dataservices.DataStore, user *portainer.User, e
 		return nil, errors.WithMessagef(err, "failed to fetch memberships of the stack author [%s]", user.Username)
 	}
 
-	filteredRegistries := make([]portainer.Registry, 0, len(registries))
+	filteredRegistries := make([]registry.Registry, 0, len(registries))
 	for _, registry := range registries {
 		if security.AuthorizedRegistryAccess(&registry, user, userMemberships, endpointID) {
 			filteredRegistries = append(filteredRegistries, registry)

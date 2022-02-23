@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -17,7 +18,7 @@ type teamBuilder struct {
 func (b *teamBuilder) createNew(name string) *portainer.Team {
 	b.count++
 	team := &portainer.Team{
-		ID:   portainer.TeamID(b.count),
+		ID:   database.TeamID(b.count),
 		Name: name,
 	}
 

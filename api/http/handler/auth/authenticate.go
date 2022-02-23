@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"log"
 	"net/http"
 	"strings"
@@ -197,7 +198,7 @@ func teamExists(teamName string, ldapGroups []string) bool {
 	return false
 }
 
-func teamMembershipExists(teamID portainer.TeamID, memberships []portainer.TeamMembership) bool {
+func teamMembershipExists(teamID database.TeamID, memberships []portainer.TeamMembership) bool {
 	for _, membership := range memberships {
 		if membership.TeamID == teamID {
 			return true

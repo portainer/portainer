@@ -1,6 +1,7 @@
 package users
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -38,11 +39,11 @@ func (handler *Handler) userGetAccessTokens(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
 	}
 
-	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
+	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != database.UserID(userID) {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to get user access tokens", httperrors.ErrUnauthorized}
 	}
 
-	_, err = handler.DataStore.User().User(portainer.UserID(userID))
+	_, err = handler.DataStore.User().User(database.UserID(userID))
 	if err != nil {
 		if handler.DataStore.IsErrObjectNotFound(err) {
 			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
@@ -50,7 +51,7 @@ func (handler *Handler) userGetAccessTokens(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
 	}
 
-	apiKeys, err := handler.apiKeyService.GetAPIKeys(portainer.UserID(userID))
+	apiKeys, err := handler.apiKeyService.GetAPIKeys(database.UserID(userID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Internal Server Error", err}
 	}

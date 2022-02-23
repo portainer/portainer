@@ -2,6 +2,7 @@ package security
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,7 +23,7 @@ var testHandler200 = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reques
 
 func tokenLookupSucceed(dataStore dataservices.DataStore, jwtService dataservices.JWTService) tokenLookup {
 	return func(r *http.Request) *portainer.TokenData {
-		uid := portainer.UserID(1)
+		uid := database.UserID(1)
 		dataStore.User().Create(&portainer.User{ID: uid})
 		jwtService.GenerateToken(&portainer.TokenData{ID: uid})
 		return &portainer.TokenData{ID: 1}

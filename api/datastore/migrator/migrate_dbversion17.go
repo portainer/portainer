@@ -2,6 +2,7 @@ package migrator
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 )
 
 func (m *Migrator) updateUsersToDBVersion18() error {
@@ -45,16 +46,16 @@ func (m *Migrator) updateEndpointsToDBVersion18() error {
 	}
 
 	for _, endpoint := range legacyEndpoints {
-		endpoint.UserAccessPolicies = make(portainer.UserAccessPolicies)
+		endpoint.UserAccessPolicies = make(database.UserAccessPolicies)
 		for _, userID := range endpoint.AuthorizedUsers {
-			endpoint.UserAccessPolicies[userID] = portainer.AccessPolicy{
+			endpoint.UserAccessPolicies[userID] = database.AccessPolicy{
 				RoleID: 4,
 			}
 		}
 
-		endpoint.TeamAccessPolicies = make(portainer.TeamAccessPolicies)
+		endpoint.TeamAccessPolicies = make(database.TeamAccessPolicies)
 		for _, teamID := range endpoint.AuthorizedTeams {
-			endpoint.TeamAccessPolicies[teamID] = portainer.AccessPolicy{
+			endpoint.TeamAccessPolicies[teamID] = database.AccessPolicy{
 				RoleID: 4,
 			}
 		}
@@ -75,16 +76,16 @@ func (m *Migrator) updateEndpointGroupsToDBVersion18() error {
 	}
 
 	for _, endpointGroup := range legacyEndpointGroups {
-		endpointGroup.UserAccessPolicies = make(portainer.UserAccessPolicies)
+		endpointGroup.UserAccessPolicies = make(database.UserAccessPolicies)
 		for _, userID := range endpointGroup.AuthorizedUsers {
-			endpointGroup.UserAccessPolicies[userID] = portainer.AccessPolicy{
+			endpointGroup.UserAccessPolicies[userID] = database.AccessPolicy{
 				RoleID: 4,
 			}
 		}
 
-		endpointGroup.TeamAccessPolicies = make(portainer.TeamAccessPolicies)
+		endpointGroup.TeamAccessPolicies = make(database.TeamAccessPolicies)
 		for _, teamID := range endpointGroup.AuthorizedTeams {
-			endpointGroup.TeamAccessPolicies[teamID] = portainer.AccessPolicy{
+			endpointGroup.TeamAccessPolicies[teamID] = database.AccessPolicy{
 				RoleID: 4,
 			}
 		}
@@ -105,14 +106,14 @@ func (m *Migrator) updateRegistriesToDBVersion18() error {
 	}
 
 	for _, registry := range legacyRegistries {
-		registry.UserAccessPolicies = make(portainer.UserAccessPolicies)
+		registry.UserAccessPolicies = make(database.UserAccessPolicies)
 		for _, userID := range registry.AuthorizedUsers {
-			registry.UserAccessPolicies[userID] = portainer.AccessPolicy{}
+			registry.UserAccessPolicies[userID] = database.AccessPolicy{}
 		}
 
-		registry.TeamAccessPolicies = make(portainer.TeamAccessPolicies)
+		registry.TeamAccessPolicies = make(database.TeamAccessPolicies)
 		for _, teamID := range registry.AuthorizedTeams {
-			registry.TeamAccessPolicies[teamID] = portainer.AccessPolicy{}
+			registry.TeamAccessPolicies[teamID] = database.AccessPolicy{}
 		}
 
 		err = m.registryService.UpdateRegistry(registry.ID, &registry)

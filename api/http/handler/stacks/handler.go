@@ -96,7 +96,7 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 		return false, err
 	}
 
-	userTeamIDs := make([]portainer.TeamID, 0)
+	userTeamIDs := make([]database.TeamID, 0)
 	for _, membership := range securityContext.UserMemberships {
 		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}
@@ -108,7 +108,7 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
 }
 
-func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
+func (handler *Handler) userIsAdmin(userID database.UserID) (bool, error) {
 	user, err := handler.DataStore.User().User(userID)
 	if err != nil {
 		return false, err

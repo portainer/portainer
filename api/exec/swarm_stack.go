@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"os"
 	"os/exec"
 	"path"
@@ -54,7 +55,7 @@ func NewSwarmStackManager(
 }
 
 // Login executes the docker login command against a list of registries (including DockerHub).
-func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoint *portainer.Endpoint) error {
+func (manager *SwarmStackManager) Login(registries []registry.Registry, endpoint *portainer.Endpoint) error {
 	command, args, err := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
 	if err != nil {
 		return err

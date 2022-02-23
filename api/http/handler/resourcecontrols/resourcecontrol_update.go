@@ -2,6 +2,7 @@ package resourcecontrols
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -85,7 +86,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	var userAccesses = make([]portainer.UserResourceAccess, 0)
 	for _, v := range payload.Users {
 		userAccess := portainer.UserResourceAccess{
-			UserID:      portainer.UserID(v),
+			UserID:      database.UserID(v),
 			AccessLevel: portainer.ReadWriteAccessLevel,
 		}
 		userAccesses = append(userAccesses, userAccess)
@@ -95,7 +96,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	var teamAccesses = make([]portainer.TeamResourceAccess, 0)
 	for _, v := range payload.Teams {
 		teamAccess := portainer.TeamResourceAccess{
-			TeamID:      portainer.TeamID(v),
+			TeamID:      database.TeamID(v),
 			AccessLevel: portainer.ReadWriteAccessLevel,
 		}
 		teamAccesses = append(teamAccesses, teamAccess)

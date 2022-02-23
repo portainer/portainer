@@ -3,6 +3,7 @@ package security
 import (
 	"errors"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strings"
 	"time"
@@ -27,7 +28,7 @@ type (
 	RestrictedRequestContext struct {
 		IsAdmin         bool
 		IsTeamLeader    bool
-		UserID          portainer.UserID
+		UserID          database.UserID
 		UserMemberships []portainer.TeamMembership
 	}
 
@@ -350,7 +351,7 @@ func mwSecureHeaders(next http.Handler) http.Handler {
 	})
 }
 
-func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
+func (bouncer *RequestBouncer) newRestrictedContextRequest(userID database.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
 	if userRole == portainer.AdministratorRole {
 		return &RestrictedRequestContext{
 			IsAdmin: true,

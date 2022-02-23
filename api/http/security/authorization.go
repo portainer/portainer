@@ -2,6 +2,7 @@ package security
 
 import (
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -90,7 +91,7 @@ func AuthorizedResourceControlUpdate(resourceControl *portainer.ResourceControl,
 
 // AuthorizedTeamManagement ensure that access to the management of the specified team is granted.
 // It will check if the user is either administrator or leader of that team.
-func AuthorizedTeamManagement(teamID portainer.TeamID, context *RestrictedRequestContext) bool {
+func AuthorizedTeamManagement(teamID database.TeamID, context *RestrictedRequestContext) bool {
 	if context.IsAdmin {
 		return true
 	}
@@ -107,7 +108,7 @@ func AuthorizedTeamManagement(teamID portainer.TeamID, context *RestrictedReques
 // authorizedEndpointAccess ensure that the user can access the specified environment(endpoint).
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams of the environment(endpoint) and the associated group.
-func authorizedEndpointAccess(endpoint *portainer.Endpoint, endpointGroup *portainer.EndpointGroup, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+func authorizedEndpointAccess(endpoint *portainer.Endpoint, endpointGroup *portainer.EndpointGroup, userID database.UserID, memberships []portainer.TeamMembership) bool {
 	groupAccess := AuthorizedAccess(userID, memberships, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies)
 	if !groupAccess {
 		return AuthorizedAccess(userID, memberships, endpoint.UserAccessPolicies, endpoint.TeamAccessPolicies)
@@ -118,14 +119,14 @@ func authorizedEndpointAccess(endpoint *portainer.Endpoint, endpointGroup *porta
 // authorizedEndpointGroupAccess ensure that the user can access the specified environment(endpoint) group.
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams.
-func authorizedEndpointGroupAccess(endpointGroup *portainer.EndpointGroup, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+func authorizedEndpointGroupAccess(endpointGroup *portainer.EndpointGroup, userID database.UserID, memberships []portainer.TeamMembership) bool {
 	return AuthorizedAccess(userID, memberships, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies)
 }
 
 // AuthorizedRegistryAccess ensure that the user can access the specified registry.
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams for a specified environment(endpoint),
-func AuthorizedRegistryAccess(registry *portainer.Registry, user *portainer.User, teamMemberships []portainer.TeamMembership, endpointID database.EndpointID) bool {
+func AuthorizedRegistryAccess(registry *registry.Registry, user *portainer.User, teamMemberships []portainer.TeamMembership, endpointID database.EndpointID) bool {
 	if user.Role == portainer.AdministratorRole {
 		return true
 	}
@@ -136,7 +137,7 @@ func AuthorizedRegistryAccess(registry *portainer.Registry, user *portainer.User
 }
 
 // AuthorizedAccess verifies the userID or memberships are authorized to use an object per the supplied access policies
-func AuthorizedAccess(userID portainer.UserID, memberships []portainer.TeamMembership, userAccessPolicies portainer.UserAccessPolicies, teamAccessPolicies portainer.TeamAccessPolicies) bool {
+func AuthorizedAccess(userID database.UserID, memberships []portainer.TeamMembership, userAccessPolicies database.UserAccessPolicies, teamAccessPolicies database.TeamAccessPolicies) bool {
 	_, userAccess := userAccessPolicies[userID]
 	if userAccess {
 		return true

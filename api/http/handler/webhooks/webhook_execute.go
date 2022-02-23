@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/internal/registryutils"
 	"io"
 	"net/http"
@@ -67,7 +68,7 @@ func (handler *Handler) executeServiceWebhook(
 	w http.ResponseWriter,
 	endpoint *portainer.Endpoint,
 	resourceID string,
-	registryID portainer.RegistryID,
+	registryID registry.RegistryID,
 	imageTag string,
 ) *httperror.HandlerError {
 	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "", nil)

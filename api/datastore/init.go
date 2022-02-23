@@ -3,6 +3,7 @@ package datastore
 import (
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 )
 
 // Init creates the default data set.
@@ -55,7 +56,7 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 			LDAPSettings: portainer.LDAPSettings{
 				AnonymousMode:   true,
 				AutoCreateUsers: true,
-				TLSConfig:       portainer.TLSConfiguration{},
+				TLSConfig:       database.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
 					{},
 				},
@@ -112,8 +113,8 @@ func (store *Store) checkOrCreateDefaultData() error {
 			Name:               "Unassigned",
 			Description:        "Unassigned environments",
 			Labels:             []portainer.Pair{},
-			UserAccessPolicies: portainer.UserAccessPolicies{},
-			TeamAccessPolicies: portainer.TeamAccessPolicies{},
+			UserAccessPolicies: database.UserAccessPolicies{},
+			TeamAccessPolicies: database.TeamAccessPolicies{},
 			TagIDs:             []portainer.TagID{},
 		}
 

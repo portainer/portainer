@@ -1,6 +1,7 @@
 package registryutils
 
 import (
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -10,11 +11,11 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 )
 
-func isRegTokenValid(registry *portainer.Registry) (valid bool) {
+func isRegTokenValid(registry *registry.Registry) (valid bool) {
 	return registry.AccessToken != "" && registry.AccessTokenExpiry > time.Now().Unix()
 }
 
-func doGetRegToken(dataStore dataservices.DataStore, registry *portainer.Registry) (err error) {
+func doGetRegToken(dataStore dataservices.DataStore, registry *registry.Registry) (err error) {
 	ecrClient := ecr.NewService(registry.Username, registry.Password, registry.Ecr.Region)
 	accessToken, expiryAt, err := ecrClient.GetAuthorizationToken()
 	if err != nil {
@@ -29,12 +30,12 @@ func doGetRegToken(dataStore dataservices.DataStore, registry *portainer.Registr
 	return
 }
 
-func parseRegToken(registry *portainer.Registry) (username, password string, err error) {
+func parseRegToken(registry *registry.Registry) (username, password string, err error) {
 	ecrClient := ecr.NewService(registry.Username, registry.Password, registry.Ecr.Region)
 	return ecrClient.ParseAuthorizationToken(registry.AccessToken)
 }
 
-func EnsureRegTokenValid(dataStore dataservices.DataStore, registry *portainer.Registry) (err error) {
+func EnsureRegTokenValid(dataStore dataservices.DataStore, registry *registry.Registry) (err error) {
 	if registry.Type == portainer.EcrRegistry {
 		if isRegTokenValid(registry) {
 			log.Println("[DEBUG] [registry, GetEcrAccessToken] [message: curretn ECR token is still valid]")
@@ -49,7 +50,7 @@ func EnsureRegTokenValid(dataStore dataservices.DataStore, registry *portainer.R
 	return
 }
 
-func GetRegEffectiveCredential(registry *portainer.Registry) (username, password string, err error) {
+func GetRegEffectiveCredential(registry *registry.Registry) (username, password string, err error) {
 	if registry.Type == portainer.EcrRegistry {
 		username, password, err = parseRegToken(registry)
 	} else {

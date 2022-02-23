@@ -38,7 +38,7 @@ func NewService(connection database.Connection) (*Service, error) {
 }
 
 // Team returns a Team by ID
-func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
+func (service *Service) Team(ID database.TeamID) (*portainer.Team, error) {
 	var team portainer.Team
 	identifier := service.connection.ConvertToKey(int(ID))
 
@@ -101,7 +101,7 @@ func (service *Service) Teams() ([]portainer.Team, error) {
 }
 
 // UpdateTeam saves a Team.
-func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) error {
+func (service *Service) UpdateTeam(ID database.TeamID, team *portainer.Team) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, team)
 }
@@ -111,14 +111,14 @@ func (service *Service) Create(team *portainer.Team) error {
 	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
-			team.ID = portainer.TeamID(id)
+			team.ID = database.TeamID(id)
 			return int(team.ID), team
 		},
 	)
 }
 
 // DeleteTeam deletes a Team.
-func (service *Service) DeleteTeam(ID portainer.TeamID) error {
+func (service *Service) DeleteTeam(ID database.TeamID) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }

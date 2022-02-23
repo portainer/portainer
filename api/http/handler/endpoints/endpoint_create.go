@@ -3,6 +3,7 @@ package endpoints
 import (
 	"errors"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net"
 	"net/http"
 	"net/url"
@@ -313,7 +314,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 	endpoint.Type = portainer.EdgeAgentOnDockerEnvironment
 	endpoint.PublicURL = payload.PublicURL
 	endpoint.TagIDs = payload.TagIDs
-	endpoint.TLSConfig = portainer.TLSConfiguration{
+	endpoint.TLSConfig = database.TLSConfiguration{
 		TLS: false,
 	}
 	endpoint.IsEdgeDevice = payload.IsEdgeDevice
@@ -362,7 +363,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 	endpoint.Type = portainer.DockerEnvironment
 	endpoint.PublicURL = payload.PublicURL
 	endpoint.TagIDs = payload.TagIDs
-	endpoint.TLSConfig = portainer.TLSConfiguration{
+	endpoint.TLSConfig = database.TLSConfiguration{
 		TLS: false,
 	}
 	endpoint.IsEdgeDevice = payload.IsEdgeDevice
@@ -387,7 +388,7 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 	endpoint.Type = portainer.KubernetesLocalEnvironment
 	endpoint.PublicURL = payload.PublicURL
 	endpoint.TagIDs = payload.TagIDs
-	endpoint.TLSConfig = portainer.TLSConfiguration{
+	endpoint.TLSConfig = database.TLSConfiguration{
 		TLS:           payload.TLS,
 		TLSSkipVerify: payload.TLSSkipVerify,
 	}
@@ -409,7 +410,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 	endpoint.Type = endpointType
 	endpoint.PublicURL = payload.PublicURL
 	endpoint.TagIDs = payload.TagIDs
-	endpoint.TLSConfig = portainer.TLSConfiguration{
+	endpoint.TLSConfig = database.TLSConfiguration{
 		TLS:           payload.TLS,
 		TLSSkipVerify: payload.TLSSkipVerify,
 	}

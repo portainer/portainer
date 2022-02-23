@@ -117,7 +117,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID database.UserID) *httperror.HandlerError {
 
 	switch method {
 	case "string":
@@ -131,7 +131,7 @@ func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Reques
 	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string, repository or file", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID database.UserID) *httperror.HandlerError {
 	switch method {
 	case "string":
 		return handler.createSwarmStackFromFileContent(w, r, endpoint, userID)
@@ -144,7 +144,7 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string, repository or file", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID database.UserID) *httperror.HandlerError {
 	switch method {
 	case "string":
 		return handler.createKubernetesStackFromFileContent(w, r, endpoint, userID)
@@ -213,7 +213,7 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte, securitySettin
 	return nil
 }
 
-func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID database.UserID) *httperror.HandlerError {
 	var resourceControl *portainer.ResourceControl
 
 	isAdmin, err := handler.userIsAdmin(userID)

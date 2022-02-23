@@ -1,6 +1,7 @@
 package authorization
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
@@ -24,7 +25,7 @@ func NewAdministratorsOnlyResourceControl(resourceIdentifier string, resourceTyp
 
 // NewPrivateResourceControl will create a new private resource control associated to the resource specified by the
 // identifier and type parameters. It automatically assigns it to the user specified by the userID parameter.
-func NewPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) *portainer.ResourceControl {
+func NewPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID database.UserID) *portainer.ResourceControl {
 	return &portainer.ResourceControl{
 		Type:           resourceType,
 		ResourceID:     resourceIdentifier,
@@ -72,7 +73,7 @@ func NewPublicResourceControl(resourceIdentifier string, resourceType portainer.
 }
 
 // NewRestrictedResourceControl will create a new resource control with user and team accesses restrictions.
-func NewRestrictedResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userIDs []portainer.UserID, teamIDs []portainer.TeamID) *portainer.ResourceControl {
+func NewRestrictedResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userIDs []database.UserID, teamIDs []database.TeamID) *portainer.ResourceControl {
 	userAccesses := make([]portainer.UserResourceAccess, 0)
 	teamAccesses := make([]portainer.TeamResourceAccess, 0)
 
@@ -135,7 +136,7 @@ func DecorateCustomTemplates(templates []portainer.CustomTemplate, resourceContr
 }
 
 // FilterAuthorizedStacks returns a list of decorated stacks filtered through resource control access checks.
-func FilterAuthorizedStacks(stacks []portainer.Stack, user *portainer.User, userTeamIDs []portainer.TeamID) []portainer.Stack {
+func FilterAuthorizedStacks(stacks []portainer.Stack, user *portainer.User, userTeamIDs []database.TeamID) []portainer.Stack {
 	authorizedStacks := make([]portainer.Stack, 0)
 
 	for _, stack := range stacks {
@@ -148,7 +149,7 @@ func FilterAuthorizedStacks(stacks []portainer.Stack, user *portainer.User, user
 }
 
 // FilterAuthorizedCustomTemplates returns a list of decorated custom templates filtered through resource control access checks.
-func FilterAuthorizedCustomTemplates(customTemplates []portainer.CustomTemplate, user *portainer.User, userTeamIDs []portainer.TeamID) []portainer.CustomTemplate {
+func FilterAuthorizedCustomTemplates(customTemplates []portainer.CustomTemplate, user *portainer.User, userTeamIDs []database.TeamID) []portainer.CustomTemplate {
 	authorizedTemplates := make([]portainer.CustomTemplate, 0)
 
 	for _, customTemplate := range customTemplates {
@@ -162,7 +163,7 @@ func FilterAuthorizedCustomTemplates(customTemplates []portainer.CustomTemplate,
 
 // UserCanAccessResource will valid that a user has permissions defined in the specified resource control
 // based on its identifier and the team(s) he is part of.
-func UserCanAccessResource(userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControl *portainer.ResourceControl) bool {
+func UserCanAccessResource(userID database.UserID, userTeamIDs []database.TeamID, resourceControl *portainer.ResourceControl) bool {
 	if resourceControl == nil {
 		return false
 	}

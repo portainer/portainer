@@ -3,6 +3,7 @@ package stacks
 import (
 	"errors"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -29,11 +30,11 @@ func (g *gitService) LatestCommitID(repositoryURL, referenceName, username, pass
 
 type noopDeployer struct{}
 
-func (s *noopDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool) error {
+func (s *noopDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []registry.Registry, prune bool) error {
 	return nil
 }
 
-func (s *noopDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, forceRereate bool) error {
+func (s *noopDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []registry.Registry, forceRereate bool) error {
 	return nil
 }
 
@@ -188,13 +189,13 @@ func Test_getUserRegistries(t *testing.T) {
 		Role:   portainer.TeamMember,
 	})
 
-	registryReachableByUser := portainer.Registry{
+	registryReachableByUser := registry.Registry{
 		ID:   1,
 		Name: "registryReachableByUser",
-		RegistryAccesses: portainer.RegistryAccesses{
+		RegistryAccesses: registry.RegistryAccesses{
 			database.EndpointID(endpointID): {
-				UserAccessPolicies: map[portainer.UserID]portainer.AccessPolicy{
-					user.ID: {RoleID: portainer.RoleID(portainer.StandardUserRole)},
+				UserAccessPolicies: map[database.UserID]database.AccessPolicy{
+					user.ID: {RoleID: database.RoleID(portainer.StandardUserRole)},
 				},
 			},
 		},
@@ -202,13 +203,13 @@ func Test_getUserRegistries(t *testing.T) {
 	err = store.Registry().Create(&registryReachableByUser)
 	assert.NoError(t, err, "couldn't create a registry")
 
-	registryReachableByTeam := portainer.Registry{
+	registryReachableByTeam := registry.Registry{
 		ID:   2,
 		Name: "registryReachableByTeam",
-		RegistryAccesses: portainer.RegistryAccesses{
+		RegistryAccesses: registry.RegistryAccesses{
 			database.EndpointID(endpointID): {
-				TeamAccessPolicies: map[portainer.TeamID]portainer.AccessPolicy{
-					team.ID: {RoleID: portainer.RoleID(portainer.StandardUserRole)},
+				TeamAccessPolicies: map[database.TeamID]database.AccessPolicy{
+					team.ID: {RoleID: database.RoleID(portainer.StandardUserRole)},
 				},
 			},
 		},
@@ -216,13 +217,13 @@ func Test_getUserRegistries(t *testing.T) {
 	err = store.Registry().Create(&registryReachableByTeam)
 	assert.NoError(t, err, "couldn't create a registry")
 
-	registryRestricted := portainer.Registry{
+	registryRestricted := registry.Registry{
 		ID:   3,
 		Name: "registryRestricted",
-		RegistryAccesses: portainer.RegistryAccesses{
+		RegistryAccesses: registry.RegistryAccesses{
 			database.EndpointID(endpointID): {
-				UserAccessPolicies: map[portainer.UserID]portainer.AccessPolicy{
-					user.ID + 100: {RoleID: portainer.RoleID(portainer.StandardUserRole)},
+				UserAccessPolicies: map[database.UserID]database.AccessPolicy{
+					user.ID + 100: {RoleID: database.RoleID(portainer.StandardUserRole)},
 				},
 			},
 		},
@@ -233,12 +234,12 @@ func Test_getUserRegistries(t *testing.T) {
 	t.Run("admin should has access to all registries", func(t *testing.T) {
 		registries, err := getUserRegistries(store, admin, database.EndpointID(endpointID))
 		assert.NoError(t, err)
-		assert.ElementsMatch(t, []portainer.Registry{registryReachableByUser, registryReachableByTeam, registryRestricted}, registries)
+		assert.ElementsMatch(t, []registry.Registry{registryReachableByUser, registryReachableByTeam, registryRestricted}, registries)
 	})
 
 	t.Run("regular user has access to registries allowed to him and/or his team", func(t *testing.T) {
 		registries, err := getUserRegistries(store, user, database.EndpointID(endpointID))
 		assert.NoError(t, err)
-		assert.ElementsMatch(t, []portainer.Registry{registryReachableByUser, registryReachableByTeam}, registries)
+		assert.ElementsMatch(t, []registry.Registry{registryReachableByUser, registryReachableByTeam}, registries)
 	})
 }

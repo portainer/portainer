@@ -35,7 +35,7 @@ func NewService(connection database.Connection) (*Service, error) {
 }
 
 // Role returns a Role by ID
-func (service *Service) Role(ID portainer.RoleID) (*portainer.Role, error) {
+func (service *Service) Role(ID database.RoleID) (*portainer.Role, error) {
 	var set portainer.Role
 	identifier := service.connection.ConvertToKey(int(ID))
 
@@ -72,14 +72,14 @@ func (service *Service) Create(role *portainer.Role) error {
 	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
-			role.ID = portainer.RoleID(id)
+			role.ID = database.RoleID(id)
 			return int(role.ID), role
 		},
 	)
 }
 
 // UpdateRole updates a role.
-func (service *Service) UpdateRole(ID portainer.RoleID, role *portainer.Role) error {
+func (service *Service) UpdateRole(ID database.RoleID, role *portainer.Role) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, role)
 }

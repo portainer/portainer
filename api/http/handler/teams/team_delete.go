@@ -1,13 +1,13 @@
 package teams
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
 )
 
 // @id TeamDelete
@@ -30,25 +30,25 @@ func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid team identifier route variable", err}
 	}
 
-	_, err = handler.DataStore.Team().Team(portainer.TeamID(teamID))
+	_, err = handler.DataStore.Team().Team(database.TeamID(teamID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a team with the specified identifier inside the database", err}
 	}
 
-	err = handler.DataStore.Team().DeleteTeam(portainer.TeamID(teamID))
+	err = handler.DataStore.Team().DeleteTeam(database.TeamID(teamID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete the team from the database", err}
 	}
 
-	err = handler.DataStore.TeamMembership().DeleteTeamMembershipByTeamID(portainer.TeamID(teamID))
+	err = handler.DataStore.TeamMembership().DeleteTeamMembershipByTeamID(database.TeamID(teamID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete associated team memberships from the database", err}
 	}
 
 	// update default team if deleted team was default
-	err = handler.updateDefaultTeamIfDeleted(portainer.TeamID(teamID))
+	err = handler.updateDefaultTeamIfDeleted(database.TeamID(teamID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to reset default team", err}
 	}
@@ -57,7 +57,7 @@ func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *http
 }
 
 // updateDefaultTeamIfDeleted resets the default team to nil if default team was the deleted team
-func (handler *Handler) updateDefaultTeamIfDeleted(teamID portainer.TeamID) error {
+func (handler *Handler) updateDefaultTeamIfDeleted(teamID database.TeamID) error {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch settings")

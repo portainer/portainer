@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"log"
 	"net/http"
 
@@ -36,7 +37,7 @@ func (transport *Transport) createAzureRequestContext(request *http.Request) (*a
 			return nil, err
 		}
 
-		userTeamIDs := make([]portainer.TeamID, 0)
+		userTeamIDs := make([]database.TeamID, 0)
 		for _, membership := range teamMemberships {
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
@@ -59,7 +60,7 @@ func decorateObject(object map[string]interface{}, resourceControl *portainer.Re
 func (transport *Transport) createPrivateResourceControl(
 	resourceIdentifier string,
 	resourceType portainer.ResourceControlType,
-	userID portainer.UserID) (*portainer.ResourceControl, error) {
+	userID database.UserID) (*portainer.ResourceControl, error) {
 
 	resourceControl := authorization.NewPrivateResourceControl(resourceIdentifier, resourceType, userID)
 

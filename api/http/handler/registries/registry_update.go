@@ -2,6 +2,7 @@ package registries
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 
@@ -27,11 +28,11 @@ type registryUpdatePayload struct {
 	// Password used to authenticate against this registry. required when Authentication is true
 	Password *string `example:"registry_password"`
 	// Quay data
-	Quay *portainer.QuayRegistryData
+	Quay *registry.QuayRegistryData
 	// Registry access control
-	RegistryAccesses *portainer.RegistryAccesses `json:",omitempty"`
+	RegistryAccesses *registry.RegistryAccesses `json:",omitempty"`
 	// ECR data
-	Ecr *portainer.EcrData `json:",omitempty"`
+	Ecr *registry.EcrData `json:",omitempty"`
 }
 
 func (payload *registryUpdatePayload) Validate(r *http.Request) error {
@@ -70,7 +71,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
-	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
+	registry, err := handler.DataStore.Registry().Registry(registry.RegistryID(registryID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -172,7 +173,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	return response.JSON(w, registry)
 }
 
-func (handler *Handler) updateEndpointRegistryAccess(endpoint *portainer.Endpoint, registry *portainer.Registry, endpointAccess portainer.RegistryAccessPolicies) error {
+func (handler *Handler) updateEndpointRegistryAccess(endpoint *portainer.Endpoint, registry *registry.Registry, endpointAccess registry.RegistryAccessPolicies) error {
 
 	cli, err := handler.K8sClientFactory.GetKubeClient(endpoint)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	registry2 "github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 	"strconv"
 	"strings"
@@ -62,12 +63,12 @@ func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.R
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
-	var registry *portainer.Registry
+	var registry *registry2.Registry
 
 	if registryID == 0 {
-		registry = &portainer.Registry{}
+		registry = &registry2.Registry{}
 	} else {
-		registry, err = handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
+		registry, err = handler.DataStore.Registry().Registry(registry2.RegistryID(registryID))
 		if handler.DataStore.IsErrObjectNotFound(err) {
 			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 		} else if err != nil {
@@ -93,7 +94,7 @@ func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.R
 	return response.JSON(w, resp)
 }
 
-func getDockerHubToken(httpClient *client.HTTPClient, registry *portainer.Registry) (string, error) {
+func getDockerHubToken(httpClient *client.HTTPClient, registry *registry2.Registry) (string, error) {
 	type dockerhubTokenResponse struct {
 		Token string `json:"token"`
 	}

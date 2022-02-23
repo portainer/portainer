@@ -177,7 +177,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 	return response.Empty(w)
 }
 
-func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (handler *Handler) deleteStack(userID database.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	if stack.Type == portainer.DockerSwarmStack {
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}

@@ -2,7 +2,9 @@ package migrator
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices/errors"
+	registry2 "github.com/portainer/portainer/api/dataservices/registry"
 	"log"
 
 	portainer "github.com/portainer/portainer/api"
@@ -54,25 +56,25 @@ func (m *Migrator) updateRegistriesToDB32() error {
 
 	for _, registry := range registries {
 
-		registry.RegistryAccesses = portainer.RegistryAccesses{}
+		registry.RegistryAccesses = registry2.RegistryAccesses{}
 
 		for _, endpoint := range endpoints {
 
-			filteredUserAccessPolicies := portainer.UserAccessPolicies{}
+			filteredUserAccessPolicies := database.UserAccessPolicies{}
 			for userId, registryPolicy := range registry.UserAccessPolicies {
 				if _, found := endpoint.UserAccessPolicies[userId]; found {
 					filteredUserAccessPolicies[userId] = registryPolicy
 				}
 			}
 
-			filteredTeamAccessPolicies := portainer.TeamAccessPolicies{}
+			filteredTeamAccessPolicies := database.TeamAccessPolicies{}
 			for teamId, registryPolicy := range registry.TeamAccessPolicies {
 				if _, found := endpoint.TeamAccessPolicies[teamId]; found {
 					filteredTeamAccessPolicies[teamId] = registryPolicy
 				}
 			}
 
-			registry.RegistryAccesses[endpoint.ID] = portainer.RegistryAccessPolicies{
+			registry.RegistryAccesses[endpoint.ID] = registry2.RegistryAccessPolicies{
 				UserAccessPolicies: filteredUserAccessPolicies,
 				TeamAccessPolicies: filteredTeamAccessPolicies,
 				Namespaces:         []string{},
@@ -95,14 +97,14 @@ func (m *Migrator) updateDockerhubToDB32() error {
 		return nil
 	}
 
-	registry := &portainer.Registry{
+	registry := &registry2.Registry{
 		Type:             portainer.DockerHubRegistry,
 		Name:             "Dockerhub (authenticated - migrated)",
 		URL:              "docker.io",
 		Authentication:   true,
 		Username:         dockerhub.Username,
 		Password:         dockerhub.Password,
-		RegistryAccesses: portainer.RegistryAccesses{},
+		RegistryAccesses: registry2.RegistryAccesses{},
 	}
 
 	// The following code will make this function idempotent.
@@ -122,7 +124,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 				migrated = true
 			} else {
 				// delete subsequent duplicates
-				m.registryService.DeleteRegistry(portainer.RegistryID(r.ID))
+				m.registryService.DeleteRegistry(registry2.RegistryID(r.ID))
 			}
 		}
 	}
@@ -142,25 +144,25 @@ func (m *Migrator) updateDockerhubToDB32() error {
 			endpoint.Type != portainer.AgentOnKubernetesEnvironment &&
 			endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
 
-			userAccessPolicies := portainer.UserAccessPolicies{}
+			userAccessPolicies := database.UserAccessPolicies{}
 			for userId := range endpoint.UserAccessPolicies {
 				if _, found := endpoint.UserAccessPolicies[userId]; found {
-					userAccessPolicies[userId] = portainer.AccessPolicy{
+					userAccessPolicies[userId] = database.AccessPolicy{
 						RoleID: 0,
 					}
 				}
 			}
 
-			teamAccessPolicies := portainer.TeamAccessPolicies{}
+			teamAccessPolicies := database.TeamAccessPolicies{}
 			for teamId := range endpoint.TeamAccessPolicies {
 				if _, found := endpoint.TeamAccessPolicies[teamId]; found {
-					teamAccessPolicies[teamId] = portainer.AccessPolicy{
+					teamAccessPolicies[teamId] = database.AccessPolicy{
 						RoleID: 0,
 					}
 				}
 			}
 
-			registry.RegistryAccesses[endpoint.ID] = portainer.RegistryAccessPolicies{
+			registry.RegistryAccesses[endpoint.ID] = registry2.RegistryAccessPolicies{
 				UserAccessPolicies: userAccessPolicies,
 				TeamAccessPolicies: teamAccessPolicies,
 				Namespaces:         []string{},

@@ -99,11 +99,11 @@ func (service *Service) NewDefault() *portainer.Endpoint {
 		//URL:                *flags.EndpointURL,
 		//GroupID:            portainer.EndpointGroupID(1),
 		//Type:               portainer.DockerEnvironment,
-		TLSConfig: portainer.TLSConfiguration{
+		TLSConfig: database.TLSConfiguration{
 			TLS: false,
 		},
-		UserAccessPolicies: portainer.UserAccessPolicies{},
-		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		UserAccessPolicies: database.UserAccessPolicies{},
+		TeamAccessPolicies: database.TeamAccessPolicies{},
 		TagIDs:             []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},

@@ -3,6 +3,8 @@ package registries
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -52,9 +54,9 @@ func Test_registryCreatePayload_Validate(t *testing.T) {
 
 type testRegistryService struct {
 	dataservices.RegistryService
-	createRegistry func(r *portainer.Registry) error
-	updateRegistry func(ID portainer.RegistryID, r *portainer.Registry) error
-	getRegistry    func(ID portainer.RegistryID) (*portainer.Registry, error)
+	createRegistry func(r *registry.Registry) error
+	updateRegistry func(ID registry.RegistryID, r *registry.Registry) error
+	getRegistry    func(ID registry.RegistryID) (*registry.Registry, error)
 }
 
 type testDataStore struct {
@@ -66,23 +68,23 @@ func (t testDataStore) Registry() dataservices.RegistryService {
 	return t.registry
 }
 
-func (t testRegistryService) CreateRegistry(r *portainer.Registry) error {
+func (t testRegistryService) CreateRegistry(r *registry.Registry) error {
 	return t.createRegistry(r)
 }
 
-func (t testRegistryService) UpdateRegistry(ID portainer.RegistryID, r *portainer.Registry) error {
+func (t testRegistryService) UpdateRegistry(ID registry.RegistryID, r *registry.Registry) error {
 	return t.updateRegistry(ID, r)
 }
 
-func (t testRegistryService) Registry(ID portainer.RegistryID) (*portainer.Registry, error) {
+func (t testRegistryService) Registry(ID registry.RegistryID) (*registry.Registry, error) {
 	return t.getRegistry(ID)
 }
 
-func (t testRegistryService) Registries() ([]portainer.Registry, error) {
+func (t testRegistryService) Registries() ([]registry.Registry, error) {
 	return nil, nil
 }
 
-func (t testRegistryService) Create(registry *portainer.Registry) error {
+func (t testRegistryService) Create(registry *registry.Registry) error {
 	return nil
 }
 
@@ -96,7 +98,7 @@ func deleteTestHandler_registryCreate(t *testing.T) {
 		Authentication: false,
 		Username:       "username",
 		Password:       "password",
-		Gitlab:         portainer.GitlabRegistryData{},
+		Gitlab:         registry.GitlabRegistryData{},
 	}
 	payloadBytes, err := json.Marshal(payload)
 	assert.NoError(t, err)
@@ -105,17 +107,17 @@ func deleteTestHandler_registryCreate(t *testing.T) {
 
 	restrictedContext := &security.RestrictedRequestContext{
 		IsAdmin: true,
-		UserID:  portainer.UserID(1),
+		UserID:  database.UserID(1),
 	}
 
 	ctx := security.StoreRestrictedRequestContext(r, restrictedContext)
 	r = r.WithContext(ctx)
 
-	registry := portainer.Registry{}
+	registry := registry.Registry{}
 	handler := Handler{}
 	handler.DataStore = testDataStore{
 		registry: &testRegistryService{
-			createRegistry: func(r *portainer.Registry) error {
+			createRegistry: func(r *registry.Registry) error {
 				registry = *r
 				return nil
 			},

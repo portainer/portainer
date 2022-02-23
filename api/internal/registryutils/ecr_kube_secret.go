@@ -4,9 +4,10 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/registry"
 )
 
-func isRegistryAssignedToNamespace(registry portainer.Registry, endpointID database.EndpointID, namespace string) (in bool) {
+func isRegistryAssignedToNamespace(registry registry.Registry, endpointID database.EndpointID, namespace string) (in bool) {
 	for _, ns := range registry.RegistryAccesses[endpointID].Namespaces {
 		if ns == namespace {
 			return true

@@ -50,7 +50,7 @@ func (manager *tokenManager) GetUserServiceAccountToken(userID int, endpointID d
 
 	token, ok := manager.tokenCache.getToken(userID)
 	if !ok {
-		memberships, err := manager.dataStore.TeamMembership().TeamMembershipsByUserID(portainer.UserID(userID))
+		memberships, err := manager.dataStore.TeamMembership().TeamMembershipsByUserID(database.UserID(userID))
 		if err != nil {
 			return "", err
 		}

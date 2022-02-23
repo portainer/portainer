@@ -2,6 +2,7 @@ package apikey
 
 import (
 	"crypto/rand"
+	"github.com/portainer/portainer/api/database"
 	"io"
 
 	portainer "github.com/portainer/portainer/api"
@@ -12,11 +13,11 @@ type APIKeyService interface {
 	HashRaw(rawKey string) []byte
 	GenerateApiKey(user portainer.User, description string) (string, *portainer.APIKey, error)
 	GetAPIKey(apiKeyID portainer.APIKeyID) (*portainer.APIKey, error)
-	GetAPIKeys(userID portainer.UserID) ([]portainer.APIKey, error)
+	GetAPIKeys(userID database.UserID) ([]portainer.APIKey, error)
 	GetDigestUserAndKey(digest []byte) (portainer.User, portainer.APIKey, error)
 	UpdateAPIKey(apiKey *portainer.APIKey) error
 	DeleteAPIKey(apiKeyID portainer.APIKeyID) error
-	InvalidateUserKeyCache(userId portainer.UserID) bool
+	InvalidateUserKeyCache(userId database.UserID) bool
 }
 
 // generateRandomKey generates a random key of specified length

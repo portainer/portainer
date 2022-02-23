@@ -38,7 +38,7 @@ func NewService(connection database.Connection) (*Service, error) {
 }
 
 // User returns a user by ID
-func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
+func (service *Service) User(ID database.UserID) (*portainer.User, error) {
 	var user portainer.User
 	identifier := service.connection.ConvertToKey(int(ID))
 
@@ -122,7 +122,7 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 }
 
 // UpdateUser saves a user.
-func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) error {
+func (service *Service) UpdateUser(ID database.UserID, user *portainer.User) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	user.Username = strings.ToLower(user.Username)
 	return service.connection.UpdateObject(BucketName, identifier, user)
@@ -133,7 +133,7 @@ func (service *Service) Create(user *portainer.User) error {
 	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
-			user.ID = portainer.UserID(id)
+			user.ID = database.UserID(id)
 			user.Username = strings.ToLower(user.Username)
 
 			return int(user.ID), user
@@ -142,7 +142,7 @@ func (service *Service) Create(user *portainer.User) error {
 }
 
 // DeleteUser deletes a user.
-func (service *Service) DeleteUser(ID portainer.UserID) error {
+func (service *Service) DeleteUser(ID database.UserID) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }

@@ -3,6 +3,8 @@ package registries
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/portainer/portainer/api/database"
+	registry2 "github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -46,27 +48,27 @@ func delete_TestHandler_registryUpdate(t *testing.T) {
 	}
 	payloadBytes, err := json.Marshal(payload)
 	assert.NoError(t, err)
-	registry := portainer.Registry{Type: portainer.ProGetRegistry, ID: 5}
+	registry := registry2.Registry{Type: portainer.ProGetRegistry, ID: 5}
 	r := httptest.NewRequest(http.MethodPut, "/registries/5", bytes.NewReader(payloadBytes))
 	w := httptest.NewRecorder()
 
 	restrictedContext := &security.RestrictedRequestContext{
 		IsAdmin: true,
-		UserID:  portainer.UserID(1),
+		UserID:  database.UserID(1),
 	}
 
 	ctx := security.StoreRestrictedRequestContext(r, restrictedContext)
 	r = r.WithContext(ctx)
 
-	updatedRegistry := portainer.Registry{}
+	updatedRegistry := registry2.Registry{}
 	handler := newHandler(nil)
 	handler.initRouter(TestBouncer{})
 	handler.DataStore = testDataStore{
 		registry: &testRegistryService{
-			getRegistry: func(_ portainer.RegistryID) (*portainer.Registry, error) {
+			getRegistry: func(_ registry2.RegistryID) (*registry2.Registry, error) {
 				return &registry, nil
 			},
-			updateRegistry: func(ID portainer.RegistryID, r *portainer.Registry) error {
+			updateRegistry: func(ID registry2.RegistryID, r *registry2.Registry) error {
 				assert.Equal(t, ID, r.ID)
 				updatedRegistry = *r
 				return nil

@@ -3,6 +3,7 @@ package exec
 import (
 	"bytes"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"os/exec"
 	"path"
 	"runtime"
@@ -42,7 +43,7 @@ func NewKubernetesDeployer(kubernetesTokenCacheManager *kubernetes.TokenCacheMan
 	}
 }
 
-func (deployer *KubernetesDeployer) getToken(userID portainer.UserID, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, error) {
+func (deployer *KubernetesDeployer) getToken(userID database.UserID, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, error) {
 	kubeCLI, err := deployer.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return "", err
@@ -76,16 +77,16 @@ func (deployer *KubernetesDeployer) getToken(userID portainer.UserID, endpoint *
 }
 
 // Deploy upserts Kubernetes resources defined in manifest(s)
-func (deployer *KubernetesDeployer) Deploy(userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
+func (deployer *KubernetesDeployer) Deploy(userID database.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
 	return deployer.command("apply", userID, endpoint, manifestFiles, namespace)
 }
 
 // Remove deletes Kubernetes resources defined in manifest(s)
-func (deployer *KubernetesDeployer) Remove(userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
+func (deployer *KubernetesDeployer) Remove(userID database.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
 	return deployer.command("delete", userID, endpoint, manifestFiles, namespace)
 }
 
-func (deployer *KubernetesDeployer) command(operation string, userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
+func (deployer *KubernetesDeployer) command(operation string, userID database.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
 	token, err := deployer.getToken(userID, endpoint, endpoint.Type == portainer.KubernetesLocalEnvironment)
 	if err != nil {
 		return "", errors.Wrap(err, "failed generating a user token")

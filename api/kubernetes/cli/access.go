@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"encoding/json"
+	"github.com/portainer/portainer/api/database"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
@@ -84,13 +85,13 @@ func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, service
 }
 
 func hasUserAccessToNamespace(userID int, teamIDs []int, policies portainer.K8sNamespaceAccessPolicy) bool {
-	_, userAccess := policies.UserAccessPolicies[portainer.UserID(userID)]
+	_, userAccess := policies.UserAccessPolicies[database.UserID(userID)]
 	if userAccess {
 		return true
 	}
 
 	for _, teamID := range teamIDs {
-		_, teamAccess := policies.TeamAccessPolicies[portainer.TeamID(teamID)]
+		_, teamAccess := policies.TeamAccessPolicies[database.TeamID(teamID)]
 		if teamAccess {
 			return true
 		}

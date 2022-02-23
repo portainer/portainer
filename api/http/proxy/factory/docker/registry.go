@@ -4,6 +4,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils"
 )
@@ -14,7 +15,7 @@ type (
 		user            *portainer.User
 		endpointID      database.EndpointID
 		teamMemberships []portainer.TeamMembership
-		registries      []portainer.Registry
+		registries      []registry.Registry
 	}
 
 	registryAuthenticationHeader struct {
@@ -24,19 +25,19 @@ type (
 	}
 
 	portainerRegistryAuthenticationHeader struct {
-		RegistryId portainer.RegistryID `json:"registryId"`
+		RegistryId registry.RegistryID `json:"registryId"`
 	}
 )
 
 func createRegistryAuthenticationHeader(
 	dataStore dataservices.DataStore,
-	registryId portainer.RegistryID,
+	registryId registry.RegistryID,
 	accessContext *registryAccessContext,
 ) (authenticationHeader registryAuthenticationHeader, err error) {
 	if registryId == 0 { // dockerhub (anonymous)
 		authenticationHeader.Serveraddress = "docker.io"
 	} else { // any "custom" registry
-		var matchingRegistry *portainer.Registry
+		var matchingRegistry *registry.Registry
 		for _, registry := range accessContext.registries {
 			if registry.ID == registryId &&
 				(accessContext.isAdmin ||

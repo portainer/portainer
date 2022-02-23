@@ -3,6 +3,7 @@ package webhooks
 import (
 	"errors"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils/access"
 	"net/http"
@@ -18,7 +19,7 @@ import (
 type webhookCreatePayload struct {
 	ResourceID  string
 	EndpointID  int
-	RegistryID  portainer.RegistryID
+	RegistryID  registry.RegistryID
 	WebhookType int
 }
 

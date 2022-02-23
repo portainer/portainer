@@ -3,6 +3,7 @@ package access
 import (
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/registry"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -11,9 +12,9 @@ import (
 
 func hasPermission(
 	dataStore dataservices.DataStore,
-	userID portainer.UserID,
+	userID database.UserID,
 	endpointID database.EndpointID,
-	registry *portainer.Registry,
+	registry *registry.Registry,
 ) (hasPermission bool, err error) {
 	user, err := dataStore.User().User(userID)
 	if err != nil {
@@ -37,10 +38,10 @@ func hasPermission(
 // GetAccessibleRegistry get the registry if the user has permission
 func GetAccessibleRegistry(
 	dataStore dataservices.DataStore,
-	userID portainer.UserID,
+	userID database.UserID,
 	endpointID database.EndpointID,
-	registryID portainer.RegistryID,
-) (registry *portainer.Registry, err error) {
+	registryID registry.RegistryID,
+) (registry *registry.Registry, err error) {
 
 	registry, err = dataStore.Registry().Registry(registryID)
 	if err != nil {

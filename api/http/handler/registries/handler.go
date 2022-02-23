@@ -1,6 +1,7 @@
 package registries
 
 import (
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -12,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
-func hideFields(registry *portainer.Registry, hideAccesses bool) {
+func hideFields(registry *registry.Registry, hideAccesses bool) {
 	registry.Password = ""
 	registry.ManagementConfiguration = nil
 	if hideAccesses {
@@ -68,7 +69,7 @@ type accessGuard interface {
 	AuthenticatedAccess(h http.Handler) http.Handler
 }
 
-func (handler *Handler) registriesHaveSameURLAndCredentials(r1, r2 *portainer.Registry) bool {
+func (handler *Handler) registriesHaveSameURLAndCredentials(r1, r2 *registry.Registry) bool {
 	hasSameUrl := r1.URL == r2.URL
 	hasSameCredentials := r1.Authentication == r2.Authentication && (!r1.Authentication || (r1.Authentication && r1.Username == r2.Username))
 

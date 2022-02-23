@@ -2,6 +2,7 @@ package teammemberships
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -68,7 +69,7 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	if !security.AuthorizedTeamManagement(portainer.TeamID(payload.TeamID), securityContext) {
+	if !security.AuthorizedTeamManagement(database.TeamID(payload.TeamID), securityContext) {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the membership", httperrors.ErrResourceAccessDenied}
 	}
 
@@ -83,8 +84,8 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the role of membership", httperrors.ErrResourceAccessDenied}
 	}
 
-	membership.UserID = portainer.UserID(payload.UserID)
-	membership.TeamID = portainer.TeamID(payload.TeamID)
+	membership.UserID = database.UserID(payload.UserID)
+	membership.TeamID = database.TeamID(payload.TeamID)
 	membership.Role = portainer.MembershipRole(payload.Role)
 
 	err = handler.DataStore.TeamMembership().UpdateTeamMembership(membership.ID, membership)

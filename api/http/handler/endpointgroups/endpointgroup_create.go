@@ -56,8 +56,8 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 	endpointGroup := &portainer.EndpointGroup{
 		Name:               payload.Name,
 		Description:        payload.Description,
-		UserAccessPolicies: portainer.UserAccessPolicies{},
-		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		UserAccessPolicies: database.UserAccessPolicies{},
+		TeamAccessPolicies: database.TeamAccessPolicies{},
 		TagIDs:             payload.TagIDs,
 	}
 

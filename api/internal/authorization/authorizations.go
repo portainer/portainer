@@ -445,7 +445,7 @@ func (service *Service) UpdateUsersAuthorizations() error {
 	return nil
 }
 
-func (service *Service) updateUserAuthorizations(userID portainer.UserID) error {
+func (service *Service) updateUserAuthorizations(userID database.UserID) error {
 	user, err := service.dataStore.User().User(userID)
 	if err != nil {
 		return err
@@ -495,8 +495,8 @@ func (service *Service) getAuthorizations(user *portainer.User) (portainer.Endpo
 func getUserEndpointAuthorizations(user *portainer.User, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, roles []portainer.Role, userMemberships []portainer.TeamMembership) portainer.EndpointAuthorizations {
 	endpointAuthorizations := make(portainer.EndpointAuthorizations)
 
-	groupUserAccessPolicies := map[portainer.EndpointGroupID]portainer.UserAccessPolicies{}
-	groupTeamAccessPolicies := map[portainer.EndpointGroupID]portainer.TeamAccessPolicies{}
+	groupUserAccessPolicies := map[portainer.EndpointGroupID]database.UserAccessPolicies{}
+	groupTeamAccessPolicies := map[portainer.EndpointGroupID]database.TeamAccessPolicies{}
 	for _, endpointGroup := range endpointGroups {
 		groupUserAccessPolicies[endpointGroup.ID] = endpointGroup.UserAccessPolicies
 		groupTeamAccessPolicies[endpointGroup.ID] = endpointGroup.TeamAccessPolicies
@@ -531,7 +531,7 @@ func getUserEndpointAuthorizations(user *portainer.User, endpoints []portainer.E
 }
 
 func getAuthorizationsFromUserEndpointPolicy(user *portainer.User, endpoint *portainer.Endpoint, roles []portainer.Role) portainer.Authorizations {
-	policyRoles := make([]portainer.RoleID, 0)
+	policyRoles := make([]database.RoleID, 0)
 
 	policy, ok := endpoint.UserAccessPolicies[user.ID]
 	if ok {
@@ -541,8 +541,8 @@ func getAuthorizationsFromUserEndpointPolicy(user *portainer.User, endpoint *por
 	return getAuthorizationsFromRoles(policyRoles, roles)
 }
 
-func getAuthorizationsFromUserEndpointGroupPolicy(user *portainer.User, endpoint *portainer.Endpoint, roles []portainer.Role, groupAccessPolicies map[portainer.EndpointGroupID]portainer.UserAccessPolicies) portainer.Authorizations {
-	policyRoles := make([]portainer.RoleID, 0)
+func getAuthorizationsFromUserEndpointGroupPolicy(user *portainer.User, endpoint *portainer.Endpoint, roles []portainer.Role, groupAccessPolicies map[portainer.EndpointGroupID]database.UserAccessPolicies) portainer.Authorizations {
+	policyRoles := make([]database.RoleID, 0)
 
 	policy, ok := groupAccessPolicies[endpoint.GroupID][user.ID]
 	if ok {
@@ -553,7 +553,7 @@ func getAuthorizationsFromUserEndpointGroupPolicy(user *portainer.User, endpoint
 }
 
 func getAuthorizationsFromTeamEndpointPolicies(memberships []portainer.TeamMembership, endpoint *portainer.Endpoint, roles []portainer.Role) portainer.Authorizations {
-	policyRoles := make([]portainer.RoleID, 0)
+	policyRoles := make([]database.RoleID, 0)
 
 	for _, membership := range memberships {
 		policy, ok := endpoint.TeamAccessPolicies[membership.TeamID]
@@ -565,8 +565,8 @@ func getAuthorizationsFromTeamEndpointPolicies(memberships []portainer.TeamMembe
 	return getAuthorizationsFromRoles(policyRoles, roles)
 }
 
-func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []portainer.TeamMembership, endpoint *portainer.Endpoint, roles []portainer.Role, groupAccessPolicies map[portainer.EndpointGroupID]portainer.TeamAccessPolicies) portainer.Authorizations {
-	policyRoles := make([]portainer.RoleID, 0)
+func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []portainer.TeamMembership, endpoint *portainer.Endpoint, roles []portainer.Role, groupAccessPolicies map[portainer.EndpointGroupID]database.TeamAccessPolicies) portainer.Authorizations {
+	policyRoles := make([]database.RoleID, 0)
 
 	for _, membership := range memberships {
 		policy, ok := groupAccessPolicies[endpoint.GroupID][membership.TeamID]
@@ -578,7 +578,7 @@ func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []portainer.Team
 	return getAuthorizationsFromRoles(policyRoles, roles)
 }
 
-func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []portainer.Role) portainer.Authorizations {
+func getAuthorizationsFromRoles(roleIdentifiers []database.RoleID, roles []portainer.Role) portainer.Authorizations {
 	var associatedRoles []portainer.Role
 
 	for _, id := range roleIdentifiers {
@@ -602,7 +602,7 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 	return authorizations
 }
 
-func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpointID database.EndpointID, authorizations []portainer.Authorization) (bool, error) {
+func (service *Service) UserIsAdminOrAuthorized(userID database.UserID, endpointID database.EndpointID, authorizations []portainer.Authorization) (bool, error) {
 	user, err := service.dataStore.User().User(userID)
 	if err != nil {
 		return false, err

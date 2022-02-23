@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	registry2 "github.com/portainer/portainer/api/dataservices/registry"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -49,8 +50,8 @@ type (
 
 	restrictedDockerOperationContext struct {
 		isAdmin          bool
-		userID           portainer.UserID
-		userTeamIDs      []portainer.TeamID
+		userID           database.UserID
+		userTeamIDs      []database.TeamID
 		resourceControls []portainer.ResourceControl
 	}
 
@@ -173,12 +174,12 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 
 		r.URL.Path = strings.TrimSuffix(requestPath, "/")
 
-		registry := &portainer.Registry{
+		registry := &registry2.Registry{
 			Type: portainer.DockerHubRegistry,
 		}
 
 		if registryID != 0 {
-			registry, err = transport.dataStore.Registry().Registry(portainer.RegistryID(registryID))
+			registry, err = transport.dataStore.Registry().Registry(registry2.RegistryID(registryID))
 			if err != nil {
 				return nil, fmt.Errorf("failed fetching registry: %w", err)
 			}
@@ -459,7 +460,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			return nil, err
 		}
 
-		userTeamIDs := make([]portainer.TeamID, 0)
+		userTeamIDs := make([]database.TeamID, 0)
 		for _, membership := range teamMemberships {
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
@@ -553,7 +554,7 @@ func (transport *Transport) interceptAndRewriteRequest(request *http.Request, op
 // https://docs.docker.com/engine/api/v1.37/#operation/ServiceCreate
 // https://docs.docker.com/engine/api/v1.37/#operation/SecretCreate
 // https://docs.docker.com/engine/api/v1.37/#operation/ConfigCreate
-func (transport *Transport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
+func (transport *Transport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID database.UserID) error {
 	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
@@ -709,7 +710,7 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 			return nil, err
 		}
 
-		userTeamIDs := make([]portainer.TeamID, 0)
+		userTeamIDs := make([]database.TeamID, 0)
 		for _, membership := range teamMemberships {
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}

@@ -68,7 +68,7 @@ func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 }
 
 // TeamMembershipsByUserID return an array containing all the TeamMembership objects where the specified userID is present.
-func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]portainer.TeamMembership, error) {
+func (service *Service) TeamMembershipsByUserID(userID database.UserID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
 	err := service.connection.GetAll(
@@ -90,7 +90,7 @@ func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]port
 }
 
 // TeamMembershipsByTeamID return an array containing all the TeamMembership objects where the specified teamID is present.
-func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]portainer.TeamMembership, error) {
+func (service *Service) TeamMembershipsByTeamID(teamID database.TeamID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
 	err := service.connection.GetAll(
@@ -135,7 +135,7 @@ func (service *Service) DeleteTeamMembership(ID portainer.TeamMembershipID) erro
 }
 
 // DeleteTeamMembershipByUserID deletes all the TeamMembership object associated to a UserID.
-func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) error {
+func (service *Service) DeleteTeamMembershipByUserID(userID database.UserID) error {
 	return service.connection.DeleteAllObjects(
 		BucketName,
 		func(obj interface{}) (id int, ok bool) {
@@ -153,7 +153,7 @@ func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) er
 }
 
 // DeleteTeamMembershipByTeamID deletes all the TeamMembership object associated to a TeamID.
-func (service *Service) DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error {
+func (service *Service) DeleteTeamMembershipByTeamID(teamID database.TeamID) error {
 	return service.connection.DeleteAllObjects(
 		BucketName,
 		func(obj interface{}) (id int, ok bool) {

@@ -2,6 +2,7 @@ package users
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -75,11 +76,11 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
 	}
 
-	if tokenData.ID != portainer.UserID(userID) {
+	if tokenData.ID != database.UserID(userID) {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user access token", httperrors.ErrUnauthorized}
 	}
 
-	user, err := handler.DataStore.User().User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().User(database.UserID(userID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Unable to find a user", err}
 	}

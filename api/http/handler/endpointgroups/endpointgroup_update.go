@@ -1,6 +1,7 @@
 package endpointgroups
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"reflect"
 
@@ -18,8 +19,8 @@ type endpointGroupUpdatePayload struct {
 	Description string `example:"description"`
 	// List of tag identifiers associated to the environment(endpoint) group
 	TagIDs             []portainer.TagID `example:"3,4"`
-	UserAccessPolicies portainer.UserAccessPolicies
-	TeamAccessPolicies portainer.TeamAccessPolicies
+	UserAccessPolicies database.UserAccessPolicies
+	TeamAccessPolicies database.TeamAccessPolicies
 }
 
 func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {

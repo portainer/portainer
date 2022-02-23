@@ -1,6 +1,7 @@
 package helm
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strings"
 
@@ -49,7 +50,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
 	}
-	userID := portainer.UserID(tokenData.ID)
+	userID := database.UserID(tokenData.ID)
 
 	p := new(addHelmRepoUrlPayload)
 	err = request.DecodeAndValidateJSONPayload(r, p)
@@ -108,7 +109,7 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
 	}
-	userID := portainer.UserID(tokenData.ID)
+	userID := database.UserID(tokenData.ID)
 
 	settings, err := handler.dataStore.Settings().Settings()
 	if err != nil {

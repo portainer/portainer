@@ -2,13 +2,14 @@ package registries
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
+	registry2 "github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -118,14 +119,14 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
-	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
+	registry, err := handler.DataStore.Registry().Registry(registry2.RegistryID(registryID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
-	registry.ManagementConfiguration = &portainer.RegistryManagementConfiguration{
+	registry.ManagementConfiguration = &registry2.RegistryManagementConfiguration{
 		Type: registry.Type,
 	}
 
@@ -144,7 +145,7 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 	}
 
 	if payload.TLS {
-		registry.ManagementConfiguration.TLSConfig = portainer.TLSConfiguration{
+		registry.ManagementConfiguration.TLSConfig = database.TLSConfiguration{
 			TLS:           true,
 			TLSSkipVerify: payload.TLSSkipVerify,
 		}

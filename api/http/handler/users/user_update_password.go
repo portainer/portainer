@@ -2,6 +2,7 @@ package users
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"time"
 
@@ -59,7 +60,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
 	}
 
-	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
+	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != database.UserID(userID) {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", httperrors.ErrUnauthorized}
 	}
 
@@ -69,7 +70,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	user, err := handler.DataStore.User().User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().User(database.UserID(userID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {

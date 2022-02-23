@@ -1,12 +1,12 @@
 package registries
 
 import (
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -38,14 +38,14 @@ func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
-	_, err = handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
+	_, err = handler.DataStore.Registry().Registry(registry.RegistryID(registryID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
-	err = handler.DataStore.Registry().DeleteRegistry(portainer.RegistryID(registryID))
+	err = handler.DataStore.Registry().DeleteRegistry(registry.RegistryID(registryID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the registry from the database", err}
 	}

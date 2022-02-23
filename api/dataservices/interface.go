@@ -5,6 +5,7 @@ package dataservices
 import (
 	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices/edgejob"
+	"github.com/portainer/portainer/api/dataservices/registry"
 	"io"
 	"time"
 
@@ -140,7 +141,7 @@ type (
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
 	HelmUserRepositoryService interface {
 		HelmUserRepositories() ([]portainer.HelmUserRepository, error)
-		HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error)
+		HelmUserRepositoryByUserID(userID database.UserID) ([]portainer.HelmUserRepository, error)
 		Create(record *portainer.HelmUserRepository) error
 		UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, repository *portainer.HelmUserRepository) error
 		DeleteHelmUserRepository(ID portainer.HelmUserRepositoryID) error
@@ -158,11 +159,11 @@ type (
 
 	// RegistryService represents a service for managing registry data
 	RegistryService interface {
-		Registry(ID portainer.RegistryID) (*portainer.Registry, error)
-		Registries() ([]portainer.Registry, error)
-		Create(registry *portainer.Registry) error
-		UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error
-		DeleteRegistry(ID portainer.RegistryID) error
+		Registry(ID registry.RegistryID) (*registry.Registry, error)
+		Registries() ([]registry.Registry, error)
+		Create(registry *registry.Registry) error
+		UpdateRegistry(ID registry.RegistryID, registry *registry.Registry) error
+		DeleteRegistry(ID registry.RegistryID) error
 		BucketName() string
 	}
 
@@ -179,10 +180,10 @@ type (
 
 	// RoleService represents a service for managing user roles
 	RoleService interface {
-		Role(ID portainer.RoleID) (*portainer.Role, error)
+		Role(ID database.RoleID) (*portainer.Role, error)
 		Roles() ([]portainer.Role, error)
 		Create(role *portainer.Role) error
-		UpdateRole(ID portainer.RoleID, role *portainer.Role) error
+		UpdateRole(ID database.RoleID, role *portainer.Role) error
 		BucketName() string
 	}
 
@@ -192,7 +193,7 @@ type (
 		GetAPIKey(keyID portainer.APIKeyID) (*portainer.APIKey, error)
 		UpdateAPIKey(key *portainer.APIKey) error
 		DeleteAPIKey(ID portainer.APIKeyID) error
-		GetAPIKeysByUserID(userID portainer.UserID) ([]portainer.APIKey, error)
+		GetAPIKeysByUserID(userID database.UserID) ([]portainer.APIKey, error)
 		GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, error)
 	}
 
@@ -238,12 +239,12 @@ type (
 
 	// TeamService represents a service for managing user data
 	TeamService interface {
-		Team(ID portainer.TeamID) (*portainer.Team, error)
+		Team(ID database.TeamID) (*portainer.Team, error)
 		TeamByName(name string) (*portainer.Team, error)
 		Teams() ([]portainer.Team, error)
 		Create(team *portainer.Team) error
-		UpdateTeam(ID portainer.TeamID, team *portainer.Team) error
-		DeleteTeam(ID portainer.TeamID) error
+		UpdateTeam(ID database.TeamID, team *portainer.Team) error
+		DeleteTeam(ID database.TeamID) error
 		BucketName() string
 	}
 
@@ -251,13 +252,13 @@ type (
 	TeamMembershipService interface {
 		TeamMembership(ID portainer.TeamMembershipID) (*portainer.TeamMembership, error)
 		TeamMemberships() ([]portainer.TeamMembership, error)
-		TeamMembershipsByUserID(userID portainer.UserID) ([]portainer.TeamMembership, error)
-		TeamMembershipsByTeamID(teamID portainer.TeamID) ([]portainer.TeamMembership, error)
+		TeamMembershipsByUserID(userID database.UserID) ([]portainer.TeamMembership, error)
+		TeamMembershipsByTeamID(teamID database.TeamID) ([]portainer.TeamMembership, error)
 		Create(membership *portainer.TeamMembership) error
 		UpdateTeamMembership(ID portainer.TeamMembershipID, membership *portainer.TeamMembership) error
 		DeleteTeamMembership(ID portainer.TeamMembershipID) error
-		DeleteTeamMembershipByUserID(userID portainer.UserID) error
-		DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error
+		DeleteTeamMembershipByUserID(userID database.UserID) error
+		DeleteTeamMembershipByTeamID(teamID database.TeamID) error
 		BucketName() string
 	}
 
@@ -270,13 +271,13 @@ type (
 
 	// UserService represents a service for managing user data
 	UserService interface {
-		User(ID portainer.UserID) (*portainer.User, error)
+		User(ID database.UserID) (*portainer.User, error)
 		UserByUsername(username string) (*portainer.User, error)
 		Users() ([]portainer.User, error)
 		UsersByRole(role portainer.UserRole) ([]portainer.User, error)
 		Create(user *portainer.User) error
-		UpdateUser(ID portainer.UserID, user *portainer.User) error
-		DeleteUser(ID portainer.UserID) error
+		UpdateUser(ID database.UserID, user *portainer.User) error
+		DeleteUser(ID database.UserID) error
 		BucketName() string
 	}
 

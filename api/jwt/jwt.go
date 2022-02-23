@@ -3,6 +3,7 @@ package jwt
 import (
 	"errors"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -122,7 +123,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 	if err == nil && parsedToken != nil {
 		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
 
-			user, err := service.dataStore.User().User(portainer.UserID(cl.UserID))
+			user, err := service.dataStore.User().User(database.UserID(cl.UserID))
 			if err != nil {
 				return nil, errInvalidJWTToken
 			}
@@ -130,7 +131,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 				return nil, errInvalidJWTToken
 			}
 			return &portainer.TokenData{
-				ID:       portainer.UserID(cl.UserID),
+				ID:       database.UserID(cl.UserID),
 				Username: cl.Username,
 				Role:     portainer.UserRole(cl.Role),
 			}, nil

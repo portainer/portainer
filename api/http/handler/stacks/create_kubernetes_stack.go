@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"os"
 	"strconv"
@@ -96,7 +97,7 @@ type createKubernetesStackResponse struct {
 	Output string `json:"Output"`
 }
 
-func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID database.UserID) *httperror.HandlerError {
 	var payload kubernetesStringDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
@@ -167,7 +168,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID database.UserID) *httperror.HandlerError {
 	var payload kubernetesGitDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
@@ -281,7 +282,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
+func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID database.UserID) *httperror.HandlerError {
 	var payload kubernetesManifestURLDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
@@ -353,7 +354,7 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) deployKubernetesStack(userID portainer.UserID, endpoint *portainer.Endpoint, stack *portainer.Stack, appLabels k.KubeAppLabels) (string, error) {
+func (handler *Handler) deployKubernetesStack(userID database.UserID, endpoint *portainer.Endpoint, stack *portainer.Stack, appLabels k.KubeAppLabels) (string, error) {
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
