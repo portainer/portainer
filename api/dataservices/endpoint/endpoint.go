@@ -80,10 +80,58 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 
 // CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
 func (service *Service) Create(endpoint *portainer.Endpoint) error {
+	if int(endpoint.ID) == 0 {
+		// TODO: hopefully this can become the only path
+		endpoint.ID = portainer.EndpointID(service.getNextIdentifier())
+	}
 	return service.connection.CreateObjectWithSetSequence(BucketName, int(endpoint.ID), endpoint)
 }
 
 // GetNextIdentifier returns the next identifier for an environment(endpoint).
-func (service *Service) GetNextIdentifier() int {
+func (service *Service) getNextIdentifier() int {
 	return service.connection.GetNextIdentifier(BucketName)
+}
+
+func (service *Service) NewDefault() *portainer.Endpoint {
+	return &portainer.Endpoint{
+		//ID:                 0,
+		//Name:               "primary",
+		//URL:                *flags.EndpointURL,
+		//GroupID:            portainer.EndpointGroupID(1),
+		//Type:               portainer.DockerEnvironment,
+		TLSConfig: portainer.TLSConfiguration{
+			TLS: false,
+		},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		TagIDs:             []portainer.TagID{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         kubernetesDefault(),
+
+		SecuritySettings: portainer.EndpointSecuritySettings{
+			AllowVolumeBrowserForRegularUsers: false,
+			EnableHostManagementFeatures:      false,
+
+			AllowSysctlSettingForRegularUsers:         true,
+			AllowBindMountsForRegularUsers:            true,
+			AllowPrivilegedModeForRegularUsers:        true,
+			AllowHostNamespaceForRegularUsers:         true,
+			AllowContainerCapabilitiesForRegularUsers: true,
+			AllowDeviceMappingForRegularUsers:         true,
+			AllowStackManagementForRegularUsers:       true,
+		},
+	}
+}
+
+func kubernetesDefault() portainer.KubernetesData {
+	return portainer.KubernetesData{
+		Configuration: portainer.KubernetesConfiguration{
+			UseLoadBalancer:  false,
+			UseServerMetrics: false,
+			StorageClasses:   []portainer.KubernetesStorageClassConfig{},
+			IngressClasses:   []portainer.KubernetesIngressClassConfig{},
+		},
+		Snapshots: []portainer.KubernetesSnapshot{},
+	}
 }

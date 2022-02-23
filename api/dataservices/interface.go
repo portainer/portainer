@@ -99,7 +99,8 @@ type (
 		Create(endpoint *portainer.Endpoint) error
 		UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error
 		DeleteEndpoint(ID portainer.EndpointID) error
-		GetNextIdentifier() int
+		//GetNextIdentifier() int
+		NewDefault() *portainer.Endpoint
 		BucketName() string
 	}
 
