@@ -201,17 +201,6 @@ type (
 	// EdgeGroupID represents an Edge group identifier
 	EdgeGroupID int
 
-	// EdgeSchedule represents a scheduled job that can run on Edge environments(endpoints).
-	// Deprecated in favor of EdgeJob
-	EdgeSchedule struct {
-		// EdgeSchedule Identifier
-		ID             ScheduleID            `json:"Id" example:"1"`
-		CronExpression string                `json:"CronExpression"`
-		Script         string                `json:"Script"`
-		Version        int                   `json:"Version"`
-		Endpoints      []database.EndpointID `json:"Endpoints"`
-	}
-
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
@@ -415,9 +404,6 @@ type (
 		URL string `json:"URL" example:"https://charts.bitnami.com/bitnami"`
 	}
 
-	// JobType represents a job type
-	JobType int
-
 	K8sNodeLimits struct {
 		CPU    int64 `json:"CPU"`
 		Memory int64 `json:"Memory"`
@@ -617,26 +603,6 @@ type (
 		LastUsed    int64           `json:"lastUsed"`         // Unix timestamp (UTC) when the API key was last used
 		Digest      []byte          `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
 	}
-
-	// Schedule represents a scheduled job.
-	// It only contains a pointer to one of the JobRunner implementations
-	// based on the JobType.
-	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
-	// Deprecated in favor of EdgeJob
-	Schedule struct {
-		// Schedule Identifier
-		ID             ScheduleID `json:"Id" example:"1"`
-		Name           string
-		CronExpression string
-		Recurring      bool
-		Created        int64
-		JobType        JobType
-		EdgeSchedule   *EdgeSchedule
-	}
-
-	// ScheduleID represents a schedule identifier.
-	// Deprecated in favor of EdgeJob
-	ScheduleID int
 
 	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
 	ScriptExecutionJob struct {
@@ -1307,12 +1273,6 @@ const (
 	AgentOnKubernetesEnvironment
 	// EdgeAgentOnKubernetesEnvironment represents an environment(endpoint) connected to an Edge agent deployed on a Kubernetes environment(endpoint)
 	EdgeAgentOnKubernetesEnvironment
-)
-
-const (
-	_ JobType = iota
-	// SnapshotJobType is a system job used to create environment(endpoint) snapshots
-	SnapshotJobType = 2
 )
 
 const (

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices/registry"
+	schedule2 "github.com/portainer/portainer/api/dataservices/schedule"
 	"runtime"
 	"strings"
 	"testing"
@@ -374,8 +375,8 @@ func (store *Store) testSchedules(t *testing.T) {
 	is := assert.New(t)
 
 	schedule := store.ScheduleService
-	s := &portainer.Schedule{
-		ID:             portainer.ScheduleID(schedule.GetNextIdentifier()),
+	s := &schedule2.Schedule{
+		ID:             schedule2.ScheduleID(schedule.GetNextIdentifier()),
 		Name:           "My Custom Schedule 1",
 		CronExpression: "*/5 * * * * portainer /bin/sh -c echo 'hello world'",
 	}

@@ -359,7 +359,7 @@ type storeExport struct {
 	Registry           []registry.Registry            `json:"registries,omitempty"`
 	ResourceControl    []portainer.ResourceControl    `json:"resource_control,omitempty"`
 	Role               []portainer.Role               `json:"roles,omitempty"`
-	Schedules          []portainer.Schedule           `json:"schedules,omitempty"`
+	Schedules          []schedule.Schedule            `json:"schedules,omitempty"`
 	Settings           portainer.Settings             `json:"settings,omitempty"`
 	SSLSettings        portainer.SSLSettings          `json:"ssl,omitempty"`
 	Stack              []portainer.Stack              `json:"stacks,omitempty"`
