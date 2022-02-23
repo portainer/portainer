@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/orchestrators/snapshot"
 	"net/http"
 	"path"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
 const (

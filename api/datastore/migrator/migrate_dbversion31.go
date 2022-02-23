@@ -5,11 +5,11 @@ import (
 	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices/errors"
 	registry2 "github.com/portainer/portainer/api/dataservices/registry"
+	snapshotutils "github.com/portainer/portainer/api/orchestrators/snapshot"
 	"log"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	snapshotutils "github.com/portainer/portainer/api/internal/snapshot"
 )
 
 func (m *Migrator) migrateDBVersionToDB32() error {

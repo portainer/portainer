@@ -3,13 +3,13 @@ package endpoints
 import (
 	"errors"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/orchestrators/snapshot"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
 // @id EndpointSnapshot
