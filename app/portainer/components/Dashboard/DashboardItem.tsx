@@ -3,12 +3,12 @@ import { Widget, WidgetBody } from '@/portainer/components/widget';
 interface Props {
   value: number;
   icon: string;
-  comment: string;
+  type: string;
 }
 
-export function DashboardItem({ value, icon, comment }: Props) {
+export function DashboardItem({ value, icon, type }: Props) {
   return (
-    <div className="col-sm-12 col-md-6" aria-label={comment}>
+    <div className="col-sm-12 col-md-6" aria-label={type}>
       <Widget>
         <WidgetBody>
           <div className="widget-icon blue pull-left">
@@ -18,7 +18,7 @@ export function DashboardItem({ value, icon, comment }: Props) {
             {value}
           </div>
           <div className="comment" aria-label="resourceType">
-            {comment}
+            {type}
           </div>
         </WidgetBody>
       </Widget>

@@ -57,13 +57,13 @@ export function DashboardView() {
           <DashboardItem
             value={subscriptionsCount as number}
             icon="fa fa-th-list"
-            comment="Subscriptions"
+            type="Subscriptions"
           />
           {!resourceGroupsQuery.isError && (
             <DashboardItem
               value={resourceGroupsCount as number}
               icon="fa fa-th-list"
-              comment="Resource groups"
+              type="Resource groups"
             />
           )}
         </div>

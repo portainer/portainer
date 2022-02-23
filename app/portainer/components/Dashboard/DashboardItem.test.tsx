@@ -16,7 +16,7 @@ test('should show provided icon', async () => {
   expect(icon).toHaveClass('fa-th-list');
 });
 
-test('should show provided comment', async () => {
+test('should show provided resource type', async () => {
   const { getByLabelText } = renderComponent(0, '', 'Test');
   const title = getByLabelText('resourceType');
 
@@ -24,12 +24,12 @@ test('should show provided comment', async () => {
   expect(title).toHaveTextContent('Test');
 });
 
-test('should have provided accesibility label (from comment)', async () => {
+test('should have accessibility label created from the provided resource type', async () => {
   const { getByLabelText } = renderComponent(0, '', 'testLabel');
 
   expect(getByLabelText('testLabel')).toBeTruthy();
 });
 
-function renderComponent(value = 0, icon = '', comment = '') {
-  return render(<DashboardItem value={value} icon={icon} comment={comment} />);
+function renderComponent(value = 0, icon = '', type = '') {
+  return render(<DashboardItem value={value} icon={icon} type={type} />);
 }
