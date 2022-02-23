@@ -234,10 +234,7 @@ func initKubernetesClientFactory(signatureService portainer.DigitalSignatureServ
 }
 
 func initSnapshotService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerClientFactory *docker2.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (portainer.SnapshotService, error) {
-	dockerSnapshotter := docker2.NewSnapshotter(dockerClientFactory)
-	kubernetesSnapshotter := kubernetes2.NewSnapshotter(kubernetesClientFactory)
-
-	snapshotService, err := snapshot.NewService(snapshotIntervalFromFlag, dataStore, dockerSnapshotter, kubernetesSnapshotter, shutdownCtx)
+	snapshotService, err := snapshot.NewService(snapshotIntervalFromFlag, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx)
 	if err != nil {
 		return nil, err
 	}

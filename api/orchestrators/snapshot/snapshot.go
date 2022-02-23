@@ -3,6 +3,9 @@ package snapshot
 import (
 	"context"
 	"errors"
+	docker2 "github.com/portainer/portainer/api/orchestrators/docker"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes"
+	kubecli "github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"log"
 	"time"
 
@@ -17,13 +20,13 @@ type Service struct {
 	dataStore                 dataservices.DataStore
 	refreshSignal             chan struct{}
 	snapshotIntervalInSeconds float64
-	dockerSnapshotter         portainer.DockerSnapshotter
-	kubernetesSnapshotter     portainer.KubernetesSnapshotter
+	dockerClientFactory       *docker2.ClientFactory
+	kubernetesClientFactory   *kubecli.ClientFactory
 	shutdownCtx               context.Context
 }
 
 // NewService creates a new instance of a service
-func NewService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
+func NewService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerClientFactory *docker2.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (*Service, error) {
 	snapshotFrequency, err := parseSnapshotFrequency(snapshotIntervalFromFlag, dataStore)
 	if err != nil {
 		return nil, err
@@ -32,8 +35,8 @@ func NewService(snapshotIntervalFromFlag string, dataStore dataservices.DataStor
 	return &Service{
 		dataStore:                 dataStore,
 		snapshotIntervalInSeconds: snapshotFrequency,
-		dockerSnapshotter:         dockerSnapshotter,
-		kubernetesSnapshotter:     kubernetesSnapshotter,
+		dockerClientFactory:       dockerClientFactory,
+		kubernetesClientFactory:   kubernetesClientFactory,
 		shutdownCtx:               shutdownCtx,
 	}, nil
 }
@@ -115,7 +118,11 @@ func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
 }
 
 func (service *Service) snapshotKubernetesEndpoint(endpoint *portainer.Endpoint) error {
-	snapshot, err := service.kubernetesSnapshotter.CreateSnapshot(endpoint)
+	client, err := service.kubernetesClientFactory.CreateClient(endpoint)
+	if err != nil {
+		return err
+	}
+	snapshot, err := kubernetes.CreateSnapshot(client, endpoint)
 	if err != nil {
 		return err
 	}
@@ -128,7 +135,12 @@ func (service *Service) snapshotKubernetesEndpoint(endpoint *portainer.Endpoint)
 }
 
 func (service *Service) snapshotDockerEndpoint(endpoint *portainer.Endpoint) error {
-	snapshot, err := service.dockerSnapshotter.CreateSnapshot(endpoint)
+	cli, err := service.dockerClientFactory.CreateClient(endpoint, "", nil)
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+	snapshot, err := docker2.CreateSnapshot(cli, endpoint)
 	if err != nil {
 		return err
 	}

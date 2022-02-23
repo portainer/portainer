@@ -2,7 +2,6 @@ package kubernetes
 
 import (
 	"context"
-	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"log"
 	"time"
 
@@ -11,28 +10,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-type Snapshotter struct {
-	clientFactory *cli.ClientFactory
-}
-
-// NewSnapshotter returns a new Snapshotter instance
-func NewSnapshotter(clientFactory *cli.ClientFactory) *Snapshotter {
-	return &Snapshotter{
-		clientFactory: clientFactory,
-	}
-}
-
-// CreateSnapshot creates a snapshot of a specific Kubernetes environment(endpoint)
-func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*portainer.KubernetesSnapshot, error) {
-	client, err := snapshotter.clientFactory.CreateClient(endpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	return snapshot(client, endpoint)
-}
-
-func snapshot(cli *kubernetes.Clientset, endpoint *portainer.Endpoint) (*portainer.KubernetesSnapshot, error) {
+func CreateSnapshot(cli *kubernetes.Clientset, endpoint *portainer.Endpoint) (*portainer.KubernetesSnapshot, error) {
 	res := cli.RESTClient().Get().AbsPath("/healthz").Do(context.TODO())
 	if res.Error() != nil {
 		return nil, res.Error()

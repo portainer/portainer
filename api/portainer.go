@@ -1008,11 +1008,6 @@ type (
 		CreateSignature(message string) (string, error)
 	}
 
-	// DockerSnapshotter represents a service used to create Docker environment(endpoint) snapshots
-	DockerSnapshotter interface {
-		CreateSnapshot(endpoint *Endpoint) (*DockerSnapshot, error)
-	}
-
 	// FileService represents a service for managing files
 	FileService interface {
 		GetDockerConfigPath() string
@@ -1086,11 +1081,6 @@ type (
 		Deploy(userID database.UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		Remove(userID database.UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		ConvertCompose(data []byte) ([]byte, error)
-	}
-
-	// KubernetesSnapshotter represents a service used to create Kubernetes environment(endpoint) snapshots
-	KubernetesSnapshotter interface {
-		CreateSnapshot(endpoint *Endpoint) (*KubernetesSnapshot, error)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
