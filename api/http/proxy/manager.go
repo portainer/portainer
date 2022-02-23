@@ -3,16 +3,15 @@ package proxy
 import (
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/orchestrators/docker"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"net/http"
 
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 
 	cmap "github.com/orcaman/concurrent-map"
-	"github.com/portainer/portainer/api/kubernetes/cli"
-
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory"
 )
 

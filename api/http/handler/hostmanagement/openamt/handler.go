@@ -1,6 +1,7 @@
 package openamt
 
 import (
+	"github.com/portainer/portainer/api/orchestrators/docker"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -8,7 +9,6 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
 )
 

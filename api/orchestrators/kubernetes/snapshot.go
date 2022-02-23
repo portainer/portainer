@@ -2,11 +2,11 @@ package kubernetes
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"log"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/kubernetes/cli"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )

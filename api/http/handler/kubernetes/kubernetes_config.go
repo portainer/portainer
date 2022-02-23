@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"net/http"
 	"strings"
 
@@ -13,7 +14,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	kcli "github.com/portainer/portainer/api/kubernetes/cli"
 	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
@@ -125,7 +125,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 
 	for idx, endpoint := range endpoints {
 		instanceID := handler.kubernetesClientFactory.GetInstanceID()
-		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instanceID)
+		serviceAccountName := cli.UserServiceAccountName(int(tokenData.ID), instanceID)
 
 		configClusters[idx] = buildCluster(r, handler.BaseURL, endpoint)
 		configContexts[idx] = buildContext(serviceAccountName, endpoint)
@@ -191,7 +191,7 @@ func writeFileContent(w http.ResponseWriter, r *http.Request, endpoints []portai
 	filenameBase := fmt.Sprintf("%s-%s", tokenData.Username, filenameSuffix)
 
 	if r.Header.Get("Accept") == "text/yaml" {
-		yaml, err := kcli.GenerateYAML(config)
+		yaml, err := cli.GenerateYAML(config)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Failed to generate Kubeconfig", err}
 		}

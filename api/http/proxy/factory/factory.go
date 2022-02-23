@@ -1,15 +1,13 @@
 package factory
 
 import (
+	"github.com/portainer/portainer/api/orchestrators/docker"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
-
-	"github.com/portainer/portainer/api/kubernetes/cli"
-
-	"github.com/portainer/portainer/api/docker"
 )
 
 const azureAPIBaseURL = "https://management.azure.com"

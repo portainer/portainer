@@ -3,12 +3,12 @@ package stackutils
 import (
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	k "github.com/portainer/portainer/api/orchestrators/kubernetes"
 	"io/ioutil"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
-	k "github.com/portainer/portainer/api/kubernetes"
 )
 
 // ResourceControlID returns the stack resource control id

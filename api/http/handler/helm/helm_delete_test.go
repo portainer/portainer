@@ -2,6 +2,7 @@ package helm
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,7 +14,6 @@ import (
 	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
-	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 
 	helper "github.com/portainer/portainer/api/internal/testhelpers"

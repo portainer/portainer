@@ -3,6 +3,7 @@ package stacks
 import (
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	k "github.com/portainer/portainer/api/orchestrators/kubernetes"
 	"net/http"
 	"os"
 	"strconv"
@@ -20,7 +21,6 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/stackutils"
-	k "github.com/portainer/portainer/api/kubernetes"
 )
 
 type kubernetesStringDeploymentPayload struct {

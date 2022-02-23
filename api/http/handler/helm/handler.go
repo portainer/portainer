@@ -1,6 +1,7 @@
 package helm
 
 import (
+	"github.com/portainer/portainer/api/orchestrators/kubernetes"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,7 +12,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/kubernetes"
 )
 
 const (

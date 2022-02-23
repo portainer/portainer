@@ -7,7 +7,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 
 	"net/http"
 

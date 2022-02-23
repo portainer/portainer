@@ -4,19 +4,18 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"os/exec"
 	"path"
 	"runtime"
 	"strings"
 
 	"github.com/pkg/errors"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
-	"github.com/portainer/portainer/api/kubernetes/cli"
-
-	portainer "github.com/portainer/portainer/api"
 )
 
 // KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment(endpoint).

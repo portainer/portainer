@@ -4,7 +4,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 )
 
 // Service represents a service used to

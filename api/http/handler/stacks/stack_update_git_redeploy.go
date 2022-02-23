@@ -3,6 +3,7 @@ package stacks
 import (
 	"fmt"
 	"github.com/portainer/portainer/api/database"
+	k "github.com/portainer/portainer/api/orchestrators/kubernetes"
 	"log"
 	"net/http"
 	"time"
@@ -17,7 +18,6 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
-	k "github.com/portainer/portainer/api/kubernetes"
 )
 
 type stackGitRedployPayload struct {

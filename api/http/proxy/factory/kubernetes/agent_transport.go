@@ -2,12 +2,12 @@ package kubernetes
 
 import (
 	"crypto/tls"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"net/http"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 type agentTransport struct {

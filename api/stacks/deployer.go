@@ -3,6 +3,7 @@ package stacks
 import (
 	"context"
 	"github.com/portainer/portainer/api/dataservices/registry"
+	k "github.com/portainer/portainer/api/orchestrators/kubernetes"
 	"os"
 	"sync"
 
@@ -10,7 +11,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/stackutils"
-	k "github.com/portainer/portainer/api/kubernetes"
 )
 
 type StackDeployer interface {

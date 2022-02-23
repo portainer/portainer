@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"fmt"
+	k "github.com/portainer/portainer/api/orchestrators/kubernetes"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -15,7 +16,6 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
-	k "github.com/portainer/portainer/api/kubernetes"
 )
 
 type kubernetesFileStackUpdatePayload struct {

@@ -1,12 +1,12 @@
 package kubernetes
 
 import (
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 type localTransport struct {

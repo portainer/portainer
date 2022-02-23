@@ -8,7 +8,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 )
 
 // Handler is the HTTP handler used to handle websocket operations.

@@ -2,6 +2,7 @@ package registries
 
 import (
 	"github.com/portainer/portainer/api/dataservices/registry"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -10,7 +11,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 func hideFields(registry *registry.Registry, hideAccesses bool) {

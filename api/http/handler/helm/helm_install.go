@@ -2,6 +2,8 @@ package helm
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/validation"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -15,8 +17,6 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/kubernetes"
-	"github.com/portainer/portainer/api/kubernetes/validation"
 	"golang.org/x/sync/errgroup"
 )
 

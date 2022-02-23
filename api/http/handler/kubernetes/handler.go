@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/orchestrators/kubernetes/cli"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,7 +12,6 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
-	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Handler is the HTTP handler which will natively deal with to external environments(endpoints).
