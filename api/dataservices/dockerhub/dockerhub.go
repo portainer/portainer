@@ -10,6 +10,8 @@ const (
 	dockerHubKey = "DOCKERHUB"
 )
 
+// TODO: does this get used anymore?
+
 // Service represents a service for managing Dockerhub data.
 type Service struct {
 	connection portainer.Connection
@@ -32,8 +34,8 @@ func NewService(connection portainer.Connection) (*Service, error) {
 }
 
 // DockerHub returns the DockerHub object.
-func (service *Service) DockerHub() (*portainer.DockerHub, error) {
-	var dockerhub portainer.DockerHub
+func (service *Service) DockerHub() (*DockerHub, error) {
+	var dockerhub DockerHub
 
 	err := service.connection.GetObject(BucketName, []byte(dockerHubKey), &dockerhub)
 	if err != nil {
@@ -44,6 +46,16 @@ func (service *Service) DockerHub() (*portainer.DockerHub, error) {
 }
 
 // UpdateDockerHub updates a DockerHub object.
-func (service *Service) UpdateDockerHub(dockerhub *portainer.DockerHub) error {
+func (service *Service) UpdateDockerHub(dockerhub *DockerHub) error {
 	return service.connection.UpdateObject(BucketName, []byte(dockerHubKey), dockerhub)
+}
+
+// DockerHub represents all the required information to connect and use the Docker Hub
+type DockerHub struct {
+	// Is authentication against DockerHub enabled
+	Authentication bool `json:"Authentication" example:"true"`
+	// Username used to authenticate against the DockerHub
+	Username string `json:"Username" example:"user"`
+	// Password used to authenticate against the DockerHub
+	Password string `json:"Password,omitempty" example:"passwd"`
 }

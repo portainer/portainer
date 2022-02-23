@@ -159,17 +159,6 @@ type (
 	// CustomTemplatePlatform represents a custom template platform
 	CustomTemplatePlatform int
 
-	// DockerHub represents all the required information to connect and use the
-	// Docker Hub
-	DockerHub struct {
-		// Is authentication against DockerHub enabled
-		Authentication bool `json:"Authentication" example:"true"`
-		// Username used to authenticate against the DockerHub
-		Username string `json:"Username" example:"user"`
-		// Password used to authenticate against the DockerHub
-		Password string `json:"Password,omitempty" example:"passwd"`
-	}
-
 	// DockerSnapshot represents a snapshot of a specific Docker environment(endpoint) at a specific time
 	DockerSnapshot struct {
 		Time                    int64             `json:"Time"`
