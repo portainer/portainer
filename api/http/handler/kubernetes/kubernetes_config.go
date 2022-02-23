@@ -143,7 +143,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 }
 
 func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
-	kubeConfigInternal := handler.kubeClusterAccessService.GetKubeClusterAccessData(r.Host, endpoint.ID)
+	kubeConfigInternal := handler.kubeClusterAccessService.GetData(r.Host, endpoint.ID)
 	return clientV1.NamedCluster{
 		Name: buildClusterName(endpoint.Name),
 		Cluster: clientV1.Cluster{

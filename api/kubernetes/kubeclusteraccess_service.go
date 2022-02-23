@@ -16,7 +16,7 @@ import (
 // KubeClusterAccessService represents a service that is responsible for centralizing kube cluster access data
 type KubeClusterAccessService interface {
 	IsSecure() bool
-	GetKubeClusterAccessData(hostURL string, endpointId portainer.EndpointID) kubernetesClusterAccessData
+	GetData(hostURL string, endpointId portainer.EndpointID) kubernetesClusterAccessData
 }
 
 // KubernetesClusterAccess represents core details which can be used to generate KubeConfig file/data
@@ -87,11 +87,11 @@ func (service *kubeClusterAccessService) IsSecure() bool {
 	return service.certificateAuthorityData != ""
 }
 
-// GetKubeClusterAccessData returns K8s cluster access details for the specified environment(endpoint).
+// GetData returns K8s cluster access details for the specified environment(endpoint).
 // The struct can be used to:
 // - generate a kubeconfig file
 // - pass down params to binaries
-func (service *kubeClusterAccessService) GetKubeClusterAccessData(hostURL string, endpointID portainer.EndpointID) kubernetesClusterAccessData {
+func (service *kubeClusterAccessService) GetData(hostURL string, endpointID portainer.EndpointID) kubernetesClusterAccessData {
 	baseURL := service.baseURL
 	if baseURL != "/" {
 		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))

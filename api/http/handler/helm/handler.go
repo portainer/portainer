@@ -100,7 +100,7 @@ func (handler *Handler) getHelmClusterAccess(r *http.Request) (*options.Kubernet
 		return nil, &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
 	}
 
-	kubeConfigInternal := handler.kubeClusterAccessService.GetKubeClusterAccessData(r.Host, endpoint.ID)
+	kubeConfigInternal := handler.kubeClusterAccessService.GetData(r.Host, endpoint.ID)
 	return &options.KubernetesClusterAccess{
 		ClusterServerURL:         kubeConfigInternal.ClusterServerURL,
 		CertificateAuthorityFile: kubeConfigInternal.CertificateAuthorityFile,
