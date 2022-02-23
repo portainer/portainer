@@ -1,13 +1,13 @@
 package endpoints
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
 )
 
 // @id EndpointDelete
@@ -29,7 +29,7 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -44,7 +44,7 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	err = handler.DataStore.Endpoint().DeleteEndpoint(portainer.EndpointID(endpointID))
+	err = handler.DataStore.Endpoint().DeleteEndpoint(database.EndpointID(endpointID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove environment from the database", err}
 	}
@@ -122,7 +122,7 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 	return response.Empty(w)
 }
 
-func findEndpointIndex(tags []portainer.EndpointID, searchEndpointID portainer.EndpointID) int {
+func findEndpointIndex(tags []database.EndpointID, searchEndpointID database.EndpointID) int {
 	for idx, tagID := range tags {
 		if searchEndpointID == tagID {
 			return idx
@@ -131,7 +131,7 @@ func findEndpointIndex(tags []portainer.EndpointID, searchEndpointID portainer.E
 	return -1
 }
 
-func removeElement(arr []portainer.EndpointID, index int) []portainer.EndpointID {
+func removeElement(arr []database.EndpointID, index int) []database.EndpointID {
 	if index < 0 {
 		return arr
 	}

@@ -2,8 +2,8 @@ package endpoint
 
 import (
 	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,7 +14,7 @@ const (
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
-	connection portainer.Connection
+	connection database.Connection
 }
 
 func (service *Service) BucketName() string {
@@ -22,7 +22,7 @@ func (service *Service) BucketName() string {
 }
 
 // NewService creates a new instance of a service.
-func NewService(connection portainer.Connection) (*Service, error) {
+func NewService(connection database.Connection) (*Service, error) {
 	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func NewService(connection portainer.Connection) (*Service, error) {
 }
 
 // Endpoint returns an environment(endpoint) by ID.
-func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
+func (service *Service) Endpoint(ID database.EndpointID) (*portainer.Endpoint, error) {
 	var endpoint portainer.Endpoint
 	identifier := service.connection.ConvertToKey(int(ID))
 
@@ -47,13 +47,13 @@ func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, 
 }
 
 // UpdateEndpoint updates an environment(endpoint).
-func (service *Service) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
+func (service *Service) UpdateEndpoint(ID database.EndpointID, endpoint *portainer.Endpoint) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, endpoint)
 }
 
 // DeleteEndpoint deletes an environment(endpoint).
-func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
+func (service *Service) DeleteEndpoint(ID database.EndpointID) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
@@ -82,7 +82,7 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 func (service *Service) Create(endpoint *portainer.Endpoint) error {
 	if int(endpoint.ID) == 0 {
 		// TODO: hopefully this can become the only path
-		endpoint.ID = portainer.EndpointID(service.getNextIdentifier())
+		endpoint.ID = database.EndpointID(service.getNextIdentifier())
 	}
 	return service.connection.CreateObjectWithSetSequence(BucketName, int(endpoint.ID), endpoint)
 }

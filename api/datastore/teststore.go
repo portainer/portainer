@@ -14,7 +14,7 @@ import (
 
 var errTempDir = errors.New("can't create a temp dir")
 
-func (store *Store) GetConnection() portainer.Connection {
+func (store *Store) GetConnection() database.Connection {
 	return store.connection
 }
 

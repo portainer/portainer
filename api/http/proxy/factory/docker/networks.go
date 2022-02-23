@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -19,7 +20,7 @@ const (
 	networkObjectName       = "Name"
 )
 
-func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, endpointID portainer.EndpointID, networkID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, endpointID database.EndpointID, networkID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	network, err := dockerClient.NetworkInspect(context.Background(), networkID, types.NetworkInspectOptions{})
 	if err != nil {
 		return nil, err

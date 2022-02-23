@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"time"
 
@@ -82,7 +83,7 @@ func (handler *Handler) stackAssociate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	stack.EndpointID = portainer.EndpointID(endpointID)
+	stack.EndpointID = database.EndpointID(endpointID)
 	stack.SwarmID = swarmId
 
 	if orphanedRunning {

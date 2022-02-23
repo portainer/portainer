@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperrors "github.com/portainer/portainer/api/http/errors"
@@ -106,7 +107,7 @@ func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters, 
 			continue
 		}
 
-		if stack.Type == portainer.DockerComposeStack && stack.EndpointID == portainer.EndpointID(filters.EndpointID) {
+		if stack.Type == portainer.DockerComposeStack && stack.EndpointID == database.EndpointID(filters.EndpointID) {
 			filteredStacks = append(filteredStacks, stack)
 		}
 		if stack.Type == portainer.DockerSwarmStack && stack.SwarmID == filters.SwarmID {

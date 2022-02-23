@@ -1,6 +1,7 @@
 package edgegroups
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -22,19 +23,19 @@ func Test_getEndpointTypes(t *testing.T) {
 	datastore := testhelpers.NewDatastore(testhelpers.WithEndpoints(endpoints))
 
 	tests := []struct {
-		endpointIds []portainer.EndpointID
+		endpointIds []database.EndpointID
 		expected    []portainer.EndpointType
 	}{
-		{endpointIds: []portainer.EndpointID{1}, expected: []portainer.EndpointType{portainer.DockerEnvironment}},
-		{endpointIds: []portainer.EndpointID{2}, expected: []portainer.EndpointType{portainer.AgentOnDockerEnvironment}},
-		{endpointIds: []portainer.EndpointID{3}, expected: []portainer.EndpointType{portainer.AzureEnvironment}},
-		{endpointIds: []portainer.EndpointID{4}, expected: []portainer.EndpointType{portainer.EdgeAgentOnDockerEnvironment}},
-		{endpointIds: []portainer.EndpointID{5}, expected: []portainer.EndpointType{portainer.KubernetesLocalEnvironment}},
-		{endpointIds: []portainer.EndpointID{6}, expected: []portainer.EndpointType{portainer.AgentOnKubernetesEnvironment}},
-		{endpointIds: []portainer.EndpointID{7}, expected: []portainer.EndpointType{portainer.EdgeAgentOnKubernetesEnvironment}},
-		{endpointIds: []portainer.EndpointID{7, 2}, expected: []portainer.EndpointType{portainer.EdgeAgentOnKubernetesEnvironment, portainer.AgentOnDockerEnvironment}},
-		{endpointIds: []portainer.EndpointID{6, 4, 1}, expected: []portainer.EndpointType{portainer.AgentOnKubernetesEnvironment, portainer.EdgeAgentOnDockerEnvironment, portainer.DockerEnvironment}},
-		{endpointIds: []portainer.EndpointID{1, 2, 3}, expected: []portainer.EndpointType{portainer.DockerEnvironment, portainer.AgentOnDockerEnvironment, portainer.AzureEnvironment}},
+		{endpointIds: []database.EndpointID{1}, expected: []portainer.EndpointType{portainer.DockerEnvironment}},
+		{endpointIds: []database.EndpointID{2}, expected: []portainer.EndpointType{portainer.AgentOnDockerEnvironment}},
+		{endpointIds: []database.EndpointID{3}, expected: []portainer.EndpointType{portainer.AzureEnvironment}},
+		{endpointIds: []database.EndpointID{4}, expected: []portainer.EndpointType{portainer.EdgeAgentOnDockerEnvironment}},
+		{endpointIds: []database.EndpointID{5}, expected: []portainer.EndpointType{portainer.KubernetesLocalEnvironment}},
+		{endpointIds: []database.EndpointID{6}, expected: []portainer.EndpointType{portainer.AgentOnKubernetesEnvironment}},
+		{endpointIds: []database.EndpointID{7}, expected: []portainer.EndpointType{portainer.EdgeAgentOnKubernetesEnvironment}},
+		{endpointIds: []database.EndpointID{7, 2}, expected: []portainer.EndpointType{portainer.EdgeAgentOnKubernetesEnvironment, portainer.AgentOnDockerEnvironment}},
+		{endpointIds: []database.EndpointID{6, 4, 1}, expected: []portainer.EndpointType{portainer.AgentOnKubernetesEnvironment, portainer.EdgeAgentOnDockerEnvironment, portainer.DockerEnvironment}},
+		{endpointIds: []database.EndpointID{1, 2, 3}, expected: []portainer.EndpointType{portainer.DockerEnvironment, portainer.AgentOnDockerEnvironment, portainer.AzureEnvironment}},
 	}
 
 	for _, test := range tests {
@@ -48,6 +49,6 @@ func Test_getEndpointTypes(t *testing.T) {
 func Test_getEndpointTypes_failWhenEndpointDontExist(t *testing.T) {
 	datastore := testhelpers.NewDatastore(testhelpers.WithEndpoints([]portainer.Endpoint{}))
 
-	_, err := getEndpointTypes(datastore.Endpoint(), []portainer.EndpointID{1})
+	_, err := getEndpointTypes(datastore.Endpoint(), []database.EndpointID{1})
 	assert.Error(t, err, "getEndpointTypes should fail")
 }

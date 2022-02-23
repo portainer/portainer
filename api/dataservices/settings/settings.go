@@ -2,6 +2,7 @@ package settings
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
-	connection portainer.Connection
+	connection database.Connection
 }
 
 func (service *Service) BucketName() string {
@@ -20,7 +21,7 @@ func (service *Service) BucketName() string {
 }
 
 // NewService creates a new instance of a service.
-func NewService(connection portainer.Connection) (*Service, error) {
+func NewService(connection database.Connection) (*Service, error) {
 	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err

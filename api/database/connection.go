@@ -1,4 +1,4 @@
-package portainer
+package database
 
 import (
 	"io"

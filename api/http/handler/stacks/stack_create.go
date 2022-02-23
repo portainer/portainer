@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"log"
 	"net/http"
 
@@ -69,7 +70,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -82,7 +83,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
 		}
 
-		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpointID))
+		canCreate, err := handler.userCanCreateStack(securityContext, database.EndpointID(endpointID))
 
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack creation", err}

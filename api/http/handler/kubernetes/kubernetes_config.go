@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"errors"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strings"
 
@@ -61,10 +62,10 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 }
 
 func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.Endpoint, *httperror.HandlerError) {
-	var endpointIDs []portainer.EndpointID
+	var endpointIDs []database.EndpointID
 	_ = request.RetrieveJSONQueryParameter(r, "ids", &endpointIDs, true)
 
-	var excludeEndpointIDs []portainer.EndpointID
+	var excludeEndpointIDs []database.EndpointID
 	_ = request.RetrieveJSONQueryParameter(r, "excludeIds", &excludeEndpointIDs, true)
 
 	if len(endpointIDs) > 0 && len(excludeEndpointIDs) > 0 {

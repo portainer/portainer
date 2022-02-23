@@ -3,6 +3,8 @@ package dataservices
 // 	"github.com/portainer/portainer/api/dataservices"
 
 import (
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
 	"io"
 	"time"
 
@@ -72,11 +74,11 @@ type (
 
 	// EdgeJobService represents a service to manage Edge jobs
 	EdgeJobService interface {
-		EdgeJobs() ([]portainer.EdgeJob, error)
-		EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error)
-		Create(edgeJob *portainer.EdgeJob) error
-		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
-		DeleteEdgeJob(ID portainer.EdgeJobID) error
+		EdgeJobs() ([]edgejob.EdgeJob, error)
+		EdgeJob(ID edgejob.EdgeJobID) (*edgejob.EdgeJob, error)
+		Create(edgeJob *edgejob.EdgeJob) error
+		UpdateEdgeJob(ID edgejob.EdgeJobID, edgeJob *edgejob.EdgeJob) error
+		DeleteEdgeJob(ID edgejob.EdgeJobID) error
 		GetNextIdentifier() int
 		BucketName() string
 	}
@@ -94,11 +96,11 @@ type (
 
 	// EndpointService represents a service for managing environment(endpoint) data
 	EndpointService interface {
-		Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error)
+		Endpoint(ID database.EndpointID) (*portainer.Endpoint, error)
 		Endpoints() ([]portainer.Endpoint, error)
 		Create(endpoint *portainer.Endpoint) error
-		UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error
-		DeleteEndpoint(ID portainer.EndpointID) error
+		UpdateEndpoint(ID database.EndpointID, endpoint *portainer.Endpoint) error
+		DeleteEndpoint(ID database.EndpointID) error
 		//GetNextIdentifier() int
 		NewDefault() *portainer.Endpoint
 		BucketName() string
@@ -117,10 +119,10 @@ type (
 	// EndpointRelationService represents a service for managing environment(endpoint) relations data
 	EndpointRelationService interface {
 		EndpointRelations() ([]portainer.EndpointRelation, error)
-		EndpointRelation(EndpointID portainer.EndpointID) (*portainer.EndpointRelation, error)
+		EndpointRelation(EndpointID database.EndpointID) (*portainer.EndpointRelation, error)
 		Create(endpointRelation *portainer.EndpointRelation) error
-		UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error
-		DeleteEndpointRelation(EndpointID portainer.EndpointID) error
+		UpdateEndpointRelation(EndpointID database.EndpointID, endpointRelation *portainer.EndpointRelation) error
+		DeleteEndpointRelation(EndpointID database.EndpointID) error
 		BucketName() string
 	}
 

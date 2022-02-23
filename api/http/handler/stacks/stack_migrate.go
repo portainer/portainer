@@ -3,6 +3,7 @@ package stacks
 import (
 	"errors"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -108,17 +109,17 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid query parameter: endpointId", Err: err}
 	}
 	if endpointID != int(stack.EndpointID) {
-		stack.EndpointID = portainer.EndpointID(endpointID)
+		stack.EndpointID = database.EndpointID(endpointID)
 	}
 
-	targetEndpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(payload.EndpointID))
+	targetEndpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(payload.EndpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
 	} else if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
 	}
 
-	stack.EndpointID = portainer.EndpointID(payload.EndpointID)
+	stack.EndpointID = database.EndpointID(payload.EndpointID)
 	if payload.SwarmID != "" {
 		stack.SwarmID = payload.SwarmID
 	}

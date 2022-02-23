@@ -3,6 +3,7 @@ package webhooks
 import (
 	"context"
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/internal/registryutils"
 	"io"
 	"net/http"
@@ -45,7 +46,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	registryID := webhook.RegistryID
 	webhookType := webhook.WebhookType
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {

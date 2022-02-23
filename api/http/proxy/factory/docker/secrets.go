@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -15,7 +16,7 @@ const (
 	secretObjectIdentifier = "ID"
 )
 
-func getInheritedResourceControlFromSecretLabels(dockerClient *client.Client, endpointID portainer.EndpointID, secretID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromSecretLabels(dockerClient *client.Client, endpointID database.EndpointID, secretID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	secret, _, err := dockerClient.SecretInspectWithRaw(context.Background(), secretID)
 	if err != nil {
 		return nil, err

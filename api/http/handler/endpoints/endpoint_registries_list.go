@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -41,7 +42,7 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment identifier route variable", Err: err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -114,7 +115,7 @@ func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, name
 	return security.AuthorizedAccess(userId, memberships, namespacePolicy.UserAccessPolicies, namespacePolicy.TeamAccessPolicies), nil
 }
 
-func filterRegistriesByNamespace(registries []portainer.Registry, endpointId portainer.EndpointID, namespace string) []portainer.Registry {
+func filterRegistriesByNamespace(registries []portainer.Registry, endpointId database.EndpointID, namespace string) []portainer.Registry {
 	if namespace == "" {
 		return registries
 	}

@@ -2,13 +2,14 @@ package edgegroups
 
 import (
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 )
 
-type endpointSetType map[portainer.EndpointID]bool
+type endpointSetType map[database.EndpointID]bool
 
-func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatch bool) ([]portainer.EndpointID, error) {
+func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatch bool) ([]database.EndpointID, error) {
 	if len(tagIDs) == 0 {
-		return []portainer.EndpointID{}, nil
+		return []database.EndpointID{}, nil
 	}
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
@@ -36,7 +37,7 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 		endpointSet = setsIntersection(setsOfEndpoints)
 	}
 
-	results := []portainer.EndpointID{}
+	results := []database.EndpointID{}
 	for _, endpoint := range endpoints {
 		if _, ok := endpointSet[endpoint.ID]; ok && (endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment) {
 			results = append(results, endpoint.ID)

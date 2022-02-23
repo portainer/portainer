@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"io/ioutil"
 	"log"
@@ -25,14 +26,14 @@ import (
 )
 
 type HostInfo struct {
-	EndpointID     portainer.EndpointID `json:"EndpointID"`
-	RawOutput      string               `json:"RawOutput"`
-	AMT            string               `json:"AMT"`
-	UUID           string               `json:"UUID"`
-	DNSSuffix      string               `json:"DNS Suffix"`
-	BuildNumber    string               `json:"Build Number"`
-	ControlMode    string               `json:"Control Mode"`
-	ControlModeRaw int                  `json:"Control Mode (Raw)"`
+	EndpointID     database.EndpointID `json:"EndpointID"`
+	RawOutput      string              `json:"RawOutput"`
+	AMT            string              `json:"AMT"`
+	UUID           string              `json:"UUID"`
+	DNSSuffix      string              `json:"DNS Suffix"`
+	BuildNumber    string              `json:"Build Number"`
+	ControlMode    string              `json:"Control Mode"`
+	ControlModeRaw int                 `json:"Control Mode (Raw)"`
 }
 
 const (
@@ -62,7 +63,7 @@ func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 
 	logrus.WithField("endpointID", endpointID).Info("OpenAMTHostInfo")
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
 	} else if err != nil {

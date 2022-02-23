@@ -3,6 +3,7 @@ package stacks
 import (
 	"context"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strings"
 	"sync"
@@ -89,7 +90,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	return h
 }
 
-func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID, resourceControl *portainer.ResourceControl) (bool, error) {
+func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedRequestContext, endpointID database.EndpointID, resourceControl *portainer.ResourceControl) (bool, error) {
 	user, err := handler.DataStore.User().User(securityContext.UserID)
 	if err != nil {
 		return false, err
@@ -118,13 +119,13 @@ func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
 	return isAdmin, nil
 }
 
-func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {
+func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID database.EndpointID) (bool, error) {
 	isAdmin := user.Role == portainer.AdministratorRole
 
 	return isAdmin, nil
 }
 
-func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {
+func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID database.EndpointID) (bool, error) {
 	user, err := handler.DataStore.User().User(securityContext.UserID)
 	if err != nil {
 		return false, err

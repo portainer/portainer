@@ -3,6 +3,7 @@ package middlewares
 import (
 	"context"
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -30,7 +31,7 @@ func WithEndpoint(endpointService dataservices.EndpointService, endpointIDParam 
 				return
 			}
 
-			endpoint, err := endpointService.Endpoint(portainer.EndpointID(endpointID))
+			endpoint, err := endpointService.Endpoint(database.EndpointID(endpointID))
 			if err != nil {
 				statusCode := http.StatusInternalServerError
 

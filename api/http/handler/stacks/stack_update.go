@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strconv"
 	"time"
@@ -86,7 +87,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid query parameter: endpointId", Err: err}
 	}
 	if endpointID != int(stack.EndpointID) {
-		stack.EndpointID = portainer.EndpointID(endpointID)
+		stack.EndpointID = database.EndpointID(endpointID)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)

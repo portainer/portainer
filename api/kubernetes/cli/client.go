@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	cmap "github.com/orcaman/concurrent-map"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strconv"
 	"sync"
@@ -50,7 +51,7 @@ func (factory *ClientFactory) GetInstanceID() (instanceID string) {
 }
 
 // Remove the cached kube client so a new one can be created
-func (factory *ClientFactory) RemoveKubeClient(endpointID portainer.EndpointID) {
+func (factory *ClientFactory) RemoveKubeClient(endpointID database.EndpointID) {
 	factory.endpointClients.Remove(strconv.Itoa(int(endpointID)))
 }
 

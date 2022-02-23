@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -46,7 +47,7 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {

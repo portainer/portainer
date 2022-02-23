@@ -2,16 +2,17 @@ package edge
 
 import (
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/internal/tag"
 )
 
 // EdgeGroupRelatedEndpoints returns a list of environments(endpoints) related to this Edge group
-func EdgeGroupRelatedEndpoints(edgeGroup *portainer.EdgeGroup, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup) []portainer.EndpointID {
+func EdgeGroupRelatedEndpoints(edgeGroup *portainer.EdgeGroup, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup) []database.EndpointID {
 	if !edgeGroup.Dynamic {
 		return edgeGroup.Endpoints
 	}
 
-	endpointIDs := []portainer.EndpointID{}
+	endpointIDs := []database.EndpointID{}
 	for _, endpoint := range endpoints {
 		if endpoint.Type != portainer.EdgeAgentOnDockerEnvironment && endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
 			continue

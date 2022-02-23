@@ -2,8 +2,7 @@ package edgejob
 
 import (
 	"fmt"
-
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,7 +13,7 @@ const (
 
 // Service represents a service for managing edge jobs data.
 type Service struct {
-	connection portainer.Connection
+	connection database.Connection
 }
 
 func (service *Service) BucketName() string {
@@ -22,7 +21,7 @@ func (service *Service) BucketName() string {
 }
 
 // NewService creates a new instance of a service.
-func NewService(connection portainer.Connection) (*Service, error) {
+func NewService(connection database.Connection) (*Service, error) {
 	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
@@ -34,29 +33,29 @@ func NewService(connection portainer.Connection) (*Service, error) {
 }
 
 // EdgeJobs returns a list of Edge jobs
-func (service *Service) EdgeJobs() ([]portainer.EdgeJob, error) {
-	var edgeJobs = make([]portainer.EdgeJob, 0)
+func (service *Service) EdgeJobs() ([]EdgeJob, error) {
+	var edgeJobs = make([]EdgeJob, 0)
 
 	err := service.connection.GetAll(
 		BucketName,
-		&portainer.EdgeJob{},
+		&EdgeJob{},
 		func(obj interface{}) (interface{}, error) {
 			//var tag portainer.Tag
-			job, ok := obj.(*portainer.EdgeJob)
+			job, ok := obj.(*EdgeJob)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeJob object")
 				return nil, fmt.Errorf("Failed to convert to EdgeJob object: %s", obj)
 			}
 			edgeJobs = append(edgeJobs, *job)
-			return &portainer.EdgeJob{}, nil
+			return &EdgeJob{}, nil
 		})
 
 	return edgeJobs, err
 }
 
 // EdgeJob returns an Edge job by ID
-func (service *Service) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
-	var edgeJob portainer.EdgeJob
+func (service *Service) EdgeJob(ID EdgeJobID) (*EdgeJob, error) {
+	var edgeJob EdgeJob
 	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &edgeJob)
@@ -68,24 +67,24 @@ func (service *Service) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, err
 }
 
 // CreateEdgeJob creates a new Edge job
-func (service *Service) Create(edgeJob *portainer.EdgeJob) error {
+func (service *Service) Create(edgeJob *EdgeJob) error {
 	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
-			edgeJob.ID = portainer.EdgeJobID(id)
+			edgeJob.ID = EdgeJobID(id)
 			return int(edgeJob.ID), edgeJob
 		},
 	)
 }
 
 // UpdateEdgeJob updates an Edge job by ID
-func (service *Service) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
+func (service *Service) UpdateEdgeJob(ID EdgeJobID, edgeJob *EdgeJob) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, edgeJob)
 }
 
 // DeleteEdgeJob deletes an Edge job
-func (service *Service) DeleteEdgeJob(ID portainer.EdgeJobID) error {
+func (service *Service) DeleteEdgeJob(ID EdgeJobID) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
@@ -94,3 +93,28 @@ func (service *Service) DeleteEdgeJob(ID portainer.EdgeJobID) error {
 func (service *Service) GetNextIdentifier() int {
 	return service.connection.GetNextIdentifier(BucketName)
 }
+
+// EdgeJob represents a job that can run on Edge environments(endpoints).
+type EdgeJob struct {
+	// EdgeJob Identifier
+	ID             EdgeJobID                                   `json:"Id" example:"1"`
+	Created        int64                                       `json:"Created"`
+	CronExpression string                                      `json:"CronExpression"`
+	Endpoints      map[database.EndpointID]EdgeJobEndpointMeta `json:"Endpoints"`
+	Name           string                                      `json:"Name"`
+	ScriptPath     string                                      `json:"ScriptPath"`
+	Recurring      bool                                        `json:"Recurring"`
+	Version        int                                         `json:"Version"`
+}
+
+// EdgeJobEndpointMeta represents a meta data object for an Edge job and Environment(Endpoint) relation
+type EdgeJobEndpointMeta struct {
+	LogsStatus  EdgeJobLogsStatus
+	CollectLogs bool
+}
+
+// EdgeJobID represents an Edge job identifier
+type EdgeJobID int
+
+// EdgeJobLogsStatus represent status of logs collection job
+type EdgeJobLogsStatus int

@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/portainer/portainer/api/dataservices"
@@ -64,7 +65,7 @@ func (manager *Manager) GetEndpointProxy(endpoint *portainer.Endpoint) http.Hand
 // DeleteEndpointProxy deletes the proxy associated to a key
 // and cleans the k8s environment(endpoint) client cache. DeleteEndpointProxy
 // is currently only called for edge connection clean up.
-func (manager *Manager) DeleteEndpointProxy(endpointID portainer.EndpointID) {
+func (manager *Manager) DeleteEndpointProxy(endpointID database.EndpointID) {
 	manager.endpointProxies.Remove(fmt.Sprint(endpointID))
 	manager.k8sClientFactory.RemoveKubeClient(endpointID)
 }

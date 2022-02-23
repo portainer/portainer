@@ -3,11 +3,12 @@ package edge
 import (
 	"errors"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 )
 
 // EdgeStackRelatedEndpoints returns a list of environments(endpoints) related to this Edge stack
-func EdgeStackRelatedEndpoints(edgeGroupIDs []portainer.EdgeGroupID, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, edgeGroups []portainer.EdgeGroup) ([]portainer.EndpointID, error) {
-	edgeStackEndpoints := []portainer.EndpointID{}
+func EdgeStackRelatedEndpoints(edgeGroupIDs []portainer.EdgeGroupID, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, edgeGroups []portainer.EdgeGroup) ([]database.EndpointID, error) {
+	edgeStackEndpoints := []database.EndpointID{}
 
 	for _, edgeGroupID := range edgeGroupIDs {
 		var edgeGroup *portainer.EdgeGroup

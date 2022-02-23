@@ -3,6 +3,7 @@ package stacks
 import (
 	"context"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -68,13 +69,13 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid query parameter: endpointId", Err: err}
 	}
 
-	isOrphaned := portainer.EndpointID(endpointID) != stack.EndpointID
+	isOrphaned := database.EndpointID(endpointID) != stack.EndpointID
 
 	if isOrphaned && !securityContext.IsAdmin {
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to remove orphaned stack", Err: errors.New("Permission denied to remove orphaned stack")}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find the endpoint associated to the stack inside the database", Err: err}
 	} else if err != nil {
@@ -151,7 +152,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "A stack with this name exists inside the database. Cannot use external delete method", Err: errors.New("A tag already exists with this name")}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find the endpoint associated to the stack inside the database", Err: err}
 	} else if err != nil {

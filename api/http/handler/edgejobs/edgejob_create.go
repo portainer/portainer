@@ -2,6 +2,8 @@ package edgejobs
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
 	"net/http"
 	"strconv"
 	"strings"
@@ -48,7 +50,7 @@ type edgeJobCreateFromFileContentPayload struct {
 	Name           string
 	CronExpression string
 	Recurring      bool
-	Endpoints      []portainer.EndpointID
+	Endpoints      []database.EndpointID
 	FileContent    string
 }
 
@@ -97,7 +99,7 @@ type edgeJobCreateFromFilePayload struct {
 	Name           string
 	CronExpression string
 	Recurring      bool
-	Endpoints      []portainer.EndpointID
+	Endpoints      []database.EndpointID
 	File           []byte
 }
 
@@ -118,7 +120,7 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	}
 	payload.CronExpression = cronExpression
 
-	var endpoints []portainer.EndpointID
+	var endpoints []database.EndpointID
 	err = request.RetrieveMultiPartFormJSONValue(r, "Environments", &endpoints, false)
 	if err != nil {
 		return errors.New("Invalid environments")
@@ -151,12 +153,12 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 	return response.JSON(w, edgeJob)
 }
 
-func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreateFromFilePayload) *portainer.EdgeJob {
-	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
+func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreateFromFilePayload) *edgejob.EdgeJob {
+	edgeJobIdentifier := edgejob.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
 	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
 
-	edgeJob := &portainer.EdgeJob{
+	edgeJob := &edgejob.EdgeJob{
 		ID:             edgeJobIdentifier,
 		Name:           payload.Name,
 		CronExpression: payload.CronExpression,
@@ -169,12 +171,12 @@ func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreat
 	return edgeJob
 }
 
-func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJobCreateFromFileContentPayload) *portainer.EdgeJob {
-	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
+func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJobCreateFromFileContentPayload) *edgejob.EdgeJob {
+	edgeJobIdentifier := edgejob.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
 	endpoints := convertEndpointsToMetaObject(payload.Endpoints)
 
-	edgeJob := &portainer.EdgeJob{
+	edgeJob := &edgejob.EdgeJob{
 		ID:             edgeJobIdentifier,
 		Name:           payload.Name,
 		CronExpression: payload.CronExpression,
@@ -187,7 +189,7 @@ func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJ
 	return edgeJob
 }
 
-func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []byte) error {
+func (handler *Handler) addAndPersistEdgeJob(edgeJob *edgejob.EdgeJob, file []byte) error {
 	edgeCronExpression := strings.Split(edgeJob.CronExpression, " ")
 	if len(edgeCronExpression) == 6 {
 		edgeCronExpression = edgeCronExpression[1:]
@@ -222,11 +224,11 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 	return handler.DataStore.EdgeJob().Create(edgeJob)
 }
 
-func convertEndpointsToMetaObject(endpoints []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeJobEndpointMeta {
-	endpointsMap := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
+func convertEndpointsToMetaObject(endpoints []database.EndpointID) map[database.EndpointID]edgejob.EdgeJobEndpointMeta {
+	endpointsMap := map[database.EndpointID]edgejob.EdgeJobEndpointMeta{}
 
 	for _, endpointID := range endpoints {
-		endpointsMap[endpointID] = portainer.EdgeJobEndpointMeta{}
+		endpointsMap[endpointID] = edgejob.EdgeJobEndpointMeta{}
 	}
 
 	return endpointsMap

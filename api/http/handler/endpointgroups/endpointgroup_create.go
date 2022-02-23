@@ -2,6 +2,7 @@ package endpointgroups
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -17,7 +18,7 @@ type endpointGroupCreatePayload struct {
 	// Environment(Endpoint) group description
 	Description string `example:"description"`
 	// List of environment(endpoint) identifiers that will be part of this group
-	AssociatedEndpoints []portainer.EndpointID `example:"1,3"`
+	AssociatedEndpoints []database.EndpointID `example:"1,3"`
 	// List of tag identifiers to which this environment(endpoint) group is associated
 	TagIDs []portainer.TagID `example:"1,2"`
 }

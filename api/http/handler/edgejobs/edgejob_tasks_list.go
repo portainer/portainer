@@ -2,18 +2,19 @@ package edgejobs
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
 )
 
 type taskContainer struct {
-	ID         string                      `json:"Id"`
-	EndpointID portainer.EndpointID        `json:"EndpointId"`
-	LogsStatus portainer.EdgeJobLogsStatus `json:"LogsStatus"`
+	ID         string                    `json:"Id"`
+	EndpointID database.EndpointID       `json:"EndpointId"`
+	LogsStatus edgejob.EdgeJobLogsStatus `json:"LogsStatus"`
 }
 
 // @id EdgeJobTasksList
@@ -35,7 +36,7 @@ func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge job identifier route variable", err}
 	}
 
-	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
+	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(edgejob.EdgeJobID(edgeJobID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {

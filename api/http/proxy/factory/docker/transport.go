@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -728,7 +729,7 @@ func (transport *Transport) isAdminOrEndpointAdmin(request *http.Request) (bool,
 }
 
 func (transport *Transport) fetchEndpointSecuritySettings() (*portainer.EndpointSecuritySettings, error) {
-	endpoint, err := transport.dataStore.Endpoint().Endpoint(portainer.EndpointID(transport.endpoint.ID))
+	endpoint, err := transport.dataStore.Endpoint().Endpoint(database.EndpointID(transport.endpoint.ID))
 	if err != nil {
 		return nil, err
 	}

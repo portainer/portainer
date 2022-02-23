@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"github.com/portainer/portainer/api/database"
 	"io/ioutil"
 	"strconv"
 
@@ -39,7 +40,7 @@ import (
 // Store defines the implementation of portainer.DataStore using
 // BoltDB as the storage system.
 type Store struct {
-	connection portainer.Connection
+	connection database.Connection
 
 	fileService               portainer.FileService
 	CustomTemplateService     *customtemplate.Service
@@ -348,7 +349,7 @@ func (store *Store) Webhook() dataservices.WebhookService {
 type storeExport struct {
 	CustomTemplate     []portainer.CustomTemplate     `json:"customtemplates,omitempty"`
 	EdgeGroup          []portainer.EdgeGroup          `json:"edgegroups,omitempty"`
-	EdgeJob            []portainer.EdgeJob            `json:"edgejobs,omitempty"`
+	EdgeJob            []edgejob.EdgeJob              `json:"edgejobs,omitempty"`
 	EdgeStack          []portainer.EdgeStack          `json:"edge_stack,omitempty"`
 	Endpoint           []portainer.Endpoint           `json:"endpoints,omitempty"`
 	EndpointGroup      []portainer.EndpointGroup      `json:"endpoint_groups,omitempty"`

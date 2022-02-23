@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"runtime"
 	"strings"
 	"testing"
@@ -83,7 +84,7 @@ func (store *Store) testEnvironments(t *testing.T) {
 	store.CreateEndpointRelation(id)
 }
 
-func newEndpoint(endpointType portainer.EndpointType, id portainer.EndpointID, name, URL string, TLS bool) *portainer.Endpoint {
+func newEndpoint(endpointType portainer.EndpointType, id database.EndpointID, name, URL string, TLS bool) *portainer.Endpoint {
 	endpoint := &portainer.Endpoint{
 		ID:        id,
 		Name:      name,
@@ -127,11 +128,11 @@ func setEndpointAuthorizations(endpoint *portainer.Endpoint) {
 	}
 }
 
-func (store *Store) CreateEndpoint(t *testing.T, name string, endpointType portainer.EndpointType, URL string, tls bool) portainer.EndpointID {
+func (store *Store) CreateEndpoint(t *testing.T, name string, endpointType portainer.EndpointType, URL string, tls bool) database.EndpointID {
 	is := assert.New(t)
 
 	var expectedEndpoint *portainer.Endpoint
-	id := portainer.EndpointID(store.Endpoint().GetNextIdentifier())
+	id := database.EndpointID(store.Endpoint().GetNextIdentifier())
 
 	switch endpointType {
 	case portainer.DockerEnvironment:
@@ -174,7 +175,7 @@ func (store *Store) CreateEndpoint(t *testing.T, name string, endpointType porta
 	return endpoint.ID
 }
 
-func (store *Store) CreateEndpointRelation(id portainer.EndpointID) {
+func (store *Store) CreateEndpointRelation(id database.EndpointID) {
 	relation := &portainer.EndpointRelation{
 		EndpointID: id,
 		EdgeStacks: map[portainer.EdgeStackID]bool{},

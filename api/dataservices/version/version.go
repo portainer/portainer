@@ -1,6 +1,7 @@
 package version
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
@@ -17,7 +18,7 @@ const (
 
 // Service represents a service to manage stored versions.
 type Service struct {
-	connection portainer.Connection
+	connection database.Connection
 }
 
 func (service *Service) BucketName() string {
@@ -25,7 +26,7 @@ func (service *Service) BucketName() string {
 }
 
 // NewService creates a new instance of a service.
-func NewService(connection portainer.Connection) (*Service, error) {
+func NewService(connection database.Connection) (*Service, error) {
 	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err

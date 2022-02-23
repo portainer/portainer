@@ -1,6 +1,8 @@
 package testhelpers
 
 import (
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
 	"io"
 
 	portainer "github.com/portainer/portainer/api"
@@ -145,23 +147,23 @@ func WithUsers(us []portainer.User) datastoreOption {
 }
 
 type stubEdgeJobService struct {
-	jobs []portainer.EdgeJob
+	jobs []edgejob.EdgeJob
 }
 
-func (s *stubEdgeJobService) BucketName() string                     { return "edgejob" }
-func (s *stubEdgeJobService) EdgeJobs() ([]portainer.EdgeJob, error) { return s.jobs, nil }
-func (s *stubEdgeJobService) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
+func (s *stubEdgeJobService) BucketName() string                   { return "edgejob" }
+func (s *stubEdgeJobService) EdgeJobs() ([]edgejob.EdgeJob, error) { return s.jobs, nil }
+func (s *stubEdgeJobService) EdgeJob(ID edgejob.EdgeJobID) (*edgejob.EdgeJob, error) {
 	return nil, nil
 }
-func (s *stubEdgeJobService) Create(edgeJob *portainer.EdgeJob) error { return nil }
-func (s *stubEdgeJobService) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
+func (s *stubEdgeJobService) Create(edgeJob *edgejob.EdgeJob) error { return nil }
+func (s *stubEdgeJobService) UpdateEdgeJob(ID edgejob.EdgeJobID, edgeJob *edgejob.EdgeJob) error {
 	return nil
 }
-func (s *stubEdgeJobService) DeleteEdgeJob(ID portainer.EdgeJobID) error { return nil }
-func (s *stubEdgeJobService) GetNextIdentifier() int                     { return 0 }
+func (s *stubEdgeJobService) DeleteEdgeJob(ID edgejob.EdgeJobID) error { return nil }
+func (s *stubEdgeJobService) GetNextIdentifier() int                   { return 0 }
 
 // WithEdgeJobs option will instruct testDatastore to return provided jobs
-func WithEdgeJobs(js []portainer.EdgeJob) datastoreOption {
+func WithEdgeJobs(js []edgejob.EdgeJob) datastoreOption {
 	return func(d *testDatastore) {
 		d.edgeJob = &stubEdgeJobService{jobs: js}
 	}
@@ -175,7 +177,7 @@ func (s *stubEndpointRelationService) BucketName() string { return "endpoint_rel
 func (s *stubEndpointRelationService) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	return s.relations, nil
 }
-func (s *stubEndpointRelationService) EndpointRelation(ID portainer.EndpointID) (*portainer.EndpointRelation, error) {
+func (s *stubEndpointRelationService) EndpointRelation(ID database.EndpointID) (*portainer.EndpointRelation, error) {
 	for _, relation := range s.relations {
 		if relation.EndpointID == ID {
 			return &relation, nil
@@ -187,7 +189,7 @@ func (s *stubEndpointRelationService) EndpointRelation(ID portainer.EndpointID) 
 func (s *stubEndpointRelationService) Create(EndpointRelation *portainer.EndpointRelation) error {
 	return nil
 }
-func (s *stubEndpointRelationService) UpdateEndpointRelation(ID portainer.EndpointID, relation *portainer.EndpointRelation) error {
+func (s *stubEndpointRelationService) UpdateEndpointRelation(ID database.EndpointID, relation *portainer.EndpointRelation) error {
 	for i, r := range s.relations {
 		if r.EndpointID == ID {
 			s.relations[i] = *relation
@@ -196,7 +198,7 @@ func (s *stubEndpointRelationService) UpdateEndpointRelation(ID portainer.Endpoi
 
 	return nil
 }
-func (s *stubEndpointRelationService) DeleteEndpointRelation(ID portainer.EndpointID) error {
+func (s *stubEndpointRelationService) DeleteEndpointRelation(ID database.EndpointID) error {
 	return nil
 }
 func (s *stubEndpointRelationService) GetNextIdentifier() int { return 0 }
@@ -213,7 +215,7 @@ type stubEndpointService struct {
 }
 
 func (s *stubEndpointService) BucketName() string { return "endpoint" }
-func (s *stubEndpointService) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
+func (s *stubEndpointService) Endpoint(ID database.EndpointID) (*portainer.Endpoint, error) {
 	for _, endpoint := range s.endpoints {
 		if endpoint.ID == ID {
 			return &endpoint, nil
@@ -233,7 +235,7 @@ func (s *stubEndpointService) Create(endpoint *portainer.Endpoint) error {
 	return nil
 }
 
-func (s *stubEndpointService) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
+func (s *stubEndpointService) UpdateEndpoint(ID database.EndpointID, endpoint *portainer.Endpoint) error {
 	for i, e := range s.endpoints {
 		if e.ID == ID {
 			s.endpoints[i] = *endpoint
@@ -243,7 +245,7 @@ func (s *stubEndpointService) UpdateEndpoint(ID portainer.EndpointID, endpoint *
 	return nil
 }
 
-func (s *stubEndpointService) DeleteEndpoint(ID portainer.EndpointID) error {
+func (s *stubEndpointService) DeleteEndpoint(ID database.EndpointID) error {
 	endpoints := []portainer.Endpoint{}
 
 	for _, endpoint := range s.endpoints {

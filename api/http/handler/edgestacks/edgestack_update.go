@@ -2,6 +2,7 @@ package edgestacks
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strconv"
 
@@ -83,7 +84,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		oldRelatedSet := EndpointSet(relatedEndpointIds)
 		newRelatedSet := EndpointSet(newRelated)
 
-		endpointsToRemove := map[portainer.EndpointID]bool{}
+		endpointsToRemove := map[database.EndpointID]bool{}
 		for endpointID := range oldRelatedSet {
 			if !newRelatedSet[endpointID] {
 				endpointsToRemove[endpointID] = true
@@ -104,7 +105,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 			}
 		}
 
-		endpointsToAdd := map[portainer.EndpointID]bool{}
+		endpointsToAdd := map[database.EndpointID]bool{}
 		for endpointID := range newRelatedSet {
 			if !oldRelatedSet[endpointID] {
 				endpointsToAdd[endpointID] = true
@@ -179,7 +180,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 
 	if payload.Version != nil && *payload.Version != stack.Version {
 		stack.Version = *payload.Version
-		stack.Status = map[portainer.EndpointID]portainer.EdgeStackStatus{}
+		stack.Status = map[database.EndpointID]portainer.EdgeStackStatus{}
 	}
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
@@ -190,8 +191,8 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	return response.JSON(w, stack)
 }
 
-func EndpointSet(endpointIDs []portainer.EndpointID) map[portainer.EndpointID]bool {
-	set := map[portainer.EndpointID]bool{}
+func EndpointSet(endpointIDs []database.EndpointID) map[database.EndpointID]bool {
+	set := map[database.EndpointID]bool{}
 
 	for _, endpointID := range endpointIDs {
 		set[endpointID] = true

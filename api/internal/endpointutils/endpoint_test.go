@@ -1,6 +1,7 @@
 package endpointutils
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -67,33 +68,33 @@ func Test_FilterByExcludeIDs(t *testing.T) {
 	tests := []struct {
 		name            string
 		inputArray      []portainer.Endpoint
-		inputExcludeIDs []portainer.EndpointID
+		inputExcludeIDs []database.EndpointID
 		asserts         func(*testing.T, []portainer.Endpoint)
 	}{
 		{
 			name: "filter endpoints",
 			inputArray: []portainer.Endpoint{
-				{ID: portainer.EndpointID(1)},
-				{ID: portainer.EndpointID(2)},
-				{ID: portainer.EndpointID(3)},
-				{ID: portainer.EndpointID(4)},
+				{ID: database.EndpointID(1)},
+				{ID: database.EndpointID(2)},
+				{ID: database.EndpointID(3)},
+				{ID: database.EndpointID(4)},
 			},
-			inputExcludeIDs: []portainer.EndpointID{
-				portainer.EndpointID(2),
-				portainer.EndpointID(3),
+			inputExcludeIDs: []database.EndpointID{
+				database.EndpointID(2),
+				database.EndpointID(3),
 			},
 			asserts: func(t *testing.T, output []portainer.Endpoint) {
-				assert.Contains(t, output, portainer.Endpoint{ID: portainer.EndpointID(1)})
-				assert.NotContains(t, output, portainer.Endpoint{ID: portainer.EndpointID(2)})
-				assert.NotContains(t, output, portainer.Endpoint{ID: portainer.EndpointID(3)})
-				assert.Contains(t, output, portainer.Endpoint{ID: portainer.EndpointID(4)})
+				assert.Contains(t, output, portainer.Endpoint{ID: database.EndpointID(1)})
+				assert.NotContains(t, output, portainer.Endpoint{ID: database.EndpointID(2)})
+				assert.NotContains(t, output, portainer.Endpoint{ID: database.EndpointID(3)})
+				assert.Contains(t, output, portainer.Endpoint{ID: database.EndpointID(4)})
 			},
 		},
 		{
 			name:       "empty input",
 			inputArray: []portainer.Endpoint{},
-			inputExcludeIDs: []portainer.EndpointID{
-				portainer.EndpointID(2),
+			inputExcludeIDs: []database.EndpointID{
+				database.EndpointID(2),
 			},
 			asserts: func(t *testing.T, output []portainer.Endpoint) {
 				assert.Equal(t, 0, len(output))
@@ -102,10 +103,10 @@ func Test_FilterByExcludeIDs(t *testing.T) {
 		{
 			name: "no filter",
 			inputArray: []portainer.Endpoint{
-				{ID: portainer.EndpointID(1)},
-				{ID: portainer.EndpointID(2)},
+				{ID: database.EndpointID(1)},
+				{ID: database.EndpointID(2)},
 			},
-			inputExcludeIDs: []portainer.EndpointID{},
+			inputExcludeIDs: []database.EndpointID{},
 			asserts: func(t *testing.T, output []portainer.Endpoint) {
 				assert.Equal(t, 2, len(output))
 			},

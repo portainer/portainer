@@ -1,6 +1,7 @@
 package edgestacks
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -18,7 +19,7 @@ func Test_updateEndpointRelation_successfulRuns(t *testing.T) {
 		{EndpointID: 5, EdgeStacks: map[portainer.EdgeStackID]bool{}},
 	}
 
-	relatedIds := []portainer.EndpointID{2, 3}
+	relatedIds := []database.EndpointID{2, 3}
 
 	dataStore := testhelpers.NewDatastore(testhelpers.WithEndpointRelations(endpointRelations))
 
@@ -26,7 +27,7 @@ func Test_updateEndpointRelation_successfulRuns(t *testing.T) {
 
 	assert.NoError(t, err, "updateEndpointRelations should not fail")
 
-	relatedSet := map[portainer.EndpointID]bool{}
+	relatedSet := map[database.EndpointID]bool{}
 	for _, relationID := range relatedIds {
 		relatedSet[relationID] = true
 	}

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"io/ioutil"
 	"net/http"
 
@@ -19,7 +20,7 @@ const (
 	containerObjectIdentifier = "Id"
 )
 
-func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client, endpointID portainer.EndpointID, containerID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client, endpointID database.EndpointID, containerID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	container, err := dockerClient.ContainerInspect(context.Background(), containerID)
 	if err != nil {
 		return nil, err

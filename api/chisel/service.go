@@ -3,6 +3,7 @@ package chisel
 import (
 	"context"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/http/proxy"
 	"log"
 	"net/http"
@@ -46,7 +47,7 @@ func NewService(dataStore dataservices.DataStore, shutdownCtx context.Context) *
 }
 
 // pingAgent ping the given agent so that the agent can keep the tunnel alive
-func (service *Service) pingAgent(endpointID portainer.EndpointID) error {
+func (service *Service) pingAgent(endpointID database.EndpointID) error {
 	tunnel := service.GetTunnelDetails(endpointID)
 	requestURL := fmt.Sprintf("http://127.0.0.1:%d/ping", tunnel.Port)
 	req, err := http.NewRequest(http.MethodHead, requestURL, nil)
@@ -66,7 +67,7 @@ func (service *Service) pingAgent(endpointID portainer.EndpointID) error {
 }
 
 // KeepTunnelAlive keeps the tunnel of the given environment for maxAlive duration, or until ctx is done
-func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx context.Context, maxAlive time.Duration) {
+func (service *Service) KeepTunnelAlive(endpointID database.EndpointID, ctx context.Context, maxAlive time.Duration) {
 	go func() {
 		log.Printf("[DEBUG] [chisel,KeepTunnelAlive] [endpoint_id: %d] [message: start for %.0f minutes]\n", endpointID, maxAlive.Minutes())
 		maxAliveTicker := time.NewTicker(maxAlive)
@@ -211,7 +212,7 @@ func (service *Service) checkTunnels() {
 				log.Printf("[ERROR] [chisel,snapshot,conversion] Invalid environment identifier (id: %s): %s", item.Key, err)
 			}
 
-			err = service.snapshotEnvironment(portainer.EndpointID(endpointID), tunnel.Port)
+			err = service.snapshotEnvironment(database.EndpointID(endpointID), tunnel.Port)
 			if err != nil {
 				log.Printf("[ERROR] [snapshot] Unable to snapshot Edge environment (id: %s): %s", item.Key, err)
 			}
@@ -223,11 +224,11 @@ func (service *Service) checkTunnels() {
 			continue
 		}
 
-		service.SetTunnelStatusToIdle(portainer.EndpointID(endpointID))
+		service.SetTunnelStatusToIdle(database.EndpointID(endpointID))
 	}
 }
 
-func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tunnelPort int) error {
+func (service *Service) snapshotEnvironment(endpointID database.EndpointID, tunnelPort int) error {
 	endpoint, err := service.dataStore.Endpoint().Endpoint(endpointID)
 	if err != nil {
 		return err

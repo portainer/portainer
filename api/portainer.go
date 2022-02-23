@@ -2,6 +2,8 @@ package portainer
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
 	"io"
 	"time"
 
@@ -191,64 +193,40 @@ type (
 	// EdgeGroup represents an Edge group
 	EdgeGroup struct {
 		// EdgeGroup Identifier
-		ID           EdgeGroupID  `json:"Id" example:"1"`
-		Name         string       `json:"Name"`
-		Dynamic      bool         `json:"Dynamic"`
-		TagIDs       []TagID      `json:"TagIds"`
-		Endpoints    []EndpointID `json:"Endpoints"`
-		PartialMatch bool         `json:"PartialMatch"`
+		ID           EdgeGroupID           `json:"Id" example:"1"`
+		Name         string                `json:"Name"`
+		Dynamic      bool                  `json:"Dynamic"`
+		TagIDs       []TagID               `json:"TagIds"`
+		Endpoints    []database.EndpointID `json:"Endpoints"`
+		PartialMatch bool                  `json:"PartialMatch"`
 	}
 
 	// EdgeGroupID represents an Edge group identifier
+	// EdgeGroupID represents an Edge group identifier
 	EdgeGroupID int
-
-	// EdgeJob represents a job that can run on Edge environments(endpoints).
-	EdgeJob struct {
-		// EdgeJob Identifier
-		ID             EdgeJobID                          `json:"Id" example:"1"`
-		Created        int64                              `json:"Created"`
-		CronExpression string                             `json:"CronExpression"`
-		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints"`
-		Name           string                             `json:"Name"`
-		ScriptPath     string                             `json:"ScriptPath"`
-		Recurring      bool                               `json:"Recurring"`
-		Version        int                                `json:"Version"`
-	}
-
-	// EdgeJobEndpointMeta represents a meta data object for an Edge job and Environment(Endpoint) relation
-	EdgeJobEndpointMeta struct {
-		LogsStatus  EdgeJobLogsStatus
-		CollectLogs bool
-	}
-
-	// EdgeJobID represents an Edge job identifier
-	EdgeJobID int
-
-	// EdgeJobLogsStatus represent status of logs collection job
-	EdgeJobLogsStatus int
 
 	// EdgeSchedule represents a scheduled job that can run on Edge environments(endpoints).
 	// Deprecated in favor of EdgeJob
 	EdgeSchedule struct {
 		// EdgeSchedule Identifier
-		ID             ScheduleID   `json:"Id" example:"1"`
-		CronExpression string       `json:"CronExpression"`
-		Script         string       `json:"Script"`
-		Version        int          `json:"Version"`
-		Endpoints      []EndpointID `json:"Endpoints"`
+		ID             ScheduleID            `json:"Id" example:"1"`
+		CronExpression string                `json:"CronExpression"`
+		Script         string                `json:"Script"`
+		Version        int                   `json:"Version"`
+		Endpoints      []database.EndpointID `json:"Endpoints"`
 	}
 
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
-		ID             EdgeStackID                    `json:"Id" example:"1"`
-		Name           string                         `json:"Name"`
-		Status         map[EndpointID]EdgeStackStatus `json:"Status"`
-		CreationDate   int64                          `json:"CreationDate"`
-		EdgeGroups     []EdgeGroupID                  `json:"EdgeGroups"`
-		ProjectPath    string                         `json:"ProjectPath"`
-		EntryPoint     string                         `json:"EntryPoint"`
-		Version        int                            `json:"Version"`
+		ID             EdgeStackID                             `json:"Id" example:"1"`
+		Name           string                                  `json:"Name"`
+		Status         map[database.EndpointID]EdgeStackStatus `json:"Status"`
+		CreationDate   int64                                   `json:"CreationDate"`
+		EdgeGroups     []EdgeGroupID                           `json:"EdgeGroups"`
+		ProjectPath    string                                  `json:"ProjectPath"`
+		EntryPoint     string                                  `json:"EntryPoint"`
+		Version        int                                     `json:"Version"`
 		ManifestPath   string
 		DeploymentType EdgeStackDeploymentType
 
@@ -265,7 +243,7 @@ type (
 	EdgeStackStatus struct {
 		Type       EdgeStackStatusType `json:"Type"`
 		Error      string              `json:"Error"`
-		EndpointID EndpointID          `json:"EndpointID"`
+		EndpointID database.EndpointID `json:"EndpointID"`
 	}
 
 	//EdgeStackStatusType represents an edge stack status type
@@ -275,7 +253,7 @@ type (
 	// to connect to it
 	Endpoint struct {
 		// Environment(Endpoint) Identifier
-		ID EndpointID `json:"Id" example:"1"`
+		ID database.EndpointID `json:"Id" example:"1"`
 		// Environment(Endpoint) name
 		Name string `json:"Name" example:"my-environment"`
 		// Environment(Endpoint) environment(endpoint) type. 1 for a Docker environment(endpoint), 2 for an agent on Docker environment(endpoint) or 3 for an Azure environment(endpoint).
@@ -335,7 +313,7 @@ type (
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
-	EndpointAuthorizations map[EndpointID]Authorizations
+	EndpointAuthorizations map[database.EndpointID]Authorizations
 
 	// EndpointGroup represents a group of environments(endpoints)
 	EndpointGroup struct {
@@ -363,9 +341,6 @@ type (
 
 	// EndpointGroupID represents an environment(endpoint) group identifier
 	EndpointGroupID int
-
-	// EndpointID represents an environment(endpoint) identifier
-	EndpointID int
 
 	// EndpointStatus represents the status of an environment(endpoint)
 	EndpointStatus int
@@ -401,7 +376,7 @@ type (
 
 	// EndpointRelation represents a environment(endpoint) relation object
 	EndpointRelation struct {
-		EndpointID EndpointID
+		EndpointID database.EndpointID
 		EdgeStacks map[EdgeStackID]bool
 	}
 
@@ -643,7 +618,7 @@ type (
 		AccessTokenExpiry int64  `json:"AccessTokenExpiry,omitempty"`
 	}
 
-	RegistryAccesses map[EndpointID]RegistryAccessPolicies
+	RegistryAccesses map[database.EndpointID]RegistryAccessPolicies
 
 	RegistryAccessPolicies struct {
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
@@ -758,7 +733,7 @@ type (
 
 	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
 	ScriptExecutionJob struct {
-		Endpoints     []EndpointID
+		Endpoints     []database.EndpointID
 		Image         string
 		ScriptPath    string
 		RetryCount    int
@@ -839,7 +814,7 @@ type (
 		// Stack type. 1 for a Swarm stack, 2 for a Compose stack
 		Type StackType `json:"Type" example:"2"`
 		// Environment(Endpoint) identifier. Reference the environment(endpoint) that will be used for deployment
-		EndpointID EndpointID `json:"EndpointId" example:"1"`
+		EndpointID database.EndpointID `json:"EndpointId" example:"1"`
 		// Cluster identifier of the Swarm cluster where the stack is deployed
 		SwarmID string `json:"SwarmId" example:"jpofkc0i9uo9wtx1zesuk649w"`
 		// Path to the Stack file
@@ -908,7 +883,7 @@ type (
 		// Tag name
 		Name string `json:"Name" example:"org/acme"`
 		// A set of environment(endpoint) ids that have this tag
-		Endpoints map[EndpointID]bool `json:"Endpoints"`
+		Endpoints map[database.EndpointID]bool `json:"Endpoints"`
 		// A set of environment(endpoint) group ids that have this tag
 		EndpointGroups map[EndpointGroupID]bool `json:"EndpointGroups"`
 	}
@@ -1097,7 +1072,7 @@ type (
 		Status       string
 		LastActivity time.Time
 		Port         int
-		Jobs         []EdgeJob
+		Jobs         []edgejob.EdgeJob
 		Credentials  string
 	}
 
@@ -1143,12 +1118,12 @@ type (
 	// Webhook represents a url webhook that can be used to update a service
 	Webhook struct {
 		// Webhook Identifier
-		ID          WebhookID   `json:"Id" example:"1"`
-		Token       string      `json:"Token"`
-		ResourceID  string      `json:"ResourceId"`
-		EndpointID  EndpointID  `json:"EndpointId"`
-		RegistryID  RegistryID  `json:"RegistryId"`
-		WebhookType WebhookType `json:"Type"`
+		ID          WebhookID           `json:"Id" example:"1"`
+		Token       string              `json:"Token"`
+		ResourceID  string              `json:"ResourceId"`
+		EndpointID  database.EndpointID `json:"EndpointId"`
+		RegistryID  RegistryID          `json:"RegistryId"`
+		WebhookType WebhookType         `json:"Type"`
 	}
 
 	// WebhookID represents a webhook identifier.
@@ -1290,14 +1265,14 @@ type (
 		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
 		StopTunnelServer() error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
-		SetTunnelStatusToActive(endpointID EndpointID)
-		SetTunnelStatusToRequired(endpointID EndpointID) error
-		SetTunnelStatusToIdle(endpointID EndpointID)
-		KeepTunnelAlive(endpointID EndpointID, ctx context.Context, maxKeepAlive time.Duration)
-		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
+		SetTunnelStatusToActive(endpointID database.EndpointID)
+		SetTunnelStatusToRequired(endpointID database.EndpointID) error
+		SetTunnelStatusToIdle(endpointID database.EndpointID)
+		KeepTunnelAlive(endpointID database.EndpointID, ctx context.Context, maxKeepAlive time.Duration)
+		GetTunnelDetails(endpointID database.EndpointID) *TunnelDetails
 		GetActiveTunnel(endpoint *Endpoint) (*TunnelDetails, error)
-		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
-		RemoveEdgeJob(edgeJobID EdgeJobID)
+		AddEdgeJob(endpointID database.EndpointID, edgeJob *edgejob.EdgeJob)
+		RemoveEdgeJob(edgeJobID edgejob.EdgeJobID)
 	}
 
 	// Server defines the interface to serve the API
@@ -1393,7 +1368,7 @@ const (
 )
 
 const (
-	_ EdgeJobLogsStatus = iota
+	_ edgejob.EdgeJobLogsStatus = iota
 	// EdgeJobLogsStatusIdle represents an idle log collection job
 	EdgeJobLogsStatusIdle
 	// EdgeJobLogsStatusPending represents a pending log collection job

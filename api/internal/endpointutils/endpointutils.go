@@ -1,6 +1,7 @@
 package endpointutils
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -39,14 +40,14 @@ func IsAgentEndpoint(endpoint *portainer.Endpoint) bool {
 }
 
 // FilterByExcludeIDs receives an environment(endpoint) array and returns a filtered array using an excludeIds param
-func FilterByExcludeIDs(endpoints []portainer.Endpoint, excludeIds []portainer.EndpointID) []portainer.Endpoint {
+func FilterByExcludeIDs(endpoints []portainer.Endpoint, excludeIds []database.EndpointID) []portainer.Endpoint {
 	if len(excludeIds) == 0 {
 		return endpoints
 	}
 
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
-	idsSet := make(map[portainer.EndpointID]bool)
+	idsSet := make(map[database.EndpointID]bool)
 	for _, id := range excludeIds {
 		idsSet[id] = true
 	}

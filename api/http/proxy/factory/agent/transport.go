@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -11,7 +12,7 @@ type (
 	Transport struct {
 		httpTransport      *http.Transport
 		signatureService   portainer.DigitalSignatureService
-		endpointIdentifier portainer.EndpointID
+		endpointIdentifier database.EndpointID
 	}
 )
 

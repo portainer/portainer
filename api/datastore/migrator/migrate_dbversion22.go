@@ -1,6 +1,9 @@
 package migrator
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
+)
 
 func (m *Migrator) updateTagsToDBVersion23() error {
 	migrateLog.Info("Updating tags")
@@ -11,7 +14,7 @@ func (m *Migrator) updateTagsToDBVersion23() error {
 
 	for _, tag := range tags {
 		tag.EndpointGroups = make(map[portainer.EndpointGroupID]bool)
-		tag.Endpoints = make(map[portainer.EndpointID]bool)
+		tag.Endpoints = make(map[database.EndpointID]bool)
 		err = m.tagService.UpdateTag(tag.ID, &tag)
 		if err != nil {
 			return err

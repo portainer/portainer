@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"log"
 	"net/http"
 	"strings"
@@ -311,7 +312,7 @@ func (transport *Transport) findResourceControl(resourceIdentifier string, resou
 	return nil, nil
 }
 
-func getStackResourceIDFromLabels(resourceLabelsObject map[string]string, endpointID portainer.EndpointID) string {
+func getStackResourceIDFromLabels(resourceLabelsObject map[string]string, endpointID database.EndpointID) string {
 	if resourceLabelsObject[resourceLabelForDockerSwarmStackName] != "" {
 		stackName := resourceLabelsObject[resourceLabelForDockerSwarmStackName]
 		return stackutils.ResourceControlID(endpointID, stackName)

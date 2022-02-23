@@ -2,6 +2,7 @@ package edgegroups
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -16,7 +17,7 @@ type edgeGroupUpdatePayload struct {
 	Name         string
 	Dynamic      bool
 	TagIDs       []portainer.TagID
-	Endpoints    []portainer.EndpointID
+	Endpoints    []database.EndpointID
 	PartialMatch *bool
 }
 
@@ -95,7 +96,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	if edgeGroup.Dynamic {
 		edgeGroup.TagIDs = payload.TagIDs
 	} else {
-		endpointIDs := []portainer.EndpointID{}
+		endpointIDs := []database.EndpointID{}
 		for _, endpointID := range payload.Endpoints {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
@@ -131,7 +132,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	return response.JSON(w, edgeGroup)
 }
 
-func (handler *Handler) updateEndpoint(endpointID portainer.EndpointID) error {
+func (handler *Handler) updateEndpoint(endpointID database.EndpointID) error {
 	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 	if err != nil {
 		return err

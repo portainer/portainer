@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -15,7 +16,7 @@ const (
 	configObjectIdentifier = "ID"
 )
 
-func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, endpointID portainer.EndpointID, configID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, endpointID database.EndpointID, configID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	config, _, err := dockerClient.ConfigInspectWithRaw(context.Background(), configID)
 	if err != nil {
 		return nil, err

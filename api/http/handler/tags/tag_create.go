@@ -2,6 +2,7 @@ package tags
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -58,7 +59,7 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 	tag := &portainer.Tag{
 		Name:           payload.Name,
 		EndpointGroups: map[portainer.EndpointGroupID]bool{},
-		Endpoints:      map[portainer.EndpointID]bool{},
+		Endpoints:      map[database.EndpointID]bool{},
 	}
 
 	err = handler.DataStore.Tag().Create(tag)

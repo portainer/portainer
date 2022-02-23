@@ -2,6 +2,7 @@ package authorization
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
@@ -601,7 +602,7 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 	return authorizations
 }
 
-func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpointID portainer.EndpointID, authorizations []portainer.Authorization) (bool, error) {
+func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpointID database.EndpointID, authorizations []portainer.Authorization) (bool, error) {
 	user, err := service.dataStore.User().User(userID)
 	if err != nil {
 		return false, err

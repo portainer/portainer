@@ -2,6 +2,7 @@ package stackutils
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"io/ioutil"
 
 	"github.com/pkg/errors"
@@ -11,7 +12,7 @@ import (
 )
 
 // ResourceControlID returns the stack resource control id
-func ResourceControlID(endpointID portainer.EndpointID, name string) string {
+func ResourceControlID(endpointID database.EndpointID, name string) string {
 	return fmt.Sprintf("%d_%s", endpointID, name)
 }
 

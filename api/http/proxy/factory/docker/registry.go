@@ -2,6 +2,7 @@ package docker
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils"
@@ -11,7 +12,7 @@ type (
 	registryAccessContext struct {
 		isAdmin         bool
 		user            *portainer.User
-		endpointID      portainer.EndpointID
+		endpointID      database.EndpointID
 		teamMemberships []portainer.TeamMembership
 		registries      []portainer.Registry
 	}

@@ -1,6 +1,7 @@
 package security
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -124,7 +125,7 @@ func authorizedEndpointGroupAccess(endpointGroup *portainer.EndpointGroup, userI
 // AuthorizedRegistryAccess ensure that the user can access the specified registry.
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams for a specified environment(endpoint),
-func AuthorizedRegistryAccess(registry *portainer.Registry, user *portainer.User, teamMemberships []portainer.TeamMembership, endpointID portainer.EndpointID) bool {
+func AuthorizedRegistryAccess(registry *portainer.Registry, user *portainer.User, teamMemberships []portainer.TeamMembership, endpointID database.EndpointID) bool {
 	if user.Role == portainer.AdministratorRole {
 		return true
 	}

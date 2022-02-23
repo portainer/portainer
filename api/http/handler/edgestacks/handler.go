@@ -2,6 +2,7 @@ package edgestacks
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strconv"
 
@@ -46,7 +47,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	return h
 }
 
-func (handler *Handler) convertAndStoreKubeManifestIfNeeded(edgeStack *portainer.EdgeStack, relatedEndpointIds []portainer.EndpointID) error {
+func (handler *Handler) convertAndStoreKubeManifestIfNeeded(edgeStack *portainer.EdgeStack, relatedEndpointIds []database.EndpointID) error {
 	hasKubeEndpoint, err := hasKubeEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
 	if err != nil {
 		return fmt.Errorf("unable to check if edge stack has kube environments: %w", err)

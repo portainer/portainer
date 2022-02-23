@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -54,7 +55,7 @@ func (handler *Handler) endpointRegistryInspect(w http.ResponseWriter, r *http.R
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user from the database", Err: err}
 	}
 
-	if !security.AuthorizedRegistryAccess(registry, user, securityContext.UserMemberships, portainer.EndpointID(endpointID)) {
+	if !security.AuthorizedRegistryAccess(registry, user, securityContext.UserMemberships, database.EndpointID(endpointID)) {
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied to resource", Err: httperrors.ErrResourceAccessDenied}
 	}
 

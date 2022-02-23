@@ -3,6 +3,8 @@ package chisel
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -39,7 +41,7 @@ func randomInt(min, max int) int {
 }
 
 // GetTunnelDetails returns information about the tunnel associated to an environment(endpoint).
-func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *portainer.TunnelDetails {
+func (service *Service) GetTunnelDetails(endpointID database.EndpointID) *portainer.TunnelDetails {
 	key := strconv.Itoa(int(endpointID))
 
 	if item, ok := service.tunnelDetailsMap.Get(key); ok {
@@ -47,7 +49,7 @@ func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *porta
 		return tunnelDetails
 	}
 
-	jobs := make([]portainer.EdgeJob, 0)
+	jobs := make([]edgejob.EdgeJob, 0)
 	return &portainer.TunnelDetails{
 		Status:      portainer.EdgeAgentIdle,
 		Port:        0,
@@ -90,7 +92,7 @@ func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (*portaine
 
 // SetTunnelStatusToActive update the status of the tunnel associated to the specified environment(endpoint).
 // It sets the status to ACTIVE.
-func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID) {
+func (service *Service) SetTunnelStatusToActive(endpointID database.EndpointID) {
 	tunnel := service.GetTunnelDetails(endpointID)
 	tunnel.Status = portainer.EdgeAgentActive
 	tunnel.Credentials = ""
@@ -103,7 +105,7 @@ func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID)
 // SetTunnelStatusToIdle update the status of the tunnel associated to the specified environment(endpoint).
 // It sets the status to IDLE.
 // It removes any existing credentials associated to the tunnel.
-func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
+func (service *Service) SetTunnelStatusToIdle(endpointID database.EndpointID) {
 	tunnel := service.GetTunnelDetails(endpointID)
 
 	tunnel.Status = portainer.EdgeAgentIdle
@@ -127,7 +129,7 @@ func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
 // If no port is currently associated to the tunnel, it will associate a random unused port to the tunnel
 // and generate temporary credentials that can be used to establish a reverse tunnel on that port.
 // Credentials are encrypted using the Edge ID associated to the environment(endpoint).
-func (service *Service) SetTunnelStatusToRequired(endpointID portainer.EndpointID) error {
+func (service *Service) SetTunnelStatusToRequired(endpointID database.EndpointID) error {
 	tunnel := service.GetTunnelDetails(endpointID)
 
 	if tunnel.Port == 0 {

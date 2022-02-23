@@ -5,17 +5,17 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"io/ioutil"
 	"log"
 
 	"github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
 )
 
 // KubeConfigService represents a service that is responsible for handling kubeconfig operations
 type KubeConfigService interface {
 	IsSecure() bool
-	GetKubeConfigInternal(endpointId portainer.EndpointID, authToken string) kubernetesClusterAccess
+	GetKubeConfigInternal(endpointId database.EndpointID, authToken string) kubernetesClusterAccess
 }
 
 // KubernetesClusterAccess represents core details which can be used to generate KubeConfig file/data
@@ -93,7 +93,7 @@ func (kccas *kubeConfigCAService) IsSecure() bool {
 // The struct can be used to:
 // - generate a kubeconfig file
 // - pass down params to binaries
-func (kccas *kubeConfigCAService) GetKubeConfigInternal(endpointId portainer.EndpointID, authToken string) kubernetesClusterAccess {
+func (kccas *kubeConfigCAService) GetKubeConfigInternal(endpointId database.EndpointID, authToken string) kubernetesClusterAccess {
 	clusterServerUrl := fmt.Sprintf("https://localhost%s/api/endpoints/%s/kubernetes", kccas.httpsBindAddr, fmt.Sprint(endpointId))
 	return kubernetesClusterAccess{
 		ClusterServerURL:         clusterServerUrl,

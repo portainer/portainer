@@ -3,6 +3,8 @@ package endpoints
 import (
 	"encoding/base64"
 	"errors"
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
 	"net/http"
 	"strconv"
 	"time"
@@ -22,7 +24,7 @@ type stackStatusResponse struct {
 
 type edgeJobResponse struct {
 	// EdgeJob Identifier
-	ID portainer.EdgeJobID `json:"Id" example:"2"`
+	ID edgejob.EdgeJobID `json:"Id" example:"2"`
 	// Whether to collect logs
 	CollectLogs bool `json:"CollectLogs" example:"true"`
 	// A cron expression to schedule this job
@@ -68,7 +70,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {

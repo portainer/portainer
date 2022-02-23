@@ -2,6 +2,8 @@ package edgejobs
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
 	"net/http"
 	"strconv"
 
@@ -16,7 +18,7 @@ type edgeJobUpdatePayload struct {
 	Name           *string
 	CronExpression *string
 	Recurring      *bool
-	Endpoints      []portainer.EndpointID
+	Endpoints      []database.EndpointID
 	FileContent    *string
 }
 
@@ -54,7 +56,7 @@ func (handler *Handler) edgeJobUpdate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
+	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(edgejob.EdgeJobID(edgeJobID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -74,13 +76,13 @@ func (handler *Handler) edgeJobUpdate(w http.ResponseWriter, r *http.Request) *h
 	return response.JSON(w, edgeJob)
 }
 
-func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *edgeJobUpdatePayload) error {
+func (handler *Handler) updateEdgeSchedule(edgeJob *edgejob.EdgeJob, payload *edgeJobUpdatePayload) error {
 	if payload.Name != nil {
 		edgeJob.Name = *payload.Name
 	}
 
 	if payload.Endpoints != nil {
-		endpointsMap := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
+		endpointsMap := map[database.EndpointID]edgejob.EdgeJobEndpointMeta{}
 
 		for _, endpointID := range payload.Endpoints {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
@@ -95,7 +97,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 			if meta, ok := edgeJob.Endpoints[endpointID]; ok {
 				endpointsMap[endpointID] = meta
 			} else {
-				endpointsMap[endpointID] = portainer.EdgeJobEndpointMeta{}
+				endpointsMap[endpointID] = edgejob.EdgeJobEndpointMeta{}
 			}
 		}
 

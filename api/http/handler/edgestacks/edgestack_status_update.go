@@ -2,6 +2,7 @@ package edgestacks
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -14,7 +15,7 @@ import (
 type updateStatusPayload struct {
 	Error      string
 	Status     *portainer.EdgeStackStatusType
-	EndpointID *portainer.EndpointID
+	EndpointID *database.EndpointID
 }
 
 func (payload *updateStatusPayload) Validate(r *http.Request) error {
@@ -62,7 +63,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(*payload.EndpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(*payload.EndpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {

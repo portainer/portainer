@@ -2,8 +2,8 @@ package endpointrelation
 
 import (
 	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,7 +14,7 @@ const (
 
 // Service represents a service for managing environment(endpoint) relation data.
 type Service struct {
-	connection portainer.Connection
+	connection database.Connection
 }
 
 func (service *Service) BucketName() string {
@@ -22,7 +22,7 @@ func (service *Service) BucketName() string {
 }
 
 // NewService creates a new instance of a service.
-func NewService(connection portainer.Connection) (*Service, error) {
+func NewService(connection database.Connection) (*Service, error) {
 	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (service *Service) EndpointRelations() ([]portainer.EndpointRelation, error
 }
 
 // EndpointRelation returns a Environment(Endpoint) relation object by EndpointID
-func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*portainer.EndpointRelation, error) {
+func (service *Service) EndpointRelation(endpointID database.EndpointID) (*portainer.EndpointRelation, error) {
 	var endpointRelation portainer.EndpointRelation
 	identifier := service.connection.ConvertToKey(int(endpointID))
 
@@ -72,13 +72,13 @@ func (service *Service) Create(endpointRelation *portainer.EndpointRelation) err
 }
 
 // UpdateEndpointRelation updates an Environment(Endpoint) relation object
-func (service *Service) UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
+func (service *Service) UpdateEndpointRelation(EndpointID database.EndpointID, endpointRelation *portainer.EndpointRelation) error {
 	identifier := service.connection.ConvertToKey(int(EndpointID))
 	return service.connection.UpdateObject(BucketName, identifier, endpointRelation)
 }
 
 // DeleteEndpointRelation deletes an Environment(Endpoint) relation object
-func (service *Service) DeleteEndpointRelation(EndpointID portainer.EndpointID) error {
+func (service *Service) DeleteEndpointRelation(EndpointID database.EndpointID) error {
 	identifier := service.connection.ConvertToKey(int(EndpointID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }

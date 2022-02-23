@@ -1,6 +1,8 @@
 package edgejobs
 
 import (
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/dataservices/edgejob"
 	"net/http"
 	"strconv"
 
@@ -35,14 +37,14 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Task identifier route variable", err}
 	}
 
-	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
+	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(edgejob.EdgeJobID(edgeJobID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}
 	}
 
-	endpointID := portainer.EndpointID(taskID)
+	endpointID := database.EndpointID(taskID)
 
 	meta := edgeJob.Endpoints[endpointID]
 	meta.CollectLogs = false

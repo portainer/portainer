@@ -2,6 +2,7 @@ package edgegroups
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -76,7 +77,7 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 	return response.JSON(w, decoratedEdgeGroups)
 }
 
-func getEndpointTypes(endpointService dataservices.EndpointService, endpointIds []portainer.EndpointID) ([]portainer.EndpointType, error) {
+func getEndpointTypes(endpointService dataservices.EndpointService, endpointIds []database.EndpointID) ([]portainer.EndpointType, error) {
 	typeSet := map[portainer.EndpointType]bool{}
 	for _, endpointID := range endpointIds {
 		endpoint, err := endpointService.Endpoint(endpointID)

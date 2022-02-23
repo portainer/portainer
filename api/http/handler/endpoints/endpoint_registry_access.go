@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -48,7 +49,7 @@ func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Re
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid registry identifier route variable", Err: err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(database.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
 	} else if err != nil {
@@ -104,7 +105,7 @@ func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Re
 		registryAccess.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
-	registry.RegistryAccesses[portainer.EndpointID(endpointID)] = registryAccess
+	registry.RegistryAccesses[database.EndpointID(endpointID)] = registryAccess
 
 	handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)
 

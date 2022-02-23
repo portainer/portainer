@@ -3,6 +3,7 @@ package edgestacks
 import (
 	"errors"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strconv"
 	"strings"
@@ -105,7 +106,7 @@ func (handler *Handler) createSwarmStackFromFileContent(r *http.Request) (*porta
 		DeploymentType: payload.DeploymentType,
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     payload.EdgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
+		Status:         make(map[database.EndpointID]portainer.EdgeStackStatus),
 		Version:        1,
 	}
 
@@ -228,7 +229,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 		Name:           payload.Name,
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     payload.EdgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
+		Status:         make(map[database.EndpointID]portainer.EdgeStackStatus),
 		DeploymentType: payload.DeploymentType,
 		Version:        1,
 	}
@@ -337,7 +338,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request) (*portai
 		DeploymentType: payload.DeploymentType,
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     payload.EdgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
+		Status:         make(map[database.EndpointID]portainer.EdgeStackStatus),
 		Version:        1,
 	}
 
@@ -404,7 +405,7 @@ func (handler *Handler) validateUniqueName(name string) error {
 }
 
 // updateEndpointRelations adds a relation between the Edge Stack to the related environments(endpoints)
-func updateEndpointRelations(endpointRelationService dataservices.EndpointRelationService, edgeStackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID) error {
+func updateEndpointRelations(endpointRelationService dataservices.EndpointRelationService, edgeStackID portainer.EdgeStackID, relatedEndpointIds []database.EndpointID) error {
 	for _, endpointID := range relatedEndpointIds {
 		relation, err := endpointRelationService.EndpointRelation(endpointID)
 		if err != nil {

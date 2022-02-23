@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/http/security"
 	"net/http"
 
@@ -58,7 +59,7 @@ func filterWebhooks(webhooks []portainer.Webhook, filters *webhookListOperationF
 
 	filteredWebhooks := make([]portainer.Webhook, 0, len(webhooks))
 	for _, webhook := range webhooks {
-		if webhook.EndpointID == portainer.EndpointID(filters.EndpointID) && webhook.ResourceID == string(filters.ResourceID) {
+		if webhook.EndpointID == database.EndpointID(filters.EndpointID) && webhook.ResourceID == string(filters.ResourceID) {
 			filteredWebhooks = append(filteredWebhooks, webhook)
 		}
 	}

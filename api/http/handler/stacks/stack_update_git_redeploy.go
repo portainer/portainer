@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"log"
 	"net/http"
 	"time"
@@ -77,7 +78,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid query parameter: endpointId", Err: err}
 	}
 	if endpointID != int(stack.EndpointID) {
-		stack.EndpointID = portainer.EndpointID(endpointID)
+		stack.EndpointID = database.EndpointID(endpointID)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)

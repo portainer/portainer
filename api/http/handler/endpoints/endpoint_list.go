@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"strconv"
 	"strings"
@@ -56,7 +57,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	tagsPartialMatch, _ := request.RetrieveBooleanQueryParameter(r, "tagsPartialMatch", true)
 
-	var endpointIDs []portainer.EndpointID
+	var endpointIDs []database.EndpointID
 	request.RetrieveJSONQueryParameter(r, "endpointIds", &endpointIDs, true)
 
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
@@ -321,10 +322,10 @@ func endpointFullMatchTags(endpoint portainer.Endpoint, endpointGroup portainer.
 	return len(missingTags) == 0
 }
 
-func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []portainer.EndpointID) []portainer.Endpoint {
+func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []database.EndpointID) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
-	idsSet := make(map[portainer.EndpointID]bool)
+	idsSet := make(map[database.EndpointID]bool)
 	for _, id := range ids {
 		idsSet[id] = true
 	}

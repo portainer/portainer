@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"io"
 	"os"
 	"path"
@@ -29,7 +30,7 @@ func (store *Store) edition() portainer.SoftwareEdition {
 }
 
 // NewStore initializes a new Store and the associated services
-func NewStore(storePath string, fileService portainer.FileService, connection portainer.Connection) *Store {
+func NewStore(storePath string, fileService portainer.FileService, connection database.Connection) *Store {
 	return &Store{
 		fileService: fileService,
 		connection:  connection,

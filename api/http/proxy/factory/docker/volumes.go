@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"path"
 
@@ -20,7 +21,7 @@ const (
 	volumeObjectIdentifier = "ResourceID"
 )
 
-func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, endpointID portainer.EndpointID, volumeID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, endpointID database.EndpointID, volumeID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	volume, err := dockerClient.VolumeInspect(context.Background(), volumeID)
 	if err != nil {
 		return nil, err

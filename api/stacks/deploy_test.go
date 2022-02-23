@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -191,7 +192,7 @@ func Test_getUserRegistries(t *testing.T) {
 		ID:   1,
 		Name: "registryReachableByUser",
 		RegistryAccesses: portainer.RegistryAccesses{
-			portainer.EndpointID(endpointID): {
+			database.EndpointID(endpointID): {
 				UserAccessPolicies: map[portainer.UserID]portainer.AccessPolicy{
 					user.ID: {RoleID: portainer.RoleID(portainer.StandardUserRole)},
 				},
@@ -205,7 +206,7 @@ func Test_getUserRegistries(t *testing.T) {
 		ID:   2,
 		Name: "registryReachableByTeam",
 		RegistryAccesses: portainer.RegistryAccesses{
-			portainer.EndpointID(endpointID): {
+			database.EndpointID(endpointID): {
 				TeamAccessPolicies: map[portainer.TeamID]portainer.AccessPolicy{
 					team.ID: {RoleID: portainer.RoleID(portainer.StandardUserRole)},
 				},
@@ -219,7 +220,7 @@ func Test_getUserRegistries(t *testing.T) {
 		ID:   3,
 		Name: "registryRestricted",
 		RegistryAccesses: portainer.RegistryAccesses{
-			portainer.EndpointID(endpointID): {
+			database.EndpointID(endpointID): {
 				UserAccessPolicies: map[portainer.UserID]portainer.AccessPolicy{
 					user.ID + 100: {RoleID: portainer.RoleID(portainer.StandardUserRole)},
 				},
@@ -230,13 +231,13 @@ func Test_getUserRegistries(t *testing.T) {
 	assert.NoError(t, err, "couldn't create a registry")
 
 	t.Run("admin should has access to all registries", func(t *testing.T) {
-		registries, err := getUserRegistries(store, admin, portainer.EndpointID(endpointID))
+		registries, err := getUserRegistries(store, admin, database.EndpointID(endpointID))
 		assert.NoError(t, err)
 		assert.ElementsMatch(t, []portainer.Registry{registryReachableByUser, registryReachableByTeam, registryRestricted}, registries)
 	})
 
 	t.Run("regular user has access to registries allowed to him and/or his team", func(t *testing.T) {
-		registries, err := getUserRegistries(store, user, portainer.EndpointID(endpointID))
+		registries, err := getUserRegistries(store, user, database.EndpointID(endpointID))
 		assert.NoError(t, err)
 		assert.ElementsMatch(t, []portainer.Registry{registryReachableByUser, registryReachableByTeam}, registries)
 	})

@@ -1,6 +1,7 @@
 package kubernetes
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"io/ioutil"
 
 	portainer "github.com/portainer/portainer/api"
@@ -43,7 +44,7 @@ func (manager *tokenManager) GetAdminServiceAccountToken() string {
 	return manager.adminToken
 }
 
-func (manager *tokenManager) GetUserServiceAccountToken(userID int, endpointID portainer.EndpointID) (string, error) {
+func (manager *tokenManager) GetUserServiceAccountToken(userID int, endpointID database.EndpointID) (string, error) {
 	manager.tokenCache.mutex.Lock()
 	defer manager.tokenCache.mutex.Unlock()
 

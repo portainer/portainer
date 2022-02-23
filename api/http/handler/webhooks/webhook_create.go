@@ -2,6 +2,7 @@ package webhooks
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils/access"
 	"net/http"
@@ -62,7 +63,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusConflict, "A webhook for this resource already exists", errors.New("A webhook for this resource already exists")}
 	}
 
-	endpointID := portainer.EndpointID(payload.EndpointID)
+	endpointID := database.EndpointID(payload.EndpointID)
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
