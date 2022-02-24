@@ -19,8 +19,6 @@ interface State {
   user?: UserViewModel | null;
 }
 
-const state: State = {};
-
 export const UserContext = createContext<State | null>(null);
 
 export function useUser() {
@@ -93,9 +91,7 @@ export function UserProvider({ children }: UserProviderProps) {
   const [user, setUser] = useState<UserViewModel | null>(null);
 
   useEffect(() => {
-    if (state.user) {
-      setUser(state.user);
-    } else if (jwt !== '') {
+    if (jwt !== '') {
       const tokenPayload = jwtDecode(jwt) as { id: number };
 
       loadUser(tokenPayload.id);
@@ -120,7 +116,6 @@ export function UserProvider({ children }: UserProviderProps) {
 
   async function loadUser(id: number) {
     const user = await getUser(id);
-    state.user = user;
     setUser(user);
   }
 }
