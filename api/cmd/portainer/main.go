@@ -23,6 +23,7 @@ import (
 	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/datastore/migrations"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
@@ -68,7 +69,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 }
 
 func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase("boltdb", *flags.Data, secretKey)
+	connection, err := database.NewDatabase("boltdb", *flags.Data, []byte("B8962909B929B03AC37182F61BF7CFCD"))
 	if err != nil {
 		logrus.Fatalf("failed creating database connection: %s", err)
 	}
@@ -124,6 +125,12 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 			}
 		}
 	}
+
+	m := migrations.NewMigrator(*store)
+
+	m.Migrate("v1.7")
+
+	logrus.Fatal("Dieing.....")
 
 	err = updateSettingsFromFlags(store, flags)
 	if err != nil {
