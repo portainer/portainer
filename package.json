@@ -98,7 +98,7 @@
     "bootstrap": "^3.4.0",
     "buffer": "^6.0.3",
     "chardet": "^1.4.0",
-    "chart.js": "~2.7.0",
+    "chart.js": "~2.9.4",
     "clsx": "^1.1.1",
     "codemirror": "~5.64.0",
     "core-js": "^3.19.3",
