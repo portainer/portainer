@@ -1,8 +1,10 @@
 package migrations
 
 import (
+	"fmt"
 	"sort"
 
+	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/datastore/migrations/types"
 	"github.com/sirupsen/logrus"
@@ -78,7 +80,7 @@ func (m *Migrator) Migrate(currentVersion int) error {
 	for _, v := range m.Versions {
 		mg := m.Migrations[v]
         // if migration version is below current version
-        if v <= currentVersion {
+        if v < currentVersion {
             continue
         }
         migrationsToRun.Versions = append(migrationsToRun.Versions, v)
@@ -87,9 +89,16 @@ func (m *Migrator) Migrate(currentVersion int) error {
 
     // TODO: Sort by Timestamp
     for v, mg := range migrationsToRun.Migrations {
-        logrus.Infof("Version %s", v)
+        logrus.Infof("Version %d", v)
         for _, m := range mg {
-            logrus.Infof("Version %s, Timestamp %d, Completed %t", m.Version, m.Timestamp, m.Completed)
+            log := logrus.WithFields(logrus.Fields{"Version": m.Version, "Name": m.Name})
+            log.Info("starting migration")
+            err := m.Up()
+            if err != nil {
+                return errors.Wrap(err, fmt.Sprintf("while running migration for version %d, name `%s`", m.Version, m.Name))
+            }
+            m.Completed = true
+            log.Info("migration completed successfully")
         }
     }
 	return nil

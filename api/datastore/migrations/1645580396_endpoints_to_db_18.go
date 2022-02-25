@@ -7,7 +7,7 @@ import (
 
 func init() {
 	migrator.AddMigration(types.Migration{
-		Version:   0,
+		Version:   17,
 		Timestamp: 1645580396,
 		Up:        v17_up_endpoints_to_18,
 		Down:      v17_down_endpoints_from_18,

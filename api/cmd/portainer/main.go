@@ -128,7 +128,7 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 
 	m := migrations.NewMigrator(*store)
 
-	m.Migrate("v1.7")
+	m.Migrate(18)
 
 	logrus.Fatal("Dieing.....")
 

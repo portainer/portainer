@@ -33,6 +33,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/portainer/portainer/api/dataservices/webhook"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/sirupsen/logrus"
 )
 
@@ -68,6 +69,8 @@ type Store struct {
 	UserService               *user.Service
 	VersionService            *version.Service
 	WebhookService            *webhook.Service
+
+	AuthorizationService *authorization.Service // TODO: validate why it is not part of store
 }
 
 func (store *Store) initServices() error {
@@ -226,6 +229,13 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.ScheduleService = scheduleService
+
+	authService := authorization.NewService(store)
+	if err != nil {
+		return err
+	}
+	store.AuthorizationService = authService
+
 
 	return nil
 }
