@@ -1,4 +1,4 @@
-import { buildOption } from '@/portainer/components/box-selector';
+import { buildOption } from '@/portainer/components/BoxSelector';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 
 class KubeCreateCustomTemplateViewController {
@@ -46,7 +46,9 @@ class KubeCreateCustomTemplateViewController {
   }
 
   onChangeFile(file) {
-    this.formValues.File = file;
+    return this.$async(async () => {
+      this.formValues.File = file;
+    });
   }
 
   async createCustomTemplate() {

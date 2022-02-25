@@ -3,7 +3,8 @@ package endpointproxy
 import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -11,7 +12,7 @@ import (
 // Handler is the HTTP handler used to proxy requests to external APIs.
 type Handler struct {
 	*mux.Router
-	DataStore            portainer.DataStore
+	DataStore            dataservices.DataStore
 	requestBouncer       *security.RequestBouncer
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
@@ -33,7 +34,5 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToDockerAPI)))
 	h.PathPrefix("/{id}/agent/kubernetes").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToKubernetesAPI)))
-	h.PathPrefix("/{id}/storidge").Handler(
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToStoridgeAPI)))
 	return h
 }

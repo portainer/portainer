@@ -1,0 +1,22 @@
+<rd-header>
+  <rd-header-title title-text="Settings"></rd-header-title>
+  <rd-header-content> <a ui-sref="portainer.settings">Settings</a> &gt; Edge Compute </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12" ng-if="$ctrl.settings">
+    <settings-edge-compute on-submit="($ctrl.onSubmitEdgeCompute)" settings="($ctrl.settings)"></settings-edge-compute>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12" ng-if="$ctrl.settings">
+    <settings-open-amt on-submit="($ctrl.onSubmitOpenAMT)" settings="($ctrl.settings)"></settings-open-amt>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12" ng-if="$ctrl.settings">
+    <settings-fdo on-submit="($ctrl.onSubmitFDO)" settings="($ctrl.settings)"></settings-fdo>
+  </div>
+</div>

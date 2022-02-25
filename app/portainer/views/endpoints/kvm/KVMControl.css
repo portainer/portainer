@@ -1,0 +1,15 @@
+.canvas-container {
+  display: contents;
+}
+
+.kvm-maximized {
+  position: fixed;
+  background: white;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 1000;
+  max-height: 100% !important;
+  overflow-y: scroll;
+}

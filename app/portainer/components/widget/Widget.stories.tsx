@@ -28,13 +28,9 @@ const meta: Meta<WidgetProps> = {
 
 export default meta;
 
-export function Default({
-  loading,
-  bodyText,
-  footerText,
-  icon,
-  title,
-}: WidgetProps) {
+export { Default, WidgetWithCustomImage, WidgetWithTaskBar };
+
+function Default({ loading, bodyText, footerText, icon, title }: WidgetProps) {
   return (
     <Widget>
       <WidgetTitle title={title} icon={icon} />
@@ -44,7 +40,7 @@ export function Default({
   );
 }
 
-export function WidgetWithCustomImage({
+function WidgetWithCustomImage({
   loading,
   bodyText,
   footerText,
@@ -73,7 +69,7 @@ WidgetWithCustomImage.args = {
   icon: 'https://via.placeholder.com/150',
 };
 
-export function WidgetWithTaskBar({
+function WidgetWithTaskBar({
   loading,
   bodyText,
   footerText,

@@ -136,7 +136,8 @@ angular.module('portainer.app').factory('FileUploadService', [
       TLSCAFile,
       TLSCertFile,
       TLSKeyFile,
-      checkinInterval
+      checkinInterval,
+      isEdgeDevice
     ) {
       return Upload.upload({
         url: 'api/endpoints',
@@ -154,6 +155,7 @@ angular.module('portainer.app').factory('FileUploadService', [
           TLSCertFile: TLSCertFile,
           TLSKeyFile: TLSKeyFile,
           CheckinInterval: checkinInterval,
+          IsEdgeDevice: isEdgeDevice,
         },
         ignoreLoadingBar: true,
       });
@@ -205,6 +207,16 @@ angular.module('portainer.app').factory('FileUploadService', [
       }
 
       return $q.all(queue);
+    };
+
+    service.uploadOwnershipVoucher = function (voucherFile) {
+      return Upload.upload({
+        url: 'api/fdo/register',
+        data: {
+          voucher: voucherFile,
+        },
+        ignoreLoadingBar: true,
+      });
     };
 
     return service;

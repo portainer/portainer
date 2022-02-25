@@ -39,27 +39,10 @@
         ></docker-sidebar>
       </div>
 
-      <sidebar-section title="Integrations" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0" authorization="IntegrationStoridgeAdmin">
-        <sidebar-menu
-          ng-if="
-            applicationState.endpoint.mode &&
-            applicationState.endpoint.extensions.indexOf('storidge') !== -1 &&
-            applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' &&
-            applicationState.endpoint.mode.role === 'MANAGER'
-          "
-          icon-class="fa-bolt fa-fw"
-          label="Storidge"
-          path="storidge.cluster"
-          is-sidebar-open="toggle"
-          children-paths="['storidge.cluster', 'storidge.profiles', 'storidge.monitor', 'storidge.profiles.new', 'storidge.profiles.profile', 'storidge.drives', 'storidge.drives.drive', 'storidge.cluster.node']"
-        >
-          <sidebar-menu-item path="storidge.monitor" class-name="sidebar-sublist">Monitor</sidebar-menu-item>
-          <sidebar-menu-item path="storidge.profiles" class-name="sidebar-sublist">Profiles</sidebar-menu-item>
-          <sidebar-menu-item path="storidge.drives" class-name="sidebar-sublist">Drives</sidebar-menu-item>
-        </sidebar-menu>
-      </sidebar-section>
-
       <sidebar-section title="Edge compute" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
+        <sidebar-menu-item path="edge.devices" icon-class="fas fa-laptop-code fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-edgeDevices">
+          Edge Devices
+        </sidebar-menu-item>
         <sidebar-menu-item path="edge.groups" icon-class="fa-object-group fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-edgeGroups">Edge Groups</sidebar-menu-item>
         <sidebar-menu-item path="edge.stacks" icon-class="fa-layer-group fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-edgeStacks">Edge Stacks</sidebar-menu-item>
         <sidebar-menu-item path="edge.jobs" icon-class="fa-clock fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-edgeJobs">Edge Jobs</sidebar-menu-item>
@@ -97,8 +80,15 @@
             <sidebar-menu-item path="portainer.activityLogs" class-name="sidebar-sublist" data-cy="portainerSidebar-activityLogs">Activity Logs</sidebar-menu-item>
           </sidebar-menu>
 
-          <sidebar-menu label="Settings" icon-class="fa-cogs fa-fw" path="portainer.settings" is-sidebar-open="toggle" children-paths="['portainer.settings.authentication']">
+          <sidebar-menu
+            label="Settings"
+            icon-class="fa-cogs fa-fw"
+            path="portainer.settings"
+            is-sidebar-open="toggle"
+            children-paths="['portainer.settings.authentication', 'portainer.settings.edgeCompute']"
+          >
             <sidebar-menu-item path="portainer.settings.authentication" class-name="sidebar-sublist" data-cy="portainerSidebar-authentication">Authentication</sidebar-menu-item>
+            <sidebar-menu-item path="portainer.settings.edgeCompute" class-name="sidebar-sublist" data-cy="portainerSidebar-edge-compute">Edge Compute</sidebar-menu-item>
 
             <div class="sidebar-sublist">
               <a href="https://www.portainer.io/community_help" target="_blank" data-cy="portainerSidebar-help">Help / About</a>
@@ -109,8 +99,8 @@
     </ul>
     <div class="sidebar-footer-content">
       <div class="update-notification" ng-if="applicationState.application.versionStatus.UpdateAvailable">
-        <a target="_blank" href="https://github.com/portainer/portainer/releases/tag/{{ applicationState.application.versionStatus.LatestVersion }}" style="color: #091e5d;">
-          <i class="fa-lg fas fa-cloud-download-alt" style="margin-right: 2px;"></i> A new version is available
+        <a target="_blank" href="https://github.com/portainer/portainer/releases/tag/{{ applicationState.application.versionStatus.LatestVersion }}" style="color: #091e5d">
+          <i class="fa-lg fas fa-cloud-download-alt" style="margin-right: 2px"></i> A new version is available
         </a>
       </div>
       <div>

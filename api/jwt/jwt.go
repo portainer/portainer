@@ -8,6 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/securecookie"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 // scope represents JWT scopes that are supported in JWT claims.
@@ -17,7 +18,7 @@ type scope string
 type Service struct {
 	secrets            map[scope][]byte
 	userSessionTimeout time.Duration
-	dataStore          portainer.DataStore
+	dataStore          dataservices.DataStore
 }
 
 type claims struct {
@@ -39,7 +40,7 @@ const (
 )
 
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
-func NewService(userSessionDuration string, dataStore portainer.DataStore) (*Service, error) {
+func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*Service, error) {
 	userSessionTimeout, err := time.ParseDuration(userSessionDuration)
 	if err != nil {
 		return nil, err
@@ -66,7 +67,7 @@ func NewService(userSessionDuration string, dataStore portainer.DataStore) (*Ser
 	return service, nil
 }
 
-func getOrCreateKubeSecret(dataStore portainer.DataStore) ([]byte, error) {
+func getOrCreateKubeSecret(dataStore dataservices.DataStore) ([]byte, error) {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
 		return nil, err
@@ -120,6 +121,14 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 
 	if err == nil && parsedToken != nil {
 		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
+
+			user, err := service.dataStore.User().User(portainer.UserID(cl.UserID))
+			if err != nil {
+				return nil, errInvalidJWTToken
+			}
+			if user.TokenIssueAt > cl.StandardClaims.IssuedAt {
+				return nil, errInvalidJWTToken
+			}
 			return &portainer.TokenData{
 				ID:       portainer.UserID(cl.UserID),
 				Username: cl.Username,
@@ -161,6 +170,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		Scope:    scope,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiresAt,
+			IssuedAt:  time.Now().Unix(),
 		},
 	}
 

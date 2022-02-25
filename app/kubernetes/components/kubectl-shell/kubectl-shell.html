@@ -13,7 +13,7 @@
 
 <div ng-if="$ctrl.state.shell.connected" class="{{ $ctrl.state.css }}-kubectl-shell">
   <div class="shell-container">
-    <div class="shell-item"><i class="fas fa-terminal" style="margin-right: 5px;"></i>kubectl shell</div>
+    <div class="shell-item"><i class="fas fa-terminal" style="margin-right: 5px"></i>kubectl shell</div>
     <div class="shell-item-right">
       <i class="fas fa-redo-alt" ng-click="$ctrl.screenClear();" data-cy="k8sShell-refreshButton"></i>
       <i
@@ -28,7 +28,7 @@
     <div class="nopadding">
       <div>
         <div id="terminal-container" class="terminal-container">
-          <div style="position: fixed; color: #fff;">Loading Terminal...</div>
+          <div style="position: fixed; color: #fff">Loading Terminal...</div>
         </div>
       </div>
     </div>

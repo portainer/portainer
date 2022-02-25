@@ -38,10 +38,10 @@
         <td>
           {{ item.Name }}
           <!-- <span class="image-tag label label-">inherited</span> -->
-          <span ng-if="item.Inherited" class="text-muted small" style="margin-left: 2px;"><code style="font-size: 85% !important;">inherited</code></span>
+          <span ng-if="item.Inherited" class="text-muted small" style="margin-left: 2px"><code style="font-size: 85% !important">inherited</code></span>
         </td>
         <td>
-          <i class="fa" ng-class="item.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-right: 2px;"></i>
+          <i class="fa" ng-class="item.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-right: 2px"></i>
           {{ item.Type }}
         </td>
       </tr>
@@ -62,9 +62,7 @@
     <div class="paginationControls">
       <form class="form-inline">
         <span class="limitSelector">
-          <span style="margin-right: 5px;">
-            Items per page
-          </span>
+          <span style="margin-right: 5px"> Items per page </span>
           <select ng-model="$ctrl.state.paginatedItemLimit">
             <option value="0">All</option>
             <option value="10">10</option>

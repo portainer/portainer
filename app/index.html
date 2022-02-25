@@ -1,5 +1,5 @@
-<!DOCTYPE html
-><html lang="en" ng-app="<%= name %>" ng-strict-di>
+<!DOCTYPE html>
+<html lang="en" ng-app="<%= name %>" ng-strict-di>
   <head>
     <meta charset="utf-8" />
     <title>Portainer</title>
@@ -18,12 +18,12 @@
     <![endif]-->
 
     <!-- Fav and touch icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="${require('./assets/ico/apple-touch-icon.png')}" />
-    <link rel="icon" type="image/png" sizes="32x32" href="${require('./assets/ico/favicon-32x32.png')}" />
-    <link rel="icon" type="image/png" sizes="16x16" href="${require('./assets/ico/favicon-16x16.png')}" />
-    <link rel="mask-icon" href="${require('./assets/ico/safari-pinned-tab.svg')}" color="#5bbad5" />
-    <link rel="shortcut icon" href="${require('./assets/ico/favicon.ico')}" />
-    <meta name="msapplication-config" content="${require('./assets/ico/browserconfig.xml')}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="<%=require('./assets/ico/apple-touch-icon.png')%>" />
+    <link rel="icon" type="image/png" sizes="32x32" href="<%=require('./assets/ico/favicon-32x32.png')%>" />
+    <link rel="icon" type="image/png" sizes="16x16" href="<%=require('./assets/ico/favicon-16x16.png')%>" />
+    <link rel="mask-icon" href="<%=require('./assets/ico/safari-pinned-tab.svg')%>" color="#5bbad5" />
+    <link rel="shortcut icon" href="<%=require('./assets/ico/favicon.ico')%>" />
+    <meta name="msapplication-config" content="<%=require('./assets/ico/browserconfig.xml')%>" />
     <meta name="theme-color" content="#ffffff" />
   </head>
 
@@ -47,13 +47,13 @@
                 <!-- loading box logo -->
                 <div class="row">
                   <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo" />
-                  <img ng-if="!logo" src="${require('./assets/images/logo_alt.svg')}" class="simple-box-logo" alt="Portainer" />
+                  <img ng-if="!logo" src="<%=require('./assets/images/logo_alt.svg')%>" class="simple-box-logo" alt="Portainer" />
                 </div>
                 <!-- !loading box logo -->
                 <!-- panel -->
-                <div class="row" style="text-align: center;">
+                <div class="row" style="text-align: center">
                   Loading Portainer...
-                  <i class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+                  <i class="fa fa-cog fa-spin" style="margin-left: 5px"></i>
                 </div>
                 <!-- !panel -->
               </div>

@@ -849,10 +849,6 @@ definitions:
       EdgeKey:
         description: The key which is used to map the agent to Portainer
         type: string
-      Extensions:
-        items:
-          $ref: '#/definitions/portainer.EndpointExtension'
-        type: array
       GroupId:
         description: Endpoint group identifier
         example: 1
@@ -925,13 +921,6 @@ definitions:
   portainer.EndpointAuthorizations:
     additionalProperties:
       $ref: '#/definitions/portainer.Authorizations'
-    type: object
-  portainer.EndpointExtension:
-    properties:
-      Type:
-        type: integer
-      URL:
-        type: string
     type: object
   portainer.EndpointGroup:
     properties:

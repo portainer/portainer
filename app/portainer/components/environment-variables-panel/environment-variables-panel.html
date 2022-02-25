@@ -1,8 +1,6 @@
 <ng-form class="form-horizontal environment-variables-panel" name="$ctrl.envVarsForm">
   <div class="form-group">
-    <div class="col-sm-12 form-section-title" style="margin-top: 10px; margin-left: 15px; width: 98%;">
-      Environment variables
-    </div>
+    <div class="col-sm-12 form-section-title" style="margin-top: 10px; margin-left: 15px; width: 98%"> Environment variables </div>
     <div class="col-sm-12 environment-variables-panel--explanation">
       {{::$ctrl.explanation}}
     </div>
@@ -22,7 +20,7 @@
         <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
         Switch to simple mode to define variables line by line, or load from .env file
       </div>
-      <div class="form-group" style="margin-left: 1px;">
+      <div class="form-group" style="margin-left: 1px">
         <code-editor identifier="environment-variables-editor" placeholder="e.g. key=value" value="$ctrl.editorText" yml="false" on-change="($ctrl.editorUpdate)"></code-editor>
       </div>
     </div>

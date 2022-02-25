@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package cli
@@ -15,9 +16,10 @@ const (
 	defaultTLSCertPath         = "/certs/cert.pem"
 	defaultTLSKeyPath          = "/certs/key.pem"
 	defaultHTTPDisabled        = "false"
+	defaultHTTPEnabled         = "false"
 	defaultSSL                 = "false"
 	defaultSSLCertPath         = "/certs/portainer.crt"
 	defaultSSLKeyPath          = "/certs/portainer.key"
-	defaultSnapshotInterval    = "5m"
 	defaultBaseURL             = "/"
+	defaultSecretKeyName       = "portainer"
 )

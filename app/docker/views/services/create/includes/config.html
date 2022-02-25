@@ -1,14 +1,20 @@
-<form class="form-horizontal" style="margin-top: 15px;">
+<form class="form-horizontal" style="margin-top: 15px">
   <div class="form-group">
-    <div class="col-sm-12" style="margin-top: 5px;">
+    <div class="col-sm-12" style="margin-top: 5px">
       <label class="control-label text-left">Configs</label>
-      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addConfig()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> add a config </span>
+      <span class="label label-default interactive" style="margin-left: 10px" ng-click="addConfig()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> add a config </span>
     </div>
-    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-      <div ng-repeat="config in formValues.Configs" style="margin-top: 2px;">
+    <!-- info message -->
+    <div class="form-group" ng-show="formValues.Configs.$invalid" style="margin-bottom: 0px">
+      <div class="col-sm-12 small text-warning" style="padding-left: 35px; padding-top: 20px">
+        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {{ formValues.Configs.$error }}
+      </div>
+    </div>
+    <div class="col-sm-12 form-inline" style="margin-top: 10px">
+      <div ng-repeat="config in formValues.Configs" style="margin-top: 2px">
         <div class="input-group col-sm-4 input-group-sm">
           <span class="input-group-addon">config</span>
-          <select class="form-control" ng-model="config.model" ng-options="config.Name for config in availableConfigs | orderBy: 'Name'">
+          <select class="form-control" ng-model="config.model" ng-change="checkIfConfigDuplicated()" ng-options="config.Name for config in availableConfigs | orderBy: 'Name'">
             <option value="" selected="selected">Select a config</option>
           </select>
         </div>

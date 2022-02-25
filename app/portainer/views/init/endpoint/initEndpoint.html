@@ -16,20 +16,18 @@
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
-                <span class="small text-muted">
-                  Connect Portainer to the container environment you want to manage.
-                </span>
+                <span class="small text-muted"> Connect Portainer to the container environment you want to manage. </span>
               </div>
             </div>
             <!-- !note -->
             <!-- environment-type -->
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group" style="margin-bottom: 0">
               <div class="boxselector_wrapper">
                 <div ng-repeat="type in ctrl.endpointSections">
                   <input type="radio" id="{{ type.Id }}" ng-model="ctrl.formValues.ConnectionType" ng-value="type.Value" />
                   <label for="{{ type.Id }}">
                     <div class="boxselector_header">
-                      <i ng-class="type.Classes" aria-hidden="true" style="margin-right: 2px;"></i>
+                      <i ng-class="type.Classes" aria-hidden="true" style="margin-right: 2px"></i>
                       {{ type.Title }}
                     </div>
                     <p>{{ type.Description }}</p>

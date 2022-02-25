@@ -1,79 +1,85 @@
-angular.module('portainer.azure', ['portainer.app']).config([
-  '$stateRegistryProvider',
-  function ($stateRegistryProvider) {
-    'use strict';
+import angular from 'angular';
 
-    var azure = {
-      name: 'azure',
-      url: '/azure',
-      parent: 'endpoint',
-      abstract: true,
-      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, Notifications, StateManager) {
-        return $async(async () => {
-          if (endpoint.Type !== 3) {
-            $state.go('portainer.home');
-            return;
-          }
-          try {
-            EndpointProvider.setEndpointID(endpoint.Id);
-            EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-            EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-            await StateManager.updateEndpointState(endpoint, []);
-          } catch (e) {
-            Notifications.error('Failed loading environment', e);
-            $state.go('portainer.home', {}, { reload: true });
-          }
-        });
-      },
-    };
+import { DashboardViewAngular } from './Dashboard/DashboardView';
+import { containerInstancesModule } from './ContainerInstances';
 
-    var containerInstances = {
-      name: 'azure.containerinstances',
-      url: '/containerinstances',
-      views: {
-        'content@': {
-          templateUrl: './views/containerinstances/containerinstances.html',
-          controller: 'AzureContainerInstancesController',
+angular
+  .module('portainer.azure', ['portainer.app', containerInstancesModule])
+  .config([
+    '$stateRegistryProvider',
+    function ($stateRegistryProvider) {
+      'use strict';
+
+      var azure = {
+        name: 'azure',
+        url: '/azure',
+        parent: 'endpoint',
+        abstract: true,
+        onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, Notifications, StateManager) {
+          return $async(async () => {
+            if (endpoint.Type !== 3) {
+              $state.go('portainer.home');
+              return;
+            }
+            try {
+              EndpointProvider.setEndpointID(endpoint.Id);
+              EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+              EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
+              await StateManager.updateEndpointState(endpoint, []);
+            } catch (e) {
+              Notifications.error('Failed loading environment', e);
+              $state.go('portainer.home', {}, { reload: true });
+            }
+          });
         },
-      },
-    };
+      };
 
-    var containerInstance = {
-      name: 'azure.containerinstances.container',
-      url: '/:id',
-      views: {
-        'content@': {
-          component: 'containerInstanceDetails',
+      var containerInstances = {
+        name: 'azure.containerinstances',
+        url: '/containerinstances',
+        views: {
+          'content@': {
+            templateUrl: './views/containerinstances/containerinstances.html',
+            controller: 'AzureContainerInstancesController',
+          },
         },
-      },
-    };
+      };
 
-    var containerInstanceCreation = {
-      name: 'azure.containerinstances.new',
-      url: '/new/',
-      views: {
-        'content@': {
-          templateUrl: './views/containerinstances/create/createcontainerinstance.html',
-          controller: 'AzureCreateContainerInstanceController',
+      var containerInstance = {
+        name: 'azure.containerinstances.container',
+        url: '/:id',
+        views: {
+          'content@': {
+            component: 'containerInstanceDetails',
+          },
         },
-      },
-    };
+      };
 
-    var dashboard = {
-      name: 'azure.dashboard',
-      url: '/dashboard',
-      views: {
-        'content@': {
-          templateUrl: './views/dashboard/dashboard.html',
-          controller: 'AzureDashboardController',
+      var containerInstanceCreation = {
+        name: 'azure.containerinstances.new',
+        url: '/new/',
+        views: {
+          'content@': {
+            component: 'createContainerInstanceView',
+          },
         },
-      },
-    };
+      };
 
-    $stateRegistryProvider.register(azure);
-    $stateRegistryProvider.register(containerInstances);
-    $stateRegistryProvider.register(containerInstance);
-    $stateRegistryProvider.register(containerInstanceCreation);
-    $stateRegistryProvider.register(dashboard);
-  },
-]);
+      var dashboard = {
+        name: 'azure.dashboard',
+        url: '/dashboard',
+        views: {
+          'content@': {
+            component: 'dashboardView',
+          },
+        },
+      };
+
+      $stateRegistryProvider.register(azure);
+      $stateRegistryProvider.register(containerInstances);
+      $stateRegistryProvider.register(containerInstance);
+      $stateRegistryProvider.register(containerInstanceCreation);
+      $stateRegistryProvider.register(dashboard);
+    },
+  ])
+  .component('dashboardView', DashboardViewAngular).name;

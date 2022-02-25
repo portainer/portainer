@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
@@ -29,6 +30,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/helm"
+	"github.com/portainer/portainer/api/http/handler/hostmanagement/fdo"
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
@@ -75,11 +77,11 @@ type Server struct {
 	SignatureService            portainer.DigitalSignatureService
 	SnapshotService             portainer.SnapshotService
 	FileService                 portainer.FileService
-	DataStore                   portainer.DataStore
+	DataStore                   dataservices.DataStore
 	GitService                  portainer.GitService
 	OpenAMTService              portainer.OpenAMTService
 	APIKeyService               apikey.APIKeyService
-	JWTService                  portainer.JWTService
+	JWTService                  dataservices.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
 	SwarmStackManager           portainer.SwarmStackManager
@@ -96,7 +98,7 @@ type Server struct {
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               stackdeployer.StackDeployer
-	BaseURL string
+	BaseURL                     string
 }
 
 // Start starts the HTTP server
@@ -208,14 +210,12 @@ func (server *Server) Start() error {
 	var sslHandler = sslhandler.NewHandler(requestBouncer)
 	sslHandler.SSLService = server.SSLService
 
-	openAMTHandler, err := openamt.NewHandler(requestBouncer, server.DataStore)
-	if err != nil {
-		return err
-	}
-	if openAMTHandler != nil {
-		openAMTHandler.OpenAMTService = server.OpenAMTService
-		openAMTHandler.DataStore = server.DataStore
-	}
+	openAMTHandler := openamt.NewHandler(requestBouncer)
+	openAMTHandler.OpenAMTService = server.OpenAMTService
+	openAMTHandler.DataStore = server.DataStore
+	openAMTHandler.DockerClientFactory = server.DockerClientFactory
+
+	fdoHandler := fdo.NewHandler(requestBouncer, server.DataStore, server.FileService)
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
@@ -283,6 +283,7 @@ func (server *Server) Start() error {
 		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
 		OpenAMTHandler:         openAMTHandler,
+		FDOHandler:             fdoHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,

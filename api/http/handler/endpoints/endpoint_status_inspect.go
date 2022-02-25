@@ -11,7 +11,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type stackStatusResponse struct {
@@ -70,7 +69,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
@@ -104,6 +103,15 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		}
 	}
 
+	if endpoint.EdgeCheckinInterval == 0 {
+		settings, err := handler.DataStore.Settings().Settings()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+		}
+
+		endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
+	}
+
 	endpoint.LastCheckInDate = time.Now().Unix()
 
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
@@ -111,17 +119,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist environment changes inside the database", err}
 	}
 
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
-	}
-
 	tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
-
-	checkinInterval := settings.EdgeAgentCheckinInterval
-	if endpoint.EdgeCheckinInterval != 0 {
-		checkinInterval = endpoint.EdgeCheckinInterval
-	}
 
 	schedules := []edgeJobResponse{}
 	for _, job := range tunnel.Jobs {
@@ -147,7 +145,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		Status:          tunnel.Status,
 		Port:            tunnel.Port,
 		Schedules:       schedules,
-		CheckinInterval: checkinInterval,
+		CheckinInterval: endpoint.EdgeCheckinInterval,
 		Credentials:     tunnel.Credentials,
 	}
 

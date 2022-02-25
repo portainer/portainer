@@ -11,27 +11,27 @@ import (
 	"github.com/portainer/libhelm/options"
 	"github.com/portainer/libhelm/release"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/portainer/portainer/api/bolt"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 )
 
 func Test_helmList(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
-	err := store.Endpoint().CreateEndpoint(&portainer.Endpoint{ID: 1})
-	is.NoError(err, "error creating environment")
+	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})
+	assert.NoError(t, err, "error creating environment")
 
-	err = store.User().CreateUser(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
-	is.NoError(err, "error creating a user")
+	err = store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
+	assert.NoError(t, err, "error creating a user")
 
 	jwtService, err := jwt.NewService("1h", store)
 	is.NoError(err, "Error initialising jwt service")

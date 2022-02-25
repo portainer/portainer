@@ -9,7 +9,6 @@ class KubernetesDashboardController {
     $async,
     Notifications,
     EndpointService,
-    EndpointProvider,
     KubernetesResourcePoolService,
     KubernetesApplicationService,
     KubernetesConfigurationService,
@@ -20,7 +19,6 @@ class KubernetesDashboardController {
     this.$async = $async;
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
-    this.EndpointProvider = EndpointProvider;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
@@ -37,16 +35,13 @@ class KubernetesDashboardController {
     const isAdmin = this.Authentication.isAdmin();
 
     try {
-      const endpointId = this.EndpointProvider.endpointID();
-      const [endpoint, pools, applications, configurations, volumes, tags] = await Promise.all([
-        this.EndpointService.endpoint(endpointId),
+      const [pools, applications, configurations, volumes, tags] = await Promise.all([
         this.KubernetesResourcePoolService.get(),
         this.KubernetesApplicationService.get(),
         this.KubernetesConfigurationService.get(),
         this.KubernetesVolumeService.get(),
         this.TagService.tags(),
       ]);
-      this.endpoint = endpoint;
       this.applications = applications;
       this.volumes = volumes;
 

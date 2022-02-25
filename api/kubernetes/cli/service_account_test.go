@@ -67,7 +67,7 @@ func Test_GetServiceAccount(t *testing.T) {
 			ID:   1,
 			Role: portainer.StandardUserRole,
 		}
-		serviceAccountName := userServiceAccountName(int(tokenData.ID), k.instanceID)
+		serviceAccountName := UserServiceAccountName(int(tokenData.ID), k.instanceID)
 		serviceAccount := &v1.ServiceAccount{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: serviceAccountName,

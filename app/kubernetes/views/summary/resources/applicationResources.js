@@ -4,7 +4,7 @@ import { KubernetesApplicationFormValues } from 'Kubernetes/models/application/f
 import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
 import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
-import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+import { KubernetesService, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import {
   KubernetesApplication,
   KubernetesApplicationDeploymentTypes,
@@ -40,7 +40,17 @@ export default function (formValues, oldFormValues = {}) {
 function getCreatedApplicationResources(formValues) {
   const resources = [];
 
-  let [app, headlessService, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
+  let [app, headlessService, services, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
+
+  if (services) {
+    services.forEach((service) => {
+      resources.push({ action: CREATE, kind: KubernetesResourceTypes.SERVICE, name: service.Name, type: service.Type || KubernetesServiceTypes.CLUSTER_IP });
+      if (formValues.OriginalIngresses.length !== 0) {
+        const ingresses = KubernetesIngressConverter.newApplicationFormValuesToIngresses(formValues, service.Name, service.Ports);
+        resources.push(...getIngressUpdateSummary(formValues.OriginalIngresses, ingresses));
+      }
+    });
+  }
 
   if (service) {
     // Service
@@ -87,16 +97,15 @@ function getCreatedApplicationResources(formValues) {
 function getUpdatedApplicationResources(oldFormValues, newFormValues) {
   const resources = [];
 
-  const [oldApp, oldHeadlessService, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
-  const [newApp, newHeadlessService, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
-
+  const [oldApp, oldHeadlessService, oldServices, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
+  const [newApp, newHeadlessService, newServices, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
   const oldAppResourceType = getApplicationResourceType(oldApp);
   const newAppResourceType = getApplicationResourceType(newApp);
 
   if (oldAppResourceType !== newAppResourceType) {
     // Deployment
     resources.push({ action: DELETE, kind: oldAppResourceType, name: oldApp.Name });
-    if (oldService) {
+    if (oldService && oldServices) {
       // Service
       resources.push({ action: DELETE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP });
     }
@@ -129,11 +138,13 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
   // Deployment
   resources.push({ action: UPDATE, kind: oldAppResourceType, name: oldApp.Name });
 
-  if (oldService && newService) {
+  if (oldServices && newServices) {
     // Service
-    const serviceUpdateResourceSummary = getServiceUpdateResourceSummary(oldService, newService);
-    if (serviceUpdateResourceSummary) {
-      resources.push(serviceUpdateResourceSummary);
+    const serviceUpdateResourceSummary = getServiceUpdateResourceSummary(oldServices, newServices);
+    if (serviceUpdateResourceSummary !== null) {
+      serviceUpdateResourceSummary.forEach((updateSummary) => {
+        resources.push(updateSummary);
+      });
     }
 
     if (newFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS || oldFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
@@ -224,10 +235,41 @@ function getVolumeClaimUpdateResourceSummary(oldPVC, newPVC) {
 }
 
 // getServiceUpdateResourceSummary replicates KubernetesServiceService.patch
-function getServiceUpdateResourceSummary(oldService, newService) {
-  const payload = KubernetesServiceConverter.patchPayload(oldService, newService);
-  if (payload.length) {
-    return { action: UPDATE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP };
+function getServiceUpdateResourceSummary(oldServices, newServices) {
+  let summary = [];
+  newServices.forEach((newService) => {
+    const oldServiceMatched = _.find(oldServices, { Name: newService.Name });
+    if (oldServiceMatched) {
+      const payload = KubernetesServiceConverter.patchPayload(oldServiceMatched, newService);
+      if (payload.length) {
+        const serviceUpdate = {
+          action: UPDATE,
+          kind: KubernetesResourceTypes.SERVICE,
+          name: oldServiceMatched.Name,
+          type: oldServiceMatched.Type || KubernetesServiceTypes.CLUSTER_IP,
+        };
+        summary.push(serviceUpdate);
+      }
+    } else {
+      const emptyService = new KubernetesService();
+      const payload = KubernetesServiceConverter.patchPayload(emptyService, newService);
+      if (payload.length) {
+        const serviceCreate = { action: CREATE, kind: KubernetesResourceTypes.SERVICE, name: newService.Name, type: newService.Type || KubernetesServiceTypes.CLUSTER_IP };
+        summary.push(serviceCreate);
+      }
+    }
+  });
+
+  oldServices.forEach((oldService) => {
+    const newServiceMatched = _.find(newServices, { Name: oldService.Name });
+    if (!newServiceMatched) {
+      const serviceDelete = { action: DELETE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP };
+      summary.push(serviceDelete);
+    }
+  });
+
+  if (summary.length !== 0) {
+    return summary;
   }
   return null;
 }

@@ -17,7 +17,7 @@ const (
 	portainerShellPodPrefix                 = "portainer-pod-kubectl-shell"
 )
 
-func userServiceAccountName(userID int, instanceID string) string {
+func UserServiceAccountName(userID int, instanceID string) string {
 	return fmt.Sprintf("%s-%s-%d", portainerUserServiceAccountPrefix, instanceID, userID)
 }
 

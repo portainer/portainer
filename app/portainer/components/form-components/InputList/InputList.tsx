@@ -4,14 +4,18 @@ import clsx from 'clsx';
 import { AddButton, Button } from '@/portainer/components/Button';
 import { Tooltip } from '@/portainer/components/Tip/Tooltip';
 
-import { TextInput } from '../Input';
+import { Input } from '../Input';
+import { FormError } from '../FormError';
 
 import styles from './InputList.module.css';
 import { arrayMove } from './utils';
 
-interface ItemProps<T> {
+export type InputListError<T> = Record<keyof T, string>;
+
+export interface ItemProps<T> {
   item: T;
   onChange(value: T): void;
+  error?: InputListError<T>;
 }
 type Key = string | number;
 type ChangeType = 'delete' | 'create' | 'update';
@@ -38,18 +42,20 @@ interface Props<T> {
   addLabel?: string;
   itemKeyGetter?(item: T, index: number): Key;
   movable?: boolean;
+  errors?: InputListError<T>[] | string;
 }
 
 export function InputList<T = DefaultType>({
   label,
   value,
   onChange,
-  itemBuilder = (defaultItemBuilder as unknown) as () => T,
-  item = (DefaultItem as unknown) as ComponentType<ItemProps<T>>,
+  itemBuilder = defaultItemBuilder as unknown as () => T,
+  item = DefaultItem as unknown as ComponentType<ItemProps<T>>,
   tooltip,
   addLabel = 'Add item',
   itemKeyGetter = (item: T, index: number) => index,
   movable,
+  errors,
 }: Props<T>) {
   const Item = item;
 
@@ -70,12 +76,17 @@ export function InputList<T = DefaultType>({
       <div className={clsx('col-sm-12 form-inline', styles.items)}>
         {value.map((item, index) => {
           const key = itemKeyGetter(item, index);
+          const error = typeof errors === 'object' ? errors[index] : undefined;
 
           return (
-            <div key={key} className={clsx(styles.itemLine)}>
+            <div
+              key={key}
+              className={clsx(styles.itemLine, { [styles.hasError]: !!error })}
+            >
               <Item
                 item={item}
                 onChange={(value: T) => handleChangeItem(key, value)}
+                error={error}
               />
               <div className={styles.itemActions}>
                 {movable && (
@@ -172,12 +183,15 @@ function defaultItemBuilder(): DefaultType {
   return { value: '' };
 }
 
-function DefaultItem({ item, onChange }: ItemProps<DefaultType>) {
+function DefaultItem({ item, onChange, error }: ItemProps<DefaultType>) {
   return (
-    <TextInput
-      value={item.value}
-      onChange={(value: string) => onChange({ value })}
-      className={styles.defaultItem}
-    />
+    <>
+      <Input
+        value={item.value}
+        onChange={(e) => onChange({ value: e.target.value })}
+        className={styles.defaultItem}
+      />
+      <FormError>{error}</FormError>
+    </>
   );
 }
