@@ -167,6 +167,10 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 		logrus.
 			WithField("chain Subject", chainCaCert.Subject.String()).
 			WithField("tls DNSNames", chainCaCert.DNSNames).
+			WithField("Agent Addr", r.RemoteAddr).
+			WithField("Agent Version", r.Header.Get(portainer.HTTPAgentVersionHeaderName)).
+			WithField("Agent PID", r.Header.Get(portainer.HTTPAgentPIDName)).
+			WithField("Agent EdgeID", r.Header.Get(portainer.PortainerAgentEdgeIDHeader)).
 			Debugf("TLS client chain")
 
 		opts := x509.VerifyOptions{

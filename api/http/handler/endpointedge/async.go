@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
+	version "github.com/hashicorp/go-version"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -48,8 +50,8 @@ type Snapshot struct {
 	Kubernetes *portainer.KubernetesSnapshot
 }
 type AsyncRequest struct {
-	CommandId   string   `json: optional`
-	Snapshot    Snapshot `json: optional` // todo
+	CommandId   string    `json: optional`
+	Snapshot    *Snapshot `json: optional` // todo
 	StackStatus map[portainer.EdgeStackID]updateStatusPayload
 }
 
@@ -67,7 +69,11 @@ type AsyncResponse struct {
 	ServerCommandId      string      // should be easy to detect if its larger / smaller:  this is the response that tells the agent there are new commands waiting for it
 	SendDiffSnapshotTime time.Time   `json: optional` // might be optional
 	Commands             []JSONPatch `json: optional` // todo
+	Status               string      // give the agent some idea if the server thinks its OK, or if it should STOP
 }
+
+// Yup, this should be environment specific, and not global
+var lastcheckinStatusMutex sync.Mutex
 
 // for testing with mTLS..:
 //sven@p1:~/src/portainer/portainer$ curl -k --cacert ~/.config/portainer/certs/ca.pem --cert ~/.config/portainer/certs/agent-cert.pem --key ~/.config/portainer/certs/agent-key.pem -X POST --header "X-PortainerAgent-EdgeID: 7e2b0143-c511-43c3-844c-a7a91ab0bedc" --data '{"CommandId": "okok", "Snapshot": {}}'  https://p1:9443/api/endpoints/edge/async/
@@ -102,7 +108,7 @@ func (handler *Handler) endpointAsync(w http.ResponseWriter, r *http.Request) *h
 		// TODO: if its a valid cert, or the user hasn't limited to mTLS / portainer set id, the
 		// create new untrusted environment
 		// portainer.HTTPResponseAgentPlatform tells us what platform it is too...
-		logrus.WithField("portainer.PortainerAgentEdgeIDHeader", edgeIdentifier).Debug("edge id not found in existing endpoints!")
+		logrus.WithField("portainer.PortainerAgentEdgeIDHeader", edgeIdentifier).WithField("Agent Addr", r.RemoteAddr).Debug("edge id not found in existing endpoints!")
 	}
 	// if agent mTLS is on, drop the connection if the client cert isn't CA'd (or if its revoked)
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
@@ -110,25 +116,112 @@ func (handler *Handler) endpointAsync(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
+	// TODO: an assumption that needs testing, is that using the right EdgeId means we're also talking to the same DOckerd / Kube cluster.
+	//       I suspect that without getting the Dockerd UUID, or the "by convention" kube uuid, we can't know if someone's re-used info which then would cause some kind of state flapping.
+	//		Don't ask me what happens in non-async mode if you have more than one agent running - surely that would make the tunnel go boom?
+	requestLogger := logrus.
+		WithField("Agent Addr", r.RemoteAddr).
+		WithField("Agent Version", r.Header.Get(portainer.HTTPAgentVersionHeaderName)).
+		WithField("Agent PID", r.Header.Get(portainer.HTTPAgentPIDName)).
+		WithField("Agent EdgeID", r.Header.Get(portainer.PortainerAgentEdgeIDHeader)) //.
+		//WithField("Agent UniqueID", r.Header.Get(portainer.HTTPAgentUUIDHeaderName))
+
 	// Any request we can identify as coming from a valid agent is treated as a Ping
 	endpoint.LastCheckInDate = time.Now().Unix()
 	endpoint.Status = portainer.EndpointStatusUp
+
+	// TODO: update endpoint contact time
+	lastcheckinStatusMutex.Lock()
+	if endpoint.AgentHistory == nil {
+		endpoint.AgentHistory = make(map[string]portainer.AgentInfo)
+	}
+	info, ok := endpoint.AgentHistory[r.RemoteAddr]
+	if !ok {
+		info = portainer.AgentInfo{
+			LastCheckInDate: endpoint.LastCheckInDate,
+			Version:         r.Header.Get(portainer.HTTPAgentVersionHeaderName),
+			RemoteAddr:      r.RemoteAddr,
+			Status:          "OK",
+		}
+	}
+	info.CheckInCount = info.CheckInCount + 1
+	info.Status = "OK"
+	info.LastCheckInDate = endpoint.LastCheckInDate
+	requestLogger.Debugf("Checkin count = %d", info.CheckInCount)
+
+	endpoint.AgentHistory[r.RemoteAddr] = info
+
+	// Determine if there's more than one active agent, and if so, tell them to STOP
+	okCount := 0
+	infoVersion, _ := version.NewVersion(info.Version)
+	for key, val := range endpoint.AgentHistory {
+		timeToLastCheckIn := time.Second * time.Duration(endpoint.LastCheckInDate-val.LastCheckInDate)
+		// Timeout for last best agent (currently based on version number)
+		if timeToLastCheckIn > time.Second*time.Duration(endpoint.EdgeCheckinInterval*100) {
+			delete(endpoint.AgentHistory, key)
+			continue
+		}
+		if timeToLastCheckIn > time.Second*time.Duration(endpoint.EdgeCheckinInterval*10) {
+			val.Status = "GONE"
+			endpoint.AgentHistory[key] = val
+			continue
+		}
+		if timeToLastCheckIn > time.Second*time.Duration(endpoint.EdgeCheckinInterval*2) {
+			val.Status = "TROUBLED"
+			endpoint.AgentHistory[key] = val
+			continue
+		}
+		if val.Status == "OK" {
+			// if there's a info.Version difference, choose the more up to date agent...
+			valVersion, _ := version.NewVersion(val.Version)
+			if infoVersion.GreaterThan(valVersion) {
+				val.Status = "STOP VERSION - " + info.Version
+				endpoint.AgentHistory[val.RemoteAddr] = val
+				continue
+			}
+			if valVersion.GreaterThan(infoVersion) {
+				info.Status = "STOP VERSION - " + val.Version
+				endpoint.AgentHistory[info.RemoteAddr] = info
+				info = val
+				continue
+			}
+
+			// TODO: UX question - trade off between user expectation on upgrade, vs stability at staeday state.
+			// if we have two or more otherwise just as good agents, pick the newer one, on the presumption that it was started on purpose
+			// the risk with this is the flapping you get if you gave two identical agents with --restart always - so maybe it should get tuned
+			// for eg, only use the younger one if the user has initiated an upgrade? otherwise prefer the old?
+			if val.CheckInCount < info.CheckInCount {
+				info.Status = "STOP AGE"
+				endpoint.AgentHistory[info.RemoteAddr] = info
+				info = val
+				continue
+			}
+			okCount++
+		}
+	}
+
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist environment changes inside the database", err}
 	}
-
-	// TODO: update endpoint contact time
+	lastcheckinStatusMutex.Unlock()
 
 	var payload AsyncRequest
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		// an "" request ~~ same as {}
-		logrus.WithError(err).WithField("payload", r).Debug("decode payload")
+		requestLogger.WithError(err).WithField("payload", r).Debug("decode payload")
 	}
+
+	//if endpoint.AgentHistory[r.RemoteAddr].Status != "OK" {
+	// okCount of zero can happen - basically, we havn't timed out a newer agent's last contact, and so we're hoping it will come back, so we refuse the old version
+	// we could instead allow this, cos in some circumstances, it may be better to have more than one agent giving the user control
+	requestLogger.Debugf("Checkin STATUS = %s (okCount = %d)", endpoint.AgentHistory[r.RemoteAddr].Status, okCount)
+	//}
 
 	asyncResponse := AsyncResponse{
 		ServerCommandId: "8888", // the most current id of a new command on the server
+		Status:          endpoint.AgentHistory[r.RemoteAddr].Status,
 	}
 
 	// TODO: need a way to detect that these are changed, and send them to the agent...
@@ -142,17 +235,17 @@ func (handler *Handler) endpointAsync(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if payload.Snapshot != nil {
-		asyncResponse.SendDiffSnapshotTime = handler.saveSnapshot(endpoint, payload)
+		asyncResponse.SendDiffSnapshotTime = handler.saveSnapshot(requestLogger, endpoint, payload)
 	}
 	if payload.CommandId != "" {
-		asyncResponse.Commands = handler.sendCommandsSince(endpoint, payload.CommandId)
+		asyncResponse.Commands = handler.sendCommandsSince(requestLogger, endpoint, payload.CommandId)
 	}
 
 	return response.JSON(w, asyncResponse)
 }
 
 // TODO: yup, next step is for these to be JSONDiff's and to be rehydrated
-func (handler *Handler) saveSnapshot(endpoint *portainer.Endpoint, payload AsyncRequest) time.Time {
+func (handler *Handler) saveSnapshot(requestLogger *logrus.Entry, endpoint *portainer.Endpoint, payload AsyncRequest) time.Time {
 	for stackID, status := range payload.StackStatus {
 		stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
 		// TODO: work out what we can do with the errors
@@ -170,11 +263,11 @@ func (handler *Handler) saveSnapshot(endpoint *portainer.Endpoint, payload Async
 	// case portainer.AzureEnvironment:
 	// 	return time.Now()
 	case portainer.KubernetesLocalEnvironment, portainer.AgentOnKubernetesEnvironment, portainer.EdgeAgentOnKubernetesEnvironment:
-		logrus.Debug("Got a Kubernetes Snapshot")
+		requestLogger.Debug("Got a Kubernetes Snapshot")
 		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{*payload.Snapshot.Kubernetes}
 		return time.Unix(payload.Snapshot.Kubernetes.Time, 0)
 	case portainer.DockerEnvironment, portainer.AgentOnDockerEnvironment, portainer.EdgeAgentOnDockerEnvironment:
-		logrus.Debug("Got a Docker Snapshot")
+		requestLogger.Debug("Got a Docker Snapshot")
 		endpoint.Snapshots = []portainer.DockerSnapshot{*payload.Snapshot.Docker}
 		return time.Unix(payload.Snapshot.Docker.Time, 0)
 	default:
@@ -182,12 +275,12 @@ func (handler *Handler) saveSnapshot(endpoint *portainer.Endpoint, payload Async
 	}
 }
 
-func (handler *Handler) sendCommandsSince(endpoint *portainer.Endpoint, commandId string) []JSONPatch {
+func (handler *Handler) sendCommandsSince(requestLogger *logrus.Entry, endpoint *portainer.Endpoint, commandId string) []JSONPatch {
 	var commandList []JSONPatch
 
 	// TODO: later, figure out if it is scalable to do diff's, as it means the server needs to store what it sent to all million agents (if the database had time based versioning, this would be trivial...)
 	//       I suspect the easiest thing will be to add a "modified timestamp" to edge stacks and edge jobs, and to send them only when the modified time > requested time
-	logrus.WithField("endpoint", endpoint.Name).WithField("from command", commandId).Debug("Sending commands")
+	requestLogger.WithField("endpoint", endpoint.Name).WithField("from command", commandId).Debug("Sending commands")
 
 	// schedules := []edgeJobResponse{}
 	tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
@@ -202,7 +295,7 @@ func (handler *Handler) sendCommandsSince(endpoint *portainer.Endpoint, commandI
 		file, err := handler.FileService.GetFileContent("/", job.ScriptPath)
 		if err != nil {
 			// TODO: this should maybe just skip thi job?
-			logrus.WithError(err).Error("Unable to retrieve Edge job script file")
+			requestLogger.WithError(err).Error("Unable to retrieve Edge job script file")
 			continue
 		}
 
@@ -217,7 +310,7 @@ func (handler *Handler) sendCommandsSince(endpoint *portainer.Endpoint, commandI
 
 	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
 	if err != nil {
-		logrus.WithError(err).Error("Unable to retrieve relation object from the database")
+		requestLogger.WithError(err).Error("Unable to retrieve relation object from the database")
 		return commandList
 	}
 
@@ -232,23 +325,23 @@ func (handler *Handler) sendCommandsSince(endpoint *portainer.Endpoint, commandI
 	for stackID := range relation.EdgeStacks {
 		stack, err := handler.DataStore.EdgeStack().EdgeStack(stackID)
 		if err != nil {
-			logrus.WithError(err).Error("Unable to retrieve edge stack from the database")
+			requestLogger.WithError(err).Error("Unable to retrieve edge stack from the database")
 			continue
 		}
 
 		edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
 		if handler.DataStore.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Error("Unable to find an edge stack with the specified identifier inside the database")
+			requestLogger.WithError(err).Error("Unable to find an edge stack with the specified identifier inside the database")
 			continue
 		} else if err != nil {
-			logrus.WithError(err).Error("Unable to find an edge stack with the specified identifier inside the database")
+			requestLogger.WithError(err).Error("Unable to find an edge stack with the specified identifier inside the database")
 			continue
 		}
 
 		fileName := edgeStack.EntryPoint
 		if endpointutils.IsDockerEndpoint(endpoint) {
 			if fileName == "" {
-				logrus.Error("Docker is not supported by this stack")
+				requestLogger.Error("Docker is not supported by this stack")
 				continue
 			}
 		}
@@ -257,14 +350,14 @@ func (handler *Handler) sendCommandsSince(endpoint *portainer.Endpoint, commandI
 			fileName = edgeStack.ManifestPath
 
 			if fileName == "" {
-				logrus.Error("Kubernetes is not supported by this stack")
+				requestLogger.Error("Kubernetes is not supported by this stack")
 				continue
 			}
 		}
 
 		stackFileContent, err := handler.FileService.GetFileContent(edgeStack.ProjectPath, fileName)
 		if err != nil {
-			logrus.WithError(err).Error("Unable to retrieve Compose file from disk")
+			requestLogger.WithError(err).Error("Unable to retrieve Compose file from disk")
 			continue
 		}
 

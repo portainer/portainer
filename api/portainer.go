@@ -344,6 +344,17 @@ type (
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
+
+		AgentHistory map[string]AgentInfo
+	}
+
+	AgentInfo struct {
+		LastCheckInDate int64
+		CheckInCount    int64
+		Version         string
+		RemoteAddr      string
+		Status          string
+		//UniqueId        string
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
@@ -1366,6 +1377,10 @@ const (
 	PortainerAgentKubernetesSATokenHeader = "X-PortainerAgent-SA-Token"
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
+	HTTPAgentVersionHeaderName = "X-Portainer-Agent-Version"
+	HTTPAgentPIDName           = "X-Portainer-Process-Id"
+	HTTPAgentUUIDHeaderName    = "X-Portainer-Agent-UUID"
+
 	PortainerAgentSignatureMessage = "Portainer-App"
 	// DefaultSnapshotInterval represents the default interval between each environment snapshot job
 	DefaultSnapshotInterval = "5m"

@@ -24,6 +24,7 @@ require (
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.2
+	github.com/hashicorp/go-version v1.4.0
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/joho/godotenv v1.3.0
 	github.com/jpillora/chisel v0.0.0-20190724232113-f3a8df20e389
