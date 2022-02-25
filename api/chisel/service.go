@@ -3,11 +3,13 @@ package chisel
 import (
 	"context"
 	"fmt"
-	"github.com/portainer/portainer/api/http/proxy"
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
+
+	"github.com/portainer/portainer/api/http/proxy"
 
 	"github.com/dchest/uniuri"
 	chserver "github.com/jpillora/chisel/server"
@@ -34,6 +36,7 @@ type Service struct {
 	chiselServer      *chserver.Server
 	shutdownCtx       context.Context
 	ProxyManager      *proxy.Manager
+	mu                sync.Mutex
 }
 
 // NewService returns a pointer to a new instance of Service
@@ -58,11 +61,7 @@ func (service *Service) pingAgent(endpointID portainer.EndpointID) error {
 		Timeout: 3 * time.Second,
 	}
 	_, err = httpClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // KeepTunnelAlive keeps the tunnel of the given environment for maxAlive duration, or until ctx is done
@@ -185,6 +184,8 @@ func (service *Service) startTunnelVerificationLoop() {
 }
 
 func (service *Service) checkTunnels() {
+	service.mu.Lock()
+
 	for item := range service.tunnelDetailsMap.IterBuffered() {
 		tunnel := item.Val.(*portainer.TunnelDetails)
 
@@ -223,8 +224,10 @@ func (service *Service) checkTunnels() {
 			continue
 		}
 
-		service.SetTunnelStatusToIdle(portainer.EndpointID(endpointID))
+		service.setTunnelStatusToIdle(portainer.EndpointID(endpointID))
 	}
+
+	service.mu.Unlock()
 }
 
 func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tunnelPort int) error {
