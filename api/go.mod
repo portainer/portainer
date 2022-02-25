@@ -30,7 +30,7 @@ require (
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
 	github.com/pkg/errors v0.9.1
-	github.com/portainer/docker-compose-wrapper v0.0.0-20220113045708-6569596db840
+	github.com/portainer/docker-compose-wrapper v0.0.0-20220225003350-cec58db3549e
 	github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a
 	github.com/portainer/libhelm v0.0.0-20210929000907-825e93d62108
 	github.com/portainer/libhttp v0.0.0-20211208103139-07a5f798eb3f
@@ -58,7 +58,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.1 // indirect
 	github.com/aws/smithy-go v1.9.0 // indirect
 	github.com/containerd/containerd v1.5.7 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/davecgh/go-spew v1.1.1
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
