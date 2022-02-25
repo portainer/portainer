@@ -24,8 +24,7 @@ const (
 func (service *Service) getUnusedPort() int {
 	port := randomInt(minAvailablePort, maxAvailablePort)
 
-	for item := range service.tunnelDetailsMap.IterBuffered() {
-		tunnel := item.Val.(*portainer.TunnelDetails)
+	for _, tunnel := range service.tunnelDetailsMap {
 		if tunnel.Port == port {
 			return service.getUnusedPort()
 		}
@@ -42,17 +41,17 @@ func randomInt(min, max int) int {
 func (service *Service) getTunnelDetails(endpointID portainer.EndpointID) *portainer.TunnelDetails {
 	key := strconv.Itoa(int(endpointID))
 
-	if item, ok := service.tunnelDetailsMap.Get(key); ok {
-		return item.(*portainer.TunnelDetails)
+	if tunnel, ok := service.tunnelDetailsMap[key]; ok {
+		return tunnel
 	}
 
-	tunnelDetails := &portainer.TunnelDetails{
+	tunnel := &portainer.TunnelDetails{
 		Status: portainer.EdgeAgentIdle,
 	}
 
-	service.tunnelDetailsMap.Set(key, tunnelDetails)
+	service.tunnelDetailsMap[key] = tunnel
 
-	return tunnelDetails
+	return tunnel
 }
 
 // GetTunnelDetails returns information about the tunnel associated to an environment(endpoint).

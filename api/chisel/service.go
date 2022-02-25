@@ -13,7 +13,6 @@ import (
 
 	"github.com/dchest/uniuri"
 	chserver "github.com/jpillora/chisel/server"
-	cmap "github.com/orcaman/concurrent-map"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 )
@@ -30,7 +29,7 @@ const (
 type Service struct {
 	serverFingerprint string
 	serverPort        string
-	tunnelDetailsMap  cmap.ConcurrentMap
+	tunnelDetailsMap  map[string]*portainer.TunnelDetails
 	dataStore         dataservices.DataStore
 	snapshotService   portainer.SnapshotService
 	chiselServer      *chserver.Server
@@ -42,7 +41,7 @@ type Service struct {
 // NewService returns a pointer to a new instance of Service
 func NewService(dataStore dataservices.DataStore, shutdownCtx context.Context) *Service {
 	return &Service{
-		tunnelDetailsMap: cmap.New(),
+		tunnelDetailsMap: make(map[string]*portainer.TunnelDetails),
 		dataStore:        dataStore,
 		shutdownCtx:      shutdownCtx,
 	}
@@ -186,41 +185,39 @@ func (service *Service) startTunnelVerificationLoop() {
 func (service *Service) checkTunnels() {
 	service.mu.Lock()
 
-	for item := range service.tunnelDetailsMap.IterBuffered() {
-		tunnel := item.Val.(*portainer.TunnelDetails)
-
+	for key, tunnel := range service.tunnelDetailsMap {
 		if tunnel.LastActivity.IsZero() || tunnel.Status == portainer.EdgeAgentIdle {
 			continue
 		}
 
 		elapsed := time.Since(tunnel.LastActivity)
-		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: environment tunnel monitoring]", item.Key, tunnel.Status, elapsed.Seconds())
+		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: environment tunnel monitoring]", key, tunnel.Status, elapsed.Seconds())
 
 		if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() < requiredTimeout.Seconds() {
 			continue
 		} else if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() > requiredTimeout.Seconds() {
-			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: REQUIRED state timeout exceeded]", item.Key, tunnel.Status, elapsed.Seconds(), requiredTimeout.Seconds())
+			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: REQUIRED state timeout exceeded]", key, tunnel.Status, elapsed.Seconds(), requiredTimeout.Seconds())
 		}
 
 		if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() < activeTimeout.Seconds() {
 			continue
 		} else if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() > activeTimeout.Seconds() {
-			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded]", item.Key, tunnel.Status, elapsed.Seconds(), activeTimeout.Seconds())
+			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded]", key, tunnel.Status, elapsed.Seconds(), activeTimeout.Seconds())
 
-			endpointID, err := strconv.Atoi(item.Key)
+			endpointID, err := strconv.Atoi(key)
 			if err != nil {
-				log.Printf("[ERROR] [chisel,snapshot,conversion] Invalid environment identifier (id: %s): %s", item.Key, err)
+				log.Printf("[ERROR] [chisel,snapshot,conversion] Invalid environment identifier (id: %s): %s", key, err)
 			}
 
 			err = service.snapshotEnvironment(portainer.EndpointID(endpointID), tunnel.Port)
 			if err != nil {
-				log.Printf("[ERROR] [snapshot] Unable to snapshot Edge environment (id: %s): %s", item.Key, err)
+				log.Printf("[ERROR] [snapshot] Unable to snapshot Edge environment (id: %s): %s", key, err)
 			}
 		}
 
-		endpointID, err := strconv.Atoi(item.Key)
+		endpointID, err := strconv.Atoi(key)
 		if err != nil {
-			log.Printf("[ERROR] [chisel,conversion] Invalid environment identifier (id: %s): %s", item.Key, err)
+			log.Printf("[ERROR] [chisel,conversion] Invalid environment identifier (id: %s): %s", key, err)
 			continue
 		}
 

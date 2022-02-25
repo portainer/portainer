@@ -30,19 +30,17 @@ func (service *Service) AddEdgeJob(endpointID portainer.EndpointID, edgeJob *por
 func (service *Service) RemoveEdgeJob(edgeJobID portainer.EdgeJobID) {
 	service.mu.Lock()
 
-	for item := range service.tunnelDetailsMap.IterBuffered() {
-		tunnelDetails := item.Val.(*portainer.TunnelDetails)
-
+	for _, tunnel := range service.tunnelDetailsMap {
 		// Filter in-place
 		n := 0
-		for _, edgeJob := range tunnelDetails.Jobs {
+		for _, edgeJob := range tunnel.Jobs {
 			if edgeJob.ID != edgeJobID {
-				tunnelDetails.Jobs[n] = edgeJob
+				tunnel.Jobs[n] = edgeJob
 				n++
 			}
 		}
 
-		tunnelDetails.Jobs = tunnelDetails.Jobs[:n]
+		tunnel.Jobs = tunnel.Jobs[:n]
 	}
 
 	service.mu.Unlock()
