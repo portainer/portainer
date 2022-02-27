@@ -1,7 +1,11 @@
+{{#if addStyles}}
+import styles from './{{pascalCase name}}.module.css';
+
+{{/if}}
 interface Props {
 
 }
 
 export function {{pascalCase name}}({}: Props) {
-  return <div>{{name}}</div>
+  return <div{{#if addStyles}} className={styles.root}{{/if}}>{{name}}</div>
 }

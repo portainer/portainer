@@ -5,9 +5,15 @@ module.exports = () => ({
       name: 'name',
       message: 'component name please',
     },
+    {
+      type: 'confirm',
+      name: 'addStyles',
+      default: false,
+      when: false,
+    },
   ], // array of inquirer prompts
-  actions: () => {
-    const actions = [
+  actions: ({ addStyles }) => {
+    return [
       {
         type: 'add',
         path: `{{cwd}}/{{pascalCase name}}/index.ts`,
@@ -28,8 +34,11 @@ module.exports = () => ({
         path: `{{cwd}}/{{pascalCase name}}/{{pascalCase name}}.stories.tsx`,
         templateFile: './plop/react-component/component.stories.tsx.hbs',
       },
-    ];
-
-    return actions;
-  }, // array of actions
+      addStyles && {
+        type: 'add',
+        path: `{{cwd}}/{{pascalCase name}}/{{pascalCase name}}.module.css`,
+        templateFile: './plop/react-component/component.module.css.hbs',
+      },
+    ].filter(Boolean);
+  },
 });

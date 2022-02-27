@@ -6,7 +6,7 @@ module.exports = function (
   plop
 ) {
   // use of INIT_CWD instead of process.cwd() because yarn changes the cwd
-  const cwd = process.env.INIT_CWD;
+  const cwd = process.env.INIT_CWD || process.cwd();
   plop.addHelper('cwd', () => cwd);
   plop.setGenerator('ng-component', angularComponents(cwd));
   plop.setGenerator('component', reactComponent());
