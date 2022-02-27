@@ -1,14 +1,14 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { type EnvironmentGroupId } from '@/portainer/environment-groups/types';
 import { type TagId } from '@/portainer/tags/types';
+import { UserId } from '@/portainer/users/types';
+import { TeamId } from '@/portainer/teams/types';
 
 import type {
   Environment,
   EnvironmentId,
   EnvironmentType,
   EnvironmentSettings,
-  UserId,
-  TeamId,
 } from '../types';
 
 import { arrayToJson, buildUrl } from './utils';

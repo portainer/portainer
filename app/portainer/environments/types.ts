@@ -1,5 +1,7 @@
 import { TagId } from '@/portainer/tags/types';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { UserId } from '@/portainer/users/types';
+import { TeamId } from '@/portainer/teams/types';
 
 export type EnvironmentId = number;
 
@@ -111,11 +113,9 @@ export interface EnvironmentSettings {
   enableHostManagementFeatures: boolean;
 }
 
-export type UserId = number;
-export type TeamId = number;
 export type RoleId = number;
 interface AccessPolicy {
   RoleId: RoleId;
 }
-export type UserAccessPolicies = Record<UserId, AccessPolicy>; // map[UserID]AccessPolicy
+export type UserAccessPolicies = Record<UserId, AccessPolicy>;
 export type TeamAccessPolicies = Record<TeamId, AccessPolicy>;
