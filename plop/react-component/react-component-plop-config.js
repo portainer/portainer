@@ -8,7 +8,7 @@ module.exports = () => ({
     {
       type: 'confirm',
       name: 'addStyles',
-      default: false,
+      default: true,
       when: false,
     },
     {
