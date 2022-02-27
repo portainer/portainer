@@ -1,3 +1,7 @@
+{{#if addAngular}}
+import { r2a } from '@/react-tools/react2angular';
+{{/if}}
+
 {{#if addStyles}}
 import styles from './{{pascalCase name}}.module.css';
 
@@ -9,3 +13,7 @@ interface Props {
 export function {{pascalCase name}}({}: Props) {
   return <div{{#if addStyles}} className={styles.root}{{/if}}>{{name}}</div>
 }
+
+{{#if addAngular}}
+export const {{pascalCase name}}Angular = r2a({{pascalCase name}}, []);
+{{/if}}

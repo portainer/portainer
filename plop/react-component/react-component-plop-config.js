@@ -11,6 +11,12 @@ module.exports = () => ({
       default: false,
       when: false,
     },
+    {
+      type: 'confirm',
+      name: 'addAngular',
+      default: false,
+      when: false,
+    },
   ], // array of inquirer prompts
   actions: ({ addStyles }) => {
     return [
