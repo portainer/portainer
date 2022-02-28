@@ -407,6 +407,9 @@ func (connection *DbConnection) RestoreMetadata(s map[string]interface{}) error 
 
 		err = connection.Batch(func(tx *bolt.Tx) error {
 			bucket := tx.Bucket([]byte(bucketName))
+			if bucket == nil {
+				return nil
+			}
 			return bucket.SetSequence(uint64(id))
 		})
 	}
