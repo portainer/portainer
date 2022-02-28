@@ -116,7 +116,7 @@ type (
 		HTTPDisabled              *bool
 		HTTPEnabled               *bool
 		SSL                       *bool
-		SSLCacert                 *string
+		SSLCACert                 *string
 		SSLCert                   *string
 		SSLKey                    *string
 		Rollback                  *bool
@@ -1238,7 +1238,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
-		CopySSLCacert(cacertPath string) (string, error)
+		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 	}
 

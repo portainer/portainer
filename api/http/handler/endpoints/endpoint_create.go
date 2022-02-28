@@ -312,10 +312,6 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		portainerHost = portainerURL.Host
 	}
 
-	if portainerHost == "localhost" {
-		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid environment URL", errors.New("cannot use localhost as environment URL")}
-	}
-
 	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
 
 	endpoint := &portainer.Endpoint{

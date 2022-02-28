@@ -48,8 +48,8 @@ type Snapshot struct {
 	Kubernetes *portainer.KubernetesSnapshot
 }
 type AsyncRequest struct {
-	CommandId   string   `json: optional`
-	Snapshot    Snapshot `json: optional` // todo
+	CommandId   string    `json: optional`
+	Snapshot    *Snapshot `json: optional` // todo
 	StackStatus map[portainer.EdgeStackID]updateStatusPayload
 }
 
@@ -117,8 +117,6 @@ func (handler *Handler) endpointAsync(w http.ResponseWriter, r *http.Request) *h
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist environment changes inside the database", err}
 	}
-
-	// TODO: update endpoint contact time
 
 	var payload AsyncRequest
 	err = request.DecodeAndValidateJSONPayload(r, &payload)

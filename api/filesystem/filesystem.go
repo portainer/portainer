@@ -60,8 +60,8 @@ const (
 	DefaultSSLCertFilename = "cert.pem"
 	// DefaultSSLKeyFilename represents the default ssl key file name
 	DefaultSSLKeyFilename = "key.pem"
-	// DefaultSSLCacertFilename represents the default CA ssl certificate file name for mTLS
-	DefaultSSLCacertFilename = "ca-cert.pem"
+	// DefaultSSLCACertFilename represents the default CA ssl certificate file name for mTLS
+	DefaultSSLCACertFilename = "ca-cert.pem"
 )
 
 // ErrUndefinedTLSFileType represents an error returned on undefined TLS file type
@@ -632,16 +632,16 @@ func (service *Service) CopySSLCertPair(certPath, keyPath string) (string, strin
 	return defCertPath, defKeyPath, nil
 }
 
-// GetDefaultSSLCacertsPath returns the ssl cacert path
-func (service *Service) GetDefaultSSLCacertsPath() string {
-	cacertPath := JoinPaths(SSLCertPath, DefaultSSLCacertFilename)
+// GetDefaultSSLCACertsPath returns the ssl caCert path
+func (service *Service) GetDefaultSSLCACertsPath() string {
+	caCertPath := JoinPaths(SSLCertPath, DefaultSSLCACertFilename)
 
-	return service.wrapFileStore(cacertPath)
+	return service.wrapFileStore(caCertPath)
 }
 
-// CopySSLCacert copies the specified cacert pem file
-func (service *Service) CopySSLCacert(cacertPath string) (string, error) {
-	defCacertPath := service.GetDefaultSSLCacertsPath()
+// CopySSLCACert copies the specified caCert pem file
+func (service *Service) CopySSLCACert(cacertPath string) (string, error) {
+	defCacertPath := service.GetDefaultSSLCACertsPath()
 
 	err := service.Copy(cacertPath, defCacertPath, true)
 	if err != nil {

@@ -18,9 +18,9 @@ const (
 	defaultHTTPDisabled        = "false"
 	defaultHTTPEnabled         = "false"
 	defaultSSL                 = "false"
-	defaultSSLCacertPath       = "/certs/portainer-ca.crt"
 	defaultSSLCertPath         = "/certs/portainer.crt"
 	defaultSSLKeyPath          = "/certs/portainer.key"
+	defaultSSLCACertPath       = "/certs/portainer-ca.crt"
 	defaultBaseURL             = "/"
 	defaultSecretKeyName       = "portainer"
 )

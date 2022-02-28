@@ -149,10 +149,10 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 // AuthorizedEdgeEndpointOperation verifies that the request was received from a valid Edge environment(endpoint)
 func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
 	// tls.RequireAndVerifyClientCert would be nice, but that would require the same certs for browser and api use
-	sslsettings, _ := bouncer.dataStore.SSLSettings().Settings()
-	if sslsettings.CacertPath != "" {
+	sslSettings, _ := bouncer.dataStore.SSLSettings().Settings()
+	if sslSettings.CacertPath != "" {
 		// if a caCert is set, then reject any requests that don't have a client Auth cert signed with it
-		if len(r.TLS.PeerCertificates) == 0 {
+		if r.TLS == nil || len(r.TLS.PeerCertificates) == 0 {
 			logrus.Error("No clientAuth Agent certificate offered")
 			return errors.New("No clientAuth Agent certificate offered")
 		}
@@ -160,7 +160,7 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 		caChainIdx := len(r.TLS.VerifiedChains)
 		chainCaCert := r.TLS.VerifiedChains[0][caChainIdx]
 
-		caCert, _ := ioutil.ReadFile(sslsettings.CacertPath)
+		caCert, _ := ioutil.ReadFile(sslSettings.CacertPath)
 		certPool := x509.NewCertPool()
 		certPool.AppendCertsFromPEM(caCert)
 

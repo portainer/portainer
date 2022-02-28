@@ -32,7 +32,7 @@ func NewService(fileService portainer.FileService, dataStore dataservices.DataSt
 }
 
 // Init initializes the service
-func (service *Service) Init(host, certPath, keyPath, cacertPath string) error {
+func (service *Service) Init(host, certPath, keyPath, caCertPath string) error {
 	pathSupplied := certPath != "" && keyPath != ""
 	if pathSupplied {
 		newCertPath, newKeyPath, err := service.fileService.CopySSLCertPair(certPath, keyPath)
@@ -40,18 +40,18 @@ func (service *Service) Init(host, certPath, keyPath, cacertPath string) error {
 			return errors.Wrap(err, "failed copying supplied certs")
 		}
 
-		newCacertPath := ""
-		if cacertPath != "" {
-			newCacertPath, err = service.fileService.CopySSLCacert(cacertPath)
+		newCACertPath := ""
+		if caCertPath != "" {
+			newCACertPath, err = service.fileService.CopySSLCACert(caCertPath)
 			if err != nil {
 				return errors.Wrap(err, "failed copying supplied cacert")
 			}
 		}
 
-		return service.cacheInfo(newCertPath, newKeyPath, newCacertPath, false)
+		return service.cacheInfo(newCertPath, newKeyPath, newCACertPath, false)
 	}
-	if cacertPath != "" {
-		return errors.Errorf("supplying a CA cert path (%s) requires an SSL cert and key file", cacertPath)
+	if caCertPath != "" {
+		return errors.Errorf("supplying a CA cert path (%s) requires an SSL cert and key file", caCertPath)
 
 	}
 
