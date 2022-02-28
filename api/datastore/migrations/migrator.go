@@ -88,17 +88,17 @@ func (m *Migrator) Migrate(currentVersion int) error {
 	}
 
     // TODO: Sort by Timestamp
-    for v, mg := range migrationsToRun.Migrations {
-        logrus.Infof("Version %d", v)
+    for _, v := range migrationsToRun.Versions {
+        mg := m.Migrations[v]
         for _, m := range mg {
-            log := logrus.WithFields(logrus.Fields{"Version": m.Version, "Name": m.Name})
-            log.Info("starting migration")
+            logger := logrus.WithFields(logrus.Fields{"version": m.Version, "migration": m.Name})
+            logger.Info("starting migration")
             err := m.Up()
             if err != nil {
                 return errors.Wrap(err, fmt.Sprintf("while running migration for version %d, name `%s`", m.Version, m.Name))
             }
             m.Completed = true
-            log.Info("migration completed successfully")
+            logger.Info("migration completed successfully")
         }
     }
 	return nil
