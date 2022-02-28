@@ -10,6 +10,7 @@ class GitFormAutoUpdateFieldsetController {
     this.onChangeInterval = this.onChangeField('RepositoryFetchInterval');
 
     this.limitedFeature = FeatureId.FORCE_REDEPLOYMENT;
+    this.stackPullImageFeature = FeatureId.STACK_PULL_IMAGE;
   }
 
   copyWebhook() {

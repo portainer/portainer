@@ -376,3 +376,40 @@ func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interf
 	})
 	return err
 }
+
+func (connection *DbConnection) BackupMetadata() (map[string]interface{}, error) {
+	buckets := map[string]interface{}{}
+
+	err := connection.View(func(tx *bolt.Tx) error {
+		err := tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
+			bucketName := string(name)
+			bucket = tx.Bucket([]byte(bucketName))
+			seqId := bucket.Sequence()
+			buckets[bucketName] = int(seqId)
+			return nil
+		})
+
+		return err
+	})
+
+	return buckets, err
+}
+
+func (connection *DbConnection) RestoreMetadata(s map[string]interface{}) error {
+	var err error
+
+	for bucketName, v := range s {
+		id, ok := v.(float64) // JSON ints are unmarshalled to interface as float64. See: https://pkg.go.dev/encoding/json#Decoder.Decode
+		if !ok {
+			logrus.Errorf("Failed to restore metadata to bucket %s, skipped", bucketName)
+			continue
+		}
+
+		err = connection.Batch(func(tx *bolt.Tx) error {
+			bucket := tx.Bucket([]byte(bucketName))
+			return bucket.SetSequence(uint64(id))
+		})
+	}
+
+	return err
+}

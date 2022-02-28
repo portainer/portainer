@@ -4,6 +4,7 @@ import uuidv4 from 'uuid/v4';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
 import { RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
+import { FeatureId } from 'Portainer/feature-flags/enums';
 
 angular
   .module('portainer.app')
@@ -31,8 +32,9 @@ angular
     ) {
       $scope.onChangeTemplateId = onChangeTemplateId;
       $scope.buildAnalyticsProperties = buildAnalyticsProperties;
-
+      $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
       $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
+      $scope.isAdmin = Authentication.isAdmin();
 
       $scope.formValues = {
         Name: '',
@@ -51,6 +53,7 @@ angular
         RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
         RepositoryFetchInterval: '5m',
         RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
+        ShowForcePullImage: false,
       };
 
       $scope.state = {
@@ -310,7 +313,7 @@ angular
         }
 
         $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
-
+        $scope.formValues.ShowForcePullImage = $scope.state.StackType !== 3;
         try {
           const containers = await ContainerService.containers(true);
           $scope.containerNames = ContainerHelper.getContainerNames(containers);

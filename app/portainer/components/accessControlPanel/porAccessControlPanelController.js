@@ -56,6 +56,17 @@ angular.module('portainer.app').controller('porAccessControlPanelController', [
       });
     };
 
+    ctrl.removeEndpointId = function (stackName) {
+      if (!stackName) {
+        return stackName;
+      }
+      const firstUnderlineIndex = stackName.indexOf('_');
+      if (firstUnderlineIndex < 0) {
+        return stackName;
+      }
+      return stackName.substring(firstUnderlineIndex + 1);
+    };
+
     function validateForm() {
       ctrl.state.formValidationError = '';
       var error = '';

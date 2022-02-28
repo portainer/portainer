@@ -6,6 +6,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install modules
-        run: yarn
+        run: yarn --frozen-lockfile
       - name: Run tests
         run: yarn test:client
