@@ -20,6 +20,7 @@ const (
 	defaultSSL                 = "false"
 	defaultSSLCertPath         = "/certs/portainer.crt"
 	defaultSSLKeyPath          = "/certs/portainer.key"
+	defaultSSLCACertPath       = "/certs/portainer-ca.crt"
 	defaultBaseURL             = "/"
 	defaultSecretKeyName       = "portainer"
 )

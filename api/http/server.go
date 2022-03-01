@@ -3,7 +3,9 @@ package http
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -328,6 +330,17 @@ func (server *Server) Start() error {
 	httpsServer.TLSConfig = crypto.CreateServerTLSConfiguration()
 	httpsServer.TLSConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 		return server.SSLService.GetRawCertificate(), nil
+	}
+
+	if caCert := server.SSLService.GetCACertificatePEM(); len(caCert) > 0 {
+		logrus.Debugf("using CA certificate for %s", server.BindAddressHTTPS)
+		certPool := x509.NewCertPool()
+		certPool.AppendCertsFromPEM(caCert)
+
+		httpsServer.TLSConfig.ClientCAs = certPool
+		// can't use tls.RequireAndVerifyClientCert, and this port is also used for the browser (though it would be a strong feature to allow the user to enable)
+		httpsServer.TLSConfig.ClientAuth = tls.VerifyClientCertIfGiven
+		// httpsServer.TLSConfig.BuildNameToCertificate() // TODO mrydel
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)
