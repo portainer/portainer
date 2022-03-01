@@ -49,7 +49,7 @@ func (service *Service) Init(host, certPath, keyPath, caCertPath string) error {
 		}
 
 		newCACertPath := ""
-		if caCertPath != "" {
+		if caCertSupplied {
 			newCACertPath, err = service.fileService.CopySSLCACert(caCertPath)
 			if err != nil {
 				return errors.Wrap(err, "failed copying supplied CA cert")
