@@ -17,15 +17,19 @@ interface StoryProps {
 
 function Template({ iconClass, className, itemName, LinkName }: StoryProps) {
   return (
-    <SidebarMenuItem
-      path="example.path"
-      pathParams={{ endpointId: 1 }}
-      iconClass={iconClass}
-      className={className}
-      itemName={itemName}
-    >
-      {LinkName}
-    </SidebarMenuItem>
+    <ul className="sidebar">
+      <div className="sidebar-list">
+        <SidebarMenuItem
+          path="example.path"
+          pathParams={{ endpointId: 1 }}
+          iconClass={iconClass}
+          className={className}
+          itemName={itemName}
+        >
+          {LinkName}
+        </SidebarMenuItem>
+      </div>
+    </ul>
   );
 }
 

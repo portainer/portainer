@@ -4,6 +4,7 @@ import { UISrefActive } from '@uirouter/react';
 
 import { Link } from '@/portainer/components/Link';
 
+import '../sidebar.css';
 import styles from './SidebarMenuItem.module.css';
 
 interface Props {
