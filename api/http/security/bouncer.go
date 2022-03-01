@@ -5,17 +5,18 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"github.com/portainer/portainer/api/internal/ssl"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/internal/ssl"
 )
 
 type (
