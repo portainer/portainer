@@ -12,10 +12,10 @@ interface StoryProps {
   iconClass: string;
   className: string;
   itemName: string;
-  LinkName: string;
+  linkName: string;
 }
 
-function Template({ iconClass, className, itemName, LinkName }: StoryProps) {
+function Template({ iconClass, className, itemName, linkName }: StoryProps) {
   return (
     <ul className="sidebar">
       <div className="sidebar-list">
@@ -26,7 +26,7 @@ function Template({ iconClass, className, itemName, LinkName }: StoryProps) {
           className={className}
           itemName={itemName}
         >
-          {LinkName}
+          {linkName}
         </SidebarMenuItem>
       </div>
     </ul>
@@ -38,28 +38,22 @@ Primary.args = {
   iconClass: 'fa-tachometer-alt fa-fw',
   className: 'exampleItemClass',
   itemName: 'ExampleItem',
-  LinkName: 'Example Link Name',
+  linkName: 'Example link',
 };
 
-export function WithoutLinkName() {
+export function WithoutIcon() {
   return (
-    <SidebarMenuItem
-      path="example.path"
-      pathParams={{ endpointId: 1 }}
-      iconClass="fa-tachometer-alt fa-fw"
-      className="exampleItemClass"
-      itemName="ExampleItem"
-    />
-  );
-}
-
-export function WithoutIconOrLinkName() {
-  return (
-    <SidebarMenuItem
-      path="example.path"
-      pathParams={{ endpointId: 1 }}
-      className="exampleItemClass"
-      itemName="ExampleItem"
-    />
+    <ul className="sidebar">
+      <div className="sidebar-list">
+        <SidebarMenuItem
+          path="example.path"
+          pathParams={{ endpointId: 1 }}
+          className="exampleItemClass"
+          itemName="ExampleItem"
+        >
+          Item without icon
+        </SidebarMenuItem>
+      </div>
+    </ul>
   );
 }
