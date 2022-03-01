@@ -19,7 +19,8 @@ class AuthenticationController {
     SettingsService,
     URLHelper,
     LocalStorage,
-    StatusService
+    StatusService,
+    ModalService
   ) {
     this.$async = $async;
     this.$scope = $scope;
@@ -37,6 +38,7 @@ class AuthenticationController {
     this.URLHelper = URLHelper;
     this.LocalStorage = LocalStorage;
     this.StatusService = StatusService;
+    this.ModalService = ModalService;
 
     this.logo = this.StateManager.getState().application.logo;
     this.formValues = {
@@ -157,6 +159,7 @@ class AuthenticationController {
       }
     } finally {
       this.StateManager.setVersionInfo(versionInfo);
+      this.ModalService.upgradeNotification();
     }
   }
 

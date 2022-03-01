@@ -1,7 +1,9 @@
 package bolt
 
 import (
+	"io"
 	"log"
+	"os"
 	"path"
 	"time"
 
@@ -11,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/tunnelserver"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
@@ -34,6 +36,7 @@ import (
 
 const (
 	databaseFileName = "portainer.db"
+	dbBackupFileName = "portainer-1-24-backup.db"
 )
 
 // Store defines the implementation of portainer.DataStore using
@@ -283,4 +286,39 @@ func (store *Store) initServices() error {
 	store.ScheduleService = scheduleService
 
 	return nil
+}
+
+func (store *Store) Backup1_24db() error {
+	version, err := store.VersionService.DBVersion()
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return err
+	}
+
+	if version != 24 {
+		return nil
+	}
+
+	databasePath := path.Join(store.path, databaseFileName)
+	dbBackupPath := path.Join(store.path, dbBackupFileName)
+
+	source, err := os.Open(databasePath)
+	if err != nil {
+		return err
+	}
+
+	defer source.Close()
+
+	destination, err := os.Create(dbBackupPath)
+	if err != nil {
+		return err
+	}
+
+	defer destination.Close()
+
+	_, err = io.Copy(destination, source)
+	if err == nil {
+		log.Println("backup for 1.24 finished successfully.")
+	}
+
+	return err
 }
