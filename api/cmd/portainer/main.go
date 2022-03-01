@@ -69,7 +69,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 }
 
 func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase("boltdb", *flags.Data, []byte("B8962909B929B03AC37182F61BF7CFCD"))
+	connection, err := database.NewDatabase("boltdb", *flags.Data, secretKey)
 	if err != nil {
 		logrus.Fatalf("failed creating database connection: %s", err)
 	}
@@ -119,7 +119,8 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 			logrus.Fatalf("Something Failed during creation of new database: %v", err)
 		}
 		if storedVersion != portainer.DBVersion {
-			err = store.MigrateData()
+			m := migrations.NewMigrator(*store)
+			err = m.Migrate(storedVersion)
 			if err != nil {
 				logrus.Fatalf("Failed migration: %v", err)
 			}
