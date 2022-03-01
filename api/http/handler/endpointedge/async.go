@@ -29,18 +29,6 @@ type updateStatusPayload struct {
 	Status     *portainer.EdgeStackStatusType
 	EndpointID *portainer.EndpointID
 }
-type edgeJobResponse struct {
-	// EdgeJob Identifier
-	ID portainer.EdgeJobID `json:"Id" example:"2"`
-	// Whether to collect logs
-	CollectLogs bool `json:"CollectLogs" example:"true"`
-	// A cron expression to schedule this job
-	CronExpression string `json:"CronExpression" example:"* * * * *"`
-	// Script to run
-	Script string `json:"Script" example:"echo hello"`
-	// Version of this EdgeJob
-	Version int `json:"Version" example:"2"`
-}
 
 // An empty request ~~ just a ping.
 type Snapshot struct {

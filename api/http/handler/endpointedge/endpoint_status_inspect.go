@@ -1,4 +1,4 @@
-package endpoints
+package endpointedge
 
 import (
 	"encoding/base64"
@@ -49,7 +49,6 @@ type endpointStatusInspectResponse struct {
 	Stacks []stackStatusResponse `json:"stacks"`
 }
 
-// TODO: first up, why is this not in ../endpointedge/???
 // @id EndpointStatusInspect
 // @summary Get environment(endpoint) status
 // @description Environment(Endpoint) for edge agent to check status of environment(endpoint)
