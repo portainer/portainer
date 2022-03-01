@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"log"
@@ -107,7 +106,7 @@ type Server struct {
 func (server *Server) Start() error {
 	kubernetesTokenCacheManager := server.KubernetesTokenCacheManager
 
-	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, server.APIKeyService)
+	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, server.APIKeyService, server.SSLService)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 	offlineGate := offlinegate.NewOfflineGate()
@@ -332,15 +331,12 @@ func (server *Server) Start() error {
 		return server.SSLService.GetRawCertificate(), nil
 	}
 
-	if caCert := server.SSLService.GetCACertificatePEM(); len(caCert) > 0 {
+	caCertPool := server.SSLService.GetCACertificatePool()
+	if caCertPool != nil {
 		logrus.Debugf("using CA certificate for %s", server.BindAddressHTTPS)
-		certPool := x509.NewCertPool()
-		certPool.AppendCertsFromPEM(caCert)
-
-		httpsServer.TLSConfig.ClientCAs = certPool
-		// can't use tls.RequireAndVerifyClientCert, and this port is also used for the browser (though it would be a strong feature to allow the user to enable)
-		httpsServer.TLSConfig.ClientAuth = tls.VerifyClientCertIfGiven
-		// httpsServer.TLSConfig.BuildNameToCertificate() // TODO mrydel
+		httpsServer.TLSConfig.ClientCAs = caCertPool
+		httpsServer.TLSConfig.ClientAuth = tls.VerifyClientCertIfGiven // can't use tls.RequireAndVerifyClientCert, this port is also used for the browser
+		// httpsServer.TLSConfig.BuildNameToCertificate()
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)
