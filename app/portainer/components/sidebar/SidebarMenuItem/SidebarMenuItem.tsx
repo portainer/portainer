@@ -11,6 +11,7 @@ interface Props {
   pathParams: object;
   iconClass?: string;
   className: string;
+  itemName: string;
 }
 
 export function SidebarMenuItem({
@@ -18,16 +19,23 @@ export function SidebarMenuItem({
   pathParams,
   iconClass,
   className,
+  itemName,
   children,
 }: PropsWithChildren<Props>) {
   return (
     <li
       className={clsx('sidebar-menu-item', styles.sidebarMenuItem, className)}
+      aria-label={itemName}
     >
       <UISrefActive class="active">
-        <Link to={path} params={pathParams}>
+        <Link to={path} params={pathParams} title={itemName}>
           {children}
-          {iconClass && <span className={clsx('menu-icon fa', iconClass)} />}
+          {iconClass && (
+            <span
+              className={clsx('menu-icon fa', iconClass)}
+              aria-label="itemIcon"
+            />
+          )}
         </Link>
       </UISrefActive>
     </li>

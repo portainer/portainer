@@ -13,6 +13,7 @@ export function AzureSidebar({ environmentId }: Props) {
         pathParams={{ endpointId: environmentId }}
         iconClass="fa-tachometer-alt fa-fw"
         className="sidebar-list"
+        itemName="Dashboard"
         data-cy="azureSidebar-dashboard"
       >
         Dashboard
@@ -22,6 +23,7 @@ export function AzureSidebar({ environmentId }: Props) {
         pathParams={{ endpointId: environmentId }}
         iconClass="fa-cubes fa-fw"
         className="sidebar-list"
+        itemName="ContainerInstances"
         data-cy="azureSidebar-containerInstances"
       >
         Container instances
