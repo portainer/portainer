@@ -1274,6 +1274,7 @@ type (
 	KubernetesDeployer interface {
 		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		Remove(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
+		GetAll(userID UserID, endpoint *Endpoint, namespace string) ([]byte, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 

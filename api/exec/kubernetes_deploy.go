@@ -85,6 +85,49 @@ func (deployer *KubernetesDeployer) Remove(userID portainer.UserID, endpoint *po
 	return deployer.command("delete", userID, endpoint, manifestFiles, namespace)
 }
 
+// Get all Kubernetes resources in the gaven namespace
+func (deployer *KubernetesDeployer) GetAll(userID portainer.UserID, endpoint *portainer.Endpoint, namespace string) ([]byte, error) {
+	token, err := deployer.getToken(userID, endpoint, endpoint.Type == portainer.KubernetesLocalEnvironment)
+	if err != nil {
+		return []byte{}, errors.Wrap(err, "failed generating a user token")
+	}
+
+	command := path.Join(deployer.binaryPath, "kubectl")
+	if runtime.GOOS == "windows" {
+		command = path.Join(deployer.binaryPath, "kubectl.exe")
+	}
+
+	args := []string{"--token", token}
+	if namespace != "" {
+		args = append(args, "--namespace", namespace)
+	}
+
+	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		url, proxy, err := deployer.getAgentURL(endpoint)
+		if err != nil {
+			return []byte{}, errors.WithMessage(err, "failed generating endpoint URL")
+		}
+
+		defer proxy.Close()
+		args = append(args, "--server", url)
+		args = append(args, "--insecure-skip-tls-verify")
+	}
+
+	args = append(args, "get", "all")
+	args = append(args, "--output", "json")
+
+	var stderr bytes.Buffer
+	cmd := exec.Command(command, args...)
+	cmd.Stderr = &stderr
+
+	output, err := cmd.Output()
+	if err != nil {
+		return []byte{}, errors.Wrapf(err, "failed to execute kubectl command: %q", stderr.String())
+	}
+
+	return output, nil
+}
+
 func (deployer *KubernetesDeployer) command(operation string, userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
 	token, err := deployer.getToken(userID, endpoint, endpoint.Type == portainer.KubernetesLocalEnvironment)
 	if err != nil {
