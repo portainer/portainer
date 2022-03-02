@@ -314,6 +314,19 @@ func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, ob
 	})
 }
 
+// CreateObjectWithStringId creates a new object in the bucket, using the specified id
+func (connection *DbConnection) CreateObjectWithStringId(bucketName string, id []byte, obj interface{}) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+		data, err := connection.MarshalObject(obj)
+		if err != nil {
+			return err
+		}
+
+		return bucket.Put(id, data)
+	})
+}
+
 // CreateObjectWithSetSequence creates a new object in the bucket, using the specified id, and sets the bucket sequence
 // avoid this :)
 func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, id int, obj interface{}) error {
