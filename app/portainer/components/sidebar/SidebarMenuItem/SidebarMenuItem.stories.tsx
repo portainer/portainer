@@ -9,7 +9,7 @@ const meta: Meta = {
 export default meta;
 
 interface StoryProps {
-  iconClass: string;
+  iconClass?: string;
   className: string;
   itemName: string;
   linkName: string;
@@ -38,22 +38,12 @@ Primary.args = {
   iconClass: 'fa-tachometer-alt fa-fw',
   className: 'exampleItemClass',
   itemName: 'ExampleItem',
-  linkName: 'Example link',
+  linkName: 'Item with icon',
 };
 
-export function WithoutIcon() {
-  return (
-    <ul className="sidebar">
-      <div className="sidebar-list">
-        <SidebarMenuItem
-          path="example.path"
-          pathParams={{ endpointId: 1 }}
-          className="exampleItemClass"
-          itemName="ExampleItem"
-        >
-          Item without icon
-        </SidebarMenuItem>
-      </div>
-    </ul>
-  );
-}
+export const WithoutIcon: Story<StoryProps> = Template.bind({});
+WithoutIcon.args = {
+  className: 'exampleItemClass',
+  itemName: 'ExampleItem',
+  linkName: 'Item without icon',
+};
