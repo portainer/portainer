@@ -336,7 +336,6 @@ func (server *Server) Start() error {
 		logrus.Debugf("using CA certificate for %s", server.BindAddressHTTPS)
 		httpsServer.TLSConfig.ClientCAs = caCertPool
 		httpsServer.TLSConfig.ClientAuth = tls.VerifyClientCertIfGiven // can't use tls.RequireAndVerifyClientCert, this port is also used for the browser
-		// httpsServer.TLSConfig.BuildNameToCertificate()
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)
