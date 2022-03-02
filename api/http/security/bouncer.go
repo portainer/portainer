@@ -173,31 +173,27 @@ func (bouncer *RequestBouncer) validateCACert(tlsConn *tls.ConnectionState) erro
 		return errors.New("no clientAuth Agent certificate offered")
 	}
 
-	caChainIdx := len(tlsConn.VerifiedChains) // mrydel no es [0] ?
-	chainCaCert := tlsConn.VerifiedChains[0][caChainIdx]
-	logrus.
-		WithField("chain_subject", chainCaCert.Subject.String()).
-		WithField("chain_dns_names", chainCaCert.DNSNames).
-		Debugf("TLS Client Chain")
-
-	caCertPool := bouncer.sslService.GetCACertificatePool()
-	if caCertPool == nil {
+	serverCACertPool := bouncer.sslService.GetCACertificatePool()
+	if serverCACertPool == nil {
 		logrus.Error("CA Certificate not found")
 		return errors.New("no CA Certificate was found")
 	}
 
 	opts := x509.VerifyOptions{
-		Roots:     caCertPool,
+		Roots:     serverCACertPool,
 		KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 	}
-	remoteCert := tlsConn.PeerCertificates[0]
+	agentCert := tlsConn.PeerCertificates[0]
 
-	if _, err := remoteCert.Verify(opts); err != nil {
+	if _, err := agentCert.Verify(opts); err != nil {
 		logrus.WithError(err).Error("Agent certificate not signed by the CACert")
 		return errors.New("agent certificate wasn't signed by required CA Cert")
 	}
 
-	logrus.Debugf("Successfully validated TLS Client Chain")
+	logrus.
+		WithField("subject", agentCert.Subject.String()).
+		WithField("dns_names", agentCert.DNSNames).
+		Debug("Successfully validated TLS Client Chain")
 	return nil
 }
 
