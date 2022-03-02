@@ -118,7 +118,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
 
                 <FormControl
                   inputId="edge_enforce_id"
-                  label="Enforce environment ID"
+                  label="Enforce use of Portainer generated Edge ID’s"
                   size="medium"
                   errors={errors.EnforceEdgeID}
                 >
@@ -129,23 +129,6 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                     checked={values.EnforceEdgeID}
                     onChange={(e) =>
                       setFieldValue('EnforceEdgeID', e.valueOf())
-                    }
-                  />
-                </FormControl>
-
-                <FormControl
-                  inputId="edge_tofc"
-                  label="Trust on first connect"
-                  size="medium"
-                  errors={errors.DisableTrustOnFirstConnect}
-                >
-                  <Switch
-                    id="edge_disable_tofc"
-                    name="edge_disable_tofc"
-                    className="space-right"
-                    checked={!values.DisableTrustOnFirstConnect}
-                    onChange={(e) =>
-                      setFieldValue('DisableTrustOnFirstConnect', !e.valueOf())
                     }
                   />
                 </FormControl>
