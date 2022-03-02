@@ -173,13 +173,6 @@ func (bouncer *RequestBouncer) validateCACert(tlsConn *tls.ConnectionState) erro
 		return errors.New("no clientAuth Agent certificate offered")
 	}
 
-	caChainIdx := len(tlsConn.VerifiedChains)
-	chainCaCert := tlsConn.VerifiedChains[0][caChainIdx]
-	logrus.
-		WithField("chain Subject", chainCaCert.Subject.String()).
-		WithField("tls DNSNames", chainCaCert.DNSNames).
-		Debugf("TLS client chain")
-
 	caCertPool := bouncer.sslService.GetCACertificatePool()
 	if caCertPool == nil {
 		logrus.Error("CA Certificate not found")
@@ -197,7 +190,6 @@ func (bouncer *RequestBouncer) validateCACert(tlsConn *tls.ConnectionState) erro
 		return errors.New("agent certificate wasn't signed by required CA Cert")
 	}
 
-	// TODO: test revoke cert list.
 	return nil
 }
 
