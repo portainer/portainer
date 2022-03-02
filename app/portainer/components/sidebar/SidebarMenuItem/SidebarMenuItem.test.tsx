@@ -34,7 +34,7 @@ test('li element should have correct accessibility label', () => {
 function renderComponent(
   className = '',
   iconClass = '',
-  LinkText = '',
+  linkText = '',
   itemName = 'sidebarItem'
 ) {
   return render(
@@ -45,7 +45,7 @@ function renderComponent(
       className={className}
       itemName={itemName}
     >
-      {LinkText}
+      {linkText}
     </SidebarMenuItem>
   );
 }
