@@ -25,7 +25,7 @@ type (
 		dataStore     dataservices.DataStore
 		jwtService    dataservices.JWTService
 		apiKeyService apikey.APIKeyService
-		sslService    ssl.Service
+		sslService    *ssl.Service
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -49,7 +49,7 @@ func NewRequestBouncer(dataStore dataservices.DataStore, jwtService dataservices
 		dataStore:     dataStore,
 		jwtService:    jwtService,
 		apiKeyService: apiKeyService,
-		sslService:    *sslService,
+		sslService:    sslService,
 	}
 }
 

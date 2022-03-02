@@ -37,7 +37,7 @@ func NewService(fileService portainer.FileService, dataStore dataservices.DataSt
 func (service *Service) Init(host, certPath, keyPath, caCertPath string) error {
 	certSupplied := certPath != "" && keyPath != ""
 	caCertSupplied := caCertPath != ""
-
+	
 	if caCertSupplied && !certSupplied {
 		return errors.Errorf("supplying a CA cert path (%s) requires an SSL cert and key file", caCertPath)
 	}

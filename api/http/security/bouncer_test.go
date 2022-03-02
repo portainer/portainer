@@ -44,7 +44,7 @@ func Test_mwAuthenticateFirst(t *testing.T) {
 
 	apiKeyService := apikey.NewAPIKeyService(nil, nil)
 
-	bouncer := NewRequestBouncer(store, jwtService, apiKeyService)
+	bouncer := NewRequestBouncer(store, jwtService, apiKeyService, nil)
 
 	tests := []struct {
 		name                   string
@@ -271,7 +271,7 @@ func Test_apiKeyLookup(t *testing.T) {
 	jwtService, err := jwt.NewService("1h", store)
 	is.NoError(err, "Error initiating jwt service")
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
-	bouncer := NewRequestBouncer(store, jwtService, apiKeyService)
+	bouncer := NewRequestBouncer(store, jwtService, apiKeyService, nil)
 
 	t.Run("missing x-api-key header fails api-key lookup", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
