@@ -498,40 +498,6 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			return utils.WriteAccessDeniedResponse()
 		}
 	}
-	accessContext, err := transport.createRegistryAccessContext(request)
-	if err != nil {
-		return nil, err
-	}
-	originalHeader := request.Header.Get("X-Registry-Auth")
-
-	if originalHeader != "" {
-
-		decodedHeaderData, err := base64.StdEncoding.DecodeString(originalHeader)
-		if err != nil {
-			return nil, err
-		}
-
-		var originalHeaderData portainerRegistryAuthenticationHeader
-		err = json.Unmarshal(decodedHeaderData, &originalHeaderData)
-		if err != nil {
-			return nil, err
-		}
-
-		authenticationHeader, err := createRegistryAuthenticationHeader(transport.dataStore, originalHeaderData.RegistryId, accessContext)
-		if err != nil {
-			return nil, err
-		}
-
-		headerData, err := json.Marshal(authenticationHeader)
-		if err != nil {
-			return nil, err
-		}
-
-		header := base64.StdEncoding.EncodeToString(headerData)
-
-		request.Header.Set("X-Registry-Auth", header)
-	}
-
 	return transport.executeDockerRequest(request)
 }
 

@@ -53,7 +53,6 @@ angular.module('portainer.docker').controller('ServiceController', [
   'WebhookHelper',
   'NetworkService',
   'RegistryService',
-  'HttpRequestHelper',
   'endpoint',
   function (
     $q,
@@ -86,7 +85,6 @@ angular.module('portainer.docker').controller('ServiceController', [
     WebhookHelper,
     NetworkService,
     RegistryService,
-    HttpRequestHelper,
     endpoint
   ) {
     $scope.endpoint = endpoint;
@@ -420,10 +418,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       config.TaskTemplate.ContainerSpec.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceContainerLabels);
 
       if ($scope.hasChanges(service, ['Image'])) {
-        var registryModel = $scope.formValues.RegistryModel;
-        var authenticationDetails = registryModel.Registry.Authentication ? RegistryService.encodedCredentials(registryModel.Registry) : '';
-        HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
-        const image = ImageHelper.createImageConfigForContainer(registryModel);
+        const image = ImageHelper.createImageConfigForContainer($scope.formValues.RegistryModel);
         config.TaskTemplate.ContainerSpec.Image = image.fromImage;
       } else {
         config.TaskTemplate.ContainerSpec.Image = service.Image;
