@@ -23,6 +23,7 @@ import (
 	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/datastore/migrations"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
@@ -118,12 +119,19 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 			logrus.Fatalf("Something Failed during creation of new database: %v", err)
 		}
 		if storedVersion != portainer.DBVersion {
-			err = store.MigrateData()
+			m := migrations.NewMigrator(*store)
+			err = m.Migrate(storedVersion)
 			if err != nil {
 				logrus.Fatalf("Failed migration: %v", err)
 			}
 		}
 	}
+
+	m := migrations.NewMigrator(*store)
+
+	m.Migrate(18)
+
+	logrus.Fatal("Dieing.....")
 
 	err = updateSettingsFromFlags(store, flags)
 	if err != nil {
