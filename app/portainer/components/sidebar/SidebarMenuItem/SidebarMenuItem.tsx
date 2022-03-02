@@ -32,7 +32,7 @@ export function SidebarMenuItem({
         <Link to={path} params={pathParams} title={itemName}>
           {children}
           {iconClass && (
-            <span
+            <i
               className={clsx('menu-icon fa', iconClass)}
               aria-label="itemIcon"
             />
