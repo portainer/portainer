@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -106,7 +105,7 @@ type Server struct {
 func (server *Server) Start() error {
 	kubernetesTokenCacheManager := server.KubernetesTokenCacheManager
 
-	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, server.APIKeyService, server.SSLService)
+	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, server.APIKeyService)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 	offlineGate := offlinegate.NewOfflineGate()
@@ -329,13 +328,6 @@ func (server *Server) Start() error {
 	httpsServer.TLSConfig = crypto.CreateServerTLSConfiguration()
 	httpsServer.TLSConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 		return server.SSLService.GetRawCertificate(), nil
-	}
-
-	caCertPool := server.SSLService.GetCACertificatePool()
-	if caCertPool != nil {
-		logrus.Debugf("using CA certificate for %s", server.BindAddressHTTPS)
-		httpsServer.TLSConfig.ClientCAs = caCertPool
-		httpsServer.TLSConfig.ClientAuth = tls.VerifyClientCertIfGiven // can't use tls.RequireAndVerifyClientCert, this port is also used for the browser
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)

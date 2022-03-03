@@ -3,8 +3,6 @@ package ssl
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -34,29 +32,15 @@ func NewService(fileService portainer.FileService, dataStore dataservices.DataSt
 }
 
 // Init initializes the service
-func (service *Service) Init(host, certPath, keyPath, caCertPath string) error {
+func (service *Service) Init(host, certPath, keyPath string) error {
 	certSupplied := certPath != "" && keyPath != ""
-	caCertSupplied := caCertPath != ""
-
-	if caCertSupplied && !certSupplied {
-		return errors.Errorf("supplying a CA cert path (%s) requires an SSL cert and key file", caCertPath)
-	}
-
 	if certSupplied {
 		newCertPath, newKeyPath, err := service.fileService.CopySSLCertPair(certPath, keyPath)
 		if err != nil {
 			return errors.Wrap(err, "failed copying supplied certs")
 		}
 
-		newCACertPath := ""
-		if caCertSupplied {
-			newCACertPath, err = service.fileService.CopySSLCACert(caCertPath)
-			if err != nil {
-				return errors.Wrap(err, "failed copying supplied CA cert")
-			}
-		}
-
-		return service.cacheInfo(newCertPath, newKeyPath, &newCACertPath, false)
+		return service.cacheInfo(newCertPath, newKeyPath, false)
 	}
 
 	settings, err := service.GetSSLSettings()
@@ -85,7 +69,7 @@ func (service *Service) Init(host, certPath, keyPath, caCertPath string) error {
 		return errors.Wrap(err, "failed generating self signed certs")
 	}
 
-	return service.cacheInfo(certPath, keyPath, &caCertPath, true)
+	return service.cacheInfo(certPath, keyPath, true)
 }
 
 func generateSelfSignedCertificates(ip, certPath, keyPath string) error {
@@ -123,7 +107,7 @@ func (service *Service) SetCertificates(certData, keyData []byte) error {
 		return err
 	}
 
-	err = service.cacheInfo(certPath, keyPath, nil, false)
+	err = service.cacheInfo(certPath, keyPath, false)
 	if err != nil {
 		return err
 	}
@@ -131,23 +115,6 @@ func (service *Service) SetCertificates(certData, keyData []byte) error {
 	service.shutdownTrigger()
 
 	return nil
-}
-
-// GetCACertificatePool gets the CA Certificate pem file and returns it as a CertPool
-func (service *Service) GetCACertificatePool() *x509.CertPool {
-	settings, _ := service.GetSSLSettings()
-	if settings.CACertPath == "" {
-		return nil
-	}
-	caCert, err := ioutil.ReadFile(settings.CACertPath)
-	if err != nil {
-		log.Printf("error reading CA cert in path %s: %s", settings.CACertPath, err)
-		return nil
-	}
-
-	certPool := x509.NewCertPool()
-	certPool.AppendCertsFromPEM(caCert)
-	return certPool
 }
 
 func (service *Service) SetHTTPEnabled(httpEnabled bool) error {
@@ -183,7 +150,7 @@ func (service *Service) cacheCertificate(certPath, keyPath string) error {
 	return nil
 }
 
-func (service *Service) cacheInfo(certPath string, keyPath string, caCertPath *string, selfSigned bool) error {
+func (service *Service) cacheInfo(certPath string, keyPath string, selfSigned bool) error {
 	err := service.cacheCertificate(certPath, keyPath)
 	if err != nil {
 		return err
@@ -197,9 +164,6 @@ func (service *Service) cacheInfo(certPath string, keyPath string, caCertPath *s
 	settings.CertPath = certPath
 	settings.KeyPath = keyPath
 	settings.SelfSigned = selfSigned
-	if caCertPath != nil {
-		settings.CACertPath = *caCertPath
-	}
 
 	err = service.dataStore.SSLSettings().UpdateSettings(settings)
 	if err != nil {

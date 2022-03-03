@@ -118,7 +118,6 @@ type (
 		SSL                       *bool
 		SSLCert                   *string
 		SSLKey                    *string
-		SSLCACert                 *string
 		Rollback                  *bool
 		SnapshotInterval          *string
 		BaseURL                   *string
@@ -838,7 +837,6 @@ type (
 	SSLSettings struct {
 		CertPath    string `json:"certPath"`
 		KeyPath     string `json:"keyPath"`
-		CACertPath  string `json:"caCertPath"`
 		SelfSigned  bool   `json:"selfSigned"`
 		HTTPEnabled bool   `json:"httpEnabled"`
 	}

@@ -49,7 +49,6 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		SSL:                       kingpin.Flag("ssl", "Secure Portainer instance using SSL (deprecated)").Default(defaultSSL).Bool(),
 		SSLCert:                   kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").String(),
 		SSLKey:                    kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").String(),
-		SSLCACert:                 kingpin.Flag("sslcacert", "Path to the SSL CA certificate used to validate the edge agent cert").String(),
 		Rollback:                  kingpin.Flag("rollback", "Rollback the database store to the previous version").Bool(),
 		SnapshotInterval:          kingpin.Flag("snapshot-interval", "Duration between each environment snapshot job").String(),
 		AdminPassword:             kingpin.Flag("admin-password", "Hashed admin password").String(),

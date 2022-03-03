@@ -1,22 +1,17 @@
 package security
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
-
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
-	"github.com/portainer/portainer/api/internal/ssl"
 )
 
 type (
@@ -25,7 +20,6 @@ type (
 		dataStore     dataservices.DataStore
 		jwtService    dataservices.JWTService
 		apiKeyService apikey.APIKeyService
-		sslService    *ssl.Service
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -44,12 +38,11 @@ type (
 const apiKeyHeader = "X-API-KEY"
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(dataStore dataservices.DataStore, jwtService dataservices.JWTService, apiKeyService apikey.APIKeyService, sslService *ssl.Service) *RequestBouncer {
+func NewRequestBouncer(dataStore dataservices.DataStore, jwtService dataservices.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
 	return &RequestBouncer{
 		dataStore:     dataStore,
 		jwtService:    jwtService,
 		apiKeyService: apiKeyService,
-		sslService:    sslService,
 	}
 }
 
@@ -129,14 +122,6 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 
 // AuthorizedEdgeEndpointOperation verifies that the request was received from a valid Edge environment(endpoint)
 func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
-	sslSettings, _ := bouncer.dataStore.SSLSettings().Settings()
-	if sslSettings.CACertPath != "" {
-		caCertErr := bouncer.validateCACert(r.TLS)
-		if caCertErr != nil {
-			return caCertErr
-		}
-	}
-
 	if endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment && endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
 		return errors.New("Invalid environment type")
 	}
@@ -163,37 +148,6 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 		return errors.New("the device has not been trusted yet")
 	}
 
-	return nil
-}
-
-func (bouncer *RequestBouncer) validateCACert(tlsConn *tls.ConnectionState) error {
-	// if a caCert is set, then reject any requests that don't have a client Auth cert signed with it
-	if tlsConn == nil || len(tlsConn.PeerCertificates) == 0 {
-		logrus.Error("No clientAuth Agent certificate offered")
-		return errors.New("no clientAuth Agent certificate offered")
-	}
-
-	serverCACertPool := bouncer.sslService.GetCACertificatePool()
-	if serverCACertPool == nil {
-		logrus.Error("CA Certificate not found")
-		return errors.New("no CA Certificate was found")
-	}
-
-	opts := x509.VerifyOptions{
-		Roots:     serverCACertPool,
-		KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-	}
-	agentCert := tlsConn.PeerCertificates[0]
-
-	if _, err := agentCert.Verify(opts); err != nil {
-		logrus.WithError(err).Error("Agent certificate not signed by the CACert")
-		return errors.New("agent certificate wasn't signed by required CA Cert")
-	}
-
-	logrus.
-		WithField("subject", agentCert.Subject.String()).
-		WithField("dns_names", agentCert.DNSNames).
-		Debug("Successfully validated TLS Client Chain")
 	return nil
 }
 

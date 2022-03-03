@@ -36,7 +36,7 @@ func Test_userGetAccessTokens(t *testing.T) {
 	jwtService, err := jwt.NewService("1h", store)
 	is.NoError(err, "Error initiating jwt service")
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
-	requestBouncer := security.NewRequestBouncer(store, jwtService, apiKeyService, nil)
+	requestBouncer := security.NewRequestBouncer(store, jwtService, apiKeyService)
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
 	h := NewHandler(requestBouncer, rateLimiter, apiKeyService)
