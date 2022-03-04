@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 // @id EndpointGroupAddEndpoint
@@ -15,6 +14,7 @@ import (
 // @description Add an environment(endpoint) to an environment(endpoint) group
 // @description **Access policy**: administrator
 // @tags endpoint_groups
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "EndpointGroup identifier"
 // @param endpointId path int true "Environment(Endpoint) identifier"
@@ -35,14 +35,14 @@ func (handler *Handler) endpointGroupAddEndpoint(w http.ResponseWriter, r *http.
 	}
 
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
-	if err == errors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment group with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment group with the specified identifier inside the database", err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == errors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}

@@ -18,6 +18,7 @@ export function KubernetesApplicationFormValues() {
   this.ReplicaCount = 1;
   this.AutoScaler = {};
   this.Containers = [];
+  this.Services = [];
   this.EnvironmentVariables = []; // KubernetesApplicationEnvironmentVariableFormValue lis;
   this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
   this.PersistedFolders = []; // KubernetesApplicationPersistedFolderFormValue lis;
@@ -27,6 +28,7 @@ export function KubernetesApplicationFormValues() {
   this.PlacementType = KubernetesApplicationPlacementTypes.PREFERRED;
   this.Placements = []; // KubernetesApplicationPlacementFormValue lis;
   this.OriginalIngresses = undefined;
+  this.IsPublishingService = false;
 }
 
 export const KubernetesApplicationConfigurationFormValueOverridenKeyTypes = Object.freeze({

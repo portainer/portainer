@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 type endpointSettingsUpdatePayload struct {
@@ -39,6 +38,7 @@ func (payload *endpointSettingsUpdatePayload) Validate(r *http.Request) error {
 // @summary Update settings for an environment(endpoint)
 // @description Update settings for an environment(endpoint).
 // @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags endpoints
 // @accept json
@@ -63,7 +63,7 @@ func (handler *Handler) endpointSettingsUpdate(w http.ResponseWriter, r *http.Re
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == errors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}

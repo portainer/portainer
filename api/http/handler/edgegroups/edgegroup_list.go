@@ -7,6 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 type decoratedEdgeGroup struct {
@@ -19,9 +20,10 @@ type decoratedEdgeGroup struct {
 // @summary list EdgeGroups
 // @description **Access policy**: administrator
 // @tags edge_groups
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @success 200 {array} portainer.EdgeGroup{HasEdgeStack=bool} "EdgeGroups"
+// @success 200 {array} decoratedEdgeGroup "EdgeGroups"
 // @failure 500
 // @failure 503 "Edge compute features are disabled"
 // @router /edge_groups [get]
@@ -74,7 +76,7 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 	return response.JSON(w, decoratedEdgeGroups)
 }
 
-func getEndpointTypes(endpointService portainer.EndpointService, endpointIds []portainer.EndpointID) ([]portainer.EndpointType, error) {
+func getEndpointTypes(endpointService dataservices.EndpointService, endpointIds []portainer.EndpointID) ([]portainer.EndpointType, error) {
 	typeSet := map[portainer.EndpointType]bool{}
 	for _, endpointID := range endpointIds {
 		endpoint, err := endpointService.Endpoint(endpointID)

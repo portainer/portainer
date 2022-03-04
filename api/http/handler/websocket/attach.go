@@ -11,7 +11,6 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 // @summary Attach a websocket
@@ -19,6 +18,7 @@ import (
 // @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
 // @description an AttachStart operation HTTP request will be created and hijacked.
 // @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags websocket
 // @accept json
@@ -47,7 +47,7 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == errors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}

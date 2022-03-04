@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
@@ -15,6 +14,7 @@ import (
 // @summary Delete an EdgeStack
 // @description **Access policy**: administrator
 // @tags edge_stacks
+// @security ApiKeyAuth
 // @security jwt
 // @param id path string true "EdgeStack Id"
 // @success 204
@@ -29,7 +29,7 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 	}
 
 	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(edgeStackID))
-	if err == errors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an edge stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an edge stack with the specified identifier inside the database", err}

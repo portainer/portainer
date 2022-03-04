@@ -16,12 +16,26 @@ function TemplateListController($async, $state, DatatableService, Notifications,
     DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
   };
 
+  this.filterByTemplateType = function (item) {
+    switch (item.Type) {
+      case 1: // container
+        return ctrl.state.showContainerTemplates;
+      case 2: // swarm stack
+        return ctrl.showSwarmStacks;
+      case 3: // docker compose
+        return !ctrl.showSwarmStacks || (ctrl.showSwarmStacks && ctrl.state.showContainerTemplates);
+      case 4: // Edge stack templates
+        return false;
+    }
+    return false;
+  };
+
   this.updateCategories = function () {
     var availableCategories = [];
 
     for (var i = 0; i < ctrl.templates.length; i++) {
       var template = ctrl.templates[i];
-      if ((template.Type === 1 && ctrl.state.showContainerTemplates) || (template.Type === 2 && ctrl.showSwarmStacks) || (template.Type === 3 && !ctrl.showSwarmStacks)) {
+      if (this.filterByTemplateType(template)) {
         availableCategories = availableCategories.concat(template.Categories);
       }
     }
@@ -35,13 +49,6 @@ function TemplateListController($async, $state, DatatableService, Notifications,
     }
 
     return _.includes(item.Categories, ctrl.state.selectedCategory);
-  };
-
-  this.filterByType = function (item) {
-    if ((item.Type === 1 && ctrl.state.showContainerTemplates) || (item.Type === 2 && ctrl.showSwarmStacks) || (item.Type === 3 && !ctrl.showSwarmStacks)) {
-      return true;
-    }
-    return false;
   };
 
   this.duplicateTemplate = duplicateTemplate.bind(this);

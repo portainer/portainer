@@ -1,6 +1,8 @@
-import { UIRouterContextComponent } from '@uirouter/react-hybrid';
 import ReactDOM from 'react-dom';
 import { IComponentOptions, IController } from 'angular';
+import { Suspense } from 'react';
+
+import { RootProvider } from './RootProvider';
 
 function toProps(
   propNames: string[],
@@ -44,10 +46,12 @@ export function react2angular<T>(
     this.$onChanges = () => {
       const props = toProps(propNames, this, $q);
       ReactDOM.render(
-        <UIRouterContextComponent>
-          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-          <Component {...(props as T)} />
-        </UIRouterContextComponent>,
+        <Suspense fallback="loading translations">
+          <RootProvider>
+            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+            <Component {...(props as T)} />
+          </RootProvider>
+        </Suspense>,
         el
       );
     };

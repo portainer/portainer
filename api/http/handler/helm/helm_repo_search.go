@@ -16,6 +16,7 @@ import (
 // @description **Access policy**: authenticated
 // @tags helm
 // @param repo query string true "Helm repository URL"
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {object} string "Success"

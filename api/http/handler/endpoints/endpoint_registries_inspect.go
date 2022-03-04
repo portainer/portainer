@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -16,6 +15,7 @@ import (
 // @summary get registry for environment
 // @description **Access policy**: authenticated
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "identifier"
@@ -38,7 +38,7 @@ func (handler *Handler) endpointRegistryInspect(w http.ResponseWriter, r *http.R
 	}
 
 	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find a registry with the specified identifier inside the database", Err: err}
 	} else if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find a registry with the specified identifier inside the database", Err: err}

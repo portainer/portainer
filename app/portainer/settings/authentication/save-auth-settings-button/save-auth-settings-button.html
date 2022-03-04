@@ -1,0 +1,17 @@
+<div class="col-sm-12 form-section-title"> Actions </div>
+<div class="form-group">
+  <div class="col-sm-12">
+    <button
+      type="button"
+      ng-class="[$ctrl.className, 'btn btn-primary btn-sm']"
+      ng-click="$ctrl.onSaveSettings()"
+      ng-disabled="$ctrl.saveButtonDisabled || $ctrl.saveButtonState"
+      button-spinner="$ctrl.saveButtonState"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-class="{{::$ctrl.limitedFeatureClass}}"
+    >
+      <span ng-hide="$ctrl.saveButtonState">Save settings</span>
+      <span ng-show="$ctrl.saveButtonState">Saving...</span>
+    </button>
+  </div>
+</div>

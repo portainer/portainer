@@ -8,7 +8,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 )
@@ -19,6 +18,7 @@ import (
 // @description **Access policy**: authenticated
 // @tags endpoints
 // @param namespace query string false "required if kubernetes environment, will show registries by namespace"
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
@@ -42,7 +42,7 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}

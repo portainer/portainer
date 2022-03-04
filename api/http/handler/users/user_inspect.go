@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -18,6 +17,7 @@ import (
 // @description User passwords are filtered out, and should never be accessible.
 // @description **Access policy**: authenticated
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "User identifier"
@@ -43,7 +43,7 @@ func (handler *Handler) userInspect(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}

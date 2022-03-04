@@ -14,25 +14,29 @@
       <rd-widget-header icon="fa-cogs" title-text="Actions"></rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="btn-group" role="group" aria-label="...">
-          <button authorization="DockerContainerStart" class="btn btn-success btn-sm" ng-click="start()" ng-disabled="container.State.Running"
+          <button authorization="DockerContainerStart" class="btn btn-success btn-sm" ng-click="start()" ng-disabled="container.State.Running || container.IsPortainer"
             ><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button
           >
-          <button authorization="DockerContainerStop" class="btn btn-danger btn-sm" ng-click="stop()" ng-disabled="!container.State.Running"
+          <button authorization="DockerContainerStop" class="btn btn-danger btn-sm" ng-click="stop()" ng-disabled="!container.State.Running || container.IsPortainer"
             ><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button
           >
-          <button authorization="DockerContainerKill" class="btn btn-danger btn-sm" ng-click="kill()" ng-disabled="!container.State.Running"
+          <button authorization="DockerContainerKill" class="btn btn-danger btn-sm" ng-click="kill()" ng-disabled="!container.State.Running || container.IsPortainer"
             ><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button
           >
-          <button authorization="DockerContainerRestart" class="btn btn-primary btn-sm" ng-click="restart()" ng-disabled="!container.State.Running"
+          <button authorization="DockerContainerRestart" class="btn btn-primary btn-sm" ng-click="restart()" ng-disabled="!container.State.Running || container.IsPortainer"
             ><i class="fa fa-sync space-right" aria-hidden="true"></i>Restart</button
           >
-          <button authorization="DockerContainerPause" class="btn btn-primary btn-sm" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"
+          <button
+            authorization="DockerContainerPause"
+            class="btn btn-primary btn-sm"
+            ng-click="pause()"
+            ng-disabled="!container.State.Running || container.State.Paused || container.IsPortainer"
             ><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button
           >
-          <button authorization="DockerContainerUnpause" class="btn btn-primary btn-sm" ng-click="unpause()" ng-disabled="!container.State.Paused"
+          <button authorization="DockerContainerUnpause" class="btn btn-primary btn-sm" ng-click="unpause()" ng-disabled="!container.State.Paused || container.IsPortainer"
             ><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button
           >
-          <button authorization="DockerContainerDelete" class="btn btn-danger btn-sm" ng-click="confirmRemove()"
+          <button authorization="DockerContainerDelete" class="btn btn-danger btn-sm" ng-click="confirmRemove()" ng-disabled="container.IsPortainer"
             ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button
           >
         </div>
@@ -40,14 +44,14 @@
           <button
             type="button"
             class="btn btn-danger btn-sm"
-            ng-disabled="state.recreateContainerInProgress"
+            ng-disabled="state.recreateContainerInProgress || container.IsPortainer"
             ng-click="recreate()"
             button-spinner="state.recreateContainerInProgress"
           >
             <span ng-hide="state.recreateContainerInProgress"><i class="fa fa-sync space-right" aria-hidden="true"></i>Recreate</span>
             <span ng-show="state.recreateContainerInProgress">Recreation in progress...</span>
           </button>
-          <a class="btn btn-primary btn-sm" type="button" ui-sref="docker.containers.new({ from: container.Id, nodeName: nodeName })"
+          <a class="btn btn-primary btn-sm" type="button" ui-sref="docker.containers.new({ from: container.Id, nodeName: nodeName })" ng-disabled="container.IsPortainer"
             ><i class="fa fa-copy space-right" aria-hidden="true"></i>Duplicate/Edit</a
           >
         </div>
@@ -105,6 +109,19 @@
             <tr ng-if="!container.State.Running && container.State.Status !== 'created'">
               <td>Finished</td>
               <td>{{ container.State.FinishedAt | getisodate }}</td>
+            </tr>
+            <tr ng-if="isAdmin && displayRecreateButton && applicationState.endpoint.type !== 4">
+              <td colspan="1">
+                Container webhook
+                <portainer-tooltip
+                  position="top"
+                  message="Webhook (or callback URI) used to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container."
+                ></portainer-tooltip>
+                <label class="switch box-selector-item limited business" style="margin-left: 20px">
+                  <input disable-authorization="DockerContainerUpdate" type="checkbox" ng-model="WebhookExists" disabled="disabled" ng-checked="true" /><i></i>
+                </label>
+                <be-feature-indicator feature="containerWebhookFeature"></be-feature-indicator>
+              </td>
             </tr>
             <tr authorization="DockerContainerLogs, DockerContainerInspect, DockerContainerStats, DockerExecStart">
               <td colspan="2">

@@ -1,12 +1,14 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
-import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 import { buildLdapSettingsModel, buildAdSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
 
 angular.module('portainer.app').controller('SettingsAuthenticationController', SettingsAuthenticationController);
 
 function SettingsAuthenticationController($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService, LDAPService) {
+  $scope.authMethod = 1;
+
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false,
@@ -47,11 +49,13 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
   $scope.authOptions = [
     { id: 'auth_internal', icon: 'fa fa-users', label: 'Internal', description: 'Internal authentication mechanism', value: 1 },
     { id: 'auth_ldap', icon: 'fa fa-users', label: 'LDAP', description: 'LDAP authentication', value: 2 },
-    { id: 'auth_ad', icon: 'fab fa-microsoft', label: 'Microsoft Active Directory', description: 'AD authentication', value: 4, feature: HIDE_INTERNAL_AUTH },
+    { id: 'auth_ad', icon: 'fab fa-microsoft', label: 'Microsoft Active Directory', description: 'AD authentication', value: 4, feature: FeatureId.HIDE_INTERNAL_AUTH },
     { id: 'auth_oauth', icon: 'fa fa-users', label: 'OAuth', description: 'OAuth authentication', value: 3 },
   ];
 
   $scope.onChangeAuthMethod = function onChangeAuthMethod(value) {
+    $scope.authMethod = value;
+
     if (value === 4) {
       $scope.settings.AuthenticationMethod = 2;
       $scope.formValues.ldap.serverType = 2;
@@ -182,7 +186,8 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     return (
       _.compact(ldapSettings.URLs).length &&
       (ldapSettings.AnonymousMode || (ldapSettings.ReaderDN && ldapSettings.Password)) &&
-      (!isTLSMode || $scope.formValues.TLSCACert || ldapSettings.TLSConfig.TLSSkipVerify)
+      (!isTLSMode || $scope.formValues.TLSCACert || ldapSettings.TLSConfig.TLSSkipVerify) &&
+      (!$scope.settings.LDAPSettings.AdminAutoPopulate || ($scope.settings.LDAPSettings.AdminAutoPopulate && $scope.formValues.selectedAdminGroups.length > 0))
     );
   }
 

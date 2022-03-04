@@ -8,7 +8,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -18,6 +17,7 @@ import (
 // @description Remove a template.
 // @description **Access policy**: authenticated
 // @tags custom_templates
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Template identifier"
 // @success 204 "Success"
@@ -38,7 +38,7 @@ func (handler *Handler) customTemplateDelete(w http.ResponseWriter, r *http.Requ
 	}
 
 	customTemplate, err := handler.DataStore.CustomTemplate().CustomTemplate(portainer.CustomTemplateID(customTemplateID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a custom template with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a custom template with the specified identifier inside the database", err}

@@ -11,7 +11,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -35,6 +34,7 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 // @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
 // @description **Access policy**: authenticated
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @accept json,multipart/form-data
 // @produce json
@@ -70,7 +70,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
@@ -226,7 +226,7 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 		resourceControl = authorization.NewPrivateResourceControl(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl, userID)
 	}
 
-	err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
+	err = handler.DataStore.ResourceControl().Create(resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
 	}

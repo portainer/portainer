@@ -22,7 +22,7 @@ module.exports = function (grunt) {
       dockerWindowsVersion: '19-03-12',
       dockerLinuxComposeVersion: '1.27.4',
       dockerWindowsComposeVersion: '1.28.0',
-      dockerComposePluginVersion: '2.0.0-beta.6',
+      dockerComposePluginVersion: '2.0.0-rc.2',
       helmVersion: 'v3.6.3',
       komposeVersion: 'v1.22.0',
       kubectlVersion: 'v1.18.0',
@@ -131,7 +131,7 @@ function shell_storybook(env) {
 
 function shell_build_binary(platform, arch) {
   const binfile = 'dist/portainer';
-  if (platform === 'linux') {
+  if (platform === 'linux' || platform === 'darwin') {
     return `
       if [ -f ${binfile} ]; then
         echo "Portainer binary exists";
@@ -158,6 +158,7 @@ function shell_build_binary_azuredevops(platform, arch) {
 function shell_run_container() {
   const portainerData = '${PORTAINER_DATA:-/tmp/portainer}';
   const portainerRoot = process.env.PORTAINER_PROJECT ? process.env.PORTAINER_PROJECT : process.env.PWD;
+  const portainerFlags = '${PORTAINER_FLAGS:-}';
 
   return `
     docker rm -f portainer
@@ -172,7 +173,7 @@ function shell_run_container() {
       -v /tmp:/tmp \
       --name portainer \
       portainer/base \
-      /app/portainer
+      /app/portainer ${portainerFlags}
   `;
 }
 

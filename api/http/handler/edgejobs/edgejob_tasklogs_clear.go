@@ -8,13 +8,13 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 // @id EdgeJobTasksClear
 // @summary Clear the log for a specifc task on an EdgeJob
 // @description **Access policy**: administrator
 // @tags edge_jobs
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path string true "EdgeJob Id"
@@ -36,7 +36,7 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 	}
 
 	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}

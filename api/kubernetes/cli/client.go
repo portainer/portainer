@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -18,7 +19,7 @@ import (
 type (
 	// ClientFactory is used to create Kubernetes clients
 	ClientFactory struct {
-		dataStore            portainer.DataStore
+		dataStore            dataservices.DataStore
 		reverseTunnelService portainer.ReverseTunnelService
 		signatureService     portainer.DigitalSignatureService
 		instanceID           string
@@ -34,7 +35,7 @@ type (
 )
 
 // NewClientFactory returns a new instance of a ClientFactory
-func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore portainer.DataStore) *ClientFactory {
+func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore dataservices.DataStore) *ClientFactory {
 	return &ClientFactory{
 		dataStore:            dataStore,
 		signatureService:     signatureService,
@@ -44,8 +45,12 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 	}
 }
 
+func (factory *ClientFactory) GetInstanceID() (instanceID string) {
+	return factory.instanceID
+}
+
 // Remove the cached kube client so a new one can be created
- func (factory *ClientFactory) RemoveKubeClient(endpointID portainer.EndpointID) {
+func (factory *ClientFactory) RemoveKubeClient(endpointID portainer.EndpointID) {
 	factory.endpointClients.Remove(strconv.Itoa(int(endpointID)))
 }
 

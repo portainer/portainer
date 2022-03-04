@@ -13,13 +13,13 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 )
 
 // @summary Execute a websocket on pod
 // @description The request will be upgraded to the websocket protocol.
 // @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags websocket
 // @accept json
@@ -63,7 +63,7 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}

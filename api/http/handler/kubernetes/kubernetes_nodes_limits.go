@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 // @id getKubernetesNodesLimits
@@ -15,6 +14,7 @@ import (
 // @description Get CPU and memory limits of all nodes within k8s cluster
 // @description **Access policy**: authenticated
 // @tags kubernetes
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -33,7 +33,7 @@ func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.
 	}
 
 	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.dataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}

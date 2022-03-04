@@ -2,18 +2,19 @@ package authorization
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Service represents a service used to
 // update authorizations associated to a user or team.
 type Service struct {
-	dataStore        portainer.DataStore
+	dataStore        dataservices.DataStore
 	K8sClientFactory *cli.ClientFactory
 }
 
 // NewService returns a point to a new Service instance.
-func NewService(dataStore portainer.DataStore) *Service {
+func NewService(dataStore dataservices.DataStore) *Service {
 	return &Service{
 		dataStore: dataStore,
 	}
@@ -152,7 +153,6 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 		portainer.OperationPortainerWebhookList:               true,
 		portainer.OperationPortainerWebhookCreate:             true,
 		portainer.OperationPortainerWebhookDelete:             true,
-		portainer.OperationIntegrationStoridgeAdmin:           true,
 		portainer.EndpointResourcesAccess:                     true,
 	}
 }
@@ -411,21 +411,19 @@ func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizatio
 // DefaultPortainerAuthorizations returns the default Portainer authorizations used by non-admin users.
 func DefaultPortainerAuthorizations() portainer.Authorizations {
 	return map[portainer.Authorization]bool{
-		portainer.OperationPortainerDockerHubInspect:        true,
-		portainer.OperationPortainerEndpointGroupList:       true,
-		portainer.OperationPortainerEndpointList:            true,
-		portainer.OperationPortainerEndpointInspect:         true,
-		portainer.OperationPortainerEndpointExtensionAdd:    true,
-		portainer.OperationPortainerEndpointExtensionRemove: true,
-		portainer.OperationPortainerMOTD:                    true,
-		portainer.OperationPortainerRegistryList:            true,
-		portainer.OperationPortainerRegistryInspect:         true,
-		portainer.OperationPortainerTeamList:                true,
-		portainer.OperationPortainerTemplateList:            true,
-		portainer.OperationPortainerTemplateInspect:         true,
-		portainer.OperationPortainerUserList:                true,
-		portainer.OperationPortainerUserInspect:             true,
-		portainer.OperationPortainerUserMemberships:         true,
+		portainer.OperationPortainerDockerHubInspect:  true,
+		portainer.OperationPortainerEndpointGroupList: true,
+		portainer.OperationPortainerEndpointList:      true,
+		portainer.OperationPortainerEndpointInspect:   true,
+		portainer.OperationPortainerMOTD:              true,
+		portainer.OperationPortainerRegistryList:      true,
+		portainer.OperationPortainerRegistryInspect:   true,
+		portainer.OperationPortainerTeamList:          true,
+		portainer.OperationPortainerTemplateList:      true,
+		portainer.OperationPortainerTemplateInspect:   true,
+		portainer.OperationPortainerUserList:          true,
+		portainer.OperationPortainerUserInspect:       true,
+		portainer.OperationPortainerUserMemberships:   true,
 	}
 }
 
@@ -601,4 +599,22 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 	}
 
 	return authorizations
+}
+
+func (service *Service) UserIsAdminOrAuthorized(userID portainer.UserID, endpointID portainer.EndpointID, authorizations []portainer.Authorization) (bool, error) {
+	user, err := service.dataStore.User().User(userID)
+	if err != nil {
+		return false, err
+	}
+	if user.Role == portainer.AdministratorRole {
+		return true, nil
+	}
+
+	for _, authorization := range authorizations {
+		_, authorized := user.EndpointAuthorizations[endpointID][authorization]
+		if authorized {
+			return true, nil
+		}
+	}
+	return false, nil
 }

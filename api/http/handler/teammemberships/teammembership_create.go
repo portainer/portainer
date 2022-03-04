@@ -39,6 +39,7 @@ func (payload *teamMembershipCreatePayload) Validate(r *http.Request) error {
 // @description Create a new team memberships. Access is only available to administrators leaders of the associated team.
 // @description **Access policy**: administrator
 // @tags team_memberships
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -85,7 +86,7 @@ func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Requ
 		Role:   portainer.MembershipRole(payload.Role),
 	}
 
-	err = handler.DataStore.TeamMembership().CreateTeamMembership(membership)
+	err = handler.DataStore.TeamMembership().Create(membership)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team memberships inside the database", err}
 	}

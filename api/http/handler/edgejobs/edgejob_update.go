@@ -10,7 +10,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type edgeJobUpdatePayload struct {
@@ -32,6 +31,7 @@ func (payload *edgeJobUpdatePayload) Validate(r *http.Request) error {
 // @summary Update an EdgeJob
 // @description **Access policy**: administrator
 // @tags edge_jobs
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -55,7 +55,7 @@ func (handler *Handler) edgeJobUpdate(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}

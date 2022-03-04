@@ -15,6 +15,8 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
+	dataerrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
@@ -29,7 +31,7 @@ type (
 	Transport struct {
 		HTTPTransport        *http.Transport
 		endpoint             *portainer.Endpoint
-		dataStore            portainer.DataStore
+		dataStore            dataservices.DataStore
 		signatureService     portainer.DigitalSignatureService
 		reverseTunnelService portainer.ReverseTunnelService
 		dockerClientFactory  *docker.ClientFactory
@@ -38,7 +40,7 @@ type (
 	// TransportParameters is used to create a new Transport
 	TransportParameters struct {
 		Endpoint             *portainer.Endpoint
-		DataStore            portainer.DataStore
+		DataStore            dataservices.DataStore
 		SignatureService     portainer.DigitalSignatureService
 		ReverseTunnelService portainer.ReverseTunnelService
 		DockerClientFactory  *docker.ClientFactory
@@ -414,7 +416,10 @@ func (transport *Transport) replaceRegistryAuthenticationHeader(request *http.Re
 			return nil, err
 		}
 
-		authenticationHeader := createRegistryAuthenticationHeader(originalHeaderData.RegistryId, accessContext)
+		authenticationHeader, err := createRegistryAuthenticationHeader(transport.dataStore, originalHeaderData.RegistryId, accessContext)
+		if err != nil {
+			return nil, err
+		}
 
 		headerData, err := json.Marshal(authenticationHeader)
 		if err != nil {
@@ -597,6 +602,10 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 	if response.StatusCode == http.StatusNoContent || response.StatusCode == http.StatusOK {
 		resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
 		if err != nil {
+			if err == dataerrors.ErrObjectNotFound {
+				return response, nil
+			}
+
 			return response, err
 		}
 

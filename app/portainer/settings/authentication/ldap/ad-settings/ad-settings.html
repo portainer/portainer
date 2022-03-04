@@ -9,23 +9,19 @@
   </auto-user-provision-toggle>
 
   <div>
-    <div class="col-sm-12 form-section-title">
-      Information
-    </div>
+    <div class="col-sm-12 form-section-title"> Information </div>
     <div class="form-group col-sm-12 text-muted small">
       When using Microsoft AD authentication, Portainer will delegate user authentication to the Domain Controller(s) configured below; if there is no connectivity, Portainer will
       fallback to internal authentication.
     </div>
   </div>
 
-  <div class="col-sm-12 form-section-title">
-    AD configuration
-  </div>
+  <div class="col-sm-12 form-section-title"> AD configuration </div>
 
   <div class="form-group">
     <div class="col-sm-12 small text-muted">
       <p>
-        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
         You can configure multiple AD Controllers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all use
         the same certificates).
       </p>
@@ -33,12 +29,12 @@
   </div>
 
   <div class="form-group">
-    <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap;">
+    <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap">
       AD Controller
       <button
         type="button"
         class="label label-default interactive"
-        style="border: 0;"
+        style="border: 0"
         ng-click="$ctrl.addLDAPUrl()"
         limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
         limited-feature-tabindex="-1"
@@ -47,7 +43,7 @@
       </button>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px;">
+      <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px">
         <input
           type="text"
           class="form-control"
@@ -135,7 +131,7 @@
   ></ldap-connectivity-check>
 
   <ldap-user-search
-    style="margin-top: 5px;"
+    style="margin-top: 5px"
     show-username-format="true"
     settings="$ctrl.settings.SearchSettings"
     domain-suffix="{{ $ctrl.domainSuffix }}"
@@ -145,7 +141,7 @@
   ></ldap-user-search>
 
   <ldap-group-search
-    style="margin-top: 5px;"
+    style="margin-top: 5px"
     settings="$ctrl.settings.GroupSearchSettings"
     domain-suffix="{{ $ctrl.domainSuffix }}"
     base-filter="(objectClass=group)"
@@ -154,13 +150,20 @@
   ></ldap-group-search>
 
   <ldap-custom-admin-group
-    style="margin-top: 5px;"
+    style="margin-top: 5px"
     settings="$ctrl.settings"
     on-search-click="($ctrl.onSearchAdminGroupsClick)"
     selected-admin-groups="$ctrl.selectedAdminGroups"
     default-admin-group-search-filter="'(objectClass=groupOfNames)'"
     limited-feature-id="$ctrl.limitedFeatureId"
+    is-limited-feature-self-contained="false"
   ></ldap-custom-admin-group>
 
-  <ldap-settings-test-login settings="$ctrl.settings" limited-feature-id="$ctrl.limitedFeatureId"></ldap-settings-test-login>
+  <ldap-settings-test-login settings="$ctrl.settings" limited-feature-id="$ctrl.limitedFeatureId" is-limited-feature-self-contained="false"></ldap-settings-test-login>
+  <save-auth-settings-button
+    on-save-settings="($ctrl.onSaveSettings)"
+    save-button-state="($ctrl.saveButtonState)"
+    limited-feature-id="$ctrl.limitedFeatureId"
+    save-button-disabled="($ctrl.isSaveSettingButtonDisabled())"
+  ></save-auth-settings-button>
 </ng-form>

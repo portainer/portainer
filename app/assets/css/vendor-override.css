@@ -269,6 +269,7 @@ json-tree .branch-preview {
 
 .panel {
   border: 1px solid var(--border-panel-color);
+  background-color: var(--bg-panel-body-color);
 }
 
 .theme-information .col-sm-12 {

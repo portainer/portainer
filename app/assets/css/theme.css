@@ -264,6 +264,7 @@ html {
   --bg-multiselect-helpercontainer: var(--white-color);
   --text-input-textarea: var(--white-color);
   --bg-service-datatable-thead: var(--grey-23);
+  --bg-inner-datatable-thead: var(--grey-23);
   --bg-service-datatable-tbody: var(--grey-24);
 }
 
@@ -338,7 +339,7 @@ html {
   --text-body-color: var(--white-color);
   --text-sidebar-title-color: var(--grey-8);
   --text-widget-header-color: var(--white-color);
-  --text-form-control-color: var(--grey-8);
+  --text-form-control-color: var(--white-color);
   --text-muted-color: var(--grey-8);
   --text-link-color: var(--blue-9);
   --text-link-hover-color: var(--blue-2);
@@ -364,7 +365,7 @@ html {
   --text-blocklist-item-selected-color: var(--white-color);
   --text-progress-bar-color: var(--white-color);
   --text-pagination-color: var(--white-color);
-  --text-pagination-span-color: var(--white-color);
+  --text-pagination-span-color: var(--blue-2);
   --text-pagination-span-hover-color: var(--white-color);
   --text-ui-select-color: var(--white-color);
   --text-ui-select-hover-color: var(--white-color);
@@ -435,6 +436,7 @@ html {
   --bg-multiselect-helpercontainer: var(--grey-1);
   --text-input-textarea: var(--grey-1);
   --bg-service-datatable-thead: var(--grey-1);
+  --bg-inner-datatable-thead: var(--grey-1);
   --bg-service-datatable-tbody: var(--grey-1);
 }
 
@@ -472,6 +474,7 @@ html {
   --bg-input-sm-color: var(--black-color);
   --bg-item-highlighted-color: var(--black-color);
   --bg-service-datatable-thead: var(--black-color);
+  --bg-inner-datatable-thead: var(--black-color);
   --bg-service-datatable-tbody: var(--black-color);
   --bg-pagination-color: var(--grey-3);
   --bg-pagination-span-color: var(--grey-3);
@@ -544,6 +547,8 @@ html {
   --text-button-hover-color: var(--white-color);
   --text-btn-default-color: var(--white-color);
   --text-small-select-color: var(--white-color);
+  --text-multiselect-item-color: var(--white-color);
+  --text-pagination-span-color: var(--blue-2);
 
   --border-color: var(--grey-55);
   --border-widget-color: var(--white-color);

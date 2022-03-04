@@ -8,8 +8,6 @@ import (
 	"net/http/httputil"
 	"time"
 
-	"github.com/portainer/portainer/api/bolt/errors"
-
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
@@ -27,6 +25,7 @@ type execStartOperationPayload struct {
 // @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
 // @description an ExecStart operation HTTP request will be created and hijacked.
 // @**Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags websocket
 // @accept json
@@ -54,7 +53,7 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == errors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}

@@ -111,7 +111,7 @@ export class VolumeBrowserController {
   }
   async onFileSelectedForUploadAsync(file) {
     try {
-      await this.VolumeBrowserService.upload(this.state.path, file, this.volumeId);
+      await this.VolumeBrowserService.upload(this.endpointId, this.state.path, file, this.volumeId);
       this.onFileUploaded();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to upload file');

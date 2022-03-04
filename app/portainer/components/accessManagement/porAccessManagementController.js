@@ -2,11 +2,12 @@ import _ from 'lodash-es';
 import angular from 'angular';
 
 import { RoleTypes } from '@/portainer/rbac/models/role';
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class PorAccessManagementController {
   /* @ngInject */
-  constructor(Notifications, AccessService, RoleService, featureService) {
-    Object.assign(this, { Notifications, AccessService, RoleService, featureService });
+  constructor(Notifications, AccessService, RoleService) {
+    Object.assign(this, { Notifications, AccessService, RoleService });
 
     this.limitedToBE = false;
 
@@ -76,7 +77,7 @@ class PorAccessManagementController {
   async $onInit() {
     try {
       if (this.limitedFeature) {
-        this.limitedToBE = this.featureService.isLimitedToBE(this.limitedFeature);
+        this.limitedToBE = isLimitedToBE(this.limitedFeature);
       }
 
       const entity = this.accessControlledEntity;

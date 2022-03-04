@@ -1,7 +1,7 @@
 <div
   class="col-xs-12 form-section-title interactive"
   ng-click="$ctrl.toggleSummary()"
-  style="display: flex; justify-content: space-between;"
+  style="display: flex; justify-content: space-between"
   ng-if="$ctrl.state.resources.length > 0"
 >
   Summary
@@ -13,11 +13,11 @@
 
 <div class="form-group" ng-if="$ctrl.state.expandedTemplate">
   <div class="col-sm-12 small text-muted">
-    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
     Portainer will execute the following Kubernetes actions.
   </div>
 
-  <div class="col-sm-12 small text-muted" style="padding-top: 1em;" ng-if="$ctrl.state.resources.length > 0">
+  <div class="col-sm-12 small text-muted" style="padding-top: 1em" ng-if="$ctrl.state.resources.length > 0">
     <ul>
       <li ng-repeat="summary in $ctrl.state.resources" ng-if="summary.action && summary.kind && summary.name">
         {{ summary.action }}

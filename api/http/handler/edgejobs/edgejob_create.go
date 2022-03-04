@@ -18,6 +18,7 @@ import (
 // @summary Create an EdgeJob
 // @description **Access policy**: administrator
 // @tags edge_jobs
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param method query string true "Creation Method" Enums(file, string)
@@ -218,7 +219,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 	}
 
-	return handler.DataStore.EdgeJob().CreateEdgeJob(edgeJob)
+	return handler.DataStore.EdgeJob().Create(edgeJob)
 }
 
 func convertEndpointsToMetaObject(endpoints []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeJobEndpointMeta {

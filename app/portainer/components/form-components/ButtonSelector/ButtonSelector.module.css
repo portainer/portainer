@@ -1,0 +1,10 @@
+.group input {
+  display: none;
+}
+
+.group input:checked + label {
+  color: #fff;
+  background-color: #286090;
+  background-image: none;
+  border-color: #204d74;
+}

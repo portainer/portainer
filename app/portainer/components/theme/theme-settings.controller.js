@@ -1,4 +1,4 @@
-import { buildOption } from '@/portainer/components/box-selector';
+import { buildOption } from '@/portainer/components/BoxSelector';
 
 export default class ThemeSettingsController {
   /* @ngInject */
@@ -25,8 +25,13 @@ export default class ThemeSettingsController {
   }
 
   setTheme(theme) {
-    this.ThemeManager.setTheme(theme);
+    if (theme === 'auto' || !theme) {
+      this.ThemeManager.autoTheme();
+    } else {
+      this.ThemeManager.setTheme(theme);
+    }
     this.state.themeInProgress = true;
+    this.state.userTheme = theme;
   }
 
   $onInit() {
@@ -35,7 +40,7 @@ export default class ThemeSettingsController {
         userId: null,
         userTheme: '',
         initTheme: '',
-        defaultTheme: 'light',
+        defaultTheme: 'auto',
         themeInProgress: false,
       };
 
@@ -43,13 +48,8 @@ export default class ThemeSettingsController {
         buildOption('light', 'fas fa-sun', 'Light Theme', 'Default color mode', 'light'),
         buildOption('dark', 'fas fa-moon', 'Dark Theme', 'Dark color mode', 'dark'),
         buildOption('highcontrast', 'fas fa-adjust', 'High Contrast', 'High contrast color mode', 'highcontrast'),
+        buildOption('auto', 'fas fa-sync-alt', 'Auto', 'Sync with system theme', 'auto'),
       ];
-
-      this.state.availableTheme = {
-        light: 'light',
-        dark: 'dark',
-        highContrast: 'highcontrast',
-      };
 
       try {
         this.state.userId = await this.Authentication.getUserDetails().ID;

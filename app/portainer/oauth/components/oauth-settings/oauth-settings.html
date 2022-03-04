@@ -1,17 +1,15 @@
-<ng-form name="$ctrl.oauthSettingsForm">
-  <div class="col-sm-12 form-section-title">
-    Single Sign-On
-  </div>
+<ng-form name="oauthSettingsForm">
+  <div class="col-sm-12 form-section-title"> Single Sign-On </div>
 
   <!-- SSO -->
   <div class="form-group">
     <div class="col-sm-12">
       <por-switch-field
-        label="Use SSO"
-        tooltip="When using SSO the OAuth provider is not forced to prompt for credentials."
-        name="use-sso"
-        ng-model="$ctrl.settings.SSO"
-        on-change="$ctrl.updateSSO()"
+        label="'Use SSO'"
+        tooltip="'When using SSO the OAuth provider is not forced to prompt for credentials.'"
+        name="'use-sso'"
+        checked="$ctrl.settings.SSO"
+        on-change="($ctrl.updateSSO)"
       ></por-switch-field>
     </div>
   </div>
@@ -21,10 +19,11 @@
   <div class="form-group" ng-if="$ctrl.settings.SSO">
     <div class="col-sm-12">
       <por-switch-field
-        label="Hide internal authentication prompt"
-        name="hide-internal-auth"
-        feature="$ctrl.limitedFeature"
-        ng-model="$ctrl.settings.HideInternalAuth"
+        label="'Hide internal authentication prompt'"
+        name="'hide-internal-auth'"
+        feature-id="$ctrl.limitedFeature"
+        checked="$ctrl.settings.HideInternalAuth"
+        on-change="($ctrl.onChangeHideInternalAuth)"
       ></por-switch-field>
     </div>
   </div>
@@ -49,14 +48,14 @@
     </div>
     <div class="form-group">
       <label class="col-sm-3 col-lg-2 control-label text-left">Default team</label>
-      <span class="small text-muted" style="margin-left: 20px;" ng-if="$ctrl.teams.length === 0">
+      <span class="small text-muted" style="margin-left: 20px" ng-if="$ctrl.teams.length === 0">
         You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
       </span>
 
       <div class="col-sm-9" ng-if="$ctrl.teams.length > 0">
         <div class="col-sm-12 small text-muted">
           <p>
-            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
             The default team option will be disabled when automatic team membership is enabled
           </p>
         </div>
@@ -83,17 +82,19 @@
     </div>
   </div>
 
-  <div class="col-sm-12 form-section-title">
-    Team membership
-  </div>
+  <div class="col-sm-12 form-section-title"> Team membership </div>
   <div class="form-group">
-    <div class="col-sm-12 text-muted small">
-      Automatic team membership synchronizes the team membership based on a custom claim in the token from the OAuth provider.
-    </div>
+    <div class="col-sm-12 text-muted small"> Automatic team membership synchronizes the team membership based on a custom claim in the token from the OAuth provider. </div>
   </div>
   <div class="form-group">
     <div class="col-sm-12">
-      <por-switch-field label="Automatic team membership" name="tls" feature="$ctrl.limitedFeature" ng-model="$ctrl.settings.OAuthAutoMapTeamMemberships"></por-switch-field>
+      <por-switch-field
+        label="'Automatic team membership'"
+        name="'tls'"
+        feature-id="$ctrl.limitedFeature"
+        checked="$ctrl.settings.OAuthAutoMapTeamMemberships"
+        on-change="($ctrl.onToggleAutoTeamMembership)"
+      ></por-switch-field>
     </div>
   </div>
 
@@ -111,20 +112,18 @@
     </div>
 
     <div class="form-group">
-      <label class="col-sm-3 col-lg-2 control-label text-left">
-        Statically assigned teams
-      </label>
+      <label class="col-sm-3 col-lg-2 control-label text-left"> Statically assigned teams </label>
       <div class="col-sm-9 col-lg-10">
-        <span class="label label-default interactive" style="margin-left: 1.4em;" ng-click="$ctrl.addTeamMembershipMapping()">
+        <span class="label label-default interactive" style="margin-left: 1.4em" ng-click="$ctrl.addTeamMembershipMapping()">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> add team mapping
         </span>
 
-        <div class="col-sm-12 form-inline" ng-repeat="mapping in $ctrl.settings.TeamMemberships.OAuthClaimMappings" style="margin-top: 0.75em;">
+        <div class="col-sm-12 form-inline" ng-repeat="mapping in $ctrl.settings.TeamMemberships.OAuthClaimMappings" style="margin-top: 0.75em">
           <div class="input-group input-group-sm col-sm-5">
             <span class="input-group-addon">claim value regex</span>
             <input type="text" class="form-control" ng-model="mapping.ClaimValRegex" />
           </div>
-          <span style="margin: 0px 0.5em;">maps to</span>
+          <span style="margin: 0px 0.5em">maps to</span>
           <div class="input-group input-group-sm col-sm-3 col-lg-4">
             <span class="input-group-addon">team</span>
             <select
@@ -138,7 +137,7 @@
           </div>
           <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.removeTeamMembership($index)"> <i class="fa fa-trash" aria-hidden="true"> </i></button>
 
-          <div class="small text-warning" ng-show="!mapping.ClaimValRegex" style="margin-top: 0.4em;">
+          <div class="small text-warning" ng-show="!mapping.ClaimValRegex" style="margin-top: 0.4em">
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Claim value regex is required.
           </div>
         </div>
@@ -146,11 +145,9 @@
     </div>
 
     <div class="form-group">
-      <div class="col-sm-12 text-muted small" style="margin-bottom: 0.5em;">
-        The default team will be assigned when the user does not belong to any other team
-      </div>
+      <div class="col-sm-12 text-muted small" style="margin-bottom: 0.5em"> The default team will be assigned when the user does not belong to any other team </div>
       <label class="col-sm-3 col-lg-2 control-label text-left">Default team</label>
-      <span class="small text-muted" style="margin-left: 20px;" ng-if="$ctrl.teams.length === 0">
+      <span class="small text-muted" style="margin-left: 20px" ng-if="$ctrl.teams.length === 0">
         You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
       </span>
 
@@ -379,4 +376,12 @@
       </a>
     </div>
   </div>
+  <save-auth-settings-button
+    on-save-settings="($ctrl.onSaveSettings)"
+    save-button-state="($ctrl.saveButtonState)"
+    save-button-disabled="!$ctrl.isOAuthTeamMembershipFormValid() || oauthSettingsForm.$invalid"
+    limited-feature-id="$ctrl.limitedFeature"
+    limited-feature-class="$ctrl.limitedFeatureClass"
+    class-name="'oauth-save-settings-button'"
+  ></save-auth-settings-button>
 </ng-form>

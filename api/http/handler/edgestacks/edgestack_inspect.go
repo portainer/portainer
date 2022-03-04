@@ -7,13 +7,13 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 // @id EdgeStackInspect
 // @summary Inspect an EdgeStack
 // @description **Access policy**: administrator
 // @tags edge_stacks
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path string true "EdgeStack Id"
@@ -29,7 +29,7 @@ func (handler *Handler) edgeStackInspect(w http.ResponseWriter, r *http.Request)
 	}
 
 	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(edgeStackID))
-	if err == errors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an edge stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an edge stack with the specified identifier inside the database", err}

@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -17,6 +16,7 @@ import (
 // @description Remove a team membership. Access is only available to administrators leaders of the associated team.
 // @description **Access policy**: administrator
 // @tags team_memberships
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "TeamMembership identifier"
 // @success 204 "Success"
@@ -32,7 +32,7 @@ func (handler *Handler) teamMembershipDelete(w http.ResponseWriter, r *http.Requ
 	}
 
 	membership, err := handler.DataStore.TeamMembership().TeamMembership(portainer.TeamMembershipID(membershipID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team membership with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a team membership with the specified identifier inside the database", err}

@@ -19,7 +19,7 @@
                   class="form-control"
                   name="configuration_name"
                   ng-model="ctrl.formValues.Name"
-                  ng-pattern="/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/"
+                  ng-pattern="/^[a-z0-9]([a-z0-9-.]{0,61}[a-z0-9])?$/"
                   ng-change="ctrl.onChangeName()"
                   placeholder="my-configuration"
                   auto-focus
@@ -33,8 +33,8 @@
                 <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                   <p ng-message="pattern"
-                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end
-                    with an alphanumeric character.</p
+                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters, '-' or '.', and contain at most 63
+                    characters, and must start and end with an alphanumeric character.</p
                   >
                 </div>
                 <p ng-if="ctrl.state.alreadyExist"
@@ -44,9 +44,7 @@
             </div>
             <!-- !name -->
 
-            <div class="col-sm-12 form-section-title">
-              Namespace
-            </div>
+            <div class="col-sm-12 form-section-title"> Namespace </div>
 
             <!-- resource-pool -->
             <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
@@ -64,37 +62,33 @@
             </div>
             <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
               <div class="col-sm-12 small text-warning">
-                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                 This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
                 namespace.
               </div>
             </div>
             <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
               <div class="col-sm-12 small text-muted">
-                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                 You do not have access to any namespace. Contact your administrator to get access to a namespace.
               </div>
             </div>
             <!-- !resource-pool -->
             <div ng-if="ctrl.formValues.ResourcePool">
-              <div class="col-sm-12 form-section-title">
-                Configuration type
-              </div>
+              <div class="col-sm-12 form-section-title"> Configuration type </div>
 
               <div class="form-group">
-                <div class="col-sm-12 small text-muted">
-                  Select the type of data that you want to save in the configuration.
-                </div>
+                <div class="col-sm-12 small text-muted"> Select the type of data that you want to save in the configuration. </div>
               </div>
 
               <!-- type options -->
-              <div class="form-group" style="margin-bottom: 0;">
+              <div class="form-group" style="margin-bottom: 0">
                 <div class="boxselector_wrapper">
                   <div>
                     <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
                     <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
                       <div class="boxselector_header">
-                        <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
+                        <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px"></i>
                         ConfigMap
                       </div>
                       <p>This configuration holds non-sensitive information</p>
@@ -104,7 +98,7 @@
                     <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
                     <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
                       <div class="boxselector_header">
-                        <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
+                        <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px"></i>
                         Secret
                       </div>
                       <p>This configuration holds sensitive information</p>
@@ -114,9 +108,7 @@
               </div>
               <!-- !type options -->
 
-              <div class="col-sm-12 form-section-title" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET">
-                Information
-              </div>
+              <div class="col-sm-12 form-section-title" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET"> Information </div>
               <div class="form-group" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET">
                 <div class="col-sm-12 small text-muted">
                   Creating a sensitive configuration will create a Kubernetes Secret of type <code>Opaque</code>. You can find more information about this in the
@@ -140,9 +132,7 @@
             </div>
 
             <!-- actions -->
-            <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
-              Actions
-            </div>
+            <div class="col-sm-12 form-section-title" style="margin-top: 10px"> Actions </div>
             <div class="form-group">
               <div class="col-sm-12">
                 <button

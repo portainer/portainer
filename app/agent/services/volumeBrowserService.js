@@ -2,7 +2,8 @@ import angular from 'angular';
 
 angular.module('portainer.agent').factory('VolumeBrowserService', VolumeBrowserServiceFactory);
 
-function VolumeBrowserServiceFactory(StateManager, Browse, BrowseVersion1, API_ENDPOINT_ENDPOINTS, EndpointProvider, Upload) {
+/* @ngInject */
+function VolumeBrowserServiceFactory(StateManager, Browse, BrowseVersion1, API_ENDPOINT_ENDPOINTS, Upload) {
   return {
     ls,
     get,
@@ -41,13 +42,13 @@ function VolumeBrowserServiceFactory(StateManager, Browse, BrowseVersion1, API_E
     return getBrowseService().rename({ volumeID: volumeId, version: getAgentApiVersion() }, payload).$promise;
   }
 
-  function upload(path, file, volumeId, onProgress) {
+  function upload(endpointId, path, file, volumeId, onProgress) {
     const agentVersion = StateManager.getAgentApiVersion();
     if (agentVersion < 2) {
       throw new Error('upload is not supported on this agent version');
     }
 
-    const url = `${API_ENDPOINT_ENDPOINTS}/${EndpointProvider.endpointID()}/docker/v${agentVersion}/browse/put?volumeID=${volumeId}`;
+    const url = `${API_ENDPOINT_ENDPOINTS}/${endpointId}/docker/v${agentVersion}/browse/put?volumeID=${volumeId}`;
 
     return new Promise((resolve, reject) => {
       Upload.upload({

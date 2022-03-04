@@ -14,7 +14,6 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 // @id StackStart
@@ -22,6 +21,7 @@ import (
 // @description Starts a stopped Stack.
 // @description **Access policy**: authenticated
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Stack identifier"
 // @success 200 {object} portainer.Stack "Success"
@@ -42,7 +42,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find a stack with the specified identifier inside the database", Err: err}
 	} else if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find a stack with the specified identifier inside the database", Err: err}
@@ -53,7 +53,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
 	} else if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
@@ -123,7 +123,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 func (handler *Handler) startStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	switch stack.Type {
 	case portainer.DockerComposeStack:
-		return handler.ComposeStackManager.Up(context.TODO(), stack, endpoint)
+		return handler.ComposeStackManager.Up(context.TODO(), stack, endpoint, false)
 	case portainer.DockerSwarmStack:
 		return handler.SwarmStackManager.Deploy(stack, true, endpoint)
 	}

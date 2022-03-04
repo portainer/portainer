@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 type teamUpdatePayload struct {
@@ -24,6 +23,7 @@ func (payload *teamUpdatePayload) Validate(r *http.Request) error {
 // @description Update a team.
 // @description **Access policy**: administrator
 // @tags teams
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -49,7 +49,7 @@ func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	team, err := handler.DataStore.Team().Team(portainer.TeamID(teamID))
-	if err == errors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a team with the specified identifier inside the database", err}

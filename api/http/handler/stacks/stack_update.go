@@ -12,7 +12,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
@@ -50,9 +49,10 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 
 // @id StackUpdate
 // @summary Update a stack
-// @description Update a stack.
+// @description Update a stack, only for file based stacks.
 // @description **Access policy**: authenticated
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -72,7 +72,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find a stack with the specified identifier inside the database", Err: err}
 	} else if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find a stack with the specified identifier inside the database", Err: err}
@@ -90,7 +90,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find the environment associated to the stack inside the database", Err: err}
 	} else if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find the environment associated to the stack inside the database", Err: err}
@@ -162,6 +162,15 @@ func (handler *Handler) updateAndDeployStack(r *http.Request, stack *portainer.S
 }
 
 func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	// Must not be git based stack. stop the auto update job if there is any
+	if stack.AutoUpdate != nil {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		stack.AutoUpdate = nil
+	}
+	if stack.GitConfig != nil {
+		stack.FromAppTemplate = true
+	}
+
 	var payload updateComposeStackPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -181,7 +190,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return configErr
 	}
 
-	err = handler.deployComposeStack(config)
+	err = handler.deployComposeStack(config, false)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 	}
@@ -190,6 +199,15 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 }
 
 func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	// Must not be git based stack. stop the auto update job if there is any
+	if stack.AutoUpdate != nil {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		stack.AutoUpdate = nil
+	}
+	if stack.GitConfig != nil {
+		stack.FromAppTemplate = true
+	}
+
 	var payload updateSwarmStackPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {

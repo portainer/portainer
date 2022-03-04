@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
@@ -18,6 +17,7 @@ import (
 // @summary Associate an orphaned stack to a new environment(endpoint)
 // @description **Access policy**: administrator
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Stack identifier"
@@ -62,7 +62,7 @@ func (handler *Handler) stackAssociate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}

@@ -42,6 +42,10 @@ type settingsUpdatePayload struct {
 	HelmRepositoryURL *string `example:"https://charts.bitnami.com/bitnami"`
 	// Kubectl Shell Image
 	KubectlShellImage *string `example:"portainer/kubectl-shell:latest"`
+	// DisableTrustOnFirstConnect makes Portainer require explicit user trust of the edge agent before accepting the connection
+	DisableTrustOnFirstConnect *bool `example:"false"`
+	// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
+	EnforceEdgeID *bool `example:"false"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -78,6 +82,7 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 // @description Update Portainer settings.
 // @description **Access policy**: administrator
 // @tags settings
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -111,18 +116,22 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.HelmRepositoryURL != nil {
-		newHelmRepo := strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
+		if *payload.HelmRepositoryURL != "" {
 
-		if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
-			err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusBadRequest, "Invalid Helm repository URL. Must correspond to a valid URL format", err}
+			newHelmRepo := strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
+
+			if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
+				err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusBadRequest, "Invalid Helm repository URL. Must correspond to a valid URL format", err}
+				}
+
 			}
-		}
 
-		settings.HelmRepositoryURL = newHelmRepo
-	} else {
-		settings.HelmRepositoryURL = ""
+			settings.HelmRepositoryURL = newHelmRepo
+		} else {
+			settings.HelmRepositoryURL = ""
+		}
 	}
 
 	if payload.BlackListedLabels != nil {
@@ -148,12 +157,25 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		if clientSecret == "" {
 			clientSecret = settings.OAuthSettings.ClientSecret
 		}
+		kubeSecret := payload.OAuthSettings.KubeSecretKey
+		if kubeSecret == nil {
+			kubeSecret = settings.OAuthSettings.KubeSecretKey
+		}
 		settings.OAuthSettings = *payload.OAuthSettings
 		settings.OAuthSettings.ClientSecret = clientSecret
+		settings.OAuthSettings.KubeSecretKey = kubeSecret
 	}
 
 	if payload.EnableEdgeComputeFeatures != nil {
 		settings.EnableEdgeComputeFeatures = *payload.EnableEdgeComputeFeatures
+	}
+
+	if payload.DisableTrustOnFirstConnect != nil {
+		settings.DisableTrustOnFirstConnect = *payload.DisableTrustOnFirstConnect
+	}
+
+	if payload.EnforceEdgeID != nil {
+		settings.EnforceEdgeID = *payload.EnforceEdgeID
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {

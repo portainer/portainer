@@ -1,3 +1,4 @@
+import './ldap-settings-custom.css';
 import controller from './ldap-settings-custom.controller';
 
 export const ldapSettingsCustom = {
@@ -11,5 +12,8 @@ export const ldapSettingsCustom = {
     connectivityCheck: '<',
     onSearchUsersClick: '<',
     onSearchGroupsClick: '<',
+    onSaveSettings: '<',
+    saveButtonState: '<',
+    saveButtonDisabled: '<',
   },
 };

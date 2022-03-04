@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
@@ -24,10 +25,10 @@ type baseTransport struct {
 	tokenManager     *tokenManager
 	endpoint         *portainer.Endpoint
 	k8sClientFactory *cli.ClientFactory
-	dataStore        portainer.DataStore
+	dataStore        dataservices.DataStore
 }
 
-func newBaseTransport(httpTransport *http.Transport, tokenManager *tokenManager, endpoint *portainer.Endpoint, k8sClientFactory *cli.ClientFactory, dataStore portainer.DataStore) *baseTransport {
+func newBaseTransport(httpTransport *http.Transport, tokenManager *tokenManager, endpoint *portainer.Endpoint, k8sClientFactory *cli.ClientFactory, dataStore dataservices.DataStore) *baseTransport {
 	return &baseTransport{
 		httpTransport:    httpTransport,
 		tokenManager:     tokenManager,
@@ -42,7 +43,10 @@ func newBaseTransport(httpTransport *http.Transport, tokenManager *tokenManager,
 // proxyKubernetesRequest intercepts a Kubernetes API request and apply logic based
 // on the requested operation.
 func (transport *baseTransport) proxyKubernetesRequest(request *http.Request) (*http.Response, error) {
-	apiVersionRe := regexp.MustCompile(`^(/kubernetes)?/api/v[0-9](\.[0-9])?`)
+	// URL path examples:
+	// http://localhost:9000/api/endpoints/3/kubernetes/api/v1/namespaces
+	// http://localhost:9000/api/endpoints/3/kubernetes/apis/apps/v1/namespaces/default/deployments
+	apiVersionRe := regexp.MustCompile(`^(/kubernetes)?/(api|apis/apps)/v[0-9](\.[0-9])?`)
 	requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 
 	switch {
@@ -66,6 +70,10 @@ func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fu
 	}
 
 	switch {
+	case strings.HasPrefix(requestPath, "pods"):
+		return transport.proxyPodsRequest(request, namespace, requestPath)
+	case strings.HasPrefix(requestPath, "deployments"):
+		return transport.proxyDeploymentsRequest(request, namespace, requestPath)
 	case requestPath == "" && request.Method == "DELETE":
 		return transport.proxyNamespaceDeleteOperation(request, namespace)
 	default:
@@ -136,7 +144,7 @@ func (transport *baseTransport) getRoundTripToken(request *http.Request, tokenMa
 
 // #region DECORATE FUNCTIONS
 
-func decorateAgentRequest(r *http.Request, dataStore portainer.DataStore) error {
+func decorateAgentRequest(r *http.Request, dataStore dataservices.DataStore) error {
 	requestPath := strings.TrimPrefix(r.URL.Path, "/v2")
 
 	switch {
@@ -147,7 +155,7 @@ func decorateAgentRequest(r *http.Request, dataStore portainer.DataStore) error 
 	return nil
 }
 
-func decorateAgentDockerHubRequest(r *http.Request, dataStore portainer.DataStore) error {
+func decorateAgentDockerHubRequest(r *http.Request, dataStore dataservices.DataStore) error {
 	requestPath, registryIdString := path.Split(r.URL.Path)
 
 	registryID, err := strconv.Atoi(registryIdString)

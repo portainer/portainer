@@ -21,6 +21,7 @@ import (
 // @description only return authorized environments(endpoints).
 // @description **Access policy**: restricted
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param start query int false "Start searching from"
@@ -87,6 +88,11 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	if groupID != 0 {
 		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
+	}
+
+	edgeDeviceFilter, edgeDeviceFilterErr := request.RetrieveBooleanQueryParameter(r, "edgeDeviceFilter", false)
+	if edgeDeviceFilterErr == nil {
+		filteredEndpoints = filterEndpointsByEdgeDevice(filteredEndpoints, edgeDeviceFilter)
 	}
 
 	if search != "" {
@@ -226,6 +232,17 @@ func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []int)
 
 	for _, endpoint := range endpoints {
 		if typeSet[endpoint.Type] {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+	return filteredEndpoints
+}
+
+func filterEndpointsByEdgeDevice(endpoints []portainer.Endpoint, edgeDeviceFilter bool) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, endpoint := range endpoints {
+		if edgeDeviceFilter == endpoint.IsEdgeDevice {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
 		}
 	}

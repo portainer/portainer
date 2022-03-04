@@ -10,18 +10,19 @@ import (
 	"github.com/pkg/errors"
 	"github.com/portainer/libcrypto"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 // Service represents a service to manage SSL certificates
 type Service struct {
 	fileService     portainer.FileService
-	dataStore       portainer.DataStore
+	dataStore       dataservices.DataStore
 	rawCert         *tls.Certificate
 	shutdownTrigger context.CancelFunc
 }
 
 // NewService returns a pointer to a new Service
-func NewService(fileService portainer.FileService, dataStore portainer.DataStore, shutdownTrigger context.CancelFunc) *Service {
+func NewService(fileService portainer.FileService, dataStore dataservices.DataStore, shutdownTrigger context.CancelFunc) *Service {
 	return &Service{
 		fileService:     fileService,
 		dataStore:       dataStore,
@@ -31,6 +32,16 @@ func NewService(fileService portainer.FileService, dataStore portainer.DataStore
 
 // Init initializes the service
 func (service *Service) Init(host, certPath, keyPath string) error {
+	pathSupplied := certPath != "" && keyPath != ""
+	if pathSupplied {
+		newCertPath, newKeyPath, err := service.fileService.CopySSLCertPair(certPath, keyPath)
+		if err != nil {
+			return errors.Wrap(err, "failed copying supplied certs")
+		}
+
+		return service.cacheInfo(newCertPath, newKeyPath, false)
+	}
+
 	settings, err := service.GetSSLSettings()
 	if err != nil {
 		return errors.Wrap(err, "failed fetching ssl settings")
@@ -47,16 +58,6 @@ func (service *Service) Init(host, certPath, keyPath string) error {
 		if err == nil {
 			return nil
 		}
-	}
-
-	pathSupplied := certPath != "" && keyPath != ""
-	if pathSupplied {
-		newCertPath, newKeyPath, err := service.fileService.CopySSLCertPair(certPath, keyPath)
-		if err != nil {
-			return errors.Wrap(err, "failed copying supplied certs")
-		}
-
-		return service.cacheInfo(newCertPath, newKeyPath, false)
 	}
 
 	// path not supplied and certificates doesn't exist - generate self signed

@@ -1,13 +1,17 @@
-import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
-
+import { baseHref } from '@/portainer/helpers/pathHelper';
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 import providers, { getProviderByUrl } from './providers';
+
+const MS_TENANT_ID_PLACEHOLDER = 'TENANT_ID';
 
 export default class OAuthSettingsController {
   /* @ngInject */
-  constructor(featureService) {
-    this.featureService = featureService;
+  constructor($scope) {
+    Object.assign(this, { $scope });
 
-    this.limitedFeature = HIDE_INTERNAL_AUTH;
+    this.limitedFeature = FeatureId.HIDE_INTERNAL_AUTH;
+    this.limitedFeatureClass = 'limited-be';
 
     this.state = {
       provider: 'custom',
@@ -22,14 +26,16 @@ export default class OAuthSettingsController {
     this.updateSSO = this.updateSSO.bind(this);
     this.addTeamMembershipMapping = this.addTeamMembershipMapping.bind(this);
     this.removeTeamMembership = this.removeTeamMembership.bind(this);
+    this.onToggleAutoTeamMembership = this.onToggleAutoTeamMembership.bind(this);
   }
 
   onMicrosoftTenantIDChange() {
-    const tenantID = this.state.microsoftTenantID;
+    const tenantID = this.state.microsoftTenantID || MS_TENANT_ID_PLACEHOLDER;
 
     this.settings.AuthorizationURI = `https://login.microsoftonline.com/${tenantID}/oauth2/authorize`;
     this.settings.AccessTokenURI = `https://login.microsoftonline.com/${tenantID}/oauth2/token`;
     this.settings.ResourceURI = `https://graph.windows.net/${tenantID}/me?api-version=2013-11-08`;
+    this.settings.LogoutURI = `https://login.microsoftonline.com/${tenantID}/oauth2/logout`;
   }
 
   useDefaultProviderConfiguration(providerId) {
@@ -60,8 +66,25 @@ export default class OAuthSettingsController {
     this.useDefaultProviderConfiguration(provider);
   }
 
-  updateSSO() {
-    this.settings.HideInternalAuth = this.settings.SSO;
+  updateSSO(checked) {
+    this.$scope.$evalAsync(() => {
+      this.settings.SSO = checked;
+      this.onChangeHideInternalAuth(checked);
+    });
+  }
+
+  onChangeHideInternalAuth(checked) {
+    this.$scope.$evalAsync(() => {
+      if (!this.isLimitedToBE) {
+        this.settings.HideInternalAuth = checked;
+      }
+    });
+  }
+
+  onToggleAutoTeamMembership(checked) {
+    this.$scope.$evalAsync(() => {
+      this.settings.OAuthAutoMapTeamMemberships = checked;
+    });
   }
 
   addTeamMembershipMapping() {
@@ -72,15 +95,29 @@ export default class OAuthSettingsController {
     this.settings.TeamMemberships.OAuthClaimMappings.splice(index, 1);
   }
 
+  isOAuthTeamMembershipFormValid() {
+    if (this.settings.OAuthAutoMapTeamMemberships && this.settings.TeamMemberships) {
+      if (!this.settings.TeamMemberships.OAuthClaimName) {
+        return false;
+      }
+
+      const hasInvalidMapping = this.settings.TeamMemberships.OAuthClaimMappings.some((m) => !(m.ClaimValRegex && m.Team));
+      if (hasInvalidMapping) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   $onInit() {
-    this.isLimitedToBE = this.featureService.isLimitedToBE(this.limitedFeature);
+    this.isLimitedToBE = isLimitedToBE(this.limitedFeature);
 
     if (this.isLimitedToBE) {
       return;
     }
 
     if (this.settings.RedirectURI === '') {
-      this.settings.RedirectURI = window.location.origin;
+      this.settings.RedirectURI = window.location.origin + baseHref();
     }
 
     if (this.settings.AuthorizationURI) {
@@ -89,8 +126,10 @@ export default class OAuthSettingsController {
       this.state.provider = getProviderByUrl(authUrl);
       if (this.state.provider === 'microsoft') {
         const tenantID = authUrl.match(/login.microsoftonline.com\/(.*?)\//)[1];
-        this.state.microsoftTenantID = tenantID;
-        this.onMicrosoftTenantIDChange();
+        if (tenantID !== MS_TENANT_ID_PLACEHOLDER) {
+          this.state.microsoftTenantID = tenantID;
+          this.onMicrosoftTenantIDChange();
+        }
       }
     }
 

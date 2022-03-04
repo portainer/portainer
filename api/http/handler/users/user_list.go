@@ -15,6 +15,7 @@ import (
 // @description User passwords are filtered out, and should never be accessible.
 // @description **Access policy**: restricted
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {array} portainer.User "Success"

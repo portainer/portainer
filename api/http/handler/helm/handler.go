@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -25,18 +26,20 @@ type requestBouncer interface {
 type Handler struct {
 	*mux.Router
 	requestBouncer     requestBouncer
-	dataStore          portainer.DataStore
+	dataStore          dataservices.DataStore
+	jwtService         dataservices.JWTService
 	kubeConfigService  kubernetes.KubeConfigService
 	kubernetesDeployer portainer.KubernetesDeployer
 	helmPackageManager libhelm.HelmPackageManager
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
-func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, kubernetesDeployer portainer.KubernetesDeployer, helmPackageManager libhelm.HelmPackageManager, kubeConfigService kubernetes.KubeConfigService) *Handler {
+func NewHandler(bouncer requestBouncer, dataStore dataservices.DataStore, jwtService dataservices.JWTService, kubernetesDeployer portainer.KubernetesDeployer, helmPackageManager libhelm.HelmPackageManager, kubeConfigService kubernetes.KubeConfigService) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
 		requestBouncer:     bouncer,
 		dataStore:          dataStore,
+		jwtService:         jwtService,
 		kubernetesDeployer: kubernetesDeployer,
 		helmPackageManager: helmPackageManager,
 		kubeConfigService:  kubeConfigService,
@@ -91,7 +94,12 @@ func (handler *Handler) getHelmClusterAccess(r *http.Request) (*options.Kubernet
 		return nil, &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment on request context", err}
 	}
 
-	bearerToken, err := security.ExtractBearerToken(r)
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+	}
+
+	bearerToken, err := handler.jwtService.GenerateToken(tokenData)
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
 	}

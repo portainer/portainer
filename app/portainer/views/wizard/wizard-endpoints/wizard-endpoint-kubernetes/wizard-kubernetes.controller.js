@@ -1,7 +1,6 @@
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
-//import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
-import { buildOption } from '@/portainer/components/box-selector';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
+import { buildOption } from '@/portainer/components/BoxSelector';
 
 export default class WizardKubernetesController {
   /* @ngInject */
@@ -13,6 +12,22 @@ export default class WizardKubernetesController {
     this.$filter = $filter;
     this.clipboard = clipboard;
     this.NameValidator = NameValidator;
+
+    this.state = {
+      endpointType: 'agent',
+      actionInProgress: false,
+      formValues: {
+        name: '',
+        url: '',
+      },
+      availableOptions: [buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent')],
+    };
+
+    this.onChangeEndpointType = this.onChangeEndpointType.bind(this);
+  }
+
+  onChangeEndpointType(endpointType) {
+    this.state.endpointType = endpointType;
   }
 
   addKubernetesAgent() {
@@ -87,16 +102,6 @@ export default class WizardKubernetesController {
 
   $onInit() {
     return this.$async(async () => {
-      this.state = {
-        endpointType: 'agent',
-        actionInProgress: false,
-        formValues: {
-          name: '',
-          url: '',
-        },
-        availableOptions: [buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent')],
-      };
-
       const agentVersion = this.StateManager.getState().application.version;
       const agentShortVersion = getAgentShortVersion(agentVersion);
 

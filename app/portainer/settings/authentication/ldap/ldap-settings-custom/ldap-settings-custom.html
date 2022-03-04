@@ -1,20 +1,16 @@
 <div>
-  <div class="col-sm-12 form-section-title">
-    Information
-  </div>
+  <div class="col-sm-12 form-section-title"> Information </div>
   <div class="form-group col-sm-12 text-muted small">
     When using LDAP authentication, Portainer will delegate user authentication to a LDAP server and fallback to internal authentication if LDAP authentication fails.
   </div>
 </div>
 
-<div class="col-sm-12 form-section-title">
-  LDAP configuration
-</div>
+<div class="col-sm-12 form-section-title"> LDAP configuration </div>
 
 <div class="form-group">
   <div class="col-sm-12 small text-muted">
     <p>
-      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-info-circle blue-icon m-r-2" aria-hidden="true"></i>
       You can configure multiple LDAP Servers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all use the
       same certificates).
     </p>
@@ -22,12 +18,11 @@
 </div>
 
 <div class="form-group">
-  <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap;">
+  <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left dispay-flex flex-wrap">
     LDAP Server
     <button
       type="button"
-      class="label label-default interactive"
-      style="border: 0;"
+      class="label label-default interactive no-border"
       ng-click="$ctrl.addLDAPUrl()"
       limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
       limited-feature-disabled
@@ -37,7 +32,7 @@
     </button>
   </label>
   <div class="col-sm-9 col-lg-10">
-    <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px;">
+    <div class="m-b-10 dispay-flex" ng-repeat="url in $ctrl.settings.URLs track by $index">
       <input type="text" class="form-control" id="ldap_url" ng-model="$ctrl.settings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" required />
       <button ng-if="$index > 0" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLDAPUrl($index)">
         <i class="fa fa-trash" aria-hidden="true"></i>
@@ -46,14 +41,15 @@
   </div>
 </div>
 
-<!-- Anonymous mode-->
 <div class="form-group">
-  <div class="col-sm-12">
-    <label for="anonymous_mode" class="control-label text-left">
-      Anonymous mode
-      <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
+  <label for="anonymous_mode" class="control-label text-left col-sm-3 col-lg-2">
+    Anonymous mode
+    <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
+  </label>
+  <div class="col-sm-9 col-lg-10">
+    <label class="switch">
+      <input type="checkbox" id="anonymous_mode" ng-model="$ctrl.settings.AnonymousMode" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" /><i></i>
     </label>
-    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" id="anonymous_mode" ng-model="$ctrl.settings.AnonymousMode" /><i></i> </label>
   </div>
 </div>
 <!-- !Anonymous mode-->
@@ -102,29 +98,38 @@
 ></ldap-connectivity-check>
 
 <ldap-custom-user-search
-  style="margin-top: 5px;"
+  class="m-r-5"
   settings="$ctrl.settings.SearchSettings"
   on-search-click="($ctrl.onSearchUsersClick)"
   limited-feature-id="$ctrl.limitedFeatureId"
 ></ldap-custom-user-search>
 <ldap-custom-group-search
-  style="margin-top: 5px;"
+  class="m-r-5"
   settings="$ctrl.settings.GroupSearchSettings"
   on-search-click="($ctrl.onSearchGroupsClick)"
   limited-feature-id="$ctrl.limitedFeatureId"
 ></ldap-custom-group-search>
 
-<div limited-feature-dir="{{ $ctrl.limitedFeatureId }}" limited-feature-class="limited-be" style="margin-bottom: 20px;">
-  <ldap-custom-admin-group
-    style="margin-top: 5px;"
-    settings="$ctrl.settings"
-    on-search-click="($ctrl.onSearchAdminGroupsClick)"
-    selected-admin-groups="$ctrl.selectedAdminGroups"
-    default-admin-group-search-filter="'(objectClass=groupOfNames)'"
-    limited-feature-id="$ctrl.limitedFeatureId"
-  ></ldap-custom-admin-group>
-</div>
+<ldap-custom-admin-group
+  class="m-r-5"
+  settings="$ctrl.settings"
+  on-search-click="($ctrl.onSearchAdminGroupsClick)"
+  selected-admin-groups="$ctrl.selectedAdminGroups"
+  default-admin-group-search-filter="'(objectClass=groupOfNames)'"
+  limited-feature-id="$ctrl.limitedFeatureId"
+  is-limited-feature-self-contained="true"
+></ldap-custom-admin-group>
 
-<div limited-feature-dir="{{ $ctrl.limitedFeatureId }}" limited-feature-class="limited-be">
-  <ldap-settings-test-login settings="$ctrl.settings" limited-feature-id="$ctrl.limitedFeatureId" show-be-indicator-if-needed="true"></ldap-settings-test-login>
-</div>
+<ldap-settings-test-login
+  settings="$ctrl.settings"
+  limited-feature-id="$ctrl.limitedFeatureId"
+  show-be-indicator-if-needed="true"
+  is-limited-feature-self-contained="true"
+></ldap-settings-test-login>
+
+<save-auth-settings-button
+  on-save-settings="($ctrl.onSaveSettings)"
+  save-button-state="($ctrl.saveButtonState)"
+  save-button-disabled="!$ctrl.saveButtonDisabled()"
+  limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
+></save-auth-settings-button>

@@ -4,19 +4,27 @@ export function SettingsViewModel(data) {
   this.AuthenticationMethod = data.AuthenticationMethod;
   this.LDAPSettings = data.LDAPSettings;
   this.OAuthSettings = new OAuthSettingsViewModel(data.OAuthSettings);
+  this.openAMTConfiguration = data.openAMTConfiguration;
+  this.fdoConfiguration = data.fdoConfiguration;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
+  this.FeatureFlagSettings = data.FeatureFlagSettings;
   this.UserSessionTimeout = data.UserSessionTimeout;
   this.EnableTelemetry = data.EnableTelemetry;
   this.KubeconfigExpiry = data.KubeconfigExpiry;
   this.HelmRepositoryURL = data.HelmRepositoryURL;
+  this.DisableTrustOnFirstConnect = data.DisableTrustOnFirstConnect;
+  this.EnforceEdgeID = data.EnforceEdgeID;
 }
 
 export function PublicSettingsViewModel(settings) {
   this.AuthenticationMethod = settings.AuthenticationMethod;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
+  this.DisableTrustOnFirstConnect = settings.DisableTrustOnFirstConnect;
+  this.EnforceEdgeID = settings.EnforceEdgeID;
+  this.FeatureFlagSettings = settings.FeatureFlagSettings;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
   this.EnableTelemetry = settings.EnableTelemetry;

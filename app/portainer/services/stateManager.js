@@ -1,218 +1,211 @@
 import moment from 'moment';
 
-angular.module('portainer.app').factory('StateManager', [
-  '$q',
-  '$async',
-  'SystemService',
-  'InfoHelper',
-  'LocalStorage',
-  'SettingsService',
-  'StatusService',
-  'APPLICATION_CACHE_VALIDITY',
-  'AgentPingService',
-  '$analytics',
-  function StateManagerFactory($q, $async, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService, $analytics) {
-    var manager = {};
+angular.module('portainer.app').factory('StateManager', StateManagerFactory);
 
-    var state = {
-      loading: true,
-      application: {},
-      endpoint: {},
-      UI: {
-        dismissedInfoPanels: {},
-        dismissedInfoHash: '',
-      },
-      extensions: [],
-    };
+/* @ngInject */
+function StateManagerFactory(
+  $async,
+  $q,
+  SystemService,
+  InfoHelper,
+  LocalStorage,
+  SettingsService,
+  StatusService,
+  APPLICATION_CACHE_VALIDITY,
+  AgentPingService,
+  $analytics,
+  EndpointProvider
+) {
+  var manager = {};
 
-    manager.setVersionInfo = function (versionInfo) {
-      state.application.versionStatus = versionInfo;
-      LocalStorage.storeApplicationState(state.application);
-    };
+  var state = {
+    loading: true,
+    application: {},
+    endpoint: {},
+    UI: {
+      dismissedInfoPanels: {},
+      dismissedInfoHash: '',
+    },
+  };
 
-    manager.dismissInformationPanel = function (id) {
-      state.UI.dismissedInfoPanels[id] = true;
-      LocalStorage.storeUIState(state.UI);
-    };
+  manager.setVersionInfo = function (versionInfo) {
+    state.application.versionStatus = versionInfo;
+    LocalStorage.storeApplicationState(state.application);
+  };
 
-    manager.dismissImportantInformation = function (hash) {
-      state.UI.dismissedInfoHash = hash;
-      LocalStorage.storeUIState(state.UI);
-    };
+  manager.dismissInformationPanel = function (id) {
+    state.UI.dismissedInfoPanels[id] = true;
+    LocalStorage.storeUIState(state.UI);
+  };
 
-    manager.getState = function () {
-      return state;
-    };
+  manager.dismissImportantInformation = function (hash) {
+    state.UI.dismissedInfoHash = hash;
+    LocalStorage.storeUIState(state.UI);
+  };
 
-    manager.clean = function () {
-      state.endpoint = {};
-      state.application = {};
-    };
+  manager.getState = function () {
+    return state;
+  };
 
-    manager.updateLogo = function (logoURL) {
-      state.application.logo = logoURL;
-      LocalStorage.storeApplicationState(state.application);
-    };
+  manager.clean = function () {
+    state.endpoint = {};
+    state.application = {};
+  };
 
-    manager.updateTheme = function (theme) {
-      state.application.theme = theme;
-      LocalStorage.storeApplicationState(state.application);
-    };
+  manager.cleanEndpoint = function () {
+    state.endpoint = {};
+    EndpointProvider.clean();
+  };
 
-    manager.updateSnapshotInterval = function (interval) {
-      state.application.snapshotInterval = interval;
-      LocalStorage.storeApplicationState(state.application);
-    };
+  manager.updateLogo = function (logoURL) {
+    state.application.logo = logoURL;
+    LocalStorage.storeApplicationState(state.application);
+  };
 
-    manager.updateEnableEdgeComputeFeatures = function updateEnableEdgeComputeFeatures(enableEdgeComputeFeatures) {
-      state.application.enableEdgeComputeFeatures = enableEdgeComputeFeatures;
-      LocalStorage.storeApplicationState(state.application);
-    };
+  manager.updateTheme = function (theme) {
+    state.application.theme = theme;
+    LocalStorage.storeApplicationState(state.application);
+  };
 
-    manager.updateEnableTelemetry = function updateEnableTelemetry(enableTelemetry) {
-      state.application.enableTelemetry = enableTelemetry;
-      $analytics.setOptOut(!enableTelemetry);
-      LocalStorage.storeApplicationState(state.application);
-    };
+  manager.updateSnapshotInterval = function (interval) {
+    state.application.snapshotInterval = interval;
+    LocalStorage.storeApplicationState(state.application);
+  };
 
-    function assignStateFromStatusAndSettings(status, settings) {
-      state.application.version = status.Version;
-      state.application.edition = status.Edition;
-      state.application.instanceId = status.InstanceID;
+  manager.updateEnableEdgeComputeFeatures = function updateEnableEdgeComputeFeatures(enableEdgeComputeFeatures) {
+    state.application.enableEdgeComputeFeatures = enableEdgeComputeFeatures;
+    LocalStorage.storeApplicationState(state.application);
+  };
 
-      state.application.enableTelemetry = settings.EnableTelemetry;
-      state.application.logo = settings.LogoURL;
-      state.application.snapshotInterval = settings.SnapshotInterval;
-      state.application.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
-      state.application.validity = moment().unix();
-    }
+  manager.updateEnableTelemetry = function updateEnableTelemetry(enableTelemetry) {
+    state.application.enableTelemetry = enableTelemetry;
+    $analytics.setOptOut(!enableTelemetry);
+    LocalStorage.storeApplicationState(state.application);
+  };
 
-    function loadApplicationState() {
-      var deferred = $q.defer();
+  function assignStateFromStatusAndSettings(status, settings) {
+    state.application.version = status.Version;
+    state.application.edition = status.Edition;
+    state.application.instanceId = status.InstanceID;
 
-      $q.all({
-        settings: SettingsService.publicSettings(),
-        status: StatusService.status(),
+    state.application.enableTelemetry = settings.EnableTelemetry;
+    state.application.logo = settings.LogoURL;
+    state.application.snapshotInterval = settings.SnapshotInterval;
+    state.application.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
+    state.application.validity = moment().unix();
+  }
+
+  function loadApplicationState() {
+    var deferred = $q.defer();
+
+    $q.all({
+      settings: SettingsService.publicSettings(),
+      status: StatusService.status(),
+    })
+      .then(function success(data) {
+        var status = data.status;
+        var settings = data.settings;
+        assignStateFromStatusAndSettings(status, settings);
+        LocalStorage.storeApplicationState(state.application);
+        deferred.resolve(state);
       })
-        .then(function success(data) {
-          var status = data.status;
-          var settings = data.settings;
-          assignStateFromStatusAndSettings(status, settings);
-          LocalStorage.storeApplicationState(state.application);
-          deferred.resolve(state);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve server settings and status', err: err });
-        });
-
-      return deferred.promise;
-    }
-
-    manager.initialize = initialize;
-    async function initialize() {
-      return $async(async () => {
-        const UIState = LocalStorage.getUIState();
-        if (UIState) {
-          state.UI = UIState;
-        }
-
-        const endpointState = LocalStorage.getEndpointState();
-        if (endpointState) {
-          state.endpoint = endpointState;
-        }
-
-        const applicationState = LocalStorage.getApplicationState();
-        if (isAppStateValid(applicationState)) {
-          state.application = applicationState;
-        } else {
-          await loadApplicationState();
-        }
-
-        state.loading = false;
-        $analytics.setPortainerStatus(state.application.instanceId, state.application.version);
-        $analytics.setOptOut(!state.application.enableTelemetry);
-        return state;
+      .catch(function error(err) {
+        deferred.reject({ msg: 'Unable to retrieve server settings and status', err: err });
       });
-    }
 
-    function isAppStateValid(appState) {
-      if (!appState || !appState.validity) {
-        return false;
-      }
-      const now = moment().unix();
-      const cacheValidity = now - appState.validity;
-      return cacheValidity < APPLICATION_CACHE_VALIDITY;
-    }
+    return deferred.promise;
+  }
 
-    function assignExtensions(endpointExtensions) {
-      var extensions = [];
-
-      for (var i = 0; i < endpointExtensions.length; i++) {
-        var extension = endpointExtensions[i];
-        if (extension.Type === 1) {
-          extensions.push('storidge');
-        }
+  manager.initialize = initialize;
+  async function initialize() {
+    return $async(async () => {
+      const UIState = LocalStorage.getUIState();
+      if (UIState) {
+        state.UI = UIState;
       }
 
-      return extensions;
-    }
-
-    manager.updateEndpointState = function (endpoint, extensions) {
-      var deferred = $q.defer();
-
-      if (endpoint.Type === 3) {
-        state.endpoint.name = endpoint.Name;
-        state.endpoint.mode = { provider: 'AZURE' };
-        LocalStorage.storeEndpointState(state.endpoint);
-        deferred.resolve();
-        return deferred.promise;
-      } else if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
-        state.endpoint.name = endpoint.Name;
-        state.endpoint.mode = { provider: 'KUBERNETES' };
-        LocalStorage.storeEndpointState(state.endpoint);
-        deferred.resolve();
-        return deferred.promise;
+      const endpointState = LocalStorage.getEndpointState();
+      if (endpointState) {
+        state.endpoint = endpointState;
       }
 
-      const reload = endpoint.Status === 1 || !endpoint.Snaphosts || !endpoint.Snaphosts.length || !endpoint.Snapshots[0].SnapshotRaw;
+      const applicationState = LocalStorage.getApplicationState();
+      if (isAppStateValid(applicationState)) {
+        state.application = applicationState;
+      } else {
+        await loadApplicationState();
+      }
 
-      $q.all({
-        version: reload ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),
-        info: reload ? SystemService.info() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Info),
-      })
-        .then(function success(data) {
-          var endpointMode = InfoHelper.determineEndpointMode(data.info, endpoint.Type);
-          var endpointAPIVersion = parseFloat(data.version.ApiVersion);
-          state.endpoint.mode = endpointMode;
-          state.endpoint.name = endpoint.Name;
-          state.endpoint.type = endpoint.Type;
-          state.endpoint.apiVersion = endpointAPIVersion;
-          state.endpoint.extensions = assignExtensions(extensions);
+      state.loading = false;
+      $analytics.setPortainerStatus(state.application.instanceId, state.application.version);
+      $analytics.setOptOut(!state.application.enableTelemetry);
+      return state;
+    });
+  }
 
-          if (endpointMode.agentProxy && endpoint.Status === 1) {
-            return AgentPingService.ping().then(function onPingSuccess(data) {
-              state.endpoint.agentApiVersion = data.version;
-            });
-          }
-        })
-        .then(function () {
-          LocalStorage.storeEndpointState(state.endpoint);
-          deferred.resolve();
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to connect to the Docker environment', err: err });
-        })
-        .finally(function final() {
-          state.loading = false;
-        });
+  function isAppStateValid(appState) {
+    if (!appState || !appState.validity) {
+      return false;
+    }
+    const now = moment().unix();
+    const cacheValidity = now - appState.validity;
+    return cacheValidity < APPLICATION_CACHE_VALIDITY;
+  }
 
+  manager.updateEndpointState = function (endpoint) {
+    var deferred = $q.defer();
+
+    if (endpoint.Type === 3) {
+      state.endpoint.name = endpoint.Name;
+      state.endpoint.mode = { provider: 'AZURE' };
+      LocalStorage.storeEndpointState(state.endpoint);
+      deferred.resolve();
       return deferred.promise;
-    };
+    } else if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
+      state.endpoint.name = endpoint.Name;
+      state.endpoint.mode = { provider: 'KUBERNETES' };
+      LocalStorage.storeEndpointState(state.endpoint);
+      deferred.resolve();
+      return deferred.promise;
+    }
 
-    manager.getAgentApiVersion = function getAgentApiVersion() {
-      return state.endpoint.agentApiVersion;
-    };
+    const reload = endpoint.Status === 1 || !endpoint.Snaphosts || !endpoint.Snaphosts.length || !endpoint.Snapshots[0].SnapshotRaw;
 
-    return manager;
-  },
-]);
+    $q.all({
+      version: reload ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),
+      info: reload ? SystemService.info() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Info),
+    })
+      .then(function success(data) {
+        var endpointMode = InfoHelper.determineEndpointMode(data.info, endpoint.Type);
+        var endpointAPIVersion = parseFloat(data.version.ApiVersion);
+        state.endpoint.mode = endpointMode;
+        state.endpoint.name = endpoint.Name;
+        state.endpoint.type = endpoint.Type;
+        state.endpoint.apiVersion = endpointAPIVersion;
+
+        if (endpointMode.agentProxy && endpoint.Status === 1) {
+          return AgentPingService.ping().then(function onPingSuccess(data) {
+            state.endpoint.agentApiVersion = data.version;
+          });
+        }
+      })
+      .then(function () {
+        LocalStorage.storeEndpointState(state.endpoint);
+        deferred.resolve();
+      })
+      .catch(function error(err) {
+        deferred.reject({ msg: 'Unable to connect to the Docker environment', err: err });
+      })
+      .finally(function final() {
+        state.loading = false;
+      });
+
+    return deferred.promise;
+  };
+
+  manager.getAgentApiVersion = function getAgentApiVersion() {
+    return state.endpoint.agentApiVersion;
+  };
+
+  return manager;
+}

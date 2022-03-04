@@ -2,21 +2,32 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"fmt"
 	"log"
 	"os"
+	"path"
+	"strconv"
 	"strings"
+	"time"
 
+	"github.com/sirupsen/logrus"
+
+	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/database/boltdb"
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/docker"
-
-	"github.com/portainer/libhelm"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
+	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
@@ -38,12 +49,12 @@ func initCLI() *portainer.CLIFlags {
 	var cliService portainer.CLIService = &cli.Service{}
 	flags, err := cliService.ParseFlags(portainer.APIVersion)
 	if err != nil {
-		log.Fatalf("failed parsing flags: %v", err)
+		logrus.Fatalf("Failed parsing flags: %v", err)
 	}
 
 	err = cliService.ValidateFlags(flags)
 	if err != nil {
-		log.Fatalf("failed validating flags:%v", err)
+		logrus.Fatalf("Failed validating flags:%v", err)
 	}
 	return flags
 }
@@ -51,62 +62,113 @@ func initCLI() *portainer.CLIFlags {
 func initFileService(dataStorePath string) portainer.FileService {
 	fileService, err := filesystem.NewService(dataStorePath, "")
 	if err != nil {
-		log.Fatalf("failed creating file service: %v", err)
+		logrus.Fatalf("Failed creating file service: %v", err)
 	}
 	return fileService
 }
 
-func initDataStore(dataStorePath string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) portainer.DataStore {
-	store := bolt.NewStore(dataStorePath, fileService)
-	err := store.Open()
+func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
+	connection, err := database.NewDatabase("boltdb", *flags.Data, secretKey)
 	if err != nil {
-		log.Fatalf("failed opening store: %v", err)
+		logrus.Fatalf("failed creating database connection: %s", err)
 	}
 
-	if rollback {
+	if bconn, ok := connection.(*boltdb.DbConnection); ok {
+		bconn.MaxBatchSize = *flags.MaxBatchSize
+		bconn.MaxBatchDelay = *flags.MaxBatchDelay
+		bconn.InitialMmapSize = *flags.InitialMmapSize
+	} else {
+		logrus.Fatalf("failed creating database connection: expecting a boltdb database type but a different one was received")
+	}
+
+	store := datastore.NewStore(*flags.Data, fileService, connection)
+	isNew, err := store.Open()
+	if err != nil {
+		logrus.Fatalf("Failed opening store: %v", err)
+	}
+
+	if *flags.Rollback {
 		err := store.Rollback(false)
 		if err != nil {
-			log.Fatalf("failed rolling back: %s", err)
+			logrus.Fatalf("Failed rolling back: %v", err)
 		}
 
-		log.Println("Exiting rollback")
+		logrus.Println("Exiting rollback")
 		os.Exit(0)
 		return nil
 	}
 
+	// Init sets some defaults - it's basically a migration
 	err = store.Init()
 	if err != nil {
-		log.Fatalf("failed initializing data store: %v", err)
+		logrus.Fatalf("Failed initializing data store: %v", err)
 	}
 
-	err = store.MigrateData(false)
+	if isNew {
+		// from MigrateData
+		store.VersionService.StoreDBVersion(portainer.DBVersion)
+
+		err := updateSettingsFromFlags(store, flags)
+		if err != nil {
+			logrus.Fatalf("Failed updating settings from flags: %v", err)
+		}
+	} else {
+		storedVersion, err := store.VersionService.DBVersion()
+		if err != nil {
+			logrus.Fatalf("Something Failed during creation of new database: %v", err)
+		}
+		if storedVersion != portainer.DBVersion {
+			err = store.MigrateData()
+			if err != nil {
+				logrus.Fatalf("Failed migration: %v", err)
+			}
+		}
+	}
+
+	err = updateSettingsFromFlags(store, flags)
 	if err != nil {
-		log.Fatalf("failed migration: %v", err)
+		log.Fatalf("Failed updating settings from flags: %v", err)
 	}
 
-	go shutdownDatastore(shutdownCtx, store)
-	return store
-}
+	// this is for the db restore functionality - needs more tests.
+	go func() {
+		<-shutdownCtx.Done()
+		defer connection.Close()
 
-func shutdownDatastore(shutdownCtx context.Context, datastore portainer.DataStore) {
-	<-shutdownCtx.Done()
-	datastore.Close()
+		exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
+
+		err := store.Export(exportFilename)
+		if err != nil {
+			logrus.WithError(err).Debugf("Failed to export to %s", exportFilename)
+		} else {
+			logrus.Debugf("exported to %s", exportFilename)
+		}
+		connection.Close()
+	}()
+	return store
 }
 
 func initComposeStackManager(assetsPath string, configPath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
 	composeWrapper, err := exec.NewComposeStackManager(assetsPath, configPath, proxyManager)
 	if err != nil {
-		log.Fatalf("failed creating compose manager: %s", err)
+		logrus.Fatalf("Failed creating compose manager: %v", err)
 	}
 
 	return composeWrapper
 }
 
-func initSwarmStackManager(assetsPath string, configPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (portainer.SwarmStackManager, error) {
-	return exec.NewSwarmStackManager(assetsPath, configPath, signatureService, fileService, reverseTunnelService)
+func initSwarmStackManager(
+	assetsPath string,
+	configPath string,
+	signatureService portainer.DigitalSignatureService,
+	fileService portainer.FileService,
+	reverseTunnelService portainer.ReverseTunnelService,
+	dataStore dataservices.DataStore,
+) (portainer.SwarmStackManager, error) {
+	return exec.NewSwarmStackManager(assetsPath, configPath, signatureService, fileService, reverseTunnelService, dataStore)
 }
 
-func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheManager, kubernetesClientFactory *kubecli.ClientFactory, dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, proxyManager *proxy.Manager, assetsPath string) portainer.KubernetesDeployer {
+func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheManager, kubernetesClientFactory *kubecli.ClientFactory, dataStore dataservices.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, proxyManager *proxy.Manager, assetsPath string) portainer.KubernetesDeployer {
 	return exec.NewKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, signatureService, proxyManager, assetsPath)
 }
 
@@ -114,17 +176,12 @@ func initHelmPackageManager(assetsPath string) (libhelm.HelmPackageManager, erro
 	return libhelm.NewHelmPackageManager(libhelm.HelmConfig{BinaryPath: assetsPath})
 }
 
-func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
-	settings, err := dataStore.Settings().Settings()
-	if err != nil {
-		return nil, err
-	}
+func initAPIKeyService(datastore dataservices.DataStore) apikey.APIKeyService {
+	return apikey.NewAPIKeyService(datastore.APIKeyRepository(), datastore.User())
+}
 
-	if settings.UserSessionTimeout == "" {
-		settings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
-		dataStore.Settings().UpdateSettings(settings)
-	}
-	jwtService, err := jwt.NewService(settings.UserSessionTimeout, dataStore)
+func initJWTService(userSessionTimeout string, dataStore dataservices.DataStore) (dataservices.JWTService, error) {
+	jwtService, err := jwt.NewService(userSessionTimeout, dataStore)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +208,7 @@ func initGitService() portainer.GitService {
 	return git.NewService()
 }
 
-func initSSLService(addr, dataPath, certPath, keyPath string, fileService portainer.FileService, dataStore portainer.DataStore, shutdownTrigger context.CancelFunc) (*ssl.Service, error) {
+func initSSLService(addr, dataPath, certPath, keyPath string, fileService portainer.FileService, dataStore dataservices.DataStore, shutdownTrigger context.CancelFunc) (*ssl.Service, error) {
 	slices := strings.Split(addr, ":")
 	host := slices[0]
 	if host == "" {
@@ -172,15 +229,15 @@ func initDockerClientFactory(signatureService portainer.DigitalSignatureService,
 	return docker.NewClientFactory(signatureService, reverseTunnelService)
 }
 
-func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore portainer.DataStore) *kubecli.ClientFactory {
+func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore dataservices.DataStore) *kubecli.ClientFactory {
 	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID, dataStore)
 }
 
-func initSnapshotService(snapshotInterval string, dataStore portainer.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (portainer.SnapshotService, error) {
+func initSnapshotService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (portainer.SnapshotService, error) {
 	dockerSnapshotter := docker.NewSnapshotter(dockerClientFactory)
 	kubernetesSnapshotter := kubernetes.NewSnapshotter(kubernetesClientFactory)
 
-	snapshotService, err := snapshot.NewService(snapshotInterval, dataStore, dockerSnapshotter, kubernetesSnapshotter, shutdownCtx)
+	snapshotService, err := snapshot.NewService(snapshotIntervalFromFlag, dataStore, dockerSnapshotter, kubernetesSnapshotter, shutdownCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -195,17 +252,23 @@ func initStatus(instanceID string) *portainer.Status {
 	}
 }
 
-func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLIFlags) error {
+func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.CLIFlags) error {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
 		return err
 	}
 
-	settings.LogoURL = *flags.Logo
-	settings.SnapshotInterval = *flags.SnapshotInterval
-	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
-	settings.EnableTelemetry = true
-	settings.OAuthSettings.SSO = true
+	if *flags.SnapshotInterval != "" {
+		settings.SnapshotInterval = *flags.SnapshotInterval
+	}
+
+	if *flags.Logo != "" {
+		settings.LogoURL = *flags.Logo
+	}
+
+	if *flags.EnableEdgeComputeFeatures {
+		settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
+	}
 
 	if *flags.Templates != "" {
 		settings.TemplatesURL = *flags.Templates
@@ -220,14 +283,16 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 		return err
 	}
 
-	httpEnabled := !*flags.HTTPDisabled
-
 	sslSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {
 		return err
 	}
 
-	sslSettings.HTTPEnabled = httpEnabled
+	if *flags.HTTPDisabled {
+		sslSettings.HTTPEnabled = false
+	} else if *flags.HTTPEnabled {
+		sslSettings.HTTPEnabled = true
+	}
 
 	err = dataStore.SSLSettings().UpdateSettings(sslSettings)
 	if err != nil {
@@ -235,6 +300,49 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	}
 
 	return nil
+}
+
+// enableFeaturesFromFlags turns on or off feature flags
+// e.g.  portainer --feat open-amt --feat fdo=true ... (defaults to true)
+// note, settings are persisted to the DB. To turn off `--feat open-amt=false`
+func enableFeaturesFromFlags(dataStore dataservices.DataStore, flags *portainer.CLIFlags) error {
+	settings, err := dataStore.Settings().Settings()
+	if err != nil {
+		return err
+	}
+
+	if settings.FeatureFlagSettings == nil {
+		settings.FeatureFlagSettings = make(map[portainer.Feature]bool)
+	}
+
+	// loop through feature flags to check if they are supported
+	for _, feat := range *flags.FeatureFlags {
+		var correspondingFeature *portainer.Feature
+		for i, supportedFeat := range portainer.SupportedFeatureFlags {
+			if strings.EqualFold(feat.Name, string(supportedFeat)) {
+				correspondingFeature = &portainer.SupportedFeatureFlags[i]
+			}
+		}
+
+		if correspondingFeature == nil {
+			return fmt.Errorf("unknown feature flag '%s'", feat.Name)
+		}
+
+		featureState, err := strconv.ParseBool(feat.Value)
+		if err != nil {
+			return fmt.Errorf("feature flag's '%s' value should be true or false", feat.Name)
+		}
+
+		if featureState {
+			logrus.Printf("Feature %v : on", *correspondingFeature)
+		} else {
+			logrus.Printf("Feature %v : off", *correspondingFeature)
+		}
+
+		settings.FeatureFlagSettings[*correspondingFeature] = featureState
+	}
+
+	return dataStore.Settings().UpdateSettings(settings)
 }
 
 func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
@@ -257,7 +365,7 @@ func generateAndStoreKeyPair(fileService portainer.FileService, signatureService
 func initKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
 	existingKeyPair, err := fileService.KeyPairFilesExist()
 	if err != nil {
-		log.Fatalf("failed checking for existing key pair: %v", err)
+		logrus.Fatalf("Failed checking for existing key pair: %v", err)
 	}
 
 	if existingKeyPair {
@@ -266,7 +374,7 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 	return generateAndStoreKeyPair(fileService, signatureService)
 }
 
-func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snapshotService portainer.SnapshotService) error {
+func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
 	tlsConfiguration := portainer.TLSConfiguration{
 		TLS:           *flags.TLS,
 		TLSSkipVerify: *flags.TLSSkipVerify,
@@ -290,7 +398,6 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 		TLSConfig:          tlsConfiguration,
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
-		Extensions:         []portainer.EndpointExtension{},
 		TagIDs:             []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
@@ -328,13 +435,13 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 
 	err := snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
-		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		logrus.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
-	return dataStore.Endpoint().CreateEndpoint(endpoint)
+	return dataStore.Endpoint().Create(endpoint)
 }
 
-func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, snapshotService portainer.SnapshotService) error {
+func createUnsecuredEndpoint(endpointURL string, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
 	if strings.HasPrefix(endpointURL, "tcp://") {
 		_, err := client.ExecutePingOperation(endpointURL, nil)
 		if err != nil {
@@ -352,7 +459,6 @@ func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, 
 		TLSConfig:          portainer.TLSConfiguration{},
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
-		Extensions:         []portainer.EndpointExtension{},
 		TagIDs:             []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
@@ -374,13 +480,13 @@ func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, 
 
 	err := snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
-		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		logrus.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
-	return dataStore.Endpoint().CreateEndpoint(endpoint)
+	return dataStore.Endpoint().Create(endpoint)
 }
 
-func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snapshotService portainer.SnapshotService) error {
+func initEndpoint(flags *portainer.CLIFlags, dataStore dataservices.DataStore, snapshotService portainer.SnapshotService) error {
 	if *flags.EndpointURL == "" {
 		return nil
 	}
@@ -391,7 +497,7 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	}
 
 	if len(endpoints) > 0 {
-		log.Println("Instance already has defined environments. Skipping the environment defined via CLI.")
+		logrus.Println("Instance already has defined environments. Skipping the environment defined via CLI.")
 		return nil
 	}
 
@@ -401,60 +507,90 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
 }
 
+func loadEncryptionSecretKey(keyfilename string) []byte {
+	content, err := os.ReadFile(path.Join("/run/secrets", keyfilename))
+	if err != nil {
+		if os.IsNotExist(err) {
+			logrus.Printf("Encryption key file `%s` not present", keyfilename)
+		} else {
+			logrus.Printf("Error reading encryption key file: %v", err)
+		}
+
+		return nil
+	}
+
+	// return a 32 byte hash of the secret (required for AES)
+	hash := sha256.Sum256(content)
+	return hash[:]
+}
+
 func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	shutdownCtx, shutdownTrigger := context.WithCancel(context.Background())
 
 	fileService := initFileService(*flags.Data)
-
-	dataStore := initDataStore(*flags.Data, *flags.Rollback, fileService, shutdownCtx)
-
-	if err := dataStore.CheckCurrentEdition(); err != nil {
-		log.Fatal(err)
+	encryptionKey := loadEncryptionSecretKey(*flags.SecretKeyName)
+	if encryptionKey == nil {
+		logrus.Println("Proceeding without encryption key")
 	}
 
-	jwtService, err := initJWTService(dataStore)
+	dataStore := initDataStore(flags, encryptionKey, fileService, shutdownCtx)
+
+	if err := dataStore.CheckCurrentEdition(); err != nil {
+		logrus.Fatal(err)
+	}
+	instanceID, err := dataStore.Version().InstanceID()
 	if err != nil {
-		log.Fatalf("failed initializing JWT service: %v", err)
+		logrus.Fatalf("Failed getting instance id: %v", err)
+	}
+
+	apiKeyService := initAPIKeyService(dataStore)
+
+	settings, err := dataStore.Settings().Settings()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	jwtService, err := initJWTService(settings.UserSessionTimeout, dataStore)
+	if err != nil {
+		logrus.Fatalf("Failed initializing JWT service: %v", err)
+	}
+
+	err = enableFeaturesFromFlags(dataStore, flags)
+	if err != nil {
+		logrus.Fatalf("Failed enabling feature flag: %v", err)
 	}
 
 	ldapService := initLDAPService()
-
 	oauthService := initOAuthService()
-
 	gitService := initGitService()
 
-	cryptoService := initCryptoService()
+	openAMTService := openamt.NewService()
 
+	cryptoService := initCryptoService()
 	digitalSignatureService := initDigitalSignatureService()
 
 	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.Data, *flags.SSLCert, *flags.SSLKey, fileService, dataStore, shutdownTrigger)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	sslSettings, err := sslService.GetSSLSettings()
 	if err != nil {
-		log.Fatalf("failed to get ssl settings: %s", err)
+		logrus.Fatalf("Failed to get ssl settings: %s", err)
 	}
 
 	err = initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
-		log.Fatalf("failed initializing key pai: %v", err)
+		logrus.Fatalf("Failed initializing key pair: %v", err)
 	}
 
 	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx)
-
-	instanceID, err := dataStore.Version().InstanceID()
-	if err != nil {
-		log.Fatalf("failed getting instance id: %v", err)
-	}
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
 	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, instanceID, dataStore)
 
 	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx)
 	if err != nil {
-		log.Fatalf("failed initializing snapshot service: %v", err)
+		logrus.Fatalf("Failed initializing snapshot service: %v", err)
 	}
 	snapshotService.Start()
 
@@ -473,46 +609,39 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	composeStackManager := initComposeStackManager(*flags.Assets, dockerConfigPath, reverseTunnelService, proxyManager)
 
-	swarmStackManager, err := initSwarmStackManager(*flags.Assets, dockerConfigPath, digitalSignatureService, fileService, reverseTunnelService)
+	swarmStackManager, err := initSwarmStackManager(*flags.Assets, dockerConfigPath, digitalSignatureService, fileService, reverseTunnelService, dataStore)
 	if err != nil {
-		log.Fatalf("failed initializing swarm stack manager: %s", err)
+		logrus.Fatalf("Failed initializing swarm stack manager: %v", err)
 	}
 
 	kubernetesDeployer := initKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, digitalSignatureService, proxyManager, *flags.Assets)
 
 	helmPackageManager, err := initHelmPackageManager(*flags.Assets)
 	if err != nil {
-		log.Fatalf("failed initializing helm package manager: %s", err)
-	}
-
-	if dataStore.IsNew() {
-		err = updateSettingsFromFlags(dataStore, flags)
-		if err != nil {
-			log.Fatalf("failed updating settings from flags: %v", err)
-		}
+		logrus.Fatalf("Failed initializing helm package manager: %v", err)
 	}
 
 	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)
 	if err != nil {
-		log.Fatalf("failed loading edge jobs from database: %v", err)
+		logrus.Fatalf("Failed loading edge jobs from database: %v", err)
 	}
 
 	applicationStatus := initStatus(instanceID)
 
 	err = initEndpoint(flags, dataStore, snapshotService)
 	if err != nil {
-		log.Fatalf("failed initializing environment: %v", err)
+		logrus.Fatalf("Failed initializing environment: %v", err)
 	}
 
 	adminPasswordHash := ""
 	if *flags.AdminPasswordFile != "" {
 		content, err := fileService.GetFileContent(*flags.AdminPasswordFile, "")
 		if err != nil {
-			log.Fatalf("failed getting admin password file: %v", err)
+			logrus.Fatalf("Failed getting admin password file: %v", err)
 		}
 		adminPasswordHash, err = cryptoService.Hash(strings.TrimSuffix(string(content), "\n"))
 		if err != nil {
-			log.Fatalf("failed hashing admin password: %v", err)
+			logrus.Fatalf("Failed hashing admin password: %v", err)
 		}
 	} else if *flags.AdminPassword != "" {
 		adminPasswordHash = *flags.AdminPassword
@@ -521,33 +650,33 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	if adminPasswordHash != "" {
 		users, err := dataStore.User().UsersByRole(portainer.AdministratorRole)
 		if err != nil {
-			log.Fatalf("failed getting admin user: %v", err)
+			logrus.Fatalf("Failed getting admin user: %v", err)
 		}
 
 		if len(users) == 0 {
-			log.Println("Created admin user with the given password.")
+			logrus.Println("Created admin user with the given password.")
 			user := &portainer.User{
 				Username: "admin",
 				Role:     portainer.AdministratorRole,
 				Password: adminPasswordHash,
 			}
-			err := dataStore.User().CreateUser(user)
+			err := dataStore.User().Create(user)
 			if err != nil {
-				log.Fatalf("failed creating admin user: %v", err)
+				logrus.Fatalf("Failed creating admin user: %v", err)
 			}
 		} else {
-			log.Println("Instance already has an administrator user defined. Skipping admin password related flags.")
+			logrus.Println("Instance already has an administrator user defined. Skipping admin password related flags.")
 		}
 	}
 
 	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotService)
 	if err != nil {
-		log.Fatalf("failed starting tunnel server: %s", err)
+		logrus.Fatalf("Failed starting tunnel server: %v", err)
 	}
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {
-		log.Fatalf("failed to fetch ssl settings from DB")
+		logrus.Fatalf("Failed to fetch ssl settings from DB")
 	}
 
 	scheduler := scheduler.NewScheduler(shutdownCtx)
@@ -568,11 +697,13 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		KubernetesDeployer:          kubernetesDeployer,
 		HelmPackageManager:          helmPackageManager,
 		CryptoService:               cryptoService,
+		APIKeyService:               apiKeyService,
 		JWTService:                  jwtService,
 		FileService:                 fileService,
 		LDAPService:                 ldapService,
 		OAuthService:                oauthService,
 		GitService:                  gitService,
+		OpenAMTService:              openAMTService,
 		ProxyManager:                proxyManager,
 		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
 		KubeConfigService:           kubeConfigService,
@@ -585,6 +716,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
+		BaseURL:                     *flags.BaseURL,
 	}
 }
 
@@ -595,8 +727,8 @@ func main() {
 
 	for {
 		server := buildServer(flags)
-		log.Printf("[INFO] [cmd,main] Starting Portainer version %s\n", portainer.APIVersion)
+		logrus.Printf("[INFO] [cmd,main] Starting Portainer version %s\n", portainer.APIVersion)
 		err := server.Start()
-		log.Printf("[INFO] [cmd,main] Http server exited: %s\n", err)
+		logrus.Printf("[INFO] [cmd,main] Http server exited: %v\n", err)
 	}
 }

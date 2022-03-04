@@ -1,0 +1,34 @@
+.items {
+  margin-top: 10px;
+}
+
+.items > * + * {
+  margin-top: 2px;
+}
+
+.label {
+  text-align: left;
+  font-size: 0.9em;
+  padding-top: 7px;
+  margin-bottom: 0;
+  display: inline-block;
+  max-width: 100%;
+  font-weight: 700;
+}
+
+.item-line {
+  display: flex;
+}
+
+.item-line.has-error {
+  margin-bottom: 20px;
+}
+
+.item-actions {
+  display: flex;
+  margin-left: 2px;
+}
+
+.default-item {
+  width: 100% !important;
+}

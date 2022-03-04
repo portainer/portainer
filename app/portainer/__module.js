@@ -5,6 +5,8 @@ import componentsModule from './components';
 import settingsModule from './settings';
 import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
+import servicesModule from './services';
+import teamsModule from './teams';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -22,12 +24,20 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
 }
 
 angular
-  .module('portainer.app', ['portainer.oauth', 'portainer.rbac', componentsModule, settingsModule, featureFlagModule, userActivityModule, 'portainer.shared.datatable'])
+  .module('portainer.app', [
+    'portainer.oauth',
+    'portainer.rbac',
+    componentsModule,
+    settingsModule,
+    featureFlagModule,
+    userActivityModule,
+    'portainer.shared.datatable',
+    servicesModule,
+    teamsModule,
+  ])
   .config([
     '$stateRegistryProvider',
     function ($stateRegistryProvider) {
-      'use strict';
-
       var root = {
         name: 'root',
         abstract: true,
@@ -54,18 +64,6 @@ angular
           'sidebar@': {
             templateUrl: './views/sidebar/sidebar.html',
             controller: 'SidebarController',
-          },
-        },
-        resolve: {
-          featuresServiceInitialized: /* @ngInject */ function featuresServiceInitialized($async, featureService, Notifications) {
-            return $async(async () => {
-              try {
-                await featureService.init();
-              } catch (e) {
-                Notifications.error('Failed initializing features service', e);
-                throw e;
-              }
-            });
           },
         },
       };
@@ -111,6 +109,16 @@ angular
           'content@': {
             templateUrl: './views/account/account.html',
             controller: 'AccountController',
+          },
+        },
+      };
+
+      const tokenCreation = {
+        name: 'portainer.account.new-access-token',
+        url: '/tokens/new',
+        views: {
+          'content@': {
+            component: 'createUserAccessToken',
           },
         },
       };
@@ -197,6 +205,51 @@ angular
         },
       };
 
+      var edgeDeviceCreation = {
+        name: 'portainer.endpoints.newEdgeDevice',
+        url: '/newEdgeDevice',
+        params: {
+          isEdgeDevice: true,
+        },
+        views: {
+          'content@': {
+            templateUrl: './views/endpoints/create/createendpoint.html',
+            controller: 'CreateEndpointController',
+          },
+        },
+      };
+
+      var deviceImport = {
+        name: 'portainer.endpoints.importDevice',
+        url: '/device',
+        views: {
+          'content@': {
+            templateUrl: './views/devices/import/importDevice.html',
+            controller: 'ImportDeviceController',
+          },
+        },
+      };
+
+      var addFDOProfile = {
+        name: 'portainer.endpoints.profile',
+        url: '/profile',
+        views: {
+          'content@': {
+            component: 'addProfileView',
+          },
+        },
+      };
+
+      var editFDOProfile = {
+        name: 'portainer.endpoints.profile.edit',
+        url: '/:id',
+        views: {
+          'content@': {
+            component: 'editProfileView',
+          },
+        },
+      };
+
       var endpointAccess = {
         name: 'portainer.endpoints.endpoint.access',
         url: '/access',
@@ -205,6 +258,17 @@ angular
             templateUrl: './views/endpoints/access/endpointAccess.html',
             controller: 'EndpointAccessController',
             controllerAs: 'ctrl',
+          },
+        },
+      };
+
+      var endpointKVM = {
+        name: 'portainer.endpoints.endpoint.kvm',
+        url: '/kvm?deviceId&deviceName',
+        views: {
+          'content@': {
+            templateUrl: './views/endpoints/kvm/endpointKVM.html',
+            controller: 'EndpointKVMController',
           },
         },
       };
@@ -370,6 +434,16 @@ angular
         },
       };
 
+      var settingsEdgeCompute = {
+        name: 'portainer.settings.edgeCompute',
+        url: '/edge',
+        views: {
+          'content@': {
+            component: 'settingsEdgeComputeView',
+          },
+        },
+      };
+
       var tags = {
         name: 'portainer.tags',
         url: '/tags',
@@ -429,13 +503,19 @@ angular
       $stateRegistryProvider.register(endpointRoot);
       $stateRegistryProvider.register(portainer);
       $stateRegistryProvider.register(account);
+      $stateRegistryProvider.register(tokenCreation);
       $stateRegistryProvider.register(authentication);
       $stateRegistryProvider.register(logout);
       $stateRegistryProvider.register(endpoints);
       $stateRegistryProvider.register(endpoint);
       $stateRegistryProvider.register(k8sendpoint);
       $stateRegistryProvider.register(endpointAccess);
+      $stateRegistryProvider.register(endpointKVM);
+      $stateRegistryProvider.register(edgeDeviceCreation);
       $stateRegistryProvider.register(endpointCreation);
+      $stateRegistryProvider.register(deviceImport);
+      $stateRegistryProvider.register(addFDOProfile);
+      $stateRegistryProvider.register(editFDOProfile);
       $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
@@ -452,6 +532,7 @@ angular
       $stateRegistryProvider.register(registryCreation);
       $stateRegistryProvider.register(settings);
       $stateRegistryProvider.register(settingsAuthentication);
+      $stateRegistryProvider.register(settingsEdgeCompute);
       $stateRegistryProvider.register(tags);
       $stateRegistryProvider.register(users);
       $stateRegistryProvider.register(user);

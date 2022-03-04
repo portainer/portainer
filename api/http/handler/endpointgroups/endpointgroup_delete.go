@@ -8,7 +8,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 // @id EndpointGroupDelete
@@ -16,6 +15,7 @@ import (
 // @description Remove an environment(endpoint) group.
 // @description **Access policy**: administrator
 // @tags endpoint_groups
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "EndpointGroup identifier"
 // @success 204 "Success"
@@ -34,7 +34,7 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 	}
 
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment group with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment group with the specified identifier inside the database", err}

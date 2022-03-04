@@ -3,6 +3,8 @@ package file
 import (
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/handlers"
 )
 
 // Handler represents an HTTP API handler for managing static files.
@@ -13,8 +15,11 @@ type Handler struct {
 // NewHandler creates a handler to serve static files.
 func NewHandler(assetPublicPath string) *Handler {
 	h := &Handler{
-		Handler: http.FileServer(http.Dir(assetPublicPath)),
+		Handler: handlers.CompressHandler(
+			http.FileServer(http.Dir(assetPublicPath)),
+		),
 	}
+
 	return h
 }
 

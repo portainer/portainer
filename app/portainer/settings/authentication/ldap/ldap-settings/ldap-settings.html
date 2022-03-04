@@ -6,14 +6,12 @@
     </field-description>
   </auto-user-provision-toggle>
 
-  <div class="col-sm-12 form-section-title">
-    Server Type
-  </div>
+  <div class="col-sm-12 form-section-title"> Server Type </div>
 
   <box-selector
-    style="margin-bottom: 0;"
-    radio-name="ldap-server-type-selector"
-    ng-model="$ctrl.settings.ServerType"
+    style="margin-bottom: 0"
+    radio-name="'ldap-server-type-selector'"
+    value="$ctrl.settings.ServerType"
     options="$ctrl.boxSelectorOptions"
     on-change="($ctrl.onChangeServerType)"
   ></box-selector>
@@ -27,6 +25,9 @@
     connectivity-check="$ctrl.connectivityCheck"
     on-search-users-click="($ctrl.searchUsers)"
     on-search-groups-click="($ctrl.searchGroups)"
+    on-save-settings="($ctrl.onSaveSettings)"
+    save-button-state="($ctrl.saveButtonState)"
+    save-button-disabled="$ctrl.isLdapFormValid"
   ></ldap-settings-custom>
   <ldap-settings-open-ldap
     ng-if="$ctrl.settings.ServerType === $ctrl.SERVER_TYPES.OPEN_LDAP"
@@ -37,5 +38,8 @@
     connectivity-check="$ctrl.connectivityCheck"
     on-search-users-click="($ctrl.searchUsers)"
     on-search-groups-click="($ctrl.searchGroups)"
+    on-save-settings="($ctrl.onSaveSettings)"
+    save-button-state="($ctrl.saveButtonState)"
+    save-button-disabled="$ctrl.isLdapFormValid"
   ></ldap-settings-open-ldap>
 </div>

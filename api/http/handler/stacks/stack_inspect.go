@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
@@ -19,6 +18,7 @@ import (
 // @description Retrieve details about a stack.
 // @description **Access policy**: restricted
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Stack identifier"
@@ -35,7 +35,7 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
@@ -47,7 +47,7 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		if !securityContext.IsAdmin {
 			return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 		}

@@ -129,6 +129,6 @@ func teamAccess(
 	teamID portainer.TeamID,
 	teamAccessPolicies portainer.TeamAccessPolicies,
 ) bool {
-	_, ok := teamAccessPolicies[teamID];
+	_, ok := teamAccessPolicies[teamID]
 	return ok
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -39,6 +38,7 @@ func (payload *userCreatePayload) Validate(r *http.Request) error {
 // @description Only administrators can create an administrator user account.
 // @description **Access policy**: restricted
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -70,7 +70,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	user, err := handler.DataStore.User().UserByUsername(payload.Username)
-	if err != nil && err != bolterrors.ErrObjectNotFound {
+	if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}
 	if user != nil {
@@ -87,6 +87,12 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
 
+	// when ldap/oauth is on, can only add users without password
+	if (settings.AuthenticationMethod == portainer.AuthenticationLDAP || settings.AuthenticationMethod == portainer.AuthenticationOAuth) && payload.Password != "" {
+		errMsg := "A user with password can not be created when authentication method is Oauth or LDAP"
+		return &httperror.HandlerError{http.StatusBadRequest, errMsg, errors.New(errMsg)}
+	}
+
 	if settings.AuthenticationMethod == portainer.AuthenticationInternal {
 		user.Password, err = handler.CryptoService.Hash(payload.Password)
 		if err != nil {
@@ -94,7 +100,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 		}
 	}
 
-	err = handler.DataStore.User().CreateUser(user)
+	err = handler.DataStore.User().Create(user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 	}

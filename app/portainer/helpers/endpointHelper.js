@@ -12,6 +12,10 @@ export default class EndpointHelper {
     return endpoint.URL.includes('unix://') || endpoint.URL.includes('npipe://') || endpoint.Type === PortainerEndpointTypes.KubernetesLocalEnvironment;
   }
 
+  static isDockerEndpoint(endpoint) {
+    return [PortainerEndpointTypes.DockerEnvironment, PortainerEndpointTypes.AgentOnDockerEnvironment, PortainerEndpointTypes.EdgeAgentOnDockerEnvironment].includes(endpoint.Type);
+  }
+
   static isAgentEndpoint(endpoint) {
     return [
       PortainerEndpointTypes.AgentOnDockerEnvironment,
@@ -34,4 +38,8 @@ export default class EndpointHelper {
       }
     }
   }
+}
+
+export function isOfflineEndpoint(endpoint) {
+  return endpoint.Status !== 1;
 }

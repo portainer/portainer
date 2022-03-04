@@ -9,9 +9,7 @@
       <rd-widget-header icon="fa-users" title-text="Authentication"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" name="authSettingsForm">
-          <div class="col-sm-12 form-section-title">
-            Configuration
-          </div>
+          <div class="col-sm-12 form-section-title"> Configuration </div>
           <div class="form-group">
             <label for="user_timeout" class="col-sm-2 control-label text-left">
               Session lifetime
@@ -27,24 +25,13 @@
             </div>
           </div>
           <div class="form-group">
-            <span class="col-sm-12 text-muted small">
-              Changing from default is only recommended if you have additional layers of authentication in front of Portainer.
-            </span>
-          </div>
-          <div class="col-sm-12 form-section-title">
-            Authentication method
+            <span class="col-sm-12 text-muted small"> Changing from default is only recommended if you have additional layers of authentication in front of Portainer. </span>
           </div>
 
-          <box-selector radio-name="authOptions" ng-model="authMethod" options="authOptions" on-change="(onChangeAuthMethod)"></box-selector>
+          <div class="col-sm-12 form-section-title"> Authentication method </div>
+          <box-selector radio-name="'authOptions'" value="authMethod" options="authOptions" on-change="(onChangeAuthMethod)"></box-selector>
 
-          <div ng-if="authenticationMethodSelected(1)">
-            <div class="col-sm-12 form-section-title">
-              Information
-            </div>
-            <div class="form-group col-sm-12 text-muted small">
-              When using internal authentication, Portainer will encrypt user passwords and store credentials locally.
-            </div>
-          </div>
+          <internal-auth ng-if="authenticationMethodSelected(1)" on-save-settings="(saveSettings)" save-button-state="state.actionInProgress"></internal-auth>
 
           <ldap-settings
             ng-if="authenticationMethodSelected(2)"
@@ -52,6 +39,9 @@
             tlsca-cert="formValues.TLSCACert"
             state="state"
             connectivity-check="LDAPConnectivityCheck"
+            on-save-settings="(saveSettings)"
+            save-button-state="state.actionInProgress"
+            is-ldap-form-valid="isLDAPFormValid"
           ></ldap-settings>
 
           <ad-settings
@@ -60,29 +50,18 @@
             tlsca-cert="formValues.TLSCACert"
             state="state"
             connectivity-check="LDAPConnectivityCheck"
+            on-save-settings="(saveSettings)"
+            save-button-state="state.actionInProgress"
+            is-ldap-form-valid="isLDAPFormValid()"
           ></ad-settings>
 
-          <oauth-settings ng-if="authenticationMethodSelected(3)" settings="OAuthSettings" teams="teams"></oauth-settings>
-
-          <!-- actions -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button
-                type="button"
-                class="btn btn-primary btn-sm"
-                ng-click="saveSettings()"
-                ng-disabled="state.actionInProgress || (settings.AuthenticationMethod === 2 && !isLDAPFormValid()) || (settings.AuthenticationMethod === 3 && !isOAuthTeamMembershipFormValid()) || authSettingsForm.$invalid"
-                button-spinner="state.actionInProgress"
-              >
-                <span ng-hide="state.actionInProgress">Save settings</span>
-                <span ng-show="state.actionInProgress">Saving...</span>
-              </button>
-            </div>
-          </div>
-          <!-- !actions -->
+          <oauth-settings
+            ng-if="authenticationMethodSelected(3)"
+            settings="OAuthSettings"
+            teams="teams"
+            on-save-settings="(saveSettings)"
+            save-button-state="state.actionInProgress"
+          ></oauth-settings>
         </form>
       </rd-widget-body>
     </rd-widget>
