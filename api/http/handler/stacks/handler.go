@@ -3,7 +3,6 @@ package stacks
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -167,8 +166,6 @@ func (handler *Handler) checkUniqueStackNameInKubernetes(endpoint *portainer.End
 		}
 		isUniqueStackName = true
 		for i := range deployments {
-			log.Println(deployments[i].Namespace)
-			log.Println(deployments[i].StackName)
 			if deployments[i].Namespace == namespace && deployments[i].StackName == name {
 				// There is a stack with this name in the kubernetes.
 				isUniqueStackName = false
