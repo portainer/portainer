@@ -534,6 +534,12 @@ type (
 		ShellExecCommand string
 	}
 
+	KubernetesDeployment struct {
+		Namespace string
+		Name      string
+		StackName string
+	}
+
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
 	LDAPGroupSearchSettings struct {
 		// The distinguished name of the element from which the LDAP server will search for groups
@@ -1261,6 +1267,7 @@ type (
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
+		GetDeployments(namespace string) ([]KubernetesDeployment, error)
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
@@ -1274,7 +1281,7 @@ type (
 	KubernetesDeployer interface {
 		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		Remove(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
-		GetAll(userID UserID, endpoint *Endpoint, namespace string) ([]byte, error)
+		GetAll(endpoint *Endpoint, namespace string) ([]KubernetesDeployment, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 

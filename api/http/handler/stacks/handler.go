@@ -2,8 +2,8 @@ package stacks
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -158,38 +158,18 @@ func (handler *Handler) checkUniqueStackNameInKubernetes(endpoint *portainer.End
 	if !isUniqueStackName {
 		// Check if this stack name is really used in the kubernetes.
 		// Because the stack with this name could be removed via kubectl cli outside and the datastore does not be informed of this action.
-		type structLabels struct {
-			Name    string `json:"io.portainer.kubernetes.application.name"`
-			Stack   string `json:"io.portainer.kubernetes.application.stack"`
-			Stackid string `json:"io.portainer.kubernetes.application.stackid"`
-		}
-		type structMetadata struct {
-			Name      string       `json:"name"`
-			Namespace string       `json:"namespace"`
-			Labels    structLabels `json:"labels"`
-		}
-		type structItem struct {
-			Metadata structMetadata `json:"metadata"`
-		}
-		type structDeployment struct {
-			Items []structItem `json:"items"`
-		}
-
-		byteJsonDeployments, err := handler.KubernetesDeployer.GetAll(userID, endpoint, namespace)
-		if err != nil {
-			return false, err
-		}
-		var deployments structDeployment
-		err = json.Unmarshal(byteJsonDeployments, &deployments)
-		if err != nil {
-			return false, err
-		}
 		if namespace == "" {
 			namespace = "default"
 		}
+		deployments, err := handler.KubernetesDeployer.GetAll(endpoint, namespace)
+		if err != nil {
+			return false, err
+		}
 		isUniqueStackName = true
-		for i := range deployments.Items {
-			if deployments.Items[i].Metadata.Namespace == namespace && deployments.Items[i].Metadata.Labels.Stack == name {
+		for i := range deployments {
+			log.Println(deployments[i].Namespace)
+			log.Println(deployments[i].StackName)
+			if deployments[i].Namespace == namespace && deployments[i].StackName == name {
 				// There is a stack with this name in the kubernetes.
 				isUniqueStackName = false
 				break
