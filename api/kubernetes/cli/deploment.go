@@ -17,8 +17,8 @@ func (kcl *KubeClient) GetDeployments(namespace string) ([]portainer.KubernetesD
 	deployments := make([]portainer.KubernetesDeployment, 0, len(list.Items))
 	for index := range list.Items {
 		deployments = append(deployments, portainer.KubernetesDeployment{
-			Namespace: list.Items[index].Namespace, 
-			Name:      list.Items[index].Name, 
+			Namespace: list.Items[index].Namespace,
+			Name:      list.Items[index].Name,
 			StackName: list.Items[index].Labels["io.portainer.kubernetes.application.stack"],
 		})
 	}
