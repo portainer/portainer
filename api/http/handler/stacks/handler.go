@@ -149,7 +149,7 @@ func (handler *Handler) checkUniqueStackName(endpoint *portainer.Endpoint, name 
 	return true, nil
 }
 
-func (handler *Handler) checkUniqueStackNameInKubernetes(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, userID portainer.UserID, namespace string) (bool, error) {
+func (handler *Handler) checkUniqueStackNameInKubernetes(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, namespace string) (bool, error) {
 	isUniqueStackName, err := handler.checkUniqueStackName(endpoint, name, stackID)
 	if err != nil {
 		return false, err
