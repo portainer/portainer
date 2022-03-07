@@ -1,8 +1,9 @@
-package endpoints
+package endpointedge
 
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
 type stackStatusResponse struct {
@@ -33,7 +35,7 @@ type edgeJobResponse struct {
 	Version int `json:"Version" example:"2"`
 }
 
-type endpointStatusInspectResponse struct {
+type endpointEdgeStatusInspectResponse struct {
 	// Status represents the environment(endpoint) status
 	Status string `json:"status" example:"REQUIRED"`
 	// The tunnel port
@@ -43,33 +45,33 @@ type endpointStatusInspectResponse struct {
 	// The current value of CheckinInterval
 	CheckinInterval int `json:"checkin" example:"5"`
 	//
-	Credentials string `json:"credentials" example:""`
+	Credentials string `json:"credentials"`
 	// List of stacks to be deployed on the environments(endpoints)
 	Stacks []stackStatusResponse `json:"stacks"`
 }
 
-// @id EndpointStatusInspect
+// @id EndpointEdgeStatusInspect
 // @summary Get environment(endpoint) status
-// @description Environment(Endpoint) for edge agent to check status of environment(endpoint)
+// @description environment(endpoint) for edge agent to check status of environment(endpoint)
 // @description **Access policy**: restricted only to Edge environments(endpoints)
 // @tags endpoints
 // @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Environment(Endpoint) identifier"
-// @success 200 {object} endpointStatusInspectResponse "Success"
+// @success 200 {object} endpointEdgeStatusInspectResponse "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access environment(endpoint)"
 // @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
-// @router /endpoints/{id}/status [get]
-func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+// @router /endpoints/{id}/edge/status [get]
+func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
+	if err == portainerDsErrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
@@ -84,32 +86,11 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
 		endpoint.EdgeID = edgeIdentifier
 
-		agentPlatformHeader := r.Header.Get(portainer.HTTPResponseAgentPlatform)
-		if agentPlatformHeader == "" {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Agent Platform Header is missing", errors.New("Agent Platform Header is missing")}
+		agentPlatform, agentPlatformErr := parseAgentPlatform(r)
+		if agentPlatformErr != nil {
+			return &httperror.HandlerError{http.StatusBadRequest, "Agent Platform Header is not valid", err}
 		}
-
-		agentPlatformNumber, err := strconv.Atoi(agentPlatformHeader)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse agent platform header", err}
-		}
-
-		agentPlatform := portainer.AgentPlatform(agentPlatformNumber)
-
-		if agentPlatform == portainer.AgentPlatformDocker {
-			endpoint.Type = portainer.EdgeAgentOnDockerEnvironment
-		} else if agentPlatform == portainer.AgentPlatformKubernetes {
-			endpoint.Type = portainer.EdgeAgentOnKubernetesEnvironment
-		}
-	}
-
-	if endpoint.EdgeCheckinInterval == 0 {
-		settings, err := handler.DataStore.Settings().Settings()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
-		}
-
-		endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
+		endpoint.Type = *agentPlatform
 	}
 
 	endpoint.LastCheckInDate = time.Now().Unix()
@@ -119,50 +100,103 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist environment changes inside the database", err}
 	}
 
+	checkinInterval := endpoint.EdgeCheckinInterval
+	if endpoint.EdgeCheckinInterval == 0 {
+		settings, err := handler.DataStore.Settings().Settings()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+		}
+		checkinInterval = settings.EdgeAgentCheckinInterval
+	}
+
 	tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
 
-	schedules := []edgeJobResponse{}
-	for _, job := range tunnel.Jobs {
-		schedule := edgeJobResponse{
-			ID:             job.ID,
-			CronExpression: job.CronExpression,
-			CollectLogs:    job.Endpoints[endpoint.ID].CollectLogs,
-			Version:        job.Version,
-		}
-
-		file, err := handler.FileService.GetFileContent("", job.ScriptPath)
-
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge job script file", err}
-		}
-
-		schedule.Script = base64.RawStdEncoding.EncodeToString(file)
-
-		schedules = append(schedules, schedule)
-	}
-
-	statusResponse := endpointStatusInspectResponse{
+	statusResponse := endpointEdgeStatusInspectResponse{
 		Status:          tunnel.Status,
 		Port:            tunnel.Port,
-		Schedules:       schedules,
-		CheckinInterval: endpoint.EdgeCheckinInterval,
+		CheckinInterval: checkinInterval,
 		Credentials:     tunnel.Credentials,
 	}
+
+	schedules, handlerErr := handler.buildSchedules(endpoint.ID, tunnel)
+	if handlerErr != nil {
+		return handlerErr
+	}
+	statusResponse.Schedules = schedules
 
 	if tunnel.Status == portainer.EdgeAgentManagementRequired {
 		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
 	}
 
-	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
+	edgeStacksStatus, handlerErr := handler.buildEdgeStacks(endpoint.ID)
+	if handlerErr != nil {
+		return handlerErr
+	}
+	statusResponse.Stacks = edgeStacksStatus
+
+	return response.JSON(w, statusResponse)
+}
+
+func parseAgentPlatform(r *http.Request) (*portainer.EndpointType, error) {
+	agentPlatformHeader := r.Header.Get(portainer.HTTPResponseAgentPlatform)
+	if agentPlatformHeader == "" {
+		return nil, errors.New("agent platform header is missing")
+	}
+
+	agentPlatformNumber, err := strconv.Atoi(agentPlatformHeader)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve relation object from the database", err}
+		return nil, err
+	}
+
+	agentPlatform := portainer.AgentPlatform(agentPlatformNumber)
+
+	var result portainer.EndpointType
+	switch agentPlatform {
+	case portainer.AgentPlatformDocker:
+		result = portainer.EdgeAgentOnDockerEnvironment
+		break
+	case portainer.AgentPlatformKubernetes:
+		result = portainer.EdgeAgentOnKubernetesEnvironment
+		break
+	default:
+		return nil, fmt.Errorf("agent platform %v is not valid", agentPlatform)
+	}
+
+	return &result, nil
+}
+
+func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel portainer.TunnelDetails) ([]edgeJobResponse, *httperror.HandlerError) {
+	schedules := []edgeJobResponse{}
+	for _, job := range tunnel.Jobs {
+		schedule := edgeJobResponse{
+			ID:             job.ID,
+			CronExpression: job.CronExpression,
+			CollectLogs:    job.Endpoints[endpointID].CollectLogs,
+			Version:        job.Version,
+		}
+
+		file, err := handler.FileService.GetFileContent(job.ScriptPath, "")
+		if err != nil {
+			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge job script file", err}
+		}
+		schedule.Script = base64.RawStdEncoding.EncodeToString(file)
+
+		schedules = append(schedules, schedule)
+	}
+	return schedules, nil
+}
+
+func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID) ([]stackStatusResponse, *httperror.HandlerError) {
+	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve relation object from the database", err}
 	}
 
 	edgeStacksStatus := []stackStatusResponse{}
 	for stackID := range relation.EdgeStacks {
 		stack, err := handler.DataStore.EdgeStack().EdgeStack(stackID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack from the database", err}
+			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack from the database", err}
 		}
 
 		stackStatus := stackStatusResponse{
@@ -172,8 +206,5 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 
 		edgeStacksStatus = append(edgeStacksStatus, stackStatus)
 	}
-
-	statusResponse.Stacks = edgeStacksStatus
-
-	return response.JSON(w, statusResponse)
+	return edgeStacksStatus, nil
 }
