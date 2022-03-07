@@ -12,7 +12,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
 type stackStatusResponse struct {
@@ -71,7 +70,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == portainerDsErrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
