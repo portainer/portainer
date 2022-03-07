@@ -231,7 +231,7 @@ angular.module('portainer.app').factory('ModalService', [
         title: 'Upgrade notification',
         message: `You are currently using version 1.x of Portainer, which is no longer supported maintained or enhanced. Continuing to use this version is at your own risk.
         <br/><br/>Please upgrade immediately by using the tag <code>portainer/portainer-ce:2.0.1</code>
-        <br/><br/>If you decide to stay on version 1, please use the tag <code>portainer/portainer:1.24.2</code> to prevent automatically upgrading to version 2.`,
+        <br/><br/>If you decide to stay on version 1, please use the tag <code>portainer/portainer:1.25</code> to prevent automatically upgrading to version 2.`,
         onEscape: false,
         buttons: {
           Close: {
