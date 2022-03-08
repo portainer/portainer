@@ -7,6 +7,7 @@ import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
 import servicesModule from './services';
 import teamsModule from './teams';
+import homeModule from './home';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -25,6 +26,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
 
 angular
   .module('portainer.app', [
+    homeModule,
     'portainer.oauth',
     'portainer.rbac',
     componentsModule,
@@ -74,7 +76,7 @@ angular
         parent: 'root',
         abstract: true,
         resolve: {
-          endpoint: /* @ngInject */ function endpoint($async, $state, $transition$, EndpointService, Notifications) {
+          endpoint: /* @ngInject */ function endpoint($async, $state, $transition$, EndpointProvider, EndpointService, Notifications) {
             return $async(async () => {
               try {
                 const endpointId = +$transition$.params().endpointId;
@@ -84,6 +86,8 @@ angular
                   $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
                   return;
                 }
+
+                EndpointProvider.setCurrentEndpoint(endpoint);
 
                 return endpoint;
               } catch (e) {
@@ -322,8 +326,7 @@ angular
         url: '/home',
         views: {
           'content@': {
-            templateUrl: './views/home/home.html',
-            controller: 'HomeController',
+            component: 'homeView',
           },
         },
       };
