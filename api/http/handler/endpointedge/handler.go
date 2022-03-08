@@ -27,7 +27,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		requestBouncer: bouncer,
 	}
 
-	h.Handle("/{id}/edge/status",
+	h.Handle("/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeStatusInspect))).Methods(http.MethodGet)
 	h.Handle("/{id}/edge/stacks/{stackId}",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeStackInspect))).Methods(http.MethodGet)
