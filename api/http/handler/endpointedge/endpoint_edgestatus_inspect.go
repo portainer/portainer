@@ -87,9 +87,9 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 		agentPlatform, agentPlatformErr := parseAgentPlatform(r)
 		if agentPlatformErr != nil {
-			return &httperror.HandlerError{http.StatusBadRequest, "Agent Platform Header is not valid", err}
+			return httperror.BadRequest("agent platform header is not valid", err)
 		}
-		endpoint.Type = *agentPlatform
+		endpoint.Type = agentPlatform
 	}
 
 	endpoint.LastCheckInDate = time.Now().Unix()
@@ -136,32 +136,27 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	return response.JSON(w, statusResponse)
 }
 
-func parseAgentPlatform(r *http.Request) (*portainer.EndpointType, error) {
+func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {
 	agentPlatformHeader := r.Header.Get(portainer.HTTPResponseAgentPlatform)
 	if agentPlatformHeader == "" {
-		return nil, errors.New("agent platform header is missing")
+		return 0, errors.New("agent platform header is missing")
 	}
 
 	agentPlatformNumber, err := strconv.Atoi(agentPlatformHeader)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	agentPlatform := portainer.AgentPlatform(agentPlatformNumber)
 
-	var result portainer.EndpointType
 	switch agentPlatform {
 	case portainer.AgentPlatformDocker:
-		result = portainer.EdgeAgentOnDockerEnvironment
-		break
+		return portainer.EdgeAgentOnDockerEnvironment, nil
 	case portainer.AgentPlatformKubernetes:
-		result = portainer.EdgeAgentOnKubernetesEnvironment
-		break
+		return portainer.EdgeAgentOnKubernetesEnvironment, nil
 	default:
-		return nil, fmt.Errorf("agent platform %v is not valid", agentPlatform)
+		return 0, fmt.Errorf("agent platform %v is not valid", agentPlatform)
 	}
-
-	return &result, nil
 }
 
 func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel portainer.TunnelDetails) ([]edgeJobResponse, *httperror.HandlerError) {
