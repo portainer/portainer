@@ -280,7 +280,7 @@ class KubernetesApplicationService {
    *    To synchronise with kubernetes resource creation, update and delete summary output, any new resources created
    *    in this method should also be displayed in the summary output (getUpdatedApplicationResources)
    */
-   async patchAsync(oldFormValues, newFormValues) {
+  async patchAsync(oldFormValues, newFormValues) {
     const [oldApp, oldHeadlessService, oldServices, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
     const [newApp, newHeadlessService, newServices, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
     const oldApiService = this._getApplicationApiService(oldApp);
