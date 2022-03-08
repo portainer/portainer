@@ -35,16 +35,16 @@ type Handler struct {
 	stackDeletionMutex *sync.Mutex
 	requestBouncer     *security.RequestBouncer
 	*mux.Router
-	DataStore           dataservices.DataStore
-	DockerClientFactory *docker.ClientFactory
-	FileService         portainer.FileService
-	GitService          portainer.GitService
-	SwarmStackManager   portainer.SwarmStackManager
-	ComposeStackManager portainer.ComposeStackManager
-	KubernetesDeployer  portainer.KubernetesDeployer
+	DataStore               dataservices.DataStore
+	DockerClientFactory     *docker.ClientFactory
+	FileService             portainer.FileService
+	GitService              portainer.GitService
+	SwarmStackManager       portainer.SwarmStackManager
+	ComposeStackManager     portainer.ComposeStackManager
+	KubernetesDeployer      portainer.KubernetesDeployer
 	KubernetesClientFactory *cli.ClientFactory
-	Scheduler           *scheduler.Scheduler
-	StackDeployer       stacks.StackDeployer
+	Scheduler               *scheduler.Scheduler
+	StackDeployer           stacks.StackDeployer
 }
 
 func stackExistsError(name string) *httperror.HandlerError {
