@@ -18,10 +18,6 @@ func (deployer *kubernetesMockDeployer) Remove(userID portainer.UserID, endpoint
 	return "", nil
 }
 
-func (deployer *kubernetesMockDeployer) GetAll(endpoint *portainer.Endpoint, namespace string) ([]portainer.KubernetesDeployment, error) {
-	return []portainer.KubernetesDeployment{}, nil
-}
-
 func (deployer *kubernetesMockDeployer) ConvertCompose(data []byte) ([]byte, error) {
 	return nil, nil
 }

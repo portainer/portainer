@@ -1267,13 +1267,13 @@ type (
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
-		GetDeployments(namespace string) ([]KubernetesDeployment, error)
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 		DeleteRegistrySecret(registry *Registry, namespace string) error
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
+		IsUniqueStackName(namespace string, name string) (bool, error)
 		ToggleSystemState(namespace string, isSystem bool) error
 	}
 
@@ -1281,7 +1281,6 @@ type (
 	KubernetesDeployer interface {
 		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		Remove(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
-		GetAll(endpoint *Endpoint, namespace string) ([]KubernetesDeployment, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 

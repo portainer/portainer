@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks"
 )
@@ -41,6 +42,7 @@ type Handler struct {
 	SwarmStackManager   portainer.SwarmStackManager
 	ComposeStackManager portainer.ComposeStackManager
 	KubernetesDeployer  portainer.KubernetesDeployer
+	KubernetesClientFactory *cli.ClientFactory
 	Scheduler           *scheduler.Scheduler
 	StackDeployer       stacks.StackDeployer
 }
@@ -160,17 +162,14 @@ func (handler *Handler) checkUniqueStackNameInKubernetes(endpoint *portainer.End
 		if namespace == "" {
 			namespace = "default"
 		}
-		deployments, err := handler.KubernetesDeployer.GetAll(endpoint, namespace)
+
+		kubeCli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 		if err != nil {
 			return false, err
 		}
-		isUniqueStackName = true
-		for i := range deployments {
-			if deployments[i].Namespace == namespace && deployments[i].StackName == name {
-				// There is a stack with this name in the kubernetes.
-				isUniqueStackName = false
-				break
-			}
+		isUniqueStackName, err = kubeCli.IsUniqueStackName(namespace, name)
+		if err != nil {
+			return false, err
 		}
 	}
 	return isUniqueStackName, nil

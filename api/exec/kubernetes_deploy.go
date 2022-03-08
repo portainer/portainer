@@ -85,19 +85,6 @@ func (deployer *KubernetesDeployer) Remove(userID portainer.UserID, endpoint *po
 	return deployer.command("delete", userID, endpoint, manifestFiles, namespace)
 }
 
-// Get all Kubernetes resources in the gaven namespace
-func (deployer *KubernetesDeployer) GetAll(endpoint *portainer.Endpoint, namespace string) ([]portainer.KubernetesDeployment, error) {
-	cli, err := deployer.kubernetesClientFactory.GetKubeClient(endpoint)
-	if err != nil {
-		return []portainer.KubernetesDeployment{}, err
-	}
-	deps, err := cli.GetDeployments(namespace)
-	if err != nil {
-		return []portainer.KubernetesDeployment{}, err
-	}
-	return deps, nil
-}
-
 func (deployer *KubernetesDeployer) command(operation string, userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
 	token, err := deployer.getToken(userID, endpoint, endpoint.Type == portainer.KubernetesLocalEnvironment)
 	if err != nil {
