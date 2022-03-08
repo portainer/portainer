@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useQuery } from 'react-query';
 
 import { error as notifyError } from '@/portainer/services/notifications';
@@ -43,15 +42,15 @@ function useNodesValid() {
 }
 
 function useNodesCounts() {
-  const { isLoading, data, error, isError } = useQuery(
+  const { isLoading, data } = useQuery(
     ['status', 'nodes'],
-    () => getNodesCount()
-  );
-  useEffect(() => {
-    if (isError) {
-      notifyError('Failure', error as Error, 'Failed to get nodes count');
+    () => getNodesCount(),
+    {
+      onError(error) {
+        notifyError('Failure', error as Error, 'Failed to get nodes count');
+      },
     }
-  }, [error, isError]);
+  );
 
   return { nodesCount: data || 0, isLoading };
 }

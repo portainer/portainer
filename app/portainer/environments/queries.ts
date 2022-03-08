@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
 import { useQuery } from 'react-query';
 
 import { getEndpoints } from '@/portainer/environments/environment.service';
 import { EnvironmentStatus } from '@/portainer/environments/types';
-import * as notifications from '@/portainer/services/notifications';
+import { error as notifyError } from '@/portainer/services/notifications';
 
 const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
@@ -13,7 +12,7 @@ export function useEnvironmentList(
   textFilter: string,
   refetchOffline = false
 ) {
-  const { isLoading, data, isError, error } = useQuery(
+  const { isLoading, data } = useQuery(
     ['environments', page, pageLimit, textFilter],
     async () => {
       const start = (page - 1) * pageLimit + 1;
@@ -32,14 +31,11 @@ export function useEnvironmentList(
 
         return hasOfflineEnvironment && ENVIRONMENTS_POLLING_INTERVAL;
       },
+      onError(error) {
+        notifyError('Failed loading environments', error as Error);
+      },
     }
   );
-
-  useEffect(() => {
-    if (isError) {
-      notifications.error('Failed loading environments', error as Error, '');
-    }
-  }, [isError, error]);
 
   return {
     isLoading,

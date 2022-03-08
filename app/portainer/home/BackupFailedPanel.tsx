@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useQuery } from 'react-query';
 
 import { error as notifyError } from '@/portainer/services/notifications';
@@ -29,16 +28,15 @@ export function BackupFailedPanel() {
 }
 
 function useBackupStatus() {
-  const { data, isLoading, isError, error } = useQuery(
+  const { data, isLoading } = useQuery(
     ['backup', 'status'],
-    () => getBackupStatus()
-  );
-
-  useEffect(() => {
-    if (isError) {
-      notifyError('Failure', error as Error, 'Failed to get license info');
+    () => getBackupStatus(),
+    {
+      onError(error) {
+        notifyError('Failure', error as Error, 'Failed to get license info');
+      },
     }
-  }, [error, isError]);
+  );
 
   return { status: data, isLoading };
 }
