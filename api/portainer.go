@@ -534,12 +534,6 @@ type (
 		ShellExecCommand string
 	}
 
-	KubernetesDeployment struct {
-		Namespace string
-		Name      string
-		StackName string
-	}
-
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
 	LDAPGroupSearchSettings struct {
 		// The distinguished name of the element from which the LDAP server will search for groups
@@ -1273,7 +1267,7 @@ type (
 		DeleteRegistrySecret(registry *Registry, namespace string) error
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
-		IsUniqueStackName(namespace string, name string) (bool, error)
+		IsUniqueStackName(namespace string, stackName string) (bool, error)
 		ToggleSystemState(namespace string, isSystem bool) error
 	}
 

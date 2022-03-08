@@ -7,10 +7,9 @@ import (
 	labels "k8s.io/apimachinery/pkg/labels"
 )
 
-// GetStacksByName will get deployments within a given namespace.
-// If the parameter 'namespace' is an empty string, all deployments in the kubernetes env will be retrived.
-func (kcl *KubeClient) IsUniqueStackName(namespace string, name string) (bool, error) {
-	querySet := labels.Set{"io.portainer.kubernetes.application.stack": name}
+// @description Checks whether the given name is unique in the given namespace.
+func (kcl *KubeClient) IsUniqueStackName(namespace string, stackName string) (bool, error) {
+	querySet := labels.Set{"io.portainer.kubernetes.application.stack": stackName}
 	listOpts := metav1.ListOptions{LabelSelector: labels.SelectorFromSet(querySet).String()}
 	list, err := kcl.cli.AppsV1().Deployments(namespace).List(context.TODO(), listOpts)
 	if err != nil {
