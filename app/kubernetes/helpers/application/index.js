@@ -282,7 +282,7 @@ class KubernetesApplicationHelper {
     if (app.Services) {
       app.Services.forEach(function (service) {
         //skip generate formValues if service = headless service ( clusterIp === "None" )
-        if(service.spec.clusterIP !== "None"){
+        if (service.spec.clusterIP !== 'None') {
           const svc = new KubernetesService();
           svc.Namespace = service.metadata.namespace;
           svc.Name = service.metadata.name;
@@ -297,7 +297,7 @@ class KubernetesApplicationHelper {
           } else if (service.spec.type === KubernetesServiceTypes.LOAD_BALANCER) {
             svc.Type = 3;
           }
-  
+
           let ports = [];
           service.spec.ports.forEach(function (port) {
             const svcport = new KubernetesServicePort();
@@ -306,7 +306,7 @@ class KubernetesApplicationHelper {
             svcport.nodePort = port.nodePort;
             svcport.protocol = port.protocol;
             svcport.targetPort = port.targetPort;
-  
+
             app.Ingresses.value.forEach((ingress) => {
               const ingressMatched = _.find(ingress.Paths, { ServiceName: service.metadata.name });
               if (ingressMatched) {
@@ -318,7 +318,7 @@ class KubernetesApplicationHelper {
                 svc.Ingress = true;
               }
             });
-  
+
             ports.push(svcport);
           });
           svc.Ports = ports;

@@ -238,7 +238,7 @@ function getVolumeClaimUpdateResourceSummary(oldPVC, newPVC) {
 function getServiceUpdateResourceSummary(oldServices, newServices) {
   let summary = [];
   // skip update summary when service is headless service
-  if(!oldServices.Headless){
+  if (!oldServices.Headless) {
     newServices.forEach((newService) => {
       const oldServiceMatched = _.find(oldServices, { Name: newService.Name });
       if (oldServiceMatched) {
@@ -261,7 +261,7 @@ function getServiceUpdateResourceSummary(oldServices, newServices) {
         }
       }
     });
-  
+
     oldServices.forEach((oldService) => {
       const newServiceMatched = _.find(newServices, { Name: oldService.Name });
       if (!newServiceMatched) {
@@ -270,10 +270,10 @@ function getServiceUpdateResourceSummary(oldServices, newServices) {
       }
     });
   }
-    if (summary.length !== 0) {
-      return summary;
-    }
-    return null;
+  if (summary.length !== 0) {
+    return summary;
+  }
+  return null;
 }
 
 // getHorizontalPodAutoScalerUpdateResourceSummary replicates KubernetesHorizontalPodAutoScalerService.patch
