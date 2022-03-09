@@ -7,7 +7,7 @@ import (
 	labels "k8s.io/apimachinery/pkg/labels"
 )
 
-// @description Checks whether the given name is unique in the given namespace.
+// IsUniqueStackName Checks whether the given name is unique in the given namespace.
 func (kcl *KubeClient) IsUniqueStackName(namespace string, stackName string) (bool, error) {
 	querySet := labels.Set{"io.portainer.kubernetes.application.stack": stackName}
 	listOpts := metav1.ListOptions{LabelSelector: labels.SelectorFromSet(querySet).String()}
