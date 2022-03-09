@@ -92,7 +92,7 @@ export function endpointTypeName(type) {
   return '';
 }
 
-export function endpointTypeIcon(type) {
+export function environmentTypeIcon(type) {
   if (type === 3) {
     return 'fab fa-microsoft';
   } else if (type === 4) {
@@ -130,11 +130,4 @@ export function truncate(text, length, end) {
   } else {
     return String(text).substring(0, length - end.length) + end;
   }
-}
-
-export function endpointStatusBadge(status) {
-  if (status === 2) {
-    return 'danger';
-  }
-  return 'success';
 }
