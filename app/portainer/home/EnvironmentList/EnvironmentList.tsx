@@ -31,8 +31,6 @@ interface Props {
 }
 
 export function EnvironmentList({ onClickItem, onRefresh }: Props) {
-  const homepageLoadTime = usePageLoadingTime();
-
   const isAdmin = useIsAdmin();
   const storageKey = 'home_endpoints';
 
@@ -98,7 +96,6 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                       groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
                     }
                     onClick={onClickItem}
-                    homepageLoadTime={homepageLoadTime}
                   />
                 ))
               )}
@@ -144,16 +141,4 @@ function renderItems(
   }
 
   return items;
-}
-
-function usePageLoadingTime() {
-  const [homepageLoadTime, setHomepageLoadTime] = useState<
-    number | undefined
-  >();
-
-  useEffect(() => {
-    setHomepageLoadTime(Math.floor(Date.now() / 1000));
-  }, []);
-
-  return homepageLoadTime;
 }

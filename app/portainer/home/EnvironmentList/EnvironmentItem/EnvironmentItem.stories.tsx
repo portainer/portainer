@@ -15,14 +15,12 @@ export default {
 
 interface Args {
   environment: Environment;
-  homepageLoadTime: number;
 }
 
-function Template({ environment, homepageLoadTime = 1 }: Args) {
+function Template({ environment }: Args) {
   return (
     <EnvironmentItem
       environment={environment}
-      homepageLoadTime={homepageLoadTime}
       onClick={() => {}}
     />
   );

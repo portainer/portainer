@@ -67,7 +67,6 @@ function renderComponent(
         onClick={() => {}}
         environment={env}
         groupName={group.Name}
-        homepageLoadTime={0}
       />
     </UserContext.Provider>
   );

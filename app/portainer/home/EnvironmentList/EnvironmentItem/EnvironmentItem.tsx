@@ -25,7 +25,6 @@ import styles from './EnvironmentItem.module.css';
 import { EnvironmentStatusBadge } from './EnvironmentStatusBadge';
 
 interface Props {
-  homepageLoadTime?: number;
   environment: Environment;
   groupName?: string;
   onClick(environment: Environment): void;
@@ -34,7 +33,6 @@ interface Props {
 export function EnvironmentItem({
   environment,
   onClick,
-  homepageLoadTime,
   groupName,
 }: Props) {
   const isAdmin = useIsAdmin();
