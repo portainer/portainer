@@ -30,11 +30,7 @@ interface Props {
   onClick(environment: Environment): void;
 }
 
-export function EnvironmentItem({
-  environment,
-  onClick,
-  groupName,
-}: Props) {
+export function EnvironmentItem({ environment, onClick, groupName }: Props) {
   const isAdmin = useIsAdmin();
   const isEdge = isEdgeEnvironment(environment.Type);
 

@@ -26,8 +26,7 @@ export function EdgeIndicator({
   // give checkIn some wiggle room
   let isCheckValid = false;
   if (checkInInterval && queryDate && lastCheckInDate) {
-    isCheckValid =
-      queryDate - lastCheckInDate <= checkInInterval * 2 + 20;
+    isCheckValid = queryDate - lastCheckInDate <= checkInInterval * 2 + 20;
   }
 
   return (
