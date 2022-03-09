@@ -167,7 +167,7 @@ func (handler *Handler) checkUniqueStackNameInKubernetes(endpoint *portainer.End
 		if err != nil {
 			return false, err
 		}
-		isUniqueStackName, err = kubeCli.IsUniqueStackName(namespace, name)
+		isUniqueStackName, err = kubeCli.HasStackName(namespace, name)
 		if err != nil {
 			return false, err
 		}
