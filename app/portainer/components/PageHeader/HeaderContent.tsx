@@ -15,7 +15,7 @@ export function HeaderContent({ children }: PropsWithChildren<unknown>) {
   return (
     <div className="breadcrumb-links">
       <div className="pull-left">{children}</div>
-      {user && (
+      {user && !window.ddExtension && (
         <div className={clsx('pull-right', styles.userLinks)}>
           <Link to="portainer.account" className={styles.link}>
             <i

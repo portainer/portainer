@@ -17,9 +17,10 @@ export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
     <div className="page white-space-normal">
       {title}
       <span className="header_title_content">{children}</span>
-      {user && (
+      {user && !window.ddExtension && (
         <span className="pull-right user-box">
-          <i className="fa fa-user-circle" aria-hidden="true" /> {user.Username}
+          <i className="fa fa-user-circle" aria-hidden="true" /> ext{' '}
+          {user.Username}
         </span>
       )}
     </div>

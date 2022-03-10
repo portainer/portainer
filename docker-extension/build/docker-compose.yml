@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainer/portainer-extension:2.11.4
+    command: ["--admin-password", "$$$$2a$$$$10$$$$HX4qSZhtQcvKUNmAsPXuPe9POkM7gdaFPcSnRjokgb8EkMI.1gkSa"]
+    # command: ["--generate-password"]
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
+    ports:
+      - 8000:8000
+      - 9000:9000
+      - 9443:9443
+volumes:
+  portainer_data:
+

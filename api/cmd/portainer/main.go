@@ -34,6 +34,7 @@ import (
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/password"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/ssl"
 	"github.com/portainer/portainer/api/jwt"
@@ -645,6 +646,13 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		}
 	} else if *flags.AdminPassword != "" {
 		adminPasswordHash = *flags.AdminPassword
+	}
+
+	if *flags.GenerateAdminPassword {
+		adminPasswordHash, err = password.GeneratePassword(cryptoService, fileService)
+		if err != nil {
+			logrus.Fatalf("Failed generating admin password: %v", err)
+		}
 	}
 
 	if adminPasswordHash != "" {

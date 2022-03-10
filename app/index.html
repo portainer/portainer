@@ -9,6 +9,8 @@
     <script>
       if (window.origin == 'file://') {
         document.getElementById('base').href = 'http://localhost:9000/';
+
+        window.ddExtension = true;
       } else {
         var path = window.location.pathname.replace(/^\/+|\/+$/g, '');
         var basePath = path ? '/' + path + '/' : '/';
