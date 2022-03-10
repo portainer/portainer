@@ -420,6 +420,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       if ($scope.hasChanges(service, ['Image'])) {
         const image = ImageHelper.createImageConfigForContainer($scope.formValues.RegistryModel);
         config.TaskTemplate.ContainerSpec.Image = image.fromImage;
+        config.registryId = $scope.formValues.RegistryModel.Registry.Id;
       } else {
         config.TaskTemplate.ContainerSpec.Image = service.Image;
       }
