@@ -99,24 +99,26 @@ export class KubernetesIngressConverter {
     return originalIngress;
   }
 
-  static generateNewIngresses(ingress, services) {
-    const originalIngress = angular.copy(ingress);
-    services.forEach((service) => {
-      if (service.Ingress) {
-        const matchedIngress = _.find(originalIngress, { Name: service.Ports[0].ingress.IngressName });
-        if (matchedIngress) {
-          const rule = new KubernetesIngressRule();
-          rule.ServiceName = service.Name;
-          rule.IngressName = service.Ports[0].ingress.IngressName;
-          rule.Host = service.Ports[0].ingress.Host;
-          rule.Path = _.startsWith(service.Ports[0].ingress.Path, '/') ? service.Ports[0].ingress.Path : '/' + service.Ports[0].ingress.Path;
-          rule.Port = service.Ports[0].port;
+  static generateNewIngresses(ingresses, services) {
+    const originalIngresses = angular.copy(ingresses);
+    services
+      .filter((s) => s.Ingress)
+      .forEach((service) => {
+        if (service.Ports.length !== 0) {
+          const matchedIngress = _.find(originalIngresses, { Name: service.Ports[0].ingress.IngressName });
+          if (matchedIngress) {
+            const rule = new KubernetesIngressRule();
+            rule.ServiceName = service.Name;
+            rule.IngressName = service.Ports[0].ingress.IngressName;
+            rule.Host = service.Ports[0].ingress.Host;
+            rule.Path = _.startsWith(service.Ports[0].ingress.Path, '/') ? service.Ports[0].ingress.Path : '/' + service.Ports[0].ingress.Path;
+            rule.Port = service.Ports[0].port;
 
-          matchedIngress.Paths.push(rule);
+            matchedIngress.Paths.push(rule);
+          }
         }
-      }
-    });
-    return originalIngress;
+      });
+    return originalIngresses;
   }
 
   // need this function for [ resource summary ] controller
