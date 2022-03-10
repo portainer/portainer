@@ -426,10 +426,10 @@ class KubernetesApplicationService {
     if (apiService === this.KubernetesStatefulSetService) {
       const headlessServicePayload = angular.copy(payload);
       headlessServicePayload.Name = application instanceof KubernetesStatefulSet ? application.ServiceName : application.HeadlessServiceName;
-      await this.KubernetesServiceService.delete(headlessServicePayload);
     }
 
     if (application.ServiceType) {
+      // delete headless service && non-headless service
       await this.KubernetesServiceService.delete(application.Services);
 
       if (application.Ingresses.length) {
