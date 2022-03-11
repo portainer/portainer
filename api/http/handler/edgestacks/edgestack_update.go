@@ -2,6 +2,7 @@ package edgestacks
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 	"strconv"
 
@@ -80,7 +81,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack related environments from database", err}
 		}
 
-		oldRelatedSet := EndpointSet(relatedEndpointIds)
+		oldRelatedSet := endpointutils.EndpointSet(relatedEndpointIds)
 		newRelatedSet := EndpointSet(newRelated)
 
 		endpointsToRemove := map[portainer.EndpointID]bool{}
