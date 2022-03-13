@@ -1,8 +1,9 @@
 import { r2a } from '@/react-tools/react2angular';
 import { SidebarMenuItem } from '@/portainer/components/sidebar/SidebarMenuItem';
+import type { EnvironmentId } from '@/portainer/environments/types';
 
 interface Props {
-  environmentId: string;
+  environmentId: EnvironmentId;
 }
 
 export function AzureSidebar({ environmentId }: Props) {

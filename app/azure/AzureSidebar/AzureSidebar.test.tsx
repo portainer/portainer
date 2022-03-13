@@ -30,5 +30,5 @@ test('dashboard items should render correctly', () => {
 });
 
 function renderComponent() {
-  return render(<AzureSidebar environmentId="1" />);
+  return render(<AzureSidebar environmentId={1} />);
 }
