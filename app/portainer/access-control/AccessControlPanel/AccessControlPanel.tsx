@@ -52,7 +52,7 @@ export function AccessControlPanel({
               resourceControl={resourceControl}
             />
 
-            {!isEditDisabled && (
+            {!isEditDisabled && !isEditMode && (
               <div className="row">
                 <div>
                   <Button color="link" onClick={toggleEditMode}>
