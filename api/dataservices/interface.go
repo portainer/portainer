@@ -303,7 +303,7 @@ type (
 	// State represents a service for managing application state
 	StateService interface {
 		State() (*portainer.State, error)
-		UpdateState(settings *portainer.State) error
+		UpdateState(state *portainer.State) error
 		BucketName() string
 	}
 )

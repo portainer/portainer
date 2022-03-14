@@ -33,7 +33,7 @@ func Test_canStopStartedMonitor(t *testing.T) {
 func Test_start_shouldFatalAfterTimeout_ifNotInitialized(t *testing.T) {
 	timeout := 10 * time.Millisecond
 
-	datastore := i.NewDatastore(i.WithUsers([]portainer.User{}))
+	datastore := i.NewDatastore(i.WithUsers([]portainer.User{}), i.WithState(&portainer.State{}))
 
 	var fataled bool
 	origLogFatalf := logFatalf

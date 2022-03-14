@@ -269,3 +269,18 @@ func WithEndpoints(endpoints []portainer.Endpoint) datastoreOption {
 		d.endpoint = &stubEndpointService{endpoints: endpoints}
 	}
 }
+
+type stubStateService struct {
+	state *portainer.State
+}
+
+func (s *stubStateService) BucketName() string                       { return "state" }
+func (s *stubStateService) State() (*portainer.State, error)         { return s.state, nil }
+func (s *stubStateService) UpdateState(state *portainer.State) error { return nil }
+
+// WithState testDatastore option that will instruct testDatastore to return provided state
+func WithState(s *portainer.State) datastoreOption {
+	return func(d *testDatastore) {
+		d.state = &stubStateService{state: s}
+	}
+}
