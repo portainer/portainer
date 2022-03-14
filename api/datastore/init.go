@@ -27,6 +27,11 @@ func (store *Store) Init() error {
 		return err
 	}
 
+	err = store.checkOrCreateDefaultState()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -123,4 +128,17 @@ func (store *Store) checkOrCreateDefaultData() error {
 		}
 	}
 	return nil
+}
+
+func (store *Store) checkOrCreateDefaultState() error {
+	_, err := store.State().State()
+	if store.IsErrObjectNotFound(err) {
+		defaultState := &portainer.State{
+			DisableAdminInit: false,
+		}
+
+		return store.State().UpdateState(defaultState)
+	}
+
+	return err
 }

@@ -61,6 +61,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		MaxBatchSize:              kingpin.Flag("max-batch-size", "Maximum size of a batch").Int(),
 		MaxBatchDelay:             kingpin.Flag("max-batch-delay", "Maximum delay before a batch starts").Duration(),
 		SecretKeyName:             kingpin.Flag("secret-key-name", "Secret key name for encryption and will be used as /run/secrets/<secret-key-name>.").Default(defaultSecretKeyName).String(),
+		EnableAdminInit:           kingpin.Flag("enable-admin-init", "Enable Portainer admin initialization ability if the previous initialization expires").Bool(),
 	}
 
 	kingpin.Parse()

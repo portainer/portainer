@@ -41,6 +41,11 @@ func (m *Monitor) Start() {
 				logFatalf("%s", err)
 			}
 			if !initialized {
+				err = m.DisableInstanceInit()
+				if err != nil {
+					log.Printf("[DEBUG] [internal,init] [message: fail to disable initialization monitor: %s]\n", err)
+				}
+
 				logFatalf("[FATAL] [internal,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
 			}
 		case <-cancellationCtx.Done():
@@ -67,4 +72,11 @@ func (m *Monitor) WasInitialized() (bool, error) {
 		return false, err
 	}
 	return len(users) > 0, nil
+}
+
+func (m *Monitor) DisableInstanceInit() error {
+	state := portainer.State{
+		DisableAdminInit: true,
+	}
+	return m.datastore.State().UpdateState(&state)
 }

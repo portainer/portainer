@@ -125,6 +125,7 @@ type (
 		MaxBatchSize              *int
 		MaxBatchDelay             *time.Duration
 		SecretKeyName             *string
+		EnableAdminInit           *bool
 	}
 
 	// CustomTemplate represents a custom template
@@ -1169,6 +1170,12 @@ type (
 
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
+
+	// State represents the state of PortainerInstance
+	State struct {
+		// Disable the Portainer instance if the initialization set up expires
+		DisableAdminInit bool `json:"DisableAdminInit" example:"false"`
+	}
 
 	// CLIService represents a service for managing CLI
 	CLIService interface {

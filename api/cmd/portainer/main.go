@@ -125,6 +125,11 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		}
 	}
 
+	err = updateStateFromFlags(store, flags)
+	if err != nil {
+		log.Fatalf("Failed updating state from flags: %v", err)
+	}
+
 	err = updateSettingsFromFlags(store, flags)
 	if err != nil {
 		log.Fatalf("Failed updating settings from flags: %v", err)
@@ -250,6 +255,24 @@ func initStatus(instanceID string) *portainer.Status {
 		Version:    portainer.APIVersion,
 		InstanceID: instanceID,
 	}
+}
+
+func updateStateFromFlags(dataStore dataservices.DataStore, flags *portainer.CLIFlags) error {
+	state, err := dataStore.State().State()
+	if err != nil {
+		return err
+	}
+
+	if !state.DisableAdminInit {
+		return nil
+	}
+
+	if !*flags.EnableAdminInit {
+		logrus.Fatalln("[FATAL] [internal,init] The Portainer instance initialization is disabled. Restarting the Portainer instance with the optional parameter enable-init")
+	}
+
+	state.DisableAdminInit = !*flags.EnableAdminInit
+	return dataStore.State().UpdateState(state)
 }
 
 func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.CLIFlags) error {

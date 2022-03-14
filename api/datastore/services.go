@@ -26,6 +26,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/settings"
 	"github.com/portainer/portainer/api/dataservices/ssl"
 	"github.com/portainer/portainer/api/dataservices/stack"
+	"github.com/portainer/portainer/api/dataservices/state"
 	"github.com/portainer/portainer/api/dataservices/tag"
 	"github.com/portainer/portainer/api/dataservices/team"
 	"github.com/portainer/portainer/api/dataservices/teammembership"
@@ -68,6 +69,7 @@ type Store struct {
 	UserService               *user.Service
 	VersionService            *version.Service
 	WebhookService            *webhook.Service
+	StateService              *state.Service
 }
 
 func (store *Store) initServices() error {
@@ -227,6 +229,12 @@ func (store *Store) initServices() error {
 	}
 	store.ScheduleService = scheduleService
 
+	stateService, err := state.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.StateService = stateService
+
 	return nil
 }
 
@@ -343,6 +351,11 @@ func (store *Store) Version() dataservices.VersionService {
 // Webhook gives access to the Webhook data management layer
 func (store *Store) Webhook() dataservices.WebhookService {
 	return store.WebhookService
+}
+
+// State gives access to the State data management layer
+func (store *Store) State() dataservices.StateService {
+	return store.StateService
 }
 
 type storeExport struct {

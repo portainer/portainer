@@ -32,6 +32,7 @@ type testDatastore struct {
 	user                    dataservices.UserService
 	version                 dataservices.VersionService
 	webhook                 dataservices.WebhookService
+	state                   dataservices.StateService
 }
 
 func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
@@ -74,6 +75,7 @@ func (d *testDatastore) TunnelServer() dataservices.TunnelServerService     { re
 func (d *testDatastore) User() dataservices.UserService                     { return d.user }
 func (d *testDatastore) Version() dataservices.VersionService               { return d.version }
 func (d *testDatastore) Webhook() dataservices.WebhookService               { return d.webhook }
+func (d *testDatastore) State() dataservices.StateService                   { return d.state }
 
 func (d *testDatastore) IsErrObjectNotFound(e error) bool {
 	return false

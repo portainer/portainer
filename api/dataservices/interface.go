@@ -47,6 +47,7 @@ type (
 		User() UserService
 		Version() VersionService
 		Webhook() WebhookService
+		State() StateService
 	}
 
 	// CustomTemplateService represents a service to manage custom templates
@@ -296,6 +297,13 @@ type (
 		WebhookByResourceID(resourceID string) (*portainer.Webhook, error)
 		WebhookByToken(token string) (*portainer.Webhook, error)
 		DeleteWebhook(ID portainer.WebhookID) error
+		BucketName() string
+	}
+
+	// State represents a service for managing application state
+	StateService interface {
+		State() (*portainer.State, error)
+		UpdateState(settings *portainer.State) error
 		BucketName() string
 	}
 )
