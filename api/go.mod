@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/Microsoft/go-winio v0.4.17
+	github.com/andres-portainer/chisel v1.7.8-0.20220314202502-97e2b32f6bd8
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535
 	github.com/aws/aws-sdk-go-v2 v1.11.1
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.2
@@ -25,7 +26,6 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/joho/godotenv v1.3.0
-	github.com/jpillora/chisel v1.7.7
 	github.com/json-iterator/go v1.1.11
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6

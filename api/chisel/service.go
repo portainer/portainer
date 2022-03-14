@@ -11,8 +11,8 @@ import (
 
 	"github.com/portainer/portainer/api/http/proxy"
 
+	chserver "github.com/andres-portainer/chisel/server"
 	"github.com/dchest/uniuri"
-	chserver "github.com/jpillora/chisel/server"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 )
