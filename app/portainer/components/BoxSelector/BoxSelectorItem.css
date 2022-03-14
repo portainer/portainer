@@ -85,10 +85,6 @@
   }
 }
 
-.box-selector-item-description {
-  height: 1em;
-}
-
 .box-selector-item.limited.business {
   --selected-item-color: var(--BE-only);
 }
