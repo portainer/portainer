@@ -5,7 +5,7 @@ import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 interface Props {
   checkInInterval?: number;
   edgeId?: string;
-  homepageLoadTime?: number;
+  queryDate?: number;
   lastCheckInDate?: number;
 }
 
@@ -13,7 +13,7 @@ export function EdgeIndicator({
   edgeId,
   lastCheckInDate,
   checkInInterval,
-  homepageLoadTime,
+  queryDate,
 }: Props) {
   if (!edgeId) {
     return (
@@ -25,9 +25,8 @@ export function EdgeIndicator({
 
   // give checkIn some wiggle room
   let isCheckValid = false;
-  if (checkInInterval && homepageLoadTime && lastCheckInDate) {
-    isCheckValid =
-      homepageLoadTime - lastCheckInDate <= checkInInterval * 2 + 20;
+  if (checkInInterval && queryDate && lastCheckInDate) {
+    isCheckValid = queryDate - lastCheckInDate <= checkInInterval * 2 + 20;
   }
 
   return (

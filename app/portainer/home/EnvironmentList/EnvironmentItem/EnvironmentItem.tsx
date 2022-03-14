@@ -25,18 +25,12 @@ import styles from './EnvironmentItem.module.css';
 import { EnvironmentStatusBadge } from './EnvironmentStatusBadge';
 
 interface Props {
-  homepageLoadTime?: number;
   environment: Environment;
   groupName?: string;
   onClick(environment: Environment): void;
 }
 
-export function EnvironmentItem({
-  environment,
-  onClick,
-  homepageLoadTime,
-  groupName,
-}: Props) {
+export function EnvironmentItem({ environment, onClick, groupName }: Props) {
   const isAdmin = useIsAdmin();
   const isEdge = isEdgeEnvironment(environment.Type);
 
@@ -77,7 +71,7 @@ export function EnvironmentItem({
                         edgeId={environment.EdgeID}
                         checkInInterval={environment.EdgeCheckinInterval}
                         lastCheckInDate={environment.LastCheckInDate}
-                        homepageLoadTime={homepageLoadTime}
+                        queryDate={environment.QueryDate}
                       />
                     ) : (
                       <>
