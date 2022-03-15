@@ -82,7 +82,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		}
 
 		oldRelatedSet := endpointutils.EndpointSet(relatedEndpointIds)
-		newRelatedSet := EndpointSet(newRelated)
+		newRelatedSet := endpointutils.EndpointSet(newRelated)
 
 		endpointsToRemove := map[portainer.EndpointID]bool{}
 		for endpointID := range oldRelatedSet {
@@ -189,14 +189,4 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	return response.JSON(w, stack)
-}
-
-func EndpointSet(endpointIDs []portainer.EndpointID) map[portainer.EndpointID]bool {
-	set := map[portainer.EndpointID]bool{}
-
-	for _, endpointID := range endpointIDs {
-		set[endpointID] = true
-	}
-
-	return set
 }
