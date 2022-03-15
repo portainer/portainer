@@ -41,7 +41,7 @@ var (
 )
 
 // NewKubeClusterAccessService creates a new instance of a KubeClusterAccessService
-func NewKubeClusterAccessService(baseURL string, tlsCertPath string) KubeClusterAccessService {
+func NewKubeClusterAccessService(baseURL, httpsBindAddr, tlsCertPath string) KubeClusterAccessService {
 	certificateAuthorityData, err := getCertificateAuthorityData(tlsCertPath)
 	if err != nil {
 		log.Printf("[DEBUG] [internal,kubeconfig] [message: %s, generated KubeConfig will be insecure]", err.Error())
@@ -49,6 +49,7 @@ func NewKubeClusterAccessService(baseURL string, tlsCertPath string) KubeCluster
 
 	return &kubeClusterAccessService{
 		baseURL:                  baseURL,
+		httpsBindAddr:            httpsBindAddr,
 		certificateAuthorityFile: tlsCertPath,
 		certificateAuthorityData: certificateAuthorityData,
 	}
@@ -96,7 +97,10 @@ func (service *kubeClusterAccessService) GetData(hostURL string, endpointID port
 	if baseURL != "/" {
 		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
 	}
-	clusterServerURL := fmt.Sprintf("https://%s%sapi/endpoints/%d/kubernetes", hostURL, baseURL, endpointID)
+
+	host := strings.Split(hostURL, ":")[0] + service.httpsBindAddr + baseURL
+
+	clusterServerURL := fmt.Sprintf("https://%sapi/endpoints/%d/kubernetes", host, endpointID)
 
 	return kubernetesClusterAccessData{
 		ClusterServerURL:         clusterServerURL,
