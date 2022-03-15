@@ -18,6 +18,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             $state.go('portainer.home');
             return;
           }
+          var preEndpoint = EndpointProvider.endpoints();
           try {
             if (endpoint.Type === 7) {
               //edge
@@ -39,6 +40,10 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             await KubernetesNamespaceService.get();
           } catch (e) {
             Notifications.error('Failed loading environment', e);
+            if (preEndpoint && preEndpoint.Id) {
+              EndpointProvider.setEndpointID(preEndpoint.Id);
+            }
+
             $state.go('portainer.home', {}, { reload: true });
           }
         });
