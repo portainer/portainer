@@ -222,13 +222,6 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
           $scope.authMethod = 4;
         }
 
-        $scope.formValues.ldap.serverType = settings.LDAPSettings.ServerType;
-        if (settings.LDAPSettings.ServerType === 2) {
-          $scope.formValues.ldap.adSettings = settings.LDAPSettings;
-        } else {
-          $scope.formValues.ldap.ldapSettings = Object.assign($scope.formValues.ldap.ldapSettings, settings.LDAPSettings);
-        }
-
         if (settings.LDAPSettings.URL) {
           settings.LDAPSettings.URLs = [settings.LDAPSettings.URL];
         }
@@ -240,6 +233,13 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
         }
         if (!settings.LDAPSettings.ServerType) {
           settings.LDAPSettings.ServerType = 0;
+        }
+
+        $scope.formValues.ldap.serverType = settings.LDAPSettings.ServerType;
+        if (settings.LDAPSettings.ServerType === 2) {
+          $scope.formValues.ldap.adSettings = settings.LDAPSettings;
+        } else {
+          $scope.formValues.ldap.ldapSettings = Object.assign($scope.formValues.ldap.ldapSettings, settings.LDAPSettings);
         }
       })
       .catch(function error(err) {

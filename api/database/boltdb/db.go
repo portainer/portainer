@@ -314,6 +314,19 @@ func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, ob
 	})
 }
 
+// CreateObjectWithStringId creates a new object in the bucket, using the specified id
+func (connection *DbConnection) CreateObjectWithStringId(bucketName string, id []byte, obj interface{}) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+		data, err := connection.MarshalObject(obj)
+		if err != nil {
+			return err
+		}
+
+		return bucket.Put(id, data)
+	})
+}
+
 // CreateObjectWithSetSequence creates a new object in the bucket, using the specified id, and sets the bucket sequence
 // avoid this :)
 func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, id int, obj interface{}) error {
@@ -374,5 +387,45 @@ func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interf
 
 		return nil
 	})
+	return err
+}
+
+func (connection *DbConnection) BackupMetadata() (map[string]interface{}, error) {
+	buckets := map[string]interface{}{}
+
+	err := connection.View(func(tx *bolt.Tx) error {
+		err := tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
+			bucketName := string(name)
+			bucket = tx.Bucket([]byte(bucketName))
+			seqId := bucket.Sequence()
+			buckets[bucketName] = int(seqId)
+			return nil
+		})
+
+		return err
+	})
+
+	return buckets, err
+}
+
+func (connection *DbConnection) RestoreMetadata(s map[string]interface{}) error {
+	var err error
+
+	for bucketName, v := range s {
+		id, ok := v.(float64) // JSON ints are unmarshalled to interface as float64. See: https://pkg.go.dev/encoding/json#Decoder.Decode
+		if !ok {
+			logrus.Errorf("Failed to restore metadata to bucket %s, skipped", bucketName)
+			continue
+		}
+
+		err = connection.Batch(func(tx *bolt.Tx) error {
+			bucket, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+			if err != nil {
+				return err
+			}
+			return bucket.SetSequence(uint64(id))
+		})
+	}
+
 	return err
 }

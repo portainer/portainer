@@ -30,8 +30,8 @@ import { ColumnVisibilityMenu } from '@/portainer/components/datatables/componen
 import { useRepeater } from '@/portainer/components/datatables/components/useRepeater';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
-  useSearchBarContext,
   SearchBar,
+  useSearchBarState,
 } from '@/portainer/components/datatables/components/SearchBar';
 import type {
   ContainersTableSettings,
@@ -63,7 +63,7 @@ export function ContainersDatatable({
 }: ContainerTableProps) {
   const { settings, setTableSettings } =
     useTableSettings<ContainersTableSettings>();
-  const [searchBarValue, setSearchBarValue] = useSearchBarContext();
+  const [searchBarValue, setSearchBarValue] = useSearchBarState('containers');
 
   const columns = useColumns();
 

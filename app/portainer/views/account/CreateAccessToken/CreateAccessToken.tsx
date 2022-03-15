@@ -18,9 +18,6 @@ interface AccessTokenResponse {
 }
 
 export interface Props {
-  // userId for whom the access token is generated for
-  userId: number;
-
   // onSubmit dispatches a successful matomo analytics event
   onSubmit: (description: string) => Promise<AccessTokenResponse>;
 
@@ -32,7 +29,8 @@ export function CreateAccessToken({
   onSubmit,
   onError,
 }: PropsWithChildren<Props>) {
-  const { t } = useTranslation();
+  const translationNS = 'account.accessTokens.create';
+  const { t } = useTranslation(translationNS);
 
   const router = useRouter();
   const [description, setDescription] = useState('');
@@ -42,12 +40,7 @@ export function CreateAccessToken({
 
   useEffect(() => {
     if (description.length === 0) {
-      setErrorText(
-        t(
-          'users.access-tokens.create.form.description-field.error.required',
-          'this field is required'
-        )
-      );
+      setErrorText(t('this field is required'));
     } else setErrorText('');
   }, [description, t]);
 
@@ -73,10 +66,7 @@ export function CreateAccessToken({
         <div>
           <FormControl
             inputId="input"
-            label={t(
-              'users.access-tokens.create.form.description-field.label',
-              'Description'
-            )}
+            label={t('Description')}
             errors={errorText}
           >
             <Input
@@ -90,36 +80,30 @@ export function CreateAccessToken({
             onClick={() => generateAccessToken()}
             className={styles.addButton}
           >
-            {t('users.access-tokens.create.add-button', 'Add access token')}
+            {t('Add access token')}
           </Button>
         </div>
         {accessToken && (
           <>
             <FormSectionTitle>
-              <Trans i18nKey="users.access-tokens.create.new-access-token.title">
-                New access token
-              </Trans>
+              <Trans ns={translationNS}>New access token</Trans>
             </FormSectionTitle>
             <TextTip>
-              <Trans i18nKey="users.access-tokens.create.new-access-token.explanation">
+              <Trans ns={translationNS}>
                 Please copy the new access token. You won&#39;t be able to view
                 the token again.
               </Trans>
             </TextTip>
             <Code>{accessToken}</Code>
             <CopyButton copyText={accessToken} className={styles.copyButton}>
-              <Trans i18nKey="users.access-tokens.create.new-access-token.copy-button">
-                Copy access token
-              </Trans>
+              <Trans ns={translationNS}>Copy access token</Trans>
             </CopyButton>
             <hr />
             <Button
               type="button"
               onClick={() => router.stateService.go('portainer.account')}
             >
-              <Trans i18nKey="users.access-tokens.create.done-button">
-                Done
-              </Trans>
+              <Trans ns={translationNS}>Done</Trans>
             </Button>
           </>
         )}

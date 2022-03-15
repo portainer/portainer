@@ -6,7 +6,7 @@
         <table class="table">
           <tbody>
             <!-- ownership -->
-            <tr>
+            <tr data-cy="access-ownership">
               <td>Ownership</td>
               <td>
                 <i ng-class="$ctrl.resourceControl.Ownership | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
@@ -65,7 +65,7 @@
             <tr ng-if="$ctrl.resourceControl.Type === $ctrl.RCTI.STACK && $ctrl.resourceType !== $ctrl.RCTS.STACK">
               <td colspan="2">
                 <i class="fa fa-info-circle" aria-hidden="true" style="margin-right: 2px"></i>
-                Access control on this resource is inherited from the following stack: {{ $ctrl.resourceControl.ResourceId }}
+                Access control on this resource is inherited from the following stack: {{ $ctrl.removeEndpointId($ctrl.resourceControl.ResourceId) }}
                 <portainer-tooltip
                   message="Access control applied on a stack is also applied on each resource in the stack."
                   position="bottom"
@@ -74,7 +74,7 @@
               </td>
             </tr>
             <!-- authorized-users -->
-            <tr ng-if="$ctrl.resourceControl.UserAccesses.length > 0">
+            <tr ng-if="$ctrl.resourceControl.UserAccesses.length > 0" data-cy="access-authorisedUsers">
               <td>Authorized users</td>
               <td>
                 <span ng-repeat="user in $ctrl.authorizedUsers">{{ user.Username }}{{ $last ? '' : ', ' }} </span>
@@ -82,7 +82,7 @@
             </tr>
             <!-- !authorized-users -->
             <!-- authorized-teams -->
-            <tr ng-if="$ctrl.resourceControl.TeamAccesses.length > 0">
+            <tr ng-if="$ctrl.resourceControl.TeamAccesses.length > 0" data-cy="access-authorisedTeams">
               <td>Authorized teams</td>
               <td>
                 <span ng-repeat="team in $ctrl.authorizedTeams">{{ team.Name }}{{ $last ? '' : ', ' }} </span>
