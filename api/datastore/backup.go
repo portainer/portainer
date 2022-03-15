@@ -69,6 +69,11 @@ func getBackupRestoreOptions(backupDir string) *BackupOptions {
 	}
 }
 
+// Backup current database with default options
+func (store *Store) Backup() (string, error) {
+	return store.backupWithOptions(nil)
+}
+
 func (store *Store) setupOptions(options *BackupOptions) *BackupOptions {
 	if options == nil {
 		options = &BackupOptions{}

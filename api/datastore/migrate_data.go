@@ -9,6 +9,7 @@ import (
 	plog "github.com/portainer/portainer/api/datastore/log"
 	"github.com/portainer/portainer/api/datastore/migrator"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/sirupsen/logrus"
 
 	werrors "github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
@@ -22,6 +23,12 @@ func (store *Store) MigrateData() error {
 	version, err := store.version()
 	if err != nil {
 		return err
+	}
+
+	// Backup Database
+	backupPath, err := store.Backup()
+	if err != nil {
+		return werrors.Wrap(err, "while backing up db before migration")
 	}
 
 	migratorParams := &migrator.MigratorParameters{
@@ -46,7 +53,20 @@ func (store *Store) MigrateData() error {
 		AuthorizationService:    authorization.NewService(store),
 	}
 
-	return store.connectionMigrateData(migratorParams)
+	// restore on error
+	err = store.connectionMigrateData(migratorParams)
+	if err != nil {
+		// Restore options
+		options := BackupOptions{
+			BackupPath: backupPath,
+		}
+		err := store.restoreWithOptions(&options)
+		if err != nil {
+			logrus.Fatalf("Failed restoring the backup. Error %s", err)
+		}
+	}
+
+	return err
 }
 
 // FailSafeMigrate backup and restore DB if migration fail
