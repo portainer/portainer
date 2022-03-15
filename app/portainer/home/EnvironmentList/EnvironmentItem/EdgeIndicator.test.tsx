@@ -21,14 +21,14 @@ function renderComponent(
   edgeId = '',
   lastCheckInDate = 0,
   checkInInterval = 0,
-  homepageLoadTime = 0
+  queryDate = 0
 ) {
   return render(
     <EdgeIndicator
       edgeId={edgeId}
       lastCheckInDate={lastCheckInDate}
       checkInInterval={checkInInterval}
-      homepageLoadTime={homepageLoadTime}
+      queryDate={queryDate}
     />
   );
 }

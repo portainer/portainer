@@ -5,16 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
-
-	"github.com/portainer/portainer/api/http/proxy"
 
 	chserver "github.com/andres-portainer/chisel/server"
 	"github.com/dchest/uniuri"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/http/proxy"
 )
 
 const (
@@ -29,7 +27,7 @@ const (
 type Service struct {
 	serverFingerprint string
 	serverPort        string
-	tunnelDetailsMap  map[string]*portainer.TunnelDetails
+	tunnelDetailsMap  map[portainer.EndpointID]*portainer.TunnelDetails
 	dataStore         dataservices.DataStore
 	snapshotService   portainer.SnapshotService
 	chiselServer      *chserver.Server
@@ -41,7 +39,7 @@ type Service struct {
 // NewService returns a pointer to a new instance of Service
 func NewService(dataStore dataservices.DataStore, shutdownCtx context.Context) *Service {
 	return &Service{
-		tunnelDetailsMap: make(map[string]*portainer.TunnelDetails),
+		tunnelDetailsMap: make(map[portainer.EndpointID]*portainer.TunnelDetails),
 		dataStore:        dataStore,
 		shutdownCtx:      shutdownCtx,
 	}
@@ -183,48 +181,41 @@ func (service *Service) startTunnelVerificationLoop() {
 }
 
 func (service *Service) checkTunnels() {
-	service.mu.Lock()
+	tunnels := make(map[portainer.EndpointID]portainer.TunnelDetails)
 
+	service.mu.Lock()
 	for key, tunnel := range service.tunnelDetailsMap {
+		tunnels[key] = *tunnel
+	}
+	service.mu.Unlock()
+
+	for endpointID, tunnel := range tunnels {
 		if tunnel.LastActivity.IsZero() || tunnel.Status == portainer.EdgeAgentIdle {
 			continue
 		}
 
 		elapsed := time.Since(tunnel.LastActivity)
-		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: environment tunnel monitoring]", key, tunnel.Status, elapsed.Seconds())
+		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %d] [status: %s] [status_time_seconds: %f] [message: environment tunnel monitoring]", endpointID, tunnel.Status, elapsed.Seconds())
 
 		if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() < requiredTimeout.Seconds() {
 			continue
 		} else if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() > requiredTimeout.Seconds() {
-			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: REQUIRED state timeout exceeded]", key, tunnel.Status, elapsed.Seconds(), requiredTimeout.Seconds())
+			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %d] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: REQUIRED state timeout exceeded]", endpointID, tunnel.Status, elapsed.Seconds(), requiredTimeout.Seconds())
 		}
 
 		if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() < activeTimeout.Seconds() {
 			continue
 		} else if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() > activeTimeout.Seconds() {
-			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded]", key, tunnel.Status, elapsed.Seconds(), activeTimeout.Seconds())
+			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %d] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded]", endpointID, tunnel.Status, elapsed.Seconds(), activeTimeout.Seconds())
 
-			endpointID, err := strconv.Atoi(key)
+			err := service.snapshotEnvironment(endpointID, tunnel.Port)
 			if err != nil {
-				log.Printf("[ERROR] [chisel,snapshot,conversion] Invalid environment identifier (id: %s): %s", key, err)
-			}
-
-			err = service.snapshotEnvironment(portainer.EndpointID(endpointID), tunnel.Port)
-			if err != nil {
-				log.Printf("[ERROR] [snapshot] Unable to snapshot Edge environment (id: %s): %s", key, err)
+				log.Printf("[ERROR] [snapshot] Unable to snapshot Edge environment (id: %d): %s", endpointID, err)
 			}
 		}
 
-		endpointID, err := strconv.Atoi(key)
-		if err != nil {
-			log.Printf("[ERROR] [chisel,conversion] Invalid environment identifier (id: %s): %s", key, err)
-			continue
-		}
-
-		service.setTunnelStatusToIdle(portainer.EndpointID(endpointID))
+		service.SetTunnelStatusToIdle(portainer.EndpointID(endpointID))
 	}
-
-	service.mu.Unlock()
 }
 
 func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tunnelPort int) error {
