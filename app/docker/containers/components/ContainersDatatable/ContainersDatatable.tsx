@@ -101,6 +101,9 @@ export function ContainersDatatable({
         return !row.original.IsPortainer;
       },
       autoResetSelectedRows: false,
+      getRowId(originalRow: DockerContainer) {
+        return originalRow.Id;
+      },
       selectCheckboxComponent: Checkbox,
     },
     useFilters,
