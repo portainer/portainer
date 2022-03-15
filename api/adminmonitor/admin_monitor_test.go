@@ -21,6 +21,18 @@ func Test_stopCouldBeCalledMultipleTimes(t *testing.T) {
 	monitor.Stop()
 }
 
+func Test_startOrStopCouldBeCalledMultipleTimesConcurrently(t *testing.T) {
+	monitor := New(1*time.Minute, nil, context.Background())
+
+	go monitor.Start()
+	monitor.Start()
+
+	go monitor.Stop()
+	monitor.Stop()
+
+	time.Sleep(2 * time.Second)
+}
+
 func Test_canStopStartedMonitor(t *testing.T) {
 	monitor := New(1*time.Minute, nil, context.Background())
 	monitor.Start()
