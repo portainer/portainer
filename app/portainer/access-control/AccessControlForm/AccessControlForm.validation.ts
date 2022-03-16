@@ -1,17 +1,13 @@
-import { object, string, array, number, bool } from 'yup';
+import { object, string, array, number } from 'yup';
 
-import { ResourceControlOwnership } from '@/portainer/models/resourceControl/resourceControlOwnership';
+import { ResourceControlOwnership } from '../types';
 
 export function validationSchema(isAdmin: boolean) {
   return object()
     .shape({
-      accessControlEnabled: bool(),
       ownership: string()
         .oneOf(Object.values(ResourceControlOwnership))
-        .when('accessControlEnabled', {
-          is: true,
-          then: (schema) => schema.required(),
-        }),
+        .required(),
       authorizedUsers: array(number()),
       authorizedTeams: array(number()),
     })
@@ -20,16 +16,8 @@ export function validationSchema(isAdmin: boolean) {
       isAdmin
         ? 'You must specify at least one team or user.'
         : 'You must specify at least one team.',
-      ({
-        accessControlEnabled,
-        ownership,
-        authorizedTeams,
-        authorizedUsers,
-      }) => {
-        if (
-          !accessControlEnabled ||
-          ownership !== ResourceControlOwnership.RESTRICTED
-        ) {
+      ({ ownership, authorizedTeams, authorizedUsers }) => {
+        if (ownership !== ResourceControlOwnership.RESTRICTED) {
           return true;
         }
 

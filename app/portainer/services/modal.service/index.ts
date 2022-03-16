@@ -3,7 +3,6 @@ import bootbox from 'bootbox';
 
 import {
   cancelRegistryRepositoryAction,
-  confirmAccessControlUpdate,
   confirmAsync,
   confirmDeassociate,
   confirmDeletion,
@@ -43,7 +42,6 @@ export function ModalServiceAngular() {
     confirmWebEditorDiscard,
     confirmAsync,
     confirm,
-    confirmAccessControlUpdate,
     confirmImageForceRemoval,
     cancelRegistryRepositoryAction,
     confirmDeletion,
