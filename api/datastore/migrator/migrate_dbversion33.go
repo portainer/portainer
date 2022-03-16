@@ -1,9 +1,8 @@
 package migrator
 
 import (
-	"fmt"
-
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/sirupsen/logrus"
 )
 
 func (m *Migrator) migrateDBVersionToDB34() error {
@@ -47,7 +46,8 @@ func validateStackEntryPoint(stackService dataservices.StackService) error {
 			continue
 		}
 		if stack.GitConfig.ConfigFilePath == "" {
-			return fmt.Errorf("GitConfig.ConfigFilePath is empty for stack - name=%s, ID=%d", stack.Name, stack.ID)
+			// Not something we should be stopping migration
+			logrus.Errorf("GitConfig.ConfigFilePath is empty for stack - name=%s, ID=%d", stack.Name, stack.ID)
 		}
 	}
 	return nil

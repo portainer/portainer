@@ -1,9 +1,8 @@
 package migrator
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/sirupsen/logrus"
 )
 
 func (m *Migrator) migrateDBVersionToDB33() error {
@@ -32,7 +31,7 @@ func (m *Migrator) validateSettingsToDB33() error {
 	}
 
 	if settings.KubectlShellImage != portainer.DefaultKubectlShellImage {
-		return fmt.Errorf("settings KubectlShellImage is not same as portainer.DefaultKubectlShellImage")
+		logrus.Errorf("settings KubectlShellImage is not same as portainer.DefaultKubectlShellImage")
 	}
 
 	return nil

@@ -56,6 +56,7 @@ func (store *Store) MigrateData() error {
 	// restore on error
 	err = store.connectionMigrateData(migratorParams)
 	if err != nil {
+		logrus.Errorf("While DB migration %v. Restoring DB", err)
 		// Restore options
 		options := BackupOptions{
 			BackupPath: backupPath,
