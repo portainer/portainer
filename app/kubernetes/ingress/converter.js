@@ -89,17 +89,39 @@ export class KubernetesIngressConverter {
     return ingresses;
   }
 
-  static deleteIngressByServiceName(formValues, service) {
-    const ingresses = angular.copy(formValues.OriginalIngresses);
-    ingresses.forEach((ingress) => {
-      const path = _.find(ingress.Paths, { ServiceName: service.Name });
-      if (path) {
-        _.remove(ingress.Paths, path);
-      }
+  static removeIngressesPaths(ingresses, services) {
+    const originalIngress = angular.copy(ingresses);
+    originalIngress.forEach((ingress) => {
+      services.forEach((service) => {
+        _.remove(ingress.Paths, { ServiceName: service.Name });
+      });
     });
-    return ingresses;
+    return originalIngress;
   }
 
+  static generateNewIngresses(ingresses, services) {
+    const originalIngresses = angular.copy(ingresses);
+    services
+      .filter((s) => s.Ingress)
+      .forEach((service) => {
+        if (service.Ports.length !== 0) {
+          const matchedIngress = _.find(originalIngresses, { Name: service.Ports[0].ingress.IngressName });
+          if (matchedIngress) {
+            const rule = new KubernetesIngressRule();
+            rule.ServiceName = service.Name;
+            rule.IngressName = service.Ports[0].ingress.IngressName;
+            rule.Host = service.Ports[0].ingress.Host;
+            rule.Path = _.startsWith(service.Ports[0].ingress.Path, '/') ? service.Ports[0].ingress.Path : '/' + service.Ports[0].ingress.Path;
+            rule.Port = service.Ports[0].port;
+
+            matchedIngress.Paths.push(rule);
+          }
+        }
+      });
+    return originalIngresses;
+  }
+
+  // need this function for [ resource summary ] controller
   static newApplicationFormValuesToIngresses(formValues, serviceName, servicePorts) {
     const ingresses = angular.copy(formValues.OriginalIngresses);
     servicePorts.forEach((port) => {
@@ -113,27 +135,6 @@ export class KubernetesIngressConverter {
         rule.Port = port.port;
 
         ingress.Paths.push(rule);
-      }
-    });
-    return ingresses;
-  }
-
-  static editingFormValuesToIngresses(formValues, serviceName, servicePorts) {
-    const ingresses = angular.copy(formValues.OriginalIngresses);
-    servicePorts.forEach((port) => {
-      const ingressMatched = _.find(ingresses, { Name: port.ingress.IngressName });
-      if (ingressMatched) {
-        const pathMatched = _.find(ingressMatched.Paths, { ServiceName: serviceName });
-        _.remove(ingressMatched.Paths, pathMatched);
-
-        const rule = new KubernetesIngressRule();
-        rule.ServiceName = serviceName;
-        rule.IngressName = port.ingress.IngressName;
-        rule.Host = port.ingress.Host;
-        rule.Path = _.startsWith(port.ingress.Path, '/') ? port.ingress.Path : '/' + port.ingress.Path;
-        rule.Port = port.port;
-
-        ingressMatched.Paths.push(rule);
       }
     });
     return ingresses;
