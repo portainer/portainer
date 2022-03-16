@@ -4,13 +4,11 @@ import (
 	"encoding/base64"
 	"fmt"
 	"math/rand"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/portainer/libcrypto"
-
 	"github.com/dchest/uniuri"
+	"github.com/portainer/libcrypto"
 	portainer "github.com/portainer/portainer/api"
 )
 
@@ -19,6 +17,7 @@ const (
 	maxAvailablePort = 65535
 )
 
+// NOTE: it needs to be called with the lock acquired
 // getUnusedPort is used to generate an unused random port in the dynamic port range.
 // Dynamic ports (also called private ports) are 49152 to 65535.
 func (service *Service) getUnusedPort() int {
@@ -39,9 +38,8 @@ func randomInt(min, max int) int {
 
 // NOTE: it needs to be called with the lock acquired
 func (service *Service) getTunnelDetails(endpointID portainer.EndpointID) *portainer.TunnelDetails {
-	key := strconv.Itoa(int(endpointID))
 
-	if tunnel, ok := service.tunnelDetailsMap[key]; ok {
+	if tunnel, ok := service.tunnelDetailsMap[endpointID]; ok {
 		return tunnel
 	}
 
@@ -49,7 +47,7 @@ func (service *Service) getTunnelDetails(endpointID portainer.EndpointID) *porta
 		Status: portainer.EdgeAgentIdle,
 	}
 
-	service.tunnelDetailsMap[key] = tunnel
+	service.tunnelDetailsMap[endpointID] = tunnel
 
 	return tunnel
 }
@@ -103,8 +101,12 @@ func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID)
 	service.mu.Unlock()
 }
 
-// NOTE: it needs to be called with the lock acquired
-func (service *Service) setTunnelStatusToIdle(endpointID portainer.EndpointID) {
+// SetTunnelStatusToIdle update the status of the tunnel associated to the specified environment(endpoint).
+// It sets the status to IDLE.
+// It removes any existing credentials associated to the tunnel.
+func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
+	service.mu.Lock()
+
 	tunnel := service.getTunnelDetails(endpointID)
 	tunnel.Status = portainer.EdgeAgentIdle
 	tunnel.Port = 0
@@ -117,14 +119,7 @@ func (service *Service) setTunnelStatusToIdle(endpointID portainer.EndpointID) {
 	}
 
 	service.ProxyManager.DeleteEndpointProxy(endpointID)
-}
 
-// SetTunnelStatusToIdle update the status of the tunnel associated to the specified environment(endpoint).
-// It sets the status to IDLE.
-// It removes any existing credentials associated to the tunnel.
-func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
-	service.mu.Lock()
-	service.setTunnelStatusToIdle(endpointID)
 	service.mu.Unlock()
 }
 

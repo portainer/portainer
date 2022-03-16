@@ -3,6 +3,7 @@ package adminmonitor
 import (
 	"context"
 	"log"
+	"sync"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -16,6 +17,7 @@ type Monitor struct {
 	datastore        dataservices.DataStore
 	shutdownCtx      context.Context
 	cancellationFunc context.CancelFunc
+	mu               sync.Mutex
 }
 
 // New creates a monitor that when started will wait for the timeout duration and then shutdown the application unless it has been initialized.
@@ -29,6 +31,13 @@ func New(timeout time.Duration, datastore dataservices.DataStore, shutdownCtx co
 
 // Starts starts the monitor. Active monitor could be stopped or shuttted down by cancelling the shutdown context.
 func (m *Monitor) Start() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if m.cancellationFunc != nil {
+		return
+	}
+
 	cancellationCtx, cancellationFunc := context.WithCancel(context.Background())
 	m.cancellationFunc = cancellationFunc
 
@@ -53,6 +62,9 @@ func (m *Monitor) Start() {
 
 // Stop stops monitor. Safe to call even if monitor wasn't started.
 func (m *Monitor) Stop() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	if m.cancellationFunc == nil {
 		return
 	}
