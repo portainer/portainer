@@ -33,12 +33,17 @@ func (o *OfflineGate) Lock() func() {
 // WaitingMiddleware returns an http handler that waits for the gate to be unlocked before continuing
 func (o *OfflineGate) WaitingMiddleware(timeout time.Duration, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" && r.Method != "HEAD" && r.Method != "OPTIONS" && !o.lock.RTryLockWithTimeout(timeout) {
+		if r.Method == "GET" || r.Method == "HEAD" || r.Method == "OPTIONS" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		if !o.lock.RTryLockWithTimeout(timeout) {
 			log.Println("error: Timeout waiting for the offline gate to signal")
 			httperror.WriteError(w, http.StatusRequestTimeout, "Timeout waiting for the offline gate to signal", http.ErrHandlerTimeout)
 			return
 		}
-
 		next.ServeHTTP(w, r)
+		o.lock.RUnlock()
 	})
 }
