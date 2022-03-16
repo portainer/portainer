@@ -3,6 +3,7 @@ package offlinegate
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -33,7 +34,7 @@ func (o *OfflineGate) Lock() func() {
 // WaitingMiddleware returns an http handler that waits for the gate to be unlocked before continuing
 func (o *OfflineGate) WaitingMiddleware(timeout time.Duration, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" || r.Method == "HEAD" || r.Method == "OPTIONS" {
+		if r.Method == "GET" || r.Method == "HEAD" || r.Method == "OPTIONS" || strings.HasPrefix(r.URL.Path, "/api/backup") || strings.HasPrefix(r.URL.Path, "/api/restore") {
 			next.ServeHTTP(w, r)
 			return
 		}
