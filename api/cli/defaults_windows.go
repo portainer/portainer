@@ -15,6 +15,7 @@ const (
 	defaultHTTPDisabled        = "false"
 	defaultHTTPEnabled         = "false"
 	defaultSSL                 = "false"
+	defaultSSLCacertPath       = "C:\\certs\\portainer-ca.crt"
 	defaultSSLCertPath         = "C:\\certs\\portainer.crt"
 	defaultSSLKeyPath          = "C:\\certs\\portainer.key"
 	defaultSnapshotInterval    = "5m"

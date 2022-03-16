@@ -1,8 +1,10 @@
 package security
 
 import (
+	"crypto/x509"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -12,6 +14,9 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/sirupsen/logrus"
 )
 
 type (
@@ -36,6 +41,21 @@ type (
 )
 
 const apiKeyHeader = "X-API-KEY"
+
+var (
+	apiProcessed = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "portainer_api_bouncer_results",
+		Help: "The total number of request access success/failures",
+	},
+		[]string{"permission", "path"},
+	)
+	agentApiProcessed = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "portainer_agent_api_bouncer_results",
+		Help: "The total number of agent request access success/failures",
+	},
+		[]string{"permission", "path"},
+	)
+)
 
 // NewRequestBouncer initializes a new RequestBouncer
 func NewRequestBouncer(dataStore dataservices.DataStore, jwtService dataservices.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
@@ -96,58 +116,111 @@ func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler 
 func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
+		apiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "error"}).Inc()
 		return err
 	}
 
 	if tokenData.Role == portainer.AdministratorRole {
+		apiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "admin"}).Inc()
 		return nil
 	}
 
 	memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 	if err != nil {
+		apiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "error"}).Inc()
 		return err
 	}
 
 	group, err := bouncer.dataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
+		apiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "error"}).Inc()
 		return err
 	}
 
 	if !authorizedEndpointAccess(endpoint, group, tokenData.ID, memberships) {
+		apiProcessed.With(prometheus.Labels{"permission": "denied"}).Inc()
 		return httperrors.ErrEndpointAccessDenied
 	}
 
+	apiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "ok"}).Inc()
 	return nil
 }
 
 // AuthorizedEdgeEndpointOperation verifies that the request was received from a valid Edge environment(endpoint)
 func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
+	// tls.RequireAndVerifyClientCert would be nice, but that would require the same certs for browser and api use
+	sslsettings, _ := bouncer.dataStore.SSLSettings().Settings()
+	if sslsettings.CacertPath != "" {
+		// if a caCert is set, then reject any requests that don't have a client Auth cert signed with it
+		if len(r.TLS.PeerCertificates) == 0 {
+			logrus.Error("No clientAuth Agent certificate offered")
+			return errors.New("No clientAuth Agent certificate offered")
+		}
+
+		caChainIdx := len(r.TLS.VerifiedChains)
+		chainCaCert := r.TLS.VerifiedChains[0][caChainIdx]
+
+		caCert, _ := ioutil.ReadFile(sslsettings.CacertPath)
+		certPool := x509.NewCertPool()
+		certPool.AppendCertsFromPEM(caCert)
+
+		logrus.
+			WithField("chain Subject", chainCaCert.Subject.String()).
+			WithField("tls DNSNames", chainCaCert.DNSNames).
+			WithField("Agent Addr", r.RemoteAddr).
+			WithField("Agent Version", r.Header.Get(portainer.HTTPAgentVersionHeaderName)).
+			WithField("Agent PID", r.Header.Get(portainer.HTTPAgentPIDName)).
+			WithField("Agent EdgeID", r.Header.Get(portainer.PortainerAgentEdgeIDHeader)).
+			Debugf("TLS client chain")
+
+		opts := x509.VerifyOptions{
+			//DNSName: name,	// Not normally used on server side - important on the client side
+			Roots:     certPool, // as used in ListenAndServe
+			KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+		}
+		remoteCert := r.TLS.PeerCertificates[0]
+
+		if _, err := remoteCert.Verify(opts); err != nil {
+			logrus.WithError(err).Error("Agent certificate not signed by the CACert")
+			return errors.New("Agent certificate wasn't signed by required CA Cert")
+		}
+
+		// TODO: test revoke cert list.
+	}
+
 	if endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment && endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
+		agentApiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_error"}).Inc()
 		return errors.New("Invalid environment type")
 	}
 
 	edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
 	if edgeIdentifier == "" {
+		agentApiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_noiderror"}).Inc()
 		return errors.New("missing Edge identifier")
 	}
 
 	if endpoint.EdgeID != "" && endpoint.EdgeID != edgeIdentifier {
+		agentApiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_iderror"}).Inc()
 		return errors.New("invalid Edge identifier")
 	}
 
 	if endpoint.LastCheckInDate > 0 || endpoint.UserTrusted {
+		agentApiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_ok"}).Inc()
 		return nil
 	}
 
 	settings, err := bouncer.dataStore.Settings().Settings()
 	if err != nil {
+		agentApiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_error"}).Inc()
 		return fmt.Errorf("could not retrieve the settings: %w", err)
 	}
 
 	if settings.DisableTrustOnFirstConnect {
+		agentApiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_untrusted"}).Inc()
 		return errors.New("the device has not been trusted yet")
 	}
 
+	agentApiProcessed.With(prometheus.Labels{"path": r.RequestURI, "permission": "edge_ok"}).Inc()
 	return nil
 }
 

@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/sirupsen/logrus"
 )
 
 type stackStatusResponse struct {
@@ -48,6 +49,7 @@ type endpointStatusInspectResponse struct {
 	Stacks []stackStatusResponse `json:"stacks"`
 }
 
+// TODO: first up, why is this not in ../endpointedge/???
 // @id EndpointStatusInspect
 // @summary Get environment(endpoint) status
 // @description Environment(Endpoint) for edge agent to check status of environment(endpoint)
@@ -70,6 +72,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
+		logrus.WithError(err).WithField("env", endpointID).WithField("remote", r.RemoteAddr).Error("Unable to find an environment with the specified identifier inside the database")
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}

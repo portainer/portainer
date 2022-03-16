@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"log"
 	"net/http"
@@ -34,6 +35,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/hostmanagement/openamt"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
+	"github.com/portainer/portainer/api/http/handler/metrics"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
@@ -61,6 +63,7 @@ import (
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
 	stackdeployer "github.com/portainer/portainer/api/stacks"
+	"github.com/sirupsen/logrus"
 )
 
 // Server implements the portainer.Server interface
@@ -264,6 +267,11 @@ func (server *Server) Start() error {
 	webhookHandler.DataStore = server.DataStore
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
+	var metricsHandler *metrics.Handler
+	if server.DataStore.Settings().IsFeatureFlagEnabled("dev-metrics") {
+		metricsHandler = metrics.NewHandler(requestBouncer)
+	}
+
 	server.Handler = &handler.Handler{
 		RoleHandler:            roleHandler,
 		AuthHandler:            authHandler,
@@ -300,6 +308,7 @@ func (server *Server) Start() error {
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
+		MetricsHandler:         metricsHandler,
 	}
 
 	handler := offlineGate.WaitingMiddleware(time.Minute, server.Handler)
@@ -329,6 +338,17 @@ func (server *Server) Start() error {
 	httpsServer.TLSConfig = crypto.CreateServerTLSConfiguration()
 	httpsServer.TLSConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 		return server.SSLService.GetRawCertificate(), nil
+	}
+
+	if caCert := server.SSLService.GetCacertificatePem(); len(caCert) > 0 {
+		logrus.Debugf("using CA certificate for %s", server.BindAddressHTTPS)
+		certPool := x509.NewCertPool()
+		certPool.AppendCertsFromPEM(caCert)
+
+		httpsServer.TLSConfig.ClientCAs = certPool
+		// can't use tls.RequireAndVerifyClientCert, and this port is also used for the browser (though it would be a strong feature to allow the user to enable)
+		httpsServer.TLSConfig.ClientAuth = tls.VerifyClientCertIfGiven
+		httpsServer.TLSConfig.BuildNameToCertificate()
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)

@@ -116,6 +116,7 @@ type (
 		HTTPDisabled              *bool
 		HTTPEnabled               *bool
 		SSL                       *bool
+		SSLCacert                 *string
 		SSLCert                   *string
 		SSLKey                    *string
 		Rollback                  *bool
@@ -345,6 +346,17 @@ type (
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
+
+		AgentHistory map[string]AgentInfo
+	}
+
+	AgentInfo struct {
+		LastCheckInDate int64
+		CheckInCount    int64
+		Version         string
+		RemoteAddr      string
+		Status          string
+		//UniqueId        string
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
@@ -839,6 +851,7 @@ type (
 	SSLSettings struct {
 		CertPath    string `json:"certPath"`
 		KeyPath     string `json:"keyPath"`
+		CacertPath  string `json:"cacertPath"`
 		SelfSigned  bool   `json:"selfSigned"`
 		HTTPEnabled bool   `json:"httpEnabled"`
 	}
@@ -1238,6 +1251,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
+		CopySSLCacert(cacertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 	}
 
@@ -1365,6 +1379,10 @@ const (
 	PortainerAgentKubernetesSATokenHeader = "X-PortainerAgent-SA-Token"
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
+	HTTPAgentVersionHeaderName = "X-Portainer-Agent-Version"
+	HTTPAgentPIDName           = "X-Portainer-Process-Id"
+	HTTPAgentUUIDHeaderName    = "X-Portainer-Agent-UUID"
+
 	PortainerAgentSignatureMessage = "Portainer-App"
 	// DefaultSnapshotInterval represents the default interval between each environment snapshot job
 	DefaultSnapshotInterval = "5m"
@@ -1385,7 +1403,7 @@ const (
 )
 
 // List of supported features
-var SupportedFeatureFlags = []Feature{}
+var SupportedFeatureFlags = []Feature{"dev-metrics"}
 
 const (
 	_ AuthenticationMethod = iota
