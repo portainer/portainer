@@ -39,7 +39,7 @@ interface Container {
 }
 
 interface ContainerGroupProperties {
-  containers: Container[];
+  containers: (Container | undefined)[];
   instanceView: {
     events: unknown[];
     state: 'pending' | string;

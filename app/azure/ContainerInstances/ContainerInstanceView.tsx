@@ -17,6 +17,7 @@ import {
   useSubscription,
   useContainerGroup,
 } from '../queries';
+import { ContainerGroup, ResourceGroup, Subscription } from '../types';
 
 import { PortsMappingField } from './CreateContainerInstanceForm/PortsMappingField';
 
@@ -30,14 +31,14 @@ export function ContainerInstanceView() {
 
   const queryClient = useQueryClient();
 
-  const subscription = useSubscription(environmentId, subscriptionId);
-  const resourceGroup = useResourceGroup(
+  const subscriptionQuery = useSubscription(environmentId, subscriptionId);
+  const resourceGroupQuery = useResourceGroup(
     environmentId,
     subscriptionId,
     resourceGroupId
   );
 
-  const container = useContainerGroup(
+  const containerQuery = useContainerGroup(
     environmentId,
     subscriptionId,
     resourceGroupId,
@@ -45,27 +46,17 @@ export function ContainerInstanceView() {
   );
 
   if (
-    !subscription.isSuccess ||
-    !resourceGroup.isSuccess ||
-    !container.isSuccess
+    !subscriptionQuery.isSuccess ||
+    !resourceGroupQuery.isSuccess ||
+    !containerQuery.isSuccess
   ) {
     return null;
   }
 
-  const containerInstanceData = container.data.properties.containers[0];
-  const containerPorts = containerInstanceData.properties.ports;
-
-  const ports = container.data.properties.ipAddress.ports.map(
-    (binding, index) => {
-      const port = containerPorts[index]
-        ? containerPorts[index].port
-        : undefined;
-      return {
-        container: port,
-        host: binding.port,
-        protocol: binding.protocol,
-      };
-    }
+  const container = aggregateContainerData(
+    subscriptionQuery.data,
+    resourceGroupQuery.data,
+    containerQuery.data
   );
 
   return (
@@ -74,7 +65,7 @@ export function ContainerInstanceView() {
         title="Container Instance"
         breadcrumbs={[
           { link: 'azure.containerinstances', label: 'Container instances' },
-          { label: container.data.name },
+          { label: container.name },
         ]}
       />
 
@@ -87,7 +78,7 @@ export function ContainerInstanceView() {
                 <Input
                   name="subscription"
                   id="subscription-input"
-                  value={subscription.data.displayName}
+                  value={container.subscriptionName}
                   readOnly
                 />
               </FormControl>
@@ -96,7 +87,7 @@ export function ContainerInstanceView() {
                 <Input
                   name="resourceGroup"
                   id="resourceGroup-input"
-                  value={resourceGroup.data.name}
+                  value={container.resourceGroupName}
                   readOnly
                 />
               </FormControl>
@@ -105,7 +96,7 @@ export function ContainerInstanceView() {
                 <Input
                   name="location"
                   id="location-input"
-                  value={container.data.location}
+                  value={container.location}
                   readOnly
                 />
               </FormControl>
@@ -117,7 +108,7 @@ export function ContainerInstanceView() {
                   name="name"
                   id="name-input"
                   readOnly
-                  value={container.data.name}
+                  value={container.name}
                 />
               </FormControl>
 
@@ -125,9 +116,7 @@ export function ContainerInstanceView() {
                 <Input
                   name="image"
                   id="image-input"
-                  value={
-                    container.data.properties.containers[0].properties.image
-                  }
+                  value={container.imageName}
                   readOnly
                 />
               </FormControl>
@@ -137,18 +126,18 @@ export function ContainerInstanceView() {
                   name="os"
                   id="os-input"
                   readOnly
-                  value={container.data.properties.osType}
+                  value={container.osType}
                 />
               </FormControl>
 
-              <PortsMappingField value={ports} onChange={() => {}} readOnly />
+              <PortsMappingField value={container.ports} readOnly />
 
               <FormControl label="Public IP" inputId="public-ip">
                 <Input
                   name="public-ip"
                   id="public-ip"
                   readOnly
-                  value={container.data.properties.ipAddress.ip}
+                  value={container.ipAddress}
                 />
               </FormControl>
 
@@ -161,10 +150,7 @@ export function ContainerInstanceView() {
                   type="number"
                   placeholder="1"
                   readOnly
-                  value={
-                    container.data.properties.containers[0].properties.resources
-                      .cpu
-                  }
+                  value={container.cpu}
                 />
               </FormControl>
 
@@ -175,10 +161,7 @@ export function ContainerInstanceView() {
                   type="number"
                   placeholder="1"
                   readOnly
-                  value={
-                    container.data.properties.containers[0].properties.resources
-                      .memoryInGB
-                  }
+                  value={container.memory}
                 />
               </FormControl>
             </WidgetBody>
@@ -194,19 +177,13 @@ export function ContainerInstanceView() {
             'subscriptions',
             subscriptionId,
             'resourceGroups',
-            resourceGroup.data.name,
+            resourceGroupQuery.data.name,
             'containerGroups',
-            container.data.name,
+            containerQuery.data.name,
           ])
         }
         resourceId={id}
-        resourceControl={
-          container.data.Portainer?.ResourceControl
-            ? new ResourceControlViewModel(
-                container.data.Portainer?.ResourceControl
-              )
-            : undefined
-        }
+        resourceControl={container.resourceControl}
         resourceType={ResourceControlType.ContainerGroup}
       />
     </>
@@ -228,3 +205,63 @@ function parseId(id: string) {
 }
 
 export const ContainerInstanceViewAngular = r2a(ContainerInstanceView, []);
+
+function aggregateContainerData(
+  subscription: Subscription,
+  resourceGroup: ResourceGroup,
+  containerGroup: ContainerGroup
+) {
+  const containerInstanceData = aggregateContainerInstance();
+
+  const resourceControl = containerGroup.Portainer?.ResourceControl
+    ? new ResourceControlViewModel(containerGroup.Portainer.ResourceControl)
+    : undefined;
+
+  return {
+    name: containerGroup.name,
+    subscriptionName: subscription.displayName,
+    resourceGroupName: resourceGroup.name,
+    location: containerGroup.location,
+    osType: containerGroup.properties.osType,
+    ipAddress: containerGroup.properties.ipAddress.ip,
+    resourceControl,
+    ...containerInstanceData,
+  };
+
+  function aggregateContainerInstance() {
+    const containerInstanceData = containerGroup.properties.containers[0];
+
+    if (!containerInstanceData) {
+      return {
+        ports: [],
+      };
+    }
+
+    const containerInstanceProperties = containerInstanceData.properties;
+
+    const containerPorts = containerInstanceProperties.ports;
+
+    const imageName = containerInstanceProperties.image;
+
+    const ports = containerGroup.properties.ipAddress.ports.map(
+      (binding, index) => {
+        const port =
+          containerPorts && containerPorts[index]
+            ? containerPorts[index].port
+            : undefined;
+        return {
+          container: port,
+          host: binding.port,
+          protocol: binding.protocol,
+        };
+      }
+    );
+
+    return {
+      imageName,
+      ports,
+      cpu: containerInstanceProperties.resources.cpu,
+      memory: containerInstanceProperties.resources.memoryInGB,
+    };
+  }
+}

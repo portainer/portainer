@@ -19,7 +19,7 @@ export interface PortMapping {
 
 interface Props {
   value: PortMapping[];
-  onChange(value: PortMapping[]): void;
+  onChange?(value: PortMapping[]): void;
   errors?: InputListError<PortMapping>;
   disabled?: boolean;
   readOnly?: boolean;
@@ -27,7 +27,7 @@ interface Props {
 
 export function PortsMappingField({
   value,
-  onChange,
+  onChange = () => {},
   errors,
   disabled,
   readOnly,
