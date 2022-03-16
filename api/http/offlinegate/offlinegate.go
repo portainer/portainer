@@ -27,11 +27,7 @@ func NewOfflineGate() *OfflineGate {
 // Lock locks readonly gate and returns a function to unlock
 func (o *OfflineGate) Lock() func() {
 	o.lock.Lock()
-	return o.unlock
-}
-
-func (o *OfflineGate) unlock() {
-	o.lock.Unlock()
+	return o.lock.Unlock
 }
 
 // WaitingMiddleware returns an http handler that waits for the gate to be unlocked before continuing
