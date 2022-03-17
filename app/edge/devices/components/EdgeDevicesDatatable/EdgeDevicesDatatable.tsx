@@ -107,6 +107,9 @@ export function EdgeDevicesDatatable({
       },
       autoResetExpanded: false,
       autoResetSelectedRows: false,
+      getRowId(originalRow: Environment) {
+        return originalRow.Id.toString();
+      },
       selectColumnWidth: 5,
     },
     useFilters,
