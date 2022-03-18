@@ -112,7 +112,7 @@ func TestKubeClusterAccessService_GetKubeConfigInternal(t *testing.T) {
 
 	t.Run("GetData returns insecure cluster access config", func(t *testing.T) {
 		kcs := NewKubeClusterAccessService("/", ":9443", "")
-		clusterAccessDetails := kcs.GetData("mysite.com:9443", 1)
+		clusterAccessDetails := kcs.GetData("mysite.com", 1)
 
 		wantClusterAccessDetails := kubernetesClusterAccessData{
 			ClusterServerURL:         "https://mysite.com:9443/api/endpoints/1/kubernetes",
