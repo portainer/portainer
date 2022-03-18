@@ -9,7 +9,6 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.11.1
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.2
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.10.1
-	github.com/boltdb/bolt v1.3.1
 	github.com/coreos/go-semver v0.3.0
 	github.com/dchest/uniuri v0.0.0-20160212164326-8902c56451e9
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -39,6 +38,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/viney-shih/go-lock v1.1.1
+	go.etcd.io/bbolt v1.3.6
 	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
