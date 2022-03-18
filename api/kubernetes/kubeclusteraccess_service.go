@@ -98,7 +98,7 @@ func (service *kubeClusterAccessService) GetData(hostURL string, endpointID port
 		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
 	}
 
-	host := strings.Split(hostURL, ":")[0] + service.httpsBindAddr + baseURL
+	host := hostURL + service.httpsBindAddr + baseURL
 
 	clusterServerURL := fmt.Sprintf("https://%sapi/endpoints/%d/kubernetes", host, endpointID)
 
