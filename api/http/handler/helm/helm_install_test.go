@@ -39,7 +39,7 @@ func Test_helmInstall(t *testing.T) {
 
 	kubernetesDeployer := exectest.NewKubernetesDeployer()
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
-	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService("", "", "")
+	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService("", "", "", false)
 	h := NewHandler(helper.NewTestRequestBouncer(), store, jwtService, kubernetesDeployer, helmPackageManager, kubeClusterAccessService)
 
 	is.NotNil(h, "Handler should not fail")
