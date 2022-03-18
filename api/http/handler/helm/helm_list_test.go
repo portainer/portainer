@@ -38,7 +38,7 @@ func Test_helmList(t *testing.T) {
 
 	kubernetesDeployer := exectest.NewKubernetesDeployer()
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
-	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService("", "", "", false)
+	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService("", "", "")
 	h := NewHandler(helper.NewTestRequestBouncer(), store, jwtService, kubernetesDeployer, helmPackageManager, kubeClusterAccessService)
 
 	// Install a single chart.  We expect to get these values back

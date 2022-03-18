@@ -82,7 +82,7 @@ func TestKubeClusterAccessService_IsSecure(t *testing.T) {
 	is := assert.New(t)
 
 	t.Run("IsSecure should be false", func(t *testing.T) {
-		kcs := NewKubeClusterAccessService("", "", "", false)
+		kcs := NewKubeClusterAccessService("", "", "")
 		is.False(kcs.IsSecure(), "should be false if TLS cert not provided")
 	})
 
@@ -90,7 +90,7 @@ func TestKubeClusterAccessService_IsSecure(t *testing.T) {
 		filePath, teardown := createTempFile("valid-cert.crt", certData)
 		defer teardown()
 
-		kcs := NewKubeClusterAccessService("", "", filePath, false)
+		kcs := NewKubeClusterAccessService("", "", filePath)
 		is.True(kcs.IsSecure(), "should be true if valid TLS cert (path and content) provided")
 	})
 }
@@ -99,19 +99,19 @@ func TestKubeClusterAccessService_GetKubeConfigInternal(t *testing.T) {
 	is := assert.New(t)
 
 	t.Run("GetData contains host address", func(t *testing.T) {
-		kcs := NewKubeClusterAccessService("/", "", "", false)
+		kcs := NewKubeClusterAccessService("/", "", "")
 		clusterAccessDetails := kcs.GetData("mysite.com", 1)
 		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "https://mysite.com"), "should contain host address")
 	})
 
 	t.Run("GetData contains environment proxy url", func(t *testing.T) {
-		kcs := NewKubeClusterAccessService("/", "", "", false)
+		kcs := NewKubeClusterAccessService("/", "", "")
 		clusterAccessDetails := kcs.GetData("mysite.com", 100)
 		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "api/endpoints/100/kubernetes"), "should contain environment proxy url")
 	})
 
 	t.Run("GetData returns insecure cluster access config", func(t *testing.T) {
-		kcs := NewKubeClusterAccessService("/", ":9443", "", false)
+		kcs := NewKubeClusterAccessService("/", ":9443", "")
 		clusterAccessDetails := kcs.GetData("mysite.com", 1)
 
 		wantClusterAccessDetails := kubernetesClusterAccessData{
@@ -127,7 +127,7 @@ func TestKubeClusterAccessService_GetKubeConfigInternal(t *testing.T) {
 		filePath, teardown := createTempFile("valid-cert.crt", certData)
 		defer teardown()
 
-		kcs := NewKubeClusterAccessService("/", "", filePath, false)
+		kcs := NewKubeClusterAccessService("/", "", filePath)
 		clusterAccessDetails := kcs.GetData("localhost", 1)
 
 		wantClusterAccessDetails := kubernetesClusterAccessData{

@@ -3,6 +3,9 @@ package kubernetes
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -11,7 +14,6 @@ import (
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	kcli "github.com/portainer/portainer/api/kubernetes/cli"
 	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
-	"net/http"
 )
 
 // @id GetKubernetesConfig
@@ -143,7 +145,8 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 }
 
 func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
-	kubeConfigInternal := handler.kubeClusterAccessService.GetData(r.Host, endpoint.ID)
+	hostURL := strings.Split(r.Host, ":")[0]
+	kubeConfigInternal := handler.kubeClusterAccessService.GetData(hostURL, endpoint.ID)
 	return clientV1.NamedCluster{
 		Name: buildClusterName(endpoint.Name),
 		Cluster: clientV1.Cluster{

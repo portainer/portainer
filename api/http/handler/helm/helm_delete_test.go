@@ -36,7 +36,7 @@ func Test_helmDelete(t *testing.T) {
 
 	kubernetesDeployer := exectest.NewKubernetesDeployer()
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
-	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService("", "", "", false)
+	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService("", "", "")
 	h := NewHandler(helper.NewTestRequestBouncer(), store, jwtService, kubernetesDeployer, helmPackageManager, kubeClusterAccessService)
 
 	is.NotNil(h, "Handler should not fail")

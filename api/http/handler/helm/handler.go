@@ -1,6 +1,9 @@
 package helm
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/gorilla/mux"
 	"github.com/portainer/libhelm"
 	"github.com/portainer/libhelm/options"
@@ -10,7 +13,6 @@ import (
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
-	"net/http"
 )
 
 type requestBouncer interface {
@@ -99,7 +101,17 @@ func (handler *Handler) getHelmClusterAccess(r *http.Request) (*options.Kubernet
 		return nil, &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
 	}
 
-	kubeConfigInternal := handler.kubeClusterAccessService.GetData(r.Host, endpoint.ID)
+	sslSettings, err := handler.dataStore.SSLSettings().Settings()
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	hostURL := "localhost"
+	if !sslSettings.SelfSigned {
+		hostURL = strings.Split(r.Host, ":")[0]
+	}
+
+	kubeConfigInternal := handler.kubeClusterAccessService.GetData(hostURL, endpoint.ID)
 	return &options.KubernetesClusterAccess{
 		ClusterServerURL:         kubeConfigInternal.ClusterServerURL,
 		CertificateAuthorityFile: kubeConfigInternal.CertificateAuthorityFile,
