@@ -46,21 +46,21 @@ func newHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 }
 
-func (h *Handler) initRouter(bouncer accessGuard) {
-	adminRouter := h.NewRoute().Subrouter()
+func (handler *Handler) initRouter(bouncer accessGuard) {
+	adminRouter := handler.NewRoute().Subrouter()
 	adminRouter.Use(bouncer.AdminAccess)
 
-	authenticatedRouter := h.NewRoute().Subrouter()
+	authenticatedRouter := handler.NewRoute().Subrouter()
 	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
 
-	adminRouter.Handle("/registries", httperror.LoggerHandler(h.registryList)).Methods(http.MethodGet)
-	adminRouter.Handle("/registries", httperror.LoggerHandler(h.registryCreate)).Methods(http.MethodPost)
-	adminRouter.Handle("/registries/{id}", httperror.LoggerHandler(h.registryUpdate)).Methods(http.MethodPut)
-	adminRouter.Handle("/registries/{id}/configure", httperror.LoggerHandler(h.registryConfigure)).Methods(http.MethodPost)
-	adminRouter.Handle("/registries/{id}", httperror.LoggerHandler(h.registryDelete)).Methods(http.MethodDelete)
+	adminRouter.Handle("/registries", httperror.LoggerHandler(handler.registryList)).Methods(http.MethodGet)
+	adminRouter.Handle("/registries", httperror.LoggerHandler(handler.registryCreate)).Methods(http.MethodPost)
+	adminRouter.Handle("/registries/{id}", httperror.LoggerHandler(handler.registryUpdate)).Methods(http.MethodPut)
+	adminRouter.Handle("/registries/{id}/configure", httperror.LoggerHandler(handler.registryConfigure)).Methods(http.MethodPost)
+	adminRouter.Handle("/registries/{id}", httperror.LoggerHandler(handler.registryDelete)).Methods(http.MethodDelete)
 
-	authenticatedRouter.Handle("/registries/{id}", httperror.LoggerHandler(h.registryInspect)).Methods(http.MethodGet)
-	authenticatedRouter.PathPrefix("/registries/proxies/gitlab").Handler(httperror.LoggerHandler(h.proxyRequestsToGitlabAPIWithoutRegistry))
+	authenticatedRouter.Handle("/registries/{id}", httperror.LoggerHandler(handler.registryInspect)).Methods(http.MethodGet)
+	authenticatedRouter.PathPrefix("/registries/proxies/gitlab").Handler(httperror.LoggerHandler(handler.proxyRequestsToGitlabAPIWithoutRegistry))
 }
 
 type accessGuard interface {
@@ -80,7 +80,7 @@ func (handler *Handler) registriesHaveSameURLAndCredentials(r1, r2 *portainer.Re
 	return hasSameUrl && hasSameCredentials && r1.Gitlab.ProjectPath == r2.Gitlab.ProjectPath
 }
 
-func (handler *Handler) userHasRegistryAccess(r *http.Request) (bool, bool, error) {
+func (handler *Handler) userHasRegistryAccess(r *http.Request) (hasAccess bool, isAdmin bool, err error) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return false, false, err

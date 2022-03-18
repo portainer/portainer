@@ -27,6 +27,13 @@ import (
 // @failure 500 "Server error"
 // @router /registries/{id} [get]
 func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	hasAccess, isAdmin, err := handler.userHasRegistryAccess(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+	if !hasAccess {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
+	}
 
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -38,14 +45,6 @@ func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
-	}
-
-	hasAccess, isAdmin, err := handler.userHasRegistryAccess(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-	if !hasAccess {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
 	}
 
 	hideFields(registry, !isAdmin)
