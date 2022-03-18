@@ -6,11 +6,17 @@ import { HeaderContainer } from './HeaderContainer';
 import { HeaderContent } from './HeaderContent';
 
 test('should not render without a wrapping HeaderContainer', async () => {
+  const consoleErrorFn = jest
+    .spyOn(console, 'error')
+    .mockImplementation(() => jest.fn());
+
   function renderComponent() {
     return render(<HeaderContent />);
   }
 
   expect(renderComponent).toThrowErrorMatchingSnapshot();
+
+  consoleErrorFn.mockRestore();
 });
 
 test('should display a HeaderContent', async () => {

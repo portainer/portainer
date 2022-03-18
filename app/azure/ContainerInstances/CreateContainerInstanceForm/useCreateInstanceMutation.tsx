@@ -8,8 +8,7 @@ import {
   ContainerInstanceFormValues,
   ResourceGroup,
 } from '@/azure/types';
-import { UserId } from '@/portainer/users/types';
-import { applyResourceControl } from '@/portainer/resource-control/resource-control.service';
+import { applyResourceControl } from '@/portainer/access-control/access-control.service';
 
 import { getSubscriptionResourceGroups } from './utils';
 
@@ -17,8 +16,7 @@ export function useCreateInstance(
   resourceGroups: {
     [k: string]: ResourceGroup[];
   },
-  environmentId: EnvironmentId,
-  userId?: UserId
+  environmentId: EnvironmentId
 ) {
   const queryClient = useQueryClient();
   return useMutation<ContainerGroup, unknown, ContainerInstanceFormValues>(
@@ -47,13 +45,13 @@ export function useCreateInstance(
     },
     {
       async onSuccess(containerGroup, values) {
-        if (!userId) {
-          throw new Error('missing user id');
+        const resourceControl = containerGroup.Portainer?.ResourceControl;
+        if (!resourceControl) {
+          throw new PortainerError('resource control expected after creation');
         }
 
-        const resourceControl = containerGroup.Portainer.ResourceControl;
         const accessControlData = values.accessControl;
-        await applyResourceControl(userId, accessControlData, resourceControl);
+        await applyResourceControl(accessControlData, resourceControl);
         queryClient.invalidateQueries(['azure', 'container-instances']);
       },
     }
