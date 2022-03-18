@@ -54,29 +54,44 @@
         </div>
       </div>
 
-      <por-switch-field
-        label="'Allow self-signed certs'"
-        checked="state.allowSelfSignedCerts"
-        tooltip="'When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS'"
-        on-change="(onToggleAllowSelfSignedCerts)"
-      ></por-switch-field>
+      <div class="form-group">
+        <por-switch-field
+          label="'Allow self-signed certs'"
+          checked="state.allowSelfSignedCerts"
+          tooltip="'When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS'"
+          on-change="(onToggleAllowSelfSignedCerts)"
+        ></por-switch-field>
+      </div>
+
+      <div class="form-group clearfix" ng-if="!isKubernetesDeploymentTabSelected()">
+        <label for="env_vars" class="col-sm-3 col-lg-2 control-label text-left" style="padding-left: 0; padding-top: 5px">
+          Environment variables
+          <portainer-tooltip
+            position="bottom"
+            message="Comma separated list of environment variables that will be sourced from the host where the agent is deployed."
+          ></portainer-tooltip>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="text" class="form-control" id="env_vars" ng-model="formValues.EnvVarSource" placeholder="foo=bar,myvar" />
+        </div>
+      </div>
 
       <div style="margin-top: 10px">
         <uib-tabset active="state.deploymentTab">
           <uib-tab index="'kubernetes'" heading="Kubernetes" ng-if="state.platformType === 'linux'">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
-              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
-            </code>
+            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
+              dockerCommands[state.deploymentTab][state.platformType](agentShortVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
+            }}</code>
           </uib-tab>
           <uib-tab index="'swarm'" heading="Docker Swarm">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
-              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
-            </code>
+            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
+              dockerCommands[state.deploymentTab][state.platformType](agentVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
+            }}</code>
           </uib-tab>
           <uib-tab index="'standalone'" heading="Docker Standalone">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">
-              {{ dockerCommands[state.deploymentTab][state.platformType](agentVersion, agentShortVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
-            </code>
+            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
+              dockerCommands[state.deploymentTab][state.platformType](agentVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
+            }}</code>
           </uib-tab>
         </uib-tabset>
         <div style="margin-top: 10px">

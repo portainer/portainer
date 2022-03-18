@@ -1,3 +1,5 @@
+import { ResourceControlType } from '@/portainer/access-control/types';
+
 class ContainerInstanceDetailsController {
   /* @ngInject */
   constructor($state, AzureService, ContainerGroupService, Notifications, ResourceGroupService, SubscriptionService) {
@@ -7,9 +9,16 @@ class ContainerInstanceDetailsController {
       loading: false,
     };
 
+    this.resourceType = ResourceControlType.ContainerGroup;
+
     this.container = null;
     this.subscription = null;
     this.resourceGroup = null;
+    this.onUpdateSuccess = this.onUpdateSuccess.bind(this);
+  }
+
+  onUpdateSuccess() {
+    this.$state.reload();
   }
 
   async $onInit() {

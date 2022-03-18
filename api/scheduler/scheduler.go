@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -14,6 +15,7 @@ import (
 type Scheduler struct {
 	crontab    *cron.Cron
 	activeJobs map[cron.EntryID]context.CancelFunc
+	mu         sync.Mutex
 }
 
 func NewScheduler(ctx context.Context) *Scheduler {
@@ -45,11 +47,13 @@ func (s *Scheduler) Shutdown() error {
 	ctx := s.crontab.Stop()
 	<-ctx.Done()
 
+	s.mu.Lock()
 	for _, job := range s.crontab.Entries() {
 		if cancel, ok := s.activeJobs[job.ID]; ok {
 			cancel()
 		}
 	}
+	s.mu.Unlock()
 
 	err := ctx.Err()
 	if err == context.Canceled {
@@ -65,9 +69,12 @@ func (s *Scheduler) StopJob(jobID string) error {
 		return errors.Wrapf(err, "failed convert jobID %q to int", jobID)
 	}
 	entryID := cron.EntryID(id)
+
+	s.mu.Lock()
 	if cancel, ok := s.activeJobs[entryID]; ok {
 		cancel()
 	}
+	s.mu.Unlock()
 
 	return nil
 }
@@ -87,7 +94,9 @@ func (s *Scheduler) StartJobEvery(duration time.Duration, job func() error) stri
 
 	entryID := s.crontab.Schedule(cron.Every(duration), j)
 
+	s.mu.Lock()
 	s.activeJobs[entryID] = cancel
+	s.mu.Unlock()
 
 	go func(entryID cron.EntryID) {
 		<-ctx.Done()

@@ -69,14 +69,15 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel
+<access-control-panel
   ng-if="network"
   resource-id="network.Id"
   resource-control="network.ResourceControl"
-  resource-type="'network'"
+  resource-type="resourceType"
   disable-ownership-change="isSystemNetwork()"
+  on-update-success="(onUpdateResourceControlSuccess)"
 >
-</por-access-control-panel>
+</access-control-panel>
 <!-- !access-control-panel -->
 
 <div class="row" ng-if="!(network.Options | emptyobject)">

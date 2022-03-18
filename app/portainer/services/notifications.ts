@@ -9,15 +9,15 @@ toastr.options = {
   tapToDismiss: false,
 };
 
-export function success(title: string, text: string) {
+export function notifySuccess(title: string, text?: string) {
   toastr.success(sanitize(_.escape(text)), sanitize(title));
 }
 
-export function warning(title: string, text: string) {
+export function notifyWarning(title: string, text: string) {
   toastr.warning(sanitize(_.escape(text)), sanitize(title), { timeOut: 6000 });
 }
 
-export function error(title: string, e?: Error, fallbackText = '') {
+export function notifyError(title: string, e?: Error, fallbackText = '') {
   const msg = pickErrorMsg(e) || fallbackText;
 
   // eslint-disable-next-line no-console
@@ -28,12 +28,16 @@ export function error(title: string, e?: Error, fallbackText = '') {
   }
 }
 
+export const success = notifySuccess;
+export const error = notifyError;
+export const warning = notifyWarning;
+
 /* @ngInject */
 export function Notifications() {
   return {
-    success,
-    warning,
-    error,
+    success: notifySuccess,
+    warning: notifyWarning,
+    error: notifyError,
   };
 }
 

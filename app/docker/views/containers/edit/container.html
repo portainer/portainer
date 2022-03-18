@@ -110,6 +110,19 @@
               <td>Finished</td>
               <td>{{ container.State.FinishedAt | getisodate }}</td>
             </tr>
+            <tr ng-if="isAdmin && displayRecreateButton && applicationState.endpoint.type !== 4">
+              <td colspan="1">
+                Container webhook
+                <portainer-tooltip
+                  position="top"
+                  message="Webhook (or callback URI) used to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container."
+                ></portainer-tooltip>
+                <label class="switch box-selector-item limited business" style="margin-left: 20px">
+                  <input disable-authorization="DockerContainerUpdate" type="checkbox" ng-model="WebhookExists" disabled="disabled" ng-checked="true" /><i></i>
+                </label>
+                <be-feature-indicator feature="containerWebhookFeature"></be-feature-indicator>
+              </td>
+            </tr>
             <tr authorization="DockerContainerLogs, DockerContainerInspect, DockerContainerStats, DockerExecStart">
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
@@ -139,7 +152,14 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel ng-if="container" resource-id="container.Id" resource-control="container.ResourceControl" resource-type="'container'"> </por-access-control-panel>
+<access-control-panel
+  ng-if="container"
+  resource-id="container.Id"
+  resource-control="container.ResourceControl"
+  resource-type="resourceType"
+  on-update-success="(onUpdateResourceControlSuccess)"
+>
+</access-control-panel>
 <!-- !access-control-panel -->
 
 <div ng-if="container.State.Health" class="row">

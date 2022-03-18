@@ -1,5 +1,6 @@
 import sanitize from 'sanitize-html';
 import bootbox from 'bootbox';
+import '@/portainer/components/BoxSelector/BoxSelectorItem.css';
 
 import { applyBoxCSS, ButtonsOptions, confirmButtons } from './utils';
 
@@ -134,6 +135,46 @@ export function confirmServiceForceUpdate(
   });
 
   customizeCheckboxPrompt(box, sanitizedMessage);
+}
+
+export function confirmStackUpdate(
+  message: string,
+  defaultDisabled: boolean,
+  defaultToggle: boolean,
+  confirmButtonClassName: string | undefined,
+  callback: PromptCallback
+) {
+  const box = prompt({
+    title: 'Are you sure?',
+    inputType: 'checkbox',
+    inputOptions: [
+      {
+        text: 'Pull latest image version<i></i>',
+        value: '1',
+      },
+    ],
+    buttons: {
+      confirm: {
+        label: 'Update',
+        className: confirmButtonClassName || 'btn-primary',
+      },
+    },
+    callback,
+  });
+  box.find('.bootbox-body').prepend(message);
+  const checkbox = box.find('.bootbox-input-checkbox');
+  checkbox.prop('checked', defaultToggle);
+  checkbox.prop('disabled', defaultDisabled);
+  const checkboxDiv = box.find('.checkbox');
+  checkboxDiv.removeClass('checkbox');
+  checkboxDiv.prop(
+    'style',
+    'position: relative; display: block; margin-top: 10px; margin-bottom: 10px;'
+  );
+  const checkboxLabel = box.find('.form-check-label');
+  checkboxLabel.addClass('switch box-selector-item limited business');
+  const switchEle = checkboxLabel.find('i');
+  switchEle.prop('style', 'margin-left:20px');
 }
 
 export function confirmKubeconfigSelection(

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/portainer/libhttp/request"
 
@@ -80,6 +81,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
+	totalAvailableEndpoints := len(filteredEndpoints)
 
 	if endpointIDs != nil {
 		filteredEndpoints = filteredEndpointsByIds(filteredEndpoints, endpointIDs)
@@ -124,9 +126,11 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		if paginatedEndpoints[idx].EdgeCheckinInterval == 0 {
 			paginatedEndpoints[idx].EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
 		}
+		paginatedEndpoints[idx].QueryDate = time.Now().Unix()
 	}
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(filteredEndpointCount))
+	w.Header().Set("X-Total-Available", strconv.Itoa(totalAvailableEndpoints))
 	return response.JSON(w, paginatedEndpoints)
 }
 

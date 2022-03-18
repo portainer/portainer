@@ -1,20 +1,30 @@
 import { PropsWithChildren } from 'react';
-import { Row, TableInstance } from 'react-table';
+import { Row } from 'react-table';
 
-interface Props {
-  row: Row<TableInstance>;
+import styles from './ExpandingCell.module.css';
+
+interface Props<D extends Record<string, unknown> = Record<string, unknown>> {
+  row: Row<D>;
+  showExpandArrow: boolean;
 }
 
-export function ExpandingCell({ children, row }: PropsWithChildren<Props>) {
+export function ExpandingCell<
+  D extends Record<string, unknown> = Record<string, unknown>
+>({ row, showExpandArrow, children }: PropsWithChildren<Props<D>>) {
   return (
-    // eslint-disable-next-line react/jsx-props-no-spreading
-    <div {...row.getToggleRowExpandedProps()}>
-      <i
-        className={`fas ${arrowClass(row.isExpanded)} space-right`}
-        aria-hidden="true"
-      />
+    <>
+      {showExpandArrow && (
+        <button type="button" className={styles.expandButton}>
+          <i
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...row.getToggleRowExpandedProps()}
+            className={`fas ${arrowClass(row.isExpanded)} space-right`}
+            aria-hidden="true"
+          />
+        </button>
+      )}
       {children}
-    </div>
+    </>
   );
 
   function arrowClass(isExpanded: boolean) {

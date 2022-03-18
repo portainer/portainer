@@ -1,14 +1,11 @@
-import Select from 'react-select';
-
-import { UserViewModel } from '@/portainer/models/user';
-import { UserId } from '@/portainer/users/types';
-import './UsersSelector.css';
+import { User, UserId } from '@/portainer/users/types';
+import { Select } from '@/portainer/components/form-components/ReactSelect';
 
 interface Props {
   name?: string;
   value: UserId[];
   onChange(value: UserId[]): void;
-  users: UserViewModel[];
+  users: User[];
   dataCy?: string;
   inputId?: string;
   placeholder?: string;
@@ -28,9 +25,8 @@ export function UsersSelector({
       isMulti
       name={name}
       getOptionLabel={(user) => user.Username}
-      getOptionValue={(user) => user.Id}
+      getOptionValue={(user) => `${user.Id}`}
       options={users}
-      classNamePrefix="selector"
       value={users.filter((user) => value.includes(user.Id))}
       closeMenuOnSelect={false}
       onChange={(selectedUsers) =>

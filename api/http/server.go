@@ -221,6 +221,7 @@ func (server *Server) Start() error {
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
 	stackHandler.FileService = server.FileService
+	stackHandler.KubernetesClientFactory = server.KubernetesClientFactory
 	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
 	stackHandler.Scheduler = server.Scheduler
