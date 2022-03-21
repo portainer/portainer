@@ -96,20 +96,19 @@ class StackRedeployGitFormController {
       '<be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div></div>';
     const template = angular.element(tplCrop);
     const html = this.$compile(template)(this.$scope);
-    var that = this;
-    this.ModalService.confirmStackUpdate(html, true, true, 'btn-warning', async function (result) {
+    this.ModalService.confirmStackUpdate(html, true, true, 'btn-warning', async (result) => {
       if (!result) {
         return;
       }
       try {
-        that.state.redeployInProgress = true;
-        await that.StackService.updateGit(that.stack.Id, that.stack.EndpointId, that.FormHelper.removeInvalidEnvVars(that.formValues.Env), false, that.formValues);
-        that.Notifications.success('Pulled and redeployed stack successfully');
-        that.$state.reload();
+        this.state.redeployInProgress = true;
+        await this.StackService.updateGit(this.stack.Id, this.stack.EndpointId, this.FormHelper.removeInvalidEnvVars(this.formValues.Env), false, this.formValues);
+        this.Notifications.success('Pulled and redeployed stack successfully');
+        this.$state.reload();
       } catch (err) {
-        that.Notifications.error('Failure', err, 'Failed redeploying stack');
+        this.Notifications.error('Failure', err, 'Failed redeploying stack');
       } finally {
-        that.state.redeployInProgress = false;
+        this.state.redeployInProgress = false;
       }
     });
   }
