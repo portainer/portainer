@@ -11,6 +11,7 @@ import (
 )
 
 var logFatalf = log.Fatalf
+var logPrintf = log.Printf
 
 type Monitor struct {
 	timeout          time.Duration
@@ -18,14 +19,16 @@ type Monitor struct {
 	shutdownCtx      context.Context
 	cancellationFunc context.CancelFunc
 	mu               sync.Mutex
+	timeoutCh        chan interface{}
 }
 
 // New creates a monitor that when started will wait for the timeout duration and then shutdown the application unless it has been initialized.
-func New(timeout time.Duration, datastore dataservices.DataStore, shutdownCtx context.Context) *Monitor {
+func New(timeout time.Duration, datastore dataservices.DataStore, timeoutCh chan interface{}, shutdownCtx context.Context) *Monitor {
 	return &Monitor{
 		timeout:     timeout,
 		datastore:   datastore,
 		shutdownCtx: shutdownCtx,
+		timeoutCh:   timeoutCh,
 	}
 }
 
@@ -50,7 +53,11 @@ func (m *Monitor) Start() {
 				logFatalf("%s", err)
 			}
 			if !initialized {
-				logFatalf("[FATAL] [internal,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
+				logPrintf("[FATAL] [internal,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
+				if m.timeoutCh != nil {
+					m.timeoutCh <- struct{}{}
+				}
+				return
 			}
 		case <-cancellationCtx.Done():
 			log.Println("[DEBUG] [internal,init] [message: canceling initialization monitor]")

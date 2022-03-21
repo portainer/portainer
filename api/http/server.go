@@ -118,7 +118,8 @@ func (server *Server) Start() error {
 	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 	authHandler.OAuthService = server.OAuthService
 
-	adminMonitor := adminmonitor.New(5*time.Minute, server.DataStore, server.ShutdownCtx)
+	initTimeoutCh := make(chan interface{})
+	adminMonitor := adminmonitor.New(1*time.Minute, server.DataStore, initTimeoutCh, server.ShutdownCtx)
 	adminMonitor.Start()
 
 	var backupHandler = backup.NewHandler(requestBouncer, server.DataStore, offlineGate, server.FileService.GetDatastorePath(), server.ShutdownTrigger, adminMonitor)
@@ -300,7 +301,8 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
-	handler := offlineGate.WaitingMiddleware(time.Minute, server.Handler)
+	offlineGateWrapper := offlinegate.NewOfflineGateWrapper()
+	handler := offlineGate.WaitingMiddleware(time.Minute, offlineGateWrapper.WaitingMiddlewareWrapper(initTimeoutCh, server.Handler))
 
 	if server.HTTPEnabled {
 		go func() {
