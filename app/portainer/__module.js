@@ -385,6 +385,17 @@ angular
         },
       };
 
+      var initTimeOut = {
+        name: 'portainer.init.timeout',
+        url: '/timeout',
+        views: {
+          'content@': {
+            templateUrl: './views/init/timeout/initTimeOut.html',
+            controller: 'InitTimeOutController',
+          },
+        },
+      };
+
       var registries = {
         name: 'portainer.registries',
         url: '/registries',
@@ -532,6 +543,7 @@ angular
       $stateRegistryProvider.register(wizardEndpoints);
       $stateRegistryProvider.register(initEndpoint);
       $stateRegistryProvider.register(initAdmin);
+      $stateRegistryProvider.register(initTimeOut);
       $stateRegistryProvider.register(registries);
       $stateRegistryProvider.register(registry);
       $stateRegistryProvider.register(registryCreation);

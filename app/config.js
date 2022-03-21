@@ -15,6 +15,7 @@ export function configApp($urlRouterProvider, $httpProvider, localStorageService
       return LocalStorage.getJWT();
     },
   });
+  $httpProvider.interceptors.push('RedirectStatusInterceptor');
   $httpProvider.interceptors.push('jwtInterceptor');
   $httpProvider.interceptors.push('EndpointStatusInterceptor');
   $httpProvider.defaults.headers.post['Content-Type'] = 'application/json';
