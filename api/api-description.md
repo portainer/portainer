@@ -52,8 +52,8 @@ To do so, you can use the `/endpoints/{id}/docker` Portainer API environment(end
 
 # Private Registry
 
-Using private registry, you will need to pass a based64 encoded JSON string ‘{"registryId":<registryID value>}’ inside the Request Header. The parameter name is "X-Registry-Auth".
-<registryID value>  - The registry ID where the repository was created.
+Using private registry, you will need to pass a based64 encoded JSON string ‘{"registryId":\<registryID value\>}’ inside the Request Header. The parameter name is "X-Registry-Auth".
+\<registryID value\>  - The registry ID where the repository was created.
 
 Example:
 
