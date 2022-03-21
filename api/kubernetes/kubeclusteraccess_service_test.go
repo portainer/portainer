@@ -78,11 +78,11 @@ func Test_getCertificateAuthorityData(t *testing.T) {
 	})
 }
 
-func TestKubeConfigService_IsSecure(t *testing.T) {
+func TestKubeClusterAccessService_IsSecure(t *testing.T) {
 	is := assert.New(t)
 
 	t.Run("IsSecure should be false", func(t *testing.T) {
-		kcs := NewKubeConfigCAService("", "")
+		kcs := NewKubeClusterAccessService("", "", "")
 		is.False(kcs.IsSecure(), "should be false if TLS cert not provided")
 	})
 
@@ -90,39 +90,32 @@ func TestKubeConfigService_IsSecure(t *testing.T) {
 		filePath, teardown := createTempFile("valid-cert.crt", certData)
 		defer teardown()
 
-		kcs := NewKubeConfigCAService("", filePath)
+		kcs := NewKubeClusterAccessService("", "", filePath)
 		is.True(kcs.IsSecure(), "should be true if valid TLS cert (path and content) provided")
 	})
 }
 
-func TestKubeConfigService_GetKubeConfigInternal(t *testing.T) {
+func TestKubeClusterAccessService_GetKubeConfigInternal(t *testing.T) {
 	is := assert.New(t)
 
-	t.Run("GetKubeConfigInternal returns localhost address", func(t *testing.T) {
-		kcs := NewKubeConfigCAService("", "")
-		clusterAccessDetails := kcs.GetKubeConfigInternal(1, "some-token")
-		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "https://localhost"), "should contain localhost address")
+	t.Run("GetData contains host address", func(t *testing.T) {
+		kcs := NewKubeClusterAccessService("/", "", "")
+		clusterAccessDetails := kcs.GetData("mysite.com", 1)
+		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "https://mysite.com"), "should contain host address")
 	})
 
-	t.Run("GetKubeConfigInternal contains https bind address port", func(t *testing.T) {
-		kcs := NewKubeConfigCAService(":1010", "")
-		clusterAccessDetails := kcs.GetKubeConfigInternal(1, "some-token")
-		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, ":1010"), "should contain bind address port")
-	})
-
-	t.Run("GetKubeConfigInternal contains environment proxy url", func(t *testing.T) {
-		kcs := NewKubeConfigCAService("", "")
-		clusterAccessDetails := kcs.GetKubeConfigInternal(100, "some-token")
+	t.Run("GetData contains environment proxy url", func(t *testing.T) {
+		kcs := NewKubeClusterAccessService("/", "", "")
+		clusterAccessDetails := kcs.GetData("mysite.com", 100)
 		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "api/endpoints/100/kubernetes"), "should contain environment proxy url")
 	})
 
-	t.Run("GetKubeConfigInternal returns insecure cluster access config", func(t *testing.T) {
-		kcs := NewKubeConfigCAService("", "")
-		clusterAccessDetails := kcs.GetKubeConfigInternal(1, "some-token")
+	t.Run("GetData returns insecure cluster access config", func(t *testing.T) {
+		kcs := NewKubeClusterAccessService("/", ":9443", "")
+		clusterAccessDetails := kcs.GetData("mysite.com", 1)
 
-		wantClusterAccessDetails := kubernetesClusterAccess{
-			ClusterServerURL:         "https://localhost/api/endpoints/1/kubernetes",
-			AuthToken:                "some-token",
+		wantClusterAccessDetails := kubernetesClusterAccessData{
+			ClusterServerURL:         "https://mysite.com:9443/api/endpoints/1/kubernetes",
 			CertificateAuthorityFile: "",
 			CertificateAuthorityData: "",
 		}
@@ -130,16 +123,15 @@ func TestKubeConfigService_GetKubeConfigInternal(t *testing.T) {
 		is.Equal(clusterAccessDetails, wantClusterAccessDetails)
 	})
 
-	t.Run("GetKubeConfigInternal returns secure cluster access config", func(t *testing.T) {
+	t.Run("GetData returns secure cluster access config", func(t *testing.T) {
 		filePath, teardown := createTempFile("valid-cert.crt", certData)
 		defer teardown()
 
-		kcs := NewKubeConfigCAService("", filePath)
-		clusterAccessDetails := kcs.GetKubeConfigInternal(1, "some-token")
+		kcs := NewKubeClusterAccessService("/", "", filePath)
+		clusterAccessDetails := kcs.GetData("localhost", 1)
 
-		wantClusterAccessDetails := kubernetesClusterAccess{
+		wantClusterAccessDetails := kubernetesClusterAccessData{
 			ClusterServerURL:         "https://localhost/api/endpoints/1/kubernetes",
-			AuthToken:                "some-token",
 			CertificateAuthorityFile: filePath,
 			CertificateAuthorityData: certDataString,
 		}

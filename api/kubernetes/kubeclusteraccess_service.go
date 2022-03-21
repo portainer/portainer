@@ -7,26 +7,27 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 )
 
-// KubeConfigService represents a service that is responsible for handling kubeconfig operations
-type KubeConfigService interface {
+// KubeClusterAccessService represents a service that is responsible for centralizing kube cluster access data
+type KubeClusterAccessService interface {
 	IsSecure() bool
-	GetKubeConfigInternal(endpointId portainer.EndpointID, authToken string) kubernetesClusterAccess
+	GetData(hostURL string, endpointId portainer.EndpointID) kubernetesClusterAccessData
 }
 
 // KubernetesClusterAccess represents core details which can be used to generate KubeConfig file/data
-type kubernetesClusterAccess struct {
+type kubernetesClusterAccessData struct {
 	ClusterServerURL         string `example:"https://mycompany.k8s.com"`
 	CertificateAuthorityFile string `example:"/data/tls/localhost.crt"`
 	CertificateAuthorityData string `example:"MIIC5TCCAc2gAwIBAgIJAJ+...+xuhOaFXwQ=="`
-	AuthToken                string `example:"ey..."`
 }
 
-type kubeConfigCAService struct {
+type kubeClusterAccessService struct {
+	baseURL                  string
 	httpsBindAddr            string
 	certificateAuthorityFile string
 	certificateAuthorityData string
@@ -39,14 +40,15 @@ var (
 	errTLSCertValidation    = errors.New("failed to parse tls certificate")
 )
 
-// NewKubeConfigCAService encapsulates generation of core KubeConfig data
-func NewKubeConfigCAService(httpsBindAddr string, tlsCertPath string) KubeConfigService {
+// NewKubeClusterAccessService creates a new instance of a KubeClusterAccessService
+func NewKubeClusterAccessService(baseURL, httpsBindAddr, tlsCertPath string) KubeClusterAccessService {
 	certificateAuthorityData, err := getCertificateAuthorityData(tlsCertPath)
 	if err != nil {
 		log.Printf("[DEBUG] [internal,kubeconfig] [message: %s, generated KubeConfig will be insecure]", err.Error())
 	}
 
-	return &kubeConfigCAService{
+	return &kubeClusterAccessService{
+		baseURL:                  baseURL,
 		httpsBindAddr:            httpsBindAddr,
 		certificateAuthorityFile: tlsCertPath,
 		certificateAuthorityData: certificateAuthorityData,
@@ -82,23 +84,27 @@ func getCertificateAuthorityData(tlsCertPath string) (string, error) {
 // this is based on the fact that we can successfully extract `certificateAuthorityData` from
 // certificate file at `tlsCertPath`. If we can successfully extract `certificateAuthorityData`,
 // then this will be used as `certificate-authority-data` attribute in a generated KubeConfig.
-func (kccas *kubeConfigCAService) IsSecure() bool {
-	return kccas.certificateAuthorityData != ""
+func (service *kubeClusterAccessService) IsSecure() bool {
+	return service.certificateAuthorityData != ""
 }
 
-// GetKubeConfigInternal returns K8s cluster access details for the specified environment(endpoint).
-// On startup, portainer generates a certificate against localhost at specified `httpsBindAddr` port, hence
-// the kubeconfig generated should only be utilised by internal portainer binaries as the `ClusterServerURL`
-// points to the internally accessible `https` based `localhost` address.
+// GetData returns K8s cluster access details for the specified environment(endpoint).
 // The struct can be used to:
 // - generate a kubeconfig file
 // - pass down params to binaries
-func (kccas *kubeConfigCAService) GetKubeConfigInternal(endpointId portainer.EndpointID, authToken string) kubernetesClusterAccess {
-	clusterServerUrl := fmt.Sprintf("https://localhost%s/api/endpoints/%s/kubernetes", kccas.httpsBindAddr, fmt.Sprint(endpointId))
-	return kubernetesClusterAccess{
-		ClusterServerURL:         clusterServerUrl,
-		CertificateAuthorityFile: kccas.certificateAuthorityFile,
-		CertificateAuthorityData: kccas.certificateAuthorityData,
-		AuthToken:                authToken,
+func (service *kubeClusterAccessService) GetData(hostURL string, endpointID portainer.EndpointID) kubernetesClusterAccessData {
+	baseURL := service.baseURL
+	if baseURL != "/" {
+		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
+	}
+
+	clusterURL := hostURL + service.httpsBindAddr + baseURL
+
+	clusterServerURL := fmt.Sprintf("https://%sapi/endpoints/%d/kubernetes", clusterURL, endpointID)
+
+	return kubernetesClusterAccessData{
+		ClusterServerURL:         clusterServerURL,
+		CertificateAuthorityFile: service.certificateAuthorityFile,
+		CertificateAuthorityData: service.certificateAuthorityData,
 	}
 }
