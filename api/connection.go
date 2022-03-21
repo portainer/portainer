@@ -29,6 +29,7 @@ type Connection interface {
 	GetNextIdentifier(bucketName string) int
 	CreateObject(bucketName string, fn func(uint64) (int, interface{})) error
 	CreateObjectWithId(bucketName string, id int, obj interface{}) error
+	CreateObjectWithStringId(bucketName string, id []byte, obj interface{}) error
 	CreateObjectWithSetSequence(bucketName string, id int, obj interface{}) error
 	GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error
 	GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error

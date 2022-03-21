@@ -3,8 +3,7 @@ import _ from 'lodash-es';
 
 import {
   arrayToStr,
-  endpointStatusBadge,
-  endpointTypeIcon,
+  environmentTypeIcon,
   endpointTypeName,
   getPairKey,
   getPairValue,
@@ -35,6 +34,5 @@ angular
   .filter('arraytostr', () => arrayToStr)
   .filter('labelsToStr', () => labelsToStr)
   .filter('endpointtypename', () => endpointTypeName)
-  .filter('endpointtypeicon', () => endpointTypeIcon)
-  .filter('ownershipicon', () => ownershipIcon)
-  .filter('endpointstatusbadge', () => endpointStatusBadge);
+  .filter('endpointtypeicon', () => environmentTypeIcon)
+  .filter('ownershipicon', () => ownershipIcon);

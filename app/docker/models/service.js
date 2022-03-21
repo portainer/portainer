@@ -1,4 +1,4 @@
-import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
+import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 
 export function ServiceViewModel(data, runningTasks, allTasks) {
   this.Model = data;

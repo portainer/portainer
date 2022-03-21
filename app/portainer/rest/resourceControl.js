@@ -7,10 +7,7 @@ angular.module('portainer.app').factory('ResourceControl', [
       API_ENDPOINT_RESOURCE_CONTROLS + '/:id',
       {},
       {
-        create: { method: 'POST', ignoreLoadingBar: true },
-        get: { method: 'GET', params: { id: '@id' } },
         update: { method: 'PUT', params: { id: '@id' } },
-        remove: { method: 'DELETE', params: { id: '@id' } },
       }
     );
   },

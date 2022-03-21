@@ -71,9 +71,10 @@ class KubernetesVolumesController {
   }
 
   async getVolumesAsync() {
+    const storageClasses = this.endpoint.Kubernetes.Configuration.StorageClasses;
     try {
       const [volumes, applications, storages] = await Promise.all([
-        this.KubernetesVolumeService.get(),
+        this.KubernetesVolumeService.get(undefined, storageClasses),
         this.KubernetesApplicationService.get(),
         this.KubernetesStorageService.get(this.endpoint.Id),
       ]);
