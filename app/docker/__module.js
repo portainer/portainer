@@ -7,7 +7,7 @@ import { componentsModule } from './components';
 angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
-    'use strict';
+    ('use strict');
 
     var docker = {
       name: 'docker',
@@ -328,6 +328,17 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
         },
       },
     };
+
+    // The react component that I want to migrate to
+    // var network = {
+    //   name: 'docker.networks.network',
+    //   url: '/firstnetwork',
+    //   views: {
+    //     'content@': {
+    //       component: 'networkDetailsView',
+    //     },
+    //   },
+    // };
 
     var networkCreation = {
       name: 'docker.networks.new',
