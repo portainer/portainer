@@ -58,7 +58,7 @@ export default class KubernetesRegistryAccessController {
         this.state = {
           registryId: this.$state.params.id,
         };
-        this.registry = await this.RegistryService.registry(this.$state.params.id, this.endpoint.Id);
+        this.registry = await this.RegistryService.registry(this.state.registryId, this.endpoint.Id);
         if (this.registry.RegistryAccesses && this.registry.RegistryAccesses[this.endpoint.Id]) {
           this.savedResourcePools = this.registry.RegistryAccesses[this.endpoint.Id].Namespaces.map((value) => ({ value }));
         }
