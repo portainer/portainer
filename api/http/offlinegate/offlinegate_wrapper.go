@@ -47,11 +47,9 @@ func (o *OfflineGateWrapper) WasDisabled() bool {
 func (o *OfflineGateWrapper) WaitingMiddlewareWrapper(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if o.WasDisabled() && strings.HasPrefix(r.RequestURI, "/api") {
-			if r.RequestURI != "/api/status" {
-				w.Header().Set("redirect_reason", RedirectReasonAdminInitTimeout)
-				httperror.WriteError(w, http.StatusPermanentRedirect, "Administrator initialization timeout", nil)
-				return
-			}
+			w.Header().Set("redirect_reason", RedirectReasonAdminInitTimeout)
+			httperror.WriteError(w, http.StatusPermanentRedirect, "Administrator initialization timeout", nil)
+			return
 		}
 
 		next.ServeHTTP(w, r)
