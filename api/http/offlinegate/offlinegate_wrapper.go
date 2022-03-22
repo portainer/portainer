@@ -13,14 +13,13 @@ const RedirectReasonAdminInitTimeout string = "AdminInitTimeout"
 
 // OfflineGateWrapper is an entity used to maintain the administrator initialization status
 type OfflineGateWrapper struct {
-	lock              *sync.Mutex
+	lock              sync.RWMutex
 	adminInitDisabled bool
 }
 
 // NewOfflineGateWrapper creates a new gate wrapper
 func NewOfflineGateWrapper(timeoutCh chan interface{}) *OfflineGateWrapper {
 	gateWrapper := &OfflineGateWrapper{
-		lock:              &sync.Mutex{},
 		adminInitDisabled: false,
 	}
 
@@ -39,6 +38,8 @@ func (o *OfflineGateWrapper) DisableInstance() {
 }
 
 func (o *OfflineGateWrapper) WasDisabled() bool {
+	o.lock.RLock()
+	defer o.lock.RUnlock()
 	return o.adminInitDisabled
 }
 
@@ -46,7 +47,7 @@ func (o *OfflineGateWrapper) WasDisabled() bool {
 // Otherwise, it will pass through the request to next
 func (o *OfflineGateWrapper) WaitingMiddlewareWrapper(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if o.WasDisabled() && strings.HasPrefix(r.RequestURI, "/api") {
+		if o.WasDisabled() && strings.HasPrefix(r.RequestURI, "/api") && r.RequestURI != "/api/status" && r.RequestURI != "/api/settings/public" {
 			w.Header().Set("redirect_reason", RedirectReasonAdminInitTimeout)
 			httperror.WriteError(w, http.StatusPermanentRedirect, "Administrator initialization timeout", nil)
 			return
@@ -54,5 +55,4 @@ func (o *OfflineGateWrapper) WaitingMiddlewareWrapper(next http.Handler) http.Ha
 
 		next.ServeHTTP(w, r)
 	})
-
 }

@@ -55,7 +55,6 @@ func (m *Monitor) Start() {
 			if !initialized {
 				logPrintf("[FATAL] [internal,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
 				if m.timeoutCh != nil {
-					m.timeoutCh <- struct{}{}
 					close(m.timeoutCh)
 				}
 				return

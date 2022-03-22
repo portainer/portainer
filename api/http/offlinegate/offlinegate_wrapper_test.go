@@ -15,7 +15,7 @@ func TestBeforeAdminInitTimeout(t *testing.T) {
 	timeoutCh := make(chan interface{})
 	o := NewOfflineGateWrapper(timeoutCh)
 
-	request := httptest.NewRequest(http.MethodPost, "/", nil)
+	request := httptest.NewRequest(http.MethodPost, "/api/settings/public", nil)
 	response := httptest.NewRecorder()
 
 	go func() {
@@ -40,7 +40,7 @@ func TestAfterAdminInitTimeout(t *testing.T) {
 	timeoutCh := make(chan interface{})
 	o := NewOfflineGateWrapper(timeoutCh)
 
-	request := httptest.NewRequest(http.MethodPost, "/api/settings/public", nil)
+	request := httptest.NewRequest(http.MethodPost, "/api/users/admin/check", nil)
 	response := httptest.NewRecorder()
 
 	go func() {
