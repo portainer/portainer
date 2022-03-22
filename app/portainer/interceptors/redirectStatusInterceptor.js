@@ -1,7 +1,7 @@
 angular.module('portainer.app').factory('RedirectStatusInterceptor', [
   '$q',
-  '$window',
-  function ($q, $window) {
+  '$state',
+  function ($q, $state) {
     'use strict';
     var interceptor = {};
 
@@ -11,7 +11,7 @@ angular.module('portainer.app').factory('RedirectStatusInterceptor', [
       if (rejection.status === 307 || rejection.status === 308) {
         var redirectReason = rejection.headers()['redirect_reason'];
         if (redirectReason === 'AdminInitTimeout') {
-          $window.location.href = '/#!/init/timeout';
+          $state.go('portainer.init.timeout');
         }
 
         return $q.reject(rejection);

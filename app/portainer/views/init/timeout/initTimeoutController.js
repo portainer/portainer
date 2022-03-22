@@ -1,4 +1,4 @@
-angular.module('portainer.app').controller('InitTimeOutController', [
+angular.module('portainer.app').controller('InitTimeoutController', [
   '$scope',
   'StateManager',
   function ($scope, StateManager) {
