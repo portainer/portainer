@@ -18,7 +18,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
             $state.go('portainer.home');
             return;
           }
-          var preEndpoint = EndpointProvider.endpoints();
+          var preEndpoint = EndpointProvider.endpoint();
           try {
             if (endpoint.Type === 7) {
               //edge

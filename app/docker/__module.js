@@ -19,7 +19,7 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
             $state.go('portainer.home');
             return;
           }
-          var preEndpoint = EndpointProvider.endpoints();
+          var preEndpoint = EndpointProvider.endpoint();
           try {
             const status = await checkEndpointStatus(endpoint);
 
@@ -44,9 +44,6 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
             await StateManager.updateEndpointState(endpoint);
           } catch (e) {
             Notifications.error('Failed loading environment', e);
-            if (preEndpoint) {
-              EndpointProvider.setEndpoints(preEndpoint);
-            }
             if (preEndpoint.Id) {
               EndpointProvider.setEndpointID(preEndpoint.Id);
             }

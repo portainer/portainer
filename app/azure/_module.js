@@ -22,7 +22,7 @@ angular
               $state.go('portainer.home');
               return;
             }
-            var preEndpoint = EndpointProvider.endpoints();
+            var preEndpoint = EndpointProvider.endpoint();
             try {
               EndpointProvider.setEndpointID(endpoint.Id);
               EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
@@ -30,9 +30,6 @@ angular
               await StateManager.updateEndpointState(endpoint, []);
             } catch (e) {
               Notifications.error('Failed loading environment', e);
-              if (preEndpoint) {
-                EndpointProvider.setEndpoints(preEndpoint);
-              }
               if (preEndpoint.Id) {
                 EndpointProvider.setEndpointID(preEndpoint.Id);
               }
