@@ -3,8 +3,9 @@ import angular from 'angular';
 import { EnvironmentStatus } from '@/portainer/environments/types';
 import containersModule from './containers';
 import { componentsModule } from './components';
+import { networksModule } from './views/networks';
 
-angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule]).config([
+angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule, networksModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     ('use strict');
@@ -318,27 +319,27 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
       },
     };
 
+    // var network = {
+    //   name: 'docker.networks.network',
+    //   url: '/:id?nodeName',
+    //   views: {
+    //     'content@': {
+    //       templateUrl: './views/networks/edit/network.html',
+    //       controller: 'NetworkController',
+    //     },
+    //   },
+    // };
+
+    // The react component that I want to migrate to
     var network = {
       name: 'docker.networks.network',
       url: '/:id?nodeName',
       views: {
         'content@': {
-          templateUrl: './views/networks/edit/network.html',
-          controller: 'NetworkController',
+          component: 'networkDetailsView',
         },
       },
     };
-
-    // The react component that I want to migrate to
-    // var network = {
-    //   name: 'docker.networks.network',
-    //   url: '/firstnetwork',
-    //   views: {
-    //     'content@': {
-    //       component: 'networkDetailsView',
-    //     },
-    //   },
-    // };
 
     var networkCreation = {
       name: 'docker.networks.new',
