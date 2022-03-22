@@ -18,11 +18,18 @@ type OfflineGateWrapper struct {
 }
 
 // NewOfflineGateWrapper creates a new gate wrapper
-func NewOfflineGateWrapper() *OfflineGateWrapper {
-	return &OfflineGateWrapper{
+func NewOfflineGateWrapper(timeoutCh chan interface{}) *OfflineGateWrapper {
+	gateWrapper := &OfflineGateWrapper{
 		lock:              &sync.Mutex{},
 		adminInitDisabled: false,
 	}
+
+	go func() {
+		<-timeoutCh
+		log.Println("[INFO] Please restart Portainer instance and initialize the administrator")
+		gateWrapper.DisableInstance()
+	}()
+	return gateWrapper
 }
 
 func (o *OfflineGateWrapper) DisableInstance() {
@@ -37,18 +44,11 @@ func (o *OfflineGateWrapper) WasDisabled() bool {
 
 // WaitingMiddlewareWrapper checks whether administrator initialisation timeout. If so, it will return the error with redirect reason,
 // Otherwise, it will pass through the request to next
-func (o *OfflineGateWrapper) WaitingMiddlewareWrapper(timeoutCh chan interface{}, next http.Handler) http.Handler {
+func (o *OfflineGateWrapper) WaitingMiddlewareWrapper(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		go func() {
-			<-timeoutCh
-			log.Println("[INFO] Please restart Portainer instance and initialize the administrator")
-			o.DisableInstance()
-		}()
-
 		if o.WasDisabled() && strings.HasPrefix(r.RequestURI, "/api") {
 			if r.RequestURI != "/api/status" {
-				w.Header().Add("redirect_reason", RedirectReasonAdminInitTimeout)
+				w.Header().Set("redirect_reason", RedirectReasonAdminInitTimeout)
 				httperror.WriteError(w, http.StatusPermanentRedirect, "Administrator initialization timeout", nil)
 				return
 			}

@@ -119,7 +119,8 @@ func (server *Server) Start() error {
 	authHandler.OAuthService = server.OAuthService
 
 	initTimeoutCh := make(chan interface{})
-	adminMonitor := adminmonitor.New(1*time.Minute, server.DataStore, initTimeoutCh, server.ShutdownCtx)
+	offlineGateWrapper := offlinegate.NewOfflineGateWrapper(initTimeoutCh)
+	adminMonitor := adminmonitor.New(5*time.Minute, server.DataStore, initTimeoutCh, server.ShutdownCtx)
 	adminMonitor.Start()
 
 	var backupHandler = backup.NewHandler(requestBouncer, server.DataStore, offlineGate, server.FileService.GetDatastorePath(), server.ShutdownTrigger, adminMonitor)
@@ -301,8 +302,7 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
-	offlineGateWrapper := offlinegate.NewOfflineGateWrapper()
-	handler := offlineGate.WaitingMiddleware(time.Minute, offlineGateWrapper.WaitingMiddlewareWrapper(initTimeoutCh, server.Handler))
+	handler := offlineGate.WaitingMiddleware(time.Minute, offlineGateWrapper.WaitingMiddlewareWrapper(server.Handler))
 
 	if server.HTTPEnabled {
 		go func() {
