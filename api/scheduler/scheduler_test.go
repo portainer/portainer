@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -100,4 +101,20 @@ func Test_CanTerminateAllJobs_ByCancellingParentContext(t *testing.T) {
 
 	<-ctx.Done()
 	assert.False(t, workDone, "job shouldn't had a chance to run")
+}
+
+func Test_StartJobEvery_Concurrently(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*jobInterval)
+	s := NewScheduler(ctx)
+
+	f := func() error {
+		return errors.New("error")
+	}
+
+	go s.StartJobEvery(jobInterval, f)
+	s.StartJobEvery(jobInterval, f)
+
+	cancel()
+
+	<-ctx.Done()
 }

@@ -12,12 +12,28 @@
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0">
               <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> Deploy </uib-tab-heading>
-
+              <div class="col-sm-12 form-section-title"> Namespace </div>
               <form class="form-horizontal" style="margin-top: 20px">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="target_node" class="col-lg-1 col-sm-2 control-label text-left">Namespace</label>
                   <div class="col-lg-11 col-sm-10">
-                    <select class="form-control" ng-model="ctrl.formValues.Namespace" ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"></select>
+                    <select
+                      ng-disabled="ctrl.formValues.namespace_toggle"
+                      class="form-control"
+                      ng-model="ctrl.formValues.Namespace"
+                      ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"
+                    ></select>
+                  </div>
+                </div>
+                <div class="form-group" ng-if="ctrl.formValues.Namespace">
+                  <div class="col-sm-12">
+                    <label for="toggle_logo" class="control-label text-left"> Use namespace(s) specificed from manifest </label>
+                    <portainer-tooltip
+                      position="bottom"
+                      message="If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment"
+                    >
+                    </portainer-tooltip>
+                    <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" /><i></i> </label>
                   </div>
                 </div>
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">

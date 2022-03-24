@@ -1,47 +1,25 @@
 import _ from 'lodash-es';
+import { UserTokenModel, UserViewModel } from '@/portainer/models/user';
+import { getUser, getUsers } from '@/portainer/users/user.service';
 
-import axios, { parseAxiosError } from '@/portainer/services/axios';
-
-const BASE_URL = '/users';
-
-import { filterNonAdministratorUsers } from '@/portainer/helpers/userHelper';
-import { UserViewModel, UserTokenModel } from '../../models/user';
 import { TeamMembershipModel } from '../../models/teamMembership';
-
-export async function getUsers(includeAdministrators) {
-  try {
-    let { data } = await axios.get(BASE_URL);
-
-    const users = data.map((user) => new UserViewModel(user));
-
-    if (includeAdministrators) {
-      return users;
-    }
-
-    return filterNonAdministratorUsers(users);
-  } catch (e) {
-    throw parseAxiosError(e, 'Unable to retrieve users');
-  }
-}
-
-export async function getUser(id) {
-  try {
-    const { data: user } = await axios.get(`${BASE_URL}/${id}`);
-
-    return new UserViewModel(user);
-  } catch (e) {
-    throw parseAxiosError(e, 'Unable to retrieve user details');
-  }
-}
 
 /* @ngInject */
 export function UserService($q, Users, TeamService, TeamMembershipService) {
   'use strict';
   var service = {};
 
-  service.users = getUsers;
+  service.users = async function (includeAdministrators) {
+    const users = await getUsers(includeAdministrators);
 
-  service.user = getUser;
+    return users.map((u) => new UserViewModel(u));
+  };
+
+  service.user = async function (includeAdministrators) {
+    const user = await getUser(includeAdministrators);
+
+    return new UserViewModel(user);
+  };
 
   service.createUser = function (username, password, role, teamIds) {
     var deferred = $q.defer();
