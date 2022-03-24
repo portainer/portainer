@@ -22,7 +22,7 @@ angular
               $state.go('portainer.home');
               return;
             }
-            var preEndpoint = EndpointProvider.endpoint();
+            var preEndpoint = EndpointProvider.preEndpoint();
             try {
               EndpointProvider.setEndpointID(endpoint.Id);
               EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
@@ -30,15 +30,11 @@ angular
               await StateManager.updateEndpointState(endpoint, []);
             } catch (e) {
               Notifications.error('Failed loading environment', e);
-              if (preEndpoint.Id) {
+              if (preEndpoint) {
+                EndpointProvider.setCurrentEndpoint(preEndpoint);
                 EndpointProvider.setEndpointID(preEndpoint.Id);
               }
-              if (preEndpoint.PublicURL) {
-                EndpointProvider.setEndpointPublicURL(preEndpoint.PublicURL);
-              }
-              if (preEndpoint.Status) {
-                EndpointProvider.setOfflineModeFromStatus(preEndpoint.Status);
-              }
+              $state.dispose();
               $state.go('portainer.home', {}, { reload: true });
             }
           });
