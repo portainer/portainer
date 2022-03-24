@@ -26,17 +26,34 @@ export default class KubeServicesViewController {
   }
 
   getUniqName() {
-    let name = this.formValues.Name + '-' + this.state.nameIndex;
+    let UniqName = '';
     const services = this.formValues.Services;
-    services.forEach((service) => {
-      if (service.Name === name) {
-        this.state.nameIndex += 1;
-        name = this.formValues.Name + '-' + this.state.nameIndex;
-      }
+    const sortServices = services.sort((a,b) => {
+      return a.Name.localeCompare(b.Name);
     });
-    const UniqName = this.formValues.Name + '-' + this.state.nameIndex;
-    return UniqName;
-  }
+    console.log(sortServices)
+
+    // first service name = this.formValues.Name
+    if(this.state.nameIndex === 0) {
+      UniqName = this.formValues.Name;
+      this.state.nameIndex += 1;
+    } 
+    // second service name start from index 2 ( servicename-2 )
+    else if(this.state.nameIndex === 1){
+      this.state.nameIndex += 1;
+      UniqName = this.formValues.Name + '-' + this.state.nameIndex;
+    } 
+    // all other cases will loop through service to pickup next available name
+    else {
+      let name = this.formValues.Name + '-' + this.state.nameIndex;
+      sortServices.forEach((service) => {
+        if (service.Name === name) {
+          this.state.nameIndex += 1;
+          name = this.formValues.Name + '-' + this.state.nameIndex;
+        }
+      });
+      UniqName = this.formValues.Name + '-' + this.state.nameIndex;
+    }
 
   deleteService(index) {
     this.formValues.Services.splice(index, 1);
