@@ -1,4 +1,8 @@
-import axiosOrigin, { AxiosError, AxiosRequestConfig } from 'axios';
+import axiosOrigin, {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 import { loadProgressBar } from 'axios-progress-bar';
 import 'axios-progress-bar/dist/nprogress.css';
 
@@ -46,6 +50,22 @@ export function agentInterceptor(config: AxiosRequestConfig) {
 }
 
 axios.interceptors.request.use(agentInterceptor);
+
+export function redirectInterceptor(error: AxiosResponse) {
+  if (error.status === 307 || error.status === 308) {
+    const redirectReason = error.headers['redirect-reason'];
+    if (redirectReason === 'AdminInitTimeout') {
+      window.location.href = '/#!/init/timeout';
+    }
+    return Promise.reject(error);
+  }
+  return Promise.reject(error);
+}
+
+axios.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  redirectInterceptor
+);
 
 export function parseAxiosError(
   err: Error,

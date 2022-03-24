@@ -1,4 +1,4 @@
-package offlinegate
+package middlewares
 
 import (
 	"io"
@@ -8,22 +8,22 @@ import (
 	"time"
 )
 
-func TestBeforeAdminInitTimeout(t *testing.T) {
+func Test_beforeAdminInitDisabled(t *testing.T) {
 	// scenario:
 	// Before admin init timeout, no redirect happen
 
-	timeoutCh := make(chan interface{})
-	o := NewOfflineGateWrapper(timeoutCh)
+	timeoutSignal := make(chan interface{})
+	adminMonitorMiddleware := NewAdminMonitor(timeoutSignal)
 
 	request := httptest.NewRequest(http.MethodPost, "/api/settings/public", nil)
 	response := httptest.NewRecorder()
 
 	go func() {
 		time.Sleep(2 * time.Second)
-		timeoutCh <- struct{}{}
+		close(timeoutSignal)
 	}()
 
-	o.WaitingMiddlewareWrapper(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	adminMonitorMiddleware.WithRedirect(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("success"))
 	})).ServeHTTP(response, request)
 
@@ -33,26 +33,26 @@ func TestBeforeAdminInitTimeout(t *testing.T) {
 	}
 }
 
-func TestAfterAdminInitTimeout(t *testing.T) {
+func Test_afterAdminInitDisabled(t *testing.T) {
 	// scenario:
 	// After admin init timeout, redirect should happen
 
-	timeoutCh := make(chan interface{})
-	o := NewOfflineGateWrapper(timeoutCh)
+	timeoutSignal := make(chan interface{})
+	adminMonitorMiddleware := NewAdminMonitor(timeoutSignal)
 
 	request := httptest.NewRequest(http.MethodPost, "/api/users/admin/check", nil)
 	response := httptest.NewRecorder()
 
 	go func() {
 		time.Sleep(100 * time.Millisecond)
-		timeoutCh <- struct{}{}
+		close(timeoutSignal)
 	}()
 
 	time.Sleep(300 * time.Millisecond)
-	o.WaitingMiddlewareWrapper(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	adminMonitorMiddleware.WithRedirect(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	})).ServeHTTP(response, request)
 
-	if response.Code != http.StatusPermanentRedirect {
+	if response.Code != http.StatusTemporaryRedirect {
 		t.Error("Didn't redirect as expected")
 	}
 }

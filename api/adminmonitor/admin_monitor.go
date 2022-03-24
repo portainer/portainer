@@ -11,7 +11,6 @@ import (
 )
 
 var logFatalf = log.Fatalf
-var logPrintf = log.Printf
 
 type Monitor struct {
 	timeout          time.Duration
@@ -19,16 +18,16 @@ type Monitor struct {
 	shutdownCtx      context.Context
 	cancellationFunc context.CancelFunc
 	mu               sync.Mutex
-	timeoutCh        chan interface{}
+	timeoutSignal    chan<- interface{}
 }
 
-// New creates a monitor that when started will wait for the timeout duration and then shutdown the application unless it has been initialized.
-func New(timeout time.Duration, datastore dataservices.DataStore, timeoutCh chan interface{}, shutdownCtx context.Context) *Monitor {
+// New creates a monitor that when started will wait for the timeout duration and then sends the timeout signal to disable the application
+func New(timeout time.Duration, datastore dataservices.DataStore, timeoutSignal chan<- interface{}, shutdownCtx context.Context) *Monitor {
 	return &Monitor{
-		timeout:     timeout,
-		datastore:   datastore,
-		shutdownCtx: shutdownCtx,
-		timeoutCh:   timeoutCh,
+		timeout:       timeout,
+		datastore:     datastore,
+		shutdownCtx:   shutdownCtx,
+		timeoutSignal: timeoutSignal,
 	}
 }
 
@@ -53,9 +52,9 @@ func (m *Monitor) Start() {
 				logFatalf("%s", err)
 			}
 			if !initialized {
-				logPrintf("[FATAL] [internal,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
-				if m.timeoutCh != nil {
-					close(m.timeoutCh)
+				log.Println("[INFO] [internal,init] The Portainer instance timed out for security purposes. To re-enable your Portainer instance, you will need to restart Portainer")
+				if m.timeoutSignal != nil {
+					close(m.timeoutSignal)
 				}
 				return
 			}
