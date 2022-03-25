@@ -121,7 +121,7 @@ func (server *Server) Start() error {
 
 	initTimeoutSignal := make(chan interface{})
 	adminMonitorMiddleware := middlewares.NewAdminMonitor(initTimeoutSignal)
-	adminMonitor := adminmonitor.New(1*time.Minute, server.DataStore, initTimeoutSignal, server.ShutdownCtx)
+	adminMonitor := adminmonitor.New(5*time.Minute, server.DataStore, initTimeoutSignal, server.ShutdownCtx)
 	adminMonitor.Start()
 
 	var backupHandler = backup.NewHandler(requestBouncer, server.DataStore, offlineGate, server.FileService.GetDatastorePath(), server.ShutdownTrigger, adminMonitor)
