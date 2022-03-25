@@ -1,16 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="<%= name %>" ng-strict-di>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Portainer</title>
     <meta name="description" content="" />
     <meta name="author" content="<%= author %>" />
     <base id="base" />
-    <script>
-      var path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-      var basePath = path ? '/' + path + '/' : '/';
-      document.getElementById('base').href = basePath;
-    </script>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -27,7 +22,7 @@
     <meta name="theme-color" content="#ffffff" />
   </head>
 
-  <body ng-controller="MainController">
+  <body>
     <div
       id="page-wrapper"
       ng-class="{
@@ -38,8 +33,6 @@
       }"
       ng-cloak
     >
-      <div id="sideview" ui-view="sidebar" ng-if="!applicationState.loading"></div>
-
       <div id="content-wrapper">
         <div class="page-content">
           <div class="page-wrapper" ng-if="applicationState.loading">

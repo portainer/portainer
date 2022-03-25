@@ -51,13 +51,17 @@ export function agentInterceptor(config: AxiosRequestConfig) {
 
 axios.interceptors.request.use(agentInterceptor);
 
-export function redirectInterceptor(error: AxiosResponse) {
-  if (error.status === 307 || error.status === 308) {
-    const redirectReason = error.headers['redirect-reason'];
+export function redirectInterceptor(error: AxiosError) {
+  const newError = {
+    headers: error.response?.headers || {},
+    status: error.response?.status || {},
+    ...error,
+  };
+  if (newError.status === 307 || newError.status === 308) {
+    const redirectReason = newError.headers['redirect-reason'];
     if (redirectReason === 'AdminInitTimeout') {
-      window.location.href = '/#!/init/timeout';
+      window.location.href = '/#!/admin-timeout';
     }
-    return Promise.reject(error);
   }
   return Promise.reject(error);
 }
