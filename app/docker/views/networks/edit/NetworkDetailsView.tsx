@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
+import { confirmDeletion } from '@/portainer/services/modal.service/confirm';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
-import { getNetwork, isSystemNetwork } from './network.service'; // removeNetwork
+import { getNetwork, removeNetwork, isSystemNetwork } from './network.service'; // removeNetwork
 import {
   NetworkId,
   DockerNetwork,
@@ -53,15 +54,11 @@ export function NetworkDetailsView() {
   }, [networkId, environmentId]);
 
   useEffect(() => {
-    // transform network object to an array of [key, value] pairs for the table
-    function setnetworkRowContentFn() {
+    if (network.Name) {
+      // transform network object to an array of [key, value] pairs for the table
       setnetworkRowContent(
         filteredNetworkKeys.map((key) => [key, String(network[key])])
       );
-    }
-
-    if (network.Name) {
-      setnetworkRowContentFn();
       // decide if removing is allowed
       setallowRemove(!isSystemNetwork(network.Name));
     }
@@ -69,6 +66,13 @@ export function NetworkDetailsView() {
 
   function onRemoveNetwork() {
     // show a confirmation modal
+    const message = 'Do you want to remove the network?';
+
+    confirmDeletion(message, (confirmed) => {
+      if (confirmed) {
+        removeNetwork(networkId, environmentId);
+      }
+    });
     // on confirmation, remove the network
     console.log(networkId);
   }

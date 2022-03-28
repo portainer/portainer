@@ -319,18 +319,6 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
       },
     };
 
-    // var network = {
-    //   name: 'docker.networks.network',
-    //   url: '/:id?nodeName',
-    //   views: {
-    //     'content@': {
-    //       templateUrl: './views/networks/edit/network.html',
-    //       controller: 'NetworkController',
-    //     },
-    //   },
-    // };
-
-    // The react component that I want to migrate to
     var network = {
       name: 'docker.networks.network',
       url: '/:id?nodeName',
