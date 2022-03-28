@@ -3,7 +3,6 @@ angular.module('portainer.app').factory(
   /* @ngInject */
   function EndpointProviderFactory(LocalStorage, $uiRouterGlobals) {
     const state = {
-      preEndpoint: null,
       currentEndpoint: null,
     };
     var service = {};
@@ -112,17 +111,8 @@ angular.module('portainer.app').factory(
       return state.currentEndpoint;
     };
 
-    service.preEndpoint = function () {
-      return state.preEndpoint;
-    };
-
     service.setCurrentEndpoint = function (endpoint) {
-      state.preEndpoint = state.currentEndpoint;
       state.currentEndpoint = endpoint;
-    };
-    service.revert = function () {
-      state.currentEndpoint = state.preEndpoint;
-      state.preEndpoint = null;
     };
 
     return service;
