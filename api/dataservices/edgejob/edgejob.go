@@ -67,14 +67,14 @@ func (service *Service) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, err
 	return &edgeJob, nil
 }
 
-// CreateEdgeJob creates a new Edge job
-func (service *Service) Create(edgeJob *portainer.EdgeJob) error {
-	return service.connection.CreateObject(
+// Create creates a new EdgeJob
+func (service *Service) Create(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
+	edgeJob.ID = ID
+
+	return service.connection.CreateObjectWithId(
 		BucketName,
-		func(id uint64) (int, interface{}) {
-			edgeJob.ID = portainer.EdgeJobID(id)
-			return int(edgeJob.ID), edgeJob
-		},
+		int(edgeJob.ID),
+		edgeJob,
 	)
 }
 
