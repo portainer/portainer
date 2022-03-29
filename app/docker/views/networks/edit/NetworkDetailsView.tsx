@@ -1,18 +1,17 @@
-import { useCurrentStateAndParams } from '@uirouter/react';
+import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
 import { useEffect, useState } from 'react';
+import DockerNetworkHelper from 'Docker/helpers/networkHelper';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
 import { confirmDeletion } from '@/portainer/services/modal.service/confirm';
+import * as notifications from '@/portainer/services/notifications';
+
+import { removeNetwork, isSystemNetwork } from '../network.service';
+import { useNetwork } from '../queries';
+import { NetworkRowContent, NetworkKey, IPConfigs } from '../types';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
-import { getNetwork, removeNetwork, isSystemNetwork } from './network.service'; // removeNetwork
-import {
-  NetworkId,
-  DockerNetwork,
-  NetworkRowContent,
-  NetworkKey,
-} from './types';
 
 const filteredNetworkKeys: NetworkKey[] = [
   'Name',
@@ -24,57 +23,64 @@ const filteredNetworkKeys: NetworkKey[] = [
 ];
 
 export function NetworkDetailsView() {
-  const [network, setNetwork] = useState({
-    Attachable: false,
-    Driver: '',
-    Id: '',
-    Internal: false,
-    Name: '',
-    Scope: '',
-  } as DockerNetwork);
-  const [networkRowContent, setnetworkRowContent] = useState(
-    undefined as NetworkRowContent | undefined
-  );
-  const [allowRemove, setallowRemove] = useState(false);
+  const router = useRouter();
+
   const {
     params: { id: networkId }, // nodeName
   } = useCurrentStateAndParams();
   const environmentId = useEnvironmentId();
 
-  // when the network id changes, update the network data
+  const { data: network, status, error } = useNetwork(networkId, environmentId);
+
+  const [networkRowContent, setnetworkRowContent] = useState(
+    undefined as NetworkRowContent | undefined
+  );
+  const [allowRemove, setallowRemove] = useState(false);
+  const [IPV4Configs, setIPV4Configs] = useState([] as IPConfigs);
+  const [IPV6Configs, setIPV6Configs] = useState([] as IPConfigs);
+
+  // update state when network is loaded
   useEffect(() => {
-    async function fetchNetwork(networkId: NetworkId, environmentId: string) {
-      const data = await getNetwork(networkId, environmentId);
-      setNetwork(data);
+    if (status === 'success') {
+      if (network.Name) {
+        // transform network object to an array of [key, value] pairs for the table
+        setnetworkRowContent(
+          filteredNetworkKeys.map((key) => [key, String(network[key])])
+        );
+        setallowRemove(!isSystemNetwork(network.Name));
+      }
+      if (network.IPAM) {
+        // update the IP configs when the network is updated
+        setIPV4Configs(DockerNetworkHelper.getIPV4Configs(network.IPAM.Config));
+        setIPV6Configs(DockerNetworkHelper.getIPV6Configs(network.IPAM.Config));
+      }
     }
 
-    if (networkId) {
-      fetchNetwork(networkId, environmentId);
+    // notify the error if there is one
+    if (status === 'error') {
+      notifications.error('Failure', error as Error, 'Unable to get network');
     }
-  }, [networkId, environmentId]);
+  }, [network, status, error]);
 
-  useEffect(() => {
-    if (network.Name) {
-      // transform network object to an array of [key, value] pairs for the table
-      setnetworkRowContent(
-        filteredNetworkKeys.map((key) => [key, String(network[key])])
-      );
-      // decide if removing is allowed
-      setallowRemove(!isSystemNetwork(network.Name));
-    }
-  }, [network]);
-
-  function onRemoveNetwork() {
+  function onRemoveNetworkClicked() {
     // show a confirmation modal
     const message = 'Do you want to remove the network?';
-
-    confirmDeletion(message, (confirmed) => {
+    confirmDeletion(message, async (confirmed) => {
       if (confirmed) {
-        removeNetwork(networkId, environmentId);
+        // if comfirmed, remove the network and notify the user
+        try {
+          await removeNetwork(networkId, environmentId);
+          notifications.success('Network successfully removed', network.Name);
+          router.stateService.go('docker.networks');
+        } catch (err) {
+          notifications.error(
+            'Failure',
+            err as Error,
+            'Unable to remove network'
+          );
+        }
       }
     });
-    // on confirmation, remove the network
-    console.log(networkId);
   }
 
   return (
@@ -83,14 +89,18 @@ export function NetworkDetailsView() {
         title="Network details"
         breadcrumbs={[
           { link: 'docker.networks', label: 'Networks' },
-          { link: 'docker.networks.network', label: network.Name }, // TODO: replace with network name
+          { link: 'docker.networks.network', label: network?.Name },
         ]}
       />
-      <NetworkDetailsTable
-        networkRowContent={networkRowContent}
-        allowRemove={allowRemove}
-        onRemoveNetwork={onRemoveNetwork}
-      />
+      {status === 'success' && (
+        <NetworkDetailsTable
+          networkRowContent={networkRowContent}
+          allowRemove={allowRemove}
+          onRemoveNetworkClicked={onRemoveNetworkClicked}
+          IPV4Configs={IPV4Configs}
+          IPV6Configs={IPV6Configs}
+        />
+      )}
     </>
   );
 }

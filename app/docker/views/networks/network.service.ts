@@ -1,4 +1,5 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { EnvironmentId } from '@/portainer/environments/types';
 
 import { NetworkId } from './types';
 
@@ -8,7 +9,10 @@ export function isSystemNetwork(networkName: string): boolean {
   return systemNetworks.includes(networkName);
 }
 
-export async function getNetwork(networkId: NetworkId, environmentId: string) {
+export async function getNetwork(
+  networkId: NetworkId,
+  environmentId: EnvironmentId
+) {
   try {
     const { data: network } = await axios.get(
       `${networksUrl(environmentId)}/${networkId}`
@@ -21,18 +25,15 @@ export async function getNetwork(networkId: NetworkId, environmentId: string) {
 
 export async function removeNetwork(
   networkId: NetworkId,
-  environmentId: string
+  environmentId: EnvironmentId
 ) {
   try {
-    const response = await axios.delete(
-      `${networksUrl(environmentId)}/${networkId}`
-    );
-    console.log(response);
+    await axios.delete(`${networksUrl(environmentId)}/${networkId}`);
   } catch (e) {
-    throw parseAxiosError(e as Error, 'Unable to retrieve network details');
+    throw parseAxiosError(e as Error, 'Unable to remove network');
   }
 }
 
-function networksUrl(environmentId: string): string {
+function networksUrl(environmentId: number): string {
   return `endpoints/${environmentId}/docker/networks`;
 }

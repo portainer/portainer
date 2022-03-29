@@ -65,7 +65,7 @@ export function parseAxiosError(
 }
 
 function defaultErrorParser(axiosError: AxiosError) {
-  const message = axiosError.response?.data.message;
+  const message = axiosError.response?.data.message || axiosError.message;
   const details = axiosError.response?.data.details || message;
   const error = new Error(message);
   return { error, details };

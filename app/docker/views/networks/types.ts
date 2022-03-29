@@ -20,3 +20,12 @@ export type NetworkKey =
 type NetworkValue = string;
 
 export type NetworkRowContent = [NetworkKey, NetworkValue][];
+
+export type IPConfig = {
+  Subnet: string;
+  Gateway: string;
+  IPRange: string;
+  AuxiliaryAddresses: string[];
+};
+
+export type IPConfigs = IPConfig[];
