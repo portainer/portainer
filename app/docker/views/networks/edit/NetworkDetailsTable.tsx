@@ -63,18 +63,22 @@ export function NetworkDetailsTable({
       return IPConfigs.map((config) => (
         <Fragment key={config.Subnet}>
           <tr>
-            <td>{`${IPType} Subnet${
+            <td data-cy={`networkDetails-${IPType}Subnet`}>{`${IPType} Subnet${
               config.Subnet ? ` - ${config.Subnet}` : ''
             }`}</td>
-            <td>{`${IPType} Gateway${
+            <td
+              data-cy={`networkDetails-${IPType}Gateway`}
+            >{`${IPType} Gateway${
               config.Gateway ? ` - ${config.Gateway}` : ''
             }`}</td>
           </tr>
           <tr>
-            <td>{`${IPType} IP Range${
+            <td
+              data-cy={`networkDetails-${IPType}IPRange`}
+            >{`${IPType} IP Range${
               config.IPRange ? ` - ${config.IPRange}` : ''
             }`}</td>
-            <td>
+            <td data-cy={`networkDetails-${IPType}ExcludedIPs`}>
               {`${IPType} Excluded IPs`}
               {config.AuxiliaryAddresses &&
                 config.AuxiliaryAddresses.map((auxAddress) => (
@@ -89,21 +93,19 @@ export function NetworkDetailsTable({
   }
 
   return (
-    <div className="row">
-      <div className="col-lg-12 col-md-12 col-xs-12">
-        <Widget>
-          <WidgetTitle title="Network details" icon="fa-sitemap" />
-          <WidgetBody className="nopadding">
-            <table className="table">
-              <tbody>
-                {renderNetworkRowContent()}
-                {renderIPConfigRowContent(IPV4Configs, 'IPV4')}
-                {renderIPConfigRowContent(IPV6Configs, 'IPV6')}
-              </tbody>
-            </table>
-          </WidgetBody>
-        </Widget>
-      </div>
+    <div className="col-lg-12 col-md-12 col-xs-12">
+      <Widget>
+        <WidgetTitle title="Network details" icon="fa-sitemap" />
+        <WidgetBody className="nopadding">
+          <table className="table">
+            <tbody>
+              {renderNetworkRowContent()}
+              {renderIPConfigRowContent(IPV4Configs, 'IPV4')}
+              {renderIPConfigRowContent(IPV6Configs, 'IPV6')}
+            </tbody>
+          </table>
+        </WidgetBody>
+      </Widget>
     </div>
   );
 }

@@ -21,7 +21,7 @@ type NetworkValue = string;
 
 export type NetworkRowContent = [NetworkKey, NetworkValue][];
 
-export type IPConfig = {
+type IPConfig = {
   Subnet: string;
   Gateway: string;
   IPRange: string;

@@ -6,6 +6,7 @@ import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
 import { confirmDeletion } from '@/portainer/services/modal.service/confirm';
 import * as notifications from '@/portainer/services/notifications';
+// import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
 
 import { removeNetwork, isSystemNetwork } from '../network.service';
 import { useNetwork } from '../queries';
@@ -24,13 +25,14 @@ const filteredNetworkKeys: NetworkKey[] = [
 
 export function NetworkDetailsView() {
   const router = useRouter();
+  // onRemoveNetworkClicked()
 
   const {
     params: { id: networkId }, // nodeName
   } = useCurrentStateAndParams();
   const environmentId = useEnvironmentId();
 
-  const { data: network, status, error } = useNetwork(networkId, environmentId);
+  const { data: network, status, error } = useNetwork(networkId, environmentId); // 1 object
 
   const [networkRowContent, setnetworkRowContent] = useState(
     undefined as NetworkRowContent | undefined
@@ -39,10 +41,13 @@ export function NetworkDetailsView() {
   const [IPV4Configs, setIPV4Configs] = useState([] as IPConfigs);
   const [IPV6Configs, setIPV6Configs] = useState([] as IPConfigs);
 
+  // const networkRowContent = network && filteredNetworkKeys.map((key) => [key, String(network[key])])
+
   // update state when network is loaded
   useEffect(() => {
     if (status === 'success') {
       if (network.Name) {
+        console.log(network);
         // transform network object to an array of [key, value] pairs for the table
         setnetworkRowContent(
           filteredNetworkKeys.map((key) => [key, String(network[key])])
@@ -60,12 +65,43 @@ export function NetworkDetailsView() {
     if (status === 'error') {
       notifications.error('Failure', error as Error, 'Unable to get network');
     }
-  }, [network, status, error]);
+  }, [network, status, error]); // try to remove useEffect
+
+  return (
+    <>
+      <PageHeader
+        title="Network details"
+        breadcrumbs={[
+          { link: 'docker.networks', label: 'Networks' },
+          { link: 'docker.networks.network', label: network?.Name },
+        ]}
+      />
+      {status === 'success' && network && (
+        <>
+          <NetworkDetailsTable
+            networkRowContent={networkRowContent}
+            allowRemove={allowRemove}
+            onRemoveNetworkClicked={onRemoveNetworkClicked}
+            IPV4Configs={IPV4Configs}
+            IPV6Configs={IPV6Configs}
+          />
+          {/* <AccessControlPanel
+            resourceControl={}
+            resourceType={}
+            disableOwnershipChange={}
+            resourceId={network.Id}
+            onUpdateSuccess={}
+          /> */}
+        </>
+      )}
+    </>
+  );
 
   function onRemoveNetworkClicked() {
     // show a confirmation modal
     const message = 'Do you want to remove the network?';
     confirmDeletion(message, async (confirmed) => {
+      // confirmdeletion async
       if (confirmed) {
         // if comfirmed, remove the network and notify the user
         try {
@@ -82,25 +118,4 @@ export function NetworkDetailsView() {
       }
     });
   }
-
-  return (
-    <>
-      <PageHeader
-        title="Network details"
-        breadcrumbs={[
-          { link: 'docker.networks', label: 'Networks' },
-          { link: 'docker.networks.network', label: network?.Name },
-        ]}
-      />
-      {status === 'success' && (
-        <NetworkDetailsTable
-          networkRowContent={networkRowContent}
-          allowRemove={allowRemove}
-          onRemoveNetworkClicked={onRemoveNetworkClicked}
-          IPV4Configs={IPV4Configs}
-          IPV6Configs={IPV6Configs}
-        />
-      )}
-    </>
-  );
 }

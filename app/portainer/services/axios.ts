@@ -58,14 +58,18 @@ export function parseAxiosError(
   if ('isAxiosError' in err) {
     const { error, details } = parseError(err as AxiosError);
     resultErr = error;
-    resultMsg = msg ? `${msg}: ${details}` : details;
+    if (msg && details) {
+      resultMsg = `${msg}: ${details}`;
+    } else {
+      resultMsg = msg || details;
+    }
   }
 
   return new PortainerError(resultMsg, resultErr);
 }
 
 function defaultErrorParser(axiosError: AxiosError) {
-  const message = axiosError.response?.data.message || axiosError.message;
+  const message = axiosError.response?.data.message || '';
   const details = axiosError.response?.data.details || message;
   const error = new Error(message);
   return { error, details };
