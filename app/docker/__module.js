@@ -3,12 +3,12 @@ import angular from 'angular';
 import { EnvironmentStatus } from '@/portainer/environments/types';
 import containersModule from './containers';
 import { componentsModule } from './components';
-import { networksModule } from './views/networks';
+import { networksModule } from './networks';
 
 angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule, networksModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
-    ('use strict');
+    'use strict';
 
     var docker = {
       name: 'docker',

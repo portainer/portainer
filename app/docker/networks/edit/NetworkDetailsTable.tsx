@@ -4,23 +4,45 @@ import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { Button } from '@/portainer/components/Button';
 import { Authorized } from '@/portainer/hooks/useUser';
 
-import { NetworkRowContent, IPConfigs } from '../types';
+import { IPConfigs, DockerNetwork } from '../types';
 
 interface Props {
-  networkRowContent: NetworkRowContent | undefined;
-  allowRemove: boolean;
+  network: DockerNetwork;
+  allowRemoveNetwork: boolean;
   IPV4Configs: IPConfigs;
   IPV6Configs: IPConfigs;
   onRemoveNetworkClicked: () => void;
 }
 
+type NetworkKey =
+  | 'Name'
+  | 'Id'
+  | 'Scope'
+  | 'Driver'
+  | 'Attachable'
+  | 'Internal';
+
+type NetworkRowContent = [NetworkKey, string][];
+
+const filteredNetworkKeys: NetworkKey[] = [
+  'Name',
+  'Id',
+  'Driver',
+  'Scope',
+  'Attachable',
+  'Internal',
+];
+
 export function NetworkDetailsTable({
-  networkRowContent,
-  allowRemove,
+  network,
+  allowRemoveNetwork,
   IPV4Configs,
   IPV6Configs,
   onRemoveNetworkClicked,
 }: Props) {
+  const networkRowContent: NetworkRowContent =
+    network && filteredNetworkKeys.map((key) => [key, String(network[key])]);
+
   // convert the networkRowContent to table rows
   function renderNetworkRowContent() {
     if (networkRowContent && networkRowContent.length > 0) {
@@ -32,7 +54,7 @@ export function NetworkDetailsTable({
             {key === 'Id' && (
               <>
                 {value}
-                {allowRemove && (
+                {allowRemoveNetwork && (
                   <Authorized authorizations="DockerNetworkDelete">
                     <Button
                       dataCy="networkDetails-deleteNetwork"

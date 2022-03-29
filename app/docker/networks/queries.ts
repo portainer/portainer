@@ -11,3 +11,5 @@ export function useNetwork(networkId: NetworkId, environmentId: EnvironmentId) {
     () => getNetwork(networkId, environmentId)
   );
 }
+
+// useDeleteNetwork
