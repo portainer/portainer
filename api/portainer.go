@@ -312,6 +312,7 @@ type (
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
 		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
+		Gpus             []Pair           `json:"Gpus"`
 		TLSConfig        TLSConfiguration `json:"TLSConfig"`
 		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" example:""`
 		// List of tag identifiers to which this environment(endpoint) is associated
