@@ -34,7 +34,12 @@
           <!-- !registry-url-input -->
 
           <!-- authentication-checkbox -->
-          <div class="form-group" ng-if="registry.Type !== RegistryTypes.PROGET && registry.Type !== RegistryTypes.DOCKERHUB">
+          <div
+            class="form-group"
+            ng-if="
+              registry.Type !== RegistryTypes.DOCKERHUB && registry.Type !== RegistryTypes.QUAY && registry.Type !== RegistryTypes.PROGET && registry.Type !== RegistryTypes.AZURE
+            "
+          >
             <div class="col-sm-12">
               <label for="registry_auth" class="control-label text-left">
                 Authentication
