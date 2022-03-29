@@ -1,4 +1,4 @@
-<form class="form-horizontal" name="registryFormCustom" ng-submit="$ctrl.formAction()">
+<form class="form-horizontal" name="$ctrl.registryFormCustom" ng-submit="$ctrl.formAction()">
   <div class="col-sm-12 form-section-title"> Important notice </div>
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
@@ -14,10 +14,11 @@
       <input type="text" class="form-control" id="registry_name" name="registry_name" ng-model="$ctrl.model.Name" placeholder="my-custom-registry" required auto-focus />
     </div>
   </div>
-  <div class="form-group" ng-show="registryFormCustom.registry_name.$invalid">
+  <div class="form-group" ng-show="$ctrl.registryFormCustom.registry_name.$invalid">
     <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormCustom.registry_name.$error">
+      <div ng-messages="$ctrl.registryFormCustom.registry_name.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+        <p ng-message="used"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A registry with the same name already exists.</p>
       </div>
     </div>
   </div>
@@ -32,9 +33,9 @@
       <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="10.0.0.10:5000 or myregistry.domain.tld" required />
     </div>
   </div>
-  <div class="form-group" ng-show="registryFormCustom.registry_url.$invalid">
+  <div class="form-group" ng-show="$ctrl.registryFormCustom.registry_url.$invalid">
     <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormCustom.registry_url.$error">
+      <div ng-messages="$ctrl.registryFormCustom.registry_url.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
       </div>
     </div>
@@ -59,9 +60,9 @@
         <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
       </div>
     </div>
-    <div class="form-group" ng-show="registryFormCustom.registry_username.$invalid">
+    <div class="form-group" ng-show="$ctrl.registryFormCustom.registry_username.$invalid">
       <div class="col-sm-12 small text-warning">
-        <div ng-messages="registryFormCustom.registry_username.$error">
+        <div ng-messages="$ctrl.registryFormCustom.registry_username.$error">
           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
         </div>
       </div>
@@ -74,9 +75,9 @@
         <input type="password" class="form-control" id="registry_password" name="registry_password" ng-model="$ctrl.model.Password" required />
       </div>
     </div>
-    <div class="form-group" ng-show="registryFormCustom.registry_password.$invalid">
+    <div class="form-group" ng-show="$ctrl.registryFormCustom.registry_password.$invalid">
       <div class="col-sm-12 small text-warning">
-        <div ng-messages="registryFormCustom.registry_password.$error">
+        <div ng-messages="$ctrl.registryFormCustom.registry_password.$error">
           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
         </div>
       </div>
@@ -90,7 +91,7 @@
       <button
         type="submit"
         class="btn btn-primary btn-sm"
-        ng-disabled="$ctrl.actionInProgress || !registryFormCustom.$valid"
+        ng-disabled="$ctrl.actionInProgress || !$ctrl.registryFormCustom.$valid"
         button-spinner="$ctrl.actionInProgress"
         analytics-on
         analytics-category="portainer"
