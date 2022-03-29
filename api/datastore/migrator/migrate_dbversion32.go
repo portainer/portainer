@@ -2,7 +2,6 @@ package migrator
 
 import (
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
 )
 
 func (m *Migrator) migrateDBVersionToDB33() error {
@@ -10,7 +9,7 @@ func (m *Migrator) migrateDBVersionToDB33() error {
 		return err
 	}
 
-	return m.validateSettingsToDB33()
+	return nil
 }
 
 func (m *Migrator) migrateSettingsToDB33() error {
@@ -22,17 +21,4 @@ func (m *Migrator) migrateSettingsToDB33() error {
 	migrateLog.Info("Setting default kubectl shell image")
 	settings.KubectlShellImage = portainer.DefaultKubectlShellImage
 	return m.settingsService.UpdateSettings(settings)
-}
-
-func (m *Migrator) validateSettingsToDB33() error {
-	settings, err := m.settingsService.Settings()
-	if err != nil {
-		return err
-	}
-
-	if settings.KubectlShellImage != portainer.DefaultKubectlShellImage {
-		logrus.Errorf("settings KubectlShellImage is not same as portainer.DefaultKubectlShellImage")
-	}
-
-	return nil
 }

@@ -44,6 +44,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "updateRegistriesToDBVersion18")
 		}
+
+		migrateLog.Info("Successful migration to DB version 18")
 	}
 
 	// Portainer 1.22.0
@@ -52,6 +54,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "updateSettingsToDBVersion19")
 		}
+
+		migrateLog.Info("Successful migration to DB version 19")
 	}
 
 	// Portainer 1.22.1
@@ -70,6 +74,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "updateSchedulesToDBVersion20")
 		}
+
+		migrateLog.Info("Successful migration to DB version 20")
 	}
 
 	// Portainer 1.23.0
@@ -84,6 +90,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "updateUsersAndRolesToDBVersion22")
 		}
+
+		migrateLog.Info("Successful migration to DB version 22")
 	}
 
 	// Portainer 1.24.0
@@ -98,6 +106,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "updateEndpointsAndEndpointGroupsToDBVersion23")
 		}
+
+		migrateLog.Info("Successful migration to DB version 23")
 	}
 
 	// Portainer 1.24.1
@@ -107,6 +117,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "updateSettingsToDB24")
 		}
+
+		migrateLog.Info("Successful migration to DB version 24")
 	}
 
 	// Portainer 2.0.0
@@ -121,6 +133,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "updateStacksToDB24")
 		}
+
+		migrateLog.Info("Successful migration to DB version 25")
 	}
 
 	// Portainer 2.1.0
@@ -130,6 +144,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "updateEndpointSettingsToDB25")
 		}
+
+		migrateLog.Info("Successful migration to DB version 26")
 	}
 
 	// Portainer 2.2.0
@@ -139,6 +155,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "updateStackResourceControlToDB27")
 		}
+
+		migrateLog.Info("Successful migration to DB version 27")
 	}
 
 	// Portainer 2.6.0
@@ -148,6 +166,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "migrateDBVersionToDB30")
 		}
+
+		migrateLog.Info("Successful migration to DB version 30")
 	}
 
 	// Portainer 2.9.0
@@ -156,6 +176,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "migrateDBVersionToDB32")
 		}
+
+		migrateLog.Info("Successful migration to DB version 32")
 	}
 
 	// Portainer 2.9.1, 2.9.2
@@ -165,6 +187,8 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return migrationError(err, "migrateDBVersionToDB33")
 		}
+
+		migrateLog.Info("Successful migration to DB version 33")
 	}
 
 	// Portainer 2.10
@@ -173,6 +197,8 @@ func (m *Migrator) Migrate() error {
 		if err := m.migrateDBVersionToDB34(); err != nil {
 			return migrationError(err, "migrateDBVersionToDB34")
 		}
+
+		migrateLog.Info("Successful migration to DB version 34")
 	}
 
 	// Portainer 2.9.3 (yep out of order, but 2.10 is EE only)
@@ -181,6 +207,8 @@ func (m *Migrator) Migrate() error {
 		if err := m.migrateDBVersionToDB35(); err != nil {
 			return migrationError(err, "migrateDBVersionToDB35")
 		}
+
+		migrateLog.Info("Successful migration to DB version 35")
 	}
 
 	err = m.versionService.StoreDBVersion(portainer.DBVersion)

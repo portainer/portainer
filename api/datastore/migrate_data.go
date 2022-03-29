@@ -63,7 +63,13 @@ func (store *Store) MigrateData() error {
 		}
 		err := store.restoreWithOptions(&options)
 		if err != nil {
-			logrus.Fatalf("Failed restoring the backup. Error %s", err)
+			logrus.Fatalf(
+				"Failed restoring the backup. DB file needs to restored manualy by "+
+					"replacing %s DB file with recent backup %s. Error %v",
+				store.databasePath(),
+				options.BackupPath,
+				err,
+			)
 		}
 	}
 
