@@ -47,10 +47,14 @@ func (o *AdminMonitor) WasDisabled() bool {
 // Otherwise, it will pass through the request to next
 func (o *AdminMonitor) WithRedirect(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if o.WasDisabled() && strings.HasPrefix(r.RequestURI, "/api") && r.RequestURI != "/api/status" && r.RequestURI != "/api/settings/public" {
-			w.Header().Set("redirect-reason", RedirectReasonAdminInitTimeout)
-			httperror.WriteError(w, http.StatusTemporaryRedirect, "Administrator initialization timeout", nil)
-			return
+		if o.WasDisabled() {
+			if r.RequestURI == "/" {
+				http.Redirect(w, r, "/timeout.html", http.StatusTemporaryRedirect)
+			} else if strings.HasPrefix(r.RequestURI, "/api") && r.RequestURI != "/api/status" && r.RequestURI != "/api/settings/public" {
+				w.Header().Set("redirect-reason", RedirectReasonAdminInitTimeout)
+				httperror.WriteError(w, http.StatusSeeOther, "Administrator initialization timeout", nil)
+				return
+			}
 		}
 
 		next.ServeHTTP(w, r)

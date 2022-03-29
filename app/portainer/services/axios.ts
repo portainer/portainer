@@ -1,11 +1,7 @@
-import axiosOrigin, {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from 'axios';
+import axiosOrigin, { AxiosError, AxiosRequestConfig } from 'axios';
 import { loadProgressBar } from 'axios-progress-bar';
-import 'axios-progress-bar/dist/nprogress.css';
 
+import 'axios-progress-bar/dist/nprogress.css';
 import PortainerError from '@/portainer/error';
 import { get as localStorageGet } from '@/portainer/hooks/useLocalStorage';
 
@@ -50,26 +46,6 @@ export function agentInterceptor(config: AxiosRequestConfig) {
 }
 
 axios.interceptors.request.use(agentInterceptor);
-
-export function redirectInterceptor(error: AxiosError) {
-  const newError = {
-    headers: error.response?.headers || {},
-    status: error.response?.status || {},
-    ...error,
-  };
-  if (newError.status === 307 || newError.status === 308) {
-    const redirectReason = newError.headers['redirect-reason'];
-    if (redirectReason === 'AdminInitTimeout') {
-      window.location.href = '/#!/admin-timeout';
-    }
-  }
-  return Promise.reject(error);
-}
-
-axios.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  redirectInterceptor
-);
 
 export function parseAxiosError(
   err: Error,

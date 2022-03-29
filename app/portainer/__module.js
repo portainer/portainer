@@ -385,17 +385,6 @@ angular
         },
       };
 
-      var adminTimeout = {
-        name: 'portainer.admin-timeout',
-        url: '/admin-timeout',
-        views: {
-          'content@': {
-            component: 'adminTimeoutView',
-          },
-          'sidebar@': {},
-        },
-      };
-
       var registries = {
         name: 'portainer.registries',
         url: '/registries',
@@ -543,7 +532,6 @@ angular
       $stateRegistryProvider.register(wizardEndpoints);
       $stateRegistryProvider.register(initEndpoint);
       $stateRegistryProvider.register(initAdmin);
-      $stateRegistryProvider.register(adminTimeout);
       $stateRegistryProvider.register(registries);
       $stateRegistryProvider.register(registry);
       $stateRegistryProvider.register(registryCreation);
@@ -559,7 +547,7 @@ angular
   ]);
 
 function isTransitionRequiresAuthentication(transition) {
-  const UNAUTHENTICATED_ROUTES = ['portainer.logout', 'portainer.auth', 'portainer.admin-timeout'];
+  const UNAUTHENTICATED_ROUTES = ['portainer.logout', 'portainer.auth'];
   if (!transition) {
     return true;
   }
