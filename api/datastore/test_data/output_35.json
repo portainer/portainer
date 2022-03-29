@@ -37,6 +37,7 @@
       "ComposeSyntaxMaxVersion": "",
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
+      "Gpus": [],
       "GroupId": 1,
       "Id": 1,
       "IsEdgeDevice": false,
@@ -804,7 +805,7 @@
   ],
   "version": {
     "DB_UPDATING": "false",
-    "DB_VERSION": "35",
+    "DB_VERSION": "41",
     "INSTANCE_ID": "null"
   }
 }

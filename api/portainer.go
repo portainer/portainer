@@ -300,6 +300,7 @@ type (
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
 		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
+		Gpus             []Pair           `json:"Gpus"`
 		TLSConfig        TLSConfiguration `json:"TLSConfig"`
 		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" example:""`
 		// List of tag identifiers to which this environment(endpoint) is associated
@@ -1349,7 +1350,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.13.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 35
+	DBVersion = 41
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server

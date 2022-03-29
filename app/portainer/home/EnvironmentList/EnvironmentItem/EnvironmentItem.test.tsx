@@ -14,6 +14,7 @@ import { EnvironmentItem } from './EnvironmentItem';
 test('loads component', async () => {
   const env: Environment = {
     TagIds: [],
+    Gpus: [],
     GroupId: 1,
     Type: 1,
     Name: 'environment',
@@ -35,6 +36,7 @@ test('shows group name', async () => {
 
   const env: Environment = {
     TagIds: [],
+    Gpus: [],
     GroupId: groupId,
     Type: 1,
     Name: 'environment',
