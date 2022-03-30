@@ -2,13 +2,14 @@ package adminmonitor
 
 import (
 	"context"
+	"embed"
+	"io/fs"
 	"log"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
 
-	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 )
@@ -26,7 +27,8 @@ type Monitor struct {
 	adminInitDisabled bool
 }
 
-// New creates a monitor that when started will wait for the timeout duration and then sends the timeout signal to disable the application
+// New creates a monitor that when started will wait for an admin account being created for timeout duration
+// if and admin account would still be missing, it'll disable the http traffic handling
 func New(timeout time.Duration, datastore dataservices.DataStore, shutdownCtx context.Context) *Monitor {
 	return &Monitor{
 		timeout:           timeout,
@@ -98,16 +100,26 @@ func (m *Monitor) WasInstanceDisabled() bool {
 	return m.adminInitDisabled
 }
 
+//go:embed timeout
+var timeoutFiles embed.FS
+
 // WithRedirect checks whether administrator initialisation timeout. If so, it will return the error with redirect reason.
 // Otherwise, it will pass through the request to next
 func (m *Monitor) WithRedirect(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if m.WasInstanceDisabled() {
-			if strings.HasPrefix(r.RequestURI, "/api") && r.RequestURI != "/api/status" && r.RequestURI != "/api/settings/public" {
-				w.Header().Set("redirect-reason", RedirectReasonAdminInitTimeout)
-				httperror.WriteError(w, http.StatusSeeOther, "Administrator initialization timeout", nil)
+			if r.RequestURI == `/` || strings.HasPrefix(r.RequestURI, "/api") {
+				w.Header().Set("redirect-reason", `Administrator initialization timeout`)
+				http.Redirect(w, r, `/timeout.html`, http.StatusSeeOther)
 				return
 			}
+
+			files, err := fs.Sub(timeoutFiles, "timeout")
+			if err != nil {
+				log.Printf("Error %s\n", err)
+			}
+			http.FileServer(http.FS(files)).ServeHTTP(w, r)
+			return
 		}
 
 		next.ServeHTTP(w, r)
