@@ -1,5 +1,4 @@
 import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
-import DockerNetworkHelper from 'Docker/helpers/networkHelper';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
@@ -7,9 +6,8 @@ import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm
 import * as notifications from '@/portainer/services/notifications';
 // import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
 
-import { removeNetwork, isSystemNetwork } from '../network.service';
+import { removeNetwork } from '../network.service';
 import { useNetwork } from '../queries';
-import { IPConfigs } from '../types';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 
@@ -21,25 +19,7 @@ export function NetworkDetailsView() {
   } = useCurrentStateAndParams();
   const environmentId = useEnvironmentId();
 
-  const networkQuery = useNetwork(networkId, environmentId); // 1 object
-
-  const allowRemoveNetwork: boolean =
-    networkQuery.data && !isSystemNetwork(networkQuery.data.Name);
-  const IPV4Configs: IPConfigs =
-    networkQuery.data?.IPAM &&
-    DockerNetworkHelper.getIPV4Configs(networkQuery.data?.IPAM.Config);
-  const IPV6Configs: IPConfigs =
-    networkQuery.data?.IPAM &&
-    DockerNetworkHelper.getIPV6Configs(networkQuery.data?.IPAM.Config);
-
-  // if there's a network error, tell the user
-  if (networkQuery.isError) {
-    notifications.error(
-      'Failure',
-      networkQuery.error as Error,
-      'Unable to get network'
-    );
-  }
+  const networkQuery = useNetwork(environmentId, networkId);
 
   return (
     <>
@@ -54,10 +34,7 @@ export function NetworkDetailsView() {
         <>
           <NetworkDetailsTable
             network={networkQuery.data}
-            allowRemoveNetwork={allowRemoveNetwork}
             onRemoveNetworkClicked={onRemoveNetworkClicked}
-            IPV4Configs={IPV4Configs}
-            IPV6Configs={IPV6Configs}
           />
           {/* <AccessControlPanel
             resourceControl={}

@@ -1,5 +1,12 @@
 export type NetworkId = string;
 
+export type IPConfig = {
+  Subnet: string;
+  Gateway: string;
+  IPRange?: string;
+  AuxiliaryAddresses?: string[];
+};
+
 export interface DockerNetwork {
   Name: string;
   Id: string;
@@ -7,13 +14,7 @@ export interface DockerNetwork {
   Scope: string;
   Attachable: boolean;
   Internal: boolean;
+  IPAM?: {
+    Config: IPConfig[];
+  };
 }
-
-type IPConfig = {
-  Subnet: string;
-  Gateway: string;
-  IPRange: string;
-  AuxiliaryAddresses: string[];
-};
-
-export type IPConfigs = IPConfig[];

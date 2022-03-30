@@ -3,12 +3,6 @@ import { EnvironmentId } from '@/portainer/environments/types';
 
 import { NetworkId } from './types';
 
-const systemNetworks: string[] = ['host', 'bridge', 'none'];
-
-export function isSystemNetwork(networkName: string): boolean {
-  return systemNetworks.includes(networkName);
-}
-
 export async function getNetwork(
   networkId: NetworkId,
   environmentId: EnvironmentId
