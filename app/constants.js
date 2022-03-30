@@ -33,7 +33,6 @@ export const STACK_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
 export const TEMPLATE_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
 export const BROWSER_OS_PLATFORM = navigator.userAgent.indexOf('Windows NT') > -1 ? 'win' : 'lin';
 export const NEW_LINE_BREAKER = BROWSER_OS_PLATFORM === 'win' ? '\r\n' : '\n';
-export const REDIRECT_REASON_TIMEOUT = 'AdminInitTimeout';
 
 // don't declare new constants, either:
 // - if only used in one file or module, declare in that file or module (as a regular js constant)
@@ -67,5 +66,4 @@ angular
   .constant('PAGINATION_MAX_ITEMS', PAGINATION_MAX_ITEMS)
   .constant('APPLICATION_CACHE_VALIDITY', APPLICATION_CACHE_VALIDITY)
   .constant('CONSOLE_COMMANDS_LABEL_PREFIX', CONSOLE_COMMANDS_LABEL_PREFIX)
-  .constant('PREDEFINED_NETWORKS', PREDEFINED_NETWORKS)
-  .constant('REDIRECT_REASON_TIMEOUT', REDIRECT_REASON_TIMEOUT);
+  .constant('PREDEFINED_NETWORKS', PREDEFINED_NETWORKS);

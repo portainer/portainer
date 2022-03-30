@@ -9,8 +9,7 @@ angular.module('portainer.app').controller('InitAdminController', [
   'EndpointService',
   'BackupService',
   'StatusService',
-  'REDIRECT_REASON_TIMEOUT',
-  function ($scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, BackupService, StatusService, REDIRECT_REASON_TIMEOUT) {
+  function ($scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, BackupService, StatusService) {
     $scope.uploadBackup = uploadBackup;
 
     $scope.logo = StateManager.getState().application.logo;
@@ -72,6 +71,7 @@ angular.module('portainer.app').controller('InitAdminController', [
     function handleError(err) {
       if (err.status === 303) {
         const headers = err.headers();
+        const REDIRECT_REASON_TIMEOUT = 'AdminInitTimeout';
         if (headers && headers['redirect-reason'] === REDIRECT_REASON_TIMEOUT) {
           window.location.href = '/timeout.html';
         }
