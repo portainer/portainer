@@ -47,7 +47,7 @@ func Test_backupHandlerWithoutPassword_shouldCreateATarballArchive(t *testing.T)
 	w := httptest.NewRecorder()
 
 	gate := offlinegate.NewOfflineGate()
-	adminMonitor := adminmonitor.New(time.Hour, nil, nil, context.Background())
+	adminMonitor := adminmonitor.New(time.Hour, nil, context.Background())
 
 	handlerErr := NewHandler(nil, i.NewDatastore(), gate, "./test_assets/handler_test", func() {}, adminMonitor).backup(w, r)
 	assert.Nil(t, handlerErr, "Handler should not fail")
@@ -84,7 +84,7 @@ func Test_backupHandlerWithPassword_shouldCreateEncryptedATarballArchive(t *test
 	w := httptest.NewRecorder()
 
 	gate := offlinegate.NewOfflineGate()
-	adminMonitor := adminmonitor.New(time.Hour, nil, nil, nil)
+	adminMonitor := adminmonitor.New(time.Hour, nil, nil)
 
 	handlerErr := NewHandler(nil, i.NewDatastore(), gate, "./test_assets/handler_test", func() {}, adminMonitor).backup(w, r)
 	assert.Nil(t, handlerErr, "Handler should not fail")
