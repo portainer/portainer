@@ -3,10 +3,7 @@ import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
-// import * as notifications from '@/portainer/services/notifications';
-// import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
 
-// import { removeNetwork } from '../network.service';
 import { useNetwork, UseDeleteNetwork } from '../queries';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
@@ -60,6 +57,7 @@ export function NetworkDetailsView() {
     const message = 'Do you want to remove the network?';
     const confirm = await confirmDeletionAsync(message);
 
+    // if confirmed, delete the network by invoking the useDeleteNetwork (useMutate) hook
     if (confirm) {
       deleteNetworkQuery.mutate(environmentId, networkId);
     }

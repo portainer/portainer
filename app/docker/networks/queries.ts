@@ -11,7 +11,7 @@ import { NetworkId } from './types';
 
 export function useNetwork(environmentId: EnvironmentId, networkId: NetworkId) {
   return useQuery(
-    ['environmentId', environmentId, 'network', networkId],
+    ['environmentId', environmentId, 'docker', 'network', networkId],
     () => getNetwork(environmentId, networkId),
     {
       onError: (err) => {
@@ -22,7 +22,6 @@ export function useNetwork(environmentId: EnvironmentId, networkId: NetworkId) {
   );
 }
 
-// useDeleteNetwork
 export function UseDeleteNetwork(
   environmentId: EnvironmentId,
   networkId: NetworkId
@@ -35,6 +34,7 @@ export function UseDeleteNetwork(
       queryClient.invalidateQueries([
         'environmentId',
         environmentId,
+        'docker',
         'network',
       ]);
     },
