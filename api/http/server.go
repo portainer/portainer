@@ -51,7 +51,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
-	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/offlinegate"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
@@ -119,9 +118,7 @@ func (server *Server) Start() error {
 	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 	authHandler.OAuthService = server.OAuthService
 
-	initTimeoutSignal := make(chan interface{})
-	adminMonitorMiddleware := middlewares.NewAdminMonitor(initTimeoutSignal)
-	adminMonitor := adminmonitor.New(5*time.Minute, server.DataStore, initTimeoutSignal, server.ShutdownCtx)
+	adminMonitor := adminmonitor.New(5*time.Minute, server.DataStore, server.ShutdownCtx)
 	adminMonitor.Start()
 
 	var backupHandler = backup.NewHandler(requestBouncer, server.DataStore, offlineGate, server.FileService.GetDatastorePath(), server.ShutdownTrigger, adminMonitor)
@@ -179,7 +176,7 @@ func (server *Server) Start() error {
 
 	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.JWTService, server.KubeClusterAccessService, server.KubernetesClientFactory)
 
-	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
+	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"), adminMonitor.WasInstanceDisabled)
 
 	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeClusterAccessService)
 
@@ -303,7 +300,7 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
-	handler := adminMonitorMiddleware.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
+	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
 	if server.HTTPEnabled {
 		go func() {
 			log.Printf("[INFO] [http,server] [message: starting HTTP server on port %s]", server.BindAddress)
