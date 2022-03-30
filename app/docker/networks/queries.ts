@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery, useMutation } from 'react-query';
 
 import { EnvironmentId } from '@/portainer/environments/types';
 import {
@@ -11,7 +11,7 @@ import { NetworkId } from './types';
 
 export function useNetwork(environmentId: EnvironmentId, networkId: NetworkId) {
   return useQuery(
-    ['environmentId', environmentId, 'docker', 'network', networkId],
+    ['environments', environmentId, 'docker', 'networks', networkId],
     () => getNetwork(environmentId, networkId),
     {
       onError: (err) => {
@@ -22,24 +22,25 @@ export function useNetwork(environmentId: EnvironmentId, networkId: NetworkId) {
   );
 }
 
-export function UseDeleteNetwork(
+export function useDeleteNetwork(
   environmentId: EnvironmentId,
   networkId: NetworkId
 ) {
-  const queryClient = useQueryClient();
-
-  return useMutation(() => removeNetwork(environmentId, networkId), {
-    onSuccess: () => {
-      notifySuccess('Network successfully removed', networkId);
-      queryClient.invalidateQueries([
-        'environmentId',
-        environmentId,
-        'docker',
-        'network',
-      ]);
-    },
-    onError: (err) => {
-      notifyError('Failure', err as Error, 'Unable to remove network');
-    },
-  });
+  return useMutation(
+    ({
+      environmentId,
+      networkId,
+    }: {
+      environmentId: EnvironmentId;
+      networkId: NetworkId;
+    }) => removeNetwork(environmentId, networkId),
+    {
+      onSuccess: () => {
+        notifySuccess('Network successfully removed', networkId);
+      },
+      onError: (err) => {
+        notifyError('Failure', err as Error, 'Unable to remove network');
+      },
+    }
+  );
 }

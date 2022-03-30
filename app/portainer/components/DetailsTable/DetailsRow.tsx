@@ -5,7 +5,7 @@ interface Props {
   keyProp: string;
 }
 
-export function DetailsTableKeyValueRow({ keyProp, children }: Props) {
+export function DetailsRow({ keyProp, children }: Props) {
   return (
     <tr>
       <td>{keyProp}</td>

@@ -4,7 +4,7 @@ import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
-import { useNetwork, UseDeleteNetwork } from '../queries';
+import { useNetwork, useDeleteNetwork } from '../queries';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 
@@ -17,13 +17,7 @@ export function NetworkDetailsView() {
   const environmentId = useEnvironmentId();
 
   const networkQuery = useNetwork(environmentId, networkId);
-  const deleteNetworkQuery = UseDeleteNetwork(environmentId, networkId);
-
-  // if the network deletes, then take the user back to the list of networks
-  // this isn't in the onSuccess callback because navigation should be specific to the component
-  if (deleteNetworkQuery.isSuccess) {
-    router.stateService.go('docker.networks');
-  }
+  const deleteNetworkMutation = useDeleteNetwork(environmentId, networkId);
 
   return (
     <>
@@ -56,13 +50,19 @@ export function NetworkDetailsView() {
   );
 
   async function onRemoveNetworkClicked() {
-    // show a confirmation modal
     const message = 'Do you want to remove the network?';
-    const confirm = await confirmDeletionAsync(message);
+    const confirmed = await confirmDeletionAsync(message);
 
-    // if confirmed, delete the network by invoking the useDeleteNetwork (useMutate) hook
-    if (confirm) {
-      deleteNetworkQuery.mutate(environmentId, networkId);
+    if (confirmed) {
+      // networkQuery.
+      deleteNetworkMutation.mutate(
+        { environmentId, networkId },
+        {
+          onSuccess: () => {
+            router.stateService.go('docker.networks');
+          },
+        }
+      );
     }
   }
 }

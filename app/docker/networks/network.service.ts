@@ -9,7 +9,7 @@ export async function getNetwork(
 ) {
   try {
     const { data: network } = await axios.get<DockerNetwork>(
-      `${networksUrl(environmentId)}/${networkId}`
+      buildUrl(environmentId, networkId)
     );
     return network;
   } catch (e) {
@@ -22,12 +22,18 @@ export async function removeNetwork(
   networkId: NetworkId
 ) {
   try {
-    await axios.delete(`${networksUrl(environmentId)}/${networkId}`);
+    await axios.delete(buildUrl(environmentId, networkId));
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to remove network');
   }
 }
 
-function networksUrl(environmentId: number): string {
-  return `endpoints/${environmentId}/docker/networks`;
+function buildUrl(environmentId: EnvironmentId, networkId?: NetworkId) {
+  let url = `endpoints/${environmentId}/docker/networks`;
+
+  if (networkId) {
+    url += `/${networkId}`;
+  }
+
+  return url;
 }

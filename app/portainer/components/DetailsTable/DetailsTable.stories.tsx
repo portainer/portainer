@@ -1,23 +1,33 @@
 import { Meta, Story } from '@storybook/react';
 
-import { DetailsTable, Props } from './DetailsTable';
-import { DetailsTableKeyValueRow } from './DetailsTableKeyValueRow';
+import { DetailsTable } from './DetailsTable';
+import { DetailsRow } from './DetailsRow';
+
+type Args = {
+  key1: string;
+  val1: string;
+  key2: string;
+  val2: string;
+};
 
 export default {
   component: DetailsTable,
   title: 'Components/Tables/DetailsTable',
 } as Meta;
 
-function Template({ children }: Props) {
-  return <DetailsTable>{children}</DetailsTable>;
+function Template({ key1, val1, key2, val2 }: Args) {
+  return (
+    <DetailsTable>
+      <DetailsRow keyProp={key1}>{val1}</DetailsRow>
+      <DetailsRow keyProp={key2}>{val2}</DetailsRow>
+    </DetailsTable>
+  );
 }
 
-export const Default: Story<Props> = Template.bind({});
+export const Default: Story<Args> = Template.bind({});
 Default.args = {
-  children: (
-    <>
-      <DetailsTableKeyValueRow keyProp="Name">Bob</DetailsTableKeyValueRow>
-      <DetailsTableKeyValueRow keyProp="Id">dmsjs1532</DetailsTableKeyValueRow>
-    </>
-  ),
+  key1: 'Name',
+  val1: 'My Cool App',
+  key2: 'Id',
+  val2: 'dmsjs1532',
 };

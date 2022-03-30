@@ -1,6 +1,6 @@
 import { render } from '@/react-tools/test-utils';
 
-import { DetailsTable, DetailsTableKeyValueRow } from './index';
+import { DetailsTable, DetailsRow } from './index';
 
 // should display child row elements
 test('should display child row elements', () => {
@@ -11,12 +11,8 @@ test('should display child row elements', () => {
 
   const { queryByText } = render(
     <DetailsTable>
-      <DetailsTableKeyValueRow keyProp="Name">
-        {person.name}
-      </DetailsTableKeyValueRow>
-      <DetailsTableKeyValueRow keyProp="Id">
-        {person.id}
-      </DetailsTableKeyValueRow>
+      <DetailsRow keyProp="Name">{person.name}</DetailsRow>
+      <DetailsRow keyProp="Id">{person.id}</DetailsRow>
     </DetailsTable>
   );
 

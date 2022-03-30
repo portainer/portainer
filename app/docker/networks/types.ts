@@ -4,12 +4,12 @@ export type IPConfig = {
   Subnet: string;
   Gateway: string;
   IPRange?: string;
-  AuxiliaryAddresses?: string[];
+  AuxiliaryAddresses?: object;
 };
 
 export interface DockerNetwork {
   Name: string;
-  Id: string;
+  Id: NetworkId;
   Driver: string;
   Scope: string;
   Attachable: boolean;

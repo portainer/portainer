@@ -1,4 +1,4 @@
 import { DetailsTable } from './DetailsTable';
-import { DetailsTableKeyValueRow } from './DetailsTableKeyValueRow';
+import { DetailsRow } from './DetailsRow';
 
-export { DetailsTable, DetailsTableKeyValueRow };
+export { DetailsTable, DetailsRow };

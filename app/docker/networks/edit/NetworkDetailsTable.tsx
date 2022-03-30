@@ -2,10 +2,7 @@ import { Fragment } from 'react';
 import DockerNetworkHelper from 'Docker/helpers/networkHelper';
 
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
-import {
-  DetailsTable,
-  DetailsTableKeyValueRow,
-} from '@/portainer/components/DetailsTable';
+import { DetailsTable, DetailsRow } from '@/portainer/components/DetailsTable';
 import { Button } from '@/portainer/components/Button';
 import { Authorized } from '@/portainer/hooks/useUser';
 
@@ -17,37 +14,17 @@ interface Props {
   onRemoveNetworkClicked: () => void;
 }
 
-type NetworkKey =
-  | 'Name'
-  | 'Id'
-  | 'Scope'
-  | 'Driver'
-  | 'Attachable'
-  | 'Internal';
-
-type NetworkRowContent = [NetworkKey, string][];
-
-const filteredNetworkKeys: NetworkKey[] = [
-  'Name',
-  'Id',
-  'Driver',
-  'Scope',
-  'Attachable',
-  'Internal',
-];
-
 export function NetworkDetailsTable({
   network,
   onRemoveNetworkClicked,
 }: Props) {
-  const networkRowContent: NetworkRowContent = filteredNetworkKeys.map(
-    (key) => [key, String(network[key])]
-  );
   const allowRemoveNetwork = !isSystemNetwork(network.Name);
-  const IPV4Configs: IPConfig[] | undefined =
-    network.IPAM && DockerNetworkHelper.getIPV4Configs(network.IPAM.Config);
-  const IPV6Configs: IPConfig[] | undefined =
-    network.IPAM && DockerNetworkHelper.getIPV6Configs(network.IPAM.Config);
+  const IPV4Configs: IPConfig[] =
+    (network.IPAM && DockerNetworkHelper.getIPV4Configs(network.IPAM.Config)) ||
+    [];
+  const IPV6Configs: IPConfig[] =
+    (network.IPAM && DockerNetworkHelper.getIPV6Configs(network.IPAM.Config)) ||
+    [];
 
   return (
     <div className="col-lg-12 col-md-12 col-xs-12">
@@ -56,58 +33,51 @@ export function NetworkDetailsTable({
         <WidgetBody className="nopadding">
           <DetailsTable>
             {/* networkRowContent */}
-            {networkRowContent &&
-              networkRowContent?.map(([key, value]) => (
-                <DetailsTableKeyValueRow key={key} keyProp={key}>
-                  {key !== 'Id' && value}
-                  {key === 'Id' && (
-                    <>
-                      {value}
-                      {allowRemoveNetwork && (
-                        <Authorized authorizations="DockerNetworkDelete">
-                          <Button
-                            dataCy="networkDetails-deleteNetwork"
-                            size="xsmall"
-                            color="danger"
-                            onClick={() => onRemoveNetworkClicked()}
-                          >
-                            <i
-                              className="fa fa-trash-alt space-right"
-                              aria-hidden="true"
-                            />
-                            Delete this network
-                          </Button>
-                        </Authorized>
-                      )}
-                    </>
-                  )}
-                </DetailsTableKeyValueRow>
-              ))}
+            <DetailsRow keyProp="Name">{network.Name}</DetailsRow>
+            <DetailsRow keyProp="Id">
+              {network.Id}
+              {allowRemoveNetwork && (
+                <Authorized authorizations="DockerNetworkDelete">
+                  <Button
+                    dataCy="networkDetails-deleteNetwork"
+                    size="xsmall"
+                    color="danger"
+                    onClick={() => onRemoveNetworkClicked()}
+                  >
+                    <i
+                      className="fa fa-trash-alt space-right"
+                      aria-hidden="true"
+                    />
+                    Delete this network
+                  </Button>
+                </Authorized>
+              )}
+            </DetailsRow>
+            <DetailsRow keyProp="Driver">{network.Driver}</DetailsRow>
+            <DetailsRow keyProp="Scope">{network.Scope}</DetailsRow>
+            <DetailsRow keyProp="Attachable">
+              {String(network.Attachable)}
+            </DetailsRow>
+            <DetailsRow keyProp="Internal">
+              {String(network.Internal)}
+            </DetailsRow>
 
             {/* IPV4 ConfigRowContent */}
             {IPV4Configs &&
               IPV4Configs?.map((config) => (
                 <Fragment key={config.Subnet}>
-                  <DetailsTableKeyValueRow
-                    keyProp={`IPV4 Subnet${
-                      config.Subnet ? ` - ${config.Subnet}` : ''
-                    }`}
+                  <DetailsRow
+                    keyProp={`IPV4 Subnet${getConfigDetails(config.Subnet)}`}
                   >
-                    {`IPV4 Gateway${
-                      config.Gateway ? ` - ${config.Gateway}` : ''
-                    }`}
-                  </DetailsTableKeyValueRow>
-                  <DetailsTableKeyValueRow
-                    keyProp={`IPV4 IP Range${
-                      config.IPRange ? ` - ${config.IPRange}` : ''
-                    }`}
+                    {`IPV4 Gateway${getConfigDetails(config.Gateway)}`}
+                  </DetailsRow>
+                  <DetailsRow
+                    keyProp={`IPV4 IP Range${getConfigDetails(config.IPRange)}`}
                   >
-                    <div>{`IPV4 Excluded IPs `}</div>
-                    {config.AuxiliaryAddresses &&
-                      Object.values(config.AuxiliaryAddresses).map(
-                        (auxAddress) => <li key={auxAddress}>{auxAddress}</li>
-                      )}
-                  </DetailsTableKeyValueRow>
+                    {`IPV4 Excluded IPs - ${Object.values(
+                      config.AuxiliaryAddresses || []
+                    ).join(' - ')}`}
+                  </DetailsRow>
                 </Fragment>
               ))}
 
@@ -115,28 +85,18 @@ export function NetworkDetailsTable({
             {IPV6Configs &&
               IPV6Configs?.map((config) => (
                 <Fragment key={config.Subnet}>
-                  <DetailsTableKeyValueRow
-                    keyProp={`IPV6 Subnet${
-                      config.Subnet ? ` - ${config.Subnet}` : ''
-                    }`}
+                  <DetailsRow
+                    keyProp={`IPV6 Subnet${getConfigDetails(config.Subnet)}`}
                   >
-                    {`IPV6 Gateway${
-                      config.Gateway ? ` - ${config.Gateway}` : ''
-                    }`}
-                  </DetailsTableKeyValueRow>
-                  <DetailsTableKeyValueRow
-                    keyProp={`IPV6 IP Range${
-                      config.IPRange ? ` - ${config.IPRange}` : ''
-                    }`}
+                    {`IPV6 Gateway${getConfigDetails(config.Gateway)}`}
+                  </DetailsRow>
+                  <DetailsRow
+                    keyProp={`IPV6 IP Range${getConfigDetails(config.IPRange)}`}
                   >
-                    <div>{`IPV6 Excluded IPs `}</div>
-                    {config.AuxiliaryAddresses &&
-                      Object.values(config.AuxiliaryAddresses).map(
-                        (auxAddress) => (
-                          <li key={auxAddress}>{`- ${auxAddress}`}</li>
-                        )
-                      )}
-                  </DetailsTableKeyValueRow>
+                    {`IPV6 Excluded IPs - ${Object.values(
+                      config.AuxiliaryAddresses || []
+                    ).join(' - ')}`}
+                  </DetailsRow>
                 </Fragment>
               ))}
           </DetailsTable>
@@ -144,4 +104,8 @@ export function NetworkDetailsTable({
       </Widget>
     </div>
   );
+
+  function getConfigDetails(configValue: string | undefined) {
+    return configValue ? ` - ${configValue}` : '';
+  }
 }
