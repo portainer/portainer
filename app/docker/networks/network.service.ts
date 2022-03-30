@@ -1,14 +1,14 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/portainer/environments/types';
 
-import { NetworkId } from './types';
+import { NetworkId, DockerNetwork } from './types';
 
 export async function getNetwork(
   environmentId: EnvironmentId,
   networkId: NetworkId
 ) {
   try {
-    const { data: network } = await axios.get(
+    const { data: network } = await axios.get<DockerNetwork>(
       `${networksUrl(environmentId)}/${networkId}`
     );
     return network;

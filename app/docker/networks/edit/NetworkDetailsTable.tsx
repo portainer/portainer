@@ -102,11 +102,11 @@ export function NetworkDetailsTable({
                       config.IPRange ? ` - ${config.IPRange}` : ''
                     }`}
                   >
-                    {`IPV4 Excluded IPs `}
+                    <div>{`IPV4 Excluded IPs `}</div>
                     {config.AuxiliaryAddresses &&
-                      config.AuxiliaryAddresses.map((auxAddress) => (
-                        <span key={auxAddress}>{` - ${auxAddress}`}</span>
-                      ))}
+                      Object.values(config.AuxiliaryAddresses).map(
+                        (auxAddress) => <li key={auxAddress}>{auxAddress}</li>
+                      )}
                   </DetailsTableKeyValueRow>
                 </Fragment>
               ))}
@@ -129,11 +129,13 @@ export function NetworkDetailsTable({
                       config.IPRange ? ` - ${config.IPRange}` : ''
                     }`}
                   >
-                    {`IPV6 Excluded IPs `}
+                    <div>{`IPV6 Excluded IPs `}</div>
                     {config.AuxiliaryAddresses &&
-                      config.AuxiliaryAddresses.map((auxAddress) => (
-                        <span key={auxAddress}>{` - ${auxAddress}`}</span>
-                      ))}
+                      Object.values(config.AuxiliaryAddresses).map(
+                        (auxAddress) => (
+                          <li key={auxAddress}>{`- ${auxAddress}`}</li>
+                        )
+                      )}
                   </DetailsTableKeyValueRow>
                 </Fragment>
               ))}
