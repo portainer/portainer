@@ -74,6 +74,7 @@ export type Environment = {
   IsEdgeDevice?: boolean;
   UserTrusted: boolean;
   AMTDeviceGUID?: string;
+  Gpus: { name: string; value: string }[];
 };
 
 /**
