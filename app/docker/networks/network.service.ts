@@ -4,8 +4,8 @@ import { EnvironmentId } from '@/portainer/environments/types';
 import { NetworkId } from './types';
 
 export async function getNetwork(
-  networkId: NetworkId,
-  environmentId: EnvironmentId
+  environmentId: EnvironmentId,
+  networkId: NetworkId
 ) {
   try {
     const { data: network } = await axios.get(
@@ -18,8 +18,8 @@ export async function getNetwork(
 }
 
 export async function removeNetwork(
-  networkId: NetworkId,
-  environmentId: EnvironmentId
+  environmentId: EnvironmentId,
+  networkId: NetworkId
 ) {
   try {
     await axios.delete(`${networksUrl(environmentId)}/${networkId}`);

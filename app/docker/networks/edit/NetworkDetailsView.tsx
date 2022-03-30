@@ -3,11 +3,11 @@ import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
-import * as notifications from '@/portainer/services/notifications';
+// import * as notifications from '@/portainer/services/notifications';
 // import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
 
-import { removeNetwork } from '../network.service';
-import { useNetwork } from '../queries';
+// import { removeNetwork } from '../network.service';
+import { useNetwork, UseDeleteNetwork } from '../queries';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 
@@ -20,6 +20,13 @@ export function NetworkDetailsView() {
   const environmentId = useEnvironmentId();
 
   const networkQuery = useNetwork(environmentId, networkId);
+  const deleteNetworkQuery = UseDeleteNetwork(environmentId, networkId);
+
+  // if the network deletes, then take the user back to the list of networks
+  // this isn't in the onSuccess callback because navigation should be specific to the component
+  if (deleteNetworkQuery.isSuccess) {
+    router.stateService.go('docker.networks');
+  }
 
   return (
     <>
@@ -54,20 +61,7 @@ export function NetworkDetailsView() {
     const confirm = await confirmDeletionAsync(message);
 
     if (confirm) {
-      try {
-        await removeNetwork(networkId, environmentId);
-        notifications.success(
-          'Network successfully removed',
-          networkQuery.data.Name
-        );
-        router.stateService.go('docker.networks');
-      } catch (err) {
-        notifications.error(
-          'Failure',
-          err as Error,
-          'Unable to remove network'
-        );
-      }
+      deleteNetworkQuery.mutate(environmentId, networkId);
     }
   }
 }
