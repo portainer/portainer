@@ -395,6 +395,7 @@
                       class="btn btn-primary btn-sm"
                       ng-click="ctrl.markUnmarkAsSystem()"
                       button-spinner="ctrl.state.actionInProgress"
+                      data-cy="k8sNamespaceEdit-markSystem"
                     >
                       <span ng-if="ctrl.isSystem">Unmark as system</span>
                       <span ng-if="!ctrl.isSystem">Mark as system</span>
