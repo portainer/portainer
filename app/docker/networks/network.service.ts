@@ -1,7 +1,11 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/portainer/environments/types';
 
+import { ContainerId } from '../containers/types';
+
 import { NetworkId, DockerNetwork } from './types';
+
+type NetworkAction = 'connect' | 'disconnect' | 'create';
 
 export async function getNetwork(
   environmentId: EnvironmentId,
@@ -28,11 +32,37 @@ export async function removeNetwork(
   }
 }
 
-function buildUrl(environmentId: EnvironmentId, networkId?: NetworkId) {
+export async function disconnectContainer(
+  environmentId: EnvironmentId,
+  networkId: NetworkId,
+  containerId: ContainerId
+) {
+  try {
+    await axios.post(buildUrl(environmentId, networkId, 'disconnect'), {
+      Container: containerId,
+      Force: false,
+    });
+  } catch (e) {
+    throw parseAxiosError(
+      e as Error,
+      'Unable to disconnect container from network'
+    );
+  }
+}
+
+function buildUrl(
+  environmentId: EnvironmentId,
+  networkId?: NetworkId,
+  action?: NetworkAction
+) {
   let url = `endpoints/${environmentId}/docker/networks`;
 
   if (networkId) {
     url += `/${networkId}`;
+  }
+
+  if (action) {
+    url += `/${action}`;
   }
 
   return url;

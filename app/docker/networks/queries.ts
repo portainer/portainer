@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 
 import { EnvironmentId } from '@/portainer/environments/types';
 import {
@@ -6,7 +6,13 @@ import {
   success as notifySuccess,
 } from '@/portainer/services/notifications';
 
-import { getNetwork, removeNetwork } from './network.service';
+import { ContainerId } from '../containers/types';
+
+import {
+  getNetwork,
+  removeNetwork,
+  disconnectContainer,
+} from './network.service';
 import { NetworkId } from './types';
 
 export function useNetwork(environmentId: EnvironmentId, networkId: NetworkId) {
@@ -40,6 +46,37 @@ export function useDeleteNetwork(
       },
       onError: (err) => {
         notifyError('Failure', err as Error, 'Unable to remove network');
+      },
+    }
+  );
+}
+
+export function useDisconnectContainer(
+  environmentId: EnvironmentId,
+  networkId: NetworkId
+) {
+  const client = useQueryClient();
+
+  return useMutation(
+    ({ containerId }: { containerId: ContainerId }) =>
+      disconnectContainer(environmentId, networkId, containerId),
+    {
+      onSuccess: () => {
+        notifySuccess('Container successfully disconnected', networkId);
+        return client.invalidateQueries([
+          'environments',
+          environmentId,
+          'docker',
+          'networks',
+          networkId,
+        ]);
+      },
+      onError: (err) => {
+        notifyError(
+          'Failure',
+          err as Error,
+          'Unable to disconnect container from network'
+        );
       },
     }
   );

@@ -1,8 +1,21 @@
 import { PropsWithChildren } from 'react';
 
-export function DetailsTable({ children }: PropsWithChildren<unknown>) {
+type Props = {
+  headers?: string[];
+};
+
+export function DetailsTable({ headers, children }: PropsWithChildren<Props>) {
   return (
     <table className="table">
+      {headers && headers.length > 0 && (
+        <thead>
+          <tr>
+            {headers.map((header) => (
+              <th key={header}>{header}</th>
+            ))}
+          </tr>
+        </thead>
+      )}
       <tbody>{children}</tbody>
     </table>
   );
