@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import DockerNetworkHelper from 'Docker/helpers/networkHelper';
 
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
-import { DetailsTable, DetailsRow } from '@/portainer/components/DetailsTable';
+import { DetailsTable } from '@/portainer/components/DetailsTable';
 import { Button } from '@/portainer/components/Button';
 import { Authorized } from '@/portainer/hooks/useUser';
 
@@ -33,8 +33,8 @@ export function NetworkDetailsTable({
         <WidgetBody className="nopadding">
           <DetailsTable>
             {/* networkRowContent */}
-            <DetailsRow keyProp="Name">{network.Name}</DetailsRow>
-            <DetailsRow keyProp="Id">
+            <DetailsTable.Row label="Name">{network.Name}</DetailsTable.Row>
+            <DetailsTable.Row label="Id">
               {network.Id}
               {allowRemoveNetwork && (
                 <Authorized authorizations="DockerNetworkDelete">
@@ -52,32 +52,32 @@ export function NetworkDetailsTable({
                   </Button>
                 </Authorized>
               )}
-            </DetailsRow>
-            <DetailsRow keyProp="Driver">{network.Driver}</DetailsRow>
-            <DetailsRow keyProp="Scope">{network.Scope}</DetailsRow>
-            <DetailsRow keyProp="Attachable">
+            </DetailsTable.Row>
+            <DetailsTable.Row label="Driver">{network.Driver}</DetailsTable.Row>
+            <DetailsTable.Row label="Scope">{network.Scope}</DetailsTable.Row>
+            <DetailsTable.Row label="Attachable">
               {String(network.Attachable)}
-            </DetailsRow>
-            <DetailsRow keyProp="Internal">
+            </DetailsTable.Row>
+            <DetailsTable.Row label="Internal">
               {String(network.Internal)}
-            </DetailsRow>
+            </DetailsTable.Row>
 
             {/* IPV4 ConfigRowContent */}
             {IPV4Configs &&
               IPV4Configs?.map((config) => (
                 <Fragment key={config.Subnet}>
-                  <DetailsRow
-                    keyProp={`IPV4 Subnet${getConfigDetails(config.Subnet)}`}
+                  <DetailsTable.Row
+                    label={`IPV4 Subnet${getConfigDetails(config.Subnet)}`}
                   >
                     {`IPV4 Gateway${getConfigDetails(config.Gateway)}`}
-                  </DetailsRow>
-                  <DetailsRow
-                    keyProp={`IPV4 IP Range${getConfigDetails(config.IPRange)}`}
+                  </DetailsTable.Row>
+                  <DetailsTable.Row
+                    label={`IPV4 IP Range${getConfigDetails(config.IPRange)}`}
                   >
                     {`IPV4 Excluded IPs - ${Object.values(
                       config.AuxiliaryAddresses || []
                     ).join(' - ')}`}
-                  </DetailsRow>
+                  </DetailsTable.Row>
                 </Fragment>
               ))}
 
@@ -85,18 +85,18 @@ export function NetworkDetailsTable({
             {IPV6Configs &&
               IPV6Configs?.map((config) => (
                 <Fragment key={config.Subnet}>
-                  <DetailsRow
-                    keyProp={`IPV6 Subnet${getConfigDetails(config.Subnet)}`}
+                  <DetailsTable.Row
+                    label={`IPV6 Subnet${getConfigDetails(config.Subnet)}`}
                   >
                     {`IPV6 Gateway${getConfigDetails(config.Gateway)}`}
-                  </DetailsRow>
-                  <DetailsRow
-                    keyProp={`IPV6 IP Range${getConfigDetails(config.IPRange)}`}
+                  </DetailsTable.Row>
+                  <DetailsTable.Row
+                    label={`IPV6 IP Range${getConfigDetails(config.IPRange)}`}
                   >
                     {`IPV6 Excluded IPs - ${Object.values(
                       config.AuxiliaryAddresses || []
                     ).join(' - ')}`}
-                  </DetailsRow>
+                  </DetailsTable.Row>
                 </Fragment>
               ))}
           </DetailsTable>

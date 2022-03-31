@@ -1,10 +1,6 @@
-import { ReactNode } from 'react';
+import { PropsWithChildren } from 'react';
 
-export interface Props {
-  children: ReactNode;
-}
-
-export function DetailsTable({ children }: Props) {
+export function DetailsTable({ children }: PropsWithChildren<unknown>) {
   return (
     <table className="table">
       <tbody>{children}</tbody>

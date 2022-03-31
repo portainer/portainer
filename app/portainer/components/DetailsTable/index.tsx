@@ -1,4 +1,13 @@
-import { DetailsTable } from './DetailsTable';
+import { DetailsTable as MainComponent } from './DetailsTable';
 import { DetailsRow } from './DetailsRow';
 
-export { DetailsTable, DetailsRow };
+interface DetailsTableSubcomponents {
+  Row: typeof DetailsRow;
+}
+
+const DetailsTable = MainComponent as typeof MainComponent &
+  DetailsTableSubcomponents;
+
+DetailsTable.Row = DetailsRow;
+
+export { DetailsTable };

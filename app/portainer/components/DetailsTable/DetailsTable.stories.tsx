@@ -18,8 +18,8 @@ export default {
 function Template({ key1, val1, key2, val2 }: Args) {
   return (
     <DetailsTable>
-      <DetailsRow keyProp={key1}>{val1}</DetailsRow>
-      <DetailsRow keyProp={key2}>{val2}</DetailsRow>
+      <DetailsRow label={key1}>{val1}</DetailsRow>
+      <DetailsRow label={key2}>{val2}</DetailsRow>
     </DetailsTable>
   );
 }

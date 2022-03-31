@@ -2,14 +2,14 @@ import { ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
-  keyProp: string;
+  label: string;
 }
 
-export function DetailsRow({ keyProp, children }: Props) {
+export function DetailsRow({ label, children }: Props) {
   return (
     <tr>
-      <td>{keyProp}</td>
-      {children && <td data-cy={`detailsTable-${keyProp}Value`}>{children}</td>}
+      <td>{label}</td>
+      {children && <td data-cy={`detailsTable-${label}Value`}>{children}</td>}
     </tr>
   );
 }
