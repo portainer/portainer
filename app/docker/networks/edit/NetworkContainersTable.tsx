@@ -1,10 +1,9 @@
-import { useSref } from '@uirouter/react';
-
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { DetailsTable } from '@/portainer/components/DetailsTable';
 import { Button } from '@/portainer/components/Button';
 import { Authorized } from '@/portainer/hooks/useUser';
 import { EnvironmentId } from '@/portainer/environments/types';
+import { Link } from '@/portainer/components/Link';
 
 import { NetworkContainers, NetworkId } from '../types';
 import { useDisconnectContainer } from '../queries';
@@ -41,11 +40,16 @@ export function NetworkContainersTable({
               {Object.entries(containers).map(([containerId, container]) => (
                 <tr key={containerId}>
                   <td>
-                    <ContainerLink
-                      containerName={container.Name}
-                      containerId={containerId}
-                      nodeName={nodeName}
-                    />
+                    <Link
+                      to="docker.containers.container"
+                      params={{
+                        id: containerId,
+                        nodeName,
+                      }}
+                      title="Logs"
+                    >
+                      {container.Name}
+                    </Link>
                   </td>
                   <td>{container.IPv4Address || '-'}</td>
                   <td>{container.IPv6Address || '-'}</td>
@@ -75,25 +79,5 @@ export function NetworkContainersTable({
         </Widget>
       </div>
     </div>
-  );
-}
-
-function ContainerLink({
-  containerName,
-  containerId,
-  nodeName,
-}: {
-  containerName: string;
-  containerId: string;
-  nodeName: string;
-}) {
-  const linkProps = useSref('docker.containers.container', {
-    id: containerId,
-    nodeName,
-  });
-  return (
-    <a href={linkProps.href} onClick={linkProps.onClick}>
-      {containerName}
-    </a>
   );
 }
