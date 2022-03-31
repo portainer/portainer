@@ -24,7 +24,7 @@ export function NetworkDetailsView() {
   const environmentId = useEnvironmentId();
 
   const networkQuery = useNetwork(environmentId, networkId);
-  const deleteNetworkMutation = useDeleteNetwork(environmentId, networkId);
+  const deleteNetworkMutation = useDeleteNetwork();
 
   return (
     <>
@@ -83,7 +83,6 @@ export function NetworkDetailsView() {
     const confirmed = await confirmDeletionAsync(message);
 
     if (confirmed) {
-      // networkQuery.
       deleteNetworkMutation.mutate(
         { environmentId, networkId },
         {

@@ -10,7 +10,7 @@ import { ContainerId } from '../containers/types';
 
 import {
   getNetwork,
-  removeNetwork,
+  deleteNetwork,
   disconnectContainer,
 } from './network.service';
 import { NetworkId } from './types';
@@ -21,17 +21,13 @@ export function useNetwork(environmentId: EnvironmentId, networkId: NetworkId) {
     () => getNetwork(environmentId, networkId),
     {
       onError: (err) => {
-        // if there's an error fetching the network, tell the user
         notifyError('Failure', err as Error, 'Unable to get network');
       },
     }
   );
 }
 
-export function useDeleteNetwork(
-  environmentId: EnvironmentId,
-  networkId: NetworkId
-) {
+export function useDeleteNetwork() {
   return useMutation(
     ({
       environmentId,
@@ -39,9 +35,9 @@ export function useDeleteNetwork(
     }: {
       environmentId: EnvironmentId;
       networkId: NetworkId;
-    }) => removeNetwork(environmentId, networkId),
+    }) => deleteNetwork(environmentId, networkId),
     {
-      onSuccess: () => {
+      onSuccess: (networkId) => {
         notifySuccess('Network successfully removed', networkId);
       },
       onError: (err) => {

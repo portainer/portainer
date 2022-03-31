@@ -21,12 +21,13 @@ export async function getNetwork(
   }
 }
 
-export async function removeNetwork(
+export async function deleteNetwork(
   environmentId: EnvironmentId,
   networkId: NetworkId
 ) {
   try {
     await axios.delete(buildUrl(environmentId, networkId));
+    return networkId;
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to remove network');
   }

@@ -19,12 +19,12 @@ export function NetworkDetailsTable({
   onRemoveNetworkClicked,
 }: Props) {
   const allowRemoveNetwork = !isSystemNetwork(network.Name);
-  const IPV4Configs: IPConfig[] =
-    (network.IPAM && DockerNetworkHelper.getIPV4Configs(network.IPAM.Config)) ||
-    [];
-  const IPV6Configs: IPConfig[] =
-    (network.IPAM && DockerNetworkHelper.getIPV6Configs(network.IPAM.Config)) ||
-    [];
+  const IPV4Configs: IPConfig[] = DockerNetworkHelper.getIPV4Configs(
+    network.IPAM?.Config
+  );
+  const IPV6Configs: IPConfig[] = DockerNetworkHelper.getIPV6Configs(
+    network.IPAM?.Config
+  );
 
   return (
     <div className="row">
@@ -109,11 +109,11 @@ export function NetworkDetailsTable({
     </div>
   );
 
-  function getConfigDetails(configValue: string | undefined) {
+  function getConfigDetails(configValue?: string) {
     return configValue ? ` - ${configValue}` : '';
   }
 
-  function getAuxiliaryAddresses(auxiliaryAddresses: object | undefined) {
+  function getAuxiliaryAddresses(auxiliaryAddresses?: object) {
     return auxiliaryAddresses
       ? ` - ${Object.values(auxiliaryAddresses).join(' - ')}`
       : '';
