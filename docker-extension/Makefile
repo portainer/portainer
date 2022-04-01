@@ -3,7 +3,7 @@
 all: clean build install
 
 ORG=portainer
-VERSION=2.11.4
+VERSION=2.11.8
 IMAGE_NAME=$(ORG)/portainer-extension
 TAGGED_IMAGE_NAME=$(IMAGE_NAME):$(VERSION)
 

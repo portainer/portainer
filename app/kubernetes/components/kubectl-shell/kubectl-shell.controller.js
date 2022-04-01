@@ -100,7 +100,6 @@ export default class KubectlShellController {
       .join('&');
 
     const url = `${wsProtocol}${base}?${queryParams}`;
-
     Terminal.applyAddon(fit);
     this.state.shell.socket = new WebSocket(url);
     this.state.shell.term = new Terminal();
