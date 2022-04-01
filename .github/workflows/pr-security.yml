@@ -1,7 +1,4 @@
-on:
-  pull_request:
-    branches: [develop, release/**]
-  workflow_dispatch:
+on: push
 
 jobs:
   client-dependencies:
