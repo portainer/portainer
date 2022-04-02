@@ -2,8 +2,8 @@ import axiosOrigin, { AxiosError, AxiosRequestConfig } from 'axios';
 import { loadProgressBar } from 'axios-progress-bar';
 import 'axios-progress-bar/dist/nprogress.css';
 
-import PortainerError from '../error';
-import { get as localStorageGet } from '../hooks/useLocalStorage';
+import PortainerError from '@/portainer/error';
+import { get as localStorageGet } from '@/portainer/hooks/useLocalStorage';
 
 import {
   portainerAgentManagerOperation,

@@ -1,3 +1,4 @@
+import { ResourceControlType } from '@/portainer/access-control/types';
 import DockerNetworkHelper from 'Docker/helpers/networkHelper';
 
 angular.module('portainer.docker').controller('NetworkController', [
@@ -11,6 +12,12 @@ angular.module('portainer.docker').controller('NetworkController', [
   'HttpRequestHelper',
   'NetworkHelper',
   function ($scope, $state, $transition$, $filter, NetworkService, Container, Notifications, HttpRequestHelper, NetworkHelper) {
+    $scope.resourceType = ResourceControlType.Network;
+
+    $scope.onUpdateResourceControlSuccess = function () {
+      $state.reload();
+    };
+
     $scope.removeNetwork = function removeNetwork() {
       NetworkService.remove($transition$.params().id, $transition$.params().id)
         .then(function success() {

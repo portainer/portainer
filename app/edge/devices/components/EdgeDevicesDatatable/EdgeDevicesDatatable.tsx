@@ -8,6 +8,7 @@ import {
   usePagination,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
+import _ from 'lodash';
 
 import { Environment } from '@/portainer/environments/types';
 import { PaginationControls } from '@/portainer/components/pagination-controls';
@@ -27,7 +28,7 @@ import { ColumnVisibilityMenu } from '@/portainer/components/datatables/componen
 import { useRepeater } from '@/portainer/components/datatables/components/useRepeater';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
-  useSearchBarContext,
+  useSearchBarState,
   SearchBar,
 } from '@/portainer/components/datatables/components/SearchBar';
 import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
@@ -38,34 +39,39 @@ import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevi
 import { EdgeDevicesDatatableActions } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions';
 import { AMTDevicesDatatable } from '@/edge/devices/components/AMTDevicesDatatable/AMTDevicesDatatable';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
+import { EnvironmentGroup } from '@/portainer/environment-groups/types';
 
 import { RowProvider } from './columns/RowContext';
 import { useColumns } from './columns';
 import styles from './EdgeDevicesDatatable.module.css';
 
 export interface EdgeDevicesTableProps {
+  storageKey: string;
   isEnabled: boolean;
   isFdoEnabled: boolean;
   isOpenAmtEnabled: boolean;
   disableTrustOnFirstConnect: boolean;
   mpsServer: string;
   dataset: Environment[];
+  groups: EnvironmentGroup[];
   onRefresh(): Promise<void>;
   setLoadingMessage(message: string): void;
 }
 
 export function EdgeDevicesDatatable({
+  storageKey,
   isFdoEnabled,
   isOpenAmtEnabled,
   disableTrustOnFirstConnect,
   mpsServer,
   dataset,
+  groups,
   onRefresh,
   setLoadingMessage,
 }: EdgeDevicesTableProps) {
   const { settings, setTableSettings } =
     useTableSettings<EdgeDeviceTableSettings>();
-  const [searchBarValue, setSearchBarValue] = useSearchBarContext();
+  const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
 
   const columns = useColumns();
 
@@ -101,6 +107,9 @@ export function EdgeDevicesDatatable({
       },
       autoResetExpanded: false,
       autoResetSelectedRows: false,
+      getRowId(originalRow: Environment) {
+        return originalRow.Id.toString();
+      },
       selectColumnWidth: 5,
     },
     useFilters,
@@ -130,6 +139,8 @@ export function EdgeDevicesDatatable({
     (environment) =>
       environment.AMTDeviceGUID && environment.AMTDeviceGUID !== ''
   );
+
+  const groupsById = _.groupBy(groups, 'Id');
 
   return (
     <TableContainer>
@@ -201,12 +212,13 @@ export function EdgeDevicesDatatable({
           {page.map((row) => {
             prepareRow(row);
             const { key, className, role, style } = row.getRowProps();
-
+            const group = groupsById[row.original.GroupId];
             return (
               <RowProvider
                 key={key}
                 disableTrustOnFirstConnect={disableTrustOnFirstConnect}
                 isOpenAmtEnabled={isOpenAmtEnabled}
+                groupName={group[0]?.Name}
               >
                 <TableRow<Environment>
                   cells={row.cells}

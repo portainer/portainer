@@ -34,7 +34,6 @@ class StackRedeployGitFormController {
         RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
         RepositoryFetchInterval: '5m',
         RepositoryWebhookURL: '',
-        ShowForcePullImage: false,
       },
     };
 
@@ -96,13 +95,13 @@ class StackRedeployGitFormController {
       '<be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div></div>';
     const template = angular.element(tplCrop);
     const html = this.$compile(template)(this.$scope);
-    this.ModalService.confirmStackUpdate(html, true, true, 'btn-warning', function (result) {
+    this.ModalService.confirmStackUpdate(html, true, true, 'btn-warning', async (result) => {
       if (!result) {
         return;
       }
       try {
         this.state.redeployInProgress = true;
-        this.StackService.updateGit(this.stack.Id, this.stack.EndpointId, this.FormHelper.removeInvalidEnvVars(this.formValues.Env), false, this.formValues);
+        await this.StackService.updateGit(this.stack.Id, this.stack.EndpointId, this.FormHelper.removeInvalidEnvVars(this.formValues.Env), false, this.formValues);
         this.Notifications.success('Pulled and redeployed stack successfully');
         this.$state.reload();
       } catch (err) {
@@ -149,10 +148,10 @@ class StackRedeployGitFormController {
   $onInit() {
     this.formValues.RefName = this.model.ReferenceName;
     this.formValues.Env = this.stack.Env;
+
     // Init auto update
     if (this.stack.AutoUpdate && (this.stack.AutoUpdate.Interval || this.stack.AutoUpdate.Webhook)) {
       this.formValues.AutoUpdate.RepositoryAutomaticUpdates = true;
-      this.formValues.AutoUpdate.ShowForcePullImage = this.stack.Type !== 3;
 
       if (this.stack.AutoUpdate.Interval) {
         this.formValues.AutoUpdate.RepositoryMechanism = RepositoryMechanismTypes.INTERVAL;

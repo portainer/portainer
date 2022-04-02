@@ -198,7 +198,14 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel ng-if="service" resource-id="service.Id" resource-control="service.ResourceControl" resource-type="'service'"> </por-access-control-panel>
+<access-control-panel
+  ng-if="service"
+  resource-id="service.Id"
+  resource-control="service.ResourceControl"
+  resource-type="resourceType"
+  on-update-success="(onUpdateResourceControlSuccess)"
+>
+</access-control-panel>
 <!-- !access-control-panel -->
 
 <div class="row">
