@@ -40,6 +40,8 @@ export interface DockerSnapshot {
   ServiceCount: number;
   Swarm: boolean;
   DockerVersion: string;
+  GpuUseAll: boolean;
+  GpuUseList: string[];
 }
 
 export interface KubernetesSnapshot {
