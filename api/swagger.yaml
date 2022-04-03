@@ -693,6 +693,12 @@ definitions:
         $ref: '#/definitions/portainer.DockerSnapshotRaw'
       DockerVersion:
         type: string
+      GpuUseAll:
+        type: boolean
+      GpuUseList:
+        items:
+          type: string
+        type: array
       HealthyContainerCount:
         type: integer
       ImageCount:

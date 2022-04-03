@@ -175,6 +175,8 @@
             }
           },
           "DockerVersion": "20.10.13",
+          "GpuUseAll": false,
+          "GpuUseList": null,
           "HealthyContainerCount": 0,
           "ImageCount": 9,
           "NodeCount": 0,

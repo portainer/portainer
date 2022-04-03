@@ -199,6 +199,8 @@ type (
 		StackCount              int               `json:"StackCount"`
 		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
 		NodeCount               int               `json:"NodeCount"`
+		GpuUseAll               bool              `json:"GpuUseAll"`
+		GpuUseList              []string          `json:"GpuUseList"`
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
