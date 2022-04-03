@@ -701,10 +701,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         .then(function success(networks) {
           networks.push({ Name: 'container' });
           $scope.availableNetworks = networks.sort((a, b) => a.Name.localeCompare(b.Name));
-          console.log($scope.availableNetworks);
-          if (_.find(networks, { Name: 'nat' })) {
-            $scope.config.HostConfig.NetworkMode = 'nat';
-          }
+          $scope.config.HostConfig.NetworkMode = _.find(networks, { Name: 'nat' }) ? 'nat' : $scope.availableNetworks[0].Name;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve networks');
