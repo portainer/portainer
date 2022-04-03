@@ -8,7 +8,7 @@ import { networksModule } from './networks';
 angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule, networksModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
-    ('use strict');
+    'use strict';
 
     var docker = {
       name: 'docker',
