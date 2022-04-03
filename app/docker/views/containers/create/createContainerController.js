@@ -760,6 +760,26 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       });
     }
 
+    $scope.getGpusInfo = function() {
+      var gpusInfo = new Array();
+      var selectedGPUs = _.map($scope.formValues.GPU.selectedGPUs, 'key');
+      var gpuUseSet = new Set($scope.gpuUseList);
+      var mark = '';
+      for(let gpu of endpoint.Gpus){
+        if(selectedGPUs.includes(gpu.name)){
+          continue;
+        }
+        else if($scope.gpuUseAll === true || gpuUseSet.has(gpu.name)){
+          mark = '<i class="fa fa-ban space-right red-icon"></i>';
+        }          
+        else {
+          mark = '<i class="fa fa-check space-right green-icon"></i>';
+        }
+        gpusInfo.push({'name':gpu.name,'value':gpu.value,'mark':mark});
+      }
+      return gpusInfo;
+    }
+
     async function initView() {
       var nodeName = $transition$.params().nodeName;
       $scope.formValues.NodeName = nodeName;
@@ -803,6 +823,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         function (d) {
           var containers = d;
           $scope.runningContainers = containers;
+          $scope.gpuUseAll = $scope.endpoint.Snapshots[0].GpuUseAll;
+          $scope.gpuUseList = $scope.endpoint.Snapshots[0].GpuUseList;
           if ($transition$.params().from) {
             loadFromContainerSpec();
           } else {
