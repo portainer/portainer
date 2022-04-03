@@ -86,15 +86,37 @@ export async function removeContainer(
   }
 }
 
+export async function queryContainers(
+  endpointId: EnvironmentId,
+  filters?: object
+) {
+  try {
+    const { data } = await axios.get<DockerContainer[]>(
+      urlBuilder(endpointId, '', 'json'),
+      {
+        params: { all: 0, filters },
+      }
+    );
+
+    return data;
+  } catch (e) {
+    throw new PortainerError('Unable to retrieve containers', e as Error);
+  }
+}
+
 function urlBuilder(
   endpointId: EnvironmentId,
-  id: ContainerId,
+  id?: ContainerId,
   action?: string
 ) {
-  const url = `/endpoints/${endpointId}/docker/containers/${id}`;
+  let url = `/endpoints/${endpointId}/docker/containers`;
+
+  if (id) {
+    url += `/${id}`;
+  }
 
   if (action) {
-    return `${url}/${action}`;
+    url += `/${action}`;
   }
 
   return url;

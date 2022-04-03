@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
 import { useQueryClient } from 'react-query';
 
@@ -6,9 +7,12 @@ import { PageHeader } from '@/portainer/components/PageHeader';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
 import { ResourceControlType } from '@/portainer/access-control/types';
+import { DockerContainer } from '@/docker/containers/types';
 
 import { useNetwork, useDeleteNetwork } from '../queries';
 import { isSystemNetwork } from '../network.helper';
+import { useContainers } from '../../containers/queries';
+import { DockerNetwork, NetworkContainer } from '../types';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 import { NetworkOptionsTable } from './NetworkOptionsTable';
@@ -18,6 +22,9 @@ export function NetworkDetailsView() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  const [filteredNetworkContainers, setFilteredNetworkContainers] = useState(
+    [] as NetworkContainer[]
+  );
   const {
     params: { id: networkId, nodeName },
   } = useCurrentStateAndParams();
@@ -25,6 +32,18 @@ export function NetworkDetailsView() {
 
   const networkQuery = useNetwork(environmentId, networkId);
   const deleteNetworkMutation = useDeleteNetwork();
+  const filters = {
+    network: [networkId],
+  };
+  const containersQuery = useContainers(environmentId, filters);
+
+  useEffect(() => {
+    if (networkQuery.data && containersQuery.data) {
+      setFilteredNetworkContainers(
+        filterContainersInNetwork(networkQuery.data, containersQuery.data)
+      );
+    }
+  }, [networkQuery.data, containersQuery.data]);
 
   return (
     <>
@@ -55,7 +74,7 @@ export function NetworkDetailsView() {
                 networkId,
               ])
             }
-            resourceControl={networkQuery.data.Portainer.ResourceControl}
+            resourceControl={networkQuery.data.Portainer?.ResourceControl}
             resourceType={ResourceControlType.Network}
             disableOwnershipChange={isSystemNetwork(networkQuery.data.Name)}
             resourceId={networkId}
@@ -66,20 +85,19 @@ export function NetworkDetailsView() {
         Object.keys(networkQuery.data.Options).length > 0 && (
           <NetworkOptionsTable options={networkQuery.data.Options} />
         )}
-      {networkQuery.data?.Containers &&
-        Object.keys(networkQuery.data.Containers).length > 0 && (
-          <NetworkContainersTable
-            containers={networkQuery.data.Containers}
-            nodeName={nodeName}
-            environmentId={environmentId}
-            networkId={networkId}
-          />
-        )}
+      {filteredNetworkContainers && filteredNetworkContainers.length > 0 && (
+        <NetworkContainersTable
+          networkContainers={filteredNetworkContainers}
+          nodeName={nodeName}
+          environmentId={environmentId}
+          networkId={networkId}
+        />
+      )}
     </>
   );
 
   async function onRemoveNetworkClicked() {
-    const message = 'Do you want to remove the network?';
+    const message = 'Do you want to delete the network?';
     const confirmed = await confirmDeletionAsync(message);
 
     if (confirmed) {
@@ -92,5 +110,21 @@ export function NetworkDetailsView() {
         }
       );
     }
+  }
+
+  function filterContainersInNetwork(
+    network: DockerNetwork,
+    containers: DockerContainer[]
+  ) {
+    const containersInNetwork: NetworkContainer[] = [];
+    containers.forEach((container) => {
+      const containerInNetwork =
+        network.Containers && network.Containers[container.Id];
+      if (containerInNetwork) {
+        containerInNetwork.Id = container.Id;
+        containersInNetwork.push(containerInNetwork);
+      }
+    });
+    return containersInNetwork;
   }
 }

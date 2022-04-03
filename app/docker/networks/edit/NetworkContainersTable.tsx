@@ -5,11 +5,11 @@ import { Authorized } from '@/portainer/hooks/useUser';
 import { EnvironmentId } from '@/portainer/environments/types';
 import { Link } from '@/portainer/components/Link';
 
-import { NetworkContainers, NetworkId } from '../types';
+import { NetworkContainer, NetworkId } from '../types';
 import { useDisconnectContainer } from '../queries';
 
 type Props = {
-  containers: NetworkContainers;
+  networkContainers: NetworkContainer[];
   nodeName: string;
   environmentId: EnvironmentId;
   networkId: NetworkId;
@@ -24,7 +24,7 @@ const tableHeaders = [
 ];
 
 export function NetworkContainersTable({
-  containers,
+  networkContainers,
   nodeName,
   environmentId,
   networkId,
@@ -38,13 +38,13 @@ export function NetworkContainersTable({
           <WidgetTitle title="Containers in network" icon="fa-server" />
           <WidgetBody className="nopadding">
             <DetailsTable headers={tableHeaders}>
-              {Object.entries(containers).map(([containerId, container]) => (
-                <tr key={containerId}>
+              {networkContainers.map((container) => (
+                <tr key={container.Id}>
                   <td>
                     <Link
                       to="docker.containers.container"
                       params={{
-                        id: containerId,
+                        id: container.Id,
                         nodeName,
                       }}
                       title="Logs"
@@ -61,9 +61,13 @@ export function NetworkContainersTable({
                         dataCy="networkDetails-deleteNetwork"
                         size="xsmall"
                         color="danger"
-                        onClick={() =>
-                          disconnectContainer.mutate({ containerId })
-                        }
+                        onClick={() => {
+                          if (container.Id) {
+                            disconnectContainer.mutate({
+                              containerId: container.Id,
+                            });
+                          }
+                        }}
                       >
                         <i
                           className="fa fa-trash-alt space-right"

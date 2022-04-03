@@ -15,6 +15,7 @@ angular.module('portainer.docker').controller('NetworkController', [
     $scope.resourceType = ResourceControlType.Network;
 
     $scope.onUpdateResourceControlSuccess = function () {
+      // console.log($scope.network);
       $state.reload();
     };
 
@@ -50,6 +51,8 @@ angular.module('portainer.docker').controller('NetworkController', [
     };
 
     function filterContainersInNetwork(network, containers) {
+      console.log('filter containers');
+      console.log(containers);
       var containersInNetwork = [];
       containers.forEach(function (container) {
         var containerInNetwork = network.Containers[container.Id];
