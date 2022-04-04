@@ -87,7 +87,7 @@ export async function removeContainer(
 }
 
 export async function getContainers(
-  endpointId: EnvironmentId,
+  environmentId: EnvironmentId,
   filters?: object
 ) {
   try {
