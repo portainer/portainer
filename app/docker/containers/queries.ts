@@ -7,7 +7,7 @@ import { queryContainers } from './containers.service';
 
 export function useContainers(environmentId: EnvironmentId, filters?: object) {
   return useQuery(
-    ['environments', environmentId, 'docker', 'containers', 'filters', filters],
+    ['environments', environmentId, 'docker', 'containers', {filters}],
     () => queryContainers(environmentId, filters),
     {
       onError: (err) => {
