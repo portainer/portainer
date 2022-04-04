@@ -161,7 +161,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
-	b, err := connection.exportJson(databasePath)
+	b, err := connection.ExportJson(databasePath, true)
 	if err != nil {
 		return err
 	}
@@ -310,6 +310,7 @@ func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, ob
 			return err
 		}
 
+		logrus.Infof("&&&&&&&&&&&&&&&&&&& bucket %s - %v", bucketName, bucket)
 		return bucket.Put(connection.ConvertToKey(id), data)
 	})
 }

@@ -1,0 +1,2804 @@
+{
+  "dockerhub": [
+    {
+      "Authentication": false,
+      "Username": ""
+    }
+  ],
+  "endpoint_groups": [
+    {
+      "AuthorizedTeams": null,
+      "AuthorizedUsers": null,
+      "Description": "Unassigned endpoints",
+      "Id": 1,
+      "Labels": [],
+      "Name": "Unassigned",
+      "TagIds": [],
+      "Tags": null,
+      "TeamAccessPolicies": {},
+      "UserAccessPolicies": {}
+    }
+  ],
+  "endpoint_relations": [
+    {
+      "EdgeStacks": {},
+      "EndpointID": 1
+    }
+  ],
+  "endpoints": [
+    {
+      "AuthorizedTeams": null,
+      "AuthorizedUsers": null,
+      "AzureCredentials": {
+        "ApplicationID": "",
+        "AuthenticationKey": "",
+        "TenantID": ""
+      },
+      "EdgeKey": "",
+      "Extensions": [],
+      "GroupId": 1,
+      "Id": 1,
+      "Name": "local",
+      "PublicURL": "",
+      "Snapshots": [
+        {
+          "DockerVersion": "20.10.13",
+          "HealthyContainerCount": 0,
+          "ImageCount": 9,
+          "RunningContainerCount": 5,
+          "ServiceCount": 0,
+          "SnapshotRaw": {
+            "Containers": [
+              {
+                "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+                "Created": 1648609973,
+                "HostConfig": {
+                  "NetworkMode": "nginx_default"
+                },
+                "Id": "0eca796ba47ad6e479a09191d90be17b5d151b63227f30ec1974338a55a24f11",
+                "Image": "nginx:latest",
+                "ImageID": "sha256:c919045c4c2b0b0007c606e763ed2c830c7b1d038ce878a3c0d6f5b81e6ab80b",
+                "Labels": {
+                  "com.docker.compose.config-hash": "b6013e48916cd17f37d6675ae35e0cac34cace20",
+                  "com.docker.compose.container-number": "1",
+                  "com.docker.compose.oneoff": "False",
+                  "com.docker.compose.project": "nginx",
+                  "com.docker.compose.service": "redis-master",
+                  "com.docker.compose.version": "1.5.0",
+                  "maintainer": "NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e"
+                },
+                "Mounts": [],
+                "Names": ["/nginx_redis-master_1"],
+                "NetworkSettings": {
+                  "Networks": {
+                    "nginx_default": {
+                      "Aliases": null,
+                      "DriverOpts": null,
+                      "EndpointID": "f761433ec60e0514f2a4ce9e7e408029af6c363a95e5723e31f82a497597ede4",
+                      "Gateway": "172.20.0.1",
+                      "GlobalIPv6Address": "",
+                      "GlobalIPv6PrefixLen": 0,
+                      "IPAMConfig": {},
+                      "IPAddress": "172.20.0.2",
+                      "IPPrefixLen": 16,
+                      "IPv6Gateway": "",
+                      "Links": null,
+                      "MacAddress": "02:42:ac:14:00:02",
+                      "NetworkID": "d9576d8c709d65504ca1d0a654cdc7b13ab17ebc6ae051f74e6b124d9d368c9a"
+                    }
+                  }
+                },
+                "Ports": [
+                  {
+                    "IP": "0.0.0.0",
+                    "PrivatePort": 80,
+                    "PublicPort": 8080,
+                    "Type": "tcp"
+                  },
+                  {
+                    "IP": "::",
+                    "PrivatePort": 80,
+                    "PublicPort": 8080,
+                    "Type": "tcp"
+                  }
+                ],
+                "State": "running",
+                "Status": "Up 2 minutes"
+              },
+              {
+                "Command": "apache2-foreground",
+                "Created": 1648609919,
+                "HostConfig": {
+                  "NetworkMode": "redis_default"
+                },
+                "Id": "ab541bbf504f9ef6cddfbd0dd06224f36fe7b291a2d9a3bc1ed406140312bf7a",
+                "Image": "gcr.io/google-samples/gb-frontend:v4",
+                "ImageID": "sha256:e2b3e8542af735080e6bda06873ce666e2319eea353884a88e45f3c9ef996846",
+                "Labels": {
+                  "com.docker.compose.config-hash": "7c2882b6ebdb0d582b4a326e9383d0ea5b3cc155",
+                  "com.docker.compose.container-number": "1",
+                  "com.docker.compose.oneoff": "False",
+                  "com.docker.compose.project": "redis",
+                  "com.docker.compose.service": "frontend",
+                  "com.docker.compose.version": "1.5.0",
+                  "kompose.service.type": "LoadBalancer"
+                },
+                "Mounts": [],
+                "Names": ["/redis_frontend_1"],
+                "NetworkSettings": {
+                  "Networks": {
+                    "redis_default": {
+                      "Aliases": null,
+                      "DriverOpts": null,
+                      "EndpointID": "f9c6fb004c9546d999230b1a3b64f0e680eef8a74d494f7e0455ba64a190b322",
+                      "Gateway": "172.19.0.1",
+                      "GlobalIPv6Address": "",
+                      "GlobalIPv6PrefixLen": 0,
+                      "IPAMConfig": {},
+                      "IPAddress": "172.19.0.2",
+                      "IPPrefixLen": 16,
+                      "IPv6Gateway": "",
+                      "Links": null,
+                      "MacAddress": "02:42:ac:13:00:02",
+                      "NetworkID": "9fa60f4b6a71b29a95127e99ae0ba09f616386a58ae790f0e8f975e8029f791d"
+                    }
+                  }
+                },
+                "Ports": [
+                  {
+                    "IP": "0.0.0.0",
+                    "PrivatePort": 80,
+                    "PublicPort": 80,
+                    "Type": "tcp"
+                  },
+                  {
+                    "IP": "::",
+                    "PrivatePort": 80,
+                    "PublicPort": 80,
+                    "Type": "tcp"
+                  }
+                ],
+                "State": "running",
+                "Status": "Up 3 minutes"
+              },
+              {
+                "Command": "redis-server /etc/redis/redis.conf",
+                "Created": 1648609919,
+                "HostConfig": {
+                  "NetworkMode": "redis_default"
+                },
+                "Id": "621d31f8aa50ad8ee182f3bc581fe19fa67c4f3728b412cfe3d20aa0d6deb2ef",
+                "Image": "k8s.gcr.io/redis:e2e",
+                "ImageID": "sha256:e5e67996c442f903cda78dd983ea6e94bb4e542950fd2eba666b44cbd303df42",
+                "Labels": {
+                  "com.docker.compose.config-hash": "86f8fef221e155eb14f94d707313986c865e8ac5",
+                  "com.docker.compose.container-number": "1",
+                  "com.docker.compose.oneoff": "False",
+                  "com.docker.compose.project": "redis",
+                  "com.docker.compose.service": "redis-master",
+                  "com.docker.compose.version": "1.5.0"
+                },
+                "Mounts": [
+                  {
+                    "Destination": "/data",
+                    "Driver": "local",
+                    "Mode": "",
+                    "Name": "a3fedc4b90b70e9f28456b4f88f8a2ebd90f76cf8a8a5e4fb5dcbd0b90ff0153",
+                    "Propagation": "",
+                    "RW": true,
+                    "Source": "",
+                    "Type": "volume"
+                  }
+                ],
+                "Names": ["/redis_redis-master_1"],
+                "NetworkSettings": {
+                  "Networks": {
+                    "redis_default": {
+                      "Aliases": null,
+                      "DriverOpts": null,
+                      "EndpointID": "7efb43c9f1b67e518e53b2dbcee2cfbbab07dcfa4788bad8c9fde8334cb6a213",
+                      "Gateway": "172.19.0.1",
+                      "GlobalIPv6Address": "",
+                      "GlobalIPv6PrefixLen": 0,
+                      "IPAMConfig": {},
+                      "IPAddress": "172.19.0.3",
+                      "IPPrefixLen": 16,
+                      "IPv6Gateway": "",
+                      "Links": null,
+                      "MacAddress": "02:42:ac:13:00:03",
+                      "NetworkID": "9fa60f4b6a71b29a95127e99ae0ba09f616386a58ae790f0e8f975e8029f791d"
+                    }
+                  }
+                },
+                "Ports": [
+                  {
+                    "IP": "0.0.0.0",
+                    "PrivatePort": 6379,
+                    "PublicPort": 49154,
+                    "Type": "tcp"
+                  },
+                  {
+                    "IP": "::",
+                    "PrivatePort": 6379,
+                    "PublicPort": 49154,
+                    "Type": "tcp"
+                  }
+                ],
+                "State": "running",
+                "Status": "Up 3 minutes"
+              },
+              {
+                "Command": "/entrypoint.sh /bin/sh -c /run.sh",
+                "Created": 1648609919,
+                "HostConfig": {
+                  "NetworkMode": "redis_default"
+                },
+                "Id": "536f5789838e57d3e24658cf5a45d7957861542ac4d8dab688d7a64d2be274f1",
+                "Image": "gcr.io/google_samples/gb-redisslave:v1",
+                "ImageID": "sha256:5f026ddffa27f011242781f7f2498538334e173869e7fe757008881fb48180b6",
+                "Labels": {
+                  "com.docker.compose.config-hash": "757a0da54b072e33a11a367408e83d930ad1f30f",
+                  "com.docker.compose.container-number": "1",
+                  "com.docker.compose.oneoff": "False",
+                  "com.docker.compose.project": "redis",
+                  "com.docker.compose.service": "redis-slave",
+                  "com.docker.compose.version": "1.5.0"
+                },
+                "Mounts": [
+                  {
+                    "Destination": "/data",
+                    "Driver": "local",
+                    "Mode": "",
+                    "Name": "5f93240d96e42d0b3728435cbfb43b6fcb3b01446d5c7d4be1cba8f9336c0a58",
+                    "Propagation": "",
+                    "RW": true,
+                    "Source": "",
+                    "Type": "volume"
+                  }
+                ],
+                "Names": ["/redis_redis-slave_1"],
+                "NetworkSettings": {
+                  "Networks": {
+                    "redis_default": {
+                      "Aliases": null,
+                      "DriverOpts": null,
+                      "EndpointID": "78b76382fcb909030a6e96caf5ce579d852bb565d82d47293302900eb81042ee",
+                      "Gateway": "172.19.0.1",
+                      "GlobalIPv6Address": "",
+                      "GlobalIPv6PrefixLen": 0,
+                      "IPAMConfig": {},
+                      "IPAddress": "172.19.0.4",
+                      "IPPrefixLen": 16,
+                      "IPv6Gateway": "",
+                      "Links": null,
+                      "MacAddress": "02:42:ac:13:00:04",
+                      "NetworkID": "9fa60f4b6a71b29a95127e99ae0ba09f616386a58ae790f0e8f975e8029f791d"
+                    }
+                  }
+                },
+                "Ports": [
+                  {
+                    "IP": "0.0.0.0",
+                    "PrivatePort": 6379,
+                    "PublicPort": 49155,
+                    "Type": "tcp"
+                  },
+                  {
+                    "IP": "::",
+                    "PrivatePort": 6379,
+                    "PublicPort": 49155,
+                    "Type": "tcp"
+                  }
+                ],
+                "State": "running",
+                "Status": "Up 3 minutes"
+              },
+              {
+                "Command": "httpd-foreground",
+                "Created": 1647381304,
+                "HostConfig": {
+                  "NetworkMode": "bridge"
+                },
+                "Id": "74034d9d05b07b2592fbe4ec878486eac5c743e960f75816884750e0aa40939b",
+                "Image": "httpd:latest",
+                "ImageID": "sha256:6b8e87fff1072470bbfc957a735e7e46007177864a7f61bd9e0f5872d3d7b4a5",
+                "Labels": {},
+                "Mounts": [
+                  {
+                    "Destination": "/usr/local/apache2/htdocs",
+                    "Driver": "local",
+                    "Mode": "z",
+                    "Name": "f1d6fe0188cc05f24309a86b58cf8130f89fa21aaa73f37789ad36fd188b38e2",
+                    "Propagation": "",
+                    "RW": true,
+                    "Source": "/var/lib/docker/volumes/f1d6fe0188cc05f24309a86b58cf8130f89fa21aaa73f37789ad36fd188b38e2/_data",
+                    "Type": "volume"
+                  }
+                ],
+                "Names": ["/httpd"],
+                "NetworkSettings": {
+                  "Networks": {
+                    "bridge": {
+                      "Aliases": null,
+                      "DriverOpts": null,
+                      "EndpointID": "2914aa7399460c2e7d48e9c7ae17b29a099bbda9e4fd514ac4cb660c30edf677",
+                      "Gateway": "172.17.0.1",
+                      "GlobalIPv6Address": "",
+                      "GlobalIPv6PrefixLen": 0,
+                      "IPAMConfig": null,
+                      "IPAddress": "172.17.0.2",
+                      "IPPrefixLen": 16,
+                      "IPv6Gateway": "",
+                      "Links": null,
+                      "MacAddress": "02:42:ac:11:00:02",
+                      "NetworkID": "ed5a12608291f91d5c344f685f97665e3b7252d32c71ec15b10c55c3d8eb8235"
+                    }
+                  }
+                },
+                "Ports": [
+                  {
+                    "IP": "0.0.0.0",
+                    "PrivatePort": 80,
+                    "PublicPort": 49153,
+                    "Type": "tcp"
+                  },
+                  {
+                    "IP": "::",
+                    "PrivatePort": 80,
+                    "PublicPort": 49153,
+                    "Type": "tcp"
+                  }
+                ],
+                "State": "running",
+                "Status": "Up 2 days"
+              }
+            ],
+            "Images": [
+              {
+                "Containers": -1,
+                "Created": 1648010665,
+                "Id": "sha256:86a511f3915ac296298506d2caf827e9597483bf84115bbe4e1707829de8534a",
+                "Labels": null,
+                "ParentId": "sha256:d03d4e751a04005e130d20ca4f22b3074b1ffbfdcf6b59a5d85727e267d31d98",
+                "RepoDigests": ["prabhat/ubuntu@sha256:bfe1371854e7e0e28517a041bfda08ecb3b345738c62092bfdf04f0513c27219"],
+                "RepoTags": ["ubuntu-prabhat:latest", "prabhat/ubuntu:latest"],
+                "SharedSize": -1,
+                "Size": 753642080,
+                "VirtualSize": 753642080
+              },
+              {
+                "Containers": -1,
+                "Created": 1647581440,
+                "Id": "sha256:ff0fea8310f3957d9b1e6ba494f3e4b63cb348c76160c6c15578e65995ffaa87",
+                "Labels": null,
+                "ParentId": "",
+                "RepoDigests": ["ubuntu@sha256:bea6d19168bbfd6af8d77c2cc3c572114eb5d113e6f422573c93cb605a0e2ffb"],
+                "RepoTags": ["ubuntu:latest"],
+                "SharedSize": -1,
+                "Size": 72759731,
+                "VirtualSize": 72759731
+              },
+              {
+                "Containers": -1,
+                "Created": 1647285410,
+                "Id": "sha256:6b8e87fff1072470bbfc957a735e7e46007177864a7f61bd9e0f5872d3d7b4a5",
+                "Labels": null,
+                "ParentId": "",
+                "RepoDigests": ["httpd@sha256:73496cbfc473872dd185154a3b96faa4407d773e893c6a7b9d8f977c331bc45d"],
+                "RepoTags": ["httpd:latest"],
+                "SharedSize": -1,
+                "Size": 143974476,
+                "VirtualSize": 143974476
+              },
+              {
+                "Containers": -1,
+                "Created": 1646799692,
+                "Id": "sha256:a4ca82e34b45e34c0a8bffe4e974983a528e8beca6030c1f9d17ac7f96c7847f",
+                "Labels": null,
+                "ParentId": "",
+                "RepoDigests": ["portainer/agent@sha256:ca1a51a745f2490cf5345883dd8c5f6a953a15251ab95af246ca9e2fb3436dde"],
+                "RepoTags": null,
+                "SharedSize": -1,
+                "Size": 154347153,
+                "VirtualSize": 154347153
+              },
+              {
+                "Containers": -1,
+                "Created": 1646143205,
+                "Id": "sha256:c919045c4c2b0b0007c606e763ed2c830c7b1d038ce878a3c0d6f5b81e6ab80b",
+                "Labels": {
+                  "maintainer": "NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e"
+                },
+                "ParentId": "",
+                "RepoDigests": [
+                  "nginx@sha256:1c13bc6de5dfca749c377974146ac05256791ca2fe1979fc8e8278bf0121d285",
+                  "prabhat/nginx@sha256:2468d48e476b6a079eb646e87620f96ce1818ac0c5b3a8450532cea64b3421f4"
+                ],
+                "RepoTags": ["nginx:latest", "prabhat/nginx:latest"],
+                "SharedSize": -1,
+                "Size": 141505630,
+                "VirtualSize": 141505630
+              },
+              {
+                "Containers": -1,
+                "Created": 1551997193,
+                "Id": "sha256:6d1ef012b5674ad8a127ecfa9b5e6f5178d171b90ee462846974177fd9bdd39f",
+                "Labels": null,
+                "ParentId": "",
+                "RepoDigests": ["alpine@sha256:8421d9a84432575381bfabd248f1eb56f3aa21d9d7cd2511583c68c9b7511d10"],
+                "RepoTags": null,
+                "SharedSize": -1,
+                "Size": 4206494,
+                "VirtualSize": 4206494
+              },
+              {
+                "Containers": -1,
+                "Created": 1460421063,
+                "Id": "sha256:e2b3e8542af735080e6bda06873ce666e2319eea353884a88e45f3c9ef996846",
+                "Labels": {},
+                "ParentId": "",
+                "RepoDigests": ["gcr.io/google-samples/gb-frontend@sha256:d44e7d7491a537f822e7fe8615437e4a8a08f3a7a1d7d4cb9066b92f7556ba6d"],
+                "RepoTags": ["gcr.io/google-samples/gb-frontend:v4"],
+                "SharedSize": -1,
+                "Size": 512161546,
+                "VirtualSize": 512161546
+              },
+              {
+                "Containers": -1,
+                "Created": 1439232099,
+                "Id": "sha256:5f026ddffa27f011242781f7f2498538334e173869e7fe757008881fb48180b6",
+                "Labels": null,
+                "ParentId": "",
+                "RepoDigests": ["gcr.io/google_samples/gb-redisslave@sha256:90f62695e641e1a27d1a5e0bbb8b622205a48e18311b51b0da419ffad24b9016"],
+                "RepoTags": ["gcr.io/google_samples/gb-redisslave:v1"],
+                "SharedSize": -1,
+                "Size": 109508753,
+                "VirtualSize": 109508753
+              },
+              {
+                "Containers": -1,
+                "Created": 1426838165,
+                "Id": "sha256:e5e67996c442f903cda78dd983ea6e94bb4e542950fd2eba666b44cbd303df42",
+                "Labels": null,
+                "ParentId": "",
+                "RepoDigests": ["k8s.gcr.io/redis@sha256:f066bcf26497fbc55b9bf0769cb13a35c0afa2aa42e737cc46b7fb04b23a2f25"],
+                "RepoTags": ["k8s.gcr.io/redis:e2e"],
+                "SharedSize": -1,
+                "Size": 419003740,
+                "VirtualSize": 419003740
+              }
+            ],
+            "Info": {
+              "Architecture": "x86_64",
+              "BridgeNfIp6tables": true,
+              "BridgeNfIptables": true,
+              "CPUSet": true,
+              "CPUShares": true,
+              "CgroupDriver": "cgroupfs",
+              "ClusterAdvertise": "",
+              "ClusterStore": "",
+              "ContainerdCommit": {
+                "Expected": "2a1d4dbdb2a1030dc5b01e96fb110a9d9f150ecc",
+                "ID": "2a1d4dbdb2a1030dc5b01e96fb110a9d9f150ecc"
+              },
+              "Containers": 5,
+              "ContainersPaused": 0,
+              "ContainersRunning": 5,
+              "ContainersStopped": 0,
+              "CpuCfsPeriod": true,
+              "CpuCfsQuota": true,
+              "Debug": false,
+              "DefaultRuntime": "runc",
+              "DockerRootDir": "/var/lib/docker",
+              "Driver": "overlay2",
+              "DriverStatus": [
+                ["Backing Filesystem", "extfs"],
+                ["Supports d_type", "true"],
+                ["Native Overlay Diff", "true"],
+                ["userxattr", "false"]
+              ],
+              "ExperimentalBuild": false,
+              "GenericResources": null,
+              "HttpProxy": "",
+              "HttpsProxy": "",
+              "ID": "UQ2Y:ZHNN:XIZL:66ZK:NJCU:EO2L:BH35:SXHA:6TLU:AA25:PCAE:UQVE",
+              "IPv4Forwarding": true,
+              "Images": 13,
+              "IndexServerAddress": "https://index.docker.io/v1/",
+              "InitBinary": "docker-init",
+              "InitCommit": {
+                "Expected": "de40ad0",
+                "ID": "de40ad0"
+              },
+              "Isolation": "",
+              "KernelMemory": true,
+              "KernelMemoryTCP": true,
+              "KernelVersion": "5.13.0-35-generic",
+              "Labels": [],
+              "LiveRestoreEnabled": false,
+              "LoggingDriver": "json-file",
+              "MemTotal": 25098706944,
+              "MemoryLimit": true,
+              "NCPU": 8,
+              "NEventsListener": 0,
+              "NFd": 813,
+              "NGoroutines": 68,
+              "Name": "prabhat-linux",
+              "NoProxy": "",
+              "OSType": "linux",
+              "OomKillDisable": true,
+              "OperatingSystem": "Zorin OS 16.1",
+              "PidsLimit": true,
+              "Plugins": {
+                "Authorization": null,
+                "Log": ["awslogs", "fluentd", "gcplogs", "gelf", "journald", "json-file", "local", "logentries", "splunk", "syslog"],
+                "Network": ["bridge", "host", "ipvlan", "macvlan", "null", "overlay"],
+                "Volume": ["local"]
+              },
+              "RegistryConfig": {
+                "AllowNondistributableArtifactsCIDRs": [],
+                "AllowNondistributableArtifactsHostnames": [],
+                "IndexConfigs": {
+                  "docker.io": {
+                    "Mirrors": [],
+                    "Name": "docker.io",
+                    "Official": true,
+                    "Secure": true
+                  }
+                },
+                "InsecureRegistryCIDRs": ["127.0.0.0/8"],
+                "Mirrors": []
+              },
+              "RuncCommit": {
+                "Expected": "v1.0.3-0-gf46b6ba",
+                "ID": "v1.0.3-0-gf46b6ba"
+              },
+              "Runtimes": {
+                "io.containerd.runc.v2": {
+                  "path": "runc"
+                },
+                "io.containerd.runtime.v1.linux": {
+                  "path": "runc"
+                },
+                "runc": {
+                  "path": "runc"
+                }
+              },
+              "SecurityOptions": ["name=apparmor", "name=seccomp,profile=default"],
+              "ServerVersion": "20.10.13",
+              "SwapLimit": true,
+              "Swarm": {
+                "ControlAvailable": false,
+                "Error": "",
+                "LocalNodeState": "inactive",
+                "NodeAddr": "",
+                "NodeID": "",
+                "RemoteManagers": null
+              },
+              "SystemStatus": null,
+              "SystemTime": "2022-03-30T16:15:12.017274117+13:00",
+              "Warnings": null
+            },
+            "Networks": [
+              {
+                "Attachable": false,
+                "ConfigFrom": {
+                  "Network": ""
+                },
+                "ConfigOnly": false,
+                "Containers": {},
+                "Created": "2022-03-28T08:57:24.093279463+13:00",
+                "Driver": "bridge",
+                "EnableIPv6": false,
+                "IPAM": {
+                  "Config": [
+                    {
+                      "Gateway": "172.17.0.1",
+                      "Subnet": "172.17.0.0/16"
+                    }
+                  ],
+                  "Driver": "default",
+                  "Options": null
+                },
+                "Id": "ed5a12608291f91d5c344f685f97665e3b7252d32c71ec15b10c55c3d8eb8235",
+                "Ingress": false,
+                "Internal": false,
+                "Labels": {},
+                "Name": "bridge",
+                "Options": {
+                  "com.docker.network.bridge.default_bridge": "true",
+                  "com.docker.network.bridge.enable_icc": "true",
+                  "com.docker.network.bridge.enable_ip_masquerade": "true",
+                  "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+                  "com.docker.network.bridge.name": "docker0",
+                  "com.docker.network.driver.mtu": "1500"
+                },
+                "Scope": "local"
+              },
+              {
+                "Attachable": false,
+                "ConfigFrom": {
+                  "Network": ""
+                },
+                "ConfigOnly": false,
+                "Containers": {},
+                "Created": "2022-03-03T23:31:59.297633861+13:00",
+                "Driver": "null",
+                "EnableIPv6": false,
+                "IPAM": {
+                  "Config": [],
+                  "Driver": "default",
+                  "Options": null
+                },
+                "Id": "33c89bff6ff59323ac1c9b10dc7c2920b994b03eca696cfdbabce802f236f6e2",
+                "Ingress": false,
+                "Internal": false,
+                "Labels": {},
+                "Name": "none",
+                "Options": {},
+                "Scope": "local"
+              },
+              {
+                "Attachable": false,
+                "ConfigFrom": {
+                  "Network": ""
+                },
+                "ConfigOnly": false,
+                "Containers": {},
+                "Created": "2022-03-03T23:31:59.309101595+13:00",
+                "Driver": "host",
+                "EnableIPv6": false,
+                "IPAM": {
+                  "Config": [],
+                  "Driver": "default",
+                  "Options": null
+                },
+                "Id": "968304627a446dbe28a9985cbc2b7b8a0414cbb400cfc6533d26dafc715ff175",
+                "Ingress": false,
+                "Internal": false,
+                "Labels": {},
+                "Name": "host",
+                "Options": {},
+                "Scope": "local"
+              },
+              {
+                "Attachable": false,
+                "ConfigFrom": {
+                  "Network": ""
+                },
+                "ConfigOnly": false,
+                "Containers": {},
+                "Created": "2022-03-28T10:01:18.600583916+13:00",
+                "Driver": "bridge",
+                "EnableIPv6": false,
+                "IPAM": {
+                  "Config": [
+                    {
+                      "Gateway": "172.18.0.1",
+                      "Subnet": "172.18.0.0/16"
+                    }
+                  ],
+                  "Driver": "default",
+                  "Options": null
+                },
+                "Id": "817c5491280dd743a47eb32119fe15eb0fc5bff118ae485dcd0d95673fdd55fd",
+                "Ingress": false,
+                "Internal": false,
+                "Labels": {},
+                "Name": "docker_gwbridge",
+                "Options": {
+                  "com.docker.network.bridge.enable_icc": "false",
+                  "com.docker.network.bridge.enable_ip_masquerade": "true",
+                  "com.docker.network.bridge.name": "docker_gwbridge"
+                },
+                "Scope": "local"
+              },
+              {
+                "Attachable": false,
+                "ConfigFrom": {
+                  "Network": ""
+                },
+                "ConfigOnly": false,
+                "Containers": {},
+                "Created": "2022-03-30T16:11:59.214342406+13:00",
+                "Driver": "bridge",
+                "EnableIPv6": false,
+                "IPAM": {
+                  "Config": [
+                    {
+                      "Gateway": "172.19.0.1",
+                      "Subnet": "172.19.0.0/16"
+                    }
+                  ],
+                  "Driver": "default",
+                  "Options": null
+                },
+                "Id": "9fa60f4b6a71b29a95127e99ae0ba09f616386a58ae790f0e8f975e8029f791d",
+                "Ingress": false,
+                "Internal": false,
+                "Labels": {},
+                "Name": "redis_default",
+                "Options": {},
+                "Scope": "local"
+              },
+              {
+                "Attachable": false,
+                "ConfigFrom": {
+                  "Network": ""
+                },
+                "ConfigOnly": false,
+                "Containers": {},
+                "Created": "2022-03-30T16:12:52.93768265+13:00",
+                "Driver": "bridge",
+                "EnableIPv6": false,
+                "IPAM": {
+                  "Config": [
+                    {
+                      "Gateway": "172.20.0.1",
+                      "Subnet": "172.20.0.0/16"
+                    }
+                  ],
+                  "Driver": "default",
+                  "Options": null
+                },
+                "Id": "d9576d8c709d65504ca1d0a654cdc7b13ab17ebc6ae051f74e6b124d9d368c9a",
+                "Ingress": false,
+                "Internal": false,
+                "Labels": {},
+                "Name": "nginx_default",
+                "Options": {},
+                "Scope": "local"
+              }
+            ],
+            "Version": {
+              "ApiVersion": "1.41",
+              "Arch": "amd64",
+              "BuildTime": "2022-03-10T14:05:44.000000000+00:00",
+              "Components": [
+                {
+                  "Details": {
+                    "ApiVersion": "1.41",
+                    "Arch": "amd64",
+                    "BuildTime": "2022-03-10T14:05:44.000000000+00:00",
+                    "Experimental": "false",
+                    "GitCommit": "906f57f",
+                    "GoVersion": "go1.16.15",
+                    "KernelVersion": "5.13.0-35-generic",
+                    "MinAPIVersion": "1.12",
+                    "Os": "linux"
+                  },
+                  "Name": "Engine",
+                  "Version": "20.10.13"
+                },
+                {
+                  "Details": {
+                    "GitCommit": "2a1d4dbdb2a1030dc5b01e96fb110a9d9f150ecc"
+                  },
+                  "Name": "containerd",
+                  "Version": "1.5.10"
+                },
+                {
+                  "Details": {
+                    "GitCommit": "v1.0.3-0-gf46b6ba"
+                  },
+                  "Name": "runc",
+                  "Version": "1.0.3"
+                },
+                {
+                  "Details": {
+                    "GitCommit": "de40ad0"
+                  },
+                  "Name": "docker-init",
+                  "Version": "0.19.0"
+                }
+              ],
+              "GitCommit": "906f57f",
+              "GoVersion": "go1.16.15",
+              "KernelVersion": "5.13.0-35-generic",
+              "MinAPIVersion": "1.12",
+              "Os": "linux",
+              "Platform": {
+                "Name": "Docker Engine - Community"
+              },
+              "Version": "20.10.13"
+            },
+            "Volumes": {
+              "Volumes": [
+                {
+                  "CreatedAt": "2022-03-22T19:52:28+13:00",
+                  "Driver": "local",
+                  "Labels": null,
+                  "Mountpoint": "/var/lib/docker/volumes/prabhat/_data",
+                  "Name": "prabhat",
+                  "Options": {
+                    "device": "/home/prabhat/portainer/mounted",
+                    "type": "tmpfs"
+                  },
+                  "Scope": "local"
+                },
+                {
+                  "CreatedAt": "2022-03-18T13:51:39+13:00",
+                  "Driver": "local",
+                  "Labels": null,
+                  "Mountpoint": "/var/lib/docker/volumes/bc9d2f97a920b6be6869dc69738b1e682234d3b530539986eb5343bcf5572983/_data",
+                  "Name": "bc9d2f97a920b6be6869dc69738b1e682234d3b530539986eb5343bcf5572983",
+                  "Options": null,
+                  "Scope": "local"
+                },
+                {
+                  "CreatedAt": "2022-03-30T16:12:01+13:00",
+                  "Driver": "local",
+                  "Labels": null,
+                  "Mountpoint": "/var/lib/docker/volumes/a3fedc4b90b70e9f28456b4f88f8a2ebd90f76cf8a8a5e4fb5dcbd0b90ff0153/_data",
+                  "Name": "a3fedc4b90b70e9f28456b4f88f8a2ebd90f76cf8a8a5e4fb5dcbd0b90ff0153",
+                  "Options": null,
+                  "Scope": "local"
+                },
+                {
+                  "CreatedAt": "2022-03-30T16:12:01+13:00",
+                  "Driver": "local",
+                  "Labels": null,
+                  "Mountpoint": "/var/lib/docker/volumes/5f93240d96e42d0b3728435cbfb43b6fcb3b01446d5c7d4be1cba8f9336c0a58/_data",
+                  "Name": "5f93240d96e42d0b3728435cbfb43b6fcb3b01446d5c7d4be1cba8f9336c0a58",
+                  "Options": null,
+                  "Scope": "local"
+                },
+                {
+                  "CreatedAt": "2022-03-16T10:55:05+13:00",
+                  "Driver": "local",
+                  "Labels": null,
+                  "Mountpoint": "/var/lib/docker/volumes/f1d6fe0188cc05f24309a86b58cf8130f89fa21aaa73f37789ad36fd188b38e2/_data",
+                  "Name": "f1d6fe0188cc05f24309a86b58cf8130f89fa21aaa73f37789ad36fd188b38e2",
+                  "Options": null,
+                  "Scope": "local"
+                },
+                {
+                  "CreatedAt": "2022-03-09T12:05:37+13:00",
+                  "Driver": "local",
+                  "Labels": null,
+                  "Mountpoint": "/var/lib/docker/volumes/83aea89faf9721ec0065ea37b32608a504088ac86a882069776be3899a0034a5/_data",
+                  "Name": "83aea89faf9721ec0065ea37b32608a504088ac86a882069776be3899a0034a5",
+                  "Options": null,
+                  "Scope": "local"
+                },
+                {
+                  "CreatedAt": "2022-03-11T08:56:01+13:00",
+                  "Driver": "local",
+                  "Labels": null,
+                  "Mountpoint": "/var/lib/docker/volumes/d38856ca6c6879a8c667c300aa6e4c35c2ba93d1a1b06ba78813141fd27b0697/_data",
+                  "Name": "d38856ca6c6879a8c667c300aa6e4c35c2ba93d1a1b06ba78813141fd27b0697",
+                  "Options": null,
+                  "Scope": "local"
+                },
+                {
+                  "CreatedAt": "2022-03-22T22:06:49+13:00",
+                  "Driver": "local",
+                  "Labels": null,
+                  "Mountpoint": "/var/lib/docker/volumes/pk/_data",
+                  "Name": "pk",
+                  "Options": {},
+                  "Scope": "local"
+                },
+                {
+                  "CreatedAt": "2022-03-22T22:02:46+13:00",
+                  "Driver": "local",
+                  "Labels": {},
+                  "Mountpoint": "/var/lib/docker/volumes/test-vol/_data",
+                  "Name": "test-vol",
+                  "Options": {},
+                  "Scope": "local"
+                },
+                {
+                  "CreatedAt": "2022-03-16T10:49:47+13:00",
+                  "Driver": "local",
+                  "Labels": null,
+                  "Mountpoint": "/var/lib/docker/volumes/326d246e9371e4b426b018a7093a522f699a79bf6dda185314ef6683747a5836/_data",
+                  "Name": "326d246e9371e4b426b018a7093a522f699a79bf6dda185314ef6683747a5836",
+                  "Options": null,
+                  "Scope": "local"
+                }
+              ],
+              "Warnings": null
+            }
+          },
+          "StackCount": 2,
+          "StoppedContainerCount": 0,
+          "Swarm": false,
+          "Time": 1648610112,
+          "TotalCPU": 8,
+          "TotalMemory": 25098706944,
+          "UnhealthyContainerCount": 0,
+          "VolumeCount": 10
+        }
+      ],
+      "Status": 1,
+      "TLSConfig": {
+        "TLS": false,
+        "TLSSkipVerify": false
+      },
+      "TagIds": [],
+      "Tags": null,
+      "TeamAccessPolicies": {},
+      "Type": 1,
+      "URL": "unix:///var/run/docker.sock",
+      "UserAccessPolicies": {}
+    }
+  ],
+  "registries": [
+    {
+      "Authentication": true,
+      "AuthorizedTeams": null,
+      "AuthorizedUsers": null,
+      "Gitlab": {
+        "InstanceURL": "",
+        "ProjectId": 0,
+        "ProjectPath": ""
+      },
+      "Id": 1,
+      "ManagementConfiguration": null,
+      "Name": "canister.io",
+      "Password": "MjWbx8A6YK7cw7",
+      "TeamAccessPolicies": {},
+      "Type": 3,
+      "URL": "cloud.canister.io:5000",
+      "UserAccessPolicies": {},
+      "Username": "prabhatkhera"
+    }
+  ],
+  "resource_control": [
+    {
+      "AdministratorsOnly": false,
+      "Id": 2,
+      "Public": true,
+      "ResourceId": "762gbwaj8r4gcsdy8ld1u4why",
+      "SubResourceIds": [],
+      "System": false,
+      "TeamAccesses": [],
+      "Type": 5,
+      "UserAccesses": []
+    },
+    {
+      "AdministratorsOnly": false,
+      "Id": 3,
+      "Public": true,
+      "ResourceId": "alpine",
+      "SubResourceIds": [],
+      "System": false,
+      "TeamAccesses": [],
+      "Type": 6,
+      "UserAccesses": []
+    },
+    {
+      "AdministratorsOnly": false,
+      "Id": 4,
+      "Public": true,
+      "ResourceId": "redis",
+      "SubResourceIds": [],
+      "System": false,
+      "TeamAccesses": [],
+      "Type": 6,
+      "UserAccesses": []
+    },
+    {
+      "AdministratorsOnly": false,
+      "Id": 5,
+      "Public": false,
+      "ResourceId": "nginx",
+      "SubResourceIds": [],
+      "System": false,
+      "TeamAccesses": [
+        {
+          "AccessLevel": 1,
+          "TeamId": 1
+        }
+      ],
+      "Type": 6,
+      "UserAccesses": []
+    }
+  ],
+  "roles": [
+    {
+      "Authorizations": {
+        "DockerAgentBrowseDelete": true,
+        "DockerAgentBrowseGet": true,
+        "DockerAgentBrowseList": true,
+        "DockerAgentBrowsePut": true,
+        "DockerAgentBrowseRename": true,
+        "DockerAgentHostInfo": true,
+        "DockerAgentList": true,
+        "DockerAgentPing": true,
+        "DockerAgentUndefined": true,
+        "DockerBuildCancel": true,
+        "DockerBuildPrune": true,
+        "DockerConfigCreate": true,
+        "DockerConfigDelete": true,
+        "DockerConfigInspect": true,
+        "DockerConfigList": true,
+        "DockerConfigUpdate": true,
+        "DockerContainerArchive": true,
+        "DockerContainerArchiveInfo": true,
+        "DockerContainerAttach": true,
+        "DockerContainerAttachWebsocket": true,
+        "DockerContainerChanges": true,
+        "DockerContainerCreate": true,
+        "DockerContainerDelete": true,
+        "DockerContainerExec": true,
+        "DockerContainerExport": true,
+        "DockerContainerInspect": true,
+        "DockerContainerKill": true,
+        "DockerContainerList": true,
+        "DockerContainerLogs": true,
+        "DockerContainerPause": true,
+        "DockerContainerPrune": true,
+        "DockerContainerPutContainerArchive": true,
+        "DockerContainerRename": true,
+        "DockerContainerResize": true,
+        "DockerContainerRestart": true,
+        "DockerContainerStart": true,
+        "DockerContainerStats": true,
+        "DockerContainerStop": true,
+        "DockerContainerTop": true,
+        "DockerContainerUnpause": true,
+        "DockerContainerUpdate": true,
+        "DockerContainerWait": true,
+        "DockerDistributionInspect": true,
+        "DockerEvents": true,
+        "DockerExecInspect": true,
+        "DockerExecResize": true,
+        "DockerExecStart": true,
+        "DockerImageBuild": true,
+        "DockerImageCommit": true,
+        "DockerImageCreate": true,
+        "DockerImageDelete": true,
+        "DockerImageGet": true,
+        "DockerImageGetAll": true,
+        "DockerImageHistory": true,
+        "DockerImageInspect": true,
+        "DockerImageList": true,
+        "DockerImageLoad": true,
+        "DockerImagePrune": true,
+        "DockerImagePush": true,
+        "DockerImageSearch": true,
+        "DockerImageTag": true,
+        "DockerInfo": true,
+        "DockerNetworkConnect": true,
+        "DockerNetworkCreate": true,
+        "DockerNetworkDelete": true,
+        "DockerNetworkDisconnect": true,
+        "DockerNetworkInspect": true,
+        "DockerNetworkList": true,
+        "DockerNetworkPrune": true,
+        "DockerNodeDelete": true,
+        "DockerNodeInspect": true,
+        "DockerNodeList": true,
+        "DockerNodeUpdate": true,
+        "DockerPing": true,
+        "DockerPluginCreate": true,
+        "DockerPluginDelete": true,
+        "DockerPluginDisable": true,
+        "DockerPluginEnable": true,
+        "DockerPluginInspect": true,
+        "DockerPluginList": true,
+        "DockerPluginPrivileges": true,
+        "DockerPluginPull": true,
+        "DockerPluginPush": true,
+        "DockerPluginSet": true,
+        "DockerPluginUpgrade": true,
+        "DockerSecretCreate": true,
+        "DockerSecretDelete": true,
+        "DockerSecretInspect": true,
+        "DockerSecretList": true,
+        "DockerSecretUpdate": true,
+        "DockerServiceCreate": true,
+        "DockerServiceDelete": true,
+        "DockerServiceInspect": true,
+        "DockerServiceList": true,
+        "DockerServiceLogs": true,
+        "DockerServiceUpdate": true,
+        "DockerSessionStart": true,
+        "DockerSwarmInit": true,
+        "DockerSwarmInspect": true,
+        "DockerSwarmJoin": true,
+        "DockerSwarmLeave": true,
+        "DockerSwarmUnlock": true,
+        "DockerSwarmUnlockKey": true,
+        "DockerSwarmUpdate": true,
+        "DockerSystem": true,
+        "DockerTaskInspect": true,
+        "DockerTaskList": true,
+        "DockerTaskLogs": true,
+        "DockerUndefined": true,
+        "DockerVersion": true,
+        "DockerVolumeCreate": true,
+        "DockerVolumeDelete": true,
+        "DockerVolumeInspect": true,
+        "DockerVolumeList": true,
+        "DockerVolumePrune": true,
+        "EndpointResourcesAccess": true,
+        "IntegrationStoridgeAdmin": true,
+        "PortainerResourceControlCreate": true,
+        "PortainerResourceControlUpdate": true,
+        "PortainerStackCreate": true,
+        "PortainerStackDelete": true,
+        "PortainerStackFile": true,
+        "PortainerStackInspect": true,
+        "PortainerStackList": true,
+        "PortainerStackMigrate": true,
+        "PortainerStackUpdate": true,
+        "PortainerWebhookCreate": true,
+        "PortainerWebhookDelete": true,
+        "PortainerWebhookList": true,
+        "PortainerWebsocketExec": true
+      },
+      "Description": "Full control of all resources in an endpoint",
+      "Id": 1,
+      "Name": "Endpoint administrator",
+      "Priority": 1
+    },
+    {
+      "Authorizations": {
+        "DockerAgentHostInfo": true,
+        "DockerAgentList": true,
+        "DockerAgentPing": true,
+        "DockerConfigInspect": true,
+        "DockerConfigList": true,
+        "DockerContainerArchiveInfo": true,
+        "DockerContainerChanges": true,
+        "DockerContainerInspect": true,
+        "DockerContainerList": true,
+        "DockerContainerLogs": true,
+        "DockerContainerStats": true,
+        "DockerContainerTop": true,
+        "DockerDistributionInspect": true,
+        "DockerEvents": true,
+        "DockerImageGet": true,
+        "DockerImageGetAll": true,
+        "DockerImageHistory": true,
+        "DockerImageInspect": true,
+        "DockerImageList": true,
+        "DockerImageSearch": true,
+        "DockerInfo": true,
+        "DockerNetworkInspect": true,
+        "DockerNetworkList": true,
+        "DockerNodeInspect": true,
+        "DockerNodeList": true,
+        "DockerPing": true,
+        "DockerPluginList": true,
+        "DockerSecretInspect": true,
+        "DockerSecretList": true,
+        "DockerServiceInspect": true,
+        "DockerServiceList": true,
+        "DockerServiceLogs": true,
+        "DockerSwarmInspect": true,
+        "DockerSystem": true,
+        "DockerTaskInspect": true,
+        "DockerTaskList": true,
+        "DockerTaskLogs": true,
+        "DockerVersion": true,
+        "DockerVolumeInspect": true,
+        "DockerVolumeList": true,
+        "EndpointResourcesAccess": true,
+        "PortainerStackFile": true,
+        "PortainerStackInspect": true,
+        "PortainerStackList": true,
+        "PortainerWebhookList": true
+      },
+      "Description": "Read-only access of all resources in an endpoint",
+      "Id": 2,
+      "Name": "Helpdesk",
+      "Priority": 2
+    },
+    {
+      "Authorizations": {
+        "DockerAgentHostInfo": true,
+        "DockerAgentList": true,
+        "DockerAgentPing": true,
+        "DockerAgentUndefined": true,
+        "DockerBuildCancel": true,
+        "DockerBuildPrune": true,
+        "DockerConfigCreate": true,
+        "DockerConfigDelete": true,
+        "DockerConfigInspect": true,
+        "DockerConfigList": true,
+        "DockerConfigUpdate": true,
+        "DockerContainerArchive": true,
+        "DockerContainerArchiveInfo": true,
+        "DockerContainerAttach": true,
+        "DockerContainerAttachWebsocket": true,
+        "DockerContainerChanges": true,
+        "DockerContainerCreate": true,
+        "DockerContainerDelete": true,
+        "DockerContainerExec": true,
+        "DockerContainerExport": true,
+        "DockerContainerInspect": true,
+        "DockerContainerKill": true,
+        "DockerContainerList": true,
+        "DockerContainerLogs": true,
+        "DockerContainerPause": true,
+        "DockerContainerPutContainerArchive": true,
+        "DockerContainerRename": true,
+        "DockerContainerResize": true,
+        "DockerContainerRestart": true,
+        "DockerContainerStart": true,
+        "DockerContainerStats": true,
+        "DockerContainerStop": true,
+        "DockerContainerTop": true,
+        "DockerContainerUnpause": true,
+        "DockerContainerUpdate": true,
+        "DockerContainerWait": true,
+        "DockerDistributionInspect": true,
+        "DockerEvents": true,
+        "DockerExecInspect": true,
+        "DockerExecResize": true,
+        "DockerExecStart": true,
+        "DockerImageBuild": true,
+        "DockerImageCommit": true,
+        "DockerImageCreate": true,
+        "DockerImageDelete": true,
+        "DockerImageGet": true,
+        "DockerImageGetAll": true,
+        "DockerImageHistory": true,
+        "DockerImageInspect": true,
+        "DockerImageList": true,
+        "DockerImageLoad": true,
+        "DockerImagePush": true,
+        "DockerImageSearch": true,
+        "DockerImageTag": true,
+        "DockerInfo": true,
+        "DockerNetworkConnect": true,
+        "DockerNetworkCreate": true,
+        "DockerNetworkDelete": true,
+        "DockerNetworkDisconnect": true,
+        "DockerNetworkInspect": true,
+        "DockerNetworkList": true,
+        "DockerNodeDelete": true,
+        "DockerNodeInspect": true,
+        "DockerNodeList": true,
+        "DockerNodeUpdate": true,
+        "DockerPing": true,
+        "DockerPluginCreate": true,
+        "DockerPluginDelete": true,
+        "DockerPluginDisable": true,
+        "DockerPluginEnable": true,
+        "DockerPluginInspect": true,
+        "DockerPluginList": true,
+        "DockerPluginPrivileges": true,
+        "DockerPluginPull": true,
+        "DockerPluginPush": true,
+        "DockerPluginSet": true,
+        "DockerPluginUpgrade": true,
+        "DockerSecretCreate": true,
+        "DockerSecretDelete": true,
+        "DockerSecretInspect": true,
+        "DockerSecretList": true,
+        "DockerSecretUpdate": true,
+        "DockerServiceCreate": true,
+        "DockerServiceDelete": true,
+        "DockerServiceInspect": true,
+        "DockerServiceList": true,
+        "DockerServiceLogs": true,
+        "DockerServiceUpdate": true,
+        "DockerSessionStart": true,
+        "DockerSwarmInit": true,
+        "DockerSwarmInspect": true,
+        "DockerSwarmJoin": true,
+        "DockerSwarmLeave": true,
+        "DockerSwarmUnlock": true,
+        "DockerSwarmUnlockKey": true,
+        "DockerSwarmUpdate": true,
+        "DockerSystem": true,
+        "DockerTaskInspect": true,
+        "DockerTaskList": true,
+        "DockerTaskLogs": true,
+        "DockerUndefined": true,
+        "DockerVersion": true,
+        "DockerVolumeCreate": true,
+        "DockerVolumeDelete": true,
+        "DockerVolumeInspect": true,
+        "DockerVolumeList": true,
+        "PortainerResourceControlUpdate": true,
+        "PortainerStackCreate": true,
+        "PortainerStackDelete": true,
+        "PortainerStackFile": true,
+        "PortainerStackInspect": true,
+        "PortainerStackList": true,
+        "PortainerStackMigrate": true,
+        "PortainerStackUpdate": true,
+        "PortainerWebhookCreate": true,
+        "PortainerWebhookList": true,
+        "PortainerWebsocketExec": true
+      },
+      "Description": "Full control of assigned resources in an endpoint",
+      "Id": 3,
+      "Name": "Standard user",
+      "Priority": 3
+    },
+    {
+      "Authorizations": {
+        "DockerAgentHostInfo": true,
+        "DockerAgentList": true,
+        "DockerAgentPing": true,
+        "DockerConfigInspect": true,
+        "DockerConfigList": true,
+        "DockerContainerArchiveInfo": true,
+        "DockerContainerChanges": true,
+        "DockerContainerInspect": true,
+        "DockerContainerList": true,
+        "DockerContainerLogs": true,
+        "DockerContainerStats": true,
+        "DockerContainerTop": true,
+        "DockerDistributionInspect": true,
+        "DockerEvents": true,
+        "DockerImageGet": true,
+        "DockerImageGetAll": true,
+        "DockerImageHistory": true,
+        "DockerImageInspect": true,
+        "DockerImageList": true,
+        "DockerImageSearch": true,
+        "DockerInfo": true,
+        "DockerNetworkInspect": true,
+        "DockerNetworkList": true,
+        "DockerNodeInspect": true,
+        "DockerNodeList": true,
+        "DockerPing": true,
+        "DockerPluginList": true,
+        "DockerSecretInspect": true,
+        "DockerSecretList": true,
+        "DockerServiceInspect": true,
+        "DockerServiceList": true,
+        "DockerServiceLogs": true,
+        "DockerSwarmInspect": true,
+        "DockerSystem": true,
+        "DockerTaskInspect": true,
+        "DockerTaskList": true,
+        "DockerTaskLogs": true,
+        "DockerVersion": true,
+        "DockerVolumeInspect": true,
+        "DockerVolumeList": true,
+        "PortainerStackFile": true,
+        "PortainerStackInspect": true,
+        "PortainerStackList": true,
+        "PortainerWebhookList": true
+      },
+      "Description": "Read-only access of assigned resources in an endpoint",
+      "Id": 4,
+      "Name": "Read-only user",
+      "Priority": 4
+    }
+  ],
+  "schedules": [
+    {
+      "Created": 1648608136,
+      "CronExpression": "@every 5m",
+      "EdgeSchedule": null,
+      "EndpointSyncJob": null,
+      "Id": 1,
+      "JobType": 2,
+      "Name": "system_snapshot",
+      "Recurring": true,
+      "ScriptExecutionJob": null,
+      "SnapshotJob": {}
+    }
+  ],
+  "settings": {
+    "AllowBindMountsForRegularUsers": true,
+    "AllowContainerCapabilitiesForRegularUsers": true,
+    "AllowDeviceMappingForRegularUsers": true,
+    "AllowHostNamespaceForRegularUsers": true,
+    "AllowPrivilegedModeForRegularUsers": true,
+    "AllowStackManagementForRegularUsers": true,
+    "AllowVolumeBrowserForRegularUsers": false,
+    "AuthenticationMethod": 1,
+    "BlackListedLabels": [],
+    "DisplayDonationHeader": false,
+    "DisplayExternalContributors": false,
+    "EdgeAgentCheckinInterval": 5,
+    "EnableEdgeComputeFeatures": false,
+    "EnableHostManagementFeatures": false,
+    "LDAPSettings": {
+      "AnonymousMode": true,
+      "AutoCreateUsers": true,
+      "GroupSearchSettings": [
+        {
+          "GroupAttribute": "",
+          "GroupBaseDN": "",
+          "GroupFilter": ""
+        }
+      ],
+      "ReaderDN": "",
+      "SearchSettings": [
+        {
+          "BaseDN": "",
+          "Filter": "",
+          "UserNameAttribute": ""
+        }
+      ],
+      "StartTLS": false,
+      "TLSConfig": {
+        "TLS": false,
+        "TLSSkipVerify": false
+      },
+      "URL": ""
+    },
+    "LogoURL": "",
+    "OAuthSettings": {
+      "AccessTokenURI": "",
+      "AuthorizationURI": "",
+      "ClientID": "",
+      "DefaultTeamID": 0,
+      "OAuthAutoCreateUsers": false,
+      "RedirectURI": "",
+      "ResourceURI": "",
+      "Scopes": "",
+      "UserIdentifier": ""
+    },
+    "SnapshotInterval": "5m",
+    "TemplatesURL": ""
+  },
+  "stacks": [
+    {
+      "EndpointId": 1,
+      "EntryPoint": "docker/alpine37-compose.yml",
+      "Env": [],
+      "Id": 2,
+      "Name": "alpine",
+      "ProjectPath": "/home/prabhat/portainer/data/ce1.25/compose/2",
+      "ResourceControl": null,
+      "SwarmId": "s3fd604zdba7z13tbq2x6lyue",
+      "Type": 1
+    },
+    {
+      "EndpointId": 1,
+      "EntryPoint": "docker-compose.yml",
+      "Env": [],
+      "Id": 5,
+      "Name": "redis",
+      "ProjectPath": "/home/prabhat/portainer/data/ce1.25/compose/5",
+      "ResourceControl": null,
+      "SwarmId": "",
+      "Type": 2
+    },
+    {
+      "EndpointId": 1,
+      "EntryPoint": "docker-compose.yml",
+      "Env": [],
+      "Id": 6,
+      "Name": "nginx",
+      "ProjectPath": "/home/prabhat/portainer/data/ce1.25/compose/6",
+      "ResourceControl": null,
+      "SwarmId": "",
+      "Type": 2
+    }
+  ],
+  "teams": [
+    {
+      "Id": 1,
+      "Name": "hello"
+    }
+  ],
+  "templates": [
+    {
+      "Id": 1,
+      "administrator_only": false,
+      "categories": ["docker"],
+      "description": "Docker image registry",
+      "image": "registry:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/registry.png",
+      "platform": "linux",
+      "ports": ["5000/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Registry",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/lib/registry"
+        }
+      ]
+    },
+    {
+      "Id": 2,
+      "administrator_only": false,
+      "categories": ["webserver"],
+      "description": "High performance web server",
+      "image": "nginx:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/nginx.png",
+      "platform": "linux",
+      "ports": ["80/tcp", "443/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Nginx",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/etc/nginx"
+        },
+        {
+          "container": "/usr/share/nginx/html"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "administrator_only": false,
+      "categories": ["webserver"],
+      "description": "Open-source HTTP server",
+      "image": "httpd:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/httpd.png",
+      "platform": "linux",
+      "ports": ["80/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Httpd",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/usr/local/apache2/htdocs/"
+        }
+      ]
+    },
+    {
+      "Id": 4,
+      "administrator_only": false,
+      "categories": ["webserver"],
+      "description": "HTTP/2 web server with automatic HTTPS",
+      "image": "abiosoft/caddy:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/caddy.png",
+      "platform": "linux",
+      "ports": ["80/tcp", "443/tcp", "2015/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Caddy",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/root/.caddy"
+        }
+      ]
+    },
+    {
+      "Id": 5,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "The most popular open-source database",
+      "env": [
+        {
+          "label": "Root password",
+          "name": "MYSQL_ROOT_PASSWORD"
+        }
+      ],
+      "image": "mysql:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/mysql.png",
+      "platform": "linux",
+      "ports": ["3306/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "MySQL",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/lib/mysql"
+        }
+      ]
+    },
+    {
+      "Id": 6,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "Performance beyond MySQL",
+      "env": [
+        {
+          "label": "Root password",
+          "name": "MYSQL_ROOT_PASSWORD"
+        }
+      ],
+      "image": "mariadb:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/mariadb.png",
+      "platform": "linux",
+      "ports": ["3306/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "MariaDB",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/lib/mysql"
+        }
+      ]
+    },
+    {
+      "Id": 7,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "The most advanced open-source database",
+      "env": [
+        {
+          "label": "Superuser",
+          "name": "POSTGRES_USER"
+        },
+        {
+          "label": "Superuser password",
+          "name": "POSTGRES_PASSWORD"
+        }
+      ],
+      "image": "postgres:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/postgres.png",
+      "platform": "linux",
+      "ports": ["5432/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "PostgreSQL",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/lib/postgresql/data"
+        }
+      ]
+    },
+    {
+      "Id": 8,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "Open-source document-oriented database",
+      "image": "mongo:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/mongo.png",
+      "platform": "linux",
+      "ports": ["27017/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Mongo",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/data/db"
+        }
+      ]
+    },
+    {
+      "Id": 9,
+      "administrator_only": false,
+      "categories": ["database"],
+      "command": "start --insecure",
+      "description": "An open-source, survivable, strongly consistent, scale-out SQL database",
+      "image": "cockroachdb/cockroach:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/cockroachdb.png",
+      "platform": "linux",
+      "ports": ["26257/tcp", "8080/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "CockroachDB",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/cockroach/cockroach-data"
+        }
+      ]
+    },
+    {
+      "Id": 10,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "An open-source distributed SQL database",
+      "image": "crate:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/cratedb.png",
+      "platform": "linux",
+      "ports": ["4200/tcp", "4300/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "CrateDB",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/data"
+        }
+      ]
+    },
+    {
+      "Id": 11,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "Open-source search and analytics engine",
+      "image": "elasticsearch:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/elasticsearch.png",
+      "platform": "linux",
+      "ports": ["9200/tcp", "9300/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Elasticsearch",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/usr/share/elasticsearch/data"
+        }
+      ]
+    },
+    {
+      "Id": 12,
+      "administrator_only": false,
+      "categories": ["development", "project-management"],
+      "description": "Open-source end-to-end software development platform",
+      "image": "gitlab/gitlab-ce:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/gitlab_ce.png",
+      "note": "Default username is \u003cb\u003eroot\u003c/b\u003e. Check the \u003ca href=\"https://docs.gitlab.com/omnibus/docker/README.html#after-starting-a-container\" target=\"_blank\"\u003eGitlab documentation\u003c/a\u003e to get started.",
+      "platform": "linux",
+      "ports": ["80/tcp", "443/tcp", "22/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Gitlab CE",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/etc/gitlab"
+        },
+        {
+          "container": "/var/log/gitlab"
+        },
+        {
+          "container": "/var/opt/gitlab"
+        }
+      ]
+    },
+    {
+      "Id": 13,
+      "administrator_only": false,
+      "categories": ["storage"],
+      "command": "server /data",
+      "description": "A distributed object storage server built for cloud applications and devops",
+      "env": [
+        {
+          "label": "Minio access key",
+          "name": "MINIO_ACCESS_KEY"
+        },
+        {
+          "label": "Minio secret key",
+          "name": "MINIO_SECRET_KEY"
+        }
+      ],
+      "image": "minio/minio:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/minio.png",
+      "platform": "linux",
+      "ports": ["9000/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Minio",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/data"
+        },
+        {
+          "container": "/root/.minio"
+        }
+      ]
+    },
+    {
+      "Id": 14,
+      "administrator_only": false,
+      "categories": ["storage"],
+      "description": "Standalone AWS S3 protocol server",
+      "env": [
+        {
+          "label": "Scality S3 access key",
+          "name": "SCALITY_ACCESS_KEY"
+        },
+        {
+          "label": "Scality S3 secret key",
+          "name": "SCALITY_SECRET_KEY"
+        }
+      ],
+      "image": "scality/s3server",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/scality-s3.png",
+      "platform": "linux",
+      "ports": ["8000/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Scality S3",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/usr/src/app/localData"
+        },
+        {
+          "container": "/usr/src/app/localMetadata"
+        }
+      ]
+    },
+    {
+      "Id": 15,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "Microsoft SQL Server on Linux",
+      "env": [
+        {
+          "name": "ACCEPT_EULA"
+        },
+        {
+          "label": "SA password",
+          "name": "SA_PASSWORD"
+        }
+      ],
+      "image": "microsoft/mssql-server-linux:2017-GA",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/microsoft.png",
+      "note": "Password needs to include at least 8 characters including uppercase, lowercase letters, base-10 digits and/or non-alphanumeric symbols.",
+      "platform": "linux",
+      "ports": ["1433/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "SQL Server",
+      "type": 1
+    },
+    {
+      "Id": 16,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "Microsoft SQL Server Developer for Windows containers",
+      "env": [
+        {
+          "name": "ACCEPT_EULA"
+        },
+        {
+          "label": "SA password",
+          "name": "sa_password"
+        }
+      ],
+      "image": "microsoft/mssql-server-windows-developer:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/microsoft.png",
+      "note": "Password needs to include at least 8 characters including uppercase, lowercase letters, base-10 digits and/or non-alphanumeric symbols.",
+      "platform": "windows",
+      "ports": ["1433/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "SQL Server",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "C:/temp/"
+        }
+      ]
+    },
+    {
+      "Id": 17,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "Microsoft SQL Server Express for Windows containers",
+      "env": [
+        {
+          "name": "ACCEPT_EULA"
+        },
+        {
+          "label": "SA password",
+          "name": "sa_password"
+        }
+      ],
+      "image": "microsoft/mssql-server-windows-express:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/microsoft.png",
+      "note": "Password needs to include at least 8 characters including uppercase, lowercase letters, base-10 digits and/or non-alphanumeric symbols.",
+      "platform": "windows",
+      "ports": ["1433/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "SQL Server Express",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "C:/temp/"
+        }
+      ]
+    },
+    {
+      "Id": 18,
+      "administrator_only": false,
+      "categories": ["serverless"],
+      "description": "Open-source serverless computing platform",
+      "image": "iron/functions:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ironfunctions.png",
+      "platform": "linux",
+      "ports": ["8080/tcp"],
+      "privileged": true,
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "IronFunctions API",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/app/data"
+        }
+      ]
+    },
+    {
+      "Id": 19,
+      "administrator_only": false,
+      "categories": ["serverless"],
+      "description": "Open-source user interface for IronFunctions",
+      "env": [
+        {
+          "label": "API URL",
+          "name": "API_URL"
+        }
+      ],
+      "image": "iron/functions-ui:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ironfunctions.png",
+      "platform": "linux",
+      "ports": ["4000/tcp"],
+      "privileged": true,
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "IronFunctions UI",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/app/data"
+        }
+      ]
+    },
+    {
+      "Id": 20,
+      "administrator_only": false,
+      "categories": ["search-engine"],
+      "description": "Open-source enterprise search platform",
+      "image": "solr:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/solr.png",
+      "platform": "linux",
+      "ports": ["8983/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Solr",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/opt/solr/mydata"
+        }
+      ]
+    },
+    {
+      "Id": 21,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "Open-source in-memory data structure store",
+      "image": "redis:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/redis.png",
+      "platform": "linux",
+      "ports": ["6379/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Redis",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/data"
+        }
+      ]
+    },
+    {
+      "Id": 22,
+      "administrator_only": false,
+      "categories": ["messaging"],
+      "description": "Highly reliable enterprise messaging system",
+      "image": "rabbitmq:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/rabbitmq.png",
+      "platform": "linux",
+      "ports": ["5671/tcp", "5672/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "RabbitMQ",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/lib/rabbitmq"
+        }
+      ]
+    },
+    {
+      "Id": 23,
+      "administrator_only": false,
+      "categories": ["blog"],
+      "description": "Free and open-source blogging platform",
+      "image": "ghost:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ghost.png",
+      "note": "Access the blog management interface under \u003ccode\u003e/ghost/\u003c/code\u003e.",
+      "platform": "linux",
+      "ports": ["2368/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Ghost",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/lib/ghost/content"
+        }
+      ]
+    },
+    {
+      "Id": 24,
+      "administrator_only": false,
+      "categories": ["CMS"],
+      "description": "WebOps platform and hosting control panel",
+      "image": "plesk/plesk:preview",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/plesk.png",
+      "note": "Default credentials: admin / changeme",
+      "platform": "linux",
+      "ports": ["21/tcp", "80/tcp", "443/tcp", "8880/tcp", "8443/tcp", "8447/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Plesk",
+      "type": 1
+    },
+    {
+      "Id": 25,
+      "administrator_only": false,
+      "categories": ["CMS"],
+      "description": "Another free and open-source CMS",
+      "env": [
+        {
+          "label": "MySQL database host",
+          "name": "JOOMLA_DB_HOST"
+        },
+        {
+          "label": "Database password",
+          "name": "JOOMLA_DB_PASSWORD"
+        }
+      ],
+      "image": "joomla:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/joomla.png",
+      "platform": "linux",
+      "ports": ["80/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Joomla",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/www/html"
+        }
+      ]
+    },
+    {
+      "Id": 26,
+      "administrator_only": false,
+      "categories": ["CMS"],
+      "description": "Open-source content management framework",
+      "image": "drupal:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/drupal.png",
+      "platform": "linux",
+      "ports": ["80/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Drupal",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/www/html"
+        }
+      ]
+    },
+    {
+      "Id": 27,
+      "administrator_only": false,
+      "categories": ["CMS"],
+      "description": "A free and open-source CMS built on top of Zope",
+      "image": "plone:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/plone.png",
+      "platform": "linux",
+      "ports": ["8080/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Plone",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/data"
+        }
+      ]
+    },
+    {
+      "Id": 28,
+      "administrator_only": false,
+      "categories": ["CMS"],
+      "description": "Open-source e-commerce platform",
+      "image": "alankent/gsd:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/magento.png",
+      "platform": "linux",
+      "ports": ["80/tcp", "3000/tcp", "3001/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Magento 2",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/www/html/"
+        }
+      ]
+    },
+    {
+      "Id": 29,
+      "administrator_only": false,
+      "categories": ["Log Management", "Monitoring"],
+      "description": "Collect logs, metrics and docker events",
+      "env": [
+        {
+          "label": "Logs token",
+          "name": "LOGSENE_TOKEN"
+        },
+        {
+          "label": "SPM monitoring token",
+          "name": "SPM_TOKEN"
+        }
+      ],
+      "image": "sematext/sematext-agent-docker:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/sematext_agent.png",
+      "name": "sematext-agent",
+      "platform": "linux",
+      "privileged": true,
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Sematext Docker Agent",
+      "type": 1,
+      "volumes": [
+        {
+          "bind": "/var/run/docker.sock",
+          "container": "/var/run/docker.sock"
+        }
+      ]
+    },
+    {
+      "Id": 30,
+      "administrator_only": false,
+      "categories": ["Monitoring"],
+      "description": "Collect events and metrics",
+      "env": [
+        {
+          "label": "Datadog API key",
+          "name": "DD_API_KEY"
+        }
+      ],
+      "image": "datadog/agent:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/datadog_agent.png",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Datadog agent",
+      "type": 1,
+      "volumes": [
+        {
+          "bind": "/var/run/docker.sock",
+          "container": "/var/run/docker.sock",
+          "readonly": true
+        },
+        {
+          "bind": "/sys/fs/cgroup",
+          "container": "/host/sys/fs/cgroup",
+          "readonly": true
+        },
+        {
+          "bind": "/proc",
+          "container": "/host/proc",
+          "readonly": true
+        }
+      ]
+    },
+    {
+      "Id": 31,
+      "administrator_only": false,
+      "categories": ["marketing"],
+      "description": "Open-source marketing automation platform",
+      "env": [
+        {
+          "label": "MySQL database host",
+          "name": "MAUTIC_DB_HOST"
+        },
+        {
+          "label": "Database password",
+          "name": "MAUTIC_DB_PASSWORD"
+        }
+      ],
+      "image": "mautic/mautic:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/mautic.png",
+      "platform": "linux",
+      "ports": ["80/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Mautic",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/www/html"
+        }
+      ]
+    },
+    {
+      "Id": 32,
+      "administrator_only": false,
+      "categories": ["streaming"],
+      "description": "Streaming media server",
+      "env": [
+        {
+          "label": "Agree to Wowza EULA",
+          "name": "WOWZA_ACCEPT_LICENSE"
+        },
+        {
+          "label": "License key",
+          "name": "WOWZA_KEY"
+        }
+      ],
+      "image": "sameersbn/wowza:4.1.2-8",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/wowza.png",
+      "platform": "linux",
+      "ports": ["1935/tcp", "8086/tcp", "8087/tcp", "8088/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Wowza",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/lib/wowza"
+        }
+      ]
+    },
+    {
+      "Id": 33,
+      "administrator_only": false,
+      "categories": ["continuous-integration"],
+      "description": "Open-source continuous integration tool",
+      "env": [
+        {
+          "label": "Jenkins options",
+          "name": "JENKINS_OPTS"
+        }
+      ],
+      "image": "jenkins/jenkins:lts",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/jenkins.png",
+      "platform": "linux",
+      "ports": ["8080/tcp", "50000/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Jenkins",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/jenkins_home"
+        }
+      ]
+    },
+    {
+      "Id": 34,
+      "administrator_only": false,
+      "categories": ["project-management"],
+      "description": "Open-source project management tool",
+      "image": "redmine:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/redmine.png",
+      "platform": "linux",
+      "ports": ["3000/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Redmine",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/usr/src/redmine/files"
+        }
+      ]
+    },
+    {
+      "Id": 35,
+      "administrator_only": false,
+      "categories": ["project-management"],
+      "description": "Open-source business apps",
+      "env": [
+        {
+          "label": "PostgreSQL database host",
+          "name": "HOST"
+        },
+        {
+          "label": "Database user",
+          "name": "USER"
+        },
+        {
+          "label": "Database password",
+          "name": "PASSWORD"
+        }
+      ],
+      "image": "odoo:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/odoo.png",
+      "platform": "linux",
+      "ports": ["8069/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Odoo",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/lib/odoo"
+        },
+        {
+          "container": "/mnt/extra-addons"
+        }
+      ]
+    },
+    {
+      "Id": 36,
+      "administrator_only": false,
+      "categories": ["backup"],
+      "description": "Open-source network backup",
+      "image": "cfstras/urbackup",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/urbackup.png",
+      "note": "This application web interface is exposed on the port 55414 inside the container.",
+      "platform": "linux",
+      "ports": ["55413/tcp", "55414/tcp", "55415/tcp", "35622/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Urbackup",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/var/urbackup"
+        }
+      ]
+    },
+    {
+      "Id": 37,
+      "administrator_only": false,
+      "categories": ["filesystem", "storage"],
+      "command": "--port 80 --database /data/database.db --scope /srv",
+      "description": "A web file manager",
+      "image": "filebrowser/filebrowser:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/filebrowser.png",
+      "note": "Default credentials: admin/admin",
+      "platform": "linux",
+      "ports": ["80/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "File browser",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/data"
+        },
+        {
+          "container": "/srv"
+        }
+      ]
+    },
+    {
+      "Id": 38,
+      "administrator_only": false,
+      "categories": ["development"],
+      "description": "ColdFusion (CFML) CLI",
+      "env": [
+        {
+          "name": "CFENGINE"
+        }
+      ],
+      "image": "ortussolutions/commandbox:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ortussolutions-commandbox.png",
+      "platform": "linux",
+      "ports": ["8080/tcp", "8443/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "CommandBox",
+      "type": 1
+    },
+    {
+      "Id": 39,
+      "administrator_only": false,
+      "categories": ["CMS"],
+      "description": "Open-source modular CMS",
+      "env": [
+        {
+          "name": "express"
+        },
+        {
+          "name": "install"
+        },
+        {
+          "name": "CFENGINE"
+        }
+      ],
+      "image": "ortussolutions/contentbox:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ortussolutions-contentbox.png",
+      "platform": "linux",
+      "ports": ["8080/tcp", "8443/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "ContentBox",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/data/contentbox/db"
+        },
+        {
+          "container": "/app/includes/shared/media"
+        }
+      ]
+    },
+    {
+      "Id": 40,
+      "administrator_only": false,
+      "categories": ["portainer"],
+      "description": "Manage all the resources in your Swarm cluster",
+      "image": "",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png",
+      "note": "The agent will be deployed globally inside your cluster and available on port 9001.",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "stacks/portainer-agent/docker-stack.yml",
+        "url": "https://github.com/portainer/templates"
+      },
+      "stackFile": "",
+      "title": "Portainer Agent",
+      "type": 2
+    },
+    {
+      "Id": 41,
+      "administrator_only": false,
+      "categories": ["serverless"],
+      "description": "Serverless functions made simple",
+      "image": "",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/openfaas.png",
+      "name": "func",
+      "note": "Deploys the API gateway and sample functions. You can access the UI on port 8080. \u003cb\u003eWarning\u003c/b\u003e: the name of the stack must be 'func'.",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "docker-compose.yml",
+        "url": "https://github.com/openfaas/faas"
+      },
+      "stackFile": "",
+      "title": "OpenFaaS",
+      "type": 2
+    },
+    {
+      "Id": 42,
+      "administrator_only": false,
+      "categories": ["serverless"],
+      "description": "Open-source serverless computing platform",
+      "image": "",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/ironfunctions.png",
+      "note": "Deploys the IronFunctions API and UI.",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "stacks/ironfunctions/docker-stack.yml",
+        "url": "https://github.com/portainer/templates"
+      },
+      "stackFile": "",
+      "title": "IronFunctions",
+      "type": 2
+    },
+    {
+      "Id": 43,
+      "administrator_only": false,
+      "categories": ["database"],
+      "description": "CockroachDB cluster",
+      "image": "",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/cockroachdb.png",
+      "note": "Deploys an insecure CockroachDB cluster, please refer to \u003ca href=\"https://www.cockroachlabs.com/docs/stable/orchestrate-cockroachdb-with-docker-swarm.html\" target=\"_blank\"\u003eCockroachDB documentation\u003c/a\u003e for production deployments.",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "stacks/cockroachdb/docker-stack.yml",
+        "url": "https://github.com/portainer/templates"
+      },
+      "stackFile": "",
+      "title": "CockroachDB",
+      "type": 2
+    },
+    {
+      "Id": 44,
+      "administrator_only": false,
+      "categories": ["CMS"],
+      "description": "Wordpress setup with a MySQL database",
+      "env": [
+        {
+          "description": "Password used by the MySQL root user.",
+          "label": "Database root password",
+          "name": "MYSQL_DATABASE_PASSWORD"
+        }
+      ],
+      "image": "",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/wordpress.png",
+      "note": "Deploys a Wordpress instance connected to a MySQL database.",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "stacks/wordpress/docker-stack.yml",
+        "url": "https://github.com/portainer/templates"
+      },
+      "stackFile": "",
+      "title": "Wordpress",
+      "type": 2
+    },
+    {
+      "Id": 45,
+      "administrator_only": false,
+      "categories": ["CMS"],
+      "description": "Wordpress setup with a MySQL database",
+      "env": [
+        {
+          "description": "Password used by the MySQL root user.",
+          "label": "Database root password",
+          "name": "MYSQL_DATABASE_PASSWORD"
+        }
+      ],
+      "image": "",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/wordpress.png",
+      "note": "Deploys a Wordpress instance connected to a MySQL database.",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "stacks/wordpress/docker-compose.yml",
+        "url": "https://github.com/portainer/templates"
+      },
+      "stackFile": "",
+      "title": "Wordpress",
+      "type": 3
+    },
+    {
+      "Id": 46,
+      "administrator_only": false,
+      "categories": ["OPS"],
+      "description": "Microsoft Operations Management Suite Linux agent.",
+      "env": [
+        {
+          "description": "Azure Workspace ID",
+          "label": "Workspace ID",
+          "name": "AZURE_WORKSPACE_ID"
+        },
+        {
+          "description": "Azure primary key",
+          "label": "Primary key",
+          "name": "AZURE_PRIMARY_KEY"
+        }
+      ],
+      "image": "",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/microsoft.png",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "stacks/microsoft-oms/docker-stack.yml",
+        "url": "https://github.com/portainer/templates"
+      },
+      "stackFile": "",
+      "title": "Microsoft OMS Agent",
+      "type": 2
+    },
+    {
+      "Id": 47,
+      "administrator_only": false,
+      "categories": ["Log Management", "Monitoring"],
+      "description": "Collect logs, metrics and docker events",
+      "env": [
+        {
+          "label": "Logs token",
+          "name": "LOGSENE_TOKEN"
+        },
+        {
+          "label": "SPM monitoring token",
+          "name": "SPM_TOKEN"
+        }
+      ],
+      "image": "",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/sematext_agent.png",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "stacks/sematext-agent-docker/docker-stack.yml",
+        "url": "https://github.com/portainer/templates"
+      },
+      "stackFile": "",
+      "title": "Sematext Docker Agent",
+      "type": 2
+    },
+    {
+      "Id": 48,
+      "administrator_only": false,
+      "categories": ["Monitoring"],
+      "description": "Collect events and metrics",
+      "env": [
+        {
+          "label": "Datadog API key",
+          "name": "API_KEY"
+        }
+      ],
+      "image": "",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/datadog_agent.png",
+      "platform": "linux",
+      "repository": {
+        "stackfile": "stacks/datadog-agent/docker-stack.yml",
+        "url": "https://github.com/portainer/templates"
+      },
+      "stackFile": "",
+      "title": "Datadog agent",
+      "type": 2
+    },
+    {
+      "Id": 49,
+      "administrator_only": false,
+      "categories": ["docker"],
+      "description": "Sonatype Nexus3 registry manager",
+      "image": "sonatype/nexus3:latest",
+      "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/sonatype.png",
+      "platform": "linux",
+      "ports": ["8081/tcp"],
+      "repository": {
+        "stackfile": "",
+        "url": ""
+      },
+      "stackFile": "",
+      "title": "Sonatype Nexus3",
+      "type": 1,
+      "volumes": [
+        {
+          "container": "/nexus-data"
+        }
+      ]
+    }
+  ],
+  "tunnel_server": {
+    "PrivateKeySeed": "IvX6ZPRuWtLS5zyg"
+  },
+  "users": [
+    {
+      "EndpointAuthorizations": null,
+      "Id": 1,
+      "Password": "$2a$10$siRDprr/5uUFAU8iom3Sr./WXQkN2dhSNjAC471pkJaALkghS762a",
+      "PortainerAuthorizations": {
+        "PortainerDockerHubInspect": true,
+        "PortainerEndpointExtensionAdd": true,
+        "PortainerEndpointExtensionRemove": true,
+        "PortainerEndpointGroupList": true,
+        "PortainerEndpointInspect": true,
+        "PortainerEndpointList": true,
+        "PortainerExtensionList": true,
+        "PortainerMOTD": true,
+        "PortainerRegistryInspect": true,
+        "PortainerRegistryList": true,
+        "PortainerTeamList": true,
+        "PortainerTemplateInspect": true,
+        "PortainerTemplateList": true,
+        "PortainerUserInspect": true,
+        "PortainerUserList": true,
+        "PortainerUserMemberships": true
+      },
+      "Role": 1,
+      "Username": "admin"
+    },
+    {
+      "EndpointAuthorizations": null,
+      "Id": 2,
+      "Password": "$2a$10$WpCAW8mSt6FRRp1GkynbFOGSZnHR6E5j9cETZ8HiMlw06hVlDW/Li",
+      "PortainerAuthorizations": {
+        "PortainerDockerHubInspect": true,
+        "PortainerEndpointExtensionAdd": true,
+        "PortainerEndpointExtensionRemove": true,
+        "PortainerEndpointGroupList": true,
+        "PortainerEndpointInspect": true,
+        "PortainerEndpointList": true,
+        "PortainerExtensionList": true,
+        "PortainerMOTD": true,
+        "PortainerRegistryInspect": true,
+        "PortainerRegistryList": true,
+        "PortainerTeamList": true,
+        "PortainerTemplateInspect": true,
+        "PortainerTemplateList": true,
+        "PortainerUserInspect": true,
+        "PortainerUserList": true,
+        "PortainerUserMemberships": true
+      },
+      "Role": 1,
+      "Username": "prabhat"
+    }
+  ],
+  "version": {
+    "DB_VERSION": 24
+  }
+}

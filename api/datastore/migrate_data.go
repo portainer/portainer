@@ -64,8 +64,8 @@ func (store *Store) MigrateData() error {
 		err := store.restoreWithOptions(&options)
 		if err != nil {
 			logrus.Fatalf(
-				"Failed restoring the backup. DB file needs to restored manualy by "+
-					"replacing %s DB file with recent backup %s. Error %v",
+				"Failed restoring the backup. portainer database file needs to restored manually by "+
+					"replacing %s database file with recent backup %s. Error %v",
 				store.databasePath(),
 				options.BackupPath,
 				err,
