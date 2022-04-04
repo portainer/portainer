@@ -35,9 +35,16 @@ func isHTML(acceptContent []string) bool {
 }
 
 func (handler *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if handler.wasInstanceDisabled() && (r.RequestURI == "/" || r.RequestURI == "/index.html") {
-		http.Redirect(w, r, "/timeout.html", http.StatusTemporaryRedirect)
-		return
+	if handler.wasInstanceDisabled() {
+		if r.RequestURI == "/" || r.RequestURI == "/index.html" {
+			http.Redirect(w, r, "/timeout.html", http.StatusTemporaryRedirect)
+			return
+		}
+	} else {
+		if strings.HasPrefix(r.RequestURI, "/timeout.html") {
+			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+			return
+		}
 	}
 
 	if !isHTML(r.Header["Accept"]) {
