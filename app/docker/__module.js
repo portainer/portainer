@@ -1,5 +1,6 @@
 import angular from 'angular';
 
+import { EnvironmentStatus } from '@/portainer/environments/types';
 import containersModule from './containers';
 import { componentsModule } from './components';
 
@@ -27,13 +28,8 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
             }
             endpoint.Status = status;
 
-            if (status === 2) {
-              if (!endpoint.Snapshots[0]) {
-                throw new Error('Environment is unreachable and there is no snapshot available for offline browsing.');
-              }
-              if (endpoint.Snapshots[0].Swarm) {
-                throw new Error('Environment is unreachable. Connect to another swarm manager.');
-              }
+            if (status === EnvironmentStatus.Down) {
+              throw new Error('Environment is unreachable.');
             }
 
             EndpointProvider.setEndpointID(endpoint.Id);
