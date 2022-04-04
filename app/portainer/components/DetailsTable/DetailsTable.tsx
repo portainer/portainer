@@ -6,7 +6,7 @@ type Props = {
 };
 
 export function DetailsTable({
-  headers,
+  headers = [],
   dataCy,
   children,
 }: PropsWithChildren<Props>) {
