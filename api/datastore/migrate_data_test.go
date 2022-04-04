@@ -353,19 +353,6 @@ func importJSON(t *testing.T, r io.Reader, store *Store) error {
 				t.Logf("failed writing INSTANCE_ID in %s: %v", k, err)
 			}
 
-			// Edition doesn't existing in CE. But is present in EE
-			edition, ok := versions["EDITION"]
-			if ok {
-				err := con.CreateObjectWithStringId(
-					k,
-					[]byte("EDITION"),
-					edition,
-				)
-				if err != nil {
-					t.Logf("failed writing EDITION in %s: %v", k, err)
-				}
-			}
-
 		case "dockerhub":
 			obj, ok := v.([]interface{})
 			if !ok {
