@@ -14,7 +14,7 @@ export function NetworkOptionsTable({ options }: Props) {
         <Widget>
           <WidgetTitle title="Network options" icon="fa-cogs" />
           <WidgetBody className="nopadding">
-            <DetailsTable>
+            <DetailsTable dataCy="networkDetails-networkOptionsTable">
               {Object.entries(options).map(([key, value]) => (
                 <DetailsTable.Row key={key} label={key}>
                   {value}

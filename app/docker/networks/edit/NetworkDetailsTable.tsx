@@ -32,7 +32,7 @@ export function NetworkDetailsTable({
         <Widget>
           <WidgetTitle title="Network details" icon="fa-sitemap" />
           <WidgetBody className="nopadding">
-            <DetailsTable>
+            <DetailsTable dataCy="networkDetails-detailsTable">
               {/* networkRowContent */}
               <DetailsTable.Row label="Name">{network.Name}</DetailsTable.Row>
               <DetailsTable.Row label="Id">

@@ -37,7 +37,10 @@ export function NetworkContainersTable({
         <Widget>
           <WidgetTitle title="Containers in network" icon="fa-server" />
           <WidgetBody className="nopadding">
-            <DetailsTable headers={tableHeaders}>
+            <DetailsTable
+              headers={tableHeaders}
+              dataCy="networkDetails-networkContainers"
+            >
               {networkContainers.map((container) => (
                 <tr key={container.Id}>
                   <td>
@@ -47,7 +50,7 @@ export function NetworkContainersTable({
                         id: container.Id,
                         nodeName,
                       }}
-                      title="Logs"
+                      title={container.Name}
                     >
                       {container.Name}
                     </Link>
@@ -58,7 +61,7 @@ export function NetworkContainersTable({
                   <td>
                     <Authorized authorizations="DockerNetworkDisconnect">
                       <Button
-                        dataCy="networkDetails-deleteNetwork"
+                        dataCy={`networkDetails-disconnect${container.Name}`}
                         size="xsmall"
                         color="danger"
                         onClick={() => {

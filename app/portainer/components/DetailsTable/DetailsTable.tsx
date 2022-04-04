@@ -2,11 +2,16 @@ import { PropsWithChildren } from 'react';
 
 type Props = {
   headers?: string[];
+  dataCy?: string;
 };
 
-export function DetailsTable({ headers, children }: PropsWithChildren<Props>) {
+export function DetailsTable({
+  headers,
+  dataCy,
+  children,
+}: PropsWithChildren<Props>) {
   return (
-    <table className="table">
+    <table className="table" data-cy={dataCy}>
       {headers && headers.length > 0 && (
         <thead>
           <tr>
