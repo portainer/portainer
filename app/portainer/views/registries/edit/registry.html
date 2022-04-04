@@ -60,7 +60,7 @@
             <!-- credentials-password -->
             <div class="form-group">
               <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">
-                {{ registry.Type === RegistryTypes.ECR ? 'AWS Secret Access Key' : 'Password' }}
+                {{ passwordLabel() }}
               </label>
               <div class="col-sm-9 col-lg-10">
                 <input type="password" class="form-control" id="credentials_password" ng-model="formValues.Password" placeholder="*******" />
