@@ -1,5 +1,4 @@
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
-import { EnvironmentId } from '@/portainer/environments/types';
 
 import { ContainerId } from '../containers/types';
 
@@ -16,7 +15,7 @@ export type NetworkOptions = Record<string, string>;
 
 export type NetworkContainer = {
   Id?: ContainerId;
-  EndpointID: EnvironmentId;
+  EndpointID: string;
   IPv4Address: string;
   IPv6Address: string;
   MacAddress: string;
@@ -34,6 +33,8 @@ export interface DockerNetwork {
   Internal: boolean;
   IPAM?: {
     Config: IPConfig[];
+    Driver?: string;
+    Options?: string | null;
   };
   Portainer: { ResourceControl?: ResourceControlViewModel };
   Options?: NetworkOptions;
