@@ -1,4 +1,6 @@
-import { render } from '@/react-tools/test-utils';
+import { renderWithQueryClient } from '@/react-tools/test-utils';
+import { UserContext } from '@/portainer/hooks/useUser';
+import { UserViewModel } from '@/portainer/models/user';
 
 import { NetworkContainer } from '../types';
 
@@ -16,21 +18,27 @@ const networkContainers: NetworkContainer[] = [
   },
 ];
 
+jest.mock('@uirouter/react', () => ({
+  ...jest.requireActual('@uirouter/react'),
+  useCurrentStateAndParams: jest.fn(() => ({
+    params: { endpointId: 1 },
+  })),
+}));
+
 test('Network container values should be visible and the link should be valid', async () => {
-  const { findByText, getByText } = render(
-    <NetworkContainersTable
-      networkContainers={networkContainers}
-      nodeName=""
-      environmentId={1}
-      networkId="pc8xc9s6ot043vl1q5iz4zhfs"
-    />
+  const user = new UserViewModel({ Username: 'test', Role: 1 });
+  const { findByText } = renderWithQueryClient(
+    <UserContext.Provider value={{ user }}>
+      <NetworkContainersTable
+        networkContainers={networkContainers}
+        nodeName=""
+        environmentId={1}
+        networkId="pc8xc9s6ot043vl1q5iz4zhfs"
+      />
+    </UserContext.Provider>
   );
 
   await expect(findByText('Containers in network')).resolves.toBeVisible();
-  expect(getByText(networkContainers[0].Name).closest('a')).toHaveAttribute(
-    'href',
-    getHref(networkContainers[0].Id || '', '')
-  );
   await expect(findByText(networkContainers[0].Name)).resolves.toBeVisible();
   await expect(
     findByText(networkContainers[0].IPv4Address)
@@ -38,13 +46,7 @@ test('Network container values should be visible and the link should be valid', 
   await expect(
     findByText(networkContainers[0].MacAddress)
   ).resolves.toBeVisible();
-  await expect(findByText('Leave network')).resolves.toBeVisible();
+  await expect(
+    findByText('Leave network', { exact: false })
+  ).resolves.toBeVisible();
 });
-
-function getHref(containerId: string, nodeName?: string) {
-  let href = `#!/2/docker/containers/${containerId}`;
-  if (nodeName) {
-    href += `?nodeName=${nodeName}`;
-  }
-  return href;
-}
