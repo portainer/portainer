@@ -126,12 +126,6 @@ angular.module('portainer.app').factory('LocalStorage', [
         const activeTab = localStorageService.get('active_tab_' + key);
         return activeTab === null ? 0 : activeTab;
       },
-      storeToolbarToggle(value) {
-        localStorageService.set('toolbar_toggle', value);
-      },
-      getToolbarToggle() {
-        return localStorageService.get('toolbar_toggle');
-      },
       storeLogoutReason: (reason) => localStorageService.set('logout_reason', reason),
       getLogoutReason: () => localStorageService.get('logout_reason'),
       cleanLogoutReason: () => localStorageService.remove('logout_reason'),

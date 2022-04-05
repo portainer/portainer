@@ -1,0 +1,28 @@
+a.active {
+  color: #fff;
+  border-left-color: var(--border-sidebar-color);
+}
+
+a.active {
+  background: var(--grey-37);
+}
+
+:global(:root[theme='dark']) a.active {
+  background-color: var(--grey-3);
+}
+
+:global(:root[theme='highcontrast']) a.active {
+  background-color: var(--black-color);
+}
+
+:global(:root[data-edition='BE']) a.active {
+  background-color: var(--grey-5);
+}
+
+:global(:root[data-edition='BE'][theme='dark']) a.active {
+  background-color: var(--grey-1);
+}
+
+:global(:root[data-edition='BE'][theme='highcontrast']) a.active {
+  background-color: var(--black-color);
+}

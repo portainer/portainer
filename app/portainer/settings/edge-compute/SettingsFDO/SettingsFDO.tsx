@@ -145,7 +145,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                   <div className="col-sm-12">
                     <LoadingButton
                       disabled={!isValid || !dirty}
-                      dataCy="settings-fdoButton"
+                      data-cy="settings-fdoButton"
                       isLoading={isSubmitting}
                       loadingText="Saving settings..."
                     >

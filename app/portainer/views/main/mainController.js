@@ -1,39 +1,14 @@
-angular.module('portainer.app').controller('MainController', [
-  '$scope',
-  'LocalStorage',
-  'StateManager',
-  'EndpointProvider',
-  'ThemeManager',
-  function ($scope, LocalStorage, StateManager, EndpointProvider, ThemeManager) {
-    /**
-     * Sidebar Toggle & Cookie Control
-     */
-    var mobileView = 992;
-    $scope.getWidth = function () {
-      return window.innerWidth;
-    };
+angular.module('portainer.app').controller('MainController', MainController);
 
-    $scope.applicationState = StateManager.getState();
-    $scope.endpointState = EndpointProvider.endpoint();
+/* @ngInject */
+function MainController($scope, StateManager, ThemeManager, SidebarService) {
+  /**
+   * Sidebar Toggle & Cookie Control
+   */
 
-    $scope.$watch($scope.getWidth, function (newValue) {
-      if (newValue >= mobileView) {
-        const toggleValue = LocalStorage.getToolbarToggle();
-        $scope.toggle = typeof toggleValue === 'boolean' ? toggleValue : !window.ddExtension;
-      } else {
-        $scope.toggle = false;
-      }
-    });
+  $scope.applicationState = StateManager.getState();
 
-    $scope.toggleSidebar = function () {
-      $scope.toggle = !$scope.toggle;
-      LocalStorage.storeToolbarToggle($scope.toggle);
-    };
+  $scope.isSidebarOpen = SidebarService.isSidebarOpen;
 
-    window.onresize = function () {
-      $scope.$apply();
-    };
-
-    ThemeManager.autoTheme();
-  },
-]);
+  ThemeManager.autoTheme();
+}

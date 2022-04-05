@@ -115,7 +115,6 @@
   --bg-main-color: var(--white-color);
   --bg-body-color: var(--grey-9);
   --bg-checkbox-border-color: var(--grey-49);
-  --bg-sidebar-color: var(--grey-37);
   --bg-sidebar-header-color: var(--grey-37);
   --bg-widget-color: var(--white-color);
   --bg-widget-header-color: var(--grey-10);
@@ -152,7 +151,6 @@
   --bg-row-header-color: var(--white-color);
   --bg-image-multiselect-button: linear-gradient(var(--white-color), var(--grey-17));
   --bg-multiselect-checkbox-color: var(--white-color);
-  --bg-sidebar-wrapper-color: var(--blue-5);
   --bg-panel-body-color: var(--white-color);
   --bg-codemirror-color: var(--white-color);
   --bg-codemirror-selected-color: var(--grey-22);
@@ -223,14 +221,11 @@
   --text-ui-select-hover-color: var(--grey-28);
   --text-summary-color: var(--black-color);
   --text-tooltip-color: var(--white-color);
-  --text-sidebar-list-color: var(--grey-56);
-
   --text-rzslider-color: var(--grey-36);
   --text-rzslider-limit-color: var(--grey-36);
   --text-daterangepicker-end-date: var(--grey-57);
   --text-daterangepicker-in-range: var(--black-color);
   --text-daterangepicker-active: var(--white-color);
-  --text-tooltip-color: var(--grey-6);
   --text-input-autofill-color: var(--black-color);
   --text-button-hover-color: var(--grey-6);
   --text-small-select-color: var(--grey-25);
@@ -273,7 +268,6 @@
   --border-blocklist: var(--ui-grey-1);
   --border-widget: var(--ui-grey-1);
 
-  --hover-sidebar-color: var(--grey-37);
   --shadow-box-color: 0 3px 10px -2px var(--grey-50);
   --shadow-boxselector-color: 0 3px 10px -2px var(--grey-50);
   --blue-color: var(--blue-13);
@@ -307,7 +301,6 @@
   --bg-main-color: var(--grey-2);
   --bg-body-color: var(--grey-2);
   --bg-checkbox-border-color: var(--grey-8);
-  --bg-sidebar-color: var(--grey-3);
   --bg-widget-color: var(--grey-1);
   --bg-widget-header-color: var(--grey-1);
   --bg-widget-table-color: var(--grey-1);
@@ -345,7 +338,6 @@
   --bg-multiselect-button-color: var(--grey-3);
   --bg-image-multiselect-button: none !important;
   --bg-multiselect-checkbox-color: var(--grey-3);
-  --bg-sidebar-wrapper-color: var(--grey-1);
   --bg-panel-body-color: var(--grey-1);
   --bg-boxselector-wrapper-disabled-color: var(--grey-39);
   --bg-codemirror-selected-color: var(--grey-3);
@@ -411,7 +403,6 @@
   --text-summary-color: var(--white-color);
   --text-multiselect-button-color: var(--white-color);
   --text-multiselect-item-color: var(--white-color);
-  --text-sidebar-list-color: var(--white-color);
   --text-boxselector-wrapper-color: var(--white-color);
   --text-daterangepicker-end-date: var(--grey-7);
   --text-daterangepicker-in-range: var(--white-color);
@@ -459,7 +450,6 @@
   --border-blocklist: var(--ui-grey-3);
   --border-widget: var(--ui-grey-3);
 
-  --hover-sidebar-color: var(--grey-3);
   --blue-color: var(--blue-2);
   --button-close-color: var(--white-color);
   --button-opacity: 0.6;
@@ -491,7 +481,6 @@
   --bg-main-color: var(--black-color);
   --bg-body-color: var(--black-color);
   --bg-checkbox-border-color: var(--grey-8);
-  --bg-sidebar-color: var(--black-color);
   --bg-widget-color: var(--black-color);
   --bg-widget-header-color: var(--black-color);
   --bg-widget-table-color: var(--black-color);
@@ -503,7 +492,6 @@
   --bg-dropdown-menu-color: var(--black-color);
   --bg-codemirror-selected-color: var(--grey-3);
   --bg-row-header-color: var(--black-color);
-  --bg-sidebar-wrapper-color: var(--black-color);
   --bg-motd-body-color: var(--black-color);
   --bg-blocklist-hover-color: var(--black-color);
   --bg-blocklist-item-selected-color: var(--black-color);
@@ -585,7 +573,6 @@
   --text-daterangepicker-end-date: var(--grey-7);
   --text-daterangepicker-in-range: var(--white-color);
   --text-daterangepicker-active: var(--white-color);
-  --text-sidebar-list-color: var(--white-color);
   --text-ui-select-color: var(--white-color);
   --text-btn-default-color: var(--white-color);
   --text-json-tree-color: var(--white-color);
@@ -634,8 +621,6 @@
   --border-blocklist: var(--white-color);
   --border-widget: var(--white-color);
 
-  --hover-sidebar-color: var(--blue-9);
-  --hover-sidebar-color: var(--black-color);
   --shadow-box-color: none;
   --shadow-boxselector-color: none;
 

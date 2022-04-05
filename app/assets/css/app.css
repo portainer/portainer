@@ -809,11 +809,12 @@ json-tree .branch-preview {
 }
 /* !spinkit override */
 
-.kubectl-shell {
-  display: block;
-  text-align: center;
-  padding-bottom: 5px;
+/* uib-typeahead override */
+#scrollable-dropdown-menu .dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
 }
+/* !uib-typeahead override */
 
 .no-margin {
   margin: 0 !important;

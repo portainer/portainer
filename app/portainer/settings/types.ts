@@ -132,3 +132,24 @@ export interface Settings {
     AsyncMode: boolean;
   };
 }
+
+export interface PublicSettingsResponse {
+  // URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
+  LogoURL: string;
+  // Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
+  AuthenticationMethod: AuthenticationMethod;
+  // Whether edge compute features are enabled
+  EnableEdgeComputeFeatures: boolean;
+  // Supported feature flags
+  Features: Record<string, boolean>;
+  // The URL used for oauth login
+  OAuthLoginURI: string;
+  // The URL used for oauth logout
+  OAuthLogoutURI: string;
+  // Whether portainer internal auth view will be hidden
+  OAuthHideInternalAuth: boolean;
+  // Whether telemetry is enabled
+  EnableTelemetry: boolean;
+  // The expiry of a Kubeconfig
+  KubeconfigExpiry: string;
+}

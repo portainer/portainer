@@ -20,5 +20,8 @@ declare module 'axios-progress-bar' {
 }
 
 interface Window {
-  ddExtension: boolean;
+  /**
+   * will be true if portainer is run as a Docker Desktop Extension
+   */
+  ddExtension?: boolean;
 }
