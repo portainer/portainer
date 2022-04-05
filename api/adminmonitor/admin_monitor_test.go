@@ -42,28 +42,13 @@ func Test_canStopStartedMonitor(t *testing.T) {
 	assert.Nil(t, monitor.cancellationFunc, "cancellation function should absent in stopped monitor")
 }
 
-func Test_start_shouldFatalAfterTimeout_ifNotInitialized(t *testing.T) {
+func Test_start_shouldDisableInstanceAfterTimeout_ifNotInitialized(t *testing.T) {
 	timeout := 10 * time.Millisecond
 
 	datastore := i.NewDatastore(i.WithUsers([]portainer.User{}))
-
-	ch := make(chan struct{})
-	var fataled bool
-	origLogFatalf := logFatalf
-
-	logFatalf = func(s string, v ...interface{}) {
-		fataled = true
-		close(ch)
-	}
-
-	defer func() {
-		logFatalf = origLogFatalf
-	}()
-
 	monitor := New(timeout, datastore, context.Background())
 	monitor.Start()
-	<-time.After(2 * timeout)
-	<-ch
 
-	assert.True(t, fataled, "monitor should been timeout and fatal")
+	<-time.After(20 * timeout)
+	assert.True(t, monitor.WasInstanceDisabled(), "monitor should have been timeout and instance is disabled")
 }

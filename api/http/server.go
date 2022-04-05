@@ -176,7 +176,7 @@ func (server *Server) Start() error {
 
 	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.JWTService, server.KubeClusterAccessService, server.KubernetesClientFactory)
 
-	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
+	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"), adminMonitor.WasInstanceDisabled)
 
 	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeClusterAccessService)
 
@@ -300,8 +300,7 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
-	handler := offlineGate.WaitingMiddleware(time.Minute, server.Handler)
-
+	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
 	if server.HTTPEnabled {
 		go func() {
 			log.Printf("[INFO] [http,server] [message: starting HTTP server on port %s]", server.BindAddress)
