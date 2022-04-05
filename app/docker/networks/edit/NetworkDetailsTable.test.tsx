@@ -31,7 +31,7 @@ test('Network details values should be visible', async () => {
   ).resolves.toBeVisible();
 });
 
-test('System networks shouldnt show a delete button', async () => {
+test(`System networks shouldn't show a delete button`, async () => {
   const systemNetwork = getNetwork('bridge');
   const { queryByText } = await renderComponent(true, systemNetwork);
 

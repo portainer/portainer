@@ -43,6 +43,7 @@ export async function disconnectContainer(
       Container: containerId,
       Force: false,
     });
+    return { networkId, environmentId };
   } catch (e) {
     throw parseAxiosError(
       e as Error,

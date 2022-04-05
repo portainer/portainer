@@ -8,6 +8,10 @@ type Props = {
 };
 
 export function NetworkOptionsTable({ options }: Props) {
+  if (Object.keys(options).length === 0) {
+    return null;
+  }
+
   return (
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">

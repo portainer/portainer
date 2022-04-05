@@ -21,9 +21,7 @@ test('Network options values should be visible', async () => {
   await expect(findByText('Network options')).resolves.toBeVisible();
   // expect to find three 'true' values for the first 3 options
   const cells = await findAllByText('true');
-  expect(cells[0]).toBeVisible();
-  expect(cells[1]).toBeVisible();
-  expect(cells[2]).toBeVisible();
+  expect(cells).toHaveLength(3);
   await expect(
     findByText(options['com.docker.network.bridge.host_binding_ipv4'])
   ).resolves.toBeVisible();

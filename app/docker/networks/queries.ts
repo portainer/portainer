@@ -47,17 +47,21 @@ export function useDeleteNetwork() {
   );
 }
 
-export function useDisconnectContainer(
-  environmentId: EnvironmentId,
-  networkId: NetworkId
-) {
+export function useDisconnectContainer() {
   const client = useQueryClient();
 
   return useMutation(
-    ({ containerId }: { containerId: ContainerId }) =>
-      disconnectContainer(environmentId, networkId, containerId),
+    ({
+      containerId,
+      environmentId,
+      networkId,
+    }: {
+      containerId: ContainerId;
+      environmentId: EnvironmentId;
+      networkId: NetworkId;
+    }) => disconnectContainer(environmentId, networkId, containerId),
     {
-      onSuccess: () => {
+      onSuccess: ({ networkId, environmentId }) => {
         notifySuccess('Container successfully disconnected', networkId);
         return client.invalidateQueries([
           'environments',

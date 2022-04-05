@@ -29,7 +29,11 @@ export function NetworkContainersTable({
   environmentId,
   networkId,
 }: Props) {
-  const disconnectContainer = useDisconnectContainer(environmentId, networkId);
+  const disconnectContainer = useDisconnectContainer();
+
+  if (networkContainers.length === 0) {
+    return null;
+  }
 
   return (
     <div className="row">
@@ -68,6 +72,8 @@ export function NetworkContainersTable({
                           if (container.Id) {
                             disconnectContainer.mutate({
                               containerId: container.Id,
+                              environmentId,
+                              networkId,
                             });
                           }
                         }}

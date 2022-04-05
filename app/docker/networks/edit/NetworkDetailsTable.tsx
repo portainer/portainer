@@ -66,42 +66,40 @@ export function NetworkDetailsTable({
               </DetailsTable.Row>
 
               {/* IPV4 ConfigRowContent */}
-              {IPV4Configs &&
-                IPV4Configs?.map((config) => (
-                  <Fragment key={config.Subnet}>
-                    <DetailsTable.Row
-                      label={`IPV4 Subnet${getConfigDetails(config.Subnet)}`}
-                    >
-                      {`IPV4 Gateway${getConfigDetails(config.Gateway)}`}
-                    </DetailsTable.Row>
-                    <DetailsTable.Row
-                      label={`IPV4 IP Range${getConfigDetails(config.IPRange)}`}
-                    >
-                      {`IPV4 Excluded IPs${getAuxiliaryAddresses(
-                        config.AuxiliaryAddresses
-                      )}`}
-                    </DetailsTable.Row>
-                  </Fragment>
-                ))}
+              {IPV4Configs?.map((config) => (
+                <Fragment key={config.Subnet}>
+                  <DetailsTable.Row
+                    label={`IPV4 Subnet${getConfigDetails(config.Subnet)}`}
+                  >
+                    {`IPV4 Gateway${getConfigDetails(config.Gateway)}`}
+                  </DetailsTable.Row>
+                  <DetailsTable.Row
+                    label={`IPV4 IP Range${getConfigDetails(config.IPRange)}`}
+                  >
+                    {`IPV4 Excluded IPs${getAuxiliaryAddresses(
+                      config.AuxiliaryAddresses
+                    )}`}
+                  </DetailsTable.Row>
+                </Fragment>
+              ))}
 
               {/* IPV6 ConfigRowContent */}
-              {IPV6Configs &&
-                IPV6Configs?.map((config) => (
-                  <Fragment key={config.Subnet}>
-                    <DetailsTable.Row
-                      label={`IPV6 Subnet${getConfigDetails(config.Subnet)}`}
-                    >
-                      {`IPV6 Gateway${getConfigDetails(config.Gateway)}`}
-                    </DetailsTable.Row>
-                    <DetailsTable.Row
-                      label={`IPV6 IP Range${getConfigDetails(config.IPRange)}`}
-                    >
-                      {`IPV6 Excluded IPs${getAuxiliaryAddresses(
-                        config.AuxiliaryAddresses
-                      )}`}
-                    </DetailsTable.Row>
-                  </Fragment>
-                ))}
+              {IPV6Configs?.map((config) => (
+                <Fragment key={config.Subnet}>
+                  <DetailsTable.Row
+                    label={`IPV6 Subnet${getConfigDetails(config.Subnet)}`}
+                  >
+                    {`IPV6 Gateway${getConfigDetails(config.Gateway)}`}
+                  </DetailsTable.Row>
+                  <DetailsTable.Row
+                    label={`IPV6 IP Range${getConfigDetails(config.IPRange)}`}
+                  >
+                    {`IPV6 Excluded IPs${getAuxiliaryAddresses(
+                      config.AuxiliaryAddresses
+                    )}`}
+                  </DetailsTable.Row>
+                </Fragment>
+              ))}
             </DetailsTable>
           </WidgetBody>
         </Widget>

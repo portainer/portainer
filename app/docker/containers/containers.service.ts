@@ -92,7 +92,7 @@ export async function getContainers(
 ) {
   try {
     const { data } = await axios.get<DockerContainer[]>(
-      urlBuilder(endpointId, '', 'json'),
+      urlBuilder(environmentId, '', 'json'),
       {
         params: { all: 0, filters },
       }

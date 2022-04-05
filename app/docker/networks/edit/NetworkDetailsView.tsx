@@ -81,11 +81,10 @@ export function NetworkDetailsView() {
           />
         </>
       )}
-      {networkQuery.data?.Options &&
-        Object.keys(networkQuery.data.Options).length > 0 && (
-          <NetworkOptionsTable options={networkQuery.data.Options} />
-        )}
-      {filteredNetworkContainers && filteredNetworkContainers.length > 0 && (
+      {networkQuery.data?.Options && (
+        <NetworkOptionsTable options={networkQuery.data.Options} />
+      )}
+      {filteredNetworkContainers && (
         <NetworkContainersTable
           networkContainers={filteredNetworkContainers}
           nodeName={nodeName}

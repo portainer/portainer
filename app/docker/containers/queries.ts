@@ -3,12 +3,12 @@ import { useQuery } from 'react-query';
 import { EnvironmentId } from '@/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
 
-import { queryContainers } from './containers.service';
+import { getContainers } from './containers.service';
 
 export function useContainers(environmentId: EnvironmentId, filters?: object) {
   return useQuery(
-    ['environments', environmentId, 'docker', 'containers', {filters}],
-    () => queryContainers(environmentId, filters),
+    ['environments', environmentId, 'docker', 'containers', { filters }],
+    () => getContainers(environmentId, filters),
     {
       onError: (err) => {
         notifyError(

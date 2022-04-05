@@ -12,7 +12,7 @@ export function DetailsTable({
 }: PropsWithChildren<Props>) {
   return (
     <table className="table" data-cy={dataCy}>
-      {headers && headers.length > 0 && (
+      {headers.length > 0 && (
         <thead>
           <tr>
             {headers.map((header) => (
