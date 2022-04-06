@@ -13,7 +13,7 @@
             <uib-tab index="0">
               <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> Deploy </uib-tab-heading>
               <div class="col-sm-12 form-section-title"> Namespace </div>
-              <form class="form-horizontal" style="margin-top: 20px">
+              <form class="form-horizontal" style="margin-top: 20px" name="deploymentForm">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="target_node" class="col-lg-1 col-sm-2 control-label text-left">Namespace</label>
                   <div class="col-lg-11 col-sm-10">
@@ -161,7 +161,7 @@
                     <button
                       type="button"
                       class="btn btn-primary btn-sm"
-                      ng-disabled="ctrl.disableDeploy()"
+                      ng-disabled="!deploymentForm.$valid || ctrl.disableDeploy()"
                       ng-click="ctrl.deploy()"
                       button-spinner="ctrl.state.actionInProgress"
                       data-cy="k8sAppDeploy-deployButton"
