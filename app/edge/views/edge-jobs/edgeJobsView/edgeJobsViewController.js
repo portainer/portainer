@@ -31,7 +31,7 @@ export class EdgeJobsViewController {
     for (let edgeJob of edgeJobs) {
       try {
         await this.EdgeJobService.remove(edgeJob.Id);
-        this.Notifications.success('Stack successfully removed', edgeJob.Name);
+        this.Notifications.success('Edge job successfully removed', edgeJob.Name);
         _.remove(this.edgeJobs, edgeJob);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to remove Edge job ' + edgeJob.Name);
