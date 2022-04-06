@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Download dependencies
-        run: cd api && go get -v -d
+        run: go get -v -d
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/golang@master
         continue-on-error: true # To make sure that SARIF upload gets called
