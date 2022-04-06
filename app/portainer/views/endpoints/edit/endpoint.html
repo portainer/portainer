@@ -28,13 +28,13 @@
             type="button"
             class="btn btn-primary btn-sm"
             ng-disabled="state.actionInProgress"
-            ng-click="onDeassociateEndpoint()"
+            ng-click="onDisassociateEndpoint()"
             button-spinner="state.actionInProgress"
             analytics-on
-            analytics-event="edge-endpoint-deassociate"
+            analytics-event="edge-endpoint-disassociate"
             analytics-category="edge"
           >
-            <span ng-hide="state.actionInProgress">De-associate</span>
+            <span ng-hide="state.actionInProgress">Disassociate</span>
           </button>
         </p>
       </span>

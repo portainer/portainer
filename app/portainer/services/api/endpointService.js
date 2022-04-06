@@ -41,8 +41,8 @@ angular.module('portainer.app').factory('EndpointService', [
       return Endpoints.updateAccess({ id: id }, { UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies }).$promise;
     };
 
-    service.deassociateEndpoint = function (endpointID) {
-      return Endpoints.deassociate({ id: endpointID }).$promise;
+    service.disassociateEndpoint = function (endpointID) {
+      return Endpoints.disassociate({ id: endpointID }).$promise;
     };
 
     service.updateEndpoint = function (id, payload) {

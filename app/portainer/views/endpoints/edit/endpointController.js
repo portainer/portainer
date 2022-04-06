@@ -140,24 +140,24 @@ function EndpointController(
     }
   }
 
-  $scope.onDeassociateEndpoint = async function () {
-    ModalService.confirmDeassociate((confirmed) => {
+  $scope.onDisassociateEndpoint = async function () {
+    ModalService.confirmDisassociate((confirmed) => {
       if (confirmed) {
-        deassociateEndpoint();
+        disassociateEndpoint();
       }
     });
   };
 
-  async function deassociateEndpoint() {
+  async function disassociateEndpoint() {
     var endpoint = $scope.endpoint;
 
     try {
       $scope.state.actionInProgress = true;
-      await EndpointService.deassociateEndpoint(endpoint.Id);
-      Notifications.success('Environment de-associated', $scope.endpoint.Name);
+      await EndpointService.disassociateEndpoint(endpoint.Id);
+      Notifications.success('Environment disassociated', $scope.endpoint.Name);
       $state.reload();
     } catch (err) {
-      Notifications.error('Failure', err, 'Unable to de-associate environment');
+      Notifications.error('Failure', err, 'Unable to disassociate environment');
     } finally {
       $scope.state.actionInProgress = false;
     }
