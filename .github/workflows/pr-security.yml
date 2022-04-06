@@ -28,9 +28,8 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --fail-on=upgradable --sarif-file-output=snyk.sarif --package-manager=gomodules
+          args: --severity-threshold=high --sarif-file-output=snyk.sarif --file=./api/go.mod
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: snyk.sarif
-
