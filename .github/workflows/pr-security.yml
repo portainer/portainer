@@ -12,15 +12,12 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high --fail-on=upgradable
-      - name: Download golang dependencies
-        run: cd api && go get -v -d
-      - name: Run Snyk to check golang dependency
-        uses: snyk/actions/golang@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
   server-dependencies:
     name: server dependency check
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
     steps:
       - uses: actions/checkout@master
       - name: Download dependencies
