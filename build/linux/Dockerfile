@@ -7,7 +7,7 @@ LABEL org.opencontainers.image.title="Portainer" \
     com.docker.desktop.extension.icon=https://portainer-io-assets.sfo2.cdn.digitaloceanspaces.com/logos/portainer.png
 
 COPY dist /
-COPY docker-extension/build /
+COPY build/docker-extension /
 
 VOLUME /data
 WORKDIR /

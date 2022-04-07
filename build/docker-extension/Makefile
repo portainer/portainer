@@ -1,10 +1,11 @@
+# Makefile for development purpose
 
 .PHONY: all build
 all: clean build install
 
 ORG=portainer
-VERSION=2.11.8
-IMAGE_NAME=$(ORG)/portainer-extension
+VERSION=2.11.10
+IMAGE_NAME=$(ORG)/portainer-docker-extension
 TAGGED_IMAGE_NAME=$(IMAGE_NAME):$(VERSION)
 
 clean:

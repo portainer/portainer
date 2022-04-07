@@ -8,6 +8,7 @@
     <base id="base" />
     <script>
       if (window.origin == 'file://') {
+        // we are loading the app from a local file as in docker extension
         document.getElementById('base').href = 'http://localhost:9000/';
 
         window.ddExtension = true;

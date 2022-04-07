@@ -21,7 +21,10 @@
           <div class="form-group">
             <div class="col-sm-12">
               <label for="toggle_logo" class="control-label text-left"> Use custom logo </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="toggle_logo" ng-model="formValues.customLogo" /><i></i> </label>
+              <label class="switch" style="margin-left: 20px">
+                <input type="checkbox" name="toggle_logo" ng-model="formValues.customLogo" />
+                <i></i>
+              </label>
             </div>
           </div>
           <div ng-if="formValues.customLogo">
@@ -40,7 +43,10 @@
           <div class="form-group">
             <div class="col-sm-12">
               <label for="toggle_enableTelemetry" class="control-label text-left"> Allow the collection of anonymous statistics </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" /><i></i> </label>
+              <label class="switch" style="margin-left: 20px">
+                <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" />
+                <i></i>
+              </label>
             </div>
             <div class="col-sm-12 text-muted small" style="margin-top: 10px">
               You can find more information about this in our
@@ -128,7 +134,7 @@
   </div>
 </div>
 
-<ssl-certificate-settings></ssl-certificate-settings>
+<ssl-certificate-settings ng-show="$ctrl.showHTTPS"></ssl-certificate-settings>
 
 <div class="row">
   <div class="col-sm-12">
@@ -149,7 +155,7 @@
               <input type="text" class="form-control" id="header_value" ng-model="formValues.labelValue" placeholder="e.g. bar" />
             </div>
             <div class="col-sm-12 col-md-2 margin-sm-top">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.labelName"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add filter</button>
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.labelName"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add filter</button>
             </div>
           </div>
           <div class="form-group">
@@ -166,11 +172,11 @@
                   <tr ng-repeat="label in settings.BlackListedLabels">
                     <td>{{ label.name }}</td>
                     <td>{{ label.value }}</td>
-                    <td
-                      ><button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)"
-                        ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button
-                      ></td
-                    >
+                    <td>
+                      <button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)">
+                        <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button
+                      >
+                    </td>
                   </tr>
                   <tr ng-if="settings.BlackListedLabels.length === 0">
                     <td colspan="3" class="text-center text-muted">No filter available.</td>
@@ -208,8 +214,8 @@
                   checked="formValues.scheduleAutomaticBackups"
                   label-class="'col-sm-2'"
                   on-change="(onToggleAutoBackups)"
-                ></por-switch-field
-              ></div>
+                ></por-switch-field>
+              </div>
             </div>
             <!-- !Schedule automatic backups -->
             <!-- Cron rule  -->
@@ -311,7 +317,8 @@
               <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
               <div class="col-sm-1">
                 <label class="switch" data-cy="settings-s3PasswordToggle">
-                  <input type="checkbox" id="password_protect_s3" name="password_protect_s3" ng-model="formValues.passwordProtectS3" disabled /><i></i>
+                  <input type="checkbox" id="password_protect_s3" name="password_protect_s3" ng-model="formValues.passwordProtectS3" disabled />
+                  <i></i>
                 </label>
               </div>
             </div>
@@ -342,7 +349,7 @@
                   limited-feature-disabled
                   limited-feature-class="limited-be"
                 >
-                  <span><i class="fa fa-upload" aria-hidden="true"></i> Export backup</span>
+                  <span> <i class="fa fa-upload" aria-hidden="true"></i> Export backup</span>
                 </button>
               </div>
             </div>
@@ -370,7 +377,8 @@
               <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
               <div class="col-sm-1">
                 <label class="switch" data-cy="settings-passwordProtectLocal">
-                  <input type="checkbox" id="password_protect" name="password_protect" ng-model="formValues.passwordProtect" /><i></i>
+                  <input type="checkbox" id="password_protect" name="password_protect" ng-model="formValues.passwordProtect" />
+                  <i></i>
                 </label>
               </div>
             </div>

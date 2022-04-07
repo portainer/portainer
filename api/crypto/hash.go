@@ -10,6 +10,9 @@ type Service struct{}
 // Hash hashes a string using the bcrypt algorithm
 func (*Service) Hash(data string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(data), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
 	return string(bytes), err
 }
 
