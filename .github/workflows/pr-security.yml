@@ -43,6 +43,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+      - name: Use golang 1.17.x
+        uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.17.0'
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:
