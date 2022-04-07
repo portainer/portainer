@@ -244,7 +244,7 @@
                             ng-model="item.Host"
                             ng-change="$ctrl.onChangeIngressHostname()"
                             placeholder="foo"
-                            pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
+                            pattern="[\*a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
                             required
                             data-cy="namespaceCreate-hostnameInput{{ ic.IngressClass.Name }}_{{ $index }}"
                           />
