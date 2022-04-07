@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@master
       - name: Build an image from Dockerfile
         run: | 
-          docker build -t portainer:${{ github.sha }} ./build/linux/
+          docker build -f build/linux/Dockerfile -t portainer:${{ github.sha }} .
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
