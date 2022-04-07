@@ -21,7 +21,7 @@
       <div class="col-sm-12 small text-warning">
         <div ng-messages="$ctrl[$ctrl.formName].name.$error">
           <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required. </p>
-          <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid file path </p>
+          <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> File path must include yaml, yml, json, or hcl extension </p>
         </div>
       </div>
     </div>
