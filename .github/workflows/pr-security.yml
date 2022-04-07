@@ -55,6 +55,11 @@ jobs:
         run: yarn install
       - name: build
         run: yarn build
+      - name: upload dist artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-artifact
+          path: dist/
   image-vulnerability:
     name: image vulnerability check
     needs: [build_app]
@@ -62,8 +67,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@master
-      - name: ls
-        run: pwd | ls
+      - name: download dist artifact
+        uses: actions/download-artifact@v3
+        with:  
+          name: dist-artifact
       - name: Build an image from Dockerfile
         run: | 
           docker build -t portainer:${{ github.sha }} -f build/linux/Dockerfile .
