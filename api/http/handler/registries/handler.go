@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
@@ -45,27 +46,27 @@ func newHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 }
 
-func (h *Handler) initRouter(bouncer accessGuard) {
-	h.Handle("/registries",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.registryCreate))).Methods(http.MethodPost)
-	h.Handle("/registries",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.registryList))).Methods(http.MethodGet)
-	h.Handle("/registries/{id}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.registryInspect))).Methods(http.MethodGet)
-	h.Handle("/registries/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.registryUpdate))).Methods(http.MethodPut)
-	h.Handle("/registries/{id}/configure",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.registryConfigure))).Methods(http.MethodPost)
-	h.Handle("/registries/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
-	h.PathPrefix("/registries/proxies/gitlab").Handler(
-		bouncer.AdminAccess(httperror.LoggerHandler(h.proxyRequestsToGitlabAPIWithoutRegistry)))
+func (handler *Handler) initRouter(bouncer accessGuard) {
+	adminRouter := handler.NewRoute().Subrouter()
+	adminRouter.Use(bouncer.AdminAccess)
+
+	authenticatedRouter := handler.NewRoute().Subrouter()
+	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
+
+	adminRouter.Handle("/registries", httperror.LoggerHandler(handler.registryList)).Methods(http.MethodGet)
+	adminRouter.Handle("/registries", httperror.LoggerHandler(handler.registryCreate)).Methods(http.MethodPost)
+	adminRouter.Handle("/registries/{id}", httperror.LoggerHandler(handler.registryUpdate)).Methods(http.MethodPut)
+	adminRouter.Handle("/registries/{id}/configure", httperror.LoggerHandler(handler.registryConfigure)).Methods(http.MethodPost)
+	adminRouter.Handle("/registries/{id}", httperror.LoggerHandler(handler.registryDelete)).Methods(http.MethodDelete)
+
+	authenticatedRouter.Handle("/registries/{id}", httperror.LoggerHandler(handler.registryInspect)).Methods(http.MethodGet)
+	authenticatedRouter.PathPrefix("/registries/proxies/gitlab").Handler(httperror.LoggerHandler(handler.proxyRequestsToGitlabAPIWithoutRegistry))
 }
 
 type accessGuard interface {
 	AdminAccess(h http.Handler) http.Handler
-	RestrictedAccess(h http.Handler) http.Handler
 	AuthenticatedAccess(h http.Handler) http.Handler
+	AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error
 }
 
 func (handler *Handler) registriesHaveSameURLAndCredentials(r1, r2 *portainer.Registry) bool {
@@ -77,4 +78,31 @@ func (handler *Handler) registriesHaveSameURLAndCredentials(r1, r2 *portainer.Re
 	}
 
 	return hasSameUrl && hasSameCredentials && r1.Gitlab.ProjectPath == r2.Gitlab.ProjectPath
+}
+
+func (handler *Handler) userHasRegistryAccess(r *http.Request) (hasAccess bool, isAdmin bool, err error) {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return false, false, err
+	}
+
+	if securityContext.IsAdmin {
+		return true, true, nil
+	}
+
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
+	if err != nil {
+		return false, false, err
+	}
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err != nil {
+		return false, false, err
+	}
+
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
+	if err != nil {
+		return false, false, err
+	}
+
+	return true, false, nil
 }
