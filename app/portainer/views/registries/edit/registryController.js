@@ -1,61 +1,84 @@
+import _ from 'lodash';
 import { RegistryTypes } from '@/portainer/models/registryTypes';
 
-angular.module('portainer.app').controller('RegistryController', [
-  '$scope',
-  '$state',
-  'RegistryService',
-  'Notifications',
-  function ($scope, $state, RegistryService, Notifications) {
-    $scope.state = {
+export default class RegistryController {
+  /* @ngInject */
+  constructor($async, $state, RegistryService, Notifications) {
+    Object.assign(this, { $async, $state, RegistryService, Notifications });
+
+    this.RegistryTypes = RegistryTypes;
+
+    this.state = {
       actionInProgress: false,
+      loading: false,
     };
 
-    $scope.formValues = {
+    this.formValues = {
       Password: '',
     };
+  }
 
-    $scope.RegistryTypes = RegistryTypes;
-
-    $scope.passwordLabel = () => {
-      const type = $scope.registry.Type;
-      switch (type) {
-        case RegistryTypes.ECR:
-          return 'AWS Secret Access Key';
-        case RegistryTypes.DOCKERHUB:
-          return 'Access token';
-        default:
-          return 'Password';
-      }
-    };
-
-    $scope.updateRegistry = function () {
-      var registry = $scope.registry;
-      registry.Password = $scope.formValues.Password;
-      $scope.state.actionInProgress = true;
-      RegistryService.updateRegistry(registry)
-        .then(function success() {
-          Notifications.success('Registry successfully updated');
-          $state.go('portainer.registries');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to update registry');
-        })
-        .finally(function final() {
-          $scope.state.actionInProgress = false;
-        });
-    };
-
-    function initView() {
-      var registryID = $state.params.id;
-      RegistryService.registry(registryID)
-        .then(function success(data) {
-          $scope.registry = data;
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve registry details');
-        });
+  passwordLabel() {
+    const type = this.registry.Type;
+    switch (type) {
+      case RegistryTypes.ECR:
+        return 'AWS Secret Access Key';
+      case RegistryTypes.DOCKERHUB:
+        return 'Access token';
+      default:
+        return 'Password';
     }
+  };
 
-    initView();
-  },
-]);
+  updateRegistry() {
+    return this.$async(async () => {
+      try {
+        this.state.actionInProgress = true;
+        const registry = this.registry;
+        registry.Password = this.formValues.Password;
+        registry.Name = this.formValues.Name;
+
+        await this.RegistryService.updateRegistry(registry);
+        this.Notifications.success('Registry successfully updated');
+        this.$state.go('portainer.registries');
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to update registry');
+      } finally {
+        this.state.actionInProgress = false;
+      }
+    });
+  }
+
+  onChangeName() {
+    this.state.nameAlreadyExists = _.includes(this.registriesNames, this.formValues.Name);
+  }
+
+  isUpdateButtonDisabled() {
+    return (
+      this.state.actionInProgress ||
+      this.state.nameAlreadyExists ||
+      !this.registry.Name ||
+      !this.registry.URL ||
+      (this.registry.Type == this.RegistryTypes.QUAY && this.registry.Quay.UseOrganisation && !this.registry.Quay.OrganisationName)
+    );
+  }
+
+  async $onInit() {
+    try {
+      this.state.loading = true;
+
+      const registryId = this.$state.params.id;
+      const registry = await this.RegistryService.registry(registryId);
+      this.registry = registry;
+      this.formValues.Name = registry.Name;
+
+      const registries = await this.RegistryService.registries();
+      _.pullAllBy(registries, [registry], 'Id');
+      this.registriesNames = _.map(registries, 'Name');
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve registry details');
+    } finally {
+      this.state.loading = false;
+    }
+  }
+}

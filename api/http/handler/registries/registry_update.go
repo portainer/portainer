@@ -77,6 +77,11 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
+	registries, err := handler.DataStore.Registry().Registries()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
+	}
+
 	var payload registryUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -85,6 +90,15 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.Name != nil {
 		registry.Name = *payload.Name
+	}
+	// enforce name uniqueness across registries
+	// check is performed even if Name didn't change (Name not in payload) as we need
+	// to enforce this rule on updates not performed with frontend (e.g. on direct API requests)
+	// see https://portainer.atlassian.net/browse/EE-2706 for more details
+	for _, r := range registries {
+		if r.ID != registry.ID && r.Name == registry.Name {
+			return &httperror.HandlerError{http.StatusConflict, "Another registry with the same name already exists", errors.New("A registry is already defined with this name")}
+		}
 	}
 
 	if registry.Type == portainer.ProGetRegistry && payload.BaseURL != nil {
@@ -129,10 +143,6 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		shouldUpdateSecrets = shouldUpdateSecrets || (*payload.URL != registry.URL)
 
 		registry.URL = *payload.URL
-		registries, err := handler.DataStore.Registry().Registries()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
-		}
 
 		for _, r := range registries {
 			if r.ID != registry.ID && handler.registriesHaveSameURLAndCredentials(&r, registry) {

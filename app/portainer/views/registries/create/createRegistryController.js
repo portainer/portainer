@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { RegistryTypes } from 'Portainer/models/registryTypes';
 import { RegistryCreateFormValues } from 'Portainer/models/registry';
 
@@ -21,6 +22,8 @@ class CreateRegistryController {
     };
 
     this.createRegistry = this.createRegistry.bind(this);
+    this.getRegistries = this.getRegistries.bind(this);
+    this.nameIsUsed = this.nameIsUsed.bind(this);
     this.retrieveGitlabRegistries = this.retrieveGitlabRegistries.bind(this);
     this.createGitlabRegistries = this.createGitlabRegistries.bind(this);
   }
@@ -128,16 +131,34 @@ class CreateRegistryController {
     });
   }
 
+  nameIsUsed(name) {
+    return _.includes(this.registriesNames, name);
+  }
+
+  getRegistries() {
+    return this.$async(async () => {
+      try {
+        const registries = await this.RegistryService.registries();
+        this.registriesNames = _.map(registries, 'Name');
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to fetch existing registries');
+      }
+    });
+  }
+
   $onInit() {
-    this.model = new RegistryCreateFormValues();
+    return this.$async(async () => {
+      this.model = new RegistryCreateFormValues();
 
-    const from = this.$transition$.from();
-    const params = this.$transition$.params('from');
+      const from = this.$transition$.from();
+      const params = this.$transition$.params('from');
 
-    if (from.name && /^[a-z]+\.registries$/.test(from.name)) {
-      this.state.originViewReference = from;
-      this.state.originalEndpointId = params.endpointId || null;
-    }
+      if (from.name && /^[a-z]+\.registries$/.test(from.name)) {
+        this.state.originViewReference = from;
+        this.state.originalEndpointId = params.endpointId || null;
+      }
+      await this.getRegistries();
+    });
   }
 }
 
