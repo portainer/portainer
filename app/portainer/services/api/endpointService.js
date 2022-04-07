@@ -9,7 +9,6 @@ angular.module('portainer.app').factory('EndpointService', [
     var service = {
       updateSecuritySettings,
       registries,
-      registry,
       updateRegistryAccess,
     };
 
@@ -183,10 +182,6 @@ angular.module('portainer.app').factory('EndpointService', [
 
     function updateSecuritySettings(id, securitySettings) {
       return Endpoints.updateSecuritySettings({ id }, securitySettings).$promise;
-    }
-
-    function registry(endpointId, registryId) {
-      return Endpoints.registry({ registryId, id: endpointId }).$promise;
     }
   },
 ]);

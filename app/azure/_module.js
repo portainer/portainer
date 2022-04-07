@@ -1,5 +1,6 @@
 import angular from 'angular';
 
+import { AzureSidebarAngular } from './AzureSidebar/AzureSidebar';
 import { DashboardViewAngular } from './Dashboard/DashboardView';
 import { containerInstancesModule } from './ContainerInstances';
 
@@ -82,4 +83,5 @@ angular
       $stateRegistryProvider.register(dashboard);
     },
   ])
-  .component('dashboardView', DashboardViewAngular).name;
+  .component('azureSidebar', AzureSidebarAngular)
+  .component('dashboardView', DashboardViewAngular);

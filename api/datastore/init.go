@@ -22,23 +22,18 @@ func (store *Store) Init() error {
 		return err
 	}
 
-	err = store.checkOrCreateDefaultData()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return store.checkOrCreateDefaultData()
 }
 
 func (store *Store) checkOrCreateInstanceID() error {
-	instanceID, err := store.VersionService.InstanceID()
+	_, err := store.VersionService.InstanceID()
 	if store.IsErrObjectNotFound(err) {
 		uid, err := uuid.NewV4()
 		if err != nil {
 			return err
 		}
 
-		instanceID = uid.String()
+		instanceID := uid.String()
 		return store.VersionService.StoreInstanceID(instanceID)
 	}
 	return err

@@ -126,7 +126,7 @@ export class EdgeJobController {
   }
 
   async uiCanExit() {
-    if (this.edgeJob.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
+    if (this.edgeJob && this.edgeJob.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
       return this.ModalService.confirmWebEditorDiscard();
     }
   }
@@ -165,7 +165,7 @@ export class EdgeJobController {
     }
 
     this.$window.onbeforeunload = () => {
-      if (this.edgeJob.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
+      if (this.edgeJob && this.edgeJob.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
         return '';
       }
     };

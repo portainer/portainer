@@ -112,7 +112,7 @@
           ng-model="servicePort.ingress.Host"
           required
           ng-disabled="$ctrl.originalIngresses.length === 0"
-          ng-options="ingress.Hosts[0] as ingress.Hosts for ingress in $ctrl.originalIngresses"
+          ng-options="host as host for host in ($ctrl.originalIngresses | filter:{ Name: servicePort.ingress.IngressName })[0].Hosts"
           data-cy="k8sAppCreate-hostnamePort_{{ $index }}"
         >
           <option selected disabled hidden value="">Select a hostname</option>

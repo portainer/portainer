@@ -153,7 +153,9 @@ func (s *stubEdgeJobService) EdgeJobs() ([]portainer.EdgeJob, error) { return s.
 func (s *stubEdgeJobService) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
 	return nil, nil
 }
-func (s *stubEdgeJobService) Create(edgeJob *portainer.EdgeJob) error { return nil }
+func (s *stubEdgeJobService) Create(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
+	return nil
+}
 func (s *stubEdgeJobService) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
 	return nil
 }

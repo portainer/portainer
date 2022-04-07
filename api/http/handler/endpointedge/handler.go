@@ -1,8 +1,9 @@
 package endpointedge
 
 import (
-	"github.com/portainer/portainer/api/http/middlewares"
 	"net/http"
+
+	"github.com/portainer/portainer/api/http/middlewares"
 
 	httperror "github.com/portainer/libhttp/error"
 

@@ -1,12 +1,18 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { TeamId } from '@/portainer/teams/types';
+import { UserId } from '@/portainer/users/types';
 
-import {
-  EnvironmentId,
-  TeamAccessPolicies,
-  UserAccessPolicies,
-} from '../types';
+import { EnvironmentId } from '../types';
 
 import { buildUrl } from './utils';
+
+export type RoleId = number;
+interface AccessPolicy {
+  RoleId: RoleId;
+}
+
+type UserAccessPolicies = Record<UserId, AccessPolicy>; // map[UserID]AccessPolicy
+type TeamAccessPolicies = Record<TeamId, AccessPolicy>;
 
 export type RegistryId = number;
 export interface Registry {

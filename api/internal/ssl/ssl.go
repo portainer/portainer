@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+
 	"github.com/portainer/libcrypto"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -32,8 +33,8 @@ func NewService(fileService portainer.FileService, dataStore dataservices.DataSt
 
 // Init initializes the service
 func (service *Service) Init(host, certPath, keyPath string) error {
-	pathSupplied := certPath != "" && keyPath != ""
-	if pathSupplied {
+	certSupplied := certPath != "" && keyPath != ""
+	if certSupplied {
 		newCertPath, newKeyPath, err := service.fileService.CopySSLCertPair(certPath, keyPath)
 		if err != nil {
 			return errors.Wrap(err, "failed copying supplied certs")
@@ -60,16 +61,24 @@ func (service *Service) Init(host, certPath, keyPath string) error {
 		}
 	}
 
-	// path not supplied and certificates doesn't exist - generate self signed
+	// path not supplied and certificates doesn't exist - generate self-signed
 	certPath, keyPath = service.fileService.GetDefaultSSLCertsPath()
 
-	err = service.generateSelfSignedCertificates(host, certPath, keyPath)
+	err = generateSelfSignedCertificates(host, certPath, keyPath)
 	if err != nil {
 		return errors.Wrap(err, "failed generating self signed certs")
 	}
 
 	return service.cacheInfo(certPath, keyPath, true)
+}
 
+func generateSelfSignedCertificates(ip, certPath, keyPath string) error {
+	if ip == "" {
+		return errors.New("host can't be empty")
+	}
+
+	log.Printf("[INFO] [internal,ssl] [message: no cert files found, generating self signed ssl certificates]")
+	return libcrypto.GenerateCertsForHost("localhost", ip, certPath, keyPath, time.Now().AddDate(5, 0, 0))
 }
 
 // GetRawCertificate gets the raw certificate
@@ -98,7 +107,10 @@ func (service *Service) SetCertificates(certData, keyData []byte) error {
 		return err
 	}
 
-	service.cacheInfo(certPath, keyPath, false)
+	err = service.cacheInfo(certPath, keyPath, false)
+	if err != nil {
+		return err
+	}
 
 	service.shutdownTrigger()
 
@@ -138,7 +150,7 @@ func (service *Service) cacheCertificate(certPath, keyPath string) error {
 	return nil
 }
 
-func (service *Service) cacheInfo(certPath, keyPath string, selfSigned bool) error {
+func (service *Service) cacheInfo(certPath string, keyPath string, selfSigned bool) error {
 	err := service.cacheCertificate(certPath, keyPath)
 	if err != nil {
 		return err
@@ -159,13 +171,4 @@ func (service *Service) cacheInfo(certPath, keyPath string, selfSigned bool) err
 	}
 
 	return nil
-}
-
-func (service *Service) generateSelfSignedCertificates(ip, certPath, keyPath string) error {
-	if ip == "" {
-		return errors.New("host can't be empty")
-	}
-
-	log.Printf("[INFO] [internal,ssl] [message: no cert files found, generating self signed ssl certificates]")
-	return libcrypto.GenerateCertsForHost("localhost", ip, certPath, keyPath, time.Now().AddDate(5, 0, 0))
 }

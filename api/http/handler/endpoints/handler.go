@@ -67,8 +67,10 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/endpoints/{id}/registries",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistriesList))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/registries/{registryId}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryInspect))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}/registries/{registryId}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryAccess))).Methods(http.MethodPut)
+
+	// DEPRECATED
+	h.Handle("/endpoints/{id}/status", httperror.LoggerHandler(h.endpointStatusInspect)).Methods(http.MethodGet)
+
 	return h
 }
