@@ -62,9 +62,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@master
+      - name: ls
+        run: pwd | ls
       - name: Build an image from Dockerfile
         run: | 
-          docker build -f build/linux/Dockerfile -t portainer:${{ github.sha }} .
+          docker build -t portainer:${{ github.sha }} -f build/linux/Dockerfile .
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
