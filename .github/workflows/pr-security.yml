@@ -38,3 +38,21 @@ jobs:
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: snyk.sarif
+  image-vulnerability:
+    name: image vulnerability check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+      - uses: actions/checkout@master
+      - name: Build an image from Dockerfile
+        run: | 
+          docker build -t portainer:${{ github.sha }} ./build/linux/
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'portainer:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
