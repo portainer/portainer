@@ -38,8 +38,22 @@ jobs:
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: snyk.sarif
+  build_app:
+    name: build app and api
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: install packages
+        run: yarn install
+      - name: build
+        run: yarn build
   image-vulnerability:
     name: image vulnerability check
+    needs: [build_app]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
