@@ -436,7 +436,10 @@ function EndpointController(
   }
 
   function buildKubernetesCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
-    return `curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'}`;
+    var agentShortVersion = getAgentShortVersion(agentVersion);
+    return `curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${
+      allowSelfSignedCerts ? '1' : '0'
+    }`;
   }
 
   initView();
