@@ -71,6 +71,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:  
           name: dist-artifact
+          path: dist/
       - name: Build an image from Dockerfile
         run: | 
           docker build -t portainer:${{ github.sha }} -f build/linux/Dockerfile .
