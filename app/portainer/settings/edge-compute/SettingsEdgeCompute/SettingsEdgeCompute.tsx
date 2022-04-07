@@ -9,6 +9,7 @@ import { TextTip } from '@/portainer/components/Tip/TextTip';
 
 import styles from './SettingsEdgeCompute.module.css';
 import { validationSchema } from './SettingsEdgeCompute.validation';
+import { EdgeScript } from './EdgeScript';
 
 export interface FormValues {
   EdgeAgentCheckinInterval: number;
@@ -151,6 +152,8 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
           </Formik>
         </WidgetBody>
       </Widget>
+
+      <EdgeScript />
     </div>
   );
 }

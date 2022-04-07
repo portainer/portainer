@@ -1,3 +1,5 @@
+import { useQuery } from 'react-query';
+
 import axios, { parseAxiosError } from '../axios';
 
 interface NodesCountResponse {
@@ -11,6 +13,25 @@ export async function getNodesCount() {
   } catch (error) {
     throw parseAxiosError(error as Error);
   }
+}
+
+export interface StatusResponse {
+  Version: string;
+  InstanceID: string;
+}
+
+export async function getStatus() {
+  try {
+    const { data } = await axios.get<StatusResponse>(buildUrl());
+
+    return data;
+  } catch (error) {
+    throw parseAxiosError(error as Error);
+  }
+}
+
+export function useStatus() {
+  return useQuery(['status'], () => getStatus());
 }
 
 function buildUrl(action?: string) {
