@@ -63,7 +63,7 @@ jobs:
   image-vulnerability:
     name: image vulnerability check
     needs: [build_app]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Checkout code
         uses: actions/checkout@master
