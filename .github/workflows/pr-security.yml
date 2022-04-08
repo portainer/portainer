@@ -38,47 +38,16 @@ jobs:
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: snyk.sarif
-  build_app:
-    name: build app and api
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Use golang 1.17.x
-        uses: actions/setup-go@v3
-        with:
-          go-version: '>=1.17.0'
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12.x
-      - name: install packages
-        run: yarn install
-      - name: build
-        run: yarn build
-      - name: upload dist artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist-artifact
-          path: dist/
   image-vulnerability:
     name: image vulnerability check
-    needs: [build_app]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@master
-      - name: download dist artifact
-        uses: actions/download-artifact@v3
-        with:  
-          name: dist-artifact
-          path: dist/
-      - name: Build an image from Dockerfile
-        run: | 
-          docker build -t docker.io/oscarzhou/portainer:${{ github.sha }} -f build/linux/Dockerfile .
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.2.2
         with:
-          image-ref: 'docker.io/oscarzhou/portainer:${{ github.sha }}'
+          image-ref: 'portainer/portainer-ee:2.12.2'
           scan-type: image
           format: 'table'
           exit-code: '1'
