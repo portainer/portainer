@@ -85,7 +85,6 @@ jobs:
           scan-type: image
           format: 'table'
           exit-code: '1'
-          cache-dir: '/tmp'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH,MEDIUM'
