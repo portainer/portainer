@@ -53,7 +53,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'portainer/portainer-ee:2.12.2'
+          image-ref: 'portainerci/portainer:pr6644'
           scan-type: image
           format: 'table'
           exit-code: '1'
