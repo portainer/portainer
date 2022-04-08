@@ -76,7 +76,7 @@ jobs:
         run: | 
           docker build -t docker.io/oscarzhou/portainer:${{ github.sha }} -f build/linux/Dockerfile .
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.19.2
+        uses: aquasecurity/trivy-action@0.2.2
         with:
           image-ref: 'docker.io/oscarzhou/portainer:${{ github.sha }}'
           scan-type: image
