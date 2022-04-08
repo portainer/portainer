@@ -74,14 +74,14 @@ jobs:
           path: dist/
       - name: Build an image from Dockerfile
         run: | 
-          docker build -t trivy-portainer:latest -f build/linux/Dockerfile .
+          docker build -t oscarzhou/trivy-portainer:latest -f build/linux/Dockerfile build/linux
       - name: list docker images
         run: | 
           docker images
       - name: Run Trivy vulnerability scanner
         uses: oscarzhou/trivy-action@master
         with:
-          image-ref: 'trivy-portainer:latest'
+          image-ref: 'oscarzhou/trivy-portainer:latest'
           scan-type: image
           format: 'table'
           exit-code: '1'
