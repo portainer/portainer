@@ -160,10 +160,7 @@ func (server *Server) Start() error {
 	endpointHandler.BindAddress = server.BindAddress
 	endpointHandler.BindAddressHTTPS = server.BindAddressHTTPS
 
-	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
-	endpointEdgeHandler.DataStore = server.DataStore
-	endpointEdgeHandler.FileService = server.FileService
-	endpointEdgeHandler.ReverseTunnelService = server.ReverseTunnelService
+	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer, server.DataStore, server.FileService, server.ReverseTunnelService)
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = server.AuthorizationService

@@ -302,14 +302,14 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
 		}
 
-		edgeStackSet := map[portainer.EdgeStackID]bool{}
+		currentEdgeStackSet := map[portainer.EdgeStackID]bool{}
 
 		endpointEdgeStacks := edge.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
 		for _, edgeStackID := range endpointEdgeStacks {
-			edgeStackSet[edgeStackID] = true
+			currentEdgeStackSet[edgeStackID] = true
 		}
 
-		relation.EdgeStacks = edgeStackSet
+		relation.EdgeStacks = currentEdgeStackSet
 
 		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
 		if err != nil {
