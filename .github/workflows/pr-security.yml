@@ -76,16 +76,17 @@ jobs:
         run: cd dist && ls -lha
       - name: Build an image from Dockerfile
         run: | 
-          docker build -t portainerci/portainer:${{ github.sha }} -f build/linux/Dockerfile .
+          docker build -t docker.io/oscarzhou/trivy-portainer:${{ github.sha }} -f build/linux/Dockerfile .
       - name: list docker images
         run: | 
           docker images
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'portainerci/portainer:${{ github.sha }}'
+          image-ref: 'docker.io/oscarzhou/trivy-portainer:${{ github.sha }}'
           scan-type: image
           format: 'table'
           exit-code: '1'
+          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH,MEDIUM'
