@@ -72,6 +72,8 @@ jobs:
         with:  
           name: dist-artifact
           path: dist/
+      - name: list the download dist artifact
+        run: cd dist && ls -lha
       - name: Build an image from Dockerfile
         run: | 
           docker build -t portainerci/portainer:${{ github.sha }} -f build/linux/Dockerfile .
