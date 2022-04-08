@@ -22,7 +22,7 @@ func TestService_Hash(t *testing.T) {
 				hash: "",
 				data: "",
 			},
-			expect: true,
+			expect: false,
 		},
 		{
 			name: "Matching",
@@ -44,16 +44,9 @@ func TestService_Hash(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			_, err := s.Hash(tt.args.data)
-
-			if (err != nil) != tt.expect {
-				t.Errorf("Service.Hash() error = %v", err)
-				return
-			}
-
-			err = s.CompareHashAndData(tt.args.hash, tt.args.data)
-			if (err != nil) != tt.expect {
-				t.Errorf("Service.Hash() = %v", err)
+			err := s.CompareHashAndData(tt.args.hash, tt.args.data)
+			if (err != nil) == tt.expect {
+				t.Errorf("Service.CompareHashAndData() = %v", err)
 			}
 		})
 	}
