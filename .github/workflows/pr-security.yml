@@ -78,6 +78,9 @@ jobs:
       - name: list docker image
         run: | 
           docker images
+      - name: list docker info
+        run: | 
+          docker info
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
