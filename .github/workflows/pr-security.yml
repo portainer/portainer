@@ -75,9 +75,9 @@ jobs:
       - name: Build an image from Dockerfile
         run: | 
           docker build -t portainerci/portainer:${{ github.sha }} -f build/linux/Dockerfile .
-      - name: list docker info
+      - name: list docker images
         run: | 
-          docker info
+          docker images
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
@@ -85,6 +85,5 @@ jobs:
           scan-type: image
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH,MEDIUM'
