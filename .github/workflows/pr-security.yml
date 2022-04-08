@@ -74,14 +74,14 @@ jobs:
           path: dist/
       - name: Build an image from Dockerfile
         run: | 
-          docker build -t portainerci/portainer:${{ github.sha::7 }} -f build/linux/Dockerfile .
+          docker build -t portainerci/portainer:${{ github.sha }} -f build/linux/Dockerfile .
       - name: list docker info
         run: | 
           docker info
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'portainerci/portainer:${{ github.sha::7 }}'
+          image-ref: 'portainerci/portainer:${{ github.sha }}'
           scan-type: image
           format: 'table'
           exit-code: '1'
