@@ -88,5 +88,20 @@ jobs:
           docker load --input /tmp/trivy-portainer-image.tar
           docker image ls -a
       - name: Run Trivy vulnerability scanner
-        run: |
-          docker run --rm -v /tmp:/root/.cache/ -v "/var/run/docker.sock":"/var/run/docker.sock" aquasec/trivy:0.25.3 image 'trivy-portainer:${{ github.sha }}'
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true # To make sure that SARIF upload gets called
+        with:
+          image-ref: 'trivy-portainer:${{ github.sha }}'
+          scan-type: image
+          # format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      - name: Upload Trivy scan results to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        if: always() 
+        with:
+          sarif_file: 'trivy-results.sarif'
