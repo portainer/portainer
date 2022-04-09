@@ -64,6 +64,7 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         uses: docker://docker.io/aquasec/trivy:0.25.3
+        continue-on-error: true # To make sure that SARIF upload gets called
         with:
           args: --cache-dir='/var/lib/trivy' image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="sarif" --output="trivy-results.sarif" --no-progress trivy-portainer:${{ github.sha }}
           
