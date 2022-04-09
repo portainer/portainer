@@ -65,7 +65,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: docker://docker.io/aquasec/trivy:0.25.3
         with:
-          args: --cache-dir='/var/lib/trivy' image --ignore-unfixed=true --vuln-type=[os library] --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --no-progress --format='sarif' --output='trivy-results.sarif' trivy-portainer:${{ github.sha }}
+          args: --cache-dir='/var/lib/trivy' image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --no-progress --format='sarif' --output='trivy-results.sarif' trivy-portainer:${{ github.sha }}
           
       - name: Upload Trivy scan results to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v1
