@@ -88,7 +88,7 @@ jobs:
           docker load --input /tmp/trivy-portainer-image.tar
           docker image ls -a
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: oscarzhou/trivy-action@master
         with:
           image-ref: 'trivy-portainer:${{ github.sha }}'
           scan-type: image
