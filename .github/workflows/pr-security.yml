@@ -74,6 +74,7 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH,MEDIUM'
           format: 'sarif'
+          template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
           
       - name: Upload Trivy scan results to GitHub Code Scanning
