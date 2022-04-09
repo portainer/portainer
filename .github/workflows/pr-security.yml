@@ -1,6 +1,50 @@
 on: push
 
 jobs:
+  client-dependencies:
+    name: client dependency check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --fail-on=upgradable --sarif-file-output=snyk.sarif
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif
+
+  server-dependencies:
+    name: server dependency check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Download dependencies
+        run: go get -v -d
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/golang@master
+        continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --sarif-file-output=snyk.sarif --file=./api/go.mod
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif
+
   build_app:
     name: build app and api and docker image
     runs-on: ubuntu-latest
@@ -66,7 +110,7 @@ jobs:
         uses: docker://docker.io/aquasec/trivy:0.25.3
         continue-on-error: true # To make sure that SARIF upload gets called
         with:
-          args: --cache-dir='/var/lib/trivy' image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="sarif" --output="trivy-results.sarif" --no-progress trivy-portainer:${{ github.sha }}
+          args: --cache-dir='/var/lib/trivy' --debug image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="sarif" --output="trivy-results.sarif" --no-progress trivy-portainer:${{ github.sha }}
           
       - name: Upload Trivy scan results to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v1
