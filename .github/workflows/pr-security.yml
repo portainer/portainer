@@ -2,7 +2,7 @@ on: push
 
 jobs:
   client-dependencies:
-    name: client dependency check
+    name: Client dependency check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -21,7 +21,7 @@ jobs:
           sarif_file: snyk.sarif
 
   server-dependencies:
-    name: server dependency check
+    name: Server dependency check
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -46,7 +46,7 @@ jobs:
           sarif_file: snyk.sarif
 
   build_app:
-    name: build app and api and docker image
+    name: Build app and api and docker image
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -61,11 +61,8 @@ jobs:
         with:
           node-version: 12.x
 
-      - name: install packages
-        run: yarn install
-
-      - name: build
-        run: yarn build
+      - name: Install packages and build
+        run: yarn install && yarn build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -85,7 +82,7 @@ jobs:
           path: /tmp/trivy-portainer-image.tar
 
   image-vulnerability:
-    name: image vulnerability check
+    name: Image vulnerability check
     needs: [build_app]
     runs-on: ubuntu-latest
     steps:
@@ -95,7 +92,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: download image artifact
+      - name: Download image artifact
         uses: actions/download-artifact@v3
         with:  
           name: image-artifact
@@ -104,13 +101,12 @@ jobs:
       - name: Load docker image
         run: |
           docker load --input /tmp/trivy-portainer-image.tar
-          docker image ls -a
 
       - name: Run Trivy vulnerability scanner
-        uses: docker://docker.io/aquasec/trivy:0.25.3
+        uses: docker://docker.io/aquasec/trivy:latest
         continue-on-error: true # To make sure that SARIF upload gets called
         with:
-          args: --cache-dir='/var/lib/trivy' --debug image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="sarif" --output="trivy-results.sarif" --no-progress trivy-portainer:${{ github.sha }}
+          args: image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="sarif" --output="trivy-results.sarif" --no-progress trivy-portainer:${{ github.sha }}
           
       - name: Upload Trivy scan results to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v1
