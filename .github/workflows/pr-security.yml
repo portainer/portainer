@@ -78,6 +78,12 @@ jobs:
       - name: list docker images
         run: | 
           docker images
+      - name: list file system root
+        run: | 
+          ls -lha
+      - name: list file system github
+        run: | 
+          ls -lha github/
       - name: Run Trivy vulnerability scanner
         uses: oscarzhou/trivy-action@master
         with:
@@ -85,7 +91,7 @@ jobs:
           scan-type: image
           format: 'table'
           exit-code: '1'
-          cache-dir: '/root/.cache/trivy'
+          cache-dir: 'github/root/.cache/trivy'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH,MEDIUM'
