@@ -6,16 +6,18 @@ import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { EdgeKeyGeneration } from './EdgeKeyGenerationForm';
 import { Scripts } from './Scripts';
 import { EdgePropertiesForm } from './EdgePropertiesForm';
+import { EdgeProperties } from './types';
 
 export function EdgeScript() {
   const versionQuery = useStatus();
 
   const [edgeKey, setEdgeKey] = useState('');
 
-  const [state, setState] = useState({
+  const [edgeProperties, setEdgeProperties] = useState<EdgeProperties>({
     allowSelfSignedCertificates: true,
     envVars: '',
     edgeIdGenerator: '',
+    os: 'linux',
   });
 
   if (!versionQuery.data) {
@@ -35,19 +37,18 @@ export function EdgeScript() {
         {edgeKey && (
           <>
             <hr />
+
             <EdgePropertiesForm
               setFieldValue={(key, value) =>
-                setState({ ...state, [key]: value })
+                setEdgeProperties({ ...edgeProperties, [key]: value })
               }
-              values={state}
+              values={edgeProperties}
             />
 
             <Scripts
+              values={edgeProperties}
               agentVersion={agentVersion}
               edgeKey={edgeKey}
-              envVars={state.envVars}
-              edgeIdScript={state.edgeIdGenerator}
-              allowSelfSignedCertificates={state.allowSelfSignedCertificates}
             />
           </>
         )}

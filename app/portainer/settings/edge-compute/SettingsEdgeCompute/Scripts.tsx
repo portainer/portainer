@@ -3,19 +3,8 @@ import { useEffect, useState } from 'react';
 import { Code } from '@/portainer/components/Code';
 import { NavTabs } from '@/portainer/components/NavTabs/NavTabs';
 import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
-import { ButtonSelector } from '@/portainer/components/form-components/ButtonSelector/ButtonSelector';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 
-type Platform = 'standalone' | 'swarm' | 'k8s';
-type OS = 'win' | 'linux';
-
-interface EdgeSettings {
-  allowSelfSignedCertificates: boolean;
-  edgeKey: string;
-  agentVersion: string;
-  envVars: string;
-  edgeIdScript: string;
-}
+import { EdgeProperties, Platform } from './types';
 
 const commandsByOs = {
   linux: [
@@ -49,17 +38,16 @@ const commandsByOs = {
   ],
 };
 
-type Props = EdgeSettings;
+interface Props {
+  values: EdgeProperties;
+  edgeKey: string;
+  agentVersion: string;
+}
 
-export function Scripts({
-  agentVersion,
-  allowSelfSignedCertificates,
-  edgeIdScript,
-  edgeKey,
-  envVars,
-}: Props) {
-  const [os, setOS] = useState<OS>('linux');
+export function Scripts({ agentVersion, values, edgeKey }: Props) {
   const [platform, setPlatform] = useState<Platform>('standalone');
+
+  const { os, allowSelfSignedCertificates, edgeIdGenerator, envVars } = values;
 
   useEffect(() => {
     if (!commandsByOs[os].find((p) => p.id === platform)) {
@@ -74,7 +62,7 @@ export function Scripts({
       <Code showCopyButton>
         {c.command(
           agentVersion,
-          edgeIdScript,
+          edgeIdGenerator,
           edgeKey,
           allowSelfSignedCertificates,
           envVars
@@ -84,53 +72,15 @@ export function Scripts({
   }));
 
   return (
-    <>
-      <FormSectionTitle>Edge Script</FormSectionTitle>
-
-      <div className="row">
-        <div className="col-sm-12">
-          <ButtonSelector
-            value={os}
-            onChange={(os: OS) => setOS(os)}
-            options={[
-              {
-                value: 'linux',
-                label: (
-                  <>
-                    <i
-                      className="fab fa-linux space-right"
-                      aria-hidden="true"
-                    />
-                    Linux
-                  </>
-                ),
-              },
-              {
-                value: 'win',
-                label: (
-                  <>
-                    <i
-                      className="fab fa-windows space-right"
-                      aria-hidden="true"
-                    />
-                    Windows
-                  </>
-                ),
-              },
-            ]}
-          />
-        </div>
+    <div className="row">
+      <div className="col-sm-12">
+        <NavTabs
+          selectedId={platform}
+          options={options}
+          onSelect={(id: Platform) => setPlatform(id)}
+        />
       </div>
-      <div className="row">
-        <div className="col-sm-12">
-          <NavTabs
-            selectedId={platform}
-            options={options}
-            onSelect={(id: Platform) => setPlatform(id)}
-          />
-        </div>
-      </div>
-    </>
+    </div>
   );
 }
 

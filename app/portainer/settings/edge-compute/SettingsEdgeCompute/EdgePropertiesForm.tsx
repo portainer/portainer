@@ -3,21 +3,24 @@ import { Input } from '@/portainer/components/form-components/Input';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { SwitchField } from '@/portainer/components/form-components/SwitchField';
 
-interface Values {
-  allowSelfSignedCertificates: boolean;
-  envVars: string;
-  edgeIdGenerator: string;
-}
+import { OsSelector } from './OsSelector';
+import { EdgeProperties } from './types';
 
 interface Props {
   setFieldValue<T>(key: string, value: T): void;
-  values: Values;
+  values: EdgeProperties;
 }
 
 export function EdgePropertiesForm({ setFieldValue, values }: Props) {
   return (
     <form className="form-horizontal">
       <FormSectionTitle>Edge script settings</FormSectionTitle>
+
+      <OsSelector
+        value={values.os}
+        onChange={(os) => setFieldValue('os', os)}
+      />
+
       <FormControl
         label="Edge ID Getter"
         tooltip="A bash script one liner that will generate the edge id"
