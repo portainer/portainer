@@ -1,6 +1,7 @@
 import { Field, Form, Formik } from 'formik';
 import * as yup from 'yup';
 import { useMutation } from 'react-query';
+import { useCallback, useEffect } from 'react';
 
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
@@ -17,25 +18,19 @@ interface FormValues {
 interface Props {
   onCreate: (edgeKey: string) => void;
 }
+const validation = yup.object({
+  url: yup
+    .string()
+    .url('URL should be a valid URI')
+    .required('URL is required'),
+});
 
 export function EdgeKeyGeneration({ onCreate }: Props) {
-  const validation = yup.object({
-    url: yup
-      .string()
-      .url('URL should be a valid URI')
-      .required('URL is required'),
-  });
-
-  const [defaultUrl, setDefaultUrl] = useLocalStorage(
-    'edge-portainer-url',
-    buildDefaultUrl()
-  );
-
-  const mutation = useGenerateKeyMutation();
+  const { handleSubmit, initialValues, isLoading } = useFormState(onCreate);
 
   return (
     <Formik<FormValues>
-      initialValues={{ url: defaultUrl }}
+      initialValues={initialValues}
       onSubmit={handleSubmit}
       validationSchema={validation}
     >
@@ -56,7 +51,7 @@ export function EdgeKeyGeneration({ onCreate }: Props) {
             <div className="col-sm-12">
               <LoadingButton
                 loadingText="generating..."
-                isLoading={mutation.isLoading}
+                isLoading={isLoading}
                 disabled={!isValid}
               >
                 Generate Key
@@ -67,16 +62,42 @@ export function EdgeKeyGeneration({ onCreate }: Props) {
       )}
     </Formik>
   );
+}
 
-  function handleSubmit(values: FormValues) {
-    setDefaultUrl(values.url);
+function useFormState(onCreate: (edgeKey: string) => void) {
+  const [defaultUrl, setDefaultUrl] = useLocalStorage(
+    'edge-portainer-url',
+    buildDefaultUrl()
+  );
+  const mutation = useGenerateKeyMutation();
 
-    mutation.mutate(values.url, {
-      onSuccess(data) {
-        onCreate(data.edgeKey);
-      },
-    });
-  }
+  const { mutate } = mutation;
+
+  const handleSubmit = useCallback(
+    (values: FormValues) => {
+      setDefaultUrl(values.url);
+
+      mutate(values.url, {
+        onSuccess(data) {
+          onCreate(data.edgeKey);
+        },
+      });
+    },
+    [mutate, onCreate, setDefaultUrl]
+  );
+
+  // make sure key is generated for default url
+  useEffect(() => {
+    if (defaultUrl) {
+      handleSubmit({ url: defaultUrl });
+    }
+  }, [defaultUrl, handleSubmit]);
+
+  const initialValues = {
+    url: defaultUrl,
+  };
+
+  return { handleSubmit, isLoading: mutation.isLoading, initialValues };
 }
 
 function useGenerateKeyMutation() {
