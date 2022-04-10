@@ -3,7 +3,6 @@ package endpoints
 import (
 	"errors"
 	"fmt"
-	"net"
 	"net/http"
 	"net/url"
 	"runtime"
@@ -293,7 +292,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the environment", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occurred while trying to create the environment", err}
 	}
 
 	return endpoint, nil
@@ -302,18 +301,9 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 
-	portainerURL, err := url.Parse(payload.URL)
+	portainerHost, err := edge.ParseHostForEdge(payload.URL)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid environment URL", err}
-	}
-
-	portainerHost, _, err := net.SplitHostPort(portainerURL.Host)
-	if err != nil {
-		portainerHost = portainerURL.Host
-	}
-
-	if portainerHost == "localhost" {
-		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid environment URL", errors.New("cannot use localhost as environment URL")}
+		return nil, httperror.BadRequest("Unable to parse host", err)
 	}
 
 	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
