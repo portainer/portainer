@@ -30,8 +30,10 @@ export async function getStatus() {
   }
 }
 
-export function useStatus() {
-  return useQuery(['status'], () => getStatus());
+export function useStatus<T = StatusResponse>(
+  select?: (status: StatusResponse) => T
+) {
+  return useQuery(['status'], () => getStatus(), { select });
 }
 
 function buildUrl(action?: string) {

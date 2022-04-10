@@ -9,14 +9,14 @@ import { EdgeProperties, Platform } from './types';
 const commandsByOs = {
   linux: [
     {
-      id: 'standalone',
-      label: 'Docker Standalone',
-      command: buildLinuxStandaloneCommand,
-    },
-    {
       id: 'swarm',
       label: 'Docker Swarm',
       command: buildLinuxSwarmCommand,
+    },
+    {
+      id: 'standalone',
+      label: 'Docker Standalone',
+      command: buildLinuxStandaloneCommand,
     },
     {
       id: 'k8s',
@@ -26,14 +26,14 @@ const commandsByOs = {
   ],
   win: [
     {
-      id: 'standalone',
-      label: 'Docker Standalone',
-      command: buildWindowsStandaloneCommand,
-    },
-    {
       id: 'swarm',
       label: 'Docker Swarm',
       command: buildWindowsSwarmCommand,
+    },
+    {
+      id: 'standalone',
+      label: 'Docker Standalone',
+      command: buildWindowsStandaloneCommand,
     },
   ],
 };
@@ -42,6 +42,7 @@ interface Props {
   values: EdgeProperties;
   edgeKey: string;
   agentVersion: string;
+  edgeId?: string;
   onPlatformChange(platform: Platform): void;
 }
 
@@ -49,6 +50,7 @@ export function Scripts({
   agentVersion,
   values,
   edgeKey,
+  edgeId,
   onPlatformChange,
 }: Props) {
   const {
@@ -75,7 +77,8 @@ export function Scripts({
           edgeIdGenerator,
           edgeKey,
           allowSelfSignedCertificates,
-          envVars
+          envVars,
+          edgeId
         )}
       </Code>
     ),
@@ -107,11 +110,16 @@ function buildLinuxStandaloneCommand(
   edgeIdScript: string,
   edgeKey: string,
   allowSelfSignedCerts: boolean,
-  envVars: string
+  envVars: string,
+  edgeId?: string
 ) {
   const env = buildDockerEnvVars(
     envVars,
-    buildDefaultEnvVars(edgeKey, allowSelfSignedCerts)
+    buildDefaultEnvVars(
+      edgeKey,
+      allowSelfSignedCerts,
+      !edgeIdScript ? edgeId : undefined
+    )
   );
 
   return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}
@@ -132,11 +140,16 @@ function buildWindowsStandaloneCommand(
   edgeIdScript: string,
   edgeKey: string,
   allowSelfSignedCerts: boolean,
-  envVars: string
+  envVars: string,
+  edgeId?: string
 ) {
   const env = buildDockerEnvVars(
     envVars,
-    buildDefaultEnvVars(edgeKey, allowSelfSignedCerts, '$Env:PORTAINER_EDGE_ID')
+    buildDefaultEnvVars(
+      edgeKey,
+      allowSelfSignedCerts,
+      edgeIdScript ? '$Env:PORTAINER_EDGE_ID' : edgeId
+    )
   );
 
   return `${
@@ -158,10 +171,15 @@ function buildLinuxSwarmCommand(
   edgeIdScript: string,
   edgeKey: string,
   allowSelfSignedCerts: boolean,
-  envVars: string
+  envVars: string,
+  edgeId?: string
 ) {
   const env = buildDockerEnvVars(envVars, [
-    ...buildDefaultEnvVars(edgeKey, allowSelfSignedCerts),
+    ...buildDefaultEnvVars(
+      edgeKey,
+      allowSelfSignedCerts,
+      !edgeIdScript ? edgeId : undefined
+    ),
     'AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent',
   ]);
 
@@ -189,13 +207,14 @@ function buildWindowsSwarmCommand(
   edgeIdScript: string,
   edgeKey: string,
   allowSelfSignedCerts: boolean,
-  envVars: string
+  envVars: string,
+  edgeId?: string
 ) {
   const env = buildDockerEnvVars(envVars, [
     ...buildDefaultEnvVars(
       edgeKey,
       allowSelfSignedCerts,
-      '$Env:PORTAINER_EDGE_ID'
+      edgeIdScript ? '$Env:PORTAINER_EDGE_ID' : edgeId
     ),
     'AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent',
   ]);
@@ -224,14 +243,18 @@ function buildKubernetesCommand(
   agentVersion: string,
   edgeIdScript: string,
   edgeKey: string,
-  allowSelfSignedCerts: boolean
+  allowSelfSignedCerts: boolean,
+  _envVars: string,
+  edgeId?: string
 ) {
   const agentShortVersion = getAgentShortVersion(agentVersion);
 
   return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}
 
 curl https://downloads.portainer.io/portainer-ee${agentShortVersion}-edge-agent-setup.sh | 
-  bash -s -- $EDGE_ID ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'}`;
+  bash -s -- ${
+    !edgeIdScript && edgeId ? edgeId : '$PORTAINER_EDGE_ID'
+  } ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'}`;
 }
 
 function buildDefaultEnvVars(
