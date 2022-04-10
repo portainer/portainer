@@ -6,7 +6,7 @@ import { SwitchField } from '@/portainer/components/form-components/SwitchField'
 interface Values {
   allowSelfSignedCertificates: boolean;
   envVars: string;
-  edgeIdScript: string;
+  edgeIdGenerator: string;
 }
 
 interface Props {
@@ -20,14 +20,14 @@ export function EdgePropertiesForm({ setFieldValue, values }: Props) {
       <FormSectionTitle>Edge script settings</FormSectionTitle>
       <FormControl
         label="Edge ID Getter"
-        tooltip="A bash script one liner that will create the edge id"
-        inputId="edge-id-getter-input"
+        tooltip="A bash script one liner that will generate the edge id"
+        inputId="edge-id-generator-input"
       >
         <Input
           type="text"
-          name="edgeIdScript"
-          value={values.edgeIdScript}
-          id="edge-id-getter-input"
+          name="edgeIdGenerator"
+          value={values.edgeIdGenerator}
+          id="edge-id-generator-input"
           onChange={(e) => setFieldValue(e.target.name, e.target.value)}
         />
       </FormControl>
@@ -52,7 +52,7 @@ export function EdgePropertiesForm({ setFieldValue, values }: Props) {
       >
         <Input
           type="text"
-          name="edgeIdScript"
+          name="envVars"
           value={values.envVars}
           id="env-vars-input"
           onChange={(e) => setFieldValue(e.target.name, e.target.value)}

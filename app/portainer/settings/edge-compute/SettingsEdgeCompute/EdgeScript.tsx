@@ -13,11 +13,9 @@ export function EdgeScript() {
   const [edgeKey, setEdgeKey] = useState('');
 
   const [state, setState] = useState({
-    os: 'linux',
-    platform: 'standalone',
     allowSelfSignedCertificates: true,
     envVars: '',
-    edgeIdScript: 'cat /proc/sys/kernel/random/uuid',
+    edgeIdGenerator: '',
   });
 
   if (!versionQuery.data) {
@@ -48,7 +46,7 @@ export function EdgeScript() {
               agentVersion={agentVersion}
               edgeKey={edgeKey}
               envVars={state.envVars}
-              edgeIdScript={state.edgeIdScript}
+              edgeIdScript={state.edgeIdGenerator}
               allowSelfSignedCertificates={state.allowSelfSignedCertificates}
             />
           </>

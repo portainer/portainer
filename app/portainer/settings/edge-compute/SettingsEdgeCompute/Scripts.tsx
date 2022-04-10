@@ -155,9 +155,7 @@ function buildLinuxStandaloneCommand(
   envVars: string
 ) {
   const env = buildEnvironmentSubCommand(envVars);
-  return `
-EDGE_ID=$(${edgeIdScript})
-
+  return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}
 docker run -d \\
   -v /var/run/docker.sock:/var/run/docker.sock \\
   -v /var/lib/docker/volumes:/var/lib/docker/volumes \\
@@ -165,7 +163,7 @@ docker run -d \\
   -v portainer_agent_data:/data \\
   --restart always \\
   -e EDGE=1 \\
-  -e EDGE_ID=$EDGE_ID \\
+  -e EDGE_ID=$PORTAINER_EDGE_ID \\
   -e EDGE_KEY=${edgeKey} \\
   -e CAP_HOST_MANAGEMENT=1 \\
   -e EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0} \\ ${env}
@@ -183,16 +181,16 @@ function buildWindowsStandaloneCommand(
 ) {
   const env = buildEnvironmentSubCommand(envVars);
 
-  return `
-EDGE_ID=$(${edgeIdScript})
-    
+  return `${
+    edgeIdScript ? `$Env:PORTAINER_EDGE_ID = "@(${edgeIdScript})" \n\n` : ''
+  }
 docker run -d \\
   --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
   --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
   --mount type=volume,src=portainer_agent_data,dst=C:\\data \\
   --restart always \\
   -e EDGE=1 \\
-  -e EDGE_ID=$EDGE_ID \\
+  -e EDGE_ID=$Env:PORTAINER_EDGE_ID \\
   -e EDGE_KEY=${edgeKey} \\
   -e CAP_HOST_MANAGEMENT=1 \\
   -e EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0} \\ ${env}
@@ -210,9 +208,7 @@ function buildLinuxSwarmCommand(
 ) {
   const env = buildEnvironmentSubCommand(envVars);
 
-  return `
-EDGE_ID=$(${edgeIdScript})
-
+  return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}
 docker network create \\
   --driver overlay \\
   portainer_agent_network;
@@ -222,7 +218,7 @@ docker service create \\
   --network portainer_agent_network \\
   -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent \\
   -e EDGE=1 \\
-  -e EDGE_ID=$EDGE_ID \\
+  -e EDGE_ID=$PORTAINER_EDGE_ID \\
   -e EDGE_KEY=${edgeKey} \\
   -e CAP_HOST_MANAGEMENT=1 \\
   -e EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0}  \\ ${env}
@@ -245,9 +241,9 @@ function buildWindowsSwarmCommand(
 ) {
   const env = buildEnvironmentSubCommand(envVars);
 
-  return `
-EDGE_ID=$(${edgeIdScript})
-
+  return `${
+    edgeIdScript ? `$Env:PORTAINER_EDGE_ID = "@(${edgeIdScript})" \n\n` : ''
+  }
 docker network create \\
   --driver overlay \\
   portainer_agent_network;
@@ -257,7 +253,7 @@ docker service create \\
   --network portainer_agent_network \\
   -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent \\
   -e EDGE=1 \\
-  -e EDGE_ID=$EDGE_ID \\
+  -e EDGE_ID=$Env:PORTAINER_EDGE_ID \\
   -e EDGE_KEY=${edgeKey} \\
   -e CAP_HOST_MANAGEMENT=1 \\
   -e EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0} \\ ${env}
@@ -278,9 +274,8 @@ function buildKubernetesCommand(
 ) {
   const agentShortVersion = getAgentShortVersion(agentVersion);
 
-  return `
-EDGE_ID=$(${edgeIdScript})
-  
+  return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}
+
 curl https://downloads.portainer.io/portainer-ee${agentShortVersion}-edge-agent-setup.sh | 
   bash -s -- $EDGE_ID ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'}`;
 }
