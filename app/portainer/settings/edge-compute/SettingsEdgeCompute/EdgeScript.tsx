@@ -18,6 +18,7 @@ export function EdgeScript() {
     envVars: '',
     edgeIdGenerator: '',
     os: 'linux',
+    platform: 'standalone',
   });
 
   if (!versionQuery.data) {
@@ -49,6 +50,9 @@ export function EdgeScript() {
               values={edgeProperties}
               agentVersion={agentVersion}
               edgeKey={edgeKey}
+              onPlatformChange={(platform) =>
+                setEdgeProperties({ ...edgeProperties, platform })
+              }
             />
           </>
         )}

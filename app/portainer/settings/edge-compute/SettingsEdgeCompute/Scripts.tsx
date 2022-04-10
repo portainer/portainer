@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { Code } from '@/portainer/components/Code';
 import { NavTabs } from '@/portainer/components/NavTabs/NavTabs';
@@ -42,18 +42,28 @@ interface Props {
   values: EdgeProperties;
   edgeKey: string;
   agentVersion: string;
+  onPlatformChange(platform: Platform): void;
 }
 
-export function Scripts({ agentVersion, values, edgeKey }: Props) {
-  const [platform, setPlatform] = useState<Platform>('standalone');
-
-  const { os, allowSelfSignedCertificates, edgeIdGenerator, envVars } = values;
+export function Scripts({
+  agentVersion,
+  values,
+  edgeKey,
+  onPlatformChange,
+}: Props) {
+  const {
+    os,
+    allowSelfSignedCertificates,
+    edgeIdGenerator,
+    envVars,
+    platform,
+  } = values;
 
   useEffect(() => {
     if (!commandsByOs[os].find((p) => p.id === platform)) {
-      setPlatform('standalone');
+      onPlatformChange('standalone');
     }
-  }, [os, platform]);
+  }, [os, platform, onPlatformChange]);
 
   const options = commandsByOs[os].map((c) => ({
     id: c.id,
@@ -77,7 +87,7 @@ export function Scripts({ agentVersion, values, edgeKey }: Props) {
         <NavTabs
           selectedId={platform}
           options={options}
-          onSelect={(id: Platform) => setPlatform(id)}
+          onSelect={(id: Platform) => onPlatformChange(id)}
         />
       </div>
     </div>

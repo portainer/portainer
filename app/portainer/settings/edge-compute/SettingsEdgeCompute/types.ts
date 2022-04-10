@@ -6,4 +6,5 @@ export interface EdgeProperties {
   allowSelfSignedCertificates: boolean;
   envVars: string;
   edgeIdGenerator: string;
+  platform: Platform;
 }
