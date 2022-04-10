@@ -28,7 +28,7 @@ export default class RegistryController {
       default:
         return 'Password';
     }
-  };
+  }
 
   updateRegistry() {
     return this.$async(async () => {
