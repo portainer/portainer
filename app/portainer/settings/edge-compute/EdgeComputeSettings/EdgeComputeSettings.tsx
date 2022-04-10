@@ -7,9 +7,8 @@ import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 
-import styles from './SettingsEdgeCompute.module.css';
-import { validationSchema } from './SettingsEdgeCompute.validation';
-import { EdgeScript } from './EdgeScript';
+import styles from './EdgeComputeSettings.module.css';
+import { validationSchema } from './EdgeComputeSettings.validation';
 
 export interface FormValues {
   EdgeAgentCheckinInterval: number;
@@ -38,7 +37,7 @@ const checkinIntervalOptions = [
   },
 ];
 
-export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
+export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   const initialValues = {
     EdgeAgentCheckinInterval: settings ? settings.EdgeAgentCheckinInterval : 5,
     EnableEdgeComputeFeatures: settings
@@ -152,8 +151,6 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
           </Formik>
         </WidgetBody>
       </Widget>
-
-      <EdgeScript />
     </div>
   );
 }

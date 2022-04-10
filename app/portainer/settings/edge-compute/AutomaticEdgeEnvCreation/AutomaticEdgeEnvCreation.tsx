@@ -8,7 +8,7 @@ import { Scripts } from './Scripts';
 import { EdgePropertiesForm } from './EdgePropertiesForm';
 import { EdgeProperties } from './types';
 
-export function EdgeScript() {
+export function AutomaticEdgeEnvCreation() {
   const versionQuery = useStatus();
 
   const [edgeKey, setEdgeKey] = useState('');
