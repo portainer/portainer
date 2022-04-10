@@ -5,24 +5,113 @@ on:
 
 jobs:
   client-dependencies:
-    name: client dependency check
+    name: Client dependency check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
+        continue-on-error: true # To make sure that SARIF upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --fail-on=upgradable --sarif-file-output=snyk.sarif
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif
+
   server-dependencies:
-    name: server dependency check
+    name: Server dependency check
     runs-on: ubuntu-latest
-    env:
-      GO111MODULE: on
-      NANCY_VERSION: v1.0.11
+    defaults:
+      run:
+        working-directory: ./api
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v2
-      - name: Download Nancy binary
-        run: curl -L "https://github.com/sonatype-nexus-community/nancy/releases/download/$NANCY_VERSION/nancy-$NANCY_VERSION-linux-amd64" -o nancy && chmod +x nancy
-      - name: Scan modules
-        run: cd api && go list -json -m all | ../nancy sleuth
+      - uses: actions/checkout@master
+
+      - name: Download dependencies
+        run: go get -v -d
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/golang@master
+        continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --sarif-file-output=snyk.sarif --file=./api/go.mod
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif
+
+  build_app:
+    name: Build app and api and docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Use golang 1.17.x
+        uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.17.0'
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install packages and build
+        run: yarn install && yarn build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: build/linux/Dockerfile
+          tags: trivy-portainer:${{ github.sha }}
+          outputs: type=docker,dest=/tmp/trivy-portainer-image.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-artifact
+          path: /tmp/trivy-portainer-image.tar
+
+  image-vulnerability:
+    name: Image vulnerability check
+    needs: [build_app]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v3
+        with:  
+          name: image-artifact
+          path: /tmp
+
+      - name: Load docker image
+        run: |
+          docker load --input /tmp/trivy-portainer-image.tar
+
+      - name: Run Trivy vulnerability scanner
+        uses: docker://docker.io/aquasec/trivy:latest
+        continue-on-error: true # To make sure that SARIF upload gets called
+        with:
+          args: image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="sarif" --output="trivy-results.sarif" --no-progress trivy-portainer:${{ github.sha }}
+          
+      - name: Upload Trivy scan results to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results.sarif'
