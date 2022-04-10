@@ -6,19 +6,6 @@ import { NavTabs, type Option } from './NavTabs';
 export default {
   title: 'Components/NavTabs',
   component: NavTabs,
-  args: {
-    // options: [],
-  },
-
-  // argTypes: {
-  //   options: {
-  //     type: {
-  //       name: 'array'
-  //       required: true,
-  //       value: []
-  //     }
-  //   }
-  // }
 } as ComponentMeta<typeof NavTabs>;
 
 type Args = {

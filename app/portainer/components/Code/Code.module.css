@@ -10,7 +10,7 @@
 
 .copy-button {
   position: absolute;
-  top: 25%;
+  top: min(20px, 25%);
   right: 20px;
   padding: 0;
   outline: none !important;
