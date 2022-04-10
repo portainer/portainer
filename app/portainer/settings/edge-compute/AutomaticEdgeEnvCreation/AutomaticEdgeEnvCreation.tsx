@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
+import { EdgeScriptForm } from '@/edge/components/EdgeScriptForm';
 
 import { EdgeKeyGeneration } from './EdgeKeyGenerationForm';
-import { EdgeScriptForm } from './EdgeScriptForm';
 
 export function AutomaticEdgeEnvCreation() {
   const [edgeKey, setEdgeKey] = useState('');
