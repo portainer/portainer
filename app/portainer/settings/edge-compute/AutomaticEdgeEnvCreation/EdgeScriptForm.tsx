@@ -36,6 +36,7 @@ export function EdgeScriptForm({ edgeKey, edgeId }: Props) {
           setEdgeProperties({ ...edgeProperties, [key]: value })
         }
         values={edgeProperties}
+        hideIdGetter={edgeId !== undefined}
       />
 
       <Scripts

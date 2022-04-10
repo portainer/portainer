@@ -9,9 +9,14 @@ import { EdgeProperties } from './types';
 interface Props {
   setFieldValue<T>(key: string, value: T): void;
   values: EdgeProperties;
+  hideIdGetter: boolean;
 }
 
-export function EdgePropertiesForm({ setFieldValue, values }: Props) {
+export function EdgePropertiesForm({
+  setFieldValue,
+  values,
+  hideIdGetter,
+}: Props) {
   return (
     <form className="form-horizontal">
       <FormSectionTitle>Edge script settings</FormSectionTitle>
@@ -21,19 +26,21 @@ export function EdgePropertiesForm({ setFieldValue, values }: Props) {
         onChange={(os) => setFieldValue('os', os)}
       />
 
-      <FormControl
-        label="Edge ID Getter"
-        tooltip="A bash script one liner that will generate the edge id"
-        inputId="edge-id-generator-input"
-      >
-        <Input
-          type="text"
-          name="edgeIdGenerator"
-          value={values.edgeIdGenerator}
-          id="edge-id-generator-input"
-          onChange={(e) => setFieldValue(e.target.name, e.target.value)}
-        />
-      </FormControl>
+      {!hideIdGetter && (
+        <FormControl
+          label="Edge ID Getter"
+          tooltip="A bash script one liner that will generate the edge id"
+          inputId="edge-id-generator-input"
+        >
+          <Input
+            type="text"
+            name="edgeIdGenerator"
+            value={values.edgeIdGenerator}
+            id="edge-id-generator-input"
+            onChange={(e) => setFieldValue(e.target.name, e.target.value)}
+          />
+        </FormControl>
+      )}
 
       <div className="form-group">
         <div className="col-sm-12">
