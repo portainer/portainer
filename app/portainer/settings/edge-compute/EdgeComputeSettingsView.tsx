@@ -14,7 +14,7 @@ export function EdgeComputeSettingsView({ settings, onSubmit }: Props) {
     <div className="row">
       <EdgeComputeSettings settings={settings} onSubmit={onSubmit} />
 
-      <AutomaticEdgeEnvCreation />
+      {process.env.PORTAINER_EDITION === 'BE' && <AutomaticEdgeEnvCreation />}
     </div>
   );
 }
