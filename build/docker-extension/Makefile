@@ -14,7 +14,7 @@ clean:
 	-docker rmi $(IMAGE_NAME)
 
 build-local:
-	docker buildx build -f build/linux/Dockerfile --load --build-arg TAG=$(VERSION) --build-arg PORTAINER_IMAGE_NAME=$(IMAGE_NAME) --tag=local-development .
+	docker buildx build -f build/linux/Dockerfile --load --build-arg TAG=$(VERSION) --build-arg PORTAINER_IMAGE_NAME=$(IMAGE_NAME) --tag=$(IMAGE_NAME):local-development .
 
 install-local:
 	docker extension install portainer/portainer-docker-extension:local-development
