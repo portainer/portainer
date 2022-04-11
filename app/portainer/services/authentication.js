@@ -1,5 +1,8 @@
 import { clear as clearSessionStorage } from './session-storage';
 
+const DEFAULT_USER = 'admin';
+const DEFAULT_PASSWORD = 'Passw0rd;';
+
 angular.module('portainer.app').factory('Authentication', [
   '$async',
   '$state',
@@ -119,8 +122,8 @@ angular.module('portainer.app').factory('Authentication', [
       if (!window.ddExtension) {
         return false;
       }
-      console.debug('Auto-login Docker Desktop');
-      return login('admin', 'Passw0rd;');
+
+      return login(DEFAULT_USER, DEFAULT_PASSWORD);
     }
 
     function isAdmin() {
