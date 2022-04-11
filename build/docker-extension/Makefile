@@ -1,10 +1,10 @@
 # Makefile for development purpose
 
 .PHONY: all build
-all: clean build install
+all: clean build-local install
 
 ORG=portainer
-VERSION=2.11.12
+VERSION=local-development
 IMAGE_NAME=$(ORG)/portainer-docker-extension
 TAGGED_IMAGE_NAME=$(IMAGE_NAME):$(VERSION)
 
@@ -13,7 +13,10 @@ clean:
 	-docker rmi $(PORTAINER_IMAGE_NAME):$(VERSION)
 	-docker rmi $(IMAGE_NAME)
 
-build:
+build-local:
+	docker buildx build -f build/linux/Dockerfile --load --build-arg TAG=$(VERSION) --build-arg PORTAINER_IMAGE_NAME=$(IMAGE_NAME) --tag=$(TAGGED_IMAGE_NAME) .
+
+build-remote:
 	docker buildx build -f build/linux/Dockerfile --push --builder=buildx-multi-arch --platform=windows/amd64,linux/amd64,linux/arm64 --build-arg TAG=$(VERSION) --build-arg PORTAINER_IMAGE_NAME=$(IMAGE_NAME) --tag=$(TAGGED_IMAGE_NAME) .
 
 install:
@@ -24,5 +27,3 @@ multiarch:
 
 portainer:
 	yarn build
-
-

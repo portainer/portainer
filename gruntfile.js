@@ -41,6 +41,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', ['build:server', 'build:client']);
 
+  grunt.registerTask('install:extension', ['shell:install_extension']);
+
   grunt.registerTask('start:server', ['build:server', 'shell:run_container']);
 
   grunt.registerTask('start:localserver', [`shell:build_binary:linux:${arch}`, 'shell:run_localserver']);
@@ -108,6 +110,7 @@ gruntConfig.clean = {
 gruntConfig.shell = {
   build_binary: { command: shell_build_binary },
   build_binary_azuredevops: { command: shell_build_binary_azuredevops },
+  install_extension: { command: shell_install_extension },
   download_docker_binary: { command: shell_download_docker_binary },
   download_kompose_binary: { command: shell_download_kompose_binary },
   download_kubectl_binary: { command: shell_download_kubectl_binary },
@@ -153,6 +156,10 @@ function shell_build_binary(platform, arch) {
 
 function shell_build_binary_azuredevops(platform, arch) {
   return `build/build_binary_azuredevops.sh ${platform} ${arch};`;
+}
+
+function shell_install_extension() {
+  return `make all -f build/docker-extension/Makefile`;
 }
 
 function shell_run_container() {
