@@ -45,74 +45,6 @@ jobs:
         with:
           sarif_file: snyk.sarif
 
-  build_app:
-    name: Build app and api and docker image
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-
-      - name: Use golang 1.17.x
-        uses: actions/setup-go@v3
-        with:
-          go-version: '>=1.17.0'
-
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12.x
-
-      - name: Install packages and build
-        run: yarn install && yarn build
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: build/linux/Dockerfile
-          tags: trivy-portainer:${{ github.sha }}
-          outputs: type=docker,dest=/tmp/trivy-portainer-image.tar
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: image-artifact
-          path: /tmp/trivy-portainer-image.tar
-
-  image-vulnerability:
-    name: Image vulnerability check
-    needs: [build_app]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@master
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Download image artifact
-        uses: actions/download-artifact@v3
-        with:  
-          name: image-artifact
-          path: /tmp
-
-      - name: Load docker image
-        run: |
-          docker load --input /tmp/trivy-portainer-image.tar
-
-      - name: Run Trivy vulnerability scanner
-        uses: docker://docker.io/aquasec/trivy:latest
-        continue-on-error: true # To make sure that SARIF upload gets called
-        with:
-          args: image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="sarif" --output="trivy-results.sarif" --no-progress trivy-portainer:${{ github.sha }}
-          
-      - name: Upload Trivy scan results to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v1
-        with:
-          sarif_file: 'trivy-results.sarif'
-          
       - name: Post to a Slack channel
         id: slack
         uses: slackapi/slack-github-action@v1.18.0
@@ -123,16 +55,16 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+              "text": "PR ${{  }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ steps.slack.outputs.result }}",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url }}\n${{ github.event.head_commit.url }}"
+                    "text": "PR ${{  }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ steps.slack.outputs.result }}}"
                   }
                 }
               ]
             }
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}        
