@@ -277,21 +277,6 @@
                     </div>
                   </div>
                 </div>
-                <div class="form-group" ng-if="ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX">
-                  <div class="col-sm-12">
-                    <label class="control-label text-left">
-                      Redirect published routes to / in application
-                      <portainer-tooltip
-                        position="bottom"
-                        message="Enables the redirection of any route published via ingress to the root path of the application, e.g. /path remaps to /"
-                      >
-                      </portainer-tooltip>
-                    </label>
-                    <label class="switch" style="margin-left: 20px">
-                      <input type="checkbox" ng-model="ic.RewriteTarget" /><i data-cy="namespaceCreate-redirectRoutesToggle{{ ic.IngressClass.Name }}"></i>
-                    </label>
-                  </div>
-                </div>
               </div>
               <div ng-repeat-end class="form-group" ng-if="ic.Selected" style="margin-bottom: 20px">
                 <div class="col-sm-12 small text-muted" style="margin-top: 5px">
