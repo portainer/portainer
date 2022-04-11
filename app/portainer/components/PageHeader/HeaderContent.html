@@ -1,6 +1,6 @@
 <div class="breadcrumb-links">
   <div class="pull-left" ng-transclude></div>
-  <div class="pull-right" ng-if="$ctrl.username" ng-show="$ctrl.display">
+  <div class="pull-right" ng-if="$ctrl.username && $ctrl.display">
     <a ui-sref="portainer.account" style="margin-right: 5px">
       <u> <i class="fa fa-wrench" aria-hidden="true"></i> my account </u>
     </a>
