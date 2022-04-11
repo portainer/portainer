@@ -55,13 +55,13 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ steps.slack.outputs.result }}",
+              "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ github.run_id }}",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ steps.slack.outputs.result }}}"
+                    "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ github.run_id }}}"
                   }
                 }
               ]
