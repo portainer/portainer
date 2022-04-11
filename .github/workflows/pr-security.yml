@@ -41,6 +41,7 @@ jobs:
           args: --severity-threshold=high --sarif-file-output=snyk.sarif --file=./api/go.mod
 
       - name: Upload result to GitHub Code Scanning
+        id: server-scan
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: snyk.sarif
@@ -55,13 +56,13 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ github.run_id }}",
+              "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ github.server-scan.outputs.result }}",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ github.run_id }}}"
+                    "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ github.server-scan.outputs.result }}}"
                   }
                 }
               ]
