@@ -9,6 +9,9 @@ import {
   KubernetesResourcePoolFormValues,
   KubernetesResourcePoolIngressClassAnnotationFormValue,
   KubernetesResourcePoolIngressClassHostFormValue,
+  KubernetesResourcePoolNginxRewriteAnnotationFormValue,
+  KubernetesResourcePoolNginxUseregexAnnotationFormValue,
+  KubernetesResourcePoolTraefikRewriteAnnotationFormValue,
 } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
@@ -76,6 +79,20 @@ class KubernetesResourcePoolController {
   /* #region  ANNOTATIONS MANAGEMENT */
   addAnnotation(ingressClass) {
     ingressClass.Annotations.push(new KubernetesResourcePoolIngressClassAnnotationFormValue());
+  }
+
+  addRewriteAnnotation(ingressClass) {
+    if (ingressClass.IngressClass.Type === this.IngressClassTypes.NGINX) {
+      ingressClass.Annotations.push(new KubernetesResourcePoolNginxRewriteAnnotationFormValue());
+    }
+
+    if (ingressClass.IngressClass.Type === this.IngressClassTypes.TRAEFIK) {
+      ingressClass.Annotations.push(new KubernetesResourcePoolTraefikRewriteAnnotationFormValue());
+    }
+  }
+
+  addUseregexAnnotation(ingressClass) {
+    ingressClass.Annotations.push(new KubernetesResourcePoolNginxUseregexAnnotationFormValue());
   }
 
   removeAnnotation(ingressClass, index) {
