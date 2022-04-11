@@ -47,6 +47,7 @@ function EndpointController(
     kubernetesEndpoint: false,
     agentEndpoint: false,
     edgeEndpoint: false,
+    edgeAssociated: false,
     allowCreate: Authentication.isAdmin(),
     availableEdgeAgentCheckinOptions: [
       { key: 'Use default interval', value: 0 },
@@ -139,24 +140,24 @@ function EndpointController(
     }
   }
 
-  $scope.onDeassociateEndpoint = async function () {
-    ModalService.confirmDeassociate((confirmed) => {
+  $scope.onDisassociateEndpoint = async function () {
+    ModalService.confirmDisassociate((confirmed) => {
       if (confirmed) {
-        deassociateEndpoint();
+        disassociateEndpoint();
       }
     });
   };
 
-  async function deassociateEndpoint() {
+  async function disassociateEndpoint() {
     var endpoint = $scope.endpoint;
 
     try {
       $scope.state.actionInProgress = true;
-      await EndpointService.deassociateEndpoint(endpoint.Id);
-      Notifications.success('Environment de-associated', $scope.endpoint.Name);
+      await EndpointService.disassociateEndpoint(endpoint.Id);
+      Notifications.success('Environment disassociated', $scope.endpoint.Name);
       $state.reload();
     } catch (err) {
-      Notifications.error('Failure', err, 'Unable to de-associate environment');
+      Notifications.error('Failure', err, 'Unable to disassociate environment');
     } finally {
       $scope.state.actionInProgress = false;
     }
@@ -280,6 +281,8 @@ function EndpointController(
 
         if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
           $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
+
+          $scope.state.edgeAssociated = !!endpoint.EdgeID;
           endpoint.EdgeID = endpoint.EdgeID || uuidv4();
 
           $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
@@ -291,8 +294,7 @@ function EndpointController(
 
         configureState();
 
-        const disconnectedEdge = $scope.state.edgeEndpoint && !endpoint.EdgeID;
-        if (EndpointHelper.isDockerEndpoint(endpoint) && !disconnectedEdge) {
+        if (EndpointHelper.isDockerEndpoint(endpoint) && $scope.state.edgeAssociated) {
           $scope.state.showAMTInfo = settings && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
         }
       } catch (err) {
