@@ -69,7 +69,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/endpoints/{id}/registries/{registryId}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryAccess))).Methods(http.MethodPut)
 
-	h.Handle("/endpoints/global-key", httperror.LoggerHandler(h.endpointCreateGlobalKey)).Methods(http.MethodGet)
+	h.Handle("/endpoints/global-key", httperror.LoggerHandler(h.endpointCreateGlobalKey)).Methods(http.MethodPost)
 
 	// DEPRECATED
 	h.Handle("/endpoints/{id}/status", httperror.LoggerHandler(h.endpointStatusInspect)).Methods(http.MethodGet)
