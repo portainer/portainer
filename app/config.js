@@ -16,6 +16,7 @@ export function configApp($urlRouterProvider, $httpProvider, localStorageService
     },
     whiteListedDomains: ['localhost'],
   });
+
   $httpProvider.interceptors.push('jwtInterceptor');
   $httpProvider.interceptors.push('EndpointStatusInterceptor');
   $httpProvider.defaults.headers.post['Content-Type'] = 'application/json';

@@ -74,7 +74,7 @@ type (
 	EdgeJobService interface {
 		EdgeJobs() ([]portainer.EdgeJob, error)
 		EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error)
-		Create(edgeJob *portainer.EdgeJob) error
+		Create(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int

@@ -16,7 +16,7 @@ angular.module('portainer.app').factory('Endpoints', [
         },
         get: { method: 'GET', params: { id: '@id' } },
         update: { method: 'PUT', params: { id: '@id' } },
-        deassociate: { method: 'DELETE', params: { id: '@id', action: 'association' } },
+        disassociate: { method: 'DELETE', params: { id: '@id', action: 'association' } },
         updateAccess: { method: 'PUT', params: { id: '@id', action: 'access' } },
         remove: { method: 'DELETE', params: { id: '@id' } },
         snapshots: { method: 'POST', params: { action: 'snapshot' } },
@@ -32,11 +32,6 @@ angular.module('portainer.app').factory('Endpoints', [
           url: `${API_ENDPOINT_ENDPOINTS}/:id/registries`,
           params: { id: '@id', namespace: '@namespace' },
           isArray: true,
-        },
-        registry: {
-          url: `${API_ENDPOINT_ENDPOINTS}/:id/registries/:registryId`,
-          method: 'GET',
-          params: { id: '@id', namespace: '@namespace', registryId: '@registryId' },
         },
         updateRegistryAccess: {
           method: 'PUT',

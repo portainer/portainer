@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="<%= name %>" ng-strict-di>
+  <head>
+    <meta charset="utf-8" />
+    <title>Portainer</title>
+    <meta name="description" content="" />
+    <meta name="author" content="<%= author %>" />
+    <base id="base" />
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="<%=require('./assets/ico/apple-touch-icon.png')%>" />
+    <link rel="icon" type="image/png" sizes="32x32" href="<%=require('./assets/ico/favicon-32x32.png')%>" />
+    <link rel="icon" type="image/png" sizes="16x16" href="<%=require('./assets/ico/favicon-16x16.png')%>" />
+    <link rel="mask-icon" href="<%=require('./assets/ico/safari-pinned-tab.svg')%>" color="#5bbad5" />
+    <link rel="shortcut icon" href="<%=require('./assets/ico/favicon.ico')%>" />
+    <meta name="msapplication-config" content="<%=require('./assets/ico/browserconfig.xml')%>" />
+    <meta name="theme-color" content="#ffffff" />
+  </head>
+
+  <body>
+    <div class="page-wrapper">
+      <!-- timeout info box -->
+      <div class="container simple-box">
+        <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+          <!-- simple box logo -->
+          <div class="row">
+            <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo" />
+            <img ng-if="!logo" src="<%= require('./assets/images/logo_alt.svg') %>" class="simple-box-logo" alt="Portainer" />
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <!-- toggle -->
+              <div style="padding-bottom: 24px">
+                <a>
+                  <span style="padding-left: 10px">New Portainer installation</span>
+                </a>
+              </div>
+
+              <!-- init admin init timeout notification -->
+              <div class="simple-box" style="padding-left: 30px">
+                <div class="col-sm-12">
+                  <span class="small text-muted" style="margin-left: 2px">
+                    Your Portainer instance timed out for security purposes. To re-enable your Portainer instance, you will need to restart Portainer.
+                  </span>
+                  <br /><br />
+                  <span class="text-muted small" style="margin-left: 2px">
+                    For further information, view our <a href="https://documentation.portainer.io/r/ce-restart-portainer" target="_blank">documentation</a>.
+                  </span>
+                </div>
+              </div>
+              <!-- !init admin init timeout notification -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- !timeout info box -->
+    </div>
+  </body>
+</html>

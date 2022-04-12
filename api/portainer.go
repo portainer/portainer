@@ -1239,6 +1239,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
+		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 		WriteToFile(path string, data []byte) error
 	}
@@ -1794,6 +1795,9 @@ const (
 	OperationPortainerUserInspect           Authorization = "PortainerUserInspect"
 	OperationPortainerUserMemberships       Authorization = "PortainerUserMemberships"
 	OperationPortainerUserCreate            Authorization = "PortainerUserCreate"
+	OperationPortainerUserListToken         Authorization = "PortainerUserListToken"
+	OperationPortainerUserCreateToken       Authorization = "PortainerUserCreateToken"
+	OperationPortainerUserRevokeToken       Authorization = "PortainerUserRevokeToken"
 	OperationPortainerUserUpdate            Authorization = "PortainerUserUpdate"
 	OperationPortainerUserUpdatePassword    Authorization = "PortainerUserUpdatePassword"
 	OperationPortainerUserDelete            Authorization = "PortainerUserDelete"

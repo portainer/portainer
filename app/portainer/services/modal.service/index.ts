@@ -4,7 +4,7 @@ import bootbox from 'bootbox';
 import {
   cancelRegistryRepositoryAction,
   confirmAsync,
-  confirmDeassociate,
+  confirmDisassociate,
   confirmDeletion,
   confirmDetachment,
   confirmDeletionAsync,
@@ -46,7 +46,7 @@ export function ModalServiceAngular() {
     cancelRegistryRepositoryAction,
     confirmDeletion,
     confirmDetachment,
-    confirmDeassociate,
+    confirmDisassociate,
     confirmUpdate,
     confirmRedeploy,
     confirmDeletionAsync,
