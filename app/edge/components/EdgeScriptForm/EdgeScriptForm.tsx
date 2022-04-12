@@ -19,7 +19,7 @@ export function EdgeScriptForm({ edgeKey, edgeId }: Props) {
     envVars: '',
     edgeIdGenerator: '',
     os: 'linux',
-    platform: 'standalone',
+    platform: 'swarm',
   });
 
   const settingsQuery = useSettings((settings) => settings.AgentSecret);
