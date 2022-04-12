@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import _ from 'lodash';
 
 import { Code } from '@/portainer/components/Code';
 import { NavTabs } from '@/portainer/components/NavTabs/NavTabs';
@@ -43,6 +44,7 @@ interface Props {
   edgeKey: string;
   agentVersion: string;
   edgeId?: string;
+  agentSecret?: string;
   onPlatformChange(platform: Platform): void;
 }
 
@@ -51,6 +53,7 @@ export function Scripts({
   values,
   edgeKey,
   edgeId,
+  agentSecret,
   onPlatformChange,
 }: Props) {
   const {
@@ -78,7 +81,8 @@ export function Scripts({
           edgeKey,
           allowSelfSignedCertificates,
           envVars,
-          edgeId
+          edgeId,
+          agentSecret
         )}
       </Code>
     ),
@@ -111,14 +115,16 @@ function buildLinuxStandaloneCommand(
   edgeKey: string,
   allowSelfSignedCerts: boolean,
   envVars: string,
-  edgeId?: string
+  edgeId?: string,
+  agentSecret?: string
 ) {
   const env = buildDockerEnvVars(
     envVars,
     buildDefaultEnvVars(
       edgeKey,
       allowSelfSignedCerts,
-      !edgeIdScript ? edgeId : undefined
+      !edgeIdScript ? edgeId : undefined,
+      agentSecret
     )
   );
 
@@ -141,14 +147,16 @@ function buildWindowsStandaloneCommand(
   edgeKey: string,
   allowSelfSignedCerts: boolean,
   envVars: string,
-  edgeId?: string
+  edgeId?: string,
+  agentSecret?: string
 ) {
   const env = buildDockerEnvVars(
     envVars,
     buildDefaultEnvVars(
       edgeKey,
       allowSelfSignedCerts,
-      edgeIdScript ? '$Env:PORTAINER_EDGE_ID' : edgeId
+      edgeIdScript ? '$Env:PORTAINER_EDGE_ID' : edgeId,
+      agentSecret
     )
   );
 
@@ -172,13 +180,15 @@ function buildLinuxSwarmCommand(
   edgeKey: string,
   allowSelfSignedCerts: boolean,
   envVars: string,
-  edgeId?: string
+  edgeId?: string,
+  agentSecret?: string
 ) {
   const env = buildDockerEnvVars(envVars, [
     ...buildDefaultEnvVars(
       edgeKey,
       allowSelfSignedCerts,
-      !edgeIdScript ? edgeId : undefined
+      !edgeIdScript ? edgeId : undefined,
+      agentSecret
     ),
     'AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent',
   ]);
@@ -208,13 +218,15 @@ function buildWindowsSwarmCommand(
   edgeKey: string,
   allowSelfSignedCerts: boolean,
   envVars: string,
-  edgeId?: string
+  edgeId?: string,
+  agentSecret?: string
 ) {
   const env = buildDockerEnvVars(envVars, [
     ...buildDefaultEnvVars(
       edgeKey,
       allowSelfSignedCerts,
-      edgeIdScript ? '$Env:PORTAINER_EDGE_ID' : edgeId
+      edgeIdScript ? '$Env:PORTAINER_EDGE_ID' : edgeId,
+      agentSecret
     ),
     'AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent',
   ]);
@@ -245,27 +257,30 @@ function buildKubernetesCommand(
   edgeKey: string,
   allowSelfSignedCerts: boolean,
   _envVars: string,
-  edgeId?: string
+  edgeId?: string,
+  agentSecret = ''
 ) {
   const agentShortVersion = getAgentShortVersion(agentVersion);
 
   return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}
 
 curl https://downloads.portainer.io/portainer-ee${agentShortVersion}-edge-agent-setup.sh | 
-  bash -s -- ${
+  bash -s -- "${
     !edgeIdScript && edgeId ? edgeId : '$PORTAINER_EDGE_ID'
-  } ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'}`;
+  }" "${edgeKey}" "${allowSelfSignedCerts ? '1' : '0'}" "${agentSecret}"`;
 }
 
 function buildDefaultEnvVars(
   edgeKey: string,
   allowSelfSignedCerts: boolean,
-  edgeId = '$PORTAINER_EDGE_ID'
+  edgeId = '$PORTAINER_EDGE_ID',
+  agentSecret = ''
 ) {
-  return [
+  return _.compact([
     'EDGE=1',
     `EDGE_ID=${edgeId}`,
     `EDGE_KEY=${edgeKey}`,
     `EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0}`,
-  ];
+    agentSecret ? `AGENT_SECRET=${agentSecret}` : ``,
+  ]);
 }

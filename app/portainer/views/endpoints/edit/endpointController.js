@@ -235,7 +235,6 @@ function EndpointController(
         $scope.endpoint = endpoint;
         $scope.groups = groups;
         $scope.availableTags = tags;
-        $scope.agentSecret = settings.AgentSecret;
 
         configureState();
 
