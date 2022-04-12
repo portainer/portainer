@@ -12,7 +12,6 @@ angular.module('portainer.app').controller('EndpointController', EndpointControl
 /* @ngInject */
 function EndpointController(
   $async,
-  $q,
   $scope,
   $state,
   $transition$,
@@ -47,6 +46,7 @@ function EndpointController(
     kubernetesEndpoint: false,
     agentEndpoint: false,
     edgeEndpoint: false,
+    edgeAssociated: false,
     allowCreate: Authentication.isAdmin(),
     availableEdgeAgentCheckinOptions: [
       { key: 'Use default interval', value: 0 },
@@ -72,6 +72,7 @@ function EndpointController(
 
   $scope.agentVersion = StateManager.getState().application.version;
   $scope.agentShortVersion = getAgentShortVersion($scope.agentVersion);
+  $scope.agentSecret = '';
 
   $scope.dockerCommands = {
     [DEPLOYMENT_TABS.STANDALONE]: {
@@ -139,24 +140,24 @@ function EndpointController(
     }
   }
 
-  $scope.onDeassociateEndpoint = async function () {
-    ModalService.confirmDeassociate((confirmed) => {
+  $scope.onDisassociateEndpoint = async function () {
+    ModalService.confirmDisassociate((confirmed) => {
       if (confirmed) {
-        deassociateEndpoint();
+        disassociateEndpoint();
       }
     });
   };
 
-  async function deassociateEndpoint() {
+  async function disassociateEndpoint() {
     var endpoint = $scope.endpoint;
 
     try {
       $scope.state.actionInProgress = true;
-      await EndpointService.deassociateEndpoint(endpoint.Id);
-      Notifications.success('Environment de-associated', $scope.endpoint.Name);
+      await EndpointService.disassociateEndpoint(endpoint.Id);
+      Notifications.success('Environment disassociated', $scope.endpoint.Name);
       $state.reload();
     } catch (err) {
-      Notifications.error('Failure', err, 'Unable to de-associate environment');
+      Notifications.error('Failure', err, 'Unable to disassociate environment');
     } finally {
       $scope.state.actionInProgress = false;
     }
@@ -280,6 +281,8 @@ function EndpointController(
 
         if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
           $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
+
+          $scope.state.edgeAssociated = !!endpoint.EdgeID;
           endpoint.EdgeID = endpoint.EdgeID || uuidv4();
 
           $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
@@ -288,11 +291,11 @@ function EndpointController(
         $scope.endpoint = endpoint;
         $scope.groups = groups;
         $scope.availableTags = tags;
+        $scope.agentSecret = settings.AgentSecret;
 
         configureState();
 
-        const disconnectedEdge = $scope.state.edgeEndpoint && !endpoint.EdgeID;
-        if (EndpointHelper.isDockerEndpoint(endpoint) && !disconnectedEdge) {
+        if (EndpointHelper.isDockerEndpoint(endpoint) && $scope.state.edgeAssociated) {
           $scope.state.showAMTInfo = settings && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
         }
       } catch (err) {
@@ -324,17 +327,20 @@ function EndpointController(
   }
 
   function buildEnvironmentSubCommand() {
-    if ($scope.formValues.EnvVarSource === '') {
-      return [];
+    let env = [];
+    if ($scope.formValues.EnvVarSource != '') {
+      env = $scope.formValues.EnvVarSource.split(',')
+        .map(function (s) {
+          if (s !== '') {
+            return `-e ${s} \\`;
+          }
+        })
+        .filter((s) => s !== undefined);
     }
-
-    return $scope.formValues.EnvVarSource.split(',')
-      .map(function (s) {
-        if (s !== '') {
-          return `-e ${s} \\`;
-        }
-      })
-      .filter((s) => s !== undefined);
+    if ($scope.agentSecret != '') {
+      env.push(`-e AGENT_SECRET=${$scope.agentSecret} \\`);
+    }
+    return env;
   }
 
   function buildLinuxStandaloneCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
@@ -439,7 +445,7 @@ function EndpointController(
     var agentShortVersion = getAgentShortVersion(agentVersion);
     return `curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${
       allowSelfSignedCerts ? '1' : '0'
-    }`;
+    } ${$scope.agentSecret}`;
   }
 
   initView();

@@ -813,6 +813,8 @@ type (
 		DisableTrustOnFirstConnect bool `json:"DisableTrustOnFirstConnect" example:"false"`
 		// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
 		EnforceEdgeID bool `json:"EnforceEdgeID" example:"false"`
+		// Container environment parameter AGENT_SECRET
+		AgentSecret string `json:"AgentSecret"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -1238,6 +1240,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
+		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 	}
 

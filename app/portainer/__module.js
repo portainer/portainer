@@ -401,8 +401,7 @@ angular
         url: '/:id',
         views: {
           'content@': {
-            templateUrl: './views/registries/edit/registry.html',
-            controller: 'RegistryController',
+            component: 'editRegistry',
           },
         },
       };

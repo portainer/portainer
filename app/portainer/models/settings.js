@@ -17,6 +17,7 @@ export function SettingsViewModel(data) {
   this.HelmRepositoryURL = data.HelmRepositoryURL;
   this.DisableTrustOnFirstConnect = data.DisableTrustOnFirstConnect;
   this.EnforceEdgeID = data.EnforceEdgeID;
+  this.AgentSecret = data.AgentSecret;
 }
 
 export function PublicSettingsViewModel(settings) {

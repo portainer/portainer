@@ -10,113 +10,112 @@
 </rd-header>
 
 <div class="row">
-  <information-panel ng-if="state.edgeEndpoint && endpoint.EdgeID && endpoint.LastCheckInDate" title-text="Edge information">
-    <span class="small text-muted">
-      <p>
-        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-        This Edge environment is associated to an Edge environment {{ state.kubernetesEndpoint ? '(Kubernetes)' : '(Docker)' }}.
-      </p>
-      <p>
-        Edge key: <code>{{ endpoint.EdgeKey }}</code>
-      </p>
-      <p>
-        Edge identifier: <code>{{ endpoint.EdgeID }}</code>
-      </p>
-      <p>
-        <button
-          type="button"
-          class="btn btn-primary btn-sm"
-          ng-disabled="state.actionInProgress"
-          ng-click="onDeassociateEndpoint()"
-          button-spinner="state.actionInProgress"
-          analytics-on
-          analytics-event="edge-endpoint-deassociate"
-          analytics-category="edge"
-        >
-          <span ng-hide="state.actionInProgress">De-associate</span>
-        </button>
-      </p>
-    </span>
-  </information-panel>
-  <information-panel ng-if="state.edgeEndpoint && !endpoint.LastCheckInDate" title-text="Deploy an agent">
-    <span class="small text-muted">
-      <p>
-        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-        Refer to the platform related command below to deploy the Edge agent in your remote cluster.
-      </p>
-      <p>
-        The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u>
-      </p>
-      <div class="input-group input-group-sm" style="margin-top: 10px; margin-bottom: 10px">
-        <div class="btn-group btn-group-sm">
-          <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'linux'"><i class="fab fa-linux" style="margin-right: 2px"></i> Linux</label>
-          <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'windows'"><i class="fab fa-windows" style="margin-right: 2px"></i> Windows</label>
+  <div ng-if="state.edgeEndpoint">
+    <information-panel ng-if="state.edgeAssociated" title-text="Edge information">
+      <span class="small text-muted">
+        <p>
+          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+          This Edge environment is associated to an Edge environment {{ state.kubernetesEndpoint ? '(Kubernetes)' : '(Docker)' }}.
+        </p>
+        <p>
+          Edge key: <code>{{ endpoint.EdgeKey }}</code>
+        </p>
+        <p>
+          Edge identifier: <code>{{ endpoint.EdgeID }}</code>
+        </p>
+        <p>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            ng-disabled="state.actionInProgress"
+            ng-click="onDisassociateEndpoint()"
+            button-spinner="state.actionInProgress"
+            analytics-on
+            analytics-event="edge-endpoint-disassociate"
+            analytics-category="edge"
+          >
+            <span ng-hide="state.actionInProgress">Disassociate</span>
+          </button>
+        </p>
+      </span>
+    </information-panel>
+    <information-panel ng-if="!state.edgeAssociated" title-text="Deploy an agent">
+      <span class="small text-muted">
+        <p>
+          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+          Refer to the platform related command below to deploy the Edge agent in your remote cluster.
+        </p>
+        <p>
+          The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u>
+        </p>
+        <div class="input-group input-group-sm" style="margin-top: 10px; margin-bottom: 10px">
+          <div class="btn-group btn-group-sm">
+            <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'linux'"><i class="fab fa-linux" style="margin-right: 2px"></i> Linux</label>
+            <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'windows'"><i class="fab fa-windows" style="margin-right: 2px"></i> Windows</label>
+          </div>
         </div>
-      </div>
-
-      <div class="form-group">
-        <por-switch-field
-          label="'Allow self-signed certs'"
-          checked="state.allowSelfSignedCerts"
-          tooltip="'When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS'"
-          on-change="(onToggleAllowSelfSignedCerts)"
-        ></por-switch-field>
-      </div>
-
-      <div class="form-group clearfix" ng-if="!isKubernetesDeploymentTabSelected()">
-        <label for="env_vars" class="col-sm-3 col-lg-2 control-label text-left" style="padding-left: 0; padding-top: 5px">
-          Environment variables
-          <portainer-tooltip
-            position="bottom"
-            message="Comma separated list of environment variables that will be sourced from the host where the agent is deployed."
-          ></portainer-tooltip>
-        </label>
-        <div class="col-sm-9 col-lg-10">
-          <input type="text" class="form-control" id="env_vars" ng-model="formValues.EnvVarSource" placeholder="foo=bar,myvar" />
+        <div class="form-group">
+          <por-switch-field
+            label="'Allow self-signed certs'"
+            checked="state.allowSelfSignedCerts"
+            tooltip="'When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS'"
+            on-change="(onToggleAllowSelfSignedCerts)"
+          ></por-switch-field>
         </div>
-      </div>
-
-      <div style="margin-top: 10px">
-        <uib-tabset active="state.deploymentTab">
-          <uib-tab index="'kubernetes'" heading="Kubernetes" ng-if="state.platformType === 'linux'">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
-              dockerCommands[state.deploymentTab][state.platformType](agentShortVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
-            }}</code>
-          </uib-tab>
-          <uib-tab index="'swarm'" heading="Docker Swarm">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
-              dockerCommands[state.deploymentTab][state.platformType](agentVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
-            }}</code>
-          </uib-tab>
-          <uib-tab index="'standalone'" heading="Docker Standalone">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
-              dockerCommands[state.deploymentTab][state.platformType](agentVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
-            }}</code>
-          </uib-tab>
-        </uib-tabset>
+        <div class="form-group clearfix" ng-if="!isKubernetesDeploymentTabSelected()">
+          <label for="env_vars" class="col-sm-3 col-lg-2 control-label text-left" style="padding-left: 0; padding-top: 5px">
+            Environment variables
+            <portainer-tooltip
+              position="bottom"
+              message="Comma separated list of environment variables that will be sourced from the host where the agent is deployed."
+            ></portainer-tooltip>
+          </label>
+          <div class="col-sm-9 col-lg-10">
+            <input type="text" class="form-control" id="env_vars" ng-model="formValues.EnvVarSource" placeholder="foo=bar,myvar" />
+          </div>
+        </div>
         <div style="margin-top: 10px">
-          <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentDeploymentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy command</span>
-          <span id="copyNotificationDeploymentCommand" style="margin-left: 7px; display: none; color: #23ae89"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+          <uib-tabset active="state.deploymentTab">
+            <uib-tab index="'kubernetes'" heading="Kubernetes" ng-if="state.platformType === 'linux'">
+              <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
+                dockerCommands[state.deploymentTab][state.platformType](agentShortVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
+              }}</code>
+            </uib-tab>
+            <uib-tab index="'swarm'" heading="Docker Swarm">
+              <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
+                dockerCommands[state.deploymentTab][state.platformType](agentVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
+              }}</code>
+            </uib-tab>
+            <uib-tab index="'standalone'" heading="Docker Standalone">
+              <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
+                dockerCommands[state.deploymentTab][state.platformType](agentVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
+              }}</code>
+            </uib-tab>
+          </uib-tabset>
+          <div style="margin-top: 10px">
+            <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentDeploymentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy command</span>
+            <span id="copyNotificationDeploymentCommand" style="margin-left: 7px; display: none; color: #23ae89"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+          </div>
         </div>
-      </div>
-      <div class="col-sm-12 form-section-title" style="margin-top: 25px"> Join token </div>
-      <p>
-        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-        For those prestaging the edge agent, use the following join token to associate the Edge agent with this environment.
-      </p>
-      <p> You can read more about pre-staging in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a> </p>
-      <div style="margin-top: 10px; overflow-wrap: break-word">
-        <code>
-          {{ endpoint.EdgeKey }}
-        </code>
-        <div style="margin-top: 10px">
-          <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentKey()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy token</span>
-          <span id="copyNotificationEdgeKey" style="margin-left: 7px; display: none; color: #23ae89"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+        <div class="col-sm-12 form-section-title" style="margin-top: 25px"> Join token </div>
+        <p>
+          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+          For those prestaging the edge agent, use the following join token to associate the Edge agent with this environment.
+        </p>
+        <p> You can read more about pre-staging in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a> </p>
+        <div style="margin-top: 10px; overflow-wrap: break-word">
+          <code>
+            {{ endpoint.EdgeKey }}
+          </code>
+          <div style="margin-top: 10px">
+            <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentKey()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy token</span>
+            <span id="copyNotificationEdgeKey" style="margin-left: 7px; display: none; color: #23ae89"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+          </div>
         </div>
-      </div>
-    </span>
-  </information-panel>
-  <information-panel ng-if="state.kubernetesEndpoint && (!state.edgeEndpoint || (state.edgeEndpoint && endpoint.EdgeID))" title-text="Kubernetes features configuration">
+      </span>
+    </information-panel>
+  </div>
+  <information-panel ng-if="state.kubernetesEndpoint && (!state.edgeEndpoint || state.edgeAssociated)" title-text="Kubernetes features configuration">
     <span class="small text-muted">
       <i class="fa fa-tools blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
       You should configure the features available in this Kubernetes environment in the
