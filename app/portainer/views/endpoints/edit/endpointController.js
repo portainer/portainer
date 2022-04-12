@@ -12,7 +12,6 @@ angular.module('portainer.app').controller('EndpointController', EndpointControl
 /* @ngInject */
 function EndpointController(
   $async,
-  $q,
   $scope,
   $state,
   $transition$,
@@ -73,6 +72,7 @@ function EndpointController(
 
   $scope.agentVersion = StateManager.getState().application.version;
   $scope.agentShortVersion = getAgentShortVersion($scope.agentVersion);
+  $scope.agentSecret = '';
 
   $scope.dockerCommands = {
     [DEPLOYMENT_TABS.STANDALONE]: {
@@ -291,6 +291,7 @@ function EndpointController(
         $scope.endpoint = endpoint;
         $scope.groups = groups;
         $scope.availableTags = tags;
+        $scope.agentSecret = settings.AgentSecret;
 
         configureState();
 
@@ -326,17 +327,20 @@ function EndpointController(
   }
 
   function buildEnvironmentSubCommand() {
-    if ($scope.formValues.EnvVarSource === '') {
-      return [];
+    let env = [];
+    if ($scope.formValues.EnvVarSource != '') {
+      env = $scope.formValues.EnvVarSource.split(',')
+        .map(function (s) {
+          if (s !== '') {
+            return `-e ${s} \\`;
+          }
+        })
+        .filter((s) => s !== undefined);
     }
-
-    return $scope.formValues.EnvVarSource.split(',')
-      .map(function (s) {
-        if (s !== '') {
-          return `-e ${s} \\`;
-        }
-      })
-      .filter((s) => s !== undefined);
+    if ($scope.agentSecret != '') {
+      env.push(`-e AGENT_SECRET=${$scope.agentSecret} \\`);
+    }
+    return env;
   }
 
   function buildLinuxStandaloneCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
@@ -438,7 +442,9 @@ function EndpointController(
   }
 
   function buildKubernetesCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
-    return `curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'}`;
+    return `curl https://downloads.portainer.io/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${
+      $scope.agentSecret
+    }`;
   }
 
   initView();

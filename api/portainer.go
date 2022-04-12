@@ -813,6 +813,8 @@ type (
 		DisableTrustOnFirstConnect bool `json:"DisableTrustOnFirstConnect" example:"false"`
 		// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
 		EnforceEdgeID bool `json:"EnforceEdgeID" example:"false"`
+		// Container environment parameter AGENT_SECRET
+		AgentSecret string `json:"AgentSecret"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
