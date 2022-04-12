@@ -3,8 +3,7 @@ version: '3'
 services:
   portainer:
     image: ${DESKTOP_PLUGIN_IMAGE}
-    command: ["--admin-password", "$$$$2a$$$$10$$$$HX4qSZhtQcvKUNmAsPXuPe9POkM7gdaFPcSnRjokgb8EkMI.1gkSa"]
-    # command: ["--generate-password"]
+    command: ['--admin-password', '$$$$2a$$$$10$$$$HX4qSZhtQcvKUNmAsPXuPe9POkM7gdaFPcSnRjokgb8EkMI.1gkSa']
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -17,4 +16,3 @@ services:
       - 127.0.0.1:9443:9443
 volumes:
   portainer_data:
-

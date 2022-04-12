@@ -99,7 +99,6 @@ type (
 		TunnelPort                *string
 		AdminPassword             *string
 		AdminPasswordFile         *string
-		GenerateAdminPassword     *bool
 		Assets                    *string
 		Data                      *string
 		FeatureFlags              *[]Pair
@@ -1241,7 +1240,6 @@ type (
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
 		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
-		WriteToFile(path string, data []byte) error
 	}
 
 	// GitService represents a service for managing Git

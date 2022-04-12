@@ -53,7 +53,6 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		SnapshotInterval:          kingpin.Flag("snapshot-interval", "Duration between each environment snapshot job").String(),
 		AdminPassword:             kingpin.Flag("admin-password", "Set admin password with provided hash").String(),
 		AdminPasswordFile:         kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
-		GenerateAdminPassword:     kingpin.Flag("generate-admin-password", "Generate a password for the admin user").Bool(),
 		Labels:                    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
 		Logo:                      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
 		Templates:                 kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),

@@ -35,7 +35,6 @@ require (
 	github.com/portainer/libhttp v0.0.0-20211208103139-07a5f798eb3f
 	github.com/rkl-/digest v0.0.0-20180419075440-8316caa4a777
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/sethvargo/go-password v0.2.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/viney-shih/go-lock v1.1.1
