@@ -8,16 +8,24 @@ angular.module('portainer.app').factory('WebhookHelper', [
     'use strict';
 
     var helper = {};
+    let base;
     const protocol = $location.protocol().toLowerCase();
-    const port = $location.port();
-    const displayPort = (protocol === 'http' && port === 80) || (protocol === 'https' && port === 443) ? '' : ':' + port;
+
+    if (protocol !== 'file') {
+      const host = $location.host();
+      const port = $location.port();
+      const displayPort = (protocol === 'http' && port === 80) || (protocol === 'https' && port === 443) ? '' : ':' + port;
+      base = `${protocol}://${host}${displayPort}${baseHref()}`;
+    } else {
+      base = baseHref();
+    }
 
     helper.returnWebhookUrl = function (token) {
-      return `${protocol}://${$location.host()}${displayPort}${baseHref()}${API_ENDPOINT_WEBHOOKS}/${token}`;
+      return `${base}${API_ENDPOINT_WEBHOOKS}/${token}`;
     };
 
     helper.returnStackWebhookUrl = function (token) {
-      return `${protocol}://${$location.host()}${displayPort}${baseHref()}${API_ENDPOINT_STACKS}/webhooks/${token}`;
+      return `${base}${API_ENDPOINT_STACKS}/webhooks/${token}`;
     };
 
     return helper;
