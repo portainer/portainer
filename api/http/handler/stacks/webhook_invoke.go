@@ -2,12 +2,14 @@ package stacks
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 
 	"github.com/portainer/libhttp/response"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/stacks"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -31,6 +33,15 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	stack, err := handler.DataStore.Stack().StackByWebhookID(webhookID.String())
+
+	queryStrings := r.URL.Query()
+	for key, value := range queryStrings {
+		stack.Env = append(stack.Env, portainer.Pair{
+			Name:  key,
+			Value:  strings.Join(value, ""),
+		})
+	}
+
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if handler.DataStore.IsErrObjectNotFound(err) {
