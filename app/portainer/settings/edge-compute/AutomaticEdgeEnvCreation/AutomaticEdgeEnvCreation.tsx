@@ -35,12 +35,5 @@ export function AutomaticEdgeEnvCreation() {
 
 // using mutation because this action generates an object (although it's not saved in db)
 function useGenerateKeyMutation() {
-  return useMutation(generateKey, {
-    meta: {
-      error: {
-        title: 'Failure',
-        message: 'Failed generating key',
-      },
-    },
-  });
+  return useMutation(generateKey);
 }
