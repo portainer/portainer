@@ -88,8 +88,16 @@ angular
       };
 
       $scope.setDefaultPortainerInstanceURL = function () {
-        const baseHREF = baseHref();
-        $scope.formValues.URL = window.location.origin + (baseHREF !== '/' ? baseHREF : '');
+        let url;
+
+        if (window.location.origin.startsWith('http')) {
+          const path = baseHref() !== '/' ? path : '';
+          url = `${window.location.origin}${path}`;
+        } else {
+          url = baseHref().replace(/\/$/, '');
+        }
+
+        $scope.formValues.URL = url;
       };
 
       $scope.resetEndpointURL = function () {
