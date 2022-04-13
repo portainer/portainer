@@ -101,7 +101,9 @@ function EndpointController(
   $scope.copyEdgeAgentDeploymentCommand = copyEdgeAgentDeploymentCommand;
   function copyEdgeAgentDeploymentCommand() {
     let agentVersion = $scope.agentVersion;
-
+    if ($scope.state.deploymentTab == DEPLOYMENT_TABS.KUBERNETES) {
+      agentVersion = $scope.agentShortVersion;
+    }
     const command = $scope.dockerCommands[$scope.state.deploymentTab][$scope.state.platformType](
       agentVersion,
       $scope.endpoint.EdgeID,
@@ -440,9 +442,9 @@ function EndpointController(
 
   function buildKubernetesCommand(agentVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     var agentShortVersion = getAgentShortVersion(agentVersion);
-    return `curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-ce${agentVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${
-      allowSelfSignedCerts ? '1' : '0'
-    } ${$scope.agentSecret}`;
+    return `curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : '0'} ${
+      $scope.agentSecret
+    }`;
   }
 
   initView();
