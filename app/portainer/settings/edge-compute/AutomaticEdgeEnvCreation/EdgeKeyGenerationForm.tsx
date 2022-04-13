@@ -39,6 +39,7 @@ export function EdgeKeyGeneration({ onCreate }: Props) {
       onSubmit={handleSubmit}
       validationSchema={validation}
       validateOnMount
+      enableReinitialize
     >
       {({ errors, isValid }) => (
         <Form className="form-horizontal">
