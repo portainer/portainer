@@ -1,7 +1,7 @@
 # Makefile for development purpose
 
-.PHONY: all build
-all: clean build-local install-local
+.PHONY: local build
+local: clean build install
 remote: clean build-remote install-remote
 
 ORG=portainer
@@ -14,10 +14,10 @@ clean:
 	-docker rmi $(IMAGE_NAME):$(VERSION)
 	-docker rmi $(IMAGE_NAME)
 
-build-local:
+build:
 	docker buildx build -f build/linux/Dockerfile --load --build-arg TAG=$(VERSION) --build-arg PORTAINER_IMAGE_NAME=$(IMAGE_NAME) --tag=$(TAGGED_IMAGE_NAME) .
 
-install-local:
+install:
 	docker extension install $(TAGGED_IMAGE_NAME)
 
 build-remote:

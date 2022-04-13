@@ -159,7 +159,7 @@ function shell_build_binary_azuredevops(platform, arch) {
 }
 
 function shell_install_extension() {
-  return `make all -f build/docker-extension/Makefile`;
+  return `make local -f build/docker-extension/Makefile`;
 }
 
 function shell_run_container() {
