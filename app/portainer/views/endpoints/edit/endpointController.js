@@ -101,9 +101,6 @@ function EndpointController(
   $scope.copyEdgeAgentDeploymentCommand = copyEdgeAgentDeploymentCommand;
   function copyEdgeAgentDeploymentCommand() {
     let agentVersion = $scope.agentVersion;
-    if ($scope.state.deploymentTab == DEPLOYMENT_TABS.KUBERNETES) {
-      agentVersion = $scope.agentShortVersion;
-    }
 
     const command = $scope.dockerCommands[$scope.state.deploymentTab][$scope.state.platformType](
       agentVersion,
@@ -291,7 +288,9 @@ function EndpointController(
         $scope.endpoint = endpoint;
         $scope.groups = groups;
         $scope.availableTags = tags;
-        $scope.agentSecret = settings.AgentSecret;
+        if (settings.AgentSecret) {
+          $scope.agentSecret = settings.AgentSecret;
+        }
 
         configureState();
 

@@ -78,7 +78,7 @@
           <uib-tabset active="state.deploymentTab">
             <uib-tab index="'kubernetes'" heading="Kubernetes" ng-if="state.platformType === 'linux'">
               <code style="display: block; white-space: pre-wrap; padding: 16px 45px">{{
-                dockerCommands[state.deploymentTab][state.platformType](agentShortVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
+                dockerCommands[state.deploymentTab][state.platformType](agentVersion, endpoint.EdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts)
               }}</code>
             </uib-tab>
             <uib-tab index="'swarm'" heading="Docker Swarm">

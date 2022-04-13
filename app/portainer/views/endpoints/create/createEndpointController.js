@@ -313,7 +313,9 @@ angular
 
             const settings = data.settings;
             $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
-            $scope.agentSecret = settings.AgentSecret;
+            if (settings.AgentSecret) {
+              $scope.agentSecret = settings.AgentSecret;
+            }
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to load groups');
