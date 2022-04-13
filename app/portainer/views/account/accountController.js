@@ -46,6 +46,10 @@ angular.module('portainer.app').controller('AccountController', [
       return !$scope.forceChangePassword;
     };
 
+    $scope.uiCanExit = () => {
+      return this.uiCanExit();
+    };
+
     $scope.removeAction = (selectedTokens) => {
       const msg = 'Do you want to remove the selected access token(s)? Any script or application using these tokens will no longer be able to invoke the Portainer API.';
 
