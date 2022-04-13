@@ -114,6 +114,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 	}
 
 	if payload.FileContent != nil && *payload.FileContent != string(fileContent) {
+		fileContent = []byte(*payload.FileContent)
 		_, err := handler.FileService.StoreEdgeJobFileFromBytes(strconv.Itoa(int(edgeJob.ID)), fileContent)
 		if err != nil {
 			return err
