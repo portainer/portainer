@@ -288,9 +288,7 @@ function EndpointController(
         $scope.endpoint = endpoint;
         $scope.groups = groups;
         $scope.availableTags = tags;
-        if (settings.AgentSecret) {
-          $scope.agentSecret = settings.AgentSecret;
-        }
+        $scope.agentSecret = settings.AgentSecret;
 
         configureState();
 
