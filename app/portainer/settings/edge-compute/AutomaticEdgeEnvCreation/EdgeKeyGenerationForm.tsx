@@ -14,16 +14,21 @@ import { baseHref } from '@/portainer/helpers/pathHelper';
 interface FormValues {
   url: string;
 }
+const validation = yup.object({
+  url: yup
+    .string()
+    .test(
+      'notlocal',
+      'Cannot use localhost as environment URL',
+      (value) => !value?.includes('localhost')
+    )
+    .url('URL should be a valid URI')
+    .required('URL is required'),
+});
 
 interface Props {
   onCreate: (edgeKey: string) => void;
 }
-const validation = yup.object({
-  url: yup
-    .string()
-    .url('URL should be a valid URI')
-    .required('URL is required'),
-});
 
 export function EdgeKeyGeneration({ onCreate }: Props) {
   const { handleSubmit, initialValues, isLoading } = useFormState(onCreate);
@@ -33,8 +38,9 @@ export function EdgeKeyGeneration({ onCreate }: Props) {
       initialValues={initialValues}
       onSubmit={handleSubmit}
       validationSchema={validation}
+      validateOnMount
     >
-      {({ errors, isValid, touched }) => (
+      {({ errors, isValid }) => (
         <Form className="form-horizontal">
           <FormSectionTitle>Edge Key Generation</FormSectionTitle>
 
@@ -42,7 +48,7 @@ export function EdgeKeyGeneration({ onCreate }: Props) {
             label="Portainer URL"
             tooltip="URL of the Portainer instance that the agent will use to initiate the communications."
             inputId="url-input"
-            errors={touched.url && errors.url}
+            errors={errors.url}
           >
             <Field as={Input} id="url-input" name="url" />
           </FormControl>
@@ -74,7 +80,11 @@ function useFormState(onCreate: (edgeKey: string) => void) {
   const { mutate } = mutation;
 
   const handleSubmit = useCallback(
-    (values: FormValues) => {
+    async (values: FormValues) => {
+      if (!validation.isValidSync(values)) {
+        return;
+      }
+
       setDefaultUrl(values.url);
 
       mutate(values.url, {
