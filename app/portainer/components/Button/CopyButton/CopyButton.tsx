@@ -37,7 +37,7 @@ export function CopyButton({
       <span
         className={clsx(
           copiedSuccessfully && styles.fadeout,
-          styles.copyButton,
+          styles.displayText,
           'space-left'
         )}
       >
