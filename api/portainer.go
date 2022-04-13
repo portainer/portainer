@@ -815,6 +815,8 @@ type (
 		EnforceEdgeID bool `json:"EnforceEdgeID" example:"false"`
 		// Container environment parameter AGENT_SECRET
 		AgentSecret string `json:"AgentSecret"`
+		// EdgePortainerURL is the URL that is exposed to edge agents
+		EdgePortainerURL string `json:"EdgePortainerUrl"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool

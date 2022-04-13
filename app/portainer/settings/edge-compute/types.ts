@@ -3,4 +3,5 @@ export interface Settings {
   EnableEdgeComputeFeatures: boolean;
   DisableTrustOnFirstConnect: boolean;
   EnforceEdgeID: boolean;
+  EdgePortainerUrl: string;
 }

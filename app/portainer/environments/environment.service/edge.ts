@@ -4,13 +4,12 @@ interface GenerateUrlResponse {
   edgeKey: string;
 }
 
-export async function generateKey(portainerUrl: string) {
+export async function generateKey() {
   try {
     const { data } = await axios.post<GenerateUrlResponse>(
-      `/endpoints/edge/generate-key`,
-      { portainerUrl }
+      `/endpoints/edge/generate-key`
     );
-    return data;
+    return data.edgeKey;
   } catch (err) {
     throw parseAxiosError(err as Error, 'Unable to generate key');
   }

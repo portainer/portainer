@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useMutation } from 'react-query';
+import { useEffect } from 'react';
 
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { EdgeScriptForm } from '@/edge/components/EdgeScriptForm';
-
-import { EdgeKeyGeneration } from './EdgeKeyGenerationForm';
+import { generateKey } from '@/portainer/environments/environment.service/edge';
+import { TextTip } from '@/portainer/components/Tip/TextTip';
 
 export function AutomaticEdgeEnvCreation() {
-  const [edgeKey, setEdgeKey] = useState('');
+  const edgeKeyMutation = useGenerateKeyMutation();
+  const { mutate } = edgeKeyMutation;
+
+  useEffect(() => {
+    mutate();
+  }, [mutate]);
+
+  const edgeKey = edgeKeyMutation.data;
 
   return (
     <Widget>
@@ -15,14 +23,24 @@ export function AutomaticEdgeEnvCreation() {
         title="Automatic Edge Environment Creation"
       />
       <WidgetBody>
-        <EdgeKeyGeneration onCreate={setEdgeKey} />
-        {edgeKey && (
-          <>
-            <hr />
-            <EdgeScriptForm edgeKey={edgeKey} />
-          </>
+        {edgeKey ? (
+          <EdgeScriptForm edgeKey={edgeKey} />
+        ) : (
+          <TextTip>Please choose a valid edge portainer URL</TextTip>
         )}
       </WidgetBody>
     </Widget>
   );
+}
+
+// using mutation because this action generates an object (although it's not saved in db)
+function useGenerateKeyMutation() {
+  return useMutation(generateKey, {
+    meta: {
+      error: {
+        title: 'Failure',
+        message: 'Failed generating key',
+      },
+    },
+  });
 }
