@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import _ from 'lodash';
 
 import { Code } from '@/portainer/components/Code';
+import { CopyButton } from '@/portainer/components/Button/CopyButton';
 import { NavTabs } from '@/portainer/components/NavTabs/NavTabs';
 import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
 
@@ -70,23 +71,28 @@ export function Scripts({
     }
   }, [os, platform, onPlatformChange]);
 
-  const options = commandsByOs[os].map((c) => ({
-    id: c.id,
-    label: c.label,
-    children: (
-      <Code showCopyButton>
-        {c.command(
-          agentVersion,
-          edgeIdGenerator,
-          edgeKey,
-          allowSelfSignedCertificates,
-          envVars,
-          edgeId,
-          agentSecret
-        )}
-      </Code>
-    ),
-  }));
+  const options = commandsByOs[os].map((c) => {
+    const cmd = c.command(
+      agentVersion,
+      edgeIdGenerator,
+      edgeKey,
+      allowSelfSignedCertificates,
+      envVars,
+      edgeId,
+      agentSecret
+    );
+
+    return {
+      id: c.id,
+      label: c.label,
+      children: (
+        <>
+          <Code>{cmd}</Code>
+          <CopyButton copyText={cmd}>Copy</CopyButton>
+        </>
+      ),
+    };
+  });
 
   return (
     <div className="row">
@@ -261,10 +267,11 @@ function buildKubernetesCommand(
   agentSecret = ''
 ) {
   const agentShortVersion = getAgentShortVersion(agentVersion);
+  const idEnvVar = edgeIdScript
+    ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n`
+    : '';
 
-  return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}
-
-curl https://downloads.portainer.io/portainer-ee${agentShortVersion}-edge-agent-setup.sh | 
+  return `${idEnvVar}curl https://downloads.portainer.io/portainer-ee${agentShortVersion}-edge-agent-setup.sh | 
   bash -s -- "${
     !edgeIdScript && edgeId ? edgeId : '$PORTAINER_EDGE_ID'
   }" "${edgeKey}" "${allowSelfSignedCerts ? '1' : '0'}" "${agentSecret}"`;
