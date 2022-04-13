@@ -5,3 +5,31 @@
 .refresh-environments-button {
   margin-left: 0 !important;
 }
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.filter-left {
+  margin-left: 10px;
+  padding: 10px 0px;
+  width: 15%;
+  display: inline-block;
+}
+
+.filter-right {
+  padding: 10px;
+  width: 15%;
+  right: 0;
+  display: inline-block;
+  margin-left: auto;
+}
+
+.filter-button {
+  margin-left: 10px;
+  padding: 10px 0px;
+  width: 5%;
+  display: inline-block;
+}

@@ -1,0 +1,10 @@
+.sort-by-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.sort-by-element {
+  display: inline-block;
+}
