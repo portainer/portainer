@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/middlewares"
 )
 
 type logsPayload struct {
@@ -31,16 +32,9 @@ func (payload *logsPayload) Validate(r *http.Request) error {
 // @failure 400
 // @router /endpoints/{id}/edge/jobs/{jobID}/logs [post]
 func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
-	}
-
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.BadRequest("Unable to find an environment on request context", err)
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
@@ -66,7 +60,7 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an edge job with the specified identifier inside the database", err}
 	}
 
-	err = handler.FileService.StoreEdgeJobTaskLogFileFromBytes(strconv.Itoa(edgeJobID), strconv.Itoa(endpointID), []byte(payload.FileContent))
+	err = handler.FileService.StoreEdgeJobTaskLogFileFromBytes(strconv.Itoa(edgeJobID), strconv.Itoa(int(endpoint.ID)), []byte(payload.FileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to save task log to the filesystem", err}
 	}

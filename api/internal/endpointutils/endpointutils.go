@@ -58,3 +58,14 @@ func FilterByExcludeIDs(endpoints []portainer.Endpoint, excludeIds []portainer.E
 	}
 	return filteredEndpoints
 }
+
+// EndpointSet receives an environment(endpoint) array and returns a set
+func EndpointSet(endpointIDs []portainer.EndpointID) map[portainer.EndpointID]bool {
+	set := map[portainer.EndpointID]bool{}
+
+	for _, endpointID := range endpointIDs {
+		set[endpointID] = true
+	}
+
+	return set
+}
