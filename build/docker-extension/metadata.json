@@ -1,4 +1,5 @@
 {
+  "icon": "portainer.svg",
   "vm": {
     "composefile": "docker-compose.yml",
     "exposes": { "socket": "docker.sock" }
