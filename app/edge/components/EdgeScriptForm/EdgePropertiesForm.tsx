@@ -28,7 +28,7 @@ export function EdgePropertiesForm({
 
       {!hideIdGetter && (
         <FormControl
-          label="Edge ID Getter"
+          label="Edge ID Generator"
           tooltip="A bash script one liner that will generate the edge id"
           inputId="edge-id-generator-input"
         >
