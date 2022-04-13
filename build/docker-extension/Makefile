@@ -2,9 +2,10 @@
 
 .PHONY: all build
 all: clean build-local install-local
+remote: clean build-remote install-remote
 
 ORG=portainer
-VERSION=2.11.13
+VERSION=2.11.14
 IMAGE_NAME=$(ORG)/portainer-docker-extension
 TAGGED_IMAGE_NAME=$(IMAGE_NAME):$(VERSION)
 
