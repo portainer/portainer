@@ -5,7 +5,7 @@ local: clean build install
 remote: clean build-remote install-remote
 
 ORG=portainer
-VERSION=2.11.14
+VERSION=0.0.0
 IMAGE_NAME=$(ORG)/portainer-docker-extension
 TAGGED_IMAGE_NAME=$(IMAGE_NAME):$(VERSION)
 
