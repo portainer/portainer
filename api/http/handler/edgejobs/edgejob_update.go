@@ -92,7 +92,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 				continue
 			}
 
-			if meta, ok := edgeJob.Endpoints[endpointID]; ok {
+			if meta, exists := edgeJob.Endpoints[endpointID]; exists {
 				endpointsMap[endpointID] = meta
 			} else {
 				endpointsMap[endpointID] = portainer.EdgeJobEndpointMeta{}
@@ -103,13 +103,18 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 	}
 
 	updateVersion := false
-	if payload.CronExpression != nil {
+	if payload.CronExpression != nil && *payload.CronExpression != edgeJob.CronExpression {
 		edgeJob.CronExpression = *payload.CronExpression
 		updateVersion = true
 	}
 
-	if payload.FileContent != nil {
-		_, err := handler.FileService.StoreEdgeJobFileFromBytes(strconv.Itoa(int(edgeJob.ID)), []byte(*payload.FileContent))
+	fileContent, err := handler.FileService.GetFileContent(edgeJob.ScriptPath, "")
+	if err != nil {
+		return err
+	}
+
+	if payload.FileContent != nil && *payload.FileContent != string(fileContent) {
+		_, err := handler.FileService.StoreEdgeJobFileFromBytes(strconv.Itoa(int(edgeJob.ID)), fileContent)
 		if err != nil {
 			return err
 		}
@@ -117,7 +122,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 		updateVersion = true
 	}
 
-	if payload.Recurring != nil {
+	if payload.Recurring != nil && *payload.Recurring != edgeJob.Recurring {
 		edgeJob.Recurring = *payload.Recurring
 		updateVersion = true
 	}

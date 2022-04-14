@@ -101,6 +101,7 @@ angular.module('portainer.app').factory('Authentication', [
       user.username = tokenPayload.username;
       user.ID = tokenPayload.id;
       user.role = tokenPayload.role;
+      user.forceChangePassword = tokenPayload.forceChangePassword;
       await setUserTheme();
     }
 

@@ -87,7 +87,7 @@ type Server struct {
 	SwarmStackManager           portainer.SwarmStackManager
 	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
-	KubeConfigService           k8s.KubeConfigService
+	KubeClusterAccessService    k8s.KubeClusterAccessService
 	Handler                     *handler.Handler
 	SSLService                  *ssl.Service
 	DockerClientFactory         *docker.ClientFactory
@@ -98,7 +98,6 @@ type Server struct {
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               stackdeployer.StackDeployer
-	BaseURL                     string
 }
 
 // Start starts the HTTP server
@@ -161,10 +160,7 @@ func (server *Server) Start() error {
 	endpointHandler.BindAddress = server.BindAddress
 	endpointHandler.BindAddressHTTPS = server.BindAddressHTTPS
 
-	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
-	endpointEdgeHandler.DataStore = server.DataStore
-	endpointEdgeHandler.FileService = server.FileService
-	endpointEdgeHandler.ReverseTunnelService = server.ReverseTunnelService
+	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer, server.DataStore, server.FileService, server.ReverseTunnelService)
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = server.AuthorizationService
@@ -175,12 +171,11 @@ func (server *Server) Start() error {
 	endpointProxyHandler.ProxyManager = server.ProxyManager
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
-	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.KubernetesClientFactory, server.BaseURL)
-	kubernetesHandler.JwtService = server.JWTService
+	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.JWTService, server.KubeClusterAccessService, server.KubernetesClientFactory)
 
-	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
+	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"), adminMonitor.WasInstanceDisabled)
 
-	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeConfigService)
+	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeClusterAccessService)
 
 	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
@@ -221,6 +216,7 @@ func (server *Server) Start() error {
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
 	stackHandler.FileService = server.FileService
+	stackHandler.KubernetesClientFactory = server.KubernetesClientFactory
 	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
 	stackHandler.Scheduler = server.Scheduler
@@ -301,8 +297,7 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
-	handler := offlineGate.WaitingMiddleware(time.Minute, server.Handler)
-
+	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
 	if server.HTTPEnabled {
 		go func() {
 			log.Printf("[INFO] [http,server] [message: starting HTTP server on port %s]", server.BindAddress)

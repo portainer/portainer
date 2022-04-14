@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/passwordutils"
 )
 
 type adminInitPayload struct {
@@ -55,6 +56,10 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 
 	if len(users) != 0 {
 		return &httperror.HandlerError{http.StatusConflict, "Unable to create administrator user", errAdminAlreadyInitialized}
+	}
+
+	if !passwordutils.StrengthCheck(payload.Password) {
+		return &httperror.HandlerError{http.StatusBadRequest, "Password does not meet the requirements", nil}
 	}
 
 	user := &portainer.User{

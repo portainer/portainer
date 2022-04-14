@@ -1,5 +1,4 @@
-import Select from 'react-select';
-
+import { Select } from '@/portainer/components/form-components/ReactSelect';
 import { Team, TeamId } from '@/portainer/teams/types';
 
 interface Props {

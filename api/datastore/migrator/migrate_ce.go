@@ -95,6 +95,8 @@ func (m *Migrator) Migrate() error {
 
 		// Portainer 2.9.3 (yep out of order, but 2.10 is EE only)
 		newMigration(35, m.migrateDBVersionToDB35),
+
+		newMigration(36, m.migrateDBVersionToDB36),
 	}
 
 	var lastDbVersion int

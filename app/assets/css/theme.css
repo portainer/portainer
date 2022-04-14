@@ -526,6 +526,7 @@ html {
   --text-blocklist-item-selected-color: var(--blue-9);
   --text-input-group-addon-color: var(--white-color);
   --text-codemirror-color: var(--white-color);
+  --text-dropdown-menu-color: var(--white-color);
   --text-log-viewer-color: var(--white-color);
   --text-summary-color: var(--white-color);
   --text-rzslider-color: var(--white-color);

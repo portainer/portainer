@@ -813,6 +813,8 @@ type (
 		DisableTrustOnFirstConnect bool `json:"DisableTrustOnFirstConnect" example:"false"`
 		// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
 		EnforceEdgeID bool `json:"EnforceEdgeID" example:"false"`
+		// Container environment parameter AGENT_SECRET
+		AgentSecret string `json:"AgentSecret"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -1100,9 +1102,10 @@ type (
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID       UserID
-		Username string
-		Role     UserRole
+		ID                  UserID
+		Username            string
+		Role                UserRole
+		ForceChangePassword bool
 	}
 
 	// TunnelDetails represents information associated to a tunnel
@@ -1238,6 +1241,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
+		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 	}
 
@@ -1262,6 +1266,7 @@ type (
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
+		HasStackName(namespace string, stackName string) (bool, error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
@@ -1321,7 +1326,6 @@ type (
 	// SnapshotService represents a service for managing environment(endpoint) snapshots
 	SnapshotService interface {
 		Start()
-		Stop()
 		SetSnapshotInterval(snapshotInterval string) error
 		SnapshotEndpoint(endpoint *Endpoint) error
 	}
@@ -1792,6 +1796,9 @@ const (
 	OperationPortainerUserInspect           Authorization = "PortainerUserInspect"
 	OperationPortainerUserMemberships       Authorization = "PortainerUserMemberships"
 	OperationPortainerUserCreate            Authorization = "PortainerUserCreate"
+	OperationPortainerUserListToken         Authorization = "PortainerUserListToken"
+	OperationPortainerUserCreateToken       Authorization = "PortainerUserCreateToken"
+	OperationPortainerUserRevokeToken       Authorization = "PortainerUserRevokeToken"
 	OperationPortainerUserUpdate            Authorization = "PortainerUserUpdate"
 	OperationPortainerUserUpdatePassword    Authorization = "PortainerUserUpdatePassword"
 	OperationPortainerUserDelete            Authorization = "PortainerUserDelete"

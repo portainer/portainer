@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import { confirmContainerDeletion } from '@/portainer/services/modal.service/prompt';
 import { FeatureId } from 'Portainer/feature-flags/enums';
+import { ResourceControlType } from '@/portainer/access-control/types';
 
 angular.module('portainer.docker').controller('ContainerController', [
   '$q',
@@ -45,6 +46,7 @@ angular.module('portainer.docker').controller('ContainerController', [
     Authentication,
     endpoint
   ) {
+    $scope.resourceType = ResourceControlType.Container;
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
     $scope.activityTime = 0;
@@ -70,6 +72,10 @@ angular.module('portainer.docker').controller('ContainerController', [
     }
 
     $scope.updateRestartPolicy = updateRestartPolicy;
+
+    $scope.onUpdateResourceControlSuccess = function () {
+      $state.reload();
+    };
 
     var update = function () {
       var nodeName = $transition$.params().nodeName;

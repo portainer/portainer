@@ -55,21 +55,6 @@ export function confirm(options: ConfirmOptions) {
   applyBoxCSS(box);
 }
 
-export function confirmAccessControlUpdate(callback: ConfirmCallback) {
-  confirm({
-    title: 'Are you sure ?',
-    message:
-      'Changing the ownership of this resource will potentially restrict its management to some users.',
-    buttons: {
-      confirm: {
-        label: 'Change ownership',
-        className: 'btn-primary',
-      },
-    },
-    callback,
-  });
-}
-
 export function confirmImageForceRemoval(callback: ConfirmCallback) {
   confirm({
     title: 'Are you sure?',
@@ -130,17 +115,17 @@ export function confirmDetachment(message: string, callback: ConfirmCallback) {
   });
 }
 
-export function confirmDeassociate(callback: ConfirmCallback) {
+export function confirmDisassociate(callback: ConfirmCallback) {
   const message =
-    '<p>De-associating this Edge environment will mark it as non associated and will clear the registered Edge ID.</p>' +
+    '<p>Disassociating this Edge environment will mark it as non associated and will clear the registered Edge ID.</p>' +
     '<p>Any agent started with the Edge key associated to this environment will be able to re-associate with this environment.</p>' +
     '<p>You can re-use the Edge ID and Edge key that you used to deploy the existing Edge agent to associate a new Edge device to this environment.</p>';
   confirm({
-    title: 'About de-associating',
+    title: 'About disassociating',
     message: sanitize(message),
     buttons: {
       confirm: {
-        label: 'De-associate',
+        label: 'Disassociate',
         className: 'btn-primary',
       },
     },
@@ -216,4 +201,19 @@ export function confirmChangePassword() {
       },
     },
   });
+}
+
+export function confirmForceChangePassword() {
+  const box = bootbox.dialog({
+    message:
+      'Please update your password to a stronger password to continue using Portainer',
+    buttons: {
+      confirm: {
+        label: 'OK',
+        className: 'btn-primary',
+      },
+    },
+  });
+
+  applyBoxCSS(box);
 }

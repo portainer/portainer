@@ -10,9 +10,9 @@ import (
 	"path"
 	"time"
 
-	"github.com/boltdb/bolt"
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/sirupsen/logrus"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (
@@ -181,10 +181,7 @@ func (connection *DbConnection) ConvertToKey(v int) []byte {
 func (connection *DbConnection) SetServiceName(bucketName string) error {
 	return connection.Batch(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
-		if err != nil {
-			return err
-		}
-		return nil
+		return err
 	})
 }
 
