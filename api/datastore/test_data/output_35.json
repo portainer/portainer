@@ -577,6 +577,7 @@
     }
   ],
   "settings": {
+    "AgentSecret": "",
     "AllowBindMountsForRegularUsers": true,
     "AllowContainerCapabilitiesForRegularUsers": true,
     "AllowDeviceMappingForRegularUsers": true,
@@ -749,23 +750,25 @@
       "Password": "$2a$10$siRDprr/5uUFAU8iom3Sr./WXQkN2dhSNjAC471pkJaALkghS762a",
       "PortainerAuthorizations": {
         "PortainerDockerHubInspect": true,
-        "PortainerEndpointExtensionAdd": true,
-        "PortainerEndpointExtensionRemove": true,
         "PortainerEndpointGroupList": true,
         "PortainerEndpointInspect": true,
         "PortainerEndpointList": true,
-        "PortainerExtensionList": true,
         "PortainerMOTD": true,
         "PortainerRegistryInspect": true,
         "PortainerRegistryList": true,
         "PortainerTeamList": true,
         "PortainerTemplateInspect": true,
         "PortainerTemplateList": true,
+        "PortainerUserCreateToken": true,
         "PortainerUserInspect": true,
         "PortainerUserList": true,
-        "PortainerUserMemberships": true
+        "PortainerUserListToken": true,
+        "PortainerUserMemberships": true,
+        "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "TokenIssueAt": 0,
+      "UserTheme": "",
       "Username": "admin"
     },
     {
@@ -774,23 +777,25 @@
       "Password": "$2a$10$WpCAW8mSt6FRRp1GkynbFOGSZnHR6E5j9cETZ8HiMlw06hVlDW/Li",
       "PortainerAuthorizations": {
         "PortainerDockerHubInspect": true,
-        "PortainerEndpointExtensionAdd": true,
-        "PortainerEndpointExtensionRemove": true,
         "PortainerEndpointGroupList": true,
         "PortainerEndpointInspect": true,
         "PortainerEndpointList": true,
-        "PortainerExtensionList": true,
         "PortainerMOTD": true,
         "PortainerRegistryInspect": true,
         "PortainerRegistryList": true,
         "PortainerTeamList": true,
         "PortainerTemplateInspect": true,
         "PortainerTemplateList": true,
+        "PortainerUserCreateToken": true,
         "PortainerUserInspect": true,
         "PortainerUserList": true,
-        "PortainerUserMemberships": true
+        "PortainerUserListToken": true,
+        "PortainerUserMemberships": true,
+        "PortainerUserRevokeToken": true
       },
       "Role": 1,
+      "TokenIssueAt": 0,
+      "UserTheme": "",
       "Username": "prabhat"
     }
   ],
