@@ -32,7 +32,7 @@
     "dev:client": "grunt clean:client && webpack-dev-server --config=./webpack/webpack.develop.js",
     "dev:client:prod": "grunt clean:client && webpack-dev-server --config=./webpack/webpack.production.js",
     "dev:nodl": "grunt clean:server && grunt clean:client && grunt build:server && grunt start:client",
-    "dev:extension": "grunt build && grunt install:extension",
+    "dev:extension": "grunt build && make local -f build/docker-extension/Makefile",
     "start:toolkit": "grunt start:toolkit",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
     "clean:all": "grunt clean:all",
