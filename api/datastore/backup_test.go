@@ -10,7 +10,7 @@ import (
 )
 
 func TestCreateBackupFolders(t *testing.T) {
-	_, store, teardown := MustNewTestStore(false)
+	_, store, teardown := MustNewTestStore(false, true)
 	defer teardown()
 
 	connection := store.GetConnection()
@@ -27,7 +27,7 @@ func TestCreateBackupFolders(t *testing.T) {
 }
 
 func TestStoreCreation(t *testing.T) {
-	_, store, teardown := MustNewTestStore(true)
+	_, store, teardown := MustNewTestStore(true, true)
 	defer teardown()
 
 	if store == nil {
@@ -40,7 +40,7 @@ func TestStoreCreation(t *testing.T) {
 }
 
 func TestBackup(t *testing.T) {
-	_, store, teardown := MustNewTestStore(true)
+	_, store, teardown := MustNewTestStore(true, true)
 	connection := store.GetConnection()
 	defer teardown()
 
@@ -67,7 +67,7 @@ func TestBackup(t *testing.T) {
 }
 
 func TestRemoveWithOptions(t *testing.T) {
-	_, store, teardown := MustNewTestStore(true)
+	_, store, teardown := MustNewTestStore(true, true)
 	defer teardown()
 
 	t.Run("successfully removes file if existent", func(t *testing.T) {

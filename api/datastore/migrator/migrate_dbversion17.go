@@ -5,6 +5,7 @@ import (
 )
 
 func (m *Migrator) updateUsersToDBVersion18() error {
+	migrateLog.Info("- updating users")
 	legacyUsers, err := m.userService.Users()
 	if err != nil {
 		return err
@@ -39,6 +40,7 @@ func (m *Migrator) updateUsersToDBVersion18() error {
 }
 
 func (m *Migrator) updateEndpointsToDBVersion18() error {
+	migrateLog.Info("- updating endpoints")
 	legacyEndpoints, err := m.endpointService.Endpoints()
 	if err != nil {
 		return err
@@ -69,6 +71,7 @@ func (m *Migrator) updateEndpointsToDBVersion18() error {
 }
 
 func (m *Migrator) updateEndpointGroupsToDBVersion18() error {
+	migrateLog.Info("- updating endpoint groups")
 	legacyEndpointGroups, err := m.endpointGroupService.EndpointGroups()
 	if err != nil {
 		return err
@@ -99,6 +102,7 @@ func (m *Migrator) updateEndpointGroupsToDBVersion18() error {
 }
 
 func (m *Migrator) updateRegistriesToDBVersion18() error {
+	migrateLog.Info("- updating registries")
 	legacyRegistries, err := m.registryService.Registries()
 	if err != nil {
 		return err
