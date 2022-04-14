@@ -3,3 +3,16 @@
   white-space: pre-wrap;
   padding: 16px 90px;
 }
+
+.root {
+  position: relative;
+}
+
+.copy-button {
+  position: absolute;
+  top: min(20px, 25%);
+  right: 20px;
+  padding: 0;
+  outline: none !important;
+  margin: 0;
+}

@@ -28,7 +28,17 @@ func (slog *ScopedLog) Debug(message string) {
 	slog.print(DEBUG, fmt.Sprintf("[message: %s]", message))
 }
 
+func (slog *ScopedLog) Debugf(message string, vars ...interface{}) {
+	message = fmt.Sprintf(message, vars...)
+	slog.print(DEBUG, fmt.Sprintf("[message: %s]", message))
+}
+
 func (slog *ScopedLog) Info(message string) {
+	slog.print(INFO, fmt.Sprintf("[message: %s]", message))
+}
+
+func (slog *ScopedLog) Infof(message string, vars ...interface{}) {
+	message = fmt.Sprintf(message, vars...)
 	slog.print(INFO, fmt.Sprintf("[message: %s]", message))
 }
 

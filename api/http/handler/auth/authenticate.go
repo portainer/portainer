@@ -13,6 +13,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/passwordutils"
 )
 
 type authenticatePayload struct {
@@ -100,7 +101,8 @@ func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portai
 		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized}
 	}
 
-	return handler.writeToken(w, user)
+	forceChangePassword := !passwordutils.StrengthCheck(password)
+	return handler.writeToken(w, user, forceChangePassword)
 }
 
 func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.User, username, password string, ldapSettings *portainer.LDAPSettings) *httperror.HandlerError {
@@ -131,11 +133,11 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 		log.Printf("Warning: unable to automatically add user into teams: %s\n", err.Error())
 	}
 
-	return handler.writeToken(w, user)
+	return handler.writeToken(w, user, false)
 }
 
-func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
-	tokenData := composeTokenData(user)
+func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User, forceChangePassword bool) *httperror.HandlerError {
+	tokenData := composeTokenData(user, forceChangePassword)
 
 	return handler.persistAndWriteToken(w, tokenData)
 }
@@ -206,10 +208,11 @@ func teamMembershipExists(teamID portainer.TeamID, memberships []portainer.TeamM
 	return false
 }
 
-func composeTokenData(user *portainer.User) *portainer.TokenData {
+func composeTokenData(user *portainer.User, forceChangePassword bool) *portainer.TokenData {
 	return &portainer.TokenData{
-		ID:       user.ID,
-		Username: user.Username,
-		Role:     user.Role,
+		ID:                  user.ID,
+		Username:            user.Username,
+		Role:                user.Role,
+		ForceChangePassword: forceChangePassword,
 	}
 }
