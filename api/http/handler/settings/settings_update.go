@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 type settingsUpdatePayload struct {
@@ -46,6 +47,8 @@ type settingsUpdatePayload struct {
 	DisableTrustOnFirstConnect *bool `example:"false"`
 	// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
 	EnforceEdgeID *bool `example:"false"`
+	// EdgePortainerURL is the URL that is exposed to edge agents
+	EdgePortainerURL *string `json:"EdgePortainerURL"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -71,6 +74,13 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 		_, err := time.ParseDuration(*payload.KubeconfigExpiry)
 		if err != nil {
 			return errors.New("Invalid Kubeconfig Expiry")
+		}
+	}
+
+	if payload.EdgePortainerURL != nil {
+		_, err := edge.ParseHostForEdge(*payload.EdgePortainerURL)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -176,6 +186,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.EnforceEdgeID != nil {
 		settings.EnforceEdgeID = *payload.EnforceEdgeID
+	}
+
+	if payload.EdgePortainerURL != nil {
+		settings.EdgePortainerURL = *payload.EdgePortainerURL
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {

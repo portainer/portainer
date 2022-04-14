@@ -18,6 +18,7 @@ export function SettingsViewModel(data) {
   this.DisableTrustOnFirstConnect = data.DisableTrustOnFirstConnect;
   this.EnforceEdgeID = data.EnforceEdgeID;
   this.AgentSecret = data.AgentSecret;
+  this.EdgePortainerUrl = data.EdgePortainerUrl;
 }
 
 export function PublicSettingsViewModel(settings) {
