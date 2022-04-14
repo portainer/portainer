@@ -86,7 +86,7 @@ func TestRemoveWithOptions(t *testing.T) {
 
 		err = store.removeWithOptions(options)
 		if err != nil {
-			t.Errorf("RemoveWithOptions should successfully remove file; err=%w", err)
+			t.Errorf("RemoveWithOptions should successfully remove file; err=%v", err)
 		}
 
 		if isFileExist(f.Name()) {
