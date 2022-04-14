@@ -24,7 +24,7 @@ interface Props {
   onSubmit(values: FormValues): void;
 }
 
-export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
+export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   if (!settings) {
     return null;
   }
