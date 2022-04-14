@@ -2,20 +2,21 @@ export const KubernetesIngressClassAnnotation = 'kubernetes.io/ingress.class';
 
 // keys must match KubernetesIngressClassTypes values to map them quickly using the ingress type
 // KubernetesIngressClassRewriteTargetAnnotations[KubernetesIngressClassTypes.NGINX] for example
-export const KubernetesNginxRewriteTargetAnnotations = Object.freeze({
+
+export const KubernetesNginxRewriteTargetAnnotations = {
   Key: 'nginx.ingress.kubernetes.io/rewrite-target',
-  Value: '/',
-});
+  Value: '/$1',
+};
 
-export const KubernetesTraefikRewriteTargetAnnotations = Object.freeze({
+export const KubernetesTraefikRewriteTargetAnnotations = {
   Key: 'traefik.ingress.kubernetes.io/rewrite-target',
-  Value: '/',
-});
+  Value: '/$1',
+};
 
-export const KubernetesNginxUseregexAnnotations = Object.freeze({
+export const KubernetesNginxUseregexAnnotations = {
   Key: 'nginx.ingress.kubernetes.io/use-regex',
   Value: 'true',
-});
+};
 
 export const KubernetesIngressClassTypes = Object.freeze({
   NGINX: 'nginx',
