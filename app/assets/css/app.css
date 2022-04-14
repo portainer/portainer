@@ -897,6 +897,46 @@ json-tree .branch-preview {
   flex-wrap: wrap;
 }
 
+.ml-0 {
+  margin-left: 0rem;
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+.ml-3 {
+  margin-left: 0.75rem;
+}
+
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.ml-5 {
+  margin-left: 1.25rem;
+}
+
+.ml-5 {
+  margin-left: 1.5rem;
+}
+
+.ml-6 {
+  margin-left: 1.75rem;
+}
+
+.ml-7 {
+  margin-left: 2rem;
+}
+
+.ml-8 {
+  margin-left: 2.25rem;
+}
+
 .text-wrap {
   word-break: break-all;
   white-space: normal;

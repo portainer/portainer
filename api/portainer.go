@@ -1102,9 +1102,10 @@ type (
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID       UserID
-		Username string
-		Role     UserRole
+		ID                  UserID
+		Username            string
+		Role                UserRole
+		ForceChangePassword bool
 	}
 
 	// TunnelDetails represents information associated to a tunnel
