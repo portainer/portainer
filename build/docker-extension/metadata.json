@@ -1,4 +1,5 @@
 {
+  "name": "Portainer",
   "icon": "portainer.svg",
   "vm": {
     "composefile": "docker-compose.yml",
