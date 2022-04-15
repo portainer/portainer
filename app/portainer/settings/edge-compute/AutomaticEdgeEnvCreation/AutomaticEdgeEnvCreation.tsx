@@ -4,15 +4,27 @@ import { useEffect } from 'react';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { EdgeScriptForm } from '@/edge/components/EdgeScriptForm';
 import { generateKey } from '@/portainer/environments/environment.service/edge';
-import { TextTip } from '@/portainer/components/Tip/TextTip';
+
+import { useSettings } from '../../settings.service';
+
+import { AutoEnvCreationSettingsForm } from './AutoEnvCreationSettingsForm';
 
 export function AutomaticEdgeEnvCreation() {
   const edgeKeyMutation = useGenerateKeyMutation();
-  const { mutate } = edgeKeyMutation;
+  const { mutate: generateKey } = edgeKeyMutation;
+  const settingsQuery = useSettings();
+
+  const url = settingsQuery.data?.EdgePortainerUrl;
 
   useEffect(() => {
-    mutate();
-  }, [mutate]);
+    if (url) {
+      generateKey();
+    }
+  }, [generateKey, url]);
+
+  if (!settingsQuery.data) {
+    return null;
+  }
 
   const edgeKey = edgeKeyMutation.data;
 
@@ -23,17 +35,19 @@ export function AutomaticEdgeEnvCreation() {
         title="Automatic Edge Environment Creation"
       />
       <WidgetBody>
-        {edgeKey ? (
-          <EdgeScriptForm edgeKey={edgeKey} />
+        <AutoEnvCreationSettingsForm settings={settingsQuery.data} />
+
+        {edgeKeyMutation.isLoading ? (
+          <div>Generating key for {url} ... </div>
         ) : (
-          <TextTip>Please choose a valid edge portainer URL</TextTip>
+          edgeKey && <EdgeScriptForm edgeKey={edgeKey} />
         )}
       </WidgetBody>
     </Widget>
   );
 }
 
-// using mutation because this action generates an object (although it's not saved in db)
+// using mutation because we want this action to run only when required
 function useGenerateKeyMutation() {
   return useMutation(generateKey);
 }

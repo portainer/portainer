@@ -47,7 +47,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   const groupsQuery = useGroups();
 
   const { isLoading, environments, totalCount, totalAvailable } =
-    useEnvironmentList(page, pageLimit, debouncedTextFilter, true);
+    useEnvironmentList({ page, pageLimit, search: debouncedTextFilter }, true);
 
   return (
     <>

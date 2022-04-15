@@ -326,6 +326,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		EdgeCheckinInterval: payload.EdgeCheckinInterval,
 		Kubernetes:          portainer.KubernetesDefault(),
 		IsEdgeDevice:        payload.IsEdgeDevice,
+		UserTrusted:         true,
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()

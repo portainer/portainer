@@ -13,20 +13,20 @@ import type {
 
 import { arrayToJson, buildUrl } from './utils';
 
-interface EndpointsQuery {
+export interface EnvironmentsQueryParams {
   search?: string;
   types?: EnvironmentType[];
   tagIds?: TagId[];
   endpointIds?: EnvironmentId[];
   tagsPartialMatch?: boolean;
   groupId?: EnvironmentGroupId;
-  edgeDeviceFilter?: boolean;
+  edgeDeviceFilter?: 'all' | 'trusted' | 'untrusted';
 }
 
 export async function getEndpoints(
   start: number,
   limit: number,
-  { types, tagIds, endpointIds, ...query }: EndpointsQuery = {}
+  { types, tagIds, endpointIds, ...query }: EnvironmentsQueryParams = {}
 ) {
   if (tagIds && tagIds.length === 0) {
     return { totalCount: 0, value: <Environment[]>[] };

@@ -1,4 +1,11 @@
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+import {
+  PaginationTableSettings,
+  RefreshableTableSettings,
+  SettableColumnsTableSettings,
+  SettableQuickActionsTableSettings,
+  SortableTableSettings,
+} from '@/portainer/components/datatables/types';
 
 export type DockerContainerStatus =
   | 'paused'
@@ -13,13 +20,13 @@ export type DockerContainerStatus =
 
 export type QuickAction = 'attach' | 'exec' | 'inspect' | 'logs' | 'stats';
 
-export interface ContainersTableSettings {
-  hiddenQuickActions: QuickAction[];
-  hiddenColumns: string[];
+export interface ContainersTableSettings
+  extends SortableTableSettings,
+    PaginationTableSettings,
+    SettableColumnsTableSettings,
+    SettableQuickActionsTableSettings<QuickAction>,
+    RefreshableTableSettings {
   truncateContainerName: number;
-  autoRefreshRate: number;
-  pageSize: number;
-  sortBy: { id: string; desc: boolean };
 }
 
 export interface Port {
