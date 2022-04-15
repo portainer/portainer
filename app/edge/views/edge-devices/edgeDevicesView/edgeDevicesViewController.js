@@ -26,7 +26,7 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
         const settings = await SettingsService.settings();
 
         ctrl.isFDOEnabled = settings && settings.EnableEdgeComputeFeatures && settings.fdoConfiguration && settings.fdoConfiguration.enabled;
-        ctrl.showWaitingRoomLink = settings && settings.EnableEdgeComputeFeatures && !settings.TrustOnFirstConnect;
+        ctrl.showWaitingRoomLink = process.env.PORTAINER_EDITION === 'BE' && settings && settings.EnableEdgeComputeFeatures && !settings.TrustOnFirstConnect;
         ctrl.isOpenAMTEnabled = settings && settings.EnableEdgeComputeFeatures && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
         ctrl.mpsServer = ctrl.isOpenAMTEnabled ? settings.openAMTConfiguration.mpsServer : '';
       } catch (err) {

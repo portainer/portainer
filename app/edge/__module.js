@@ -121,15 +121,18 @@ angular
         },
       },
     };
-    $stateRegistryProvider.register({
-      name: 'edge.devices.waiting-room',
-      url: '/waiting-room',
-      views: {
-        'content@': {
-          component: 'waitingRoomView',
+
+    if (process.env.PORTAINER_EDITION === 'BE') {
+      $stateRegistryProvider.register({
+        name: 'edge.devices.waiting-room',
+        url: '/waiting-room',
+        views: {
+          'content@': {
+            component: 'waitingRoomView',
+          },
         },
-      },
-    });
+      });
+    }
 
     $stateRegistryProvider.register(edge);
 

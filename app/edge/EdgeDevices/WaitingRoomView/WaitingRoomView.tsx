@@ -1,3 +1,5 @@
+import { useRouter } from '@uirouter/react';
+
 import { TableSettingsProvider } from '@/portainer/components/datatables/components/useTableSettings';
 import { PageHeader } from '@/portainer/components/PageHeader';
 import { useEnvironmentList } from '@/portainer/environments/queries';
@@ -8,10 +10,15 @@ import { TableSettings } from './Datatable/types';
 
 export function WaitingRoomView() {
   const storageKey = 'edge-devices-waiting-room';
-
+  const router = useRouter();
   const { environments, isLoading, totalCount } = useEnvironmentList({
     edgeDeviceFilter: 'untrusted',
   });
+
+  if (process.env.PORTAINER_EDITION !== 'BE') {
+    router.stateService.go('edge.devices');
+    return null;
+  }
 
   return (
     <>
