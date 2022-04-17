@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
@@ -221,7 +222,11 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		}
 
 		if !securitySettings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
-			return forbiddenResponse, errors.New("forbidden to use bind mounts")
+			for _,bind := range partialContainer.HostConfig.Binds{
+				if strings.HasPrefix(bind,"/"){
+					return forbiddenResponse, errors.New("forbidden to use bind mounts")
+				}
+			}		
 		}
 
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
