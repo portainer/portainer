@@ -222,11 +222,11 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		}
 
 		if !securitySettings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
-			for _,bind := range partialContainer.HostConfig.Binds{
-				if strings.HasPrefix(bind,"/"){
+			for _, bind := range partialContainer.HostConfig.Binds {
+				if strings.HasPrefix(bind, "/") {
 					return forbiddenResponse, errors.New("forbidden to use bind mounts")
 				}
-			}		
+			}
 		}
 
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
