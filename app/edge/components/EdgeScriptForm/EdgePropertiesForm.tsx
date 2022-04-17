@@ -55,21 +55,19 @@ export function EdgePropertiesForm({
         </div>
       </div>
 
-      {values.platform !== 'k8s' && (
-        <FormControl
-          label="Environment variables"
-          tooltip="Comma separated list of environment variables that will be sourced from the host where the agent is deployed."
-          inputId="env-vars-input"
-        >
-          <Input
-            type="text"
-            name="envVars"
-            value={values.envVars}
-            id="env-vars-input"
-            onChange={(e) => setFieldValue(e.target.name, e.target.value)}
-          />
-        </FormControl>
-      )}
+      <FormControl
+        label="Environment variables"
+        tooltip="Comma separated list of environment variables that will be sourced from the host where the agent is deployed."
+        inputId="env-vars-input"
+      >
+        <Input
+          type="text"
+          name="envVars"
+          value={values.envVars}
+          id="env-vars-input"
+          onChange={(e) => setFieldValue(e.target.name, e.target.value)}
+        />
+      </FormControl>
     </form>
   );
 }

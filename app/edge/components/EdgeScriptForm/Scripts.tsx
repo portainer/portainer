@@ -262,7 +262,7 @@ function buildKubernetesCommand(
   edgeIdScript: string,
   edgeKey: string,
   allowSelfSignedCerts: boolean,
-  _envVars: string,
+  envVars: string,
   edgeId?: string,
   agentSecret = ''
 ) {
@@ -270,11 +270,13 @@ function buildKubernetesCommand(
   const idEnvVar = edgeIdScript
     ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n`
     : '';
+  const edgeIdVar = !edgeIdScript && edgeId ? edgeId : '$PORTAINER_EDGE_ID';
+  const selfSigned = allowSelfSignedCerts ? '1' : '0';
 
   return `${idEnvVar}curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-edge-agent-setup.sh | 
-  bash -s -- "${
-    !edgeIdScript && edgeId ? edgeId : '$PORTAINER_EDGE_ID'
-  }" "${edgeKey}" "${allowSelfSignedCerts ? '1' : '0'}" "${agentSecret}"`;
+  bash -s -- "${edgeIdVar}" \\
+    "${edgeKey}" \\
+    "${selfSigned}" "${agentSecret}" "${envVars}"`;
 }
 
 function buildDefaultEnvVars(
