@@ -55,8 +55,8 @@ angular
       $scope.agentSecret = '';
 
       $scope.deployCommands = {
-        kubeLoadBalancer: `curl -L https://downloads.portainer.io/portainer-agent-ce${agentShortVersion}-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
-        kubeNodePort: `curl -L https://downloads.portainer.io/portainer-agent-ce${agentShortVersion}-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+        kubeLoadBalancer: `curl -L https://downloads.portainer.io/ce${agentShortVersion}/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+        kubeNodePort: `curl -L https://downloads.portainer.io/ce${agentShortVersion}/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
         agentLinux: agentLinuxSwarmCommand,
         agentWindows: agentWindowsSwarmCommand,
       };

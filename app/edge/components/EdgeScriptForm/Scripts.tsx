@@ -11,6 +11,11 @@ import { EdgeProperties, Platform } from './types';
 const commandsByOs = {
   linux: [
     {
+      id: 'k8s',
+      label: 'Kubernetes',
+      command: buildKubernetesCommand,
+    },
+    {
       id: 'swarm',
       label: 'Docker Swarm',
       command: buildLinuxSwarmCommand,
@@ -19,11 +24,6 @@ const commandsByOs = {
       id: 'standalone',
       label: 'Docker Standalone',
       command: buildLinuxStandaloneCommand,
-    },
-    {
-      id: 'k8s',
-      label: 'Kubernetes',
-      command: buildKubernetesCommand,
     },
   ],
   win: [
@@ -67,7 +67,7 @@ export function Scripts({
 
   useEffect(() => {
     if (!commandsByOs[os].find((p) => p.id === platform)) {
-      onPlatformChange('standalone');
+      onPlatformChange('swarm');
     }
   }, [os, platform, onPlatformChange]);
 
@@ -271,7 +271,7 @@ function buildKubernetesCommand(
     ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n`
     : '';
 
-  return `${idEnvVar}curl https://downloads.portainer.io/portainer-ee${agentShortVersion}-edge-agent-setup.sh | 
+  return `${idEnvVar}curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-edge-agent-setup.sh | 
   bash -s -- "${
     !edgeIdScript && edgeId ? edgeId : '$PORTAINER_EDGE_ID'
   }" "${edgeKey}" "${allowSelfSignedCerts ? '1' : '0'}" "${agentSecret}"`;
