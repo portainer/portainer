@@ -173,7 +173,7 @@ function EndpointController(
     var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
 
     var confirmed = true;
-    if (_.difference($scope.initialTagIds, endpoint.TagIds).length > 0) {
+    if (endpoint.IsEdgeDevice && _.difference($scope.initialTagIds, endpoint.TagIds).length > 0) {
       confirmed = await confirmAsync({
         title: 'Confirm action',
         message: 'Removing tags from this environment will remove the corresponding edge stacks when dynamic grouping is being used',
