@@ -22,10 +22,11 @@ type Service struct {
 }
 
 type claims struct {
-	UserID   int    `json:"id"`
-	Username string `json:"username"`
-	Role     int    `json:"role"`
-	Scope    scope  `json:"scope"`
+	UserID              int    `json:"id"`
+	Username            string `json:"username"`
+	Role                int    `json:"role"`
+	Scope               scope  `json:"scope"`
+	ForceChangePassword bool   `json:"forceChangePassword"`
 	jwt.StandardClaims
 }
 
@@ -164,10 +165,11 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 	}
 
 	cl := claims{
-		UserID:   int(data.ID),
-		Username: data.Username,
-		Role:     int(data.Role),
-		Scope:    scope,
+		UserID:              int(data.ID),
+		Username:            data.Username,
+		Role:                int(data.Role),
+		Scope:               scope,
+		ForceChangePassword: data.ForceChangePassword,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiresAt,
 			IssuedAt:  time.Now().Unix(),

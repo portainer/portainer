@@ -257,6 +257,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.URL != nil || payload.TLS != nil || endpoint.Type == portainer.AzureEnvironment {
+		handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register HTTP proxy for the environment", err}

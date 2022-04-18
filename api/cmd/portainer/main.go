@@ -278,6 +278,12 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 		settings.BlackListedLabels = *flags.Labels
 	}
 
+	if agentKey, ok := os.LookupEnv("AGENT_SECRET"); ok {
+		settings.AgentSecret = agentKey
+	} else {
+		settings.AgentSecret = ""
+	}
+
 	err = dataStore.Settings().UpdateSettings(settings)
 	if err != nil {
 		return err

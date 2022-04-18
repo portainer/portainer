@@ -202,3 +202,18 @@ export function confirmChangePassword() {
     },
   });
 }
+
+export function confirmForceChangePassword() {
+  const box = bootbox.dialog({
+    message:
+      'Please update your password to a stronger password to continue using Portainer',
+    buttons: {
+      confirm: {
+        label: 'OK',
+        className: 'btn-primary',
+      },
+    },
+  });
+
+  applyBoxCSS(box);
+}

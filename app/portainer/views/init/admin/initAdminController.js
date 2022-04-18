@@ -1,3 +1,5 @@
+import { MinPasswordLen, StrengthCheck } from 'Portainer/helpers/password';
+
 angular.module('portainer.app').controller('InitAdminController', [
   '$scope',
   '$state',
@@ -25,9 +27,16 @@ angular.module('portainer.app').controller('InitAdminController', [
       actionInProgress: false,
       showInitPassword: true,
       showRestorePortainer: false,
+      passwordStrength: false,
     };
 
+    $scope.MinPasswordLen = MinPasswordLen;
+
     createAdministratorFlow();
+
+    $scope.onPasswordChange = function () {
+      $scope.state.passwordStrength = StrengthCheck($scope.formValues.Password);
+    };
 
     $scope.togglePanel = function () {
       $scope.state.showInitPassword = !$scope.state.showInitPassword;

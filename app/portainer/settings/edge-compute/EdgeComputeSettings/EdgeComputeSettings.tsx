@@ -1,4 +1,4 @@
-import { Formik, Form } from 'formik';
+import { Formik, Form, Field } from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
@@ -6,19 +6,24 @@ import { Select } from '@/portainer/components/form-components/Input/Select';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
+import { Input } from '@/portainer/components/form-components/Input';
+import { baseHref } from '@/portainer/helpers/pathHelper';
 
-import styles from './SettingsEdgeCompute.module.css';
-import { validationSchema } from './SettingsEdgeCompute.validation';
+import { Settings } from '../types';
+
+import styles from './EdgeComputeSettings.module.css';
+import { validationSchema } from './EdgeComputeSettings.validation';
 
 export interface FormValues {
   EdgeAgentCheckinInterval: number;
   EnableEdgeComputeFeatures: boolean;
   DisableTrustOnFirstConnect: boolean;
   EnforceEdgeID: boolean;
+  EdgePortainerUrl: string;
 }
 
 interface Props {
-  settings: FormValues;
+  settings?: Settings;
   onSubmit(values: FormValues): void;
 }
 
@@ -37,16 +42,17 @@ const checkinIntervalOptions = [
   },
 ];
 
-export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
-  const initialValues = {
-    EdgeAgentCheckinInterval: settings ? settings.EdgeAgentCheckinInterval : 5,
-    EnableEdgeComputeFeatures: settings
-      ? settings.EnableEdgeComputeFeatures
-      : false,
-    DisableTrustOnFirstConnect: settings
-      ? settings.DisableTrustOnFirstConnect
-      : false,
-    EnforceEdgeID: settings ? settings.EnforceEdgeID : false,
+export function EdgeComputeSettings({ settings, onSubmit }: Props) {
+  if (!settings) {
+    return null;
+  }
+
+  const initialValues: FormValues = {
+    EdgeAgentCheckinInterval: settings.EdgeAgentCheckinInterval,
+    EnableEdgeComputeFeatures: settings.EnableEdgeComputeFeatures,
+    DisableTrustOnFirstConnect: settings.DisableTrustOnFirstConnect,
+    EnforceEdgeID: settings.EnforceEdgeID,
+    EdgePortainerUrl: settings.EdgePortainerUrl || buildDefaultUrl(),
   };
 
   return (
@@ -133,6 +139,16 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                   />
                 </FormControl>
 
+                <FormControl
+                  label="Portainer URL"
+                  tooltip="URL of the Portainer instance that the agent will use to initiate the communications."
+                  inputId="url-input"
+                  errors={errors.EdgePortainerUrl}
+                  size="medium"
+                >
+                  <Field as={Input} id="url-input" name="EdgePortainerUrl" />
+                </FormControl>
+
                 <div className="form-group">
                   <div className="col-sm-12">
                     <LoadingButton
@@ -153,4 +169,9 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
       </Widget>
     </div>
   );
+}
+
+function buildDefaultUrl() {
+  const base = baseHref();
+  return window.location.origin + (base !== '/' ? base : '');
 }

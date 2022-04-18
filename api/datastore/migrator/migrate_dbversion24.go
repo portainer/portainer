@@ -5,7 +5,7 @@ import (
 )
 
 func (m *Migrator) updateSettingsToDB25() error {
-	migrateLog.Info("Updating settings")
+	migrateLog.Info("- updating settings")
 
 	legacySettings, err := m.settingsService.Settings()
 	if err != nil {

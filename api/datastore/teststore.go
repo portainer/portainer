@@ -18,8 +18,8 @@ func (store *Store) GetConnection() portainer.Connection {
 	return store.connection
 }
 
-func MustNewTestStore(init bool) (bool, *Store, func()) {
-	newStore, store, teardown, err := NewTestStore(init)
+func MustNewTestStore(init, secure bool) (bool, *Store, func()) {
+	newStore, store, teardown, err := NewTestStore(init, secure)
 	if err != nil {
 		if !errors.Is(err, errTempDir) {
 			teardown()
@@ -30,7 +30,7 @@ func MustNewTestStore(init bool) (bool, *Store, func()) {
 	return newStore, store, teardown
 }
 
-func NewTestStore(init bool) (bool, *Store, func(), error) {
+func NewTestStore(init, secure bool) (bool, *Store, func(), error) {
 	// Creates unique temp directory in a concurrency friendly manner.
 	storePath, err := ioutil.TempDir("", "test-store")
 	if err != nil {
@@ -42,7 +42,12 @@ func NewTestStore(init bool) (bool, *Store, func(), error) {
 		return false, nil, nil, err
 	}
 
-	connection, err := database.NewDatabase("boltdb", storePath, []byte("apassphrasewhichneedstobe32bytes"))
+	secretKey := []byte("apassphrasewhichneedstobe32bytes")
+	if !secure {
+		secretKey = nil
+	}
+
+	connection, err := database.NewDatabase("boltdb", storePath, secretKey)
 	if err != nil {
 		panic(err)
 	}
