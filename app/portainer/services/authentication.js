@@ -1,7 +1,7 @@
 import { clear as clearSessionStorage } from './session-storage';
 
 const DEFAULT_USER = 'admin';
-const DEFAULT_PASSWORD = 'Passw0rd;';
+const DEFAULT_PASSWORD = 'K7yJPP5qNK4hf1QsRnfV';
 
 angular.module('portainer.app').factory('Authentication', [
   '$async',
