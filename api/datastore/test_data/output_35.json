@@ -587,7 +587,6 @@
     "AllowVolumeBrowserForRegularUsers": false,
     "AuthenticationMethod": 1,
     "BlackListedLabels": [],
-    "DisableTrustOnFirstConnect": false,
     "DisplayDonationHeader": false,
     "DisplayExternalContributors": false,
     "EdgeAgentCheckinInterval": 5,
@@ -642,6 +641,7 @@
     },
     "SnapshotInterval": "5m",
     "TemplatesURL": "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json",
+    "TrustOnFirstConnect": false,
     "UserSessionTimeout": "8h",
     "fdoConfiguration": {
       "enabled": false,

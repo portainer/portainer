@@ -7,12 +7,14 @@ import { promptAsync } from '@/portainer/services/modal.service/prompt';
 import * as notifications from '@/portainer/services/notifications';
 import { activateDevice } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 import { deleteEndpoint } from '@/portainer/environments/environment.service';
+import { Link } from '@/portainer/components/Link';
 
 interface Props {
   selectedItems: Environment[];
   isFDOEnabled: boolean;
   isOpenAMTEnabled: boolean;
   setLoadingMessage(message: string): void;
+  showWaitingRoomLink: boolean;
 }
 
 export function EdgeDevicesDatatableActions({
@@ -20,6 +22,7 @@ export function EdgeDevicesDatatableActions({
   isOpenAMTEnabled,
   isFDOEnabled,
   setLoadingMessage,
+  showWaitingRoomLink,
 }: Props) {
   const router = useRouter();
 
@@ -47,6 +50,12 @@ export function EdgeDevicesDatatableActions({
           <i className="fa fa-link space-right" aria-hidden="true" />
           Associate with OpenAMT
         </Button>
+      )}
+
+      {showWaitingRoomLink && (
+        <Link to="edge.devices.waiting-room">
+          <Button>Waiting Room</Button>
+        </Link>
       )}
     </div>
   );

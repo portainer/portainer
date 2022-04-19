@@ -1,5 +1,4 @@
 import { getEndpoints } from 'Portainer/environments/environment.service';
-import { EnvironmentType } from 'Portainer/environments/types';
 
 angular.module('portainer.edge').controller('EdgeDevicesViewController', EdgeDevicesViewController);
 /* @ngInject */
@@ -11,7 +10,7 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
   this.getEnvironments = function () {
     return $async(async () => {
       try {
-        const [endpointsResponse, groups] = await Promise.all([getEndpoints(0, 100, { types: [EnvironmentType.EdgeAgentOnDocker] }), GroupService.groups()]);
+        const [endpointsResponse, groups] = await Promise.all([getEndpoints(0, 100, { edgeDeviceFilter: 'trusted' }), GroupService.groups()]);
         ctrl.groups = groups;
         ctrl.edgeDevices = endpointsResponse.value;
       } catch (err) {
@@ -27,7 +26,7 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
         const settings = await SettingsService.settings();
 
         ctrl.isFDOEnabled = settings && settings.EnableEdgeComputeFeatures && settings.fdoConfiguration && settings.fdoConfiguration.enabled;
-        ctrl.disableTrustOnFirstConnect = settings && settings.EnableEdgeComputeFeatures && settings.DisableTrustOnFirstConnect;
+        ctrl.showWaitingRoomLink = process.env.PORTAINER_EDITION === 'BE' && settings && settings.EnableEdgeComputeFeatures && !settings.TrustOnFirstConnect;
         ctrl.isOpenAMTEnabled = settings && settings.EnableEdgeComputeFeatures && settings.openAMTConfiguration && settings.openAMTConfiguration.enabled;
         ctrl.mpsServer = ctrl.isOpenAMTEnabled ? settings.openAMTConfiguration.mpsServer : '';
       } catch (err) {

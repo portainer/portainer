@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { PublicSettingsViewModel } from '@/portainer/models/settings';
 
@@ -25,7 +25,7 @@ enum AuthenticationMethod {
   AuthenticationOAuth,
 }
 
-interface SettingsResponse {
+export interface Settings {
   LogoURL: string;
   BlackListedLabels: { name: string; value: string }[];
   AuthenticationMethod: AuthenticationMethod;
@@ -38,14 +38,15 @@ interface SettingsResponse {
   EnableTelemetry: boolean;
   HelmRepositoryURL: string;
   KubectlShellImage: string;
-  DisableTrustOnFirstConnect: boolean;
+  TrustOnFirstConnect: boolean;
   EnforceEdgeID: boolean;
   AgentSecret: string;
+  EdgePortainerUrl: string;
 }
 
 export async function getSettings() {
   try {
-    const { data } = await axios.get<SettingsResponse>(buildUrl());
+    const { data } = await axios.get<Settings>(buildUrl());
     return data;
   } catch (e) {
     throw parseAxiosError(
@@ -55,9 +56,31 @@ export async function getSettings() {
   }
 }
 
-export function useSettings<T = SettingsResponse>(
-  select?: (settings: SettingsResponse) => T
-) {
+async function updateSettings(settings: Partial<Settings>) {
+  try {
+    await axios.put(buildUrl(), settings);
+  } catch (e) {
+    throw parseAxiosError(e as Error, 'Unable to update application settings');
+  }
+}
+
+export function useUpdateSettingsMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation(updateSettings, {
+    onSuccess() {
+      return queryClient.invalidateQueries(['settings']);
+    },
+    meta: {
+      error: {
+        title: 'Failure',
+        message: 'Unable to update settings',
+      },
+    },
+  });
+}
+
+export function useSettings<T = Settings>(select?: (settings: Settings) => T) {
   return useQuery(['settings'], getSettings, { select });
 }
 

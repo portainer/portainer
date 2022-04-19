@@ -19,7 +19,7 @@ export function EdgePropertiesForm({
 }: Props) {
   return (
     <form className="form-horizontal">
-      <FormSectionTitle>Edge script settings</FormSectionTitle>
+      <FormSectionTitle>Edge agent deployment script</FormSectionTitle>
 
       <OsSelector
         value={values.os}

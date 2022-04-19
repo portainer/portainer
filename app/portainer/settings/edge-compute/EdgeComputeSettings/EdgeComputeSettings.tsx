@@ -1,4 +1,4 @@
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
@@ -6,8 +6,6 @@ import { Select } from '@/portainer/components/form-components/Input/Select';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
-import { Input } from '@/portainer/components/form-components/Input';
-import { baseHref } from '@/portainer/helpers/pathHelper';
 
 import { Settings } from '../types';
 
@@ -17,9 +15,7 @@ import { validationSchema } from './EdgeComputeSettings.validation';
 export interface FormValues {
   EdgeAgentCheckinInterval: number;
   EnableEdgeComputeFeatures: boolean;
-  DisableTrustOnFirstConnect: boolean;
   EnforceEdgeID: boolean;
-  EdgePortainerUrl: string;
 }
 
 interface Props {
@@ -50,9 +46,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   const initialValues: FormValues = {
     EdgeAgentCheckinInterval: settings.EdgeAgentCheckinInterval,
     EnableEdgeComputeFeatures: settings.EnableEdgeComputeFeatures,
-    DisableTrustOnFirstConnect: settings.DisableTrustOnFirstConnect,
     EnforceEdgeID: settings.EnforceEdgeID,
-    EdgePortainerUrl: settings.EdgePortainerUrl || buildDefaultUrl(),
   };
 
   return (
@@ -124,8 +118,9 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
 
                 <FormControl
                   inputId="edge_enforce_id"
-                  label="Enforce use of Portainer generated Edge ID’s"
+                  label="Enforce use of Portainer generated Edge ID"
                   size="medium"
+                  tooltip="This setting only applies to manually created environments."
                   errors={errors.EnforceEdgeID}
                 >
                   <Switch
@@ -137,16 +132,6 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                       setFieldValue('EnforceEdgeID', e.valueOf())
                     }
                   />
-                </FormControl>
-
-                <FormControl
-                  label="Portainer URL"
-                  tooltip="URL of the Portainer instance that the agent will use to initiate the communications."
-                  inputId="url-input"
-                  errors={errors.EdgePortainerUrl}
-                  size="medium"
-                >
-                  <Field as={Input} id="url-input" name="EdgePortainerUrl" />
                 </FormControl>
 
                 <div className="form-group">
@@ -169,9 +154,4 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
       </Widget>
     </div>
   );
-}
-
-function buildDefaultUrl() {
-  const base = baseHref();
-  return window.location.origin + (base !== '/' ? base : '');
 }

@@ -1,7 +1,7 @@
 export interface Settings {
   EdgeAgentCheckinInterval: number;
   EnableEdgeComputeFeatures: boolean;
-  DisableTrustOnFirstConnect: boolean;
+  TrustOnFirstConnect: boolean;
   EnforceEdgeID: boolean;
   EdgePortainerUrl: string;
 }
