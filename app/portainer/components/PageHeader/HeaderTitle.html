@@ -1,5 +1,8 @@
 <div class="page white-space-normal">
   {{ $ctrl.titleText }}
   <span class="header_title_content" ng-transclude></span>
-  <span class="pull-right user-box" ng-if="$ctrl.username"> <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $ctrl.username }} </span>
+  <span class="pull-right user-box" ng-if="$ctrl.username && $ctrl.display">
+    <i class="fa fa-user-circle" aria-hidden="true"></i>
+    {{ $ctrl.username }}
+  </span>
 </div>

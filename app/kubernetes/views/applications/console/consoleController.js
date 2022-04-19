@@ -58,9 +58,10 @@ class KubernetesApplicationConsoleController {
       command: this.state.command,
     };
 
+    const base = window.location.origin.startsWith('http') ? `${window.location.origin}${baseHref()}` : baseHref();
+
     let url =
-      window.location.origin +
-      baseHref() +
+      base +
       'api/websocket/pod?' +
       Object.keys(params)
         .map((k) => k + '=' + params[k])

@@ -56,6 +56,7 @@
 
       <sidebar-section ng-if="isAdmin || isTeamLeader" title="Settings">
         <sidebar-menu
+          ng-show="display"
           icon-class="fa-users fa-fw"
           label="Users"
           path="portainer.users"
@@ -95,7 +96,12 @@
             is-sidebar-open="toggle"
             children-paths="['portainer.settings.authentication', 'portainer.settings.edgeCompute']"
           >
-            <sidebar-menu-item path="portainer.settings.authentication" class-name="sidebar-sublist" data-cy="portainerSidebar-authentication" title="Authentication"
+            <sidebar-menu-item
+              path="portainer.settings.authentication"
+              class-name="sidebar-sublist"
+              data-cy="portainerSidebar-authentication"
+              title="Authentication"
+              ng-show="display"
               >Authentication</sidebar-menu-item
             >
             <sidebar-menu-item path="portainer.settings.edgeCompute" class-name="sidebar-sublist" data-cy="portainerSidebar-edge-compute" title="Edge Compute"
