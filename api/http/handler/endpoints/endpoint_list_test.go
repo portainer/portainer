@@ -8,16 +8,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	portaineree "github.com/portainer/portainer-ee/api"
-	"github.com/portainer/portainer-ee/api/datastore"
-	"github.com/portainer/portainer-ee/api/http/security"
-	"github.com/portainer/portainer-ee/api/internal/testhelpers"
-	helper "github.com/portainer/portainer-ee/api/internal/testhelpers"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/testhelpers"
+	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 
 type endpointListEdgeDeviceTest struct {
-	expected []portaineree.EndpointID
+	expected []portainer.EndpointID
 	filter   string
 }
 
@@ -27,36 +27,37 @@ func Test_endpointList(t *testing.T) {
 	_, store, teardown := datastore.MustNewTestStore(true, true)
 	defer teardown()
 
-	trustedEndpoint := portaineree.Endpoint{ID: 1, UserTrusted: true, IsEdgeDevice: true, GroupID: 1}
+	trustedEndpoint := portainer.Endpoint{ID: 1, UserTrusted: true, IsEdgeDevice: true, GroupID: 1}
 	err := store.Endpoint().Create(&trustedEndpoint)
 	is.NoError(err, "error creating environment")
 
-	untrustedEndpoint := portaineree.Endpoint{ID: 2, UserTrusted: false, IsEdgeDevice: true, GroupID: 1}
+	untrustedEndpoint := portainer.Endpoint{ID: 2, UserTrusted: false, IsEdgeDevice: true, GroupID: 1}
 	err = store.Endpoint().Create(&untrustedEndpoint)
 	is.NoError(err, "error creating environment")
 
-	regularEndpoint := portaineree.Endpoint{ID: 3, IsEdgeDevice: false, GroupID: 1}
+	regularEndpoint := portainer.Endpoint{ID: 3, IsEdgeDevice: false, GroupID: 1}
 	err = store.Endpoint().Create(&regularEndpoint)
 	is.NoError(err, "error creating environment")
 
-	err = store.User().Create(&portaineree.User{Username: "admin", Role: portaineree.AdministratorRole})
+	err = store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	is.NoError(err, "error creating a user")
 
 	bouncer := helper.NewTestRequestBouncer()
-	h := NewHandler(bouncer, helper.NewUserActivityService(), store, nil)
+	h := NewHandler(bouncer)
+	h.DataStore = store
 	h.ComposeStackManager = testhelpers.NewComposeStackManager()
 
 	tests := []endpointListEdgeDeviceTest{
 		{
-			[]portaineree.EndpointID{trustedEndpoint.ID, untrustedEndpoint.ID},
+			[]portainer.EndpointID{trustedEndpoint.ID, untrustedEndpoint.ID},
 			EdgeDeviceFilterAll,
 		},
 		{
-			[]portaineree.EndpointID{trustedEndpoint.ID},
+			[]portainer.EndpointID{trustedEndpoint.ID},
 			EdgeDeviceFilterTrusted,
 		},
 		{
-			[]portaineree.EndpointID{untrustedEndpoint.ID},
+			[]portainer.EndpointID{untrustedEndpoint.ID},
 			EdgeDeviceFilterUntrusted,
 		},
 	}
@@ -68,7 +69,7 @@ func Test_endpointList(t *testing.T) {
 
 		is.Equal(len(test.expected), len(resp))
 
-		respIds := []portaineree.EndpointID{}
+		respIds := []portainer.EndpointID{}
 
 		for _, endpoint := range resp {
 			respIds = append(respIds, endpoint.ID)
@@ -81,7 +82,7 @@ func Test_endpointList(t *testing.T) {
 func buildEndpointListRequest(filter string) *http.Request {
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/endpoints?edgeDeviceFilter=%s", filter), nil)
 
-	ctx := security.StoreTokenData(req, &portaineree.TokenData{ID: 1, Username: "admin", Role: 1})
+	ctx := security.StoreTokenData(req, &portainer.TokenData{ID: 1, Username: "admin", Role: 1})
 	req = req.WithContext(ctx)
 
 	restrictedCtx := security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{UserID: 1, IsAdmin: true})
@@ -92,7 +93,7 @@ func buildEndpointListRequest(filter string) *http.Request {
 	return req
 }
 
-func doEndpointListRequest(req *http.Request, h *Handler, is *assert.Assertions) ([]portaineree.Endpoint, error) {
+func doEndpointListRequest(req *http.Request, h *Handler, is *assert.Assertions) ([]portainer.Endpoint, error) {
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, req)
 
@@ -102,7 +103,7 @@ func doEndpointListRequest(req *http.Request, h *Handler, is *assert.Assertions)
 		return nil, err
 	}
 
-	resp := []portaineree.Endpoint{}
+	resp := []portainer.Endpoint{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
 		return nil, err
