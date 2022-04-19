@@ -7,6 +7,7 @@ import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
+import { isEdgeEnvironment } from '@/portainer/environments/utils';
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
@@ -172,9 +173,8 @@ function EndpointController(
     var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
     var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
 
-    var confirmed = true;
-    if (endpoint.IsEdgeDevice && _.difference($scope.initialTagIds, endpoint.TagIds).length > 0) {
-      confirmed = await confirmAsync({
+    if (isEdgeEnvironment(endpoint.Type) && _.difference($scope.initialTagIds, endpoint.TagIds).length > 0) {
+      let confirmed = await confirmAsync({
         title: 'Confirm action',
         message: 'Removing tags from this environment will remove the corresponding edge stacks when dynamic grouping is being used',
         buttons: {
@@ -188,10 +188,10 @@ function EndpointController(
           },
         },
       });
-    }
 
-    if (!confirmed) {
-      return;
+      if (!confirmed) {
+        return;
+      }
     }
 
     var payload = {
