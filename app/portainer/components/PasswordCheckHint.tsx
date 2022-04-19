@@ -25,8 +25,8 @@ export function ForcePasswordUpdateHint() {
       </p>
 
       <p className="text-muted">
-        To ensure the security of your account, please update your password to a
-        stronger password using a combination of at least 3 of the following:
+        The password must be at least {MinPasswordLen} characters long,
+        including a combination of one character of three of the below:
       </p>
 
       <PasswordCombination />
