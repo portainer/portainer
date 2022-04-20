@@ -322,6 +322,6 @@ jobs:
               ]
             }
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SECURITY_SLACK_WEBHOOK_URL }}
 
 
