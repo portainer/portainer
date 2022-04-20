@@ -8,7 +8,9 @@ type Props = {
 };
 
 export function NetworkOptionsTable({ options }: Props) {
-  if (Object.keys(options).length === 0) {
+  const networkEntries = Object.entries(options);
+
+  if (networkEntries.length === 0) {
     return null;
   }
 
@@ -19,7 +21,7 @@ export function NetworkOptionsTable({ options }: Props) {
           <WidgetTitle title="Network options" icon="fa-cogs" />
           <WidgetBody className="nopadding">
             <DetailsTable dataCy="networkDetails-networkOptionsTable">
-              {Object.entries(options).map(([key, value]) => (
+              {networkEntries.map(([key, value]) => (
                 <DetailsTable.Row key={key} label={key}>
                   {value}
                 </DetailsTable.Row>

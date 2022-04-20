@@ -6,6 +6,10 @@ import { genericHandler } from '../rest/response/handlers';
 
 import { ContainerId, DockerContainer } from './types';
 
+export interface Filters {
+  label?: string[];
+}
+
 export async function startContainer(
   endpointId: EnvironmentId,
   id: ContainerId
@@ -88,7 +92,7 @@ export async function removeContainer(
 
 export async function getContainers(
   environmentId: EnvironmentId,
-  filters?: object
+  filters?: Filters
 ) {
   try {
     const { data } = await axios.get<DockerContainer[]>(

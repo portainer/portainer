@@ -14,7 +14,7 @@ export type NetworkId = string;
 export type NetworkOptions = Record<string, string>;
 
 export type NetworkContainer = {
-  Id?: ContainerId;
+  Id: ContainerId;
   EndpointID: string;
   IPv4Address: string;
   IPv6Address: string;

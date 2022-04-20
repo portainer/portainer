@@ -19,10 +19,10 @@ export function NetworkDetailsTable({
   onRemoveNetworkClicked,
 }: Props) {
   const allowRemoveNetwork = !isSystemNetwork(network.Name);
-  const IPV4Configs: IPConfig[] = DockerNetworkHelper.getIPV4Configs(
+  const ipv4Configs: IPConfig[] = DockerNetworkHelper.getIPV4Configs(
     network.IPAM?.Config
   );
-  const IPV6Configs: IPConfig[] = DockerNetworkHelper.getIPV6Configs(
+  const ipv6Configs: IPConfig[] = DockerNetworkHelper.getIPV6Configs(
     network.IPAM?.Config
   );
 
@@ -66,7 +66,7 @@ export function NetworkDetailsTable({
               </DetailsTable.Row>
 
               {/* IPV4 ConfigRowContent */}
-              {IPV4Configs?.map((config) => (
+              {ipv4Configs?.map((config) => (
                 <Fragment key={config.Subnet}>
                   <DetailsTable.Row
                     label={`IPV4 Subnet${getConfigDetails(config.Subnet)}`}
@@ -84,7 +84,7 @@ export function NetworkDetailsTable({
               ))}
 
               {/* IPV6 ConfigRowContent */}
-              {IPV6Configs?.map((config) => (
+              {ipv6Configs?.map((config) => (
                 <Fragment key={config.Subnet}>
                   <DetailsTable.Row
                     label={`IPV6 Subnet${getConfigDetails(config.Subnet)}`}
