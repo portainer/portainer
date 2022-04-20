@@ -50,7 +50,6 @@ export async function getEndpoints(
 
   try {
     const response = await axios.get<Environment[]>(url, { params });
-
     const totalCount = response.headers['x-total-count'];
     const totalAvailable = response.headers['x-total-available'];
 

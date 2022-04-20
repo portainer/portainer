@@ -33,7 +33,6 @@ export function useEnvironmentList(query: Query = {}, refetchOffline = false) {
         const hasOfflineEnvironment = data.value.some(
           (env) => env.Status === EnvironmentStatus.Down
         );
-
         return hasOfflineEnvironment && ENVIRONMENTS_POLLING_INTERVAL;
       },
       onError(error) {
