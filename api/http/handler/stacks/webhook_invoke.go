@@ -34,14 +34,6 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 
 	stack, err := handler.DataStore.Stack().StackByWebhookID(webhookID.String())
 
-	queryStrings := r.URL.Query()
-	for key, value := range queryStrings {
-		stack.Env = append(stack.Env, portainer.Pair{
-			Name:  key,
-			Value:  strings.Join(value, ""),
-		})
-	}
-
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if handler.DataStore.IsErrObjectNotFound(err) {
@@ -50,7 +42,15 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{StatusCode: statusCode, Message: "Unable to find the stack by webhook ID", Err: err}
 	}
 
-	if err = stacks.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
+	envs := []portainer.Pair{}
+	for key, value := range r.URL.Query() {
+		envs = append(envs, portainer.Pair{
+			Name:  key,
+			Value:  strings.Join(value, ""),
+		})
+	}
+
+	if err = stacks.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService, envs); err != nil {
 		if _, ok := err.(*stacks.StackAuthorMissingErr); ok {
 			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Autoupdate for the stack isn't available", Err: err}
 		}

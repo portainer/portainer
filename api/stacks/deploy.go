@@ -23,13 +23,35 @@ func (e *StackAuthorMissingErr) Error() string {
 
 // RedeployWhenChanged pull and redeploy the stack when git repo changed
 // Stack will always be redeployed if force deployment is set to true
-func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) error {
+func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService, additionalEnv []portainer.Pair) error {
 	logger := log.WithFields(log.Fields{"stackID": stackID})
 	logger.Debug("redeploying stack")
 
 	stack, err := datastore.Stack().Stack(stackID)
 	if err != nil {
 		return errors.WithMessagef(err, "failed to get the stack %v", stackID)
+	}
+
+	for _, env := range additionalEnv {
+		exist := false
+		for index, stackEnv := range stack.Env {
+			if env.Name == stackEnv.Name {
+				fmt.Println("found")
+				stack.Env[index] = portainer.Pair{
+					Name:  env.Name,
+					Value: env.Value,
+				}
+				exist = true
+				break
+			}
+		}
+
+		if !exist {
+			stack.Env = append(stack.Env, portainer.Pair{
+				Name:  env.Name,
+				Value: env.Value,
+			})
+		}
 	}
 
 	if stack.GitConfig == nil {

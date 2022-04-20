@@ -19,7 +19,7 @@ func startAutoupdate(stackID portainer.StackID, interval string, scheduler *sche
 	}
 
 	jobID = scheduler.StartJobEvery(d, func() error {
-		return stacks.RedeployWhenChanged(stackID, stackDeployer, datastore, gitService)
+		return stacks.RedeployWhenChanged(stackID, stackDeployer, datastore, gitService, nil)
 	})
 
 	return jobID, nil

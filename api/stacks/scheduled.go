@@ -21,7 +21,7 @@ func StartStackSchedules(scheduler *scheduler.Scheduler, stackdeployer StackDepl
 		}
 		stackID := stack.ID // to be captured by the scheduled function
 		jobID := scheduler.StartJobEvery(d, func() error {
-			return RedeployWhenChanged(stackID, stackdeployer, datastore, gitService)
+			return RedeployWhenChanged(stackID, stackdeployer, datastore, gitService, nil)
 		})
 
 		stack.AutoUpdate.JobID = jobID
