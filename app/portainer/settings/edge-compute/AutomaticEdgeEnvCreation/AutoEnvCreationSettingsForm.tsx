@@ -19,7 +19,7 @@ interface FormValues {
   TrustOnFirstConnect: boolean;
 }
 const validation = yup.object({
-  TrustOnFirstConnect: yup.boolean().required('This field is required.'),
+  TrustOnFirstConnect: yup.boolean(),
   EdgePortainerUrl: yup
     .string()
     .test(
@@ -63,10 +63,10 @@ export function AutoEnvCreationSettingsForm({ settings }: Props) {
   );
 
   useEffect(() => {
-    if (!url && validation.isValidSync({ url: defaultUrl })) {
-      handleSubmit({ EdgePortainerUrl: defaultUrl });
+    if (!url && validation.isValidSync({ EdgePortainerUrl: defaultUrl })) {
+      updateSettings({ EdgePortainerUrl: defaultUrl });
     }
-  }, [handleSubmit, url]);
+  }, [updateSettings, url]);
 
   return (
     <Formik<FormValues>
