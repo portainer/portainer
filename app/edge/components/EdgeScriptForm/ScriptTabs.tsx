@@ -49,7 +49,7 @@ interface Props {
   onPlatformChange(platform: Platform): void;
 }
 
-export function Scripts({
+export function ScriptTabs({
   agentVersion,
   values,
   edgeKey,
@@ -270,13 +270,11 @@ function buildKubernetesCommand(
   const idEnvVar = edgeIdScript
     ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n`
     : '';
+  const envVarsTrimmed = envVars.trim();
   const edgeIdVar = !edgeIdScript && edgeId ? edgeId : '$PORTAINER_EDGE_ID';
   const selfSigned = allowSelfSignedCerts ? '1' : '0';
 
-  return `${idEnvVar}curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-edge-agent-setup.sh | 
-  bash -s -- "${edgeIdVar}" \\
-    "${edgeKey}" \\
-    "${selfSigned}" "${agentSecret}" "${envVars}"`;
+  return `${idEnvVar}curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-edge-agent-setup.sh | bash -s -- "${edgeIdVar}" "${edgeKey}" "${selfSigned}" "${agentSecret}" "${envVarsTrimmed}"`;
 }
 
 function buildDefaultEnvVars(
