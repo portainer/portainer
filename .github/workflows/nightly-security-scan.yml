@@ -14,7 +14,6 @@ jobs:
       github.headref == 'security-scan-ee'
     outputs:
       image: ${{ steps.set-matrix.outputs.image_result }}
-      imagediff: ${{ steps.set-diff-matrix.outputs.image_diff_result }}
     steps:
       - name: Checkout code
         uses: actions/checkout@master
@@ -105,7 +104,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Code Scanning Result:\nJS dependency check: ${{ matrix.js.status }} ${{ matrix.js.summary }}\nGo dependency check: ${{ matrix.go.status }} ${{ matrix.go.summary }}\nImage vulnerability check: ${{ matrix.image.status }} ${{ matrix.image.summary }}\n${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}",
+                    "text": "Code Scanning Result:\nJS dependency check: ${{ matrix.js.status }} ${{ matrix.js.summary }}\nGo dependency check: ${{ matrix.go.status }} ${{ matrix.go.summary }}\nImage vulnerability check: ${{ matrix.image.status }} ${{ matrix.image.summary }}\n${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
                   }
                 }
               ]
