@@ -1,48 +1,115 @@
+name: Nightly Code Security Scan
+
 on: 
   schedule:
-    - cron: '* 13 * * *'
-
+    - cron: '10 * * * *'
+    
 jobs:
-  client-dependencies:
-    name: Client dependency check
+  image-vulnerability:
+    name: Build docker image and Image vulnerability check
     runs-on: ubuntu-latest
+    if: >-
+      github.ref == 'refs/heads/develop' || 
+      github.headref == 'security-scan-ee'
+    outputs:
+      image: ${{ steps.set-matrix.outputs.image_result }}
+      imagediff: ${{ steps.set-diff-matrix.outputs.image_diff_result }}
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout code
+        uses: actions/checkout@master
 
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
-        continue-on-error: true # To make sure that SARIF upload gets called
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Use golang 1.17.x
+        uses: actions/setup-go@v3
         with:
-          args: --severity-threshold=high --fail-on=upgradable --sarif-file-output=snyk.sarif
+          go-version: '>=1.17.0'
 
-      - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v1
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
         with:
-          sarif_file: snyk.sarif
+          node-version: 12.x
 
-  server-dependencies:
-    name: Server dependency check
+      - name: Install packages and build
+        run: yarn install && yarn build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: build/linux/Dockerfile
+          tags: trivy-portainer:${{ github.sha }}
+          outputs: type=docker,dest=/tmp/trivy-portainer-image.tar
+
+      - name: Load docker image
+        run: |
+          docker load --input /tmp/trivy-portainer-image.tar
+
+      - name: Run Trivy vulnerability scanner
+        uses: docker://docker.io/aquasec/trivy:latest
+        continue-on-error: true 
+        with:
+          args: image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}  
+
+      - name: Upload image security scan result as artifact on develop
+        uses: actions/upload-artifact@v3
+        if: >-
+          github.ref == 'refs/heads/develop' ||
+          github.head_ref == 'security-scan-ee'
+        with:
+          name: image-security-scan-develop-result
+          path: image-trivy.json
+
+      - name: Analyse the trivy result
+        if: >-
+          github.ref == 'refs/heads/develop' ||
+          github.head_ref == 'security-scan-ee'
+        id: set-matrix
+        run: | 
+          result=$(docker run --rm -v /home/runner/work/portainer/portainer:/data oscarzhou/scan-report:0.1.6 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=matrix)
+          echo "::set-output name=image_result::${result}"
+
+  result-analysis:
+    name: Analyse scan result
+    needs: [image-vulnerability]
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./api
+    if: >-
+      github.ref == 'refs/heads/develop' ||
+      github.head_ref == 'security-scan-ee'
+    strategy:
+      matrix: 
+        image: ${{fromJson(needs.image-vulnerability.outputs.image)}}
     steps:
-      - uses: actions/checkout@master
+      - name: Display the results of js, go and image
+        run: |
+          echo ${{ matrix.image.summary }}
 
-      - name: Download dependencies
-        run: go get -v -d
-
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/golang@master
-        continue-on-error: true # To make sure that SARIF upload gets called
+      - name: Post the result to a Slack channel
+        if: >- 
+          (github.ref == 'refs/heads/develop' ||
+          github.head_ref == 'security-scan-ee') && 
+          matrix.image.status == 'failure'
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          # Slack channel id, channel name, or user id to post message.
+          # See also: https://api.slack.com/methods/chat.postMessage#channels
+          channel-id: 'C039ZB872N5'
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "Code Scanning Result:\nJS dependency check: ${{ matrix.js.status }} ${{ matrix.js.summary }}\nGo dependency check: ${{ matrix.go.status }} ${{ matrix.go.summary }}\nImage vulnerability check: ${{ matrix.image.status }} ${{ matrix.image.summary }}\n${{ github.event.pull_request._links.html.href }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Code Scanning Result:\nJS dependency check: ${{ matrix.js.status }} ${{ matrix.js.summary }}\nGo dependency check: ${{ matrix.go.status }} ${{ matrix.go.summary }}\nImage vulnerability check: ${{ matrix.image.status }} ${{ matrix.image.summary }}\n${{ github.event.pull_request._links.html.href }}"
+                  }
+                }
+              ]
+            }
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high --sarif-file-output=snyk.sarif --file=./api/go.mod
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-      - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v1
-        with:
-          sarif_file: snyk.sarif
+
