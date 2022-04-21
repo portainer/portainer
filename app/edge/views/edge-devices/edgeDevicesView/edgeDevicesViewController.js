@@ -10,7 +10,12 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
   this.getEnvironments = function () {
     return $async(async () => {
       try {
-        const [endpointsResponse, groups] = await Promise.all([getEndpoints(0, 100, { edgeDeviceFilter: 'trusted' }), GroupService.groups()]);
+        const [endpointsResponse, groups] = await Promise.all([
+          getEndpoints(0, 100, {
+            edgeDeviceFilter: 'trusted',
+          }),
+          GroupService.groups(),
+        ]);
         ctrl.groups = groups;
         ctrl.edgeDevices = endpointsResponse.value;
       } catch (err) {
