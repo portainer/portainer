@@ -8,3 +8,7 @@
   display: inline-block;
   margin-right: 5px;
 }
+
+.searchBar .textSpan {
+  display: inline-block;
+}

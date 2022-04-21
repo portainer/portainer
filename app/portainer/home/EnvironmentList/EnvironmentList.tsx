@@ -15,7 +15,15 @@ import {
   useSearchBarState,
 } from '@/portainer/components/datatables/components/FilterSearchBar';
 import { SortbySelector } from '@/portainer/components/datatables/components/SortbySelector';
-import { HomepageFilter } from '@/portainer/home/HomepageFilter';
+import {
+  HomepageFilter,
+  useHomePageFilterState,
+  useHomePageFilterBoolState,
+  useHomePageFilterTypeState,
+  useHomePageStatusTypeState,
+  useHomePageNumberTypeState,
+  useHomePageSingleFilterTypeState,
+} from '@/portainer/home/HomepageFilter';
 import {
   TableActions,
   TableContainer,
@@ -51,41 +59,52 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     EnvironmentType.EdgeAgentOnKubernetes,
   ];
 
-  const [platformType, setPlatformType] = useState(allEnvironmentType);
+  const [platformType, setPlatformType] = useHomePageNumberTypeState(
+    'platformType',
+    allEnvironmentType
+  );
   const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
   const [page, setPage] = useState(1);
   const debouncedTextFilter = useDebounce(searchBarValue);
 
-  const [statusFilter, setStatusFilter] = useState<number[]>([]);
-  const [tagFilter, setTagFilter] = useState<number[]>([]);
-  const [groupFilter, setGroupFilter] = useState<number[]>([]);
-  const [sortByFilter, setSortByFilter] = useState<string>('');
-  const [sortByDescending, setSortByDescending] = useState(false);
-  const [sortByButton, setSortByButton] = useState(false);
+  const [statusFilter, setStatusFilter] = useHomePageStatusTypeState('status');
+  const [tagFilter, setTagFilter] = useHomePageNumberTypeState('tag', []);
+  const [groupFilter, setGroupFilter] = useHomePageFilterState('group');
+  const [sortByFilter, setSortByFilter] = useSearchBarState('sortBy');
+  const [sortByDescending, setSortByDescending] =
+    useHomePageFilterBoolState('sortOrder');
+  const [sortByButton, setSortByButton] =
+    useHomePageFilterBoolState('sortByButton');
 
-  const [platformState, setPlatformState] = useState<Filter[]>([]);
-  const [statusState, setStatusState] = useState<Filter[]>([]);
-  const [tagState, setTagState] = useState<Filter[]>([]);
-  const [groupState, setGroupState] = useState<Filter[]>([]);
+  const [platformState, setPlatformState] = useHomePageFilterTypeState('type');
+  const [statusState, setStatusState] = useHomePageFilterTypeState('status');
+  const [tagState, setTagState] = useHomePageFilterTypeState('tag');
+  const [groupState, setGroupState] = useHomePageFilterTypeState('group');
+  const [sortByState, setSortByState] =
+    useHomePageSingleFilterTypeState('sortBy');
 
   const groupsQuery = useGroups();
 
   const { isLoading, environments, totalCount, totalAvailable } =
     useEnvironmentList(
-      { page, pageLimit, types: platformType, search: debouncedTextFilter },
+      {
+        page,
+        pageLimit,
+        types: platformType,
+        search: debouncedTextFilter,
+        status: statusFilter,
+        tagIds: tagFilter?.length ? tagFilter : undefined,
+        groupIds: groupFilter,
+        sort: sortByFilter,
+        order: sortByDescending ? 'desc' : 'asc',
+      },
       true
     );
 
   useEffect(() => {
     setPage(1);
   }, [searchBarValue]);
-
-  interface Collection {
-    Status: number[];
-    TagIds: number[];
-    GroupId: number[];
-  }
 
   const PlatformOptions = [
     { value: EnvironmentType.Docker, label: 'Docker' },
@@ -121,64 +140,6 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     label,
   }));
 
-  const collection = {
-    Status: statusFilter,
-    TagIds: tagFilter,
-    GroupId: groupFilter,
-  };
-
-  function multiPropsFilter(
-    environments: Environment[],
-    collection: Collection,
-    sortByFilter: string,
-    sortByDescending: boolean
-  ) {
-    const filterKeys = Object.keys(collection);
-    const filterResult = environments.filter((environment: Environment) =>
-      filterKeys.every((key) => {
-        if (!collection[key as keyof Collection].length) return true;
-        if (Array.isArray(environment[key as keyof Collection])) {
-          return (environment[key as keyof Collection] as number[]).some(
-            (keyEle) => collection[key as keyof Collection].includes(keyEle)
-          );
-        }
-        return collection[key as keyof Collection].includes(
-          environment[key as keyof Collection] as number
-        );
-      })
-    );
-
-    switch (sortByFilter) {
-      case 'Name':
-        return sortByDescending
-          ? filterResult.sort((a, b) =>
-              b.Name.toUpperCase() > a.Name.toUpperCase() ? 1 : -1
-            )
-          : filterResult.sort((a, b) =>
-              a.Name.toUpperCase() > b.Name.toUpperCase() ? 1 : -1
-            );
-      case 'Group':
-        return sortByDescending
-          ? filterResult.sort((a, b) => b.GroupId - a.GroupId)
-          : filterResult.sort((a, b) => a.GroupId - b.GroupId);
-      case 'Status':
-        return sortByDescending
-          ? filterResult.sort((a, b) => b.Status - a.Status)
-          : filterResult.sort((a, b) => a.Status - b.Status);
-      case 'None':
-        return filterResult;
-      default:
-        return filterResult;
-    }
-  }
-
-  const filteredEnvironments: Environment[] = multiPropsFilter(
-    environments,
-    collection,
-    sortByFilter,
-    sortByDescending
-  );
-
   function platformOnChange(filterOptions: Filter[]) {
     setPlatformState(filterOptions);
     const dockerBaseType = EnvironmentType.Docker;
@@ -192,24 +153,21 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
       EnvironmentType.EdgeAgentOnKubernetes,
     ];
 
-    let finalFilterEnvironment: number[] = [];
-
     if (filterOptions.length === 0) {
       setPlatformType(allEnvironmentType);
     } else {
-      const filteredEnvironment = [
-        ...new Set(
-          filterOptions.map(
-            (filterOptions: { value: number }) => filterOptions.value
-          )
-        ),
-      ];
-      if (filteredEnvironment.includes(dockerBaseType)) {
-        finalFilterEnvironment = [...filteredEnvironment, ...dockerRelateType];
-      }
-      if (filteredEnvironment.includes(kubernetesBaseType)) {
+      let finalFilterEnvironment: number[] = filterOptions.map(
+        (filterOption: { value: number }) => filterOption.value
+      );
+      if (finalFilterEnvironment.includes(dockerBaseType)) {
         finalFilterEnvironment = [
-          ...filteredEnvironment,
+          ...finalFilterEnvironment,
+          ...dockerRelateType,
+        ];
+      }
+      if (finalFilterEnvironment.includes(kubernetesBaseType)) {
+        finalFilterEnvironment = [
+          ...finalFilterEnvironment,
           ...kubernetesRelateType,
         ];
       }
@@ -281,9 +239,11 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     if (filterOptions !== null) {
       setSortByFilter(filterOptions.label);
       setSortByButton(true);
+      setSortByState(filterOptions);
     } else {
-      setSortByFilter('None');
-      setSortByButton(false);
+      setSortByFilter('');
+      setSortByButton(true);
+      setSortByState(undefined);
     }
   }
 
@@ -361,7 +321,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
               </div>
               <div className={styles.filterButton}>
                 <Button size="medium" onClick={clearFilter}>
-                  Clear
+                  Clear all
                 </Button>
               </div>
               <div className={styles.filterRight}>
@@ -372,6 +332,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                   placeHolder="Sort By"
                   sortByDescending={sortByDescending}
                   sortByButton={sortByButton}
+                  value={sortByState}
                 />
               </div>
             </div>
@@ -379,7 +340,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
               {renderItems(
                 isLoading,
                 totalCount,
-                filteredEnvironments.map((env) => (
+                environments.map((env) => (
                   <EnvironmentItem
                     key={env.Id}
                     environment={env}

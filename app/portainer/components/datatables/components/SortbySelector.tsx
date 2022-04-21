@@ -13,6 +13,7 @@ interface Props {
   placeHolder: string;
   sortByDescending: boolean;
   sortByButton: boolean;
+  value?: Filter | undefined;
 }
 
 export function SortbySelector({
@@ -22,6 +23,7 @@ export function SortbySelector({
   placeHolder,
   sortByDescending,
   sortByButton,
+  value,
 }: Props) {
   const upIcon = 'fa fa-sort-alpha-up';
   const downIcon = 'fa fa-sort-alpha-down';
@@ -43,6 +45,7 @@ export function SortbySelector({
           options={filterOptions}
           onChange={(option) => onChange(option as Filter)}
           isClearable
+          value={value}
         />
       </div>
       <div className={styles.sortbyelement}>

@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -53,8 +54,9 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		search = strings.ToLower(search)
 	}
 
-	groupID, _ := request.RetrieveNumericQueryParameter(r, "groupId", true)
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
+	sortField, _ := request.RetrieveQueryParameter(r, "sort", true)
+	sortOrder, _ := request.RetrieveQueryParameter(r, "order", true)
 
 	var endpointTypes []int
 	request.RetrieveJSONQueryParameter(r, "types", &endpointTypes, true)
@@ -66,6 +68,12 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	var endpointIDs []portainer.EndpointID
 	request.RetrieveJSONQueryParameter(r, "endpointIds", &endpointIDs, true)
+
+	var statuses []int
+	request.RetrieveJSONQueryParameter(r, "status", &statuses, true)
+
+	var groupIDs []int
+	request.RetrieveJSONQueryParameter(r, "groupIds", &groupIDs, true)
 
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
@@ -94,13 +102,17 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		filteredEndpoints = filteredEndpointsByIds(filteredEndpoints, endpointIDs)
 	}
 
-	if groupID != 0 {
-		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
+	if len(groupIDs) > 0 {
+		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, groupIDs)
 	}
 
 	edgeDeviceFilter, _ := request.RetrieveQueryParameter(r, "edgeDeviceFilter", false)
 	if edgeDeviceFilter != "" {
 		filteredEndpoints = filterEndpointsByEdgeDevice(filteredEndpoints, edgeDeviceFilter)
+	}
+
+	if len(statuses) > 0 {
+		filteredEndpoints = filterEndpointsByStatuses(filteredEndpoints, statuses)
 	}
 
 	if search != "" {
@@ -121,6 +133,11 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	if tagIDs != nil {
 		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, tagIDs, endpointGroups, tagsPartialMatch)
+	}
+
+	// Sort endpoints by field
+	if sortField != "" {
+		sortEndpointsByField(filteredEndpoints, endpointGroups, sortField, sortOrder)
 	}
 
 	filteredEndpointCount := len(filteredEndpoints)
@@ -160,11 +177,11 @@ func paginateEndpoints(endpoints []portainer.Endpoint, start, limit int) []porta
 	return endpoints[start:end]
 }
 
-func filterEndpointsByGroupID(endpoints []portainer.Endpoint, endpointGroupID portainer.EndpointGroupID) []portainer.Endpoint {
+func filterEndpointsByGroupID(endpoints []portainer.Endpoint, endpointGroupIDs []int) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
 	for _, endpoint := range endpoints {
-		if endpoint.GroupID == endpointGroupID {
+		if containsInIntSlice(endpointGroupIDs, int(endpoint.GroupID)) {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
 		}
 	}
@@ -188,6 +205,84 @@ func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGro
 	}
 
 	return filteredEndpoints
+}
+
+func containsInIntSlice(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
+func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, endpoint := range endpoints {
+		status := endpoint.Status
+		if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+			isCheckValid := false
+			if endpoint.EdgeCheckinInterval != 0 && endpoint.LastCheckInDate != 0 {
+				isCheckValid = time.Now().Unix()-endpoint.LastCheckInDate <= int64(endpoint.EdgeCheckinInterval*2+20)
+			}
+			if isCheckValid {
+				status = portainer.EndpointStatusUp // Online
+			} else {
+				status = portainer.EndpointStatusDown // Offline
+			}
+		}
+
+		if containsInIntSlice(statuses, int(status)) {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+			continue
+		}
+	}
+
+	return filteredEndpoints
+}
+
+func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, sortField, sortOrder string) {
+	if sortField == "Name" {
+		if sortOrder == "asc" {
+			sort.Slice(endpoints, func(i, j int) bool {
+				// Case insensitive sort
+				return strings.ToLower(endpoints[i].Name) < strings.ToLower(endpoints[j].Name)
+			})
+		} else {
+			sort.Slice(endpoints, func(i, j int) bool {
+				return strings.ToLower(endpoints[i].Name) > strings.ToLower(endpoints[j].Name)
+			})
+		}
+	}
+
+	if sortField == "Group" {
+		if sortOrder == "asc" {
+			sort.Slice(endpoints, func(i, j int) bool {
+				groupOne := getEndpointGroup(endpoints[i].GroupID, endpointGroups)
+				groupTwo := getEndpointGroup(endpoints[j].GroupID, endpointGroups)
+				return strings.ToLower(groupOne.Name) < strings.ToLower(groupTwo.Name)
+			})
+		} else {
+			sort.Slice(endpoints, func(i, j int) bool {
+				groupOne := getEndpointGroup(endpoints[i].GroupID, endpointGroups)
+				groupTwo := getEndpointGroup(endpoints[j].GroupID, endpointGroups)
+				return strings.ToLower(groupOne.Name) > strings.ToLower(groupTwo.Name)
+			})
+		}
+	}
+
+	if sortField == "Status" {
+		if sortOrder == "asc" {
+			sort.Slice(endpoints, func(i, j int) bool {
+				return endpoints[i].Status < endpoints[j].Status
+			})
+		} else {
+			sort.Slice(endpoints, func(i, j int) bool {
+				return endpoints[i].Status > endpoints[j].Status
+			})
+		}
+	}
 }
 
 func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tags []string, searchCriteria string) bool {

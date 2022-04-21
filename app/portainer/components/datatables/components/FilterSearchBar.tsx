@@ -18,7 +18,7 @@ export function FilterSearchBar({
       <span className={styles.iconSpan}>
         <i className="fa fa-search" aria-hidden="true" />
       </span>
-      <span className={styles.iconSpan}>
+      <span className={styles.textSpan}>
         <input
           type="text"
           className="searchInput"
