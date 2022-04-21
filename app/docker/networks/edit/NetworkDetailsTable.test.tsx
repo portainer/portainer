@@ -76,7 +76,6 @@ function getNetwork(networkName: string): DockerNetwork {
         IPv6Address: '',
         MacAddress: '02:42:ac:11:00:02',
         Name: 'portainer',
-        Id: 'a761fcafdae3bdae42cf3702c8554b3e1b0334f85dd6b65b3584aff7246279e4',
       },
     },
     Driver: 'bridge',

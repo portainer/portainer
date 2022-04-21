@@ -13,8 +13,7 @@ export type NetworkId = string;
 
 export type NetworkOptions = Record<string, string>;
 
-export type NetworkContainer = {
-  Id: ContainerId;
+export type NetworkResponseContainer = {
   EndpointID: string;
   IPv4Address: string;
   IPv6Address: string;
@@ -22,7 +21,14 @@ export type NetworkContainer = {
   Name: string;
 };
 
-export type NetworkContainers = Record<ContainerId, NetworkContainer>;
+export interface NetworkContainer extends NetworkResponseContainer {
+  Id: ContainerId;
+}
+
+export type NetworkResponseContainers = Record<
+  ContainerId,
+  NetworkResponseContainer
+>;
 
 export interface DockerNetwork {
   Name: string;
@@ -38,5 +44,5 @@ export interface DockerNetwork {
   };
   Portainer: { ResourceControl?: ResourceControlViewModel };
   Options?: NetworkOptions;
-  Containers?: NetworkContainers;
+  Containers?: NetworkResponseContainers;
 }
