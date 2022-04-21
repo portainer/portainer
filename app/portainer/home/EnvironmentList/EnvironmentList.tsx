@@ -8,6 +8,7 @@ import {
   EnvironmentType,
   EnvironmentStatus,
 } from '@/portainer/environments/types';
+import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
 import { Button } from '@/portainer/components/Button';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
 import {
@@ -17,12 +18,7 @@ import {
 import { SortbySelector } from '@/portainer/components/datatables/components/SortbySelector';
 import {
   HomepageFilter,
-  useHomePageFilterState,
-  useHomePageFilterBoolState,
-  useHomePageFilterTypeState,
-  useHomePageStatusTypeState,
-  useHomePageNumberTypeState,
-  useHomePageSingleFilterTypeState,
+  useHomePageFilter,
 } from '@/portainer/home/HomepageFilter';
 import {
   TableActions,
@@ -46,20 +42,38 @@ interface Props {
   onRefresh(): void;
 }
 
+const PlatformOptions = [
+  { value: EnvironmentType.Docker, label: 'Docker' },
+  { value: EnvironmentType.Azure, label: 'Azure' },
+  { value: EnvironmentType.KubernetesLocal, label: 'Kubernetes' },
+];
+
+const status = [
+  { value: EnvironmentStatus.Up, label: 'Up' },
+  { value: EnvironmentStatus.Down, label: 'Down' },
+];
+
+const SortByOptions = [
+  { value: 1, label: 'Name' },
+  { value: 2, label: 'Group' },
+  { value: 3, label: 'Status' },
+];
+
+const storageKey = 'home_endpoints';
+const allEnvironmentType = [
+  EnvironmentType.Docker,
+  EnvironmentType.AgentOnDocker,
+  EnvironmentType.Azure,
+  EnvironmentType.EdgeAgentOnDocker,
+  EnvironmentType.KubernetesLocal,
+  EnvironmentType.AgentOnKubernetes,
+  EnvironmentType.EdgeAgentOnKubernetes,
+];
+
 export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   const isAdmin = useIsAdmin();
-  const storageKey = 'home_endpoints';
-  const allEnvironmentType = [
-    EnvironmentType.Docker,
-    EnvironmentType.AgentOnDocker,
-    EnvironmentType.Azure,
-    EnvironmentType.EdgeAgentOnDocker,
-    EnvironmentType.KubernetesLocal,
-    EnvironmentType.AgentOnKubernetes,
-    EnvironmentType.EdgeAgentOnKubernetes,
-  ];
 
-  const [platformType, setPlatformType] = useHomePageNumberTypeState(
+  const [platformType, setPlatformType] = useHomePageFilter(
     'platformType',
     allEnvironmentType
   );
@@ -68,21 +82,41 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   const [page, setPage] = useState(1);
   const debouncedTextFilter = useDebounce(searchBarValue);
 
-  const [statusFilter, setStatusFilter] = useHomePageStatusTypeState('status');
-  const [tagFilter, setTagFilter] = useHomePageNumberTypeState('tag', []);
-  const [groupFilter, setGroupFilter] = useHomePageFilterState('group');
+  const [statusFilter, setStatusFilter] = useHomePageFilter<
+    EnvironmentStatus[]
+  >('status', []);
+  const [tagFilter, setTagFilter] = useHomePageFilter<number[]>('tag', []);
+  const [groupFilter, setGroupFilter] = useHomePageFilter<EnvironmentGroupId[]>(
+    'group',
+    []
+  );
   const [sortByFilter, setSortByFilter] = useSearchBarState('sortBy');
-  const [sortByDescending, setSortByDescending] =
-    useHomePageFilterBoolState('sortOrder');
-  const [sortByButton, setSortByButton] =
-    useHomePageFilterBoolState('sortByButton');
+  const [sortByDescending, setSortByDescending] = useHomePageFilter(
+    'sortOrder',
+    false
+  );
+  const [sortByButton, setSortByButton] = useHomePageFilter(
+    'sortByButton',
+    false
+  );
 
-  const [platformState, setPlatformState] = useHomePageFilterTypeState('type');
-  const [statusState, setStatusState] = useHomePageFilterTypeState('status');
-  const [tagState, setTagState] = useHomePageFilterTypeState('tag');
-  const [groupState, setGroupState] = useHomePageFilterTypeState('group');
-  const [sortByState, setSortByState] =
-    useHomePageSingleFilterTypeState('sortBy');
+  const [platformState, setPlatformState] = useHomePageFilter<Filter[]>(
+    'type_state',
+    []
+  );
+  const [statusState, setStatusState] = useHomePageFilter<Filter[]>(
+    'status_state',
+    []
+  );
+  const [tagState, setTagState] = useHomePageFilter<Filter[]>('tag_state', []);
+  const [groupState, setGroupState] = useHomePageFilter<Filter[]>(
+    'group_state',
+    []
+  );
+  const [sortByState, setSortByState] = useHomePageFilter<Filter | undefined>(
+    'sortby_state',
+    undefined
+  );
 
   const groupsQuery = useGroups();
 
@@ -105,23 +139,6 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   useEffect(() => {
     setPage(1);
   }, [searchBarValue]);
-
-  const PlatformOptions = [
-    { value: EnvironmentType.Docker, label: 'Docker' },
-    { value: EnvironmentType.Azure, label: 'Azure' },
-    { value: EnvironmentType.KubernetesLocal, label: 'Kubernetes' },
-  ];
-
-  const status = [
-    { value: EnvironmentStatus.Up, label: 'Up' },
-    { value: EnvironmentStatus.Down, label: 'Down' },
-  ];
-
-  const SortByOptions = [
-    { value: 1, label: 'Name' },
-    { value: 2, label: 'Group' },
-    { value: 3, label: 'Status' },
-  ];
 
   const groupOptions = [...(groupsQuery.data || [])];
   const uniqueGroup = [
@@ -156,8 +173,8 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     if (filterOptions.length === 0) {
       setPlatformType(allEnvironmentType);
     } else {
-      let finalFilterEnvironment: number[] = filterOptions.map(
-        (filterOption: { value: number }) => filterOption.value
+      let finalFilterEnvironment = filterOptions.map(
+        (filterOption) => filterOption.value
       );
       if (finalFilterEnvironment.includes(dockerBaseType)) {
         finalFilterEnvironment = [

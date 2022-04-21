@@ -13,7 +13,7 @@ interface Props {
   placeHolder: string;
   sortByDescending: boolean;
   sortByButton: boolean;
-  value?: Filter | undefined;
+  value?: Filter;
 }
 
 export function SortbySelector({

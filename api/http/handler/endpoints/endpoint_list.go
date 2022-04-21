@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 const (
@@ -221,15 +222,14 @@ func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int) [
 
 	for _, endpoint := range endpoints {
 		status := endpoint.Status
-		if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		if endpointutils.IsEdgeEndpoint(&endpoint) {
 			isCheckValid := false
 			if endpoint.EdgeCheckinInterval != 0 && endpoint.LastCheckInDate != 0 {
 				isCheckValid = time.Now().Unix()-endpoint.LastCheckInDate <= int64(endpoint.EdgeCheckinInterval*2+20)
 			}
+			status = portainer.EndpointStatusDown // Offline
 			if isCheckValid {
 				status = portainer.EndpointStatusUp // Online
-			} else {
-				status = portainer.EndpointStatusDown // Offline
 			}
 		}
 
