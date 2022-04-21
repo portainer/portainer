@@ -21,6 +21,7 @@ const (
 	EdgeDeviceFilterAll       = "all"
 	EdgeDeviceFilterTrusted   = "trusted"
 	EdgeDeviceFilterUntrusted = "untrusted"
+	EdgeDeviceFilterNone      = "none"
 )
 
 var endpointGroupNames map[portainer.EndpointGroupID]string
@@ -43,7 +44,7 @@ var endpointGroupNames map[portainer.EndpointGroupID]string
 // @param tagIds query []int false "search environments(endpoints) with these tags (depends on tagsPartialMatch)"
 // @param tagsPartialMatch query bool false "If true, will return environment(endpoint) which has one of tagIds, if false (or missing) will return only environments(endpoints) that has all the tags"
 // @param endpointIds query []int false "will return only these environments(endpoints)"
-// @param edgeDeviceFilter query string false "will return only these edge devices" Enum("all", "trusted", "untrusted")
+// @param edgeDeviceFilter query string false "will return only these edge environments, none will return only regular edge environments" Enum("all", "trusted", "untrusted", "none")
 // @success 200 {array} portainer.Endpoint "Endpoints"
 // @failure 500 "Server error"
 // @router /endpoints [get]
@@ -334,10 +335,6 @@ func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []int)
 func filterEndpointsByEdgeDevice(endpoints []portainer.Endpoint, edgeDeviceFilter string) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
-	if edgeDeviceFilter != EdgeDeviceFilterAll && edgeDeviceFilter != EdgeDeviceFilterTrusted && edgeDeviceFilter != EdgeDeviceFilterUntrusted {
-		return endpoints
-	}
-
 	for _, endpoint := range endpoints {
 		if shouldReturnEdgeDevice(endpoint, edgeDeviceFilter) {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
@@ -347,7 +344,12 @@ func filterEndpointsByEdgeDevice(endpoints []portainer.Endpoint, edgeDeviceFilte
 }
 
 func shouldReturnEdgeDevice(endpoint portainer.Endpoint, edgeDeviceFilter string) bool {
-	if !endpoint.IsEdgeDevice {
+	// none - return all endpoints that are not edge devices
+	if edgeDeviceFilter == EdgeDeviceFilterNone && !endpoint.IsEdgeDevice {
+		return true
+	}
+
+	if !endpointutils.IsEdgeEndpoint(&endpoint) {
 		return false
 	}
 
