@@ -303,6 +303,7 @@
                   </portainer-tooltip>
                   <span
                     class="label label-default interactive"
+                    ng-if="ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX"
                     style="margin-left: 10px"
                     ng-click="$ctrl.addRewriteAnnotation(ic)"
                     data-cy="namespaceCreate-addAnnotation{{ ic.IngressClass.Name }}"
