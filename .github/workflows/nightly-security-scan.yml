@@ -163,13 +163,43 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "Code Scanning Result:\nJS dependency check: ${{ matrix.js.status }} ${{ matrix.js.summary }}\nGo dependency check: ${{ matrix.go.status }} ${{ matrix.go.summary }}\nImage vulnerability check: ${{ matrix.image.status }} ${{ matrix.image.summary }}\n${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Code Scanning Result:\nJS dependency check: ${{ matrix.js.status }} ${{ matrix.js.summary }}\nGo dependency check: ${{ matrix.go.status }} ${{ matrix.go.summary }}\nImage vulnerability check: ${{ matrix.image.status }} ${{ matrix.image.summary }}\n${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
+                    "text": "Code Scanning Result(*${{ github.event.repository.name}}*)"
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "JS dependency check: *${{ matrix.js.status }}*\n${{ matrix.js.summary }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Go dependency check: *${{ matrix.go.status }}*\n${{ matrix.go.summary }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Image vulnerability check: *${{ matrix.image.status }}*\n${{ matrix.image.summary }}\n"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
                   }
                 }
               ]
