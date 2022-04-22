@@ -14,6 +14,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/utils"
 )
 
 const (
@@ -101,7 +102,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	totalAvailableEndpoints := len(filteredEndpoints)
 
 	if groupID != 0 {
-		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
+		filteredEndpoints = filterEndpointsByGroupIDs(filteredEndpoints, []int{groupID})
 	}
 
 	if endpointIDs != nil {
@@ -143,7 +144,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	// Sort endpoints by field
 	if sortField != "" {
-		sortEndpointsByField(filteredEndpoints, endpointGroups, sortField, sortOrder)
+		sortEndpointsByField(filteredEndpoints, endpointGroups, sortField, sortOrder == "asc")
 	}
 
 	filteredEndpointCount := len(filteredEndpoints)
@@ -183,22 +184,11 @@ func paginateEndpoints(endpoints []portainer.Endpoint, start, limit int) []porta
 	return endpoints[start:end]
 }
 
-func filterEndpointsByGroupID(endpoints []portainer.Endpoint, endpointGroupID portainer.EndpointGroupID) []portainer.Endpoint {
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-
-	for _, endpoint := range endpoints {
-		if endpoint.GroupID == endpointGroupID {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
-		}
-	}
-	return filteredEndpoints
-}
-
 func filterEndpointsByGroupIDs(endpoints []portainer.Endpoint, endpointGroupIDs []int) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
 	for _, endpoint := range endpoints {
-		if containsInIntSlice(endpointGroupIDs, int(endpoint.GroupID)) {
+		if utils.Contains(endpointGroupIDs, int(endpoint.GroupID)) {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
 		}
 	}
@@ -224,15 +214,6 @@ func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGro
 	return filteredEndpoints
 }
 
-func containsInIntSlice(s []int, e int) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
 func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
@@ -249,18 +230,19 @@ func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int) [
 			}
 		}
 
-		if containsInIntSlice(statuses, int(status)) {
+		if utils.Contains(statuses, int(status)) {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
-			continue
 		}
 	}
 
 	return filteredEndpoints
 }
 
-func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, sortField, sortOrder string) {
-	if sortField == "Name" {
-		if sortOrder == "asc" {
+func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, sortField string, isSortAsc bool) {
+
+	switch sortField {
+	case "Name":
+		if isSortAsc {
 			sort.Slice(endpoints, func(i, j int) bool {
 				// Case insensitive sort
 				return strings.ToLower(endpoints[i].Name) < strings.ToLower(endpoints[j].Name)
@@ -270,10 +252,8 @@ func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []porta
 				return strings.ToLower(endpoints[i].Name) > strings.ToLower(endpoints[j].Name)
 			})
 		}
-	}
-
-	if sortField == "Group" {
-		if sortOrder == "asc" {
+	case "Group":
+		if isSortAsc {
 			sort.Slice(endpoints, func(i, j int) bool {
 				groupOne := getEndpointGroup(endpoints[i].GroupID, endpointGroups)
 				groupTwo := getEndpointGroup(endpoints[j].GroupID, endpointGroups)
@@ -286,10 +266,8 @@ func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []porta
 				return strings.ToLower(groupOne.Name) > strings.ToLower(groupTwo.Name)
 			})
 		}
-	}
-
-	if sortField == "Status" {
-		if sortOrder == "asc" {
+	case "Status":
+		if isSortAsc {
 			sort.Slice(endpoints, func(i, j int) bool {
 				return endpoints[i].Status < endpoints[j].Status
 			})
