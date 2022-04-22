@@ -163,42 +163,46 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "blocks": [
+              "attachments": [
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Code Scanning Result(*${{ github.event.repository.name}}*)\n*<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|GitHub Actions Workflow URL>*"
-                  }
-                },
-                {
-                  "type": "divider"
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*JS dependency check*: *${{ matrix.js.status }}*\n${{ matrix.js.summary }}"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Go dependency check*: *${{ matrix.go.status }}*\n${{ matrix.go.summary }}"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Image vulnerability check*: *${{ matrix.image.status }}*\n${{ matrix.image.summary }}\n"
-                  }
+                  "color": "#FF0000",
+                  "blocks": [
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "Code Scanning Result(*${{ github.event.repository.name}}*)\n*<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|GitHub Actions Workflow URL>*"
+                      }
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*JS dependency check*: *${{ matrix.js.status }}*\n${{ matrix.js.summary }}"
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Go dependency check*: *${{ matrix.go.status }}*\n${{ matrix.go.summary }}"
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Image vulnerability check*: *${{ matrix.image.status }}*\n${{ matrix.image.summary }}\n"
+                      }
+                    }
+                  ]
                 }
               ]
             }
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_COLOR: '#0000FF'
 
 
