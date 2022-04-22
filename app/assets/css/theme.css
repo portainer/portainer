@@ -161,6 +161,7 @@ html {
   --bg-app-datatable-tbody: var(--grey-24);
   --bg-stepper-item-active: var(--white-color);
   --bg-stepper-item-counter: var(--grey-61);
+  --bg-sortbutton-color: var(--white-color);
 
   --text-main-color: var(--grey-7);
   --text-body-color: var(--grey-6);
@@ -242,6 +243,7 @@ html {
   --border-daterangepicker-after: var(--white-color);
   --border-tooltip-color: var(--grey-47);
   --border-modal: 0px;
+  --border-sortbutton: var(--grey-8);
 
   --hover-sidebar-color: var(--grey-37);
   --shadow-box-color: 0 3px 10px -2px var(--grey-50);
@@ -334,6 +336,7 @@ html {
   --bg-app-datatable-tbody: var(--grey-1);
   --bg-stepper-item-active: var(--grey-1);
   --bg-stepper-item-counter: var(--grey-7);
+  --bg-sortbutton-color: var(--grey-1);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -416,6 +419,7 @@ html {
   --border-daterangepicker-after: var(--grey-3);
   --border-tooltip-color: var(--grey-3);
   --border-modal: 0px;
+  --border-sortbutton: var(--grey-3);
 
   --hover-sidebar-color: var(--grey-3);
   --blue-color: var(--blue-2);
@@ -507,6 +511,7 @@ html {
   --bg-app-datatable-tbody: var(--black-color);
   --bg-stepper-item-active: var(--black-color);
   --bg-stepper-item-counter: var(--grey-3);
+  --bg-sortbutton-color: var(--grey-1);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -578,6 +583,7 @@ html {
   --border-codemirror-cursor-color: var(--white-color);
   --border-modal: 1px solid var(--white-color);
   --border-blocklist-color: var(--white-color);
+  --border-sortbutton: var(--black-color);
 
   --hover-sidebar-color: var(--blue-9);
   --hover-sidebar-color: var(--black-color);

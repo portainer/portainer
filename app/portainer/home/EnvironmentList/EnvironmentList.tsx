@@ -241,7 +241,6 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   }
 
   function clearFilter() {
-    setSearchBarValue('');
     setPlatformState([]);
     setPlatformType(allEnvironmentType);
     setStatusState([]);
@@ -281,19 +280,34 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                 <i className="fa fa-exclamation-circle blue-icon space-right" />
                 Click on an environment to manage
               </div>
-
-              {isAdmin && (
-                <Button
-                  onClick={onRefresh}
-                  data-cy="home-refreshEndpointsButton"
-                  className={clsx(styles.refreshEnvironmentsButton)}
-                >
-                  <i className="fa fa-sync space-right" aria-hidden="true" />
-                  Refresh
-                </Button>
-              )}
-
-              <KubeconfigButton environments={environments} />
+              <div className={styles.actionButton}>
+                <div className={styles.refreshButton}>
+                  {isAdmin && (
+                    <Button
+                      onClick={onRefresh}
+                      data-cy="home-refreshEndpointsButton"
+                      className={clsx(styles.refreshEnvironmentsButton)}
+                    >
+                      <i
+                        className="fa fa-sync space-right"
+                        aria-hidden="true"
+                      />
+                      Refresh
+                    </Button>
+                  )}
+                </div>
+                <div className={styles.kubeconfigButton}>
+                  <KubeconfigButton environments={environments} />
+                </div>
+                <div className={styles.filterSearchbar}>
+                  <FilterSearchBar
+                    value={searchBarValue}
+                    onChange={setSearchBarValue}
+                    placeholder="Search by name, group, tag, status, URL..."
+                    data-cy="home-endpointsSearchInput"
+                  />
+                </div>
+              </div>
             </TableActions>
             <div className={styles.filterContainer}>
               <div className={styles.filterLeft}>
@@ -328,19 +342,13 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                   value={groupState}
                 />
               </div>
-              <div className={styles.filterLeft}>
-                <FilterSearchBar
-                  value={searchBarValue}
-                  onChange={setSearchBarValue}
-                  placeholder="Search...."
-                  data-cy="home-endpointsSearchInput"
-                />
-              </div>
-              <div className={styles.filterButton}>
-                <Button size="medium" onClick={clearFilter}>
-                  Clear all
-                </Button>
-              </div>
+              <button
+                type="button"
+                className={styles.clearButton}
+                onClick={clearFilter}
+              >
+                Clear all
+              </button>
               <div className={styles.filterRight}>
                 <SortbySelector
                   filterOptions={SortByOptions}
