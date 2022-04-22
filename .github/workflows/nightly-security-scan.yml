@@ -2,10 +2,77 @@ name: Nightly Code Security Scan
 
 on: 
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '0 8 * * *'
   workflow_dispatch:
     
 jobs:
+  client-dependencies:
+    name: Client dependency check
+    runs-on: ubuntu-latest
+    if: >- # only run for develop branch
+      github.ref == 'refs/heads/develop' || 
+      github.headref == 'security-scan-ee'
+    outputs:
+      js: ${{ steps.set-matrix.outputs.js_result }}
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true # To make sure that artifact upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --fail-on=upgradable
+          json: true
+
+      - name: Upload js security scan result as artifact 
+        uses: actions/upload-artifact@v3
+        with:
+          name: js-security-scan-develop-result
+          path: snyk.json
+
+      - name: Analyse the js result
+        id: set-matrix
+        run: | 
+          result=$(docker run --rm -v /home/runner/work/portainer/portainer:/data oscarzhou/scan-report:0.1.6 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
+          echo "::set-output name=js_result::${result}"
+
+  server-dependencies:
+    name: Server dependency check
+    runs-on: ubuntu-latest
+    if: >- # only run for develop branch
+      github.ref == 'refs/heads/develop' || 
+      github.headref == 'security-scan-ee'
+    outputs:
+      go: ${{ steps.set-matrix.outputs.go_result }}
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Download dependencies
+        run: cd ./api && go get -v -d
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/golang@master
+        continue-on-error: true # To make sure that artifact upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --file=./api/go.mod
+          json: true
+
+      - name: Upload go security scan result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: go-security-scan-develop-result
+          path: snyk.json
+
+      - name: Analyse the go result
+        id: set-matrix
+        run: | 
+          result=$(docker run --rm -v /home/runner/work/portainer/portainer:/data oscarzhou/scan-report:0.1.6 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
+          echo "::set-output name=go_result::${result}"
+
   image-vulnerability:
     name: Build docker image and Image vulnerability check
     runs-on: ubuntu-latest
@@ -52,19 +119,13 @@ jobs:
         with:
           args: image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}  
 
-      - name: Upload image security scan result as artifact on develop
+      - name: Upload image security scan result as artifact
         uses: actions/upload-artifact@v3
-        if: >-
-          github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'security-scan-ee'
         with:
           name: image-security-scan-develop-result
           path: image-trivy.json
 
       - name: Analyse the trivy result
-        if: >-
-          github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'security-scan-ee'
         id: set-matrix
         run: | 
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.6 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=matrix)
@@ -72,23 +133,27 @@ jobs:
 
   result-analysis:
     name: Analyse scan result
-    needs: [image-vulnerability]
+    needs: [client-dependencies, server-dependencies, image-vulnerability]
     runs-on: ubuntu-latest
     if: >-
       github.ref == 'refs/heads/develop' ||
       github.head_ref == 'security-scan-ee'
     strategy:
       matrix: 
+        js: ${{fromJson(needs.client-dependencies.outputs.js)}}
+        go: ${{fromJson(needs.server-dependencies.outputs.go)}}
         image: ${{fromJson(needs.image-vulnerability.outputs.image)}}
     steps:
       - name: Display the results of js, go and image
         run: |
+          echo ${{ matrix.js.summary }}
+          echo ${{ matrix.go.summary }}
           echo ${{ matrix.image.summary }}
 
       - name: Post the result to a Slack channel
         if: >- 
-          (github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'security-scan-ee') && 
+          matrix.js.status == 'failure' ||
+          matrix.go.status == 'failure' || 
           matrix.image.status == 'failure'
         uses: slackapi/slack-github-action@v1.18.0
         with:
