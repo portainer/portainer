@@ -1,71 +1,182 @@
-on: push
+name: PR Code Security Scan
 
+on: workflow_dispatch
+    
 jobs:
   client-dependencies:
     name: Client dependency check
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/develop' 
+    outputs:
+      jsdiff: ${{ steps.set-diff-matrix.outputs.js_diff_result }}
     steps:
       - uses: actions/checkout@master
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
-        continue-on-error: true # To make sure that SARIF upload gets called
+        continue-on-error: true # To make sure that artifact upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --fail-on=upgradable --sarif-file-output=snyk.sarif
+          args: --severity-threshold=high --fail-on=upgradable
+          json: true
 
-      - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v1
+      - name: Upload js security scan result as artifact
+        uses: actions/upload-artifact@v3
         with:
-          sarif_file: snyk.sarif
+          name: js-security-scan-feat-result
+          path: snyk.json
+
+      - name: Download artifacts from develop branch
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          mv ./snyk.json ./js-snyk-feature.json
+          (gh run download -n js-security-scan-develop-result -R ${{ github.repository }} 2>&1 >/dev/null) || :
+          if [[ -e ./snyk.json ]]; then
+            mv ./snyk.json ./js-snyk-develop.json
+          else
+            echo "null" > ./js-snyk-develop.json
+          fi
+
+      - name: Analyse the js diff result
+        id: set-diff-matrix
+        run: | 
+          result=$(docker run --rm -v /home/runner/work/portainer/portainer:/data oscarzhou/scan-report:0.1.6 diff -report-type=snyk -path="/data/js-snyk-feature.json" -compare-to="./data/js-snyk-develop.json" -output-type=matrix)
+          echo "::set-output name=js_diff_result::${result}"
 
   server-dependencies:
     name: Server dependency check
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./api
+    if: github.ref != 'refs/heads/develop' 
+    outputs:
+      godiff: ${{ steps.set-diff-matrix.outputs.go_diff_result }}
     steps:
       - uses: actions/checkout@master
 
       - name: Download dependencies
-        run: go get -v -d
+        run: cd ./api && go get -v -d
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/golang@master
-        continue-on-error: true # To make sure that SARIF upload gets called
+        continue-on-error: true # To make sure that artifact upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --sarif-file-output=snyk.sarif --file=./api/go.mod
+          args: --severity-threshold=high --file=./api/go.mod
+          json: true
 
-      - name: Upload result to GitHub Code Scanning
-        id: server-scan
-        uses: github/codeql-action/upload-sarif@v1
+      - name: Upload go security scan result as artifact
+        uses: actions/upload-artifact@v3
         with:
-          sarif_file: snyk.sarif
+          name: go-security-scan-feature-result
+          path: snyk.json
 
-      - name: Post to a Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v1.18.0
-        with:
-          # Slack channel id, channel name, or user id to post message.
-          # See also: https://api.slack.com/methods/chat.postMessage#channels
-          channel-id: 'C039ZB872N5'
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ github.server-scan.outputs.result }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "PR ${{ steps.slack.outputs.pr }}\n Commit: ${{ github.event.head_commit.url }}\nSnyk summary xx ${{ github.event.pull_request._links.html.href }}/checks?check_run_id=${{ github.server-scan.outputs.result }}}"
-                  }
-                }
-              ]
-            }
+      - name: Download artifacts from develop branch
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}        
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          mv ./snyk.json ./go-snyk-feature.json
+          (gh run download -n go-security-scan-develop-result -R ${{ github.repository }} 2>&1 >/dev/null) || :
+          if [[ -e ./snyk.json ]]; then
+            mv ./snyk.json ./go-snyk-develop.json
+          else
+            echo "null" > ./go-snyk-develop.json
+          fi
+
+      - name: Analyse the go diff result
+        id: set-diff-matrix
+        run: | 
+          result=$(docker run --rm -v /home/runner/work/portainer/portainer:/data oscarzhou/scan-report:0.1.6 diff -report-type=snyk -path="/data/go-snyk-feature.json" -compare-to="./data/go-snyk-develop.json" -output-type=matrix)
+          echo "::set-output name=go_diff_result::${result}"
+
+  image-vulnerability:
+    name: Build docker image and Image vulnerability check
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/develop' 
+    outputs:
+      imagediff: ${{ steps.set-diff-matrix.outputs.image_diff_result }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+
+      - name: Use golang 1.17.x
+        uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.17.0'
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install packages and build
+        run: yarn install && yarn build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: build/linux/Dockerfile
+          tags: trivy-portainer:${{ github.sha }}
+          outputs: type=docker,dest=/tmp/trivy-portainer-image.tar
+
+      - name: Load docker image
+        run: |
+          docker load --input /tmp/trivy-portainer-image.tar
+
+      - name: Run Trivy vulnerability scanner
+        uses: docker://docker.io/aquasec/trivy:latest
+        continue-on-error: true 
+        with:
+          args: image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}  
+
+      - name: Upload image security scan result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-security-scan-feature-result
+          path: image-trivy.json
+
+      - name: Download artifacts from develop branch
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          mv ./image-trivy.json ./image-trivy-feature.json
+          (gh run download -n image-security-scan-develop-result -R ${{ github.repository }} 2>&1 >/dev/null) || :
+          if [[ -e ./image-trivy.json ]]; then
+            mv ./image-trivy.json ./image-trivy-develop.json
+          else
+            echo "null" > ./image-trivy-develop.json
+          fi
+
+      - name: Analyse the image diff result
+        id: set-diff-matrix
+        run: | 
+          result=$(docker run --rm -v /home/runner/work/portainer/portainer:/data oscarzhou/scan-report:0.1.6 diff -report-type=trivy -path="/data/image-trivy-feature.json" -compare-to="./data/image-trivy-develop.json" -output-type=matrix)
+          echo "::set-output name=image_diff_result::${result}"
+
+  result-analysis-compared-to-develop:
+    name: Analyse scan result compared to develop
+    needs: [client-dependencies, server-dependencies, image-vulnerability]
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/develop' 
+    strategy:
+      matrix: 
+        jsdiff: ${{fromJson(needs.client-dependencies.outputs.jsdiff)}}
+        godiff: ${{fromJson(needs.server-dependencies.outputs.godiff)}}
+        imagediff: ${{fromJson(needs.image-vulnerability.outputs.imagediff)}}
+    steps:
+
+      - name: Check job status of diff result
+        if: >-
+          matrix.jsdiff.status == 'failure' || 
+          matrix.godiff.status == 'failure' || 
+          matrix.imagediff.status == 'failure'
+        run: |
+          echo ${{ matrix.jsdiff.summary }}
+          echo ${{ matrix.godiff.summary }}
+          echo ${{ matrix.imagediff.summary }}
+          exit 1
