@@ -13,6 +13,8 @@ export type NetworkId = string;
 
 export type NetworkOptions = Record<string, string>;
 
+type IpamOptions = Record<string, string> | null;
+
 export type NetworkResponseContainer = {
   EndpointID: string;
   IPv4Address: string;
@@ -37,12 +39,12 @@ export interface DockerNetwork {
   Scope: string;
   Attachable: boolean;
   Internal: boolean;
-  IPAM?: {
+  IPAM: {
     Config: IPConfig[];
-    Driver?: string;
-    Options?: string | null;
+    Driver: string;
+    Options: IpamOptions;
   };
   Portainer: { ResourceControl?: ResourceControlViewModel };
-  Options?: NetworkOptions;
-  Containers?: NetworkResponseContainers;
+  Options: NetworkOptions;
+  Containers: NetworkResponseContainers;
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
 import { useQueryClient } from 'react-query';
+import _ from 'lodash';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { PageHeader } from '@/portainer/components/PageHeader';
@@ -26,9 +27,9 @@ export function NetworkDetailsView() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const [filteredNetworkContainers, setFilteredNetworkContainers] = useState(
-    [] as NetworkContainer[]
-  );
+  const [networkContainers, setNetworkContainers] = useState<
+    NetworkContainer[]
+  >([]);
   const {
     params: { id: networkId, nodeName },
   } = useCurrentStateAndParams();
@@ -43,11 +44,15 @@ export function NetworkDetailsView() {
 
   useEffect(() => {
     if (networkQuery.data && containersQuery.data) {
-      setFilteredNetworkContainers(
+      setNetworkContainers(
         filterContainersInNetwork(networkQuery.data, containersQuery.data)
       );
     }
   }, [networkQuery.data, containersQuery.data]);
+
+  if (!networkQuery.data) {
+    return null;
+  }
 
   return (
     <>
@@ -88,14 +93,12 @@ export function NetworkDetailsView() {
       {networkQuery.data?.Options && (
         <NetworkOptionsTable options={networkQuery.data.Options} />
       )}
-      {filteredNetworkContainers && (
-        <NetworkContainersTable
-          networkContainers={filteredNetworkContainers}
-          nodeName={nodeName}
-          environmentId={environmentId}
-          networkId={networkId}
-        />
-      )}
+      <NetworkContainersTable
+        networkContainers={networkContainers}
+        nodeName={nodeName}
+        environmentId={environmentId}
+        networkId={networkId}
+      />
     </>
   );
 
@@ -119,9 +122,8 @@ export function NetworkDetailsView() {
     network: DockerNetwork,
     containers: DockerContainer[]
   ) {
-    const containersInNetwork: NetworkContainer[] = [];
-    containers.forEach((container) => {
-      if (network.Containers) {
+    const containersInNetwork = _.compact(
+      containers.map((container) => {
         const containerInNetworkResponse: NetworkResponseContainer =
           network.Containers[container.Id];
         if (containerInNetworkResponse) {
@@ -129,10 +131,11 @@ export function NetworkDetailsView() {
             ...containerInNetworkResponse,
             Id: container.Id,
           };
-          containersInNetwork.push(containerInNetwork);
+          return containerInNetwork;
         }
-      }
-    });
+        return null;
+      })
+    );
     return containersInNetwork;
   }
 }
