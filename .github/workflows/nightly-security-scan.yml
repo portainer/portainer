@@ -171,7 +171,7 @@ jobs:
                       "type": "section",
                       "text": {
                         "type": "mrkdwn",
-                        "text": "Code Scanning Result(*${{ github.event.repository.name}}*)\n*<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|GitHub Actions Workflow URL>*"
+                        "text": "Code Scanning Result (*${{ github.event.repository.name}}*)\n*<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|GitHub Actions Workflow URL>*"
                       }
                     },
                     {
