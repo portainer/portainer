@@ -11,4 +11,5 @@
 
 .searchBar .textSpan {
   display: inline-block;
+  width: 90%;
 }

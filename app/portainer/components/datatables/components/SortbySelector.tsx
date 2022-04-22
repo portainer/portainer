@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import { Select } from '@/portainer/components/form-components/ReactSelect';
-import { Button } from '@/portainer/components/Button';
 import { Filter } from '@/portainer/home/types';
 
 import styles from './SortbySelector.module.css';
@@ -48,9 +47,10 @@ export function SortbySelector({
           value={value}
         />
       </div>
-      <div className={styles.sortbyelement}>
-        <Button
-          size="medium"
+      <div className={styles.sortByElement}>
+        <button
+          className={styles.sortButton}
+          type="button"
           disabled={!sortByButton}
           onClick={(e) => {
             e.preventDefault();
@@ -58,7 +58,7 @@ export function SortbySelector({
           }}
         >
           <i className={iconStyle} />
-        </Button>
+        </button>
       </div>
     </div>
   );
