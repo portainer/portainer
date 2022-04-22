@@ -55,6 +55,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		search = strings.ToLower(search)
 	}
 
+	groupID, _ := request.RetrieveNumericQueryParameter(r, "groupId", true)
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
 	sortField, _ := request.RetrieveQueryParameter(r, "sort", true)
 	sortOrder, _ := request.RetrieveQueryParameter(r, "order", true)
@@ -99,12 +100,16 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
 	totalAvailableEndpoints := len(filteredEndpoints)
 
+	if groupID != 0 {
+		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
+	}
+
 	if endpointIDs != nil {
 		filteredEndpoints = filteredEndpointsByIds(filteredEndpoints, endpointIDs)
 	}
 
 	if len(groupIDs) > 0 {
-		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, groupIDs)
+		filteredEndpoints = filterEndpointsByGroupIDs(filteredEndpoints, groupIDs)
 	}
 
 	edgeDeviceFilter, _ := request.RetrieveQueryParameter(r, "edgeDeviceFilter", false)
@@ -178,7 +183,18 @@ func paginateEndpoints(endpoints []portainer.Endpoint, start, limit int) []porta
 	return endpoints[start:end]
 }
 
-func filterEndpointsByGroupID(endpoints []portainer.Endpoint, endpointGroupIDs []int) []portainer.Endpoint {
+func filterEndpointsByGroupID(endpoints []portainer.Endpoint, endpointGroupID portainer.EndpointGroupID) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, endpoint := range endpoints {
+		if endpoint.GroupID == endpointGroupID {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+	return filteredEndpoints
+}
+
+func filterEndpointsByGroupIDs(endpoints []portainer.Endpoint, endpointGroupIDs []int) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
 	for _, endpoint := range endpoints {
