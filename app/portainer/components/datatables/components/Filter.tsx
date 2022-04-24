@@ -4,7 +4,7 @@ import { Menu, MenuButton, MenuPopover } from '@reach/menu-button';
 import { ColumnInstance } from 'react-table';
 
 export function DefaultFilter({
-  column: { filterValue, setFilter, preFilteredRows, id },
+  column: { filterValue, setFilter, preFilteredRows, id, Header },
 }: {
   column: ColumnInstance;
 }) {
@@ -22,6 +22,7 @@ export function DefaultFilter({
       options={options}
       filterKey={id}
       value={filterValue}
+      header={String(Header)}
       onChange={setFilter}
     />
   );
@@ -31,6 +32,7 @@ interface MultipleSelectionFilterProps {
   options: string[];
   value: string[];
   filterKey: string;
+  header: string;
   onChange: (value: string[]) => void;
 }
 
@@ -38,6 +40,7 @@ function MultipleSelectionFilter({
   options,
   value = [],
   filterKey,
+  header,
   onChange,
 }: MultipleSelectionFilterProps) {
   const enabled = value.length > 0;
@@ -59,7 +62,7 @@ function MultipleSelectionFilter({
         </MenuButton>
         <MenuPopover className="dropdown-menu">
           <div className="tableMenu">
-            <div className="menuHeader">Filter by state</div>
+            <div className="menuHeader">Filter by {header}</div>
             <div className="menuContent">
               {options.map((option, index) => (
                 <div className="md-checkbox" key={index}>

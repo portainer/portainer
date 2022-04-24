@@ -2,7 +2,7 @@ import { getEndpoints } from 'Portainer/environments/environment.service';
 
 angular.module('portainer.edge').controller('EdgeDevicesViewController', EdgeDevicesViewController);
 /* @ngInject */
-export function EdgeDevicesViewController($q, $async, EndpointService, GroupService, SettingsService, ModalService, Notifications) {
+export function EdgeDevicesViewController($q, $async, EndpointService, EdgeGroupService, GroupService, SettingsService, ModalService, Notifications) {
   var ctrl = this;
 
   ctrl.edgeDevices = [];
@@ -10,8 +10,34 @@ export function EdgeDevicesViewController($q, $async, EndpointService, GroupServ
   this.getEnvironments = function () {
     return $async(async () => {
       try {
-        const [endpointsResponse, groups] = await Promise.all([getEndpoints(0, 100, { edgeDeviceFilter: 'trusted' }), GroupService.groups()]);
-        ctrl.groups = groups;
+        const [endpointsResponse, groups, edgeGroups] = await Promise.all([
+          getEndpoints(0, 100, { edgeDeviceFilter: 'trusted' }),
+          GroupService.groups(),
+          EdgeGroupService.groups(),
+        ]);
+        // Update GroupName and EdgeGroupName for each endpoint
+        let groupNameMap = new Map();
+        groups.forEach(function (group) {
+          groupNameMap[group.Id] = group.Name;
+        });
+        let endpointEdgeGroupMap = new Map();
+        endpointsResponse.value.forEach(function (endpoint) {
+          endpoint.GroupName = groupNameMap[endpoint.GroupId] ? groupNameMap[endpoint.GroupId] : groupNameMap[1];
+          endpoint.EdgeGroupName = 'Unassigned';
+          endpointEdgeGroupMap[endpoint.Id] = [];
+        });
+        edgeGroups.forEach(function (edgeGroup) {
+          edgeGroup.Endpoints.forEach(function (endpointId) {
+            if (endpointEdgeGroupMap[Number(endpointId)]) {
+              endpointEdgeGroupMap[Number(endpointId)].push(edgeGroup.Name);
+            }
+          });
+        });
+        endpointsResponse.value.forEach(function (endpoint) {
+          if (endpointEdgeGroupMap[endpoint.Id].length > 0) {
+            endpoint.EdgeGroupName = endpointEdgeGroupMap[endpoint.Id].join(', ');
+          }
+        });
         ctrl.edgeDevices = endpointsResponse.value;
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve edge devices');

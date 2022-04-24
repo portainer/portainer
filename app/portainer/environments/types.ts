@@ -59,8 +59,10 @@ export type Environment = {
   Type: EnvironmentType;
   TagIds: TagId[];
   GroupId: EnvironmentGroupId;
+  GroupName: string;
   EdgeID?: string;
   EdgeCheckinInterval?: number;
+  EdgeGroupName?: string;
   QueryDate?: number;
   LastCheckInDate?: number;
   Name: string;
