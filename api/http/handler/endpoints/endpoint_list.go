@@ -143,9 +143,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	// Sort endpoints by field
-	if sortField != "" {
-		sortEndpointsByField(filteredEndpoints, endpointGroups, sortField, sortOrder == "asc")
-	}
+	sortEndpointsByField(filteredEndpoints, endpointGroups, sortField, sortOrder == "desc")
 
 	filteredEndpointCount := len(filteredEndpoints)
 
@@ -238,42 +236,42 @@ func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int) [
 	return filteredEndpoints
 }
 
-func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, sortField string, isSortAsc bool) {
+func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, sortField string, isSortDesc bool) {
 
 	switch sortField {
 	case "Name":
-		if isSortAsc {
+		if isSortDesc {
+			sort.Slice(endpoints, func(i, j int) bool {
+				return strings.ToLower(endpoints[i].Name) > strings.ToLower(endpoints[j].Name)
+			})
+		} else {
 			sort.Slice(endpoints, func(i, j int) bool {
 				// Case insensitive sort
 				return strings.ToLower(endpoints[i].Name) < strings.ToLower(endpoints[j].Name)
 			})
-		} else {
-			sort.Slice(endpoints, func(i, j int) bool {
-				return strings.ToLower(endpoints[i].Name) > strings.ToLower(endpoints[j].Name)
-			})
 		}
 	case "Group":
-		if isSortAsc {
-			sort.Slice(endpoints, func(i, j int) bool {
-				groupOne := getEndpointGroup(endpoints[i].GroupID, endpointGroups)
-				groupTwo := getEndpointGroup(endpoints[j].GroupID, endpointGroups)
-				return strings.ToLower(groupOne.Name) < strings.ToLower(groupTwo.Name)
-			})
-		} else {
+		if isSortDesc {
 			sort.Slice(endpoints, func(i, j int) bool {
 				groupOne := getEndpointGroup(endpoints[i].GroupID, endpointGroups)
 				groupTwo := getEndpointGroup(endpoints[j].GroupID, endpointGroups)
 				return strings.ToLower(groupOne.Name) > strings.ToLower(groupTwo.Name)
 			})
+		} else {
+			sort.Slice(endpoints, func(i, j int) bool {
+				groupOne := getEndpointGroup(endpoints[i].GroupID, endpointGroups)
+				groupTwo := getEndpointGroup(endpoints[j].GroupID, endpointGroups)
+				return strings.ToLower(groupOne.Name) < strings.ToLower(groupTwo.Name)
+			})
 		}
 	case "Status":
-		if isSortAsc {
+		if isSortDesc {
 			sort.Slice(endpoints, func(i, j int) bool {
-				return endpoints[i].Status < endpoints[j].Status
+				return endpoints[i].Status > endpoints[j].Status
 			})
 		} else {
 			sort.Slice(endpoints, func(i, j int) bool {
-				return endpoints[i].Status > endpoints[j].Status
+				return endpoints[i].Status < endpoints[j].Status
 			})
 		}
 	}
