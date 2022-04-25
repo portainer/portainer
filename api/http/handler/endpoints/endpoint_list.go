@@ -23,6 +23,8 @@ const (
 	EdgeDeviceFilterUntrusted = "untrusted"
 )
 
+var endpointGroupNames map[portainer.EndpointGroupID]string
+
 // @id EndpointList
 // @summary List environments(endpoints)
 // @description List all environments(endpoints) based on the current user authorizations. Will
@@ -81,6 +83,12 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from the database", err}
+	}
+
+	// create endpoint groups as a map for more convenient access
+	endpointGroupNames = make(map[portainer.EndpointGroupID]string, 0)
+	for _, group := range endpointGroups {
+		endpointGroupNames[group.ID] = group.Name
 	}
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
@@ -143,7 +151,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	// Sort endpoints by field
-	sortEndpointsByField(filteredEndpoints, endpointGroups, sortField, sortOrder == "desc")
+	sortEndpointsByField(filteredEndpoints, sortField, sortOrder == "desc")
 
 	filteredEndpointCount := len(filteredEndpoints)
 
@@ -236,34 +244,23 @@ func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int) [
 	return filteredEndpoints
 }
 
-func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, sortField string, isSortDesc bool) {
+func sortEndpointsByField(endpoints []portainer.Endpoint, sortField string, isSortDesc bool) {
 
 	switch sortField {
 	case "Name":
 		if isSortDesc {
-			sort.Slice(endpoints, func(i, j int) bool {
-				return strings.ToLower(endpoints[i].Name) > strings.ToLower(endpoints[j].Name)
-			})
+			sort.Stable(sort.Reverse(EndpointsByName(endpoints)))
 		} else {
-			sort.Slice(endpoints, func(i, j int) bool {
-				// Case insensitive sort
-				return strings.ToLower(endpoints[i].Name) < strings.ToLower(endpoints[j].Name)
-			})
+			sort.Stable(EndpointsByName(endpoints))
 		}
+
 	case "Group":
 		if isSortDesc {
-			sort.Slice(endpoints, func(i, j int) bool {
-				groupOne := getEndpointGroup(endpoints[i].GroupID, endpointGroups)
-				groupTwo := getEndpointGroup(endpoints[j].GroupID, endpointGroups)
-				return strings.ToLower(groupOne.Name) > strings.ToLower(groupTwo.Name)
-			})
+			sort.Stable(sort.Reverse(EndpointsByGroup(endpoints)))
 		} else {
-			sort.Slice(endpoints, func(i, j int) bool {
-				groupOne := getEndpointGroup(endpoints[i].GroupID, endpointGroups)
-				groupTwo := getEndpointGroup(endpoints[j].GroupID, endpointGroups)
-				return strings.ToLower(groupOne.Name) < strings.ToLower(groupTwo.Name)
-			})
+			sort.Stable(EndpointsByGroup(endpoints))
 		}
+
 	case "Status":
 		if isSortDesc {
 			sort.Slice(endpoints, func(i, j int) bool {
