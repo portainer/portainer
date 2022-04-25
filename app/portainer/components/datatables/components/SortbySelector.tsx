@@ -26,13 +26,13 @@ export function SortbySelector({
 }: Props) {
   const upIcon = 'fa fa-sort-alpha-up';
   const downIcon = 'fa fa-sort-alpha-down';
-  const [iconStyle, setIconStyle] = useState(upIcon);
+  const [iconStyle, setIconStyle] = useState(downIcon);
 
   useEffect(() => {
     if (sortByDescending) {
-      setIconStyle(downIcon);
-    } else {
       setIconStyle(upIcon);
+    } else {
+      setIconStyle(downIcon);
     }
   }, [sortByDescending]);
 
