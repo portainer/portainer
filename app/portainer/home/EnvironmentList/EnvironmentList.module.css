@@ -58,5 +58,5 @@
 .filterSearchbar {
   display: inline-block;
   width: 100%;
-  padding: 0px 10px;
+  padding-left: 10px;
 }
