@@ -32,10 +32,20 @@ jobs:
           name: js-security-scan-develop-result
           path: snyk.json
 
+      - name: Export scan result to html file 
+        run: | 
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="js-result")
+
+      - name: Upload js result html file
+        uses: actions/upload-artifact@v3
+        with:
+          name: js-result-$${{github.run_id}}-html
+          path: js-result.html
+
       - name: Analyse the js result
         id: set-matrix
         run: | 
-          result=$(docker run --rm -v /home/runner/work/portainer/portainer:/data oscarzhou/scan-report:0.1.6 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
           echo "::set-output name=js_result::${result}"
 
   server-dependencies:
@@ -67,10 +77,20 @@ jobs:
           name: go-security-scan-develop-result
           path: snyk.json
 
+      - name: Export scan result to html file 
+        run: | 
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="go-result")
+
+      - name: Upload go result html file
+        uses: actions/upload-artifact@v3
+        with:
+          name: go-result-$${{github.run_id}}-html
+          path: go-result.html
+
       - name: Analyse the go result
         id: set-matrix
         run: | 
-          result=$(docker run --rm -v /home/runner/work/portainer/portainer:/data oscarzhou/scan-report:0.1.6 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
           echo "::set-output name=go_result::${result}"
 
   image-vulnerability:
@@ -125,10 +145,20 @@ jobs:
           name: image-security-scan-develop-result
           path: image-trivy.json
 
+      - name: Export scan result to html file 
+        run: | 
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/image-trivy.json" -output-type=table -export -export-filename="image-result")
+
+      - name: Upload go result html file
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-result-$${{github.run_id}}-html
+          path: image-result.html
+
       - name: Analyse the trivy result
         id: set-matrix
         run: | 
-          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.6 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=matrix)
           echo "::set-output name=image_result::${result}"
 
   result-analysis:
@@ -149,10 +179,6 @@ jobs:
           echo ${{ matrix.js.summary }}
           echo ${{ matrix.go.summary }}
           echo ${{ matrix.image.summary }}
-
-      - name: Dump context json
-        id: github_context_step
-        run: echo '${{ toJSON(github) }}'
 
       - name: Send Slack message
         if: >- 
