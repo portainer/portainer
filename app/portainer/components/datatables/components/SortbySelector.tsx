@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import { Select } from '@/portainer/components/form-components/ReactSelect';
-import { Button } from '@/portainer/components/Button';
 import { Filter } from '@/portainer/home/types';
 
 import styles from './SortbySelector.module.css';
@@ -13,6 +12,7 @@ interface Props {
   placeHolder: string;
   sortByDescending: boolean;
   sortByButton: boolean;
+  value?: Filter;
 }
 
 export function SortbySelector({
@@ -22,16 +22,17 @@ export function SortbySelector({
   placeHolder,
   sortByDescending,
   sortByButton,
+  value,
 }: Props) {
   const upIcon = 'fa fa-sort-alpha-up';
   const downIcon = 'fa fa-sort-alpha-down';
-  const [iconStyle, setIconStyle] = useState(upIcon);
+  const [iconStyle, setIconStyle] = useState(downIcon);
 
   useEffect(() => {
     if (sortByDescending) {
-      setIconStyle(downIcon);
-    } else {
       setIconStyle(upIcon);
+    } else {
+      setIconStyle(downIcon);
     }
   }, [sortByDescending]);
 
@@ -43,11 +44,13 @@ export function SortbySelector({
           options={filterOptions}
           onChange={(option) => onChange(option as Filter)}
           isClearable
+          value={value}
         />
       </div>
-      <div className={styles.sortbyelement}>
-        <Button
-          size="medium"
+      <div className={styles.sortByElement}>
+        <button
+          className={styles.sortButton}
+          type="button"
           disabled={!sortByButton}
           onClick={(e) => {
             e.preventDefault();
@@ -55,7 +58,7 @@ export function SortbySelector({
           }}
         >
           <i className={iconStyle} />
-        </Button>
+        </button>
       </div>
     </div>
   );
