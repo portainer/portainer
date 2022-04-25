@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -21,6 +22,9 @@ type endpointCreateGlobalKeyResponse struct {
 // @router /endpoints/global-key [post]
 func (handler *Handler) endpointCreateGlobalKey(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeID := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
+	if edgeID == "" {
+		return httperror.BadRequest("Invalid Edge ID", errors.New("the Edge ID cannot be empty"))
+	}
 
 	// Search for existing endpoints for the given edgeID
 
