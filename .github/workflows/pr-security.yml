@@ -186,21 +186,19 @@ jobs:
 
   result-analysis-compared-to-develop:
     name: Analyse scan result compared to develop
-    needs: [client-dependencies, server-dependencies]
+    needs: [client-dependencies]
     # needs: [client-dependencies, server-dependencies, image-vulnerability]
     runs-on: ubuntu-latest
     strategy:
       matrix: 
         jsdiff: ${{fromJson(needs.client-dependencies.outputs.jsdiff)}}
-        godiff: ${{fromJson(needs.server-dependencies.outputs.godiff)}}
+        # godiff: ${{fromJson(needs.server-dependencies.outputs.godiff)}}
         # imagediff: ${{fromJson(needs.image-vulnerability.outputs.imagediff)}}
     steps:
 
       - name: Check job status of diff result
         if: >-
-          matrix.jsdiff.status == 'failure' || 
-          matrix.godiff.status == 'failure'  
+          matrix.jsdiff.status == 'failure' 
         run: |
           echo ${{ matrix.jsdiff.summary }}
-          echo ${{ matrix.godiff.summary }}
           exit 1
