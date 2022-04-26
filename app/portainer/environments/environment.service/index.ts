@@ -21,10 +21,10 @@ export interface EnvironmentsQueryParams {
   endpointIds?: EnvironmentId[];
   tagsPartialMatch?: boolean;
   groupIds?: EnvironmentGroupId[];
-  edgeDeviceFilter?: 'all' | 'trusted' | 'untrusted';
   status?: EnvironmentStatus[];
   sort?: string;
   order?: 'asc' | 'desc';
+  edgeDeviceFilter?: 'all' | 'trusted' | 'untrusted' | 'none';
 }
 
 export async function getEndpoints(
