@@ -147,7 +147,7 @@ jobs:
 
       - name: Export scan result to html file 
         run: | 
-          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/image-trivy.json" -output-type=table -export -export-filename="/data/image-result")
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=table -export -export-filename="/data/image-result")
 
       - name: Upload go result html file
         uses: actions/upload-artifact@v3
