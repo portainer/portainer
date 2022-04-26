@@ -1,22 +1,17 @@
-name: Code Security Scan
+name: PR Code Security Scan
 
-on: 
-  push:
-    branches:
-      - develop 
-  pull_request:
-    branches:
-      - develop
-      - feat/ce-220-security-scan
-  schedule:
-    - cron: '30 * * * *'
+on:
+  pull_request_review:
+    types: [edited, submitted]
+  workflow_dispatch:
     
 jobs:
   client-dependencies:
     name: Client dependency check
     runs-on: ubuntu-latest
+    if: >-
+      github.ref != 'refs/heads/develop'
     outputs:
-      js: ${{ steps.set-matrix.outputs.js_result }}
       jsdiff: ${{ steps.set-diff-matrix.outputs.js_diff_result }}
     steps:
       - uses: actions/checkout@master
@@ -29,37 +24,13 @@ jobs:
         with:
           json: true
 
-      - name: Upload js security scan result as artifact on develop
-        uses: actions/upload-artifact@v3
-        if: >-
-          github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'feat/ce-220-security-scan'
-        with:
-          name: js-security-scan-develop-result
-          path: snyk.json
-
       - name: Upload js security scan result as artifact
         uses: actions/upload-artifact@v3
-        if: >-
-          github.ref != 'refs/heads/develop' && 
-          github.head_ref != 'feat/ce-220-security-scan'
         with:
           name: js-security-scan-feat-result
           path: snyk.json
 
-      - name: Analyse the js result
-        if: >-
-          github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'feat/ce-220-security-scan'
-        id: set-matrix
-        run: | 
-          result=$(docker run --rm -v /home/runner/work/${{ github.event.repository.name}}/${{ github.event.repository.name}}:/data oscarzhou/scan-report:0.1.6 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
-          echo "::set-output name=js_result::${result}"
-
       - name: Download artifacts from develop branch
-        if: >-
-          github.ref != 'refs/heads/develop' && 
-          github.head_ref != 'feat/ce-220-security-scan'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -71,27 +42,34 @@ jobs:
             echo "null" > ./js-snyk-develop.json
           fi
 
+      - name: Export scan result to html file 
+        run: | 
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/js-snyk-feature.json" -compare-to="/data/js-snyk-develop.json" -output-type=table -export -export-filename="/data/js-result")
+
+      - name: Upload js result html file
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-js-result-compare-to-develop-${{github.run_id}}
+          path: js-result.html
+
       - name: Analyse the js diff result
-        if: >-
-          github.ref != 'refs/heads/develop' && 
-          github.head_ref != 'feat/ce-220-security-scan'
         id: set-diff-matrix
         run: | 
-          result=$(docker run --rm -v /home/runner/work/${{ github.event.repository.name}}/${{ github.event.repository.name}}:/data oscarzhou/scan-report:0.1.6 diff -report-type=snyk -path="/data/js-snyk-feature.json" -compare-to="./data/js-snyk-develop.json" -output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/js-snyk-feature.json" -compare-to="./data/js-snyk-develop.json" -output-type=matrix)
           echo "::set-output name=js_diff_result::${result}"
 
   server-dependencies:
     name: Server dependency check
     runs-on: ubuntu-latest
+    if: >-
+      github.ref != 'refs/heads/develop'
     outputs:
-      go: ${{ steps.set-matrix.outputs.go_result }}
       godiff: ${{ steps.set-diff-matrix.outputs.go_diff_result }}
     steps:
       - uses: actions/checkout@master
 
-      - name: Download dependencies
-        run: |
-          cd ./api && go get -v -d
+      - name: Download go modules
+        run: cd ./api && go get -t -v -d ./...
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/golang@master
@@ -99,40 +77,16 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --file=./api/go.mod
+          args: --file=./api/go.mod
           json: true
-
-      - name: Upload go security scan result as artifact on develop
-        uses: actions/upload-artifact@v3
-        if: >-
-          github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'feat/ce-220-security-scan'
-        with:
-          name: go-security-scan-develop-result
-          path: snyk.json
 
       - name: Upload go security scan result as artifact
         uses: actions/upload-artifact@v3
-        if: >-
-          github.ref != 'refs/heads/develop' && 
-          github.head_ref != 'feat/ce-220-security-scan'
         with:
           name: go-security-scan-feature-result
           path: snyk.json
 
-      - name: Analyse the go result
-        if: >-
-          github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'feat/ce-220-security-scan'
-        id: set-matrix
-        run: | 
-          result=$(docker run --rm -v /home/runner/work/${{ github.event.repository.name}}/${{ github.event.repository.name}}:/data oscarzhou/scan-report:0.1.6 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
-          echo "::set-output name=go_result::${result}"
-
       - name: Download artifacts from develop branch
-        if: >-
-          github.ref != 'refs/heads/develop' && 
-          github.head_ref != 'feat/ce-220-security-scan'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -144,20 +98,28 @@ jobs:
             echo "null" > ./go-snyk-develop.json
           fi
 
+      - name: Export scan result to html file 
+        run: | 
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/go-snyk-feature.json" -compare-to="/data/go-snyk-develop.json" -output-type=table -export -export-filename="/data/go-result")
+
+      - name: Upload go result html file
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-go-result-compare-to-develop-${{github.run_id}}
+          path: go-result.html
+
       - name: Analyse the go diff result
-        if: >-
-          github.ref != 'refs/heads/develop' && 
-          github.head_ref != 'feat/ce-220-security-scan'
         id: set-diff-matrix
         run: | 
-          result=$(docker run --rm -v /home/runner/work/${{ github.event.repository.name}}/${{ github.event.repository.name}}:/data oscarzhou/scan-report:0.1.6 diff -report-type=snyk -path="/data/go-snyk-feature.json" -compare-to="./data/go-snyk-develop.json" -output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/go-snyk-feature.json" -compare-to="/data/go-snyk-develop.json" -output-type=matrix)
           echo "::set-output name=go_diff_result::${result}"
 
   image-vulnerability:
     name: Build docker image and Image vulnerability check
     runs-on: ubuntu-latest
+    if: >-
+      github.ref != 'refs/heads/develop'
     outputs:
-      image: ${{ steps.set-matrix.outputs.image_result }}
       imagediff: ${{ steps.set-diff-matrix.outputs.image_diff_result }}
     steps:
       - name: Checkout code
@@ -174,8 +136,7 @@ jobs:
           node-version: 12.x
 
       - name: Install packages and build
-        run: | 
-          yarn install && yarn build
+        run: yarn install && yarn build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -196,39 +157,15 @@ jobs:
         uses: docker://docker.io/aquasec/trivy:latest
         continue-on-error: true 
         with:
-          args: image --ignore-unfixed=true --vuln-type="os,library" --severity="CRITICAL,HIGH,MEDIUM" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}  
-
-      - name: Upload image security scan result as artifact on develop
-        uses: actions/upload-artifact@v3
-        if: >-
-          github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'feat/ce-220-security-scan'
-        with:
-          name: image-security-scan-develop-result
-          path: image-trivy.json
+          args: image --ignore-unfixed=true --vuln-type="os,library" --exit-code=1 --format="json" --output="image-trivy.json" --no-progress trivy-portainer:${{ github.sha }}  
 
       - name: Upload image security scan result as artifact
         uses: actions/upload-artifact@v3
-        if: >-
-          github.ref != 'refs/heads/develop' && 
-          github.head_ref != 'feat/ce-220-security-scan'
         with:
           name: image-security-scan-feature-result
           path: image-trivy.json
 
-      - name: Analyse the trivy result
-        if: >-
-          github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'feat/ce-220-security-scan'
-        id: set-matrix
-        run: | 
-          result=$(docker run --rm -v /home/runner/work/${{ github.event.repository.name}}/${{ github.event.repository.name}}:/data oscarzhou/scan-report:0.1.6 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=matrix)
-          echo "::set-output name=image_result::${result}"
-
       - name: Download artifacts from develop branch
-        if: >-
-          github.ref != 'refs/heads/develop' && 
-          github.head_ref != 'feat/ce-220-security-scan'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -240,22 +177,28 @@ jobs:
             echo "null" > ./image-trivy-develop.json
           fi
 
+      - name: Export scan result to html file 
+        run: | 
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=trivy -path="/data/image-trivy-feature.json" -compare-to="/data/image-trivy-develop.json" -output-type=table -export -export-filename="/data/image-result")
+
+      - name: Upload image result html file
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-image-result-compare-to-develop-${{github.run_id}}
+          path: image-result.html
+
       - name: Analyse the image diff result
-        if: >-
-          github.ref != 'refs/heads/develop' && 
-          github.head_ref != 'feat/ce-220-security-scan'
         id: set-diff-matrix
         run: | 
-          result=$(docker run --rm -v /home/runner/work/${{ github.event.repository.name}}/${{ github.event.repository.name}}:/data oscarzhou/scan-report:0.1.6 diff -report-type=trivy -path="/data/image-trivy-feature.json" -compare-to="./data/image-trivy-develop.json" -output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=trivy -path="/data/image-trivy-feature.json" -compare-to="./data/image-trivy-develop.json" -output-type=matrix)
           echo "::set-output name=image_diff_result::${result}"
 
-  result-analysis-compared-to-develop:
+  result-analysis:
     name: Analyse scan result compared to develop
     needs: [client-dependencies, server-dependencies, image-vulnerability]
     runs-on: ubuntu-latest
     if: >-
-      github.ref != 'refs/heads/develop' && 
-      github.head_ref != 'feat/ce-220-security-scan'
+      github.ref != 'refs/heads/develop'
     strategy:
       matrix: 
         jsdiff: ${{fromJson(needs.client-dependencies.outputs.jsdiff)}}
@@ -265,63 +208,14 @@ jobs:
 
       - name: Check job status of diff result
         if: >-
-          github.ref != 'refs/heads/develop' &&
-          github.head_ref != 'feat/ce-220-security-scan' && 
-          (matrix.jsdiff.status == 'failure' || 
-          matrix.godiff.status == 'failure' || 
-          matrix.imagediff.status == 'failure')
+          matrix.jsdiff.status == 'failure' ||
+          matrix.godiff.status == 'failure' ||
+          matrix.imagediff.status == 'failure' 
         run: |
+          echo ${{ matrix.jsdiff.status }}
+          echo ${{ matrix.godiff.status }}
+          echo ${{ matrix.imagediff.status }}
           echo ${{ matrix.jsdiff.summary }}
           echo ${{ matrix.godiff.summary }}
           echo ${{ matrix.imagediff.summary }}
           exit 1
-
-  result-analysis:
-    name: Analyse scan result
-    needs: [client-dependencies, server-dependencies, image-vulnerability]
-    runs-on: ubuntu-latest
-    if: >-
-      github.ref == 'refs/heads/develop' ||
-      github.head_ref == 'feat/ce-220-security-scan'
-    strategy:
-      matrix: 
-        js: ${{fromJson(needs.client-dependencies.outputs.js)}}
-        go: ${{fromJson(needs.server-dependencies.outputs.go)}}
-        image: ${{fromJson(needs.image-vulnerability.outputs.image)}}
-    steps:
-      - name: Display the results of js, go and image
-        run: |
-          echo ${{ matrix.js.summary }}
-          echo ${{ matrix.go.summary }}
-          echo ${{ matrix.image.summary }}
-
-      - name: Post the result to a Slack channel
-        if: >- 
-          (github.ref == 'refs/heads/develop' ||
-          github.head_ref == 'feat/ce-220-security-scan') && 
-          (matrix.js.status == 'failure' ||
-          matrix.go.status == 'failure' || 
-          matrix.image.status == 'failure')
-        uses: slackapi/slack-github-action@v1.18.0
-        with:
-          # Slack channel id, channel name, or user id to post message.
-          # See also: https://api.slack.com/methods/chat.postMessage#channels
-          channel-id: 'C03B2CVR49L'
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "Code Scanning Result:\nJS dependency check: ${{ matrix.js.status }} ${{ matrix.js.summary }}\nGo dependency check: ${{ matrix.go.status }} ${{ matrix.go.summary }}\nImage vulnerability check: ${{ matrix.image.status }} ${{ matrix.image.summary }}\n${{ github.event.pull_request._links.html.href }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Code Scanning Result:\nJS dependency check: ${{ matrix.js.status }} ${{ matrix.js.summary }}\nGo dependency check: ${{ matrix.go.status }} ${{ matrix.go.summary }}\nImage vulnerability check: ${{ matrix.image.status }} ${{ matrix.image.summary }}\n${{ github.event.pull_request._links.html.href }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SECURITY_SLACK_WEBHOOK_URL }}
-
-
