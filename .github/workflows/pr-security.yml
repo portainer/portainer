@@ -17,7 +17,6 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --fail-on=upgradable
           json: true
 
       - name: Upload js security scan result as artifact
