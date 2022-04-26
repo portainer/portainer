@@ -2,7 +2,6 @@ package stacks
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
