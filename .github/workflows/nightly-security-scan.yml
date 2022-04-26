@@ -34,7 +34,7 @@ jobs:
 
       - name: Export scan result to html file 
         run: | 
-          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="js-result")
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="js-result")
 
       - name: Upload js result html file
         uses: actions/upload-artifact@v3
@@ -45,7 +45,7 @@ jobs:
       - name: Analyse the js result
         id: set-matrix
         run: | 
-          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
           echo "::set-output name=js_result::${result}"
 
   server-dependencies:
@@ -79,7 +79,7 @@ jobs:
 
       - name: Export scan result to html file 
         run: | 
-          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="go-result")
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=table -export -export-filename="go-result")
 
       - name: Upload go result html file
         uses: actions/upload-artifact@v3
@@ -90,7 +90,7 @@ jobs:
       - name: Analyse the go result
         id: set-matrix
         run: | 
-          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/snyk.json" -output-type=matrix)
           echo "::set-output name=go_result::${result}"
 
   image-vulnerability:
@@ -147,7 +147,7 @@ jobs:
 
       - name: Export scan result to html file 
         run: | 
-          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=snyk -path="/data/image-trivy.json" -output-type=table -export -export-filename="image-result")
+          $(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=snyk -path="/data/image-trivy.json" -output-type=table -export -export-filename="image-result")
 
       - name: Upload go result html file
         uses: actions/upload-artifact@v3
@@ -158,7 +158,7 @@ jobs:
       - name: Analyse the trivy result
         id: set-matrix
         run: | 
-          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.7 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=matrix)
+          result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 summary -report-type=trivy -path="/data/image-trivy.json" -output-type=matrix)
           echo "::set-output name=image_result::${result}"
 
   result-analysis:
