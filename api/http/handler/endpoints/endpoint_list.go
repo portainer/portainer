@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -12,13 +13,18 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/utils"
 )
 
 const (
 	EdgeDeviceFilterAll       = "all"
 	EdgeDeviceFilterTrusted   = "trusted"
 	EdgeDeviceFilterUntrusted = "untrusted"
+	EdgeDeviceFilterNone      = "none"
 )
+
+var endpointGroupNames map[portainer.EndpointGroupID]string
 
 // @id EndpointList
 // @summary List environments(endpoints)
@@ -38,7 +44,7 @@ const (
 // @param tagIds query []int false "search environments(endpoints) with these tags (depends on tagsPartialMatch)"
 // @param tagsPartialMatch query bool false "If true, will return environment(endpoint) which has one of tagIds, if false (or missing) will return only environments(endpoints) that has all the tags"
 // @param endpointIds query []int false "will return only these environments(endpoints)"
-// @param edgeDeviceFilter query string false "will return only these edge devices" Enum("all", "trusted", "untrusted")
+// @param edgeDeviceFilter query string false "will return only these edge environments, none will return only regular edge environments" Enum("all", "trusted", "untrusted", "none")
 // @success 200 {array} portainer.Endpoint "Endpoints"
 // @failure 500 "Server error"
 // @router /endpoints [get]
@@ -55,6 +61,8 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	groupID, _ := request.RetrieveNumericQueryParameter(r, "groupId", true)
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
+	sortField, _ := request.RetrieveQueryParameter(r, "sort", true)
+	sortOrder, _ := request.RetrieveQueryParameter(r, "order", true)
 
 	var endpointTypes []int
 	request.RetrieveJSONQueryParameter(r, "types", &endpointTypes, true)
@@ -67,9 +75,21 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	var endpointIDs []portainer.EndpointID
 	request.RetrieveJSONQueryParameter(r, "endpointIds", &endpointIDs, true)
 
+	var statuses []int
+	request.RetrieveJSONQueryParameter(r, "status", &statuses, true)
+
+	var groupIDs []int
+	request.RetrieveJSONQueryParameter(r, "groupIds", &groupIDs, true)
+
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from the database", err}
+	}
+
+	// create endpoint groups as a map for more convenient access
+	endpointGroupNames = make(map[portainer.EndpointGroupID]string, 0)
+	for _, group := range endpointGroups {
+		endpointGroupNames[group.ID] = group.Name
 	}
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
@@ -90,17 +110,25 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
 	totalAvailableEndpoints := len(filteredEndpoints)
 
+	if groupID != 0 {
+		filteredEndpoints = filterEndpointsByGroupIDs(filteredEndpoints, []int{groupID})
+	}
+
 	if endpointIDs != nil {
 		filteredEndpoints = filteredEndpointsByIds(filteredEndpoints, endpointIDs)
 	}
 
-	if groupID != 0 {
-		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
+	if len(groupIDs) > 0 {
+		filteredEndpoints = filterEndpointsByGroupIDs(filteredEndpoints, groupIDs)
 	}
 
 	edgeDeviceFilter, _ := request.RetrieveQueryParameter(r, "edgeDeviceFilter", false)
 	if edgeDeviceFilter != "" {
 		filteredEndpoints = filterEndpointsByEdgeDevice(filteredEndpoints, edgeDeviceFilter)
+	}
+
+	if len(statuses) > 0 {
+		filteredEndpoints = filterEndpointsByStatuses(filteredEndpoints, statuses)
 	}
 
 	if search != "" {
@@ -122,6 +150,9 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	if tagIDs != nil {
 		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, tagIDs, endpointGroups, tagsPartialMatch)
 	}
+
+	// Sort endpoints by field
+	sortEndpointsByField(filteredEndpoints, sortField, sortOrder == "desc")
 
 	filteredEndpointCount := len(filteredEndpoints)
 
@@ -160,11 +191,11 @@ func paginateEndpoints(endpoints []portainer.Endpoint, start, limit int) []porta
 	return endpoints[start:end]
 }
 
-func filterEndpointsByGroupID(endpoints []portainer.Endpoint, endpointGroupID portainer.EndpointGroupID) []portainer.Endpoint {
+func filterEndpointsByGroupIDs(endpoints []portainer.Endpoint, endpointGroupIDs []int) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
 	for _, endpoint := range endpoints {
-		if endpoint.GroupID == endpointGroupID {
+		if utils.Contains(endpointGroupIDs, int(endpoint.GroupID)) {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
 		}
 	}
@@ -188,6 +219,60 @@ func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGro
 	}
 
 	return filteredEndpoints
+}
+
+func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, endpoint := range endpoints {
+		status := endpoint.Status
+		if endpointutils.IsEdgeEndpoint(&endpoint) {
+			isCheckValid := false
+			if endpoint.EdgeCheckinInterval != 0 && endpoint.LastCheckInDate != 0 {
+				isCheckValid = time.Now().Unix()-endpoint.LastCheckInDate <= int64(endpoint.EdgeCheckinInterval*2+20)
+			}
+			status = portainer.EndpointStatusDown // Offline
+			if isCheckValid {
+				status = portainer.EndpointStatusUp // Online
+			}
+		}
+
+		if utils.Contains(statuses, int(status)) {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+
+	return filteredEndpoints
+}
+
+func sortEndpointsByField(endpoints []portainer.Endpoint, sortField string, isSortDesc bool) {
+
+	switch sortField {
+	case "Name":
+		if isSortDesc {
+			sort.Stable(sort.Reverse(EndpointsByName(endpoints)))
+		} else {
+			sort.Stable(EndpointsByName(endpoints))
+		}
+
+	case "Group":
+		if isSortDesc {
+			sort.Stable(sort.Reverse(EndpointsByGroup(endpoints)))
+		} else {
+			sort.Stable(EndpointsByGroup(endpoints))
+		}
+
+	case "Status":
+		if isSortDesc {
+			sort.Slice(endpoints, func(i, j int) bool {
+				return endpoints[i].Status > endpoints[j].Status
+			})
+		} else {
+			sort.Slice(endpoints, func(i, j int) bool {
+				return endpoints[i].Status < endpoints[j].Status
+			})
+		}
+	}
 }
 
 func endpointMatchSearchCriteria(endpoint *portainer.Endpoint, tags []string, searchCriteria string) bool {
@@ -250,10 +335,6 @@ func filterEndpointsByTypes(endpoints []portainer.Endpoint, endpointTypes []int)
 func filterEndpointsByEdgeDevice(endpoints []portainer.Endpoint, edgeDeviceFilter string) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
-	if edgeDeviceFilter != EdgeDeviceFilterAll && edgeDeviceFilter != EdgeDeviceFilterTrusted && edgeDeviceFilter != EdgeDeviceFilterUntrusted {
-		return endpoints
-	}
-
 	for _, endpoint := range endpoints {
 		if shouldReturnEdgeDevice(endpoint, edgeDeviceFilter) {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
@@ -263,7 +344,12 @@ func filterEndpointsByEdgeDevice(endpoints []portainer.Endpoint, edgeDeviceFilte
 }
 
 func shouldReturnEdgeDevice(endpoint portainer.Endpoint, edgeDeviceFilter string) bool {
-	if !endpoint.IsEdgeDevice {
+	// none - return all endpoints that are not edge devices
+	if edgeDeviceFilter == EdgeDeviceFilterNone && !endpoint.IsEdgeDevice {
+		return true
+	}
+
+	if !endpointutils.IsEdgeEndpoint(&endpoint) {
 		return false
 	}
 

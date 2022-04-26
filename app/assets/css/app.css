@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html,
 body,
 #page-wrapper,
@@ -812,129 +816,12 @@ json-tree .branch-preview {
   padding-bottom: 5px;
 }
 
-.w-full {
-  width: 100%;
-}
-
-.flex {
-  display: flex;
-}
-
-.block {
-  display: block;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.space-x-2 > * + * {
-  margin-left: 0.5rem;
-}
-
-.space-x-3 > * + * {
-  margin-left: 0.75rem;
-}
-
-.space-x-4 > * + * {
-  margin-left: 1rem;
-}
-
-.space-y-8 > * + * {
-  margin-top: 2rem;
-}
-
-.my-8 {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-.m-l-5 {
-  margin-left: 5px;
-}
-
-.m-l-20 {
-  margin-left: 20px;
-}
-
-.m-l-30 {
-  margin-left: 30px;
-}
-
-.m-r-2 {
-  margin-right: 2px;
-}
-
-.m-r-5 {
-  margin-right: 5px;
-}
-
-.m-t-10 {
-  margin-top: 10px;
-}
-
-.m-t-10 {
-  margin-top: 10px;
-}
-
-.m-b-10 {
-  margin-bottom: 10px;
-}
-
 .no-margin {
   margin: 0 !important;
 }
 
 .no-border {
   border: none;
-}
-
-.dispay-flex {
-  display: flex;
-}
-
-.flex-wrap {
-  flex-wrap: wrap;
-}
-
-.ml-0 {
-  margin-left: 0rem;
-}
-
-.ml-1 {
-  margin-left: 0.25rem;
-}
-
-.ml-2 {
-  margin-left: 0.5rem;
-}
-
-.ml-3 {
-  margin-left: 0.75rem;
-}
-
-.ml-4 {
-  margin-left: 1rem;
-}
-
-.ml-5 {
-  margin-left: 1.25rem;
-}
-
-.ml-5 {
-  margin-left: 1.5rem;
-}
-
-.ml-6 {
-  margin-left: 1.75rem;
-}
-
-.ml-7 {
-  margin-left: 2rem;
-}
-
-.ml-8 {
-  margin-left: 2.25rem;
 }
 
 .text-wrap {
@@ -945,10 +832,6 @@ json-tree .branch-preview {
 .icon-disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.space-x-1 {
-  margin-left: 0.25rem;
 }
 
 /* used for bootbox prompt with inputType radio */

@@ -24,6 +24,9 @@ function EndpointController(
   SettingsService,
   ModalService
 ) {
+  $scope.onChangeCheckInInterval = onChangeCheckInInterval;
+  $scope.setFieldValue = setFieldValue;
+
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false,
@@ -33,24 +36,6 @@ function EndpointController(
     edgeEndpoint: false,
     edgeAssociated: false,
     allowCreate: Authentication.isAdmin(),
-    availableEdgeAgentCheckinOptions: [
-      { key: 'Use default interval', value: 0 },
-      {
-        key: '5 seconds',
-        value: 5,
-      },
-      {
-        key: '10 seconds',
-        value: 10,
-      },
-      {
-        key: '30 seconds',
-        value: 30,
-      },
-      { key: '5 minutes', value: 300 },
-      { key: '1 hour', value: 3600 },
-      { key: '1 day', value: 86400 },
-    ],
     allowSelfSignedCerts: true,
     showAMTInfo: false,
   };
@@ -107,6 +92,19 @@ function EndpointController(
     }
   }
 
+  function onChangeCheckInInterval(value) {
+    setFieldValue('EdgeCheckinInterval', value);
+  }
+
+  function setFieldValue(name, value) {
+    return $scope.$evalAsync(() => {
+      $scope.endpoint = {
+        ...$scope.endpoint,
+        [name]: value,
+      };
+    });
+  }
+
   $scope.updateEndpoint = function () {
     var endpoint = $scope.endpoint;
     var securityData = $scope.formValues.SecurityFormData;
@@ -120,7 +118,6 @@ function EndpointController(
       PublicURL: endpoint.PublicURL,
       GroupID: endpoint.GroupId,
       TagIds: endpoint.TagIds,
-      EdgeCheckinInterval: endpoint.EdgeCheckinInterval,
       TLS: TLS,
       TLSSkipVerify: TLSSkipVerify,
       TLSSkipClientVerify: TLSSkipClientVerify,
@@ -130,6 +127,7 @@ function EndpointController(
       AzureApplicationID: endpoint.AzureCredentials.ApplicationID,
       AzureTenantID: endpoint.AzureCredentials.TenantID,
       AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey,
+      EdgeCheckinInterval: endpoint.EdgeCheckinInterval,
     };
 
     if (
@@ -228,8 +226,6 @@ function EndpointController(
 
           $scope.state.edgeAssociated = !!endpoint.EdgeID;
           endpoint.EdgeID = endpoint.EdgeID || uuidv4();
-
-          $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
         }
 
         $scope.endpoint = endpoint;
