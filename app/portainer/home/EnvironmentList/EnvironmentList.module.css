@@ -8,7 +8,6 @@
 
 .filter-container {
   display: flex;
-  flex-wrap: wrap;
   justify-content: flex-start;
 }
 
@@ -21,7 +20,7 @@
 
 .filter-right {
   padding: 10px;
-  width: 15%;
+  width: 20%;
   right: 0;
   display: inline-block;
   margin-left: auto;
@@ -32,4 +31,32 @@
   padding: 10px 0px;
   width: 5%;
   display: inline-block;
+}
+
+.clear-button {
+  display: inline-block;
+  border: 0px;
+  padding: 10px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-button {
+  display: inline-block;
+  width: fit-content;
+}
+
+.kubeconfig-button {
+  display: inline-block;
+  width: fit-content;
+}
+
+.filterSearchbar {
+  display: inline-block;
+  width: 100%;
+  padding-left: 10px;
 }
