@@ -39,7 +39,7 @@ jobs:
       - name: Upload js result html file
         uses: actions/upload-artifact@v3
         with:
-          name: js-result-$${{github.run_id}}-html
+          name: html-js-result-${{github.run_id}}
           path: js-result.html
 
       - name: Analyse the js result
@@ -84,7 +84,7 @@ jobs:
       - name: Upload go result html file
         uses: actions/upload-artifact@v3
         with:
-          name: go-result-$${{github.run_id}}-html
+          name: html-go-result-${{github.run_id}}
           path: go-result.html
 
       - name: Analyse the go result
@@ -152,7 +152,7 @@ jobs:
       - name: Upload go result html file
         uses: actions/upload-artifact@v3
         with:
-          name: image-result-$${{github.run_id}}-html
+          name: html-image-result-${{github.run_id}}
           path: image-result.html
 
       - name: Analyse the trivy result
