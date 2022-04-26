@@ -23,6 +23,9 @@ angular
       Authentication,
       StateManager
     ) {
+      $scope.onChangeCheckInInterval = onChangeCheckInInterval;
+      $scope.setFieldValue = setFieldValue;
+
       $scope.state = {
         EnvironmentType: $state.params.isEdgeDevice ? 'edge_agent' : 'agent',
         PlatformType: 'linux',
@@ -30,24 +33,6 @@ angular
         deploymentTab: 0,
         allowCreateTag: Authentication.isAdmin(),
         isEdgeDevice: $state.params.isEdgeDevice,
-        availableEdgeAgentCheckinOptions: [
-          { key: 'Use default interval', value: 0 },
-          {
-            key: '5 seconds',
-            value: 5,
-          },
-          {
-            key: '10 seconds',
-            value: 10,
-          },
-          {
-            key: '30 seconds',
-            value: 30,
-          },
-          { key: '5 minutes', value: 300 },
-          { key: '1 hour', value: 3600 },
-          { key: '1 day', value: 86400 },
-        ],
       };
 
       const agentVersion = StateManager.getState().application.version;
@@ -71,7 +56,7 @@ angular
         AzureTenantId: '',
         AzureAuthenticationKey: '',
         TagIds: [],
-        CheckinInterval: $scope.state.availableEdgeAgentCheckinOptions[0].value,
+        CheckinInterval: 0,
       };
 
       $scope.copyAgentCommand = function () {
@@ -118,6 +103,19 @@ angular
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to create tag');
         }
+      }
+
+      function onChangeCheckInInterval(value) {
+        setFieldValue('EdgeCheckinInterval', value);
+      }
+
+      function setFieldValue(name, value) {
+        return $scope.$evalAsync(() => {
+          $scope.formValues = {
+            ...$scope.formValues,
+            [name]: value,
+          };
+        });
       }
 
       $scope.addDockerEndpoint = function () {
@@ -320,7 +318,7 @@ angular
             $scope.availableTags = data.tags;
 
             const settings = data.settings;
-            $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
+
             $scope.agentSecret = settings.AgentSecret;
           })
           .catch(function error(err) {
