@@ -132,6 +132,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
         groupIds: groupFilter,
         sort: sortByFilter,
         order: sortByDescending ? 'desc' : 'asc',
+        edgeDeviceFilter: 'none',
       },
       true
     );
