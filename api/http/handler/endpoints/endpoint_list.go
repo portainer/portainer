@@ -24,6 +24,11 @@ const (
 	EdgeDeviceFilterNone      = "none"
 )
 
+const (
+	EdgeDeviceIntervalMultiplier = 2
+	EdgeDeviceIntervalAdd        = 20
+)
+
 var endpointGroupNames map[portainer.EndpointGroupID]string
 
 // @id EndpointList
@@ -128,7 +133,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	if len(statuses) > 0 {
-		filteredEndpoints = filterEndpointsByStatuses(filteredEndpoints, statuses)
+		filteredEndpoints = filterEndpointsByStatuses(filteredEndpoints, statuses, settings)
 	}
 
 	if search != "" {
@@ -221,15 +226,19 @@ func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGro
 	return filteredEndpoints
 }
 
-func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int) []portainer.Endpoint {
+func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int, settings *portainer.Settings) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
 	for _, endpoint := range endpoints {
 		status := endpoint.Status
 		if endpointutils.IsEdgeEndpoint(&endpoint) {
 			isCheckValid := false
-			if endpoint.EdgeCheckinInterval != 0 && endpoint.LastCheckInDate != 0 {
-				isCheckValid = time.Now().Unix()-endpoint.LastCheckInDate <= int64(endpoint.EdgeCheckinInterval*2+20)
+			edgeCheckinInterval := endpoint.EdgeCheckinInterval
+			if endpoint.EdgeCheckinInterval == 0 {
+				edgeCheckinInterval = settings.EdgeAgentCheckinInterval
+			}
+			if edgeCheckinInterval != 0 && endpoint.LastCheckInDate != 0 {
+				isCheckValid = time.Now().Unix()-endpoint.LastCheckInDate <= int64(edgeCheckinInterval*EdgeDeviceIntervalMultiplier+EdgeDeviceIntervalAdd)
 			}
 			status = portainer.EndpointStatusDown // Offline
 			if isCheckValid {
