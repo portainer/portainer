@@ -34,3 +34,5 @@ jobs:
           prettier_dir: app/
           gofmt: true
           gofmt_dir: api/
+      - name: Typecheck
+        uses: andoshin11/typescript-error-reporter-action@v1.0.2
