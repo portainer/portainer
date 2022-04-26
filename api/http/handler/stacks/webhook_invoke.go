@@ -46,7 +46,7 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 	for key, value := range r.URL.Query() {
 		envs = append(envs, portainer.Pair{
 			Name:  key,
-			Value: strings.Join(value, ""),
+			Value: value[len(value)-1],
 		})
 	}
 
