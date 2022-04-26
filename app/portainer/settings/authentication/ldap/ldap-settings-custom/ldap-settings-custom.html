@@ -10,7 +10,7 @@
 <div class="form-group">
   <div class="col-sm-12 small text-muted">
     <p>
-      <i class="fa fa-info-circle blue-icon m-r-2" aria-hidden="true"></i>
+      <i class="fa fa-info-circle blue-icon mr-1" aria-hidden="true"></i>
       You can configure multiple LDAP Servers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all use the
       same certificates).
     </p>
@@ -18,7 +18,7 @@
 </div>
 
 <div class="form-group">
-  <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left dispay-flex flex-wrap">
+  <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left flex flex-wrap">
     LDAP Server
     <button
       type="button"
@@ -32,7 +32,7 @@
     </button>
   </label>
   <div class="col-sm-9 col-lg-10">
-    <div class="m-b-10 dispay-flex" ng-repeat="url in $ctrl.settings.URLs track by $index">
+    <div class="mb-3 flex" ng-repeat="url in $ctrl.settings.URLs track by $index">
       <input type="text" class="form-control" id="ldap_url" ng-model="$ctrl.settings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" required />
       <button ng-if="$index > 0" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLDAPUrl($index)">
         <i class="fa fa-trash" aria-hidden="true"></i>
@@ -97,35 +97,39 @@
   connectivity-check="$ctrl.connectivityCheck"
 ></ldap-connectivity-check>
 
-<ldap-custom-user-search
-  class="m-r-5"
-  settings="$ctrl.settings.SearchSettings"
-  on-search-click="($ctrl.onSearchUsersClick)"
-  limited-feature-id="$ctrl.limitedFeatureId"
-></ldap-custom-user-search>
-<ldap-custom-group-search
-  class="m-r-5"
-  settings="$ctrl.settings.GroupSearchSettings"
-  on-search-click="($ctrl.onSearchGroupsClick)"
-  limited-feature-id="$ctrl.limitedFeatureId"
-></ldap-custom-group-search>
+<div class="space-y-10">
+  <ldap-custom-user-search
+    class="block"
+    settings="$ctrl.settings.SearchSettings"
+    on-search-click="($ctrl.onSearchUsersClick)"
+    limited-feature-id="$ctrl.limitedFeatureId"
+  ></ldap-custom-user-search>
 
-<ldap-custom-admin-group
-  class="m-r-5"
-  settings="$ctrl.settings"
-  on-search-click="($ctrl.onSearchAdminGroupsClick)"
-  selected-admin-groups="$ctrl.selectedAdminGroups"
-  default-admin-group-search-filter="'(objectClass=groupOfNames)'"
-  limited-feature-id="$ctrl.limitedFeatureId"
-  is-limited-feature-self-contained="true"
-></ldap-custom-admin-group>
+  <ldap-custom-group-search
+    class="block"
+    settings="$ctrl.settings.GroupSearchSettings"
+    on-search-click="($ctrl.onSearchGroupsClick)"
+    limited-feature-id="$ctrl.limitedFeatureId"
+  ></ldap-custom-group-search>
 
-<ldap-settings-test-login
-  settings="$ctrl.settings"
-  limited-feature-id="$ctrl.limitedFeatureId"
-  show-be-indicator-if-needed="true"
-  is-limited-feature-self-contained="true"
-></ldap-settings-test-login>
+  <ldap-custom-admin-group
+    class="block"
+    settings="$ctrl.settings"
+    on-search-click="($ctrl.onSearchAdminGroupsClick)"
+    selected-admin-groups="$ctrl.selectedAdminGroups"
+    default-admin-group-search-filter="'(objectClass=groupOfNames)'"
+    limited-feature-id="$ctrl.limitedFeatureId"
+    is-limited-feature-self-contained="true"
+  ></ldap-custom-admin-group>
+
+  <ldap-settings-test-login
+    class="block"
+    settings="$ctrl.settings"
+    limited-feature-id="$ctrl.limitedFeatureId"
+    show-be-indicator-if-needed="true"
+    is-limited-feature-self-contained="true"
+  ></ldap-settings-test-login>
+</div>
 
 <save-auth-settings-button
   on-save-settings="($ctrl.onSaveSettings)"

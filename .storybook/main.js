@@ -16,6 +16,9 @@ module.exports = {
             exportLocalsConvention: 'camelCaseOnly',
           },
         },
+        postcssLoaderOptions: {
+          implementation: require('postcss'),
+        },
       },
     },
   ],
