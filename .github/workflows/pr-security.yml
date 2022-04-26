@@ -190,7 +190,7 @@ jobs:
   #         result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=trivy -path="/data/image-trivy-feature.json" -compare-to="./data/image-trivy-develop.json" -output-type=matrix)
   #         echo "::set-output name=image_diff_result::${result}"
 
-  result-analysis-compared-to-develop:
+  result-analysis:
     name: Analyse scan result compared to develop
     needs: [client-dependencies]
     # needs: [client-dependencies, server-dependencies, image-vulnerability]
