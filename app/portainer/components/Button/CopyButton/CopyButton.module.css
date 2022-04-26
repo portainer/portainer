@@ -6,6 +6,7 @@
 .container {
   display: flex;
   align-items: baseline;
+  margin-top: 10px;
 }
 
 .display-text {
