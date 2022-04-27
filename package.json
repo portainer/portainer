@@ -202,7 +202,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-storybook": "^0.5.5",
     "eslint-webpack-plugin": "^3.1.1",
-    "grunt": "^1.4.1",
+    "grunt": "^1.5.2",
     "grunt-cli": "^1.4.3",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
