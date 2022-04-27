@@ -133,6 +133,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
         sort: sortByFilter,
         order: sortByDescending ? 'desc' : 'asc',
         edgeDeviceFilter: 'none',
+        tagsPartialMatch: true,
       },
       true
     );
