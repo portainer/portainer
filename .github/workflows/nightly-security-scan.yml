@@ -101,10 +101,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
 
-      - name: Use golang 1.17.x
+      - name: Use golang 1.18
         uses: actions/setup-go@v3
         with:
-          go-version: '>=1.17.0'
+          go-version: '1.18'
 
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
@@ -195,7 +195,7 @@ jobs:
                       "type": "section",
                       "text": {
                         "type": "mrkdwn",
-                        "text": "Code Scanning Result (*${{ github.event.repository.name}}*)\n*<${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|GitHub Actions Workflow URL>*"
+                        "text": "Code Scanning Result (*${{ github.repository }}*)\n*<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|GitHub Actions Workflow URL>*"
                       }
                     },
                     {

@@ -1,8 +1,14 @@
 name: PR Code Security Scan
 
 on:
-  pull_request_review:
-    types: [edited, submitted]
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'api/go.mod'
+      - 'gruntfile.js'
+      - 'build/linux/Dockerfile'
+      - 'build/linux/alpine.Dockerfile'
+      - 'build/windows/Dockerfile'
   workflow_dispatch:
     
 jobs:
@@ -125,10 +131,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
 
-      - name: Use golang 1.17.x
+      - name: Use golang 1.18
         uses: actions/setup-go@v3
         with:
-          go-version: '>=1.17.0'
+          go-version: '1.18'
 
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
