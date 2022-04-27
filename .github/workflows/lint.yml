@@ -34,3 +34,5 @@ jobs:
           prettier_dir: app/
           gofmt: true
           gofmt_dir: api/
+      - name: Typecheck
+        uses: icrawl/action-tsc@v1

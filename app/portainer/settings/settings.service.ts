@@ -42,9 +42,9 @@ export interface Settings {
   AgentSecret: string;
   EdgePortainerUrl: string;
   EdgeAgentCheckinInterval: number;
-  EdgePingInterval: string;
-  EdgeSnapshotInterval: string;
-  EdgeCommandInterval: string;
+  EdgePingInterval: number;
+  EdgeSnapshotInterval: number;
+  EdgeCommandInterval: number;
 }
 
 export async function getSettings() {

@@ -1,8 +1,9 @@
 import { r2a } from '@/react-tools/react2angular';
 
+import { Settings } from '../settings.service';
+
 import { EdgeComputeSettings } from './EdgeComputeSettings';
 import { AutomaticEdgeEnvCreation } from './AutomaticEdgeEnvCreation';
-import { Settings } from './types';
 
 interface Props {
   settings: Settings;
