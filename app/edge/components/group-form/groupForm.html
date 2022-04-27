@@ -93,12 +93,9 @@
         </div>
       </div>
     </div>
-    <div class="form-group">
-      <tag-selector ng-if="$ctrl.tags.length" tags="$ctrl.tags" model="$ctrl.model.TagIds"></tag-selector>
-      <div ng-if="$ctrl.tags && !$ctrl.tags.length" class="col-sm-12 small text-muted">
-        No tags available. Head over to the <a ui-sref="portainer.tags">Tags view</a> to add tags
-      </div>
-    </div>
+
+    <tag-selector ng-if="$ctrl.model.TagIds" value="$ctrl.model.TagIds" on-change="($ctrl.onChangeTags)"> </tag-selector>
+
     <div class="col-sm-12 form-section-title"> Associated environments by tags </div>
     <div class="col-sm-12 form-group">
       <group-association-table
