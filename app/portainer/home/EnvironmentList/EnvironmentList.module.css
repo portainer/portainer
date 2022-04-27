@@ -37,6 +37,7 @@
   display: inline-block;
   border: 0px;
   padding: 10px;
+  height: 60px;
 }
 
 .action-button {
