@@ -19,11 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
-      - name: Dump context json
-        id: github_context_step
-        run: | 
-          echo '${{ toJSON(github) }}'
-
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
         continue-on-error: true # To make sure that artifact upload gets called
@@ -66,6 +61,11 @@ jobs:
         run: | 
           result=$(docker run --rm -v ${{ github.workspace }}:/data oscarzhou/scan-report:0.1.8 diff -report-type=snyk -path="/data/js-snyk-feature.json" -compare-to="./data/js-snyk-develop.json" -output-type=matrix)
           echo "::set-output name=js_diff_result::${result}"
+
+      - name: Dump context json
+        id: github_context_step
+        run: | 
+          echo '${{ toJSON(github) }}'
 
   server-dependencies:
     name: 'PR Code Security Scan / Server dependency check'
