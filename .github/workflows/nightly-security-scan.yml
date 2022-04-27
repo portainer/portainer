@@ -3,6 +3,7 @@ name: Nightly Code Security Scan
 on: 
   schedule:
     - cron: '0 8 * * *'
+  pull_request:
   workflow_dispatch:
     
 jobs:
@@ -10,7 +11,8 @@ jobs:
     name: Client dependency check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/develop' 
+      github.ref == 'refs/heads/develop' || 
+      github.headref == 'feat/EE-2537/security-scan-in-ci-workflow'
     outputs:
       js: ${{ steps.set-matrix.outputs.js_result }}
     steps:
@@ -50,7 +52,8 @@ jobs:
     name: Server dependency check
     runs-on: ubuntu-latest
     if: >- # only run for develop branch
-      github.ref == 'refs/heads/develop' 
+      github.ref == 'refs/heads/develop' || 
+      github.headref == 'feat/EE-2537/security-scan-in-ci-workflow'
     outputs:
       go: ${{ steps.set-matrix.outputs.go_result }}
     steps:
@@ -94,7 +97,8 @@ jobs:
     name: Build docker image and Image vulnerability check
     runs-on: ubuntu-latest
     if: >-
-      github.ref == 'refs/heads/develop' 
+      github.ref == 'refs/heads/develop' || 
+      github.headref == 'feat/EE-2537/security-scan-in-ci-workflow'
     outputs:
       image: ${{ steps.set-matrix.outputs.image_result }}
     steps:
@@ -162,7 +166,8 @@ jobs:
     needs: [client-dependencies, server-dependencies, image-vulnerability]
     runs-on: ubuntu-latest
     if: >-
-      github.ref == 'refs/heads/develop'
+      github.ref == 'refs/heads/develop' || 
+      github.headref == 'feat/EE-2537/security-scan-in-ci-workflow'
     strategy:
       matrix: 
         js: ${{fromJson(needs.client-dependencies.outputs.js)}}
