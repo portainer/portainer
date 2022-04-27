@@ -192,6 +192,7 @@ jobs:
         with:
           payload: |
             {
+              "text": "Code Scanning Result",
               "attachments": [
                 {
                   "color": "#FF0000",
