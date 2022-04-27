@@ -1,13 +1,20 @@
 name: PR Code Security Scan
 
-on: workflow_dispatch
+on: 
+  issue_comment:
+    types:
+      - created
+  workflow_dispatch:
     
 jobs:
   client-dependencies:
     name: Client dependency check
     runs-on: ubuntu-latest
     if: >-
-      github.ref != 'refs/heads/develop'
+      github.ref != 'refs/heads/develop' || 
+      (github.event.issue.pull_request && 
+      github.event.comment.body == '/scan')
+
     outputs:
       jsdiff: ${{ steps.set-diff-matrix.outputs.js_diff_result }}
     steps:
