@@ -193,13 +193,13 @@ jobs:
           payload: |
             {
               "blocks": [
-               {
+                {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
                     "text": "Code Scanning Result (*${{ github.repository }}*)\n*<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|GitHub Actions Workflow URL>*"
                   }
-                },
+                }
               ],
               "attachments": [
                 {
