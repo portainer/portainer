@@ -1,7 +1,8 @@
 .code {
   display: block;
   white-space: pre-wrap;
-  padding: 16px 90px;
+  word-break: break-word;
+  padding: 20px;
 }
 
 .root {
