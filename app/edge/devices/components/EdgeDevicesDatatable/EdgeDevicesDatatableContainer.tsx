@@ -1,5 +1,11 @@
-import { react2angular } from '@/react-tools/react2angular';
-import { TableSettingsProvider } from '@/portainer/components/datatables/components/useTableSettings';
+import {
+  TableSettingsProvider,
+  useTableSettings,
+} from '@/portainer/components/datatables/components/useTableSettings';
+import { useEnvironmentList } from '@/portainer/environments/queries';
+import { Environment } from '@/portainer/environments/types';
+
+import { EdgeDeviceTableSettings } from '../../types';
 
 import {
   EdgeDevicesDatatable,
@@ -8,7 +14,7 @@ import {
 
 export function EdgeDevicesDatatableContainer({
   ...props
-}: EdgeDevicesTableProps) {
+}: Omit<EdgeDevicesTableProps, 'dataset'>) {
   const defaultSettings = {
     autoRefreshRate: 0,
     hiddenQuickActions: [],
@@ -21,22 +27,40 @@ export function EdgeDevicesDatatableContainer({
 
   return (
     <TableSettingsProvider defaults={defaultSettings} storageKey={storageKey}>
-      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-      <EdgeDevicesDatatable {...props} storageKey={storageKey} />
+      <Loader>
+        {(environments) => (
+          <EdgeDevicesDatatable
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...props}
+            storageKey={storageKey}
+            dataset={environments}
+          />
+        )}
+      </Loader>
     </TableSettingsProvider>
   );
 }
 
-export const EdgeDevicesDatatableAngular = react2angular(
-  EdgeDevicesDatatableContainer,
-  [
-    'groups',
-    'dataset',
-    'onRefresh',
-    'setLoadingMessage',
-    'isFdoEnabled',
-    'showWaitingRoomLink',
-    'isOpenAmtEnabled',
-    'mpsServer',
-  ]
-);
+interface LoaderProps {
+  children: (environments: Environment[]) => React.ReactNode;
+}
+
+function Loader({ children }: LoaderProps) {
+  const { settings } = useTableSettings<EdgeDeviceTableSettings>();
+
+  const { environments, isLoading } = useEnvironmentList(
+    {
+      edgeDeviceFilter: 'trusted',
+      pageLimit: 100,
+      page: 1,
+    },
+    false,
+    settings.autoRefreshRate * 1000
+  );
+
+  if (isLoading) {
+    return null;
+  }
+
+  return <>{children(environments)}</>;
+}

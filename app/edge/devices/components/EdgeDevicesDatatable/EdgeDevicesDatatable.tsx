@@ -25,7 +25,6 @@ import {
 import { multiple } from '@/portainer/components/datatables/components/filter-types';
 import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
 import { ColumnVisibilityMenu } from '@/portainer/components/datatables/components/ColumnVisibilityMenu';
-import { useRepeater } from '@/portainer/components/datatables/components/useRepeater';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
   useSearchBarState,
@@ -53,7 +52,6 @@ export interface EdgeDevicesTableProps {
   mpsServer: string;
   dataset: Environment[];
   groups: EnvironmentGroup[];
-  onRefresh(): Promise<void>;
   setLoadingMessage(message: string): void;
 }
 
@@ -65,7 +63,6 @@ export function EdgeDevicesDatatable({
   mpsServer,
   dataset,
   groups,
-  onRefresh,
   setLoadingMessage,
 }: EdgeDevicesTableProps) {
   const { settings, setTableSettings } =
@@ -73,8 +70,6 @@ export function EdgeDevicesDatatable({
   const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
 
   const columns = useColumns();
-
-  useRepeater(settings.autoRefreshRate, onRefresh);
 
   const {
     getTableProps,
