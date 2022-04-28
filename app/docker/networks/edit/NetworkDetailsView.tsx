@@ -66,33 +66,27 @@ export function NetworkDetailsView() {
           },
         ]}
       />
-      {networkQuery.data && (
-        <>
-          <NetworkDetailsTable
-            network={networkQuery.data}
-            onRemoveNetworkClicked={onRemoveNetworkClicked}
-          />
+      <NetworkDetailsTable
+        network={networkQuery.data}
+        onRemoveNetworkClicked={onRemoveNetworkClicked}
+      />
 
-          <AccessControlPanel
-            onUpdateSuccess={() =>
-              queryClient.invalidateQueries([
-                'environments',
-                environmentId,
-                'docker',
-                'networks',
-                networkId,
-              ])
-            }
-            resourceControl={networkQuery.data.Portainer?.ResourceControl}
-            resourceType={ResourceControlType.Network}
-            disableOwnershipChange={isSystemNetwork(networkQuery.data.Name)}
-            resourceId={networkId}
-          />
-        </>
-      )}
-      {networkQuery.data?.Options && (
-        <NetworkOptionsTable options={networkQuery.data.Options} />
-      )}
+      <AccessControlPanel
+        onUpdateSuccess={() =>
+          queryClient.invalidateQueries([
+            'environments',
+            environmentId,
+            'docker',
+            'networks',
+            networkId,
+          ])
+        }
+        resourceControl={networkQuery.data.Portainer?.ResourceControl}
+        resourceType={ResourceControlType.Network}
+        disableOwnershipChange={isSystemNetwork(networkQuery.data.Name)}
+        resourceId={networkId}
+      />
+      <NetworkOptionsTable options={networkQuery.data.Options} />
       <NetworkContainersTable
         networkContainers={networkContainers}
         nodeName={nodeName}

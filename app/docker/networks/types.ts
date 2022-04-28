@@ -6,7 +6,7 @@ export type IPConfig = {
   Subnet: string;
   Gateway: string;
   IPRange?: string;
-  AuxiliaryAddresses?: object;
+  AuxiliaryAddresses?: Record<string, string>;
 };
 
 export type NetworkId = string;
