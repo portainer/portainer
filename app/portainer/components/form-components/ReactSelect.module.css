@@ -45,11 +45,6 @@
 :global :root[theme='dark'] :local .root :global .selector__option:active,
 :global :root[theme='dark'] :local .root :global .selector__option--is-focused {
   background-color: var(--blue-2);
-}
-
-:global :root[theme='dark'] :local .root :global .selector__option:active,
-:global :root[theme='dark'] :local .root :global .selector__option--is-focused {
-  background-color: var(--blue-2);
   color: var(--white-color);
 }
 
