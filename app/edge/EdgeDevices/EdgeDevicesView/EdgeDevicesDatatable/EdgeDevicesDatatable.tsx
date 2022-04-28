@@ -32,17 +32,16 @@ import {
 import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
 import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
 import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
-import { EdgeDeviceTableSettings } from '@/edge/devices/types';
-import { EdgeDevicesDatatableSettings } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableSettings';
-import { EdgeDevicesDatatableActions } from '@/edge/devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableActions';
-import { AMTDevicesDatatable } from '@/edge/devices/components/AMTDevicesDatatable/AMTDevicesDatatable';
+import { AMTDevicesDatatable } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/AMTDevicesDatatable';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
 import { EnvironmentGroup } from '@/portainer/environment-groups/types';
 
+import { EdgeDevicesDatatableActions } from './EdgeDevicesDatatableActions';
+import { EdgeDevicesDatatableSettings } from './EdgeDevicesDatatableSettings';
 import { RowProvider } from './columns/RowContext';
 import { useColumns } from './columns';
 import styles from './EdgeDevicesDatatable.module.css';
-import { Pagination } from './types';
+import { EdgeDeviceTableSettings, Pagination } from './types';
 
 export interface EdgeDevicesTableProps {
   storageKey: string;

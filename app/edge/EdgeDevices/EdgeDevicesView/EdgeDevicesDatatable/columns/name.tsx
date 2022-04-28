@@ -3,7 +3,8 @@ import { CellProps, Column } from 'react-table';
 import { Environment } from '@/portainer/environments/types';
 import { Link } from '@/portainer/components/Link';
 import { ExpandingCell } from '@/portainer/components/datatables/components/ExpandingCell';
-import { useRowContext } from '@/edge/devices/components/EdgeDevicesDatatable/columns/RowContext';
+
+import { useRowContext } from './RowContext';
 
 export const name: Column<Environment> = {
   Header: 'Name',

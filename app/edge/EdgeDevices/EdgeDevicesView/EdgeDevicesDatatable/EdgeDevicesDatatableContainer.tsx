@@ -7,13 +7,11 @@ import {
 import { useEnvironmentList } from '@/portainer/environments/queries';
 import { Environment } from '@/portainer/environments/types';
 
-import { EdgeDeviceTableSettings } from '../../types';
-
 import {
   EdgeDevicesDatatable,
   EdgeDevicesTableProps,
 } from './EdgeDevicesDatatable';
-import { Pagination } from './types';
+import { EdgeDeviceTableSettings, Pagination } from './types';
 
 export function EdgeDevicesDatatableContainer({
   ...props

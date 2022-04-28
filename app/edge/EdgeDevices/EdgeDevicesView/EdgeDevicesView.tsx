@@ -5,9 +5,9 @@ import { useSettings } from '@/portainer/settings/queries';
 import { useGroups } from '@/portainer/environment-groups/queries';
 import { r2a } from '@/react-tools/react2angular';
 
-import { EdgeDevicesDatatableContainer } from '../devices/components/EdgeDevicesDatatable/EdgeDevicesDatatableContainer';
+import { Loader } from '../Loader';
 
-import { Loader } from './Loader';
+import { EdgeDevicesDatatableContainer } from './EdgeDevicesDatatable/EdgeDevicesDatatableContainer';
 
 export function EdgeDevicesView() {
   const [loadingMessage, setLoadingMessage] = useState('');

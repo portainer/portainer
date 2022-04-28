@@ -9,8 +9,14 @@ import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { executeDeviceAction } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 import * as notifications from '@/portainer/services/notifications';
 import { ActionsMenuTitle } from '@/portainer/components/datatables/components/ActionsMenuTitle';
-import { useRowContext } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
-import { DeviceAction } from '@/edge/devices/types';
+
+import { useRowContext } from './RowContext';
+
+enum DeviceAction {
+  PowerOn = 'power on',
+  PowerOff = 'power off',
+  Restart = 'restart',
+}
 
 export const actions: Column<Device> = {
   Header: 'Actions',
