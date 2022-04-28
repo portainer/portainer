@@ -1,14 +1,15 @@
 import angular from 'angular';
 
 import edgeStackModule from './views/edge-stacks';
-import edgeDevicesModule from './devices';
 import { componentsModule } from './components';
 import { WaitingRoomViewAngular } from './EdgeDevices/WaitingRoomView';
 import { reactModule } from './react';
+import { EdgeDevicesViewAngular } from './EdgeDevices/EdgeDevicesView';
 
 angular
-  .module('portainer.edge', [edgeStackModule, edgeDevicesModule, componentsModule, reactModule])
+  .module('portainer.edge', [edgeStackModule, componentsModule, reactModule])
   .component('waitingRoomView', WaitingRoomViewAngular)
+  .component('edgeDevicesView', EdgeDevicesViewAngular)
   .config(function config($stateRegistryProvider) {
     const edge = {
       name: 'edge',
@@ -113,7 +114,7 @@ angular
       },
     };
 
-    const edgeDevices = {
+    $stateRegistryProvider.register({
       name: 'edge.devices',
       url: '/devices',
       views: {
@@ -121,7 +122,7 @@ angular
           component: 'edgeDevicesView',
         },
       },
-    };
+    });
 
     if (process.env.PORTAINER_EDITION === 'BE') {
       $stateRegistryProvider.register({
@@ -148,6 +149,4 @@ angular
     $stateRegistryProvider.register(edgeJobs);
     $stateRegistryProvider.register(edgeJob);
     $stateRegistryProvider.register(edgeJobCreation);
-
-    $stateRegistryProvider.register(edgeDevices);
   });

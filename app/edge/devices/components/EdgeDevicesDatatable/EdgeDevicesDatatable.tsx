@@ -47,7 +47,6 @@ import styles from './EdgeDevicesDatatable.module.css';
 
 export interface EdgeDevicesTableProps {
   storageKey: string;
-  isEnabled: boolean;
   isFdoEnabled: boolean;
   isOpenAmtEnabled: boolean;
   showWaitingRoomLink: boolean;
@@ -168,7 +167,7 @@ export function EdgeDevicesDatatable({
         />
       </TableActions>
 
-      {someDeviceHasAMTActivated && (
+      {isOpenAmtEnabled && someDeviceHasAMTActivated && (
         <div className={styles.kvmTip}>
           <TextTip color="blue">
             For the KVM function to work you need to have the MPS server added
