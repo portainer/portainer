@@ -84,7 +84,7 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
                   </span>
                 </span>
                 {groupName && (
-                  <span className="small">
+                  <span className="small space-right">
                     <span>Group: </span>
                     <span>{groupName}</span>
                   </span>
