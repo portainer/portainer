@@ -21,13 +21,12 @@ export function useCopy(copyText: string, fadeDelay = 1000) {
       navigator.clipboard.writeText(copyText);
     } else {
       // https://stackoverflow.com/a/57192718
-      const inputEl = document.createElement('input');
+      const inputEl = document.createElement('textarea');
       inputEl.value = copyText;
-      inputEl.type = 'text';
       document.body.appendChild(inputEl);
       inputEl.select();
       document.execCommand('copy');
-      inputEl.type = 'hidden';
+      inputEl.hidden = true;
       document.body.removeChild(inputEl);
     }
     setCopiedSuccessfully(true);
