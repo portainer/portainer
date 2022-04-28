@@ -239,6 +239,7 @@ export function EdgeDevicesDatatable({
       <TableFooter>
         <SelectedRowsCount value={selectedFlatRows.length} />
         <PaginationControls
+          isPageInputVisible
           pageLimit={pagination.pageLimit}
           page={pagination.page}
           onPageChange={(p) => gotoPage(p)}
