@@ -5,6 +5,8 @@ import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
+import { confirmAsync } from '@/portainer/services/modal.service/confirm';
+import { isEdgeEnvironment } from '@/portainer/environments/utils';
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
@@ -105,13 +107,34 @@ function EndpointController(
     });
   }
 
-  $scope.updateEndpoint = function () {
+  $scope.updateEndpoint = async function () {
     var endpoint = $scope.endpoint;
     var securityData = $scope.formValues.SecurityFormData;
     var TLS = securityData.TLS;
     var TLSMode = securityData.TLSMode;
     var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
     var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
+
+    if (isEdgeEnvironment(endpoint.Type) && _.difference($scope.initialTagIds, endpoint.TagIds).length > 0) {
+      let confirmed = await confirmAsync({
+        title: 'Confirm action',
+        message: 'Removing tags from this environment will remove the corresponding edge stacks when dynamic grouping is being used',
+        buttons: {
+          cancel: {
+            label: 'Cancel',
+            className: 'btn-default',
+          },
+          confirm: {
+            label: 'Confirm',
+            className: 'btn-primary',
+          },
+        },
+      });
+
+      if (!confirmed) {
+        return;
+      }
+    }
 
     var payload = {
       Name: endpoint.Name,
@@ -229,6 +252,7 @@ function EndpointController(
         }
 
         $scope.endpoint = endpoint;
+        $scope.initialTagIds = endpoint.TagIds.slice();
         $scope.groups = groups;
         $scope.availableTags = tags;
 
