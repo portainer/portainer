@@ -1,0 +1,29 @@
+name: Test
+on: push
+jobs:
+  test-client:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'yarn'
+      - run: yarn --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test:client
+  # test-server:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     GOPRIVATE: "github.com/portainer"
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-go@v3
+  #       with:
+  #         go-version: '1.18'
+  #     - name: Run tests
+  #       run: |
+  #         cd api
+  #         go test ./...

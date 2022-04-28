@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// WriteToFile creates a file in the filesystem storage
 func WriteToFile(dst string, content []byte) error {
 	if err := os.MkdirAll(filepath.Dir(dst), 0744); err != nil {
 		return errors.Wrapf(err, "failed to create filestructure for the path %q", dst)

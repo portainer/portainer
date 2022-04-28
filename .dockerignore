@@ -1,3 +1,5 @@
 *
 !dist
 !build
+!metadata.json
+!docker-extension/build

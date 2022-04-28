@@ -15,15 +15,15 @@ export function SettingsViewModel(data) {
   this.EnableTelemetry = data.EnableTelemetry;
   this.KubeconfigExpiry = data.KubeconfigExpiry;
   this.HelmRepositoryURL = data.HelmRepositoryURL;
-  this.DisableTrustOnFirstConnect = data.DisableTrustOnFirstConnect;
+  this.TrustOnFirstConnect = data.TrustOnFirstConnect;
   this.EnforceEdgeID = data.EnforceEdgeID;
   this.AgentSecret = data.AgentSecret;
+  this.EdgePortainerUrl = data.EdgePortainerUrl;
 }
 
 export function PublicSettingsViewModel(settings) {
   this.AuthenticationMethod = settings.AuthenticationMethod;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
-  this.DisableTrustOnFirstConnect = settings.DisableTrustOnFirstConnect;
   this.EnforceEdgeID = settings.EnforceEdgeID;
   this.FeatureFlagSettings = settings.FeatureFlagSettings;
   this.LogoURL = settings.LogoURL;

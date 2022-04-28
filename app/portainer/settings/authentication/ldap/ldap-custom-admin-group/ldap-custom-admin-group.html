@@ -4,7 +4,7 @@
 
 <rd-widget ng-repeat="config in $ctrl.settings.AdminGroupSearchSettings | limitTo: (1 - $ctrl.settings.AdminGroupSearchSettings)">
   <rd-widget-body>
-    <div class="form-group m-b-10" ng-if="$index > 0">
+    <div class="form-group mb-3" ng-if="$index > 0">
       <span class="col-sm-12 text-muted small"> Extra search configuration </span>
     </div>
 
@@ -72,7 +72,7 @@
   </rd-widget-body>
 </rd-widget>
 
-<div class="form-group m-t-10">
+<div class="form-group mt-3">
   <div class="col-sm-12">
     <button
       class="label label-default interactive no-border"
@@ -84,7 +84,7 @@
       <i class="fa fa-plus-circle" aria-hidden="true"></i> add group search configuration
     </button>
   </div>
-  <div class="col-sm-12 m-t-10">
+  <div class="col-sm-12 mt-3">
     <button
       class="btn btm-sm btn-primary"
       type="button"
@@ -96,14 +96,14 @@
     >
       Fetch Admin Group(s)
     </button>
-    <span ng-if="$ctrl.groups && $ctrl.groups.length === 0" class="m-l-30"> <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> No groups found</span>
+    <span ng-if="$ctrl.groups && $ctrl.groups.length === 0" class="ml-5"> <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> No groups found</span>
   </div>
 </div>
 
 <div class="form-group">
   <div class="col-sm-12">
     <label for="admin-auto-populate" class="control-label text-left text-muted" ng-class="{ 'text-muted': !$ctrl.enableAssignAdminGroup }"> Assign admin rights to group(s) </label>
-    <label class="switch m-l-20" ng-class="{ 'business limited': $ctrl.isLimitedFeatureSelfContained }">
+    <label class="switch ml-7" ng-class="{ 'business limited': $ctrl.isLimitedFeatureSelfContained }">
       <input id="admin-auto-populate" ng-disabled="!$ctrl.enableAssignAdminGroup" name="admin-auto-populate" type="checkbox" ng-model="$ctrl.settings.AdminAutoPopulate" /><i></i>
     </label>
   </div>
@@ -113,7 +113,7 @@
   <div class="col-sm-12">
     <label for="group-access" class="control-label text-left"> Select Group(s) </label>
     <span
-      class="m-l-20"
+      class="ml-7"
       isteven-multi-select
       ng-if="$ctrl.enableAssignAdminGroup"
       input-model="$ctrl.groups"

@@ -2,52 +2,32 @@ import { Formik, Form } from 'formik';
 
 import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Select } from '@/portainer/components/form-components/Input/Select';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
+import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
+import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 
-import styles from './SettingsEdgeCompute.module.css';
-import { validationSchema } from './SettingsEdgeCompute.validation';
+import { Settings } from '../types';
+
+import styles from './EdgeComputeSettings.module.css';
+import { validationSchema } from './EdgeComputeSettings.validation';
 
 export interface FormValues {
   EdgeAgentCheckinInterval: number;
   EnableEdgeComputeFeatures: boolean;
-  DisableTrustOnFirstConnect: boolean;
   EnforceEdgeID: boolean;
 }
 
 interface Props {
-  settings: FormValues;
+  settings?: Settings;
   onSubmit(values: FormValues): void;
 }
 
-const checkinIntervalOptions = [
-  {
-    value: 5,
-    label: '5 seconds',
-  },
-  {
-    value: 10,
-    label: '10 seconds',
-  },
-  {
-    value: 30,
-    label: '30 seconds',
-  },
-];
-
-export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
-  const initialValues = {
-    EdgeAgentCheckinInterval: settings ? settings.EdgeAgentCheckinInterval : 5,
-    EnableEdgeComputeFeatures: settings
-      ? settings.EnableEdgeComputeFeatures
-      : false,
-    DisableTrustOnFirstConnect: settings
-      ? settings.DisableTrustOnFirstConnect
-      : false,
-    EnforceEdgeID: settings ? settings.EnforceEdgeID : false,
-  };
+export function EdgeComputeSettings({ settings, onSubmit }: Props) {
+  if (!settings) {
+    return null;
+  }
 
   return (
     <div className="row">
@@ -55,7 +35,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
         <WidgetTitle icon="fa-laptop" title="Edge Compute settings" />
         <WidgetBody>
           <Formik
-            initialValues={initialValues}
+            initialValues={settings}
             enableReinitialize
             validationSchema={() => validationSchema()}
             onSubmit={onSubmit}
@@ -76,26 +56,7 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                 noValidate
               >
                 <FormControl
-                  inputId="edge_checkin"
-                  label="Edge agent default poll frequency"
-                  size="medium"
-                  tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
-                  errors={errors.EdgeAgentCheckinInterval}
-                >
-                  <Select
-                    value={values.EdgeAgentCheckinInterval}
-                    onChange={(e) =>
-                      setFieldValue(
-                        'EdgeAgentCheckinInterval',
-                        parseInt(e.currentTarget.value, 10)
-                      )
-                    }
-                    options={checkinIntervalOptions}
-                  />
-                </FormControl>
-
-                <FormControl
-                  inputId="edge_checkin"
+                  inputId="edge_enable"
                   label="Enable Edge Compute features"
                   size="medium"
                   errors={errors.EnableEdgeComputeFeatures}
@@ -118,8 +79,9 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
 
                 <FormControl
                   inputId="edge_enforce_id"
-                  label="Enforce use of Portainer generated Edge ID’s"
+                  label="Enforce use of Portainer generated Edge ID"
                   size="medium"
+                  tooltip="This setting only applies to manually created environments."
                   errors={errors.EnforceEdgeID}
                 >
                   <Switch
@@ -132,6 +94,18 @@ export function SettingsEdgeCompute({ settings, onSubmit }: Props) {
                     }
                   />
                 </FormControl>
+
+                <FormSectionTitle>Check-in Intervals</FormSectionTitle>
+
+                <EdgeCheckinIntervalField
+                  value={values.EdgeAgentCheckinInterval}
+                  onChange={(value) =>
+                    setFieldValue('EdgeAgentCheckinInterval', value)
+                  }
+                  isDefaultHidden
+                  label="Edge agent default poll frequency"
+                  tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
+                />
 
                 <div className="form-group">
                   <div className="col-sm-12">

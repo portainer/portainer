@@ -10,7 +10,7 @@ import {
 import { KubernetesApplicationPublishingTypes } from '../models/application/models';
 import { KubernetesIngress, KubernetesIngressRule } from './models';
 import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, KubernetesIngressRulePathCreatePayload } from './payloads';
-import { KubernetesIngressClassAnnotation, KubernetesIngressClassRewriteTargetAnnotations } from './constants';
+import { KubernetesIngressClassAnnotation, PortainerIngressClassTypes } from './constants';
 
 export class KubernetesIngressConverter {
   static apiToModel(data) {
@@ -151,10 +151,7 @@ export class KubernetesIngressConverter {
     res.Namespace = formValues.Namespace;
     const pairs = _.map(formValues.Annotations, (a) => [a.Key, a.Value]);
     res.Annotations = _.fromPairs(pairs);
-    if (formValues.RewriteTarget) {
-      _.extend(res.Annotations, KubernetesIngressClassRewriteTargetAnnotations[formValues.IngressClass.Type]);
-    }
-    res.Annotations[KubernetesIngressClassAnnotation] = formValues.IngressClass.Name;
+    res.Annotations[PortainerIngressClassTypes] = formValues.IngressClass.Name;
     res.IngressClassName = formValues.IngressClass.Name;
     res.Hosts = formValues.Hosts;
     res.Paths = formValues.Paths;
@@ -180,11 +177,8 @@ export class KubernetesIngressConverter {
           hfv.IsNew = false;
           return hfv;
         });
-        const [[rewriteKey]] = _.toPairs(KubernetesIngressClassRewriteTargetAnnotations[ic.Type]);
         const annotations = _.map(_.toPairs(ingress.Annotations), ([key, value]) => {
-          if (key === rewriteKey) {
-            fv.RewriteTarget = true;
-          } else if (key !== KubernetesIngressClassAnnotation) {
+          if (key !== PortainerIngressClassTypes) {
             const annotation = new KubernetesResourcePoolIngressClassAnnotationFormValue();
             annotation.Key = key;
             annotation.Value = value;
@@ -204,6 +198,7 @@ export class KubernetesIngressConverter {
     const res = new KubernetesIngressCreatePayload();
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
+    res.metadata.annotations = data.Annotations;
     res.spec.ingressClassName = data.IngressClassName;
     if (data.Paths && data.Paths.length) {
       _.forEach(data.Paths, (p) => {

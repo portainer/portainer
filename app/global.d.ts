@@ -18,3 +18,7 @@ declare module 'axios-progress-bar' {
     instance?: AxiosInstance
   ): void;
 }
+
+interface Window {
+  ddExtension: boolean;
+}

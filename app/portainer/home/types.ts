@@ -5,3 +5,8 @@ export interface Motd {
   Style?: string;
   ContentLayout?: Record<string, string>;
 }
+
+export interface Filter {
+  value: number;
+  label: string;
+}

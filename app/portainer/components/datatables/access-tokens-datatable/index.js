@@ -11,5 +11,6 @@ angular.module('portainer.app').component('accessTokensDatatable', {
     tableKey: '@',
     orderBy: '@',
     removeAction: '<',
+    uiCanExit: '<',
   },
 });

@@ -203,7 +203,7 @@
                                 ng-model="item.Host"
                                 ng-change="ctrl.onChangeIngressHostname()"
                                 placeholder="foo"
-                                pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
+                                pattern="[\*a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
                                 required
                               />
                             </div>
@@ -237,56 +237,80 @@
                         </div>
                       </div>
                     </div>
-
-                    <div class="form-group" ng-if="ic.IngressClass.Type === ctrl.IngressClassTypes.NGINX">
-                      <div class="col-sm-12">
-                        <label class="control-label text-left">
-                          Redirect published routes to / in application
-                          <portainer-tooltip
-                            position="bottom"
-                            message="Enables the redirection of any route published via ingress to the root path of the application, e.g. /path remaps to /"
-                          >
-                          </portainer-tooltip>
-                        </label>
-                        <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
-                      </div>
-                    </div>
                   </div>
                   <div ng-repeat-end class="form-group" ng-if="ic.Selected" style="margin-bottom: 20px">
-                    <div class="col-sm-12">
-                      <p>
-                        <a class="small interactive" ng-if="!ic.AdvancedConfig" ng-click="ic.AdvancedConfig = true">
-                          <i class="fa fa-plus space-right" aria-hidden="true"></i> Advanced configuration
-                        </a>
-                        <a class="small interactive" ng-if="ic.AdvancedConfig" ng-click="ic.AdvancedConfig = false">
-                          <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide configuration
-                        </a>
-                      </p>
-                    </div>
-
-                    <div class="col-sm-12 small text-muted" ng-if="ic.AdvancedConfig" style="margin-top: 5px">
+                    <div class="col-sm-12 small text-muted" style="margin-top: 5px">
                       <p>
                         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
                         You can specify a list of annotations that will be associated to the ingress.
                       </p>
                     </div>
 
-                    <div class="col-sm-12" ng-if="ic.AdvancedConfig">
+                    <div class="col-sm-12">
                       <label class="control-label text-left">Annotations</label>
                       <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addAnnotation(ic)">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i> add annotation
                       </span>
+                      <portainer-tooltip
+                        position="bottom"
+                        message="Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type."
+                      >
+                      </portainer-tooltip>
+                      <span
+                        class="label label-default interactive"
+                        ng-if="ic.IngressClass.Type === ctrl.IngressClassTypes.NGINX"
+                        style="margin-left: 10px"
+                        ng-click="ctrl.addRewriteAnnotation(ic)"
+                      >
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i> add rewrite annotation
+                      </span>
+                      <portainer-tooltip
+                        ng-if="ic.IngressClass.Type === ctrl.IngressClassTypes.NGINX"
+                        position="bottom"
+                        message="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to."
+                      >
+                      </portainer-tooltip>
+                      <span
+                        class="label label-default interactive"
+                        ng-if="ic.IngressClass.Type === ctrl.IngressClassTypes.NGINX"
+                        style="margin-left: 10px"
+                        ng-click="ctrl.addUseregexAnnotation(ic)"
+                      >
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i> add regular expression annotation
+                      </span>
+                      <portainer-tooltip
+                        ng-if="ic.IngressClass.Type === ctrl.IngressClassTypes.NGINX"
+                        position="bottom"
+                        message="Enable use of regular expressions in ingress paths (set in the ingress details of an application). Use this along with rewrite-target to specify the regex capturing group to be replaced, e.g. path regex of ^/foo/(,*) and rewrite-target of /bar/$1 rewrites example.com/foo/account to example.com/bar/account."
+                      >
+                      </portainer-tooltip>
                     </div>
 
-                    <div class="col-sm-12 form-inline" style="margin-top: 10px" ng-if="ic.AdvancedConfig">
+                    <div class="col-sm-12 form-inline" style="margin-top: 10px">
                       <div ng-repeat="annotation in ic.Annotations track by $index" style="margin-top: 2px">
                         <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">Key</span>
-                          <input type="text" class="form-control" ng-model="annotation.Key" placeholder="nginx.ingress.kubernetes.io/rewrite-target" required />
+                          <input
+                            type="text"
+                            class="form-control"
+                            ng-model="annotation.Key"
+                            placeholder="{{
+                              ic.IngressClass.Type === ctrl.IngressClassTypes.NGINX
+                                ? 'e.g. nginx.ingress.kubernetes.io/enable-rewrite-log'
+                                : 'e.g. traefik.ingress.kubernetes.io/router.priority'
+                            }}"
+                            required
+                          />
                         </div>
                         <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">Value</span>
-                          <input type="text" class="form-control" ng-model="annotation.Value" placeholder="/$1" required />
+                          <input
+                            type="text"
+                            class="form-control"
+                            ng-model="annotation.Value"
+                            placeholder="{{ ic.IngressClass.Type === ctrl.IngressClassTypes.NGINX ? 'e.g. true or false' : 'e.g. 42' }}"
+                            required
+                          />
                         </div>
                         <div class="col-sm-1 input-group input-group-sm">
                           <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeAnnotation(ic, $index)">
