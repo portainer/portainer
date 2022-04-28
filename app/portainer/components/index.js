@@ -15,10 +15,12 @@ import { TooltipAngular } from './Tip/Tooltip';
 import { beFeatureIndicatorAngular } from './BEFeatureIndicator';
 import { InformationPanelAngular } from './InformationPanel';
 import { ForcePasswordUpdateHintAngular, PasswordCheckHintAngular } from './PasswordCheckHint';
+import { ViewLoadingAngular } from './ViewLoading';
 
 export default angular
   .module('portainer.app.components', [pageHeaderModule, boxSelectorModule, widgetModule, sidebarModule, gitFormModule, porAccessManagementModule, formComponentsModule])
   .component('informationPanel', InformationPanelAngular)
+  .component('viewLoading', ViewLoadingAngular)
   .component('portainerTooltip', TooltipAngular)
   .component('reactExample', ReactExampleAngular)
   .component('beFeatureIndicator', beFeatureIndicatorAngular)

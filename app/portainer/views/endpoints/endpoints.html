@@ -7,22 +7,7 @@
   <rd-header-content>Environment management</rd-header-content>
 </rd-header>
 
-<div
-  class="row"
-  style="width: 100%; height: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center"
-  ng-if="state.loadingMessage"
->
-  <div class="sk-fold">
-    <div class="sk-fold-cube"></div>
-    <div class="sk-fold-cube"></div>
-    <div class="sk-fold-cube"></div>
-    <div class="sk-fold-cube"></div>
-  </div>
-  <span style="margin-top: 25px">
-    {{ state.loadingMessage }}
-    <i class="fa fa-cog fa-spin"></i>
-  </span>
-</div>
+<view-loading ng-if="state.loadingMessage" message="state.loadingMessage"></view-loading>
 
 <div class="row" ng-if="!state.loadingMessage">
   <div class="col-sm-12">

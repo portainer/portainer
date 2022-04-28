@@ -4,8 +4,7 @@ import { PageHeader } from '@/portainer/components/PageHeader';
 import { useSettings } from '@/portainer/settings/queries';
 import { useGroups } from '@/portainer/environment-groups/queries';
 import { r2a } from '@/react-tools/react2angular';
-
-import { Loader } from '../Loader';
+import { ViewLoading } from '@/portainer/components/ViewLoading';
 
 import { EdgeDevicesDatatableContainer } from './EdgeDevicesDatatable/EdgeDevicesDatatableContainer';
 
@@ -30,7 +29,7 @@ export function EdgeDevicesView() {
       />
 
       {loadingMessage ? (
-        <Loader message={loadingMessage} />
+        <ViewLoading message={loadingMessage} />
       ) : (
         <EdgeDevicesDatatableContainer
           setLoadingMessage={setLoadingMessage}
