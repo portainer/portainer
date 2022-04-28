@@ -5,7 +5,6 @@ import {
   useSortBy,
   useFilters,
   useGlobalFilter,
-  usePagination,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 import _ from 'lodash';
@@ -43,6 +42,7 @@ import { EnvironmentGroup } from '@/portainer/environment-groups/types';
 import { RowProvider } from './columns/RowContext';
 import { useColumns } from './columns';
 import styles from './EdgeDevicesDatatable.module.css';
+import { Pagination } from './types';
 
 export interface EdgeDevicesTableProps {
   storageKey: string;
@@ -53,6 +53,9 @@ export interface EdgeDevicesTableProps {
   dataset: Environment[];
   groups: EnvironmentGroup[];
   setLoadingMessage(message: string): void;
+  pagination: Pagination;
+  onChangePagination(pagination: Partial<Pagination>): void;
+  totalCount: number;
 }
 
 export function EdgeDevicesDatatable({
@@ -64,6 +67,9 @@ export function EdgeDevicesDatatable({
   dataset,
   groups,
   setLoadingMessage,
+  pagination,
+  onChangePagination,
+  totalCount,
 }: EdgeDevicesTableProps) {
   const { settings, setTableSettings } =
     useTableSettings<EdgeDeviceTableSettings>();
@@ -75,15 +81,12 @@ export function EdgeDevicesDatatable({
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    page,
+    rows,
     prepareRow,
     selectedFlatRows,
     allColumns,
-    gotoPage,
-    setPageSize,
     setHiddenColumns,
     setGlobalFilter,
-    state: { pageIndex, pageSize },
   } = useTable<Environment>(
     {
       defaultCanFilter: false,
@@ -91,7 +94,6 @@ export function EdgeDevicesDatatable({
       data: dataset,
       filterTypes: { multiple },
       initialState: {
-        pageSize: settings.pageSize || 10,
         hiddenColumns: settings.hiddenColumns,
         sortBy: [settings.sortBy],
         globalFilter: searchBarValue,
@@ -110,7 +112,6 @@ export function EdgeDevicesDatatable({
     useGlobalFilter,
     useSortBy,
     useExpanded,
-    usePagination,
     useRowSelect,
     useRowSelectColumn
   );
@@ -204,7 +205,7 @@ export function EdgeDevicesDatatable({
           role={tbodyProps.role}
           style={tbodyProps.style}
         >
-          {page.map((row) => {
+          {rows.map((row) => {
             prepareRow(row);
             const { key, className, role, style } = row.getRowProps();
             const group = groupsById[row.original.GroupId];
@@ -238,16 +239,23 @@ export function EdgeDevicesDatatable({
       <TableFooter>
         <SelectedRowsCount value={selectedFlatRows.length} />
         <PaginationControls
-          showAll
-          pageLimit={pageSize}
-          page={pageIndex + 1}
-          onPageChange={(p) => gotoPage(p - 1)}
-          totalCount={dataset.length}
+          pageLimit={pagination.pageLimit}
+          page={pagination.page}
+          onPageChange={(p) => gotoPage(p)}
+          totalCount={totalCount}
           onPageLimitChange={handlePageSizeChange}
         />
       </TableFooter>
     </TableContainer>
   );
+
+  function gotoPage(pageIndex: number) {
+    onChangePagination({ page: pageIndex });
+  }
+
+  function setPageSize(pageSize: number) {
+    onChangePagination({ pageLimit: pageSize });
+  }
 
   function handlePageSizeChange(pageSize: number) {
     setPageSize(pageSize);

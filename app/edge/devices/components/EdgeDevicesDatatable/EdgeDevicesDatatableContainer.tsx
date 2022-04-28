@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   TableSettingsProvider,
   useTableSettings,
@@ -11,10 +13,14 @@ import {
   EdgeDevicesDatatable,
   EdgeDevicesTableProps,
 } from './EdgeDevicesDatatable';
+import { Pagination } from './types';
 
 export function EdgeDevicesDatatableContainer({
   ...props
-}: Omit<EdgeDevicesTableProps, 'dataset'>) {
+}: Omit<
+  EdgeDevicesTableProps,
+  'dataset' | 'pagination' | 'onChangePagination' | 'totalCount'
+>) {
   const defaultSettings = {
     autoRefreshRate: 0,
     hiddenQuickActions: [],
@@ -28,12 +34,15 @@ export function EdgeDevicesDatatableContainer({
   return (
     <TableSettingsProvider defaults={defaultSettings} storageKey={storageKey}>
       <Loader>
-        {(environments) => (
+        {({ environments, pagination, totalCount, setPagination }) => (
           <EdgeDevicesDatatable
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...props}
             storageKey={storageKey}
             dataset={environments}
+            pagination={pagination}
+            onChangePagination={setPagination}
+            totalCount={totalCount}
           />
         )}
       </Loader>
@@ -42,17 +51,25 @@ export function EdgeDevicesDatatableContainer({
 }
 
 interface LoaderProps {
-  children: (environments: Environment[]) => React.ReactNode;
+  children: (options: {
+    environments: Environment[];
+    totalCount: number;
+    pagination: Pagination;
+    setPagination(value: Partial<Pagination>): void;
+  }) => React.ReactNode;
 }
 
 function Loader({ children }: LoaderProps) {
   const { settings } = useTableSettings<EdgeDeviceTableSettings>();
+  const [pagination, setPagination] = useState({
+    pageLimit: settings.pageSize,
+    page: 1,
+  });
 
-  const { environments, isLoading } = useEnvironmentList(
+  const { environments, isLoading, totalCount } = useEnvironmentList(
     {
       edgeDeviceFilter: 'trusted',
-      pageLimit: 100,
-      page: 1,
+      ...pagination,
     },
     false,
     settings.autoRefreshRate * 1000
@@ -62,5 +79,18 @@ function Loader({ children }: LoaderProps) {
     return null;
   }
 
-  return <>{children(environments)}</>;
+  return (
+    <>
+      {children({
+        environments,
+        totalCount,
+        pagination,
+        setPagination: handleSetPagination,
+      })}
+    </>
+  );
+
+  function handleSetPagination(value: Partial<Pagination>) {
+    setPagination((prev) => ({ ...prev, ...value }));
+  }
 }

@@ -6,7 +6,7 @@ interface Props {
   onPageLimitChange(value: number): void;
   page: number;
   pageLimit: number;
-  showAll: boolean;
+  showAll?: boolean;
   totalCount: number;
 }
 

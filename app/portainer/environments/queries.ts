@@ -15,12 +15,10 @@ interface Query extends EnvironmentsQueryParams {
 }
 
 export function useEnvironmentList(
-  query: Query = {},
+  { page = 1, pageLimit = 100, ...query }: Query = {},
   refetchOffline = false,
   refreshRate = 0
 ) {
-  const { page = 1, pageLimit = 100 } = query;
-
   const { isLoading, data } = useQuery(
     ['environments', { page, pageLimit, ...query }],
     async () => {
