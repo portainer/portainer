@@ -45,4 +45,19 @@
 :global :root[theme='dark'] :local .root :global .selector__option:active,
 :global :root[theme='dark'] :local .root :global .selector__option--is-focused {
   background-color: var(--blue-2);
+  color: var(--white-color);
+}
+
+.root :global .selector__option--is-selected {
+  color: var(--grey-7);
+}
+
+:global :root[theme='highcontrast'] :local .root :global .selector__single-value,
+:global :root[theme='dark'] :local .root :global .selector__single-value {
+  color: var(--white-color);
+}
+
+:global :root[theme='highcontrast'] :local .root :global .selector__input-container,
+:global :root[theme='dark'] :local .root :global .selector__input-container {
+  color: var(--white-color);
 }
