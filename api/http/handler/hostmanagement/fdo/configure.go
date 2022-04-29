@@ -1,13 +1,9 @@
 package fdo
 
 import (
-	"encoding/hex"
 	"errors"
+	"fmt"
 	"net/http"
-	"net/url"
-	"strings"
-
-	"github.com/fxamacker/cbor/v2"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -95,93 +91,171 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}
 
 	// enable fdo_sys
-	if err = fdoClient.PutDeviceSVIRaw(url.Values{
-		"guid":     []string{guid},
-		"priority": []string{"0"},
-		"module":   []string{"fdo_sys"},
-		"var":      []string{"active"},
-		"bytes":    []string{"F5"}, // this is "true" in CBOR
-	}, []byte("")); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+	// TODO: REVIEW
+	// This might not be needed anymore
+
+	// if err = fdoClient.PutDeviceSVIRaw(url.Values{
+	// 	"guid":     []string{guid},
+	// 	"priority": []string{"0"},
+	// 	"module":   []string{"fdo_sys"},
+	// 	"var":      []string{"active"},
+	// 	"bytes":    []string{"F5"}, // this is "true" in CBOR
+	// }, []byte("")); err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+	// }
+
+	// write down the edge id
+	// if err = fdoClient.PutDeviceSVIRaw(url.Values{
+	// 	"guid":     []string{guid},
+	// 	"priority": []string{"1"},
+	// 	"module":   []string{"fdo_sys"},
+	// 	"var":      []string{"filedesc"},
+	// 	"filename": []string{"DEVICE_edgeid.txt"},
+	// }, []byte(payload.EdgeID)); err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(edgeid)")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(edgeid)", Err: err}
+	// }
+
+	const deviceConfiguration = `
+	GUID=%s
+	DEVICE_NAME=%s
+	EDGE_ID=%s
+	EDGE_KEY=%s
+	`
+
+	deviceConfData := fmt.Sprintf(deviceConfiguration, guid, payload.Name, payload.EdgeID, payload.EdgeKey)
+	deviceConfResourceName := fmt.Sprintf("%s-DEVICE.conf", guid)
+
+	err = fdoClient.PostResource(deviceConfResourceName, []byte(deviceConfData))
+	if err != nil {
+		logrus.WithError(err).Info("fdoConfigureDevice: UploadResource(DEVICE.conf)")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: UploadResource(DEVICE.conf)", Err: err}
 	}
 
-	if err = fdoClient.PutDeviceSVIRaw(url.Values{
-		"guid":     []string{guid},
-		"priority": []string{"1"},
-		"module":   []string{"fdo_sys"},
-		"var":      []string{"filedesc"},
-		"filename": []string{"DEVICE_edgeid.txt"},
-	}, []byte(payload.EdgeID)); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(edgeid)")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(edgeid)", Err: err}
+	// TODO: REVIEW
+	// I believe this will need a filter on GUID
+	// https://github.com/secure-device-onboard/pri-fidoiot/tree/1.1.0-rel/component-samples/demo/aio#service-info-filters
+
+	// err = fdoClient.PostSVIFile("DEVICE.conf", deviceConfResourceName)
+
+	// TODO: REVIEW whether the $guid shortcut works
+	// If that's the case - then potentially we only need to do this once
+	// and just do a PostResource here (the one above)
+	// That would mean that we would need to relocate this action to somewhere else (a setup process after enabling the FDO integration for example)
+	err = fdoClient.PostSVI("DEVICE.conf", "$(guid)-DEVICE.conf")
+	if err != nil {
+		logrus.WithError(err).Info("fdoConfigureDevice: PostSVIFile(DEVICE.conf)")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PostSVIFile(DEVICE.conf)", Err: err}
 	}
 
 	// write down the edgekey
-	if err = fdoClient.PutDeviceSVIRaw(url.Values{
-		"guid":     []string{guid},
-		"priority": []string{"1"},
-		"module":   []string{"fdo_sys"},
-		"var":      []string{"filedesc"},
-		"filename": []string{"DEVICE_edgekey.txt"},
-	}, []byte(payload.EdgeKey)); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(edgekey)")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(edgekey)", Err: err}
-	}
+
+	// if err = fdoClient.PutDeviceSVIRaw(url.Values{
+	// 	"guid":     []string{guid},
+	// 	"priority": []string{"1"},
+	// 	"module":   []string{"fdo_sys"},
+	// 	"var":      []string{"filedesc"},
+	// 	"filename": []string{"DEVICE_edgekey.txt"},
+	// }, []byte(payload.EdgeKey)); err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(edgekey)")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(edgekey)", Err: err}
+	// }
+
+	// err = fdoClient.PostSVIFile("DEVICE_edgekey.txt", payload.EdgeKey)
+	// if err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PostSVIFile(edgekey)")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PostSVIFile(edgekey)", Err: err}
+	// }
 
 	// write down the device name
-	if err = fdoClient.PutDeviceSVIRaw(url.Values{
-		"guid":     []string{guid},
-		"priority": []string{"1"},
-		"module":   []string{"fdo_sys"},
-		"var":      []string{"filedesc"},
-		"filename": []string{"DEVICE_name.txt"},
-	}, []byte(payload.Name)); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(name)")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(name)", Err: err}
-	}
+
+	// if err = fdoClient.PutDeviceSVIRaw(url.Values{
+	// 	"guid":     []string{guid},
+	// 	"priority": []string{"1"},
+	// 	"module":   []string{"fdo_sys"},
+	// 	"var":      []string{"filedesc"},
+	// 	"filename": []string{"DEVICE_name.txt"},
+	// }, []byte(payload.Name)); err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(name)")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(name)", Err: err}
+	// }
+
+	// err = fdoClient.PostSVIFile("DEVICE_name.txt", payload.Name)
+	// if err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PostSVIFile(name)")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PostSVIFile(name)", Err: err}
+	// }
 
 	// write down the device GUID - used as the EDGE_DEVICE_GUID too
-	if err = fdoClient.PutDeviceSVIRaw(url.Values{
-		"guid":     []string{guid},
-		"priority": []string{"1"},
-		"module":   []string{"fdo_sys"},
-		"var":      []string{"filedesc"},
-		"filename": []string{"DEVICE_GUID.txt"},
-	}, []byte(guid)); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
-	}
 
-	if err = fdoClient.PutDeviceSVIRaw(url.Values{
-		"guid":     []string{guid},
-		"priority": []string{"1"},
-		"module":   []string{"fdo_sys"},
-		"var":      []string{"filedesc"},
-		"filename": []string{deploymentScriptName},
-	}, fileContent); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
-	}
+	// if err = fdoClient.PutDeviceSVIRaw(url.Values{
+	// 	"guid":     []string{guid},
+	// 	"priority": []string{"1"},
+	// 	"module":   []string{"fdo_sys"},
+	// 	"var":      []string{"filedesc"},
+	// 	"filename": []string{"DEVICE_GUID.txt"},
+	// }, []byte(guid)); err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+	// }
 
-	b, err := cbor.Marshal([]string{"/bin/sh", deploymentScriptName})
+	// err = fdoClient.PostSVIFile("DEVICE_GUID.txt", guid)
+	// if err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PostSVIFile(guid)")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PostSVIFile(guid)", Err: err}
+	// }
+
+	// write down the profile script
+
+	// if err = fdoClient.PutDeviceSVIRaw(url.Values{
+	// 	"guid":     []string{guid},
+	// 	"priority": []string{"1"},
+	// 	"module":   []string{"fdo_sys"},
+	// 	"var":      []string{"filedesc"},
+	// 	"filename": []string{deploymentScriptName},
+	// }, fileContent); err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+	// }
+
+	// b, err := cbor.Marshal([]string{"/bin/sh", deploymentScriptName})
+	// if err != nil {
+	// 	logrus.WithError(err).Error("failed to marshal string to CBOR")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw() failed to encode", Err: err}
+	// }
+
+	// cborBytes := strings.ToUpper(hex.EncodeToString(b))
+	// logrus.WithField("cbor", cborBytes).WithField("string", deploymentScriptName).Info("converted to CBOR")
+
+	// if err = fdoClient.PutDeviceSVIRaw(url.Values{
+	// 	"guid":     []string{guid},
+	// 	"priority": []string{"2"},
+	// 	"module":   []string{"fdo_sys"},
+	// 	"var":      []string{"exec"},
+	// 	"bytes":    []string{cborBytes},
+	// }, []byte("")); err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+	// }
+
+	// TODO: REVIEW
+	// The PostResource and PostSVI steps probably can be done once just after creating the profile
+	// PostResource should also be done after removing a profile
+	// DelResource should also be done after deleting a profile
+	err = fdoClient.PostResource(deploymentScriptName, fileContent)
 	if err != nil {
-		logrus.WithError(err).Error("failed to marshal string to CBOR")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw() failed to encode", Err: err}
+		logrus.WithError(err).Info("fdoConfigureDevice: UploadResource(DEVICE.conf)")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: UploadResource(DEVICE.conf)", Err: err}
 	}
 
-	cborBytes := strings.ToUpper(hex.EncodeToString(b))
-	logrus.WithField("cbor", cborBytes).WithField("string", deploymentScriptName).Info("converted to CBOR")
-
-	if err = fdoClient.PutDeviceSVIRaw(url.Values{
-		"guid":     []string{guid},
-		"priority": []string{"2"},
-		"module":   []string{"fdo_sys"},
-		"var":      []string{"exec"},
-		"bytes":    []string{cborBytes},
-	}, []byte("")); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+	// TODO: REVIEW
+	// Must be named OS_Install.sh to work with the BMO AIO setup
+	// This might need to be configurable in the future
+	err = fdoClient.PostSVI("OS_Install.sh", deploymentScriptName)
+	if err != nil {
+		logrus.WithError(err).Info("fdoConfigureDevice: PostSVIFileExec(profile)")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PostSVIFileExec(profile)", Err: err}
 	}
 
 	return response.Empty(w)
