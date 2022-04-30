@@ -72,14 +72,14 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return httperror.BadRequest("Unable to find an environment on request context", err)
 	}
 
-	logrus.Debugf("[http,handler,endpointedge] [message: retrieved endpoint information from context] [endpoint: %s] [endpoint_id: %s]", endpoint.Name, endpoint.ID)
+	logrus.Debugf("[http,handler,endpointedge] [message: retrieved endpoint information from context] [endpoint: %s] [endpoint_id: %d]", endpoint.Name, endpoint.ID)
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
-	logrus.Debugf("[http,handler,endpointedge] [message: authorized endpoint operation] [endpoint: %s] [endpoint_id: %s]", endpoint.Name, endpoint.ID)
+	logrus.Debugf("[http,handler,endpointedge] [message: authorized endpoint operation] [endpoint: %s] [endpoint_id: %d]", endpoint.Name, endpoint.ID)
 
 	if endpoint.EdgeID == "" {
 		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
@@ -99,7 +99,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist environment changes inside the database", err}
 	}
 
-	logrus.Debugf("[http,handler,endpointedge] [message: updated endpoint information in database] [edge_id: %s] [checkin_time: %s]", endpoint.EdgeID, endpoint.LastCheckInDate)
+	logrus.Debugf("[http,handler,endpointedge] [message: updated endpoint information in database] [edge_id: %s] [checkin_time: %d]", endpoint.EdgeID, endpoint.LastCheckInDate)
 
 	checkinInterval := endpoint.EdgeCheckinInterval
 	if endpoint.EdgeCheckinInterval == 0 {

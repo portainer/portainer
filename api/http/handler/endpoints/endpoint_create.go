@@ -197,7 +197,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return endpointCreationError
 	}
 
-	logrus.Debugf("[http,handler,endpoints] [message: successfully created endpoint] [endpoint: %s] [endpoint_id: %s]", endpoint.Name, endpoint.ID)
+	logrus.Debugf("[http,handler,endpoints] [message: successfully created endpoint] [endpoint: %s] [endpoint_id: %d]", endpoint.Name, endpoint.ID)
 
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
