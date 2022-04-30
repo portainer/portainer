@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/middlewares"
+	"github.com/sirupsen/logrus"
 )
 
 type stackStatusResponse struct {
@@ -64,15 +65,21 @@ type endpointEdgeStatusInspectResponse struct {
 // @failure 500 "Server error"
 // @router /endpoints/{id}/edge/status [get]
 func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	logrus.Debug("[http,handler,endpointedge] [message: received request to get endpoint edge status]")
+
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
 		return httperror.BadRequest("Unable to find an environment on request context", err)
 	}
 
+	logrus.Debugf("[http,handler,endpointedge] [message: retrieved endpoint information from context] [endpoint: %s] [endpoint_id: %s]", endpoint.Name, endpoint.ID)
+
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
+
+	logrus.Debugf("[http,handler,endpointedge] [message: authorized endpoint operation] [endpoint: %s] [endpoint_id: %s]", endpoint.Name, endpoint.ID)
 
 	if endpoint.EdgeID == "" {
 		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
@@ -92,6 +99,8 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist environment changes inside the database", err}
 	}
 
+	logrus.Debugf("[http,handler,endpointedge] [message: updated endpoint information in database] [edge_id: %s] [checkin_time: %s]", endpoint.EdgeID, endpoint.LastCheckInDate)
+
 	checkinInterval := endpoint.EdgeCheckinInterval
 	if endpoint.EdgeCheckinInterval == 0 {
 		settings, err := handler.DataStore.Settings().Settings()
@@ -110,11 +119,15 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		Credentials:     tunnel.Credentials,
 	}
 
+	logrus.Debugf("[http,handler,endpointedge] [message: retrieved tunnel information from mem] [status: %s]", tunnel.Status)
+
 	schedules, handlerErr := handler.buildSchedules(endpoint.ID, tunnel)
 	if handlerErr != nil {
 		return handlerErr
 	}
 	statusResponse.Schedules = schedules
+
+	logrus.Debugf("[http,handler,endpointedge] [message: built schedules] [schedule_count: %d]", len(schedules))
 
 	if tunnel.Status == portainer.EdgeAgentManagementRequired {
 		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
@@ -125,6 +138,8 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return handlerErr
 	}
 	statusResponse.Stacks = edgeStacksStatus
+
+	logrus.Debugf("[http,handler,endpointedge] [message: built stacks] [stack_count: %d]", len(edgeStacksStatus))
 
 	return response.JSON(w, statusResponse)
 }

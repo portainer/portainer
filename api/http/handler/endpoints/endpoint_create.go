@@ -18,6 +18,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/sirupsen/logrus"
 )
 
 type endpointCreatePayload struct {
@@ -181,31 +182,43 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @failure 500 "Server error"
 // @router /endpoints [post]
 func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	logrus.Debug("[http,handler,endpoints] [message: received request to create endpoint]")
+
 	payload := &endpointCreatePayload{}
 	err := payload.Validate(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
+	logrus.Debug("[http,handler,endpoints] [message: successfully validated payload]")
+
 	endpoint, endpointCreationError := handler.createEndpoint(payload)
 	if endpointCreationError != nil {
 		return endpointCreationError
 	}
+
+	logrus.Debugf("[http,handler,endpoints] [message: successfully created endpoint] [endpoint: %s] [endpoint_id: %s]", endpoint.Name, endpoint.ID)
 
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment group inside the database", err}
 	}
 
+	logrus.Debugf("[http,handler,endpoints] [message: fetched endpoint group] [group: %s]", endpointGroup.Name)
+
 	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
 	}
 
+	logrus.Debug("[http,handler,endpoints] [message: successfully fetched edge groups]")
+
 	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
 	}
+
+	logrus.Debug("[http,handler,endpoints] [message: successfully fetched edge stacks]")
 
 	relationObject := &portainer.EndpointRelation{
 		EndpointID: endpoint.ID,
@@ -217,12 +230,16 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		for _, stackID := range relatedEdgeStacks {
 			relationObject.EdgeStacks[stackID] = true
 		}
+
+		logrus.Debugf("[http,handler,endpoints] [message: computed edge stacks relationships] [stack_count: %d]", len(relatedEdgeStacks))
 	}
 
 	err = handler.DataStore.EndpointRelation().Create(relationObject)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the relation object inside the database", err}
 	}
+
+	logrus.Debug("[http,handler,endpoints] [message: created database relation object]")
 
 	return response.JSON(w, endpoint)
 }
@@ -308,6 +325,8 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 
 	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
 
+	logrus.Debugf("[http,handler,endpoints] [message: successfully generated Edge key] [key: %s]", edgeKey)
+
 	endpoint := &portainer.Endpoint{
 		ID:      portainer.EndpointID(endpointID),
 		Name:    payload.Name,
@@ -334,6 +353,8 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}
 
+	logrus.Debug("[http,handler,endpoints] [message: successfully fetched settings]")
+
 	if settings.EnforceEdgeID {
 		edgeID, err := uuid.NewV4()
 		if err != nil {
@@ -347,6 +368,8 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the environment", err}
 	}
+
+	logrus.Debug("[http,handler,endpoints] [message: successfully updated endpoint authorizations]")
 
 	return endpoint, nil
 }

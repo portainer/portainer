@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/Microsoft/go-winio v0.5.1
+	github.com/Sirupsen/logrus v1.0.6
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535
 	github.com/aws/aws-sdk-go-v2 v1.11.1
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.2
