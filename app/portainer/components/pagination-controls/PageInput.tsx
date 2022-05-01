@@ -15,9 +15,10 @@ interface Props {
 }
 
 export function PageInput({ onChange, totalPages }: Props) {
-  const { handleSubmit, setFieldValue, values } = useFormik<Values>({
+  const { handleSubmit, setFieldValue, values, isValid } = useFormik<Values>({
     initialValues: { page: '' },
     onSubmit: async ({ page }) => page && onChange(page),
+    validateOnMount: true,
     validationSchema: () =>
       object({ page: number().required().max(totalPages).min(1) }),
   });
@@ -36,7 +37,9 @@ export function PageInput({ onChange, totalPages }: Props) {
         min={1}
         onChange={handleChange}
       />
-      <Button type="submit">Go</Button>
+      <Button type="submit" disabled={!isValid}>
+        Go
+      </Button>
     </form>
   );
 
