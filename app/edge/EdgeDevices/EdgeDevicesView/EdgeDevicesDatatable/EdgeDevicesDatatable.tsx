@@ -137,116 +137,119 @@ export function EdgeDevicesDatatable({
   const groupsById = _.groupBy(groups, 'Id');
 
   return (
-    <TableContainer>
-      <TableTitle icon="fa-plug" label="Edge Devices">
-        <TableTitleActions>
-          <ColumnVisibilityMenu<Environment>
-            columns={columnsToHide}
-            onChange={handleChangeColumnsVisibility}
-            value={settings.hiddenColumns}
-          />
-
-          <TableSettingsMenu>
-            <EdgeDevicesDatatableSettings />
-          </TableSettingsMenu>
-        </TableTitleActions>
-      </TableTitle>
-
-      <TableActions>
-        <EdgeDevicesDatatableActions
-          selectedItems={selectedFlatRows.map((row) => row.original)}
-          isFDOEnabled={isFdoEnabled}
-          isOpenAMTEnabled={isOpenAmtEnabled}
-          setLoadingMessage={setLoadingMessage}
-          showWaitingRoomLink={showWaitingRoomLink}
-        />
-      </TableActions>
-
-      {isOpenAmtEnabled && someDeviceHasAMTActivated && (
-        <div className={styles.kvmTip}>
-          <TextTip color="blue">
-            For the KVM function to work you need to have the MPS server added
-            to your trusted site list, browse to this{' '}
-            <a href={`https://${mpsServer}`} target="_blank" rel="noreferrer">
-              site
-            </a>{' '}
-            and add to your trusted site list
-          </TextTip>
-        </div>
-      )}
-
-      <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
-
-      <Table
-        className={tableProps.className}
-        role={tableProps.role}
-        style={tableProps.style}
-      >
-        <thead>
-          {headerGroups.map((headerGroup) => {
-            const { key, className, role, style } =
-              headerGroup.getHeaderGroupProps();
-
-            return (
-              <TableHeaderRow<Environment>
-                key={key}
-                className={className}
-                role={role}
-                style={style}
-                headers={headerGroup.headers}
-                onSortChange={handleSortChange}
+    <div className="row">
+      <div className="col-sm-12">
+        <TableContainer>
+          <TableTitle icon="fa-plug" label="Edge Devices">
+            <TableTitleActions>
+              <ColumnVisibilityMenu<Environment>
+                columns={columnsToHide}
+                onChange={handleChangeColumnsVisibility}
+                value={settings.hiddenColumns}
               />
-            );
-          })}
-        </thead>
-        <tbody
-          className={tbodyProps.className}
-          role={tbodyProps.role}
-          style={tbodyProps.style}
-        >
-          {rows.map((row) => {
-            prepareRow(row);
-            const { key, className, role, style } = row.getRowProps();
-            const group = groupsById[row.original.GroupId];
-            return (
-              <RowProvider
-                key={key}
-                isOpenAmtEnabled={isOpenAmtEnabled}
-                groupName={group[0]?.Name}
-              >
-                <TableRow<Environment>
-                  cells={row.cells}
-                  key={key}
-                  className={className}
-                  role={role}
-                  style={style}
-                />
-                {row.isExpanded && (
-                  <tr>
-                    <td />
-                    <td colSpan={row.cells.length - 1}>
-                      <AMTDevicesDatatable environmentId={row.original.Id} />
-                    </td>
-                  </tr>
-                )}
-              </RowProvider>
-            );
-          })}
-        </tbody>
-      </Table>
-
-      <TableFooter>
-        <SelectedRowsCount value={selectedFlatRows.length} />
-        <PaginationControls
-          isPageInputVisible
-          pageLimit={pagination.pageLimit}
-          page={pagination.page}
-          onPageChange={(p) => gotoPage(p)}
-          totalCount={totalCount}
-          onPageLimitChange={handlePageSizeChange}
-        />
-      </TableFooter>
-    </TableContainer>
+              <TableSettingsMenu>
+                <EdgeDevicesDatatableSettings />
+              </TableSettingsMenu>
+            </TableTitleActions>
+          </TableTitle>
+          <TableActions>
+            <EdgeDevicesDatatableActions
+              selectedItems={selectedFlatRows.map((row) => row.original)}
+              isFDOEnabled={isFdoEnabled}
+              isOpenAMTEnabled={isOpenAmtEnabled}
+              setLoadingMessage={setLoadingMessage}
+              showWaitingRoomLink={showWaitingRoomLink}
+            />
+          </TableActions>
+          {isOpenAmtEnabled && someDeviceHasAMTActivated && (
+            <div className={styles.kvmTip}>
+              <TextTip color="blue">
+                For the KVM function to work you need to have the MPS server
+                added to your trusted site list, browse to this{' '}
+                <a
+                  href={`https://${mpsServer}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  site
+                </a>{' '}
+                and add to your trusted site list
+              </TextTip>
+            </div>
+          )}
+          <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
+          <Table
+            className={tableProps.className}
+            role={tableProps.role}
+            style={tableProps.style}
+          >
+            <thead>
+              {headerGroups.map((headerGroup) => {
+                const { key, className, role, style } =
+                  headerGroup.getHeaderGroupProps();
+                return (
+                  <TableHeaderRow<Environment>
+                    key={key}
+                    className={className}
+                    role={role}
+                    style={style}
+                    headers={headerGroup.headers}
+                    onSortChange={handleSortChange}
+                  />
+                );
+              })}
+            </thead>
+            <tbody
+              className={tbodyProps.className}
+              role={tbodyProps.role}
+              style={tbodyProps.style}
+            >
+              {rows.map((row) => {
+                prepareRow(row);
+                const { key, className, role, style } = row.getRowProps();
+                const group = groupsById[row.original.GroupId];
+                return (
+                  <RowProvider
+                    key={key}
+                    isOpenAmtEnabled={isOpenAmtEnabled}
+                    groupName={group[0]?.Name}
+                  >
+                    <TableRow<Environment>
+                      cells={row.cells}
+                      key={key}
+                      className={className}
+                      role={role}
+                      style={style}
+                    />
+                    {row.isExpanded && (
+                      <tr>
+                        <td />
+                        <td colSpan={row.cells.length - 1}>
+                          <AMTDevicesDatatable
+                            environmentId={row.original.Id}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </RowProvider>
+                );
+              })}
+            </tbody>
+          </Table>
+          <TableFooter>
+            <SelectedRowsCount value={selectedFlatRows.length} />
+            <PaginationControls
+              isPageInputVisible
+              pageLimit={pagination.pageLimit}
+              page={pagination.page}
+              onPageChange={(p) => gotoPage(p)}
+              totalCount={totalCount}
+              onPageLimitChange={handlePageSizeChange}
+            />
+          </TableFooter>
+        </TableContainer>
+      </div>
+    </div>
   );
 
   function gotoPage(pageIndex: number) {
