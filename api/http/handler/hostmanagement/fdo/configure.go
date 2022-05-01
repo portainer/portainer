@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	deploymentScriptName = "fdo.sh"
+	deploymentScriptName = "fdo-profile.sh"
 )
 
 type deviceConfigurePayload struct {
@@ -125,7 +125,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	`
 
 	deviceConfData := fmt.Sprintf(deviceConfiguration, guid, payload.Name, payload.EdgeID, payload.EdgeKey)
-	deviceConfResourceName := fmt.Sprintf("%s-DEVICE.conf", guid)
+	deviceConfResourceName := fmt.Sprintf("%s-agent.conf", guid)
 
 	err = fdoClient.PostResource(deviceConfResourceName, []byte(deviceConfData))
 	if err != nil {
@@ -143,11 +143,12 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	// If that's the case - then potentially we only need to do this once
 	// and just do a PostResource here (the one above)
 	// That would mean that we would need to relocate this action to somewhere else (a setup process after enabling the FDO integration for example)
-	err = fdoClient.PostSVI("DEVICE.conf", "$(guid)-DEVICE.conf")
-	if err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PostSVIFile(DEVICE.conf)")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PostSVIFile(DEVICE.conf)", Err: err}
-	}
+
+	// err = fdoClient.PostSVI("DEVICE.conf", "$(guid)-DEVICE.conf")
+	// if err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PostSVIFile(DEVICE.conf)")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PostSVIFile(DEVICE.conf)", Err: err}
+	// }
 
 	// write down the edgekey
 
@@ -252,11 +253,11 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	// TODO: REVIEW
 	// Must be named OS_Install.sh to work with the BMO AIO setup
 	// This might need to be configurable in the future
-	err = fdoClient.PostSVI("OS_Install.sh", deploymentScriptName)
-	if err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PostSVIFileExec(profile)")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PostSVIFileExec(profile)", Err: err}
-	}
+	// err = fdoClient.PostSVI("OS_Install.sh", deploymentScriptName)
+	// if err != nil {
+	// 	logrus.WithError(err).Info("fdoConfigureDevice: PostSVIFileExec(profile)")
+	// 	return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PostSVIFileExec(profile)", Err: err}
+	// }
 
 	return response.Empty(w)
 }
