@@ -136,21 +136,19 @@ func (a *azureDownloader) latestCommitID(ctx context.Context, options fetchOptio
 
 	var refs struct {
 		Value []struct {
-			Name     string `json:"name"`
-			ObjectId string `json:"objectId"`
+			CommitId string `json:"commitId"`
 		}
 	}
+
 	if err := json.NewDecoder(resp.Body).Decode(&refs); err != nil {
 		return "", errors.Wrap(err, "could not parse Azure Refs response")
 	}
 
-	for _, ref := range refs.Value {
-		if strings.EqualFold(ref.Name, options.referenceName) {
-			return ref.ObjectId, nil
-		}
+	if len(refs.Value) == 0 || refs.Value[0].CommitId == "" {
+		return "", errors.Errorf("failed to get latest commitID in the repository")
 	}
 
-	return "", errors.Errorf("could not find ref %q in the repository", options.referenceName)
+	return refs.Value[0].CommitId, nil
 }
 
 func parseUrl(rawUrl string) (*azureOptions, error) {
@@ -236,8 +234,10 @@ func (a *azureDownloader) buildDownloadUrl(config *azureOptions, referenceName s
 	// scopePath=/&download=true&versionDescriptor.version=main&$format=zip&recursionLevel=full&api-version=6.0
 	q.Set("scopePath", "/")
 	q.Set("download", "true")
-	q.Set("versionDescriptor.versionType", getVersionType(referenceName))
-	q.Set("versionDescriptor.version", formatReferenceName(referenceName))
+	if referenceName != "" {
+		q.Set("versionDescriptor.versionType", getVersionType(referenceName))
+		q.Set("versionDescriptor.version", formatReferenceName(referenceName))
+	}
 	q.Set("$format", "zip")
 	q.Set("recursionLevel", "full")
 	q.Set("api-version", "6.0")
@@ -247,7 +247,7 @@ func (a *azureDownloader) buildDownloadUrl(config *azureOptions, referenceName s
 }
 
 func (a *azureDownloader) buildRefsUrl(config *azureOptions, referenceName string) (string, error) {
-	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/refs",
+	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/items",
 		a.baseUrl,
 		url.PathEscape(config.organisation),
 		url.PathEscape(config.project),
@@ -258,9 +258,12 @@ func (a *azureDownloader) buildRefsUrl(config *azureOptions, referenceName strin
 		return "", errors.Wrapf(err, "failed to parse refs url path %s", rawUrl)
 	}
 
-	// filterContains=main&api-version=6.0
 	q := u.Query()
-	q.Set("filterContains", formatReferenceName(referenceName))
+	q.Set("scopePath", "/")
+	if referenceName != "" {
+		q.Set("versionDescriptor.versionType", getVersionType(referenceName))
+		q.Set("versionDescriptor.version", formatReferenceName(referenceName))
+	}
 	q.Set("api-version", "6.0")
 	u.RawQuery = q.Encode()
 
