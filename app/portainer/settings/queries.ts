@@ -3,6 +3,18 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { getSettings, updateSettings } from './settings.service';
 import { Settings } from './types';
 
+export function useSettings<T = Settings>(select?: (settings: Settings) => T) {
+  return useQuery(['settings'], getSettings, {
+    select,
+    meta: {
+      error: {
+        title: 'Failure',
+        message: 'Unable to retrieve settings',
+      },
+    },
+  });
+}
+
 export function useUpdateSettingsMutation() {
   const queryClient = useQueryClient();
 
@@ -17,8 +29,4 @@ export function useUpdateSettingsMutation() {
       },
     },
   });
-}
-
-export function useSettings<T = Settings>(select?: (settings: Settings) => T) {
-  return useQuery(['settings'], getSettings, { select });
 }

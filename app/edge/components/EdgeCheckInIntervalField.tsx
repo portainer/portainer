@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { FormControl } from '@/portainer/components/form-components/FormControl';
 import { Select } from '@/portainer/components/form-components/Input';
-import { r2a } from '@/react-tools/react2angular';
 import { useSettings } from '@/portainer/settings/queries';
+import { r2a } from '@/react-tools/react2angular';
 
 interface Props {
   value: number;
