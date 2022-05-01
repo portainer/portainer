@@ -170,9 +170,10 @@ export function EdgeDevicesDatatable({
                   href={`https://${mpsServer}`}
                   target="_blank"
                   rel="noreferrer"
+                  className="space-right"
                 >
                   site
-                </a>{' '}
+                </a>
                 and add to your trusted site list
               </TextTip>
             </div>
@@ -204,36 +205,39 @@ export function EdgeDevicesDatatable({
               role={tbodyProps.role}
               style={tbodyProps.style}
             >
-              {rows.map((row) => {
-                prepareRow(row);
-                const { key, className, role, style } = row.getRowProps();
-                const group = groupsById[row.original.GroupId];
-                return (
-                  <RowProvider
-                    key={key}
-                    isOpenAmtEnabled={isOpenAmtEnabled}
-                    groupName={group[0]?.Name}
-                  >
-                    <TableRow<Environment>
-                      cells={row.cells}
+              <Table.Content
+                prepareRow={prepareRow}
+                rows={rows}
+                renderRow={(row, { key, className, role, style }) => {
+                  const group = groupsById[row.original.GroupId];
+
+                  return (
+                    <RowProvider
                       key={key}
-                      className={className}
-                      role={role}
-                      style={style}
-                    />
-                    {row.isExpanded && (
-                      <tr>
-                        <td />
-                        <td colSpan={row.cells.length - 1}>
-                          <AMTDevicesDatatable
-                            environmentId={row.original.Id}
-                          />
-                        </td>
-                      </tr>
-                    )}
-                  </RowProvider>
-                );
-              })}
+                      isOpenAmtEnabled={isOpenAmtEnabled}
+                      groupName={group[0]?.Name}
+                    >
+                      <TableRow<Environment>
+                        cells={row.cells}
+                        key={key}
+                        className={className}
+                        role={role}
+                        style={style}
+                      />
+                      {row.isExpanded && (
+                        <tr>
+                          <td />
+                          <td colSpan={row.cells.length - 1}>
+                            <AMTDevicesDatatable
+                              environmentId={row.original.Id}
+                            />
+                          </td>
+                        </tr>
+                      )}
+                    </RowProvider>
+                  );
+                }}
+              />
             </tbody>
           </Table>
           <TableFooter>
