@@ -1,21 +1,17 @@
 import { useQuery } from 'react-query';
 
 import { EnvironmentId } from '@/portainer/environments/types';
-import { error as notifyError } from '@/portainer/services/notifications';
 
-import { getContainers } from './containers.service';
+import { getContainers, Filters } from './containers.service';
 
-export function useContainers(environmentId: EnvironmentId, filters?: object) {
+export function useContainers(environmentId: EnvironmentId, filters?: Filters) {
   return useQuery(
     ['environments', environmentId, 'docker', 'containers', { filters }],
     () => getContainers(environmentId, filters),
     {
-      onError: (err) => {
-        notifyError(
-          'Failure',
-          err as Error,
-          'Unable to get containers in network'
-        );
+      meta: {
+        title: 'Failure',
+        message: 'Unable to get containers in network',
       },
     }
   );

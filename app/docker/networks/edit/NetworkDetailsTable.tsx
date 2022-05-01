@@ -66,7 +66,7 @@ export function NetworkDetailsTable({
               </DetailsTable.Row>
 
               {/* IPV4 ConfigRowContent */}
-              {ipv4Configs?.map((config) => (
+              {ipv4Configs.map((config) => (
                 <Fragment key={config.Subnet}>
                   <DetailsTable.Row
                     label={`IPV4 Subnet${getConfigDetails(config.Subnet)}`}
@@ -84,7 +84,7 @@ export function NetworkDetailsTable({
               ))}
 
               {/* IPV6 ConfigRowContent */}
-              {ipv6Configs?.map((config) => (
+              {ipv6Configs.map((config) => (
                 <Fragment key={config.Subnet}>
                   <DetailsTable.Row
                     label={`IPV6 Subnet${getConfigDetails(config.Subnet)}`}

@@ -2,12 +2,14 @@ import { EnvironmentId } from '@/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 import axios from '@/portainer/services/axios';
 
+import { NetworkId } from '../networks/types';
 import { genericHandler } from '../rest/response/handlers';
 
 import { ContainerId, DockerContainer } from './types';
 
 export interface Filters {
   label?: string[];
+  network?: NetworkId[];
 }
 
 export async function startContainer(

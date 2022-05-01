@@ -13,11 +13,7 @@ import { DockerContainer } from '@/docker/containers/types';
 import { useNetwork, useDeleteNetwork } from '../queries';
 import { isSystemNetwork } from '../network.helper';
 import { useContainers } from '../../containers/queries';
-import {
-  DockerNetwork,
-  NetworkContainer,
-  NetworkResponseContainer,
-} from '../types';
+import { DockerNetwork, NetworkContainer } from '../types';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 import { NetworkOptionsTable } from './NetworkOptionsTable';
@@ -62,7 +58,7 @@ export function NetworkDetailsView() {
           { link: 'docker.networks', label: 'Networks' },
           {
             link: 'docker.networks.network',
-            label: networkQuery.data?.Name || '',
+            label: networkQuery.data.Name,
           },
         ]}
       />
@@ -118,8 +114,7 @@ export function NetworkDetailsView() {
   ) {
     const containersInNetwork = _.compact(
       containers.map((container) => {
-        const containerInNetworkResponse: NetworkResponseContainer =
-          network.Containers[container.Id];
+        const containerInNetworkResponse = network.Containers[container.Id];
         if (containerInNetworkResponse) {
           const containerInNetwork: NetworkContainer = {
             ...containerInNetworkResponse,
