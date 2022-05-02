@@ -73,7 +73,7 @@ export function InputList<T = DefaultType>({
         />
       </div>
 
-      <div className={clsx('col-sm-12 form-inline', styles.items)}>
+      <div className={clsx('col-sm-12', styles.items, 'space-y-4')}>
         {value.map((item, index) => {
           const key = itemKeyGetter(item, index);
           const error = typeof errors === 'object' ? errors[index] : undefined;
@@ -88,7 +88,7 @@ export function InputList<T = DefaultType>({
                 onChange={(value: T) => handleChangeItem(key, value)}
                 error={error}
               />
-              <div className={styles.itemActions}>
+              <div className={clsx(styles.itemActions, 'items-start')}>
                 {movable && (
                   <>
                     <Button
@@ -191,7 +191,7 @@ function DefaultItem({ item, onChange, error }: ItemProps<DefaultType>) {
         onChange={(e) => onChange({ value: e.target.value })}
         className={styles.defaultItem}
       />
-      <FormError>{error}</FormError>
+      {error && <FormError>{error}</FormError>}
     </>
   );
 }
