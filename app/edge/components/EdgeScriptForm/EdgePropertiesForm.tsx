@@ -2,6 +2,7 @@ import { FormControl } from '@/portainer/components/form-components/FormControl'
 import { Input } from '@/portainer/components/form-components/Input';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { SwitchField } from '@/portainer/components/form-components/SwitchField';
+import { TextTip } from '@/portainer/components/Tip/TextTip';
 
 import { OsSelector } from './OsSelector';
 import { EdgeProperties } from './types';
@@ -27,19 +28,26 @@ export function EdgePropertiesForm({
       />
 
       {!hideIdGetter && (
-        <FormControl
-          label="Edge ID Generator"
-          tooltip="A bash script one liner that will generate the edge id"
-          inputId="edge-id-generator-input"
-        >
-          <Input
-            type="text"
-            name="edgeIdGenerator"
-            value={values.edgeIdGenerator}
-            id="edge-id-generator-input"
-            onChange={(e) => setFieldValue(e.target.name, e.target.value)}
-          />
-        </FormControl>
+        <>
+          <FormControl
+            label="Edge ID Generator"
+            tooltip="A bash script one liner that will generate the edge id"
+            inputId="edge-id-generator-input"
+          >
+            <Input
+              type="text"
+              name="edgeIdGenerator"
+              value={values.edgeIdGenerator}
+              id="edge-id-generator-input"
+              onChange={(e) => setFieldValue(e.target.name, e.target.value)}
+            />
+          </FormControl>
+
+          <TextTip color="blue">
+            <code>PORTAINER_EDGE_ID</code> environment variable is required to
+            successfully connect the edge agent to Portainer
+          </TextTip>
+        </>
       )}
 
       <div className="form-group">
