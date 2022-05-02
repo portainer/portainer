@@ -383,7 +383,29 @@ func (transport *Transport) proxyTaskRequest(request *http.Request) (*http.Respo
 }
 
 func (transport *Transport) proxyBuildRequest(request *http.Request) (*http.Response, error) {
+	err := transport.updateDefaultGitBranch(request)
+	if err != nil {
+		return nil, err
+	}
 	return transport.interceptAndRewriteRequest(request, buildOperation)
+}
+
+func (transport *Transport) updateDefaultGitBranch(request *http.Request) error {
+	remote := request.URL.Query().Get("remote")
+	if strings.HasSuffix(remote, ".git") {
+		repositoryURL := remote[:len(remote)-4]
+		latestCommitID, err := transport.gitService.LatestCommitID(repositoryURL, "", "", "")
+		if err != nil {
+			return err
+		}
+		newRemote := fmt.Sprintf("%s#%s", remote, latestCommitID)
+
+		q := request.URL.Query()
+		q.Set("remote", newRemote)
+		request.URL.RawQuery = q.Encode()
+	}
+
+	return nil
 }
 
 func (transport *Transport) proxyImageRequest(request *http.Request) (*http.Response, error) {
