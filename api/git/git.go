@@ -82,10 +82,17 @@ func (c gitClient) latestCommitID(ctx context.Context, opt fetchOptions) (string
 		return "", errors.Wrap(err, "failed to list repository refs")
 	}
 
+	referenceName := opt.referenceName
+	if referenceName == "" {
+		for _, ref := range refs {
+			if strings.EqualFold(ref.Name().String(), "HEAD") {
+				referenceName = ref.Target().String()
+			}
+		}
+	}
+
 	for _, ref := range refs {
-		isDefaultBranch := opt.referenceName == "" && ref.Name().String() == "HEAD"
-		isSpecifiedBranch := strings.EqualFold(ref.Name().String(), opt.referenceName)
-		if isDefaultBranch || isSpecifiedBranch {
+		if strings.EqualFold(ref.Name().String(), referenceName) {
 			return ref.Hash().String(), nil
 		}
 	}
