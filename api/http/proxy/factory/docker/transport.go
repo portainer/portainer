@@ -35,6 +35,7 @@ type (
 		signatureService     portainer.DigitalSignatureService
 		reverseTunnelService portainer.ReverseTunnelService
 		dockerClientFactory  *docker.ClientFactory
+		gitService           portainer.GitService
 	}
 
 	// TransportParameters is used to create a new Transport
@@ -62,7 +63,7 @@ type (
 )
 
 // NewTransport returns a pointer to a new Transport instance.
-func NewTransport(parameters *TransportParameters, httpTransport *http.Transport) (*Transport, error) {
+func NewTransport(parameters *TransportParameters, httpTransport *http.Transport, gitService portainer.GitService) (*Transport, error) {
 	transport := &Transport{
 		endpoint:             parameters.Endpoint,
 		dataStore:            parameters.DataStore,
@@ -70,6 +71,7 @@ func NewTransport(parameters *TransportParameters, httpTransport *http.Transport
 		reverseTunnelService: parameters.ReverseTunnelService,
 		dockerClientFactory:  parameters.DockerClientFactory,
 		HTTPTransport:        httpTransport,
+		gitService:           gitService,
 	}
 
 	return transport, nil
