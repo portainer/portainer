@@ -3,8 +3,8 @@ package endpoints
 import (
 	"strings"
 
+	"github.com/fvbommel/sortorder"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/internal/natsort"
 )
 
 type EndpointsByName []portainer.Endpoint
@@ -18,7 +18,7 @@ func (e EndpointsByName) Swap(i, j int) {
 }
 
 func (e EndpointsByName) Less(i, j int) bool {
-	return natsort.Compare(strings.ToLower(e[i].Name), strings.ToLower(e[j].Name))
+	return sortorder.NaturalLess(strings.ToLower(e[i].Name), strings.ToLower(e[j].Name))
 }
 
 type EndpointsByGroup []portainer.Endpoint
@@ -39,5 +39,5 @@ func (e EndpointsByGroup) Less(i, j int) bool {
 	groupA := endpointGroupNames[e[i].GroupID]
 	groupB := endpointGroupNames[e[j].GroupID]
 
-	return natsort.Compare(strings.ToLower(groupA), strings.ToLower(groupB))
+	return sortorder.NaturalLess(strings.ToLower(groupA), strings.ToLower(groupB))
 }
