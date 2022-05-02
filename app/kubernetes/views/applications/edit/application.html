@@ -68,9 +68,11 @@
                     <tr>
                       <td>Creation</td>
                       <td>
-                        <span ng-if="ctrl.application.ApplicationOwner" style="margin-right: 5px"> <i class="fas fa-user"></i> {{ ctrl.application.ApplicationOwner }} </span>
+                        <span ng-if="ctrl.application.ApplicationOwner" style="margin-right: 5px" data-cy="k8sAppDetail-owner">
+                          <i class="fas fa-user"></i> {{ ctrl.application.ApplicationOwner }}
+                        </span>
                         <span> <i class="fas fa-clock"></i> {{ ctrl.application.CreationDate | getisodate }}</span>
-                        <span ng-if="ctrl.application.ApplicationOwner">
+                        <span ng-if="ctrl.application.ApplicationOwner" data-cy="k8sAppDetail-creationMethod">
                           <i class="fa fa-file-code space-left space-right" aria-hidden="true"></i> Deployed from {{ ctrl.state.appType }}</span
                         >
                       </td>
