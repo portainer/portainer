@@ -2,6 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"net/http/pprof"
+	"runtime"
 	"strings"
 
 	"github.com/portainer/portainer/api/http/handler/auth"
@@ -154,9 +156,20 @@ type Handler struct {
 // @tag.name websocket
 // @tag.description Create exec sessions using websockets
 
+func init() {
+	runtime.SetBlockProfileRate(1)
+	runtime.SetMutexProfileFraction(1)
+}
+
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
+	case strings.HasPrefix(r.URL.Path, "/debug/pprof/profile"):
+		pprof.Profile(w, r)
+	case strings.HasPrefix(r.URL.Path, "/debug/pprof/trace"):
+		pprof.Trace(w, r)
+	case strings.HasPrefix(r.URL.Path, "/debug/pprof"):
+		pprof.Index(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/backup"):
