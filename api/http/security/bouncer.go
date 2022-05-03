@@ -132,7 +132,7 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 	}
 
 	if endpoint.EdgeID != "" && endpoint.EdgeID != edgeIdentifier {
-		return errors.New("invalid Edge identifier")
+		return errors.New(fmt.Sprintf("invalid Edge identifier for endpoint %d. Expecting: %s - Received: %s", endpoint.ID, endpoint.EdgeID, edgeIdentifier))
 	}
 
 	if endpoint.LastCheckInDate > 0 || endpoint.UserTrusted {
