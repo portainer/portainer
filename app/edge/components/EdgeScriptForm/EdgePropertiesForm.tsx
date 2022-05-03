@@ -31,7 +31,7 @@ export function EdgePropertiesForm({
         <>
           <FormControl
             label="Edge ID Generator"
-            tooltip="A bash script one liner that will generate the edge id"
+            tooltip="A bash script one liner that will generate the edge id and will be assigned to the PORTAINER_EDGE_ID environment variable"
             inputId="edge-id-generator-input"
           >
             <Input
