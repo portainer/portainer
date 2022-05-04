@@ -3,6 +3,7 @@ package jwt
 import (
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -165,11 +166,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		return "", fmt.Errorf("invalid scope: %v", scope)
 	}
 
-	settings, err := service.dataStore.Settings().Settings()
-	if err != nil {
-		return "", fmt.Errorf("failed looking up settings")
-	}
-	if settings.FeatureFlagSettings["docker-extension"] {
+	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
 		// Set expiration to 99 years for docker desktop extension.
 		log.Infof("[message: using 99 year JWT expiration time for docker desktop extension environment]")
 		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()
