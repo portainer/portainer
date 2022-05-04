@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/securecookie"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	log "github.com/sirupsen/logrus"
 )
 
 // scope represents JWT scopes that are supported in JWT claims.
@@ -162,6 +163,16 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 	secret, found := service.secrets[scope]
 	if !found {
 		return "", fmt.Errorf("invalid scope: %v", scope)
+	}
+
+	settings, err := service.dataStore.Settings().Settings()
+	if err != nil {
+		return "", fmt.Errorf("failed looking up settings")
+	}
+	if settings.FeatureFlagSettings["docker-extension"] {
+		// Set expiration to 99 years for docker desktop extension.
+		log.Infof("[message: using 99 year JWT expiration time for docker desktop extension environment]")
+		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()
 	}
 
 	cl := claims{
