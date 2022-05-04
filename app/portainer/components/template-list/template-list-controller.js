@@ -10,10 +10,23 @@ function TemplateListController($async, $state, DatatableService, Notifications,
     selectedCategory: '',
     categories: [],
     showContainerTemplates: true,
+    selectedOrderBy: '',
+    orderByFields: [],
+    orderDesc: false,
   };
 
   this.onTextFilterChange = function () {
     DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+  };
+
+  this.changeOrderBy = function (orderField) {
+    this.state.selectedOrderBy = orderField;
+    this.templates = _.orderBy(this.templates, [this.state.selectedOrderBy], [this.state.orderDesc ? 'desc' : 'asc']);
+  };
+
+  this.revertOrder = function () {
+    this.state.orderDesc = !this.state.orderDesc;
+    this.templates = _.orderBy(this.templates, [this.state.selectedOrderBy], [this.state.orderDesc ? 'desc' : 'asc']);
   };
 
   this.filterByTemplateType = function (item) {
@@ -83,5 +96,7 @@ function TemplateListController($async, $state, DatatableService, Notifications,
     if (textFilter !== null) {
       this.state.textFilter = textFilter;
     }
+
+    this.state.orderByFields = ['Title'];
   };
 }

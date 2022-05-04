@@ -6,27 +6,49 @@
       </div>
 
       <div class="actionBar">
-        <div>
-          <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.templates.new" ng-if="$ctrl.showAddAction">
-            <i class="fa fa-plus space-right" aria-hidden="true"></i>Add template
-          </button>
-          <span ng-class="{ 'pull-right': $ctrl.showAddAction }" style="width: 25%">
-            <ui-select ng-model="$ctrl.state.selectedCategory">
-              <ui-select-match placeholder="Select a category" allow-clear="true">
-                <span>{{ $select.selected }}</span>
-              </ui-select-match>
-              <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
-                <span>{{ category }}</span>
-              </ui-select-choices>
-            </ui-select>
-          </span>
+        <div class="row">
+          <div class="col-sm-12">
+            <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.templates.new" ng-if="$ctrl.showAddAction">
+              <i class="fa fa-plus space-right" aria-hidden="true"></i>Add template
+            </button>
+            <span ng-class="{ 'pull-right': $ctrl.showAddAction }" style="width: 25%">
+              <ui-select ng-model="$ctrl.state.selectedCategory">
+                <ui-select-match placeholder="Select a category" allow-clear="true">
+                  <span>{{ $select.selected }}</span>
+                </ui-select-match>
+                <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
+                  <span>{{ category }}</span>
+                </ui-select-choices>
+              </ui-select>
+            </span>
+          </div>
         </div>
 
-        <div class="small text-muted" style="margin: 15px 0 0 5px">
-          <label for="show_stacks" class="control-label text-left"> Show container templates </label>
-          <label class="switch" style="margin-left: 20px">
-            <input type="checkbox" name="show_stacks" ng-model="$ctrl.state.showContainerTemplates" ng-change="$ctrl.updateCategories()" /><i></i>
-          </label>
+        <div class="row">
+          <div class="col-sm-2 col-sm-offset-9">
+            <ui-select ng-model="$ctrl.state.selectedOrderBy" ng-change="$ctrl.changeOrderBy($select.selected, false)">
+              <ui-select-match placeholder="Sort By" allow-clear="true">
+                <span>{{ $select.selected }}</span>
+              </ui-select-match>
+              <ui-select-choices repeat="field in ($ctrl.state.orderByFields | filter: $select.search)">
+                <span>{{ field }}</span>
+              </ui-select-choices>
+            </ui-select>
+          </div>
+          <div class="col-sm-1">
+            <button style="padding: 5px 10px; border-radius: 4px; margin-left: 0px" type="button" disabled>
+              <a ng-click="$ctrl.revertOrder()"
+                ><i
+                  class="fa fa-sort-alpha-down"
+                  ng-class="{
+                  'fa-sort-alpha-down': !$ctrl.state.orderDesc,
+                  'fa-sort-alpha-up': $ctrl.state.orderDesc,
+                }"
+                  aria-hidden="true"
+                ></i
+              ></a>
+            </button>
+          </div>
         </div>
       </div>
 
