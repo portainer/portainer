@@ -1391,9 +1391,7 @@ const (
 )
 
 // List of supported features
-var SupportedFeatureFlags = []Feature{
-	"docker-extension",
-}
+var SupportedFeatureFlags = []Feature{}
 
 const (
 	_ AuthenticationMethod = iota
