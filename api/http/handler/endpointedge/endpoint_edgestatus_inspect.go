@@ -94,14 +94,12 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	endpoint.LastCheckInDate = time.Now().Unix()
 
-	go func() {
-		err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
-		if err != nil {
-			logrus.Errorf("Unable to persist environment changes inside the database: %s", err)
-		}
+	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+	if err != nil {
+		logrus.Errorf("Unable to persist environment changes inside the database: %s", err)
+	}
 
-		logrus.Debugf("[http,handler,endpointedge] [message: updated endpoint information in database] [edge_id: %s] [checkin_time: %d]", endpoint.EdgeID, endpoint.LastCheckInDate)
-	}()
+	logrus.Debugf("[http,handler,endpointedge] [message: updated endpoint information in database] [edge_id: %s] [checkin_time: %d]", endpoint.EdgeID, endpoint.LastCheckInDate)
 
 	checkinInterval := endpoint.EdgeCheckinInterval
 	if endpoint.EdgeCheckinInterval == 0 {
