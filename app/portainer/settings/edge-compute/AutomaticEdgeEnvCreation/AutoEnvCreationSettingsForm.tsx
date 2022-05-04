@@ -31,7 +31,7 @@ const validation = yup.object({
         }
         try {
           const url = new URL(value);
-          return url.hostname !== 'localhost';
+          return !!url.hostname && url.hostname !== 'localhost';
         } catch {
           return false;
         }
