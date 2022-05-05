@@ -1,6 +1,8 @@
 package settings
 
 import (
+	"sync"
+
 	portainer "github.com/portainer/portainer/api"
 )
 
@@ -13,6 +15,26 @@ const (
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection portainer.Connection
+	cache      *portainer.Settings
+	mu         sync.RWMutex
+}
+
+func cloneSettings(src *portainer.Settings) *portainer.Settings {
+	if src == nil {
+		return nil
+	}
+
+	c := *src
+
+	c.BlackListedLabels = make([]portainer.Pair, len(src.BlackListedLabels))
+	copy(c.BlackListedLabels, src.BlackListedLabels)
+
+	c.FeatureFlagSettings = make(map[portainer.Feature]bool)
+	for k, v := range src.FeatureFlagSettings {
+		c.FeatureFlagSettings[k] = v
+	}
+
+	return &c
 }
 
 func (service *Service) BucketName() string {
@@ -33,6 +55,18 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 // Settings retrieve the settings object.
 func (service *Service) Settings() (*portainer.Settings, error) {
+	service.mu.RLock()
+	if service.cache != nil {
+		s := cloneSettings(service.cache)
+		service.mu.RUnlock()
+
+		return s, nil
+	}
+	service.mu.RUnlock()
+
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
 	var settings portainer.Settings
 
 	err := service.connection.GetObject(BucketName, []byte(settingsKey), &settings)
@@ -40,12 +74,24 @@ func (service *Service) Settings() (*portainer.Settings, error) {
 		return nil, err
 	}
 
+	service.cache = cloneSettings(&settings)
+
 	return &settings, nil
 }
 
 // UpdateSettings persists a Settings object.
 func (service *Service) UpdateSettings(settings *portainer.Settings) error {
-	return service.connection.UpdateObject(BucketName, []byte(settingsKey), settings)
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
+	err := service.connection.UpdateObject(BucketName, []byte(settingsKey), settings)
+	if err != nil {
+		return err
+	}
+
+	service.cache = cloneSettings(settings)
+
+	return nil
 }
 
 func (service *Service) IsFeatureFlagEnabled(feature portainer.Feature) bool {
