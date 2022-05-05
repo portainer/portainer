@@ -111,3 +111,9 @@ func (service *Service) IsFeatureFlagEnabled(feature portainer.Feature) bool {
 
 	return false
 }
+
+func (service *Service) InvalidateCache() {
+	service.mu.Lock()
+	service.cache = nil
+	service.mu.Unlock()
+}

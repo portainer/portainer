@@ -31,6 +31,8 @@ func (store *Store) MigrateData() error {
 		return werrors.Wrap(err, "while backing up db before migration")
 	}
 
+	store.SettingsService.InvalidateCache()
+
 	migratorParams := &migrator.MigratorParameters{
 		DatabaseVersion:         version,
 		EndpointGroupService:    store.EndpointGroupService,
