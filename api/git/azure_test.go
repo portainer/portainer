@@ -30,7 +30,7 @@ func Test_buildDownloadUrl(t *testing.T) {
 
 func Test_buildRefsUrl(t *testing.T) {
 	a := NewAzureDownloader(nil)
-	u, err := a.buildRefsUrl(&azureOptions{
+	u, err := a.buildRootItemUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
 		repository:   "repository",
