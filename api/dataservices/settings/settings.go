@@ -26,12 +26,16 @@ func cloneSettings(src *portainer.Settings) *portainer.Settings {
 
 	c := *src
 
-	c.BlackListedLabels = make([]portainer.Pair, len(src.BlackListedLabels))
-	copy(c.BlackListedLabels, src.BlackListedLabels)
+	if c.BlackListedLabels != nil {
+		c.BlackListedLabels = make([]portainer.Pair, len(src.BlackListedLabels))
+		copy(c.BlackListedLabels, src.BlackListedLabels)
+	}
 
-	c.FeatureFlagSettings = make(map[portainer.Feature]bool)
-	for k, v := range src.FeatureFlagSettings {
-		c.FeatureFlagSettings[k] = v
+	if src.FeatureFlagSettings != nil {
+		c.FeatureFlagSettings = make(map[portainer.Feature]bool)
+		for k, v := range src.FeatureFlagSettings {
+			c.FeatureFlagSettings[k] = v
+		}
 	}
 
 	return &c
