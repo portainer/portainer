@@ -97,6 +97,7 @@ type (
 		Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error)
 		Endpoints() ([]portainer.Endpoint, error)
 		Create(endpoint *portainer.Endpoint) error
+		CreateWithCallback(endpoint *portainer.Endpoint, fn func(uint64) (int, interface{})) error
 		UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error
 		DeleteEndpoint(ID portainer.EndpointID) error
 		GetNextIdentifier() int
