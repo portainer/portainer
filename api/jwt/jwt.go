@@ -168,7 +168,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 
 	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
 		// Set expiration to 99 years for docker desktop extension.
-		log.Infof("[message: using 99 year JWT expiration time for docker desktop extension environment]")
+		log.Infof("[message: detected docker desktop extension mode]")
 		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()
 	}
 
