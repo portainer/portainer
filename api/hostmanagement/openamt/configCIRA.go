@@ -77,15 +77,15 @@ func (service *Service) saveCIRAConfig(method string, configuration portainer.Op
 		return nil, err
 	}
 
-	addressFormat, err := addressFormat(configuration.MPSServer)
+	addressFormat, serverAddress, err := addressFormat(configuration.MPSServer)
 	if err != nil {
 		return nil, err
 	}
 
 	config := CIRAConfig{
 		ConfigName:          configName,
-		MPSServerAddress:    configuration.MPSServer,
-		CommonName:          configuration.MPSServer,
+		MPSServerAddress:    serverAddress,
+		CommonName:          serverAddress,
 		ServerAddressFormat: addressFormat,
 		MPSPort:             4433,
 		Username:            "admin",
@@ -108,32 +108,33 @@ func (service *Service) saveCIRAConfig(method string, configuration portainer.Op
 	return &result, nil
 }
 
-// addressFormat returns the address format for the given server address.
+// addressFormat returns the address format and the address for the given server address.
+// when using a IP:PORT format, only the IP is returned.
 // see https://github.com/open-amt-cloud-toolkit/rps/blob/b63e0112f8a6323764742165a2cd5b465d9a9a24/src/routes/admin/ciraconfig/ciraValidator.ts#L20-L25
-func addressFormat(u string) (int, error) {
+func addressFormat(u string) (int, string, error) {
 	ip2 := net.ParseIP(u)
 	if ip2 != nil {
 		if ip2.To4() != nil {
-			return addrFormatIpv4, nil
+			return addrFormatIpv4, u, nil
 		}
 
-		return addrFormatIpv6, nil
+		return addrFormatIpv6, u, nil
 	}
 
 	_, err := url.Parse(u)
 	if err == nil {
-		return addrFormatFQDN, nil
+		return addrFormatFQDN, u, nil
 	}
 
-	_, _, err = net.SplitHostPort(u)
+	host, _, err := net.SplitHostPort(u)
 	if err == nil {
 		if strings.Count(u, ":") >= 2 {
-			return addrFormatIpv6, nil
+			return addrFormatIpv6, host, nil
 		}
-		return addrFormatIpv4, nil
+		return addrFormatIpv4, host, nil
 	}
 
-	return 0, fmt.Errorf("could not determine server address format for %s", u)
+	return 0, "", fmt.Errorf("could not determine server address format for %s", u)
 }
 
 func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfiguration) (string, error) {
