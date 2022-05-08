@@ -2,7 +2,6 @@ package edgestack
 
 import (
 	"fmt"
-	"sync"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/sirupsen/logrus"
@@ -16,30 +15,6 @@ const (
 // Service represents a service for managing Edge stack data.
 type Service struct {
 	connection portainer.Connection
-	cache      map[portainer.EdgeStackID]*portainer.EdgeStack
-	mu         sync.RWMutex
-}
-
-func cloneEdgeStack(src *portainer.EdgeStack) *portainer.EdgeStack {
-	if src == nil {
-		return nil
-	}
-
-	c := *src
-
-	if src.EdgeGroups != nil {
-		c.EdgeGroups = make([]portainer.EdgeGroupID, len(src.EdgeGroups))
-		copy(c.EdgeGroups, src.EdgeGroups)
-	}
-
-	if src.Status != nil {
-		c.Status = make(map[portainer.EndpointID]portainer.EdgeStackStatus)
-		for k, v := range src.Status {
-			c.Status[k] = v
-		}
-	}
-
-	return &c
 }
 
 func (service *Service) BucketName() string {
@@ -55,7 +30,6 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 	return &Service{
 		connection: connection,
-		cache:      make(map[portainer.EdgeStackID]*portainer.EdgeStack),
 	}, nil
 }
 
@@ -82,18 +56,6 @@ func (service *Service) EdgeStacks() ([]portainer.EdgeStack, error) {
 
 // EdgeStack returns an Edge stack by ID.
 func (service *Service) EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStack, error) {
-	service.mu.RLock()
-	if c, ok := service.cache[ID]; ok {
-		e := cloneEdgeStack(c)
-		service.mu.RUnlock()
-
-		return e, nil
-	}
-	service.mu.RUnlock()
-
-	service.mu.Lock()
-	defer service.mu.Unlock()
-
 	var stack portainer.EdgeStack
 	identifier := service.connection.ConvertToKey(int(ID))
 
@@ -101,8 +63,6 @@ func (service *Service) EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStac
 	if err != nil {
 		return nil, err
 	}
-
-	service.cache[ID] = cloneEdgeStack(&stack)
 
 	return &stack, nil
 }
@@ -121,16 +81,12 @@ func (service *Service) Create(id portainer.EdgeStackID, edgeStack *portainer.Ed
 
 // UpdateEdgeStack updates an Edge stack.
 func (service *Service) UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error {
-	defer service.invalidateCacheForID(ID)
-
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, edgeStack)
 }
 
 // DeleteEdgeStack deletes an Edge stack.
 func (service *Service) DeleteEdgeStack(ID portainer.EdgeStackID) error {
-	defer service.invalidateCacheForID(ID)
-
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
@@ -138,16 +94,4 @@ func (service *Service) DeleteEdgeStack(ID portainer.EdgeStackID) error {
 // GetNextIdentifier returns the next identifier for an environment(endpoint).
 func (service *Service) GetNextIdentifier() int {
 	return service.connection.GetNextIdentifier(BucketName)
-}
-
-func (service *Service) invalidateCacheForID(ID portainer.EdgeStackID) {
-	service.mu.Lock()
-	delete(service.cache, ID)
-	service.mu.Unlock()
-}
-
-func (service *Service) InvalidateCache() {
-	service.mu.Lock()
-	service.cache = make(map[portainer.EdgeStackID]*portainer.EdgeStack)
-	service.mu.Unlock()
 }
