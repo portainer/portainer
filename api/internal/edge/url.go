@@ -19,6 +19,10 @@ func ParseHostForEdge(portainerURL string) (string, error) {
 		portainerHost = parsedURL.Host
 	}
 
+	if portainerHost == "" {
+		return "", errors.New("hostname cannot be empty")
+	}
+
 	if portainerHost == "localhost" {
 		return "", errors.New("cannot use localhost as environment URL")
 	}

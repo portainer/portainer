@@ -23,11 +23,20 @@ const validation = yup.object({
   EdgePortainerUrl: yup
     .string()
     .test(
-      'not-local',
-      'Cannot use localhost as environment URL',
-      (value) => !value?.includes('localhost')
+      'url',
+      'URL should be a valid URI and cannot include localhost',
+      (value) => {
+        if (!value) {
+          return false;
+        }
+        try {
+          const url = new URL(value);
+          return !!url.hostname && url.hostname !== 'localhost';
+        } catch {
+          return false;
+        }
+      }
     )
-    .url('URL should be a valid URI')
     .required('URL is required'),
 });
 

@@ -49,7 +49,7 @@ interface Props {
   onPlatformChange(platform: Platform): void;
 }
 
-export function Scripts({
+export function ScriptTabs({
   agentVersion,
   values,
   edgeKey,
@@ -134,7 +134,7 @@ function buildLinuxStandaloneCommand(
     )
   );
 
-  return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}
+  return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}\
 docker run -d \\
   -v /var/run/docker.sock:/var/run/docker.sock \\
   -v /var/lib/docker/volumes:/var/lib/docker/volumes \\
@@ -168,7 +168,7 @@ function buildWindowsStandaloneCommand(
 
   return `${
     edgeIdScript ? `$Env:PORTAINER_EDGE_ID = "@(${edgeIdScript})" \n\n` : ''
-  }
+  }\
 docker run -d \\
   --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
   --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
@@ -199,7 +199,7 @@ function buildLinuxSwarmCommand(
     'AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent',
   ]);
 
-  return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}
+  return `${edgeIdScript ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n` : ''}\
 docker network create \\
   --driver overlay \\
   portainer_agent_network;
@@ -270,13 +270,11 @@ function buildKubernetesCommand(
   const idEnvVar = edgeIdScript
     ? `PORTAINER_EDGE_ID=$(${edgeIdScript}) \n\n`
     : '';
+  const envVarsTrimmed = envVars.trim();
   const edgeIdVar = !edgeIdScript && edgeId ? edgeId : '$PORTAINER_EDGE_ID';
   const selfSigned = allowSelfSignedCerts ? '1' : '0';
 
-  return `${idEnvVar}curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-edge-agent-setup.sh | 
-  bash -s -- "${edgeIdVar}" \\
-    "${edgeKey}" \\
-    "${selfSigned}" "${agentSecret}" "${envVars}"`;
+  return `${idEnvVar}curl https://downloads.portainer.io/ce${agentShortVersion}/portainer-edge-agent-setup.sh | bash -s -- "${edgeIdVar}" "${edgeKey}" "${selfSigned}" "${agentSecret}" "${envVarsTrimmed}"`;
 }
 
 function buildDefaultEnvVars(

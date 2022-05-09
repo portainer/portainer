@@ -5,7 +5,7 @@ import { r2a } from '@/react-tools/react2angular';
 import { useSettings } from '@/portainer/settings/settings.service';
 
 import { EdgePropertiesForm } from './EdgePropertiesForm';
-import { Scripts } from './Scripts';
+import { ScriptTabs } from './ScriptTabs';
 import { EdgeProperties } from './types';
 
 interface Props {
@@ -43,7 +43,7 @@ export function EdgeScriptForm({ edgeKey, edgeId }: Props) {
         hideIdGetter={edgeId !== undefined}
       />
 
-      <Scripts
+      <ScriptTabs
         values={edgeProperties}
         agentVersion={agentVersion}
         edgeKey={edgeKey}
