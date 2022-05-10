@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/portainer/portainer/api/hostmanagement/openamt"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -37,7 +38,7 @@ type HostInfo struct {
 
 const (
 	// TODO: this should get extracted to some configurable - don't assume Docker Hub is everyone's global namespace, or that they're allowed to pull images from the internet
-	rpcGoImageName      = "ptrrd/openamt:rpc-go-json"
+	rpcGoImageName      = "intel/oact-rpc-go:v2.0.0"
 	rpcGoContainerName  = "openamt-rpc-go"
 	dockerClientTimeout = 5 * time.Minute
 )
