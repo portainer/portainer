@@ -77,7 +77,7 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 		}
 	}
 
-	if payload.EdgePortainerURL != nil {
+	if payload.EdgePortainerURL != nil && *payload.EdgePortainerURL != "" {
 		_, err := edge.ParseHostForEdge(*payload.EdgePortainerURL)
 		if err != nil {
 			return err
