@@ -38,7 +38,7 @@ type HostInfo struct {
 
 const (
 	// TODO: this should get extracted to some configurable - don't assume Docker Hub is everyone's global namespace, or that they're allowed to pull images from the internet
-	rpcGoImageName      = "intel/oact-rpc-go:v2.0.0"
+	rpcGoImageName      = "intel/oact-rpc-go:v2.1.0"
 	rpcGoContainerName  = "openamt-rpc-go"
 	dockerClientTimeout = 5 * time.Minute
 )
