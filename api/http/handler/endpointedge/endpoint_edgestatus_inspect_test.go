@@ -75,6 +75,16 @@ var endpointTestCases = []endpointTestCase{
 }
 
 func setupHandler() (*Handler, func(), error) {
+	tmpDir, err := os.MkdirTemp(os.TempDir(), "portainer-test")
+	if err != nil {
+		return nil, nil, fmt.Errorf("could not create a tmp dir: %w", err)
+	}
+
+	fs, err := filesystem.NewService(tmpDir, "")
+	if err != nil {
+		return nil, nil, fmt.Errorf("could not start a new filesystem service: %w", err)
+	}
+
 	_, store, storeTeardown := datastore.MustNewTestStore(true, true)
 
 	ctx := context.Background()
@@ -83,18 +93,6 @@ func setupHandler() (*Handler, func(), error) {
 	teardown := func() {
 		cancelFn()
 		storeTeardown()
-	}
-
-	tmpDir, err := os.MkdirTemp(os.TempDir(), "portainer-test")
-	if err != nil {
-		teardown()
-		return nil, nil, fmt.Errorf("could not create a tmp dir: %w", err)
-	}
-
-	fs, err := filesystem.NewService(tmpDir, "")
-	if err != nil {
-		teardown()
-		return nil, nil, fmt.Errorf("could not start a new filesystem service: %w", err)
 	}
 
 	jwtService, err := jwt.NewService("1h", store)
@@ -130,7 +128,7 @@ func setupHandler() (*Handler, func(), error) {
 	return handler, teardown, nil
 }
 
-func setEndpoint(handler *Handler, endpoint portainer.Endpoint) (err error) {
+func createEndpoint(handler *Handler, endpoint portainer.Endpoint, endpointRelation portainer.EndpointRelation) (err error) {
 	// Avoid setting ID below 0 to generate invalid test cases
 	if endpoint.ID <= 0 {
 		return nil
@@ -141,24 +139,7 @@ func setEndpoint(handler *Handler, endpoint portainer.Endpoint) (err error) {
 		return err
 	}
 
-	endpointRelation := portainer.EndpointRelation{
-		EndpointID: endpoint.ID,
-	}
-	err = handler.DataStore.EndpointRelation().Create(&endpointRelation)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func setEndpointRelation(handler *Handler, endpointRelation portainer.EndpointRelation) (err error) {
-	err = handler.DataStore.EndpointRelation().Create(&endpointRelation)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return handler.DataStore.EndpointRelation().Create(&endpointRelation)
 }
 
 func TestMissingEdgeIdentifier(t *testing.T) {
@@ -170,19 +151,14 @@ func TestMissingEdgeIdentifier(t *testing.T) {
 	}
 
 	endpointID := portainer.EndpointID(45)
-	err = setEndpoint(handler, portainer.Endpoint{
+	err = createEndpoint(handler, portainer.Endpoint{
 		ID:     endpointID,
 		Name:   "endpoint-id-45",
 		Type:   portainer.EdgeAgentOnDockerEnvironment,
 		URL:    "https://portainer.io:9443",
 		EdgeID: "edge-id",
-	})
+	}, portainer.EndpointRelation{EndpointID: endpointID})
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = setEndpointRelation(handler, portainer.EndpointRelation{EndpointID: endpointID})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,12 +185,7 @@ func TestWithEndpoints(t *testing.T) {
 	}
 
 	for _, test := range endpointTestCases {
-		err = setEndpoint(handler, test.endpoint)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		err = setEndpointRelation(handler, test.endpointRelation)
+		err = createEndpoint(handler, test.endpoint, test.endpointRelation)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -256,12 +227,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 		EndpointID: endpoint.ID,
 	}
 
-	err = setEndpoint(handler, endpoint)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = setEndpointRelation(handler, endpointRelation)
+	err = createEndpoint(handler, endpoint, endpointRelation)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -310,12 +276,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 		EndpointID: endpoint.ID,
 	}
 
-	err = setEndpoint(handler, endpoint)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = setEndpointRelation(handler, endpointRelation)
+	err = createEndpoint(handler, endpoint, endpointRelation)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -384,12 +345,7 @@ func TestEdgeStackStatus(t *testing.T) {
 	}
 	handler.DataStore.EdgeStack().Create(edgeStack.ID, &edgeStack)
 
-	err = setEndpoint(handler, endpoint)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = setEndpointRelation(handler, endpointRelation)
+	err = createEndpoint(handler, endpoint, endpointRelation)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -440,17 +396,12 @@ func TestEdgeJobsResponse(t *testing.T) {
 		EndpointID: endpoint.ID,
 	}
 
-	err = setEndpoint(handler, endpoint)
+	err = createEndpoint(handler, endpoint, endpointRelation)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = setEndpointRelation(handler, endpointRelation)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	path, err := handler.FileService.StoreEdgeJobFileFromBytes("test-script", []byte{70, 77, 64})
+	path, err := handler.FileService.StoreEdgeJobFileFromBytes("test-script", []byte("pwd"))
 	if err != nil {
 		t.Fatal(err)
 	}
