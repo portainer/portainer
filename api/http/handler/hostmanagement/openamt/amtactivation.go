@@ -56,9 +56,6 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve AMT information", Err: err}
 	}
-	if hostInfo.ControlModeRaw < 1 {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to activate device", Err: errors.New("failed to activate device")}
-	}
 	if hostInfo.UUID == "" {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve device UUID", Err: errors.New("unable to retrieve device UUID")}
 	}
