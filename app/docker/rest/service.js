@@ -28,6 +28,7 @@ angular.module('portainer.docker').factory('Service', [
           method: 'POST',
           params: { id: '@id', action: 'update', version: '@version', rollback: '@rollback' },
           headers: {
+            'X-Registry-Auth': (config) => btoa(JSON.stringify({ registryId: config.data.registryId })),
             version: '1.29',
           },
         },

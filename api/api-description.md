@@ -50,4 +50,15 @@ Instead, it acts as a reverse-proxy to the Docker HTTP API. This means that you 
 
 To do so, you can use the `/endpoints/{id}/docker` Portainer API environment(endpoint) (which is not documented below due to Swagger limitations). This environment(endpoint) has a restricted access policy so you still need to be authenticated to be able to query this environment(endpoint). Any query on this environment(endpoint) will be proxied to the Docker API of the associated environment(endpoint) (requests and responses objects are the same as documented in the Docker API).
 
+# Private Registry
+
+Using private registry, you will need to pass a based64 encoded JSON string ‘{"registryId":\<registryID value\>}’ inside the Request Header. The parameter name is "X-Registry-Auth".
+\<registryID value\> - The registry ID where the repository was created.
+
+Example:
+
+```
+eyJyZWdpc3RyeUlkIjoxfQ==
+```
+
 **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://documentation.portainer.io/api/api-examples/).

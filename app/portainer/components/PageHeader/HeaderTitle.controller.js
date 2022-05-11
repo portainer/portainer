@@ -2,7 +2,7 @@ export default class HeaderTitle {
   /* @ngInject */
   constructor(Authentication) {
     this.Authentication = Authentication;
-
+    this.display = !window.ddExtension;
     this.username = null;
   }
 

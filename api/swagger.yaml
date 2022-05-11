@@ -470,7 +470,7 @@ definitions:
         example: 2
         type: integer
     type: object
-  endpoints.endpointStatusInspectResponse:
+  endpoints.endpointEdgeStatusInspectResponse:
     properties:
       checkin:
         description: The current value of CheckinInterval
@@ -4156,12 +4156,12 @@ paths:
       summary: Snapshots an endpoint
       tags:
       - endpoints
-  /endpoints/{id}/status:
+  /endpoints/{id}/edge/status:
     get:
       description: |-
         Endpoint for edge agent to check status of environment
         **Access policy**: restricted only to Edge endpoints
-      operationId: EndpointStatusInspect
+      operationId: EndpointEdgeStatusInspect
       parameters:
       - description: Endpoint identifier
         in: path
@@ -4172,7 +4172,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/endpoints.endpointStatusInspectResponse'
+            $ref: '#/definitions/endpoints.endpointEdgeStatusInspectResponse'
         "400":
           description: Invalid request
         "403":

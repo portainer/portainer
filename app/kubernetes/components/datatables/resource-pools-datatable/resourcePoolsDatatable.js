@@ -2,6 +2,7 @@ angular.module('portainer.kubernetes').component('kubernetesResourcePoolsDatatab
   templateUrl: './resourcePoolsDatatable.html',
   controller: 'KubernetesResourcePoolsDatatableController',
   bindings: {
+    endpoint: '<',
     titleText: '@',
     titleIcon: '@',
     dataset: '<',
@@ -10,6 +11,5 @@ angular.module('portainer.kubernetes').component('kubernetesResourcePoolsDatatab
     reverseOrder: '<',
     removeAction: '<',
     refreshCallback: '<',
-    endpoint: '<',
   },
 });

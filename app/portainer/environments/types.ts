@@ -1,3 +1,6 @@
+import { TagId } from '@/portainer/tags/types';
+import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+
 export type EnvironmentId = number;
 
 export enum EnvironmentType {
@@ -15,13 +18,6 @@ export enum EnvironmentType {
   AgentOnKubernetes,
   // EdgeAgentOnKubernetes represents an environment(endpoint) connected to an Edge agent deployed on a Kubernetes environment(endpoint)
   EdgeAgentOnKubernetes,
-}
-
-export type TagId = number;
-
-export interface Tag {
-  Id: TagId;
-  Name: string;
 }
 
 export enum EnvironmentStatus {
@@ -55,16 +51,17 @@ export interface KubernetesSnapshot {
 }
 
 export interface KubernetesSettings {
-  Snapshots: KubernetesSnapshot[];
+  Snapshots?: KubernetesSnapshot[] | null;
 }
 
 export type Environment = {
   Id: EnvironmentId;
   Type: EnvironmentType;
   TagIds: TagId[];
-  GroupName: string;
+  GroupId: EnvironmentGroupId;
   EdgeID?: string;
   EdgeCheckinInterval?: number;
+  QueryDate?: number;
   LastCheckInDate?: number;
   Name: string;
   Status: EnvironmentStatus;
@@ -87,8 +84,6 @@ export enum EnvironmentCreationTypes {
   EdgeAgentEnvironment,
   LocalKubernetesEnvironment,
 }
-
-export type EnvironmentGroupId = number;
 
 export enum PlatformType {
   Docker,
@@ -116,12 +111,3 @@ export interface EnvironmentSettings {
   // Whether host management features are enabled
   enableHostManagementFeatures: boolean;
 }
-
-export type UserId = number;
-export type TeamId = number;
-export type RoleId = number;
-interface AccessPolicy {
-  RoleId: RoleId;
-}
-export type UserAccessPolicies = Record<UserId, AccessPolicy>; // map[UserID]AccessPolicy
-export type TeamAccessPolicies = Record<TeamId, AccessPolicy>;

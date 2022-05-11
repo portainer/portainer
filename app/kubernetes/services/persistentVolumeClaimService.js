@@ -6,9 +6,8 @@ import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 
 class KubernetesPersistentVolumeClaimService {
   /* @ngInject */
-  constructor($async, EndpointProvider, KubernetesPersistentVolumeClaims) {
+  constructor($async, KubernetesPersistentVolumeClaims) {
     this.$async = $async;
-    this.EndpointProvider = EndpointProvider;
     this.KubernetesPersistentVolumeClaims = KubernetesPersistentVolumeClaims;
 
     this.getAsync = this.getAsync.bind(this);
@@ -18,7 +17,7 @@ class KubernetesPersistentVolumeClaimService {
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
-  async getAsync(namespace, name) {
+  async getAsync(namespace, storageClasses, name) {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
@@ -26,28 +25,28 @@ class KubernetesPersistentVolumeClaimService {
         this.KubernetesPersistentVolumeClaims(namespace).get(params).$promise,
         this.KubernetesPersistentVolumeClaims(namespace).getYaml(params).$promise,
       ]);
-      const storageClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.StorageClasses;
+
       return KubernetesPersistentVolumeClaimConverter.apiToPersistentVolumeClaim(raw, storageClasses, yaml);
     } catch (err) {
       throw new PortainerError('Unable to retrieve persistent volume claim', err);
     }
   }
 
-  async getAllAsync(namespace) {
+  async getAllAsync(namespace, storageClasses) {
     try {
       const data = await this.KubernetesPersistentVolumeClaims(namespace).get().$promise;
-      const storageClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.StorageClasses;
+
       return _.map(data.items, (item) => KubernetesPersistentVolumeClaimConverter.apiToPersistentVolumeClaim(item, storageClasses));
     } catch (err) {
       throw new PortainerError('Unable to retrieve persistent volume claims', err);
     }
   }
 
-  get(namespace, name) {
+  get(namespace, storageClasses, name) {
     if (name) {
-      return this.$async(this.getAsync, namespace, name);
+      return this.$async(this.getAsync, namespace, storageClasses, name);
     }
-    return this.$async(this.getAllAsync, namespace);
+    return this.$async(this.getAllAsync, namespace, storageClasses);
   }
 
   /**

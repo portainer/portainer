@@ -1,5 +1,5 @@
 module.exports = {
-  plugins: ['lodash', 'angularjs-annotate', ['i18next-extract', { outputPath: 'translations/{{locale}}/{{ns}}.json' }]],
+  plugins: ['lodash', 'angularjs-annotate'],
   presets: [
     [
       '@babel/preset-env',

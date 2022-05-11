@@ -10,5 +10,6 @@ export const gitForm = {
     additionalFile: '<',
     autoUpdate: '<',
     showAuthExplanation: '<',
+    showForcePullImage: '<',
   },
 };

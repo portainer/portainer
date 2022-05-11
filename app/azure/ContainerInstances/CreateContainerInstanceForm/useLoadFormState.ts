@@ -9,7 +9,7 @@ import { getResourceGroups } from '@/azure/services/resource-groups.service';
 import { getSubscriptions } from '@/azure/services/subscription.service';
 import { getContainerInstanceProvider } from '@/azure/services/provider.service';
 import { ContainerInstanceFormValues, Subscription } from '@/azure/types';
-import { parseFromResourceControl } from '@/portainer/components/accessControlForm/model';
+import { parseAccessControlFormData } from '@/portainer/access-control/utils';
 
 import {
   getSubscriptionLocations,
@@ -58,7 +58,7 @@ export function useLoadFormState(
     cpu: 1,
     ports: [{ container: '80', host: '80', protocol: 'TCP' }],
     allocatePublicIP: true,
-    accessControl: parseFromResourceControl(isUserAdmin),
+    accessControl: parseAccessControlFormData(isUserAdmin),
   };
 
   return {

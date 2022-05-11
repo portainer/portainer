@@ -1,0 +1,15 @@
+.searchBar {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+}
+
+.searchBar .iconSpan {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.searchBar .textSpan {
+  display: inline-block;
+  width: 90%;
+}

@@ -6,6 +6,7 @@ import (
 )
 
 func (m *Migrator) updateResourceControlsToDBVersion22() error {
+	migrateLog.Info("- updating resource controls")
 	legacyResourceControls, err := m.resourceControlService.ResourceControls()
 	if err != nil {
 		return err
@@ -24,6 +25,7 @@ func (m *Migrator) updateResourceControlsToDBVersion22() error {
 }
 
 func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
+	migrateLog.Info("- updating users and roles")
 	legacyUsers, err := m.userService.Users()
 	if err != nil {
 		return err

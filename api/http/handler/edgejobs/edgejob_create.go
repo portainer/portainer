@@ -119,7 +119,7 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	payload.CronExpression = cronExpression
 
 	var endpoints []portainer.EndpointID
-	err = request.RetrieveMultiPartFormJSONValue(r, "Environments", &endpoints, false)
+	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
 	if err != nil {
 		return errors.New("Invalid environments")
 	}
@@ -219,7 +219,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 	}
 
-	return handler.DataStore.EdgeJob().Create(edgeJob)
+	return handler.DataStore.EdgeJob().Create(edgeJob.ID, edgeJob)
 }
 
 func convertEndpointsToMetaObject(endpoints []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeJobEndpointMeta {

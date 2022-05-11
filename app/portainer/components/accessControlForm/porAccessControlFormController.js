@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
+import { ResourceControlOwnership as RCO } from '@/portainer/access-control/types';
 
 angular.module('portainer.app').controller('porAccessControlFormController', [
   '$q',

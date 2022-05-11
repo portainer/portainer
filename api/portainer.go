@@ -325,6 +325,8 @@ type (
 		AMTDeviceGUID string `json:"AMTDeviceGUID,omitempty" example:"4c4c4544-004b-3910-8037-b6c04f504633"`
 		// LastCheckInDate mark last check-in date on checkin
 		LastCheckInDate int64
+		// QueryDate of each query with the endpoints list
+		QueryDate int64
 		// IsEdgeDevice marks if the environment was created as an EdgeDevice
 		IsEdgeDevice bool
 		// Whether the device has been trusted or not by the user
@@ -557,13 +559,13 @@ type (
 	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
 		// Enable this option if the server is configured for Anonymous access. When enabled, ReaderDN and Password will not be used
-		AnonymousMode bool `json:"AnonymousMode" example:"true"`
+		AnonymousMode bool `json:"AnonymousMode" example:"true" validate:"validate_bool"`
 		// Account that will be used to search for users
-		ReaderDN string `json:"ReaderDN" example:"cn=readonly-account,dc=ldap,dc=domain,dc=tld"`
+		ReaderDN string `json:"ReaderDN" example:"cn=readonly-account,dc=ldap,dc=domain,dc=tld" validate:"required_if=AnonymousMode false"`
 		// Password of the account that will be used to search users
-		Password string `json:"Password,omitempty" example:"readonly-password"`
+		Password string `json:"Password,omitempty" example:"readonly-password" validate:"required_if=AnonymousMode false"`
 		// URL or IP address of the LDAP server
-		URL       string           `json:"URL" example:"myldap.domain.tld:389"`
+		URL       string           `json:"URL" example:"myldap.domain.tld:389" validate:"hostname_port"`
 		TLSConfig TLSConfiguration `json:"TLSConfig"`
 		// Whether LDAP connection should use StartTLS
 		StartTLS            bool                      `json:"StartTLS" example:"true"`
@@ -807,10 +809,14 @@ type (
 		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
 		// KubectlImage, defaults to portainer/kubectl-shell
 		KubectlShellImage string `json:"KubectlShellImage" example:"portainer/kubectl-shell"`
-		// DisableTrustOnFirstConnect makes Portainer require explicit user trust of the edge agent before accepting the connection
-		DisableTrustOnFirstConnect bool `json:"DisableTrustOnFirstConnect" example:"false"`
+		// TrustOnFirstConnect makes Portainer accepting edge agent connection by default
+		TrustOnFirstConnect bool `json:"TrustOnFirstConnect" example:"false"`
 		// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
 		EnforceEdgeID bool `json:"EnforceEdgeID" example:"false"`
+		// Container environment parameter AGENT_SECRET
+		AgentSecret string `json:"AgentSecret"`
+		// EdgePortainerURL is the URL that is exposed to edge agents
+		EdgePortainerURL string `json:"EdgePortainerUrl"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -1098,9 +1104,10 @@ type (
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID       UserID
-		Username string
-		Role     UserRole
+		ID                  UserID
+		Username            string
+		Role                UserRole
+		ForceChangePassword bool
 	}
 
 	// TunnelDetails represents information associated to a tunnel
@@ -1236,6 +1243,7 @@ type (
 		GetDefaultSSLCertsPath() (string, string)
 		StoreSSLCertPair(cert, key []byte) (string, string, error)
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
+		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
 	}
 
@@ -1260,6 +1268,7 @@ type (
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
+		HasStackName(namespace string, stackName string) (bool, error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
@@ -1305,8 +1314,8 @@ type (
 		SetTunnelStatusToRequired(endpointID EndpointID) error
 		SetTunnelStatusToIdle(endpointID EndpointID)
 		KeepTunnelAlive(endpointID EndpointID, ctx context.Context, maxKeepAlive time.Duration)
-		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
-		GetActiveTunnel(endpoint *Endpoint) (*TunnelDetails, error)
+		GetTunnelDetails(endpointID EndpointID) TunnelDetails
+		GetActiveTunnel(endpoint *Endpoint) (TunnelDetails, error)
 		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
 		RemoveEdgeJob(edgeJobID EdgeJobID)
 	}
@@ -1319,7 +1328,6 @@ type (
 	// SnapshotService represents a service for managing environment(endpoint) snapshots
 	SnapshotService interface {
 		Start()
-		Stop()
 		SetSnapshotInterval(snapshotInterval string) error
 		SnapshotEndpoint(endpoint *Endpoint) error
 	}
@@ -1336,7 +1344,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.11.0"
+	APIVersion = "2.13.0"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 35
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1790,6 +1798,9 @@ const (
 	OperationPortainerUserInspect           Authorization = "PortainerUserInspect"
 	OperationPortainerUserMemberships       Authorization = "PortainerUserMemberships"
 	OperationPortainerUserCreate            Authorization = "PortainerUserCreate"
+	OperationPortainerUserListToken         Authorization = "PortainerUserListToken"
+	OperationPortainerUserCreateToken       Authorization = "PortainerUserCreateToken"
+	OperationPortainerUserRevokeToken       Authorization = "PortainerUserRevokeToken"
 	OperationPortainerUserUpdate            Authorization = "PortainerUserUpdate"
 	OperationPortainerUserUpdatePassword    Authorization = "PortainerUserUpdatePassword"
 	OperationPortainerUserDelete            Authorization = "PortainerUserDelete"

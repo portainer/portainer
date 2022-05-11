@@ -41,7 +41,7 @@
             <div class="form-group">
               <label for="password" class="col-sm-4 control-label text-left">Password</label>
               <div class="col-sm-8">
-                <input type="password" class="form-control" ng-model="formValues.Password" id="password" auto-focus />
+                <input type="password" class="form-control" ng-model="formValues.Password" id="password" ng-change="onPasswordChange()" auto-focus />
               </div>
             </div>
             <!-- !new-password-input -->
@@ -63,11 +63,19 @@
             <!-- !confirm-password-input -->
             <!-- note -->
             <div class="form-group">
-              <div class="col-sm-12">
-                <span class="small text-muted">
-                  <i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.Password.length >= 8]" aria-hidden="true"></i>
-                  The password must be at least 8 characters long
-                </span>
+              <div class="col-sm-12 text-muted" ng-if="!state.passwordStrength">
+                <!-- below code is duplicated with component of <force-password-update-hint>  -->
+                <!-- it is a workaround for firefox that does not render component <force-password-update-hint>  -->
+                <p>
+                  <i class="fa fa-times red-icon space-right" aria-hidden="true"></i>
+                  <span>The password must be at least {{ MinPasswordLen }} characters long, including a combination of one character of three of the below:</span>
+                </p>
+                <ul>
+                  <li class="ml-8"> Special characters </li>
+                  <li class="ml-8"> Lower case characters </li>
+                  <li class="ml-8"> Upper case characters </li>
+                  <li class="ml-8"> Numeric characters </li>
+                </ul>
               </div>
             </div>
             <!-- !note -->
@@ -77,7 +85,7 @@
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="state.actionInProgress || formValues.Password.length < 8 || formValues.Password !== formValues.ConfirmPassword"
+                  ng-disabled="state.actionInProgress || !state.passwordStrength || formValues.Password !== formValues.ConfirmPassword"
                   ng-click="createAdminUser()"
                   button-spinner="state.actionInProgress"
                 >

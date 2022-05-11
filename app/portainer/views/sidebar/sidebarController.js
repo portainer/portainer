@@ -3,6 +3,7 @@ angular.module('portainer.app').controller('SidebarController', SidebarControlle
 function SidebarController($rootScope, $scope, $transitions, StateManager, Notifications, Authentication, UserService, EndpointProvider) {
   $scope.applicationState = StateManager.getState();
   $scope.endpointState = EndpointProvider.endpoint();
+  $scope.display = !window.ddExtension;
 
   function checkPermissions(memberships) {
     var isLeader = false;

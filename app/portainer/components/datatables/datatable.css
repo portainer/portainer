@@ -87,8 +87,20 @@
   margin: 0;
 }
 
+.datatable .pagination > li.disabled > a,
+.datatable .pagination > li.disabled > button {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.datatable .pagination > li.disabled {
+  cursor: not-allowed;
+}
+
 .datatable .pagination > li > a,
+.datatable .pagination > li > button,
 .pagination > li > span {
+  user-select: none;
   float: none;
 }
 

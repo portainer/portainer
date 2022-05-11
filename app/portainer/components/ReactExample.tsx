@@ -30,12 +30,12 @@ export function ReactExample({ text }: ReactExampleProps) {
       <div className={styles.redBg}>{text}</div>
       <div>
         <a href={href} onClick={onClick}>
-          {t('reactExample.registries.useSref', 'Registries useSref')}
+          {t('Registries useSref')}
         </a>
       </div>
       <div>
         <Link to={route}>
-          <Trans i18nKey="reactExample.registries.link">
+          <Trans>
             Registries <strong>Link</strong>
           </Trans>
         </Link>

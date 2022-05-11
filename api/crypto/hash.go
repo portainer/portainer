@@ -9,11 +9,11 @@ type Service struct{}
 
 // Hash hashes a string using the bcrypt algorithm
 func (*Service) Hash(data string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(data), bcrypt.DefaultCost)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(data), bcrypt.DefaultCost)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
-	return string(hash), nil
+	return string(bytes), err
 }
 
 // CompareHashAndData compares a hash to clear data and returns an error if the comparison fails.

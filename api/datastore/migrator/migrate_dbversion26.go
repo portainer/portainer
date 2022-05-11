@@ -7,7 +7,7 @@ import (
 )
 
 func (m *Migrator) updateStackResourceControlToDB27() error {
-	migrateLog.Info("Updating stack resource controls")
+	migrateLog.Info("- updating stack resource controls")
 	resourceControls, err := m.resourceControlService.ResourceControls()
 	if err != nil {
 		return err

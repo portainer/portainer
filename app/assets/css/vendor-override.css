@@ -222,33 +222,6 @@ json-tree .branch-preview {
   background-color: var(--bg-progress-color);
 }
 
-.pagination > .disabled > span,
-.pagination > .disabled > span:hover,
-.pagination > .disabled > span:focus,
-.pagination > .disabled > a,
-.pagination > .disabled > a:hover,
-.pagination > .disabled > a:focus {
-  color: var(--text-pagination-color);
-  background-color: var(--bg-pagination-color);
-  border-color: var(--border-pagination-color);
-}
-
-.pagination > li > a,
-.pagination > li > span {
-  background-color: var(--bg-pagination-span-color);
-  border-color: var(--border-pagination-span-color);
-  color: var(--text-pagination-span-color);
-}
-
-.pagination > li > a:hover,
-.pagination > li > span:hover,
-.pagination > li > a:focus,
-.pagination > li > span:focus {
-  background-color: var(--bg-pagination-hover-color);
-  border-color: var(--border-pagination-hover-color);
-  color: var(--text-pagination-span-hover-color);
-}
-
 .ui-select-bootstrap .ui-select-choices-row > span {
   color: var(--text-ui-select-color);
 }

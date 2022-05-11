@@ -123,6 +123,10 @@ class AuthenticationController {
       const endpoints = await this.EndpointService.endpoints(0, 1);
       const isAdmin = this.Authentication.isAdmin();
 
+      if (this.Authentication.getUserDetails().forceChangePassword) {
+        return this.$state.go('portainer.account');
+      }
+
       if (endpoints.value.length === 0 && isAdmin) {
         return this.$state.go('portainer.wizard');
       } else {

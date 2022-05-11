@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { MouseEventHandler, PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
 type Type = 'submit' | 'button' | 'reset';
@@ -13,7 +13,7 @@ export interface Props {
   className?: string;
   dataCy?: string;
   type?: Type;
-  onClick?: () => void;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
 export function Button({

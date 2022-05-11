@@ -39,7 +39,7 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
-	bearerToken, err := handler.JwtService.GenerateTokenForKubeconfig(tokenData)
+	bearerToken, err := handler.jwtService.GenerateTokenForKubeconfig(tokenData)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}
 	}
@@ -126,7 +126,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 		instanceID := handler.kubernetesClientFactory.GetInstanceID()
 		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instanceID)
 
-		configClusters[idx] = buildCluster(r, handler.BaseURL, endpoint)
+		configClusters[idx] = handler.buildCluster(r, endpoint)
 		configContexts[idx] = buildContext(serviceAccountName, endpoint)
 		if !authInfosSet[serviceAccountName] {
 			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccountName, bearerToken))
@@ -144,15 +144,13 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 	}, nil
 }
 
-func buildCluster(r *http.Request, baseURL string, endpoint portainer.Endpoint) clientV1.NamedCluster {
-	if baseURL != "/" {
-		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
-	}
-	proxyURL := fmt.Sprintf("https://%s%sapi/endpoints/%d/kubernetes", r.Host, baseURL, endpoint.ID)
+func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
+	hostURL := strings.Split(r.Host, ":")[0]
+	kubeConfigInternal := handler.kubeClusterAccessService.GetData(hostURL, endpoint.ID)
 	return clientV1.NamedCluster{
 		Name: buildClusterName(endpoint.Name),
 		Cluster: clientV1.Cluster{
-			Server:                proxyURL,
+			Server:                kubeConfigInternal.ClusterServerURL,
 			InsecureSkipTLSVerify: true,
 		},
 	}

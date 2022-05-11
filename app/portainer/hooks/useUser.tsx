@@ -9,17 +9,14 @@ import {
   useMemo,
 } from 'react';
 
-import { getUser } from '@/portainer/services/api/userService';
-
-import { UserViewModel } from '../models/user';
+import { getUser } from '../users/user.service';
+import { User, UserId } from '../users/types';
 
 import { useLocalStorage } from './useLocalStorage';
 
 interface State {
-  user?: UserViewModel | null;
+  user?: User;
 }
-
-const state: State = {};
 
 export const UserContext = createContext<State | null>(null);
 
@@ -30,7 +27,10 @@ export function useUser() {
     throw new Error('should be nested under UserProvider');
   }
 
-  return context;
+  return useMemo(
+    () => ({ user: context.user, isAdmin: isAdmin(context.user) }),
+    [context.user]
+  );
 }
 
 export function useAuthorizations(
@@ -43,16 +43,16 @@ export function useAuthorizations(
   const { user } = useUser();
   const { params } = useCurrentStateAndParams();
 
+  if (!user) {
+    return false;
+  }
+
   if (process.env.PORTAINER_EDITION === 'CE') {
     return !adminOnlyCE || isAdmin(user);
   }
 
   const { endpointId } = params;
   if (!endpointId) {
-    return false;
-  }
-
-  if (!user) {
     return false;
   }
 
@@ -90,12 +90,10 @@ interface UserProviderProps {
 
 export function UserProvider({ children }: UserProviderProps) {
   const [jwt] = useLocalStorage('JWT', '');
-  const [user, setUser] = useState<UserViewModel | null>(null);
+  const [user, setUser] = useState<User | undefined>();
 
   useEffect(() => {
-    if (state.user) {
-      setUser(state.user);
-    } else if (jwt !== '') {
+    if (jwt !== '') {
       const tokenPayload = jwtDecode(jwt) as { id: number };
 
       loadUser(tokenPayload.id);
@@ -118,13 +116,17 @@ export function UserProvider({ children }: UserProviderProps) {
     </UserContext.Provider>
   );
 
-  async function loadUser(id: number) {
+  async function loadUser(id: UserId) {
     const user = await getUser(id);
-    state.user = user;
     setUser(user);
   }
 }
 
-export function isAdmin(user?: UserViewModel | null): boolean {
+function isAdmin(user?: User): boolean {
   return !!user && user.Role === 1;
+}
+
+export function useIsAdmin() {
+  const { user } = useUser();
+  return !!user && isAdmin(user);
 }

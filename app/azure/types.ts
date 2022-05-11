@@ -1,5 +1,7 @@
-import { AccessControlFormData } from '@/portainer/components/accessControlForm/model';
-import { ResourceControlResponse } from '@/portainer/models/resourceControl/resourceControl';
+import {
+  AccessControlFormData,
+  ResourceControlResponse,
+} from '@/portainer/access-control/types';
 
 import { PortMapping } from './ContainerInstances/CreateContainerInstanceForm/PortsMappingField';
 

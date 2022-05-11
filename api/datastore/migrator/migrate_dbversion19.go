@@ -7,6 +7,7 @@ import (
 const scheduleScriptExecutionJobType = 1
 
 func (m *Migrator) updateUsersToDBVersion20() error {
+	migrateLog.Info("- updating user authentication")
 	return m.authorizationService.UpdateUsersAuthorizations()
 }
 
@@ -22,6 +23,7 @@ func (m *Migrator) updateSettingsToDBVersion20() error {
 }
 
 func (m *Migrator) updateSchedulesToDBVersion20() error {
+	migrateLog.Info("- updating schedules")
 	legacySchedules, err := m.scheduleService.Schedules()
 	if err != nil {
 		return err

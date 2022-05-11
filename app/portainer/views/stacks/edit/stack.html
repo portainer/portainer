@@ -258,6 +258,12 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel ng-if="stack && !orphaned" resource-id="stack.EndpointId + '_' + stack.Name" resource-control="stack.ResourceControl" resource-type="'stack'">
-</por-access-control-panel>
+<access-control-panel
+  ng-if="stack && !orphaned"
+  resource-id="stack.EndpointId + '_' + stack.Name"
+  resource-control="stack.ResourceControl"
+  resource-type="resourceType"
+  on-update-success="(onUpdateResourceControlSuccess)"
+>
+</access-control-panel>
 <!-- !access-control-panel -->

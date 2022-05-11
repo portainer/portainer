@@ -1,10 +1,10 @@
-import _ from 'lodash-es';
-
 angular.module('portainer.app').factory(
   'EndpointProvider',
   /* @ngInject */
   function EndpointProviderFactory(LocalStorage, $uiRouterGlobals) {
-    'use strict';
+    const state = {
+      currentEndpoint: null,
+    };
     var service = {};
     var endpoint = {};
 
@@ -108,11 +108,11 @@ angular.module('portainer.app').factory(
     };
 
     service.currentEndpoint = function () {
-      var endpointId = endpoint.ID;
-      var endpoints = LocalStorage.getEndpoints();
-      return _.find(endpoints, function (item) {
-        return item.Id === endpointId;
-      });
+      return state.currentEndpoint;
+    };
+
+    service.setCurrentEndpoint = function (endpoint) {
+      state.currentEndpoint = endpoint;
     };
 
     return service;

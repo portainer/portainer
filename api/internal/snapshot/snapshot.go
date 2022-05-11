@@ -15,7 +15,7 @@ import (
 // specific Docker/Kubernetes environment(endpoint) snapshot methods.
 type Service struct {
 	dataStore                 dataservices.DataStore
-	refreshSignal             chan struct{}
+	snapshotIntervalCh        chan time.Duration
 	snapshotIntervalInSeconds float64
 	dockerSnapshotter         portainer.DockerSnapshotter
 	kubernetesSnapshotter     portainer.KubernetesSnapshotter
@@ -24,14 +24,15 @@ type Service struct {
 
 // NewService creates a new instance of a service
 func NewService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
-	snapshotFrequency, err := parseSnapshotFrequency(snapshotIntervalFromFlag, dataStore)
+	interval, err := parseSnapshotFrequency(snapshotIntervalFromFlag, dataStore)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
 		dataStore:                 dataStore,
-		snapshotIntervalInSeconds: snapshotFrequency,
+		snapshotIntervalCh:        make(chan time.Duration),
+		snapshotIntervalInSeconds: interval,
 		dockerSnapshotter:         dockerSnapshotter,
 		kubernetesSnapshotter:     kubernetesSnapshotter,
 		shutdownCtx:               shutdownCtx,
@@ -58,35 +59,17 @@ func parseSnapshotFrequency(snapshotInterval string, dataStore dataservices.Data
 
 // Start will start a background routine to execute periodic snapshots of environments(endpoints)
 func (service *Service) Start() {
-	if service.refreshSignal != nil {
-		return
-	}
-
-	service.refreshSignal = make(chan struct{})
-	service.startSnapshotLoop()
-}
-
-func (service *Service) Stop() {
-	if service.refreshSignal == nil {
-		return
-	}
-
-	// clear refreshSignal to mark the service as disabled
-	close(service.refreshSignal)
-	service.refreshSignal = nil
+	go service.startSnapshotLoop()
 }
 
 // SetSnapshotInterval sets the snapshot interval and resets the service
 func (service *Service) SetSnapshotInterval(snapshotInterval string) error {
-	service.Stop()
-
-	snapshotFrequency, err := time.ParseDuration(snapshotInterval)
+	interval, err := time.ParseDuration(snapshotInterval)
 	if err != nil {
 		return err
 	}
-	service.snapshotIntervalInSeconds = snapshotFrequency.Seconds()
 
-	service.Start()
+	service.snapshotIntervalCh <- interval
 
 	return nil
 }
@@ -140,34 +123,29 @@ func (service *Service) snapshotDockerEndpoint(endpoint *portainer.Endpoint) err
 	return nil
 }
 
-func (service *Service) startSnapshotLoop() error {
+func (service *Service) startSnapshotLoop() {
 	ticker := time.NewTicker(time.Duration(service.snapshotIntervalInSeconds) * time.Second)
-	go func() {
-		err := service.snapshotEndpoints()
-		if err != nil {
-			log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
-		}
 
-		for {
-			select {
-			case <-ticker.C:
-				err := service.snapshotEndpoints()
-				if err != nil {
-					log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
-				}
-			case <-service.shutdownCtx.Done():
-				log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
-				ticker.Stop()
-				return
-			case <-service.refreshSignal:
-				log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
-				ticker.Stop()
-				return
+	err := service.snapshotEndpoints()
+	if err != nil {
+		log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
+	}
+
+	for {
+		select {
+		case <-ticker.C:
+			err := service.snapshotEndpoints()
+			if err != nil {
+				log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
 			}
+		case <-service.shutdownCtx.Done():
+			log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
+			ticker.Stop()
+			return
+		case interval := <-service.snapshotIntervalCh:
+			ticker.Reset(interval)
 		}
-	}()
-
-	return nil
+	}
 }
 
 func (service *Service) snapshotEndpoints() error {

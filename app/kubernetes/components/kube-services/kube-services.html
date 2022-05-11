@@ -3,8 +3,13 @@
 <div class="form-group">
   <div class="col-sm-12 form-inline">
     <div class="col-sm-5" style="padding-left: 0px">
-      <select class="form-control" ng-model="$ctrl.state.selected" ng-options="item.typeValue as item.typeName for item in $ctrl.state.serviceType"></select>
-      <button type="button" class="btn btn-sm btn-default" style="margin-left: 0" ng-click="$ctrl.addEntry( $ctrl.state.selected )" data-cy="k8sConfigCreate-createEntryButton">
+      <select
+        class="form-control"
+        ng-model="$ctrl.state.selected"
+        ng-options="item.typeValue as item.typeName for item in $ctrl.state.serviceType"
+        data-cy="k8sAppCreate-publishingModeDropdown"
+      ></select>
+      <button type="button" class="btn btn-sm btn-default" style="margin-left: 0" ng-click="$ctrl.addEntry( $ctrl.state.selected )" data-cy="k8sAppCreate-createServiceButton">
         <i class="fa fa-plus-circle" aria-hidden="true"></i> Create service
       </button>
     </div>

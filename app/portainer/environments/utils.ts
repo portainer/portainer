@@ -17,6 +17,14 @@ export function getPlatformType(envType: EnvironmentType) {
   }
 }
 
+export function isDockerEnvironment(envType: EnvironmentType) {
+  return getPlatformType(envType) === PlatformType.Docker;
+}
+
+export function isKubernetesEnvironment(envType: EnvironmentType) {
+  return getPlatformType(envType) === PlatformType.Kubernetes;
+}
+
 export function isEdgeEnvironment(envType: EnvironmentType) {
   return [
     EnvironmentType.EdgeAgentOnDocker,

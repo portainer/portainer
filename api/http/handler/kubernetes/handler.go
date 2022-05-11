@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/kubernetes"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,21 +18,22 @@ import (
 // Handler is the HTTP handler which will natively deal with to external environments(endpoints).
 type Handler struct {
 	*mux.Router
-	dataStore               dataservices.DataStore
-	kubernetesClientFactory *cli.ClientFactory
-	authorizationService    *authorization.Service
-	JwtService              dataservices.JWTService
-	BaseURL                 string
+	authorizationService     *authorization.Service
+	dataStore                dataservices.DataStore
+	jwtService               dataservices.JWTService
+	kubernetesClientFactory  *cli.ClientFactory
+	kubeClusterAccessService kubernetes.KubeClusterAccessService
 }
 
 // NewHandler creates a handler to process pre-proxied requests to external APIs.
-func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, kubernetesClientFactory *cli.ClientFactory, baseURL string) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, jwtService dataservices.JWTService, kubeClusterAccessService kubernetes.KubeClusterAccessService, kubernetesClientFactory *cli.ClientFactory) *Handler {
 	h := &Handler{
-		Router:                  mux.NewRouter(),
-		dataStore:               dataStore,
-		kubernetesClientFactory: kubernetesClientFactory,
-		authorizationService:    authorizationService,
-		BaseURL:                 baseURL,
+		Router:                   mux.NewRouter(),
+		authorizationService:     authorizationService,
+		dataStore:                dataStore,
+		jwtService:               jwtService,
+		kubeClusterAccessService: kubeClusterAccessService,
+		kubernetesClientFactory:  kubernetesClientFactory,
 	}
 
 	kubeRouter := h.PathPrefix("/kubernetes").Subrouter()

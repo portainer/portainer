@@ -213,7 +213,9 @@ class KubernetesDeployController {
 
       let deployNamespace = '';
 
-      if (this.formValues.Namespace !== 'default') {
+      if (this.formValues.namespace_toggle) {
+        deployNamespace = '';
+      } else {
         deployNamespace = this.formValues.Namespace;
       }
 
@@ -298,6 +300,7 @@ class KubernetesDeployController {
 
   $onInit() {
     return this.$async(async () => {
+      this.formValues.namespace_toggle = false;
       await this.getNamespaces();
 
       if (this.$state.params.templateId) {

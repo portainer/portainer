@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -53,12 +54,15 @@ func Test_JobShouldStop_UponError(t *testing.T) {
 	defer s.Shutdown()
 
 	var acc int
+	ch := make(chan struct{})
 	s.StartJobEvery(jobInterval, func() error {
 		acc++
+		close(ch)
 		return fmt.Errorf("failed")
 	})
 
 	<-time.After(3 * jobInterval)
+	<-ch
 	assert.Equal(t, 1, acc, "job stop after the first run because it returns an error")
 }
 
@@ -97,4 +101,20 @@ func Test_CanTerminateAllJobs_ByCancellingParentContext(t *testing.T) {
 
 	<-ctx.Done()
 	assert.False(t, workDone, "job shouldn't had a chance to run")
+}
+
+func Test_StartJobEvery_Concurrently(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*jobInterval)
+	s := NewScheduler(ctx)
+
+	f := func() error {
+		return errors.New("error")
+	}
+
+	go s.StartJobEvery(jobInterval, f)
+	s.StartJobEvery(jobInterval, f)
+
+	cancel()
+
+	<-ctx.Done()
 }

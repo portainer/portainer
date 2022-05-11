@@ -6,5 +6,6 @@ export const gitFormAutoUpdateFieldset = {
   bindings: {
     model: '<',
     onChange: '<',
+    showForcePullImage: '<',
   },
 };

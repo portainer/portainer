@@ -1,6 +1,6 @@
 import { object, string, number, boolean } from 'yup';
 
-import { validationSchema as accessControlSchema } from '@/portainer/components/accessControlForm/AccessControlForm.validation';
+import { validationSchema as accessControlSchema } from '@/portainer/access-control/AccessControlForm/AccessControlForm.validation';
 
 import { validationSchema as portsSchema } from './PortsMappingField.validation';
 

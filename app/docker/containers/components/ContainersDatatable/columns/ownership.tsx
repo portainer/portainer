@@ -2,8 +2,8 @@ import { Column } from 'react-table';
 import clsx from 'clsx';
 
 import { ownershipIcon } from '@/portainer/filters/filters';
-import { ResourceControlOwnership } from '@/portainer/models/resourceControl/resourceControlOwnership';
 import type { DockerContainer } from '@/docker/containers/types';
+import { ResourceControlOwnership } from '@/portainer/access-control/types';
 
 export const ownership: Column<DockerContainer> = {
   Header: 'Ownership',

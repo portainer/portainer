@@ -38,7 +38,7 @@ export function onStartupAngular($rootScope, $state, $interval, LocalStorage, En
 
 function ping(EndpointProvider, SystemService) {
   const endpoint = EndpointProvider.currentEndpoint();
-  if (endpoint !== undefined && endpoint.Type == PortainerEndpointTypes.EdgeAgentOnDockerEnvironment) {
+  if (endpoint && endpoint.Type == PortainerEndpointTypes.EdgeAgentOnDockerEnvironment) {
     SystemService.ping(endpoint.Id);
   }
 }

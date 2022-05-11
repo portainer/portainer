@@ -7,7 +7,9 @@
         Enable access control
         <portainer-tooltip position="bottom" message="When enabled, you can restrict the access and management of this resource."></portainer-tooltip>
       </label>
-      <label class="switch" style="margin-left: 20px"> <input name="ownership" type="checkbox" ng-model="$ctrl.formData.AccessControlEnabled" /><i></i> </label>
+      <label class="switch" style="margin-left: 20px">
+        <input name="ownership" type="checkbox" ng-model="$ctrl.formData.AccessControlEnabled" /><i data-cy="portainer-accessMgmtToggle"></i>
+      </label>
     </div>
   </div>
   <!-- !access-control-switch -->
@@ -16,7 +18,7 @@
     <div class="boxselector_wrapper">
       <div ng-if="$ctrl.isAdmin">
         <input type="radio" id="access_administrators" ng-model="$ctrl.formData.Ownership" value="administrators" />
-        <label for="access_administrators">
+        <label for="access_administrators" data-cy="portainer-selectAdminAccess">
           <div class="boxselector_header">
             <i ng-class="'administrators' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
             Administrators
@@ -26,7 +28,7 @@
       </div>
       <div ng-if="$ctrl.isAdmin">
         <input type="radio" id="access_restricted" ng-model="$ctrl.formData.Ownership" value="restricted" />
-        <label for="access_restricted">
+        <label for="access_restricted" data-cy="portainer-selectRestrictedAccess">
           <div class="boxselector_header">
             <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
             Restricted
@@ -95,6 +97,7 @@
         search-property="Name"
         translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
         style="margin-left: 20px"
+        data-cy="portainer-selectTeamAccess"
       >
       </span>
     </div>
@@ -126,6 +129,7 @@
         search-property="Username"
         translation="{nothingSelected: 'Select one or more users', search: 'Search...'}"
         style="margin-left: 20px"
+        data-cy="portainer-selectUserAccess"
       >
       </span>
     </div>

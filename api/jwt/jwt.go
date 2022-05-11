@@ -3,12 +3,14 @@ package jwt
 import (
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/securecookie"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	log "github.com/sirupsen/logrus"
 )
 
 // scope represents JWT scopes that are supported in JWT claims.
@@ -22,10 +24,11 @@ type Service struct {
 }
 
 type claims struct {
-	UserID   int    `json:"id"`
-	Username string `json:"username"`
-	Role     int    `json:"role"`
-	Scope    scope  `json:"scope"`
+	UserID              int    `json:"id"`
+	Username            string `json:"username"`
+	Role                int    `json:"role"`
+	Scope               scope  `json:"scope"`
+	ForceChangePassword bool   `json:"forceChangePassword"`
 	jwt.StandardClaims
 }
 
@@ -163,11 +166,18 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 		return "", fmt.Errorf("invalid scope: %v", scope)
 	}
 
+	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
+		// Set expiration to 99 years for docker desktop extension.
+		log.Infof("[message: detected docker desktop extension mode]")
+		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()
+	}
+
 	cl := claims{
-		UserID:   int(data.ID),
-		Username: data.Username,
-		Role:     int(data.Role),
-		Scope:    scope,
+		UserID:              int(data.ID),
+		Username:            data.Username,
+		Role:                int(data.Role),
+		Scope:               scope,
+		ForceChangePassword: data.ForceChangePassword,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiresAt,
 			IssuedAt:  time.Now().Unix(),

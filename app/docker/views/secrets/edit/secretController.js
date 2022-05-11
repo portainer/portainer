@@ -1,3 +1,5 @@
+import { ResourceControlType } from '@/portainer/access-control/types';
+
 angular.module('portainer.docker').controller('SecretController', [
   '$scope',
   '$transition$',
@@ -5,6 +7,12 @@ angular.module('portainer.docker').controller('SecretController', [
   'SecretService',
   'Notifications',
   function ($scope, $transition$, $state, SecretService, Notifications) {
+    $scope.resourceType = ResourceControlType.Secret;
+
+    $scope.onUpdateResourceControlSuccess = function () {
+      $state.reload();
+    };
+
     $scope.removeSecret = function removeSecret(secretId) {
       SecretService.remove(secretId)
         .then(function success() {

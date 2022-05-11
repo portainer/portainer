@@ -152,7 +152,14 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel ng-if="container" resource-id="container.Id" resource-control="container.ResourceControl" resource-type="'container'"> </por-access-control-panel>
+<access-control-panel
+  ng-if="container"
+  resource-id="container.Id"
+  resource-control="container.ResourceControl"
+  resource-type="resourceType"
+  on-update-success="(onUpdateResourceControlSuccess)"
+>
+</access-control-panel>
 <!-- !access-control-panel -->
 
 <div ng-if="container.State.Health" class="row">

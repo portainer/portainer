@@ -1,5 +1,5 @@
+import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
-import { ResourceControlViewModel } from '@/portainer/models/resourceControl/resourceControl';
 
 class KubeEditCustomTemplateViewController {
   /* @ngInject */

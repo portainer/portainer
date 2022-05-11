@@ -1,7 +1,7 @@
 import _ from 'lodash';
+import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
 
 class EditCustomTemplateViewController {
   /* @ngInject */

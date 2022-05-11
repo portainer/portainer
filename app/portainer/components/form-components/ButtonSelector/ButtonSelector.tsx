@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 import { ButtonGroup, Size } from '../../Button/ButtonGroup';
 
@@ -7,7 +7,7 @@ import styles from './ButtonSelector.module.css';
 
 export interface Option<T> {
   value: T;
-  label?: string;
+  label?: ReactNode;
 }
 
 interface Props<T> {

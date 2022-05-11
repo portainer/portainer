@@ -312,7 +312,6 @@ angular
         }
 
         $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
-
         try {
           const containers = await ContainerService.containers(true);
           $scope.containerNames = ContainerHelper.getContainerNames(containers);

@@ -19,7 +19,7 @@ angular.module('portainer.app').controller('MainController', [
     $scope.$watch($scope.getWidth, function (newValue) {
       if (newValue >= mobileView) {
         const toggleValue = LocalStorage.getToolbarToggle();
-        $scope.toggle = typeof toggleValue === 'boolean' ? toggleValue : true;
+        $scope.toggle = typeof toggleValue === 'boolean' ? toggleValue : !window.ddExtension;
       } else {
         $scope.toggle = false;
       }

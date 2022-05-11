@@ -4,5 +4,5 @@
   "gopls": {
     "build.expandWorkspaceToModule": false
   },
-  "gitlens.advanced.blame.customArguments": ["–ignore-revs-file", ".git-blame-ignore-revs"]
+  "gitlens.advanced.blame.customArguments": ["--ignore-revs-file", ".git-blame-ignore-revs"]
 }

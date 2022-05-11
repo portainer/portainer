@@ -3,13 +3,11 @@ import bootbox from 'bootbox';
 
 import {
   cancelRegistryRepositoryAction,
-  confirmAccessControlUpdate,
   confirmAsync,
-  confirmDeassociate,
+  confirmDisassociate,
   confirmDeletion,
   confirmDetachment,
   confirmDeletionAsync,
-  confirmEndpointSnapshot,
   confirmChangePassword,
   confirmImageExport,
   confirmImageForceRemoval,
@@ -17,6 +15,7 @@ import {
   confirmUpdate,
   confirmWebEditorDiscard,
   confirm,
+  confirmForceChangePassword,
 } from './confirm';
 import {
   confirmContainerDeletion,
@@ -44,17 +43,15 @@ export function ModalServiceAngular() {
     confirmWebEditorDiscard,
     confirmAsync,
     confirm,
-    confirmAccessControlUpdate,
     confirmImageForceRemoval,
     cancelRegistryRepositoryAction,
     confirmDeletion,
     confirmDetachment,
-    confirmDeassociate,
+    confirmDisassociate,
     confirmUpdate,
     confirmRedeploy,
     confirmDeletionAsync,
     confirmContainerRecreation,
-    confirmEndpointSnapshot,
     confirmChangePassword,
     confirmImageExport,
     confirmServiceForceUpdate,
@@ -62,5 +59,6 @@ export function ModalServiceAngular() {
     selectRegistry,
     confirmContainerDeletion,
     confirmKubeconfigSelection,
+    confirmForceChangePassword,
   };
 }

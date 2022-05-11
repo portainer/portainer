@@ -237,37 +237,39 @@ function getVolumeClaimUpdateResourceSummary(oldPVC, newPVC) {
 // getServiceUpdateResourceSummary replicates KubernetesServiceService.patch
 function getServiceUpdateResourceSummary(oldServices, newServices) {
   let summary = [];
-  newServices.forEach((newService) => {
-    const oldServiceMatched = _.find(oldServices, { Name: newService.Name });
-    if (oldServiceMatched) {
-      const payload = KubernetesServiceConverter.patchPayload(oldServiceMatched, newService);
-      if (payload.length) {
-        const serviceUpdate = {
-          action: UPDATE,
-          kind: KubernetesResourceTypes.SERVICE,
-          name: oldServiceMatched.Name,
-          type: oldServiceMatched.Type || KubernetesServiceTypes.CLUSTER_IP,
-        };
-        summary.push(serviceUpdate);
+  // skip update summary when service is headless service
+  if (!oldServices.Headless) {
+    newServices.forEach((newService) => {
+      const oldServiceMatched = _.find(oldServices, { Name: newService.Name });
+      if (oldServiceMatched) {
+        const payload = KubernetesServiceConverter.patchPayload(oldServiceMatched, newService);
+        if (payload.length) {
+          const serviceUpdate = {
+            action: UPDATE,
+            kind: KubernetesResourceTypes.SERVICE,
+            name: oldServiceMatched.Name,
+            type: oldServiceMatched.Type || KubernetesServiceTypes.CLUSTER_IP,
+          };
+          summary.push(serviceUpdate);
+        }
+      } else {
+        const emptyService = new KubernetesService();
+        const payload = KubernetesServiceConverter.patchPayload(emptyService, newService);
+        if (payload.length) {
+          const serviceCreate = { action: CREATE, kind: KubernetesResourceTypes.SERVICE, name: newService.Name, type: newService.Type || KubernetesServiceTypes.CLUSTER_IP };
+          summary.push(serviceCreate);
+        }
       }
-    } else {
-      const emptyService = new KubernetesService();
-      const payload = KubernetesServiceConverter.patchPayload(emptyService, newService);
-      if (payload.length) {
-        const serviceCreate = { action: CREATE, kind: KubernetesResourceTypes.SERVICE, name: newService.Name, type: newService.Type || KubernetesServiceTypes.CLUSTER_IP };
-        summary.push(serviceCreate);
+    });
+
+    oldServices.forEach((oldService) => {
+      const newServiceMatched = _.find(newServices, { Name: oldService.Name });
+      if (!newServiceMatched) {
+        const serviceDelete = { action: DELETE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP };
+        summary.push(serviceDelete);
       }
-    }
-  });
-
-  oldServices.forEach((oldService) => {
-    const newServiceMatched = _.find(newServices, { Name: oldService.Name });
-    if (!newServiceMatched) {
-      const serviceDelete = { action: DELETE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP };
-      summary.push(serviceDelete);
-    }
-  });
-
+    });
+  }
   if (summary.length !== 0) {
     return summary;
   }

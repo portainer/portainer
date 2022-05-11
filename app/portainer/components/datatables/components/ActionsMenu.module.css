@@ -8,18 +8,18 @@
 }
 
 .table-actions-menu-list {
-  padding: 0 10px 0 10px;
   background: var(--bg-widget-color);
   border: 1px solid var(--border-color);
 }
 
 .table-actions-menu-list [data-reach-menu-item] {
-  padding: 5px 5px !important;
+  padding: 5px 15px;
 }
 
 .table-actions-menu-btn {
   border: none;
   background: none;
+  padding: 0 10px;
 }
 
 [data-reach-menu-link] {

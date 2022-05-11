@@ -19,28 +19,28 @@ class KubernetesVolumeService {
   /**
    * GET
    */
-  async getAsync(namespace, name) {
-    const [pvc, pool] = await Promise.all([this.KubernetesPersistentVolumeClaimService.get(namespace, name), this.KubernetesResourcePoolService.get(namespace)]);
+  async getAsync(namespace, storageClasses, name) {
+    const [pvc, pool] = await Promise.all([this.KubernetesPersistentVolumeClaimService.get(namespace, storageClasses, name), this.KubernetesResourcePoolService.get(namespace)]);
     return KubernetesVolumeConverter.pvcToVolume(pvc, pool);
   }
 
-  async getAllAsync(namespace) {
+  async getAllAsync(namespace, storageClasses) {
     const data = await this.KubernetesResourcePoolService.get(namespace);
     const pools = data instanceof Array ? data : [data];
     const res = await Promise.all(
       _.map(pools, async (pool) => {
-        const pvcs = await this.KubernetesPersistentVolumeClaimService.get(pool.Namespace.Name);
+        const pvcs = await this.KubernetesPersistentVolumeClaimService.get(pool.Namespace.Name, storageClasses);
         return _.map(pvcs, (pvc) => KubernetesVolumeConverter.pvcToVolume(pvc, pool));
       })
     );
     return _.flatten(res);
   }
 
-  get(namespace, name) {
+  get(namespace, storageClasses, name) {
     if (name) {
-      return this.$async(this.getAsync, namespace, name);
+      return this.$async(this.getAsync, namespace, storageClasses, name);
     }
-    return this.$async(this.getAllAsync, namespace);
+    return this.$async(this.getAllAsync, namespace, storageClasses);
   }
 
   /**

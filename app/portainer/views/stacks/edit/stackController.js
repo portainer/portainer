@@ -1,3 +1,4 @@
+import { ResourceControlType } from '@/portainer/access-control/types';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { FeatureId } from 'Portainer/feature-flags/enums';
 
@@ -54,6 +55,12 @@ angular.module('portainer.app').controller('StackController', [
     ContainerHelper,
     endpoint
   ) {
+    $scope.resourceType = ResourceControlType.Stack;
+
+    $scope.onUpdateResourceControlSuccess = function () {
+      $state.reload();
+    };
+
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
     $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;

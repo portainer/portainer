@@ -71,20 +71,6 @@ angular.module('portainer.app').factory('BackupService', [
       return deferred.promise;
     };
 
-    service.getBackupStatus = function () {
-      var deferred = $q.defer();
-
-      Backup.getBackupStatus()
-        .$promise.then(function success(data) {
-          deferred.resolve(data);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve backup status', err: err });
-        });
-
-      return deferred.promise;
-    };
-
     return service;
   },
 ]);

@@ -1,0 +1,63 @@
+.root :global .selector__control {
+  border: 1px solid var(--border-multiselect);
+  background-color: var(--bg-multiselect-color);
+}
+
+.root :global .selector__multi-value {
+  background-color: var(--grey-51);
+}
+
+:global :root[theme='dark'] :local .root :global .selector__multi-value {
+  background-color: var(--grey-3);
+}
+
+:global :root[theme='highcontrast'] :local .root :global .selector__multi-value {
+  background-color: var(--grey-3);
+}
+
+.root :global .selector__multi-value__label {
+  color: var(--black-color);
+}
+
+:global :root[theme='dark'] :local .root :global .selector__multi-value__label {
+  color: var(--white-color);
+}
+
+:global :root[theme='highcontrast'] :local .root :global .selector__multi-value__label {
+  color: var(--white-color);
+}
+
+.root :global .selector__menu {
+  background-color: var(--bg-multiselect-color);
+  border: 1px solid var(--border-multiselect);
+}
+
+.root :global .selector__option {
+  background-color: var(--bg-multiselect-color);
+  border: 1px solid var(--border-multiselect);
+}
+
+.root :global .selector__option:active,
+.root :global .selector__option--is-focused {
+  background-color: var(--blue-8);
+}
+
+:global :root[theme='dark'] :local .root :global .selector__option:active,
+:global :root[theme='dark'] :local .root :global .selector__option--is-focused {
+  background-color: var(--blue-2);
+  color: var(--white-color);
+}
+
+.root :global .selector__option--is-selected {
+  color: var(--grey-7);
+}
+
+:global :root[theme='highcontrast'] :local .root :global .selector__single-value,
+:global :root[theme='dark'] :local .root :global .selector__single-value {
+  color: var(--white-color);
+}
+
+:global :root[theme='highcontrast'] :local .root :global .selector__input-container,
+:global :root[theme='dark'] :local .root :global .selector__input-container {
+  color: var(--white-color);
+}

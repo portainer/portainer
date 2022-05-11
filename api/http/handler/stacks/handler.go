@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks"
 )
@@ -34,15 +35,16 @@ type Handler struct {
 	stackDeletionMutex *sync.Mutex
 	requestBouncer     *security.RequestBouncer
 	*mux.Router
-	DataStore           dataservices.DataStore
-	DockerClientFactory *docker.ClientFactory
-	FileService         portainer.FileService
-	GitService          portainer.GitService
-	SwarmStackManager   portainer.SwarmStackManager
-	ComposeStackManager portainer.ComposeStackManager
-	KubernetesDeployer  portainer.KubernetesDeployer
-	Scheduler           *scheduler.Scheduler
-	StackDeployer       stacks.StackDeployer
+	DataStore               dataservices.DataStore
+	DockerClientFactory     *docker.ClientFactory
+	FileService             portainer.FileService
+	GitService              portainer.GitService
+	SwarmStackManager       portainer.SwarmStackManager
+	ComposeStackManager     portainer.ComposeStackManager
+	KubernetesDeployer      portainer.KubernetesDeployer
+	KubernetesClientFactory *cli.ClientFactory
+	Scheduler               *scheduler.Scheduler
+	StackDeployer           stacks.StackDeployer
 }
 
 func stackExistsError(name string) *httperror.HandlerError {
@@ -146,6 +148,31 @@ func (handler *Handler) checkUniqueStackName(endpoint *portainer.Endpoint, name 
 	}
 
 	return true, nil
+}
+
+func (handler *Handler) checkUniqueStackNameInKubernetes(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, namespace string) (bool, error) {
+	isUniqueStackName, err := handler.checkUniqueStackName(endpoint, name, stackID)
+	if err != nil {
+		return false, err
+	}
+
+	if !isUniqueStackName {
+		// Check if this stack name is really used in the kubernetes.
+		// Because the stack with this name could be removed via kubectl cli outside and the datastore does not be informed of this action.
+		if namespace == "" {
+			namespace = "default"
+		}
+
+		kubeCli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+		if err != nil {
+			return false, err
+		}
+		isUniqueStackName, err = kubeCli.HasStackName(namespace, name)
+		if err != nil {
+			return false, err
+		}
+	}
+	return isUniqueStackName, nil
 }
 
 func (handler *Handler) checkUniqueStackNameInDocker(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, swarmMode bool) (bool, error) {

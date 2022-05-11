@@ -6,12 +6,18 @@ import { HeaderContainer } from './HeaderContainer';
 import { HeaderTitle } from './HeaderTitle';
 
 test('should not render without a wrapping HeaderContainer', async () => {
+  const consoleErrorFn = jest
+    .spyOn(console, 'error')
+    .mockImplementation(() => jest.fn());
+
   const title = 'title';
   function renderComponent() {
     return render(<HeaderTitle title={title} />);
   }
 
   expect(renderComponent).toThrowErrorMatchingSnapshot();
+
+  consoleErrorFn.mockRestore();
 });
 
 test('should display a HeaderTitle', async () => {

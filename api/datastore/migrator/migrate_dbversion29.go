@@ -1,7 +1,7 @@
 package migrator
 
 func (m *Migrator) migrateDBVersionToDB30() error {
-	migrateLog.Info("Updating legacy settings")
+	migrateLog.Info("- updating legacy settings")
 	if err := m.MigrateSettingsToDB30(); err != nil {
 		return err
 	}

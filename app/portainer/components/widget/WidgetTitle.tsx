@@ -45,7 +45,7 @@ export function WidgetTitle({
       <div className="row">
         <span className={clsx('pull-left', className)}>
           {typeof icon === 'string' ? <i className={clsx('fa', icon)} /> : icon}
-          {title}
+          <span>{title}</span>
         </span>
         <span className={clsx('pull-right', className)}>{children}</span>
       </div>

@@ -33,13 +33,14 @@ class KubernetesDashboardController {
 
   async getAllAsync() {
     const isAdmin = this.Authentication.isAdmin();
+    const storageClasses = this.endpoint.Kubernetes.Configuration.StorageClasses;
 
     try {
       const [pools, applications, configurations, volumes, tags] = await Promise.all([
         this.KubernetesResourcePoolService.get(),
         this.KubernetesApplicationService.get(),
         this.KubernetesConfigurationService.get(),
-        this.KubernetesVolumeService.get(),
+        this.KubernetesVolumeService.get(undefined, storageClasses),
         this.TagService.tags(),
       ]);
       this.applications = applications;

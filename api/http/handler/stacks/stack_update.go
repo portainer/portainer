@@ -123,15 +123,6 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		}
 	}
 
-	// Must not be git based stack. stop the auto update job if there is any
-	if stack.AutoUpdate != nil {
-		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
-		stack.AutoUpdate = nil
-	}
-	if stack.GitConfig != nil {
-		stack.FromAppTemplate = true
-	}
-
 	updateError := handler.updateAndDeployStack(r, stack, endpoint)
 	if updateError != nil {
 		return updateError
@@ -171,6 +162,15 @@ func (handler *Handler) updateAndDeployStack(r *http.Request, stack *portainer.S
 }
 
 func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	// Must not be git based stack. stop the auto update job if there is any
+	if stack.AutoUpdate != nil {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		stack.AutoUpdate = nil
+	}
+	if stack.GitConfig != nil {
+		stack.FromAppTemplate = true
+	}
+
 	var payload updateComposeStackPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -199,6 +199,15 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 }
 
 func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	// Must not be git based stack. stop the auto update job if there is any
+	if stack.AutoUpdate != nil {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		stack.AutoUpdate = nil
+	}
+	if stack.GitConfig != nil {
+		stack.FromAppTemplate = true
+	}
+
 	var payload updateSwarmStackPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {

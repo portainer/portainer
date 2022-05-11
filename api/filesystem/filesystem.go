@@ -56,10 +56,12 @@ const (
 	TempPath = "tmp"
 	// SSLCertPath represents the default ssl certificates path
 	SSLCertPath = "certs"
-	// DefaultSSLCertFilename represents the default ssl certificate file name
-	DefaultSSLCertFilename = "cert.pem"
-	// DefaultSSLKeyFilename represents the default ssl key file name
-	DefaultSSLKeyFilename = "key.pem"
+	// SSLCertFilename represents the ssl certificate file name
+	SSLCertFilename = "cert.pem"
+	// SSLKeyFilename represents the ssl key file name
+	SSLKeyFilename = "key.pem"
+	// SSLCACertFilename represents the CA ssl certificate file name for mTLS
+	SSLCACertFilename = "ca-cert.pem"
 )
 
 // ErrUndefinedTLSFileType represents an error returned on undefined TLS file type
@@ -161,7 +163,7 @@ func (service *Service) Copy(fromFilePath string, toFilePath string, deleteIfExi
 	}
 
 	if !exists {
-		return errors.New("File doesn't exist")
+		return errors.New(fmt.Sprintf("File (%s) doesn't exist", fromFilePath))
 	}
 
 	finput, err := os.Open(fromFilePath)
@@ -580,8 +582,8 @@ func (service *Service) wrapFileStore(filepath string) string {
 }
 
 func defaultCertPathUnderFileStore() (string, string) {
-	certPath := JoinPaths(SSLCertPath, DefaultSSLCertFilename)
-	keyPath := JoinPaths(SSLCertPath, DefaultSSLKeyFilename)
+	certPath := JoinPaths(SSLCertPath, SSLCertFilename)
+	keyPath := JoinPaths(SSLCertPath, SSLKeyFilename)
 	return certPath, keyPath
 }
 
@@ -625,6 +627,18 @@ func (service *Service) CopySSLCertPair(certPath, keyPath string) (string, strin
 	}
 
 	return defCertPath, defKeyPath, nil
+}
+
+// CopySSLCACert copies the specified caCert pem file
+func (service *Service) CopySSLCACert(caCertPath string) (string, error) {
+	toFilePath := service.wrapFileStore(JoinPaths(SSLCertPath, SSLCACertFilename))
+
+	err := service.Copy(caCertPath, toFilePath, true)
+	if err != nil {
+		return "", err
+	}
+
+	return toFilePath, nil
 }
 
 // FileExists checks for the existence of the specified file.

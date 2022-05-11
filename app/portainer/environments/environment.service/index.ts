@@ -1,32 +1,43 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { type EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { type TagId } from '@/portainer/tags/types';
+import { UserId } from '@/portainer/users/types';
+import { TeamId } from '@/portainer/teams/types';
 
-import {
+import type {
   Environment,
-  EnvironmentGroupId,
   EnvironmentId,
   EnvironmentType,
   EnvironmentSettings,
-  TagId,
-  TeamId,
-  UserId,
+  EnvironmentStatus,
 } from '../types';
 
 import { arrayToJson, buildUrl } from './utils';
 
-interface EndpointsQuery {
+export interface EnvironmentsQueryParams {
   search?: string;
   types?: EnvironmentType[];
   tagIds?: TagId[];
   endpointIds?: EnvironmentId[];
   tagsPartialMatch?: boolean;
-  groupId?: EnvironmentGroupId;
-  edgeDeviceFilter?: boolean;
+  groupIds?: EnvironmentGroupId[];
+  status?: EnvironmentStatus[];
+  sort?: string;
+  order?: 'asc' | 'desc';
+  edgeDeviceFilter?: 'all' | 'trusted' | 'untrusted' | 'none';
 }
 
 export async function getEndpoints(
   start: number,
   limit: number,
-  { types, tagIds, endpointIds, ...query }: EndpointsQuery = {}
+  {
+    types,
+    tagIds,
+    endpointIds,
+    status,
+    groupIds,
+    ...query
+  }: EnvironmentsQueryParams = {}
 ) {
   if (tagIds && tagIds.length === 0) {
     return { totalCount: 0, value: <Environment[]>[] };
@@ -48,12 +59,24 @@ export async function getEndpoints(
     params.endpointIds = arrayToJson(endpointIds);
   }
 
+  if (status) {
+    params.status = arrayToJson(status);
+  }
+
+  if (groupIds) {
+    params.groupIds = arrayToJson(groupIds);
+  }
+
   try {
     const response = await axios.get<Environment[]>(url, { params });
+    const totalCount = response.headers['x-total-count'];
+    const totalAvailable = response.headers['x-total-available'];
 
-    const totalCount = response.headers['X-Total-Count'];
-
-    return { totalCount: parseInt(totalCount, 10), value: response.data };
+    return {
+      totalCount: parseInt(totalCount, 10),
+      value: response.data,
+      totalAvailable: parseInt(totalAvailable, 10),
+    };
   } catch (e) {
     throw parseAxiosError(e as Error);
   }
@@ -90,7 +113,7 @@ export async function endpointsByGroup(
   search: string,
   groupId: EnvironmentGroupId
 ) {
-  return getEndpoints(start, limit, { search, groupId });
+  return getEndpoints(start, limit, { search, groupIds: [groupId] });
 }
 
 export async function disassociateEndpoint(id: EnvironmentId) {

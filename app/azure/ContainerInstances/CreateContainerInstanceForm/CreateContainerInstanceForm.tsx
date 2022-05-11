@@ -6,10 +6,10 @@ import { Input, Select } from '@/portainer/components/form-components/Input';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { InputListError } from '@/portainer/components/form-components/InputList/InputList';
-import { AccessControlForm } from '@/portainer/components/accessControlForm';
 import { ContainerInstanceFormValues } from '@/azure/types';
 import * as notifications from '@/portainer/services/notifications';
-import { isAdmin, useUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/portainer/hooks/useUser';
+import { AccessControlForm } from '@/portainer/access-control/AccessControlForm';
 
 import { validationSchema } from './CreateContainerInstanceForm.validation';
 import { PortMapping, PortsMappingField } from './PortsMappingField';
@@ -29,19 +29,14 @@ export function CreateContainerInstanceForm() {
     throw new Error('endpointId url param is required');
   }
 
-  const { user } = useUser();
-  const isUserAdmin = isAdmin(user);
+  const { isAdmin } = useUser();
 
   const { initialValues, isLoading, providers, subscriptions, resourceGroups } =
-    useLoadFormState(environmentId, isUserAdmin);
+    useLoadFormState(environmentId, isAdmin);
 
   const router = useRouter();
 
-  const { mutateAsync } = useCreateInstance(
-    resourceGroups,
-    environmentId,
-    user?.Id
-  );
+  const { mutateAsync } = useCreateInstance(resourceGroups, environmentId);
 
   if (isLoading) {
     return null;
@@ -50,7 +45,7 @@ export function CreateContainerInstanceForm() {
   return (
     <Formik<ContainerInstanceFormValues>
       initialValues={initialValues}
-      validationSchema={() => validationSchema(isUserAdmin)}
+      validationSchema={() => validationSchema(isAdmin)}
       onSubmit={onSubmit}
       validateOnMount
       validateOnChange

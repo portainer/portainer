@@ -78,7 +78,9 @@ module.exports = {
               },
             },
           },
-          'postcss-loader',
+          {
+            loader: 'postcss-loader',
+          },
         ],
       },
     ],
@@ -107,6 +109,14 @@ module.exports = {
         author: pkg.author,
       },
       manifest: './assets/ico/manifest.json',
+    }),
+    new HtmlWebpackPlugin({
+      template: './app/timeout.ejs',
+      filename: 'timeout.html',
+      templateParameters: {
+        name: pkg.name,
+        author: pkg.author,
+      },
     }),
     new WebpackBuildNotifierPlugin({
       title: 'Portainer build',

@@ -1,14 +1,19 @@
-export interface EdgeDeviceTableSettings {
-  hiddenColumns: string[];
-  autoRefreshRate: number;
-  pageSize: number;
-  sortBy: { id: string; desc: boolean };
-}
+import {
+  PaginationTableSettings,
+  RefreshableTableSettings,
+  SettableColumnsTableSettings,
+  SortableTableSettings,
+} from '@/portainer/components/datatables/types';
 
-export interface FDOProfilesTableSettings {
-  pageSize: number;
-  sortBy: { id: string; desc: boolean };
-}
+export interface EdgeDeviceTableSettings
+  extends SortableTableSettings,
+    PaginationTableSettings,
+    SettableColumnsTableSettings,
+    RefreshableTableSettings {}
+
+export interface FDOProfilesTableSettings
+  extends SortableTableSettings,
+    PaginationTableSettings {}
 
 export enum DeviceAction {
   PowerOn = 'power on',

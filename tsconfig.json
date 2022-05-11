@@ -24,6 +24,7 @@
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "removeComments": true,
+    "resolveJsonModule": true,
     // "sourceMap": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {

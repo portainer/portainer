@@ -144,7 +144,7 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 		return fmt.Errorf("could not retrieve the settings: %w", err)
 	}
 
-	if settings.DisableTrustOnFirstConnect {
+	if !settings.TrustOnFirstConnect {
 		return errors.New("the device has not been trusted yet")
 	}
 

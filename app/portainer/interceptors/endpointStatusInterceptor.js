@@ -31,9 +31,11 @@ angular.module('portainer.app').factory('EndpointStatusInterceptor', [
     }
 
     function responseErrorInterceptor(rejection) {
-      var url = rejection.config.url;
-      if ((rejection.status === 502 || rejection.status === 503 || rejection.status === -1) && canBeOffline(url) && !EndpointProvider.offlineMode()) {
-        EndpointProvider.setOfflineMode(true);
+      if (rejection.config) {
+        var url = rejection.config.url;
+        if ((rejection.status === 502 || rejection.status === 503 || rejection.status === -1) && canBeOffline(url) && !EndpointProvider.offlineMode()) {
+          EndpointProvider.setOfflineMode(true);
+        }
       }
       return $q.reject(rejection);
     }
