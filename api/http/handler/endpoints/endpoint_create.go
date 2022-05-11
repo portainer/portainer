@@ -209,13 +209,15 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 
 	relationObject := &portainer.EndpointRelation{
 		EndpointID: endpoint.ID,
-		EdgeStacks: map[portainer.EdgeStackID]bool{},
+		EdgeStacks: map[portainer.EdgeStackID]portainer.EdgeStackStatus{},
 	}
 
 	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		relatedEdgeStacks := edge.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
 		for _, stackID := range relatedEdgeStacks {
-			relationObject.EdgeStacks[stackID] = true
+			relationObject.EdgeStacks[stackID] = portainer.EdgeStackStatus{
+				Type: portainer.StatusAcknowledged,
+			}
 		}
 	}
 

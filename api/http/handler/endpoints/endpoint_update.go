@@ -304,7 +304,9 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			currentEdgeStackSet[edgeStackID] = true
 		}
 
-		relation.EdgeStacks = currentEdgeStackSet
+		for edgeStackID := range currentEdgeStackSet {
+			relation.EdgeStacks[edgeStackID] = portainer.EdgeStackStatus{}
+		}
 
 		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
 		if err != nil {

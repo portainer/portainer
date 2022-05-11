@@ -53,12 +53,5 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 		return handler.handlerDBErr(err, "Unable to find a stack with the specified identifier inside the database")
 	}
 
-	delete(stack.Status, endpoint.ID)
-
-	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
-	}
-
 	return response.JSON(w, stack)
 }

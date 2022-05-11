@@ -164,7 +164,9 @@ func (handler *Handler) updateEndpoint(endpointID portainer.EndpointID) error {
 		edgeStackSet[edgeStackID] = true
 	}
 
-	relation.EdgeStacks = edgeStackSet
+	for edgeStackID := range edgeStackSet {
+		relation.EdgeStacks[edgeStackID] = portainer.EdgeStackStatus{}
+	}
 
 	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
 }

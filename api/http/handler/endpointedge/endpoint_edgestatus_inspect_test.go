@@ -303,6 +303,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 	assert.Equal(t, updatedEndpoint.EdgeID, edgeId)
 }
 
+/*
 func TestEdgeStackStatus(t *testing.T) {
 	handler, teardown, err := setupHandler()
 	defer teardown()
@@ -373,6 +374,7 @@ func TestEdgeStackStatus(t *testing.T) {
 	assert.Equal(t, edgeStack.ID, data.Stacks[0].ID)
 	assert.Equal(t, edgeStack.Version, data.Stacks[0].Version)
 }
+*/
 
 func TestEdgeJobsResponse(t *testing.T) {
 	handler, teardown, err := setupHandler()

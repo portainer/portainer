@@ -105,7 +105,6 @@ func (handler *Handler) createSwarmStackFromFileContent(r *http.Request) (*porta
 		DeploymentType: payload.DeploymentType,
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     payload.EdgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
 		Version:        1,
 	}
 
@@ -228,7 +227,6 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 		Name:           payload.Name,
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     payload.EdgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
 		DeploymentType: payload.DeploymentType,
 		Version:        1,
 	}
@@ -337,7 +335,6 @@ func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request) (*portai
 		DeploymentType: payload.DeploymentType,
 		CreationDate:   time.Now().Unix(),
 		EdgeGroups:     payload.EdgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
 		Version:        1,
 	}
 
@@ -411,7 +408,7 @@ func updateEndpointRelations(endpointRelationService dataservices.EndpointRelati
 			return fmt.Errorf("unable to find endpoint relation in database: %w", err)
 		}
 
-		relation.EdgeStacks[edgeStackID] = true
+		relation.EdgeStacks[edgeStackID] = portainer.EdgeStackStatus{}
 
 		err = endpointRelationService.UpdateEndpointRelation(endpointID, relation)
 		if err != nil {

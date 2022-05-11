@@ -126,11 +126,12 @@ func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edg
 	}
 
 	endpointStacks := edge.EndpointRelatedEdgeStacks(&endpoint, endpointGroup, edgeGroups, edgeStacks)
-	stacksSet := map[portainer.EdgeStackID]bool{}
+	updatedStacks := make(map[portainer.EdgeStackID]portainer.EdgeStackStatus)
+
 	for _, edgeStackID := range endpointStacks {
-		stacksSet[edgeStackID] = true
+		updatedStacks[edgeStackID] = endpointRelation.EdgeStacks[edgeStackID]
 	}
-	endpointRelation.EdgeStacks = stacksSet
+	endpointRelation.EdgeStacks = updatedStacks
 
 	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, endpointRelation)
 }
