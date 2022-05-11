@@ -61,6 +61,14 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 	// Should check here that the activation is OK (can check for control mode / RAS remote status)
 	// If not, ask the user to check the logs
 
+	// We should also check for the following logs in the service container
+	// INFO[0050] Status: Admin control mode., MEBx Password updated
+	// INFO[0050] Network: Ethernet Configured.
+	// INFO[0050] CIRA: Configured
+	// without the 0050 as it might change at runtime
+	// if these logs are not found, assume an error and don't remove the service container as it will be useful for troubleshooting
+	// consider redirecting these logs to portainer
+
 	if hostInfo.UUID == "" {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve device UUID", Err: errors.New("unable to retrieve device UUID")}
 	}
