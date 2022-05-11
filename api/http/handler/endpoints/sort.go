@@ -21,23 +21,26 @@ func (e EndpointsByName) Less(i, j int) bool {
 	return sortorder.NaturalLess(strings.ToLower(e[i].Name), strings.ToLower(e[j].Name))
 }
 
-type EndpointsByGroup []portainer.Endpoint
+type EndpointsByGroup struct {
+	endpointGroupNames map[portainer.EndpointGroupID]string
+	endpoints          []portainer.Endpoint
+}
 
 func (e EndpointsByGroup) Len() int {
-	return len(e)
+	return len(e.endpoints)
 }
 
 func (e EndpointsByGroup) Swap(i, j int) {
-	e[i], e[j] = e[j], e[i]
+	e.endpoints[i], e.endpoints[j] = e.endpoints[j], e.endpoints[i]
 }
 
 func (e EndpointsByGroup) Less(i, j int) bool {
-	if e[i].GroupID == e[j].GroupID {
+	if e.endpoints[i].GroupID == e.endpoints[j].GroupID {
 		return false
 	}
 
-	groupA := endpointGroupNames[e[i].GroupID]
-	groupB := endpointGroupNames[e[j].GroupID]
+	groupA := endpointGroupNames[e.endpoints[i].GroupID]
+	groupB := endpointGroupNames[e.endpoints[j].GroupID]
 
 	return sortorder.NaturalLess(strings.ToLower(groupA), strings.ToLower(groupB))
 }
