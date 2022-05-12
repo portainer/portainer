@@ -33,9 +33,9 @@ export function withInvalidate(
 ) {
   return {
     onSuccess() {
-      queryKeysToInvalidate.forEach((keys) => {
-        queryClient.invalidateQueries(keys);
-      });
+      return queryKeysToInvalidate.map((keys) =>
+        queryClient.invalidateQueries(keys)
+      );
     },
   };
 }
