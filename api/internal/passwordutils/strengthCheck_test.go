@@ -13,9 +13,9 @@ func TestStrengthCheck(t *testing.T) {
 	}{
 		{"Empty password", args{""}, false},
 		{"Short password", args{"portainer"}, false},
-		{"Short password", args{"portaienr!@#"}, false},
+		{"Short password", args{"portaienr!@#"}, true},
 		{"Week password", args{"12345678!@#"}, false},
-		{"Week password", args{"portaienr123"}, false},
+		{"Week password", args{"portaienr123"}, true},
 		{"Good password", args{"Portainer123"}, true},
 		{"Good password", args{"Portainer___"}, true},
 		{"Good password", args{"^portainer12"}, true},

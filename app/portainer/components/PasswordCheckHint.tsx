@@ -2,17 +2,6 @@ import { react2angular } from '@/react-tools/react2angular';
 
 import { MinPasswordLen } from '../helpers/password';
 
-function PasswordCombination() {
-  return (
-    <ul className="text-muted">
-      <li className="ml-8"> Special characters </li>
-      <li className="ml-8"> Lower case characters </li>
-      <li className="ml-8"> Upper case characters </li>
-      <li className="ml-8"> Numeric characters </li>
-    </ul>
-  );
-}
-
 export function ForcePasswordUpdateHint() {
   return (
     <div>
@@ -25,11 +14,8 @@ export function ForcePasswordUpdateHint() {
       </p>
 
       <p className="text-muted">
-        The password must be at least {MinPasswordLen} characters long,
-        including a combination of one character of three of the below:
+        The password must be at least {MinPasswordLen} characters long.
       </p>
-
-      <PasswordCombination />
     </div>
   );
 }
@@ -42,12 +28,9 @@ export function PasswordCheckHint() {
           {' '}
         </i>
         <span>
-          The password must be at least {MinPasswordLen} characters long,
-          including a combination of one character of three of the below:
+          The password must be at least {MinPasswordLen} characters long.
         </span>
       </p>
-
-      <PasswordCombination />
     </div>
   );
 }
