@@ -168,7 +168,7 @@ func TestDeleteAndInspect(t *testing.T) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/edge_stacks/%d", edgeStack.ID), nil)
 	if err != nil {
 		t.Fatal("request error:", err)
-	}	
+	}
 
 	req.Header.Add("x-api-key", rawAPIKey)
 	rec := httptest.NewRecorder()
