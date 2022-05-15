@@ -3,6 +3,7 @@ import clsx from 'clsx';
 
 import { AddButton, Button } from '@/portainer/components/Button';
 import { Tooltip } from '@/portainer/components/Tip/Tooltip';
+import { TextTip } from '@/portainer/components/Tip/TextTip';
 
 import { Input } from '../Input';
 import { FormError } from '../FormError';
@@ -43,6 +44,7 @@ interface Props<T> {
   itemKeyGetter?(item: T, index: number): Key;
   movable?: boolean;
   errors?: InputListError<T>[] | string;
+  textTip?: string;
 }
 
 export function InputList<T = DefaultType>({
@@ -56,6 +58,7 @@ export function InputList<T = DefaultType>({
   itemKeyGetter = (item: T, index: number) => index,
   movable,
   errors,
+  textTip,
 }: Props<T>) {
   const Item = item;
 
@@ -72,6 +75,12 @@ export function InputList<T = DefaultType>({
           onClick={handleAdd}
         />
       </div>
+
+      {textTip && (
+        <div className="col-sm-12 my-5">
+          <TextTip color="blue">{textTip}</TextTip>
+        </div>
+      )}
 
       <div className={clsx('col-sm-12', styles.items, 'space-y-4')}>
         {value.map((item, index) => {

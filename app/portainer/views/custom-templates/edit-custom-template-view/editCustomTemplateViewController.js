@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { getTemplateVariables, intersectVariables } from '@/portainer/custom-templates/utils';
 
 class EditCustomTemplateViewController {
   /* @ngInject */
@@ -20,6 +21,8 @@ class EditCustomTemplateViewController {
     this.submitAction = this.submitAction.bind(this);
     this.submitActionAsync = this.submitActionAsync.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
+    this.onVariablesChange = this.onVariablesChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   getTemplate() {
@@ -32,13 +35,31 @@ class EditCustomTemplateViewController {
         this.CustomTemplateService.customTemplateFile(this.$state.params.id),
       ]);
       template.FileContent = file;
+      template.Variables = template.Variables || [];
       this.formValues = template;
+      this.parseTemplate(template.FileContent);
+
       this.oldFileContent = this.formValues.FileContent;
-      this.formValues.ResourceControl = new ResourceControlViewModel(template.ResourceControl);
+      if (template.ResourceControl) {
+        this.formValues.ResourceControl = new ResourceControlViewModel(template.ResourceControl);
+      }
       this.formValues.AccessControlData = new AccessControlFormData();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve custom template data');
     }
+  }
+
+  onVariablesChange(value) {
+    this.handleChange({ Variables: value });
+  }
+
+  handleChange(values) {
+    return this.$async(async () => {
+      this.formValues = {
+        ...this.formValues,
+        ...values,
+      };
+    });
   }
 
   validateForm() {
@@ -96,9 +117,23 @@ class EditCustomTemplateViewController {
   }
 
   editorUpdate(cm) {
-    if (this.formValues.FileContent.replace(/(\r\n|\n|\r)/gm, '') !== cm.getValue().replace(/(\r\n|\n|\r)/gm, '')) {
-      this.formValues.FileContent = cm.getValue();
+    const value = cm.getValue();
+    if (this.formValues.FileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
+      this.formValues.FileContent = value;
+      this.parseTemplate(value);
       this.state.isEditorDirty = true;
+    }
+  }
+
+  parseTemplate(templateStr) {
+    const variables = getTemplateVariables(templateStr);
+
+    const isValid = !!variables;
+
+    this.state.isTemplateValid = isValid;
+
+    if (isValid) {
+      this.onVariablesChange(intersectVariables(this.formValues.Variables, variables));
     }
   }
 

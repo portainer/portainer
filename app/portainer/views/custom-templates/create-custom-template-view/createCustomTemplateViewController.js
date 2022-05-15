@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
+import { getTemplateVariables, intersectVariables } from '@/portainer/custom-templates/utils';
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
@@ -35,6 +36,7 @@ class CreateCustomTemplateViewController {
       Platform: 1,
       Type: 1,
       AccessControlData: new AccessControlFormData(),
+      Variables: [],
     };
 
     this.state = {
@@ -58,7 +60,21 @@ class CreateCustomTemplateViewController {
     this.createCustomTemplateFromGitRepository = this.createCustomTemplateFromGitRepository.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
-    this.onChangeFormValues = this.onChangeFormValues.bind(this);
+    this.onVariablesChange = this.onVariablesChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  onVariablesChange(value) {
+    this.handleChange({ Variables: value });
+  }
+
+  handleChange(values) {
+    return this.$async(async () => {
+      this.formValues = {
+        ...this.formValues,
+        ...values,
+      };
+    });
   }
 
   createCustomTemplate() {
@@ -151,12 +167,22 @@ class CreateCustomTemplateViewController {
   }
 
   editorUpdate(cm) {
-    this.formValues.FileContent = cm.getValue();
+    const value = cm.getValue();
+    this.formValues.FileContent = value;
     this.state.isEditorDirty = true;
+    this.parseTemplate(value);
   }
 
-  onChangeFormValues(newValues) {
-    this.formValues = newValues;
+  parseTemplate(templateStr) {
+    const variables = getTemplateVariables(templateStr);
+
+    const isValid = !!variables;
+
+    this.state.isTemplateValid = isValid;
+
+    if (isValid) {
+      this.onVariablesChange(intersectVariables(this.formValues.Variables, variables));
+    }
   }
 
   async $onInit() {

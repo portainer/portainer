@@ -36,6 +36,17 @@
           </div>
           <!-- !web-editor -->
 
+          <div class="form-group" ng-if="!$ctrl.state.isTemplateValid">
+            <div class="col-sm-12">
+              <div class="small text-warning">
+                <i class="fa fa-exclamation-triangle space-right" aria-hidden="true"></i>
+                Template is invalid.
+              </div>
+            </div>
+          </div>
+
+          <custom-templates-variables-definition-field value="$ctrl.formValues.Variables" on-change="($ctrl.onVariablesChange)"></custom-templates-variables-definition-field>
+
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData" resource-control="$ctrl.formValues.ResourceControl"></por-access-control-form>
 
           <div class="col-sm-12 form-section-title"> Actions </div>
@@ -46,7 +57,9 @@
                 class="btn btn-primary btn-sm"
                 ng-disabled="$ctrl.actionInProgress || customTemplateForm.$invalid
                   || !$ctrl.formValues.Title
-                  || !$ctrl.formValues.FileContent"
+                  || !$ctrl.formValues.FileContent
+                  || !$ctrl.state.isTemplateValid
+                  "
                 ng-click="$ctrl.submitAction()"
                 button-spinner="$ctrl.actionInProgress"
               >

@@ -96,7 +96,19 @@
           </div>
           <!-- !upload -->
           <!-- repository -->
-          <git-form ng-if="$ctrl.state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
+          <git-form ng-if="$ctrl.state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.handleChange)"></git-form>
+
+          <div class="form-group" ng-if="!$ctrl.state.isTemplateValid">
+            <div class="col-sm-12">
+              <div class="small text-warning">
+                <i class="fa fa-exclamation-triangle space-right" aria-hidden="true"></i>
+                Template is invalid.
+              </div>
+            </div>
+          </div>
+
+          <custom-templates-variables-definition-field value="$ctrl.formValues.Variables" on-change="($ctrl.onVariablesChange)"></custom-templates-variables-definition-field>
+
           <!-- !repository -->
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData"></por-access-control-form>
 
@@ -111,7 +123,8 @@
               || ($ctrl.state.Method === 'editor' && !$ctrl.formValues.FileContent)
               || ($ctrl.state.Method === 'upload' && !$ctrl.formValues.File)
               || ($ctrl.state.Method === 'repository' && ((!$ctrl.formValues.RepositoryURL || !$ctrl.formValues.ComposeFilePathInRepository) || ($ctrl.formValues.RepositoryAuthentication && (!$ctrl.formValues.RepositoryUsername || !$ctrl.formValues.RepositoryPassword))))
-              || !$ctrl.formValues.Title"
+              || !$ctrl.formValues.Title
+              || !$ctrl.state.isTemplateValid"
                 ng-click="$ctrl.createCustomTemplate()"
                 button-spinner="$ctrl.state.actionInProgress"
               >

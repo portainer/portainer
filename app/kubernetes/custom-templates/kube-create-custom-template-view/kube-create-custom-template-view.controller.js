@@ -1,5 +1,6 @@
 import { buildOption } from '@/portainer/components/BoxSelector';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
+import { getTemplateVariables, intersectVariables } from '@/portainer/custom-templates/utils';
 
 class KubeCreateCustomTemplateViewController {
   /* @ngInject */
@@ -18,6 +19,7 @@ class KubeCreateCustomTemplateViewController {
       actionInProgress: false,
       formValidationError: '',
       isEditorDirty: false,
+      isTemplateValid: true,
     };
 
     this.formValues = {
@@ -28,12 +30,15 @@ class KubeCreateCustomTemplateViewController {
       Note: '',
       Logo: '',
       AccessControlData: new AccessControlFormData(),
+      Variables: [],
     };
 
     this.onChangeFile = this.onChangeFile.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
     this.onBeforeOnload = this.onBeforeOnload.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.onVariablesChange = this.onVariablesChange.bind(this);
   }
 
   onChangeMethod(method) {
@@ -41,13 +46,37 @@ class KubeCreateCustomTemplateViewController {
   }
 
   onChangeFileContent(content) {
-    this.formValues.FileContent = content;
+    this.handleChange({ FileContent: content });
+    this.parseTemplate(content);
     this.state.isEditorDirty = true;
   }
 
+  parseTemplate(templateStr) {
+    const variables = getTemplateVariables(templateStr);
+
+    const isValid = !!variables;
+
+    this.state.isTemplateValid = isValid;
+
+    if (isValid) {
+      this.onVariablesChange(intersectVariables(this.formValues.Variables, variables));
+    }
+  }
+
+  onVariablesChange(value) {
+    this.handleChange({ Variables: value });
+  }
+
   onChangeFile(file) {
+    this.handleChange({ File: file });
+  }
+
+  handleChange(values) {
     return this.$async(async () => {
-      this.formValues.File = file;
+      this.formValues = {
+        ...this.formValues,
+        ...values,
+      };
     });
   }
 
@@ -113,6 +142,11 @@ class KubeCreateCustomTemplateViewController {
       return false;
     }
 
+    if (!this.state.isTemplateValid) {
+      this.state.formValidationError = 'Template is not valid';
+      return false;
+    }
+
     const isAdmin = this.Authentication.isAdmin();
     const accessControlData = this.formValues.AccessControlData;
     const error = this.FormValidator.validateAccessControl(accessControlData, isAdmin);
@@ -130,6 +164,7 @@ class KubeCreateCustomTemplateViewController {
       const { fileContent, type } = this.$state.params;
 
       this.formValues.FileContent = fileContent;
+      this.parseTemplate(fileContent);
       if (type) {
         this.formValues.Type = +type;
       }

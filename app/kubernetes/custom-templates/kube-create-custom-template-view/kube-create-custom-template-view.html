@@ -36,6 +36,8 @@
             <file-upload-description> You can upload a Manifest file from your computer. </file-upload-description>
           </file-upload-form>
 
+          <custom-templates-variables-definition-field value="$ctrl.formValues.Variables" on-change="($ctrl.onVariablesChange)"></custom-templates-variables-definition-field>
+
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData"></por-access-control-form>
 
           <!-- actions -->
@@ -45,7 +47,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="$ctrl.state.actionInProgress || $ctrl.form.$invalid || ($ctrl.state.method === 'editor' && !$ctrl.formValues.FileContent)"
+                ng-disabled="!$ctrl.state.isTemplateValid ||$ctrl.state.actionInProgress || $ctrl.form.$invalid || ($ctrl.state.method === 'editor' && !$ctrl.formValues.FileContent)"
                 ng-click="$ctrl.createCustomTemplate()"
                 button-spinner="$ctrl.state.actionInProgress"
               >

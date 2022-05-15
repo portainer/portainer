@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
+import { renderTemplate } from '@/portainer/custom-templates/utils';
 
 class CustomTemplatesViewController {
   /* @ngInject */
@@ -44,6 +45,7 @@ class CustomTemplatesViewController {
       isEditorVisible: false,
       deployable: false,
       templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
+      templateContent: '',
     };
 
     this.currentUser = {
@@ -56,6 +58,7 @@ class CustomTemplatesViewController {
       name: '',
       fileContent: '',
       AccessControlData: new AccessControlFormData(),
+      variables: [],
     };
 
     this.getTemplates = this.getTemplates.bind(this);
@@ -75,6 +78,8 @@ class CustomTemplatesViewController {
     this.confirmDeleteAsync = this.confirmDeleteAsync.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.isEditAllowed = this.isEditAllowed.bind(this);
+    this.onChangeFormValues = this.onChangeFormValues.bind(this);
+    this.onChangeTemplateVariables = this.onChangeTemplateVariables.bind(this);
   }
 
   isEditAllowed(template) {
@@ -105,6 +110,24 @@ class CustomTemplatesViewController {
         this.Notifications.error('Failed removing template', err, 'Unable to remove custom template');
       }
     }
+  }
+
+  onChangeTemplateVariables(variables) {
+    this.onChangeFormValues({ variables });
+
+    this.renderTemplate();
+  }
+
+  renderTemplate() {
+    const fileContent = renderTemplate(this.state.templateContent, this.formValues.variables, this.state.selectedTemplate.Variables);
+    this.onChangeFormValues({ fileContent });
+  }
+
+  onChangeFormValues(values) {
+    this.formValues = {
+      ...this.formValues,
+      ...values,
+    };
   }
 
   validateForm(accessControlData, isAdmin) {
@@ -161,6 +184,7 @@ class CustomTemplatesViewController {
       name: '',
       fileContent: '',
       AccessControlData: new AccessControlFormData(),
+      variables: [],
     };
   }
 
@@ -184,7 +208,13 @@ class CustomTemplatesViewController {
     const applicationState = this.StateManager.getState();
     this.state.deployable = this.isDeployable(applicationState.endpoint, template.Type);
     const file = await this.CustomTemplateService.customTemplateFile(template.Id);
+    this.state.templateContent = file;
     this.formValues.fileContent = file;
+
+    if (template.Variables && template.Variables.length > 0) {
+      const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
+      this.onChangeTemplateVariables(variables);
+    }
   }
 
   getNetworks(provider, apiVersion) {

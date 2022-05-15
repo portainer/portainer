@@ -17,6 +17,12 @@
     unselect-template="$ctrl.unselectTemplate"
   >
     <advanced-form>
+      <custom-templates-variables-field
+        definitions="$ctrl.state.selectedTemplate.Variables"
+        value="$ctrl.formValues.variables"
+        on-change="($ctrl.onChangeTemplateVariables)"
+      ></custom-templates-variables-field>
+
       <div class="form-group">
         <div class="col-sm-12">
           <a class="small interactive" ng-show="!$ctrl.state.showAdvancedOptions" ng-click="$ctrl.state.showAdvancedOptions = true;">

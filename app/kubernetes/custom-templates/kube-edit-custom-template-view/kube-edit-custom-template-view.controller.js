@@ -1,5 +1,6 @@
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
+import { getTemplateVariables, intersectVariables } from '@/portainer/custom-templates/utils';
 
 class KubeEditCustomTemplateViewController {
   /* @ngInject */
@@ -10,6 +11,7 @@ class KubeEditCustomTemplateViewController {
     this.state = {
       formValidationError: '',
       isEditorDirty: false,
+      isTemplateValid: true,
     };
     this.templates = [];
 
@@ -17,6 +19,8 @@ class KubeEditCustomTemplateViewController {
     this.submitAction = this.submitAction.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.onBeforeUnload = this.onBeforeUnload.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.onVariablesChange = this.onVariablesChange.bind(this);
   }
 
   getTemplate() {
@@ -26,7 +30,12 @@ class KubeEditCustomTemplateViewController {
 
         const [template, file] = await Promise.all([this.CustomTemplateService.customTemplate(id), this.CustomTemplateService.customTemplateFile(id)]);
         template.FileContent = file;
+        template.Variables = template.Variables || [];
+
         this.formValues = template;
+
+        this.parseTemplate(file);
+
         this.oldFileContent = this.formValues.FileContent;
 
         this.formValues.ResourceControl = new ResourceControlViewModel(template.ResourceControl);
@@ -35,6 +44,31 @@ class KubeEditCustomTemplateViewController {
         this.Notifications.error('Failure', err, 'Unable to retrieve custom template data');
       }
     });
+  }
+
+  onVariablesChange(values) {
+    this.handleChange({ Variables: values });
+  }
+
+  handleChange(values) {
+    return this.$async(async () => {
+      this.formValues = {
+        ...this.formValues,
+        ...values,
+      };
+    });
+  }
+
+  parseTemplate(templateStr) {
+    const variables = getTemplateVariables(templateStr);
+
+    const isValid = !!variables;
+
+    this.state.isTemplateValid = isValid;
+
+    if (isValid) {
+      this.onVariablesChange(intersectVariables(this.formValues.Variables, variables));
+    }
   }
 
   validateForm() {
@@ -94,6 +128,7 @@ class KubeEditCustomTemplateViewController {
   onChangeFileContent(value) {
     if (stripSpaces(this.formValues.FileContent) !== stripSpaces(value)) {
       this.formValues.FileContent = value;
+      this.parseTemplate(value);
       this.state.isEditorDirty = true;
     }
   }
