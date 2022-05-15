@@ -10,7 +10,6 @@ import { FormSectionTitle } from '@/portainer/components/form-components/FormSec
 
 import { Settings } from '../types';
 
-import styles from './EdgeComputeSettings.module.css';
 import { validationSchema } from './EdgeComputeSettings.validation';
 
 export interface FormValues {
@@ -107,12 +106,11 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                   tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
                 />
 
-                <div className="form-group">
+                <div className="form-group mt-5">
                   <div className="col-sm-12">
                     <LoadingButton
                       disabled={!isValid || !dirty}
                       dataCy="settings-edgeComputeButton"
-                      className={styles.saveButton}
                       isLoading={isSubmitting}
                       loadingText="Saving settings..."
                     >

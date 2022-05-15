@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 16px;
+}
+
 html,
 body,
 #page-wrapper,
@@ -217,8 +221,8 @@ a[ng-click] {
 }
 
 .blocklist-item {
-  padding: 0.7rem;
-  margin-bottom: 0.7rem;
+  padding: 7px;
+  margin-bottom: 7px;
   cursor: pointer;
   border: 1px solid var(--border-blocklist-color);
   border-radius: 2px;

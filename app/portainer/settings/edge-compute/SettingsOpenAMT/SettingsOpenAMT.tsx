@@ -10,7 +10,6 @@ import { Input } from '@/portainer/components/form-components/Input';
 import { FileUploadField } from '@/portainer/components/form-components/FileUpload';
 import { OpenAMTConfiguration } from '@/portainer/hostmanagement/open-amt/model';
 
-import styles from './SettingsOpenAMT.module.css';
 import { validationSchema } from './SettingsOpenAMT.validation';
 
 export interface Settings {
@@ -243,12 +242,11 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                   </>
                 )}
 
-                <div className="form-group">
+                <div className="form-group mt-5">
                   <div className="col-sm-12">
                     <LoadingButton
                       disabled={!isValid || !dirty}
                       dataCy="settings-fdoButton"
-                      className={styles.saveButton}
                       isLoading={isSubmitting}
                       loadingText="Saving settings..."
                     >
