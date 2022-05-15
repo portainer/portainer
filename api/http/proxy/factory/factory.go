@@ -23,11 +23,12 @@ type (
 		dockerClientFactory         *docker.ClientFactory
 		kubernetesClientFactory     *cli.ClientFactory
 		kubernetesTokenCacheManager *kubernetes.TokenCacheManager
+		gitService                  portainer.GitService
 	}
 )
 
 // NewProxyFactory returns a pointer to a new instance of a ProxyFactory
-func NewProxyFactory(dataStore dataservices.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *ProxyFactory {
+func NewProxyFactory(dataStore dataservices.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager, gitService portainer.GitService) *ProxyFactory {
 	return &ProxyFactory{
 		dataStore:                   dataStore,
 		signatureService:            signatureService,
@@ -35,6 +36,7 @@ func NewProxyFactory(dataStore dataservices.DataStore, signatureService portaine
 		dockerClientFactory:         clientFactory,
 		kubernetesClientFactory:     kubernetesClientFactory,
 		kubernetesTokenCacheManager: kubernetesTokenCacheManager,
+		gitService:                  gitService,
 	}
 }
 
