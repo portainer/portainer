@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom';
 import { IComponentOptions, IController } from 'angular';
 import { Suspense } from 'react';
+import _ from 'lodash';
 
 import { RootProvider } from './RootProvider';
 
@@ -27,13 +28,14 @@ function toProps(
 
 export function react2angular<T>(
   Component: React.ComponentType<T>,
-  propNames: string[]
-): IComponentOptions {
+  propNames: Exclude<keyof T, number | symbol>[]
+): IComponentOptions & { name: string } {
   const bindings = Object.fromEntries(propNames.map((key) => [key, '<']));
 
   return {
     bindings,
     controller: Controller,
+    name: _.camelCase(Component.displayName || Component.name),
   };
 
   /* @ngInject */
