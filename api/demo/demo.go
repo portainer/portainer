@@ -29,6 +29,15 @@ func (service *Service) Details() EnvironmentDetails {
 func (service *Service) Init(store dataservices.DataStore, cryptoService portainer.CryptoService) error {
 	log.Print("[INFO] [main] Starting demo environment")
 
+	isClean, err := isCleanStore(store)
+	if err != nil {
+		return errors.WithMessage(err, "failed checking if store is clean")
+	}
+
+	if !isClean {
+		return errors.New(" Demo environment can only be initialized on a clean database")
+	}
+
 	id, err := initDemoUser(store, cryptoService)
 	if err != nil {
 		return errors.WithMessage(err, "failed creating demo user")
@@ -52,6 +61,28 @@ func (service *Service) Init(store dataservices.DataStore, cryptoService portain
 	}
 
 	return nil
+}
+
+func isCleanStore(store dataservices.DataStore) (bool, error) {
+	endpoints, err := store.Endpoint().Endpoints()
+	if err != nil {
+		return false, err
+	}
+
+	if len(endpoints) > 0 {
+		return false, nil
+	}
+
+	users, err := store.User().Users()
+	if err != nil {
+		return false, err
+	}
+
+	if len(users) > 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func (service *Service) IsDemo() bool {
