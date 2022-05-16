@@ -114,8 +114,8 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if handler.demoService.IsDemo() {
-		*payload.EnableTelemetry = false
-		*payload.LogoURL = ""
+		payload.EnableTelemetry = nil
+		payload.LogoURL = nil
 	}
 
 	if payload.AuthenticationMethod != nil {
