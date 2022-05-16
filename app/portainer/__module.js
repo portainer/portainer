@@ -346,26 +346,6 @@ angular
         },
       };
 
-      const wizard = {
-        name: 'portainer.wizard',
-        url: '/wizard',
-        views: {
-          'content@': {
-            component: 'wizardView',
-          },
-        },
-      };
-
-      const wizardEndpoints = {
-        name: 'portainer.wizard.endpoints',
-        url: '/endpoints',
-        views: {
-          'content@': {
-            component: 'wizardEndpoints',
-          },
-        },
-      };
-
       var initEndpoint = {
         name: 'portainer.init.endpoint',
         url: '/endpoint',
@@ -531,8 +511,6 @@ angular
       $stateRegistryProvider.register(groupCreation);
       $stateRegistryProvider.register(home);
       $stateRegistryProvider.register(init);
-      $stateRegistryProvider.register(wizard);
-      $stateRegistryProvider.register(wizardEndpoints);
       $stateRegistryProvider.register(initEndpoint);
       $stateRegistryProvider.register(initAdmin);
       $stateRegistryProvider.register(registries);

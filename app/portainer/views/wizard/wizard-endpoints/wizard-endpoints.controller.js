@@ -218,8 +218,17 @@ export default class WizardEndpointsController {
       }),
         (this.endpoints = []);
 
-      const endpoints = await this.EndpointService.endpoints();
-      this.endpoints = endpoints.value;
+      const { envType } = this.$state.params;
+
+      if (!envType) {
+        this.$state.go('portainer.wizard.endpoints');
+      }
+
+      const envTypes = Array.isArray(envType) ? envType : [envType];
+      envTypes.forEach((type) => this.endpointSelect(type));
+      this.startWizard();
+
+      this.reloadEndpoints();
     });
   }
 }
