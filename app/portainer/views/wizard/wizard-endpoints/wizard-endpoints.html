@@ -19,7 +19,7 @@
             <div ng-switch="$ctrl.state.section" class="wizard-endpoint-section">
               <wizard-docker ng-switch-when="docker" on-create="($ctrl.onCreate)"></wizard-docker>
               <wizard-aci ng-switch-when="aci" on-update="($ctrl.reloadEndpoints)" on-analytics="($ctrl.addAnalytics)"></wizard-aci>
-              <wizard-kubernetes ng-switch-when="kubernetes" on-update="($ctrl.reloadEndpoints)" on-analytics="($ctrl.addAnalytics)"></wizard-kubernetes>
+              <wizard-kubernetes ng-switch-when="kubernetes" on-create="($ctrl.onCreate)"></wizard-kubernetes>
               <kaas-create-form ng-switch-when="kaas" on-update="($ctrl.reloadEndpoints)" on-analytics="($ctrl.addAnalytics)" view="'wizard'"></kaas-create-form>
               <wizard-nomad ng-switch-when="nomad" on-update="($ctrl.reloadEndpoints)" on-analytics="($ctrl.addAnalytics)" agent-version="$ctrl.agentVersion"></wizard-nomad>
             </div>
