@@ -3,7 +3,7 @@ import { MenuItem, MenuLink } from '@reach/menu-button';
 import { useRouter, useSref } from '@uirouter/react';
 
 import { Environment } from '@/portainer/environments/types';
-import { ActionsMenu } from '@/portainer/components/datatables/components/ActionsMenu';
+import { ActionsMenu } from '@/react/components/datatables/ActionsMenu';
 import { snapshotEndpoint } from '@/portainer/environments/environment.service';
 import * as notifications from '@/portainer/services/notifications';
 import { getRoute } from '@/portainer/environments/utils';

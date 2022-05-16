@@ -1,8 +1,6 @@
 import controller from './BEFeatureIndicator.controller';
 
-import './BEFeatureIndicator.css';
-
-export const beFeatureIndicatorAngular = {
+export const beFeatureIndicator = {
   templateUrl: './BEFeatureIndicator.html',
   controller,
   bindings: {
@@ -10,5 +8,3 @@ export const beFeatureIndicatorAngular = {
   },
   transclude: true,
 };
-
-export { BEFeatureIndicator } from './BEFeatureIndicator';

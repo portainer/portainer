@@ -1,8 +1,8 @@
 import { FormikErrors } from 'formik';
 
 import { useUser } from '@/portainer/hooks/useUser';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
-import { SwitchField } from '@/portainer/components/form-components/SwitchField';
+import { FormSectionTitle } from '@/react/components/form-components/FormSectionTitle';
+import { SwitchField } from '@/react/components/form-components/SwitchField';
 import { EditDetails } from '@/portainer/access-control/EditDetails/EditDetails';
 
 import { ResourceControlOwnership, AccessControlFormData } from '../types';

@@ -1,10 +1,10 @@
-import { FormError } from '@/portainer/components/form-components/FormError';
-import { Input } from '@/portainer/components/form-components/Input';
-import { InputList } from '@/portainer/components/form-components/InputList';
+import { FormError } from '@/react/components/form-components/FormError';
+import { Input } from '@/react/components/form-components/Input';
+import { InputList } from '@/react/components/form-components/InputList';
 import {
   InputListError,
   ItemProps,
-} from '@/portainer/components/form-components/InputList/InputList';
+} from '@/react/components/form-components/InputList/InputList';
 
 export interface VariableDefinition {
   name: string;

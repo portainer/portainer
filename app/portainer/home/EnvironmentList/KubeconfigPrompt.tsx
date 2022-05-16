@@ -4,11 +4,11 @@ import { DialogOverlay } from '@reach/dialog';
 
 import * as kcService from '@/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
-import { Button } from '@/portainer/components/Button';
-import { Checkbox } from '@/portainer/components/form-components/Checkbox';
+import { Button } from '@/react/components/buttons';
+import { Checkbox } from '@/react/components/form-components/Checkbox';
 import { EnvironmentType } from '@/portainer/environments/types';
 import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service/index';
-import { PaginationControls } from '@/portainer/components/pagination-controls';
+import { PaginationControls } from '@/react/components/PaginationControls';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
 import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
 

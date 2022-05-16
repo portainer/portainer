@@ -4,7 +4,7 @@ import { useQueryClient } from 'react-query';
 import _ from 'lodash';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
-import { PageHeader } from '@/portainer/components/PageHeader';
+import { PageHeader } from '@/react/components/PageHeader';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
 import { ResourceControlType } from '@/portainer/access-control/types';

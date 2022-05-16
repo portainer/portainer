@@ -4,11 +4,11 @@ import { MenuItem, MenuLink } from '@reach/menu-button';
 import { useQueryClient } from 'react-query';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
-import { ActionsMenu } from '@/portainer/components/datatables/components/ActionsMenu';
+import { ActionsMenu } from '@/react/components/datatables/ActionsMenu';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { executeDeviceAction } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 import * as notifications from '@/portainer/services/notifications';
-import { ActionsMenuTitle } from '@/portainer/components/datatables/components/ActionsMenuTitle';
+import { ActionsMenuTitle } from '@/react/components/datatables/ActionsMenuTitle';
 
 import { useRowContext } from './RowContext';
 

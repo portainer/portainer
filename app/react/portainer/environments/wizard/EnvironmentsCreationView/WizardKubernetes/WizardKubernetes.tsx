@@ -1,14 +1,14 @@
 import { useState } from 'react';
 
-import { BoxSelector } from '@/portainer/components/BoxSelector';
+import { BoxSelector } from '@/react/components/BoxSelector';
 import {
   Environment,
   EnvironmentCreationTypes,
 } from '@/portainer/environments/types';
-import { BoxSelectorOption } from '@/portainer/components/BoxSelector/types';
+import { BoxSelectorOption } from '@/react/components/BoxSelector/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import { BEFeatureIndicator } from '@/portainer/components/BEFeatureIndicator';
+import { BEFeatureIndicator } from '@/react/components/BEFeatureIndicator';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';

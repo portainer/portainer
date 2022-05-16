@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
-import { PageHeader } from '@/portainer/components/PageHeader';
-import { DashboardItem } from '@/portainer/components/Dashboard/DashboardItem';
+import { PageHeader } from '@/react/components/PageHeader';
+import { DashboardItem } from '@/react/components/DashboardItem';
 import { error as notifyError } from '@/portainer/services/notifications';
 import PortainerError from '@/portainer/error';
 import { r2a } from '@/react-tools/react2angular';

@@ -1,7 +1,7 @@
 import { useField } from 'formik';
 
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
+import { FormControl } from '@/react/components/form-components/FormControl';
+import { Switch } from '@/react/components/form-components/SwitchField/Switch';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 
 export function EnabledWaitingRoomSwitch() {

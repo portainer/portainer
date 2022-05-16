@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
+import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
 import {
   environmentTypeIcon,
   endpointTypeName,

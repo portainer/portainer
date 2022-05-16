@@ -2,8 +2,8 @@ import { useRouter } from '@uirouter/react';
 import { useState } from 'react';
 
 import { r2a } from '@/react-tools/react2angular';
+import { PageHeader } from '@/react/components/PageHeader';
 
-import { PageHeader } from '../components/PageHeader';
 import * as notifications from '../services/notifications';
 import { Environment } from '../environments/types';
 import { snapshotEndpoints } from '../environments/environment.service';

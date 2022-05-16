@@ -1,5 +1,5 @@
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
-import { DetailsTable } from '@/portainer/components/DetailsTable';
+import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
+import { DetailsTable } from '@/react/components/DetailsTable';
 
 import { NetworkOptions } from '../types';
 

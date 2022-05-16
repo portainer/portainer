@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 import { UISrefActive } from '@uirouter/react';
 
-import { Link } from '@/portainer/components/Link';
+import { Link } from '@/react/components/Link';
 
 import '../sidebar.css';
 import styles from './SidebarMenuItem.module.css';

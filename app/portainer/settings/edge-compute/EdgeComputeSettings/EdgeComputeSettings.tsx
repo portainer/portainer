@@ -1,12 +1,12 @@
 import { Formik, Form } from 'formik';
 
-import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
-import { TextTip } from '@/portainer/components/Tip/TextTip';
+import { Switch } from '@/react/components/form-components/SwitchField/Switch';
+import { FormControl } from '@/react/components/form-components/FormControl';
+import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
+import { LoadingButton } from '@/react/components/buttons/LoadingButton';
+import { TextTip } from '@/react/components/Tip/TextTip';
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
+import { FormSectionTitle } from '@/react/components/form-components/FormSectionTitle';
 
 import { Settings } from '../types';
 

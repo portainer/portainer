@@ -1,8 +1,8 @@
 import { useFormikContext } from 'formik';
 
-import { FileUploadField } from '@/portainer/components/form-components/FileUpload';
-import { SwitchField } from '@/portainer/components/form-components/SwitchField';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
+import { FileUploadField } from '@/react/components/form-components/FileUpload';
+import { SwitchField } from '@/react/components/form-components/SwitchField';
+import { FormControl } from '@/react/components/form-components/FormControl';
 import {
   file,
   withFileSize,

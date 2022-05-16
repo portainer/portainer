@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { useSref } from '@uirouter/react';
 
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
-import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
+import { useTableSettings } from '@/react/components/datatables/useTableSettings';
 import type {
   ContainersTableSettings,
   DockerContainer,

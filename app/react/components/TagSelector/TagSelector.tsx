@@ -5,10 +5,10 @@ import { TagId } from '@/portainer/tags/types';
 import {
   Creatable,
   Select,
-} from '@/portainer/components/form-components/ReactSelect';
+} from '@/react/components/form-components/ReactSelect';
 import { useCreateTagMutation, useTags } from '@/portainer/tags/queries';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Link } from '@/portainer/components/Link';
+import { FormControl } from '@/react/components/form-components/FormControl';
+import { Link } from '@/react/components/Link';
 
 import styles from './TagSelector.module.css';
 

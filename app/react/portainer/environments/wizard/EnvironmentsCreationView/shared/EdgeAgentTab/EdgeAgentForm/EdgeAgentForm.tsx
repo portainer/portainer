@@ -1,10 +1,10 @@
 import { Formik, Form } from 'formik';
 
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
+import { LoadingButton } from '@/react/components/buttons/LoadingButton';
 import { Environment } from '@/portainer/environments/types';
 import { useCreateEdgeAgentEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
 import { baseHref } from '@/portainer/helpers/pathHelper';
-import { FormSection } from '@/portainer/components/form-components/FormSection';
+import { FormSection } from '@/react/components/form-components/FormSection';
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
 
 import { MoreSettingsSection } from '../../MoreSettingsSection';

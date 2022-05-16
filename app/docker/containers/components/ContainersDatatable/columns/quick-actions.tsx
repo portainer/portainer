@@ -1,6 +1,6 @@
 import { CellProps, Column } from 'react-table';
 
-import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
+import { useTableSettings } from '@/react/components/datatables/useTableSettings';
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import { useAuthorizations } from '@/portainer/hooks/useUser';
 import { ContainerQuickActions } from '@/docker/components/container-quick-actions/ContainerQuickActions';

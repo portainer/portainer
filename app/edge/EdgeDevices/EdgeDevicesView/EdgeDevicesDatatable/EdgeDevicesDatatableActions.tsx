@@ -1,13 +1,13 @@
 import { useRouter } from '@uirouter/react';
 
 import type { Environment } from '@/portainer/environments/types';
-import { Button } from '@/portainer/components/Button';
+import { Button } from '@/react/components/buttons';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { promptAsync } from '@/portainer/services/modal.service/prompt';
 import * as notifications from '@/portainer/services/notifications';
 import { activateDevice } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 import { deleteEndpoint } from '@/portainer/environments/environment.service';
-import { Link } from '@/portainer/components/Link';
+import { Link } from '@/react/components/Link';
 
 interface Props {
   selectedItems: Environment[];

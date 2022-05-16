@@ -1,4 +1,4 @@
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
+import { FormSectionTitle } from '@/react/components/form-components/FormSectionTitle';
 import { react2angular } from '@/react-tools/react2angular';
 import { confirm } from '@/portainer/services/modal.service/confirm';
 

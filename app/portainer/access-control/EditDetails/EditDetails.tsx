@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { FormikErrors } from 'formik';
 
-import { BoxSelector } from '@/portainer/components/BoxSelector';
+import { BoxSelector } from '@/react/components/BoxSelector';
 import { useUser } from '@/portainer/hooks/useUser';
-import { FormError } from '@/portainer/components/form-components/FormError';
+import { FormError } from '@/react/components/form-components/FormError';
 
 import { ResourceControlOwnership, AccessControlFormData } from '../types';
 

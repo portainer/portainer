@@ -1,6 +1,6 @@
 import sanitize from 'sanitize-html';
 import bootbox from 'bootbox';
-import '@/portainer/components/BoxSelector/BoxSelectorItem.css';
+import '@/react/components/BoxSelector/BoxSelectorItem.css';
 
 import { applyBoxCSS, ButtonsOptions, confirmButtons } from './utils';
 

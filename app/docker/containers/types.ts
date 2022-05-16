@@ -5,7 +5,7 @@ import {
   SettableColumnsTableSettings,
   SettableQuickActionsTableSettings,
   SortableTableSettings,
-} from '@/portainer/components/datatables/types';
+} from '@/react/components/datatables/types';
 
 export type DockerContainerStatus =
   | 'paused'

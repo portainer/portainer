@@ -1,6 +1,5 @@
 import { FeatureId } from '@/portainer/feature-flags/enums';
-
-import { getFeatureDetails } from './utils';
+import { getFeatureDetails } from '@/react/components/BEFeatureIndicator/utils';
 
 export default class BeIndicatorController {
   limitedToBE?: boolean;

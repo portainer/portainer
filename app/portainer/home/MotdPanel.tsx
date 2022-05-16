@@ -2,8 +2,7 @@ import { useQuery } from 'react-query';
 import _ from 'lodash';
 
 import { useUIState } from '@/portainer/hooks/UIStateProvider';
-
-import { InformationPanel } from '../components/InformationPanel/InformationPanel';
+import { InformationPanel } from '@/react/components/InformationPanel';
 
 import { getMotd } from './home.service';
 

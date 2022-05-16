@@ -2,7 +2,7 @@ import { Column } from 'react-table';
 import clsx from 'clsx';
 import _ from 'lodash';
 
-import { DefaultFilter } from '@/portainer/components/datatables/components/Filter';
+import { DefaultFilter } from '@/react/components/datatables/Filter';
 import type {
   DockerContainer,
   DockerContainerStatus,

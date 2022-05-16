@@ -4,13 +4,13 @@ import _ from 'lodash';
 import clsx from 'clsx';
 
 import { Stepper } from '@/react/components/Stepper';
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
+import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
 import { notifyError } from '@/portainer/services/notifications';
-import { PageHeader } from '@/portainer/components/PageHeader';
-import { Button } from '@/portainer/components/Button';
+import { PageHeader } from '@/react/components/PageHeader';
+import { Button } from '@/react/components/buttons';
 import { Environment, EnvironmentId } from '@/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-import { FormSection } from '@/portainer/components/form-components/FormSection';
+import { FormSection } from '@/react/components/form-components/FormSection';
 
 import { environmentTypes } from '../EnvironmentTypeSelectView/environment-types';
 import { EnvironmentSelectorValue } from '../EnvironmentTypeSelectView/EnvironmentSelector';

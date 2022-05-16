@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
 
-import { PaginationControls } from '@/portainer/components/pagination-controls';
+import { PaginationControls } from '@/react/components/PaginationControls';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
 import {
   Environment,
@@ -9,13 +9,13 @@ import {
   EnvironmentStatus,
 } from '@/portainer/environments/types';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
-import { Button } from '@/portainer/components/Button';
+import { Button } from '@/react/components/buttons';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
 import {
   FilterSearchBar,
   useSearchBarState,
-} from '@/portainer/components/datatables/components/FilterSearchBar';
-import { SortbySelector } from '@/portainer/components/datatables/components/SortbySelector';
+} from '@/react/components/datatables/FilterSearchBar';
+import { SortbySelector } from '@/react/components/datatables/SortbySelector';
 import {
   HomepageFilter,
   useHomePageFilter,
@@ -24,8 +24,8 @@ import {
   TableActions,
   TableContainer,
   TableTitle,
-} from '@/portainer/components/datatables/components';
-import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
+} from '@/react/components/datatables';
+import { TableFooter } from '@/react/components/datatables/TableFooter';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
   refetchIfAnyOffline,

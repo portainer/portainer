@@ -2,8 +2,8 @@ import { Field, useField } from 'formik';
 import { string } from 'yup';
 import { debounce } from 'lodash';
 
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Input } from '@/portainer/components/form-components/Input';
+import { FormControl } from '@/react/components/form-components/FormControl';
+import { Input } from '@/react/components/form-components/Input';
 import { getEndpoints } from '@/portainer/environments/environment.service';
 
 interface Props {

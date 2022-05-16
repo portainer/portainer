@@ -2,10 +2,10 @@ import { Field, Form, Formik } from 'formik';
 import * as yup from 'yup';
 import { useCallback, useEffect } from 'react';
 
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
-import { Input } from '@/portainer/components/form-components/Input';
+import { LoadingButton } from '@/react/components/buttons/LoadingButton';
+import { FormControl } from '@/react/components/form-components/FormControl';
+import { FormSectionTitle } from '@/react/components/form-components/FormSectionTitle';
+import { Input } from '@/react/components/form-components/Input';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useUpdateSettingsMutation } from '@/portainer/settings/queries';

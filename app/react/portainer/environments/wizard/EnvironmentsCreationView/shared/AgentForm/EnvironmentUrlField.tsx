@@ -1,7 +1,7 @@
 import { Field, useField } from 'formik';
 
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Input } from '@/portainer/components/form-components/Input';
+import { FormControl } from '@/react/components/form-components/FormControl';
+import { Input } from '@/react/components/form-components/Input';
 
 export function EnvironmentUrlField() {
   const [, meta] = useField('environmentUrl');

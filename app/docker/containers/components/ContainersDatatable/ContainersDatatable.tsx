@@ -9,11 +9,11 @@ import {
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 
-import { PaginationControls } from '@/portainer/components/pagination-controls';
+import { PaginationControls } from '@/react/components/PaginationControls';
 import {
   QuickActionsSettings,
   buildAction,
-} from '@/portainer/components/datatables/components/QuickActionsSettings';
+} from '@/react/components/datatables/QuickActionsSettings';
 import {
   Table,
   TableActions,
@@ -23,25 +23,25 @@ import {
   TableSettingsMenu,
   TableTitle,
   TableTitleActions,
-} from '@/portainer/components/datatables/components';
-import { multiple } from '@/portainer/components/datatables/components/filter-types';
-import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
-import { ColumnVisibilityMenu } from '@/portainer/components/datatables/components/ColumnVisibilityMenu';
-import { useRepeater } from '@/portainer/components/datatables/components/useRepeater';
+} from '@/react/components/datatables';
+import { multiple } from '@/react/components/datatables/filter-types';
+import { useTableSettings } from '@/react/components/datatables/useTableSettings';
+import { ColumnVisibilityMenu } from '@/react/components/datatables/ColumnVisibilityMenu';
+import { useRepeater } from '@/react/components/datatables/useRepeater';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
   SearchBar,
   useSearchBarState,
-} from '@/portainer/components/datatables/components/SearchBar';
+} from '@/react/components/datatables/SearchBar';
 import type {
   ContainersTableSettings,
   DockerContainer,
 } from '@/docker/containers/types';
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
-import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
-import { Checkbox } from '@/portainer/components/form-components/Checkbox';
-import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
-import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
+import { useRowSelect } from '@/react/components/datatables/useRowSelect';
+import { Checkbox } from '@/react/components/form-components/Checkbox';
+import { TableFooter } from '@/react/components/datatables/TableFooter';
+import { SelectedRowsCount } from '@/react/components/datatables/SelectedRowsCount';
 
 import { ContainersDatatableActions } from './ContainersDatatableActions';
 import { ContainersDatatableSettings } from './ContainersDatatableSettings';

@@ -5,8 +5,8 @@ import {
   TableContainer,
   TableHeaderRow,
   TableRow,
-} from '@/portainer/components/datatables/components';
-import { InnerDatatable } from '@/portainer/components/datatables/components/InnerDatatable';
+} from '@/react/components/datatables';
+import { InnerDatatable } from '@/react/components/datatables/InnerDatatable';
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
 import { useAMTDevices } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/useAMTDevices';
 import { RowProvider } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/columns/RowContext';

@@ -1,6 +1,6 @@
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { FormSection } from '@/portainer/components/form-components/FormSection/FormSection';
-import { Input } from '@/portainer/components/form-components/Input';
+import { FormControl } from '@/react/components/form-components/FormControl';
+import { FormSection } from '@/react/components/form-components/FormSection/FormSection';
+import { Input } from '@/react/components/form-components/Input';
 
 import { VariableDefinition } from '../CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
 

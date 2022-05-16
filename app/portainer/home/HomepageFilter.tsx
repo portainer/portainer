@@ -1,7 +1,7 @@
 import { components, OptionProps } from 'react-select';
 
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
-import { Select } from '@/portainer/components/form-components/ReactSelect';
+import { Select } from '@/react/components/form-components/ReactSelect';
 import { Filter } from '@/portainer/home/types';
 
 interface Props {

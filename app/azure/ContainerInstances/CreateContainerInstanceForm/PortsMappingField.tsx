@@ -1,11 +1,11 @@
-import { ButtonSelector } from '@/portainer/components/form-components/ButtonSelector/ButtonSelector';
-import { FormError } from '@/portainer/components/form-components/FormError';
-import { InputGroup } from '@/portainer/components/form-components/InputGroup';
-import { InputList } from '@/portainer/components/form-components/InputList';
+import { ButtonSelector } from '@/react/components/form-components/ButtonSelector/ButtonSelector';
+import { FormError } from '@/react/components/form-components/FormError';
+import { InputGroup } from '@/react/components/form-components/InputGroup';
+import { InputList } from '@/react/components/form-components/InputList';
 import {
   InputListError,
   ItemProps,
-} from '@/portainer/components/form-components/InputList/InputList';
+} from '@/react/components/form-components/InputList/InputList';
 
 import styles from './PortsMappingField.module.css';
 

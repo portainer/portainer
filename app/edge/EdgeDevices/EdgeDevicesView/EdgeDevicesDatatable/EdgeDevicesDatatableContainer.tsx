@@ -3,10 +3,10 @@ import { useState } from 'react';
 import {
   TableSettingsProvider,
   useTableSettings,
-} from '@/portainer/components/datatables/components/useTableSettings';
+} from '@/react/components/datatables/useTableSettings';
 import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
 import { Environment } from '@/portainer/environments/types';
-import { useSearchBarState } from '@/portainer/components/datatables/components/SearchBar';
+import { useSearchBarState } from '@/react/components/datatables/SearchBar';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 
 import {

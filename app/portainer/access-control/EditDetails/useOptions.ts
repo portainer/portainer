@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 
 import { buildOption } from '@/portainer/components/BoxSelector';
-import { BoxSelectorOption } from '@/portainer/components/BoxSelector/types';
+import { BoxSelectorOption } from '@/react/components/BoxSelector/types';
 import { ownershipIcon } from '@/portainer/filters/filters';
 import { Team } from '@/portainer/teams/types';
 
