@@ -299,7 +299,19 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                   )}
                 </div>
                 <div className={styles.kubeconfigButton}>
-                  <KubeconfigButton environments={environments} />
+                  <KubeconfigButton
+                    environments={environments}
+                    envQueryParams={{
+                      types: platformType,
+                      search: debouncedTextFilter,
+                      status: statusFilter,
+                      tagIds: tagFilter?.length ? tagFilter : undefined,
+                      groupIds: groupFilter,
+                      sort: sortByFilter,
+                      order: sortByDescending ? 'desc' : 'asc',
+                      edgeDeviceFilter: 'none',
+                    }}
+                  />
                 </div>
                 <div className={styles.filterSearchbar}>
                   <FilterSearchBar
