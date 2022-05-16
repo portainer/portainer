@@ -22,13 +22,13 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/team_memberships",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.teamMembershipCreate))).Methods(http.MethodPost)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.teamMembershipCreate))).Methods(http.MethodPost)
 	h.Handle("/team_memberships",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.teamMembershipList))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.teamMembershipList))).Methods(http.MethodGet)
 	h.Handle("/team_memberships/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.teamMembershipUpdate))).Methods(http.MethodPut)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.teamMembershipUpdate))).Methods(http.MethodPut)
 	h.Handle("/team_memberships/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.teamMembershipDelete))).Methods(http.MethodDelete)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.teamMembershipDelete))).Methods(http.MethodDelete)
 
 	return h
 }
