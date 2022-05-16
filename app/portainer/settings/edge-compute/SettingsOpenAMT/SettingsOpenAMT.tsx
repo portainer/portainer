@@ -213,6 +213,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                       errors={errors.certFileContent}
                     >
                       <FileUploadField
+                        inputId="certificate_file"
                         title="Upload file"
                         accept=".pfx"
                         value={certFile}

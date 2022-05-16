@@ -1,3 +1,7 @@
+import _ from 'lodash';
+
+import { isUnassociatedEdgeEnvironment } from '@/portainer/environments/utils';
+
 export default class WizardEndpointsController {
   /* @ngInject */
   constructor($async, $scope, $state, EndpointService, $analytics) {
@@ -14,9 +18,34 @@ export default class WizardEndpointsController {
    * WIZARD ENDPOINT SECTION
    */
 
-  async updateEndpoint() {
-    const updateEndpoints = await this.EndpointService.endpoints();
-    this.endpoints = updateEndpoints.value;
+  onCreate(environment, environmentType) {
+    this.addAnalytics(_.kebabCase(environmentType));
+    this.reloadEndpoints();
+  }
+
+  async reloadEndpoints() {
+    // TODO: when converting to react, should use `useEnvironmentsList` hook like in HomeView, and reload if has unassociated edge environment
+    try {
+      const { value } = await this.EndpointService.endpoints();
+      this.endpoints = value;
+
+      if (this.endpoints.some((env) => isUnassociatedEdgeEnvironment(env))) {
+        this.startReloadLoop();
+      }
+    } catch (e) {
+      this.Notifications.error('Failure', e, 'Unable to retrieve endpoints');
+    }
+  }
+
+  startReloadLoop() {
+    this.clearReloadLoop();
+    this.reloadInterval = setTimeout(this.reloadEndpoints, 5000);
+  }
+
+  clearReloadLoop() {
+    if (this.reloadInterval) {
+      clearInterval(this.reloadInterval);
+    }
   }
 
   startWizard() {
