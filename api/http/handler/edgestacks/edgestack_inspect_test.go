@@ -1,11 +1,13 @@
 package edgestacks
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"reflect"
 	"strconv"
 	"testing"
 	"time"
@@ -14,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
 )
@@ -48,6 +51,19 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 		store,
 	)
 
+	tmpDir, err := os.MkdirTemp(os.TempDir(), "portainer-test")
+	if err != nil {
+		storeTeardown()
+		t.Fatal(err)
+	}
+
+	fs, err := filesystem.NewService(tmpDir, "")
+	if err != nil {
+		storeTeardown()
+		t.Fatal(err)
+	}
+	handler.FileService = fs
+
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		t.Fatal(err)
@@ -65,7 +81,7 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 func createEndpoint(t *testing.T, store dataservices.DataStore) portainer.Endpoint {
 	t.Helper()
 
-	endpointID := portainer.EndpointID(rand.Int())
+	endpointID := portainer.EndpointID(5)
 
 	endpoint := portainer.Endpoint{
 		ID:              endpointID,
@@ -87,7 +103,18 @@ func createEndpoint(t *testing.T, store dataservices.DataStore) portainer.Endpoi
 func createEdgeStack(t *testing.T, store dataservices.DataStore, endpointID portainer.EndpointID) portainer.EdgeStack {
 	t.Helper()
 
-	edgeStackID := portainer.EdgeStackID(rand.Int())
+	edgeGroup := portainer.EdgeGroup{
+		ID:           1,
+		Name:         "EdgeGroup 1",
+		Dynamic:      false,
+		TagIDs:       nil,
+		Endpoints:    nil,
+		PartialMatch: false,
+	}
+
+	store.EdgeGroup().Create(&edgeGroup)
+
+	edgeStackID := portainer.EdgeStackID(14)
 	edgeStack := portainer.EdgeStack{
 		ID:   edgeStackID,
 		Name: "test-edge-stack-" + strconv.Itoa(int(edgeStackID)),
@@ -95,7 +122,7 @@ func createEdgeStack(t *testing.T, store dataservices.DataStore, endpointID port
 			endpointID: {Type: portainer.StatusOk, Error: "", EndpointID: endpointID},
 		},
 		CreationDate:   time.Now().Unix(),
-		EdgeGroups:     []portainer.EdgeGroupID{1, 2},
+		EdgeGroups:     []portainer.EdgeGroupID{1},
 		ProjectPath:    "/project/path",
 		EntryPoint:     "entrypoint",
 		Version:        237,
@@ -211,7 +238,33 @@ func TestUpdateAndInspect(t *testing.T) {
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/edge_stacks/%d", edgeStack.ID), nil)
+	// Update edge stack: change edgeGroups and DeploymentType
+	edgeGroup := portainer.EdgeGroup{
+		ID:           2,
+		Name:         "EdgeGroup 2",
+		Dynamic:      false,
+		TagIDs:       nil,
+		Endpoints:    nil,
+		PartialMatch: false,
+	}
+
+	handler.DataStore.EdgeGroup().Create(&edgeGroup)
+
+	newVersion := 238
+	payload := updateEdgeStackPayload{
+		StackFileContent: "update-test",
+		Version:          &newVersion,
+		EdgeGroups:       []portainer.EdgeGroupID{2},
+		DeploymentType:   0,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal("request error:", err)
+	}
+
+	r := bytes.NewBuffer(jsonPayload)
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("/edge_stacks/%d", edgeStack.ID), r)
 	if err != nil {
 		t.Fatal("request error:", err)
 	}
@@ -224,26 +277,7 @@ func TestUpdateAndInspect(t *testing.T) {
 		t.Fatalf(fmt.Sprintf("expected a %d response, found: %d", http.StatusOK, rec.Code))
 	}
 
-	data := portainer.EdgeStack{}
-	err = json.NewDecoder(rec.Body).Decode(&data)
-	if err != nil {
-		t.Fatal("error decoding response:", err)
-	}
-
-	if data.ID != edgeStack.ID {
-		t.Fatalf(fmt.Sprintf("expected EdgeStackID %d, found %d", int(edgeStack.ID), data.ID))
-	}
-
-	if int(data.Status[endpoint.ID].Type) != int(portainer.StatusOk) {
-		t.Fatalf(fmt.Sprintf("expected EdgeStackStatusType %d, found %d", int(portainer.StatusOk), int(data.Status[endpoint.ID].Type)))
-	}
-
-	edgeStack.Version = 239
-	err = handler.DataStore.EdgeStack().UpdateEdgeStack(edgeStack.ID, &edgeStack)
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	// Get updated edge stack
 	req, err = http.NewRequest(http.MethodGet, fmt.Sprintf("/edge_stacks/%d", edgeStack.ID), nil)
 	if err != nil {
 		t.Fatal("request error:", err)
@@ -257,14 +291,89 @@ func TestUpdateAndInspect(t *testing.T) {
 		t.Fatalf(fmt.Sprintf("expected a %d response, found: %d", http.StatusOK, rec.Code))
 	}
 
-	data = portainer.EdgeStack{}
+	data := portainer.EdgeStack{}
 	err = json.NewDecoder(rec.Body).Decode(&data)
 	if err != nil {
 		t.Fatal("error decoding response:", err)
 	}
 
-	if data.Version != int(edgeStack.Version) {
+	if data.Version != *payload.Version {
 		t.Fatalf(fmt.Sprintf("expected EdgeStackID %d, found %d", edgeStack.Version, data.Version))
+	}
+
+	if data.DeploymentType != payload.DeploymentType {
+		t.Fatalf(fmt.Sprintf("expected DeploymentType %d, found %d", edgeStack.DeploymentType, data.DeploymentType))
+	}
+
+	if !reflect.DeepEqual(data.EdgeGroups, payload.EdgeGroups) {
+		t.Fatalf("expected EdgeGroups to be equal")
+	}
+}
+
+func TestUpdateStatusAndInspect(t *testing.T) {
+	handler, rawAPIKey, teardown := setupHandler(t)
+	defer teardown()
+
+	endpoint := createEndpoint(t, handler.DataStore)
+	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
+
+	// Update edge stack status
+	newStatus := portainer.StatusError
+	payload := updateStatusPayload{
+		Error:      "test-error",
+		Status:     &newStatus,
+		EndpointID: &endpoint.ID,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal("request error:", err)
+	}
+
+	r := bytes.NewBuffer(jsonPayload)
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("/edge_stacks/%d/status", edgeStack.ID), r)
+	if err != nil {
+		t.Fatal("request error:", err)
+	}
+
+	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, endpoint.EdgeID)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf(fmt.Sprintf("expected a %d response, found: %d", http.StatusOK, rec.Code))
+	}
+
+	// Get updated edge stack
+	req, err = http.NewRequest(http.MethodGet, fmt.Sprintf("/edge_stacks/%d", edgeStack.ID), nil)
+	if err != nil {
+		t.Fatal("request error:", err)
+	}
+
+	req.Header.Add("x-api-key", rawAPIKey)
+	rec = httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf(fmt.Sprintf("expected a %d response, found: %d", http.StatusOK, rec.Code))
+	}
+
+	data := portainer.EdgeStack{}
+	err = json.NewDecoder(rec.Body).Decode(&data)
+	if err != nil {
+		t.Fatal("error decoding response:", err)
+	}
+
+	if data.Status[endpoint.ID].Type != *payload.Status {
+		t.Fatalf(fmt.Sprintf("expected EdgeStackStatusType %d, found %d", payload.Status, data.Status[endpoint.ID].Type))
+	}
+
+	if data.Status[endpoint.ID].Error != payload.Error {
+		t.Fatalf(fmt.Sprintf("expected EdgeStackStatusError %s, found %s", payload.Error, data.Status[endpoint.ID].Error))
+	}
+
+	if data.Status[endpoint.ID].EndpointID != *payload.EndpointID {
+		t.Fatalf(fmt.Sprintf("expected EndpointID %d, found %d", payload.EndpointID, data.Status[endpoint.ID].EndpointID))
 	}
 }
 
