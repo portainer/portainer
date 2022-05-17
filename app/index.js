@@ -19,6 +19,7 @@ import { configApp } from './config';
 
 import { init as initFeatureService } from './portainer/feature-flags/feature-flags.service';
 import { Edition } from './portainer/feature-flags/enums';
+import { nomadModule } from './nomad';
 
 initFeatureService(Edition[process.env.PORTAINER_EDITION]);
 
@@ -46,6 +47,7 @@ angular
     'portainer.azure',
     'portainer.docker',
     'portainer.kubernetes',
+    nomadModule,
     'portainer.edge',
     'rzModule',
     'moment-picker',

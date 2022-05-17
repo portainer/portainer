@@ -4,9 +4,10 @@ import edgeStackModule from './views/edge-stacks';
 import edgeDevicesModule from './devices';
 import { componentsModule } from './components';
 import { WaitingRoomViewAngular } from './EdgeDevices/WaitingRoomView';
+import { reactModule } from './react';
 
 angular
-  .module('portainer.edge', [edgeStackModule, edgeDevicesModule, componentsModule])
+  .module('portainer.edge', [edgeStackModule, edgeDevicesModule, componentsModule, reactModule])
   .component('waitingRoomView', WaitingRoomViewAngular)
   .config(function config($stateRegistryProvider) {
     const edge = {
