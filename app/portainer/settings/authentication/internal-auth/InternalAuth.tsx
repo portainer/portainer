@@ -32,4 +32,7 @@ export function InternalAuth({ onSaveSettings, saveButtonState }: Props) {
   );
 }
 
-export const InternalAuthAngular = react2angular(InternalAuth, []);
+export const InternalAuthAngular = react2angular(InternalAuth, [
+  'onSaveSettings',
+  'saveButtonState',
+]);
