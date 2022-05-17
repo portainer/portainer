@@ -1,11 +1,13 @@
 import angular from 'angular';
 
 import { EnvironmentStatus } from '@/portainer/environments/types';
+
+import { reactModule } from './react';
 import containersModule from './containers';
 import { componentsModule } from './components';
 import { networksModule } from './networks';
 
-angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule, networksModule]).config([
+angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule, networksModule, reactModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
