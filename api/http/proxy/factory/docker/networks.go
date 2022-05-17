@@ -86,7 +86,7 @@ func findSystemNetworkResourceControl(networkObject map[string]interface{}) *por
 	networkID := networkObject[networkObjectIdentifier].(string)
 	networkName := networkObject[networkObjectName].(string)
 
-	if networkName == "bridge" || networkName == "host" || networkName == "none" {
+	if networkName == "bridge" || networkName == "host" || networkName == "ingress" || networkName == "nat" || networkName == "none" {
 		return authorization.NewSystemResourceControl(networkID, portainer.NetworkResourceControl)
 	}
 
