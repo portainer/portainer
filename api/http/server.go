@@ -139,8 +139,7 @@ func (server *Server) Start() error {
 	edgeJobsHandler.FileService = server.FileService
 	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
 
-	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer)
-	edgeStacksHandler.DataStore = server.DataStore
+	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer, server.DataStore)
 	edgeStacksHandler.FileService = server.FileService
 	edgeStacksHandler.GitService = server.GitService
 	edgeStacksHandler.KubernetesDeployer = server.KubernetesDeployer
@@ -160,10 +159,7 @@ func (server *Server) Start() error {
 	endpointHandler.BindAddress = server.BindAddress
 	endpointHandler.BindAddressHTTPS = server.BindAddressHTTPS
 
-	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
-	endpointEdgeHandler.DataStore = server.DataStore
-	endpointEdgeHandler.FileService = server.FileService
-	endpointEdgeHandler.ReverseTunnelService = server.ReverseTunnelService
+	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer, server.DataStore, server.FileService, server.ReverseTunnelService)
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = server.AuthorizationService
@@ -176,7 +172,7 @@ func (server *Server) Start() error {
 
 	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.JWTService, server.KubeClusterAccessService, server.KubernetesClientFactory)
 
-	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
+	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"), adminMonitor.WasInstanceDisabled)
 
 	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeClusterAccessService)
 
@@ -300,8 +296,7 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
-	handler := offlineGate.WaitingMiddleware(time.Minute, server.Handler)
-
+	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
 	if server.HTTPEnabled {
 		go func() {
 			log.Printf("[INFO] [http,server] [message: starting HTTP server on port %s]", server.BindAddress)

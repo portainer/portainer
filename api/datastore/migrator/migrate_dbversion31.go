@@ -2,8 +2,9 @@ package migrator
 
 import (
 	"fmt"
-	"github.com/portainer/portainer/api/dataservices/errors"
 	"log"
+
+	"github.com/portainer/portainer/api/dataservices/errors"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -11,29 +12,24 @@ import (
 )
 
 func (m *Migrator) migrateDBVersionToDB32() error {
-	migrateLog.Info("Updating registries")
 	err := m.updateRegistriesToDB32()
 	if err != nil {
 		return err
 	}
 
-	migrateLog.Info("Updating dockerhub")
 	err = m.updateDockerhubToDB32()
 	if err != nil {
 		return err
 	}
 
-	migrateLog.Info("Updating resource controls")
 	if err := m.updateVolumeResourceControlToDB32(); err != nil {
 		return err
 	}
 
-	migrateLog.Info("Updating kubeconfig expiry")
 	if err := m.kubeconfigExpiryToDB32(); err != nil {
 		return err
 	}
 
-	migrateLog.Info("Setting default helm repository url")
 	if err := m.helmRepositoryURLToDB32(); err != nil {
 		return err
 	}
@@ -42,6 +38,7 @@ func (m *Migrator) migrateDBVersionToDB32() error {
 }
 
 func (m *Migrator) updateRegistriesToDB32() error {
+	migrateLog.Info("- updating registries")
 	registries, err := m.registryService.Registries()
 	if err != nil {
 		return err
@@ -84,6 +81,7 @@ func (m *Migrator) updateRegistriesToDB32() error {
 }
 
 func (m *Migrator) updateDockerhubToDB32() error {
+	migrateLog.Info("- updating dockerhub")
 	dockerhub, err := m.dockerhubService.DockerHub()
 	if err == errors.ErrObjectNotFound {
 		return nil
@@ -172,6 +170,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 }
 
 func (m *Migrator) updateVolumeResourceControlToDB32() error {
+	migrateLog.Info("- updating resource controls")
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
 		return fmt.Errorf("failed fetching environments: %w", err)
@@ -264,6 +263,7 @@ func findResourcesToUpdateForDB32(dockerID string, volumesData map[string]interf
 }
 
 func (m *Migrator) kubeconfigExpiryToDB32() error {
+	migrateLog.Info("- updating kubeconfig expiry")
 	settings, err := m.settingsService.Settings()
 	if err != nil {
 		return err
@@ -273,6 +273,7 @@ func (m *Migrator) kubeconfigExpiryToDB32() error {
 }
 
 func (m *Migrator) helmRepositoryURLToDB32() error {
+	migrateLog.Info("- setting default helm repository URL")
 	settings, err := m.settingsService.Settings()
 	if err != nil {
 		return err

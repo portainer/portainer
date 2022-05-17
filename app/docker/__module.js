@@ -1,9 +1,13 @@
 import angular from 'angular';
 
+import { EnvironmentStatus } from '@/portainer/environments/types';
+
+import { reactModule } from './react';
 import containersModule from './containers';
 import { componentsModule } from './components';
+import { networksModule } from './networks';
 
-angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule]).config([
+angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule, networksModule, reactModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -27,13 +31,8 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
             }
             endpoint.Status = status;
 
-            if (status === 2) {
-              if (!endpoint.Snapshots[0]) {
-                throw new Error('Environment is unreachable and there is no snapshot available for offline browsing.');
-              }
-              if (endpoint.Snapshots[0].Swarm) {
-                throw new Error('Environment is unreachable. Connect to another swarm manager.');
-              }
+            if (status === EnvironmentStatus.Down) {
+              throw new Error('Environment is unreachable.');
             }
 
             EndpointProvider.setEndpointID(endpoint.Id);
@@ -327,8 +326,7 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
       url: '/:id?nodeName',
       views: {
         'content@': {
-          templateUrl: './views/networks/edit/network.html',
-          controller: 'NetworkController',
+          component: 'networkDetailsView',
         },
       },
     };

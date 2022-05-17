@@ -55,29 +55,9 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}
 
-	if endpointutils.IsKubernetesEndpoint(endpoint) {
-		namespace, _ := request.RetrieveQueryParameter(r, "namespace", true)
-
-		if namespace == "" && !isAdmin {
-			return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Missing namespace query parameter", Err: errors.New("missing namespace query parameter")}
-		}
-
-		if namespace != "" {
-
-			authorized, err := handler.isNamespaceAuthorized(endpoint, namespace, user.ID, securityContext.UserMemberships, isAdmin)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusNotFound, "Unable to check for namespace authorization", err}
-			}
-
-			if !authorized {
-				return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized to use namespace", Err: errors.New("user is not authorized to use namespace")}
-			}
-
-			registries = filterRegistriesByNamespace(registries, endpoint.ID, namespace)
-		}
-
-	} else if !isAdmin {
-		registries = security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
+	registries, handleError := handler.filterRegistriesByAccess(r, registries, endpoint, user, securityContext.UserMemberships)
+	if handleError != nil {
+		return handleError
 	}
 
 	for idx := range registries {
@@ -85,6 +65,40 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 	}
 
 	return response.JSON(w, registries)
+}
+
+func (handler *Handler) filterRegistriesByAccess(r *http.Request, registries []portainer.Registry, endpoint *portainer.Endpoint, user *portainer.User, memberships []portainer.TeamMembership) ([]portainer.Registry, *httperror.HandlerError) {
+	if !endpointutils.IsKubernetesEndpoint(endpoint) {
+		return security.FilterRegistries(registries, user, memberships, endpoint.ID), nil
+	}
+
+	return handler.filterKubernetesEndpointRegistries(r, registries, endpoint, user, memberships)
+}
+
+func (handler *Handler) filterKubernetesEndpointRegistries(r *http.Request, registries []portainer.Registry, endpoint *portainer.Endpoint, user *portainer.User, memberships []portainer.TeamMembership) ([]portainer.Registry, *httperror.HandlerError) {
+	namespaceParam, _ := request.RetrieveQueryParameter(r, "namespace", true)
+	isAdmin, err := security.IsAdmin(r)
+	if err != nil {
+		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check user role", Err: err}
+	}
+
+	if namespaceParam != "" {
+		authorized, err := handler.isNamespaceAuthorized(endpoint, namespaceParam, user.ID, memberships, isAdmin)
+		if err != nil {
+			return nil, &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to check for namespace authorization", Err: err}
+		}
+		if !authorized {
+			return nil, &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized to use namespace", Err: errors.New("user is not authorized to use namespace")}
+		}
+
+		return filterRegistriesByNamespaces(registries, endpoint.ID, []string{namespaceParam}), nil
+	}
+
+	if isAdmin {
+		return registries, nil
+	}
+
+	return handler.filterKubernetesRegistriesByUserRole(r, registries, endpoint, user)
 }
 
 func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, namespace string, userId portainer.UserID, memberships []portainer.TeamMembership, isAdmin bool) (bool, error) {
@@ -114,22 +128,76 @@ func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, name
 	return security.AuthorizedAccess(userId, memberships, namespacePolicy.UserAccessPolicies, namespacePolicy.TeamAccessPolicies), nil
 }
 
-func filterRegistriesByNamespace(registries []portainer.Registry, endpointId portainer.EndpointID, namespace string) []portainer.Registry {
-	if namespace == "" {
-		return registries
-	}
-
+func filterRegistriesByNamespaces(registries []portainer.Registry, endpointId portainer.EndpointID, namespaces []string) []portainer.Registry {
 	filteredRegistries := []portainer.Registry{}
 
 	for _, registry := range registries {
-		for _, authorizedNamespace := range registry.RegistryAccesses[endpointId].Namespaces {
-			if authorizedNamespace == namespace {
-				filteredRegistries = append(filteredRegistries, registry)
-			}
+		if registryAccessPoliciesContainsNamespace(registry.RegistryAccesses[endpointId], namespaces) {
+			filteredRegistries = append(filteredRegistries, registry)
 		}
 	}
 
 	return filteredRegistries
+}
+
+func registryAccessPoliciesContainsNamespace(registryAccess portainer.RegistryAccessPolicies, namespaces []string) bool {
+	for _, authorizedNamespace := range registryAccess.Namespaces {
+		for _, namespace := range namespaces {
+			if namespace == authorizedNamespace {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (handler *Handler) filterKubernetesRegistriesByUserRole(r *http.Request, registries []portainer.Registry, endpoint *portainer.Endpoint, user *portainer.User) ([]portainer.Registry, *httperror.HandlerError) {
+	err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
+	if err == security.ErrAuthorizationRequired {
+		return nil, &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized", Err: errors.New("missing namespace query parameter")}
+	}
+	if err != nil {
+		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
+	}
+
+	userNamespaces, err := handler.userNamespaces(endpoint, user)
+	if err != nil {
+		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "unable to retrieve user namespaces", Err: err}
+	}
+
+	return filterRegistriesByNamespaces(registries, endpoint.ID, userNamespaces), nil
+}
+
+func (handler *Handler) userNamespaces(endpoint *portainer.Endpoint, user *portainer.User) ([]string, error) {
+	kcl, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	namespaceAuthorizations, err := kcl.GetNamespaceAccessPolicies()
+	if err != nil {
+		return nil, err
+	}
+
+	userMemberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	var userNamespaces []string
+	for namespace, namespaceAuthorization := range namespaceAuthorizations {
+		if _, ok := namespaceAuthorization.UserAccessPolicies[user.ID]; ok {
+			userNamespaces = append(userNamespaces, namespace)
+			continue
+		}
+		for _, userTeam := range userMemberships {
+			if _, ok := namespaceAuthorization.TeamAccessPolicies[userTeam.TeamID]; ok {
+				userNamespaces = append(userNamespaces, namespace)
+				continue
+			}
+		}
+	}
+	return userNamespaces, nil
 }
 
 func hideRegistryFields(registry *portainer.Registry, hideAccesses bool) {

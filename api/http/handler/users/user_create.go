@@ -11,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/passwordutils"
 )
 
 type userCreatePayload struct {
@@ -94,6 +95,10 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationInternal {
+		if !passwordutils.StrengthCheck(payload.Password) {
+			return &httperror.HandlerError{http.StatusBadRequest, "Password does not meet the requirements", nil}
+		}
+
 		user.Password, err = handler.CryptoService.Hash(payload.Password)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errCryptoHashFailure}

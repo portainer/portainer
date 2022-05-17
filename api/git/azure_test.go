@@ -28,15 +28,15 @@ func Test_buildDownloadUrl(t *testing.T) {
 	}
 }
 
-func Test_buildRefsUrl(t *testing.T) {
+func Test_buildRootItemUrl(t *testing.T) {
 	a := NewAzureDownloader(nil)
-	u, err := a.buildRefsUrl(&azureOptions{
+	u, err := a.buildRootItemUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
 		repository:   "repository",
 	}, "refs/heads/main")
 
-	expectedUrl, _ := url.Parse("https://dev.azure.com/organisation/project/_apis/git/repositories/repository/refs?filterContains=main&api-version=6.0")
+	expectedUrl, _ := url.Parse("https://dev.azure.com/organisation/project/_apis/git/repositories/repository/items?scopePath=/&api-version=6.0&versionDescriptor.version=main&versionDescriptor.versionType=branch")
 	actualUrl, _ := url.Parse(u)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedUrl.Host, actualUrl.Host)
@@ -270,63 +270,17 @@ func Test_azureDownloader_downloadZipFromAzureDevOps(t *testing.T) {
 func Test_azureDownloader_latestCommitID(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		response := `{
-			"value": [
-				{
-					"name": "refs/heads/feature/calcApp",
-					"objectId": "ffe9cba521f00d7f60e322845072238635edb451",
-					"creator": {
-						"displayName": "Normal Paulk",
-						"url": "https://vssps.dev.azure.com/fabrikam/_apis/Identities/ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
-						"_links": {
-							"avatar": {
-								"href": "https://dev.azure.com/fabrikam/_apis/GraphProfile/MemberAvatars/aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
-							}
-						},
-						"id": "ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
-						"uniqueName": "dev@mailserver.com",
-						"imageUrl": "https://dev.azure.com/fabrikam/_api/_common/identityImage?id=ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
-						"descriptor": "aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
-					},
-					"url": "https://dev.azure.com/fabrikam/7484f783-66a3-4f27-b7cd-6b08b0b077ed/_apis/git/repositories/d3d1760b-311c-4175-a726-20dfc6a7f885/refs?filter=heads%2Ffeature%2FcalcApp"
-				},
-				{
-					"name": "refs/heads/feature/replacer",
-					"objectId": "917131a709996c5cfe188c3b57e9a6ad90e8b85c",
-					"creator": {
-						"displayName": "Normal Paulk",
-						"url": "https://vssps.dev.azure.com/fabrikam/_apis/Identities/ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
-						"_links": {
-							"avatar": {
-								"href": "https://dev.azure.com/fabrikam/_apis/GraphProfile/MemberAvatars/aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
-							}
-						},
-						"id": "ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
-						"uniqueName": "dev@mailserver.com",
-						"imageUrl": "https://dev.azure.com/fabrikam/_api/_common/identityImage?id=ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
-						"descriptor": "aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
-					},
-					"url": "https://dev.azure.com/fabrikam/7484f783-66a3-4f27-b7cd-6b08b0b077ed/_apis/git/repositories/d3d1760b-311c-4175-a726-20dfc6a7f885/refs?filter=heads%2Ffeature%2Freplacer"
-				},
-				{
-					"name": "refs/heads/master",
-					"objectId": "ffe9cba521f00d7f60e322845072238635edb451",
-					"creator": {
-						"displayName": "Normal Paulk",
-						"url": "https://vssps.dev.azure.com/fabrikam/_apis/Identities/ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
-						"_links": {
-							"avatar": {
-								"href": "https://dev.azure.com/fabrikam/_apis/GraphProfile/MemberAvatars/aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
-							}
-						},
-						"id": "ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
-						"uniqueName": "dev@mailserver.com",
-						"imageUrl": "https://dev.azure.com/fabrikam/_api/_common/identityImage?id=ac5aaba6-a66a-4e1d-b508-b060ec624fa9",
-						"descriptor": "aad.YmFjMGYyZDctNDA3ZC03OGRhLTlhMjUtNmJhZjUwMWFjY2U5"
-					},
-					"url": "https://dev.azure.com/fabrikam/7484f783-66a3-4f27-b7cd-6b08b0b077ed/_apis/git/repositories/d3d1760b-311c-4175-a726-20dfc6a7f885/refs?filter=heads%2Fmaster"
-				}
-			],
-			"count": 3
+		  "count": 1,
+		  "value": [
+			{
+			  "objectId": "1a5630f017127db7de24d8771da0f536ff98fc9b",
+			  "gitObjectType": "tree",
+			  "commitId": "27104ad7549d9e66685e115a497533f18024be9c",
+			  "path": "/",
+			  "isFolder": true,
+			  "url": "https://dev.azure.com/simonmeng0474/4b546a97-c481-4506-bdd5-976e9592f91a/_apis/git/repositories/a22247ad-053f-43bc-88a7-62ff4846bb97/items?path=%2F&versionType=Branch&versionOptions=None"
+			}
+		  ]
 		}`
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(response))
@@ -347,18 +301,10 @@ func Test_azureDownloader_latestCommitID(t *testing.T) {
 		{
 			name: "should be able to parse response",
 			args: fetchOptions{
-				referenceName: "refs/heads/master",
+				referenceName: "",
 				repositoryUrl: "https://dev.azure.com/Organisation/Project/_git/Repository"},
-			want:    "ffe9cba521f00d7f60e322845072238635edb451",
+			want:    "27104ad7549d9e66685e115a497533f18024be9c",
 			wantErr: false,
-		},
-		{
-			name: "should be able to parse response",
-			args: fetchOptions{
-				referenceName: "refs/heads/unknown",
-				repositoryUrl: "https://dev.azure.com/Organisation/Project/_git/Repository"},
-			want:    "",
-			wantErr: true,
 		},
 	}
 

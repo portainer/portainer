@@ -1,3 +1,5 @@
+import { MinPasswordLen, StrengthCheck } from 'Portainer/helpers/password';
+
 angular.module('portainer.app').controller('AccountController', [
   '$scope',
   '$state',
@@ -16,17 +18,36 @@ angular.module('portainer.app').controller('AccountController', [
       userTheme: '',
     };
 
+    $scope.passwordStrength = false;
+    $scope.MinPasswordLen = MinPasswordLen;
+
     $scope.updatePassword = async function () {
       const confirmed = await ModalService.confirmChangePassword();
       if (confirmed) {
         try {
           await UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword);
           Notifications.success('Success', 'Password successfully updated');
+          $scope.forceChangePassword = false;
           $state.go('portainer.logout');
         } catch (err) {
           Notifications.error('Failure', err, err.msg);
         }
       }
+    };
+
+    $scope.onNewPasswordChange = function () {
+      $scope.passwordStrength = StrengthCheck($scope.formValues.newPassword);
+    };
+
+    this.uiCanExit = () => {
+      if ($scope.forceChangePassword) {
+        ModalService.confirmForceChangePassword();
+      }
+      return !$scope.forceChangePassword;
+    };
+
+    $scope.uiCanExit = () => {
+      return this.uiCanExit();
     };
 
     $scope.removeAction = (selectedTokens) => {
@@ -77,6 +98,7 @@ angular.module('portainer.app').controller('AccountController', [
 
     async function initView() {
       $scope.userID = Authentication.getUserDetails().ID;
+      $scope.forceChangePassword = Authentication.getUserDetails().forceChangePassword;
 
       const data = await UserService.user($scope.userID);
 

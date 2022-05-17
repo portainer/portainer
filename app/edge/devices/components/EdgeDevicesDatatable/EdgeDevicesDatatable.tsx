@@ -50,7 +50,7 @@ export interface EdgeDevicesTableProps {
   isEnabled: boolean;
   isFdoEnabled: boolean;
   isOpenAmtEnabled: boolean;
-  disableTrustOnFirstConnect: boolean;
+  showWaitingRoomLink: boolean;
   mpsServer: string;
   dataset: Environment[];
   groups: EnvironmentGroup[];
@@ -62,7 +62,7 @@ export function EdgeDevicesDatatable({
   storageKey,
   isFdoEnabled,
   isOpenAmtEnabled,
-  disableTrustOnFirstConnect,
+  showWaitingRoomLink,
   mpsServer,
   dataset,
   groups,
@@ -164,6 +164,7 @@ export function EdgeDevicesDatatable({
           isFDOEnabled={isFdoEnabled}
           isOpenAMTEnabled={isOpenAmtEnabled}
           setLoadingMessage={setLoadingMessage}
+          showWaitingRoomLink={showWaitingRoomLink}
         />
       </TableActions>
 
@@ -216,7 +217,6 @@ export function EdgeDevicesDatatable({
             return (
               <RowProvider
                 key={key}
-                disableTrustOnFirstConnect={disableTrustOnFirstConnect}
                 isOpenAmtEnabled={isOpenAmtEnabled}
                 groupName={group[0]?.Name}
               >

@@ -10,14 +10,16 @@ import (
 // Handler represents an HTTP API handler for managing static files.
 type Handler struct {
 	http.Handler
+	wasInstanceDisabled func() bool
 }
 
 // NewHandler creates a handler to serve static files.
-func NewHandler(assetPublicPath string) *Handler {
+func NewHandler(assetPublicPath string, wasInstanceDisabled func() bool) *Handler {
 	h := &Handler{
 		Handler: handlers.CompressHandler(
 			http.FileServer(http.Dir(assetPublicPath)),
 		),
+		wasInstanceDisabled: wasInstanceDisabled,
 	}
 
 	return h
@@ -33,6 +35,18 @@ func isHTML(acceptContent []string) bool {
 }
 
 func (handler *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if handler.wasInstanceDisabled() {
+		if r.RequestURI == "/" || r.RequestURI == "/index.html" {
+			http.Redirect(w, r, "/timeout.html", http.StatusTemporaryRedirect)
+			return
+		}
+	} else {
+		if strings.HasPrefix(r.RequestURI, "/timeout.html") {
+			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+			return
+		}
+	}
+
 	if !isHTML(r.Header["Accept"]) {
 		w.Header().Set("Cache-Control", "max-age=31536000")
 	} else {

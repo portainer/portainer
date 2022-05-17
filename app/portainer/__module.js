@@ -9,6 +9,7 @@ import servicesModule from './services';
 import teamsModule from './teams';
 import homeModule from './home';
 import { accessControlModule } from './access-control';
+import { reactModule } from './react';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -38,6 +39,7 @@ angular
     servicesModule,
     teamsModule,
     accessControlModule,
+    reactModule,
   ])
   .config([
     '$stateRegistryProvider',
@@ -401,8 +403,7 @@ angular
         url: '/:id',
         views: {
           'content@': {
-            templateUrl: './views/registries/edit/registry.html',
-            controller: 'RegistryController',
+            component: 'editRegistry',
           },
         },
       };

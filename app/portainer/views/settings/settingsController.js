@@ -45,6 +45,7 @@ angular.module('portainer.app').controller('SettingsController', [
       ],
       backupInProgress: false,
       featureLimited: false,
+      showHTTPS: !window.ddExtension,
     };
 
     $scope.BACKUP_FORM_TYPES = { S3: 's3', FILE: 'file' };

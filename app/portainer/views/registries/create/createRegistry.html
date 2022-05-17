@@ -101,6 +101,7 @@
             form-action="$ctrl.createRegistry"
             form-action-label="Add registry"
             action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
           ></registry-form-azure>
 
           <registry-form-custom
@@ -109,6 +110,7 @@
             form-action="$ctrl.createRegistry"
             form-action-label="Add registry"
             action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
           ></registry-form-custom>
 
           <registry-form-ecr
@@ -117,6 +119,7 @@
             form-action="$ctrl.createRegistry"
             form-action-label="Add registry"
             action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
           ></registry-form-ecr>
 
           <registry-form-proget
@@ -125,6 +128,7 @@
             form-action="$ctrl.createRegistry"
             form-action-label="Add registry"
             action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
           ></registry-form-proget>
 
           <registry-form-gitlab
@@ -144,6 +148,7 @@
             form-action="$ctrl.createRegistry"
             form-action-label="Add registry"
             action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
           ></registry-form-dockerhub>
         </form>
       </rd-widget-body>

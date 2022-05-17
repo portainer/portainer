@@ -106,8 +106,8 @@ export default class WizardKubernetesController {
       const agentShortVersion = getAgentShortVersion(agentVersion);
 
       this.command = {
-        loadBalancer: `curl -L https://downloads.portainer.io/portainer-agent-ce${agentShortVersion}-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml `,
-        nodePort: `curl -L https://downloads.portainer.io/portainer-agent-ce${agentShortVersion}-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml `,
+        loadBalancer: `curl -L https://downloads.portainer.io/ce${agentShortVersion}/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml `,
+        nodePort: `curl -L https://downloads.portainer.io/ce${agentShortVersion}/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml `,
       };
     });
   }

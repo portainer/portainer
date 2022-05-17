@@ -3,7 +3,7 @@ package migrator
 import portainer "github.com/portainer/portainer/api"
 
 func (m *Migrator) updateTagsToDBVersion23() error {
-	migrateLog.Info("Updating tags")
+	migrateLog.Info("- Updating tags")
 	tags, err := m.tagService.Tags()
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func (m *Migrator) updateTagsToDBVersion23() error {
 }
 
 func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
-	migrateLog.Info("Updating endpoints and endpoint groups")
+	migrateLog.Info("- updating endpoints and endpoint groups")
 	tags, err := m.tagService.Tags()
 	if err != nil {
 		return err

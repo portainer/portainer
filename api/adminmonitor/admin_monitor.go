@@ -3,29 +3,36 @@ package adminmonitor
 import (
 	"context"
 	"log"
+	"net/http"
+	"strings"
 	"sync"
 	"time"
 
+	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 )
 
 var logFatalf = log.Fatalf
 
+const RedirectReasonAdminInitTimeout string = "AdminInitTimeout"
+
 type Monitor struct {
-	timeout          time.Duration
-	datastore        dataservices.DataStore
-	shutdownCtx      context.Context
-	cancellationFunc context.CancelFunc
-	mu               sync.Mutex
+	timeout           time.Duration
+	datastore         dataservices.DataStore
+	shutdownCtx       context.Context
+	cancellationFunc  context.CancelFunc
+	mu                sync.Mutex
+	adminInitDisabled bool
 }
 
-// New creates a monitor that when started will wait for the timeout duration and then shutdown the application unless it has been initialized.
+// New creates a monitor that when started will wait for the timeout duration and then sends the timeout signal to disable the application
 func New(timeout time.Duration, datastore dataservices.DataStore, shutdownCtx context.Context) *Monitor {
 	return &Monitor{
-		timeout:     timeout,
-		datastore:   datastore,
-		shutdownCtx: shutdownCtx,
+		timeout:           timeout,
+		datastore:         datastore,
+		shutdownCtx:       shutdownCtx,
+		adminInitDisabled: false,
 	}
 }
 
@@ -50,7 +57,11 @@ func (m *Monitor) Start() {
 				logFatalf("%s", err)
 			}
 			if !initialized {
-				logFatalf("[FATAL] [internal,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
+				log.Println("[INFO] [internal,init] The Portainer instance timed out for security purposes. To re-enable your Portainer instance, you will need to restart Portainer")
+				m.mu.Lock()
+				defer m.mu.Unlock()
+				m.adminInitDisabled = true
+				return
 			}
 		case <-cancellationCtx.Done():
 			log.Println("[DEBUG] [internal,init] [message: canceling initialization monitor]")
@@ -79,4 +90,26 @@ func (m *Monitor) WasInitialized() (bool, error) {
 		return false, err
 	}
 	return len(users) > 0, nil
+}
+
+func (m *Monitor) WasInstanceDisabled() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.adminInitDisabled
+}
+
+// WithRedirect checks whether administrator initialisation timeout. If so, it will return the error with redirect reason.
+// Otherwise, it will pass through the request to next
+func (m *Monitor) WithRedirect(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if m.WasInstanceDisabled() {
+			if strings.HasPrefix(r.RequestURI, "/api") && r.RequestURI != "/api/status" && r.RequestURI != "/api/settings/public" {
+				w.Header().Set("redirect-reason", RedirectReasonAdminInitTimeout)
+				httperror.WriteError(w, http.StatusSeeOther, "Administrator initialization timeout", nil)
+				return
+			}
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

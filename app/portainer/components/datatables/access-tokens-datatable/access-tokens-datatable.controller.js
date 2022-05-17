@@ -1,7 +1,13 @@
 export default class AccessTokensDatatableController {
   /* @ngInject*/
-  constructor($scope, $controller, DatatableService) {
+  constructor($scope, $state, $controller, DatatableService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
+
+    this.onClickAdd = () => {
+      if (this.uiCanExit()) {
+        $state.go('portainer.account.new-access-token');
+      }
+    };
 
     this.$onInit = function () {
       this.setDefaults();

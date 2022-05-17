@@ -33,7 +33,7 @@ func setup(store *Store) error {
 }
 
 func TestMigrateSettings(t *testing.T) {
-	_, store, teardown := MustNewTestStore(false)
+	_, store, teardown := MustNewTestStore(false, true)
 	defer teardown()
 
 	err := setup(store)

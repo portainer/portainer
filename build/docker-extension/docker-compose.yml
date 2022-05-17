@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  portainer:
+    image: ${DESKTOP_PLUGIN_IMAGE}
+    command: ['--admin-password', '$$$$2y$$$$05$$$$bsb.XmF.r2DU6/9oVUaDxu3.Lxhmg1R8M0NMLK6JJKUiqUcaNjvdu']
+    restart: always
+    environment:
+      - DOCKER_EXTENSION=1
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
+    ports:
+      - 127.0.0.1:8000:8000
+      - 127.0.0.1:9000:9000
+      - 127.0.0.1:9443:9443
+volumes:
+  portainer_data:

@@ -1,5 +1,5 @@
 import { Column } from 'react-table';
-import _ from 'lodash-es';
+import _ from 'lodash';
 
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import type { DockerContainer, Port } from '@/docker/containers/types';

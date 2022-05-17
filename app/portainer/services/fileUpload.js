@@ -48,7 +48,7 @@ angular.module('portainer.app').factory('FileUploadService', [
 
     service.createSchedule = function (payload) {
       return Upload.upload({
-        url: 'api/schedules?method=file',
+        url: 'api/edge_jobs?method=file',
         data: {
           file: payload.File,
           Name: payload.Name,

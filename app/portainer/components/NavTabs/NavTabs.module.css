@@ -1,0 +1,32 @@
+.parent {
+  background: var(--blue-4);
+  border-radius: 4px 4px 0 0;
+  padding-top: 5px;
+  margin-top: -5px;
+}
+
+.parent a {
+  background-color: initial !important;
+  border: 1px solid transparent !important;
+  cursor: inherit !important;
+}
+
+.parent {
+  background-color: var(--blue-4);
+}
+:global(:root[theme='dark']) .parent {
+  background-color: var(--grey-40);
+}
+:global(:root[theme='highcontrast']) .parent {
+  background-color: var(--white-color);
+}
+
+.parent a {
+  color: var(--white-color) !important;
+}
+:global([theme='dark']) .parent a {
+  color: var(--black-color) !important;
+}
+:global([theme='highcontrast']) .parent a {
+  color: var(--black-color) !important;
+}

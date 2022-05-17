@@ -424,6 +424,9 @@ func DefaultPortainerAuthorizations() portainer.Authorizations {
 		portainer.OperationPortainerUserList:          true,
 		portainer.OperationPortainerUserInspect:       true,
 		portainer.OperationPortainerUserMemberships:   true,
+		portainer.OperationPortainerUserListToken:     true,
+		portainer.OperationPortainerUserCreateToken:   true,
+		portainer.OperationPortainerUserRevokeToken:   true,
 	}
 }
 

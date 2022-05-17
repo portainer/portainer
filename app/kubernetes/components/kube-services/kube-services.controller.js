@@ -21,26 +21,32 @@ export default class KubeServicesViewController {
     p.Selector = this.formValues.Selector;
 
     p.Name = this.getUniqName();
-    this.state.nameIndex += 1;
     this.formValues.Services.push(p);
   }
 
   getUniqName() {
-    let name = this.formValues.Name + '-' + this.state.nameIndex;
+    //services name will follow thia patten: service, service-2, service-3...
+    let nameIndex = 2;
+    let UniqName = this.formValues.Name;
     const services = this.formValues.Services;
-    services.forEach((service) => {
-      if (service.Name === name) {
-        this.state.nameIndex += 1;
-        name = this.formValues.Name + '-' + this.state.nameIndex;
-      }
+
+    const sortServices = services.sort((a, b) => {
+      return a.Name.localeCompare(b.Name);
     });
-    const UniqName = this.formValues.Name + '-' + this.state.nameIndex;
+
+    if (sortServices.length !== 0) {
+      sortServices.forEach((service) => {
+        if (service.Name === UniqName) {
+          UniqName = this.formValues.Name + '-' + nameIndex;
+          nameIndex += 1;
+        }
+      });
+    }
     return UniqName;
   }
 
   deleteService(index) {
     this.formValues.Services.splice(index, 1);
-    this.state.nameIndex -= 1;
   }
 
   addPort(index) {
@@ -98,7 +104,6 @@ export default class KubeServicesViewController {
         },
       ],
       selected: KubernetesApplicationPublishingTypes.CLUSTER_IP,
-      nameIndex: this.formValues.Services.length,
       endpointId: this.EndpointProvider.endpointID(),
     };
   }

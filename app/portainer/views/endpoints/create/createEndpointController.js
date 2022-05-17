@@ -23,6 +23,9 @@ angular
       Authentication,
       StateManager
     ) {
+      $scope.onChangeCheckInInterval = onChangeCheckInInterval;
+      $scope.setFieldValue = setFieldValue;
+
       $scope.state = {
         EnvironmentType: $state.params.isEdgeDevice ? 'edge_agent' : 'agent',
         PlatformType: 'linux',
@@ -30,36 +33,18 @@ angular
         deploymentTab: 0,
         allowCreateTag: Authentication.isAdmin(),
         isEdgeDevice: $state.params.isEdgeDevice,
-        availableEdgeAgentCheckinOptions: [
-          { key: 'Use default interval', value: 0 },
-          {
-            key: '5 seconds',
-            value: 5,
-          },
-          {
-            key: '10 seconds',
-            value: 10,
-          },
-          {
-            key: '30 seconds',
-            value: 30,
-          },
-          { key: '5 minutes', value: 300 },
-          { key: '1 hour', value: 3600 },
-          { key: '1 day', value: 86400 },
-        ],
       };
 
       const agentVersion = StateManager.getState().application.version;
       const agentShortVersion = getAgentShortVersion(agentVersion);
+      $scope.agentSecret = '';
 
-      const deployCommands = {
-        kubeLoadBalancer: `curl -L https://downloads.portainer.io/portainer-agent-ce${agentShortVersion}-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
-        kubeNodePort: `curl -L https://downloads.portainer.io/portainer-agent-ce${agentShortVersion}-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
-        agentLinux: `curl -L https://downloads.portainer.io/agent-stack-ce${agentShortVersion}.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent`,
-        agentWindows: `curl -L https://downloads.portainer.io/agent-stack-ce${agentShortVersion}-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent`,
+      $scope.deployCommands = {
+        kubeLoadBalancer: `curl -L https://downloads.portainer.io/ce${agentShortVersion}/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+        kubeNodePort: `curl -L https://downloads.portainer.io/ce${agentShortVersion}/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+        agentLinux: agentLinuxSwarmCommand,
+        agentWindows: agentWindowsSwarmCommand,
       };
-      $scope.deployCommands = deployCommands;
 
       $scope.formValues = {
         Name: '',
@@ -71,25 +56,35 @@ angular
         AzureTenantId: '',
         AzureAuthenticationKey: '',
         TagIds: [],
-        CheckinInterval: $scope.state.availableEdgeAgentCheckinOptions[0].value,
+        CheckinInterval: 0,
       };
 
       $scope.copyAgentCommand = function () {
+        let command = '';
         if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'linux') {
-          clipboard.copyText(deployCommands.agentLinux);
+          command = $scope.deployCommands.agentLinux($scope.agentSecret);
         } else if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'windows') {
-          clipboard.copyText(deployCommands.agentWindows);
+          command = $scope.deployCommands.agentWindows($scope.agentSecret);
         } else if ($scope.state.deploymentTab === 1) {
-          clipboard.copyText(deployCommands.kubeNodePort);
+          command = $scope.deployCommands.kubeNodePort;
         } else {
-          clipboard.copyText(deployCommands.kubeLoadBalancer);
+          command = $scope.deployCommands.kubeLoadBalancer;
         }
+        clipboard.copyText(command.trim());
         $('#copyNotification').show().fadeOut(2500);
       };
 
       $scope.setDefaultPortainerInstanceURL = function () {
-        const baseHREF = baseHref();
-        $scope.formValues.URL = window.location.origin + (baseHREF !== '/' ? baseHREF : '');
+        let url;
+
+        if (window.location.origin.startsWith('http')) {
+          const path = baseHref() !== '/' ? path : '';
+          url = `${window.location.origin}${path}`;
+        } else {
+          url = baseHref().replace(/\/$/, '');
+        }
+
+        $scope.formValues.URL = url;
       };
 
       $scope.resetEndpointURL = function () {
@@ -108,6 +103,19 @@ angular
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to create tag');
         }
+      }
+
+      function onChangeCheckInInterval(value) {
+        setFieldValue('EdgeCheckinInterval', value);
+      }
+
+      function setFieldValue(name, value) {
+        return $scope.$evalAsync(() => {
+          $scope.formValues = {
+            ...$scope.formValues,
+            [name]: value,
+          };
+        });
       }
 
       $scope.addDockerEndpoint = function () {
@@ -310,11 +318,49 @@ angular
             $scope.availableTags = data.tags;
 
             const settings = data.settings;
-            $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
+
+            $scope.agentSecret = settings.AgentSecret;
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to load groups');
           });
+      }
+
+      function agentLinuxSwarmCommand(agentSecret) {
+        let secret = agentSecret == '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
+        return `
+docker network create \\
+  --driver overlay \\
+  portainer_agent_network
+
+docker service create \\
+  --name portainer_agent \\
+  --network portainer_agent_network \\
+  -p 9001:9001/tcp ${secret}\\
+  --mode global \\
+  --constraint 'node.platform.os == linux' \\
+  --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \\
+  --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
+  portainer/agent:${agentVersion}
+  `;
+      }
+
+      function agentWindowsSwarmCommand(agentSecret) {
+        let secret = agentSecret == '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
+        return `
+docker network create \\
+  --driver overlay \\
+  portainer_agent_network && \\
+docker service create \\
+  --name portainer_agent \\
+  --network portainer_agent_network \\
+  -p 9001:9001/tcp  ${secret}\\
+  --mode global \\
+  --constraint 'node.platform.os == windows' \\
+  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
+  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
+  portainer/agent:${agentVersion}
+  `;
       }
 
       initView();
