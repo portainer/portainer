@@ -10,7 +10,6 @@ import { PageHeader } from '@/portainer/components/PageHeader';
 import { Button } from '@/portainer/components/Button';
 import { Environment, EnvironmentId } from '@/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-import { r2a } from '@/react-tools/react2angular';
 import { FormSection } from '@/portainer/components/form-components/FormSection';
 
 import { environmentTypes } from '../EnvironmentTypeSelectView/environment-types';
@@ -62,7 +61,7 @@ export function EnvironmentCreationView() {
           <WidgetBody>
             <Stepper steps={steps} currentStep={currentStepIndex + 1} />
 
-            <div className="mt-24">
+            <div className="mt-12">
               <FormSection
                 title={`Connect to your ${currentStep.title}
                     environment`}
@@ -198,5 +197,3 @@ function useAnalyticsState() {
     }));
   }
 }
-
-export const EnvironmentCreationViewAngular = r2a(EnvironmentCreationView, []);

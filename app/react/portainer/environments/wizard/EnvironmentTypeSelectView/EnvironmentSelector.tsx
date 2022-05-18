@@ -1,5 +1,4 @@
 import { FormSection } from '@/portainer/components/form-components/FormSection';
-import { r2a } from '@/react-tools/react2angular';
 
 import { Option } from '../components/Option';
 
@@ -45,8 +44,3 @@ export function EnvironmentSelector({ value, onChange }: Props) {
     onChange([...value, eType]);
   }
 }
-
-export const EnvironmentSelectorAngular = r2a(EnvironmentSelector, [
-  'value',
-  'onChange',
-]);

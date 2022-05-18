@@ -5,7 +5,6 @@ import { Code } from '@/portainer/components/Code';
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { NavTabs } from '@/portainer/components/NavTabs/NavTabs';
 import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
-import { r2a } from '@/react-tools/react2angular';
 import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
 
 const deployments = [
@@ -69,8 +68,6 @@ export function DeploymentScripts() {
     </>
   );
 }
-
-export const AgentEnvironmentAngular = r2a(DeploymentScripts, []);
 
 function kubeNodePortCommand(agentVersion: string) {
   const agentShortVersion = getAgentShortVersion(agentVersion);

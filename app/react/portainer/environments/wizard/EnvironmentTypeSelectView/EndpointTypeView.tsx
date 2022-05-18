@@ -6,7 +6,6 @@ import { Button } from '@/portainer/components/Button';
 import { PageHeader } from '@/portainer/components/PageHeader';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-import { r2a } from '@/react-tools/react2angular';
 
 import {
   EnvironmentSelector,
@@ -71,8 +70,3 @@ export function EnvironmentTypeSelectView() {
     });
   }
 }
-
-export const EnvironmentTypeSelectViewAngular = r2a(
-  EnvironmentTypeSelectView,
-  []
-);

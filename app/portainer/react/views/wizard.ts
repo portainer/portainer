@@ -2,20 +2,18 @@ import angular from 'angular';
 import { StateRegistry } from '@uirouter/angularjs';
 
 import { r2a } from '@/react-tools/react2angular';
-
-import { EnvironmentCreationViewAngular } from './EnvironmentsCreationView';
-import { EnvironmentTypeSelectViewAngular } from './EnvironmentTypeSelectView';
-import { HomeView } from './HomeView';
+import {
+  EnvironmentCreationView,
+  EnvironmentTypeSelectView,
+  HomeView,
+} from '@/react/portainer/environments/wizard';
 
 export const wizardModule = angular
-  .module('portainer.app.wizard', [])
+  .module('portainer.app.react.views.wizard', [])
+  .component('wizardEnvironmentCreationView', r2a(EnvironmentCreationView, []))
   .component(
     'wizardEnvironmentTypeSelectView',
-    EnvironmentTypeSelectViewAngular
-  )
-  .component(
-    'wizardEnvironmentCreationViewAngular',
-    EnvironmentCreationViewAngular
+    r2a(EnvironmentTypeSelectView, [])
   )
   .component('wizardMainView', r2a(HomeView, []))
   .config(config).name;
@@ -36,7 +34,7 @@ function config($stateRegistryProvider: StateRegistry) {
     url: '/create?envType',
     views: {
       'content@': {
-        component: 'wizardEnvironmentCreationViewAngular',
+        component: 'wizardEnvironmentCreationView',
       },
     },
     params: {

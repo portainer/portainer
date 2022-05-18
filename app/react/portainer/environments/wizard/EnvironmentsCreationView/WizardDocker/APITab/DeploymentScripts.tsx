@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { CopyButton } from '@/portainer/components/Button/CopyButton';
 import { Code } from '@/portainer/components/Code';
 import { NavTabs } from '@/portainer/components/NavTabs/NavTabs';
-import { r2a } from '@/react-tools/react2angular';
 import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
 
 const deployments = [
@@ -42,8 +41,6 @@ export function DeploymentScripts() {
     />
   );
 }
-
-export const AgentEnvironmentAngular = r2a(DeploymentScripts, []);
 
 interface DeployCodeProps {
   code: string;
