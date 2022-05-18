@@ -1,34 +1,21 @@
 import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
+import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 
 export interface Props {
-  onSaveSettings(): void;
-  saveButtonState: boolean;
-  saveButtonDisabled?: boolean;
-  limitedFeatureId?: string;
-  limitedFeatureClass?: string;
-  className?: string;
+  onSubmit(): void;
+  isLoading: boolean;
 }
 
-export function SaveAuthSettingsButton({
-  onSaveSettings,
-  saveButtonDisabled,
-  saveButtonState,
-  limitedFeatureId,
-  limitedFeatureClass,
-  className,
-}: Props) {
+export function SaveAuthSettingsButton({ onSubmit, isLoading }: Props) {
   return (
     <>
-      <div className="col-sm-12 form-section-title"> Actions </div>
+      <FormSectionTitle>Actions</FormSectionTitle>
       <div className="form-group">
         <div className="col-sm-12">
           <LoadingButton
-            disabled={saveButtonDisabled}
             loadingText="Saving..."
-            isLoading={saveButtonState}
-            className={className}
-            onClick={() => onSaveSettings()}
-            {...{ limitedFeatureId, limitedFeatureClass }}
+            isLoading={isLoading}
+            onClick={() => onSubmit()}
           >
             Save settings
           </LoadingButton>
