@@ -26,7 +26,7 @@
           </div>
           <!-- !name-input -->
           <!-- registry-url-input -->
-          <div class="form-group">
+          <div class="form-group" ng-if="registry.Type !== RegistryTypes.DOCKERHUB && registry.Type !== RegistryTypes.QUAY && registry.Type !== RegistryTypes.GITLAB">
             <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
               Registry URL
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry. Any protocol or trailing slash will be stripped if present.">
@@ -39,7 +39,15 @@
           <!-- !registry-url-input -->
 
           <!-- authentication-checkbox -->
-          <div class="form-group" ng-if="$ctrl.registry.Type !== $ctrl.RegistryTypes.PROGET">
+          <div
+            class="form-group"
+            ng-if="
+              $ctrl.registry.Type !== $ctrl.RegistryTypes.DOCKERHUB &&
+              $ctrl.registry.Type !== $ctrl.RegistryTypes.QUAY &&
+              $ctrl.registry.Type !== $ctrl.RegistryTypes.PROGET &&
+              $ctrl.registry.Type !== $ctrl.RegistryTypes.AZURE
+            "
+          >
             <div class="col-sm-12">
               <label for="registry_auth" class="control-label text-left">
                 Authentication
