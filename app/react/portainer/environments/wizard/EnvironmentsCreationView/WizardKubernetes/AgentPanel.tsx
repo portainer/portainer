@@ -1,12 +1,11 @@
 import { Environment } from '@/portainer/environments/types';
 
-import { AgentForm } from '../shared/AgentForm/AgentForm';
-import { AnalyticsStateKey } from '../types';
+import { AgentForm } from '../shared/AgentForm';
 
 import { DeploymentScripts } from './DeploymentScripts';
 
 interface Props {
-  onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
+  onCreate(environment: Environment): void;
 }
 
 export function AgentPanel({ onCreate }: Props) {
@@ -14,9 +13,7 @@ export function AgentPanel({ onCreate }: Props) {
     <>
       <DeploymentScripts />
 
-      <AgentForm
-        onCreate={(environment) => onCreate(environment, 'kubernetesAgent')}
-      />
+      <AgentForm onCreate={onCreate} />
     </>
   );
 }

@@ -1,17 +1,28 @@
 import { useState } from 'react';
 
-import { useStatus } from '@/portainer/services/api/status.service';
 import { r2a } from '@/react-tools/react2angular';
-import { useSettings } from '@/portainer/settings/queries';
 
 import { EdgePropertiesForm } from './EdgePropertiesForm';
 import { ScriptTabs } from './ScriptTabs';
 import { EdgeProperties } from './types';
+import { commandsTabs } from './scripts';
 
 interface Props {
   edgeKey: string;
   edgeId?: string;
 }
+
+const linuxCommands = [
+  commandsTabs.k8sLinux,
+  commandsTabs.swarmLinux,
+  commandsTabs.standaloneLinux,
+  commandsTabs.nomadLinux,
+];
+
+const windowsCommands = [
+  commandsTabs.swarmWindows,
+  commandsTabs.standaloneWindow,
+];
 
 export function EdgeScriptForm({ edgeKey, edgeId }: Props) {
   const [edgeProperties, setEdgeProperties] = useState<EdgeProperties>({
@@ -22,39 +33,31 @@ export function EdgeScriptForm({ edgeKey, edgeId }: Props) {
     platform: 'k8s',
   });
 
-  const settingsQuery = useSettings((settings) => settings.AgentSecret);
-
-  const versionQuery = useStatus((status) => status.Version);
-
-  if (!versionQuery.data) {
-    return null;
-  }
-
-  const agentVersion = versionQuery.data;
-  const agentSecret = settingsQuery.data;
+  const commands =
+    edgeProperties.os === 'linux' ? linuxCommands : windowsCommands;
 
   return (
     <>
       <EdgePropertiesForm
-        setFieldValue={(key, value) =>
-          setEdgeProperties({ ...edgeProperties, [key]: value })
-        }
+        setFieldValue={handleChange}
         values={edgeProperties}
         hideIdGetter={edgeId !== undefined}
       />
 
       <ScriptTabs
+        commands={commands}
         values={edgeProperties}
-        agentVersion={agentVersion}
         edgeKey={edgeKey}
-        onPlatformChange={(platform) =>
-          setEdgeProperties({ ...edgeProperties, platform })
-        }
+        onPlatformChange={(value) => handleChange('platform', value)}
+        platform={edgeProperties.platform}
         edgeId={edgeId}
-        agentSecret={agentSecret}
       />
     </>
   );
+
+  function handleChange<T>(key: string, value: T) {
+    setEdgeProperties((props) => ({ ...props, [key]: value }));
+  }
 }
 
 export const EdgeScriptFormAngular = r2a(EdgeScriptForm, ['edgeKey', 'edgeId']);

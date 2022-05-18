@@ -11,6 +11,7 @@ interface Props {
   isDefaultHidden?: boolean;
   label?: string;
   tooltip?: string;
+  readonly?: boolean;
 }
 
 export const checkinIntervalOptions = [
@@ -34,6 +35,7 @@ export const checkinIntervalOptions = [
 
 export function EdgeCheckinIntervalField({
   value,
+  readonly,
   onChange,
   isDefaultHidden = false,
   label = 'Poll frequency',
@@ -49,6 +51,7 @@ export function EdgeCheckinIntervalField({
           onChange(parseInt(e.currentTarget.value, 10));
         }}
         options={options}
+        disabled={readonly}
       />
     </FormControl>
   );

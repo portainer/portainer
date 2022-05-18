@@ -23,7 +23,7 @@ export function EdgePropertiesForm({
       <FormSectionTitle>Edge agent deployment script</FormSectionTitle>
 
       <OsSelector
-        value={values.os}
+        value={values.os || 'linux'}
         onChange={(os) => setFieldValue('os', os)}
       />
 
