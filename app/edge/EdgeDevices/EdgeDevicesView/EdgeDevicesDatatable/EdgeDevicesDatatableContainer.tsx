@@ -4,7 +4,7 @@ import {
   TableSettingsProvider,
   useTableSettings,
 } from '@/portainer/components/datatables/components/useTableSettings';
-import { useEnvironmentList } from '@/portainer/environments/queries';
+import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
 import { Environment } from '@/portainer/environments/types';
 import { useSearchBarState } from '@/portainer/components/datatables/components/SearchBar';
 import { useDebounce } from '@/portainer/hooks/useDebounce';

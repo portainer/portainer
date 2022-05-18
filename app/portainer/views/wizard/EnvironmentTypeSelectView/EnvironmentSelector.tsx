@@ -1,7 +1,8 @@
 import { FormSection } from '@/portainer/components/form-components/FormSection';
 import { r2a } from '@/react-tools/react2angular';
 
-import { EnvironmentSelectorItem } from './EnvironmentSelectorItem';
+import { Option } from '../components/Option';
+
 import { environmentTypes } from './environment-types';
 
 export type Value = typeof environmentTypes[number]['id'];
@@ -21,7 +22,7 @@ export function EnvironmentSelector({ value, onChange }: Props) {
         </p>
         <div className="col-sm-12">
           {environmentTypes.map((eType) => (
-            <EnvironmentSelectorItem
+            <Option
               key={eType.id}
               title={eType.title}
               description={eType.description}

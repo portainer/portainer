@@ -11,19 +11,19 @@ interface Meta {
   tagIds?: TagId[];
 }
 
-interface CreateLocalEnvironment {
+interface CreateLocalDockerEnvironment {
   name: string;
   socketPath?: string;
   publicUrl?: string;
   meta?: Meta;
 }
 
-export async function createLocalEnvironment({
-  name = 'local',
+export async function createLocalDockerEnvironment({
+  name,
   socketPath = '',
   publicUrl = '',
   meta = { tagIds: [] },
-}: CreateLocalEnvironment) {
+}: CreateLocalDockerEnvironment) {
   const url = prefixPath(socketPath);
 
   return createEnvironment(
@@ -32,7 +32,7 @@ export async function createLocalEnvironment({
     {
       url,
       publicUrl,
-      ...meta,
+      meta,
     }
   );
 
@@ -56,13 +56,13 @@ interface CreateLocalKubernetesEnvironment {
 }
 
 export async function createLocalKubernetesEnvironment({
-  name = 'local',
+  name,
   meta = { tagIds: [] },
 }: CreateLocalKubernetesEnvironment) {
   return createEnvironment(
     name,
     EnvironmentCreationTypes.LocalKubernetesEnvironment,
-    { ...meta, tls: { skipClientVerify: true, skipVerify: true } }
+    { meta, tls: { skipClientVerify: true, skipVerify: true } }
   );
 }
 
@@ -84,7 +84,7 @@ export async function createAzureEnvironment({
   meta = { tagIds: [] },
 }: CreateAzureEnvironment) {
   return createEnvironment(name, EnvironmentCreationTypes.AzureEnvironment, {
-    ...meta,
+    meta,
     azure,
   });
 }
@@ -145,7 +145,7 @@ export function createAgentEnvironment({
     url: environmentUrl,
     creationType: EnvironmentCreationTypes.AgentEnvironment,
     options: {
-      ...meta,
+      meta,
       tls: {
         skipVerify: true,
         skipClientVerify: true,

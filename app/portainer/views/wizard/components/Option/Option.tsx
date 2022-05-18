@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { ComponentType } from 'react';
 
-import styles from './EnvironmentSelectorItem.module.css';
+import styles from './Option.module.css';
 
 export interface SelectorItemType {
   icon: string | ComponentType<{ selected?: boolean; className?: string }>;
@@ -10,16 +10,16 @@ export interface SelectorItemType {
 }
 
 interface Props extends SelectorItemType {
-  active: boolean;
-  onClick(): void;
+  active?: boolean;
+  onClick?(): void;
 }
 
-export function EnvironmentSelectorItem({
+export function Option({
   icon,
   active,
   description,
   title,
-  onClick,
+  onClick = () => {},
 }: Props) {
   const Icon = typeof icon !== 'string' ? icon : null;
 

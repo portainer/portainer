@@ -2,18 +2,23 @@ import { useQueryClient, useMutation, MutationFunction } from 'react-query';
 
 import {
   createRemoteEnvironment,
-  createLocalEnvironment,
+  createLocalDockerEnvironment,
   createAzureEnvironment,
   createAgentEnvironment,
   createEdgeAgentEnvironment,
+  createLocalKubernetesEnvironment,
 } from '../environment.service/create';
 
 export function useCreateAzureEnvironmentMutation() {
   return useGenericCreationMutation(createAzureEnvironment);
 }
 
-export function useCreateLocalEnvironmentMutation() {
-  return useGenericCreationMutation(createLocalEnvironment);
+export function useCreateLocalDockerEnvironmentMutation() {
+  return useGenericCreationMutation(createLocalDockerEnvironment);
+}
+
+export function useCreateLocalKubernetesEnvironmentMutation() {
+  return useGenericCreationMutation(createLocalKubernetesEnvironment);
 }
 
 export function useCreateRemoteEnvironmentMutation(
