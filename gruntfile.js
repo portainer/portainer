@@ -26,6 +26,7 @@ module.exports = function (grunt) {
       helmVersion: 'v3.8.0',
       komposeVersion: 'v1.22.0',
       kubectlVersion: 'v1.18.0',
+      busyboxVersion: 'v1.34.1',
     },
     env: gruntConfig.env,
     clean: gruntConfig.clean,
@@ -73,6 +74,7 @@ module.exports = function (grunt) {
       `shell:download_helm_binary:${platform}:${a}`,
       `shell:download_kompose_binary:${platform}:${a}`,
       `shell:download_kubectl_binary:${platform}:${a}`,
+      `shell:download_busybox_binary`,
     ]);
   });
 };
@@ -108,11 +110,14 @@ gruntConfig.clean = {
 gruntConfig.shell = {
   build_binary: { command: shell_build_binary },
   build_binary_azuredevops: { command: shell_build_binary_azuredevops },
-  download_docker_binary: { command: shell_download_docker_binary },
-  download_kompose_binary: { command: shell_download_kompose_binary },
-  download_kubectl_binary: { command: shell_download_kubectl_binary },
-  download_helm_binary: { command: shell_download_helm_binary },
-  download_docker_compose_binary: { command: shell_download_docker_compose_binary },
+  // Include current environment variables in shell scripts to allow for
+  // passing HTTP proxy settings
+  download_docker_binary: { command: shell_download_docker_binary, options: { env: process.env } },
+  download_kompose_binary: { command: shell_download_kompose_binary, options: { env: process.env } },
+  download_kubectl_binary: { command: shell_download_kubectl_binary, options: { env: process.env } },
+  download_helm_binary: { command: shell_download_helm_binary, options: { env: process.env } },
+  download_docker_compose_binary: { command: shell_download_docker_compose_binary, options: { env: process.env } },
+  download_busybox_binary: { command: shell_download_busybox_binary, options: { env: process.env } },
   run_container: { command: shell_run_container },
   run_localserver: { command: shell_run_localserver, options: { async: true } },
   install_yarndeps: { command: shell_install_yarndeps },
@@ -261,6 +266,18 @@ function shell_download_kubectl_binary(platform, arch) {
       echo "kubectl binary exists";
     else
       build/download_kubectl_binary.sh ${platform} ${arch} ${binaryVersion};
+    fi
+  `;
+}
+
+function shell_download_busybox_binary() {
+  var binaryVersion = '<%= binaries.busyboxVersion %>';
+
+  return `
+    if [ -f dist/busybox.tar ]; then
+      echo "busybox binary exists";
+    else
+      build/download_busybox_binary.sh ${binaryVersion};
     fi
   `;
 }

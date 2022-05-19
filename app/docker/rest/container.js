@@ -52,6 +52,14 @@ angular.module('portainer.docker').factory('Container', [
           transformResponse: genericHandler,
           ignoreLoadingBar: true,
         },
+        copyTo: {
+          method: 'PUT',
+          params: { id: '@id', action: 'archive' },
+          headers: { 'content-type': 'application/tar' },
+          transformRequest: [],
+          transformResponse: genericHandler,
+          ignoreLoadingBar: true,
+        },
         inspect: {
           method: 'GET',
           params: { id: '@id', action: 'json' },

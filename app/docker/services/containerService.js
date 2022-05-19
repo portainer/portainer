@@ -9,6 +9,7 @@ import {
   startContainer,
   stopContainer,
 } from '@/docker/containers/containers.service';
+import { startExec } from '@/docker/exec/exec.service';
 import { ContainerDetailsViewModel, ContainerStatsViewModel, ContainerViewModel } from '../models/container';
 
 angular.module('portainer.docker').factory('ContainerService', ContainerServiceFactory);
@@ -24,6 +25,7 @@ function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointPro
     startContainer: withEndpointId(startContainer),
     stopContainer: withEndpointId(stopContainer),
     remove: withEndpointId(removeContainer),
+    startExec: withEndpointId(startExec),
     updateRestartPolicy,
     updateLimits,
   };
@@ -131,6 +133,48 @@ function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointPro
     var deferred = $q.defer();
 
     Container.exec({}, execConfig)
+      .$promise.then(function success(data) {
+        if (data.message) {
+          deferred.reject({ msg: data.message, err: data.message });
+        } else {
+          deferred.resolve(data);
+        }
+      })
+      .catch(function error(err) {
+        deferred.reject(err);
+      });
+
+    return deferred.promise;
+  };
+
+  service.createAndStartExec = function (execConfig) {
+    var deferred = $q.defer();
+    var exec;
+    service
+      .createExec(execConfig)
+      .then(function success(data) {
+        exec = data;
+        return service.startExec(exec.Id);
+      })
+      .then(function success() {
+        deferred.resolve(exec);
+      })
+      .catch(function error(err) {
+        deferred.reject(err);
+      });
+    return deferred.promise;
+  };
+
+  service.copyTo = function (id, path, archive) {
+    var deferred = $q.defer();
+
+    var parameters = {
+      id: id,
+      path: path || '/',
+      noOverwriteDirNonDir: 'true',
+    };
+
+    Container.copyTo(parameters, archive)
       .$promise.then(function success(data) {
         if (data.message) {
           deferred.reject({ msg: data.message, err: data.message });

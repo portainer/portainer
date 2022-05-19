@@ -38,6 +38,13 @@
               <label for="command" class="text-left control-label">Use custom command</label>
               <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="formValues.isCustomCommand" /><i></i> </label>
             </div>
+            <div class="form-group col-lg-12" ng-if="imageOS == 'linux'">
+              <label for="command" class="text-left control-label">
+                Inject busybox commands
+                <portainer-tooltip position="bottom" message="Provides common shell and file utils; Useful for scratch containers"></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-change="onToggleBusybox()" ng-model="formValues.isUsingBusybox" /><i></i> </label>
+            </div>
             <div class="form-group">
               <label class="col-lg-1 text-left col-sm-2 control-label">
                 User

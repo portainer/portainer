@@ -151,6 +151,7 @@ module.exports = {
           from: 'translations',
           to: 'locales',
         },
+        'dist/busybox.tar',
       ],
     }),
   ],
