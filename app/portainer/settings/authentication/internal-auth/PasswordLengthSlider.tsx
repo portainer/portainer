@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-nested-ternary */
 import { useEffect, useState } from 'react';
 import RcSlider from 'rc-slider';
 import clsx from 'clsx';
@@ -26,31 +24,40 @@ export function PasswordLengthSlider({ min, max, step, defaultValue }: Props) {
     labelColor: '',
   });
 
+  const icons: Record<string, string> = {
+    Weak: 'fa-times-circle',
+    Good: 'fa-check-circle',
+    Strong: 'fa-check-circle',
+    'Very strong': 'fa-lock',
+  };
+
+  const colors: Record<string, string> = {
+    Weak: 'red',
+    Good: 'yellow',
+    Strong: 'green',
+    'Very strong': 'blue',
+  };
+
+  function getPasswordStrength(value: number) {
+    let strength;
+
+    if (value < 10) {
+      strength = 'Weak';
+    } else if (value < 12) {
+      strength = 'Good';
+    } else if (value < 14) {
+      strength = 'Strong';
+    } else {
+      strength = 'Very strong';
+    }
+
+    return strength;
+  }
+
   useEffect(() => {
-    const icon =
-      defaultValue < 10
-        ? 'fa-times-circle'
-        : defaultValue < 12
-        ? 'fa-check-circle'
-        : defaultValue < 14
-        ? 'fa-check-circle'
-        : 'fa-lock';
-    const strength =
-      defaultValue < 10
-        ? 'Weak'
-        : defaultValue < 12
-        ? 'Good'
-        : defaultValue < 14
-        ? 'Strong'
-        : 'Very strong';
-    const labelColor =
-      defaultValue < 10
-        ? 'red'
-        : defaultValue < 12
-        ? 'yellow'
-        : defaultValue < 14
-        ? 'green'
-        : 'blue';
+    const strength = getPasswordStrength(defaultValue);
+    const icon = icons[strength];
+    const labelColor = colors[strength];
 
     setLabelProperties({
       sliderValue: defaultValue,
@@ -58,33 +65,13 @@ export function PasswordLengthSlider({ min, max, step, defaultValue }: Props) {
       strength,
       labelColor,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultValue]);
 
   function onAfterChange(value: number) {
-    const icon =
-      value < 10
-        ? 'fa-times-circle'
-        : value < 12
-        ? 'fa-check-circle'
-        : value < 14
-        ? 'fa-check-circle'
-        : 'fa-lock';
-    const strength =
-      value < 10
-        ? 'Weak'
-        : value < 12
-        ? 'Good'
-        : value < 14
-        ? 'Strong'
-        : 'Very strong';
-    const labelColor =
-      value < 10
-        ? 'red'
-        : value < 12
-        ? 'yellow'
-        : value < 14
-        ? 'green'
-        : 'blue';
+    const strength = getPasswordStrength(value);
+    const icon = icons[strength];
+    const labelColor = colors[strength];
 
     setLabelProperties({ sliderValue: value, icon, strength, labelColor });
   }
