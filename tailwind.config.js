@@ -4,6 +4,6 @@ module.exports = {
     preflight: false,
   },
   theme: {
-    colors: {},
+    colors: { transparent: 'transparent', current: 'currentColor', white: '#ffffff' },
   },
 };

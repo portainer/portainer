@@ -6,7 +6,7 @@ import { type Environment, EnvironmentCreationTypes } from '../types';
 
 import { arrayToJson, buildUrl, json2formData } from './utils';
 
-interface Meta {
+export interface EnvironmentMetadata {
   groupId?: EnvironmentGroupId;
   tagIds?: TagId[];
 }
@@ -15,7 +15,7 @@ interface CreateLocalDockerEnvironment {
   name: string;
   socketPath?: string;
   publicUrl?: string;
-  meta?: Meta;
+  meta?: EnvironmentMetadata;
 }
 
 export async function createLocalDockerEnvironment({
@@ -52,7 +52,7 @@ export async function createLocalDockerEnvironment({
 
 interface CreateLocalKubernetesEnvironment {
   name: string;
-  meta?: Meta;
+  meta?: EnvironmentMetadata;
 }
 
 export async function createLocalKubernetesEnvironment({
@@ -75,7 +75,7 @@ interface AzureSettings {
 interface CreateAzureEnvironment {
   name: string;
   azure: AzureSettings;
-  meta?: Meta;
+  meta?: EnvironmentMetadata;
 }
 
 export async function createAzureEnvironment({
@@ -100,7 +100,7 @@ interface TLSSettings {
 export interface EnvironmentOptions {
   url?: string;
   publicUrl?: string;
-  meta?: Meta;
+  meta?: EnvironmentMetadata;
   checkinInterval?: number;
   azure?: AzureSettings;
   tls?: TLSSettings;
@@ -129,17 +129,17 @@ export async function createRemoteEnvironment({
   });
 }
 
-interface CreateAgentEnvironment {
+export interface CreateAgentEnvironmentValues {
   name: string;
   environmentUrl: string;
-  meta?: Meta;
+  meta: EnvironmentMetadata;
 }
 
 export function createAgentEnvironment({
   name,
   environmentUrl,
   meta = { tagIds: [] },
-}: CreateAgentEnvironment) {
+}: CreateAgentEnvironmentValues) {
   return createRemoteEnvironment({
     name,
     url: environmentUrl,
@@ -157,7 +157,7 @@ export function createAgentEnvironment({
 interface CreateEdgeAgentEnvironment {
   name: string;
   portainerUrl: string;
-  meta?: Meta;
+  meta?: EnvironmentMetadata;
   pollFrequency: number;
 }
 

@@ -1,3 +1,5 @@
+import { EnvironmentMetadata } from '@/portainer/environments/environment.service/create';
+
 export interface FormValues {
   name: string;
   url: string;
@@ -6,4 +8,5 @@ export interface FormValues {
   caCertFile?: File;
   certFile?: File;
   keyFile?: File;
+  meta: EnvironmentMetadata;
 }

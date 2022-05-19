@@ -1,6 +1,6 @@
 import { Field, Form, Formik } from 'formik';
 import { useReducer, useState } from 'react';
-import { object, string } from 'yup';
+import { object, SchemaOf, string } from 'yup';
 
 import { BoxSelector, buildOption } from '@/portainer/components/BoxSelector';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
@@ -9,15 +9,30 @@ import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { useCreateAzureEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/portainer/environments/types';
+import { EnvironmentMetadata } from '@/portainer/environments/environment.service/create';
 
 import { NameField } from '../shared/NameField';
 import { AnalyticsStateKey } from '../types';
+import { MetadataFieldset } from '../shared/MetadataFieldset';
+import { metadataValidation } from '../shared/MetadataFieldset/validation';
 
-const initialValues = {
+interface FormValues {
+  name: string;
+  applicationId: string;
+  tenantId: string;
+  authenticationKey: string;
+  meta: EnvironmentMetadata;
+}
+
+const initialValues: FormValues = {
   name: '',
   applicationId: '',
   tenantId: '',
-  authKey: '',
+  authenticationKey: '',
+  meta: {
+    groupId: 1,
+    tagIds: [],
+  },
 };
 
 const options = [buildOption('api', 'fa fa-bolt', 'API', '', 'api')];
@@ -41,7 +56,7 @@ export function WizardAzure({ onCreate }: Props) {
         value={creationType}
       />
 
-      <Formik
+      <Formik<FormValues>
         initialValues={initialValues}
         onSubmit={handleSubmit}
         key={formKey}
@@ -82,17 +97,19 @@ export function WizardAzure({ onCreate }: Props) {
 
             <FormControl
               label="Authentication Key"
-              errors={errors.authKey}
-              inputId="authKey-input"
+              errors={errors.authenticationKey}
+              inputId="authenticationKey-input"
               required
             >
               <Field
-                name="authKey"
-                id="authKey-input"
+                name="authenticationKey"
+                id="authenticationKey-input"
                 as={Input}
                 placeholder="cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
               />
             </FormControl>
+
+            <MetadataFieldset />
 
             <div className="row">
               <div className="col-sm-12">
@@ -111,15 +128,22 @@ export function WizardAzure({ onCreate }: Props) {
     </div>
   );
 
-  function handleSubmit(values: typeof initialValues) {
+  function handleSubmit({
+    applicationId,
+    authenticationKey,
+    meta,
+    name,
+    tenantId,
+  }: typeof initialValues) {
     mutation.mutate(
       {
-        name: values.name,
+        name,
         azure: {
-          applicationId: values.applicationId,
-          authenticationKey: values.authKey,
-          tenantId: values.tenantId,
+          applicationId,
+          authenticationKey,
+          tenantId,
         },
+        meta,
       },
       {
         onSuccess(environment) {
@@ -132,11 +156,12 @@ export function WizardAzure({ onCreate }: Props) {
   }
 }
 
-function validationSchema() {
+function validationSchema(): SchemaOf<FormValues> {
   return object({
     name: string().required('Name is required'),
     applicationId: string().required('Application ID is required'),
     tenantId: string().required('Tenant ID is required'),
-    authKey: string().required('Authentication Key is required'),
+    authenticationKey: string().required('Authentication Key is required'),
+    meta: metadataValidation(),
   });
 }

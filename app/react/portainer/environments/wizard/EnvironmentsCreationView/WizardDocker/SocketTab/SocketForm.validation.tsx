@@ -1,15 +1,22 @@
-import { boolean, object, string } from 'yup';
+import { boolean, object, SchemaOf, string } from 'yup';
 
-export function validation() {
+import { metadataValidation } from '../../shared/MetadataFieldset/validation';
+
+import { FormValues } from './types';
+
+export function validation(): SchemaOf<FormValues> {
   return object({
     name: string().required('This field is required.'),
-    overridePath: boolean(),
-    socketPath: string().when('overridePath', (overridePath, schema) =>
-      overridePath
-        ? schema.required(
-            'Socket Path is required when override path is enabled'
-          )
-        : schema
-    ),
+    meta: metadataValidation(),
+    overridePath: boolean().default(false),
+    socketPath: string()
+      .default('')
+      .when('overridePath', (overridePath, schema) =>
+        overridePath
+          ? schema.required(
+              'Socket Path is required when override path is enabled'
+            )
+          : schema
+      ),
   });
 }

@@ -10,6 +10,7 @@ import { SwitchField } from '@/portainer/components/form-components/SwitchField'
 import { Environment } from '@/portainer/environments/types';
 
 import { NameField } from '../../shared/NameField';
+import { MetadataFieldset } from '../../shared/MetadataFieldset';
 
 import { validation } from './SocketForm.validation';
 import { FormValues } from './types';
@@ -24,6 +25,7 @@ export function SocketForm({ onCreate }: Props) {
     name: '',
     socketPath: '',
     overridePath: false,
+    meta: { groupId: 1, tagIds: [] },
   };
 
   const mutation = useCreateLocalDockerEnvironmentMutation();
@@ -41,6 +43,8 @@ export function SocketForm({ onCreate }: Props) {
           <NameField />
 
           <OverrideSocketFieldset />
+
+          <MetadataFieldset />
 
           <div className="form-group">
             <div className="col-sm-12">

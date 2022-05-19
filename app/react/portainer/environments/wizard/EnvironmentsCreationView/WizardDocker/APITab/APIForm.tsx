@@ -12,6 +12,7 @@ import {
 } from '@/portainer/environments/types';
 
 import { NameField } from '../../shared/NameField';
+import { MetadataFieldset } from '../../shared/MetadataFieldset';
 
 import { validation } from './APIForm.validation';
 import { FormValues } from './types';
@@ -27,6 +28,10 @@ export function APIForm({ onCreate }: Props) {
     url: '',
     name: '',
     tls: false,
+    meta: {
+      groupId: 1,
+      tagIds: [],
+    },
   };
 
   const mutation = useCreateRemoteEnvironmentMutation(
@@ -56,6 +61,8 @@ export function APIForm({ onCreate }: Props) {
 
           <TLSFieldset />
 
+          <MetadataFieldset />
+
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
@@ -82,6 +89,7 @@ export function APIForm({ onCreate }: Props) {
         url: values.url,
         options: {
           tls,
+          meta: values.meta,
         },
       },
       {

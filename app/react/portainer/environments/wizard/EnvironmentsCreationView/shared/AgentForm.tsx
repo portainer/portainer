@@ -5,26 +5,28 @@ import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { useCreateAgentEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/portainer/environments/types';
+import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
 
 import { NameField } from './NameField';
 import { EnvironmentUrlField } from './EnvironmentUrlField';
 import { validation } from './AgentForm.validation';
-
-interface FormValues {
-  name: string;
-  environmentUrl: string;
-}
+import { MetadataFieldset } from './MetadataFieldset';
 
 interface Props {
   onCreate(environment: Environment): void;
 }
 
+const initialValues: CreateAgentEnvironmentValues = {
+  environmentUrl: '',
+  name: '',
+  meta: {
+    groupId: 1,
+    tagIds: [],
+  },
+};
+
 export function AgentForm({ onCreate }: Props) {
   const [formKey, clearForm] = useReducer((state) => state + 1, 0);
-  const initialValues = {
-    environmentUrl: '',
-    name: '',
-  };
 
   const mutation = useCreateAgentEnvironmentMutation();
 
@@ -40,6 +42,8 @@ export function AgentForm({ onCreate }: Props) {
         <Form>
           <NameField />
           <EnvironmentUrlField />
+
+          <MetadataFieldset />
 
           <div className="form-group">
             <div className="col-sm-12">
@@ -58,7 +62,7 @@ export function AgentForm({ onCreate }: Props) {
     </Formik>
   );
 
-  function handleSubmit(values: FormValues) {
+  function handleSubmit(values: CreateAgentEnvironmentValues) {
     mutation.mutate(values, {
       onSuccess(environment) {
         notifySuccess('Environment created', environment.Name);
