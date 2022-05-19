@@ -2,10 +2,13 @@
 /* eslint-disable no-nested-ternary */
 import { useEffect, useState } from 'react';
 import RcSlider from 'rc-slider';
+import clsx from 'clsx';
 
 import { Badge } from '@/portainer/components/Badge/Badge';
 
 import 'rc-slider/assets/index.css';
+
+import styles from './PasswordLengthSlider.module.css';
 
 export interface Props {
   min: number;
@@ -57,7 +60,7 @@ export function PasswordLengthSlider({ min, max, step, defaultValue }: Props) {
     });
   }, [defaultValue]);
 
-  function onChange(value: number) {
+  function onAfterChange(value: number) {
     const icon =
       value < 10
         ? 'fa-times-circle'
@@ -94,13 +97,12 @@ export function PasswordLengthSlider({ min, max, step, defaultValue }: Props) {
           min={min}
           max={max}
           step={step}
-          defaultValue={defaultValue}
-          value={labelProperties.sliderValue}
-          onChange={onChange}
+          defaultValue={labelProperties.sliderValue}
+          onAfterChange={onAfterChange}
         />
       </div>
 
-      <div className="col-sm-2">
+      <div className={clsx('col-sm-2', styles.sliderBadge)}>
         <Badge
           value={`${labelProperties.strength} password`}
           icon={`far ${labelProperties.icon} space-right`}
