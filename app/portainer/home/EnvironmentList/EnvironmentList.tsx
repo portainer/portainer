@@ -27,7 +27,10 @@ import {
 } from '@/portainer/components/datatables/components';
 import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
-import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
+import {
+  refetchIfAnyOffline,
+  useEnvironmentList,
+} from '@/portainer/environments/queries/useEnvironmentList';
 import { useGroups } from '@/portainer/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
 import { Filter } from '@/portainer/home/types';
@@ -135,7 +138,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
         edgeDeviceFilter: 'none',
         tagsPartialMatch: true,
       },
-      true
+      refetchIfAnyOffline
     );
 
   useEffect(() => {

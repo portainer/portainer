@@ -29,6 +29,7 @@ function renderComponent(
       lastCheckInDate={lastCheckInDate}
       checkInInterval={checkInInterval}
       queryDate={queryDate}
+      showLastCheckInDate
     />
   );
 }

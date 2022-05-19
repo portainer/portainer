@@ -6,7 +6,7 @@
   margin-bottom: 20px;
   margin-left: 10px;
 }
-.stepper-item {
+.step-wrapper {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -14,20 +14,7 @@
   flex: 1;
 }
 
-.docker {
-  margin-left: -5px;
-  text-transform: capitalize;
-}
-.kubernetes {
-  margin-left: -20px;
-  text-transform: capitalize;
-}
-.aci {
-  margin-left: 5px;
-  text-transform: uppercase;
-}
-
-.stepper-item::before {
+.step-wrapper::before {
   position: absolute;
   content: '';
   width: 100%;
@@ -37,7 +24,7 @@
   border-bottom: 5px solid var(--bg-stepper-item-counter);
 }
 
-.stepper-item::after {
+.step-wrapper::after {
   position: absolute;
   content: '';
   border-bottom: 5px solid var(--bg-stepper-item-counter);
@@ -47,7 +34,13 @@
   z-index: 2;
 }
 
-.stepper-item .step-counter {
+.step .step-name {
+  position: absolute;
+  bottom: -25px;
+  min-width: max-content;
+}
+
+.step-wrapper .step {
   position: relative;
   z-index: 5;
   display: flex;
@@ -60,23 +53,28 @@
   margin-bottom: 6px;
 }
 
-.stepper-item.active {
+.step-wrapper.active {
   font-weight: bold;
-  background: var(--bg-stepper-item-active);
   content: none;
 }
 
-.stepper-item.active .step-counter {
+.step-wrapper.active .step {
   background: #337ab7;
+}
+
+.step-wrapper.active .step-counter {
   color: #fff;
 }
 
-.stepper-item.completed .step-counter {
+.step-wrapper.completed .step {
   background-color: #48b400;
+}
+
+.step-wrapper.completed .step-counter {
   color: #fff;
 }
 
-.stepper-item.completed::after {
+.step-wrapper.completed::after {
   position: absolute;
   content: '';
   border-bottom: 5px solid #48b400;
@@ -86,10 +84,10 @@
   z-index: 3;
 }
 
-.stepper-item:first-child::before {
+.step-wrapper:first-child::before {
   content: none;
 }
 
-.stepper-item:last-child::after {
+.step-wrapper:last-child::after {
   content: none;
 }

@@ -8,11 +8,14 @@ import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 import { r2a } from '@/react-tools/react2angular';
 
-import { EnvironmentSelector, Value } from './EnvironmentSelector';
+import {
+  EnvironmentSelector,
+  EnvironmentSelectorValue,
+} from './EnvironmentSelector';
 import { environmentTypes } from './environment-types';
 
 export function EnvironmentTypeSelectView() {
-  const [types, setTypes] = useState<Value[]>([]);
+  const [types, setTypes] = useState<EnvironmentSelectorValue[]>([]);
   const { trackEvent } = useAnalytics();
   const router = useRouter();
 

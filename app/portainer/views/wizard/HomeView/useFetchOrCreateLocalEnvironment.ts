@@ -74,7 +74,6 @@ function useFetchLocalEnvironment() {
       types: [EnvironmentType.Docker, EnvironmentType.KubernetesLocal],
     },
     false,
-    0,
     Infinity
   );
 

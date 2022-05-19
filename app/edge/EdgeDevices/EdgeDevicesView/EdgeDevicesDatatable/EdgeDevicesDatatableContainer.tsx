@@ -92,7 +92,6 @@ function Loader({ children, storageKey }: LoaderProps) {
       search: debouncedSearchValue,
       ...pagination,
     },
-    false,
     settings.autoRefreshRate * 1000
   );
 

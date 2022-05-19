@@ -5,11 +5,11 @@ import { Option } from '../components/Option';
 
 import { environmentTypes } from './environment-types';
 
-export type Value = typeof environmentTypes[number]['id'];
+export type EnvironmentSelectorValue = typeof environmentTypes[number]['id'];
 
 interface Props {
-  value: Value[];
-  onChange(value: Value[]): void;
+  value: EnvironmentSelectorValue[];
+  onChange(value: EnvironmentSelectorValue[]): void;
 }
 
 export function EnvironmentSelector({ value, onChange }: Props) {
@@ -36,7 +36,7 @@ export function EnvironmentSelector({ value, onChange }: Props) {
     </div>
   );
 
-  function handleClick(eType: Value) {
+  function handleClick(eType: EnvironmentSelectorValue) {
     if (value.includes(eType)) {
       onChange(value.filter((v) => v !== eType));
       return;
