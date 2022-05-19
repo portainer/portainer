@@ -1,5 +1,5 @@
 import { useFormik } from 'formik';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, KeyboardEvent } from 'react';
 import { object, number } from 'yup';
 
 import { Button } from '../Button';
@@ -35,13 +35,21 @@ export function PageInput({ onChange, totalPages }: Props) {
         value={values.page}
         max={totalPages}
         min={1}
+        step={1}
         onChange={handleChange}
+        onKeyPress={preventNotNumber}
       />
       <Button type="submit" disabled={!isValid}>
         Go
       </Button>
     </form>
   );
+
+  function preventNotNumber(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key.match(/^\D$/)) {
+      e.preventDefault();
+    }
+  }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const value = parseInt(e.target.value, 10);
