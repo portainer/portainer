@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -36,28 +35,28 @@ func (g *gitService) LatestCommitID(repositoryURL, referenceName, username, pass
 }
 
 // Helpers
-func setupHandler(t *testing.T) (*Handler, string, func()) {
+func setupHandler(t *testing.T) (*Handler, string) {
 	t.Helper()
 
 	_, store, storeTeardown := datastore.MustNewTestStore(true, true)
+	t.Cleanup(func() {
+		storeTeardown()
+	})
 
 	jwtService, err := jwt.NewService("1h", store)
 	if err != nil {
-		storeTeardown()
 		t.Fatal(err)
 	}
 
 	user := &portainer.User{ID: 2, Username: "admin", Role: portainer.AdministratorRole}
 	err = store.User().Create(user)
 	if err != nil {
-		storeTeardown()
 		t.Fatal(err)
 	}
 
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
 	rawAPIKey, _, err := apiKeyService.GenerateApiKey(*user, "test")
 	if err != nil {
-		storeTeardown()
 		t.Fatal(err)
 	}
 
@@ -66,15 +65,8 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 		store,
 	)
 
-	tmpDir, err := os.MkdirTemp(os.TempDir(), "portainer-test")
+	fs, err := filesystem.NewService(t.TempDir(), "")
 	if err != nil {
-		storeTeardown()
-		t.Fatal(err)
-	}
-
-	fs, err := filesystem.NewService(tmpDir, "")
-	if err != nil {
-		storeTeardown()
 		t.Fatal(err)
 	}
 	handler.FileService = fs
@@ -92,7 +84,7 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 
 	handler.GitService = &gitService{errors.New("Clone error"), "git-service-id"}
 
-	return handler, rawAPIKey, storeTeardown
+	return handler, rawAPIKey
 }
 
 func createEndpoint(t *testing.T, store dataservices.DataStore) portainer.Endpoint {
@@ -171,8 +163,7 @@ func createEdgeStack(t *testing.T, store dataservices.DataStore, endpointID port
 
 // Inspect
 func TestInspectInvalidEdgeID(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	cases := []struct {
 		Name               string
@@ -203,8 +194,7 @@ func TestInspectInvalidEdgeID(t *testing.T) {
 
 // Create
 func TestCreateAndInspect(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	// Create Endpoint, EdgeGroup and EndpointRelation
 	endpoint := createEndpoint(t, handler.DataStore)
@@ -290,8 +280,7 @@ func TestCreateAndInspect(t *testing.T) {
 }
 
 func TestCreateWithInvalidPayload(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
@@ -421,8 +410,7 @@ func TestCreateWithInvalidPayload(t *testing.T) {
 
 // Delete
 func TestDeleteAndInspect(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	// Create
 	endpoint := createEndpoint(t, handler.DataStore)
@@ -482,8 +470,7 @@ func TestDeleteAndInspect(t *testing.T) {
 }
 
 func TestDeleteInvalidEdgeStack(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	cases := []struct {
 		Name               string
@@ -514,8 +501,7 @@ func TestDeleteInvalidEdgeStack(t *testing.T) {
 
 // Update
 func TestUpdateAndInspect(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
@@ -623,8 +609,7 @@ func TestUpdateAndInspect(t *testing.T) {
 }
 
 func TestUpdateWithInvalidEdgeGroups(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
@@ -704,8 +689,7 @@ func TestUpdateWithInvalidEdgeGroups(t *testing.T) {
 }
 
 func TestUpdateWithInvalidPayload(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
@@ -764,8 +748,7 @@ func TestUpdateWithInvalidPayload(t *testing.T) {
 
 // Update Status
 func TestUpdateStatusAndInspect(t *testing.T) {
-	handler, rawAPIKey, teardown := setupHandler(t)
-	defer teardown()
+	handler, rawAPIKey := setupHandler(t)
 
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
@@ -830,8 +813,7 @@ func TestUpdateStatusAndInspect(t *testing.T) {
 	}
 }
 func TestUpdateStatusWithInvalidPayload(t *testing.T) {
-	handler, _, teardown := setupHandler(t)
-	defer teardown()
+	handler, _ := setupHandler(t)
 
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)
@@ -903,8 +885,7 @@ func TestUpdateStatusWithInvalidPayload(t *testing.T) {
 
 // Delete Status
 func TestDeleteStatus(t *testing.T) {
-	handler, _, teardown := setupHandler(t)
-	defer teardown()
+	handler, _ := setupHandler(t)
 
 	endpoint := createEndpoint(t, handler.DataStore)
 	edgeStack := createEdgeStack(t, handler.DataStore, endpoint.ID)

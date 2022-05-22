@@ -52,15 +52,10 @@ func Test_ClonePublicRepository_Shallow(t *testing.T) {
 	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
-	destination := "shallow"
 
-	dir, err := ioutil.TempDir("", destination)
-	if err != nil {
-		t.Fatalf("failed to create a temp dir")
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	t.Logf("Cloning into %s", dir)
-	err = service.CloneRepository(dir, repositoryURL, referenceName, "", "")
+	err := service.CloneRepository(dir, repositoryURL, referenceName, "", "")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, getCommitHistoryLength(t, err, dir), "cloned repo has incorrect depth")
 }
@@ -69,17 +64,11 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 	service := Service{git: gitClient{preserveGitDirectory: false}} // no need for http client since the test access the repo via file system.
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
-	destination := "shallow"
 
-	dir, err := ioutil.TempDir("", destination)
-	if err != nil {
-		t.Fatalf("failed to create a temp dir")
-	}
-
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	t.Logf("Cloning into %s", dir)
-	err = service.CloneRepository(dir, repositoryURL, referenceName, "", "")
+	err := service.CloneRepository(dir, repositoryURL, referenceName, "", "")
 	assert.NoError(t, err)
 	assert.NoDirExists(t, filepath.Join(dir, ".git"))
 }
@@ -89,16 +78,11 @@ func Test_cloneRepository(t *testing.T) {
 
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
-	destination := "shallow"
 
-	dir, err := ioutil.TempDir("", destination)
-	if err != nil {
-		t.Fatalf("failed to create a temp dir")
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	t.Logf("Cloning into %s", dir)
 
-	err = service.cloneRepository(dir, cloneOptions{
+	err := service.cloneRepository(dir, cloneOptions{
 		repositoryUrl: repositoryURL,
 		referenceName: referenceName,
 		depth:         10,

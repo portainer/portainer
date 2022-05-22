@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 	"time"
 
@@ -74,15 +73,10 @@ var endpointTestCases = []endpointTestCase{
 	},
 }
 
-func setupHandler() (*Handler, func(), error) {
-	tmpDir, err := os.MkdirTemp(os.TempDir(), "portainer-test")
+func setupHandler(t *testing.T) (*Handler, error) {
+	fs, err := filesystem.NewService(t.TempDir(), "")
 	if err != nil {
-		return nil, nil, fmt.Errorf("could not create a tmp dir: %w", err)
-	}
-
-	fs, err := filesystem.NewService(tmpDir, "")
-	if err != nil {
-		return nil, nil, fmt.Errorf("could not start a new filesystem service: %w", err)
+		return nil, fmt.Errorf("could not start a new filesystem service: %w", err)
 	}
 
 	_, store, storeTeardown := datastore.MustNewTestStore(true, true)
@@ -90,30 +84,27 @@ func setupHandler() (*Handler, func(), error) {
 	ctx := context.Background()
 	shutdownCtx, cancelFn := context.WithCancel(ctx)
 
-	teardown := func() {
+	t.Cleanup(func() {
 		cancelFn()
 		storeTeardown()
-	}
+	})
 
 	jwtService, err := jwt.NewService("1h", store)
 	if err != nil {
-		teardown()
-		return nil, nil, fmt.Errorf("could not start a new jwt service: %w", err)
+		return nil, fmt.Errorf("could not start a new jwt service: %w", err)
 	}
 
 	apiKeyService := apikey.NewAPIKeyService(nil, nil)
 
 	settings, err := store.Settings().Settings()
 	if err != nil {
-		teardown()
-		return nil, nil, fmt.Errorf("could not create new settings: %w", err)
+		return nil, fmt.Errorf("could not create new settings: %w", err)
 	}
 	settings.TrustOnFirstConnect = true
 
 	err = store.Settings().UpdateSettings(settings)
 	if err != nil {
-		teardown()
-		return nil, nil, fmt.Errorf("could not update settings: %w", err)
+		return nil, fmt.Errorf("could not update settings: %w", err)
 	}
 
 	handler := NewHandler(
@@ -125,7 +116,7 @@ func setupHandler() (*Handler, func(), error) {
 
 	handler.ReverseTunnelService = chisel.NewService(store, shutdownCtx)
 
-	return handler, teardown, nil
+	return handler, nil
 }
 
 func createEndpoint(handler *Handler, endpoint portainer.Endpoint, endpointRelation portainer.EndpointRelation) (err error) {
@@ -143,9 +134,7 @@ func createEndpoint(handler *Handler, endpoint portainer.Endpoint, endpointRelat
 }
 
 func TestMissingEdgeIdentifier(t *testing.T) {
-	handler, teardown, err := setupHandler()
-	defer teardown()
-
+	handler, err := setupHandler(t)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,9 +166,7 @@ func TestMissingEdgeIdentifier(t *testing.T) {
 }
 
 func TestWithEndpoints(t *testing.T) {
-	handler, teardown, err := setupHandler()
-	defer teardown()
-
+	handler, err := setupHandler(t)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,9 +195,7 @@ func TestWithEndpoints(t *testing.T) {
 }
 
 func TestLastCheckInDateIncreases(t *testing.T) {
-	handler, teardown, err := setupHandler()
-	defer teardown()
-
+	handler, err := setupHandler(t)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -259,9 +244,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 }
 
 func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
-	handler, teardown, err := setupHandler()
-	defer teardown()
-
+	handler, err := setupHandler(t)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -307,9 +290,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 }
 
 func TestEdgeStackStatus(t *testing.T) {
-	handler, teardown, err := setupHandler()
-	defer teardown()
-
+	handler, err := setupHandler(t)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -379,9 +360,7 @@ func TestEdgeStackStatus(t *testing.T) {
 }
 
 func TestEdgeJobsResponse(t *testing.T) {
-	handler, teardown, err := setupHandler()
-	defer teardown()
-
+	handler, err := setupHandler(t)
 	if err != nil {
 		t.Fatal(err)
 	}
