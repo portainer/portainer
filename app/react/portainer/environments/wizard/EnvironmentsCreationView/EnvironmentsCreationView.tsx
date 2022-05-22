@@ -24,12 +24,19 @@ import { WizardEndpointsList } from './WizardEndpointsList';
 
 export function EnvironmentCreationView() {
   const {
-    params: { localEndpointId },
+    params: { localEndpointId: localEndpointIdParam },
   } = useCurrentStateAndParams();
 
-  const [environmentIds, setEnvironmentIds] = useState<EnvironmentId[]>([
-    parseInt(localEndpointId, 10),
-  ]);
+  const [environmentIds, setEnvironmentIds] = useState<EnvironmentId[]>(() => {
+    const localEndpointId = parseInt(localEndpointIdParam, 10);
+
+    if (!localEndpointId || Number.isNaN(localEndpointId)) {
+      return [];
+    }
+
+    return [localEndpointId];
+  });
+
   const envTypes = useParamEnvironmentTypes();
   const { trackEvent } = useAnalytics();
   const router = useRouter();

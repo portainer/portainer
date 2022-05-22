@@ -36,7 +36,8 @@ export function useEnvironmentList(
     | number
     | false
     | ((data?: GetEndpointsResponse) => false | number),
-  staleTime = 0
+  staleTime = 0,
+  enabled = true
 ) {
   const { isLoading, data } = useQuery(
     [
@@ -52,9 +53,11 @@ export function useEnvironmentList(
       return getEndpoints(start, pageLimit, query);
     },
     {
+      enabled,
       staleTime,
       keepPreviousData: true,
       refetchInterval,
+      enabled,
       ...withError('Failure retrieving environments'),
     }
   );

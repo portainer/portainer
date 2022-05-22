@@ -36,7 +36,9 @@ export function WizardEndpointsList({ environmentIds }: Props) {
       }
 
       return ENVIRONMENTS_POLLING_INTERVAL;
-    }
+    },
+    0,
+    environmentIds.length > 0
   );
 
   return (
