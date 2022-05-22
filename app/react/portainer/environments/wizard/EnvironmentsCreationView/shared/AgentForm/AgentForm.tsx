@@ -7,10 +7,11 @@ import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/portainer/environments/types';
 import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
 
-import { NameField } from './NameField';
+import { NameField } from '../NameField';
+import { MetadataFieldset } from '../MetadataFieldset';
+
 import { EnvironmentUrlField } from './EnvironmentUrlField';
 import { validation } from './AgentForm.validation';
-import { MetadataFieldset } from './MetadataFieldset';
 
 interface Props {
   onCreate(environment: Environment): void;

@@ -1,6 +1,6 @@
 import { Environment } from '@/portainer/environments/types';
 
-import { AgentForm } from '../../shared/AgentForm';
+import { AgentForm } from '../../shared/AgentForm/AgentForm';
 
 import { DeploymentScripts } from './DeploymentScripts';
 

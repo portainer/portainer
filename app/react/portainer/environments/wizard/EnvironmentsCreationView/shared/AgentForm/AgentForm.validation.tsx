@@ -2,7 +2,7 @@ import { object, SchemaOf, string } from 'yup';
 
 import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
 
-import { metadataValidation } from './MetadataFieldset/validation';
+import { metadataValidation } from '../MetadataFieldset/validation';
 
 export function validation(): SchemaOf<CreateAgentEnvironmentValues> {
   return object({

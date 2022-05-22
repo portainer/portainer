@@ -50,7 +50,12 @@ export function APIForm({ onCreate }: Props) {
         <Form>
           <NameField />
 
-          <FormControl inputId="url-field" label="Docker API URL" required>
+          <FormControl
+            inputId="url-field"
+            label="Docker API URL"
+            required
+            tooltip="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
+          >
             <Field
               as={Input}
               id="url-field"
