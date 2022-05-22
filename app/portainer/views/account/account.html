@@ -55,6 +55,7 @@
           <!-- !confirm-password-input -->
           <div class="form-group">
             <div class="col-sm-12">
+              <password-check-hint ng-if="!passwordStrength"></password-check-hint>
               <button
                 type="submit"
                 class="btn btn-primary btn-sm"
@@ -63,6 +64,9 @@
               >
                 Update password
               </button>
+              <button type="submit" class="btn btn-primary btn-sm" ng-click="skipPasswordChange()" ng-if="forceChangePassword && timesPasswordChangeSkipped < 2"
+                >Remind me later</button
+              >
               <span class="text-muted small" style="margin-left: 5px" ng-if="AuthenticationMethod === 2 && !initialUser">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 You cannot change your password when using LDAP authentication.
@@ -73,9 +77,6 @@
               </span>
             </div>
           </div>
-
-          <force-password-update-hint ng-if="forceChangePassword"></force-password-update-hint>
-          <password-check-hint ng-if="!forceChangePassword && !passwordStrength"></password-check-hint>
         </form>
       </rd-widget-body>
     </rd-widget>

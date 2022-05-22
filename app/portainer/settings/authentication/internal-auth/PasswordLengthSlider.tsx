@@ -15,65 +15,58 @@ export interface Props {
   defaultValue: number;
 }
 
+type Strength = 'weak' | 'good' | 'strong' | 'veryStrong';
+type BadgeProperties = { icon: string; color: string; text: string };
+
+const badgeProperties: Record<
+  Strength,
+  { icon: string; color: string; text: string }
+> = {
+  weak: { icon: 'far fa-times-circle', color: 'red', text: 'Weak password' },
+  good: { icon: 'far fa-check-circle', color: 'yellow', text: 'Good password' },
+  strong: {
+    icon: 'far fa-check-circle',
+    color: 'green',
+    text: 'Strong password',
+  },
+  veryStrong: {
+    icon: 'fa fa-lock',
+    color: 'blue',
+    text: 'Very strong password',
+  },
+};
+
+const SliderWithTooltip = RcSlider.createSliderWithTooltip(RcSlider);
+
 export function PasswordLengthSlider({ min, max, step, defaultValue }: Props) {
-  const SliderWithTooltip = RcSlider.createSliderWithTooltip(RcSlider);
-  const [labelProperties, setLabelProperties] = useState({
-    sliderValue: 0,
+  const [badgeProps, setBadgeProps] = useState<BadgeProperties>({
     icon: '',
-    strength: '',
-    labelColor: '',
+    color: '',
+    text: '',
   });
 
-  const icons: Record<string, string> = {
-    Weak: 'fa-times-circle',
-    Good: 'fa-check-circle',
-    Strong: 'fa-check-circle',
-    'Very strong': 'fa-lock',
-  };
-
-  const colors: Record<string, string> = {
-    Weak: 'red',
-    Good: 'yellow',
-    Strong: 'green',
-    'Very strong': 'blue',
-  };
-
-  function getPasswordStrength(value: number) {
-    let strength;
-
+  function getBadgeProps(value: number) {
     if (value < 10) {
-      strength = 'Weak';
-    } else if (value < 12) {
-      strength = 'Good';
-    } else if (value < 14) {
-      strength = 'Strong';
-    } else {
-      strength = 'Very strong';
+      return badgeProperties.weak;
     }
 
-    return strength;
+    if (value < 12) {
+      return badgeProperties.good;
+    }
+
+    if (value < 14) {
+      return badgeProperties.strong;
+    }
+
+    return badgeProperties.veryStrong;
   }
 
   useEffect(() => {
-    const strength = getPasswordStrength(defaultValue);
-    const icon = icons[strength];
-    const labelColor = colors[strength];
-
-    setLabelProperties({
-      sliderValue: defaultValue,
-      icon,
-      strength,
-      labelColor,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setBadgeProps(getBadgeProps(defaultValue));
   }, [defaultValue]);
 
-  function onAfterChange(value: number) {
-    const strength = getPasswordStrength(value);
-    const icon = icons[strength];
-    const labelColor = colors[strength];
-
-    setLabelProperties({ sliderValue: value, icon, strength, labelColor });
+  function onChange(value: number) {
+    setBadgeProps(getBadgeProps(value));
   }
 
   return (
@@ -84,15 +77,15 @@ export function PasswordLengthSlider({ min, max, step, defaultValue }: Props) {
           min={min}
           max={max}
           step={step}
-          defaultValue={labelProperties.sliderValue}
-          onAfterChange={onAfterChange}
+          defaultValue={defaultValue}
+          onChange={onChange}
         />
       </div>
 
       <div className={clsx('col-sm-2', styles.sliderBadge)}>
         <Badge
-          value={`${labelProperties.strength} password`}
-          icon={`far ${labelProperties.icon} space-right`}
+          value={badgeProps.text}
+          icon={`${badgeProps.icon} space-right`}
         />
       </div>
     </>

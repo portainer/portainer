@@ -35,6 +35,18 @@ angular.module('portainer.app').controller('AccountController', [
       }
     };
 
+    $scope.skipPasswordChange = async function () {
+      try {
+        if ($scope.timesPasswordChangeSkipped < 2) {
+          StateManager.setPasswordChangeSkipped();
+          $scope.forceChangePassword = false;
+          $state.go('portainer.home');
+        }
+      } catch (err) {
+        Notifications.error('Failure', err, err.msg);
+      }
+    };
+
     $scope.onNewPasswordChange = function () {
       $scope.passwordStrength = StrengthCheck($scope.formValues.newPassword);
     };
@@ -101,6 +113,7 @@ angular.module('portainer.app').controller('AccountController', [
       const userDetails = Authentication.getUserDetails();
       $scope.userID = userDetails.ID;
       $scope.forceChangePassword = userDetails.forceChangePassword;
+      $scope.timesPasswordChangeSkipped = StateManager.getState().UI.timesPasswordChangeSkipped || 0;
 
       if (state.application.demoEnvironment.enabled) {
         $scope.isDemoUser = state.application.demoEnvironment.users.includes($scope.userID);
