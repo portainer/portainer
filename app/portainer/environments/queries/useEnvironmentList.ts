@@ -53,7 +53,6 @@ export function useEnvironmentList(
       return getEndpoints(start, pageLimit, query);
     },
     {
-      enabled,
       staleTime,
       keepPreviousData: true,
       refetchInterval,

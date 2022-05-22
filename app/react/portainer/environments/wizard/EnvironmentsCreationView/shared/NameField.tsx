@@ -40,7 +40,7 @@ async function isNameUnique(name?: string) {
       return false;
     }
   } catch (e) {
-    // Do nothing
+    // if backend fails to respond, assume name is unique, name validation happens also in the backend
   }
   return true;
 }
