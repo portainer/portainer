@@ -1,11 +1,4 @@
-import { useEffect } from 'react';
-import {
-  useTable,
-  useExpanded,
-  useSortBy,
-  useFilters,
-  useGlobalFilter,
-} from 'react-table';
+import { useTable, useExpanded, useSortBy, useFilters } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 import _ from 'lodash';
 
@@ -24,11 +17,7 @@ import {
 import { multiple } from '@/portainer/components/datatables/components/filter-types';
 import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
 import { ColumnVisibilityMenu } from '@/portainer/components/datatables/components/ColumnVisibilityMenu';
-import { useDebounce } from '@/portainer/hooks/useDebounce';
-import {
-  useSearchBarState,
-  SearchBar,
-} from '@/portainer/components/datatables/components/SearchBar';
+import { SearchBar } from '@/portainer/components/datatables/components/SearchBar';
 import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
 import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
 import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
@@ -55,15 +44,18 @@ export interface EdgeDevicesTableProps {
   pagination: Pagination;
   onChangePagination(pagination: Partial<Pagination>): void;
   totalCount: number;
+  search: string;
+  onChangeSearch(search: string): void;
 }
 
 export function EdgeDevicesDatatable({
-  storageKey,
   isFdoEnabled,
   isOpenAmtEnabled,
   showWaitingRoomLink,
   mpsServer,
   dataset,
+  onChangeSearch,
+  search,
   groups,
   setLoadingMessage,
   pagination,
@@ -72,7 +64,6 @@ export function EdgeDevicesDatatable({
 }: EdgeDevicesTableProps) {
   const { settings, setTableSettings } =
     useTableSettings<EdgeDeviceTableSettings>();
-  const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
 
   const columns = useColumns();
 
@@ -85,7 +76,6 @@ export function EdgeDevicesDatatable({
     selectedFlatRows,
     allColumns,
     setHiddenColumns,
-    setGlobalFilter,
   } = useTable<Environment>(
     {
       defaultCanFilter: false,
@@ -95,7 +85,6 @@ export function EdgeDevicesDatatable({
       initialState: {
         hiddenColumns: settings.hiddenColumns,
         sortBy: [settings.sortBy],
-        globalFilter: searchBarValue,
       },
       isRowSelectable() {
         return true;
@@ -108,18 +97,11 @@ export function EdgeDevicesDatatable({
       selectColumnWidth: 5,
     },
     useFilters,
-    useGlobalFilter,
     useSortBy,
     useExpanded,
     useRowSelect,
     useRowSelectColumn
   );
-
-  const debouncedSearchValue = useDebounce(searchBarValue);
-
-  useEffect(() => {
-    setGlobalFilter(debouncedSearchValue);
-  }, [debouncedSearchValue, setGlobalFilter]);
 
   const columnsToHide = allColumns.filter((colInstance) => {
     const columnDef = columns.find((c) => c.id === colInstance.id);
@@ -178,7 +160,7 @@ export function EdgeDevicesDatatable({
               </TextTip>
             </div>
           )}
-          <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
+          <SearchBar value={search} onChange={handleSearchBarChange} />
           <Table
             className={tableProps.className}
             role={tableProps.role}
@@ -275,7 +257,7 @@ export function EdgeDevicesDatatable({
   }
 
   function handleSearchBarChange(value: string) {
-    setSearchBarValue(value);
+    onChangeSearch(value);
   }
 
   function handleSortChange(id: string, desc: boolean) {
