@@ -54,7 +54,7 @@
         >
       </sidebar-section>
 
-      <sidebar-section ng-if="isAdmin || isTeamLeader" title="Settings">
+      <sidebar-section ng-if="showUsersSection" title="Settings">
         <sidebar-menu
           ng-show="display"
           icon-class="fa-users fa-fw"
