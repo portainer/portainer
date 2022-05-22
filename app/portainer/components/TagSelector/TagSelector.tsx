@@ -64,18 +64,19 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
       {value.length > 0 && (
         <FormControl label="Selected tags">
           {selectedTags.map((tag) => (
-            <span className="tag space-right interactive" key={tag.value}>
+            <button
+              type="button"
+              title="Remove tag"
+              className={clsx(styles.removeTagBtn, 'space-left', 'tag')}
+              onClick={() => handleRemove(tag.value)}
+              key={tag.value}
+            >
               {tag.label}
-
-              <button
-                type="button"
-                title="Remove tag"
-                className={clsx(styles.removeTagBtn, 'space-left')}
-                onClick={() => handleRemove(tag.value)}
-              >
-                <i className="fa fa-trash-alt white-icon" aria-hidden="true" />
-              </button>
-            </span>
+              <i
+                className="fa fa-trash-alt white-icon space-left"
+                aria-hidden="true"
+              />
+            </button>
           ))}
         </FormControl>
       )}
