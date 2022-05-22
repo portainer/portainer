@@ -61,6 +61,7 @@ function mockEnvironment(type: EnvironmentType): Environment {
     Id: 1,
     Name: 'environment',
     GroupId: 1,
+    GroupName: 'Unassigned',
     Snapshots: [],
     Status: EnvironmentStatus.Up,
     TagIds: [],

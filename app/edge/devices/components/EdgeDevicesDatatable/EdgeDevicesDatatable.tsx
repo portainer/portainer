@@ -8,7 +8,6 @@ import {
   usePagination,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
-import _ from 'lodash';
 
 import { Environment } from '@/portainer/environments/types';
 import { PaginationControls } from '@/portainer/components/pagination-controls';
@@ -65,7 +64,6 @@ export function EdgeDevicesDatatable({
   showWaitingRoomLink,
   mpsServer,
   dataset,
-  groups,
   onRefresh,
   setLoadingMessage,
 }: EdgeDevicesTableProps) {
@@ -140,8 +138,6 @@ export function EdgeDevicesDatatable({
       environment.AMTDeviceGUID && environment.AMTDeviceGUID !== ''
   );
 
-  const groupsById = _.groupBy(groups, 'Id');
-
   return (
     <TableContainer>
       <TableTitle icon="fa-plug" label="Edge Devices">
@@ -213,13 +209,8 @@ export function EdgeDevicesDatatable({
           {page.map((row) => {
             prepareRow(row);
             const { key, className, role, style } = row.getRowProps();
-            const group = groupsById[row.original.GroupId];
             return (
-              <RowProvider
-                key={key}
-                isOpenAmtEnabled={isOpenAmtEnabled}
-                groupName={group[0]?.Name}
-              >
+              <RowProvider key={key} isOpenAmtEnabled={isOpenAmtEnabled}>
                 <TableRow<Environment>
                   cells={row.cells}
                   key={key}

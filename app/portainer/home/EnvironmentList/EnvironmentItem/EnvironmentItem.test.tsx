@@ -15,6 +15,7 @@ test('loads component', async () => {
   const env: Environment = {
     TagIds: [],
     GroupId: 1,
+    GroupName: 'Unassigned',
     Type: 1,
     Name: 'environment',
     Status: 1,
@@ -36,6 +37,7 @@ test('shows group name', async () => {
   const env: Environment = {
     TagIds: [],
     GroupId: groupId,
+    GroupName: 'Unassigned',
     Type: 1,
     Name: 'environment',
     Status: 1,
