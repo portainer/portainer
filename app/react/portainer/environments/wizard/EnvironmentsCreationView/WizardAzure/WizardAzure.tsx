@@ -11,7 +11,7 @@ import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/portainer/environments/types';
 import { EnvironmentMetadata } from '@/portainer/environments/environment.service/create';
 
-import { NameField } from '../shared/NameField';
+import { NameField, nameValidation } from '../shared/NameField';
 import { AnalyticsStateKey } from '../types';
 import { MetadataFieldset } from '../shared/MetadataFieldset';
 import { metadataValidation } from '../shared/MetadataFieldset/validation';
@@ -158,7 +158,7 @@ export function WizardAzure({ onCreate }: Props) {
 
 function validationSchema(): SchemaOf<FormValues> {
   return object({
-    name: string().required('Name is required'),
+    name: nameValidation(),
     applicationId: string().required('Application ID is required'),
     tenantId: string().required('Tenant ID is required'),
     authenticationKey: string().required('Authentication Key is required'),
