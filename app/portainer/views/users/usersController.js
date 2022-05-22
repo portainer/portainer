@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import { StrengthCheck } from 'Portainer/helpers/password';
+import { authenticationMethodTypesMap } from 'Portainer/settings/authentication/auth-method-constants';
 
 angular.module('portainer.app').controller('UsersController', [
   '$q',
@@ -128,6 +129,7 @@ angular.module('portainer.app').controller('UsersController', [
           $scope.users = users;
           $scope.teams = _.orderBy(data.teams, 'Name', 'asc');
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
+          $scope.showAddUserPanel = !(data.settings.AuthenticationMethod != authenticationMethodTypesMap.INTERNAL && !isAdmin);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve users and teams');
