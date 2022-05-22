@@ -26,6 +26,8 @@ type publicSettingsResponse struct {
 	EnableTelemetry bool `json:"EnableTelemetry" example:"true"`
 	// The expiry of a Kubeconfig
 	KubeconfigExpiry string `example:"24h" default:"0"`
+	// Whether team sync is enabled
+	TeamSync bool `json:"TeamSync" example:"true"`
 }
 
 // @id SettingsPublic
@@ -68,6 +70,10 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		if !appSettings.OAuthSettings.SSO {
 			publicSettings.OAuthLoginURI += "&prompt=login"
 		}
+	}
+	//if LDAP authentication is on, compose the related fields from application settings
+	if publicSettings.AuthenticationMethod == portainer.AuthenticationLDAP {
+		publicSettings.TeamSync = len(appSettings.LDAPSettings.GroupSearchSettings) > 0
 	}
 	return publicSettings
 }

@@ -23,6 +23,7 @@ export function SettingsViewModel(data) {
 
 export function PublicSettingsViewModel(settings) {
   this.AuthenticationMethod = settings.AuthenticationMethod;
+  this.TeamSync = settings.TeamSync;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.EnforceEdgeID = settings.EnforceEdgeID;
   this.FeatureFlagSettings = settings.FeatureFlagSettings;
