@@ -8,6 +8,7 @@ import (
 
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/security"
 
 	"net/http"
@@ -32,16 +33,18 @@ type Handler struct {
 	*mux.Router
 	bouncer       *security.RequestBouncer
 	apiKeyService apikey.APIKeyService
+	demoService   *demo.Service
 	DataStore     dataservices.DataStore
 	CryptoService portainer.CryptoService
 }
 
 // NewHandler creates a handler to manage user operations.
-func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, apiKeyService apikey.APIKeyService) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, apiKeyService apikey.APIKeyService, demoService *demo.Service) *Handler {
 	h := &Handler{
 		Router:        mux.NewRouter(),
 		bouncer:       bouncer,
 		apiKeyService: apiKeyService,
+		demoService:   demoService,
 	}
 	h.Handle("/users",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.userCreate))).Methods(http.MethodPost)

@@ -20,13 +20,19 @@
           <!-- logo -->
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="toggle_logo" class="control-label text-left"> Use custom logo </label>
-              <label class="switch" style="margin-left: 20px">
-                <input type="checkbox" name="toggle_logo" ng-model="formValues.customLogo" />
-                <i></i>
-              </label>
+              <por-switch-field
+                label="'Use custom logo'"
+                value="formValues.customLogo"
+                name="'toggle_logo'"
+                disabled="state.isDemo"
+                on-change="(onToggleCustomLogo)"
+              ></por-switch-field>
+            </div>
+            <div class="col-sm-12" ng-if="state.isDemo" style="margin-top: 10px">
+              <span class="small text-muted">You cannot use this feature in the demo version of Portainer.</span>
             </div>
           </div>
+
           <div ng-if="formValues.customLogo">
             <div class="form-group">
               <span class="col-sm-12 text-muted small"> You can specify the URL to your logo here. For an optimal display, logo dimensions should be 155px by 55px. </span>
@@ -39,21 +45,25 @@
             </div>
           </div>
           <!-- !logo -->
-          <!-- analytics -->
+
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="toggle_enableTelemetry" class="control-label text-left"> Allow the collection of anonymous statistics </label>
-              <label class="switch" style="margin-left: 20px">
-                <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" />
-                <i></i>
-              </label>
+              <por-switch-field
+                label="'Allow the collection of anonymous statistics'"
+                value="formValues.enableTelemetry"
+                name="'toggle_enableTelemetry'"
+                on-change="(onToggleEnableTelemetry)"
+                disabled="state.isDemo"
+              ></por-switch-field>
+            </div>
+            <div class="col-sm-12" ng-if="state.isDemo" style="margin-top: 10px">
+              <span class="small text-muted">You cannot use this feature in the demo version of Portainer.</span>
             </div>
             <div class="col-sm-12 text-muted small" style="margin-top: 10px">
               You can find more information about this in our
               <a href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.
             </div>
           </div>
-          <!-- !analytics -->
           <!-- templates -->
           <div class="col-sm-12 form-section-title"> App Templates </div>
           <div>
