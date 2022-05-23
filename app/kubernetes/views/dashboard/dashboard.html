@@ -16,7 +16,7 @@
                   {{ ctrl.endpoint.Name }}
                 </td>
               </tr>
-              <tr>
+              <tr ng-if="ctrl.showEnvUrl">
                 <td>URL</td>
                 <td>{{ ctrl.endpoint.URL | stripprotocol }}</td>
               </tr>
