@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { useSettings } from '@/portainer/settings/settings.service';
+import { useSettings } from '@/portainer/settings/queries';
 
 const categories = [
   'docker',
