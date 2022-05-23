@@ -31,17 +31,12 @@ export function EnvironmentTypeSelectView() {
             <WidgetTitle icon="fa-magic" title="Environment Wizard" />
             <WidgetBody>
               <EnvironmentSelector value={types} onChange={setTypes} />
-
-              <div className="row">
-                <div className="col-sm-12">
-                  <Button
-                    disabled={types.length === 0}
-                    onClick={() => startWizard()}
-                  >
-                    Start Wizard
-                  </Button>
-                </div>
-              </div>
+              <Button
+                disabled={types.length === 0}
+                onClick={() => startWizard()}
+              >
+                Start Wizard
+              </Button>
             </WidgetBody>
           </Widget>
         </div>

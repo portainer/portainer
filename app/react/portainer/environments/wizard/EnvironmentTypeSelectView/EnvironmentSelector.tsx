@@ -19,7 +19,7 @@ export function EnvironmentSelector({ value, onChange }: Props) {
           You can onboard different types of environments, select all that
           apply.
         </p>
-        <div className="col-sm-12">
+        <div className="flex gap-4 flex-wrap">
           {environmentTypes.map((eType) => (
             <Option
               key={eType.id}

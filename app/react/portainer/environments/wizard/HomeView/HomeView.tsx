@@ -54,28 +54,29 @@ export function HomeView() {
                   </p>
                 </div>
 
-                {localEnvironmentAdded.status === 'success' && (
-                  <Link to="portainer.home" className={styles.link}>
+                <div className="flex flex-wrap gap-4">
+                  {localEnvironmentAdded.status === 'success' && (
+                    <Link to="portainer.home" className={styles.link}>
+                      <Option
+                        icon={
+                          localEnvironmentAdded.type === EnvironmentType.Docker
+                            ? 'fab fa-docker'
+                            : 'fas fa-dharmachakra'
+                        }
+                        title="Get Started"
+                        description="Proceed using the local environment which Portainer is running in"
+                        onClick={() => trackLocalEnvironmentAnalytics()}
+                      />
+                    </Link>
+                  )}
+                  <Link to="portainer.wizard.endpoints" className={styles.link}>
                     <Option
-                      icon={
-                        localEnvironmentAdded.type === EnvironmentType.Docker
-                          ? 'fab fa-docker'
-                          : 'fas fa-dharmachakra'
-                      }
-                      title="Get Started"
-                      description="Proceed using the local environment which Portainer is running in"
-                      onClick={() => trackLocalEnvironmentAnalytics()}
+                      title="Add Environments"
+                      icon="fa fa-plug"
+                      description="Connect to other environments"
                     />
                   </Link>
-                )}
-
-                <Link to="portainer.wizard.endpoints" className={styles.link}>
-                  <Option
-                    title="Add Environments"
-                    icon="fa fa-plug"
-                    description="Connect to other environments"
-                  />
-                </Link>
+                </div>
               </div>
             </WidgetBody>
           </Widget>
