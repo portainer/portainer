@@ -86,7 +86,7 @@ export function PasswordLengthSlider({
   }
 
   return (
-    <>
+    <div style={{ marginLeft: 10, marginBottom: 50 }}>
       <div className="col-sm-6">
         <SliderWithTooltip
           tipFormatter={(value) => `${value} characters`}
@@ -115,6 +115,6 @@ export function PasswordLengthSlider({
           icon={`${badgeProps.icon} space-right`}
         />
       </div>
-    </>
+    </div>
   );
 }
