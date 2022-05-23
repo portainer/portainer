@@ -1,5 +1,6 @@
 import { generatePagesArray } from './generatePagesArray';
 import { PageButton } from './PageButton';
+import { PageInput } from './PageInput';
 
 interface Props {
   boundaryLinks?: boolean;
@@ -9,6 +10,7 @@ interface Props {
   onPageChange(page: number): void;
   totalCount: number;
   maxSize: number;
+  isInputVisible?: boolean;
 }
 
 export function PageSelector({
@@ -19,6 +21,7 @@ export function PageSelector({
   maxSize = 5,
   directionLinks = true,
   boundaryLinks = false,
+  isInputVisible = false,
 }: Props) {
   const pages = generatePagesArray(
     currentPage,
@@ -33,55 +36,63 @@ export function PageSelector({
   }
 
   return (
-    <ul className="pagination">
-      {boundaryLinks ? (
-        <PageButton
-          onPageChange={onPageChange}
-          page={1}
-          disabled={currentPage === 1}
-        >
-          &laquo;
-        </PageButton>
-      ) : null}
-      {directionLinks ? (
-        <PageButton
-          onPageChange={onPageChange}
-          page={currentPage - 1}
-          disabled={currentPage === 1}
-        >
-          &lsaquo;
-        </PageButton>
-      ) : null}
-      {pages.map((pageNumber, index) => (
-        <PageButton
-          onPageChange={onPageChange}
-          page={pageNumber}
-          disabled={pageNumber === '...'}
-          active={currentPage === pageNumber}
-          key={index}
-        >
-          {pageNumber}
-        </PageButton>
-      ))}
+    <>
+      {isInputVisible && (
+        <PageInput
+          onChange={(page) => onPageChange(page)}
+          totalPages={Math.ceil(totalCount / itemsPerPage)}
+        />
+      )}
+      <ul className="pagination">
+        {boundaryLinks ? (
+          <PageButton
+            onPageChange={onPageChange}
+            page={1}
+            disabled={currentPage === 1}
+          >
+            &laquo;
+          </PageButton>
+        ) : null}
+        {directionLinks ? (
+          <PageButton
+            onPageChange={onPageChange}
+            page={currentPage - 1}
+            disabled={currentPage === 1}
+          >
+            &lsaquo;
+          </PageButton>
+        ) : null}
+        {pages.map((pageNumber, index) => (
+          <PageButton
+            onPageChange={onPageChange}
+            page={pageNumber}
+            disabled={pageNumber === '...'}
+            active={currentPage === pageNumber}
+            key={index}
+          >
+            {pageNumber}
+          </PageButton>
+        ))}
 
-      {directionLinks ? (
-        <PageButton
-          onPageChange={onPageChange}
-          page={currentPage + 1}
-          disabled={currentPage === last}
-        >
-          &rsaquo;
-        </PageButton>
-      ) : null}
-      {boundaryLinks ? (
-        <PageButton
-          disabled={currentPage === last}
-          onPageChange={onPageChange}
-          page={last}
-        >
-          &raquo;
-        </PageButton>
-      ) : null}
-    </ul>
+        {directionLinks ? (
+          <PageButton
+            onPageChange={onPageChange}
+            page={currentPage + 1}
+            disabled={currentPage === last}
+          >
+            &rsaquo;
+          </PageButton>
+        ) : null}
+        {boundaryLinks ? (
+          <PageButton
+            disabled={currentPage === last}
+            onPageChange={onPageChange}
+            page={last}
+          >
+            &raquo;
+          </PageButton>
+        ) : null}
+      </ul>
+    </>
   );
 }

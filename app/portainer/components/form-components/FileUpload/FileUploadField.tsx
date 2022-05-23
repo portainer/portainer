@@ -11,6 +11,7 @@ export interface Props {
   accept?: string;
   title?: string;
   required?: boolean;
+  inputId: string;
 }
 
 export function FileUploadField({
@@ -19,12 +20,14 @@ export function FileUploadField({
   accept,
   title = 'Select a file',
   required = false,
+  inputId,
 }: Props) {
   const fileRef = createRef<HTMLInputElement>();
 
   return (
     <div className="file-upload-field">
       <input
+        id={inputId}
         ref={fileRef}
         type="file"
         accept={accept}

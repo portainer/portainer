@@ -33,8 +33,8 @@ export function withInvalidate(
 ) {
   return {
     onSuccess() {
-      return queryKeysToInvalidate.map((keys) =>
-        queryClient.invalidateQueries(keys)
+      return Promise.all(
+        queryKeysToInvalidate.map((keys) => queryClient.invalidateQueries(keys))
       );
     },
   };
@@ -58,7 +58,7 @@ export function queryOptions<
   return mergeOptions(options);
 }
 
-function mergeOptions<T>(...options: T[]) {
+function mergeOptions<T>(options: T[]) {
   return options.reduce(
     (acc, option) => ({
       ...acc,

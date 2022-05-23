@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 class KubernetesDashboardController {
   /* @ngInject */
@@ -34,6 +35,7 @@ class KubernetesDashboardController {
   async getAllAsync() {
     const isAdmin = this.Authentication.isAdmin();
     const storageClasses = this.endpoint.Kubernetes.Configuration.StorageClasses;
+    this.showEnvUrl = this.endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnDockerEnvironment && this.endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment;
 
     try {
       const [pools, applications, configurations, volumes, tags] = await Promise.all([

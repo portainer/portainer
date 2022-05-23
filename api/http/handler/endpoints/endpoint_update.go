@@ -88,7 +88,18 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.Name != nil {
-		endpoint.Name = *payload.Name
+		name := *payload.Name
+		isUnique, err := handler.isNameUnique(name, endpoint.ID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to check if name is unique", err)
+		}
+
+		if !isUnique {
+			return httperror.NewError(http.StatusConflict, "Name is not unique", nil)
+		}
+
+		endpoint.Name = name
+
 	}
 
 	if payload.URL != nil {

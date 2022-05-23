@@ -707,7 +707,7 @@
                 <div class="col-sm-12 form-section-title"> Resources </div>
                 <!-- memory-reservation-input -->
                 <div class="form-group">
-                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left mt-20"> Memory reservation </label>
+                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left mt-8"> Memory reservation </label>
                   <div class="col-sm-3">
                     <slider
                       on-change="(handleResourceChange)"
@@ -722,13 +722,13 @@
                     <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation" />
                   </div>
                   <div class="col-sm-4">
-                    <p class="small text-muted mt-7"> Memory soft limit (<b>MB</b>) </p>
+                    <p class="small text-muted mt-2"> Memory soft limit (<b>MB</b>) </p>
                   </div>
                 </div>
                 <!-- !memory-reservation-input -->
                 <!-- memory-limit-input -->
                 <div class="form-group">
-                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left mt-20"> Memory limit </label>
+                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left mt-8"> Memory limit </label>
                   <div class="col-sm-3">
                     <slider
                       on-change="(handleResourceChange)"
@@ -749,7 +749,7 @@
                 <!-- !memory-limit-input -->
                 <!-- cpu-limit-input -->
                 <div class="form-group">
-                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left mt-20"> CPU limit </label>
+                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left mt-8"> CPU limit </label>
                   <div class="col-sm-5">
                     <slider
                       on-change="(handleResourceChange)"
@@ -761,7 +761,7 @@
                       ng-if="state.sliderMaxCpu"
                     ></slider>
                   </div>
-                  <div class="col-sm-4 mt-20">
+                  <div class="col-sm-4 mt-8">
                     <p class="small text-muted"> Maximum CPU usage </p>
                   </div>
                 </div>
