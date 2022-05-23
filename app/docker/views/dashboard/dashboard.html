@@ -51,6 +51,10 @@
                 >
               </td>
             </tr>
+            <tr ng-if="showEnvUrl">
+              <td>URL</td>
+              <td>{{ endpoint.URL | stripprotocol }}</td>
+            </tr>
             <tr>
               <td>Tags</td>
               <td>{{ endpointTags }}</td>
