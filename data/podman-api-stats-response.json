@@ -1,0 +1,104 @@
+{
+  "read": "2022-05-22T21:46:37.52076633Z",
+  "preread": "0001-01-01T00:00:00Z",
+  "pids_stats": {
+    "current": 5
+  },
+  "blkio_stats": {
+    "io_service_bytes_recursive": [
+      {
+        "major": 0,
+        "minor": 252,
+        "op": "Read",
+        "value": 13041664
+      },
+      {
+        "major": 0,
+        "minor": 252,
+        "op": "Write",
+        "value": 18432
+      },
+      {
+        "major": 0,
+        "minor": 252,
+        "op": "Sync",
+        "value": 13060096
+      },
+      {
+        "major": 0,
+        "minor": 252,
+        "op": "Async",
+        "value": 0
+      },
+      {
+        "major": 0,
+        "minor": 252,
+        "op": "Discard",
+        "value": 0
+      },
+      {
+        "major": 0,
+        "minor": 252,
+        "op": "Total",
+        "value": 13060096
+      }
+    ],
+    "io_serviced_recursive": null,
+    "io_queue_recursive": null,
+    "io_service_time_recursive": null,
+    "io_wait_time_recursive": null,
+    "io_merged_recursive": null,
+    "io_time_recursive": null,
+    "sectors_recursive": null
+  },
+  "num_procs": 0,
+  "storage_stats": {},
+  "cpu_stats": {
+    "cpu_usage": {
+      "total_usage": 5995172328,
+      "percpu_usage": [5995172328],
+      "usage_in_kernelmode": 626098415,
+      "usage_in_usermode": 5369073913
+    },
+    "system_cpu_usage": 6528044804688,
+    "online_cpus": 1,
+    "cpu": 0,
+    "throttling_data": {
+      "periods": 0,
+      "throttled_periods": 0,
+      "throttled_time": 0
+    }
+  },
+  "precpu_stats": {
+    "cpu_usage": {
+      "total_usage": 0,
+      "usage_in_kernelmode": 0,
+      "usage_in_usermode": 0
+    },
+    "cpu": 0,
+    "throttling_data": {
+      "periods": 0,
+      "throttled_periods": 0,
+      "throttled_time": 0
+    }
+  },
+  "memory_stats": {
+    "usage": 3829760,
+    "max_usage": 9223372036854771712,
+    "limit": 9223372036854771712
+  },
+  "name": "web2",
+  "Id": "79ea1ec9721412739bfc7ca4033b063f45e72ef6a63a782ceb456ee42325e9e2",
+  "networks": {
+    "network": {
+      "rx_bytes": 22172,
+      "rx_packets": 0,
+      "rx_errors": 0,
+      "rx_dropped": 0,
+      "tx_bytes": 122920,
+      "tx_packets": 0,
+      "tx_errors": 0,
+      "tx_dropped": 0
+    }
+  }
+}
