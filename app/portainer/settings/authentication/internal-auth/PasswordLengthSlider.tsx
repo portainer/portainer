@@ -23,16 +23,24 @@ const badgeProperties: Record<
   Strength,
   { icon: string; color: string; text: string }
 > = {
-  weak: { icon: 'far fa-times-circle', color: 'red', text: 'Weak password' },
-  good: { icon: 'far fa-check-circle', color: 'yellow', text: 'Good password' },
+  weak: {
+    icon: 'far fa-times-circle',
+    color: '#f32e21',
+    text: 'Weak password',
+  },
+  good: {
+    icon: 'far fa-check-circle',
+    color: '#f69300',
+    text: 'Good password',
+  },
   strong: {
     icon: 'far fa-check-circle',
-    color: 'green',
+    color: '#40c267',
     text: 'Strong password',
   },
   veryStrong: {
     icon: 'fa fa-lock',
-    color: 'blue',
+    color: '#41b2f8',
     text: 'Very strong password',
   },
 };
@@ -79,7 +87,7 @@ export function PasswordLengthSlider({
 
   return (
     <>
-      <div className="col-sm-4">
+      <div className="col-sm-6">
         <SliderWithTooltip
           tipFormatter={(value) => `${value} characters`}
           min={min}
@@ -88,6 +96,16 @@ export function PasswordLengthSlider({
           defaultValue={12}
           value={value}
           onChange={handleChange}
+          handleStyle={{
+            height: 25,
+            width: 25,
+            borderWidth: 1.85,
+            borderColor: badgeProps.color,
+            top: 1.3,
+            boxShadow: 'none',
+          }}
+          railStyle={{ height: 10 }}
+          trackStyle={{ backgroundColor: badgeProps.color, height: 10 }}
         />
       </div>
 
