@@ -27,6 +27,7 @@ export function FileUploadForm({
       <div className="form-group">
         <div className="col-sm-12">
           <FileUploadField
+            inputId="file-upload-field"
             onChange={onChange}
             value={value}
             title={title}

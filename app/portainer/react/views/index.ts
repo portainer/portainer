@@ -1,6 +1,7 @@
 import angular from 'angular';
 
-export const viewsModule = angular.module(
-  'portainer.docker.react.views',
-  []
-).name;
+import { wizardModule } from './wizard';
+
+export const viewsModule = angular.module('portainer.app.react.views', [
+  wizardModule,
+]).name;

@@ -22,5 +22,12 @@ function Example({ title }: Args) {
     }
   }
 
-  return <FileUploadField onChange={onChange} value={value} title={title} />;
+  return (
+    <FileUploadField
+      onChange={onChange}
+      value={value}
+      title={title}
+      inputId="file-field"
+    />
+  );
 }
