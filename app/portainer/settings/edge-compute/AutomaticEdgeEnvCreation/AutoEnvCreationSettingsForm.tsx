@@ -8,7 +8,7 @@ import { FormSectionTitle } from '@/portainer/components/form-components/FormSec
 import { Input } from '@/portainer/components/form-components/Input';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { useUpdateSettingsMutation } from '@/portainer/settings/settings.service';
+import { useUpdateSettingsMutation } from '@/portainer/settings/queries';
 
 import { Settings } from '../types';
 

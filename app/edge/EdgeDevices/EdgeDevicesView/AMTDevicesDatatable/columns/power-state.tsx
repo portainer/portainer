@@ -2,8 +2,27 @@ import { CellProps, Column } from 'react-table';
 import clsx from 'clsx';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
-import { useRowContext } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
-import { PowerState, PowerStateCode } from '@/edge/devices/types';
+
+import { useRowContext } from './RowContext';
+
+enum PowerState {
+  Running = 'Running',
+  Sleep = 'Sleep',
+  Off = 'Off',
+  Hibernate = 'Hibernate',
+  PowerCycle = 'Power Cycle',
+}
+
+enum PowerStateCode {
+  On = 2,
+  SleepLight = 3,
+  SleepDeep = 4,
+  OffHard = 6,
+  Hibernate = 7,
+  OffSoft = 8,
+  PowerCycle = 9,
+  OffHardGraceful = 13,
+}
 
 export const powerState: Column<Device> = {
   Header: 'Power State',
