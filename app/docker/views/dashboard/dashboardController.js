@@ -48,9 +48,6 @@ angular.module('portainer.docker').controller('DashboardController', [
 
       $scope.showStacks = await shouldShowStacks();
       $scope.showEnvUrl = endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnDockerEnvironment && endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment;
-      console.log($scope.showEnvUrl);
-      // $scope.showEnvUrl = endpoint.;
-      console.log(endpoint);
       $q.all({
         containers: ContainerService.containers(1),
         images: ImageService.images(false),

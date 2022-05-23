@@ -36,7 +36,7 @@ class KubernetesDashboardController {
     const isAdmin = this.Authentication.isAdmin();
     const storageClasses = this.endpoint.Kubernetes.Configuration.StorageClasses;
     this.showEnvUrl = this.endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnDockerEnvironment && this.endpoint.Type !== PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment;
-    console.log(this.showEnvUrl);
+
     try {
       const [pools, applications, configurations, volumes, tags] = await Promise.all([
         this.KubernetesResourcePoolService.get(),
