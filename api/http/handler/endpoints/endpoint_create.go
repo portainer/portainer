@@ -187,6 +187,15 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
+	isUnique, err := handler.isNameUnique(payload.Name, 0)
+	if err != nil {
+		return httperror.InternalServerError("Unable to check if name is unique", err)
+	}
+
+	if !isUnique {
+		return httperror.NewError(http.StatusConflict, "Name is not unique", nil)
+	}
+
 	endpoint, endpointCreationError := handler.createEndpoint(payload)
 	if endpointCreationError != nil {
 		return endpointCreationError

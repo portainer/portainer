@@ -1,5 +1,7 @@
 import _ from 'lodash';
 
+import { useSettings } from '@/portainer/settings/queries';
+
 const categories = [
   'docker',
   'kubernetes',
@@ -58,6 +60,18 @@ export function push(
 ) {
   if (typeof window !== 'undefined') {
     window._paq.push([name, ...args]);
+  }
+}
+
+export function useAnalytics() {
+  const telemetryQuery = useSettings((settings) => settings.EnableTelemetry);
+
+  return { trackEvent: handleTrackEvent };
+
+  function handleTrackEvent(...args: Parameters<typeof trackEvent>) {
+    if (telemetryQuery.data) {
+      trackEvent(...args);
+    }
   }
 }
 
