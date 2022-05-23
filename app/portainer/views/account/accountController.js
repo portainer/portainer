@@ -112,6 +112,7 @@ angular.module('portainer.app').controller('AccountController', [
       const state = StateManager.getState();
       const userDetails = Authentication.getUserDetails();
       $scope.userID = userDetails.ID;
+      $scope.userRole = Authentication.getUserDetails().role;
       $scope.forceChangePassword = userDetails.forceChangePassword;
       $scope.timesPasswordChangeSkipped = StateManager.getState().UI.timesPasswordChangeSkipped || 0;
 
