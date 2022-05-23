@@ -8,9 +8,16 @@ import { PasswordLengthSlider } from './PasswordLengthSlider';
 export interface Props {
   onSaveSettings(): void;
   saveButtonState: boolean;
+  value: number;
+  onChange(value: number): void;
 }
 
-export function InternalAuth({ onSaveSettings, saveButtonState }: Props) {
+export function InternalAuth({
+  onSaveSettings,
+  saveButtonState,
+  value,
+  onChange,
+}: Props) {
   return (
     <>
       <FormSectionTitle>Information</FormSectionTitle>
@@ -27,7 +34,8 @@ export function InternalAuth({ onSaveSettings, saveButtonState }: Props) {
           min={8}
           max={18}
           step={1}
-          defaultValue={12} // Debug value
+          value={value}
+          onChange={onChange}
         />
       </div>
       <SaveAuthSettingsButton
@@ -41,4 +49,6 @@ export function InternalAuth({ onSaveSettings, saveButtonState }: Props) {
 export const InternalAuthAngular = react2angular(InternalAuth, [
   'onSaveSettings',
   'saveButtonState',
+  'value',
+  'onChange',
 ]);

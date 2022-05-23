@@ -71,6 +71,11 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     $scope.settings.AuthenticationMethod = value;
   };
 
+  $scope.onChangePasswordLength = function onChangePasswordLength(value) {
+    console.log($scope.settings.InternalAuthSettings.RequiredPasswordLength, value);
+    $scope.settings.InternalAuthSettings.RequiredPasswordLength = value;
+  };
+
   $scope.authenticationMethodSelected = function authenticationMethodSelected(value) {
     if (!$scope.settings) {
       return false;
@@ -218,6 +223,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
 
         $scope.OAuthSettings = settings.OAuthSettings;
         $scope.authMethod = settings.AuthenticationMethod;
+        $scope.InternalAuthSettings = settings.InternalAuthSettings;
         if (settings.AuthenticationMethod === 2 && settings.LDAPSettings.ServerType === 2) {
           $scope.authMethod = 4;
         }

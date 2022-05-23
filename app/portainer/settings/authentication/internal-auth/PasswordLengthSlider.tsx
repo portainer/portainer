@@ -12,7 +12,8 @@ export interface Props {
   min: number;
   max: number;
   step: number;
-  defaultValue: number;
+  value: number;
+  onChange(value: number): void;
 }
 
 type Strength = 'weak' | 'good' | 'strong' | 'veryStrong';
@@ -38,7 +39,13 @@ const badgeProperties: Record<
 
 const SliderWithTooltip = RcSlider.createSliderWithTooltip(RcSlider);
 
-export function PasswordLengthSlider({ min, max, step, defaultValue }: Props) {
+export function PasswordLengthSlider({
+  min,
+  max,
+  step,
+  value,
+  onChange,
+}: Props) {
   const [badgeProps, setBadgeProps] = useState<BadgeProperties>({
     icon: '',
     color: '',
@@ -62,11 +69,13 @@ export function PasswordLengthSlider({ min, max, step, defaultValue }: Props) {
   }
 
   useEffect(() => {
-    setBadgeProps(getBadgeProps(defaultValue));
-  }, [defaultValue]);
-
-  function onChange(value: number) {
     setBadgeProps(getBadgeProps(value));
+  }, [value]);
+
+  function handleChange(sliderValue: number) {
+    console.log(value);
+    onChange(sliderValue);
+    setBadgeProps(getBadgeProps(sliderValue));
   }
 
   return (
@@ -77,8 +86,8 @@ export function PasswordLengthSlider({ min, max, step, defaultValue }: Props) {
           min={min}
           max={max}
           step={step}
-          defaultValue={defaultValue}
-          onChange={onChange}
+          value={value}
+          onChange={handleChange}
         />
       </div>
 

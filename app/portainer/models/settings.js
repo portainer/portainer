@@ -2,6 +2,7 @@ export function SettingsViewModel(data) {
   this.LogoURL = data.LogoURL;
   this.BlackListedLabels = data.BlackListedLabels;
   this.AuthenticationMethod = data.AuthenticationMethod;
+  this.InternalAuthSettings = data.InternalAuthSettings;
   this.LDAPSettings = data.LDAPSettings;
   this.OAuthSettings = new OAuthSettingsViewModel(data.OAuthSettings);
   this.openAMTConfiguration = data.openAMTConfiguration;
@@ -31,6 +32,10 @@ export function PublicSettingsViewModel(settings) {
   this.EnableTelemetry = settings.EnableTelemetry;
   this.OAuthLogoutURI = settings.OAuthLogoutURI;
   this.KubeconfigExpiry = settings.KubeconfigExpiry;
+}
+
+export function InternalAuthSettingsViewModel(data) {
+  this.RequiredPasswordLength = data.RequiredPasswordLength;
 }
 
 export function LDAPSettingsViewModel(data) {
