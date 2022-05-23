@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useStatus } from '@/portainer/services/api/status.service';
 import { r2a } from '@/react-tools/react2angular';
-import { useSettings } from '@/portainer/settings/settings.service';
+import { useSettings } from '@/portainer/settings/queries';
 
 import { EdgePropertiesForm } from './EdgePropertiesForm';
 import { ScriptTabs } from './ScriptTabs';

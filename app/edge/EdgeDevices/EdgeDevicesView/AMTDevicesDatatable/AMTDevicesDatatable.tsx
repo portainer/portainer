@@ -8,8 +8,8 @@ import {
 } from '@/portainer/components/datatables/components';
 import { InnerDatatable } from '@/portainer/components/datatables/components/InnerDatatable';
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
-import { useAMTDevices } from '@/edge/devices/components/AMTDevicesDatatable/useAMTDevices';
-import { RowProvider } from '@/edge/devices/components/AMTDevicesDatatable/columns/RowContext';
+import { useAMTDevices } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/useAMTDevices';
+import { RowProvider } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/columns/RowContext';
 import { EnvironmentId } from '@/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 

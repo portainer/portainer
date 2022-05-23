@@ -4,8 +4,7 @@ import { useEffect } from 'react';
 import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { EdgeScriptForm } from '@/edge/components/EdgeScriptForm';
 import { generateKey } from '@/portainer/environments/environment.service/edge';
-
-import { useSettings } from '../../settings.service';
+import { useSettings } from '@/portainer/settings/queries';
 
 import { AutoEnvCreationSettingsForm } from './AutoEnvCreationSettingsForm';
 

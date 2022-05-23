@@ -14,9 +14,11 @@ interface Query extends EnvironmentsQueryParams {
   pageLimit?: number;
 }
 
-export function useEnvironmentList(query: Query = {}, refetchOffline = false) {
-  const { page = 1, pageLimit = 100 } = query;
-
+export function useEnvironmentList(
+  { page = 1, pageLimit = 100, ...query }: Query = {},
+  refetchOffline = false,
+  refreshRate = 0
+) {
   const { isLoading, data } = useQuery(
     ['environments', { page, pageLimit, ...query }],
     async () => {
@@ -26,6 +28,10 @@ export function useEnvironmentList(query: Query = {}, refetchOffline = false) {
     {
       keepPreviousData: true,
       refetchInterval: (data) => {
+        if (refreshRate) {
+          return refreshRate;
+        }
+
         if (!data || !refetchOffline) {
           return false;
         }
