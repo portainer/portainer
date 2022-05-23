@@ -73,7 +73,6 @@ export function PasswordLengthSlider({
   }, [value]);
 
   function handleChange(sliderValue: number) {
-    console.log(value);
     onChange(sliderValue);
     setBadgeProps(getBadgeProps(sliderValue));
   }
@@ -86,6 +85,7 @@ export function PasswordLengthSlider({
           min={min}
           max={max}
           step={step}
+          defaultValue={12}
           value={value}
           onChange={handleChange}
         />
