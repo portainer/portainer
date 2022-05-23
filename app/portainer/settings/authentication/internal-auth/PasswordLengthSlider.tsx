@@ -87,7 +87,7 @@ export function PasswordLengthSlider({
 
   return (
     <div style={{ marginLeft: 10, marginBottom: 50 }}>
-      <div className="col-sm-6">
+      <div className="col-sm-4">
         <SliderWithTooltip
           tipFormatter={(value) => `${value} characters`}
           min={min}
