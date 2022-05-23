@@ -101,7 +101,7 @@ export function PasswordLengthSlider({
             width: 25,
             borderWidth: 1.85,
             borderColor: badgeProps.color,
-            top: 1.3,
+            top: 1.5,
             boxShadow: 'none',
           }}
           railStyle={{ height: 10 }}
