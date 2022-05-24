@@ -51,7 +51,10 @@ angular.module('portainer.app').controller('AccountController', [
       $scope.passwordStrength = StrengthCheck($scope.formValues.newPassword);
     };
 
-    this.uiCanExit = () => {
+    this.uiCanExit = (newTransition) => {
+      if ($scope.userRole === 1 && newTransition.to().name === 'portainer.settings.authentication') {
+        return true;
+      }
       if ($scope.forceChangePassword) {
         ModalService.confirmForceChangePassword();
       }
