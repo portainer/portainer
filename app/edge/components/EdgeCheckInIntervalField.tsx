@@ -57,6 +57,9 @@ export function EdgeCheckinIntervalField({
 export const EdgeCheckinIntervalFieldAngular = r2a(EdgeCheckinIntervalField, [
   'value',
   'onChange',
+  'isDefaultHidden',
+  'tooltip',
+  'label',
 ]);
 
 function useOptions(isDefaultHidden: boolean) {

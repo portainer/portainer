@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 import { BEFeatureIndicator } from '@/portainer/components/BEFeatureIndicator';
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import { r2a } from '@/react-tools/react2angular';
 
 import './Switch.css';
 
@@ -55,14 +54,3 @@ export function Switch({
     </>
   );
 }
-
-export const SwitchAngular = r2a(Switch, [
-  'name',
-  'checked',
-  'id',
-  'disabled',
-  'dataCy',
-  'onChange',
-  'feature',
-  'className',
-]);
