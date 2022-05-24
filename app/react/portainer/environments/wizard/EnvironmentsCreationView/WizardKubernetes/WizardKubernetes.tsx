@@ -6,7 +6,7 @@ import {
   EnvironmentCreationTypes,
 } from '@/portainer/environments/types';
 import { BoxSelectorOption } from '@/portainer/components/BoxSelector/types';
-import { commandsTabs } from '@/edge/components/EdgeScriptForm/scripts';
+import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';

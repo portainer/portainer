@@ -5,11 +5,11 @@ import { CopyButton } from '@/portainer/components/Button/CopyButton';
 import { NavTabs } from '@/portainer/components/NavTabs/NavTabs';
 import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
 
-import { EdgeProperties, Platform } from './types';
+import { ScriptFormValues, Platform } from './types';
 import { CommandTab } from './scripts';
 
 interface Props {
-  values: EdgeProperties;
+  values: ScriptFormValues;
   edgeKey: string;
   edgeId?: string;
   commands: CommandTab[];

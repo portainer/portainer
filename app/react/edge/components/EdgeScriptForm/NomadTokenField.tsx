@@ -13,18 +13,20 @@ export function NomadTokenField() {
 
   return (
     <>
-      <div className="my-8">
-        <SwitchField
-          checked={values.authEnabled}
-          onChange={(value) => {
-            if (!value) {
-              setFieldValue('nomadToken', '');
-            }
-            setFieldValue('authEnabled', value);
-          }}
-          label="Nomad Authentication Enabled"
-          tooltip="Nomad authentication is only required if you have ACL enabled"
-        />
+      <div className="form-group">
+        <div className="col-sm-12">
+          <SwitchField
+            checked={values.authEnabled}
+            onChange={(value) => {
+              if (!value) {
+                setFieldValue('nomadToken', '');
+              }
+              setFieldValue('authEnabled', value);
+            }}
+            label="Nomad Authentication Enabled"
+            tooltip="Nomad authentication is only required if you have ACL enabled"
+          />
+        </div>
       </div>
 
       {values.authEnabled && (

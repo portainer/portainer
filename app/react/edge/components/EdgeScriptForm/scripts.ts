@@ -2,12 +2,12 @@ import _ from 'lodash';
 
 import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
 
-import { EdgeProperties, Platform } from './types';
+import { ScriptFormValues, Platform } from './types';
 
 type CommandGenerator = (
   agentVersion: string,
   edgeKey: string,
-  properties: EdgeProperties,
+  properties: ScriptFormValues,
   edgeId?: string,
   agentSecret?: string
 ) => string;
@@ -57,7 +57,7 @@ function buildDockerEnvVars(envVars: string, defaultVars: string[]) {
 export function buildLinuxStandaloneCommand(
   agentVersion: string,
   edgeKey: string,
-  properties: EdgeProperties,
+  properties: ScriptFormValues,
   edgeId?: string,
   agentSecret?: string
 ) {
@@ -91,7 +91,7 @@ docker run -d \\
 export function buildWindowsStandaloneCommand(
   agentVersion: string,
   edgeKey: string,
-  properties: EdgeProperties,
+  properties: ScriptFormValues,
   edgeId?: string,
   agentSecret?: string
 ) {
@@ -126,7 +126,7 @@ docker run -d \\
 export function buildLinuxSwarmCommand(
   agentVersion: string,
   edgeKey: string,
-  properties: EdgeProperties,
+  properties: ScriptFormValues,
   edgeId?: string,
   agentSecret?: string
 ) {
@@ -166,7 +166,7 @@ docker service create \\
 export function buildWindowsSwarmCommand(
   agentVersion: string,
   edgeKey: string,
-  properties: EdgeProperties,
+  properties: ScriptFormValues,
   edgeId?: string,
   agentSecret?: string
 ) {
@@ -207,7 +207,7 @@ docker service create \\
 export function buildLinuxKubernetesCommand(
   agentVersion: string,
   edgeKey: string,
-  properties: EdgeProperties,
+  properties: ScriptFormValues,
   edgeId?: string,
   agentSecret?: string
 ) {
