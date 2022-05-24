@@ -5,8 +5,6 @@ import { EnvironmentList } from './EnvironmentList';
 export { EnvironmentList };
 
 export const EnvironmentListAngular = react2angular(EnvironmentList, [
-  'tags',
   'onClickItem',
   'onRefresh',
-  'groups',
 ]);
