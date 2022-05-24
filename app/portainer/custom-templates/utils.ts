@@ -32,10 +32,12 @@ export function intersectVariables(
   oldVariables: VariableDefinition[] = [],
   newVariables: VariableDefinition[] = []
 ) {
+  const oldVariablesWithLabel = oldVariables.filter((v) => !!v.label);
+
   return [
-    ...oldVariables.filter((v) => !!v.label),
+    ...oldVariablesWithLabel,
     ...newVariables.filter(
-      (v) => !oldVariables.find(({ name }) => name === v.name)
+      (v) => !oldVariablesWithLabel.find(({ name }) => name === v.name)
     ),
   ];
 }
