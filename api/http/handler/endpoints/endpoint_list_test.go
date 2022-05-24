@@ -16,66 +16,57 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type endpointListEdgeDeviceTest struct {
+type endpointListTest struct {
 	title    string
 	expected []portainer.EndpointID
-	filter   string
 }
 
-func Test_endpointList(t *testing.T) {
-	var err error
-	is := assert.New(t)
+func Test_endpointList_edgeDeviceFilter(t *testing.T) {
 
-	_, store, teardown := datastore.MustNewTestStore(true, true)
-	defer teardown()
-
-	trustedEndpoint := portainer.Endpoint{ID: 1, UserTrusted: true, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
-	untrustedEndpoint := portainer.Endpoint{ID: 2, UserTrusted: false, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	trustedEdgeDevice := portainer.Endpoint{ID: 1, UserTrusted: true, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
+	untrustedEdgeDevice := portainer.Endpoint{ID: 2, UserTrusted: false, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
 	regularUntrustedEdgeEndpoint := portainer.Endpoint{ID: 3, UserTrusted: false, IsEdgeDevice: false, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
 	regularTrustedEdgeEndpoint := portainer.Endpoint{ID: 4, UserTrusted: true, IsEdgeDevice: false, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
 	regularEndpoint := portainer.Endpoint{ID: 5, UserTrusted: false, IsEdgeDevice: false, GroupID: 1, Type: portainer.DockerEnvironment}
 
-	endpoints := []portainer.Endpoint{
-		trustedEndpoint,
-		untrustedEndpoint,
+	handler, teardown := setup(t, []portainer.Endpoint{
+		trustedEdgeDevice,
+		untrustedEdgeDevice,
 		regularUntrustedEdgeEndpoint,
 		regularTrustedEdgeEndpoint,
 		regularEndpoint,
+	})
+
+	defer teardown()
+
+	type endpointListEdgeDeviceTest struct {
+		endpointListTest
+		edgeDevice          *bool
+		edgeDeviceUntrusted bool
 	}
-
-	for _, endpoint := range endpoints {
-		err = store.Endpoint().Create(&endpoint)
-		is.NoError(err, "error creating environment")
-	}
-
-	err = store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
-	is.NoError(err, "error creating a user")
-
-	bouncer := helper.NewTestRequestBouncer()
-	h := NewHandler(bouncer, nil)
-	h.DataStore = store
-	h.ComposeStackManager = testhelpers.NewComposeStackManager()
 
 	tests := []endpointListEdgeDeviceTest{
 		{
-			"should show all edge endpoints",
-			[]portainer.EndpointID{trustedEndpoint.ID, untrustedEndpoint.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID},
-			EdgeDeviceFilterAll,
+			endpointListTest: endpointListTest{
+				"should show only trusted edge devices and regular endpoints",
+				[]portainer.EndpointID{trustedEdgeDevice.ID, regularEndpoint.ID},
+			},
+			edgeDevice: BoolAddr(true),
 		},
 		{
-			"should show only trusted edge devices",
-			[]portainer.EndpointID{trustedEndpoint.ID, regularTrustedEdgeEndpoint.ID},
-			EdgeDeviceFilterTrusted,
+			endpointListTest: endpointListTest{
+				"should show only untrusted edge devices and regular endpoints",
+				[]portainer.EndpointID{untrustedEdgeDevice.ID, regularEndpoint.ID},
+			},
+			edgeDevice:          BoolAddr(true),
+			edgeDeviceUntrusted: true,
 		},
 		{
-			"should show only untrusted edge devices",
-			[]portainer.EndpointID{untrustedEndpoint.ID, regularUntrustedEdgeEndpoint.ID},
-			EdgeDeviceFilterUntrusted,
-		},
-		{
-			"should show no edge devices",
-			[]portainer.EndpointID{regularEndpoint.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID},
-			EdgeDeviceFilterNone,
+			endpointListTest: endpointListTest{
+				"should show no edge devices",
+				[]portainer.EndpointID{regularEndpoint.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID},
+			},
+			edgeDevice: BoolAddr(false),
 		},
 	}
 
@@ -83,8 +74,13 @@ func Test_endpointList(t *testing.T) {
 		t.Run(test.title, func(t *testing.T) {
 			is := assert.New(t)
 
-			req := buildEndpointListRequest(test.filter)
-			resp, err := doEndpointListRequest(req, h, is)
+			query := fmt.Sprintf("edgeDeviceUntrusted=%v&", test.edgeDeviceUntrusted)
+			if test.edgeDevice != nil {
+				query += fmt.Sprintf("edgeDevice=%v&", *test.edgeDevice)
+			}
+
+			req := buildEndpointListRequest(query)
+			resp, err := doEndpointListRequest(req, handler, is)
 			is.NoError(err)
 
 			is.Equal(len(test.expected), len(resp))
@@ -100,8 +96,28 @@ func Test_endpointList(t *testing.T) {
 	}
 }
 
-func buildEndpointListRequest(filter string) *http.Request {
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/endpoints?edgeDeviceFilter=%s", filter), nil)
+func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, teardown func()) {
+	is := assert.New(t)
+	_, store, teardown := datastore.MustNewTestStore(true, true)
+
+	for _, endpoint := range endpoints {
+		err := store.Endpoint().Create(&endpoint)
+		is.NoError(err, "error creating environment")
+	}
+
+	err := store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
+	is.NoError(err, "error creating a user")
+
+	bouncer := helper.NewTestRequestBouncer()
+	handler = NewHandler(bouncer, nil)
+	handler.DataStore = store
+	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
+
+	return handler, teardown
+}
+
+func buildEndpointListRequest(query string) *http.Request {
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/endpoints?%s", query), nil)
 
 	ctx := security.StoreTokenData(req, &portainer.TokenData{ID: 1, Username: "admin", Role: 1})
 	req = req.WithContext(ctx)
