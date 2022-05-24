@@ -1,12 +1,14 @@
+import { ReactNode } from 'react';
+
 export interface Props {
   value: string;
-  icon?: string;
+  icon?: ReactNode;
 }
 
 export function Badge({ icon, value }: Props) {
   return (
     <span className="badge">
-      {icon && <i className={icon} />}
+      {icon}
       {value}
     </span>
   );

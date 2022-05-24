@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import RcSlider from 'rc-slider';
 import clsx from 'clsx';
+import { Lock, XCircle, CheckCircle } from 'react-feather';
 
 import { Badge } from '@/portainer/components/Badge/Badge';
 
@@ -17,29 +18,29 @@ export interface Props {
 }
 
 type Strength = 'weak' | 'good' | 'strong' | 'veryStrong';
-type BadgeProperties = { icon: string; color: string; text: string };
+type SliderProperties = { strength: string; color: string; text: string };
 
-const badgeProperties: Record<
+const sliderProperties: Record<
   Strength,
-  { icon: string; color: string; text: string }
+  { strength: string; color: string; text: string }
 > = {
   weak: {
-    icon: 'far fa-times-circle',
+    strength: 'weak',
     color: '#f32e21',
     text: 'Weak password',
   },
   good: {
-    icon: 'far fa-check-circle',
+    strength: 'good',
     color: '#f69300',
     text: 'Good password',
   },
   strong: {
-    icon: 'far fa-check-circle',
+    strength: 'strong',
     color: '#40c267',
     text: 'Strong password',
   },
   veryStrong: {
-    icon: 'fa fa-lock',
+    strength: 'veryStrong',
     color: '#41b2f8',
     text: 'Very strong password',
   },
@@ -54,35 +55,47 @@ export function PasswordLengthSlider({
   value,
   onChange,
 }: Props) {
-  const [badgeProps, setBadgeProps] = useState<BadgeProperties>({
-    icon: '',
+  const [sliderProps, setSliderProps] = useState<SliderProperties>({
+    strength: '',
     color: '',
     text: '',
   });
 
-  function getBadgeProps(value: number) {
+  function getSliderProps(value: number) {
     if (value < 10) {
-      return badgeProperties.weak;
+      return sliderProperties.weak;
     }
 
     if (value < 12) {
-      return badgeProperties.good;
+      return sliderProperties.good;
     }
 
     if (value < 14) {
-      return badgeProperties.strong;
+      return sliderProperties.strong;
     }
 
-    return badgeProperties.veryStrong;
+    return sliderProperties.veryStrong;
+  }
+
+  function getBadgeIcon(strength: string) {
+    switch (strength) {
+      case 'weak':
+        return <XCircle size="15" className="space-right" />;
+      case 'good':
+      case 'strong':
+        return <CheckCircle size="15" className="space-right" />;
+      default:
+        return <Lock size="15" className="space-right" />;
+    }
   }
 
   useEffect(() => {
-    setBadgeProps(getBadgeProps(value));
+    setSliderProps(getSliderProps(value));
   }, [value]);
 
   function handleChange(sliderValue: number) {
     onChange(sliderValue);
-    setBadgeProps(getBadgeProps(sliderValue));
+    setSliderProps(getSliderProps(sliderValue));
   }
 
   return (
@@ -100,19 +113,19 @@ export function PasswordLengthSlider({
             height: 25,
             width: 25,
             borderWidth: 1.85,
-            borderColor: badgeProps.color,
+            borderColor: sliderProps.color,
             top: 1.5,
             boxShadow: 'none',
           }}
           railStyle={{ height: 10 }}
-          trackStyle={{ backgroundColor: badgeProps.color, height: 10 }}
+          trackStyle={{ backgroundColor: sliderProps.color, height: 10 }}
         />
       </div>
 
       <div className={clsx('col-sm-2', styles.sliderBadge)}>
         <Badge
-          value={badgeProps.text}
-          icon={`${badgeProps.icon} space-right`}
+          icon={getBadgeIcon(sliderProps.strength)}
+          value={sliderProps.text}
         />
       </div>
     </div>
