@@ -44,7 +44,7 @@ function StateManagerFactory(
   };
 
   manager.setPasswordChangeSkipped = function () {
-    ++state.UI.timesPasswordChangeSkipped || (state.UI.timesPasswordChangeSkipped = 1);
+    state.UI.timesPasswordChangeSkipped = state.UI.timesPasswordChangeSkipped + 1 || 1;
     LocalStorage.storeUIState(state.UI);
   };
 
