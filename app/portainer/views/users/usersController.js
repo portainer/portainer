@@ -1,5 +1,4 @@
 import _ from 'lodash-es';
-import { StrengthCheck } from 'Portainer/helpers/password';
 
 angular.module('portainer.app').controller('UsersController', [
   '$q',
@@ -17,7 +16,7 @@ angular.module('portainer.app').controller('UsersController', [
       userCreationError: '',
       validUsername: false,
       actionInProgress: false,
-      passwordStrength: false,
+      passwordTooShort: false,
     };
 
     $scope.formValues = {
@@ -29,7 +28,7 @@ angular.module('portainer.app').controller('UsersController', [
     };
 
     $scope.onPasswordChange = function () {
-      $scope.state.passwordStrength = StrengthCheck($scope.formValues.Password);
+      $scope.state.passwordTooShort = $scope.formValues.Password.length < $scope.requiredPasswordLength;
     };
 
     $scope.checkUsernameValidity = function () {
@@ -128,6 +127,7 @@ angular.module('portainer.app').controller('UsersController', [
           $scope.users = users;
           $scope.teams = _.orderBy(data.teams, 'Name', 'asc');
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
+          $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve users and teams');

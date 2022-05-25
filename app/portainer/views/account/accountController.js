@@ -1,5 +1,3 @@
-import { StrengthCheck } from 'Portainer/helpers/password';
-
 angular.module('portainer.app').controller('AccountController', [
   '$scope',
   '$state',
@@ -18,7 +16,7 @@ angular.module('portainer.app').controller('AccountController', [
       userTheme: '',
     };
 
-    $scope.passwordStrength = false;
+    $scope.passwordTooShort = false;
 
     $scope.updatePassword = async function () {
       const confirmed = await ModalService.confirmChangePassword();
@@ -47,7 +45,7 @@ angular.module('portainer.app').controller('AccountController', [
     };
 
     $scope.onNewPasswordChange = function () {
-      $scope.passwordStrength = StrengthCheck($scope.formValues.newPassword);
+      $scope.passwordTooShort = $scope.formValues.newPassword.length < $scope.requiredPasswordLength;
     };
 
     $scope.userCanSkip = function () {

@@ -70,7 +70,7 @@
           <!-- !confirm-password-input -->
 
           <!-- password-check-hint -->
-          <div class="form-group" ng-if="AuthenticationMethod === 1 && !state.passwordStrength">
+          <div class="form-group" ng-if="AuthenticationMethod === 1 && state.passwordTooShort">
             <div class="col-sm-3 col-lg-2"></div>
             <div class="col-sm-8">
               <password-check-hint></password-check-hint>
