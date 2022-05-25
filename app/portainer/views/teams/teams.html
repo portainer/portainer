@@ -7,7 +7,7 @@
   <rd-header-content>Teams management</rd-header-content>
 </rd-header>
 
-<create-team-form ng-if="isTeamLeader && users" users="users" action-in-progress="state.actionInProgress" teams="teams" on-submit="(addTeam)"></create-team-form>
+<create-team-form ng-if="(isAdmin || isTeamLeader) && users" users="users" action-in-progress="state.actionInProgress" teams="teams" on-submit="(addTeam)"></create-team-form>
 
 <div class="row">
   <div class="col-sm-12">
