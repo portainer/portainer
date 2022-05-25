@@ -6,7 +6,7 @@ import uuidv4 from 'uuid/v4';
 import PortainerError from '@/portainer/error';
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { buildOption } from '@/portainer/components/BoxSelector';
-import { renderTemplate } from '@/portainer/custom-templates/utils';
+import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 
 class KubernetesDeployController {
   /* @ngInject */

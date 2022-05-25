@@ -1,6 +1,6 @@
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
-import { getTemplateVariables, intersectVariables } from '@/portainer/custom-templates/utils';
+import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 
 class KubeEditCustomTemplateViewController {
   /* @ngInject */

@@ -6,7 +6,7 @@ import {
   IOnChangesObject,
 } from 'angular';
 
-import { VariableDefinition } from '../CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
+import { VariableDefinition } from '@/react/portainer/custom-templates/components/CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
 
 class VariablesFieldController implements IComponentController {
   formCtrl!: IFormController;

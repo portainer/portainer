@@ -5,7 +5,6 @@ import {
   InputListError,
   ItemProps,
 } from '@/portainer/components/form-components/InputList/InputList';
-import { r2a } from '@/react-tools/react2angular';
 
 export interface VariableDefinition {
   name: string;
@@ -89,8 +88,3 @@ function Item({ item, onChange, error }: ItemProps<VariableDefinition>) {
     onChange({ ...item, [e.target.name]: e.target.value });
   }
 }
-
-export const CustomTemplatesVariablesDefinitionFieldAngular = r2a(
-  CustomTemplatesVariablesDefinitionField,
-  ['onChange', 'value', 'errors']
-);

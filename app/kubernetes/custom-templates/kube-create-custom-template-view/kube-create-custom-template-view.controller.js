@@ -1,6 +1,6 @@
 import { buildOption } from '@/portainer/components/BoxSelector';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
-import { getTemplateVariables, intersectVariables } from '@/portainer/custom-templates/utils';
+import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 
 class KubeCreateCustomTemplateViewController {
   /* @ngInject */

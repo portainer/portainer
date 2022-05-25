@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-import { getTemplateVariables, intersectVariables } from '@/portainer/custom-templates/utils';
+import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 
 class EditCustomTemplateViewController {
   /* @ngInject */

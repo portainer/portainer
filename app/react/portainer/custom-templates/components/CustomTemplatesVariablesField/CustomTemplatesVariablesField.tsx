@@ -1,7 +1,6 @@
 import { FormControl } from '@/portainer/components/form-components/FormControl';
 import { FormSection } from '@/portainer/components/form-components/FormSection/FormSection';
 import { Input } from '@/portainer/components/form-components/Input';
-import { r2a } from '@/react-tools/react2angular';
 
 import { VariableDefinition } from '../CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
 
@@ -53,8 +52,3 @@ export function CustomTemplatesVariablesField({
     </FormSection>
   );
 }
-
-export const CustomTemplatesVariablesFieldAngular = r2a(
-  CustomTemplatesVariablesField,
-  ['value', 'onChange', 'definitions']
-);
