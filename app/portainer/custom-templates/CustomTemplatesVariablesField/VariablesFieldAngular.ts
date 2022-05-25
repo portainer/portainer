@@ -3,6 +3,7 @@ import {
   IComponentController,
   IFormController,
   IScope,
+  IOnChangesObject,
 } from 'angular';
 
 import { VariableDefinition } from '../CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
@@ -27,19 +28,28 @@ class VariablesFieldController implements IComponentController {
 
   handleChange(value: Record<string, string>) {
     this.$scope.$evalAsync(() => {
-      this.formCtrl.$setValidity(
-        'templateVariables',
-        Object.entries(value).every(
-          ([name, value]) =>
-            !!value ||
-            this.definitions.some(
-              (def) => def.name === name && !!def.defaultValue
-            )
-        ),
-        this.formCtrl
-      );
       this.onChange(value);
     });
+  }
+
+  $onChanges({ value }: IOnChangesObject) {
+    if (value.currentValue) {
+      this.checkValidity(value.currentValue);
+    }
+  }
+
+  checkValidity(value: Record<string, string>) {
+    this.formCtrl.$setValidity(
+      'templateVariables',
+      Object.entries(value).every(
+        ([name, value]) =>
+          !!value ||
+          this.definitions.some(
+            (def) => def.name === name && !!def.defaultValue
+          )
+      ),
+      this.formCtrl
+    );
   }
 }
 
