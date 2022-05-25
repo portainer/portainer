@@ -80,12 +80,14 @@ export function PasswordLengthSlider({
   function getBadgeIcon(strength: string) {
     switch (strength) {
       case 'weak':
-        return <XCircle size="15" className="space-right" />;
+        return <XCircle size="15" className="space-right" strokeWidth="3px" />;
       case 'good':
       case 'strong':
-        return <CheckCircle size="15" className="space-right" />;
+        return (
+          <CheckCircle size="15" className="space-right" strokeWidth="3px" />
+        );
       default:
-        return <Lock size="15" className="space-right" />;
+        return <Lock size="15" className="space-right" strokeWidth="3px" />;
     }
   }
 
