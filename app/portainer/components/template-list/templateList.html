@@ -18,7 +18,7 @@
             <ui-select ng-model="$ctrl.state.selectedCategory">
               <ui-select-match placeholder="Category">
                 <span>{{ $select.selected }}</span>
-                <a ng-click="$ctrl.clearCategoryFilter()" style="margin-left: -20px; position: relative; bottom: 4px">
+                <a ng-click="$ctrl.clearCategoryFilter(); $event.stopPropagation()" style="margin-left: -20px; position: relative; bottom: 4px">
                   <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
                 </a>
               </ui-select-match>
@@ -31,7 +31,7 @@
             <ui-select ng-model="$ctrl.state.filterByType" ng-change="$ctrl.applyTypeFilter($select.selected)">
               <ui-select-match placeholder="Type">
                 <span>{{ $select.selected }}</span>
-                <a ng-click="$ctrl.clearTypeFilter()" style="margin-left: -20px; position: relative; bottom: 4px">
+                <a ng-click="$ctrl.clearTypeFilter(); $event.stopPropagation()" style="margin-left: -20px; position: relative; bottom: 4px">
                   <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
                 </a>
               </ui-select-match>
@@ -44,7 +44,7 @@
             <ui-select ng-model="$ctrl.state.selectedOrderBy" ng-change="$ctrl.changeOrderBy($select.selected, false)">
               <ui-select-match placeholder="Sort By">
                 <span>{{ $select.selected }}</span>
-                <a ng-click="$ctrl.clearOrderBy()" style="margin-left: -20px; position: relative; bottom: 4px">
+                <a ng-click="$ctrl.clearOrderBy(); $event.stopPropagation()" style="margin-left: -20px; position: relative; bottom: 4px">
                   <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
                 </a>
               </ui-select-match>
