@@ -4,6 +4,10 @@ import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { Environment } from '@/portainer/environments/types';
 import { useCreateEdgeAgentEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
 import { baseHref } from '@/portainer/helpers/pathHelper';
+import { FormSection } from '@/portainer/components/form-components/FormSection';
+import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
+
+import { MetadataFieldset } from '../../MetadataFieldset';
 
 import { EdgeAgentFieldset } from './EdgeAgentFieldset';
 import { validationSchema } from './EdgeAgentForm.validation';
@@ -26,9 +30,21 @@ export function EdgeAgentForm({ onCreate, readonly }: Props) {
       validateOnMount
       validationSchema={validationSchema}
     >
-      {({ isValid }) => (
+      {({ isValid, setFieldValue, values }) => (
         <Form>
           <EdgeAgentFieldset readonly={readonly} />
+
+          <FormSection isFoldable title="More Settings">
+            <FormSection title="Check-in Intervals">
+              <EdgeCheckinIntervalField
+                readonly={readonly}
+                onChange={(value) => setFieldValue('pollFrequency', value)}
+                value={values.pollFrequency}
+              />
+            </FormSection>
+
+            <MetadataFieldset isFoldable={false} />
+          </FormSection>
 
           {!readonly && (
             <div className="row">

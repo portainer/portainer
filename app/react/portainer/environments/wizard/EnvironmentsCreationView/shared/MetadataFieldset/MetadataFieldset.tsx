@@ -6,13 +6,17 @@ import { FormSection } from '@/portainer/components/form-components/FormSection'
 
 import { GroupField } from './GroupsField';
 
-export function MetadataFieldset() {
+interface Props {
+  isFoldable?: boolean;
+}
+
+export function MetadataFieldset({ isFoldable = true }: Props) {
   const [tagProps, , tagHelpers] = useField('meta.tagIds');
 
   const { isAdmin } = useUser();
 
   return (
-    <FormSection title="Metadata" isFoldable>
+    <FormSection title="Metadata" isFoldable={isFoldable}>
       <GroupField />
 
       <TagSelector
