@@ -14,7 +14,7 @@ import { ContainerDetailsViewModel, ContainerStatsViewModel, ContainerViewModel 
 angular.module('portainer.docker').factory('ContainerService', ContainerServiceFactory);
 
 /* @ngInject */
-function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointProvider) {
+function ContainerServiceFactory($q, Container, PodmanContainer, LogHelper, $timeout, EndpointProvider) {
   const service = {
     killContainer: withEndpointId(killContainer),
     pauseContainer: withEndpointId(pauseContainer),
@@ -185,7 +185,7 @@ function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointPro
   };
 
   service.containerTop = function (id) {
-    return Container.top({ id: id }).$promise;
+    return PodmanContainer.top({ id: id }).$promise;
   };
 
   service.inspect = function (id) {
