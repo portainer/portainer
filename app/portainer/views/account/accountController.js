@@ -1,4 +1,4 @@
-import { MinPasswordLen, StrengthCheck } from 'Portainer/helpers/password';
+import { StrengthCheck } from 'Portainer/helpers/password';
 
 angular.module('portainer.app').controller('AccountController', [
   '$scope',
@@ -19,7 +19,6 @@ angular.module('portainer.app').controller('AccountController', [
     };
 
     $scope.passwordStrength = false;
-    $scope.MinPasswordLen = MinPasswordLen;
 
     $scope.updatePassword = async function () {
       const confirmed = await ModalService.confirmChangePassword();
@@ -37,7 +36,7 @@ angular.module('portainer.app').controller('AccountController', [
 
     $scope.skipPasswordChange = async function () {
       try {
-        if ($scope.timesPasswordChangeSkipped < 2) {
+        if ($scope.userCanSkip()) {
           StateManager.setPasswordChangeSkipped();
           $scope.forceChangePassword = false;
           $state.go('portainer.home');
@@ -49,6 +48,10 @@ angular.module('portainer.app').controller('AccountController', [
 
     $scope.onNewPasswordChange = function () {
       $scope.passwordStrength = StrengthCheck($scope.formValues.newPassword);
+    };
+
+    $scope.userCanSkip = function () {
+      return $scope.timesPasswordChangeSkipped < 2;
     };
 
     this.uiCanExit = (newTransition) => {
@@ -130,6 +133,7 @@ angular.module('portainer.app').controller('AccountController', [
       SettingsService.publicSettings()
         .then(function success(data) {
           $scope.AuthenticationMethod = data.AuthenticationMethod;
+          $scope.requiredPasswordLength = data.RequiredPasswordLength;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

@@ -34,8 +34,8 @@
           <internal-auth
             ng-if="authenticationMethodSelected(1)"
             on-save-settings="(saveSettings)"
-            save-button-state="state.actionInProgress"
-            value="InternalAuthSettings.RequiredPasswordLength"
+            is-loading="state.actionInProgress"
+            value="settings.InternalAuthSettings"
             on-change="(onChangePasswordLength)"
           ></internal-auth>
 

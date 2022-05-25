@@ -24,6 +24,7 @@ export function SettingsViewModel(data) {
 
 export function PublicSettingsViewModel(settings) {
   this.AuthenticationMethod = settings.AuthenticationMethod;
+  this.RequiredPasswordLength = settings.RequiredPasswordLength;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.EnforceEdgeID = settings.EnforceEdgeID;
   this.FeatureFlagSettings = settings.FeatureFlagSettings;

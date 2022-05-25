@@ -2,19 +2,20 @@ import { FormSectionTitle } from '@/portainer/components/form-components/FormSec
 import { react2angular } from '@/react-tools/react2angular';
 
 import { SaveAuthSettingsButton } from '../components/SaveAuthSettingsButton';
+import { Settings } from '../../types';
 
 import { PasswordLengthSlider } from './PasswordLengthSlider';
 
 export interface Props {
   onSaveSettings(): void;
-  saveButtonState: boolean;
-  value: number;
+  isLoading: boolean;
+  value: Settings['InternalAuthSettings'];
   onChange(value: number): void;
 }
 
 export function InternalAuth({
   onSaveSettings,
-  saveButtonState,
+  isLoading,
   value,
   onChange,
 }: Props) {
@@ -25,23 +26,23 @@ export function InternalAuth({
         When using internal authentication, Portainer will encrypt user
         passwords and store credentials locally.
       </div>
+
       <FormSectionTitle>Password rules</FormSectionTitle>
       <div className="form-group col-sm-12 text-muted small">
         Define minimum length for user-generated passwords.
       </div>
+
       <div className="form-group">
         <PasswordLengthSlider
           min={8}
           max={18}
           step={1}
-          value={value}
+          value={value.RequiredPasswordLength}
           onChange={onChange}
         />
       </div>
-      <SaveAuthSettingsButton
-        onSubmit={onSaveSettings}
-        isLoading={saveButtonState}
-      />
+
+      <SaveAuthSettingsButton onSubmit={onSaveSettings} isLoading={isLoading} />
     </>
   );
 }

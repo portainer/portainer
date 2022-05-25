@@ -73,8 +73,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
 
   $scope.onChangePasswordLength = function onChangePasswordLength(value) {
     $scope.$evalAsync(() => {
-      $scope.InternalAuthSettings.RequiredPasswordLength = value;
-      $scope.settings.InternalAuthSettings.RequiredPasswordLength = value;
+      $scope.settings.InternalAuthSettings = { RequiredPasswordLength: value };
     });
   };
 
@@ -225,7 +224,6 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
 
         $scope.OAuthSettings = settings.OAuthSettings;
         $scope.authMethod = settings.AuthenticationMethod;
-        $scope.InternalAuthSettings = settings.InternalAuthSettings;
         if (settings.AuthenticationMethod === 2 && settings.LDAPSettings.ServerType === 2) {
           $scope.authMethod = 4;
         }
