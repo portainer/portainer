@@ -2,7 +2,7 @@ import RcSlider from 'rc-slider';
 import clsx from 'clsx';
 import { Lock, XCircle, CheckCircle } from 'react-feather';
 
-import { Badge } from '@/portainer/components/Badge/Badge';
+import { Badge } from '@/portainer/settings/authentication/internal-auth/components/Badge';
 
 import 'rc-slider/assets/index.css';
 
@@ -74,14 +74,14 @@ export function PasswordLengthSlider({
   function getBadgeIcon(strength: string) {
     switch (strength) {
       case 'weak':
-        return <XCircle size="15" className="space-right" strokeWidth="3px" />;
+        return <XCircle size="13" className="space-right" strokeWidth="3px" />;
       case 'good':
       case 'strong':
         return (
-          <CheckCircle size="15" className="space-right" strokeWidth="3px" />
+          <CheckCircle size="13" className="space-right" strokeWidth="3px" />
         );
       default:
-        return <Lock size="15" className="space-right" strokeWidth="3px" />;
+        return <Lock size="13" className="space-right" strokeWidth="3px" />;
     }
   }
 

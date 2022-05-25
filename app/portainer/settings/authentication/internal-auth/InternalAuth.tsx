@@ -4,7 +4,7 @@ import { react2angular } from '@/react-tools/react2angular';
 import { SaveAuthSettingsButton } from '../components/SaveAuthSettingsButton';
 import { Settings } from '../../types';
 
-import { PasswordLengthSlider } from './PasswordLengthSlider';
+import { PasswordLengthSlider } from './components/PasswordLengthSlider/PasswordLengthSlider';
 
 export interface Props {
   onSaveSettings(): void;
