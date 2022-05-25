@@ -1,37 +1,18 @@
 import { ReactQueryDevtools } from 'react-query/devtools';
-import {
-  MutationCache,
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from 'react-query';
+import { QueryClientProvider } from 'react-query';
 import { UIRouterContextComponent } from '@uirouter/react-hybrid';
-import { PropsWithChildren, StrictMode, useState, useEffect } from 'react';
+import { PropsWithChildren, StrictMode } from 'react';
 
 import { UserProvider } from '@/portainer/hooks/useUser';
 import { UIStateProvider } from '@/portainer/hooks/UIStateProvider';
-import { notifyError } from '@/portainer/services/notifications';
 
-const queryClient = new QueryClient({
-  mutationCache: new MutationCache({
-    onError: (error, variable, context, mutation) => {
-      handleError(error, mutation.meta?.error);
-    },
-  }),
-  queryCache: new QueryCache({
-    onError: (error, mutation) => {
-      handleError(error, mutation.meta?.error);
-    },
-  }),
-});
+import { createQueryClient } from './react-query';
+
+const queryClient = createQueryClient();
 
 export function RootProvider({ children }: PropsWithChildren<unknown>) {
-  const [showReactQueryDevtools, setShowReactQueryDevtools] = useState(false);
-  useEffect(() => {
-    if (process.env.SHOW_REACT_QUERY_DEV_TOOLS === 'true') {
-      setShowReactQueryDevtools(true);
-    }
-  }, []);
+  const showReactQueryDevtools =
+    process.env.SHOW_REACT_QUERY_DEV_TOOLS === 'true';
 
   return (
     <StrictMode>
@@ -45,21 +26,4 @@ export function RootProvider({ children }: PropsWithChildren<unknown>) {
       </QueryClientProvider>
     </StrictMode>
   );
-}
-
-function handleError(error: unknown, errorMeta?: unknown) {
-  if (errorMeta && typeof errorMeta === 'object') {
-    if (!('title' in errorMeta)) {
-      return;
-    }
-
-    const { title, message } = errorMeta as {
-      title: unknown;
-      message?: unknown;
-    };
-
-    if (typeof title === 'string') {
-      notifyError(title, error as Error, message as string);
-    }
-  }
 }

@@ -37,7 +37,7 @@ func Test_userRemoveAccessToken(t *testing.T) {
 	requestBouncer := security.NewRequestBouncer(store, jwtService, apiKeyService)
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
-	h := NewHandler(requestBouncer, rateLimiter, apiKeyService)
+	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, nil)
 	h.DataStore = store
 
 	// generate standard and admin user tokens

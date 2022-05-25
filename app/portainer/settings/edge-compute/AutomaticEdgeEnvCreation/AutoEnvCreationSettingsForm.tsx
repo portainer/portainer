@@ -8,7 +8,7 @@ import { FormSectionTitle } from '@/portainer/components/form-components/FormSec
 import { Input } from '@/portainer/components/form-components/Input';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { useUpdateSettingsMutation } from '@/portainer/settings/settings.service';
+import { useUpdateSettingsMutation } from '@/portainer/settings/queries';
 
 import { Settings } from '../types';
 
@@ -23,11 +23,20 @@ const validation = yup.object({
   EdgePortainerUrl: yup
     .string()
     .test(
-      'not-local',
-      'Cannot use localhost as environment URL',
-      (value) => !value?.includes('localhost')
+      'url',
+      'URL should be a valid URI and cannot include localhost',
+      (value) => {
+        if (!value) {
+          return false;
+        }
+        try {
+          const url = new URL(value);
+          return !!url.hostname && url.hostname !== 'localhost';
+        } catch {
+          return false;
+        }
+      }
     )
-    .url('URL should be a valid URI')
     .required('URL is required'),
 });
 

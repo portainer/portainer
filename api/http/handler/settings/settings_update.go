@@ -77,7 +77,7 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 		}
 	}
 
-	if payload.EdgePortainerURL != nil {
+	if payload.EdgePortainerURL != nil && *payload.EdgePortainerURL != "" {
 		_, err := edge.ParseHostForEdge(*payload.EdgePortainerURL)
 		if err != nil {
 			return err
@@ -111,6 +111,11 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
+	}
+
+	if handler.demoService.IsDemo() {
+		payload.EnableTelemetry = nil
+		payload.LogoURL = nil
 	}
 
 	if payload.AuthenticationMethod != nil {

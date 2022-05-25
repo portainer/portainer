@@ -21,8 +21,6 @@ import (
 	"github.com/portainer/portainer/api/stacks"
 )
 
-const defaultGitReferenceName = "refs/heads/master"
-
 var (
 	errStackAlreadyExists     = errors.New("A stack already exists with this name")
 	errWebhookIDAlreadyExists = errors.New("A webhook ID already exists")

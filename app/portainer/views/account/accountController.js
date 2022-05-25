@@ -97,12 +97,19 @@ angular.module('portainer.app').controller('AccountController', [
     };
 
     async function initView() {
-      $scope.userID = Authentication.getUserDetails().ID;
-      $scope.forceChangePassword = Authentication.getUserDetails().forceChangePassword;
+      const state = StateManager.getState();
+      const userDetails = Authentication.getUserDetails();
+      $scope.userID = userDetails.ID;
+      $scope.forceChangePassword = userDetails.forceChangePassword;
+
+      if (state.application.demoEnvironment.enabled) {
+        $scope.isDemoUser = state.application.demoEnvironment.users.includes($scope.userID);
+      }
 
       const data = await UserService.user($scope.userID);
 
-      $scope.formValues.userTheme = data.Usertheme;
+      $scope.formValues.userTheme = data.UserTheme;
+
       SettingsService.publicSettings()
         .then(function success(data) {
           $scope.AuthenticationMethod = data.AuthenticationMethod;

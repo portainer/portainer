@@ -23,6 +23,7 @@ import (
 	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
@@ -572,6 +573,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	openAMTService := openamt.NewService()
 
 	cryptoService := initCryptoService()
+
 	digitalSignatureService := initDigitalSignatureService()
 
 	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.SSLCert, *flags.SSLKey, fileService, dataStore, shutdownTrigger)
@@ -607,7 +609,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	kubeClusterAccessService := kubernetes.NewKubeClusterAccessService(*flags.BaseURL, *flags.AddrHTTPS, sslSettings.CertPath)
 
-	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
+	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager, gitService)
 
 	reverseTunnelService.ProxyManager = proxyManager
 
@@ -633,6 +635,14 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	applicationStatus := initStatus(instanceID)
+
+	demoService := demo.NewService()
+	if *flags.DemoEnvironment {
+		err := demoService.Init(dataStore, cryptoService)
+		if err != nil {
+			log.Fatalf("failed initializing demo environment: %v", err)
+		}
+	}
 
 	err = initEndpoint(flags, dataStore, snapshotService)
 	if err != nil {
@@ -722,6 +732,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
+		DemoService:                 demoService,
 	}
 }
 

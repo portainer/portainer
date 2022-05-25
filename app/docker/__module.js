@@ -1,10 +1,13 @@
 import angular from 'angular';
 
 import { EnvironmentStatus } from '@/portainer/environments/types';
+
+import { reactModule } from './react';
 import containersModule from './containers';
 import { componentsModule } from './components';
+import { networksModule } from './networks';
 
-angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule]).config([
+angular.module('portainer.docker', ['portainer.app', containersModule, componentsModule, networksModule, reactModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -323,8 +326,7 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
       url: '/:id?nodeName',
       views: {
         'content@': {
-          templateUrl: './views/networks/edit/network.html',
-          controller: 'NetworkController',
+          component: 'networkDetailsView',
         },
       },
     };

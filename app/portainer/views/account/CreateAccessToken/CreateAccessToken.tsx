@@ -11,8 +11,6 @@ import { Code } from '@/portainer/components/Code';
 import { CopyButton } from '@/portainer/components/Button/CopyButton';
 import { Input } from '@/portainer/components/form-components/Input';
 
-import styles from './CreateAccessToken.module.css';
-
 interface AccessTokenResponse {
   rawAPIKey: string;
 }
@@ -75,13 +73,16 @@ export function CreateAccessToken({
               value={description}
             />
           </FormControl>
-          <Button
-            disabled={!!errorText || !!accessToken}
-            onClick={() => generateAccessToken()}
-            className={styles.addButton}
-          >
-            {t('Add access token')}
-          </Button>
+          <div className="row mt-5">
+            <div className="col-sm-12">
+              <Button
+                disabled={!!errorText || !!accessToken}
+                onClick={() => generateAccessToken()}
+              >
+                {t('Add access token')}
+              </Button>
+            </div>
+          </div>
         </div>
         {accessToken && (
           <>
@@ -95,7 +96,7 @@ export function CreateAccessToken({
               </Trans>
             </TextTip>
             <Code>{accessToken}</Code>
-            <CopyButton copyText={accessToken} className={styles.copyButton}>
+            <CopyButton copyText={accessToken}>
               <Trans ns={translationNS}>Copy access token</Trans>
             </CopyButton>
             <hr />
