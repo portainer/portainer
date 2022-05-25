@@ -1,6 +1,8 @@
 package teams
 
 import (
+	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -46,6 +48,15 @@ func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *http
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+
+	if !security.AuthorizedTeamManagement(portainer.TeamID(teamID), securityContext) {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to team", httperrors.ErrResourceAccessDenied}
 	}
 
 	team, err := handler.DataStore.Team().Team(portainer.TeamID(teamID))
