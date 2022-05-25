@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import RcSlider from 'rc-slider';
 import clsx from 'clsx';
 import { Lock, XCircle, CheckCircle } from 'react-feather';
@@ -18,7 +17,6 @@ export interface Props {
 }
 
 type Strength = 'weak' | 'good' | 'strong' | 'veryStrong';
-type SliderProperties = { strength: string; color: string; text: string };
 
 const sliderProperties: Record<
   Strength,
@@ -55,11 +53,7 @@ export function PasswordLengthSlider({
   value,
   onChange,
 }: Props) {
-  const [sliderProps, setSliderProps] = useState<SliderProperties>({
-    strength: '',
-    color: '',
-    text: '',
-  });
+  const sliderProps = getSliderProps(value);
 
   function getSliderProps(value: number) {
     if (value < 10) {
@@ -91,13 +85,8 @@ export function PasswordLengthSlider({
     }
   }
 
-  useEffect(() => {
-    setSliderProps(getSliderProps(value));
-  }, [value]);
-
   function handleChange(sliderValue: number) {
     onChange(sliderValue);
-    setSliderProps(getSliderProps(sliderValue));
   }
 
   return (
