@@ -64,18 +64,16 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the team inside the database", err}
 	}
 
-	if payload.TeamLeaders != nil {
-		for _, teamLeader := range payload.TeamLeaders {
-			membership := &portainer.TeamMembership{
-				UserID: teamLeader,
-				TeamID: team.ID,
-				Role:   portainer.TeamLeader,
-			}
+	for _, teamLeader := range payload.TeamLeaders {
+		membership := &portainer.TeamMembership{
+			UserID: teamLeader,
+			TeamID: team.ID,
+			Role:   portainer.TeamLeader,
+		}
 
-			err = handler.DataStore.TeamMembership().Create(membership)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team leadership inside the database", err}
-			}
+		err = handler.DataStore.TeamMembership().Create(membership)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team leadership inside the database", err}
 		}
 	}
 

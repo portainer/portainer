@@ -246,11 +246,6 @@ func (bouncer *RequestBouncer) mwIsTeamLeader(next http.Handler) http.Handler {
 			return
 		}
 
-		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrResourceAccessDenied)
-			return
-		}
-
 		next.ServeHTTP(w, r)
 	})
 }
