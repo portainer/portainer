@@ -9,10 +9,44 @@ function TemplateListController($async, $state, DatatableService, Notifications,
     textFilter: '',
     selectedCategory: '',
     categories: [],
+    typeFilters: [],
+    filterByType: '',
     showContainerTemplates: true,
     selectedOrderBy: '',
     orderByFields: [],
     orderDesc: false,
+  };
+
+  const categorySorter = (template) => {
+    if (template.Categories && template.Categories.length > 0 && template.Categories[0] && template.Categories[0].length > 0) {
+      return template.Categories[0].toLowerCase();
+    }
+    {
+      return 'zz';
+    }
+  };
+
+  const getSorter = (orderBy) => {
+    let sorter;
+    switch (orderBy) {
+      case 'Categories':
+        sorter = categorySorter;
+        break;
+      default:
+        sorter = orderBy;
+    }
+
+    return sorter;
+  };
+
+  this.applyTypeFilter = (type) => {
+    this.state.filterByType = type;
+    this.state.showContainerTemplates = 'Container' === type || '' === type;
+    this.updateCategories();
+  };
+
+  this.clearTypeFilter = () => {
+    this.applyTypeFilter('');
   };
 
   this.onTextFilterChange = function () {
@@ -21,12 +55,22 @@ function TemplateListController($async, $state, DatatableService, Notifications,
 
   this.changeOrderBy = function (orderField) {
     this.state.selectedOrderBy = orderField;
-    this.templates = _.orderBy(this.templates, [this.state.selectedOrderBy], [this.state.orderDesc ? 'desc' : 'asc']);
+    this.templates = _.orderBy(this.templates, [getSorter(this.state.selectedOrderBy)], [this.state.orderDesc ? 'desc' : 'asc']);
   };
 
-  this.revertOrder = function () {
+  this.revertOrder = () => {
     this.state.orderDesc = !this.state.orderDesc;
-    this.templates = _.orderBy(this.templates, [this.state.selectedOrderBy], [this.state.orderDesc ? 'desc' : 'asc']);
+    this.templates = _.orderBy(this.templates, [getSorter(this.state.selectedOrderBy)], [this.state.orderDesc ? 'desc' : 'asc']);
+  };
+
+  this.clearOrderBy = () => {
+    this.state.selectedOrderBy = '';
+    this.templates = this.initalTemplates;
+  };
+
+  this.clearCategoryFilter = () => {
+    this.state.selectedCategory = '';
+    this.updateCategories();
   };
 
   this.filterByTemplateType = function (item) {
@@ -34,9 +78,9 @@ function TemplateListController($async, $state, DatatableService, Notifications,
       case 1: // container
         return ctrl.state.showContainerTemplates;
       case 2: // swarm stack
-        return ctrl.showSwarmStacks;
+        return ctrl.showSwarmStacks && !ctrl.state.showContainerTemplates;
       case 3: // docker compose
-        return !ctrl.showSwarmStacks || (ctrl.showSwarmStacks && ctrl.state.showContainerTemplates);
+        return !ctrl.state.showContainerTemplates || ctrl.state.filterByType == '';
       case 4: // Edge stack templates
         return false;
     }
@@ -97,6 +141,8 @@ function TemplateListController($async, $state, DatatableService, Notifications,
       this.state.textFilter = textFilter;
     }
 
-    this.state.orderByFields = ['Title'];
+    this.initalTemplates = this.templates;
+    this.state.orderByFields = ['Title', 'Categories', 'Description'];
+    this.state.typeFilters = ['Container', 'Stack'];
   };
 }
