@@ -4,7 +4,7 @@ import { DialogOverlay } from '@reach/dialog';
 
 import * as kcService from '@/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
-import { Environment } from '@/portainer/environments/types';
+import { Environment, EnvironmentId } from '@/portainer/environments/types';
 import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service/index';
 import { isKubernetesEnvironment } from '@/portainer/environments/utils';
 import { useEnvironmentList } from '@/portainer/environments/queries';
@@ -17,7 +17,29 @@ import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitSta
 import styles from './KubeconfigButton.module.css';
 import '@reach/dialog/styles.css';
 
-const selection = new Set<number>();
+function useSelection() {
+  const [selection, setSelection] = useState<Record<EnvironmentId, boolean>>(
+    {}
+  );
+
+  const selectionSize = Object.keys(selection).length;
+
+  return { selection, toggle, selectionSize };
+
+  function toggle(id: EnvironmentId, selected: boolean) {
+    setSelection((prevSelection) => {
+      const newSelection = { ...prevSelection };
+
+      if (!selected) {
+        delete newSelection[id];
+      } else {
+        newSelection[id] = true;
+      }
+
+      return newSelection;
+    });
+  }
+}
 export interface KubeconfigButtonProps {
   environments: Environment[];
   envQueryParams: EnvironmentsQueryParams;
@@ -26,6 +48,7 @@ export function KubeconfigButton({
   environments,
   envQueryParams,
 }: KubeconfigButtonProps) {
+  const { selection, toggle: toggleSelection, selectionSize } = useSelection();
   const [showDialog, setShowDialog] = useState(false);
   const kubeServiceExpiryQuery = useQuery(['kubeServiceExpiry'], async () => {
     const expiryMessage = await kcService.expiryMessage();
@@ -61,6 +84,7 @@ export function KubeconfigButton({
             kubeServiceExpiry={kubeServiceExpiryQuery.data}
             selection={selection}
             envQueryParams={envQueryParams}
+            onToggleSelection={toggleSelection}
           />
           <div className="modal-footer">
             <Button onClick={handleClose} color="default">
@@ -82,7 +106,6 @@ export function KubeconfigButton({
       category: 'kubernetes',
     });
 
-    selection.clear();
     setShowDialog(true);
   }
 
@@ -102,12 +125,14 @@ export function KubeconfigButton({
   }
 
   async function confirmKubeconfigSelection() {
-    if (selection.size === 0) {
+    if (selectionSize === 0) {
       notifications.warning('No environment was selected', '');
       return;
     }
     try {
-      await kcService.downloadKubeconfigFile(Array.from(selection));
+      await kcService.downloadKubeconfigFile(
+        Object.keys(selection).map(Number)
+      );
       setShowDialog(false);
     } catch (e) {
       notifications.error('Failed downloading kubeconfig file', e as Error);
@@ -117,8 +142,9 @@ export function KubeconfigButton({
 
 export interface KubeconfigPormptProps {
   kubeServiceExpiry: string | undefined;
-  selection: Set<number>;
+  selection: Record<EnvironmentId, boolean>;
   envQueryParams: EnvironmentsQueryParams;
+  onToggleSelection: (id: EnvironmentId, selected: boolean) => void;
 }
 const storageKey = 'home_endpoints';
 
@@ -126,18 +152,21 @@ export function KubeconfigPormpt({
   kubeServiceExpiry,
   selection,
   envQueryParams,
+  onToggleSelection,
 }: KubeconfigPormptProps) {
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
-  const [checkChanged, setCheckChanged] = useState(false);
-  const [checkAll, setCheckAll] = useState(false);
-  const { environments, totalCount } = useEnvironmentList(
-    { page, pageLimit, ...envQueryParams },
-    true
-  );
+
+  const { environments, totalCount } = useEnvironmentList({
+    page,
+    pageLimit,
+    ...envQueryParams,
+  });
   const kubeEnvs = environments.filter((env) =>
     isKubernetesEnvironment(env.Type)
   );
+
+  const isAllPageSelected = kubeEnvs.every((env) => selection[env.Id]);
 
   return (
     <div className="modal-body">
@@ -154,8 +183,8 @@ export function KubeconfigPormpt({
         <label>
           <input
             type="checkbox"
-            checked={isCheckAll()}
-            onChange={() => onCheckAll()}
+            checked={isAllPageSelected}
+            onChange={handleSelectAll}
           />
           &nbsp;Select all (in this page)
         </label>
@@ -167,8 +196,8 @@ export function KubeconfigPormpt({
               <label>
                 <input
                   type="checkbox"
-                  checked={selection.has(env.Id)}
-                  onChange={() => onCheck(env.Id)}
+                  checked={!!selection[env.Id]}
+                  onChange={() => onToggleSelection(env.Id, !selection[env.Id])}
                 />
                 &nbsp;{env.Name} ({env.URL})
               </label>
@@ -191,29 +220,7 @@ export function KubeconfigPormpt({
     </div>
   );
 
-  function onCheck(envId: number) {
-    if (selection.has(envId)) {
-      selection.delete(envId);
-    } else {
-      selection.add(envId);
-    }
-    setCheckChanged(!checkChanged);
-  }
-
-  function isCheckAll() {
-    return kubeEnvs.every(({ Id }) => selection.has(Id));
-  }
-
-  function onCheckAll() {
-    if (isCheckAll()) {
-      for (let i = 0; i < kubeEnvs.length; i += 1) {
-        selection.delete(kubeEnvs[i].Id);
-      }
-    } else {
-      for (let i = 0; i < kubeEnvs.length; i += 1) {
-        selection.add(kubeEnvs[i].Id);
-      }
-    }
-    setCheckAll(!checkAll);
+  function handleSelectAll() {
+    kubeEnvs.forEach((env) => onToggleSelection(env.Id, !isAllPageSelected));
   }
 }
