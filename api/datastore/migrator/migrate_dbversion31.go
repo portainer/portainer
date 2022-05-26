@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/docker/docker/api/types/volume"
 	"github.com/portainer/portainer/api/dataservices/errors"
 
 	portainer "github.com/portainer/portainer/api"
@@ -207,18 +206,18 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		endpointDockerID, err := snapshotutils.FetchDockerID(snapshot)
 		if err != nil {
-			log.Printf("[WARN] [bolt,migrator,v31] [message: failed fetching environment docker id] [err: %s]", err)
+			log.Printf("[WARN] [database,migrator,v31] [message: failed fetching environment docker id] [err: %s]", err)
 			continue
 		}
 
-		volumesData := snapshot.SnapshotRaw.Volumes
-		if volumesData.Volumes == nil {
-			log.Println("[DEBUG] [volume migration] [message: no volume data found]")
-			continue
+		if volumesData, done := snapshot.SnapshotRaw.Volumes.(map[string]interface{}); done {
+			if volumesData["Volumes"] == nil {
+				log.Println("[DEBUG] [volume migration] [message: no volume data found]")
+				continue
+			}
+
+			findResourcesToUpdateForDB32(endpointDockerID, volumesData, toUpdate, volumeResourceControls)
 		}
-
-		findResourcesToUpdateToDB32(endpointDockerID, volumesData, toUpdate, volumeResourceControls)
-
 	}
 
 	for _, resourceControl := range volumeResourceControls {
@@ -241,11 +240,18 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 	return nil
 }
 
-func findResourcesToUpdateToDB32(dockerID string, volumesData volume.VolumeListOKBody, toUpdate map[portainer.ResourceControlID]string, volumeResourceControls map[string]*portainer.ResourceControl) {
-	volumes := volumesData.Volumes
-	for _, volume := range volumes {
-		volumeName := volume.Name
-		createTime := volume.CreatedAt
+func findResourcesToUpdateForDB32(dockerID string, volumesData map[string]interface{}, toUpdate map[portainer.ResourceControlID]string, volumeResourceControls map[string]*portainer.ResourceControl) {
+	volumes := volumesData["Volumes"].([]interface{})
+	for _, volumeMeta := range volumes {
+		volume := volumeMeta.(map[string]interface{})
+		volumeName, nameExist := volume["Name"].(string)
+		if !nameExist {
+			continue
+		}
+		createTime, createTimeExist := volume["CreatedAt"].(string)
+		if !createTimeExist {
+			continue
+		}
 
 		oldResourceID := fmt.Sprintf("%s%s", volumeName, createTime)
 		resourceControl, ok := volumeResourceControls[oldResourceID]
