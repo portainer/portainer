@@ -21,9 +21,6 @@ function TemplateListController($async, $state, DatatableService, Notifications,
     if (template.Categories && template.Categories.length > 0 && template.Categories[0] && template.Categories[0].length > 0) {
       return template.Categories[0].toLowerCase();
     }
-    {
-      return 'zz';
-    }
   };
 
   const getSorter = (orderBy) => {
