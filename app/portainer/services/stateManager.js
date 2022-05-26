@@ -48,7 +48,7 @@ function StateManagerFactory(
     LocalStorage.storeUIState(state.UI);
   };
 
-  manager.clearPasswordChangeSkips = function () {
+  manager.resetPasswordChangeSkips = function () {
     state.UI.timesPasswordChangeSkipped = 0;
     LocalStorage.storeUIState(state.UI);
   };

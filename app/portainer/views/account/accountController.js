@@ -24,7 +24,7 @@ angular.module('portainer.app').controller('AccountController', [
         try {
           await UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword);
           Notifications.success('Success', 'Password successfully updated');
-          StateManager.clearPasswordChangeSkips();
+          StateManager.resetPasswordChangeSkips();
           $scope.forceChangePassword = false;
           $state.go('portainer.logout');
         } catch (err) {
