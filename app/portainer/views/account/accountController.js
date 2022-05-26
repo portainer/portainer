@@ -16,7 +16,7 @@ angular.module('portainer.app').controller('AccountController', [
       userTheme: '',
     };
 
-    $scope.passwordTooShort = false;
+    $scope.passwordInvalid = false;
 
     $scope.updatePassword = async function () {
       const confirmed = await ModalService.confirmChangePassword();
@@ -45,7 +45,7 @@ angular.module('portainer.app').controller('AccountController', [
     };
 
     $scope.onNewPasswordChange = function () {
-      $scope.passwordTooShort = $scope.formValues.newPassword.length < $scope.requiredPasswordLength;
+      $scope.passwordInvalid = $scope.formValues.newPassword.length < $scope.requiredPasswordLength;
     };
 
     $scope.userCanSkip = function () {

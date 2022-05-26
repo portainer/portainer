@@ -11,6 +11,7 @@ angular.module('portainer.app').controller('UserController', [
   function ($q, $scope, $state, $transition$, UserService, ModalService, Notifications, SettingsService, Authentication) {
     $scope.state = {
       updatePasswordError: '',
+      passwordInvalid: false,
     };
 
     $scope.formValues = {
@@ -84,6 +85,10 @@ angular.module('portainer.app').controller('UserController', [
         });
     };
 
+    $scope.onPasswordChange = function () {
+      $scope.state.passwordInvalid = $scope.formValues.newPassword.length < $scope.requiredPasswordLength;
+    };
+
     function deleteUser() {
       UserService.deleteUser($scope.user.Id)
         .then(function success() {
@@ -120,6 +125,7 @@ angular.module('portainer.app').controller('UserController', [
           $scope.formValues.Administrator = user.Role === 1;
           $scope.formValues.username = user.Username;
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
+          $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve user information');

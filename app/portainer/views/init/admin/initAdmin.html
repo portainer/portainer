@@ -63,12 +63,12 @@
             <!-- !confirm-password-input -->
             <!-- note -->
             <div class="form-group">
-              <div class="col-sm-12 text-muted" ng-if="!state.passwordStrength">
+              <div class="col-sm-12 text-muted" ng-if="state.passwordInvalid">
                 <!-- below code is duplicated with component of <force-password-update-hint>  -->
                 <!-- it is a workaround for firefox that does not render component <force-password-update-hint>  -->
                 <p>
-                  <i class="fa fa-times red-icon space-right" aria-hidden="true"></i>
-                  <span>The password must be at least {{ MinPasswordLen }} characters long.</span>
+                  <i class="fa fa-exclamation-triangle orange-icon space-right" aria-hidden="true"></i>
+                  <span>The password must be at least {{ requiredPasswordLength }} characters long.</span>
                 </p>
               </div>
             </div>
@@ -79,7 +79,7 @@
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="state.actionInProgress || !state.passwordStrength || formValues.Password !== formValues.ConfirmPassword"
+                  ng-disabled="state.actionInProgress || state.passwordInvalid || formValues.Password !== formValues.ConfirmPassword"
                   ng-click="createAdminUser()"
                   button-spinner="state.actionInProgress"
                 >

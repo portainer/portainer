@@ -57,7 +57,7 @@
             <div class="col-sm-8">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password" />
+                <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password" ng-change="onPasswordChange()" />
               </div>
             </div>
           </div>
@@ -81,6 +81,7 @@
             </div>
           </div>
           <!-- !confirm-password-input -->
+          <password-check-hint ng-if="state.passwordInvalid"></password-check-hint>
           <div class="form-group">
             <div class="col-sm-2">
               <button

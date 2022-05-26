@@ -1,5 +1,3 @@
-import { MinPasswordLen, StrengthCheck } from 'Portainer/helpers/password';
-
 angular.module('portainer.app').controller('InitAdminController', [
   '$scope',
   '$state',
@@ -27,15 +25,14 @@ angular.module('portainer.app').controller('InitAdminController', [
       actionInProgress: false,
       showInitPassword: true,
       showRestorePortainer: false,
-      passwordStrength: false,
+      passwordInvalid: false,
     };
-
-    $scope.MinPasswordLen = MinPasswordLen;
 
     createAdministratorFlow();
 
     $scope.onPasswordChange = function () {
-      $scope.state.passwordStrength = StrengthCheck($scope.formValues.Password);
+      console.log($scope.formValues.Password.length, $scope.requiredPasswordLength, $scope.state.passwordInvalid);
+      $scope.state.passwordInvalid = $scope.formValues.Password.length < $scope.requiredPasswordLength;
     };
 
     $scope.togglePanel = function () {
@@ -88,6 +85,14 @@ angular.module('portainer.app').controller('InitAdminController', [
     }
 
     function createAdministratorFlow() {
+      SettingsService.publicSettings()
+        .then(function success(data) {
+          $scope.requiredPasswordLength = data.RequiredPasswordLength;
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve application settings');
+        });
+
       UserService.administratorExists()
         .then(function success(exists) {
           if (exists) {
