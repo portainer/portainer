@@ -195,12 +195,12 @@ type (
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 
 	DockerSnapshotRaw struct {
-		Containers []types.Container       `json:"Containers"`
-		Volumes    volume.VolumeListOKBody `json:"Volumes"`
-		Networks   []types.NetworkResource `json:"Networks"`
-		Images     []types.ImageSummary    `json:"Images"`
-		Info       types.Info              `json:"Info"`
-		Version    types.Version           `json:"Version"`
+		Containers []types.Container       `json:"Containers" swaggerignore:"true"`
+		Volumes    volume.VolumeListOKBody `json:"Volumes" swaggerignore:"true"`
+		Networks   []types.NetworkResource `json:"Networks" swaggerignore:"true"`
+		Images     []types.ImageSummary    `json:"Images" swaggerignore:"true"`
+		Info       types.Info              `json:"Info" swaggerignore:"true"`
+		Version    types.Version           `json:"Version" swaggerignore:"true"`
 	}
 
 	// EdgeGroup represents an Edge group
