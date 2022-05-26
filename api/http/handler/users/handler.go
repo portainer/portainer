@@ -46,30 +46,31 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 		apiKeyService: apiKeyService,
 		demoService:   demoService,
 	}
-	h.Handle("/users",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userCreate))).Methods(http.MethodPost)
-	h.Handle("/users",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userList))).Methods(http.MethodGet)
-	h.Handle("/users/{id}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userInspect))).Methods(http.MethodGet)
-	h.Handle("/users/{id}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userUpdate))).Methods(http.MethodPut)
-	h.Handle("/users/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.userDelete))).Methods(http.MethodDelete)
-	h.Handle("/users/{id}/tokens",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userGetAccessTokens))).Methods(http.MethodGet)
-	h.Handle("/users/{id}/tokens",
-		rateLimiter.LimitAccess(bouncer.RestrictedAccess(httperror.LoggerHandler(h.userCreateAccessToken)))).Methods(http.MethodPost)
-	h.Handle("/users/{id}/tokens/{keyID}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userRemoveAccessToken))).Methods(http.MethodDelete)
-	h.Handle("/users/{id}/memberships",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userMemberships))).Methods(http.MethodGet)
-	h.Handle("/users/{id}/passwd",
-		rateLimiter.LimitAccess(bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userUpdatePassword)))).Methods(http.MethodPut)
-	h.Handle("/users/admin/check",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.adminCheck))).Methods(http.MethodGet)
-	h.Handle("/users/admin/init",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.adminInit))).Methods(http.MethodPost)
+
+	adminRouter := h.NewRoute().Subrouter()
+	adminRouter.Use(bouncer.AdminAccess)
+
+	teamLeaderRouter := h.NewRoute().Subrouter()
+	teamLeaderRouter.Use(bouncer.TeamLeaderAccess)
+
+	authenticatedRouter := h.NewRoute().Subrouter()
+	authenticatedRouter.Use(bouncer.AuthenticatedAccess)
+
+	publicRouter := h.NewRoute().Subrouter()
+	publicRouter.Use(bouncer.PublicAccess)
+
+	adminRouter.Handle("/users", httperror.LoggerHandler(h.userCreate)).Methods(http.MethodPost)
+	teamLeaderRouter.Handle("/users", httperror.LoggerHandler(h.userList)).Methods(http.MethodGet)
+	authenticatedRouter.Handle("/users/{id}", httperror.LoggerHandler(h.userInspect)).Methods(http.MethodGet)
+	authenticatedRouter.Handle("/users/{id}", httperror.LoggerHandler(h.userUpdate)).Methods(http.MethodPut)
+	adminRouter.Handle("/users/{id}", httperror.LoggerHandler(h.userDelete)).Methods(http.MethodDelete)
+	adminRouter.Handle("/users/{id}/tokens", httperror.LoggerHandler(h.userGetAccessTokens)).Methods(http.MethodGet)
+	adminRouter.Handle("/users/{id}/tokens", rateLimiter.LimitAccess(httperror.LoggerHandler(h.userCreateAccessToken))).Methods(http.MethodPost)
+	adminRouter.Handle("/users/{id}/tokens/{keyID}", httperror.LoggerHandler(h.userRemoveAccessToken)).Methods(http.MethodDelete)
+	adminRouter.Handle("/users/{id}/memberships", httperror.LoggerHandler(h.userMemberships)).Methods(http.MethodGet)
+	authenticatedRouter.Handle("/users/{id}/passwd", rateLimiter.LimitAccess(httperror.LoggerHandler(h.userUpdatePassword))).Methods(http.MethodPut)
+	publicRouter.Handle("/users/admin/check", httperror.LoggerHandler(h.adminCheck)).Methods(http.MethodGet)
+	publicRouter.Handle("/users/admin/init", httperror.LoggerHandler(h.adminInit)).Methods(http.MethodPost)
 
 	return h
 }
