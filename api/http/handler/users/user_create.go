@@ -9,8 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	httperrors "github.com/portainer/portainer/api/http/errors"
-	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/passwordutils"
 )
 
@@ -35,8 +33,7 @@ func (payload *userCreatePayload) Validate(r *http.Request) error {
 // @id UserCreate
 // @summary Create a new user
 // @description Create a new Portainer user.
-// @description Only team leaders and administrators can create users.
-// @description Only administrators can create an administrator user account.
+// @description Only administrators can create users.
 // @description **Access policy**: restricted
 // @tags users
 // @security ApiKeyAuth
@@ -55,19 +52,6 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
-	}
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-
-	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user", httperrors.ErrResourceAccessDenied}
-	}
-
-	if securityContext.IsTeamLeader && payload.Role == 1 {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create administrator user", httperrors.ErrResourceAccessDenied}
 	}
 
 	user, err := handler.DataStore.User().UserByUsername(payload.Username)
