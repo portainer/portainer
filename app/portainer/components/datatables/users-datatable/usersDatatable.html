@@ -67,7 +67,8 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="portainer.users.user({id: item.Id})">{{ item.Username }}</a>
+                <a ui-sref="portainer.users.user({id: item.Id})" ng-show="$ctrl.isAdmin">{{ item.Username }}</a>
+                <span ng-show="!$ctrl.isAdmin">{{ item.Username }}</span>
               </td>
               <td>
                 <span>
