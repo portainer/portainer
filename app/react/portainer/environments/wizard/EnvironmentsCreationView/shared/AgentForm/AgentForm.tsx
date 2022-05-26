@@ -8,7 +8,7 @@ import { Environment } from '@/portainer/environments/types';
 import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
 
 import { NameField } from '../NameField';
-import { MetadataFieldset } from '../MetadataFieldset';
+import { MoreSettingsSection } from '../MoreSettingsSection';
 
 import { EnvironmentUrlField } from './EnvironmentUrlField';
 import { validation } from './AgentForm.validation';
@@ -44,7 +44,7 @@ export function AgentForm({ onCreate }: Props) {
           <NameField />
           <EnvironmentUrlField />
 
-          <MetadataFieldset />
+          <MoreSettingsSection />
 
           <div className="form-group">
             <div className="col-sm-12">
