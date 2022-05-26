@@ -5,8 +5,6 @@ import (
 	"io"
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/volume"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	v1 "k8s.io/api/core/v1"
 )
@@ -193,14 +191,13 @@ type (
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
-
 	DockerSnapshotRaw struct {
-		Containers []types.Container       `json:"Containers"`
-		Volumes    volume.VolumeListOKBody `json:"Volumes"`
-		Networks   []types.NetworkResource `json:"Networks"`
-		Images     []types.ImageSummary    `json:"Images"`
-		Info       types.Info              `json:"Info"`
-		Version    types.Version           `json:"Version"`
+		Containers interface{} `json:"Containers"`
+		Volumes    interface{} `json:"Volumes"`
+		Networks   interface{} `json:"Networks"`
+		Images     interface{} `json:"Images"`
+		Info       interface{} `json:"Info"`
+		Version    interface{} `json:"Version"`
 	}
 
 	// EdgeGroup represents an Edge group

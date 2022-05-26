@@ -188,17 +188,24 @@ func (service *Service) snapshotEndpoints() error {
 
 // FetchDockerID fetches info.Swarm.Cluster.ID if environment(endpoint) is swarm and info.ID otherwise
 func FetchDockerID(snapshot portainer.DockerSnapshot) (string, error) {
-	info := snapshot.SnapshotRaw.Info
-
-	if !snapshot.Swarm {
-		return info.ID, nil
+	info, done := snapshot.SnapshotRaw.Info.(map[string]interface{})
+	if !done {
+		return "", errors.New("failed getting snapshot info")
 	}
 
-	swarmInfo := info.Swarm
-	if swarmInfo.Cluster == nil {
+	if !snapshot.Swarm {
+		return info["ID"].(string), nil
+	}
+
+	if info["Swarm"] == nil {
+		return "", errors.New("swarm environment is missing swarm info snapshot")
+	}
+
+	swarmInfo := info["Swarm"].(map[string]interface{})
+	if swarmInfo["Cluster"] == nil {
 		return "", errors.New("swarm environment is missing cluster info snapshot")
 	}
 
-	clusterInfo := swarmInfo.Cluster
-	return clusterInfo.ID, nil
+	clusterInfo := swarmInfo["Cluster"].(map[string]interface{})
+	return clusterInfo["ID"].(string), nil
 }
