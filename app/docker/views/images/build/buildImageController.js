@@ -17,6 +17,8 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     NodeName: null,
   };
 
+  $scope.nameChecker = RegExp('^[a-z0-9-_]{2,256}$');
+
   $window.onbeforeunload = () => {
     if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
       return '';
@@ -94,7 +96,7 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
   $scope.validImageNames = function () {
     for (var i = 0; i < $scope.formValues.ImageNames.length; i++) {
       var item = $scope.formValues.ImageNames[i];
-      if (item.Name !== '') {
+      if ($scope.nameChecker.test(item.Name)) {
         return true;
       }
     }
