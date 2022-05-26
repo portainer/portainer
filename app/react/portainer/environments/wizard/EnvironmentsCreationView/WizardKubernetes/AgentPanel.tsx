@@ -13,7 +13,9 @@ export function AgentPanel({ onCreate }: Props) {
     <>
       <DeploymentScripts />
 
-      <AgentForm onCreate={onCreate} />
+      <div className="mt-5">
+        <AgentForm onCreate={onCreate} />
+      </div>
     </>
   );
 }
