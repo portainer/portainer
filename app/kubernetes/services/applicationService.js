@@ -280,14 +280,11 @@ class KubernetesApplicationService {
    *    in this method should also be displayed in the summary output (getUpdatedApplicationResources)
    */
   async patchAsync(oldFormValues, newFormValues) {
-    const [oldApp, oldHeadlessService, oldServices, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
-    const [newApp, newHeadlessService, newServices, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
+    const [oldApp, oldHeadlessService, oldServices, , oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
+    const [newApp, newHeadlessService, newServices, , newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
     const oldApiService = this._getApplicationApiService(oldApp);
     const newApiService = this._getApplicationApiService(newApp);
 
-    if (newService && oldService) {
-      // Do nothing
-    }
     if (oldApiService !== newApiService) {
       // delete services first
       if (oldServices) {
