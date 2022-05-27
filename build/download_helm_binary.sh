@@ -12,11 +12,11 @@ HELM_VERSION=$3
 HELM_DIST="helm-$HELM_VERSION-$PLATFORM-$ARCH"
 
 if [[ ${PLATFORM} == "linux" ]]; then
-  wget -O "https://get.helm.sh/${HELM_DIST}.tar.gz" | tar -x -z --strip-components 1 "${PLATFORM}-${ARCH}/helm"
+  wget -qO- "https://get.helm.sh/${HELM_DIST}.tar.gz" | tar -x -z --strip-components 1 "${PLATFORM}-${ARCH}/helm"
   mv "helm" "dist/helm"
   chmod +x "dist/helm"
 elif [[ ${PLATFORM} == "darwin" ]]; then
-  wget -O "https://get.helm.sh/helm-canary-darwin-amd64.tar.gz" | tar -x -z --strip-components 1 "darwin-amd64/helm"
+  wget -qO- "https://get.helm.sh/helm-canary-darwin-amd64.tar.gz" | tar -x -z --strip-components 1 "darwin-amd64/helm"
   mv "helm" "dist/helm"
   chmod +x "dist/helm"
 elif [[ ${PLATFORM} == "windows" ]]; then
