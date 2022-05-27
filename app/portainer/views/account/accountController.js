@@ -132,7 +132,14 @@ angular.module('portainer.app').controller('AccountController', [
       SettingsService.publicSettings()
         .then(function success(data) {
           $scope.AuthenticationMethod = data.AuthenticationMethod;
+
+          if (StateManager.getState().UI.requiredPasswordLength && StateManager.getState().UI.requiredPasswordLength !== data.RequiredPasswordLength) {
+            StateManager.resetPasswordChangeSkips();
+          }
+          $scope.timesPasswordChangeSkipped = StateManager.getState().UI.timesPasswordChangeSkipped || 0;
+
           $scope.requiredPasswordLength = data.RequiredPasswordLength;
+          StateManager.setRequiredPasswordLength(data.RequiredPasswordLength);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
