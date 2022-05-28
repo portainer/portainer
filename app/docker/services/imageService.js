@@ -156,6 +156,13 @@ angular.module('portainer.docker').factory('ImageService', [
      * @param {bool} ignoreErrors
      */
     function pullImage(registry, ignoreErrors) {
+      // note trailing space!
+      var dockerPullTxt = 'docker pull ';
+      const indexDockerPullTxt = registry.Image.indexOf(dockerPullTxt);
+      if (indexDockerPullTxt == 0) {
+        registry.Image = registry.Image.split(dockerPullTxt)[1];
+      }
+      
       var authenticationDetails = registry.Registry.Authentication ? RegistryService.encodedCredentials(registry.Registry) : '';
       HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
 
