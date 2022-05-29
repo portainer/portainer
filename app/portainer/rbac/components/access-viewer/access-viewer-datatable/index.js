@@ -7,5 +7,6 @@ export const accessViewerDatatable = {
     tableKey: '@',
     orderBy: '@',
     dataset: '<',
+    isAdmin: '<',
   },
 };

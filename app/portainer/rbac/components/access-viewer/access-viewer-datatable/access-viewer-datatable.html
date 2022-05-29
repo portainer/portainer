@@ -33,10 +33,10 @@
           <td
             >{{ item.TeamName ? 'Team' : 'User' }} <code ng-if="item.TeamName">{{ item.TeamName }}</code> access defined on {{ item.AccessLocation }}
             <code ng-if="item.GroupName">{{ item.GroupName }}</code>
-            <a ng-if="!item.GroupName" ui-sref="portainer.endpoints.endpoint.access({id: item.EndpointId})"
+            <a ng-if="!item.GroupName && $ctrl.isAdmin" ui-sref="portainer.endpoints.endpoint.access({id: item.EndpointId})"
               ><i style="margin-left: 5px" class="fa fa-users" aria-hidden="true"></i> Manage access
             </a>
-            <a ng-if="item.GroupName" ui-sref="portainer.groups.group.access({id: item.GroupId})"
+            <a ng-if="item.GroupName && $ctrl.isAdmin" ui-sref="portainer.groups.group.access({id: item.GroupId})"
               ><i style="margin-left: 5px" class="fa fa-users" aria-hidden="true"></i> Manage access
             </a>
           </td>

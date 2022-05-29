@@ -5,7 +5,7 @@ import AccessViewerPolicyModel from '../../models/access';
 
 export default class AccessViewerController {
   /* @ngInject */
-  constructor(Notifications, RoleService, UserService, EndpointService, GroupService, TeamService, TeamMembershipService) {
+  constructor(Notifications, RoleService, UserService, EndpointService, GroupService, TeamService, TeamMembershipService, Authentication) {
     this.Notifications = Notifications;
     this.RoleService = RoleService;
     this.UserService = UserService;
@@ -13,6 +13,7 @@ export default class AccessViewerController {
     this.GroupService = GroupService;
     this.TeamService = TeamService;
     this.TeamMembershipService = TeamMembershipService;
+    this.Authentication = Authentication;
 
     this.limitedFeature = 'rbac-roles';
     this.users = [];
@@ -108,6 +109,7 @@ export default class AccessViewerController {
         return;
       }
 
+      this.isAdmin = this.Authentication.isAdmin();
       this.users = await this.UserService.users();
       this.endpoints = _.keyBy((await this.EndpointService.endpoints()).value, 'Id');
       const groups = await this.GroupService.groups();
