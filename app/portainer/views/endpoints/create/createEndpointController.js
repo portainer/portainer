@@ -17,7 +17,6 @@ angular
       clipboard,
       EndpointService,
       GroupService,
-      TagService,
       SettingsService,
       Notifications,
       Authentication,
@@ -91,19 +90,11 @@ angular
         $scope.formValues.URL = '';
       };
 
-      $scope.onCreateTag = function onCreateTag(tagName) {
-        return $async(onCreateTagAsync, tagName);
+      $scope.onChangeTags = function onChangeTags(value) {
+        return $scope.$evalAsync(() => {
+          $scope.formValues.TagIds = value;
+        });
       };
-
-      async function onCreateTagAsync(tagName) {
-        try {
-          const tag = await TagService.createTag(tagName);
-          $scope.availableTags = $scope.availableTags.concat(tag);
-          $scope.formValues.TagIds = $scope.formValues.TagIds.concat(tag.Id);
-        } catch (err) {
-          Notifications.error('Failure', err, 'Unable to create tag');
-        }
-      }
 
       function onChangeCheckInInterval(value) {
         setFieldValue('EdgeCheckinInterval', value);
@@ -310,12 +301,10 @@ angular
       function initView() {
         $q.all({
           groups: GroupService.groups(),
-          tags: TagService.tags(),
           settings: SettingsService.settings(),
         })
           .then(function success(data) {
             $scope.groups = data.groups;
-            $scope.availableTags = data.tags;
 
             const settings = data.settings;
 

@@ -9,13 +9,11 @@ angular.module('portainer.app').component('groupForm', {
     pageType: '@',
     model: '=',
     availableEndpoints: '=',
-    availableTags: '<',
     associatedEndpoints: '=',
     addLabelAction: '<',
     removeLabelAction: '<',
     formAction: '<',
     formActionLabel: '@',
     actionInProgress: '<',
-    onCreateTag: '<',
   },
 });

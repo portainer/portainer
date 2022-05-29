@@ -436,12 +436,9 @@
             </div>
           </div>
           <!-- !group -->
-          <!-- tags -->
-          <div class="form-group">
-            <tag-selector ng-if="formValues && availableTags" tags="availableTags" model="formValues.TagIds" allow-create="state.allowCreateTag" on-create="(onCreateTag)">
-            </tag-selector>
-          </div>
-          <!-- !tags -->
+
+          <tag-selector ng-if="formValues" value="formValues.TagIds" allow-create="state.allowCreateTag" on-change="(onChangeTags)"> </tag-selector>
+
           <div class="col-sm-12 form-section-title"> Actions </div>
           <!-- actions -->
           <div class="form-group">
