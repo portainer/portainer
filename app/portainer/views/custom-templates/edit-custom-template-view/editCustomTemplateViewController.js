@@ -13,6 +13,7 @@ class EditCustomTemplateViewController {
     this.state = {
       formValidationError: '',
       isEditorDirty: false,
+      isTemplateValid: true,
     };
     this.templates = [];
 

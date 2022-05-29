@@ -21,6 +21,10 @@ export function getTemplateVariables(templateStr: string) {
 }
 
 function validateAndParse(templateStr: string) {
+  if (!templateStr) {
+    return [];
+  }
+
   try {
     return Mustache.parse(templateStr);
   } catch (e) {
