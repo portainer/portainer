@@ -101,11 +101,11 @@ func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.Endpoint
 }
 
 // FilterEndpointGroups filters environment(endpoint) groups based on user role and team memberships.
-// Non administrator users only have access to authorized environment(endpoint) groups.
+// Non administrator users and Non-team-leaders only have access to authorized environment(endpoint) groups.
 func FilterEndpointGroups(endpointGroups []portainer.EndpointGroup, context *RestrictedRequestContext) []portainer.EndpointGroup {
 	filteredEndpointGroups := endpointGroups
 
-	if !context.IsAdmin {
+	if !context.IsAdmin && !context.IsTeamLeader {
 		filteredEndpointGroups = make([]portainer.EndpointGroup, 0)
 
 		for _, group := range endpointGroups {
