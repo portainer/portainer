@@ -27,10 +27,10 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	teamLeaderRouter := h.NewRoute().Subrouter()
 	teamLeaderRouter.Use(bouncer.TeamLeaderAccess)
 
-	teamLeaderRouter.Handle("/teams", httperror.LoggerHandler(h.teamCreate)).Methods(http.MethodPost)
+	adminRouter.Handle("/teams", httperror.LoggerHandler(h.teamCreate)).Methods(http.MethodPost)
 	teamLeaderRouter.Handle("/teams", httperror.LoggerHandler(h.teamList)).Methods(http.MethodGet)
 	teamLeaderRouter.Handle("/teams/{id}", httperror.LoggerHandler(h.teamInspect)).Methods(http.MethodGet)
-	teamLeaderRouter.Handle("/teams/{id}", httperror.LoggerHandler(h.teamUpdate)).Methods(http.MethodPut)
+	adminRouter.Handle("/teams/{id}", httperror.LoggerHandler(h.teamUpdate)).Methods(http.MethodPut)
 	adminRouter.Handle("/teams/{id}", httperror.LoggerHandler(h.teamDelete)).Methods(http.MethodDelete)
 	teamLeaderRouter.Handle("/teams/{id}/memberships", httperror.LoggerHandler(h.teamMemberships)).Methods(http.MethodGet)
 
