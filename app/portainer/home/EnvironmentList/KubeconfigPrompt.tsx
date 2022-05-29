@@ -7,8 +7,6 @@ import { useEnvironmentList } from '@/portainer/environments/queries';
 import { Widget } from '@/portainer/components/widget';
 import { PaginationControls } from '@/portainer/components/pagination-controls';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
-
-import styles from './KubeconfigPrompt.module.css';
 import '@reach/dialog/styles.css';
 
 export interface KubeconfigPromptProps {
@@ -50,21 +48,21 @@ export function KubeconfigPrompt({
           </p>
         </div>
       </form>
-      <div className={styles.checkbox}>
-        <label>
-          <input
-            type="checkbox"
-            checked={isAllPageSelected}
-            onChange={handleSelectAll}
-          />
-          <i className="space-right" aria-hidden="true" />
-          Select all (in this page)
-        </label>
-      </div>
+      <i className="space-right" aria-hidden="true" />
+      <label>
+        <input
+          type="checkbox"
+          checked={isAllPageSelected}
+          onChange={handleSelectAll}
+        />
+        <i className="space-right" aria-hidden="true" />
+        Select all (in this page)
+      </label>
       <div className="datatable">
         <div className="bootbox-checkbox-list">
           {kubeEnvs.map((env) => (
-            <div className={styles.checkbox} key={env.Id}>
+            <div key={env.Id}>
+              <i className="space-right" aria-hidden="true" />
               <label>
                 <input
                   type="checkbox"
