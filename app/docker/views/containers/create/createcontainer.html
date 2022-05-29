@@ -703,6 +703,17 @@
                 <!-- !sysctls-input-list -->
               </div>
               <!-- !sysctls -->
+              <!-- shm-size-input -->
+              <div class="form-group">
+                    <label for="shm-size" class="col-sm-2 control-label text-left"> Shared memory size </label>
+                  <div class="col-sm-2">
+                    <input type="number" min="1" class="form-control" ng-model="formValues.ShmSize" id="shm-size" />
+                  </div>
+                  <div class="col-sm-2">
+                    <p class="small text-muted mt-2"> Size of /dev/shm (<b>MB</b>) </p>
+                  </div>
+              </div>
+              <!-- !shm-size-input -->
               <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">
                 <div class="col-sm-12 form-section-title"> Resources </div>
                 <!-- memory-reservation-input -->
