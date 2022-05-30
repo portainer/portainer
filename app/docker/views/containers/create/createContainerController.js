@@ -453,7 +453,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         return;
       }
       const driver = 'nvidia';
-      const existingDeviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function(o) { return (o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu') });
+      const existingDeviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function (o) {
+        return o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu';
+      });
       if (existingDeviceRequest) {
         _.pullAllBy(config.HostConfig.DeviceRequests, [existingDeviceRequest], 'Driver');
       }
@@ -633,7 +635,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function loadFromContainerDeviceRequests() {
-      const deviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function(o) { return (o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu') });
+      const deviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function (o) {
+        return o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu';
+      });
       if (deviceRequest) {
         $scope.formValues.GPU.enabled = true;
         $scope.formValues.GPU.useSpecific = deviceRequest.Count !== -1;
@@ -760,25 +764,23 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       });
     }
 
-    $scope.getGpusInfo = function() {
+    $scope.getGpusInfo = function () {
       var gpusInfo = new Array();
       var selectedGPUs = _.map($scope.formValues.GPU.selectedGPUs, 'key');
       var gpuUseSet = new Set($scope.gpuUseList);
       var mark = '';
-      for(let gpu of endpoint.Gpus){
-        if(selectedGPUs.includes(gpu.name)){
+      for (let gpu of endpoint.Gpus) {
+        if (selectedGPUs.includes(gpu.name)) {
           continue;
-        }
-        else if($scope.gpuUseAll === true || gpuUseSet.has(gpu.name)){
+        } else if ($scope.gpuUseAll === true || gpuUseSet.has(gpu.name)) {
           mark = '<i class="fa fa-ban space-right red-icon"></i>';
-        }          
-        else {
+        } else {
           mark = '<i class="fa fa-check space-right green-icon"></i>';
         }
-        gpusInfo.push({'name':gpu.name,'value':gpu.value,'mark':mark});
+        gpusInfo.push({ name: gpu.name, value: gpu.value, mark: mark });
       }
       return gpusInfo;
-    }
+    };
 
     async function initView() {
       var nodeName = $transition$.params().nodeName;

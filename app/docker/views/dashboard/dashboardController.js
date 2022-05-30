@@ -60,14 +60,14 @@ angular.module('portainer.docker').controller('DashboardController', [
       }
       var retStr = Object.keys(gpusAvailable).length
         ? _.join(
-          _.map(Object.keys(gpusAvailable), (gpuAvailable) => {
-            var _str = gpusAvailable[gpuAvailable];
-            _str += ' x ';
-            _str += gpuAvailable;
-            return _str;
-          })
-          , ' + '
-        )
+            _.map(Object.keys(gpusAvailable), (gpuAvailable) => {
+              var _str = gpusAvailable[gpuAvailable];
+              _str += ' x ';
+              _str += gpuAvailable;
+              return _str;
+            }),
+            ' + '
+          )
         : 'none';
       return retStr;
     };
@@ -100,21 +100,21 @@ angular.module('portainer.docker').controller('DashboardController', [
           $scope.gpuInfoStr = $scope.buildGpusStr(new Set());
           $scope.gpuUseAll = $scope.endpoint.Snapshots[0].GpuUseAll;
           $scope.gpuUseList = $scope.endpoint.Snapshots[0].GpuUseList;
-          $scope.gpuFreeStr = "all";
-          if ($scope.gpuUseAll == true) $scope.gpuFreeStr = "none";
+          $scope.gpuFreeStr = 'all';
+          if ($scope.gpuUseAll == true) $scope.gpuFreeStr = 'none';
           else $scope.gpuFreeStr = $scope.buildGpusStr(new Set($scope.gpuUseList));
 
           $scope.endpointTags = endpoint.TagIds.length
             ? _.join(
-              _.filter(
-                _.map(endpoint.TagIds, (id) => {
-                  const tag = data.tags.find((tag) => tag.Id === id);
-                  return tag ? tag.Name : '';
-                }),
-                Boolean
-              ),
-              ', '
-            )
+                _.filter(
+                  _.map(endpoint.TagIds, (id) => {
+                    const tag = data.tags.find((tag) => tag.Id === id);
+                    return tag ? tag.Name : '';
+                  }),
+                  Boolean
+                ),
+                ', '
+              )
             : '-';
           $scope.offlineMode = isOfflineEndpoint(endpoint);
         })

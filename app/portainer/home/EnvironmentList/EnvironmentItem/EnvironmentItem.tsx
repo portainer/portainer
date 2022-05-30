@@ -101,7 +101,7 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
                           {environment.Snapshots[0].TotalCPU}
                           <i className="fa fa-memory space-left space-right" />
                           {humanize(environment.Snapshots[0].TotalMemory)}
-                          <i className="fa fa-digital-tachograph space-left space-right" /> 
+                          <i className="fa fa-digital-tachograph space-left space-right" />
                           {environment.Gpus.length}
                         </span>
                       )}

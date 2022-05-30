@@ -173,17 +173,17 @@ function EndpointController(
     for (let item of selectedItems) {
       $scope.endpoint.Gpus.remove(item);
     }
-    $scope.state.selectedItems=[];
+    $scope.state.selectedItems = [];
   }
 
   function addAction() {
-    $scope.endpoint.Gpus.push({ 'name': null, 'value': null });
+    $scope.endpoint.Gpus.push({ name: null, value: null });
   }
 
   function verifyGpus() {
     var i = $scope.endpoint.Gpus.length;
     while (i--) {
-      if ($scope.endpoint.Gpus[i].name === '' || $scope.endpoint.Gpus[i].name === null ) {
+      if ($scope.endpoint.Gpus[i].name === '' || $scope.endpoint.Gpus[i].name === null) {
         $scope.endpoint.Gpus.splice(i, 1);
       }
     }

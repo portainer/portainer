@@ -108,18 +108,18 @@
               <portainer-tooltip
                 position="bottom"
                 message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
-                >
+              >
               </portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
-              <input 
-                ng-disabled="endpointType === 'local' || state.azureEndpoint" 
-                type="text" 
+              <input
+                ng-disabled="endpointType === 'local' || state.azureEndpoint"
+                type="text"
                 class="form-control"
-                id="endpoint_url" 
+                id="endpoint_url"
                 ng-model="endpoint.URL"
-                placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375" 
-                />
+                placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375"
+              />
             </div>
           </div>
           <!-- !endpoint-url-input -->
@@ -127,7 +127,7 @@
           <div class="form-group" ng-if="!state.azureEndpoint">
             <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
               Public IP
-              <portainer-tooltip 
+              <portainer-tooltip
                 position="bottom"
                 message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the environment URL."
               >
@@ -144,8 +144,8 @@
           </div>
 
           <!-- !endpoint-public-url-input -->
-          <azure-endpoint-config 
-            ng-if="state.azureEndpoint" 
+          <azure-endpoint-config
+            ng-if="state.azureEndpoint"
             application-id="endpoint.AzureCredentials.ApplicationID"
             tenant-id="endpoint.AzureCredentials.TenantID"
             authentication-key="endpoint.AzureCredentials.AuthenticationKey"
@@ -232,9 +232,7 @@
           </div>
           <!-- !open-amt info -->
           <!-- gpus info -->
-          <div class="col-sm-12 form-section-title">
-            GPU Record
-          </div>
+          <div class="col-sm-12 form-section-title"> GPU Record </div>
           <div class="row">
             <div class="col-sm-12">
               <div class="datatable">
@@ -253,22 +251,20 @@
                             <th>
                               <span class="md-checkbox">
                                 <input id="select_all" type="checkbox" ng-model="state.selectAll" ng-change="selectAll()" />
-                                <label for="select_all"></label>
-                              </span></th>
-                              <th>
-                                Id
-                            </th>
+                                <label for="select_all"></label> </span
+                            ></th>
+                            <th> Id </th>
                             <th>Device</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr dir-paginate="item in (state.filteredDataSet = (endpoint.Gpus | itemsPerPage: 0))" ng-class="{ active: item.Checked }">
-                            <td width=41>
+                            <td width="41">
                               <span class="md-checkbox">
                                 <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="selectItem(item, $event)" />
-                                <label for="select_{{ $index }}"></label>
-                              </span></td>
-                              <td>
+                                <label for="select_{{ $index }}"></label> </span
+                            ></td>
+                            <td>
                               <input type="text" class="form-control" ng-model="item.name" placeholder="0" />
                             </td>
                             <td>
@@ -295,11 +291,11 @@
           <!-- gpus info -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 class="btn btn-primary btn-sm"
                 ng-disabled="state.actionInProgress || !endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))"
-                ng-click="updateEndpoint()" 
+                ng-click="updateEndpoint()"
                 button-spinner="state.actionInProgress"
               >
                 <span ng-hide="state.actionInProgress">Update environment</span>
