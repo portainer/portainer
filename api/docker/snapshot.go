@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
-	_container "github.com/docker/docker/api/types/container"
+	contypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
@@ -169,9 +169,14 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 				return err
 			}
 
-			var gpuOptions *_container.DeviceRequest = nil
+			var gpuOptions *contypes.DeviceRequest = nil
 			for _, deviceRequest := range response.HostConfig.Resources.DeviceRequests {
-				if deviceRequest.Driver == "nvidia" || deviceRequest.Capabilities[0][0] == "gpu" {
+				var cap string
+				if len(deviceRequest.Capabilities) > 0 && len(deviceRequest.Capabilities[0]) > 0 {
+					cap = deviceRequest.Capabilities[0][0]
+				}
+
+				if deviceRequest.Driver == "nvidia" || cap == "gpu" {
 					gpuOptions = &deviceRequest
 				}
 			}
