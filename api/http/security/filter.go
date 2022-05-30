@@ -81,11 +81,11 @@ func FilterRegistries(registries []portainer.Registry, user *portainer.User, tea
 }
 
 // FilterEndpoints filters environments(endpoints) based on user role and team memberships.
-// Non administrator users only have access to authorized environments(endpoints) (can be inherited via endpoint groups).
+// Non administrator and non-team-leader only have access to authorized environments(endpoints) (can be inherited via endpoint groups).
 func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.EndpointGroup, context *RestrictedRequestContext) []portainer.Endpoint {
 	filteredEndpoints := endpoints
 
-	if !context.IsAdmin {
+	if !context.IsAdmin && !context.IsTeamLeader {
 		filteredEndpoints = make([]portainer.Endpoint, 0)
 
 		for _, endpoint := range endpoints {
