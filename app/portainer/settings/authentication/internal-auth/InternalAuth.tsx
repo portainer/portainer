@@ -49,7 +49,7 @@ export function InternalAuth({
 
 export const InternalAuthAngular = react2angular(InternalAuth, [
   'onSaveSettings',
-  'saveButtonState',
+  'isLoading',
   'value',
   'onChange',
 ]);

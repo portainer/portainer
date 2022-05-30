@@ -1,6 +1,5 @@
 import { react2angular } from '@/react-tools/react2angular';
-
-import { useSettings } from '../settings/settings.service';
+import { useSettings } from '@/portainer/settings/queries';
 
 export function PasswordCheckHint() {
   const settingsQuery = useSettings(
