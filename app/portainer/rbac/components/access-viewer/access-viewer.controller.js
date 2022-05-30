@@ -101,6 +101,33 @@ export default class AccessViewerController {
     return this.findLowestRole(policyRoles);
   }
 
+  // for admin, returns all users
+  // for team leader, only return all his/her team member users
+  async teamMemberUsers(users, teamMemberships) {
+    if (this.isAdmin) {
+      return users;
+    }
+
+    const filteredUsers = [];
+    const userId = this.Authentication.getUserDetails().ID;
+    const leadingTeams = await this.UserService.userLeadingTeams(userId);
+
+    const isMember = (userId, teamId) => {
+      return !!_.find(teamMemberships, { UserId: userId, TeamId: teamId });
+    };
+
+    for (const user of users) {
+      for (const leadingTeam of leadingTeams) {
+        if (isMember(user.Id, leadingTeam.Id)) {
+          filteredUsers.push(user);
+          break;
+        }
+      }
+    }
+
+    return filteredUsers;
+  }
+
   async $onInit() {
     try {
       const limitedToBE = isLimitedToBE(this.limitedFeature);
@@ -110,7 +137,7 @@ export default class AccessViewerController {
       }
 
       this.isAdmin = this.Authentication.isAdmin();
-      this.users = await this.UserService.users();
+      this.allUsers = await this.UserService.users();
       this.endpoints = _.keyBy((await this.EndpointService.endpoints()).value, 'Id');
       const groups = await this.GroupService.groups();
       this.groupUserAccessPolicies = {};
@@ -123,6 +150,7 @@ export default class AccessViewerController {
       this.roles = _.keyBy(await this.RoleService.roles(), 'Id');
       this.teams = _.keyBy(await this.TeamService.teams(), 'Id');
       this.teamMemberships = await this.TeamMembershipService.memberships();
+      this.users = await this.teamMemberUsers(this.allUsers, this.teamMemberships);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve accesses');
     }
