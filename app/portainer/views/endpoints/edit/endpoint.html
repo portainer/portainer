@@ -60,7 +60,7 @@
             <div class="col-sm-12 form-section-title" style="margin-top: 25px"> Join token </div>
             <p>
               <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-              For those prestaging the edge agent, use the following join token to associate the Edge agent with this environment.
+              For those pre-staging the edge agent, use the following join token to associate the Edge agent with this environment.
             </p>
             <p> You can read more about pre-staging in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a> </p>
             <div style="margin-top: 10px; overflow-wrap: break-word">
@@ -159,11 +159,9 @@
             </div>
           </div>
           <!-- !group -->
-          <!-- tags -->
-          <div class="form-group">
-            <tag-selector ng-if="endpoint && availableTags" tags="availableTags" model="endpoint.TagIds" on-create="(onCreateTag)" allow-create="state.allowCreate"></tag-selector>
-          </div>
-          <!-- !tags -->
+
+          <tag-selector ng-if="endpoint" value="endpoint.TagIds" allow-create="state.allowCreate" on-change="(onChangeTags)"></tag-selector>
+
           <!-- endpoint-security -->
           <div ng-if="endpointType === 'remote' && !state.azureEndpoint && !state.kubernetesEndpoint && !state.edgeEndpoint && endpoint.Type !== 6">
             <div class="col-sm-12 form-section-title"> Security </div>

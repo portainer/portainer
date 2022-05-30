@@ -3,8 +3,9 @@ import angular from 'angular';
 
 class GroupFormController {
   /* @ngInject */
-  constructor($q, EndpointService, GroupService, Notifications, Authentication) {
+  constructor($q, $scope, EndpointService, GroupService, Notifications, Authentication) {
     this.$q = $q;
+    this.$scope = $scope;
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
     this.Notifications = Notifications;
@@ -13,6 +14,13 @@ class GroupFormController {
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
     this.getPaginatedEndpointsByGroup = this.getPaginatedEndpointsByGroup.bind(this);
+    this.onChangeTags = this.onChangeTags.bind(this);
+  }
+
+  onChangeTags(value) {
+    return this.$scope.$evalAsync(() => {
+      this.model.TagIds = value;
+    });
   }
 
   $onInit() {
