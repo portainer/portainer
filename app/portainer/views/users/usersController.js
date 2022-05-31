@@ -16,7 +16,6 @@ angular.module('portainer.app').controller('UsersController', [
       userCreationError: '',
       validUsername: false,
       actionInProgress: false,
-      passwordInvalid: false,
     };
 
     $scope.formValues = {
@@ -25,10 +24,6 @@ angular.module('portainer.app').controller('UsersController', [
       ConfirmPassword: '',
       Administrator: false,
       Teams: [],
-    };
-
-    $scope.onPasswordChange = function () {
-      $scope.state.passwordInvalid = $scope.formValues.Password.length < $scope.requiredPasswordLength;
     };
 
     $scope.checkUsernameValidity = function () {

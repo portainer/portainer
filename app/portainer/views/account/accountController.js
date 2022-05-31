@@ -16,8 +16,6 @@ angular.module('portainer.app').controller('AccountController', [
       userTheme: '',
     };
 
-    $scope.passwordInvalid = false;
-
     $scope.updatePassword = async function () {
       const confirmed = await ModalService.confirmChangePassword();
       if (confirmed) {
@@ -43,10 +41,6 @@ angular.module('portainer.app').controller('AccountController', [
       } catch (err) {
         Notifications.error('Failure', err, err.msg);
       }
-    };
-
-    $scope.onNewPasswordChange = function () {
-      $scope.passwordInvalid = $scope.formValues.newPassword.length < $scope.requiredPasswordLength;
     };
 
     $scope.userCanSkip = function () {
@@ -133,10 +127,10 @@ angular.module('portainer.app').controller('AccountController', [
         .then(function success(data) {
           $scope.AuthenticationMethod = data.AuthenticationMethod;
 
-          if (StateManager.getState().UI.requiredPasswordLength && StateManager.getState().UI.requiredPasswordLength !== data.RequiredPasswordLength) {
+          if (state.UI.requiredPasswordLength && state.UI.requiredPasswordLength !== data.RequiredPasswordLength) {
             StateManager.resetPasswordChangeSkips();
           }
-          $scope.timesPasswordChangeSkipped = StateManager.getState().UI.timesPasswordChangeSkipped || 0;
+          $scope.timesPasswordChangeSkipped = state.timesPasswordChangeSkipped || 0;
 
           $scope.requiredPasswordLength = data.RequiredPasswordLength;
           StateManager.setRequiredPasswordLength(data.RequiredPasswordLength);

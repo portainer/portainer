@@ -11,7 +11,6 @@ angular.module('portainer.app').controller('UserController', [
   function ($q, $scope, $state, $transition$, UserService, ModalService, Notifications, SettingsService, Authentication) {
     $scope.state = {
       updatePasswordError: '',
-      passwordInvalid: false,
     };
 
     $scope.formValues = {
@@ -83,10 +82,6 @@ angular.module('portainer.app').controller('UserController', [
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update user password');
         });
-    };
-
-    $scope.onPasswordChange = function () {
-      $scope.state.passwordInvalid = $scope.formValues.newPassword.length < $scope.requiredPasswordLength;
     };
 
     function deleteUser() {

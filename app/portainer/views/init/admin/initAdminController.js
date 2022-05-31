@@ -25,14 +25,9 @@ angular.module('portainer.app').controller('InitAdminController', [
       actionInProgress: false,
       showInitPassword: true,
       showRestorePortainer: false,
-      passwordInvalid: false,
     };
 
     createAdministratorFlow();
-
-    $scope.onPasswordChange = function () {
-      $scope.state.passwordInvalid = $scope.formValues.Password.length < $scope.requiredPasswordLength;
-    };
 
     $scope.togglePanel = function () {
       $scope.state.showInitPassword = !$scope.state.showInitPassword;
