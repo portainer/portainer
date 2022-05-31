@@ -84,6 +84,7 @@ class CreateCustomTemplateViewController {
 
   onChangeMethod() {
     this.formValues.FileContent = '';
+    this.formValues.Variables = [];
     this.selectedTemplate = null;
   }
 

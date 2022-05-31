@@ -19,5 +19,6 @@ export const customTemplatesModule = angular
       'onChange',
       'value',
       'errors',
+      'isVariablesNamesFromParent',
     ])
   ).name;

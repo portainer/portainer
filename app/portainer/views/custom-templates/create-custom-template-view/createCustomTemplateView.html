@@ -107,7 +107,11 @@
             </div>
           </div>
 
-          <custom-templates-variables-definition-field value="$ctrl.formValues.Variables" on-change="($ctrl.onVariablesChange)"></custom-templates-variables-definition-field>
+          <custom-templates-variables-definition-field
+            value="$ctrl.formValues.Variables"
+            on-change="($ctrl.onVariablesChange)"
+            is-variables-names-from-parent="$ctrl.state.Method === 'editor'"
+          ></custom-templates-variables-definition-field>
 
           <!-- !repository -->
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData"></por-access-control-form>

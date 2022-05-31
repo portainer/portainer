@@ -17,19 +17,28 @@ interface Props {
   value: VariableDefinition[];
   onChange: (value: VariableDefinition[]) => void;
   errors?: InputListError<VariableDefinition>[] | string;
+  isVariablesNamesFromParent?: boolean;
 }
 
 export function CustomTemplatesVariablesDefinitionField({
   onChange,
   value,
   errors,
+  isVariablesNamesFromParent,
 }: Props) {
   return (
     <InputList
       label="Variables Definition"
       onChange={onChange}
       value={value}
-      item={Item}
+      renderItem={(item, onChange, error) => (
+        <Item
+          item={item}
+          onChange={onChange}
+          error={error}
+          isNameReadonly={isVariablesNamesFromParent}
+        />
+      )}
       itemBuilder={() => ({
         label: '',
         name: '',
@@ -38,11 +47,16 @@ export function CustomTemplatesVariablesDefinitionField({
       })}
       errors={errors}
       textTip="List should map the mustache variables in the template file, if default value is empty, the variable will be required."
+      isAddButtonHidden={isVariablesNamesFromParent}
     />
   );
 }
 
-function Item({ item, onChange, error }: ItemProps<VariableDefinition>) {
+interface DefinitionItemProps extends ItemProps<VariableDefinition> {
+  isNameReadonly?: boolean;
+}
+
+function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
   return (
     <div className="flex gap-2">
       <div>
@@ -50,7 +64,8 @@ function Item({ item, onChange, error }: ItemProps<VariableDefinition>) {
           value={item.name}
           name="name"
           onChange={handleChange}
-          placeholder="Name (e.g ENV_VAR)"
+          placeholder="Name (e.g var_name)"
+          readOnly={isNameReadonly}
         />
         {error?.name && <FormError>{error.name}</FormError>}
       </div>

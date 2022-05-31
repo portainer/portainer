@@ -33,11 +33,18 @@ type OnChangeEvent<T> =
       to: number;
     };
 
+type RenderItemFunction<T> = (
+  item: T,
+  onChange: (value: T) => void,
+  error?: InputListError<T>
+) => React.ReactNode;
+
 interface Props<T> {
   label: string;
   value: T[];
   onChange(value: T[], e: OnChangeEvent<T>): void;
   itemBuilder?(): T;
+  renderItem?: RenderItemFunction<T>;
   item?: ComponentType<ItemProps<T>>;
   tooltip?: string;
   addLabel?: string;
@@ -45,6 +52,7 @@ interface Props<T> {
   movable?: boolean;
   errors?: InputListError<T>[] | string;
   textTip?: string;
+  isAddButtonHidden?: boolean;
 }
 
 export function InputList<T = DefaultType>({
@@ -52,16 +60,16 @@ export function InputList<T = DefaultType>({
   value,
   onChange,
   itemBuilder = defaultItemBuilder as unknown as () => T,
-  item = DefaultItem as unknown as ComponentType<ItemProps<T>>,
+  renderItem = renderDefaultItem as unknown as RenderItemFunction<T>,
+  item: Item,
   tooltip,
   addLabel = 'Add item',
   itemKeyGetter = (item: T, index: number) => index,
   movable,
   errors,
   textTip,
+  isAddButtonHidden = false,
 }: Props<T>) {
-  const Item = item;
-
   return (
     <div className={clsx('form-group', styles.root)}>
       <div className={clsx('col-sm-12', styles.header)}>
@@ -69,11 +77,13 @@ export function InputList<T = DefaultType>({
           {label}
           {tooltip && <Tooltip message={tooltip} />}
         </div>
-        <AddButton
-          label={addLabel}
-          className="space-left"
-          onClick={handleAdd}
-        />
+        {!isAddButtonHidden && (
+          <AddButton
+            label={addLabel}
+            className="space-left"
+            onClick={handleAdd}
+          />
+        )}
       </div>
 
       {textTip && (
@@ -92,11 +102,19 @@ export function InputList<T = DefaultType>({
               key={key}
               className={clsx(styles.itemLine, { [styles.hasError]: !!error })}
             >
-              <Item
-                item={item}
-                onChange={(value: T) => handleChangeItem(key, value)}
-                error={error}
-              />
+              {Item ? (
+                <Item
+                  item={item}
+                  onChange={(value: T) => handleChangeItem(key, value)}
+                  error={error}
+                />
+              ) : (
+                renderItem(
+                  item,
+                  (value: T) => handleChangeItem(key, value),
+                  error
+                )
+              )}
               <div className={clsx(styles.itemActions, 'items-start')}>
                 {movable && (
                   <>
@@ -203,4 +221,12 @@ function DefaultItem({ item, onChange, error }: ItemProps<DefaultType>) {
       {error && <FormError>{error}</FormError>}
     </>
   );
+}
+
+function renderDefaultItem(
+  item: DefaultType,
+  onChange: (value: DefaultType) => void,
+  error?: InputListError<DefaultType>
+) {
+  return <DefaultItem item={item} onChange={onChange} error={error} />;
 }

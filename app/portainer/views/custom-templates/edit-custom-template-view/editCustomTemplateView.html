@@ -45,7 +45,11 @@
             </div>
           </div>
 
-          <custom-templates-variables-definition-field value="$ctrl.formValues.Variables" on-change="($ctrl.onVariablesChange)"></custom-templates-variables-definition-field>
+          <custom-templates-variables-definition-field
+            value="$ctrl.formValues.Variables"
+            on-change="($ctrl.onVariablesChange)"
+            is-variables-names-from-parent="true"
+          ></custom-templates-variables-definition-field>
 
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData" resource-control="$ctrl.formValues.ResourceControl"></por-access-control-form>
 

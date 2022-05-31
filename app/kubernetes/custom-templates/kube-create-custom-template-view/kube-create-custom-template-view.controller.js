@@ -43,6 +43,7 @@ class KubeCreateCustomTemplateViewController {
 
   onChangeMethod(method) {
     this.state.method = method;
+    this.formValues.Variables = [];
   }
 
   onChangeFileContent(content) {

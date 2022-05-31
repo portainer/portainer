@@ -11,7 +11,7 @@ export function getTemplateVariables(templateStr: string) {
   }
 
   return template
-    .filter(([type]) => type === 'name')
+    .filter(([type, value]) => type === 'name' && value)
     .map(([, value]) => ({
       name: value,
       label: '',
