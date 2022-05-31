@@ -31,6 +31,8 @@ type customTemplateUpdatePayload struct {
 	Type portainer.StackType `example:"1" enums:"1,2,3" validate:"required"`
 	// Content of stack file
 	FileContent string `validate:"required"`
+	// Definitions of variables in the stack file
+	Variables []portainer.CustomTemplateVariableDefinition
 }
 
 func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
@@ -52,6 +54,12 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if !isValidNote(payload.Note) {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
+
+	err := validateVariablesDefinitions(payload.Variables)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -124,6 +132,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	customTemplate.Note = payload.Note
 	customTemplate.Platform = payload.Platform
 	customTemplate.Type = payload.Type
+	customTemplate.Variables = payload.Variables
 
 	err = handler.DataStore.CustomTemplate().UpdateCustomTemplate(customTemplate.ID, customTemplate)
 	if err != nil {

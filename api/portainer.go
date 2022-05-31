@@ -128,6 +128,14 @@ type (
 		SecretKeyName             *string
 	}
 
+	// CustomTemplateVariableDefinition
+	CustomTemplateVariableDefinition struct {
+		Name         string `json:"name" example:"MY_VAR"`
+		Label        string `json:"label" example:"My Variable"`
+		DefaultValue string `json:"defaultValue" example:"default value"`
+		Description  string `json:"description" example:"Description"`
+	}
+
 	// CustomTemplate represents a custom template
 	CustomTemplate struct {
 		// CustomTemplate Identifier
@@ -152,6 +160,7 @@ type (
 		// Type of created stack (1 - swarm, 2 - compose)
 		Type            StackType        `json:"Type" example:"1"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
+		Variables       []CustomTemplateVariableDefinition
 	}
 
 	// CustomTemplateID represents a custom template identifier

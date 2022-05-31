@@ -59,7 +59,7 @@
             <button
               type="button"
               class="btn btn-primary btn-sm"
-              ng-disabled="$ctrl.state.actionInProgress || !$ctrl.formValues.name || !$ctrl.state.deployable"
+              ng-disabled="$ctrl.state.actionInProgress || !$ctrl.formValues.name || !$ctrl.state.deployable || stackTemplateForm.$invalid"
               ng-click="$ctrl.createTemplate()"
               button-spinner="$ctrl.state.actionInProgress"
             >
