@@ -24,8 +24,7 @@ rm -rf "${DOWNLOAD_FOLDER}"
 mkdir -pv "${DOWNLOAD_FOLDER}"
 
 if [[ ${PLATFORM} == "windows" ]]; then
-    PLATFORM="win"
-    wget -O "${DOWNLOAD_FOLDER}/docker-binaries.zip" "https://download.docker.com/${PLATFORM}/static/stable/${ARCH}/docker-${DOCKER_VERSION}.zip"
+    wget -O "${DOWNLOAD_FOLDER}/docker-binaries.zip" "https://download.docker.com/win/static/stable/${ARCH}/docker-${DOCKER_VERSION}.zip"
     unzip "${DOWNLOAD_FOLDER}/docker-binaries.zip" -d "${DOWNLOAD_FOLDER}"
     mv "${DOWNLOAD_FOLDER}/docker/docker.exe" dist/
 else
