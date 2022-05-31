@@ -113,7 +113,7 @@ angular.module('portainer.app').controller('AccountController', [
       $scope.userID = userDetails.ID;
       $scope.userRole = Authentication.getUserDetails().role;
       $scope.forceChangePassword = userDetails.forceChangePassword;
-      $scope.timesPasswordChangeSkipped = StateManager.getState().UI.timesPasswordChangeSkipped || 0;
+      $scope.timesPasswordChangeSkipped = state.timesPasswordChangeSkipped || 0;
 
       if (state.application.demoEnvironment.enabled) {
         $scope.isDemoUser = state.application.demoEnvironment.users.includes($scope.userID);

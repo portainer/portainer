@@ -65,7 +65,7 @@
               <button
                 type="submit"
                 class="btn btn-primary btn-sm"
-                ng-disabled="isDemoUser || (AuthenticationMethod !== 1 && !initialUser) || !formValues.currentPassword || !form.new_password.$valid || formValues.newPassword !== formValues.confirmPassword"
+                ng-disabled="isDemoUser || (AuthenticationMethod !== 1 && !initialUser) || !formValues.currentPassword || form.$invalid || formValues.newPassword !== formValues.confirmPassword"
                 ng-click="updatePassword()"
               >
                 Update password
