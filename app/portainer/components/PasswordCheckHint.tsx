@@ -3,9 +3,9 @@ import { useSettings } from '@/portainer/settings/queries';
 
 export function PasswordCheckHint() {
   const settingsQuery = useSettings(
-    (settings) => settings.InternalAuthSettings
+    (settings) => settings.InternalAuthSettings?.RequiredPasswordLength
   );
-  const minPasswordLength = settingsQuery.data?.RequiredPasswordLength;
+  const minPasswordLength = settingsQuery.data;
 
   return (
     <div>
