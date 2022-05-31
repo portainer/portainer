@@ -1,6 +1,7 @@
 package customtemplates
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -115,6 +116,8 @@ type customTemplateFromFileContentPayload struct {
 	Type portainer.StackType `example:"1" enums:"1,2,3" validate:"required"`
 	// Content of stack file
 	FileContent string `validate:"required"`
+	// Definitions of variables in the stack file
+	Variables []portainer.CustomTemplateVariableDefinition
 }
 
 func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) error {
@@ -136,6 +139,12 @@ func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) e
 	if !isValidNote(payload.Note) {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
+
+	err := validateVariablesDefinitions(payload.Variables)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -164,6 +173,7 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 		Platform:    (payload.Platform),
 		Type:        (payload.Type),
 		Logo:        payload.Logo,
+		Variables:   payload.Variables,
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)
@@ -204,6 +214,8 @@ type customTemplateFromGitRepositoryPayload struct {
 	RepositoryPassword string `example:"myGitPassword"`
 	// Path to the Stack file inside the Git repository
 	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
+	// Definitions of variables in the stack file
+	Variables []portainer.CustomTemplateVariableDefinition
 }
 
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -236,6 +248,12 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 	if !isValidNote(payload.Note) {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
+
+	err := validateVariablesDefinitions(payload.Variables)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -256,6 +274,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		Platform:    payload.Platform,
 		Type:        payload.Type,
 		Logo:        payload.Logo,
+		Variables:   payload.Variables,
 	}
 
 	projectPath := handler.FileService.GetCustomTemplateProjectPath(strconv.Itoa(customTemplateID))
@@ -316,6 +335,8 @@ type customTemplateFromFileUploadPayload struct {
 	Platform    portainer.CustomTemplatePlatform
 	Type        portainer.StackType
 	FileContent []byte
+	// Definitions of variables in the stack file
+	Variables []portainer.CustomTemplateVariableDefinition
 }
 
 func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) error {
@@ -361,6 +382,17 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	}
 	payload.FileContent = composeFileContent
 
+	varsString, _ := request.RetrieveMultiPartFormValue(r, "Variables", true)
+	err = json.Unmarshal([]byte(varsString), &payload.Variables)
+	if err != nil {
+		return errors.New("Invalid variables. Ensure that the variables are valid JSON")
+	}
+
+	err = validateVariablesDefinitions(payload.Variables)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -381,6 +413,7 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 		Type:        payload.Type,
 		Logo:        payload.Logo,
 		EntryPoint:  filesystem.ComposeFileDefaultName,
+		Variables:   payload.Variables,
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)

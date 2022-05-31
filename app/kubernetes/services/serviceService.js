@@ -101,8 +101,8 @@ class KubernetesServiceService {
     services.forEach(async (service) => {
       try {
         const params = new KubernetesCommonParams();
-        params.id = service.metadata.name;
-        const namespace = service.metadata.namespace;
+        params.id = (service.metadata && service.metadata.name) || service.Name;
+        const namespace = (service.metadata && service.metadata.namespace) || service.Namespace;
         await this.KubernetesServices(namespace).delete(params).$promise;
       } catch (err) {
         // eslint-disable-next-line no-console
