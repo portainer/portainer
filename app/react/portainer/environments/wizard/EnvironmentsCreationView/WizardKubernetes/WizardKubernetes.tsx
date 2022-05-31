@@ -69,10 +69,7 @@ export function WizardKubernetes({ onCreate }: Props) {
             onCreate={(environment) =>
               onCreate(environment, 'kubernetesEdgeAgent')
             }
-            commands={{
-              linux: [commandsTabs.swarmLinux, commandsTabs.standaloneLinux],
-              win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
-            }}
+            commands={[{ ...commandsTabs.k8sLinux, label: 'Linux' }]}
           />
         );
       default:
