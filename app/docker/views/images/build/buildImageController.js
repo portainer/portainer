@@ -17,7 +17,7 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     NodeName: null,
   };
 
-  $scope.nameChecker = RegExp('^[a-z0-9-_]{2,256}$');
+  $scope.nameChecker = RegExp('^(([a-z0-9-.]+(:[0-9]+)?/)?[a-z0-9-_]{2,256}/)?[a-z0-9-_]{2,256}:[A-Za-z0-9-_.]{1,128}$');
 
   $window.onbeforeunload = () => {
     if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
