@@ -36,15 +36,17 @@ type Handler struct {
 	demoService   *demo.Service
 	DataStore     dataservices.DataStore
 	CryptoService portainer.CryptoService
+	passwordStrengthChecker security.PasswordStrengthChecker
 }
 
 // NewHandler creates a handler to manage user operations.
-func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, apiKeyService apikey.APIKeyService, demoService *demo.Service) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, apiKeyService apikey.APIKeyService, demoService *demo.Service, passwordStrengthChecker security.PasswordStrengthChecker) *Handler {
 	h := &Handler{
 		Router:        mux.NewRouter(),
 		bouncer:       bouncer,
 		apiKeyService: apiKeyService,
 		demoService:   demoService,
+		passwordStrengthChecker: passwordStrengthChecker,
 	}
 	h.Handle("/users",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.userCreate))).Methods(http.MethodPost)

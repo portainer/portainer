@@ -38,8 +38,9 @@ func Test_userGetAccessTokens(t *testing.T) {
 	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
 	requestBouncer := security.NewRequestBouncer(store, jwtService, apiKeyService)
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
+	passwordChecker := security.NewPasswordStrengthChecker(store.SettingsService)
 
-	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, nil)
+	h := NewHandler(requestBouncer, rateLimiter, apiKeyService, nil, passwordChecker)
 	h.DataStore = store
 
 	// generate standard and admin user tokens
