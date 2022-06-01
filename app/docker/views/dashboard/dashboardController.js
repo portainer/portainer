@@ -42,6 +42,36 @@ angular.module('portainer.docker').controller('DashboardController', [
     $scope.offlineMode = false;
     $scope.showStacks = false;
 
+    $scope.buildGpusStr = function (gpuUseSet) {
+      var gpusAvailable = new Object();
+      for (let i = 0; i < $scope.endpoint.Gpus.length; i++) {
+        if (!gpuUseSet.has($scope.endpoint.Gpus[i].name)) {
+          var exist = false;
+          for (let gpuAvailable in gpusAvailable) {
+            if ($scope.endpoint.Gpus[i].value == gpuAvailable) {
+              gpusAvailable[gpuAvailable] += 1;
+              exist = true;
+            }
+          }
+          if (exist === false) {
+            gpusAvailable[$scope.endpoint.Gpus[i].value] = 1;
+          }
+        }
+      }
+      var retStr = Object.keys(gpusAvailable).length
+        ? _.join(
+            _.map(Object.keys(gpusAvailable), (gpuAvailable) => {
+              var _str = gpusAvailable[gpuAvailable];
+              _str += ' x ';
+              _str += gpuAvailable;
+              return _str;
+            }),
+            ' + '
+          )
+        : 'none';
+      return retStr;
+    };
+
     async function initView() {
       const endpointMode = $scope.applicationState.endpoint.mode;
       $scope.endpoint = endpoint;
@@ -66,6 +96,14 @@ angular.module('portainer.docker').controller('DashboardController', [
           $scope.serviceCount = data.services.length;
           $scope.stackCount = data.stacks.length;
           $scope.info = data.info;
+
+          $scope.gpuInfoStr = $scope.buildGpusStr(new Set());
+          $scope.gpuUseAll = $scope.endpoint.Snapshots[0].GpuUseAll;
+          $scope.gpuUseList = $scope.endpoint.Snapshots[0].GpuUseList;
+          $scope.gpuFreeStr = 'all';
+          if ($scope.gpuUseAll == true) $scope.gpuFreeStr = 'none';
+          else $scope.gpuFreeStr = $scope.buildGpusStr(new Set($scope.gpuUseList));
+
           $scope.endpointTags = endpoint.TagIds.length
             ? _.join(
                 _.filter(

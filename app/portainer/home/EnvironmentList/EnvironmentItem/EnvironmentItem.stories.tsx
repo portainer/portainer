@@ -60,6 +60,7 @@ function mockEnvironment(type: EnvironmentType): Environment {
   return {
     Id: 1,
     Name: 'environment',
+    Gpus: [],
     GroupId: 1,
     Snapshots: [],
     Status: EnvironmentStatus.Up,
