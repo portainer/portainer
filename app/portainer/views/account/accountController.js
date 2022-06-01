@@ -113,7 +113,7 @@ angular.module('portainer.app').controller('AccountController', [
       $scope.userID = userDetails.ID;
       $scope.userRole = Authentication.getUserDetails().role;
       $scope.forceChangePassword = userDetails.forceChangePassword;
-      $scope.timesPasswordChangeSkipped = state.timesPasswordChangeSkipped || 0;
+      $scope.timesPasswordChangeSkipped = state.UI.timesPasswordChangeSkipped || 0;
 
       if (state.application.demoEnvironment.enabled) {
         $scope.isDemoUser = state.application.demoEnvironment.users.includes($scope.userID);
@@ -130,7 +130,7 @@ angular.module('portainer.app').controller('AccountController', [
           if (state.UI.requiredPasswordLength && state.UI.requiredPasswordLength !== data.RequiredPasswordLength) {
             StateManager.resetPasswordChangeSkips();
           }
-          $scope.timesPasswordChangeSkipped = state.timesPasswordChangeSkipped || 0;
+          $scope.timesPasswordChangeSkipped = state.UI.timesPasswordChangeSkipped || 0;
 
           $scope.requiredPasswordLength = data.RequiredPasswordLength;
           StateManager.setRequiredPasswordLength(data.RequiredPasswordLength);

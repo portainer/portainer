@@ -1,7 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
-import { getSettings, updateSettings } from './settings.service';
+import { notifyError } from '@/portainer/services/notifications';
+
+import {
+  publicSettings,
+  getSettings,
+  updateSettings,
+} from './settings.service';
 import { Settings } from './types';
+
+export function usePublicSettings() {
+  return useQuery(['settings', 'public'], () => publicSettings(), {
+    onError: (err) => {
+      notifyError('Failure', err as Error, 'Unable to retrieve settings');
+    },
+  });
+}
 
 export function useSettings<T = Settings>(select?: (settings: Settings) => T) {
   return useQuery(['settings'], getSettings, {

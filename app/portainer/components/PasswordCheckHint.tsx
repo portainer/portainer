@@ -1,11 +1,9 @@
 import { react2angular } from '@/react-tools/react2angular';
-import { useSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/portainer/settings/queries';
 
 export function PasswordCheckHint() {
-  const settingsQuery = useSettings(
-    (settings) => settings.InternalAuthSettings?.RequiredPasswordLength
-  );
-  const minPasswordLength = settingsQuery.data;
+  const settingsQuery = usePublicSettings();
+  const minPasswordLength = settingsQuery.data?.RequiredPasswordLength;
 
   return (
     <div>
