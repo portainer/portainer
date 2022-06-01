@@ -895,7 +895,7 @@
   ],
   "version": {
     "DB_UPDATING": "false",
-    "DB_VERSION": "35",
+    "DB_VERSION": "50",
     "INSTANCE_ID": "null"
   }
 }
