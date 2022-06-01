@@ -17,13 +17,6 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     NodeName: null,
   };
 
-  $scope.checkName = function (name) {
-    const parts = name.split('/');
-    const repository = parts[parts.length - 1];
-    const repositoryRegExp = RegExp('^[a-z0-9-_]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
-    return repositoryRegExp.test(repository);
-  };
-
   $window.onbeforeunload = () => {
     if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
       return '';
@@ -33,6 +26,13 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
   $scope.$on('$destroy', function () {
     $scope.state.isEditorDirty = false;
   });
+
+  $scope.checkName = function (name) {
+    const parts = name.split('/');
+    const repository = parts[parts.length - 1];
+    const repositoryRegExp = RegExp('^[a-z0-9-_]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
+    return repositoryRegExp.test(repository);
+  };
 
   $scope.addImageName = function () {
     $scope.formValues.ImageNames.push({ Name: '' });
