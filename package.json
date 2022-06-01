@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "2.11.0",
+  "version": "2.14.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
