@@ -53,7 +53,11 @@
                   <input type="password" class="form-control" ng-model="formValues.ConfirmPassword" id="confirm_password" />
                   <span class="input-group-addon"
                     ><i
-                      ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.Password !== '' && formValues.Password === formValues.ConfirmPassword]"
+                      ng-class="
+                        { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[
+                          form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword
+                        ]
+                      "
                       aria-hidden="true"
                     ></i
                   ></span>
@@ -64,8 +68,6 @@
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12 text-muted" ng-if="!form.password.$valid">
-                <!-- below code is duplicated with component of <force-password-update-hint>  -->
-                <!-- it is a workaround for firefox that does not render component <force-password-update-hint>  -->
                 <p>
                   <i class="fa fa-exclamation-triangle orange-icon space-right" aria-hidden="true"></i>
                   <span>The password must be at least {{ requiredPasswordLength }} characters long.</span>
@@ -79,7 +81,7 @@
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="state.actionInProgress || form.$invalid || formValues.Password !== formValues.ConfirmPassword"
+                  ng-disabled="state.actionInProgress || form.$invalid || form.password.$viewValue !== formValues.ConfirmPassword"
                   ng-click="createAdminUser()"
                   button-spinner="state.actionInProgress"
                 >

@@ -72,7 +72,9 @@
                 <span class="input-group-addon"
                   ><i
                     ng-class="
-                      { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.newPassword !== '' && formValues.newPassword === formValues.confirmPassword]
+                      { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[
+                        form.new_password.$viewValue !== '' && form.new_password.$viewValue === formValues.confirmPassword
+                      ]
                     "
                     aria-hidden="true"
                   ></i
@@ -87,7 +89,7 @@
               <button
                 type="submit"
                 class="btn btn-primary btn-sm"
-                ng-disabled="formValues.newPassword === '' || form.$invalid || formValues.newPassword !== formValues.confirmPassword"
+                ng-disabled="form.new_password.$viewValue === '' || form.$invalid || form.new_password.$viewValue !== formValues.confirmPassword"
                 ng-click="updatePassword()"
                 >Update password</button
               >
