@@ -23,6 +23,7 @@ test('loads component', async () => {
     Kubernetes: { Snapshots: [] },
     Id: 3,
     UserTrusted: false,
+    EdgeKey: '',
   };
   const { getByText } = renderComponent(env);
 
@@ -44,6 +45,7 @@ test('shows group name', async () => {
     Kubernetes: { Snapshots: [] },
     Id: 3,
     UserTrusted: false,
+    EdgeKey: '',
   };
 
   const { findByText } = renderComponent(env, { Name: groupName });

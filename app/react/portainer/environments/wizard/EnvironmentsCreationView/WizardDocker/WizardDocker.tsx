@@ -1,9 +1,14 @@
 import { useState } from 'react';
 
-import { BoxSelector, buildOption } from '@/portainer/components/BoxSelector';
+import {
+  BoxSelector,
+  BoxSelectorOption,
+} from '@/portainer/components/BoxSelector';
 import { Environment } from '@/portainer/environments/types';
+import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 
 import { AnalyticsStateKey } from '../types';
+import { EdgeAgentTab } from '../shared/EdgeAgentTab';
 
 import { AgentTab } from './AgentTab';
 import { APITab } from './APITab';
@@ -13,16 +18,41 @@ interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
 }
 
-const options = [
-  buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent'),
-  buildOption('API', 'fa fa-cloud', 'API', '', 'api'),
-  buildOption('Socket', 'fab fa-docker', 'Socket', '', 'socket'),
+const options: BoxSelectorOption<'agent' | 'api' | 'socket' | 'edgeAgent'>[] = [
+  {
+    id: 'agent',
+    icon: 'fa fa-bolt',
+    label: 'Agent',
+    description: '',
+    value: 'agent',
+  },
+  {
+    id: 'api',
+    icon: 'fa fa-cloud',
+    label: 'API',
+    description: '',
+    value: 'api',
+  },
+  {
+    id: 'socket',
+    icon: 'fab fa-docker',
+    label: 'Socket',
+    description: '',
+    value: 'socket',
+  },
+  {
+    id: 'edgeAgent',
+    icon: 'fa fa-cloud', // Todo cloud with docker
+    label: 'Edge Agent',
+    description: '',
+    value: 'edgeAgent',
+  },
 ];
 
 export function WizardDocker({ onCreate }: Props) {
   const [creationType, setCreationType] = useState(options[0].value);
 
-  const form = getForm(creationType);
+  const tab = getTab(creationType);
 
   return (
     <div className="form-horizontal">
@@ -37,11 +67,11 @@ export function WizardDocker({ onCreate }: Props) {
         </div>
       </div>
 
-      {form}
+      {tab}
     </div>
   );
 
-  function getForm(creationType: 'agent' | 'api' | 'socket') {
+  function getTab(creationType: 'agent' | 'api' | 'socket' | 'edgeAgent') {
     switch (creationType) {
       case 'agent':
         return (
@@ -59,6 +89,16 @@ export function WizardDocker({ onCreate }: Props) {
         return (
           <SocketTab
             onCreate={(environment) => onCreate(environment, 'localEndpoint')}
+          />
+        );
+      case 'edgeAgent':
+        return (
+          <EdgeAgentTab
+            onCreate={(environment) => onCreate(environment, 'dockerEdgeAgent')}
+            commands={{
+              linux: [commandsTabs.swarmLinux, commandsTabs.standaloneLinux],
+              win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
+            }}
           />
         );
       default:

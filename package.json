@@ -172,6 +172,7 @@
     "@types/react-table": "^7.7.6",
     "@types/sanitize-html": "^2.5.0",
     "@types/toastr": "^2.1.39",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
     "@typescript-eslint/parser": "^5.7.0",
     "auto-ngtemplate-loader": "^2.0.1",

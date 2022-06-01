@@ -106,9 +106,7 @@ function DeployCode({
         </p>
       )}
       <Code>{code}</Code>
-      <CopyButton copyText={code} className="my-6">
-        Copy command
-      </CopyButton>
+      <CopyButton copyText={code}>Copy command</CopyButton>
     </>
   );
 }
