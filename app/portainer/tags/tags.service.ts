@@ -13,7 +13,7 @@ export async function getTags() {
 
 export async function createTag(name: string) {
   try {
-    const { data: tag } = await axios.post(buildUrl(), { name });
+    const { data: tag } = await axios.post<Tag>(buildUrl(), { name });
     return tag;
   } catch (err) {
     throw parseAxiosError(err as Error, 'Unable to create tag');

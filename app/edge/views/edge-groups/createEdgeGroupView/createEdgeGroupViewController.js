@@ -1,9 +1,8 @@
 export class CreateEdgeGroupController {
   /* @ngInject */
-  constructor(EdgeGroupService, GroupService, TagService, Notifications, $state, $async) {
+  constructor(EdgeGroupService, GroupService, Notifications, $state, $async) {
     this.EdgeGroupService = EdgeGroupService;
     this.GroupService = GroupService;
-    this.TagService = TagService;
     this.Notifications = Notifications;
     this.$state = $state;
     this.$async = $async;
@@ -26,8 +25,8 @@ export class CreateEdgeGroupController {
   }
 
   async $onInit() {
-    const [tags, endpointGroups] = await Promise.all([this.TagService.tags(), this.GroupService.groups()]);
-    this.tags = tags;
+    const endpointGroups = await this.GroupService.groups();
+
     this.endpointGroups = endpointGroups;
     this.state.loaded = true;
   }

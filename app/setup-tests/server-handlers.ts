@@ -12,6 +12,11 @@ import { createMockTeams, createMockUsers } from '../react-tools/test-mocks';
 
 import { azureHandlers } from './setup-handlers/azure';
 
+const tags: Tag[] = [
+  { ID: 1, Name: 'tag1' },
+  { ID: 2, Name: 'tag2' },
+];
+
 const licenseInfo: LicenseInfo = {
   nodes: 1000,
   type: LicenseType.Subscription,
@@ -48,11 +53,11 @@ export const handlers = [
     };
     return res(ctx.json(group));
   }),
-  rest.get('/api/tags', (req, res, ctx) => {
-    const tags: Tag[] = [
-      { ID: 1, Name: 'tag1' },
-      { ID: 2, Name: 'tag2' },
-    ];
-    return res(ctx.json(tags));
+  rest.get('/api/tags', (req, res, ctx) => res(ctx.json(tags))),
+  rest.post<{ name: string }>('/api/tags', (req, res, ctx) => {
+    const tagName = req.body.name;
+    const tag = { ID: tags.length + 1, Name: tagName };
+    tags.push(tag);
+    return res(ctx.json(tag));
   }),
 ];

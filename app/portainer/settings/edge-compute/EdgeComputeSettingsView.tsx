@@ -1,6 +1,6 @@
 import { r2a } from '@/react-tools/react2angular';
 
-import { Settings } from '../settings.service';
+import { Settings } from '../types';
 
 import { EdgeComputeSettings } from './EdgeComputeSettings';
 import { AutomaticEdgeEnvCreation } from './AutomaticEdgeEnvCreation';

@@ -2,7 +2,7 @@ import { useRouter } from '@uirouter/react';
 
 import { TableSettingsProvider } from '@/portainer/components/datatables/components/useTableSettings';
 import { PageHeader } from '@/portainer/components/PageHeader';
-import { useEnvironmentList } from '@/portainer/environments/queries';
+import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
 import { r2a } from '@/react-tools/react2angular';
 
 import { DataTable } from './Datatable/Datatable';

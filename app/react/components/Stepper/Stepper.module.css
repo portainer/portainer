@@ -1,0 +1,93 @@
+.stepper-wrapper {
+  width: 60%;
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+.step-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1;
+}
+
+.step-wrapper::before {
+  position: absolute;
+  content: '';
+  width: 100%;
+  top: 20px;
+  left: -100%;
+  z-index: 2;
+  border-bottom: 5px solid var(--bg-stepper-item-counter);
+}
+
+.step-wrapper::after {
+  position: absolute;
+  content: '';
+  border-bottom: 5px solid var(--bg-stepper-item-counter);
+  width: 100%;
+  top: 20px;
+  left: 0;
+  z-index: 2;
+}
+
+.step .step-name {
+  position: absolute;
+  bottom: -25px;
+  min-width: max-content;
+}
+
+.step-wrapper .step {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-stepper-item-counter);
+  margin-bottom: 6px;
+}
+
+.step-wrapper.active {
+  font-weight: bold;
+  content: none;
+}
+
+.step-wrapper.active .step {
+  background: #337ab7;
+}
+
+.step-wrapper.active .step-counter {
+  color: #fff;
+}
+
+.step-wrapper.completed .step {
+  background-color: #48b400;
+}
+
+.step-wrapper.completed .step-counter {
+  color: #fff;
+}
+
+.step-wrapper.completed::after {
+  position: absolute;
+  content: '';
+  border-bottom: 5px solid #48b400;
+  width: 100%;
+  top: 20px;
+  left: 0;
+  z-index: 3;
+}
+
+.step-wrapper:first-child::before {
+  content: none;
+}
+
+.step-wrapper:last-child::after {
+  content: none;
+}

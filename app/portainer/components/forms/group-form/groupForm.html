@@ -23,17 +23,9 @@
   </div>
   <!-- !description-input -->
   <div class="col-sm-12 form-section-title"> Metadata </div>
-  <!-- tags -->
-  <div class="form-group">
-    <tag-selector
-      ng-if="$ctrl.model && $ctrl.availableTags"
-      tags="$ctrl.availableTags"
-      model="$ctrl.model.TagIds"
-      allow-create="$ctrl.state.allowCreateTag"
-      on-create="($ctrl.onCreateTag)"
-    ></tag-selector>
-  </div>
-  <!-- !tags -->
+
+  <tag-selector ng-if="$ctrl.model.TagIds" value="$ctrl.model.TagIds" on-change="($ctrl.onChangeTags)" allow-create="$ctrl.state.allowCreateTag"> </tag-selector>
+
   <!-- environments -->
   <div ng-if="$ctrl.model.Id !== 1">
     <div class="col-sm-12 form-section-title"> Associated environments </div>

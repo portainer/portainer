@@ -25,6 +25,7 @@ export interface EnvironmentsQueryParams {
   sort?: string;
   order?: 'asc' | 'desc';
   edgeDeviceFilter?: 'all' | 'trusted' | 'untrusted' | 'none';
+  name?: string;
 }
 
 export async function getEndpoints(

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { FormControl } from '@/portainer/components/form-components/FormControl';
 import { Select } from '@/portainer/components/form-components/Input';
-import { useSettings } from '@/portainer/settings/settings.service';
+import { useSettings } from '@/portainer/settings/queries';
 import { r2a } from '@/react-tools/react2angular';
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
   isDefaultHidden?: boolean;
   label?: string;
   tooltip?: string;
+  readonly?: boolean;
 }
 
 export const checkinIntervalOptions = [
@@ -34,6 +35,7 @@ export const checkinIntervalOptions = [
 
 export function EdgeCheckinIntervalField({
   value,
+  readonly,
   onChange,
   isDefaultHidden = false,
   label = 'Poll frequency',
@@ -49,6 +51,7 @@ export function EdgeCheckinIntervalField({
           onChange(parseInt(e.currentTarget.value, 10));
         }}
         options={options}
+        disabled={readonly}
       />
     </FormControl>
   );
@@ -57,6 +60,10 @@ export function EdgeCheckinIntervalField({
 export const EdgeCheckinIntervalFieldAngular = r2a(EdgeCheckinIntervalField, [
   'value',
   'onChange',
+  'isDefaultHidden',
+  'tooltip',
+  'label',
+  'readonly',
 ]);
 
 function useOptions(isDefaultHidden: boolean) {

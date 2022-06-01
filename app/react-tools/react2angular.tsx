@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom';
 import { IComponentOptions, IController } from 'angular';
 import { Suspense } from 'react';
+import _ from 'lodash';
 
 import { RootProvider } from './RootProvider';
 
@@ -25,15 +26,26 @@ function toProps(
   );
 }
 
-export function react2angular<T>(
+type PropNames<T> = Exclude<keyof T, number | symbol>;
+
+/**
+ * react2angular is used to bind a React component to an AngularJS component
+ * it used in an AngularJS module definition:
+ *
+ * `.component('componentName', react2angular(ComponentName, ['prop1', 'prop2']))`
+ *
+ * if the second parameter has any ts errors check that the component has the correct props
+ */
+export function react2angular<T, U extends PropNames<T>[]>(
   Component: React.ComponentType<T>,
-  propNames: string[]
-): IComponentOptions {
+  propNames: U & ([PropNames<T>] extends [U[number]] ? unknown : PropNames<T>)
+): IComponentOptions & { name: string } {
   const bindings = Object.fromEntries(propNames.map((key) => [key, '<']));
 
   return {
     bindings,
     controller: Controller,
+    name: _.camelCase(Component.displayName || Component.name),
   };
 
   /* @ngInject */

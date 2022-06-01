@@ -20,8 +20,12 @@ export default class ThemeSettingsController {
       } else {
         this.ThemeManager.setTheme(theme);
       }
+
       this.state.userTheme = theme;
-      await this.UserService.updateUserTheme(this.state.userId, this.state.userTheme);
+      if (!this.state.isDemo) {
+        await this.UserService.updateUserTheme(this.state.userId, this.state.userTheme);
+      }
+
       this.Notifications.success('Success', 'User theme successfully updated');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update user theme');
@@ -30,10 +34,13 @@ export default class ThemeSettingsController {
 
   $onInit() {
     return this.$async(async () => {
+      const state = this.StateManager.getState();
+
       this.state = {
         userId: null,
         userTheme: '',
         defaultTheme: 'auto',
+        isDemo: state.application.demoEnvironment.enabled,
       };
 
       this.state.availableThemes = [

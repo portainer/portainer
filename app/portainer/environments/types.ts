@@ -60,6 +60,7 @@ export type Environment = {
   TagIds: TagId[];
   GroupId: EnvironmentGroupId;
   EdgeID?: string;
+  EdgeKey: string;
   EdgeCheckinInterval?: number;
   QueryDate?: number;
   LastCheckInDate?: number;
@@ -73,7 +74,6 @@ export type Environment = {
   UserTrusted: boolean;
   AMTDeviceGUID?: string;
 };
-
 /**
  * TS reference of endpoint_create.go#EndpointCreationType iota
  */
