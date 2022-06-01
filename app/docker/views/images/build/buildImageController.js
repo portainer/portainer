@@ -17,7 +17,12 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     NodeName: null,
   };
 
-  $scope.nameChecker = RegExp('^(([a-z0-9-.]+(:[0-9]+)?/)?[a-z0-9-_]{2,256}/)?[a-z0-9-_]{2,256}:[A-Za-z0-9-_.]{1,128}$');
+  $scope.checkName = function (name) {
+    const parts = name.split('/');
+    const repository = parts[parts.length - 1];
+    const repositoryRegExp = RegExp('^[a-z0-9-_]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
+    return repositoryRegExp.test(repository);
+  };
 
   $window.onbeforeunload = () => {
     if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
@@ -94,13 +99,16 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
   }
 
   $scope.validImageNames = function () {
+    if ($scope.formValues.ImageNames.length == 0) {
+      return false;
+    }
     for (var i = 0; i < $scope.formValues.ImageNames.length; i++) {
       var item = $scope.formValues.ImageNames[i];
-      if ($scope.nameChecker.test(item.Name)) {
-        return true;
+      if (!$scope.checkName(item.Name)) {
+        return false;
       }
     }
-    return false;
+    return true;
   };
 
   $scope.editorUpdate = function (cm) {
