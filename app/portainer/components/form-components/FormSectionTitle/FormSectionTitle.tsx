@@ -1,5 +1,19 @@
 import { PropsWithChildren } from 'react';
 
-export function FormSectionTitle({ children }: PropsWithChildren<unknown>) {
+interface Props {
+  htmlFor?: string;
+}
+
+export function FormSectionTitle({
+  children,
+  htmlFor,
+}: PropsWithChildren<Props>) {
+  if (htmlFor) {
+    return (
+      <label htmlFor={htmlFor} className="col-sm-12 form-section-title">
+        {children}
+      </label>
+    );
+  }
   return <div className="col-sm-12 form-section-title">{children}</div>;
 }
