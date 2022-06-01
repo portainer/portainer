@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DialogOverlay } from '@reach/dialog';
 
 import { Environment } from '@/portainer/environments/types';
 import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service/index';
@@ -8,7 +7,6 @@ import { trackEvent } from '@/angulartics.matomo/analytics-services';
 import { Button } from '@/portainer/components/Button';
 
 import { KubeconfigPrompt } from './KubeconfigPrompt';
-import styles from './KubeconfigButton.module.css';
 import '@reach/dialog/styles.css';
 
 export interface KubeconfigButtonProps {
@@ -34,17 +32,11 @@ export function KubeconfigButton({
       <Button onClick={handleClick}>
         <i className="fas fa-download space-right" /> kubeconfig
       </Button>
-      <DialogOverlay
-        className={styles.dialog}
-        isOpen={showDialog}
-        aria-label="Kubeconfig View"
-        role="dialog"
-      >
-        <KubeconfigPrompt
-          envQueryParams={envQueryParams}
-          onToggleClose={handleClose}
-        />
-      </DialogOverlay>
+      <KubeconfigPrompt
+        envQueryParams={envQueryParams}
+        onToggleShow={showDialog}
+        onToggleClose={handleClose}
+      />
     </div>
   );
 
