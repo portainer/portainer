@@ -81,7 +81,7 @@
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="state.actionInProgress || form.$invalid || form.password.$viewValue !== formValues.ConfirmPassword"
+                  ng-disabled="state.actionInProgress || form.$invalid || !formValues.Password || !formValues.ConfirmPassword ||  form.password.$viewValue !== formValues.ConfirmPassword"
                   ng-click="createAdminUser()"
                   button-spinner="state.actionInProgress"
                 >
