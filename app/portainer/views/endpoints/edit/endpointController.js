@@ -34,6 +34,12 @@ function EndpointController(
   const isBE = process.env.PORTAINER_EDITION === 'BE';
 
   $scope.state = {
+    selectAll: false,
+    // displayTextFilter: false,
+    get selectedItemCount() {
+      return $scope.state.selectedItems.length || 0;
+    },
+    selectedItems: [],
     uploadInProgress: false,
     actionInProgress: false,
     azureEndpoint: false,
@@ -49,6 +55,46 @@ function EndpointController(
       linux: _.compact([commandsTabs.k8sLinux, commandsTabs.swarmLinux, commandsTabs.standaloneLinux, isBE && commandsTabs.nomadLinux]),
       win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
     },
+  };
+
+  $scope.selectAll = function () {
+    $scope.state.firstClickedItem = null;
+    for (var i = 0; i < $scope.state.filteredDataSet.length; i++) {
+      var item = $scope.state.filteredDataSet[i];
+      if (item.Checked !== $scope.state.selectAll) {
+        // if ($scope.allowSelection(item) && item.Checked !== $scope.state.selectAll) {
+        item.Checked = $scope.state.selectAll;
+        $scope.selectItem(item);
+      }
+    }
+  };
+
+  function isBetween(value, a, b) {
+    return (value >= a && value <= b) || (value >= b && value <= a);
+  }
+
+  $scope.selectItem = function (item, event) {
+    // Handle range select using shift
+    if (event && event.originalEvent.shiftKey && $scope.state.firstClickedItem) {
+      const firstItemIndex = $scope.state.filteredDataSet.indexOf($scope.state.firstClickedItem);
+      const lastItemIndex = $scope.state.filteredDataSet.indexOf(item);
+      const itemsInRange = _.filter($scope.state.filteredDataSet, (item, index) => {
+        return isBetween(index, firstItemIndex, lastItemIndex);
+      });
+      const value = $scope.state.firstClickedItem.Checked;
+
+      _.forEach(itemsInRange, (i) => {
+        i.Checked = value;
+      });
+      $scope.state.firstClickedItem = item;
+    } else if (event) {
+      item.Checked = !item.Checked;
+      $scope.state.firstClickedItem = item;
+    }
+    $scope.state.selectedItems = _.uniq(_.concat($scope.state.selectedItems, $scope.state.filteredDataSet)).filter((i) => i.Checked);
+    if (event && $scope.state.selectAll && $scope.state.selectedItems.length !== $scope.state.filteredDataSet.length) {
+      $scope.state.selectAll = false;
+    }
   };
 
   $scope.formValues = {
@@ -106,6 +152,42 @@ function EndpointController(
     });
   }
 
+  $scope.removeAction = removeAction;
+  $scope.addAction = addAction;
+
+  Array.prototype.indexOf = function (val) {
+    for (var i = 0; i < this.length; i++) {
+      if (this[i] == val) return i;
+    }
+    return -1;
+  };
+  Array.prototype.remove = function (val) {
+    var index = this.indexOf(val);
+    if (index > -1) {
+      this.splice(index, 1);
+    }
+  };
+
+  function removeAction(selectedItems) {
+    for (let item of selectedItems) {
+      $scope.endpoint.Gpus.remove(item);
+    }
+    $scope.state.selectedItems=[];
+  }
+
+  function addAction() {
+    $scope.endpoint.Gpus.push({ 'name': null, 'value': null });
+  }
+
+  function verifyGpus() {
+    var i = $scope.endpoint.Gpus.length;
+    while (i--) {
+      if ($scope.endpoint.Gpus[i].name === '' || $scope.endpoint.Gpus[i].name === null ) {
+        $scope.endpoint.Gpus.splice(i, 1);
+      }
+    }
+  }
+
   $scope.updateEndpoint = async function () {
     var endpoint = $scope.endpoint;
     var securityData = $scope.formValues.SecurityFormData;
@@ -135,9 +217,11 @@ function EndpointController(
       }
     }
 
+    verifyGpus();
     var payload = {
       Name: endpoint.Name,
       PublicURL: endpoint.PublicURL,
+      Gpus: endpoint.Gpus,
       GroupID: endpoint.GroupId,
       TagIds: endpoint.TagIds,
       TLS: TLS,

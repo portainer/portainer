@@ -37,6 +37,7 @@
       "ComposeSyntaxMaxVersion": "",
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
+      "Gpus": [],
       "GroupId": 1,
       "Id": 1,
       "IsEdgeDevice": false,
@@ -169,6 +170,8 @@
             }
           },
           "DockerVersion": "20.10.13",
+          "GpuUseAll": false,
+          "GpuUseList": null,
           "HealthyContainerCount": 0,
           "ImageCount": 9,
           "NodeCount": 0,
@@ -895,7 +898,7 @@
   ],
   "version": {
     "DB_UPDATING": "false",
-    "DB_VERSION": "35",
+    "DB_VERSION": "41",
     "INSTANCE_ID": "null"
   }
 }
