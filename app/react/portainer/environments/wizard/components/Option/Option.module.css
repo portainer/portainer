@@ -1,20 +1,32 @@
-.root {
-  --selected-item-color: var(--blue-2);
-  display: block;
-  width: 200px;
-  height: 300px;
-  border: 1px solid rgb(163, 163, 163);
+.optionTile {
   border-radius: 5px;
   padding: 25px 20px;
   cursor: pointer;
   box-shadow: 0 3px 10px -2px rgb(161 170 166 / 60%);
   margin: 0;
+  display: block;
+  width: 200px;
+  min-height: 300px;
 }
 
-.root:hover {
+.feature {
+  --selected-item-color: var(--blue-2);
+  border: 1px solid rgb(163, 163, 163);
+}
+
+.feature:hover {
   box-shadow: 0 3px 10px -2px rgb(161 170 166 / 80%);
   border: 1px solid var(--blue-2);
   color: #337ab7;
+}
+
+.teaser {
+  border: 2px solid var(--orange-1) !important;
+  color: var(--text-muted-color);
+}
+
+.teaser:hover {
+  box-shadow: 0 3px 10px -2px rgb(161 170 166 / 80%);
 }
 
 .active:hover {
