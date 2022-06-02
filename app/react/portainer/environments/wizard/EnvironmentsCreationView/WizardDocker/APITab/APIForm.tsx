@@ -12,7 +12,7 @@ import {
 } from '@/portainer/environments/types';
 
 import { NameField } from '../../shared/NameField';
-import { MetadataFieldset } from '../../shared/MetadataFieldset';
+import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { validation } from './APIForm.validation';
 import { FormValues } from './types';
@@ -66,7 +66,7 @@ export function APIForm({ onCreate }: Props) {
 
           <TLSFieldset />
 
-          <MetadataFieldset />
+          <MoreSettingsSection />
 
           <div className="form-group">
             <div className="col-sm-12">

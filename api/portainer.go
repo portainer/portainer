@@ -5,6 +5,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/volume"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	v1 "k8s.io/api/core/v1"
 )
@@ -128,6 +130,14 @@ type (
 		SecretKeyName             *string
 	}
 
+	// CustomTemplateVariableDefinition
+	CustomTemplateVariableDefinition struct {
+		Name         string `json:"name" example:"MY_VAR"`
+		Label        string `json:"label" example:"My Variable"`
+		DefaultValue string `json:"defaultValue" example:"default value"`
+		Description  string `json:"description" example:"Description"`
+	}
+
 	// CustomTemplate represents a custom template
 	CustomTemplate struct {
 		// CustomTemplate Identifier
@@ -152,6 +162,7 @@ type (
 		// Type of created stack (1 - swarm, 2 - compose)
 		Type            StackType        `json:"Type" example:"1"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
+		Variables       []CustomTemplateVariableDefinition
 	}
 
 	// CustomTemplateID represents a custom template identifier
@@ -191,13 +202,14 @@ type (
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+
 	DockerSnapshotRaw struct {
-		Containers interface{} `json:"Containers"`
-		Volumes    interface{} `json:"Volumes"`
-		Networks   interface{} `json:"Networks"`
-		Images     interface{} `json:"Images"`
-		Info       interface{} `json:"Info"`
-		Version    interface{} `json:"Version"`
+		Containers []types.Container       `json:"Containers" swaggerignore:"true"`
+		Volumes    volume.VolumeListOKBody `json:"Volumes" swaggerignore:"true"`
+		Networks   []types.NetworkResource `json:"Networks" swaggerignore:"true"`
+		Images     []types.ImageSummary    `json:"Images" swaggerignore:"true"`
+		Info       types.Info              `json:"Info" swaggerignore:"true"`
+		Version    types.Version           `json:"Version" swaggerignore:"true"`
 	}
 
 	// EdgeGroup represents an Edge group
@@ -1351,7 +1363,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.13.0"
+	APIVersion = "2.14.0"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 50
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax

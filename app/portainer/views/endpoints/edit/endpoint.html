@@ -54,7 +54,12 @@
             </p>
           </span>
 
-          <edge-script-form edge-key="endpoint.EdgeKey" edge-id="endpoint.EdgeID"></edge-script-form>
+          <div class="col-sm-12 form-section-title"> Edge agent deployment script </div>
+          <edge-script-form
+            edge-info="{ key: endpoint.EdgeKey, id: endpoint.EdgeID }"
+            commands="state.edgeScriptCommands"
+            is-nomad-token-visible="state.showNomad"
+          ></edge-script-form>
 
           <span class="small text-muted">
             <div class="col-sm-12 form-section-title" style="margin-top: 25px"> Join token </div>

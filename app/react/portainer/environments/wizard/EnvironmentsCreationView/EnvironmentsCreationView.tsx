@@ -193,6 +193,7 @@ function useAnalyticsState() {
     aciApi: 0,
     localEndpoint: 0,
     nomadEdgeAgent: 0,
+    dockerEdgeAgent: 0,
   });
 
   return { analytics, setAnalytics };
