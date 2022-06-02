@@ -190,23 +190,23 @@ angular.module('portainer.app').controller('TeamController', [
       }
     }
 
-    function initView() {
+    async function initView() {
       $scope.isAdmin = Authentication.isAdmin();
-      $q.all({
-        team: TeamService.team($transition$.params().id),
-        users: UserService.users(false),
-        memberships: TeamService.userMemberships($transition$.params().id),
-        settings: SettingsService.publicSettings(),
-      })
-        .then(function success(data) {
-          var users = data.users;
-          $scope.team = data.team;
-          $scope.settings = data.settings;
-          assignUsersAndMembers(users, data.memberships);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve team details');
+
+      try {
+        $scope.settings = await SettingsService.publicSettings();
+
+        const data = await $q.all({
+          team: TeamService.team($transition$.params().id),
+          users: UserService.users($scope.isAdmin && $scope.settings.TeamSync),
+          memberships: TeamService.userMemberships($transition$.params().id),
         });
+
+        $scope.team = data.team;
+        assignUsersAndMembers(data.users, data.memberships);
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve team details');
+      }
     }
 
     initView();
