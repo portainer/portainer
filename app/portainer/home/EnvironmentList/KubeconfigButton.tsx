@@ -17,7 +17,7 @@ export function KubeconfigButton({
   environments,
   envQueryParams,
 }: KubeconfigButtonProps) {
-  const [showDialog, setShowDialog] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!environments) {
     return null;
@@ -32,11 +32,7 @@ export function KubeconfigButton({
       <Button onClick={handleClick}>
         <i className="fas fa-download space-right" /> kubeconfig
       </Button>
-      <KubeconfigPrompt
-        envQueryParams={envQueryParams}
-        onToggleShow={showDialog}
-        onToggleClose={handleClose}
-      />
+      {prompt()}
     </div>
   );
 
@@ -49,11 +45,11 @@ export function KubeconfigButton({
       category: 'kubernetes',
     });
 
-    setShowDialog(true);
+    setIsOpen(true);
   }
 
   function handleClose() {
-    setShowDialog(false);
+    setIsOpen(false);
   }
 
   function isKubeconfigButtonVisible(environments: Environment[]) {
@@ -61,5 +57,16 @@ export function KubeconfigButton({
       return false;
     }
     return environments.some((env) => isKubernetesEnvironment(env.Type));
+  }
+
+  function prompt() {
+    return (
+      isOpen && (
+        <KubeconfigPrompt
+          envQueryParams={envQueryParams}
+          onToggleClose={handleClose}
+        />
+      )
+    );
   }
 }

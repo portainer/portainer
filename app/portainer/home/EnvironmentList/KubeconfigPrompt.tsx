@@ -18,14 +18,12 @@ import '@reach/dialog/styles.css';
 
 export interface KubeconfigPromptProps {
   envQueryParams: EnvironmentsQueryParams;
-  onToggleShow: boolean;
   onToggleClose: () => void;
 }
 const storageKey = 'home_endpoints';
 
 export function KubeconfigPrompt({
   envQueryParams,
-  onToggleShow,
   onToggleClose,
 }: KubeconfigPromptProps) {
   const [page, setPage] = useState(1);
@@ -50,7 +48,6 @@ export function KubeconfigPrompt({
   return (
     <DialogOverlay
       className={styles.dialog}
-      isOpen={onToggleShow}
       aria-label="Kubeconfig View"
       role="dialog"
     >
