@@ -10,7 +10,8 @@ angular.module('portainer.app').controller('TeamController', [
   'Notifications',
   'PaginationService',
   'Authentication',
-  function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMembershipService, ModalService, Notifications, PaginationService, Authentication) {
+  'SettingsService',
+  function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMembershipService, ModalService, Notifications, PaginationService, Authentication, SettingsService) {
     $scope.state = {
       pagination_count_users: PaginationService.getPaginationLimit('team_available_users'),
       pagination_count_members: PaginationService.getPaginationLimit('team_members'),
@@ -195,10 +196,12 @@ angular.module('portainer.app').controller('TeamController', [
         team: TeamService.team($transition$.params().id),
         users: UserService.users(false),
         memberships: TeamService.userMemberships($transition$.params().id),
+        settings: SettingsService.publicSettings(),
       })
         .then(function success(data) {
           var users = data.users;
           $scope.team = data.team;
+          $scope.settings = data.settings;
           assignUsersAndMembers(users, data.memberships);
         })
         .catch(function error(err) {
