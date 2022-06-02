@@ -16,6 +16,7 @@ export async function init(edition: Edition) {
   const features = {
     [FeatureId.K8S_RESOURCE_POOL_LB_QUOTA]: Edition.BE,
     [FeatureId.K8S_RESOURCE_POOL_STORAGE_QUOTA]: Edition.BE,
+    [FeatureId.K8S_CREATE_FROM_KUBECONFIG]: Edition.BE,
     [FeatureId.KAAS_PROVISIONING]: Edition.BE,
     [FeatureId.NOMAD]: Edition.BE,
     [FeatureId.ACTIVITY_AUDIT]: Edition.BE,
