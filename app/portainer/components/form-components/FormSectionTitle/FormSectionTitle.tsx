@@ -10,7 +10,10 @@ export function FormSectionTitle({
 }: PropsWithChildren<Props>) {
   if (htmlFor) {
     return (
-      <label htmlFor={htmlFor} className="col-sm-12 form-section-title">
+      <label
+        htmlFor={htmlFor}
+        className="col-sm-12 form-section-title cursor-pointer"
+      >
         {children}
       </label>
     );
