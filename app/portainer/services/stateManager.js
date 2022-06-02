@@ -48,13 +48,14 @@ function StateManagerFactory(
     LocalStorage.storeUIState(state.UI);
   };
 
-  manager.setPasswordChangeSkipped = function () {
-    state.UI.timesPasswordChangeSkipped = state.UI.timesPasswordChangeSkipped + 1 || 1;
+  manager.setPasswordChangeSkipped = function (userID) {
+    state.UI.timesPasswordChangeSkipped = state.UI.timesPasswordChangeSkipped || {};
+    state.UI.timesPasswordChangeSkipped[userID] = state.UI.timesPasswordChangeSkipped[userID] + 1 || 1;
     LocalStorage.storeUIState(state.UI);
   };
 
-  manager.resetPasswordChangeSkips = function () {
-    state.UI.timesPasswordChangeSkipped = 0;
+  manager.resetPasswordChangeSkips = function (userID) {
+    if (state.UI.timesPasswordChangeSkipped && state.UI.timesPasswordChangeSkipped[userID]) state.UI.timesPasswordChangeSkipped[userID] = 0;
     LocalStorage.storeUIState(state.UI);
   };
 

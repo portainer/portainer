@@ -22,7 +22,7 @@ angular.module('portainer.app').controller('AccountController', [
         try {
           await UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword);
           Notifications.success('Success', 'Password successfully updated');
-          StateManager.resetPasswordChangeSkips();
+          StateManager.resetPasswordChangeSkips($scope.userID);
           $scope.forceChangePassword = false;
           $state.go('portainer.logout');
         } catch (err) {
@@ -34,7 +34,7 @@ angular.module('portainer.app').controller('AccountController', [
     $scope.skipPasswordChange = async function () {
       try {
         if ($scope.userCanSkip()) {
-          StateManager.setPasswordChangeSkipped();
+          StateManager.setPasswordChangeSkipped($scope.userID);
           $scope.forceChangePassword = false;
           $state.go('portainer.home');
         }
@@ -113,7 +113,6 @@ angular.module('portainer.app').controller('AccountController', [
       $scope.userID = userDetails.ID;
       $scope.userRole = Authentication.getUserDetails().role;
       $scope.forceChangePassword = userDetails.forceChangePassword;
-      $scope.timesPasswordChangeSkipped = state.UI.timesPasswordChangeSkipped || 0;
 
       if (state.application.demoEnvironment.enabled) {
         $scope.isDemoUser = state.application.demoEnvironment.users.includes($scope.userID);
@@ -128,9 +127,11 @@ angular.module('portainer.app').controller('AccountController', [
           $scope.AuthenticationMethod = data.AuthenticationMethod;
 
           if (state.UI.requiredPasswordLength && state.UI.requiredPasswordLength !== data.RequiredPasswordLength) {
-            StateManager.resetPasswordChangeSkips();
+            StateManager.resetPasswordChangeSkips($scope.userID);
           }
-          $scope.timesPasswordChangeSkipped = state.UI.timesPasswordChangeSkipped || 0;
+
+          $scope.timesPasswordChangeSkipped =
+            state.UI.timesPasswordChangeSkipped && state.UI.timesPasswordChangeSkipped[$scope.userID] ? state.UI.timesPasswordChangeSkipped[$scope.userID] : 0;
 
           $scope.requiredPasswordLength = data.RequiredPasswordLength;
           StateManager.setRequiredPasswordLength(data.RequiredPasswordLength);
