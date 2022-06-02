@@ -16,6 +16,8 @@ import { beFeatureIndicatorAngular } from './BEFeatureIndicator';
 import { InformationPanelAngular } from './InformationPanel';
 import { ForcePasswordUpdateHintAngular, PasswordCheckHintAngular } from './PasswordCheckHint';
 import { ViewLoadingAngular } from './ViewLoading';
+import { TemplateListFilterAngular } from './template-list/TemplateListFilter';
+import { TemplateListSortAngular } from './template-list/TemplateListSort';
 
 export default angular
   .module('portainer.app.components', [pageHeaderModule, boxSelectorModule, widgetModule, sidebarModule, gitFormModule, porAccessManagementModule, formComponentsModule])
@@ -26,4 +28,6 @@ export default angular
   .component('beFeatureIndicator', beFeatureIndicatorAngular)
   .component('forcePasswordUpdateHint', ForcePasswordUpdateHintAngular)
   .component('passwordCheckHint', PasswordCheckHintAngular)
-  .component('createAccessToken', CreateAccessTokenAngular).name;
+  .component('createAccessToken', CreateAccessTokenAngular)
+  .component('templateListFilter', TemplateListFilterAngular)
+  .component('templateListSort', TemplateListSortAngular).name;

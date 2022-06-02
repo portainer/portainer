@@ -14,56 +14,22 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-sm-2">
-            <ui-select ng-model="$ctrl.state.selectedCategory">
-              <ui-select-match placeholder="Category">
-                <span>{{ $select.selected }}</span>
-                <a ng-click="$ctrl.clearCategoryFilter(); $event.stopPropagation()" style="margin-left: -20px; position: relative; bottom: 4px">
-                  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
-                </a>
-              </ui-select-match>
-              <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
-                <span>{{ category }}</span>
-              </ui-select-choices>
-            </ui-select>
+          <div class="col-sm-3">
+            <template-list-filter options="$ctrl.state.categories" on-change="($ctrl.applyCategoriesFilter)" placeholder="'Category'"></template-list-filter>
           </div>
-          <div class="col-sm-2">
-            <ui-select ng-model="$ctrl.state.filterByType" ng-change="$ctrl.applyTypeFilter($select.selected)">
-              <ui-select-match placeholder="Type">
-                <span>{{ $select.selected }}</span>
-                <a ng-click="$ctrl.clearTypeFilter(); $event.stopPropagation()" style="margin-left: -20px; position: relative; bottom: 4px">
-                  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
-                </a>
-              </ui-select-match>
-              <ui-select-choices repeat="type in ($ctrl.state.typeFilters | filter: $select.search)">
-                <span>{{ type }}</span>
-              </ui-select-choices>
-            </ui-select>
+          <div class="col-sm-3">
+            <template-list-filter options="$ctrl.state.typeFilters" on-change="($ctrl.applyTypeFilter)" placeholder="'Type'"></template-list-filter>
           </div>
-          <div class="col-sm-2 col-sm-offset-5">
-            <ui-select ng-model="$ctrl.state.selectedOrderBy" ng-change="$ctrl.changeOrderBy($select.selected, false)">
-              <ui-select-match placeholder="Sort By">
-                <span>{{ $select.selected }}</span>
-                <a ng-click="$ctrl.clearOrderBy(); $event.stopPropagation()" style="margin-left: -20px; position: relative; bottom: 4px">
-                  <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
-                </a>
-              </ui-select-match>
-              <ui-select-choices repeat="field in ($ctrl.state.orderByFields | filter: $select.search)">
-                <span>{{ field }}</span>
-              </ui-select-choices>
-            </ui-select>
-          </div>
-          <div class="col-sm-1">
-            <button ng-click="$ctrl.revertOrder()" style="padding: 5px 8px; border-radius: 4px; margin-left: 0px; border: 1px solid var(--border-form-control-color)" type="button">
-              <i
-                class="fa fa-sort-alpha-down"
-                ng-class="{
-                  'fa-sort-alpha-down': !$ctrl.state.orderDesc,
-                  'fa-sort-alpha-up': $ctrl.state.orderDesc,
-                }"
-                aria-hidden="true"
-              ></i>
-            </button>
+          <div class="col-sm-3 col-sm-offset-3">
+            <template-list-sort
+              on-change="($ctrl.changeOrderBy)"
+              on-descending="($ctrl.invertOrder)"
+              options="$ctrl.state.orderByFields"
+              sort-by-button="true"
+              sort-by-descending="$ctrl.state.orderDesc"
+              placeholder="'Sort By'"
+              value="$ctrl.state.selectedOrderBy"
+            ></template-list-sort>
           </div>
         </div>
       </div>

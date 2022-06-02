@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 
 angular.module('portainer.app').controller('TemplateListController', TemplateListController);
 
-function TemplateListController($async, $state, DatatableService, Notifications, TemplateService) {
+function TemplateListController($scope, $async, $state, DatatableService, Notifications, TemplateService) {
   var ctrl = this;
 
   this.state = {
@@ -17,87 +17,38 @@ function TemplateListController($async, $state, DatatableService, Notifications,
     orderDesc: false,
   };
 
-  const categorySorter = (template) => {
-    if (template.Categories && template.Categories.length > 0 && template.Categories[0] && template.Categories[0].length > 0) {
-      return template.Categories[0].toLowerCase();
-    }
-  };
-
-  const getSorter = (orderBy) => {
-    let sorter;
-    switch (orderBy) {
-      case 'Categories':
-        sorter = categorySorter;
-        break;
-      default:
-        sorter = orderBy;
-    }
-
-    return sorter;
-  };
-
-  this.applyTypeFilter = (type) => {
-    this.state.filterByType = type;
-    this.state.showContainerTemplates = 'Container' === type || '' === type;
-    this.updateCategories();
-  };
-
-  this.clearTypeFilter = () => {
-    this.applyTypeFilter('');
-  };
-
   this.onTextFilterChange = function () {
     DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
   };
 
-  this.changeOrderBy = function (orderField) {
-    this.state.selectedOrderBy = orderField;
-    this.templates = _.orderBy(this.templates, [getSorter(this.state.selectedOrderBy)], [this.state.orderDesc ? 'desc' : 'asc']);
-  };
-
-  this.revertOrder = () => {
-    this.state.orderDesc = !this.state.orderDesc;
-    this.templates = _.orderBy(this.templates, [getSorter(this.state.selectedOrderBy)], [this.state.orderDesc ? 'desc' : 'asc']);
-  };
-
-  this.clearOrderBy = () => {
-    this.state.selectedOrderBy = '';
-    this.templates = this.initalTemplates;
-  };
-
-  this.clearCategoryFilter = () => {
-    this.state.selectedCategory = '';
-    this.updateCategories();
-  };
-
-  this.filterByTemplateType = function (item) {
+  ctrl.filterByTemplateType = function (item) {
     switch (item.Type) {
       case 1: // container
         return ctrl.state.showContainerTemplates;
       case 2: // swarm stack
         return ctrl.showSwarmStacks && !ctrl.state.showContainerTemplates;
       case 3: // docker compose
-        return !ctrl.state.showContainerTemplates || ctrl.state.filterByType == '';
+        return !ctrl.state.showContainerTemplates || '' === ctrl.state.filterByType || undefined === ctrl.state.filterByType;
       case 4: // Edge stack templates
         return false;
     }
     return false;
   };
 
-  this.updateCategories = function () {
+  ctrl.updateCategories = function () {
     var availableCategories = [];
 
     for (var i = 0; i < ctrl.templates.length; i++) {
       var template = ctrl.templates[i];
-      if (this.filterByTemplateType(template)) {
+      if (ctrl.filterByTemplateType(template)) {
         availableCategories = availableCategories.concat(template.Categories);
       }
     }
 
-    this.state.categories = _.sortBy(_.uniq(availableCategories));
+    ctrl.state.categories = _.sortBy(_.uniq(availableCategories));
   };
 
-  this.filterByCategory = function (item) {
+  ctrl.filterByCategory = function (item) {
     if (!ctrl.state.selectedCategory) {
       return true;
     }
@@ -126,6 +77,55 @@ function TemplateListController($async, $state, DatatableService, Notifications,
       Notifications.error('Failure', err, 'Failed to duplicate template');
     }
   }
+
+  const categorySorter = function (template) {
+    if (template.Categories && template.Categories.length > 0 && template.Categories[0] && template.Categories[0].length > 0) {
+      return template.Categories[0].toLowerCase();
+    }
+  };
+
+  const getSorter = function (orderBy) {
+    let sorter;
+    switch (orderBy) {
+      case 'Categories':
+        sorter = categorySorter;
+        break;
+      default:
+        sorter = orderBy;
+    }
+
+    return sorter;
+  };
+
+  ctrl.changeOrderBy = function (orderField) {
+    if (undefined === orderField) {
+      ctrl.state.selectedOrderBy = '';
+      ctrl.templates = ctrl.initalTemplates;
+    }
+
+    ctrl.state.selectedOrderBy = orderField;
+    ctrl.templates = _.orderBy(ctrl.templates, [getSorter(ctrl.state.selectedOrderBy)], [ctrl.state.orderDesc ? 'desc' : 'asc']);
+    $scope.$apply();
+  };
+
+  ctrl.applyTypeFilter = function (type) {
+    ctrl.state.filterByType = type;
+    ctrl.state.showContainerTemplates = 'Container' === type || '' === type || undefined === type;
+    ctrl.updateCategories();
+    $scope.$apply();
+  };
+
+  ctrl.invertOrder = function () {
+    ctrl.state.orderDesc = !ctrl.state.orderDesc;
+    ctrl.templates = _.orderBy(ctrl.templates, [getSorter(ctrl.state.selectedOrderBy)], [ctrl.state.orderDesc ? 'desc' : 'asc']);
+    $scope.$apply();
+  };
+
+  ctrl.applyCategoriesFilter = function (category) {
+    ctrl.state.selectedCategory = category;
+    ctrl.updateCategories();
+    $scope.$apply();
+  };
 
   this.$onInit = function () {
     if (this.showSwarmStacks) {
