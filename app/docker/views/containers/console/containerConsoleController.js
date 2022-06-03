@@ -2,6 +2,7 @@ import { Terminal } from 'xterm';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 
 angular.module('portainer.docker').controller('ContainerConsoleController', [
+  '$http',
   '$scope',
   '$state',
   '$transition$',
@@ -14,6 +15,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
   'LocalStorage',
   'CONSOLE_COMMANDS_LABEL_PREFIX',
   function (
+    $http,
     $scope,
     $state,
     $transition$,
@@ -45,6 +47,12 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     $scope.$on('$stateChangeStart', function () {
       $scope.disconnect();
     });
+
+    $scope.onToggleBusybox = function () {
+      if ($scope.formValues.isUsingBusybox) {
+        $scope.formValues.command = 'sh';
+      }
+    };
 
     $scope.connectAttach = function () {
       if ($scope.state > states.disconnected) {
@@ -90,7 +98,34 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         return;
       }
 
-      $scope.state = states.connecting;
+      let promise = Promise.resolve();
+      if ($scope.formValues.isUsingBusybox) {
+        promise = promise
+          .then(function success() {
+            return $http.get('/busybox.tar', { responseType: 'arraybuffer' });
+          })
+          .then(function success(data) {
+            return ContainerService.copyTo($transition$.params().id, '/', data.data);
+          })
+          .then(
+            function success() {
+              var execConfig = {
+                id: $transition$.params().id,
+                User: $scope.formValues.user,
+                Cmd: ['/busybox', 'sh', '-c', '/busybox mkdir -p /bin && /busybox --install -s /bin'],
+              };
+
+              return ContainerService.createAndStartExec(execConfig);
+            },
+            function error(err) {
+              Notifications.error('Failure', err, 'Unable to copy busybox into container');
+            }
+          )
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to install busybox in container');
+          });
+      }
+
       var command = $scope.formValues.isCustomCommand ? $scope.formValues.customCommand : $scope.formValues.command;
       var execConfig = {
         id: $transition$.params().id,
@@ -102,7 +137,11 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         Cmd: ContainerHelper.commandStringToArray(command),
       };
 
-      ContainerService.createExec(execConfig)
+      promise
+        .then(function success() {
+          $scope.state = states.connecting;
+          return ContainerService.createExec(execConfig);
+        })
         .then(function success(data) {
           const params = {
             token: LocalStorage.getJWT(),
