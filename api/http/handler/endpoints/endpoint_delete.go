@@ -92,22 +92,6 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
-	}
-
-	for idx := range edgeStacks {
-		edgeStack := &edgeStacks[idx]
-		if _, ok := edgeStack.Status[endpoint.ID]; ok {
-			delete(edgeStack.Status, endpoint.ID)
-			err = handler.DataStore.EdgeStack().UpdateEdgeStack(edgeStack.ID, edgeStack)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update edge stack", err}
-			}
-		}
-	}
-
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}

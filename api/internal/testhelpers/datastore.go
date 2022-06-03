@@ -235,6 +235,13 @@ func (s *stubEndpointService) Create(endpoint *portainer.Endpoint) error {
 	return nil
 }
 
+func (s *stubEndpointService) CreateWithCallback(endpoint *portainer.Endpoint, fn func(uint64) (int, interface{})) error {
+	s.endpoints = append(s.endpoints, *endpoint)
+	fn(uint64(len(s.endpoints)))
+
+	return nil
+}
+
 func (s *stubEndpointService) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
 	for i, e := range s.endpoints {
 		if e.ID == ID {

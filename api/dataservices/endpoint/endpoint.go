@@ -1,6 +1,7 @@
 package endpoint
 
 import (
+	"errors"
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
@@ -81,6 +82,15 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 // CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
 func (service *Service) Create(endpoint *portainer.Endpoint) error {
 	return service.connection.CreateObjectWithSetSequence(BucketName, int(endpoint.ID), endpoint)
+}
+
+// CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
+func (service *Service) CreateWithCallback(endpoint *portainer.Endpoint, fn func(id uint64) (int, interface{})) error {
+	if endpoint.ID > 0 {
+		return errors.New("the endpoint must not have an ID")
+	}
+
+	return service.connection.CreateObject(BucketName, fn)
 }
 
 // GetNextIdentifier returns the next identifier for an environment(endpoint).

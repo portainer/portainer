@@ -177,7 +177,7 @@ func (store *Store) CreateEndpoint(t *testing.T, name string, endpointType porta
 func (store *Store) CreateEndpointRelation(id portainer.EndpointID) {
 	relation := &portainer.EndpointRelation{
 		EndpointID: id,
-		EdgeStacks: map[portainer.EdgeStackID]bool{},
+		EdgeStacks: map[portainer.EdgeStackID]portainer.EdgeStackStatus{},
 	}
 
 	store.EndpointRelation().Create(relation)

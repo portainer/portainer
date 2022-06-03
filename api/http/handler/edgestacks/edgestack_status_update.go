@@ -49,13 +49,6 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
 
-	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
-	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
-	}
-
 	var payload updateStatusPayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -74,15 +67,26 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
-	stack.Status[*payload.EndpointID] = portainer.EdgeStackStatus{
-		Type:       *payload.Status,
-		Error:      payload.Error,
-		EndpointID: *payload.EndpointID,
+	endpointRelation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment relations", err}
 	}
 
-	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
+	endpointRelation.EdgeStacks[portainer.EdgeStackID(stackID)] = portainer.EdgeStackStatus{
+		Type:  *payload.Status,
+		Error: payload.Error,
+	}
+
+	err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, endpointRelation)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
+	}
+
+	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
 	return response.JSON(w, stack)

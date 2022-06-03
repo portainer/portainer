@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
+	portainer "github.com/portainer/portainer/api"
 )
 
 // @id EdgeStackList
@@ -25,5 +26,35 @@ func (handler *Handler) edgeStackList(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
 	}
 
-	return response.JSON(w, edgeStacks)
+	endpointRels, err := handler.DataStore.EndpointRelation().EndpointRelations()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint relations from the database", err}
+	}
+
+	m := make(map[portainer.EdgeStackID]map[portainer.EndpointID]portainer.EdgeStackStatus)
+
+	for _, r := range endpointRels {
+		for edgeStackID, status := range r.EdgeStacks {
+			if m[edgeStackID] == nil {
+				m[edgeStackID] = make(map[portainer.EndpointID]portainer.EdgeStackStatus)
+			}
+
+			m[edgeStackID][r.EndpointID] = status
+		}
+	}
+
+	type EdgeStackWithStatus struct {
+		portainer.EdgeStack
+		Status map[portainer.EndpointID]portainer.EdgeStackStatus
+	}
+
+	var edgeStacksWS []EdgeStackWithStatus
+	for _, s := range edgeStacks {
+		edgeStacksWS = append(edgeStacksWS, EdgeStackWithStatus{
+			EdgeStack: s,
+			Status:    m[s.ID],
+		})
+	}
+
+	return response.JSON(w, edgeStacksWS)
 }

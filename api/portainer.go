@@ -265,14 +265,13 @@ type (
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
-		ID             EdgeStackID                    `json:"Id" example:"1"`
-		Name           string                         `json:"Name"`
-		Status         map[EndpointID]EdgeStackStatus `json:"Status"`
-		CreationDate   int64                          `json:"CreationDate"`
-		EdgeGroups     []EdgeGroupID                  `json:"EdgeGroups"`
-		ProjectPath    string                         `json:"ProjectPath"`
-		EntryPoint     string                         `json:"EntryPoint"`
-		Version        int                            `json:"Version"`
+		ID             EdgeStackID   `json:"Id" example:"1"`
+		Name           string        `json:"Name"`
+		CreationDate   int64         `json:"CreationDate"`
+		EdgeGroups     []EdgeGroupID `json:"EdgeGroups"`
+		ProjectPath    string        `json:"ProjectPath"`
+		EntryPoint     string        `json:"EntryPoint"`
+		Version        int           `json:"Version"`
 		ManifestPath   string
 		DeploymentType EdgeStackDeploymentType
 
@@ -287,9 +286,8 @@ type (
 
 	//EdgeStackStatus represents an edge stack status
 	EdgeStackStatus struct {
-		Type       EdgeStackStatusType `json:"Type"`
-		Error      string              `json:"Error"`
-		EndpointID EndpointID          `json:"EndpointID"`
+		Type  EdgeStackStatusType `json:"Type"`
+		Error string              `json:"Error"`
 	}
 
 	//EdgeStackStatusType represents an edge stack status type
@@ -428,7 +426,7 @@ type (
 	// EndpointRelation represents a environment(endpoint) relation object
 	EndpointRelation struct {
 		EndpointID EndpointID
-		EdgeStacks map[EdgeStackID]bool
+		EdgeStacks map[EdgeStackID]EdgeStackStatus
 	}
 
 	// Extension represents a deprecated Portainer extension

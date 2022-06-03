@@ -2,9 +2,10 @@ package edgestacks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 	"strconv"
+
+	"github.com/portainer/portainer/api/internal/endpointutils"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -118,7 +119,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find environment relation in database", err}
 			}
 
-			relation.EdgeStacks[stack.ID] = true
+			relation.EdgeStacks[stack.ID] = portainer.EdgeStackStatus{}
 
 			err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
 			if err != nil {
@@ -180,7 +181,6 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 
 	if payload.Version != nil && *payload.Version != stack.Version {
 		stack.Version = *payload.Version
-		stack.Status = map[portainer.EndpointID]portainer.EdgeStackStatus{}
 	}
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)

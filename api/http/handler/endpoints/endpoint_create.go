@@ -218,13 +218,15 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 
 	relationObject := &portainer.EndpointRelation{
 		EndpointID: endpoint.ID,
-		EdgeStacks: map[portainer.EdgeStackID]bool{},
+		EdgeStacks: map[portainer.EdgeStackID]portainer.EdgeStackStatus{},
 	}
 
 	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		relatedEdgeStacks := edge.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
 		for _, stackID := range relatedEdgeStacks {
-			relationObject.EdgeStacks[stackID] = true
+			relationObject.EdgeStacks[stackID] = portainer.EdgeStackStatus{
+				Type: portainer.StatusAcknowledged,
+			}
 		}
 	}
 
@@ -308,17 +310,17 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 }
 
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	//endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 
 	portainerHost, err := edge.ParseHostForEdge(payload.URL)
 	if err != nil {
 		return nil, httperror.BadRequest("Unable to parse host", err)
 	}
 
-	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
+	//edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
 
 	endpoint := &portainer.Endpoint{
-		ID:      portainer.EndpointID(endpointID),
+		//ID:      portainer.EndpointID(endpointID),
 		Name:    payload.Name,
 		URL:     portainerHost,
 		Type:    portainer.EdgeAgentOnDockerEnvironment,
@@ -326,12 +328,12 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
-		UserAccessPolicies:  portainer.UserAccessPolicies{},
-		TeamAccessPolicies:  portainer.TeamAccessPolicies{},
-		TagIDs:              payload.TagIDs,
-		Status:              portainer.EndpointStatusUp,
-		Snapshots:           []portainer.DockerSnapshot{},
-		EdgeKey:             edgeKey,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		TagIDs:             payload.TagIDs,
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.DockerSnapshot{},
+		//EdgeKey:             edgeKey,
 		EdgeCheckinInterval: payload.EdgeCheckinInterval,
 		Kubernetes:          portainer.KubernetesDefault(),
 		IsEdgeDevice:        payload.IsEdgeDevice,
@@ -352,7 +354,15 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		endpoint.EdgeID = edgeID.String()
 	}
 
-	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizationsWithCallback(endpoint, func(id uint64) (int, interface{}) {
+		endpoint.ID = portainer.EndpointID(id)
+
+		if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
+			endpoint.EdgeKey = handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, int(id))
+		}
+
+		return int(id), endpoint
+	})
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the environment", err}
 	}
@@ -499,6 +509,42 @@ func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.
 	}
 
 	err := handler.DataStore.Endpoint().Create(endpoint)
+	if err != nil {
+		return err
+	}
+
+	for _, tagID := range endpoint.TagIDs {
+		tag, err := handler.DataStore.Tag().Tag(tagID)
+		if err != nil {
+			return err
+		}
+
+		tag.Endpoints[endpoint.ID] = true
+
+		err = handler.DataStore.Tag().UpdateTag(tagID, tag)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (handler *Handler) saveEndpointAndUpdateAuthorizationsWithCallback(endpoint *portainer.Endpoint, fn func(id uint64) (int, interface{})) error {
+	endpoint.SecuritySettings = portainer.EndpointSecuritySettings{
+		AllowVolumeBrowserForRegularUsers: false,
+		EnableHostManagementFeatures:      false,
+
+		AllowSysctlSettingForRegularUsers:         true,
+		AllowBindMountsForRegularUsers:            true,
+		AllowPrivilegedModeForRegularUsers:        true,
+		AllowHostNamespaceForRegularUsers:         true,
+		AllowContainerCapabilitiesForRegularUsers: true,
+		AllowDeviceMappingForRegularUsers:         true,
+		AllowStackManagementForRegularUsers:       true,
+	}
+
+	err := handler.DataStore.Endpoint().CreateWithCallback(endpoint, fn)
 	if err != nil {
 		return err
 	}
