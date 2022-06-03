@@ -202,17 +202,6 @@ angular
         },
       };
 
-      var endpointCreation = {
-        name: 'portainer.endpoints.new',
-        url: '/new',
-        views: {
-          'content@': {
-            templateUrl: './views/endpoints/create/createendpoint.html',
-            controller: 'CreateEndpointController',
-          },
-        },
-      };
-
       var edgeDeviceCreation = {
         name: 'portainer.endpoints.newEdgeDevice',
         url: '/newEdgeDevice',
@@ -498,7 +487,6 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(edgeDeviceCreation);
-      $stateRegistryProvider.register(endpointCreation);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);
