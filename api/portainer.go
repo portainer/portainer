@@ -549,6 +549,11 @@ type (
 		ShellExecCommand string
 	}
 
+	// InternalAuthSettings represents settings used for the default 'internal' authentication
+	InternalAuthSettings struct {
+		RequiredPasswordLength int
+	}
+
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
 	LDAPGroupSearchSettings struct {
 		// The distinguished name of the element from which the LDAP server will search for groups
@@ -799,6 +804,7 @@ type (
 		BlackListedLabels []Pair `json:"BlackListedLabels"`
 		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
+		InternalAuthSettings InternalAuthSettings `json:"InternalAuthSettings" example:""`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
 		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration" example:""`

@@ -120,6 +120,7 @@ angular.module('portainer.app').controller('UserController', [
           $scope.formValues.Administrator = user.Role === 1;
           $scope.formValues.username = user.Username;
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
+          $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve user information');

@@ -14,6 +14,8 @@ type publicSettingsResponse struct {
 	LogoURL string `json:"LogoURL" example:"https://mycompany.mydomain.tld/logo.png"`
 	// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 	AuthenticationMethod portainer.AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
+	// The minimum required length for a password of any user when using internal auth mode
+	RequiredPasswordLength int `json:"RequiredPasswordLength" example:"1"`
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
 	// Supported feature flags
@@ -51,6 +53,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 	publicSettings := &publicSettingsResponse{
 		LogoURL:                   appSettings.LogoURL,
 		AuthenticationMethod:      appSettings.AuthenticationMethod,
+		RequiredPasswordLength:    appSettings.InternalAuthSettings.RequiredPasswordLength,
 		EnableEdgeComputeFeatures: appSettings.EnableEdgeComputeFeatures,
 		EnableTelemetry:           appSettings.EnableTelemetry,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,

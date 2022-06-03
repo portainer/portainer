@@ -690,6 +690,9 @@
     "EnforceEdgeID": false,
     "FeatureFlagSettings": null,
     "HelmRepositoryURL": "https://charts.bitnami.com/bitnami",
+    "InternalAuthSettings": {
+      "RequiredPasswordLength": 12
+    },
     "KubeconfigExpiry": "0",
     "KubectlShellImage": "portainer/kubectl-shell",
     "LDAPSettings": {

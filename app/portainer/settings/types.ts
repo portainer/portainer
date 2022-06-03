@@ -93,6 +93,7 @@ export interface Settings {
   LogoURL: string;
   BlackListedLabels: Pair[];
   AuthenticationMethod: AuthenticationMethod;
+  InternalAuthSettings: { RequiredPasswordLength: number };
   LDAPSettings: LDAPSettings;
   OAuthSettings: OAuthSettings;
   openAMTConfiguration: OpenAMTConfiguration;

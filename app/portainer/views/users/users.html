@@ -12,7 +12,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-plus" title-text="Add a new user"> </rd-widget-header>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form name="form" class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
             <label for="username" class="col-sm-3 col-lg-2 control-label text-left">
@@ -46,7 +46,15 @@
             <div class="col-sm-8">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.Password" id="password" ng-change="onPasswordChange()" data-cy="user-passwordInput" />
+                <input
+                  type="password"
+                  class="form-control"
+                  ng-model="formValues.Password"
+                  id="password"
+                  name="password"
+                  ng-minlength="requiredPasswordLength"
+                  data-cy="user-passwordInput"
+                />
               </div>
             </div>
           </div>
@@ -60,7 +68,9 @@
                 <input type="password" class="form-control" ng-model="formValues.ConfirmPassword" id="confirm_password" data-cy="user-passwordConfirmInput" />
                 <span class="input-group-addon"
                   ><i
-                    ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.Password !== '' && formValues.Password === formValues.ConfirmPassword]"
+                    ng-class="
+                      { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword]
+                    "
                     aria-hidden="true"
                   ></i
                 ></span>
@@ -70,7 +80,7 @@
           <!-- !confirm-password-input -->
 
           <!-- password-check-hint -->
-          <div class="form-group" ng-if="AuthenticationMethod === 1 && !state.passwordStrength">
+          <div class="form-group" ng-if="AuthenticationMethod === 1 && !form.password.$valid">
             <div class="col-sm-3 col-lg-2"></div>
             <div class="col-sm-8">
               <password-check-hint></password-check-hint>
@@ -130,7 +140,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !state.validUsername || formValues.Username === '' || (AuthenticationMethod === 1 && !state.passwordStrength) || (AuthenticationMethod === 1 && formValues.Password !== formValues.ConfirmPassword)"
+                ng-disabled="state.actionInProgress || !state.validUsername || formValues.Username === '' || !formValues.Password || !formValues.ConfirmPassword || (AuthenticationMethod === 1 && form.$invalid) || (AuthenticationMethod === 1 && form.password.$viewValue !== formValues.ConfirmPassword)"
                 ng-click="addUser()"
                 button-spinner="state.actionInProgress"
                 data-cy="user-createUserButton"
