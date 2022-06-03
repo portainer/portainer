@@ -18,13 +18,13 @@ import '@reach/dialog/styles.css';
 
 export interface KubeconfigPromptProps {
   envQueryParams: EnvironmentsQueryParams;
-  onToggleClose: () => void;
+  onClose: () => void;
 }
 const storageKey = 'home_endpoints';
 
 export function KubeconfigPrompt({
   envQueryParams,
-  onToggleClose,
+  onClose,
 }: KubeconfigPromptProps) {
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
@@ -53,7 +53,7 @@ export function KubeconfigPrompt({
     >
       <div className="modal-content">
         <div className="modal-header">
-          <button type="button" className="close" onClick={onToggleClose}>
+          <button type="button" className="close" onClick={onClose}>
             ×
           </button>
           <h5 className="modal-title">Download kubeconfig file</h5>
@@ -101,7 +101,7 @@ export function KubeconfigPrompt({
           </div>
         </div>
         <div className="modal-footer">
-          <Button onClick={onToggleClose} color="default">
+          <Button onClick={onClose} color="default">
             Cancel
           </Button>
           <Button onClick={handleDownload}>Download File</Button>
@@ -127,7 +127,7 @@ export function KubeconfigPrompt({
       await kcService.downloadKubeconfigFile(
         Object.keys(selection).map(Number)
       );
-      onToggleClose();
+      onClose();
     } catch (e) {
       notifications.error('Failed downloading kubeconfig file', e as Error);
     }

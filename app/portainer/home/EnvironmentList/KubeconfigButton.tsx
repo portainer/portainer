@@ -28,12 +28,12 @@ export function KubeconfigButton({
   }
 
   return (
-    <div>
+    <>
       <Button onClick={handleClick}>
         <i className="fas fa-download space-right" /> kubeconfig
       </Button>
       {prompt()}
-    </div>
+    </>
   );
 
   function handleClick() {
@@ -64,7 +64,7 @@ export function KubeconfigButton({
       isOpen && (
         <KubeconfigPrompt
           envQueryParams={envQueryParams}
-          onToggleClose={handleClose}
+          onClose={handleClose}
         />
       )
     );
