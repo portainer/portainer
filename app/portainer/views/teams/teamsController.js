@@ -89,6 +89,7 @@ angular.module('portainer.app').controller('TeamsController', [
           var teams = data.teams;
           $scope.teams = teams;
           $scope.users = _.orderBy(data.users, 'Username', 'asc');
+          $scope.isTeamLeader = !!teams.length;
         })
         .catch(function error(err) {
           $scope.teams = [];

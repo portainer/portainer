@@ -4,7 +4,7 @@
       <div class="toolBar">
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
       </div>
-      <div class="actionBar">
+      <div class="actionBar" ng-show="$ctrl.isAdmin">
         <button
           type="button"
           class="btn btn-sm btn-danger"
@@ -31,7 +31,7 @@
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox">
+                <span class="md-checkbox" ng-show="$ctrl.isAdmin">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -63,11 +63,12 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox">
+                <span class="md-checkbox" ng-show="$ctrl.isAdmin">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="portainer.users.user({id: item.Id})">{{ item.Username }}</a>
+                <a ui-sref="portainer.users.user({id: item.Id})" ng-show="$ctrl.isAdmin">{{ item.Username }}</a>
+                <span ng-show="!$ctrl.isAdmin">{{ item.Username }}</span>
               </td>
               <td>
                 <span>
