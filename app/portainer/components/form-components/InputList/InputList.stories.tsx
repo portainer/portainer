@@ -74,7 +74,7 @@ function SelectAndInputItem({
   onChange: (value: ListWithSelectItem) => void;
 }) {
   return (
-    <div>
+    <div className="flex gap-2">
       <Input
         type="number"
         value={item.value}

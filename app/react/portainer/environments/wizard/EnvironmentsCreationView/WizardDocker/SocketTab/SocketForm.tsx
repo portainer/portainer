@@ -10,7 +10,7 @@ import { SwitchField } from '@/portainer/components/form-components/SwitchField'
 import { Environment } from '@/portainer/environments/types';
 
 import { NameField } from '../../shared/NameField';
-import { MetadataFieldset } from '../../shared/MetadataFieldset';
+import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { validation } from './SocketForm.validation';
 import { FormValues } from './types';
@@ -44,8 +44,7 @@ export function SocketForm({ onCreate }: Props) {
 
           <OverrideSocketFieldset />
 
-          <MetadataFieldset />
-
+          <MoreSettingsSection />
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton

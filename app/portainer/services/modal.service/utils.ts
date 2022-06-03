@@ -28,10 +28,6 @@ export function confirmButtons(options: ButtonsOptions) {
 
 export function applyBoxCSS(box: JQuery<HTMLElement>) {
   box.css({
-    top: '50%',
-    'margin-top': function marginTop() {
-      const height = box.height() || 0;
-      return -(height / 2);
-    },
+    'vertical-align': 'middle',
   });
 }

@@ -73,4 +73,6 @@ export const FileUploadFieldAngular = r2a(FileUploadField, [
   'value',
   'title',
   'required',
+  'accept',
+  'inputId',
 ]);

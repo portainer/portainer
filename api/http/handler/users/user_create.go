@@ -9,7 +9,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/internal/passwordutils"
+	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 type userCreatePayload struct {
@@ -79,7 +80,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationInternal {
-		if !passwordutils.StrengthCheck(payload.Password) {
+		if !handler.passwordStrengthChecker.Check(payload.Password) {
 			return &httperror.HandlerError{http.StatusBadRequest, "Password does not meet the requirements", nil}
 		}
 

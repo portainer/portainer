@@ -47,7 +47,7 @@ export function PortsMappingField({ value, onChange, errors }: Props) {
 function Item({ onChange, item, error }: ItemProps<PortMapping>) {
   return (
     <div className={styles.item}>
-      <div className={styles.inputs}>
+      <div className="flex items-center gap-2">
         <InputGroup size="small">
           <InputGroup.Addon>host</InputGroup.Addon>
           <InputGroup.Input
@@ -57,7 +57,7 @@ function Item({ onChange, item, error }: ItemProps<PortMapping>) {
           />
         </InputGroup>
 
-        <span style={{ margin: '0 10px 0 10px' }}>
+        <span className="mx-3">
           <i className="fa fa-long-arrow-alt-right" aria-hidden="true" />
         </span>
 

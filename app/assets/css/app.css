@@ -807,13 +807,6 @@ json-tree .branch-preview {
 }
 /* !spinkit override */
 
-/* uib-typeahead override */
-#scrollable-dropdown-menu .dropdown-menu {
-  max-height: 300px;
-  overflow-y: auto;
-}
-/* !uib-typeahead override */
-
 .kubectl-shell {
   display: block;
   text-align: center;

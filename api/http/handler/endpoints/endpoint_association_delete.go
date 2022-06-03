@@ -23,7 +23,7 @@ import (
 // @tags endpoints
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"
-// @success 200 {object} portainer.Endpoint "Success"
+// @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
@@ -61,7 +61,7 @@ func (handler *Handler) endpointAssociationDelete(w http.ResponseWriter, r *http
 
 	handler.ReverseTunnelService.SetTunnelStatusToIdle(endpoint.ID)
 
-	return response.JSON(w, endpoint)
+	return response.Empty(w)
 }
 
 func (handler *Handler) updateEdgeKey(edgeKey string) (string, error) {

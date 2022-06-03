@@ -237,7 +237,6 @@ class KubernetesApplicationService {
     }
 
     if (service) {
-      await this.KubernetesServiceService.create(service);
       if (formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
         const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(formValues, service.Name);
         await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
@@ -281,19 +280,24 @@ class KubernetesApplicationService {
    *    in this method should also be displayed in the summary output (getUpdatedApplicationResources)
    */
   async patchAsync(oldFormValues, newFormValues) {
-    const [oldApp, oldHeadlessService, oldServices, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
-    const [newApp, newHeadlessService, newServices, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
+    const [oldApp, oldHeadlessService, oldServices, , oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
+    const [newApp, newHeadlessService, newServices, , newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
     const oldApiService = this._getApplicationApiService(oldApp);
     const newApiService = this._getApplicationApiService(newApp);
 
     if (oldApiService !== newApiService) {
+      // delete services first
+      if (oldServices) {
+        await this.KubernetesServiceService.delete(oldServices);
+      }
+
+      // delete the app
       await this.delete(oldApp);
-      if (oldService) {
-        await this.KubernetesServiceService.delete(oldService);
-      }
-      if (newService) {
-        return '';
-      }
+
+      // sleep for 5 seconds to allow the app/services to be deleted
+      await new Promise((r) => setTimeout(r, 5000));
+
+      // create the app
       return await this.create(newFormValues);
     }
 
