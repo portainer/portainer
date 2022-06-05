@@ -8,6 +8,8 @@ import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { isEdgeEnvironment } from '@/portainer/environments/utils';
 
+import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
+
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
 /* @ngInject */
@@ -29,6 +31,7 @@ function EndpointController(
   $scope.onChangeCheckInInterval = onChangeCheckInInterval;
   $scope.setFieldValue = setFieldValue;
   $scope.onChangeTags = onChangeTags;
+  const isBE = process.env.PORTAINER_EDITION === 'BE';
 
   $scope.state = {
     uploadInProgress: false,
@@ -41,6 +44,11 @@ function EndpointController(
     allowCreate: Authentication.isAdmin(),
     allowSelfSignedCerts: true,
     showAMTInfo: false,
+    showNomad: isBE,
+    edgeScriptCommands: {
+      linux: _.compact([commandsTabs.k8sLinux, commandsTabs.swarmLinux, commandsTabs.standaloneLinux, isBE && commandsTabs.nomadLinux]),
+      win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
+    },
   };
 
   $scope.formValues = {

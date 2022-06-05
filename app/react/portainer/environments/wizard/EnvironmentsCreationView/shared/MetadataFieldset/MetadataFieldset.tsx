@@ -12,7 +12,7 @@ export function MetadataFieldset() {
   const { isAdmin } = useUser();
 
   return (
-    <FormSection title="Metadata" isFoldable>
+    <FormSection title="Metadata">
       <GroupField />
 
       <TagSelector

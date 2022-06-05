@@ -13,8 +13,8 @@ import { EnvironmentMetadata } from '@/portainer/environments/environment.servic
 
 import { NameField, nameValidation } from '../shared/NameField';
 import { AnalyticsStateKey } from '../types';
-import { MetadataFieldset } from '../shared/MetadataFieldset';
 import { metadataValidation } from '../shared/MetadataFieldset/validation';
+import { MoreSettingsSection } from '../shared/MoreSettingsSection';
 
 interface FormValues {
   name: string;
@@ -109,7 +109,7 @@ export function WizardAzure({ onCreate }: Props) {
               />
             </FormControl>
 
-            <MetadataFieldset />
+            <MoreSettingsSection />
 
             <div className="row">
               <div className="col-sm-12">

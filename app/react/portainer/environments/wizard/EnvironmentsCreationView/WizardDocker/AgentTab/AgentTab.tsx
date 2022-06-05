@@ -13,7 +13,7 @@ export function AgentTab({ onCreate }: Props) {
     <>
       <DeploymentScripts />
 
-      <div className="wizard-form">
+      <div className="mt-5">
         <AgentForm onCreate={onCreate} />
       </div>
     </>

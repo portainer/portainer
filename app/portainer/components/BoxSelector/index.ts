@@ -5,6 +5,8 @@ import { react2angular } from '@/react-tools/react2angular';
 import { BoxSelector, buildOption } from './BoxSelector';
 import { BoxSelectorAngular } from './BoxSelectorAngular';
 
+export { type BoxSelectorOption } from './types';
+
 export { BoxSelector, buildOption };
 const BoxSelectorReact = react2angular(BoxSelector, [
   'value',

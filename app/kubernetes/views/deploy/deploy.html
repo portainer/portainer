@@ -84,13 +84,21 @@
                 ></git-form>
                 <!-- !repository -->
 
-                <custom-template-selector
-                  ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE"
-                  new-template-path="kubernetes.templates.custom.new"
-                  stack-type="3"
-                  on-change="(ctrl.onChangeTemplateId)"
-                  value="ctrl.state.templateId"
-                ></custom-template-selector>
+                <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE">
+                  <custom-template-selector
+                    new-template-path="kubernetes.templates.custom.new"
+                    stack-type="3"
+                    on-change="(ctrl.onChangeTemplateId)"
+                    value="ctrl.state.templateId"
+                  ></custom-template-selector>
+
+                  <custom-templates-variables-field
+                    ng-if="ctrl.state.template"
+                    definitions="ctrl.state.template.Variables"
+                    value="ctrl.formValues.Variables"
+                    on-change="(ctrl.onChangeTemplateVariables)"
+                  ></custom-templates-variables-field>
+                </div>
 
                 <!-- editor -->
                 <web-editor-form
