@@ -25,11 +25,9 @@ export function KubeConfigTeaserForm() {
           <div className="form-group">
             <div className="col-sm-12">
               <span className="text-primary">
-                {' '}
                 <i
-                  className="fa fa-exclamation-circle"
+                  className="fa fa-exclamation-circle space-right"
                   aria-hidden="true"
-                  style={{ marginRight: 2 }}
                 />
               </span>
               <span className="text-muted small">
@@ -47,7 +45,7 @@ export function KubeConfigTeaserForm() {
               </span>
             </div>
             <div className="col-sm-12 text-muted small">
-              <ul style={{ padding: 10, paddingLeft: 20 }}>
+              <ul className="p-2 pl-4">
                 <li>You have a load balancer enabled in your cluster</li>
                 <li>You specify current-context in your kubeconfig</li>
                 <li>

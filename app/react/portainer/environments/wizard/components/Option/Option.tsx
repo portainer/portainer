@@ -62,7 +62,7 @@ export function Option({
           <BEFeatureIndicator
             showIcon={false}
             featureId={featureId}
-            classes="!whitespace-normal"
+            className="!whitespace-normal"
           />
         )}
       </div>

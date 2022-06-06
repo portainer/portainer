@@ -13,7 +13,7 @@ interface WizardEnvironmentOption {
   icon: string | { ({ selected, className }: KaaSIconProps): JSX.Element };
   description: string;
   type: WizardTileType;
-  featureId: FeatureId | undefined;
+  featureId?: FeatureId;
 }
 
 export const environmentTypes: WizardEnvironmentOption[] = [

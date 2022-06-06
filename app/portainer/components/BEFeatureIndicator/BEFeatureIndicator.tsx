@@ -8,14 +8,14 @@ import { getFeatureDetails } from './utils';
 export interface Props {
   featureId?: FeatureId;
   showIcon?: boolean;
-  classes?: string;
+  className?: string;
 }
 
 export function BEFeatureIndicator({
   featureId,
   children,
   showIcon = true,
-  classes = '',
+  className = '',
 }: PropsWithChildren<Props>) {
   const { url, limitedToBE } = getFeatureDetails(featureId);
 
@@ -25,7 +25,7 @@ export function BEFeatureIndicator({
 
   return (
     <a
-      className={clsx('be-indicator', classes)}
+      className={clsx('be-indicator', className)}
       href={url}
       target="_blank"
       rel="noopener noreferrer"

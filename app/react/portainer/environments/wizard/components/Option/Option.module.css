@@ -21,7 +21,7 @@
 }
 
 .teaser {
-  border: 2px solid var(--orange-1) !important;
+  border: 2px solid var(--BE-only) !important;
   color: var(--text-muted-color);
 }
 
