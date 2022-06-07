@@ -1,4 +1,4 @@
-angular.module('portainer.app').controller('GroupController', function GroupController($q, $async, $scope, $state, $transition$, GroupService, TagService, Notifications) {
+angular.module('portainer.app').controller('GroupController', function GroupController($q, $scope, $state, $transition$, GroupService, Notifications) {
   $scope.state = {
     actionInProgress: false,
   };
@@ -20,30 +20,14 @@ angular.module('portainer.app').controller('GroupController', function GroupCont
       });
   };
 
-  $scope.onCreateTag = function onCreateTag(tagName) {
-    return $async(onCreateTagAsync, tagName);
-  };
-
-  async function onCreateTagAsync(tagName) {
-    try {
-      const tag = await TagService.createTag(tagName);
-      $scope.availableTags = $scope.availableTags.concat(tag);
-      $scope.group.TagIds = $scope.group.TagIds.concat(tag.Id);
-    } catch (err) {
-      Notifications.error('Failue', err, 'Unable to create tag');
-    }
-  }
-
   function initView() {
     var groupId = $transition$.params().id;
 
     $q.all({
       group: GroupService.group(groupId),
-      tags: TagService.tags(),
     })
       .then(function success(data) {
         $scope.group = data.group;
-        $scope.availableTags = data.tags;
         $scope.loaded = true;
       })
       .catch(function error(err) {

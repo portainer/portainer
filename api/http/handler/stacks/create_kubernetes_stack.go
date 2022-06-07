@@ -70,9 +70,6 @@ func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.ManifestFile) {
 		return errors.New("Invalid manifest file in repository")
 	}
-	if govalidator.IsNull(payload.RepositoryReferenceName) {
-		payload.RepositoryReferenceName = defaultGitReferenceName
-	}
 	if err := validateStackAutoUpdate(payload.AutoUpdate); err != nil {
 		return err
 	}

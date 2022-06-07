@@ -8,7 +8,7 @@ import { HeaderTitle, HeaderTitleAngular } from './HeaderTitle';
 
 export { PageHeader, Breadcrumbs, HeaderContainer, HeaderContent, HeaderTitle };
 
-export default angular
+export const pageHeaderModule = angular
   .module('portainer.app.components.header', [])
 
   .component('rdHeader', HeaderAngular)

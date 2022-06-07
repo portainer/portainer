@@ -17,10 +17,17 @@ import {
   TableRow,
   TableTitle,
 } from '@/portainer/components/datatables/components';
-import { FDOProfilesTableSettings } from '@/edge/devices/types';
-import { useFDOProfiles } from '@/portainer/settings/edge-compute/FDOProfilesDatatable/useFDOProfiles';
+import {
+  PaginationTableSettings,
+  SortableTableSettings,
+} from '@/portainer/components/datatables/types';
 
+import { useFDOProfiles } from './useFDOProfiles';
 import { useColumns } from './columns';
+
+export interface FDOProfilesTableSettings
+  extends SortableTableSettings,
+    PaginationTableSettings {}
 
 export interface FDOProfilesDatatableProps {
   isFDOEnabled: boolean;

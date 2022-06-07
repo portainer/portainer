@@ -34,7 +34,7 @@ var endpointGroupNames map[portainer.EndpointGroupID]string
 // @id EndpointList
 // @summary List environments(endpoints)
 // @description List all environments(endpoints) based on the current user authorizations. Will
-// @description return all environments(endpoints) if using an administrator account otherwise it will
+// @description return all environments(endpoints) if using an administrator or team leader account otherwise it will
 // @description only return authorized environments(endpoints).
 // @description **Access policy**: restricted
 // @tags endpoints
@@ -50,6 +50,7 @@ var endpointGroupNames map[portainer.EndpointGroupID]string
 // @param tagsPartialMatch query bool false "If true, will return environment(endpoint) which has one of tagIds, if false (or missing) will return only environments(endpoints) that has all the tags"
 // @param endpointIds query []int false "will return only these environments(endpoints)"
 // @param edgeDeviceFilter query string false "will return only these edge environments, none will return only regular edge environments" Enum("all", "trusted", "untrusted", "none")
+// @param name query string false "will return only environments(endpoints) with this name"
 // @success 200 {array} portainer.Endpoint "Endpoints"
 // @failure 500 "Server error"
 // @router /endpoints [get]
@@ -91,12 +92,6 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from the database", err}
 	}
 
-	// create endpoint groups as a map for more convenient access
-	endpointGroupNames = make(map[portainer.EndpointGroupID]string, 0)
-	for _, group := range endpointGroups {
-		endpointGroupNames[group.ID] = group.Name
-	}
-
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
@@ -125,6 +120,11 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	if len(groupIDs) > 0 {
 		filteredEndpoints = filterEndpointsByGroupIDs(filteredEndpoints, groupIDs)
+	}
+
+	name, _ := request.RetrieveQueryParameter(r, "name", true)
+	if name != "" {
+		filteredEndpoints = filterEndpointsByName(filteredEndpoints, name)
 	}
 
 	edgeDeviceFilter, _ := request.RetrieveQueryParameter(r, "edgeDeviceFilter", false)
@@ -157,7 +157,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	// Sort endpoints by field
-	sortEndpointsByField(filteredEndpoints, sortField, sortOrder == "desc")
+	sortEndpointsByField(filteredEndpoints, endpointGroups, sortField, sortOrder == "desc")
 
 	filteredEndpointCount := len(filteredEndpoints)
 
@@ -254,7 +254,7 @@ func filterEndpointsByStatuses(endpoints []portainer.Endpoint, statuses []int, s
 	return filteredEndpoints
 }
 
-func sortEndpointsByField(endpoints []portainer.Endpoint, sortField string, isSortDesc bool) {
+func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, sortField string, isSortDesc bool) {
 
 	switch sortField {
 	case "Name":
@@ -265,10 +265,20 @@ func sortEndpointsByField(endpoints []portainer.Endpoint, sortField string, isSo
 		}
 
 	case "Group":
+		endpointGroupNames = make(map[portainer.EndpointGroupID]string, 0)
+		for _, group := range endpointGroups {
+			endpointGroupNames[group.ID] = group.Name
+		}
+
+		endpointsByGroup := EndpointsByGroup{
+			endpointGroupNames: endpointGroupNames,
+			endpoints:          endpoints,
+		}
+
 		if isSortDesc {
-			sort.Stable(sort.Reverse(EndpointsByGroup(endpoints)))
+			sort.Stable(sort.Reverse(endpointsByGroup))
 		} else {
-			sort.Stable(EndpointsByGroup(endpoints))
+			sort.Stable(endpointsByGroup)
 		}
 
 	case "Status":
@@ -464,4 +474,19 @@ func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []portainer.Endp
 
 	return filteredEndpoints
 
+}
+
+func filterEndpointsByName(endpoints []portainer.Endpoint, name string) []portainer.Endpoint {
+	if name == "" {
+		return endpoints
+	}
+
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, endpoint := range endpoints {
+		if endpoint.Name == name {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+	return filteredEndpoints
 }

@@ -9,6 +9,7 @@ import servicesModule from './services';
 import teamsModule from './teams';
 import homeModule from './home';
 import { accessControlModule } from './access-control';
+import { reactModule } from './react';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -38,6 +39,7 @@ angular
     servicesModule,
     teamsModule,
     accessControlModule,
+    reactModule,
   ])
   .config([
     '$stateRegistryProvider',
@@ -353,26 +355,6 @@ angular
         },
       };
 
-      const wizard = {
-        name: 'portainer.wizard',
-        url: '/wizard',
-        views: {
-          'content@': {
-            component: 'wizardView',
-          },
-        },
-      };
-
-      const wizardEndpoints = {
-        name: 'portainer.wizard.endpoints',
-        url: '/endpoints',
-        views: {
-          'content@': {
-            component: 'wizardEndpoints',
-          },
-        },
-      };
-
       var initEndpoint = {
         name: 'portainer.init.endpoint',
         url: '/endpoint',
@@ -527,7 +509,6 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(edgeDeviceCreation);
-      $stateRegistryProvider.register(endpointCreation);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);
@@ -539,8 +520,6 @@ angular
       $stateRegistryProvider.register(groupCreation);
       $stateRegistryProvider.register(home);
       $stateRegistryProvider.register(init);
-      $stateRegistryProvider.register(wizard);
-      $stateRegistryProvider.register(wizardEndpoints);
       $stateRegistryProvider.register(initEndpoint);
       $stateRegistryProvider.register(initAdmin);
       $stateRegistryProvider.register(registries);

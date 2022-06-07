@@ -6,8 +6,9 @@ interface Props {
   onPageLimitChange(value: number): void;
   page: number;
   pageLimit: number;
-  showAll: boolean;
+  showAll?: boolean;
   totalCount: number;
+  isPageInputVisible?: boolean;
 }
 
 export function PaginationControls({
@@ -17,15 +18,17 @@ export function PaginationControls({
   showAll,
   onPageChange,
   totalCount,
+  isPageInputVisible,
 }: Props) {
   return (
     <div className="paginationControls">
-      <form className="form-inline">
+      <div className="form-inline flex">
         <ItemsPerPageSelector
           value={pageLimit}
           onChange={handlePageLimitChange}
           showAll={showAll}
         />
+
         {pageLimit !== 0 && (
           <PageSelector
             maxSize={5}
@@ -33,9 +36,10 @@ export function PaginationControls({
             currentPage={page}
             itemsPerPage={pageLimit}
             totalCount={totalCount}
+            isInputVisible={isPageInputVisible}
           />
         )}
-      </form>
+      </div>
     </div>
   );
 

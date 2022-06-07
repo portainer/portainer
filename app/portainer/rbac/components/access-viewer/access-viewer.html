@@ -30,7 +30,7 @@
             Effective role for each environment will be displayed for the selected user
           </div>
         </div>
-        <access-viewer-datatable table-key="access_viewer" dataset="$ctrl.userRoles" order-by="EndpointName"> </access-viewer-datatable>
+        <access-viewer-datatable table-key="access_viewer" dataset="$ctrl.userRoles" order-by="EndpointName" is-admin="$ctrl.isAdmin"> </access-viewer-datatable>
       </form>
     </rd-widget-body>
   </rd-widget>

@@ -1,8 +1,6 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
-import styles from './TextTip.module.css';
-
 type Color = 'orange' | 'blue';
 
 export interface Props {
@@ -20,7 +18,7 @@ export function TextTip({
         className={clsx(
           'fa fa-exclamation-circle',
           `${color}-icon`,
-          styles.textMargin
+          'space-right'
         )}
       />
       {children}

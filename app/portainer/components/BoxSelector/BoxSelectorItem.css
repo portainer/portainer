@@ -2,7 +2,7 @@
 .boxselector_wrapper box-selector-item {
   --selected-item-color: var(--blue-2);
   flex: 1;
-  padding: 0.5rem;
+  padding: 5px;
 }
 
 .boxselector_wrapper .boxselector_header {
@@ -55,7 +55,7 @@
 .boxselector_wrapper input[type='radio']:checked + label {
   background: var(--selected-item-color);
   color: white;
-  padding-top: 2rem;
+  padding-top: 20px;
   border-color: var(--selected-item-color);
 }
 

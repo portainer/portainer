@@ -71,6 +71,12 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     $scope.settings.AuthenticationMethod = value;
   };
 
+  $scope.onChangePasswordLength = function onChangePasswordLength(value) {
+    $scope.$evalAsync(() => {
+      $scope.settings.InternalAuthSettings = { RequiredPasswordLength: value };
+    });
+  };
+
   $scope.authenticationMethodSelected = function authenticationMethodSelected(value) {
     if (!$scope.settings) {
       return false;

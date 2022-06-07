@@ -21,6 +21,7 @@ export function PageButton({
       <button
         type="button"
         onClick={() => typeof page === 'number' && onPageChange(page)}
+        disabled={disabled}
       >
         {children}
       </button>

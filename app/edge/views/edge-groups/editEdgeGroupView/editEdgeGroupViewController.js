@@ -1,9 +1,8 @@
 export class EditEdgeGroupController {
   /* @ngInject */
-  constructor(EdgeGroupService, GroupService, TagService, Notifications, $state, $async) {
+  constructor(EdgeGroupService, GroupService, Notifications, $state, $async) {
     this.EdgeGroupService = EdgeGroupService;
     this.GroupService = GroupService;
-    this.TagService = TagService;
     this.Notifications = Notifications;
     this.$state = $state;
     this.$async = $async;
@@ -18,13 +17,12 @@ export class EditEdgeGroupController {
   }
 
   async $onInit() {
-    const [tags, endpointGroups, group] = await Promise.all([this.TagService.tags(), this.GroupService.groups(), this.EdgeGroupService.group(this.$state.params.groupId)]);
+    const [endpointGroups, group] = await Promise.all([this.GroupService.groups(), this.EdgeGroupService.group(this.$state.params.groupId)]);
 
     if (!group) {
       this.Notifications.error('Failed to find edge group', {});
       this.$state.go('edge.groups');
     }
-    this.tags = tags;
     this.endpointGroups = endpointGroups;
     this.model = group;
     this.state.loaded = true;

@@ -43,6 +43,27 @@ function StateManagerFactory(
     LocalStorage.storeUIState(state.UI);
   };
 
+  manager.setRequiredPasswordLength = function (length) {
+    state.UI.requiredPasswordLength = length;
+    LocalStorage.storeUIState(state.UI);
+  };
+
+  manager.setPasswordChangeSkipped = function (userID) {
+    state.UI.timesPasswordChangeSkipped = state.UI.timesPasswordChangeSkipped || {};
+    state.UI.timesPasswordChangeSkipped[userID] = state.UI.timesPasswordChangeSkipped[userID] + 1 || 1;
+    LocalStorage.storeUIState(state.UI);
+  };
+
+  manager.resetPasswordChangeSkips = function (userID) {
+    if (state.UI.timesPasswordChangeSkipped && state.UI.timesPasswordChangeSkipped[userID]) state.UI.timesPasswordChangeSkipped[userID] = 0;
+    LocalStorage.storeUIState(state.UI);
+  };
+
+  manager.clearPasswordChangeSkips = function () {
+    state.UI.timesPasswordChangeSkipped = {};
+    LocalStorage.storeUIState(state.UI);
+  };
+
   manager.getState = function () {
     return state;
   };
@@ -87,6 +108,7 @@ function StateManagerFactory(
     state.application.version = status.Version;
     state.application.edition = status.Edition;
     state.application.instanceId = status.InstanceID;
+    state.application.demoEnvironment = status.DemoEnvironment;
 
     state.application.enableTelemetry = settings.EnableTelemetry;
     state.application.logo = settings.LogoURL;

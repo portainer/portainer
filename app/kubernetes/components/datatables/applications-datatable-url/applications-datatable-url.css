@@ -1,8 +1,8 @@
 .published-url-container {
   display: grid;
   grid-template-columns: 1fr 1fr 3fr;
-  padding-top: 1rem;
-  padding-bottom: 0.5rem;
+  padding-top: 10px;
+  padding-bottom: 5px;
 }
 
 .publish-url-link {

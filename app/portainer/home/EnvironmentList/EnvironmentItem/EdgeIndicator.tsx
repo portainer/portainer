@@ -7,6 +7,7 @@ interface Props {
   edgeId?: string;
   queryDate?: number;
   lastCheckInDate?: number;
+  showLastCheckInDate?: boolean;
 }
 
 export function EdgeIndicator({
@@ -14,6 +15,7 @@ export function EdgeIndicator({
   lastCheckInDate,
   checkInInterval,
   queryDate,
+  showLastCheckInDate = false,
 }: Props) {
   if (!edgeId) {
     return (
@@ -41,7 +43,7 @@ export function EdgeIndicator({
         heartbeat
       </span>
 
-      {!!lastCheckInDate && (
+      {showLastCheckInDate && !!lastCheckInDate && (
         <span
           className="space-left small text-muted"
           aria-label="edge-last-checkin"

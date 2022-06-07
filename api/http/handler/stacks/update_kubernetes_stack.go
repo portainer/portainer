@@ -38,9 +38,6 @@ func (payload *kubernetesFileStackUpdatePayload) Validate(r *http.Request) error
 }
 
 func (payload *kubernetesGitStackUpdatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.RepositoryReferenceName) {
-		payload.RepositoryReferenceName = defaultGitReferenceName
-	}
 	if err := validateStackAutoUpdate(payload.AutoUpdate); err != nil {
 		return err
 	}

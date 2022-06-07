@@ -1,7 +1,7 @@
 interface Props {
   value: number;
   onChange(value: number): void;
-  showAll: boolean;
+  showAll?: boolean;
 }
 
 export function ItemsPerPageSelector({ value, onChange, showAll }: Props) {
