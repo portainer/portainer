@@ -15,7 +15,7 @@
             <tr>
               <td>Name</td>
               <td>
-                {{ team.Name }}
+                <span ng-if="!settings.TeamSync">{{ team.Name }}</span>
                 <button class="btn btn-xs btn-danger" ng-if="isAdmin" ng-click="deleteTeam()"
                   ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this team</button
                 >
@@ -23,7 +23,9 @@
             </tr>
             <tr>
               <td>Leaders</td>
-              <td>{{ leaderCount }}</td>
+              <td>
+                <span ng-if="!settings.TeamSync">{{ leaderCount }}</span>
+              </td>
             </tr>
             <tr>
               <td>Total users in team</td>
