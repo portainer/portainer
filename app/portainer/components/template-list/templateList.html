@@ -15,10 +15,20 @@
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <template-list-filter options="$ctrl.state.categories" on-change="($ctrl.applyCategoriesFilter)" placeholder="'Category'"></template-list-filter>
+            <template-list-dropdown
+              options="$ctrl.state.categories"
+              on-change="($ctrl.applyCategoriesFilter)"
+              placeholder="'Category'"
+              value="$ctrl.state.selectedCategory"
+            ></template-list-dropdown>
           </div>
           <div class="col-sm-3">
-            <template-list-filter options="$ctrl.state.typeFilters" on-change="($ctrl.applyTypeFilter)" placeholder="'Type'"></template-list-filter>
+            <template-list-dropdown
+              options="$ctrl.state.typeFilters"
+              on-change="($ctrl.applyTypeFilter)"
+              placeholder="'Type'"
+              value="$ctrl.state.filterByType"
+            ></template-list-dropdown>
           </div>
           <div class="col-sm-3 col-sm-offset-3">
             <template-list-sort

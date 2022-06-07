@@ -7,12 +7,12 @@ function TemplateListController($scope, $async, $state, DatatableService, Notifi
 
   this.state = {
     textFilter: '',
-    selectedCategory: '',
+    selectedCategory: null,
     categories: [],
     typeFilters: [],
-    filterByType: '',
+    filterByType: null,
     showContainerTemplates: true,
-    selectedOrderBy: '',
+    selectedOrderBy: null,
     orderByFields: [],
     orderDesc: false,
   };
@@ -28,7 +28,7 @@ function TemplateListController($scope, $async, $state, DatatableService, Notifi
       case 2: // swarm stack
         return ctrl.showSwarmStacks && !ctrl.state.showContainerTemplates;
       case 3: // docker compose
-        return !ctrl.state.showContainerTemplates || '' === ctrl.state.filterByType || undefined === ctrl.state.filterByType;
+        return !ctrl.state.showContainerTemplates || null === ctrl.state.filterByType;
       case 4: // Edge stack templates
         return false;
     }
@@ -78,53 +78,38 @@ function TemplateListController($scope, $async, $state, DatatableService, Notifi
     }
   }
 
-  const categorySorter = function (template) {
-    if (template.Categories && template.Categories.length > 0 && template.Categories[0] && template.Categories[0].length > 0) {
-      return template.Categories[0].toLowerCase();
-    }
-  };
-
-  const getSorter = function (orderBy) {
-    let sorter;
-    switch (orderBy) {
-      case 'Categories':
-        sorter = categorySorter;
-        break;
-      default:
-        sorter = orderBy;
-    }
-
-    return sorter;
-  };
-
   ctrl.changeOrderBy = function (orderField) {
-    if (undefined === orderField) {
-      ctrl.state.selectedOrderBy = '';
-      ctrl.templates = ctrl.initalTemplates;
-    }
+    $scope.$evalAsync(() => {
+      if (null === orderField) {
+        ctrl.state.selectedOrderBy = null;
+        ctrl.templates = ctrl.initalTemplates;
+      }
 
-    ctrl.state.selectedOrderBy = orderField;
-    ctrl.templates = _.orderBy(ctrl.templates, [getSorter(ctrl.state.selectedOrderBy)], [ctrl.state.orderDesc ? 'desc' : 'asc']);
-    $scope.$apply();
+      ctrl.state.selectedOrderBy = orderField;
+      ctrl.templates = _.orderBy(ctrl.templates, [getSorter(ctrl.state.selectedOrderBy)], [ctrl.state.orderDesc ? 'desc' : 'asc']);
+    });
   };
 
   ctrl.applyTypeFilter = function (type) {
-    ctrl.state.filterByType = type;
-    ctrl.state.showContainerTemplates = 'Container' === type || '' === type || undefined === type;
-    ctrl.updateCategories();
-    $scope.$apply();
+    $scope.$evalAsync(() => {
+      ctrl.state.filterByType = type;
+      ctrl.state.showContainerTemplates = 'Container' === type || null === type;
+      ctrl.updateCategories();
+    });
   };
 
   ctrl.invertOrder = function () {
-    ctrl.state.orderDesc = !ctrl.state.orderDesc;
-    ctrl.templates = _.orderBy(ctrl.templates, [getSorter(ctrl.state.selectedOrderBy)], [ctrl.state.orderDesc ? 'desc' : 'asc']);
-    $scope.$apply();
+    $scope.$evalAsync(() => {
+      ctrl.state.orderDesc = !ctrl.state.orderDesc;
+      ctrl.templates = _.orderBy(ctrl.templates, [getSorter(ctrl.state.selectedOrderBy)], [ctrl.state.orderDesc ? 'desc' : 'asc']);
+    });
   };
 
   ctrl.applyCategoriesFilter = function (category) {
-    ctrl.state.selectedCategory = category;
-    ctrl.updateCategories();
-    $scope.$apply();
+    $scope.$evalAsync(() => {
+      ctrl.state.selectedCategory = category;
+      ctrl.updateCategories();
+    });
   };
 
   this.$onInit = function () {
@@ -142,4 +127,23 @@ function TemplateListController($scope, $async, $state, DatatableService, Notifi
     this.state.orderByFields = ['Title', 'Categories', 'Description'];
     this.state.typeFilters = ['Container', 'Stack'];
   };
+
+  function categorySorter(template) {
+    if (template.Categories && template.Categories.length > 0 && template.Categories[0] && template.Categories[0].length > 0) {
+      return template.Categories[0].toLowerCase();
+    }
+  }
+
+  function getSorter(orderBy) {
+    let sorter;
+    switch (orderBy) {
+      case 'Categories':
+        sorter = categorySorter;
+        break;
+      default:
+        sorter = orderBy;
+    }
+
+    return sorter;
+  }
 }
