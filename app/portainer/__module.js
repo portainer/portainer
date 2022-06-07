@@ -213,17 +213,6 @@ angular
         },
       };
 
-      var endpointCreation = {
-        name: 'portainer.endpoints.new',
-        url: '/new',
-        views: {
-          'content@': {
-            templateUrl: './views/endpoints/create/createendpoint.html',
-            controller: 'CreateEndpointController',
-          },
-        },
-      };
-
       var edgeDeviceCreation = {
         name: 'portainer.endpoints.newEdgeDevice',
         url: '/newEdgeDevice',
