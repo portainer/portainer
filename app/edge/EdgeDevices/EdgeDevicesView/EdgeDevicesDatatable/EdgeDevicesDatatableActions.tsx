@@ -18,6 +18,11 @@ interface Props {
   showWaitingRoomLink: boolean;
 }
 
+enum DeployType {
+  FDO = 'FDO',
+  MANUAL = 'MANUAL',
+}
+
 export function EdgeDevicesDatatableActions({
   selectedItems,
   isOpenAMTEnabled,
@@ -101,38 +106,37 @@ export function EdgeDevicesDatatableActions({
   }
 
   async function onAddNewDeviceClick() {
-    if (!isFDOEnabled) {
-      router.stateService.go('portainer.endpoints.newEdgeDevice');
-      return;
-    }
-
-    const result = await promptAsync({
-      title: 'How would you like to add an Edge Device?',
-      inputType: 'radio',
-      inputOptions: [
-        {
-          text: 'Provision bare-metal using Intel FDO',
-          value: 'FDO',
-        },
-        {
-          text: 'Deploy agent manually',
-          value: 'MANUAL',
-        },
-      ],
-      buttons: {
-        confirm: {
-          label: 'Confirm',
-          className: 'btn-primary',
-        },
-      },
-    });
+    const result = isFDOEnabled
+      ? await promptAsync({
+          title: 'How would you like to add an Edge Device?',
+          inputType: 'radio',
+          inputOptions: [
+            {
+              text: 'Provision bare-metal using Intel FDO',
+              value: DeployType.FDO,
+            },
+            {
+              text: 'Deploy agent manually',
+              value: DeployType.MANUAL,
+            },
+          ],
+          buttons: {
+            confirm: {
+              label: 'Confirm',
+              className: 'btn-primary',
+            },
+          },
+        })
+      : DeployType.MANUAL;
 
     switch (result) {
-      case 'FDO':
+      case DeployType.FDO:
         router.stateService.go('portainer.endpoints.importDevice');
         break;
-      case 'MANUAL':
-        router.stateService.go('portainer.endpoints.newEdgeDevice');
+      case DeployType.MANUAL:
+        router.stateService.go('portainer.wizard.endpoints', {
+          edgeDevice: true,
+        });
         break;
       default:
         break;
