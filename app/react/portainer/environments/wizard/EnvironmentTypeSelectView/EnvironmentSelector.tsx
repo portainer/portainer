@@ -2,7 +2,7 @@ import { FormSection } from '@/portainer/components/form-components/FormSection'
 
 import { Option } from '../components/Option';
 
-import { environmentTypes, WizardTileType } from './environment-types';
+import { environmentTypes } from './environment-types';
 
 export type EnvironmentSelectorValue = typeof environmentTypes[number]['id'];
 
@@ -22,8 +22,6 @@ export function EnvironmentSelector({ value, onChange }: Props) {
         <div className="flex gap-4 flex-wrap">
           {environmentTypes.map((eType) => (
             <Option
-              type={eType.type}
-              disabled={eType.type === WizardTileType.TEASER}
               key={eType.id}
               featureId={eType.featureId}
               title={eType.title}
