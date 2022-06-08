@@ -446,6 +446,14 @@ func (transport *Transport) decorateRegistryAuthenticationHeader(request *http.R
 			return err
 		}
 
+		// delete header and exist function without error if Front End
+		// passes empty json. This is to restore original behavior which
+		// never originally passed this header
+		if string(decodedHeaderData) == "{}" {
+			request.Header.Del("X-Registry-Auth")
+			return nil
+		}
+
 		// only set X-Registry-Auth if registryId is defined
 		if originalHeaderData.RegistryId == nil {
 			return nil
