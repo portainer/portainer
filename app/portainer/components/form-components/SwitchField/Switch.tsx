@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import { isLimitedFeature } from '@/portainer/feature-flags/feature-flags.service';
 import { BEFeatureIndicator } from '@/portainer/components/BEFeatureIndicator';
 import { FeatureId } from '@/portainer/feature-flags/enums';
 
@@ -30,7 +30,7 @@ export function Switch({
   featureId,
   className,
 }: Props) {
-  const limitedToBE = isLimitedToBE(featureId);
+  const limitedToBE = isLimitedFeature(featureId);
 
   return (
     <>

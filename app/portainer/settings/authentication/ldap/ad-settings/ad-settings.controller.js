@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import { isLimitedFeature } from '@/portainer/feature-flags/feature-flags.service';
 
 export default class AdSettingsController {
   /* @ngInject */
@@ -58,7 +58,7 @@ export default class AdSettingsController {
   }
 
   isSaveSettingButtonDisabled() {
-    return isLimitedToBE(this.limitedFeatureId) || !this.isLdapFormValid();
+    return isLimitedFeature(this.limitedFeatureId) || !this.isLdapFormValid();
   }
 
   $onInit() {

@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import { isLimitedFeature } from '@/portainer/feature-flags/feature-flags.service';
 
 import AccessViewerPolicyModel from '../../models/access';
 
@@ -130,7 +130,7 @@ export default class AccessViewerController {
 
   async $onInit() {
     try {
-      const limitedToBE = isLimitedToBE(this.limitedFeature);
+      const limitedToBE = isLimitedFeature(this.limitedFeature);
 
       if (limitedToBE) {
         return;
