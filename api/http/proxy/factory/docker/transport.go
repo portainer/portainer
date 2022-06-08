@@ -446,7 +446,12 @@ func (transport *Transport) decorateRegistryAuthenticationHeader(request *http.R
 			return err
 		}
 
-		authenticationHeader, err := createRegistryAuthenticationHeader(transport.dataStore, originalHeaderData.RegistryId, accessContext)
+		// only set X-Registry-Auth if registryId is defined
+		if originalHeaderData.RegistryId == nil {
+			return nil
+		}
+
+		authenticationHeader, err := createRegistryAuthenticationHeader(transport.dataStore, *originalHeaderData.RegistryId, accessContext)
 		if err != nil {
 			return err
 		}
