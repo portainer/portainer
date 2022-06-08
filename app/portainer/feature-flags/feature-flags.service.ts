@@ -62,3 +62,10 @@ export function selectShow(featureId?: FeatureId) {
 export function isLimitedToBE(featureId?: FeatureId) {
   return selectShow(featureId) === FeatureState.LIMITED_BE;
 }
+
+export function isLimitedFeature(featureId?: FeatureId) {
+  if (!featureId) {
+    return false;
+  }
+  return state.currentEdition < state.features[featureId];
+}

@@ -3,7 +3,7 @@ import { ComponentType } from 'react';
 
 import { BEFeatureIndicator } from '@/portainer/components/BEFeatureIndicator';
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import { WizardTileType } from '@/react/portainer/environments/wizard/EnvironmentTypeSelectView/environment-types';
+import { isLimitedFeature } from '@/portainer/feature-flags/feature-flags.service';
 
 import styles from './Option.module.css';
 
@@ -17,8 +17,6 @@ interface Props extends SelectorItemType {
   active?: boolean;
   onClick?(): void;
   featureId?: FeatureId;
-  type?: WizardTileType;
-  disabled?: boolean;
 }
 
 export function Option({
@@ -27,24 +25,22 @@ export function Option({
   description,
   title,
   onClick = () => {},
-  type = WizardTileType.FEATURE,
-  disabled = false,
   featureId,
 }: Props) {
   const Icon = typeof icon !== 'string' ? icon : null;
-
+  const isLimited = isLimitedFeature(featureId);
   return (
     <button
       className={clsx(
         styles.optionTile,
-        type === WizardTileType.FEATURE ? styles.feature : styles.teaser,
+        isLimited ? styles.teaser : styles.feature,
         'border-0',
         {
           [styles.active]: active,
         }
       )}
       type="button"
-      disabled={disabled}
+      disabled={isLimited}
       onClick={onClick}
     >
       <div className="text-center mt-2">
@@ -58,7 +54,7 @@ export function Option({
       <div className="mt-3 text-center flex flex-col">
         <h3>{title}</h3>
         <h5>{description}</h5>
-        {type === 'teaser' && (
+        {isLimited && (
           <BEFeatureIndicator
             showIcon={false}
             featureId={featureId}
