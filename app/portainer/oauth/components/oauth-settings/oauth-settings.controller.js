@@ -1,5 +1,5 @@
 import { baseHref } from '@/portainer/helpers/pathHelper';
-import { isLimitedFeature } from '@/portainer/feature-flags/feature-flags.service';
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 import { FeatureId } from '@/portainer/feature-flags/enums';
 import providers, { getProviderByUrl } from './providers';
 
@@ -43,7 +43,7 @@ export default class OAuthSettingsController {
 
     this.state.overrideConfiguration = false;
 
-    if (!this.isLimitedFeature || providerId === 'custom') {
+    if (!this.isLimitedToBE || providerId === 'custom') {
       this.settings.AuthorizationURI = provider.authUrl;
       this.settings.AccessTokenURI = provider.accessTokenUrl;
       this.settings.ResourceURI = provider.resourceUrl;
@@ -75,7 +75,7 @@ export default class OAuthSettingsController {
 
   onChangeHideInternalAuth(checked) {
     this.$scope.$evalAsync(() => {
-      if (!this.isLimitedFeature) {
+      if (!this.isLimitedToBE) {
         this.settings.HideInternalAuth = checked;
       }
     });
@@ -110,9 +110,9 @@ export default class OAuthSettingsController {
   }
 
   $onInit() {
-    this.isLimitedFeature = isLimitedFeature(this.limitedFeature);
+    this.isLimitedToBE = isLimitedToBE(this.limitedFeature);
 
-    if (this.isLimitedFeature) {
+    if (this.isLimitedToBE) {
       return;
     }
 

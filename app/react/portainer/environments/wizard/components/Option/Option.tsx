@@ -3,7 +3,7 @@ import { ComponentType } from 'react';
 
 import { BEFeatureIndicator } from '@/portainer/components/BEFeatureIndicator';
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import { isLimitedFeature } from '@/portainer/feature-flags/feature-flags.service';
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 
 import styles from './Option.module.css';
 
@@ -28,7 +28,7 @@ export function Option({
   featureId,
 }: Props) {
   const Icon = typeof icon !== 'string' ? icon : null;
-  const isLimited = isLimitedFeature(featureId);
+  const isLimited = isLimitedToBE(featureId);
   return (
     <button
       className={clsx(
