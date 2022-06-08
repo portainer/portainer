@@ -59,6 +59,6 @@ export function selectShow(featureId?: FeatureId) {
   return FeatureState.HIDDEN;
 }
 
-export function isLimitedFeature(featureId?: FeatureId) {
+export function isLimitedToBE(featureId?: FeatureId) {
   return selectShow(featureId) === FeatureState.LIMITED_BE;
 }
