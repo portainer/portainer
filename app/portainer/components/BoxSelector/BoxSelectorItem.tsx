@@ -1,10 +1,7 @@
 import clsx from 'clsx';
 import ReactTooltip from 'react-tooltip';
 
-import {
-  isLimitedFeature,
-  isLimitedToBE,
-} from '@/portainer/feature-flags/feature-flags.service';
+import { isLimitedFeature } from '@/portainer/feature-flags/feature-flags.service';
 
 import './BoxSelectorItem.css';
 
@@ -28,13 +25,12 @@ export function BoxSelectorItem<T extends number | string>({
   tooltip,
 }: Props<T>) {
   const limitedFeature = isLimitedFeature(option.feature);
-  const limitedToBE = isLimitedToBE(option.feature);
 
   const tooltipId = `box-selector-item-${radioName}-${option.id}`;
   return (
     <div
       className={clsx('box-selector-item', {
-        business: limitedToBE,
+        business: limitedFeature,
         limited: limitedFeature,
       })}
       data-tip
