@@ -47,7 +47,7 @@
                           <span class="input-group-addon">name</span>
                           <input type="text" class="form-control" ng-model="item.Name" placeholder="e.g. my-image:my-tag" auto-focus />
                           <span class="input-group-addon"
-                            ><i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[item.Name !== '']" aria-hidden="true"></i
+                            ><i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[checkName(item.Name)]" aria-hidden="true"></i
                           ></span>
                         </div>
                         <!-- !name-input -->
