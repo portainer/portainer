@@ -20,3 +20,4 @@ import './app.css';
 
 import './theme.css';
 import './vendor-override.css';
+import '../fonts/nomad-icon.css';
