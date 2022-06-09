@@ -4,10 +4,12 @@ import { DialogOverlay } from '@reach/dialog';
 import * as kcService from '@/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
 import { EnvironmentType } from '@/portainer/environments/types';
-import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service/index';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
-import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
 import { usePublicSettings } from '@/portainer/settings/queries';
+import {
+  Query,
+  useEnvironmentList,
+} from '@/portainer/environments/queries/useEnvironmentList';
 
 import { PaginationControls } from '@@/PaginationControls';
 import { Checkbox } from '@@/form-components/Checkbox';
@@ -18,7 +20,7 @@ import styles from './KubeconfigPrompt.module.css';
 import '@reach/dialog/styles.css';
 
 export interface KubeconfigPromptProps {
-  envQueryParams: EnvironmentsQueryParams;
+  envQueryParams: Query;
   onClose: () => void;
 }
 const storageKey = 'home_endpoints';

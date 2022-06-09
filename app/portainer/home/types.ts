@@ -6,7 +6,7 @@ export interface Motd {
   ContentLayout?: Record<string, string>;
 }
 
-export interface Filter {
-  value: number;
+export interface Filter<T = number> {
+  value: T;
   label: string;
 }

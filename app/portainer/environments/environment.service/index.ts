@@ -26,6 +26,7 @@ export interface EnvironmentsQueryParams {
   edgeDeviceUntrusted?: boolean;
   provisioned?: boolean;
   name?: string;
+  agentVersions?: string[];
 }
 
 export interface GetEnvironmentsOptions {
@@ -67,6 +68,17 @@ export async function getEnvironments(
       value: response.data,
       totalAvailable: parseInt(totalAvailable, 10),
     };
+  } catch (e) {
+    throw parseAxiosError(e as Error);
+  }
+}
+
+export async function getAgentVersions() {
+  try {
+    const response = await axios.get<string[]>(
+      buildUrl(undefined, 'agent_versions')
+    );
+    return response.data;
   } catch (e) {
     throw parseAxiosError(e as Error);
   }

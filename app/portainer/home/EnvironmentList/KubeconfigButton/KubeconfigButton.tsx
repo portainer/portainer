@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { Download } from 'react-feather';
 
 import { Environment } from '@/portainer/environments/types';
-import { Query } from '@/portainer/environments/queries/useEnvironmentList';
 import { isKubernetesEnvironment } from '@/portainer/environments/utils';
 import { trackEvent } from '@/angulartics.matomo/analytics-services';
+import { Query } from '@/portainer/environments/queries/useEnvironmentList';
 
 import { Button } from '@@/buttons';
 
 import styles from './KubeconfigButton.module.css';
 import { KubeconfigPrompt } from './KubeconfigPrompt';
+
 import '@reach/dialog/styles.css';
 
 export interface Props {

@@ -21,6 +21,80 @@ type endpointListTest struct {
 	expected []portainer.EndpointID
 }
 
+func Test_EndpointList_AgentVersion(t *testing.T) {
+
+	version1Endpoint := portainer.Endpoint{ID: 1, GroupID: 1, Agent: struct {
+		Version string "example:\"1.0.0\""
+	}{Version: "1.0.0"}}
+	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1, Agent: struct {
+		Version string "example:\"1.0.0\""
+	}{Version: "2.0.0"}}
+	noVersionEndpoint := portainer.Endpoint{ID: 3, GroupID: 1}
+
+	handler, teardown := setup(t, []portainer.Endpoint{
+		version1Endpoint,
+		version2Endpoint,
+		noVersionEndpoint,
+	})
+
+	defer teardown()
+
+	type endpointListAgentVersionTest struct {
+		endpointListTest
+		filter []string
+	}
+
+	tests := []endpointListAgentVersionTest{
+		{
+			endpointListTest{
+				"should show version 1 endpoints",
+				[]portainer.EndpointID{version1Endpoint.ID},
+			},
+			[]string{version1Endpoint.Agent.Version},
+		},
+		{
+			endpointListTest{
+				"should show version 2 endpoints",
+				[]portainer.EndpointID{version2Endpoint.ID},
+			},
+			[]string{version2Endpoint.Agent.Version},
+		},
+		{
+			endpointListTest{
+				"should show version 1 and 2 endpoints",
+				[]portainer.EndpointID{version2Endpoint.ID, version1Endpoint.ID},
+			},
+			[]string{version2Endpoint.Agent.Version, version1Endpoint.Agent.Version},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.title, func(t *testing.T) {
+			is := assert.New(t)
+			query := ""
+			for _, filter := range test.filter {
+				query += fmt.Sprintf("agentVersions[]=%s&", filter)
+			}
+
+			req := buildEndpointListRequest(query)
+
+			resp, err := doEndpointListRequest(req, handler, is)
+			is.NoError(err)
+
+			is.Equal(len(test.expected), len(resp))
+
+			respIds := []portainer.EndpointID{}
+
+			for _, endpoint := range resp {
+				respIds = append(respIds, endpoint.ID)
+			}
+
+			is.ElementsMatch(test.expected, respIds)
+		})
+	}
+
+}
+
 func Test_endpointList_edgeDeviceFilter(t *testing.T) {
 
 	trustedEdgeDevice := portainer.Endpoint{ID: 1, UserTrusted: true, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
@@ -48,7 +122,7 @@ func Test_endpointList_edgeDeviceFilter(t *testing.T) {
 	tests := []endpointListEdgeDeviceTest{
 		{
 			endpointListTest: endpointListTest{
-				"should show all endpoints expect of the untrusted devices",
+				"should show all endpoints except of the untrusted devices",
 				[]portainer.EndpointID{trustedEdgeDevice.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID, regularEndpoint.ID},
 			},
 			edgeDevice: nil,

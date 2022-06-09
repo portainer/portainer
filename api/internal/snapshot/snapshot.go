@@ -2,11 +2,14 @@ package snapshot
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"log"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/agent"
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 )
 
@@ -87,6 +90,24 @@ func SupportDirectSnapshot(endpoint *portainer.Endpoint) bool {
 // SnapshotEndpoint will create a snapshot of the environment(endpoint) based on the environment(endpoint) type.
 // If the snapshot is a success, it will be associated to the environment(endpoint).
 func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
+	if endpoint.Type == portainer.AgentOnDockerEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment {
+		var err error
+		var tlsConfig *tls.Config
+		if endpoint.TLSConfig.TLS {
+			tlsConfig, err = crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
+			if err != nil {
+				return err
+			}
+		}
+
+		_, version, err := agent.GetAgentVersionAndPlatform(endpoint.URL, tlsConfig)
+		if err != nil {
+			return err
+		}
+
+		endpoint.Agent.Version = version
+	}
+
 	switch endpoint.Type {
 	case portainer.AzureEnvironment:
 		return nil
@@ -175,6 +196,7 @@ func (service *Service) snapshotEndpoints() error {
 
 		latestEndpointReference.Snapshots = endpoint.Snapshots
 		latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
+		latestEndpointReference.Agent.Version = endpoint.Agent.Version
 
 		err = service.dataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 		if err != nil {
