@@ -51,61 +51,65 @@ export function KubeconfigPrompt({
       aria-label="Kubeconfig View"
       role="dialog"
     >
-      <div className="modal-content">
-        <div className="modal-header">
-          <button type="button" className="close" onClick={onClose}>
-            ×
-          </button>
-          <h5 className="modal-title">Download kubeconfig file</h5>
-        </div>
-        <div className="modal-body">
-          <form className="bootbox-form">
-            <div className="bootbox-prompt-message">
-              <p>
-                Select the kubernetes environments to add to the kubeconfig
-                file. You may select across multiple pages. Note that the
-                kubeconfig file will not expire.
-                <br />
-                {kubeServiceExpiryQuery.data}
-              </p>
-            </div>
-          </form>
-          <Checkbox
-            id="settings-container-truncate-nae"
-            label="Select all (in this page)"
-            checked={isAllPageSelected}
-            onChange={handleSelectAll}
-          />
-          <div className="datatable">
-            <div className="bootbox-checkbox-list">
-              {environments.map((env) => (
-                <div className={styles.checkbox}>
-                  <Checkbox
-                    id={`${env.Id}`}
-                    label={`${env.Name} (${env.URL})`}
-                    checked={!!selection[env.Id]}
-                    onChange={() => toggleSelection(env.Id, !selection[env.Id])}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="footer">
-              <PaginationControls
-                showAll={totalCount <= 100}
-                page={page}
-                onPageChange={setPage}
-                pageLimit={pageLimit}
-                onPageLimitChange={setPageLimit}
-                totalCount={totalCount}
-              />
+      <div className="modal-dialog">
+        <div className="modal-content">
+          <div className="modal-header">
+            <button type="button" className="close" onClick={onClose}>
+              ×
+            </button>
+            <h5 className="modal-title">Download kubeconfig file</h5>
+          </div>
+          <div className="modal-body">
+            <form className="bootbox-form">
+              <div className="bootbox-prompt-message">
+                <p>
+                  Select the kubernetes environments to add to the kubeconfig
+                  file. You may select across multiple pages. Note that the
+                  kubeconfig file will not expire.
+                  <br />
+                  {kubeServiceExpiryQuery.data}
+                </p>
+              </div>
+            </form>
+            <Checkbox
+              id="settings-container-truncate-nae"
+              label="Select all (in this page)"
+              checked={isAllPageSelected}
+              onChange={handleSelectAll}
+            />
+            <div className="datatable">
+              <div className="bootbox-checkbox-list">
+                {environments.map((env) => (
+                  <div className={styles.checkbox}>
+                    <Checkbox
+                      id={`${env.Id}`}
+                      label={`${env.Name} (${env.URL})`}
+                      checked={!!selection[env.Id]}
+                      onChange={() =>
+                        toggleSelection(env.Id, !selection[env.Id])
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="footer">
+                <PaginationControls
+                  showAll={totalCount <= 100}
+                  page={page}
+                  onPageChange={setPage}
+                  pageLimit={pageLimit}
+                  onPageLimitChange={setPageLimit}
+                  totalCount={totalCount}
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="modal-footer">
-          <Button onClick={onClose} color="default">
-            Cancel
-          </Button>
-          <Button onClick={handleDownload}>Download File</Button>
+          <div className="modal-footer">
+            <Button onClick={onClose} color="default">
+              Cancel
+            </Button>
+            <Button onClick={handleDownload}>Download File</Button>
+          </div>
         </div>
       </div>
     </DialogOverlay>
