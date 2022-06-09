@@ -21,7 +21,7 @@ export function InternalAuth({
   onChange,
 }: Props) {
   function onSubmit() {
-    if (value.RequiredPasswordLength <= 8) {
+    if (value.RequiredPasswordLength < 10) {
       confirm({
         title: 'Allow weak passwords?',
         message:
