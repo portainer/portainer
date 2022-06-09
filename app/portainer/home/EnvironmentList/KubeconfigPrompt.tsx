@@ -62,8 +62,9 @@ export function KubeconfigPrompt({
           <form className="bootbox-form">
             <div className="bootbox-prompt-message">
               <p>
-                Select the kubernetes environment(s) to add to the kubeconfig
-                file.
+                Select the kubernetes environments to add to the kubeconfig
+                file. You may select across multiple pages. Note that the
+                kubeconfig file will not expire.
                 <br />
                 {kubeServiceExpiryQuery.data}
               </p>
