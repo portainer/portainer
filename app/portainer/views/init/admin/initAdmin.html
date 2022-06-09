@@ -67,10 +67,11 @@
             <!-- !confirm-password-input -->
             <!-- note -->
             <div class="form-group">
-              <div class="col-sm-12 text-muted" ng-if="!form.password.$valid">
+              <div class="col-sm-12 text-muted">
                 <p>
                   <i class="fa fa-exclamation-triangle orange-icon space-right" aria-hidden="true"></i>
                   <span>The password must be at least {{ requiredPasswordLength }} characters long.</span>
+                  <i className="fa fa-check green-icon space-left" aria-hidden="true" ng-if="form.password.$valid && formValues.Password"></i>
                 </p>
               </div>
             </div>
