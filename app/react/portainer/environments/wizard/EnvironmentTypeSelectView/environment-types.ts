@@ -1,4 +1,16 @@
-export const environmentTypes = [
+import { FeatureId } from '@/portainer/feature-flags/enums';
+
+import { KaaSIcon, Props as KaaSIconProps } from './KaaSIcon';
+
+interface WizardEnvironmentOption {
+  id: string;
+  title: string;
+  icon: string | { ({ selected, className }: KaaSIconProps): JSX.Element };
+  description: string;
+  featureId?: FeatureId;
+}
+
+export const environmentTypes: WizardEnvironmentOption[] = [
   {
     id: 'docker',
     title: 'Docker',
@@ -18,4 +30,18 @@ export const environmentTypes = [
     description: 'Connect to ACI environment via API',
     icon: 'fab fa-microsoft',
   },
-] as const;
+  {
+    id: 'nomad',
+    title: 'Nomad',
+    description: 'Connect to HashiCorp Nomad environment via API',
+    icon: 'nomad-icon',
+    featureId: FeatureId.NOMAD,
+  },
+  {
+    id: 'kaas',
+    title: 'KaaS',
+    description: 'Provision a Kubernetes environment with a cloud provider',
+    icon: KaaSIcon,
+    featureId: FeatureId.KAAS_PROVISIONING,
+  },
+];
