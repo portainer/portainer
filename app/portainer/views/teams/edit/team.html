@@ -177,11 +177,11 @@
                   <i ng-if="user.TeamRole === 'Leader'" class="fa fa-user-plus" aria-hidden="true" style="margin-right: 2px"></i>
                   <i ng-if="user.TeamRole === 'Member'" class="fa fa-user" aria-hidden="true" style="margin-right: 2px"></i>
                   {{ user.TeamRole }}
-                  <span style="margin-left: 5px" ng-if="isAdmin">
+                  <span style="margin-left: 5px">
                     <a style="margin-left: 5px" ng-click="promoteToLeader(user)" ng-if="user.TeamRole === 'Member'" ng-class="{ 'btn disabled py-0': settings.TeamSync }"
                       ><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Leader</a
                     >
-                    <a style="margin-left: 5px" ng-click="demoteToMember(user)" ng-if="user.TeamRole === 'Leader'" ng-class="{ 'btn disabled py-0': settings.TeamSync }"
+                    <a style="margin-left: 5px" ng-click="demoteToMember(user)" ng-if="isAdmin && user.TeamRole === 'Leader'" ng-class="{ 'btn disabled py-0': settings.TeamSync }"
                       ><i class="fa fa-user-times space-right" aria-hidden="true"></i>Member</a
                     >
                   </span>
