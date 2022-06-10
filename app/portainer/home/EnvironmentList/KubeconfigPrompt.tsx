@@ -62,15 +62,16 @@ export function KubeconfigPrompt({
           <div className="modal-body">
             <form className="bootbox-form">
               <div className="bootbox-prompt-message">
-                <p>
+                <span>
                   Select the kubernetes environments to add to the kubeconfig
-                  file. You may select across multiple pages. Note that the
-                  kubeconfig file will not expire.
-                  <br />
+                  file. You may select across multiple pages.
+                </span>
+                <span className="space-left">
                   {kubeServiceExpiryQuery.data}
-                </p>
+                </span>
               </div>
             </form>
+            <br />
             <Checkbox
               id="settings-container-truncate-nae"
               label="Select all (in this page)"
