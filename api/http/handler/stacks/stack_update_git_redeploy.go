@@ -193,7 +193,11 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	switch stack.Type {
 	case portainer.DockerSwarmStack:
-		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, stack.Option.Prune)
+		prune := false
+		if stack.Option != nil {
+			prune = stack.Option.Prune
+		}
+		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, prune)
 		if httpErr != nil {
 			return httpErr
 		}
