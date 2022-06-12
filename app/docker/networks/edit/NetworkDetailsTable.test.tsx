@@ -1,7 +1,6 @@
 import { render } from '@/react-tools/test-utils';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
-import { ResourceControlOwnership } from '@/portainer/access-control/types';
 
 import { DockerNetwork } from '../types';
 
@@ -113,9 +112,9 @@ function getNetwork(networkName: string): DockerNetwork {
           },
         ],
         TeamAccesses: [],
-        Ownership: ResourceControlOwnership.PUBLIC,
         Public: true,
         System: false,
+        AdministratorsOnly: true,
       },
     },
     Scope: 'local',
