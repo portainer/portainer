@@ -110,7 +110,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                   <div className="col-sm-12">
                     <LoadingButton
                       disabled={!isValid || !dirty}
-                      dataCy="settings-edgeComputeButton"
+                      dataCy="settings-edgeComputeButton2"
                       isLoading={isSubmitting}
                       loadingText="Saving settings..."
                     >
