@@ -1,6 +1,10 @@
 import clsx from 'clsx';
 import { ComponentType } from 'react';
 
+import { BEFeatureIndicator } from '@/portainer/components/BEFeatureIndicator';
+import { FeatureId } from '@/portainer/feature-flags/enums';
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+
 import styles from './Option.module.css';
 
 export interface SelectorItemType {
@@ -12,6 +16,7 @@ export interface SelectorItemType {
 interface Props extends SelectorItemType {
   active?: boolean;
   onClick?(): void;
+  featureId?: FeatureId;
 }
 
 export function Option({
@@ -20,13 +25,22 @@ export function Option({
   description,
   title,
   onClick = () => {},
+  featureId,
 }: Props) {
   const Icon = typeof icon !== 'string' ? icon : null;
-
+  const isLimited = isLimitedToBE(featureId);
   return (
     <button
-      className={clsx('border-0', styles.root, { [styles.active]: active })}
+      className={clsx(
+        styles.optionTile,
+        isLimited ? styles.teaser : styles.feature,
+        'border-0',
+        {
+          [styles.active]: active,
+        }
+      )}
       type="button"
+      disabled={isLimited}
       onClick={onClick}
     >
       <div className="text-center mt-2">
@@ -37,9 +51,16 @@ export function Option({
         )}
       </div>
 
-      <div className="mt-3 text-center">
+      <div className="mt-3 text-center flex flex-col">
         <h3>{title}</h3>
         <h5>{description}</h5>
+        {isLimited && (
+          <BEFeatureIndicator
+            showIcon={false}
+            featureId={featureId}
+            className="!whitespace-normal"
+          />
+        )}
       </div>
     </button>
   );
