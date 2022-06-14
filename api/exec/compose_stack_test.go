@@ -65,56 +65,22 @@ func Test_createEnvFile(t *testing.T) {
 	}
 }
 
-func Test_createNetworkEnvFile(t *testing.T) {
+func Test_createEnvFile_mergesDefultAndInplaceEnvVars(t *testing.T) {
 	dir := t.TempDir()
-	buf := []byte(`
-version: '3.6'
-services:
-  nginx-example:
-    image: nginx:latest
-networks:
-  default:
-    name: ${test}
-    driver: bridge
-`)
-	if err := ioutil.WriteFile(path.Join(dir,
-		"docker-compose.yml"), buf, 0644); err != nil {
-		t.Fatalf("Failed to create yaml file: %s", err)
-	}
-
-	stackWithoutEnv := &portainer.Stack{
+	os.WriteFile(path.Join(dir, ".env"), []byte("VAR1=VAL1\nVAR2=VAL2\n"), 0600)
+	stack := &portainer.Stack{
 		ProjectPath: dir,
-		EntryPoint:  "docker-compose.yml",
-		Env:         []portainer.Pair{},
-	}
-
-	if err := createNetworkEnvFile(stackWithoutEnv); err != nil {
-		t.Fatalf("Failed to create network env file: %s", err)
-	}
-
-	content, err := ioutil.ReadFile(path.Join(dir, ".env"))
-	if err != nil {
-		t.Fatalf("Failed to read network env file: %s", err)
-	}
-
-	assert.Equal(t, "test=None\n", string(content))
-
-	stackWithEnv := &portainer.Stack{
-		ProjectPath: dir,
-		EntryPoint:  "docker-compose.yml",
 		Env: []portainer.Pair{
-			{Name: "test", Value: "test-value"},
+			{Name: "VAR1", Value: "NEW_VAL1"},
+			{Name: "VAR3", Value: "VAL3"},
 		},
 	}
+	result, err := createEnvFile(stack)
+	assert.Equal(t, "stack.env", result)
+	assert.NoError(t, err)
+	assert.FileExists(t, path.Join(dir, "stack.env"))
+	f, _ := os.Open(path.Join(dir, "stack.env"))
+	content, _ := ioutil.ReadAll(f)
 
-	if err := createNetworkEnvFile(stackWithEnv); err != nil {
-		t.Fatalf("Failed to create network env file: %s", err)
-	}
-
-	content, err = ioutil.ReadFile(path.Join(dir, ".env"))
-	if err != nil {
-		t.Fatalf("Failed to read network env file: %s", err)
-	}
-
-	assert.Equal(t, "test=test-value\n", string(content))
+	assert.Equal(t, []byte("VAR1=VAL1\nVAR2=VAL2\n\nVAR1=NEW_VAL1\nVAR3=VAL3\n"), content)
 }
