@@ -102,6 +102,11 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 
 	if query.edgeDevice != nil {
 		filteredEndpoints = filterEndpointsByEdgeDevice(filteredEndpoints, *query.edgeDevice, query.edgeDeviceUntrusted)
+	} else {
+		// If the edgeDevice parameter is not set, we need to filter out the untrusted edge devices
+		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
+			return !endpoint.IsEdgeDevice || endpoint.UserTrusted
+		})
 	}
 
 	if len(query.status) > 0 {

@@ -38,8 +38,8 @@ func Test_Filter_edgeDeviceFilter(t *testing.T) {
 
 	tests := []filterTest{
 		{
-			"should show all edge endpoints",
-			[]portainer.EndpointID{trustedEdgeDevice.ID, untrustedEdgeDevice.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID},
+			"should show all edge endpoints expect of the untrusted devices",
+			[]portainer.EndpointID{trustedEdgeDevice.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID},
 			EnvironmentsQuery{
 				types: []portainer.EndpointType{portainer.EdgeAgentOnDockerEnvironment, portainer.EdgeAgentOnKubernetesEnvironment},
 			},
