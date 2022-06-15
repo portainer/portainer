@@ -80,10 +80,10 @@
           <!-- !confirm-password-input -->
 
           <!-- password-check-hint -->
-          <div class="form-group" ng-if="AuthenticationMethod === 1 && !form.password.$valid">
+          <div class="form-group" ng-if="AuthenticationMethod === 1">
             <div class="col-sm-3 col-lg-2"></div>
             <div class="col-sm-8">
-              <password-check-hint></password-check-hint>
+              <password-check-hint password-valid="form.password.$valid && formValues.Password"></password-check-hint>
             </div>
           </div>
           <!-- ! password-check-hint  -->
