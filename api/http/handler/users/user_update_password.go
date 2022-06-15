@@ -82,7 +82,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 
 	err = handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Specified password do not match actual password", httperrors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Current password doesn't match", errors.New("Current password does not match the password provided. Please try again")}
 	}
 
 	if !handler.passwordStrengthChecker.Check(payload.NewPassword) {
