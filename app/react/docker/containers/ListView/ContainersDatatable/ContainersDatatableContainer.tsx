@@ -1,4 +1,3 @@
-import { react2angular } from '@/react-tools/react2angular';
 import { EnvironmentProvider } from '@/portainer/environments/useEnvironment';
 import type { Environment } from '@/portainer/environments/types';
 
@@ -36,15 +35,3 @@ export function ContainersDatatableContainer({
     </EnvironmentProvider>
   );
 }
-
-export const ContainersDatatableAngular = react2angular(
-  ContainersDatatableContainer,
-  [
-    'endpoint',
-    'isAddActionVisible',
-    'dataset',
-    'onRefresh',
-    'isHostColumnVisible',
-    'tableKey',
-  ]
-);

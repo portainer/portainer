@@ -1,4 +1,4 @@
-import type { ContainersTableSettings } from '@/docker/containers/types';
+import type { ContainersTableSettings } from '@/react/docker/containers/types';
 
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 import { useTableSettings } from '@@/datatables/useTableSettings';

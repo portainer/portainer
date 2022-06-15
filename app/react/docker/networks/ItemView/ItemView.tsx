@@ -7,21 +7,21 @@ import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
 import { ResourceControlType } from '@/portainer/access-control/types';
-import { DockerContainer } from '@/docker/containers/types';
+import { DockerContainer } from '@/react/docker/containers/types';
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 
 import { PageHeader } from '@@/PageHeader';
 
 import { useNetwork, useDeleteNetwork } from '../queries';
 import { isSystemNetwork } from '../network.helper';
-import { useContainers } from '../../containers/queries';
 import { DockerNetwork, NetworkContainer } from '../types';
+import { useContainers } from '../../containers/queries';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 import { NetworkOptionsTable } from './NetworkOptionsTable';
 import { NetworkContainersTable } from './NetworkContainersTable';
 
-export function NetworkDetailsView() {
+export function ItemView() {
   const router = useRouter();
   const queryClient = useQueryClient();
 

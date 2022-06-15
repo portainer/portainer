@@ -2,7 +2,7 @@ import { Column } from 'react-table';
 import _ from 'lodash';
 
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
-import type { DockerContainer, Port } from '@/docker/containers/types';
+import type { DockerContainer, Port } from '@/react/docker/containers/types';
 
 export const ports: Column<DockerContainer> = {
   Header: 'Published Ports',
