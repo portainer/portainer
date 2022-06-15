@@ -7,11 +7,14 @@ import {
 } from '@/portainer/environments/types';
 import { BoxSelectorOption } from '@/portainer/components/BoxSelector/types';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
+import { FeatureId } from '@/portainer/feature-flags/enums';
+import { BEFeatureIndicator } from '@/portainer/components/BEFeatureIndicator';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
 
 import { AgentPanel } from './AgentPanel';
+import { KubeConfigTeaserForm } from './KubeConfigTeaserForm';
 
 interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
@@ -20,6 +23,7 @@ interface Props {
 const options: BoxSelectorOption<
   | EnvironmentCreationTypes.AgentEnvironment
   | EnvironmentCreationTypes.EdgeAgentEnvironment
+  | EnvironmentCreationTypes.KubeConfigEnvironment
 >[] = [
   {
     id: 'agent_endpoint',
@@ -34,6 +38,14 @@ const options: BoxSelectorOption<
     label: 'Edge Agent',
     description: '',
     value: EnvironmentCreationTypes.EdgeAgentEnvironment,
+  },
+  {
+    id: 'kubeconfig_endpoint',
+    icon: 'fas fa-cloud-upload-alt',
+    label: 'Import',
+    value: EnvironmentCreationTypes.KubeConfigEnvironment,
+    description: 'Import an existing Kubernetes config',
+    feature: FeatureId.K8S_CREATE_FROM_KUBECONFIG,
   },
 ];
 
@@ -71,6 +83,15 @@ export function WizardKubernetes({ onCreate }: Props) {
             }
             commands={[{ ...commandsTabs.k8sLinux, label: 'Linux' }]}
           />
+        );
+      case EnvironmentCreationTypes.KubeConfigEnvironment:
+        return (
+          <div className="px-1 py-5 border border-solid border-orange-1">
+            <BEFeatureIndicator
+              featureId={options.find((o) => o.value === type)?.feature}
+            />
+            <KubeConfigTeaserForm />
+          </div>
         );
       default:
         throw new Error('Creation type not supported');

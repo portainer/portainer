@@ -118,8 +118,8 @@ export function EnvironmentCreationView() {
         ])
       ),
     });
-    if (localStorage.getItem('wizardRefferer') === 'environments') {
-      localStorage.removeItem('wizardRefferer');
+    if (localStorage.getItem('wizardReferrer') === 'environments') {
+      localStorage.removeItem('wizardReferrer');
       router.stateService.go('portainer.endpoints');
       return;
     }

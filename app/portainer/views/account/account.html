@@ -54,7 +54,7 @@
               </div>
             </div>
           </div>
-          <password-check-hint ng-if="!form.new_password.$valid || (forceChangePassword && !formValues.newPassword)"></password-check-hint>
+          <password-check-hint password-valid="form.new_password.$valid && formValues.newPassword" force-change-password="forceChangePassword"></password-check-hint>
           <div ng-if="userRole === 1">
             <p class="text-muted">
               <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true"></i>

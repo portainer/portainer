@@ -70,6 +70,7 @@
     "@lineup-lite/hooks": "^1.6.0",
     "@nxmix/tokenize-ansi": "^3.0.0",
     "@open-amt-cloud-toolkit/ui-toolkit-react": "2.0.0",
+    "@reach/dialog": "^0.17.0",
     "@reach/menu-button": "^0.16.1",
     "@uirouter/angularjs": "1.0.11",
     "@uirouter/react": "^1.0.7",

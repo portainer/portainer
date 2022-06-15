@@ -22,7 +22,7 @@ Please note that the public demo cluster is **reset every 15min**.
 
 Portainer CE is updated regularly. We aim to do an update release every couple of months.
 
-**The latest version of Portainer is 2.9.x**. Portainer is on version 2, the second number denotes the month of release.
+**The latest version of Portainer is 2.13.x**.
 
 ## Getting started
 
