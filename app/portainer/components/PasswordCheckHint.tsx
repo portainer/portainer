@@ -1,7 +1,15 @@
 import { react2angular } from '@/react-tools/react2angular';
 import { usePublicSettings } from '@/portainer/settings/queries';
 
-export function PasswordCheckHint() {
+interface Props {
+  passwordValid: boolean;
+  forceChangePassword?: boolean;
+}
+
+export function PasswordCheckHint({
+  passwordValid,
+  forceChangePassword,
+}: Props) {
   const settingsQuery = usePublicSettings();
   const minPasswordLength = settingsQuery.data?.RequiredPasswordLength;
 
@@ -12,10 +20,18 @@ export function PasswordCheckHint() {
           className="fa fa-exclamation-triangle orange-icon space-right"
           aria-hidden="true"
         />
+        {forceChangePassword &&
+          'An administrator has changed your password requirements, '}
         The password must be at least {minPasswordLength} characters long.
+        {passwordValid && (
+          <i className="fa fa-check green-icon space-left" aria-hidden="true" />
+        )}
       </p>
     </div>
   );
 }
 
-export const PasswordCheckHintAngular = react2angular(PasswordCheckHint, []);
+export const PasswordCheckHintAngular = react2angular(PasswordCheckHint, [
+  'passwordValid',
+  'forceChangePassword',
+]);

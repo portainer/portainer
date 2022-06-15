@@ -51,6 +51,9 @@ angular.module('portainer.app').controller('AccountController', [
       if ($scope.userRole === 1 && newTransition.to().name === 'portainer.settings.authentication') {
         return true;
       }
+      if (newTransition.to().name === 'portainer.logout') {
+        return true;
+      }
       if ($scope.forceChangePassword) {
         ModalService.confirmForceChangePassword();
       }
