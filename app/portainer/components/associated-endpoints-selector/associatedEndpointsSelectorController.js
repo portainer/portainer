@@ -51,11 +51,11 @@ class AssoicatedEndpointsSelectorController {
     this.getAssociatedEndpoints();
   }
 
-  /* #region  internal queries to retrive endpoints per "side" of the selector */
+  /* #region  internal queries to retrieve endpoints per "side" of the selector */
   getAvailableEndpoints() {
     return this.$async(async () => {
       const { start, search, limit } = this.getPaginationData('available');
-      const query = { search, types: EdgeTypes, edgeDevice: true };
+      const query = { search, types: EdgeTypes };
 
       const response = await getEnvironments({ start, limit, query });
 
@@ -81,7 +81,7 @@ class AssoicatedEndpointsSelectorController {
   }
   /* #endregion */
 
-  /* #region  On endpoint clic (either available or associated) */
+  /* #region  On endpoint click (either available or associated) */
   associateEndpoint(endpoint) {
     this.onAssociate(endpoint);
   }
