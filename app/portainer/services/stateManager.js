@@ -25,6 +25,7 @@ function StateManagerFactory(
     UI: {
       dismissedInfoPanels: {},
       dismissedInfoHash: '',
+      timesPasswordChangeSkipped: {},
     },
   };
 
@@ -49,13 +50,12 @@ function StateManagerFactory(
   };
 
   manager.setPasswordChangeSkipped = function (userID) {
-    state.UI.timesPasswordChangeSkipped = state.UI.timesPasswordChangeSkipped || {};
     state.UI.timesPasswordChangeSkipped[userID] = state.UI.timesPasswordChangeSkipped[userID] + 1 || 1;
     LocalStorage.storeUIState(state.UI);
   };
 
   manager.resetPasswordChangeSkips = function (userID) {
-    if (state.UI.timesPasswordChangeSkipped && state.UI.timesPasswordChangeSkipped[userID]) state.UI.timesPasswordChangeSkipped[userID] = 0;
+    if (state.UI.timesPasswordChangeSkipped[userID]) state.UI.timesPasswordChangeSkipped[userID] = 0;
     LocalStorage.storeUIState(state.UI);
   };
 
