@@ -23,6 +23,7 @@ export function EnvironmentSelector({ value, onChange }: Props) {
           {environmentTypes.map((eType) => (
             <Option
               key={eType.id}
+              featureId={eType.featureId}
               title={eType.title}
               description={eType.description}
               icon={eType.icon}

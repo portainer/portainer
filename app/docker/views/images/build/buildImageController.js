@@ -27,6 +27,13 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     $scope.state.isEditorDirty = false;
   });
 
+  $scope.checkName = function (name) {
+    const parts = name.split('/');
+    const repository = parts[parts.length - 1];
+    const repositoryRegExp = RegExp('^[a-z0-9-_]{2,255}(:[A-Za-z0-9-_.]{1,128})?$');
+    return repositoryRegExp.test(repository);
+  };
+
   $scope.addImageName = function () {
     $scope.formValues.ImageNames.push({ Name: '' });
   };
@@ -92,13 +99,16 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
   }
 
   $scope.validImageNames = function () {
+    if ($scope.formValues.ImageNames.length == 0) {
+      return false;
+    }
     for (var i = 0; i < $scope.formValues.ImageNames.length; i++) {
       var item = $scope.formValues.ImageNames[i];
-      if (item.Name !== '') {
-        return true;
+      if (!$scope.checkName(item.Name)) {
+        return false;
       }
     }
-    return false;
+    return true;
   };
 
   $scope.editorUpdate = function (cm) {

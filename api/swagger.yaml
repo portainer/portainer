@@ -11,8 +11,8 @@ definitions:
         example: admin
         type: string
     required:
-    - password
-    - username
+      - password
+      - username
     type: object
   auth.authenticateResponse:
     properties:
@@ -49,8 +49,8 @@ definitions:
           Platform associated to the template.
           Valid values are: 1 - 'linux', 2 - 'windows'
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 1
         type: integer
       title:
@@ -60,16 +60,16 @@ definitions:
       type:
         description: Type of created stack (1 - swarm, 2 - compose)
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 1
         type: integer
     required:
-    - description
-    - fileContent
-    - platform
-    - title
-    - type
+      - description
+      - fileContent
+      - platform
+      - title
+      - type
     type: object
   customtemplates.customTemplateFromGitRepositoryPayload:
     properties:
@@ -95,8 +95,8 @@ definitions:
           Platform associated to the template.
           Valid values are: 1 - 'linux', 2 - 'windows'
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 1
         type: integer
       repositoryAuthentication:
@@ -128,16 +128,16 @@ definitions:
       type:
         description: Type of created stack (1 - swarm, 2 - compose)
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 1
         type: integer
     required:
-    - description
-    - platform
-    - repositoryURL
-    - title
-    - type
+      - description
+      - platform
+      - repositoryURL
+      - title
+      - type
     type: object
   customtemplates.customTemplateUpdatePayload:
     properties:
@@ -161,8 +161,8 @@ definitions:
           Platform associated to the template.
           Valid values are: 1 - 'linux', 2 - 'windows'
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 1
         type: integer
       title:
@@ -172,16 +172,16 @@ definitions:
       type:
         description: Type of created stack (1 - swarm, 2 - compose)
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 1
         type: integer
     required:
-    - description
-    - fileContent
-    - platform
-    - title
-    - type
+      - description
+      - fileContent
+      - platform
+      - title
+      - type
     type: object
   customtemplates.fileResponse:
     properties:
@@ -203,9 +203,9 @@ definitions:
         example: hub_user
         type: string
     required:
-    - authentication
-    - password
-    - username
+      - authentication
+      - password
+      - username
     type: object
   edgegroups.edgeGroupCreatePayload:
     properties:
@@ -396,8 +396,8 @@ definitions:
       associatedEndpoints:
         description: List of endpoint identifiers that will be part of this group
         example:
-        - 1
-        - 3
+          - 1
+          - 3
         items:
           type: integer
         type: array
@@ -412,15 +412,15 @@ definitions:
       tagIDs:
         description: List of tag identifiers to which this endpoint group is associated
         example:
-        - 1
-        - 2
+          - 1
+          - 2
         items:
           description: Tag identifier
           example: 1
           type: integer
         type: array
     required:
-    - name
+      - name
     type: object
   endpointgroups.endpointGroupUpdatePayload:
     properties:
@@ -435,8 +435,8 @@ definitions:
       tagIDs:
         description: List of tag identifiers associated to the endpoint group
         example:
-        - 3
-        - 4
+          - 3
+          - 4
         items:
           description: Tag identifier
           example: 1
@@ -539,8 +539,8 @@ definitions:
       tagIDs:
         description: List of tag identifiers to which this endpoint is associated
         example:
-        - 1
-        - 2
+          - 1
+          - 2
         items:
           description: Tag identifier
           example: 1
@@ -653,8 +653,8 @@ definitions:
           Platform associated to the template.
           Valid values are: 1 - 'linux', 2 - 'windows'
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 1
         type: integer
       ProjectPath:
@@ -1037,6 +1037,12 @@ definitions:
       Provisioner:
         type: string
     type: object
+  portainer.InternalAuthSettings:
+    properties:
+      RequiredPasswordLength:
+        description: The minimum character length a user can set their password
+        example: 12
+        type: integer
   portainer.LDAPGroupSearchSettings:
     properties:
       GroupAttribute:
@@ -1180,11 +1186,11 @@ definitions:
       Type:
         description: Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab, 5 - ProGet)
         enum:
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
         type: integer
       URL:
         description: URL or IP address of the Docker registry
@@ -1244,7 +1250,7 @@ definitions:
       SubResourceIds:
         description: List of Docker resources that will inherit this access control
         example:
-        - 617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08
+          - 617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08
         items:
           type: string
         type: array
@@ -1337,6 +1343,8 @@ definitions:
         description: Whether telemetry is enabled
         example: false
         type: boolean
+      InternalAuthSettings:
+        $ref: '#/definitions/portainer.InternalAuthSettings'
       LDAPSettings:
         $ref: '#/definitions/portainer.LDAPSettings'
       LogoURL:
@@ -1532,7 +1540,7 @@ definitions:
       categories:
         description: A list of categories associated to the template
         example:
-        - database
+          - database
         items:
           type: string
         type: array
@@ -1598,7 +1606,7 @@ definitions:
       ports:
         description: A list of ports exposed by the container
         example:
-        - 8080:80/tcp
+          - 8080:80/tcp
         items:
           type: string
         type: array
@@ -1801,7 +1809,7 @@ definitions:
         example: registry_user
         type: string
     required:
-    - authentication
+      - authentication
     type: object
   registries.registryCreatePayload:
     properties:
@@ -1825,11 +1833,11 @@ definitions:
         description: 'Registry Type. Valid values are: 1 (Quay.io), 2 (Azure container
           registry), 3 (custom registry), 4 (Gitlab registry) or 5 (ProGet registry)'
         enum:
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
         example: 1
         type: integer
       url:
@@ -1846,10 +1854,10 @@ definitions:
         example: registry_user
         type: string
     required:
-    - authentication
-    - name
-    - type
-    - url
+      - authentication
+      - name
+      - type
+      - url
     type: object
   registries.registryUpdatePayload:
     properties:
@@ -1884,9 +1892,9 @@ definitions:
         example: registry_user
         type: string
     required:
-    - authentication
-    - name
-    - url
+      - authentication
+      - name
+      - url
     type: object
   resourcecontrols.resourceControlCreatePayload:
     properties:
@@ -1904,15 +1912,15 @@ definitions:
       subResourceIDs:
         description: List of Docker resources that will inherit this access control
         example:
-        - 617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08
+          - 617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08
         items:
           type: string
         type: array
       teams:
         description: List of team identifiers with access to the associated resource
         example:
-        - 56
-        - 7
+          - 56
+          - 7
         items:
           type: integer
         type: array
@@ -1925,14 +1933,14 @@ definitions:
       users:
         description: List of user identifiers with access to the associated resource
         example:
-        - 1
-        - 4
+          - 1
+          - 4
         items:
           type: integer
         type: array
     required:
-    - resourceID
-    - type
+      - resourceID
+      - type
     type: object
   resourcecontrols.resourceControlUpdatePayload:
     properties:
@@ -1947,14 +1955,14 @@ definitions:
       teams:
         description: List of team identifiers with access to the associated resource
         example:
-        - 7
+          - 7
         items:
           type: integer
         type: array
       users:
         description: List of user identifiers with access to the associated resource
         example:
-        - 4
+          - 4
         items:
           type: integer
         type: array
@@ -2083,6 +2091,8 @@ definitions:
         description: Whether telemetry is enabled
         example: false
         type: boolean
+      internalAuthSettings:
+        $ref: '#/definitions/portainer.InternalAuthSettings'
       ldapsettings:
         $ref: '#/definitions/portainer.LDAPSettings'
       logoURL:
@@ -2127,8 +2137,8 @@ definitions:
            image:nginx
         type: string
     required:
-    - name
-    - stackFileContent
+      - name
+      - stackFileContent
     type: object
   stacks.composeStackFromGitRepositoryPayload:
     properties:
@@ -2169,8 +2179,8 @@ definitions:
         example: myGitUsername
         type: string
     required:
-    - name
-    - repositoryURL
+      - name
+      - repositoryURL
     type: object
   stacks.stackFileResponse:
     properties:
@@ -2200,7 +2210,7 @@ definitions:
         example: jpofkc0i9uo9wtx1zesuk649w
         type: string
     required:
-    - endpointID
+      - endpointID
     type: object
   stacks.swarmStackFromFileContentPayload:
     properties:
@@ -2226,9 +2236,9 @@ definitions:
         example: jpofkc0i9uo9wtx1zesuk649w
         type: string
     required:
-    - name
-    - stackFileContent
-    - swarmID
+      - name
+      - stackFileContent
+      - swarmID
     type: object
   stacks.swarmStackFromGitRepositoryPayload:
     properties:
@@ -2273,9 +2283,9 @@ definitions:
         example: jpofkc0i9uo9wtx1zesuk649w
         type: string
     required:
-    - name
-    - repositoryURL
-    - swarmID
+      - name
+      - repositoryURL
+      - swarmID
     type: object
   stacks.updateSwarmStackPayload:
     properties:
@@ -2316,7 +2326,7 @@ definitions:
         example: org/acme
         type: string
     required:
-    - name
+      - name
     type: object
   teammemberships.teamMembershipCreatePayload:
     properties:
@@ -2324,8 +2334,8 @@ definitions:
         description: Role for the user inside the team (1 for leader and 2 for regular
           member)
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 1
         type: integer
       teamID:
@@ -2337,9 +2347,9 @@ definitions:
         example: 1
         type: integer
     required:
-    - role
-    - teamID
-    - userID
+      - role
+      - teamID
+      - userID
     type: object
   teammemberships.teamMembershipUpdatePayload:
     properties:
@@ -2347,8 +2357,8 @@ definitions:
         description: Role for the user inside the team (1 for leader and 2 for regular
           member)
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 1
         type: integer
       teamID:
@@ -2360,9 +2370,9 @@ definitions:
         example: 1
         type: integer
     required:
-    - role
-    - teamID
-    - userID
+      - role
+      - teamID
+      - userID
     type: object
   teams.teamCreatePayload:
     properties:
@@ -2371,7 +2381,7 @@ definitions:
         example: developers
         type: string
     required:
-    - name
+      - name
     type: object
   teams.teamUpdatePayload:
     properties:
@@ -2391,8 +2401,8 @@ definitions:
         example: https://github.com/portainer/portainer-compose
         type: string
     required:
-    - composeFilePathInRepository
-    - repositoryURL
+      - composeFilePathInRepository
+      - repositoryURL
     type: object
   templates.fileResponse:
     properties:
@@ -2420,8 +2430,8 @@ definitions:
         example: admin
         type: string
     required:
-    - password
-    - username
+      - password
+      - username
     type: object
   users.userCreatePayload:
     properties:
@@ -2431,17 +2441,17 @@ definitions:
       role:
         description: User role (1 for administrator account and 2 for regular account)
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 2
         type: integer
       username:
         example: bob
         type: string
     required:
-    - password
-    - role
-    - username
+      - password
+      - role
+      - username
     type: object
   users.userUpdatePasswordPayload:
     properties:
@@ -2454,8 +2464,8 @@ definitions:
         example: passwd
         type: string
     required:
-    - newPassword
-    - password
+      - newPassword
+      - password
     type: object
   users.userUpdatePayload:
     properties:
@@ -2465,17 +2475,17 @@ definitions:
       role:
         description: User role (1 for administrator account and 2 for regular account)
         enum:
-        - 1
-        - 2
+          - 1
+          - 2
         example: 2
         type: integer
       username:
         example: bob
         type: string
     required:
-    - password
-    - role
-    - username
+      - password
+      - role
+      - username
     type: object
   webhooks.webhookCreatePayload:
     properties:
@@ -2550,76 +2560,76 @@ paths:
   /auth:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Use this endpoint to authenticate against Portainer using a username
         and password.
       operationId: AuthenticateUser
       parameters:
-      - description: Credentials used for authentication
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/auth.authenticatePayload'
+        - description: Credentials used for authentication
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/auth.authenticatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/auth.authenticateResponse'
-        "400":
+        '400':
           description: Invalid request
-        "422":
+        '422':
           description: Invalid Credentials
-        "500":
+        '500':
           description: Server error
       summary: Authenticate
       tags:
-      - auth
+        - auth
   /auth/logout:
     post:
       consumes:
-      - application/json
+        - application/json
       operationId: logout
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
-          description: ""
+        '204':
+          description: ''
       security:
-      - jwt: []
+        - jwt: []
       summary: Logout
       tags:
-      - auth
+        - auth
   /auth/oauth/validate:
     post:
       consumes:
-      - application/json
+        - application/json
       operationId: authenticate_oauth
       parameters:
-      - description: OAuth Credentials used for authentication
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/auth.oauthPayload'
+        - description: OAuth Credentials used for authentication
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/auth.oauthPayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/auth.authenticateResponse'
-        "400":
+        '400':
           description: Invalid request
-        "422":
+        '422':
           description: Invalid Credentials
-        "500":
+        '500':
           description: Server error
       summary: Authenticate with OAuth
       tags:
-      - auth
+        - auth
   /custom_templates:
     get:
       description: |-
@@ -2627,97 +2637,97 @@ paths:
         **Access policy**: authenticated
       operationId: CustomTemplateList
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.CustomTemplate'
             type: array
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List available custom templates
       tags:
-      - custom_templates
+        - custom_templates
     post:
       consumes:
-      - application/json
-      - ' multipart/form-data'
+        - application/json
+        - ' multipart/form-data'
       description: |-
         Create a custom template.
         **Access policy**: authenticated
       operationId: CustomTemplateCreate
       parameters:
-      - description: method for creating template
-        enum:
-        - string
-        - file
-        - repository
-        in: query
-        name: method
-        required: true
-        type: string
-      - description: Required when using method=string
-        in: body
-        name: body_string
-        schema:
-          $ref: '#/definitions/customtemplates.customTemplateFromFileContentPayload'
-      - description: Required when using method=repository
-        in: body
-        name: body_repository
-        schema:
-          $ref: '#/definitions/customtemplates.customTemplateFromGitRepositoryPayload'
-      - description: Title of the template. required when method is file
-        in: formData
-        name: Title
-        type: string
-      - description: Description of the template. required when method is file
-        in: formData
-        name: Description
-        type: string
-      - description: A note that will be displayed in the UI. Supports HTML content
-        in: formData
-        name: Note
-        type: string
-      - description: Platform associated to the template (1 - 'linux', 2 - 'windows').
-          required when method is file
-        enum:
-        - 1
-        - 2
-        in: formData
-        name: Platform
-        type: integer
-      - description: Type of created stack (1 - swarm, 2 - compose), required when
-          method is file
-        enum:
-        - 1
-        - 2
-        in: formData
-        name: Type
-        type: integer
-      - description: required when method is file
-        in: formData
-        name: file
-        type: file
+        - description: method for creating template
+          enum:
+            - string
+            - file
+            - repository
+          in: query
+          name: method
+          required: true
+          type: string
+        - description: Required when using method=string
+          in: body
+          name: body_string
+          schema:
+            $ref: '#/definitions/customtemplates.customTemplateFromFileContentPayload'
+        - description: Required when using method=repository
+          in: body
+          name: body_repository
+          schema:
+            $ref: '#/definitions/customtemplates.customTemplateFromGitRepositoryPayload'
+        - description: Title of the template. required when method is file
+          in: formData
+          name: Title
+          type: string
+        - description: Description of the template. required when method is file
+          in: formData
+          name: Description
+          type: string
+        - description: A note that will be displayed in the UI. Supports HTML content
+          in: formData
+          name: Note
+          type: string
+        - description: Platform associated to the template (1 - 'linux', 2 - 'windows').
+            required when method is file
+          enum:
+            - 1
+            - 2
+          in: formData
+          name: Platform
+          type: integer
+        - description: Type of created stack (1 - swarm, 2 - compose), required when
+            method is file
+          enum:
+            - 1
+            - 2
+          in: formData
+          name: Type
+          type: integer
+        - description: required when method is file
+          in: formData
+          name: file
+          type: file
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.CustomTemplate'
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Create a custom template
       tags:
-      - custom_templates
+        - custom_templates
   /custom_templates/{id}:
     delete:
       description: |-
@@ -2725,97 +2735,97 @@ paths:
         **Access policy**: authorized
       operationId: CustomTemplateDelete
       parameters:
-      - description: Template identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Template identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Access denied to resource
-        "404":
+        '404':
           description: Template not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove a template
       tags:
-      - custom_templates
+        - custom_templates
     get:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Retrieve details about a template.
         **Access policy**: authenticated
       operationId: CustomTemplateInspect
       parameters:
-      - description: Template identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Template identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.CustomTemplate'
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: Template not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect a custom template
       tags:
-      - custom_templates
+        - custom_templates
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update a template.
         **Access policy**: authenticated
       operationId: CustomTemplateUpdate
       parameters:
-      - description: Template identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Template details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/customtemplates.customTemplateUpdatePayload'
+        - description: Template identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Template details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/customtemplates.customTemplateUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.CustomTemplate'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied to access template
-        "404":
+        '404':
           description: Template not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update a template
       tags:
-      - custom_templates
+        - custom_templates
   /custom_templates/{id}/file:
     get:
       description: |-
@@ -2823,29 +2833,29 @@ paths:
         **Access policy**: authorized
       operationId: CustomTemplateFile
       parameters:
-      - description: Template identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Template identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/customtemplates.fileResponse'
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: Custom template not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Get Template stack file content.
       tags:
-      - custom_templates
+        - custom_templates
   /dockerhub:
     get:
       description: |-
@@ -2853,757 +2863,757 @@ paths:
         **Access policy**: authenticated
       operationId: DockerHubInspect
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.DockerHub'
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Retrieve DockerHub information
       tags:
-      - dockerhub
+        - dockerhub
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Use this endpoint to update the information used to connect to the DockerHub
         **Access policy**: administrator
       operationId: DockerHubUpdate
       parameters:
-      - description: DockerHub information
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/dockerhub.dockerhubUpdatePayload'
+        - description: DockerHub information
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/dockerhub.dockerhubUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update DockerHub information
       tags:
-      - dockerhub
+        - dockerhub
   /edge_groups:
     get:
       consumes:
-      - application/json
+        - application/json
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: EdgeGroups
           schema:
             items:
               allOf:
-              - $ref: '#/definitions/portainer.EdgeGroup'
-              - properties:
-                  HasEdgeStack:
-                    type: boolean
-                type: object
+                - $ref: '#/definitions/portainer.EdgeGroup'
+                - properties:
+                    HasEdgeStack:
+                      type: boolean
+                  type: object
             type: array
-        "500":
-          description: ""
-        "503":
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: list EdgeGroups
       tags:
-      - edge_groups
+        - edge_groups
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeGroup data
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/edgegroups.edgeGroupCreatePayload'
+        - description: EdgeGroup data
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/edgegroups.edgeGroupCreatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeGroup'
-        "500":
-          description: ""
-        "503":
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Create an EdgeGroup
       tags:
-      - edge_groups
+        - edge_groups
   /edge_groups/{id}:
     delete:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeGroup Id
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: EdgeGroup Id
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '204':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Deletes an EdgeGroup
       tags:
-      - edge_groups
+        - edge_groups
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeGroup Id
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: EdgeGroup Id
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeGroup'
-        "500":
-          description: ""
-        "503":
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspects an EdgeGroup
       tags:
-      - edge_groups
+        - edge_groups
     put:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeGroup Id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: EdgeGroup data
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/edgegroups.edgeGroupUpdatePayload'
+        - description: EdgeGroup Id
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: EdgeGroup data
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/edgegroups.edgeGroupUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeGroup'
-        "500":
-          description: ""
-        "503":
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Updates an EdgeGroup
       tags:
-      - edge_groups
+        - edge_groups
   /edge_jobs:
     get:
       consumes:
-      - application/json
+        - application/json
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             items:
               $ref: '#/definitions/portainer.EdgeJob'
             type: array
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Fetch EdgeJobs list
       tags:
-      - edge_jobs
+        - edge_jobs
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Creation Method
-        enum:
-        - file
-        - string
-        in: query
-        name: method
-        required: true
-        type: string
-      - description: EdgeGroup data when method is string
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/edgejobs.edgeJobCreateFromFileContentPayload'
-      - description: EdgeGroup data when method is file
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/edgejobs.edgeJobCreateFromFilePayload'
+        - description: Creation Method
+          enum:
+            - file
+            - string
+          in: query
+          name: method
+          required: true
+          type: string
+        - description: EdgeGroup data when method is string
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/edgejobs.edgeJobCreateFromFileContentPayload'
+        - description: EdgeGroup data when method is file
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/edgejobs.edgeJobCreateFromFilePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeGroup'
-        "500":
-          description: ""
-        "503":
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Create an EdgeJob
       tags:
-      - edge_jobs
+        - edge_jobs
   /edge_jobs/{id}:
     delete:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeJob Id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: EdgeJob Id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
-          description: ""
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '204':
+          description: ''
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Delete an EdgeJob
       tags:
-      - edge_jobs
+        - edge_jobs
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeJob Id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: EdgeJob Id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeJob'
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect an EdgeJob
       tags:
-      - edge_jobs
+        - edge_jobs
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeJob Id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: EdgeGroup data
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/edgejobs.edgeJobUpdatePayload'
+        - description: EdgeJob Id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: EdgeGroup data
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/edgejobs.edgeJobUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeJob'
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Update an EdgeJob
       tags:
-      - edge_jobs
+        - edge_jobs
   /edge_jobs/{id}/file:
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeJob Id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: EdgeJob Id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/edgejobs.edgeJobFileResponse'
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Fetch a file of an EdgeJob
       tags:
-      - edge_jobs
+        - edge_jobs
   /edge_jobs/{id}/tasks:
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeJob Id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: EdgeJob Id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             items:
               $ref: '#/definitions/edgejobs.taskContainer'
             type: array
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Fetch the list of tasks on an EdgeJob
       tags:
-      - edge_jobs
+        - edge_jobs
   /edge_jobs/{id}/tasks/{taskID}/logs:
     delete:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeJob Id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Task Id
-        in: path
-        name: taskID
-        required: true
-        type: string
+        - description: EdgeJob Id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Task Id
+          in: path
+          name: taskID
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
-          description: ""
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '204':
+          description: ''
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Clear the log for a specifc task on an EdgeJob
       tags:
-      - edge_jobs
+        - edge_jobs
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeJob Id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Task Id
-        in: path
-        name: taskID
-        required: true
-        type: string
+        - description: EdgeJob Id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Task Id
+          in: path
+          name: taskID
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/edgejobs.fileResponse'
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Fetch the log for a specifc task on an EdgeJob
       tags:
-      - edge_jobs
+        - edge_jobs
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeJob Id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Task Id
-        in: path
-        name: taskID
-        required: true
-        type: string
+        - description: EdgeJob Id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Task Id
+          in: path
+          name: taskID
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
-          description: ""
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '204':
+          description: ''
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Collect the log for a specifc task on an EdgeJob
       tags:
-      - edge_jobs
+        - edge_jobs
   /edge_stacks:
     get:
       consumes:
-      - application/json
+        - application/json
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             items:
               $ref: '#/definitions/portainer.EdgeStack'
             type: array
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Fetches the list of EdgeStacks
       tags:
-      - edge_stacks
+        - edge_stacks
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Creation Method
-        enum:
-        - file
-        - string
-        - repository
-        in: query
-        name: method
-        required: true
-        type: string
-      - description: Required when using method=string
-        in: body
-        name: body_string
-        required: true
-        schema:
-          $ref: '#/definitions/edgestacks.swarmStackFromFileContentPayload'
-      - description: Required when using method=file
-        in: body
-        name: body_file
-        required: true
-        schema:
-          $ref: '#/definitions/edgestacks.swarmStackFromFileUploadPayload'
-      - description: Required when using method=repository
-        in: body
-        name: body_repository
-        required: true
-        schema:
-          $ref: '#/definitions/edgestacks.swarmStackFromGitRepositoryPayload'
+        - description: Creation Method
+          enum:
+            - file
+            - string
+            - repository
+          in: query
+          name: method
+          required: true
+          type: string
+        - description: Required when using method=string
+          in: body
+          name: body_string
+          required: true
+          schema:
+            $ref: '#/definitions/edgestacks.swarmStackFromFileContentPayload'
+        - description: Required when using method=file
+          in: body
+          name: body_file
+          required: true
+          schema:
+            $ref: '#/definitions/edgestacks.swarmStackFromFileUploadPayload'
+        - description: Required when using method=repository
+          in: body
+          name: body_repository
+          required: true
+          schema:
+            $ref: '#/definitions/edgestacks.swarmStackFromGitRepositoryPayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeStack'
-        "500":
-          description: ""
-        "503":
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Create an EdgeStack
       tags:
-      - edge_stacks
+        - edge_stacks
   /edge_stacks/{id}:
     delete:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeStack Id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: EdgeStack Id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
-          description: ""
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '204':
+          description: ''
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Delete an EdgeStack
       tags:
-      - edge_stacks
+        - edge_stacks
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeStack Id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: EdgeStack Id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeStack'
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect an EdgeStack
       tags:
-      - edge_stacks
+        - edge_stacks
     put:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeStack Id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: EdgeStack data
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/edgestacks.updateEdgeStackPayload'
+        - description: EdgeStack Id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: EdgeStack data
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/edgestacks.updateEdgeStackPayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeStack'
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Update an EdgeStack
       tags:
-      - edge_stacks
+        - edge_stacks
   /edge_stacks/{id}/file:
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: EdgeStack Id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: EdgeStack Id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/edgestacks.stackFileResponse'
-        "400":
-          description: ""
-        "500":
-          description: ""
-        "503":
+        '400':
+          description: ''
+        '500':
+          description: ''
+        '503':
           description: Service Unavailable
           schema:
             type: Edge
       security:
-      - jwt: []
+        - jwt: []
       summary: Fetches the stack file for an EdgeStack
       tags:
-      - edge_stacks
+        - edge_stacks
   /edge_stacks/{id}/status:
     put:
       consumes:
-      - application/json
+        - application/json
       description: Authorized only if the request is done by an Edge Endpoint
       parameters:
-      - description: EdgeStack Id
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: EdgeStack Id
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.EdgeStack'
-        "400":
-          description: ""
-        "403":
-          description: ""
-        "404":
-          description: ""
-        "500":
-          description: ""
+        '400':
+          description: ''
+        '403':
+          description: ''
+        '404':
+          description: ''
+        '500':
+          description: ''
       summary: Update an EdgeStack status
       tags:
-      - edge_stacks
+        - edge_stacks
   /edge_templates:
     get:
       consumes:
-      - application/json
+        - application/json
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             items:
               $ref: '#/definitions/portainer.Template'
             type: array
-        "500":
-          description: ""
+        '500':
+          description: ''
       security:
-      - jwt: []
+        - jwt: []
       summary: Fetches the list of Edge Templates
       tags:
-      - edge_templates
+        - edge_templates
   /endpoint_groups:
     get:
       description: |-
@@ -3613,207 +3623,207 @@ paths:
         **Access policy**: restricted
       operationId: EndpointGroupList
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Endpoint group
           schema:
             items:
               $ref: '#/definitions/portainer.EndpointGroup'
             type: array
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List Endpoint groups
       tags:
-      - endpoint_groups
+        - endpoint_groups
     post:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Create a new endpoint group.
         **Access policy**: administrator
       parameters:
-      - description: Endpoint Group details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/endpointgroups.endpointGroupCreatePayload'
+        - description: Endpoint Group details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/endpointgroups.endpointGroupCreatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.EndpointGroup'
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Create an Endpoint Group
       tags:
-      - endpoint_groups
+        - endpoint_groups
   /endpoint_groups/:id:
     get:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Retrieve details abont an endpoint group.
         **Access policy**: administrator
       parameters:
-      - description: Endpoint group identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Endpoint group identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.EndpointGroup'
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: EndpointGroup not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect an Endpoint group
       tags:
-      - endpoint_groups
+        - endpoint_groups
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update an endpoint group.
         **Access policy**: administrator
       operationId: EndpointGroupUpdate
       parameters:
-      - description: EndpointGroup identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: EndpointGroup details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/endpointgroups.endpointGroupUpdatePayload'
+        - description: EndpointGroup identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: EndpointGroup details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/endpointgroups.endpointGroupUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.EndpointGroup'
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: EndpointGroup not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update an endpoint group
       tags:
-      - endpoint_groups
+        - endpoint_groups
   /endpoint_groups/{id}:
     delete:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Remove an endpoint group.
         **Access policy**: administrator
       operationId: EndpointGroupDelete
       parameters:
-      - description: EndpointGroup identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: EndpointGroup identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: EndpointGroup not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove an endpoint group
       tags:
-      - endpoint_groups
+        - endpoint_groups
   /endpoint_groups/{id}/endpoints/{endpointId}:
     delete:
       description: '**Access policy**: administrator'
       operationId: EndpointGroupDeleteEndpoint
       parameters:
-      - description: EndpointGroup identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Endpoint identifier
-        in: path
-        name: endpointId
-        required: true
-        type: integer
+        - description: EndpointGroup identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Endpoint identifier
+          in: path
+          name: endpointId
+          required: true
+          type: integer
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: EndpointGroup not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Removes endpoint from an endpoint group
       tags:
-      - endpoint_groups
+        - endpoint_groups
     put:
       description: |-
         Add an endpoint to an endpoint group
         **Access policy**: administrator
       operationId: EndpointGroupAddEndpoint
       parameters:
-      - description: EndpointGroup identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Endpoint identifier
-        in: path
-        name: endpointId
-        required: true
-        type: integer
+        - description: EndpointGroup identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Endpoint identifier
+          in: path
+          name: endpointId
+          required: true
+          type: integer
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: EndpointGroup not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Add an endpoint to an endpoint group
       tags:
-      - endpoint_groups
+        - endpoint_groups
   /endpoints:
     get:
       description: |-
@@ -3823,160 +3833,160 @@ paths:
         **Access policy**: restricted
       operationId: EndpointList
       parameters:
-      - description: Start searching from
-        in: query
-        name: start
-        type: integer
-      - description: Search query
-        in: query
-        name: search
-        type: string
-      - description: List endpoints of this group
-        in: query
-        name: groupId
-        type: integer
-      - description: Limit results to this value
-        in: query
-        name: limit
-        type: integer
-      - description: List endpoints of this type
-        in: query
-        name: type
-        type: integer
-      - description: search endpoints with these tags (depends on tagsPartialMatch)
-        in: query
-        items:
+        - description: Start searching from
+          in: query
+          name: start
           type: integer
-        name: tagIds
-        type: array
-      - description: If true, will return endpoint which has one of tagIds, if false
-          (or missing) will return only endpoints that has all the tags
-        in: query
-        name: tagsPartialMatch
-        type: boolean
-      - description: will return only these endpoints
-        in: query
-        items:
+        - description: Search query
+          in: query
+          name: search
+          type: string
+        - description: List endpoints of this group
+          in: query
+          name: groupId
           type: integer
-        name: endpointIds
-        type: array
+        - description: Limit results to this value
+          in: query
+          name: limit
+          type: integer
+        - description: List endpoints of this type
+          in: query
+          name: type
+          type: integer
+        - description: search endpoints with these tags (depends on tagsPartialMatch)
+          in: query
+          items:
+            type: integer
+          name: tagIds
+          type: array
+        - description: If true, will return endpoint which has one of tagIds, if false
+            (or missing) will return only endpoints that has all the tags
+          in: query
+          name: tagsPartialMatch
+          type: boolean
+        - description: will return only these endpoints
+          in: query
+          items:
+            type: integer
+          name: endpointIds
+          type: array
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Endpoints
           schema:
             items:
               $ref: '#/definitions/portainer.Endpoint'
             type: array
-        "500":
+        '500':
           description: Internal Server Error
           schema:
             type: Server
       security:
-      - jwt: []
+        - jwt: []
       summary: List endpoints
       tags:
-      - endpoints
+        - endpoints
     post:
       consumes:
-      - multipart/form-data
+        - multipart/form-data
       description: |-
         Create a new endpoint that will be used to manage an environment.
         **Access policy**: administrator
       operationId: EndpointCreate
       parameters:
-      - description: 'Name that will be used to identify this endpoint (example: my-endpoint)'
-        in: formData
-        name: Name
-        required: true
-        type: string
-      - description: 'Environment type. Value must be one of: 1 (Local Docker environment),
-          2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment)
-          or 5 (Local Kubernetes Environment'
-        in: formData
-        name: EndpointType
-        required: true
-        type: integer
-      - description: 'URL or IP address of a Docker host (example: docker.mydomain.tld:2375).
-          Defaults to local if not specified (Linux: /var/run/docker.sock, Windows:
-          //./pipe/docker_engine)'
-        in: formData
-        name: URL
-        type: string
-      - description: 'URL or IP address where exposed containers will be reachable.
-          Defaults to URL if not specified (example: docker.mydomain.tld:2375)'
-        in: formData
-        name: PublicURL
-        type: string
-      - description: Endpoint group identifier. If not specified will default to 1
-          (unassigned).
-        in: formData
-        name: GroupID
-        type: integer
-      - description: Require TLS to connect against this endpoint
-        in: formData
-        name: TLS
-        type: boolean
-      - description: Skip server verification when using TLS
-        in: formData
-        name: TLSSkipVerify
-        type: boolean
-      - description: Skip client verification when using TLS
-        in: formData
-        name: TLSSkipClientVerify
-        type: boolean
-      - description: TLS CA certificate file
-        in: formData
-        name: TLSCACertFile
-        type: file
-      - description: TLS client certificate file
-        in: formData
-        name: TLSCertFile
-        type: file
-      - description: TLS client key file
-        in: formData
-        name: TLSKeyFile
-        type: file
-      - description: Azure application ID. Required if endpoint type is set to 3
-        in: formData
-        name: AzureApplicationID
-        type: string
-      - description: Azure tenant ID. Required if endpoint type is set to 3
-        in: formData
-        name: AzureTenantID
-        type: string
-      - description: Azure authentication key. Required if endpoint type is set to
-          3
-        in: formData
-        name: AzureAuthenticationKey
-        type: string
-      - description: List of tag identifiers to which this endpoint is associated
-        in: formData
-        items:
+        - description: 'Name that will be used to identify this endpoint (example: my-endpoint)'
+          in: formData
+          name: Name
+          required: true
+          type: string
+        - description: 'Environment type. Value must be one of: 1 (Local Docker environment),
+            2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment)
+            or 5 (Local Kubernetes Environment'
+          in: formData
+          name: EndpointType
+          required: true
           type: integer
-        name: TagIDs
-        type: array
-      - description: The check in interval for edge agent (in seconds)
-        in: formData
-        name: EdgeCheckinInterval
-        type: integer
+        - description: 'URL or IP address of a Docker host (example: docker.mydomain.tld:2375).
+            Defaults to local if not specified (Linux: /var/run/docker.sock, Windows:
+            //./pipe/docker_engine)'
+          in: formData
+          name: URL
+          type: string
+        - description: 'URL or IP address where exposed containers will be reachable.
+            Defaults to URL if not specified (example: docker.mydomain.tld:2375)'
+          in: formData
+          name: PublicURL
+          type: string
+        - description: Endpoint group identifier. If not specified will default to 1
+            (unassigned).
+          in: formData
+          name: GroupID
+          type: integer
+        - description: Require TLS to connect against this endpoint
+          in: formData
+          name: TLS
+          type: boolean
+        - description: Skip server verification when using TLS
+          in: formData
+          name: TLSSkipVerify
+          type: boolean
+        - description: Skip client verification when using TLS
+          in: formData
+          name: TLSSkipClientVerify
+          type: boolean
+        - description: TLS CA certificate file
+          in: formData
+          name: TLSCACertFile
+          type: file
+        - description: TLS client certificate file
+          in: formData
+          name: TLSCertFile
+          type: file
+        - description: TLS client key file
+          in: formData
+          name: TLSKeyFile
+          type: file
+        - description: Azure application ID. Required if endpoint type is set to 3
+          in: formData
+          name: AzureApplicationID
+          type: string
+        - description: Azure tenant ID. Required if endpoint type is set to 3
+          in: formData
+          name: AzureTenantID
+          type: string
+        - description: Azure authentication key. Required if endpoint type is set to
+            3
+          in: formData
+          name: AzureAuthenticationKey
+          type: string
+        - description: List of tag identifiers to which this endpoint is associated
+          in: formData
+          items:
+            type: integer
+          name: TagIDs
+          type: array
+        - description: The check in interval for edge agent (in seconds)
+          in: formData
+          name: EdgeCheckinInterval
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Endpoint'
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Create a new endpoint
       tags:
-      - endpoints
+        - endpoints
   /endpoints/{id}:
     delete:
       description: |-
@@ -3984,152 +3994,152 @@ paths:
         **Access policy**: administrator
       operationId: EndpointDelete
       parameters:
-      - description: Endpoint identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Endpoint identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: Endpoint not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove an endpoint
       tags:
-      - endpoints
+        - endpoints
     get:
       description: |-
         Retrieve details about an endpoint.
         **Access policy**: restricted
       operationId: EndpointInspect
       parameters:
-      - description: Endpoint identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Endpoint identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Endpoint'
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: Endpoint not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect an endpoint
       tags:
-      - endpoints
+        - endpoints
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update an endpoint.
         **Access policy**: administrator
       operationId: EndpointUpdate
       parameters:
-      - description: Endpoint identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Endpoint details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/endpoints.endpointUpdatePayload'
+        - description: Endpoint identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Endpoint details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/endpoints.endpointUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Endpoint'
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: Endpoint not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update an endpoint
       tags:
-      - endpoints
+        - endpoints
   /endpoints/{id}/edge/jobs/{jobID}/logs:
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Endpoint Id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Job Id
-        in: path
-        name: jobID
-        required: true
-        type: string
+        - description: Endpoint Id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Job Id
+          in: path
+          name: jobID
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
-          description: ""
-        "400":
-          description: ""
-        "500":
-          description: ""
+        '200':
+          description: ''
+        '400':
+          description: ''
+        '500':
+          description: ''
       summary: Inspect an EdgeJob Log
       tags:
-      - edge
-      - endpoints
+        - edge
+        - endpoints
   /endpoints/{id}/edge/stacks/{stackId}:
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Endpoint Id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: EdgeStack Id
-        in: path
-        name: stackID
-        required: true
-        type: string
+        - description: Endpoint Id
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: EdgeStack Id
+          in: path
+          name: stackID
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/endpointedge.configResponse'
-        "400":
-          description: ""
-        "404":
-          description: ""
-        "500":
-          description: ""
+        '400':
+          description: ''
+        '404':
+          description: ''
+        '500':
+          description: ''
       summary: Inspect an Edge Stack for an Endpoint
       tags:
-      - edge
-      - endpoints
-      - edge_stacks
+        - edge
+        - endpoints
+        - edge_stacks
   /endpoints/{id}/snapshot:
     post:
       description: |-
@@ -4137,25 +4147,25 @@ paths:
         **Access policy**: restricted
       operationId: EndpointSnapshot
       parameters:
-      - description: Endpoint identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Endpoint identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: Endpoint not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Snapshots an endpoint
       tags:
-      - endpoints
+        - endpoints
   /endpoints/{id}/edge/status:
     get:
       description: |-
@@ -4163,29 +4173,29 @@ paths:
         **Access policy**: restricted only to Edge endpoints
       operationId: EndpointEdgeStatusInspect
       parameters:
-      - description: Endpoint identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Endpoint identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/endpoints.endpointEdgeStatusInspectResponse'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied to access endpoint
-        "404":
+        '404':
           description: Endpoint not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Get endpoint status
       tags:
-      - endpoints
+        - endpoints
   /endpoints/snapshot:
     post:
       description: |-
@@ -4193,29 +4203,29 @@ paths:
         **Access policy**: administrator
       operationId: EndpointSnapshots
       responses:
-        "204":
+        '204':
           description: Success
-        "500":
+        '500':
           description: Server Error
       security:
-      - jwt: []
+        - jwt: []
       summary: Snapshot all endpoints
       tags:
-      - endpoints
+        - endpoints
   /motd:
     get:
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/motd.motdResponse'
       security:
-      - jwt: []
+        - jwt: []
       summary: fetches the message of the day
       tags:
-      - motd
+        - motd
   /registries:
     get:
       description: |-
@@ -4225,51 +4235,51 @@ paths:
         **Access policy**: restricted
       operationId: RegistryList
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.Registry'
             type: array
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List Registries
       tags:
-      - registries
+        - registries
     post:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Create a new registry.
         **Access policy**: administrator
       operationId: RegistryCreate
       parameters:
-      - description: Registry details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/registries.registryCreatePayload'
+        - description: Registry details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/registries.registryCreatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Registry'
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Create a new registry
       tags:
-      - registries
+        - registries
   /registries/{id}:
     delete:
       description: |-
@@ -4277,230 +4287,230 @@ paths:
         **Access policy**: administrator
       operationId: RegistryDelete
       parameters:
-      - description: Registry identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Registry identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: Registry not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove a registry
       tags:
-      - registries
+        - registries
     get:
       description: |-
         Retrieve details about a registry.
         **Access policy**: administrator
       operationId: RegistryInspect
       parameters:
-      - description: Registry identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Registry identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Registry'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied to access registry
-        "404":
+        '404':
           description: Registry not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect a registry
       tags:
-      - registries
+        - registries
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update a registry
         **Access policy**: administrator
       operationId: RegistryUpdate
       parameters:
-      - description: Registry identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Registry details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/registries.registryUpdatePayload'
+        - description: Registry identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Registry details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/registries.registryUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Registry'
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: Registry not found
-        "409":
+        '409':
           description: Another registry with the same URL already exists
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update a registry
       tags:
-      - registries
+        - registries
   /registries/{id}/configure:
     post:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Configures a registry.
         **Access policy**: admin
       operationId: RegistryConfigure
       parameters:
-      - description: Registry identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Registry configuration
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/registries.registryConfigurePayload'
+        - description: Registry identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Registry configuration
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/registries.registryConfigurePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: Registry not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Configures a registry
       tags:
-      - registries
+        - registries
   /resource_controls:
     post:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Create a new resource control to restrict access to a Docker resource.
         **Access policy**: administrator
       operationId: ResourceControlCreate
       parameters:
-      - description: Resource control details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/resourcecontrols.resourceControlCreatePayload'
+        - description: Resource control details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/resourcecontrols.resourceControlCreatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.ResourceControl'
-        "400":
+        '400':
           description: Invalid request
-        "409":
+        '409':
           description: Resource control already exists
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Create a new resource control
       tags:
-      - resource_controls
+        - resource_controls
   /resource_controls/{id}:
     delete:
       description: |-
         Remove a resource control.
         **Access policy**: administrator
       parameters:
-      - description: Resource control identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Resource control identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "404":
+        '404':
           description: Resource control not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove a resource control
       tags:
-      - resource_controls
+        - resource_controls
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update a resource control
         **Access policy**: restricted
       operationId: ResourceControlUpdate
       parameters:
-      - description: Resource control identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Resource control details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/resourcecontrols.resourceControlUpdatePayload'
+        - description: Resource control identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Resource control details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/resourcecontrols.resourceControlUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.ResourceControl'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Unauthorized
-        "404":
+        '404':
           description: Resource control not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update a resource control
       tags:
-      - resource_controls
+        - resource_controls
   /roles:
     get:
       description: |-
@@ -4508,21 +4518,21 @@ paths:
         **Access policy**: administrator
       operationId: RoleList
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.Role'
             type: array
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List roles
       tags:
-      - roles
+        - roles
   /settings:
     get:
       description: |-
@@ -4530,93 +4540,93 @@ paths:
         **Access policy**: administrator
       operationId: SettingsInspect
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Settings'
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Retrieve Portainer settings
       tags:
-      - settings
+        - settings
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update Portainer settings.
         **Access policy**: administrator
       operationId: SettingsUpdate
       parameters:
-      - description: New settings
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/settings.settingsUpdatePayload'
+        - description: New settings
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/settings.settingsUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Settings'
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update Portainer settings
       tags:
-      - settings
+        - settings
   /settings/ldap/check:
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Test LDAP connectivity using LDAP details
         **Access policy**: administrator
       operationId: SettingsLDAPCheck
       parameters:
-      - description: details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/settings.settingsLDAPCheckPayload'
+        - description: details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/settings.settingsLDAPCheckPayload'
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Test LDAP connectivity
       tags:
-      - settings
+        - settings
   /settings/public:
     get:
       description: |-
         Retrieve public settings. Returns a small set of settings that are not reserved to administrators only.
         **Access policy**: public
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/settings.publicSettingsResponse'
-        "500":
+        '500':
           description: Server error
       summary: Retrieve Portainer public settings
       tags:
-      - settings
+        - settings
   /stacks:
     get:
       description: |-
@@ -4626,116 +4636,116 @@ paths:
         **Access policy**: restricted
       operationId: StackList
       parameters:
-      - description: Filters to process on the stack list. Encoded as JSON (a map[string]string).
-          For example, {
-        in: query
-        name: filters
-        type: string
+        - description: Filters to process on the stack list. Encoded as JSON (a map[string]string).
+            For example, {
+          in: query
+          name: filters
+          type: string
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.Stack'
             type: array
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List stacks
       tags:
-      - stacks
+        - stacks
     post:
       consumes:
-      - application/json
-      - ' multipart/form-data'
+        - application/json
+        - ' multipart/form-data'
       description: |-
         Deploy a new stack into a Docker environment specified via the endpoint identifier.
         **Access policy**: restricted
       operationId: StackCreate
       parameters:
-      - description: 'Stack deployment type. Possible values: 1 (Swarm stack) or 2
-          (Compose stack).'
-        enum:
-        - 1
-        - 2
-        in: query
-        name: type
-        required: true
-        type: integer
-      - description: 'Stack deployment method. Possible values: file, string or repository.'
-        enum:
-        - string
-        - file
-        - repository
-        in: query
-        name: method
-        required: true
-        type: string
-      - description: Identifier of the endpoint that will be used to deploy the stack
-        in: query
-        name: endpointId
-        required: true
-        type: integer
-      - description: Required when using method=string and type=1
-        in: body
-        name: body_swarm_string
-        schema:
-          $ref: '#/definitions/stacks.swarmStackFromFileContentPayload'
-      - description: Required when using method=repository and type=1
-        in: body
-        name: body_swarm_repository
-        schema:
-          $ref: '#/definitions/stacks.swarmStackFromGitRepositoryPayload'
-      - description: Required when using method=string and type=2
-        in: body
-        name: body_compose_string
-        schema:
-          $ref: '#/definitions/stacks.composeStackFromFileContentPayload'
-      - description: Required when using method=repository and type=2
-        in: body
-        name: body_compose_repository
-        schema:
-          $ref: '#/definitions/stacks.composeStackFromGitRepositoryPayload'
-      - description: Name of the stack. required when method is file
-        in: formData
-        name: Name
-        type: string
-      - description: Swarm cluster identifier. Required when method equals file and
-          type equals 1. required when method is file
-        in: formData
-        name: SwarmID
-        type: string
-      - description: 'Environment variables passed during deployment, represented
-          as a JSON array [{''name'': ''name'', ''value'': ''value''}]. Optional,
-          used when method equals file and type equals 1.'
-        in: formData
-        name: Env
-        type: string
-      - description: Stack file. required when method is file
-        in: formData
-        name: file
-        type: file
+        - description: 'Stack deployment type. Possible values: 1 (Swarm stack) or 2
+            (Compose stack).'
+          enum:
+            - 1
+            - 2
+          in: query
+          name: type
+          required: true
+          type: integer
+        - description: 'Stack deployment method. Possible values: file, string or repository.'
+          enum:
+            - string
+            - file
+            - repository
+          in: query
+          name: method
+          required: true
+          type: string
+        - description: Identifier of the endpoint that will be used to deploy the stack
+          in: query
+          name: endpointId
+          required: true
+          type: integer
+        - description: Required when using method=string and type=1
+          in: body
+          name: body_swarm_string
+          schema:
+            $ref: '#/definitions/stacks.swarmStackFromFileContentPayload'
+        - description: Required when using method=repository and type=1
+          in: body
+          name: body_swarm_repository
+          schema:
+            $ref: '#/definitions/stacks.swarmStackFromGitRepositoryPayload'
+        - description: Required when using method=string and type=2
+          in: body
+          name: body_compose_string
+          schema:
+            $ref: '#/definitions/stacks.composeStackFromFileContentPayload'
+        - description: Required when using method=repository and type=2
+          in: body
+          name: body_compose_repository
+          schema:
+            $ref: '#/definitions/stacks.composeStackFromGitRepositoryPayload'
+        - description: Name of the stack. required when method is file
+          in: formData
+          name: Name
+          type: string
+        - description: Swarm cluster identifier. Required when method equals file and
+            type equals 1. required when method is file
+          in: formData
+          name: SwarmID
+          type: string
+        - description: "Environment variables passed during deployment, represented
+            as a JSON array [{'name': 'name', 'value': 'value'}]. Optional,
+            used when method equals file and type equals 1."
+          in: formData
+          name: Env
+          type: string
+        - description: Stack file. required when method is file
+          in: formData
+          name: file
+          type: file
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.CustomTemplate'
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Deploy a new stack
       tags:
-      - stacks
+        - stacks
   /stacks/{id}:
     delete:
       description: |-
@@ -4743,113 +4753,113 @@ paths:
         **Access policy**: restricted
       operationId: StackDelete
       parameters:
-      - description: Stack identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Set to true to delete an external stack. Only external Swarm
-          stacks are supported
-        in: query
-        name: external
-        type: boolean
-      - description: Endpoint identifier used to remove an external stack (required
-          when external is set to true)
-        in: query
-        name: endpointId
-        type: integer
+        - description: Stack identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Set to true to delete an external stack. Only external Swarm
+            stacks are supported
+          in: query
+          name: external
+          type: boolean
+        - description: Endpoint identifier used to remove an external stack (required
+            when external is set to true)
+          in: query
+          name: endpointId
+          type: integer
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: ' not found'
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove a stack
       tags:
-      - stacks
+        - stacks
     get:
       description: |-
         Retrieve details about a stack.
         **Access policy**: restricted
       operationId: StackInspect
       parameters:
-      - description: Stack identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Stack identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Stack'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: Stack not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect a stack
       tags:
-      - stacks
+        - stacks
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update a stack.
         **Access policy**: restricted
       operationId: StackUpdate
       parameters:
-      - description: Stack identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Stacks created before version 1.18.0 might not have an associated
-          endpoint identifier. Use this optional parameter to set the endpoint identifier
-          used by the stack.
-        in: query
-        name: endpointId
-        type: integer
-      - description: Stack details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/stacks.updateSwarmStackPayload'
+        - description: Stack identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Stacks created before version 1.18.0 might not have an associated
+            endpoint identifier. Use this optional parameter to set the endpoint identifier
+            used by the stack.
+          in: query
+          name: endpointId
+          type: integer
+        - description: Stack details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/stacks.updateSwarmStackPayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Stack'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: ' not found'
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update a stack
       tags:
-      - stacks
+        - stacks
   /stacks/{id}/file:
     get:
       description: |-
@@ -4857,31 +4867,31 @@ paths:
         **Access policy**: restricted
       operationId: StackFileInspect
       parameters:
-      - description: Stack identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Stack identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/stacks.stackFileResponse'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: Stack not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Retrieve the content of the Stack file for the specified stack
       tags:
-      - stacks
+        - stacks
   /stacks/{id}/migrate:
     post:
       description: |-
@@ -4889,43 +4899,43 @@ paths:
         **Access policy**: restricted
       operationId: StackMigrate
       parameters:
-      - description: Stack identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Stacks created before version 1.18.0 might not have an associated
-          endpoint identifier. Use this optional parameter to set the endpoint identifier
-          used by the stack.
-        in: query
-        name: endpointId
-        type: integer
-      - description: Stack migration details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/stacks.stackMigratePayload'
+        - description: Stack identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Stacks created before version 1.18.0 might not have an associated
+            endpoint identifier. Use this optional parameter to set the endpoint identifier
+            used by the stack.
+          in: query
+          name: endpointId
+          type: integer
+        - description: Stack migration details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/stacks.stackMigratePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Stack'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: Stack not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Migrate a stack to another endpoint
       tags:
-      - stacks
+        - stacks
   /stacks/{id}/start:
     post:
       description: |-
@@ -4933,29 +4943,29 @@ paths:
         **Access policy**: restricted
       operationId: StackStart
       parameters:
-      - description: Stack identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Stack identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Stack'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: ' not found'
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Starts a stopped Stack
       tags:
-      - stacks
+        - stacks
   /stacks/{id}/stop:
     post:
       description: |-
@@ -4963,29 +4973,29 @@ paths:
         **Access policy**: restricted
       operationId: StackStop
       parameters:
-      - description: Stack identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Stack identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Stack'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: ' not found'
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Stops a stopped Stack
       tags:
-      - stacks
+        - stacks
   /status:
     get:
       description: |-
@@ -4993,15 +5003,15 @@ paths:
         **Access policy**: public
       operationId: StatusInspect
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Status'
       summary: Check Portainer status
       tags:
-      - status
+        - status
   /status/version:
     get:
       description: |-
@@ -5009,17 +5019,17 @@ paths:
         **Access policy**: authenticated
       operationId: StatusInspectVersion
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/status.inspectVersionResponse'
       security:
-      - jwt: []
+        - jwt: []
       summary: Check for portainer updates
       tags:
-      - status
+        - status
   /tags:
     get:
       description: |-
@@ -5027,156 +5037,156 @@ paths:
         **Access policy**: administrator
       operationId: TagList
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.Tag'
             type: array
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List tags
       tags:
-      - tags
+        - tags
     post:
       description: |-
         Create a new tag.
         **Access policy**: administrator
       operationId: TagCreate
       parameters:
-      - description: Tag details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/tags.tagCreatePayload'
+        - description: Tag details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/tags.tagCreatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Tag'
-        "409":
+        '409':
           description: Tag name exists
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Create a new tag
       tags:
-      - tags
+        - tags
   /tags/{id}:
     delete:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Remove a tag.
         **Access policy**: administrator
       operationId: TagDelete
       parameters:
-      - description: Tag identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Tag identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: Tag not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove a tag
       tags:
-      - tags
+        - tags
   /team:
     post:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Create a new team.
         **Access policy**: administrator
       operationId: TeamCreate
       parameters:
-      - description: details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/teams.teamCreatePayload'
+        - description: details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/teams.teamCreatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Team'
-        "400":
+        '400':
           description: Invalid request
-        "409":
+        '409':
           description: Team already exists
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Create a new team
       tags:
-      - teams
+        - teams
   /team/{id}:
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update a team.
         **Access policy**: administrator
       operationId: TeamUpdate
       parameters:
-      - description: Team identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Team details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/teams.teamUpdatePayload'
+        - description: Team identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Team details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/teams.teamUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Team'
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: Team not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update a team
       tags:
-      - ""
+        - ''
   /team_memberships:
     get:
       description: |-
@@ -5184,61 +5194,61 @@ paths:
         **Access policy**: admin
       operationId: TeamMembershipList
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.TeamMembership'
             type: array
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List team memberships
       tags:
-      - team_memberships
+        - team_memberships
     post:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Create a new team memberships. Access is only available to administrators leaders of the associated team.
         **Access policy**: admin
       operationId: TeamMembershipCreate
       parameters:
-      - description: Team membership details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/teammemberships.teamMembershipCreatePayload'
+        - description: Team membership details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/teammemberships.teamMembershipCreatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.TeamMembership'
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied to manage memberships
-        "409":
+        '409':
           description: Team membership already registered
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Create a new team membership
       tags:
-      - team_memberships
+        - team_memberships
   /team_memberships/{id}:
     delete:
       description: |-
@@ -5246,66 +5256,66 @@ paths:
         **Access policy**: restricted
       operationId: TeamMembershipDelete
       parameters:
-      - description: TeamMembership identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: TeamMembership identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: TeamMembership not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove a team membership
       tags:
-      - team_memberships
+        - team_memberships
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update a team membership. Access is only available to administrators leaders of the associated team.
         **Access policy**: restricted
       operationId: TeamMembershipUpdate
       parameters:
-      - description: Team membership identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Team membership details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/teammemberships.teamMembershipUpdatePayload'
+        - description: Team membership identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Team membership details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/teammemberships.teamMembershipUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.TeamMembership'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: TeamMembership not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update a team membership
       tags:
-      - team_memberships
+        - team_memberships
   /teams:
     get:
       description: |-
@@ -5313,21 +5323,21 @@ paths:
         **Access policy**: restricted
       operationId: TeamList
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.Team'
             type: array
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List teams
       tags:
-      - teams
+        - teams
   /teams/{id}:
     delete:
       description: |-
@@ -5335,54 +5345,54 @@ paths:
         **Access policy**: administrator
       operationId: TeamDelete
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: Team not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove a team
       tags:
-      - teams
+        - teams
     get:
       description: |-
         Retrieve details about a team. Access is only available for administrator and leaders of that team.
         **Access policy**: restricted
       operationId: TeamInspect
       parameters:
-      - description: Team identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Team identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.Team'
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: Team not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect a team
       tags:
-      - teams
+        - teams
   /teams/{id}/memberships:
     get:
       description: |-
@@ -5390,25 +5400,25 @@ paths:
         **Access policy**: restricted
       operationId: TeamMemberships
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.TeamMembership'
             type: array
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List team memberships
       tags:
-      - team_memberships
+        - team_memberships
   /templates:
     get:
       description: |-
@@ -5416,93 +5426,93 @@ paths:
         **Access policy**: restricted
       operationId: TemplateList
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/templates.listResponse'
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List available templates
       tags:
-      - templates
+        - templates
   /templates/file:
     post:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Get a template's file
         **Access policy**: restricted
       operationId: TemplateFile
       parameters:
-      - description: File details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/templates.filePayload'
+        - description: File details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/templates.filePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/templates.fileResponse'
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Get a template's file
       tags:
-      - templates
+        - templates
   /upload/tls/{certificate}:
     post:
       consumes:
-      - multipart/form-data
+        - multipart/form-data
       description: |-
         Use this endpoint to upload TLS files.
         **Access policy**: administrator
       operationId: UploadTLS
       parameters:
-      - description: TLS file type. Valid values are 'ca', 'cert' or 'key'.
-        enum:
-        - ca
-        - cert
-        - key
-        in: path
-        name: certificate
-        required: true
-        type: string
-      - description: Folder where the TLS file will be stored. Will be created if
-          not existing
-        in: formData
-        name: folder
-        required: true
-        type: string
-      - description: The file to upload
-        in: formData
-        name: file
-        required: true
-        type: file
+        - description: TLS file type. Valid values are 'ca', 'cert' or 'key'.
+          enum:
+            - ca
+            - cert
+            - key
+          in: path
+          name: certificate
+          required: true
+          type: string
+        - description: Folder where the TLS file will be stored. Will be created if
+            not existing
+          in: formData
+          name: folder
+          required: true
+          type: string
+        - description: The file to upload
+          in: formData
+          name: file
+          required: true
+          type: file
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Upload TLS files
       tags:
-      - upload
+        - upload
   /users:
     get:
       description: |-
@@ -5511,26 +5521,26 @@ paths:
         **Access policy**: restricted
       operationId: UserList
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.User'
             type: array
-        "400":
+        '400':
           description: Invalid request
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: List users
       tags:
-      - users
+        - users
     post:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Create a new Portainer user.
         Only team leaders and administrators can create users.
@@ -5538,136 +5548,136 @@ paths:
         **Access policy**: restricted
       operationId: UserCreate
       parameters:
-      - description: User details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/users.userCreatePayload'
+        - description: User details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/users.userCreatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.User'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "409":
+        '409':
           description: User already exists
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Create a new user
       tags:
-      - users
+        - users
   /users/{id}:
     delete:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Remove a user.
         **Access policy**: administrator
       operationId: UserDelete
       parameters:
-      - description: User identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: User identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: User not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Remove a user
       tags:
-      - users
+        - users
     get:
       description: |-
         Retrieve details about a user.
         **Access policy**: administrator
       operationId: UserInspect
       parameters:
-      - description: User identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: User identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.User'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: User not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect a user
       tags:
-      - users
+        - users
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update user details. A regular user account can only update his details.
         **Access policy**: authenticated
       operationId: UserUpdate
       parameters:
-      - description: User identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: User details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/users.userUpdatePayload'
+        - description: User identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: User details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/users.userUpdatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.User'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: User not found
-        "409":
+        '409':
           description: Username already exist
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update a user
       tags:
-      - users
+        - users
   /users/{id}/memberships:
     get:
       description: |-
@@ -5675,67 +5685,67 @@ paths:
         **Access policy**: authenticated
       operationId: UserMembershipsInspect
       parameters:
-      - description: User identifier
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: User identifier
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.TeamMembership'
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Inspect a user memberships
       tags:
-      - users
+        - users
   /users/{id}/passwd:
     put:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Update password for the specified user.
         **Access policy**: authenticated
       operationId: UserUpdatePassword
       parameters:
-      - description: identifier
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/users.userUpdatePasswordPayload'
+        - description: identifier
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/users.userUpdatePasswordPayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "204":
+        '204':
           description: Success
-        "400":
+        '400':
           description: Invalid request
-        "403":
+        '403':
           description: Permission denied
-        "404":
+        '404':
           description: User not found
-        "500":
+        '500':
           description: Server error
       security:
-      - jwt: []
+        - jwt: []
       summary: Update password for a user
       tags:
-      - users
+        - users
   /users/admin/check:
     get:
       description: |-
@@ -5743,351 +5753,351 @@ paths:
         **Access policy**: public
       operationId: UserAdminCheck
       responses:
-        "204":
+        '204':
           description: Success
-        "404":
+        '404':
           description: User not found
       summary: Check administrator account existence
       tags:
-      - users
+        - users
   /users/admin/init:
     post:
       consumes:
-      - application/json
+        - application/json
       description: |-
         Initialize the 'admin' user account.
         **Access policy**: public
       operationId: UserAdminInit
       parameters:
-      - description: User details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/users.adminInitPayload'
+        - description: User details
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/users.adminInitPayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: Success
           schema:
             $ref: '#/definitions/portainer.User'
-        "400":
+        '400':
           description: Invalid request
-        "409":
+        '409':
           description: Admin user already initialized
-        "500":
+        '500':
           description: Server error
       summary: Initialize administrator account
       tags:
-      - ""
+        - ''
   /webhooks:
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Webhook data
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/webhooks.webhookCreatePayload'
-      - in: query
-        name: EndpointID
-        type: integer
-      - in: query
-        name: ResourceID
-        type: string
+        - description: Webhook data
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/webhooks.webhookCreatePayload'
+        - in: query
+          name: EndpointID
+          type: integer
+        - in: query
+          name: ResourceID
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             items:
               $ref: '#/definitions/portainer.Webhook'
             type: array
-        "400":
-          description: ""
-        "500":
-          description: ""
+        '400':
+          description: ''
+        '500':
+          description: ''
       security:
-      - jwt: []
+        - jwt: []
       summary: List webhooks
       tags:
-      - webhooks
+        - webhooks
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Webhook data
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/webhooks.webhookCreatePayload'
+        - description: Webhook data
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/webhooks.webhookCreatePayload'
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
+        '200':
           description: OK
           schema:
             $ref: '#/definitions/portainer.Webhook'
-        "400":
-          description: ""
-        "409":
-          description: ""
-        "500":
-          description: ""
+        '400':
+          description: ''
+        '409':
+          description: ''
+        '500':
+          description: ''
       security:
-      - jwt: []
+        - jwt: []
       summary: Create a webhook
       tags:
-      - webhooks
+        - webhooks
   /webhooks/{id}:
     delete:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Webhook id
-        in: path
-        name: id
-        required: true
-        type: integer
+        - description: Webhook id
+          in: path
+          name: id
+          required: true
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
-        "202":
+        '202':
           description: Webhook deleted
-        "400":
-          description: ""
-        "500":
-          description: ""
+        '400':
+          description: ''
+        '500':
+          description: ''
       security:
-      - jwt: []
+        - jwt: []
       summary: Delete a webhook
       tags:
-      - webhooks
+        - webhooks
   /webhooks/{token}:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Acts on a passed in token UUID to restart the docker service
       parameters:
-      - description: Webhook token
-        in: path
-        name: token
-        required: true
-        type: string
+        - description: Webhook token
+          in: path
+          name: token
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "202":
+        '202':
           description: Webhook executed
-        "400":
-          description: ""
-        "500":
-          description: ""
+        '400':
+          description: ''
+        '500':
+          description: ''
       summary: Execute a webhook
       tags:
-      - webhooks
+        - webhooks
   /websocket/attach:
     get:
       consumes:
-      - application/json
+        - application/json
       description: |-
         If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
         If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
         an AttachStart operation HTTP request will be created and hijacked.
         Authentication and access is controlled via the mandatory token query parameter.
       parameters:
-      - description: endpoint ID of the endpoint where the resource is located
-        in: query
-        name: endpointId
-        required: true
-        type: integer
-      - description: node name
-        in: query
-        name: nodeName
-        type: string
-      - description: JWT token used for authentication against this endpoint
-        in: query
-        name: token
-        required: true
-        type: string
+        - description: endpoint ID of the endpoint where the resource is located
+          in: query
+          name: endpointId
+          required: true
+          type: integer
+        - description: node name
+          in: query
+          name: nodeName
+          type: string
+        - description: JWT token used for authentication against this endpoint
+          in: query
+          name: token
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
-          description: ""
-        "400":
-          description: ""
-        "403":
-          description: ""
-        "404":
-          description: ""
-        "500":
-          description: ""
+        '200':
+          description: ''
+        '400':
+          description: ''
+        '403':
+          description: ''
+        '404':
+          description: ''
+        '500':
+          description: ''
       security:
-      - jwt: []
+        - jwt: []
       summary: Attach a websocket
       tags:
-      - websocket
+        - websocket
   /websocket/exec:
     get:
       consumes:
-      - application/json
+        - application/json
       description: |-
         If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
         If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
         an ExecStart operation HTTP request will be created and hijacked.
         Authentication and access is controlled via the mandatory token query parameter.
       parameters:
-      - description: endpoint ID of the endpoint where the resource is located
-        in: query
-        name: endpointId
-        required: true
-        type: integer
-      - description: node name
-        in: query
-        name: nodeName
-        type: string
-      - description: JWT token used for authentication against this endpoint
-        in: query
-        name: token
-        required: true
-        type: string
+        - description: endpoint ID of the endpoint where the resource is located
+          in: query
+          name: endpointId
+          required: true
+          type: integer
+        - description: node name
+          in: query
+          name: nodeName
+          type: string
+        - description: JWT token used for authentication against this endpoint
+          in: query
+          name: token
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
-          description: ""
-        "400":
-          description: ""
-        "409":
-          description: ""
-        "500":
-          description: ""
+        '200':
+          description: ''
+        '400':
+          description: ''
+        '409':
+          description: ''
+        '500':
+          description: ''
       security:
-      - jwt: []
+        - jwt: []
       summary: Execute a websocket
       tags:
-      - websocket
+        - websocket
   /websocket/pod:
     get:
       consumes:
-      - application/json
+        - application/json
       description: |-
         The request will be upgraded to the websocket protocol.
         Authentication and access is controlled via the mandatory token query parameter.
       parameters:
-      - description: endpoint ID of the endpoint where the resource is located
-        in: query
-        name: endpointId
-        required: true
-        type: integer
-      - description: namespace where the container is located
-        in: query
-        name: namespace
-        required: true
-        type: string
-      - description: name of the pod containing the container
-        in: query
-        name: podName
-        required: true
-        type: string
-      - description: name of the container
-        in: query
-        name: containerName
-        required: true
-        type: string
-      - description: command to execute in the container
-        in: query
-        name: command
-        required: true
-        type: string
-      - description: JWT token used for authentication against this endpoint
-        in: query
-        name: token
-        required: true
-        type: string
+        - description: endpoint ID of the endpoint where the resource is located
+          in: query
+          name: endpointId
+          required: true
+          type: integer
+        - description: namespace where the container is located
+          in: query
+          name: namespace
+          required: true
+          type: string
+        - description: name of the pod containing the container
+          in: query
+          name: podName
+          required: true
+          type: string
+        - description: name of the container
+          in: query
+          name: containerName
+          required: true
+          type: string
+        - description: command to execute in the container
+          in: query
+          name: command
+          required: true
+          type: string
+        - description: JWT token used for authentication against this endpoint
+          in: query
+          name: token
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
-        "200":
-          description: ""
-        "400":
-          description: ""
-        "403":
-          description: ""
-        "404":
-          description: ""
-        "500":
-          description: ""
+        '200':
+          description: ''
+        '400':
+          description: ''
+        '403':
+          description: ''
+        '404':
+          description: ''
+        '500':
+          description: ''
       security:
-      - jwt: []
+        - jwt: []
       summary: Execute a websocket on pod
       tags:
-      - websocket
+        - websocket
 schemes:
-- http
-- https
+  - http
+  - https
 securityDefinitions:
   jwt:
     in: header
     name: Authorization
     type: apiKey
-swagger: "2.0"
+swagger: '2.0'
 tags:
-- description: Authenticate against Portainer HTTP API
-  name: auth
-- description: Manage Custom Templates
-  name: custom_templates
-- description: Manage how Portainer connects to the DockerHub
-  name: dockerhub
-- description: Manage Edge Groups
-  name: edge_groups
-- description: Manage Edge Jobs
-  name: edge_jobs
-- description: Manage Edge Stacks
-  name: edge_stacks
-- description: Manage Edge Templates
-  name: edge_templates
-- description: Manage Edge related endpoint settings
-  name: edge
-- description: Manage Docker environments
-  name: endpoints
-- description: Manage endpoint groups
-  name: endpoint_groups
-- description: Fetch the message of the day
-  name: motd
-- description: Manage Docker registries
-  name: registries
-- description: Manage access control on Docker resources
-  name: resource_controls
-- description: Manage roles
-  name: roles
-- description: Manage Portainer settings
-  name: settings
-- description: Information about the Portainer instance
-  name: status
-- description: Manage Docker stacks
-  name: stacks
-- description: Manage users
-  name: users
-- description: Manage tags
-  name: tags
-- description: Manage teams
-  name: teams
-- description: Manage team memberships
-  name: team_memberships
-- description: Manage App Templates
-  name: templates
-- description: Manage stacks
-  name: stacks
-- description: Upload files
-  name: upload
-- description: Manage webhooks
-  name: webhooks
-- description: Create exec sessions using websockets
-  name: websocket
+  - description: Authenticate against Portainer HTTP API
+    name: auth
+  - description: Manage Custom Templates
+    name: custom_templates
+  - description: Manage how Portainer connects to the DockerHub
+    name: dockerhub
+  - description: Manage Edge Groups
+    name: edge_groups
+  - description: Manage Edge Jobs
+    name: edge_jobs
+  - description: Manage Edge Stacks
+    name: edge_stacks
+  - description: Manage Edge Templates
+    name: edge_templates
+  - description: Manage Edge related endpoint settings
+    name: edge
+  - description: Manage Docker environments
+    name: endpoints
+  - description: Manage endpoint groups
+    name: endpoint_groups
+  - description: Fetch the message of the day
+    name: motd
+  - description: Manage Docker registries
+    name: registries
+  - description: Manage access control on Docker resources
+    name: resource_controls
+  - description: Manage roles
+    name: roles
+  - description: Manage Portainer settings
+    name: settings
+  - description: Information about the Portainer instance
+    name: status
+  - description: Manage Docker stacks
+    name: stacks
+  - description: Manage users
+    name: users
+  - description: Manage tags
+    name: tags
+  - description: Manage teams
+    name: teams
+  - description: Manage team memberships
+    name: team_memberships
+  - description: Manage App Templates
+    name: templates
+  - description: Manage stacks
+    name: stacks
+  - description: Upload files
+    name: upload
+  - description: Manage webhooks
+    name: webhooks
+  - description: Create exec sessions using websockets
+    name: websocket

@@ -4,8 +4,7 @@ import { TeamMembershipModel } from '../../models/teamMembership';
 angular.module('portainer.app').factory('TeamService', [
   '$q',
   'Teams',
-  'TeamMembershipService',
-  function TeamServiceFactory($q, Teams, TeamMembershipService) {
+  function TeamServiceFactory($q, Teams) {
     'use strict';
     var service = {};
 
@@ -41,17 +40,11 @@ angular.module('portainer.app').factory('TeamService', [
       var deferred = $q.defer();
       var payload = {
         Name: name,
+        TeamLeaders: leaderIds,
       };
       Teams.create({}, payload)
-        .$promise.then(function success(data) {
-          var teamId = data.Id;
-          var teamMembershipQueries = [];
-          angular.forEach(leaderIds, function (userId) {
-            teamMembershipQueries.push(TeamMembershipService.createMembership(userId, teamId, 1));
-          });
-          $q.all(teamMembershipQueries).then(function success() {
-            deferred.resolve();
-          });
+        .$promise.then(function success() {
+          deferred.resolve();
         })
         .catch(function error(err) {
           deferred.reject({ msg: 'Unable to create team', err: err });

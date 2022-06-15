@@ -13,7 +13,7 @@ export function SocketTab({ onCreate }: Props) {
     <>
       <DeploymentScripts />
 
-      <div className="wizard-form">
+      <div className="mt-5">
         <SocketForm onCreate={onCreate} />
       </div>
     </>

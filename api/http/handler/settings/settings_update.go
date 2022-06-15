@@ -22,9 +22,10 @@ type settingsUpdatePayload struct {
 	// A list of label name & value that will be used to hide containers when querying containers
 	BlackListedLabels []portainer.Pair
 	// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
-	AuthenticationMethod *int                     `example:"1"`
-	LDAPSettings         *portainer.LDAPSettings  `example:""`
-	OAuthSettings        *portainer.OAuthSettings `example:""`
+	AuthenticationMethod *int                            `example:"1"`
+	InternalAuthSettings *portainer.InternalAuthSettings `example:""`
+	LDAPSettings         *portainer.LDAPSettings         `example:""`
+	OAuthSettings        *portainer.OAuthSettings        `example:""`
 	// The interval in which environment(endpoint) snapshots are created
 	SnapshotInterval *string `example:"5m"`
 	// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -151,6 +152,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.BlackListedLabels != nil {
 		settings.BlackListedLabels = payload.BlackListedLabels
+	}
+
+	if payload.InternalAuthSettings != nil {
+		settings.InternalAuthSettings.RequiredPasswordLength = payload.InternalAuthSettings.RequiredPasswordLength
 	}
 
 	if payload.LDAPSettings != nil {

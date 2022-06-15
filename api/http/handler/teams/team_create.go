@@ -14,6 +14,8 @@ import (
 type teamCreatePayload struct {
 	// Name
 	Name string `example:"developers" validate:"required"`
+	// TeamLeaders
+	TeamLeaders []portainer.UserID `example:"3,5"`
 }
 
 func (payload *teamCreatePayload) Validate(r *http.Request) error {
@@ -60,6 +62,19 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 	err = handler.DataStore.Team().Create(team)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the team inside the database", err}
+	}
+
+	for _, teamLeader := range payload.TeamLeaders {
+		membership := &portainer.TeamMembership{
+			UserID: teamLeader,
+			TeamID: team.ID,
+			Role:   portainer.TeamLeader,
+		}
+
+		err = handler.DataStore.TeamMembership().Create(membership)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team leadership inside the database", err}
+		}
 	}
 
 	return response.JSON(w, team)

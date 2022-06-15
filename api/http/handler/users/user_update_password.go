@@ -12,7 +12,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/passwordutils"
 )
 
 type userUpdatePasswordPayload struct {
@@ -83,10 +82,10 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 
 	err = handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Specified password do not match actual password", httperrors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Current password doesn't match", errors.New("Current password does not match the password provided. Please try again")}
 	}
 
-	if !passwordutils.StrengthCheck(payload.NewPassword) {
+	if !handler.passwordStrengthChecker.Check(payload.NewPassword) {
 		return &httperror.HandlerError{http.StatusBadRequest, "Password does not meet the requirements", nil}
 	}
 

@@ -1,42 +1,37 @@
 import { react2angular } from '@/react-tools/react2angular';
+import { usePublicSettings } from '@/portainer/settings/queries';
 
-import { MinPasswordLen } from '../helpers/password';
+interface Props {
+  passwordValid: boolean;
+  forceChangePassword?: boolean;
+}
 
-export function ForcePasswordUpdateHint() {
+export function PasswordCheckHint({
+  passwordValid,
+  forceChangePassword,
+}: Props) {
+  const settingsQuery = usePublicSettings();
+  const minPasswordLength = settingsQuery.data?.RequiredPasswordLength;
+
   return (
     <div>
-      <p>
+      <p className="text-muted">
         <i
-          className="fa fa-exclamation-triangle orange-icon"
+          className="fa fa-exclamation-triangle orange-icon space-right"
           aria-hidden="true"
         />
-        <b> Please update your password to continue </b>
-      </p>
-
-      <p className="text-muted">
-        The password must be at least {MinPasswordLen} characters long.
-      </p>
-    </div>
-  );
-}
-
-export function PasswordCheckHint() {
-  return (
-    <div>
-      <p className="text-muted">
-        <i className="fa fa-times red-icon space-right" aria-hidden="true">
-          {' '}
-        </i>
-        <span>
-          The password must be at least {MinPasswordLen} characters long.
-        </span>
+        {forceChangePassword &&
+          'An administrator has changed your password requirements, '}
+        The password must be at least {minPasswordLength} characters long.
+        {passwordValid && (
+          <i className="fa fa-check green-icon space-left" aria-hidden="true" />
+        )}
       </p>
     </div>
   );
 }
 
-export const ForcePasswordUpdateHintAngular = react2angular(
-  ForcePasswordUpdateHint,
-  []
-);
-export const PasswordCheckHintAngular = react2angular(PasswordCheckHint, []);
+export const PasswordCheckHintAngular = react2angular(PasswordCheckHint, [
+  'passwordValid',
+  'forceChangePassword',
+]);

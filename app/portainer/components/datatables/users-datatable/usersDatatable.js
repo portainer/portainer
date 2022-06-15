@@ -13,5 +13,6 @@ angular.module('portainer.app').component('usersDatatable', {
     reverseOrder: '<',
     removeAction: '<',
     authenticationMethod: '<',
+    isAdmin: '<',
   },
 });

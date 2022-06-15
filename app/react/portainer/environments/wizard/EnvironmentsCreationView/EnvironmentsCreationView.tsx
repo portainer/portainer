@@ -118,6 +118,11 @@ export function EnvironmentCreationView() {
         ])
       ),
     });
+    if (localStorage.getItem('wizardReferrer') === 'environments') {
+      localStorage.removeItem('wizardReferrer');
+      router.stateService.go('portainer.endpoints');
+      return;
+    }
     router.stateService.go('portainer.home');
   }
 }
@@ -193,6 +198,7 @@ function useAnalyticsState() {
     aciApi: 0,
     localEndpoint: 0,
     nomadEdgeAgent: 0,
+    dockerEdgeAgent: 0,
   });
 
   return { analytics, setAnalytics };
