@@ -16,6 +16,7 @@ import { withUIRouter } from '@/react-tools/withUIRouter';
 import { withI18nSuspense } from '@/react-tools/withI18nSuspense';
 import { SettingsFDO } from '@/react/portainer/settings/EdgeComputeView/SettingsFDO';
 import { SettingsOpenAMT } from '@/react/portainer/settings/EdgeComputeView/SettingsOpenAMT';
+import { InternalAuth } from '@/react/portainer/settings/AuthenticationView/InternalAuth';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -135,7 +136,8 @@ export const componentsModule = angular
     'settingsFdo',
     r2a(withUIRouter(withReactQuery(SettingsFDO)), ['onSubmit', 'settings'])
   )
+  .component('settingsOpenAmt', r2a(SettingsOpenAMT, ['onSubmit', 'settings']))
   .component(
-    'settingsOpenAmt',
-    r2a(SettingsOpenAMT, ['onSubmit', 'settings'])
+    'internalAuth',
+    r2a(InternalAuth, ['onSaveSettings', 'isLoading', 'value', 'onChange'])
   ).name;
