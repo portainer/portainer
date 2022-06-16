@@ -1,5 +1,6 @@
 import { Edition, FeatureId, FeatureState } from './enums';
 
+export const isBE = process.env.PORTAINER_EDITION === 'BE';
 interface ServiceState {
   currentEdition: Edition;
   features: Record<FeatureId, Edition>;

@@ -18,6 +18,7 @@
   >
     <advanced-form>
       <custom-templates-variables-field
+        ng-if="$ctrl.isTemplateVariablesEnabled"
         definitions="$ctrl.state.selectedTemplate.Variables"
         value="$ctrl.formValues.variables"
         on-change="($ctrl.onChangeTemplateVariables)"
