@@ -32,6 +32,7 @@
           </web-editor-form>
 
           <custom-templates-variables-definition-field
+            ng-if="$ctrl.isTemplateVariablesEnabled"
             value="$ctrl.formValues.Variables"
             on-change="($ctrl.onVariablesChange)"
             is-variables-names-from-parent="true"

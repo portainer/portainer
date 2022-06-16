@@ -93,7 +93,7 @@
                   ></custom-template-selector>
 
                   <custom-templates-variables-field
-                    ng-if="ctrl.state.template"
+                    ng-if="$ctrl.isTemplateVariablesEnabled && ctrl.state.template"
                     definitions="ctrl.state.template.Variables"
                     value="ctrl.formValues.Variables"
                     on-change="(ctrl.onChangeTemplateVariables)"

@@ -3,11 +3,14 @@ import { ResourceControlViewModel } from '@/portainer/access-control/models/Reso
 
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class EditCustomTemplateViewController {
   /* @ngInject */
   constructor($async, $state, $window, ModalService, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService) {
     Object.assign(this, { $async, $state, $window, ModalService, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService });
+
+    this.isTemplateVariablesEnabled = isBE;
 
     this.formValues = null;
     this.state = {
@@ -127,6 +130,10 @@ class EditCustomTemplateViewController {
   }
 
   parseTemplate(templateStr) {
+    if (!this.isTemplateVariablesEnabled) {
+      return;
+    }
+
     const variables = getTemplateVariables(templateStr);
 
     const isValid = !!variables;
