@@ -1,5 +1,6 @@
 import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { react2angular } from '@/react-tools/react2angular';
+import { confirm } from '@/portainer/services/modal.service/confirm';
 
 import { SaveAuthSettingsButton } from '../components/SaveAuthSettingsButton';
 import { Settings } from '../../types';
@@ -19,6 +20,27 @@ export function InternalAuth({
   value,
   onChange,
 }: Props) {
+  function onSubmit() {
+    if (value.RequiredPasswordLength < 10) {
+      confirm({
+        title: 'Allow weak passwords?',
+        message:
+          'You have set an insecure minimum password length. This could leave your system vulnerable to attack, are you sure?',
+        buttons: {
+          confirm: {
+            label: 'Yes',
+            className: 'btn-danger',
+          },
+        },
+        callback: function onConfirm(confirmed) {
+          if (confirmed) onSaveSettings();
+        },
+      });
+    } else {
+      onSaveSettings();
+    }
+  }
+
   return (
     <>
       <FormSectionTitle>Information</FormSectionTitle>
@@ -34,7 +56,7 @@ export function InternalAuth({
 
       <div className="form-group">
         <PasswordLengthSlider
-          min={8}
+          min={1}
           max={18}
           step={1}
           value={value.RequiredPasswordLength}
@@ -42,7 +64,7 @@ export function InternalAuth({
         />
       </div>
 
-      <SaveAuthSettingsButton onSubmit={onSaveSettings} isLoading={isLoading} />
+      <SaveAuthSettingsButton onSubmit={onSubmit} isLoading={isLoading} />
     </>
   );
 }
