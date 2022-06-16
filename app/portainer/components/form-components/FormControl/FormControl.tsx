@@ -29,26 +29,29 @@ export function FormControl({
   required,
 }: PropsWithChildren<Props>) {
   return (
-    <div className={clsx('form-group', styles.container)}>
-      <label
-        htmlFor={inputId}
-        className={clsx(sizeClassLabel(size), 'control-label', 'text-left')}
-      >
-        {label}
+    <>
+      <div className={clsx('form-group', styles.container)}>
+        <label
+          htmlFor={inputId}
+          className={clsx(sizeClassLabel(size), 'control-label', 'text-left')}
+        >
+          {label}
 
-        {required && <span className="text-danger">*</span>}
+          {required && <span className="text-danger">*</span>}
 
-        {tooltip && <Tooltip message={tooltip} />}
-      </label>
+          {tooltip && <Tooltip message={tooltip} />}
+        </label>
 
-      <div className={sizeClassChildren(size)}>{children}</div>
-
+        <div className={sizeClassChildren(size)}>{children}</div>
+      </div>
       {errors && (
-        <div className="col-md-12">
-          <FormError>{errors}</FormError>
+        <div className="form-group">
+          <div className="col-md-12">
+            <FormError>{errors}</FormError>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
