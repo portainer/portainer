@@ -1,6 +1,6 @@
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { FormSection } from '@/react/components/form-components/FormSection/FormSection';
-import { Input } from '@/react/components/form-components/Input';
+import { FormControl } from '@@/form-components/FormControl';
+import { FormSection } from '@@/form-components/FormSection/FormSection';
+import { Input } from '@@/form-components/Input';
 
 import { VariableDefinition } from '../CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
 

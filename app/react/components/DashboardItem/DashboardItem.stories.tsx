@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/react';
 
-import { Link } from '@/react/components/Link';
+import { Link } from '@@/Link';
 
 import { DashboardItem } from './DashboardItem';
 

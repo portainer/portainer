@@ -1,13 +1,14 @@
 import { useFormikContext } from 'formik';
 
-import { FileUploadField } from '@/react/components/form-components/FileUpload';
-import { SwitchField } from '@/react/components/form-components/SwitchField';
-import { FormControl } from '@/react/components/form-components/FormControl';
 import {
   file,
   withFileSize,
   withFileType,
 } from '@/portainer/helpers/yup-file-validation';
+
+import { FileUploadField } from '@@/form-components/FileUpload';
+import { SwitchField } from '@@/form-components/SwitchField';
+import { FormControl } from '@@/form-components/FormControl';
 
 import { FormValues } from './types';
 

@@ -1,7 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
 
-import { PaginationControls } from '@/react/components/PaginationControls';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
 import {
   Environment,
@@ -9,23 +8,11 @@ import {
   EnvironmentStatus,
 } from '@/portainer/environments/types';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
-import { Button } from '@/react/components/buttons';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
-import {
-  FilterSearchBar,
-  useSearchBarState,
-} from '@/react/components/datatables/FilterSearchBar';
-import { SortbySelector } from '@/react/components/datatables/SortbySelector';
 import {
   HomepageFilter,
   useHomePageFilter,
 } from '@/portainer/home/HomepageFilter';
-import {
-  TableActions,
-  TableContainer,
-  TableTitle,
-} from '@/react/components/datatables';
-import { TableFooter } from '@/react/components/datatables/TableFooter';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
   refetchIfAnyOffline,
@@ -34,6 +21,16 @@ import {
 import { useGroups } from '@/portainer/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
 import { Filter } from '@/portainer/home/types';
+
+import { TableFooter } from '@@/datatables/TableFooter';
+import { TableActions, TableContainer, TableTitle } from '@@/datatables';
+import { SortbySelector } from '@@/datatables/SortbySelector';
+import {
+  FilterSearchBar,
+  useSearchBarState,
+} from '@@/datatables/FilterSearchBar';
+import { Button } from '@@/buttons';
+import { PaginationControls } from '@@/PaginationControls';
 
 import { EnvironmentItem } from './EnvironmentItem';
 import { KubeconfigButton } from './KubeconfigButton';

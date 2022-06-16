@@ -1,9 +1,9 @@
 import { ComponentType } from 'react';
 import clsx from 'clsx';
 
-import { AddButton, Button } from '@/react/components/buttons';
-import { Tooltip } from '@/react/components/Tip/Tooltip';
-import { TextTip } from '@/react/components/Tip/TextTip';
+import { AddButton, Button } from '@@/buttons';
+import { Tooltip } from '@@/Tip/Tooltip';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { Input } from '../Input';
 import { FormError } from '../FormError';

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { Select } from '@/react/components/form-components/Input';
 import { useSettings } from '@/portainer/settings/queries';
 import { r2a } from '@/react-tools/react2angular';
+
+import { FormControl } from '@@/form-components/FormControl';
+import { Select } from '@@/form-components/Input';
 
 interface Props {
   value: number;

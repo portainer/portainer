@@ -1,8 +1,9 @@
-import { PageHeader } from '@/react/components/PageHeader';
-import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
 import { EnvironmentType } from '@/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-import { Link } from '@/react/components/Link';
+
+import { PageHeader } from '@@/PageHeader';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Link } from '@@/Link';
 
 import { Option } from '../components/Option';
 

@@ -1,8 +1,9 @@
 import { CellProps, Column } from 'react-table';
 
 import { Environment } from '@/portainer/environments/types';
-import { Link } from '@/react/components/Link';
-import { ExpandingCell } from '@/react/components/datatables/ExpandingCell';
+
+import { Link } from '@@/Link';
+import { ExpandingCell } from '@@/datatables/ExpandingCell';
 
 import { useRowContext } from './RowContext';
 

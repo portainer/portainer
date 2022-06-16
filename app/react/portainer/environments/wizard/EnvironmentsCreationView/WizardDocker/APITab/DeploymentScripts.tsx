@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
-import { CopyButton } from '@/react/components/buttons/CopyButton';
-import { Code } from '@/react/components/Code';
-import { NavTabs } from '@/react/components/NavTabs';
 import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
+
+import { CopyButton } from '@@/buttons/CopyButton';
+import { Code } from '@@/Code';
+import { NavTabs } from '@@/NavTabs';
 
 const deployments = [
   {

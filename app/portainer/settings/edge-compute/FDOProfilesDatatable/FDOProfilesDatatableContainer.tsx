@@ -1,4 +1,4 @@
-import { TableSettingsProvider } from '@/react/components/datatables/useTableSettings';
+import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 
 import {
   FDOProfilesDatatable,

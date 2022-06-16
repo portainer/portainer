@@ -3,7 +3,10 @@ import { useRowSelectColumn } from '@lineup-lite/hooks';
 import _ from 'lodash';
 
 import { Environment } from '@/portainer/environments/types';
-import { PaginationControls } from '@/react/components/PaginationControls';
+import { AMTDevicesDatatable } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/AMTDevicesDatatable';
+import { EnvironmentGroup } from '@/portainer/environment-groups/types';
+
+import { PaginationControls } from '@@/PaginationControls';
 import {
   Table,
   TableActions,
@@ -13,17 +16,15 @@ import {
   TableSettingsMenu,
   TableTitle,
   TableTitleActions,
-} from '@/react/components/datatables';
-import { multiple } from '@/react/components/datatables/filter-types';
-import { useTableSettings } from '@/react/components/datatables/useTableSettings';
-import { ColumnVisibilityMenu } from '@/react/components/datatables/ColumnVisibilityMenu';
-import { SearchBar } from '@/react/components/datatables/SearchBar';
-import { useRowSelect } from '@/react/components/datatables/useRowSelect';
-import { TableFooter } from '@/react/components/datatables/TableFooter';
-import { SelectedRowsCount } from '@/react/components/datatables/SelectedRowsCount';
-import { AMTDevicesDatatable } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/AMTDevicesDatatable';
-import { TextTip } from '@/react/components/Tip/TextTip';
-import { EnvironmentGroup } from '@/portainer/environment-groups/types';
+} from '@@/datatables';
+import { multiple } from '@@/datatables/filter-types';
+import { useTableSettings } from '@@/datatables/useTableSettings';
+import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
+import { SearchBar } from '@@/datatables/SearchBar';
+import { useRowSelect } from '@@/datatables/useRowSelect';
+import { TableFooter } from '@@/datatables/TableFooter';
+import { SelectedRowsCount } from '@@/datatables/SelectedRowsCount';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { EdgeDevicesDatatableActions } from './EdgeDevicesDatatableActions';
 import { EdgeDevicesDatatableSettings } from './EdgeDevicesDatatableSettings';

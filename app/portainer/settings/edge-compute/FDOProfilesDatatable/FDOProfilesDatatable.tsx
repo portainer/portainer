@@ -2,13 +2,14 @@ import { useTable, usePagination, useSortBy } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 import { FDOProfilesDatatableActions } from 'Portainer/settings/edge-compute/FDOProfilesDatatable/FDOProfilesDatatableActions';
 
-import { PaginationControls } from '@/react/components/PaginationControls';
-import { SelectedRowsCount } from '@/react/components/datatables/SelectedRowsCount';
-import { TableFooter } from '@/react/components/datatables/TableFooter';
-import { useTableSettings } from '@/react/components/datatables/useTableSettings';
-import { useRowSelect } from '@/react/components/datatables/useRowSelect';
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
 import PortainerError from '@/portainer/error';
+
+import { PaginationControls } from '@@/PaginationControls';
+import { SelectedRowsCount } from '@@/datatables/SelectedRowsCount';
+import { TableFooter } from '@@/datatables/TableFooter';
+import { useTableSettings } from '@@/datatables/useTableSettings';
+import { useRowSelect } from '@@/datatables/useRowSelect';
 import {
   Table,
   TableActions,
@@ -16,11 +17,11 @@ import {
   TableHeaderRow,
   TableRow,
   TableTitle,
-} from '@/react/components/datatables';
+} from '@@/datatables';
 import {
   PaginationTableSettings,
   SortableTableSettings,
-} from '@/react/components/datatables/types';
+} from '@@/datatables/types';
 
 import { useFDOProfiles } from './useFDOProfiles';
 import { useColumns } from './columns';

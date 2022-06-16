@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { PropsWithChildren, ReactNode } from 'react';
 import { TableHeaderProps } from 'react-table';
 
-import { Button } from '@/react/components/buttons';
+import { Button } from '@@/buttons';
 
 import { useTableContext } from './TableContainer';
 import styles from './TableHeaderCell.module.css';

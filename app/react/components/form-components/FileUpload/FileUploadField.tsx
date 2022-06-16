@@ -1,6 +1,6 @@
 import { ChangeEvent, createRef } from 'react';
 
-import { Button } from '@/react/components/buttons';
+import { Button } from '@@/buttons';
 
 import styles from './FileUploadField.module.css';
 

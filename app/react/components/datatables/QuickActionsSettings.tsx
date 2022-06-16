@@ -1,4 +1,4 @@
-import { Checkbox } from '@/react/components/form-components/Checkbox';
+import { Checkbox } from '@@/form-components/Checkbox';
 
 import { useTableSettings } from './useTableSettings';
 

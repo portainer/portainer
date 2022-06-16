@@ -1,7 +1,8 @@
 import angular from 'angular';
 
 import { react2angular } from '@/react-tools/react2angular';
-import { BoxSelector } from '@/react/components/BoxSelector';
+
+import { BoxSelector } from '@@/BoxSelector';
 
 import { BoxSelectorAngular } from './BoxSelectorAngular';
 

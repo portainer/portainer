@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 
-import { Checkbox } from '@/react/components/form-components/Checkbox';
+import { Checkbox } from '@@/form-components/Checkbox';
 
 import styles from './TableSettingsMenuAutoRefresh.module.css';
 

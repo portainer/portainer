@@ -1,5 +1,6 @@
-import { Select } from '@/react/components/form-components/ReactSelect';
 import { Team, TeamId } from '@/portainer/teams/types';
+
+import { Select } from '@@/form-components/ReactSelect';
 
 interface Props {
   name?: string;

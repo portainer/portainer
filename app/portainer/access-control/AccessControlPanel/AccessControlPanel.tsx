@@ -1,11 +1,12 @@
 import { useReducer } from 'react';
 
-import { Button } from '@/react/components/buttons';
-import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
 import { useUser } from '@/portainer/hooks/useUser';
 import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, Role } from '@/portainer/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
+
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Button } from '@@/buttons';
 
 import { ResourceControlType, ResourceId } from '../types';
 import { ResourceControlViewModel } from '../models/ResourceControlViewModel';

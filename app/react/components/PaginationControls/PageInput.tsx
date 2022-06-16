@@ -2,8 +2,8 @@ import { useFormik } from 'formik';
 import { ChangeEvent, KeyboardEvent } from 'react';
 import { object, number } from 'yup';
 
-import { Button } from '@/react/components/buttons';
-import { Input } from '@/react/components/form-components/Input';
+import { Button } from '@@/buttons';
+import { Input } from '@@/form-components/Input';
 
 interface Values {
   page: number | '';

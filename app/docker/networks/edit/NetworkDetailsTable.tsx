@@ -1,10 +1,11 @@
 import { Fragment } from 'react';
 import DockerNetworkHelper from 'Docker/helpers/networkHelper';
 
-import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
-import { DetailsTable } from '@/react/components/DetailsTable';
-import { Button } from '@/react/components/buttons';
 import { Authorized } from '@/portainer/hooks/useUser';
+
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { DetailsTable } from '@@/DetailsTable';
+import { Button } from '@@/buttons';
 
 import { isSystemNetwork } from '../network.helper';
 import { DockerNetwork, IPConfig } from '../types';

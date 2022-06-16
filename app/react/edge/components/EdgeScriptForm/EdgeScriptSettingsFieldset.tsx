@@ -1,9 +1,9 @@
 import { Field, useFormikContext } from 'formik';
 
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { Input } from '@/react/components/form-components/Input';
-import { SwitchField } from '@/react/components/form-components/SwitchField';
-import { TextTip } from '@/react/components/Tip/TextTip';
+import { FormControl } from '@@/form-components/FormControl';
+import { Input } from '@@/form-components/Input';
+import { SwitchField } from '@@/form-components/SwitchField';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { NomadTokenField } from './NomadTokenField';
 import { ScriptFormValues } from './types';

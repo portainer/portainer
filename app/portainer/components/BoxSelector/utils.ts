@@ -1,5 +1,6 @@
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import { BoxSelectorOption } from '@/react/components/BoxSelector/types';
+
+import { BoxSelectorOption } from '@@/BoxSelector/types';
 
 export function buildOption<T extends number | string>(
   id: string,

@@ -1,12 +1,13 @@
 import { Formik, Form } from 'formik';
 
-import { Switch } from '@/react/components/form-components/SwitchField/Switch';
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
-import { LoadingButton } from '@/react/components/buttons/LoadingButton';
-import { TextTip } from '@/react/components/Tip/TextTip';
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
-import { FormSectionTitle } from '@/react/components/form-components/FormSectionTitle';
+
+import { Switch } from '@@/form-components/SwitchField/Switch';
+import { FormControl } from '@@/form-components/FormControl';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { TextTip } from '@@/Tip/TextTip';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 
 import { Settings } from '../types';
 

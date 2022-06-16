@@ -1,11 +1,11 @@
-import { ButtonSelector } from '@/react/components/form-components/ButtonSelector/ButtonSelector';
-import { FormError } from '@/react/components/form-components/FormError';
-import { InputGroup } from '@/react/components/form-components/InputGroup';
-import { InputList } from '@/react/components/form-components/InputList';
+import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
+import { FormError } from '@@/form-components/FormError';
+import { InputGroup } from '@@/form-components/InputGroup';
+import { InputList } from '@@/form-components/InputList';
 import {
   InputListError,
   ItemProps,
-} from '@/react/components/form-components/InputList/InputList';
+} from '@@/form-components/InputList/InputList';
 
 import styles from './PortsMappingField.module.css';
 

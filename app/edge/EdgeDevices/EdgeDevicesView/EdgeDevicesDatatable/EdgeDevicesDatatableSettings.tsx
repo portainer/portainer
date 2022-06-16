@@ -1,5 +1,5 @@
-import { TableSettingsMenuAutoRefresh } from '@/react/components/datatables/TableSettingsMenuAutoRefresh';
-import { useTableSettings } from '@/react/components/datatables/useTableSettings';
+import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
+import { useTableSettings } from '@@/datatables/useTableSettings';
 
 import { EdgeDeviceTableSettings } from './types';
 

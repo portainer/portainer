@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { Link } from '@/react/components/Link';
+import { Link } from '@@/Link';
 
 import './Breadcrumbs.css';
 

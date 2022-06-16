@@ -9,11 +9,18 @@ import {
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 
-import { PaginationControls } from '@/react/components/PaginationControls';
+import { useDebounce } from '@/portainer/hooks/useDebounce';
+import type {
+  ContainersTableSettings,
+  DockerContainer,
+} from '@/docker/containers/types';
+import { useEnvironment } from '@/portainer/environments/useEnvironment';
+
+import { PaginationControls } from '@@/PaginationControls';
 import {
   QuickActionsSettings,
   buildAction,
-} from '@/react/components/datatables/QuickActionsSettings';
+} from '@@/datatables/QuickActionsSettings';
 import {
   Table,
   TableActions,
@@ -23,25 +30,16 @@ import {
   TableSettingsMenu,
   TableTitle,
   TableTitleActions,
-} from '@/react/components/datatables';
-import { multiple } from '@/react/components/datatables/filter-types';
-import { useTableSettings } from '@/react/components/datatables/useTableSettings';
-import { ColumnVisibilityMenu } from '@/react/components/datatables/ColumnVisibilityMenu';
-import { useRepeater } from '@/react/components/datatables/useRepeater';
-import { useDebounce } from '@/portainer/hooks/useDebounce';
-import {
-  SearchBar,
-  useSearchBarState,
-} from '@/react/components/datatables/SearchBar';
-import type {
-  ContainersTableSettings,
-  DockerContainer,
-} from '@/docker/containers/types';
-import { useEnvironment } from '@/portainer/environments/useEnvironment';
-import { useRowSelect } from '@/react/components/datatables/useRowSelect';
-import { Checkbox } from '@/react/components/form-components/Checkbox';
-import { TableFooter } from '@/react/components/datatables/TableFooter';
-import { SelectedRowsCount } from '@/react/components/datatables/SelectedRowsCount';
+} from '@@/datatables';
+import { multiple } from '@@/datatables/filter-types';
+import { useTableSettings } from '@@/datatables/useTableSettings';
+import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
+import { useRepeater } from '@@/datatables/useRepeater';
+import { SearchBar, useSearchBarState } from '@@/datatables/SearchBar';
+import { useRowSelect } from '@@/datatables/useRowSelect';
+import { Checkbox } from '@@/form-components/Checkbox';
+import { TableFooter } from '@@/datatables/TableFooter';
+import { SelectedRowsCount } from '@@/datatables/SelectedRowsCount';
 
 import { ContainersDatatableActions } from './ContainersDatatableActions';
 import { ContainersDatatableSettings } from './ContainersDatatableSettings';

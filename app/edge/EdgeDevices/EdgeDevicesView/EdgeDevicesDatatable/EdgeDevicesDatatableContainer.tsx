@@ -1,13 +1,14 @@
 import { useState } from 'react';
 
+import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
+import { Environment } from '@/portainer/environments/types';
+import { useDebounce } from '@/portainer/hooks/useDebounce';
+
+import { useSearchBarState } from '@@/datatables/SearchBar';
 import {
   TableSettingsProvider,
   useTableSettings,
-} from '@/react/components/datatables/useTableSettings';
-import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
-import { Environment } from '@/portainer/environments/types';
-import { useSearchBarState } from '@/react/components/datatables/SearchBar';
-import { useDebounce } from '@/portainer/hooks/useDebounce';
+} from '@@/datatables/useTableSettings';
 
 import {
   EdgeDevicesDatatable,

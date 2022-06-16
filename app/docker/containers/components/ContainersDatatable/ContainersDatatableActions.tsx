@@ -2,7 +2,6 @@ import { useRouter } from '@uirouter/react';
 
 import * as notifications from '@/portainer/services/notifications';
 import { useAuthorizations, Authorized } from '@/portainer/hooks/useUser';
-import { Link } from '@/react/components/Link';
 import { confirmContainerDeletion } from '@/portainer/services/modal.service/prompt';
 import { setPortainerAgentTargetHeader } from '@/portainer/services/http-request.helper';
 import type { ContainerId, DockerContainer } from '@/docker/containers/types';
@@ -16,7 +15,9 @@ import {
   stopContainer,
 } from '@/docker/containers/containers.service';
 import type { EnvironmentId } from '@/portainer/environments/types';
-import { ButtonGroup, Button } from '@/react/components/buttons';
+
+import { Link } from '@@/Link';
+import { ButtonGroup, Button } from '@@/buttons';
 
 type ContainerServiceAction = (
   endpointId: EnvironmentId,

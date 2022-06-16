@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
-import { PageHeader } from '@/react/components/PageHeader';
 import { useSettings } from '@/portainer/settings/queries';
 import { useGroups } from '@/portainer/environment-groups/queries';
 import { r2a } from '@/react-tools/react2angular';
-import { ViewLoading } from '@/react/components/ViewLoading';
+
+import { PageHeader } from '@@/PageHeader';
+import { ViewLoading } from '@@/ViewLoading';
 
 import { EdgeDevicesDatatableContainer } from './EdgeDevicesDatatable/EdgeDevicesDatatableContainer';
 

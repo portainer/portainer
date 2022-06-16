@@ -1,7 +1,8 @@
-import { TeamsSelector } from '@/react/components/TeamsSelector';
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { Link } from '@/react/components/Link';
 import { Team } from '@/portainer/teams/types';
+
+import { TeamsSelector } from '@@/TeamsSelector';
+import { FormControl } from '@@/form-components/FormControl';
+import { Link } from '@@/Link';
 
 interface Props {
   name: string;

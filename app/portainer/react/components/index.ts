@@ -1,10 +1,11 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
-import { TagSelector } from '@/react/components/TagSelector';
-import { Loading } from '@/react/components/Widget/Loading';
-import { PasswordCheckHint } from '@/react/components/PasswordCheckHint';
-import { ViewLoading } from '@/react/components/ViewLoading';
+
+import { TagSelector } from '@@/TagSelector';
+import { Loading } from '@@/Widget/Loading';
+import { PasswordCheckHint } from '@@/PasswordCheckHint';
+import { ViewLoading } from '@@/ViewLoading';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';

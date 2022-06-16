@@ -1,7 +1,8 @@
 import clsx from 'clsx';
 
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import { Tooltip } from '@/react/components/Tip/Tooltip';
+
+import { Tooltip } from '@@/Tip/Tooltip';
 
 import styles from './SwitchField.module.css';
 import { Switch } from './Switch';

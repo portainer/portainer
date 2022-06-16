@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Formik, Field, Form } from 'formik';
 
-import { Switch } from '@/react/components/form-components/SwitchField/Switch';
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
-import { LoadingButton } from '@/react/components/buttons/LoadingButton';
-import { TextTip } from '@/react/components/Tip/TextTip';
-import { Input } from '@/react/components/form-components/Input';
-import { FileUploadField } from '@/react/components/form-components/FileUpload';
 import { OpenAMTConfiguration } from '@/portainer/hostmanagement/open-amt/model';
+
+import { Switch } from '@@/form-components/SwitchField/Switch';
+import { FormControl } from '@@/form-components/FormControl';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { TextTip } from '@@/Tip/TextTip';
+import { Input } from '@@/form-components/Input';
+import { FileUploadField } from '@@/form-components/FileUpload';
 
 import { validationSchema } from './SettingsOpenAMT.validation';
 

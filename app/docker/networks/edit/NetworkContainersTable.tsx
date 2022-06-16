@@ -1,9 +1,10 @@
-import { Widget, WidgetBody, WidgetTitle } from '@/react/components/Widget';
-import { DetailsTable } from '@/react/components/DetailsTable';
-import { Button } from '@/react/components/buttons';
 import { Authorized } from '@/portainer/hooks/useUser';
 import { EnvironmentId } from '@/portainer/environments/types';
-import { Link } from '@/react/components/Link';
+
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { DetailsTable } from '@@/DetailsTable';
+import { Button } from '@@/buttons';
+import { Link } from '@@/Link';
 
 import { NetworkContainer, NetworkId } from '../types';
 import { useDisconnectContainer } from '../queries';

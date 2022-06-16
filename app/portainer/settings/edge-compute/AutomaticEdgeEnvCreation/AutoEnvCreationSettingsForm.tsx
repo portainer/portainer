@@ -2,13 +2,14 @@ import { Field, Form, Formik } from 'formik';
 import * as yup from 'yup';
 import { useCallback, useEffect } from 'react';
 
-import { LoadingButton } from '@/react/components/buttons/LoadingButton';
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { FormSectionTitle } from '@/react/components/form-components/FormSectionTitle';
-import { Input } from '@/react/components/form-components/Input';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { useUpdateSettingsMutation } from '@/portainer/settings/queries';
+
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { FormControl } from '@@/form-components/FormControl';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
+import { Input } from '@@/form-components/Input';
 
 import { Settings } from '../types';
 

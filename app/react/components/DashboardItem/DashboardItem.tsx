@@ -1,4 +1,4 @@
-import { Widget, WidgetBody } from '@/react/components/Widget';
+import { Widget, WidgetBody } from '@@/Widget';
 
 interface Props {
   value: number;

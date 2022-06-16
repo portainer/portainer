@@ -1,8 +1,9 @@
 import clsx from 'clsx';
 
 import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
-import { BEFeatureIndicator } from '@/react/components/BEFeatureIndicator';
 import { FeatureId } from '@/portainer/feature-flags/enums';
+
+import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
 import './Switch.css';
 

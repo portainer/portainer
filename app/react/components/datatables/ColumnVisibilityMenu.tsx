@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { ColumnInstance } from 'react-table';
 
-import { Checkbox } from '@/react/components/form-components/Checkbox';
+import { Checkbox } from '@@/form-components/Checkbox';
 
 import { useTableContext } from './TableContainer';
 

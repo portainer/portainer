@@ -1,15 +1,16 @@
 import { Field, Form, Formik } from 'formik';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { Input, Select } from '@/react/components/form-components/Input';
-import { FormSectionTitle } from '@/react/components/form-components/FormSectionTitle';
-import { LoadingButton } from '@/react/components/buttons/LoadingButton';
-import { InputListError } from '@/react/components/form-components/InputList/InputList';
 import { ContainerInstanceFormValues } from '@/azure/types';
 import * as notifications from '@/portainer/services/notifications';
 import { useUser } from '@/portainer/hooks/useUser';
 import { AccessControlForm } from '@/portainer/access-control/AccessControlForm';
+
+import { FormControl } from '@@/form-components/FormControl';
+import { Input, Select } from '@@/form-components/Input';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { InputListError } from '@@/form-components/InputList/InputList';
 
 import { validationSchema } from './CreateContainerInstanceForm.validation';
 import { PortMapping, PortsMappingField } from './PortsMappingField';

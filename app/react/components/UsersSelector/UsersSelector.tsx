@@ -1,5 +1,6 @@
 import { User, UserId } from '@/portainer/users/types';
-import { Select } from '@/react/components/form-components/ReactSelect';
+
+import { Select } from '@@/form-components/ReactSelect';
 
 interface Props {
   name?: string;

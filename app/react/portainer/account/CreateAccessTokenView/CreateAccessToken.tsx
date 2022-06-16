@@ -2,14 +2,14 @@ import { PropsWithChildren, useEffect, useState } from 'react';
 import { useRouter } from '@uirouter/react';
 import { Trans, useTranslation } from 'react-i18next';
 
-import { Widget, WidgetBody } from '@/react/components/Widget';
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { Button } from '@/react/components/buttons';
-import { FormSectionTitle } from '@/react/components/form-components/FormSectionTitle';
-import { TextTip } from '@/react/components/Tip/TextTip';
-import { Code } from '@/react/components/Code';
-import { CopyButton } from '@/react/components/buttons/CopyButton';
-import { Input } from '@/react/components/form-components/Input';
+import { Widget, WidgetBody } from '@@/Widget';
+import { FormControl } from '@@/form-components/FormControl';
+import { Button } from '@@/buttons';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
+import { TextTip } from '@@/Tip/TextTip';
+import { Code } from '@@/Code';
+import { CopyButton } from '@@/buttons/CopyButton';
+import { Input } from '@@/form-components/Input';
 
 interface AccessTokenResponse {
   rawAPIKey: string;

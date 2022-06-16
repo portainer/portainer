@@ -1,4 +1,4 @@
-import { ButtonSelector } from '@/react/components/form-components/ButtonSelector/ButtonSelector';
+import { ButtonSelector } from '@@/form-components/ButtonSelector/ButtonSelector';
 
 import { OS } from './types';
 

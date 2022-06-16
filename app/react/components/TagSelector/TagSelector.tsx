@@ -2,13 +2,11 @@ import clsx from 'clsx';
 import _ from 'lodash';
 
 import { TagId } from '@/portainer/tags/types';
-import {
-  Creatable,
-  Select,
-} from '@/react/components/form-components/ReactSelect';
 import { useCreateTagMutation, useTags } from '@/portainer/tags/queries';
-import { FormControl } from '@/react/components/form-components/FormControl';
-import { Link } from '@/react/components/Link';
+
+import { Creatable, Select } from '@@/form-components/ReactSelect';
+import { FormControl } from '@@/form-components/FormControl';
+import { Link } from '@@/Link';
 
 import styles from './TagSelector.module.css';
 

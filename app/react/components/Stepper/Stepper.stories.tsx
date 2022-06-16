@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/react';
 import { useState } from 'react';
 
-import { Button } from '@/react/components/buttons';
+import { Button } from '@@/buttons';
 
 import { Step, Stepper } from './Stepper';
 
