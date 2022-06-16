@@ -1,6 +1,6 @@
-import { TeamId } from '@/react/portainer/users/teams/types';
+import { UserId } from '@/portainer/users/types';
 
-import { UserId } from '../users/types';
+import { TeamId } from '../users/teams/types';
 
 import {
   AccessControlFormData,

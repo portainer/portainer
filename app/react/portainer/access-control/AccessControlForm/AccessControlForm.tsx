@@ -1,11 +1,11 @@
 import { FormikErrors } from 'formik';
 
 import { useUser } from '@/portainer/hooks/useUser';
-import { EditDetails } from '@/portainer/access-control/EditDetails/EditDetails';
 
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { SwitchField } from '@@/form-components/SwitchField';
 
+import { EditDetails } from '../EditDetails';
 import { ResourceControlOwnership, AccessControlFormData } from '../types';
 
 export interface Props {

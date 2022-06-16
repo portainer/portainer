@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
 export function createStatus(statusText) {
   var status = _.toLower(statusText);
