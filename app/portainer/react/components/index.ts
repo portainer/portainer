@@ -20,7 +20,7 @@ export const componentsModule = angular
   .component('porSwitchField', switchField)
   .component(
     'passwordCheckHint',
-    r2a(PasswordCheckHint, ['passwordValid', 'forceChangePassword'])
+    r2a(PasswordCheckHint, ['forceChangePassword', 'passwordValid'])
   )
   .component('rdLoading', r2a(Loading, []))
   .component('viewLoading', r2a(ViewLoading, ['message'])).name;
