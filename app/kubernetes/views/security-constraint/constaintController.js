@@ -1,4 +1,3 @@
-// import _ from 'lodash-es';
 import angular from 'angular';
 import { FeatureId } from 'Portainer/feature-flags/enums';
 
