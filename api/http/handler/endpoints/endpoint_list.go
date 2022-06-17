@@ -43,7 +43,7 @@ var endpointGroupNames map[portainer.EndpointGroupID]string
 // @param tagsPartialMatch query bool false "If true, will return environment(endpoint) which has one of tagIds, if false (or missing) will return only environments(endpoints) that has all the tags"
 // @param endpointIds query []int false "will return only these environments(endpoints)"
 // @param provisioned query bool false "If true, will return environment(endpoint) that were provisioned"
-// @param edgeDevice query bool false "if exists true show only edge devices, false show only regular edge endpoints. if missing, will show both types (relevant only for edge endpoints)
+// @param edgeDevice query bool false "if exists true show only edge devices, false show only regular edge endpoints. if missing, will show both types (relevant only for edge endpoints)"
 // @param edgeDeviceUntrusted query bool false "if true, show only untrusted endpoints, if false show only trusted (relevant only for edge devices, and if edgeDevice is true)"
 // @param name query string false "will return only environments(endpoints) with this name"
 // @success 200 {array} portainer.Endpoint "Endpoints"
