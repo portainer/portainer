@@ -83,7 +83,7 @@
             </div>
           </div>
           <!-- !confirm-password-input -->
-          <password-check-hint ng-if="!form.new_password.$valid"></password-check-hint>
+          <password-check-hint password-valid="form.new_password.$valid && formValues.newPassword"></password-check-hint>
           <div class="form-group">
             <div class="col-sm-2">
               <button
