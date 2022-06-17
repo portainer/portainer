@@ -22,7 +22,7 @@ angular.module('portainer.app').controller('AccountController', [
         try {
           await UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword);
           Notifications.success('Success', 'Password successfully updated');
-          StateManager.resetPasswordChangeSkips($scope.userID);
+          StateManager.resetPasswordChangeSkips($scope.userID.toString());
           $scope.forceChangePassword = false;
           $state.go('portainer.logout');
         } catch (err) {
@@ -34,7 +34,7 @@ angular.module('portainer.app').controller('AccountController', [
     $scope.skipPasswordChange = async function () {
       try {
         if ($scope.userCanSkip()) {
-          StateManager.setPasswordChangeSkipped($scope.userID);
+          StateManager.setPasswordChangeSkipped($scope.userID.toString());
           $scope.forceChangePassword = false;
           $state.go('portainer.home');
         }
@@ -130,11 +130,13 @@ angular.module('portainer.app').controller('AccountController', [
           $scope.AuthenticationMethod = data.AuthenticationMethod;
 
           if (state.UI.requiredPasswordLength && state.UI.requiredPasswordLength !== data.RequiredPasswordLength) {
-            StateManager.clearPasswordChangeSkips($scope.userID);
+            StateManager.clearPasswordChangeSkips($scope.userID.toString());
           }
 
           $scope.timesPasswordChangeSkipped =
-            state.UI.timesPasswordChangeSkipped && state.UI.timesPasswordChangeSkipped[$scope.userID] ? state.UI.timesPasswordChangeSkipped[$scope.userID] : 0;
+            state.UI.timesPasswordChangeSkipped && state.UI.timesPasswordChangeSkipped[$scope.userID.toString()]
+              ? state.UI.timesPasswordChangeSkipped[$scope.userID.toString()]
+              : 0;
 
           $scope.requiredPasswordLength = data.RequiredPasswordLength;
           StateManager.setRequiredPasswordLength(data.RequiredPasswordLength);
