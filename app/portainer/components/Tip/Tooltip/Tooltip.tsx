@@ -24,6 +24,7 @@ export function Tooltip({ message, position = 'bottom' }: Props) {
         place={position}
         effect="solid"
         className={styles.tooltip}
+        delayHide={200}
         arrowColor="transparent"
       />
     </span>

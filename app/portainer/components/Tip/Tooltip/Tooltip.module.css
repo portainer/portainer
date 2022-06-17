@@ -15,6 +15,12 @@
   text-align: center;
   font-size: 12px !important;
   font-weight: 400;
+  pointer-events: auto !important;
+}
+
+.tooltip:hover{
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .icon {
