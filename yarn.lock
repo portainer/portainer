@@ -4277,6 +4277,13 @@ angular-clipboard@^1.6.2:
   resolved "https://registry.yarnpkg.com/angular-clipboard/-/angular-clipboard-1.7.0.tgz#9621a6ce66eab1ea9549aa8bfb3b71352307554f"
   integrity sha512-4/eg3zZw1MJpIsMc+mWzeVNyWBu8YWpXPTdmbgyPRp/6f0xB6I3XR2iC6Mb4mg/5E9q6exCd0sX2yiIsw+ZLJw==
 
+angular-explorer@1.5.5:
+  version "1.5.5"
+  resolved "https://registry.npmjs.org/angular-explorer/-/angular-explorer-1.5.5.tgz#508fd02ad55b136066cbdf01a633f6e3c3136eb5"
+  integrity sha512-0icNVppHVrudlbkiR0RK0qB8eLMMAlalup2GQ/0Hkh1djYhZeuYweFWuPuZLqMM//B/0QHPwshjliFlJtRCAiQ==
+  dependencies:
+    angular "^1.8.2"
+
 angular-file-saver@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/angular-file-saver/-/angular-file-saver-1.1.3.tgz#dcaec0695214f226a4caafc8c16d21a9a61f7d1b"
@@ -4337,6 +4344,13 @@ angular-sanitize@1.8.2:
   resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.8.2.tgz#ae78040f00c5e2ce1c63780bcc47fa14a1698296"
   integrity sha512-OB6Goa+QN3byf5asQ7XRl7DKZejm/F/ZOqa9z1skqYVOWA2hoBxoCmt9E7+i7T/TbxZP5zYzKxNZVVJNu860Hg==
 
+angular-translate@^2.15.2:
+  version "2.19.0"
+  resolved "https://registry.npmmirror.com/angular-translate/-/angular-translate-2.19.0.tgz#133c75ad64727b11d96bcbb8b53cf9c7c7a9fde4"
+  integrity sha512-Z/Fip5uUT2N85dPQ0sMEe1JdF5AehcDe4tg/9mWXNDVU531emHCg53ZND9Oe0dyNiGX5rWcJKmsL1Fujus1vGQ==
+  dependencies:
+    angular "^1.8.0"
+
 angular-ui-bootstrap@~2.5.0:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.6.tgz#23937322ec641a6fbee16498cc32452aa199e7c5"
@@ -4351,6 +4365,11 @@ angular@1.8.2, angular@^1.3:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.2.tgz#5983bbb5a9fa63e213cb7749199e0d352de3a2f1"
   integrity sha512-IauMOej2xEe7/7Ennahkbb5qd/HFADiNuLSESz9Q27inmi32zB0lnAsFeLEWcox3Gd1F6YhNd1CP7/9IukJ0Gw==
+
+angular@^1.8.0, angular@^1.8.2:
+  version "1.8.3"
+  resolved "https://registry.npmjs.org/angular/-/angular-1.8.3.tgz#851ad75d5163c105a7e329555ef70c90aa706894"
+  integrity sha512-5qjkWIQQVsHj4Sb5TcEs4WZWpFeVFHXwxEBHUhrny41D8UrBAd6T/6nPPAsLngJCReIOqi95W3mxdveveutpZw==
 
 angularjs-scroll-glue@^2.2.0:
   version "2.2.0"
@@ -5219,6 +5238,11 @@ bootstrap@^4.4.0:
   version "4.6.1"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.6.1.tgz#bc25380c2c14192374e8dec07cf01b2742d222a2"
   integrity sha512-0dj+VgI9Ecom+rvvpNZ4MUZJz8dcX7WCX+eTID9+/8HgOkv3dsRzi8BGeZJCQU6flWQVYxwTQnEZFrmJSEO7og==
+
+bootswatch@~3.3.7:
+  version "3.3.7"
+  resolved "https://registry.npmmirror.com/bootswatch/-/bootswatch-3.3.7.tgz#eb6f9a9a8523b87a706ea91deec3e0d7eaa8ab1f"
+  integrity sha512-8tHnBRrEHX+CtFyth9XPyR7Tl97VaU/w14eRRm+/mZrEs9JSe8Ren9UEkdFjDMlxIeDREKichmrb90EzXgtKSQ==
 
 boxen@^5.1.2:
   version "5.1.2"

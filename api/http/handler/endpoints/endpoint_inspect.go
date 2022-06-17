@@ -42,7 +42,9 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 	}
 
 	hideFields(endpoint)
-	endpoint.ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
+	if handler.ComposeStackManager != nil {
+		endpoint.ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
+	}
 
 	return response.JSON(w, endpoint)
 }

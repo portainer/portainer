@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"github.com/portainer/portainer/api/scheduler"
 	"log"
 	"os"
 	"path"
@@ -42,8 +43,6 @@ import (
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/oauth"
-	"github.com/portainer/portainer/api/scheduler"
-	"github.com/portainer/portainer/api/stacks"
 )
 
 func initCLI() *portainer.CLIFlags {
@@ -615,7 +614,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	dockerConfigPath := fileService.GetDockerConfigPath()
 
-	composeStackManager := initComposeStackManager(*flags.Assets, dockerConfigPath, reverseTunnelService, proxyManager)
+	//composeStackManager := initComposeStackManager(*flags.Assets, dockerConfigPath, reverseTunnelService, proxyManager)
 
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, dockerConfigPath, digitalSignatureService, fileService, reverseTunnelService, dataStore)
 	if err != nil {
@@ -696,20 +695,21 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	scheduler := scheduler.NewScheduler(shutdownCtx)
-	stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
-	stacks.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
+	//stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
+	//stacks.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
 
 	return &http.Server{
-		AuthorizationService:        authorizationService,
-		ReverseTunnelService:        reverseTunnelService,
-		Status:                      applicationStatus,
-		BindAddress:                 *flags.Addr,
-		BindAddressHTTPS:            *flags.AddrHTTPS,
-		HTTPEnabled:                 sslDBSettings.HTTPEnabled,
-		AssetsPath:                  *flags.Assets,
-		DataStore:                   dataStore,
-		SwarmStackManager:           swarmStackManager,
-		ComposeStackManager:         composeStackManager,
+		AuthorizationService: authorizationService,
+		ReverseTunnelService: reverseTunnelService,
+		Status:               applicationStatus,
+		BindAddress:          *flags.Addr,
+		BindAddressHTTPS:     *flags.AddrHTTPS,
+		HTTPEnabled:          sslDBSettings.HTTPEnabled,
+		AssetsPath:           *flags.Assets,
+		DataStore:            dataStore,
+		SwarmStackManager:    swarmStackManager,
+		//ComposeStackManager:         composeStackManager,
+		ComposeStackManager:         nil,
 		KubernetesDeployer:          kubernetesDeployer,
 		HelmPackageManager:          helmPackageManager,
 		CryptoService:               cryptoService,
@@ -731,8 +731,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		Scheduler:                   scheduler,
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
-		StackDeployer:               stackDeployer,
-		DemoService:                 demoService,
+		StackDeployer:               nil,
+		//StackDeployer:               stackDeployer,
+		DemoService: demoService,
 	}
 }
 

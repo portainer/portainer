@@ -42,7 +42,13 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
             await StateManager.updateEndpointState(endpoint);
           } catch (e) {
             Notifications.error('Failed loading environment', e);
-            $state.go('portainer.home', {}, { reload: true });
+            $state.go(
+              'portainer.home',
+              {},
+              {
+                reload: true,
+              }
+            );
           }
 
           async function checkEndpointStatus(endpoint) {
@@ -58,7 +64,9 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
             if (endpoint.Status === status) {
               return;
             }
-            await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
+            await EndpointService.updateEndpoint(endpoint.Id, {
+              Status: status,
+            });
           }
         });
       },
@@ -183,6 +191,28 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
         'content@': {
           templateUrl: './views/containers/stats/containerstats.html',
           controller: 'ContainerStatsController',
+        },
+      },
+    };
+
+    const containerExplorer = {
+      name: 'docker.containers.container.explorer',
+      url: '/explorer',
+      views: {
+        'content@': {
+          templateUrl: './views/containers/explorer/containerExplorer.html',
+          controller: 'ContainerExplorerController',
+        },
+      },
+    };
+
+    const containerExplorerNew = {
+      name: 'docker.containers.container.explorer.new',
+      url: '/explorer/new',
+      views: {
+        'content@': {
+          templateUrl: './views/containers/explorer/new/containerExplorerNew.html',
+          controller: 'ContainerExplorerNewController',
         },
       },
     };
@@ -624,6 +654,8 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
     $stateRegistryProvider.register(containerInspect);
     $stateRegistryProvider.register(containerLogs);
     $stateRegistryProvider.register(containerStats);
+    $stateRegistryProvider.register(containerExplorer);
+    $stateRegistryProvider.register(containerExplorerNew);
     $stateRegistryProvider.register(customTemplates);
     $stateRegistryProvider.register(customTemplatesNew);
     $stateRegistryProvider.register(customTemplatesEdit);

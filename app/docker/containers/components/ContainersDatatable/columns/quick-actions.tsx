@@ -37,6 +37,7 @@ function QuickActionsCell({
     showQuickActionInspect: !hiddenQuickActions.includes('inspect'),
     showQuickActionLogs: !hiddenQuickActions.includes('logs'),
     showQuickActionStats: !hiddenQuickActions.includes('stats'),
+    showQuickActionExplorer: !hiddenQuickActions.includes('explorer'),
   };
 
   const someOn =
@@ -44,7 +45,8 @@ function QuickActionsCell({
     wrapperState.showQuickActionExec ||
     wrapperState.showQuickActionInspect ||
     wrapperState.showQuickActionLogs ||
-    wrapperState.showQuickActionStats;
+    wrapperState.showQuickActionStats ||
+    wrapperState.showQuickActionExplorer;
 
   const isAuthorized = useAuthorizations([
     'DockerContainerStats',
@@ -53,6 +55,7 @@ function QuickActionsCell({
     'DockerContainerInspect',
     'DockerTaskInspect',
     'DockerTaskLogs',
+    'DockerContainerExplorer',
   ]);
 
   if (offlineMode || !someOn || !isAuthorized) {

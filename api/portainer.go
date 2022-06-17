@@ -1629,6 +1629,7 @@ const (
 	OperationDockerContainerExport              Authorization = "DockerContainerExport"
 	OperationDockerContainerChanges             Authorization = "DockerContainerChanges"
 	OperationDockerContainerInspect             Authorization = "DockerContainerInspect"
+	OperationDockerContainerExplorer            Authorization = "DockerContainerExplorer"
 	OperationDockerContainerTop                 Authorization = "DockerContainerTop"
 	OperationDockerContainerLogs                Authorization = "DockerContainerLogs"
 	OperationDockerContainerStats               Authorization = "DockerContainerStats"

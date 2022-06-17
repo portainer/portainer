@@ -1,0 +1,119 @@
+<rd-header>
+  <rd-header-title title-text="Container Explorer"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a> &gt; Explorer
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <div class="datatable">
+      <rd-widget>
+        <rd-widget-header icon="fa-folder-open" title-text="{{ explorerService.currentPath }}">
+          <div class="settings">
+            <button class="table-setting-menu-btn" ng-click="docker.containers.container.explorer.new({ id: container.Id })">
+              <i class="fa fa-plus"></i>
+              New folder
+            </button>
+            <button class="table-setting-menu-btn">
+              <i class="fa fa-upload"></i>
+              Upload files
+            </button>
+          </div>
+        </rd-widget-header>
+        <rd-widget-body classes="no-padding">
+          <div class="row">
+            <div class="col-sm-4 col-md-3 sidebar file-tree animated slow fadeIn">
+              <ul class="nav nav-sidebar file-tree-root">
+                <li ng-repeat="node in explorerService.history[0].nodes" ng-include="'folder-branch-item'" ng-class="{ active: node.absPath == explorerService.currentPath }"></li>
+              </ul>
+            </div>
+            <div class="col-sm-8 col-md-9">
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-xs-12">
+                  <div class="searchBar">
+                    <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+                    <input
+                      type="text"
+                      class="searchInput"
+                      ng-model="$ctrl.state.textFilter"
+                      ng-change="$ctrl.onTextFilterChange()"
+                      placeholder="Search..."
+                      auto-focus
+                      ng-model-options="{ debounce: 300 }"
+                    />
+                  </div>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>
+                          <a ng-click="$ctrl.changeOrderBy('Name')">
+                            Name
+                            <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
+                            <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                          </a>
+                        </th>
+                        <th>
+                          <a ng-click="$ctrl.changeOrderBy('Size')">
+                            Size
+                            <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && !$ctrl.state.reverseOrder"></i>
+                            <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"></i>
+                          </a>
+                        </th>
+                        <th>
+                          <a ng-click="$ctrl.changeOrderBy('Data')">
+                            Data
+                            <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Data' && !$ctrl.state.reverseOrder"></i>
+                            <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Data' && $ctrl.state.reverseOrder"></i>
+                          </a>
+                        </th>
+                        <th>
+                          <a ng-click="$ctrl.changeOrderBy('Data')">
+                            Permissions
+                            <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Permissions' && !$ctrl.state.reverseOrder"></i>
+                            <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Permissions' && $ctrl.state.reverseOrder"></i>
+                          </a>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="item-list" ng-repeat="item in explorerService.fileList">
+                        <td>
+                          <a href="" ng-dblclick="smartClick(item)">
+                            <i class="fa fa-archive" ng-show="item.model.type === 'dir'"></i>
+                            <i class="fa fa-file" ng-show="item.model.type === 'file'"></i>
+                            {{ item.model.name }}
+                          </a>
+                        </td>
+                        <td>{{ item.model.size | humansize }}</td>
+                        <td>{{ item.model.date | date: 'yyyy-MM-dd hh:mm:ss' }}</td>
+                        <td>{{ item.model.perms }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="folder-branch-item">
+  <a href="" ng-click="explorerService.folderClick(node.item)" class="animated fast fadeInDown">
+
+      <span class="point">
+          <i class="fa fa-chevron-down" ng-show="isInThisPath(node.absPath)"></i>
+          <i class="fa fa-chevron-right" ng-show="!isInThisPath(node.absPath)"></i>
+      </span>
+
+      <i class="fa fa-archive" ng-show="!isInThisPath(node.absPath)"></i>
+      <i class="fa fa-folder-open" ng-show="isInThisPath(node.absPath)"></i>
+      {{node.name }}
+  </a>
+  <ul class="nav nav-sidebar">
+      <li ng-repeat="node in node.nodes" ng-include="'folder-branch-item'" ng-class="{'active': true }"></li>
+  </ul>
+</script>

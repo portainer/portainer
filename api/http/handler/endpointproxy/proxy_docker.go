@@ -2,6 +2,7 @@ package endpointproxy
 
 import (
 	"errors"
+	"fmt"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
@@ -50,6 +51,8 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 	}
 
 	id := strconv.Itoa(endpointID)
+
+	fmt.Println("URL: " + r.URL.Path)
 
 	prefix := "/" + id + "/agent/docker"
 	if !strings.HasPrefix(r.URL.Path, prefix) {

@@ -13,6 +13,7 @@ interface QuickActionsState {
   showQuickActionInspect: boolean;
   showQuickActionLogs: boolean;
   showQuickActionStats: boolean;
+  showQuickActionExplorer: boolean;
 }
 
 interface Props {
@@ -96,6 +97,18 @@ export function ContainerQuickActions({
             title="Attach Console"
           >
             <i className="fa fa-plug space-right" aria-hidden="true" />
+          </Link>
+        </Authorized>
+      )}
+
+      {state.showQuickActionExplorer && isActive && (
+        <Authorized authorizations="DockerContainerExplorer">
+          <Link
+            to="docker.containers.container.explorer"
+            params={{ id: containerId, nodeName }}
+            title="explorer"
+          >
+            <i className="fa fa-folder-open space-right" aria-hidden="true" />
           </Link>
         </Authorized>
       )}

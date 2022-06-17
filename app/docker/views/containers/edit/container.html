@@ -116,7 +116,8 @@
                 <portainer-tooltip
                   position="top"
                   message="Webhook (or callback URI) used to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
                 <label class="switch box-selector-item limited business" style="margin-left: 20px">
                   <input disable-authorization="DockerContainerUpdate" type="checkbox" ng-model="WebhookExists" disabled="disabled" ng-checked="true" /><i></i>
                 </label>
@@ -140,6 +141,9 @@
                   >
                   <a authorization="DockerContainerAttach" class="btn" type="button" ui-sref="docker.containers.container.attach({ id: container.Id })"
                     ><i class="fa fa-plug space-right" aria-hidden="true"></i>Attach</a
+                  >
+                  <a authorization="DockerContainerExplorer" class="btn" type="button" ui-sref="docker.containers.container.explorer({ id: container.Id })"
+                    ><i class="fa fa-folder-open space-right" aria-hidden="true"></i>explorer</a
                   >
                 </div>
               </td>
@@ -259,8 +263,8 @@
             <tr>
               <td>Image</td>
               <td
-                ><a ui-sref="docker.images.image({ id: container.Image, nodeName: nodeName })">{{ container.Config.Image }}@{{ container.Image }}</a></td
-              >
+                ><a ui-sref="docker.images.image({ id: container.Image, nodeName: nodeName })">{{ container.Config.Image }}@{{ container.Image }}</a>
+              </td>
             </tr>
             <tr ng-if="portBindings.length > 0">
               <td>Port configuration</td>
@@ -374,6 +378,7 @@
       leave-network-action="containerLeaveNetwork"
       leave-network-action-in-progress="state.leaveNetworkInProgress"
       node-name="nodeName"
-    ></container-networks-datatable>
+    >
+    </container-networks-datatable>
   </div>
 </div>
