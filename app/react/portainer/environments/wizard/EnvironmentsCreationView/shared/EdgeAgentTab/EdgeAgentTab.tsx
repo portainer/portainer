@@ -1,11 +1,12 @@
 import { v4 as uuid } from 'uuid';
 import { useReducer, useState } from 'react';
 
-import { Button } from '@/portainer/components/Button';
 import { Environment } from '@/portainer/environments/types';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { CommandTab } from '@/react/edge/components/EdgeScriptForm/scripts';
 import { OS, EdgeInfo } from '@/react/edge/components/EdgeScriptForm/types';
+
+import { Button } from '@@/buttons';
 
 import { EdgeAgentForm } from './EdgeAgentForm';
 

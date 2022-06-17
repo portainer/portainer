@@ -4,10 +4,11 @@ import { useMutation } from 'react-query';
 import { object } from 'yup';
 
 import { useUser } from '@/portainer/hooks/useUser';
-import { Button } from '@/portainer/components/Button';
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { notifySuccess } from '@/portainer/services/notifications';
+
+import { Button } from '@@/buttons';
+import { LoadingButton } from '@@/buttons/LoadingButton';
 
 import { EditDetails } from '../EditDetails';
 import { parseAccessControlFormData } from '../utils';

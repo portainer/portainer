@@ -1,7 +1,8 @@
-import { TableSettingsMenuAutoRefresh } from '@/portainer/components/datatables/components/TableSettingsMenuAutoRefresh';
-import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
-import { Checkbox } from '@/portainer/components/form-components/Checkbox';
 import type { ContainersTableSettings } from '@/docker/containers/types';
+
+import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
+import { useTableSettings } from '@@/datatables/useTableSettings';
+import { Checkbox } from '@@/form-components/Checkbox';
 
 interface Props {
   isRefreshVisible: boolean;

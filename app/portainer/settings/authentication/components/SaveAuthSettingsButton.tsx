@@ -1,5 +1,5 @@
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 
 export interface Props {
   onSubmit(): void;

@@ -1,6 +1,5 @@
 import { CellProps, Column } from 'react-table';
 
-import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import { useAuthorizations } from '@/portainer/hooks/useUser';
 import { ContainerQuickActions } from '@/docker/components/container-quick-actions/ContainerQuickActions';
@@ -9,6 +8,8 @@ import type {
   DockerContainer,
 } from '@/docker/containers/types';
 import { EnvironmentStatus } from '@/portainer/environments/types';
+
+import { useTableSettings } from '@@/datatables/useTableSettings';
 
 export const quickActions: Column<DockerContainer> = {
   Header: 'Quick Actions',

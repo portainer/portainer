@@ -1,6 +1,7 @@
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
 import { react2angular } from '@/react-tools/react2angular';
 import { confirm } from '@/portainer/services/modal.service/confirm';
+
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 
 import { SaveAuthSettingsButton } from '../components/SaveAuthSettingsButton';
 import { Settings } from '../../types';

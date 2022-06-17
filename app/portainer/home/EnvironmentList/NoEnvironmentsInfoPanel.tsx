@@ -1,6 +1,6 @@
-import { InformationPanel } from '@/portainer/components/InformationPanel';
-import { Link } from '@/portainer/components/Link';
-import { TextTip } from '@/portainer/components/Tip/TextTip';
+import { InformationPanel } from '@@/InformationPanel';
+import { Link } from '@@/Link';
+import { TextTip } from '@@/Tip/TextTip';
 
 export function NoEnvironmentsInfoPanel({ isAdmin }: { isAdmin: boolean }) {
   return (

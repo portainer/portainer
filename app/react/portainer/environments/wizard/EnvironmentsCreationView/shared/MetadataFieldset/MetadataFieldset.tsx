@@ -1,8 +1,9 @@
 import { useField } from 'formik';
 
-import { TagSelector } from '@/react/components/TagSelector';
 import { useUser } from '@/portainer/hooks/useUser';
-import { FormSection } from '@/portainer/components/form-components/FormSection';
+
+import { TagSelector } from '@@/TagSelector';
+import { FormSection } from '@@/form-components/FormSection';
 
 import { GroupField } from './GroupsField';
 

@@ -1,4 +1,1 @@
-import { Tooltip } from './Tooltip';
-import { TooltipAngular } from './TooltipAngular';
-
-export { Tooltip, TooltipAngular };
+export { TooltipAngular } from './TooltipAngular';

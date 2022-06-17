@@ -2,11 +2,12 @@ import { useQuery } from 'react-query';
 
 import { error as notifyError } from '@/portainer/services/notifications';
 
-import { InformationPanel } from '../components/InformationPanel';
-import { TextTip } from '../components/Tip/TextTip';
+import { InformationPanel } from '@@/InformationPanel';
+import { TextTip } from '@@/Tip/TextTip';
+import { Link } from '@@/Link';
+
 import { getBackupStatus } from '../services/api/backup.service';
 import { isoDate } from '../filters/filters';
-import { Link } from '../components/Link';
 
 export function BackupFailedPanel() {
   const { status, isLoading } = useBackupStatus();

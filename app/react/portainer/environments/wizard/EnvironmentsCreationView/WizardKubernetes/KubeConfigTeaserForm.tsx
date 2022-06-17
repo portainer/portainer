@@ -1,10 +1,10 @@
 import { Field, Form, Formik } from 'formik';
 
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
-import { Input } from '@/portainer/components/form-components/Input';
-import { Button } from '@/portainer/components/Button';
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { FormControl } from '@@/form-components/FormControl';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
+import { Input } from '@@/form-components/Input';
+import { Button } from '@@/buttons';
 
 const initialValues = {
   kubeConfig: '',

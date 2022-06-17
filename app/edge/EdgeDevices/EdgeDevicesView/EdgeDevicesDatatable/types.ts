@@ -3,7 +3,7 @@ import {
   RefreshableTableSettings,
   SettableColumnsTableSettings,
   SortableTableSettings,
-} from '@/portainer/components/datatables/types';
+} from '@@/datatables/types';
 
 export interface Pagination {
   pageLimit: number;

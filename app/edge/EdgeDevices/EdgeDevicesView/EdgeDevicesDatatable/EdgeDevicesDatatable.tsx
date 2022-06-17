@@ -3,7 +3,10 @@ import { useRowSelectColumn } from '@lineup-lite/hooks';
 import _ from 'lodash';
 
 import { Environment } from '@/portainer/environments/types';
-import { PaginationControls } from '@/portainer/components/pagination-controls';
+import { AMTDevicesDatatable } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/AMTDevicesDatatable';
+import { EnvironmentGroup } from '@/portainer/environment-groups/types';
+
+import { PaginationControls } from '@@/PaginationControls';
 import {
   Table,
   TableActions,
@@ -13,17 +16,15 @@ import {
   TableSettingsMenu,
   TableTitle,
   TableTitleActions,
-} from '@/portainer/components/datatables/components';
-import { multiple } from '@/portainer/components/datatables/components/filter-types';
-import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
-import { ColumnVisibilityMenu } from '@/portainer/components/datatables/components/ColumnVisibilityMenu';
-import { SearchBar } from '@/portainer/components/datatables/components/SearchBar';
-import { useRowSelect } from '@/portainer/components/datatables/components/useRowSelect';
-import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
-import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
-import { AMTDevicesDatatable } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/AMTDevicesDatatable';
-import { TextTip } from '@/portainer/components/Tip/TextTip';
-import { EnvironmentGroup } from '@/portainer/environment-groups/types';
+} from '@@/datatables';
+import { multiple } from '@@/datatables/filter-types';
+import { useTableSettings } from '@@/datatables/useTableSettings';
+import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
+import { SearchBar } from '@@/datatables/SearchBar';
+import { useRowSelect } from '@@/datatables/useRowSelect';
+import { TableFooter } from '@@/datatables/TableFooter';
+import { SelectedRowsCount } from '@@/datatables/SelectedRowsCount';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { EdgeDevicesDatatableActions } from './EdgeDevicesDatatableActions';
 import { EdgeDevicesDatatableSettings } from './EdgeDevicesDatatableSettings';
