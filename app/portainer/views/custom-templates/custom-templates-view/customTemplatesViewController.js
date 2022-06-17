@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class CustomTemplatesViewController {
   /* @ngInject */
@@ -33,6 +34,8 @@ class CustomTemplatesViewController {
     this.ResourceControlService = ResourceControlService;
     this.StateManager = StateManager;
     this.StackService = StackService;
+
+    this.isTemplateVariablesEnabled = isBE;
 
     this.DOCKER_STANDALONE = 'DOCKER_STANDALONE';
     this.DOCKER_SWARM_MODE = 'DOCKER_SWARM_MODE';
@@ -119,6 +122,10 @@ class CustomTemplatesViewController {
   }
 
   renderTemplate() {
+    if (!this.isTemplateVariablesEnabled) {
+      return;
+    }
+
     const fileContent = renderTemplate(this.state.templateContent, this.formValues.variables, this.state.selectedTemplate.Variables);
     this.onChangeFormValues({ fileContent });
   }

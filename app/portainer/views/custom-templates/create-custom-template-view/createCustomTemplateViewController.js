@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
@@ -19,6 +20,8 @@ class CreateCustomTemplateViewController {
       StackService,
       StateManager,
     });
+
+    this.isTemplateVariablesEnabled = isBE;
 
     this.formValues = {
       Title: '',
@@ -176,6 +179,10 @@ class CreateCustomTemplateViewController {
   }
 
   parseTemplate(templateStr) {
+    if (!this.isTemplateVariablesEnabled) {
+      return;
+    }
+
     const variables = getTemplateVariables(templateStr);
 
     const isValid = !!variables;

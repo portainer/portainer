@@ -22,7 +22,7 @@ angular.module('portainer.app').controller('AccountController', [
         try {
           await UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword);
           Notifications.success('Success', 'Password successfully updated');
-          StateManager.resetPasswordChangeSkips($scope.userID);
+          StateManager.resetPasswordChangeSkips($scope.userID.toString());
           $scope.forceChangePassword = false;
           $state.go('portainer.logout');
         } catch (err) {
@@ -34,7 +34,7 @@ angular.module('portainer.app').controller('AccountController', [
     $scope.skipPasswordChange = async function () {
       try {
         if ($scope.userCanSkip()) {
-          StateManager.setPasswordChangeSkipped($scope.userID);
+          StateManager.setPasswordChangeSkipped($scope.userID.toString());
           $scope.forceChangePassword = false;
           $state.go('portainer.home');
         }
@@ -48,7 +48,7 @@ angular.module('portainer.app').controller('AccountController', [
     };
 
     this.uiCanExit = (newTransition) => {
-      if ($scope.userRole === 1 && newTransition.to().name === 'portainer.settings.authentication') {
+      if ($scope.userRole === 1 && newTransition && newTransition.to().name === 'portainer.settings.authentication') {
         return true;
       }
       if (newTransition.to().name === 'portainer.logout') {
@@ -134,7 +134,9 @@ angular.module('portainer.app').controller('AccountController', [
           }
 
           $scope.timesPasswordChangeSkipped =
-            state.UI.timesPasswordChangeSkipped && state.UI.timesPasswordChangeSkipped[$scope.userID] ? state.UI.timesPasswordChangeSkipped[$scope.userID] : 0;
+            state.UI.timesPasswordChangeSkipped && state.UI.timesPasswordChangeSkipped[$scope.userID.toString()]
+              ? state.UI.timesPasswordChangeSkipped[$scope.userID.toString()]
+              : 0;
 
           $scope.requiredPasswordLength = data.RequiredPasswordLength;
           StateManager.setRequiredPasswordLength(data.RequiredPasswordLength);
