@@ -202,17 +202,6 @@ angular
         },
       };
 
-      const endpointKubernetesSecurityConstraint = {
-        name: 'portainer.k8sendpoint.securityConstraint',
-        url: '/securityConstraint',
-        views: {
-          'content@': {
-            templateUrl: '../kubernetes/views/security-constraint/constraint.html',
-            controller: 'KubernetesSecurityConstraintController',
-          },
-        },
-      };
-
       var edgeDeviceCreation = {
         name: 'portainer.endpoints.newEdgeDevice',
         url: '/newEdgeDevice',
@@ -502,7 +491,6 @@ angular
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);
       $stateRegistryProvider.register(endpointKubernetesConfiguration);
-      $stateRegistryProvider.register(endpointKubernetesSecurityConstraint);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
       $stateRegistryProvider.register(groupAccess);
