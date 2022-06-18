@@ -2,7 +2,7 @@ import { UISrefActive } from '@uirouter/react';
 import { Children, ComponentProps, ReactNode } from 'react';
 import _ from 'lodash';
 
-import { Link as NavLink } from '@/portainer/components/Link';
+import { Link as NavLink } from '@@/Link';
 
 import styles from './Link.module.css';
 

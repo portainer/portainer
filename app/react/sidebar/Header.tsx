@@ -1,5 +1,6 @@
-import { Link } from '@/portainer/components/Link';
 import defaultLogo from '@/assets/images/logo.png';
+
+import { Link } from '@@/Link';
 
 import styles from './Header.module.css';
 import { useSidebarState } from './useSidebarState';

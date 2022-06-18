@@ -3,7 +3,6 @@ import { fit } from 'xterm/lib/addons/fit/fit';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
-import { Button } from '@/portainer/components/Button';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import {
   terminalClose,
@@ -12,6 +11,8 @@ import {
 import { EnvironmentId } from '@/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+
+import { Button } from '@@/buttons';
 
 import styles from './KubectlShell.module.css';
 

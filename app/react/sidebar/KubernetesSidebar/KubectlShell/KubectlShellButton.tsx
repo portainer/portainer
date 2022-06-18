@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Button } from '@/portainer/components/Button';
 import { EnvironmentId } from '@/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
+
+import { Button } from '@@/buttons';
 
 import { KubeCtlShell } from './KubectlShell';
 import styles from './KubectlShellButton.module.css';
