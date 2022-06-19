@@ -1,5 +1,6 @@
-import { BoxSelectorOption } from '@/portainer/components/BoxSelector';
 import { EnvironmentCreationTypes } from '@/portainer/environments/types';
+
+import { BoxSelectorOption } from '@@/BoxSelector';
 
 import { useCreateEdgeDeviceParam } from '../hooks/useCreateEdgeDeviceParam';
 
