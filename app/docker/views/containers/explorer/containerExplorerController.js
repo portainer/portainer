@@ -19,7 +19,6 @@ angular.module('portainer.docker').controller('ContainerExplorerController', [
       // var resulut = currentPath.indexOf(path) !== -1
       // console.log(":::::::::::::::::::::::::::::::  path =" + path + "  currentPath = " + currentPath)
       // return resulut
-
       return $scope.explorerService.currentPath.indexOf(path) !== -1;
     };
 

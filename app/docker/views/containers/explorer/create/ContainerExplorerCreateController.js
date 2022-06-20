@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.docker').controller('ContainerExplorerCreateController', [
   '$scope',
   '$window',
@@ -10,7 +12,11 @@ angular.module('portainer.docker').controller('ContainerExplorerCreateController
     $scope.explorerService = ExplorerService;
 
     $scope.createFolder = function (name) {
-      var path = ExplorerService.currentPath + '/' + name;
+      if (_.isEmpty(name)) {
+        Notifications.error('Failure', null, 'folder name cannot be empty.');
+        return;
+      }
+      const path = ExplorerService.currentPath + '/' + name;
       ExplorerService.create($transition$.params().id, path)
         .then(function () {
           Notifications.success('folder created successfully');
