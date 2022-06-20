@@ -81,7 +81,7 @@
   path="kubernetes.cluster"
   path-params="{ endpointId: $ctrl.endpointId }"
   is-sidebar-open="$ctrl.isSidebarOpen"
-  children-paths="['kubernetes.cluster', 'portainer.k8sendpoint.kubernetesConfig', 'kubernetes.registries', 'kubernetes.registries.access']"
+  children-paths="['kubernetes.cluster', 'portainer.k8sendpoint.kubernetesConfig', 'portainer.k8sendpoint.securityConstraint', 'kubernetes.registries', 'kubernetes.registries.access']"
   data-cy="k8sSidebar-cluster"
 >
   <sidebar-menu-item
@@ -94,6 +94,17 @@
     title="Setup"
   >
     Setup
+  </sidebar-menu-item>
+
+  <sidebar-menu-item
+    authorization="K8sClusterSetupRW"
+    path="portainer.k8sendpoint.securityConstraint"
+    path-params="{ id: $ctrl.endpointId }"
+    class-name="sidebar-sublist"
+    data-cy="k8sSidebar-security-constraints"
+    title="Security constraints"
+  >
+    Security constraints
   </sidebar-menu-item>
 
   <sidebar-menu-item

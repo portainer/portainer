@@ -321,6 +321,17 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const endpointKubernetesSecurityConstraint = {
+      name: 'portainer.k8sendpoint.securityConstraint',
+      url: '/securityConstraint',
+      views: {
+        'content@': {
+          templateUrl: '../kubernetes/views/security-constraint/constraint.html',
+          controller: 'KubernetesSecurityConstraintController',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(kubernetes);
     $stateRegistryProvider.register(helmApplication);
     $stateRegistryProvider.register(helmTemplates);
@@ -350,5 +361,6 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(volume);
     $stateRegistryProvider.register(registries);
     $stateRegistryProvider.register(registriesAccess);
+    $stateRegistryProvider.register(endpointKubernetesSecurityConstraint);
   },
 ]);

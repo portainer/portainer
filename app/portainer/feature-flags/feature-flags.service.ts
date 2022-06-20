@@ -34,6 +34,7 @@ export async function init(edition: Edition) {
     [FeatureId.STACK_PULL_IMAGE]: Edition.BE,
     [FeatureId.STACK_WEBHOOK]: Edition.BE,
     [FeatureId.CONTAINER_WEBHOOK]: Edition.BE,
+    [FeatureId.POD_SECURITY_POLICY_CONSTRAINT]: Edition.BE,
   };
 
   state.currentEdition = currentEdition;
