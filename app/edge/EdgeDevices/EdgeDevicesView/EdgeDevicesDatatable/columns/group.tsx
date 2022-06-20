@@ -1,7 +1,8 @@
 import { Column } from 'react-table';
 
 import { Environment } from '@/portainer/environments/types';
-import { DefaultFilter } from '@/portainer/components/datatables/components/Filter';
+
+import { DefaultFilter } from '@@/datatables/Filter';
 
 import { useRowContext } from './RowContext';
 

@@ -3,11 +3,12 @@ import _ from 'lodash';
 import { useSref } from '@uirouter/react';
 
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
-import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
 import type {
   ContainersTableSettings,
   DockerContainer,
 } from '@/docker/containers/types';
+
+import { useTableSettings } from '@@/datatables/useTableSettings';
 
 export const name: Column<DockerContainer> = {
   Header: 'Name',

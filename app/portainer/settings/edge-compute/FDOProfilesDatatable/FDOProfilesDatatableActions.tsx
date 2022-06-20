@@ -1,15 +1,16 @@
 import { useQueryClient } from 'react-query';
 import { useRouter } from '@uirouter/react';
 
-import { Button } from '@/portainer/components/Button';
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
-import { Link } from '@/portainer/components/Link';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import * as notifications from '@/portainer/services/notifications';
 import {
   deleteProfile,
   duplicateProfile,
 } from '@/portainer/hostmanagement/fdo/fdo.service';
+
+import { Link } from '@@/Link';
+import { Button } from '@@/buttons';
 
 interface Props {
   isFDOEnabled: boolean;

@@ -4,13 +4,14 @@ import { DialogOverlay } from '@reach/dialog';
 
 import * as kcService from '@/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
-import { Button } from '@/portainer/components/Button';
-import { Checkbox } from '@/portainer/components/form-components/Checkbox';
 import { EnvironmentType } from '@/portainer/environments/types';
 import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service/index';
-import { PaginationControls } from '@/portainer/components/pagination-controls';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
 import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
+
+import { PaginationControls } from '@@/PaginationControls';
+import { Checkbox } from '@@/form-components/Checkbox';
+import { Button } from '@@/buttons';
 
 import { useSelection } from './KubeconfigSelection';
 import styles from './KubeconfigPrompt.module.css';

@@ -1,6 +1,6 @@
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { FormSection } from '@/portainer/components/form-components/FormSection/FormSection';
-import { Input } from '@/portainer/components/form-components/Input';
+import { FormControl } from '@@/form-components/FormControl';
+import { FormSection } from '@@/form-components/FormSection/FormSection';
+import { Input } from '@@/form-components/Input';
 
 import { VariableDefinition } from '../CustomTemplatesVariablesDefinitionField/CustomTemplatesVariablesDefinitionField';
 

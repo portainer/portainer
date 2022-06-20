@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 
-import { Code } from '@/portainer/components/Code';
-import { CopyButton } from '@/portainer/components/Button/CopyButton';
-import { NavTabs } from '@/portainer/components/NavTabs/NavTabs';
 import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
+
+import { Code } from '@@/Code';
+import { CopyButton } from '@@/buttons/CopyButton';
+import { NavTabs } from '@@/NavTabs';
 
 import { ScriptFormValues, Platform } from './types';
 import { CommandTab } from './scripts';

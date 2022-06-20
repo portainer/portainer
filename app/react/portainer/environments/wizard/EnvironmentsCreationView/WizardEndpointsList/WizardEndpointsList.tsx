@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import {
   environmentTypeIcon,
   endpointTypeName,
@@ -16,6 +15,8 @@ import {
   ENVIRONMENTS_POLLING_INTERVAL,
   useEnvironmentList,
 } from '@/portainer/environments/queries/useEnvironmentList';
+
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 
 import styles from './WizardEndpointsList.module.css';
 

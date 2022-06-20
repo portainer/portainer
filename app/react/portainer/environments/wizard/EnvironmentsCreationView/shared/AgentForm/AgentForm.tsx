@@ -1,11 +1,12 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { useCreateAgentEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/portainer/environments/types';
 import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
+
+import { LoadingButton } from '@@/buttons/LoadingButton';
 
 import { NameField } from '../NameField';
 import { MoreSettingsSection } from '../MoreSettingsSection';

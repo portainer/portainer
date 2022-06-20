@@ -1,6 +1,6 @@
 import { FeatureId } from '@/portainer/feature-flags/enums';
 
-import { getFeatureDetails } from './utils';
+import { getFeatureDetails } from '@@/BEFeatureIndicator/utils';
 
 export default class BeIndicatorController {
   limitedToBE?: boolean;

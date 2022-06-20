@@ -1,9 +1,9 @@
-import { useFormikContext, Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Input } from '@/portainer/components/form-components/Input';
-import { SwitchField } from '@/portainer/components/form-components/SwitchField';
-import { TextTip } from '@/portainer/components/Tip/TextTip';
+import { FormControl } from '@@/form-components/FormControl';
+import { Input } from '@@/form-components/Input';
+import { SwitchField } from '@@/form-components/SwitchField';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { NomadTokenField } from './NomadTokenField';
 import { ScriptFormValues } from './types';

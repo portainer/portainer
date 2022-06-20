@@ -2,8 +2,9 @@ import { useQuery } from 'react-query';
 
 import { error as notifyError } from '@/portainer/services/notifications';
 
-import { InformationPanel } from '../components/InformationPanel';
-import { TextTip } from '../components/Tip/TextTip';
+import { InformationPanel } from '@@/InformationPanel';
+import { TextTip } from '@@/Tip/TextTip';
+
 import { LicenseType } from '../license-management/types';
 import { useLicenseInfo } from '../license-management/use-license.service';
 import { getNodesCount } from '../services/api/status.service';

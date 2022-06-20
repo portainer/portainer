@@ -3,7 +3,8 @@ import { useState } from 'react';
 
 import { r2a } from '@/react-tools/react2angular';
 
-import { PageHeader } from '../components/PageHeader';
+import { PageHeader } from '@@/PageHeader';
+
 import * as notifications from '../services/notifications';
 import { Environment } from '../environments/types';
 import { snapshotEndpoints } from '../environments/environment.service';

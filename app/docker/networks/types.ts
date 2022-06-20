@@ -1,4 +1,4 @@
-import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+import { PortainerMetadata } from '@/react/docker/types';
 
 import { ContainerId } from '../containers/types';
 
@@ -44,7 +44,7 @@ export interface DockerNetwork {
     Driver: string;
     Options: IpamOptions;
   };
-  Portainer: { ResourceControl?: ResourceControlViewModel };
+  Portainer?: PortainerMetadata;
   Options: NetworkOptions;
   Containers: NetworkResponseContainers;
 }

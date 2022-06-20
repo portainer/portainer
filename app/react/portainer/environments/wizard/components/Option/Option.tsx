@@ -1,9 +1,10 @@
 import clsx from 'clsx';
 import { ComponentType } from 'react';
 
-import { BEFeatureIndicator } from '@/portainer/components/BEFeatureIndicator';
 import { FeatureId } from '@/portainer/feature-flags/enums';
 import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+
+import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
 import styles from './Option.module.css';
 

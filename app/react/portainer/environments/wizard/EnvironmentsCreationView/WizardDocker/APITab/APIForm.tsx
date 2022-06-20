@@ -1,15 +1,16 @@
 import { Field, Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { useCreateRemoteEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Input } from '@/portainer/components/form-components/Input';
 import {
   Environment,
   EnvironmentCreationTypes,
 } from '@/portainer/environments/types';
+
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { FormControl } from '@@/form-components/FormControl';
+import { Input } from '@@/form-components/Input';
 
 import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';

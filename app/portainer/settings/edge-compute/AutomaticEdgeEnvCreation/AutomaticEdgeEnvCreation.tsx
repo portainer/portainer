@@ -1,11 +1,12 @@
 import { useMutation } from 'react-query';
 import { useEffect } from 'react';
 
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { generateKey } from '@/portainer/environments/environment.service/edge';
 import { useSettings } from '@/portainer/settings/queries';
 import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
+
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 
 import { AutoEnvCreationSettingsForm } from './AutoEnvCreationSettingsForm';
 

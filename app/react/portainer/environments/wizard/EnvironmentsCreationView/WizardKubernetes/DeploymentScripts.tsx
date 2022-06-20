@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
-import { CopyButton } from '@/portainer/components/Button/CopyButton';
-import { Code } from '@/portainer/components/Code';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
-import { NavTabs } from '@/portainer/components/NavTabs/NavTabs';
 import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
 import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
+
+import { CopyButton } from '@@/buttons/CopyButton';
+import { Code } from '@@/Code';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
+import { NavTabs } from '@@/NavTabs';
 
 const deployments = [
   {
