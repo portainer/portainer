@@ -29,4 +29,5 @@ export enum FeatureId {
   STACK_PULL_IMAGE = 'stack-pull-image',
   STACK_WEBHOOK = 'stack-webhook',
   CONTAINER_WEBHOOK = 'container-webhook',
+  POD_SECURITY_POLICY_CONSTRAINT = 'pod-security-policy-constraint',
 }
