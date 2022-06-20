@@ -54,6 +54,13 @@ export interface KubernetesSettings {
   Snapshots?: KubernetesSnapshot[] | null;
 }
 
+export type EnvironmentEdge = {
+  AsyncMode: boolean;
+  PingInterval: number;
+  SnapshotInterval: number;
+  CommandInterval: number;
+};
+
 export type Environment = {
   Id: EnvironmentId;
   Type: EnvironmentType;
@@ -73,6 +80,7 @@ export type Environment = {
   IsEdgeDevice?: boolean;
   UserTrusted: boolean;
   AMTDeviceGUID?: string;
+  Edge: EnvironmentEdge;
 };
 /**
  * TS reference of endpoint_create.go#EndpointCreationType iota

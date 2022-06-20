@@ -1,4 +1,5 @@
-import { render } from '@/react-tools/test-utils';
+import { createMockEnvironment } from '@/react-tools/test-mocks';
+import { renderWithQueryClient } from '@/react-tools/test-utils';
 
 import { EdgeIndicator } from './EdgeIndicator';
 
@@ -23,13 +24,14 @@ function renderComponent(
   checkInInterval = 0,
   queryDate = 0
 ) {
-  return render(
-    <EdgeIndicator
-      edgeId={edgeId}
-      lastCheckInDate={lastCheckInDate}
-      checkInInterval={checkInInterval}
-      queryDate={queryDate}
-      showLastCheckInDate
-    />
+  const environment = createMockEnvironment();
+
+  environment.EdgeID = edgeId;
+  environment.LastCheckInDate = lastCheckInDate;
+  environment.EdgeCheckinInterval = checkInInterval;
+  environment.QueryDate = queryDate;
+
+  return renderWithQueryClient(
+    <EdgeIndicator environment={environment} showLastCheckInDate />
   );
 }
