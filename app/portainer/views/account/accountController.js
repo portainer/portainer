@@ -130,7 +130,7 @@ angular.module('portainer.app').controller('AccountController', [
           $scope.AuthenticationMethod = data.AuthenticationMethod;
 
           if (state.UI.requiredPasswordLength && state.UI.requiredPasswordLength !== data.RequiredPasswordLength) {
-            StateManager.clearPasswordChangeSkips($scope.userID.toString());
+            StateManager.clearPasswordChangeSkips();
           }
 
           $scope.timesPasswordChangeSkipped =
