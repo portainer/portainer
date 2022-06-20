@@ -75,6 +75,10 @@
                       </tr>
                     </thead>
                     <tbody>
+                      <tr ng-show="!explorerService.requesting &amp;&amp; explorerService.fileList.length < 1 &amp;&amp; !explorerService.error">
+                        <td colspan="4"> No files in this folder... </td>
+                      </tr>
+
                       <tr class="item-list" ng-repeat="item in explorerService.fileList">
                         <td>
                           <a href="" ng-dblclick="smartClick(item)">
