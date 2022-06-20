@@ -25,14 +25,16 @@ export function EdgeIndicator({
 
   if (!associated) {
     return (
-      <span className="label label-default" aria-label="unassociated">
-        <s>associated</s>
+      <span role="status" aria-label="edge-status">
+        <span className="label label-default" aria-label="unassociated">
+          <s>associated</s>
+        </span>
       </span>
     );
   }
 
   return (
-    <span>
+    <span role="status" aria-label="edge-status">
       <span
         className={clsx('label', {
           'label-danger': !isValid,
@@ -55,8 +57,13 @@ export function EdgeIndicator({
   );
 }
 
-function useHasHeartbeat(environment: Environment, enabled: boolean) {
-  const settingsQuery = useSettings(undefined, enabled);
+function useHasHeartbeat(environment: Environment, associated: boolean) {
+  const settingsQuery = useSettings(undefined, associated);
+
+  if (!associated) {
+    return false;
+  }
+
   const { LastCheckInDate, QueryDate } = environment;
 
   const settings = settingsQuery.data;
