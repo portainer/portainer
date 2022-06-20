@@ -61,7 +61,7 @@ export function CreateAccessToken({
   return (
     <Widget>
       <WidgetBody>
-        <div>
+        <div className="form-horizontal">
           <FormControl
             inputId="input"
             label={t('Description')}
