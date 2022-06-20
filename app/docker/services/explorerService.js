@@ -135,7 +135,25 @@ function ExplorerServiceFactory($q, Explorer) {
       item instanceof ItemViewModel && item.isFolder() && recursive(this.history[0], item, path);
     }
 
-    console.log('history', this.history);
+    // console.log('history', this.history);
+  };
+
+  service.create = function (containerId, path) {
+    const deferred = $q.defer();
+
+    const parameters = {
+      id: containerId,
+      path: path,
+    };
+    Explorer.create(parameters)
+      .$promise.then(function success(data) {
+        deferred.resolve(data);
+      })
+      .catch(function error(err) {
+        deferred.reject(err);
+      });
+
+    return deferred.promise;
   };
 
   return service;

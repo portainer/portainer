@@ -20,6 +20,14 @@ angular.module('portainer.docker').factory('Explorer', [
           ignoreLoadingBar: true,
           isArray: true,
         },
+        create: {
+          method: 'POST',
+          params: {
+            id: '@id',
+            action: 'create',
+            path: '@path',
+          },
+        },
       }
     );
   },

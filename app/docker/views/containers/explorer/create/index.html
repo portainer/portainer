@@ -1,0 +1,38 @@
+<rd-header>
+  <rd-header-title title-text="Container Explorer"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a> &gt;
+    <a ui-sref="docker.containers.container.explorer({id: container.Id})">Explorer</a> &gt; New folder
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-folder-open" title-text="{{ explorerService.currentPath }}"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" autocomplete="off">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="folder_name" class="col-sm-1 control-label text-left">folder Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="folderName" id="folder_name" placeholder="new folder name" />
+            </div>
+          </div>
+
+          <div class="col-sm-12 form-section-title"> Actions </div>
+          <div class="form-group">
+            <div class="col-sm-4 col-md-3">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="createFolder(folderName)">
+                <span>Create</span>
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="goBack()">
+                <span>Cancel</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

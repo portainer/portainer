@@ -11,21 +11,19 @@
       <rd-widget>
         <rd-widget-header icon="fa-folder-open" title-text="{{ explorerService.currentPath }}">
           <div class="settings">
-            <button class="table-setting-menu-btn" ng-click="docker.containers.container.explorer.new({ id: container.Id })">
-              <i class="fa fa-plus"></i>
-              New folder
-            </button>
-            <button class="table-setting-menu-btn">
-              <i class="fa fa-upload"></i>
-              Upload files
-            </button>
+            <a class="btn btn-primary btn-sm" type="button" ui-sref="docker.containers.container.explorer.create({ id: container.Id})" ng-disabled="container.IsPortainer"
+              ><i class="fa fa-plus space-right" aria-hidden="true"></i> New folder</a
+            >
+            <a class="btn btn-primary btn-sm" type="button" ui-sref="docker.containers.container.explorer.upload({ id: container.Id})" ng-disabled="container.IsPortainer"
+              ><i class="fa fa-upload space-right" aria-hidden="true"></i> Upload files</a
+            >
           </div>
         </rd-widget-header>
         <rd-widget-body classes="no-padding">
           <div class="row">
             <div class="col-sm-4 col-md-3 sidebar file-tree animated slow fadeIn">
               <ul class="nav nav-sidebar file-tree-root">
-                <li ng-repeat="node in explorerService.history[0].nodes" ng-include="'folder-branch-item'" ng-class="{ active: node.absPath == explorerService.currentPath }"></li>
+                <li ng-repeat="node in explorerService.history[0].nodes" ng-include="'folder-branch-item'" ng-class="{ active: true }"></li>
               </ul>
             </div>
             <div class="col-sm-8 col-md-9">
@@ -37,7 +35,7 @@
                       type="text"
                       class="searchInput"
                       ng-model="$ctrl.state.textFilter"
-                      ng-change="$ctrl.onTextFilterChange()"
+                      ng-change="explorerService.onTextFilterChange()"
                       placeholder="Search..."
                       auto-focus
                       ng-model-options="{ debounce: 300 }"
@@ -47,28 +45,28 @@
                     <thead>
                       <tr>
                         <th>
-                          <a ng-click="$ctrl.changeOrderBy('Name')">
+                          <a ng-click="explorerService.changeOrderBy('Name')">
                             Name
                             <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
                             <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                           </a>
                         </th>
                         <th>
-                          <a ng-click="$ctrl.changeOrderBy('Size')">
+                          <a ng-click="explorerService.changeOrderBy('Size')">
                             Size
                             <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && !$ctrl.state.reverseOrder"></i>
                             <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"></i>
                           </a>
                         </th>
                         <th>
-                          <a ng-click="$ctrl.changeOrderBy('Data')">
+                          <a ng-click="explorerService.changeOrderBy('Data')">
                             Data
                             <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Data' && !$ctrl.state.reverseOrder"></i>
                             <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Data' && $ctrl.state.reverseOrder"></i>
                           </a>
                         </th>
                         <th>
-                          <a ng-click="$ctrl.changeOrderBy('Data')">
+                          <a ng-click="explorerService.changeOrderBy('Data')">
                             Permissions
                             <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Permissions' && !$ctrl.state.reverseOrder"></i>
                             <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Permissions' && $ctrl.state.reverseOrder"></i>

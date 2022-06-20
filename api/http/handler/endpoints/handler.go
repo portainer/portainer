@@ -66,6 +66,8 @@ func NewHandler(bouncer requestBouncer, demoService *demo.Service) *Handler {
 	h.Handle("/endpoints", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/explorer/{containerId}/list", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExplorer))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}/explorer/{containerId}/create", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExplorerCreate))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}/explorer/{containerId}/remove", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExplorerRemove))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}", bouncer.AdminAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}", bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
 	h.Handle("/endpoints/{id}/dockerhub/{registryId}", bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)

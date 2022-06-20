@@ -206,13 +206,24 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
       },
     };
 
-    const containerExplorerNew = {
-      name: 'docker.containers.container.explorer.new',
-      url: '/explorer/new',
+    const containerExplorerCreate = {
+      name: 'docker.containers.container.explorer.create',
+      url: '/create',
       views: {
         'content@': {
-          templateUrl: './views/containers/explorer/new/containerExplorerNew.html',
-          controller: 'ContainerExplorerNewController',
+          templateUrl: './views/containers/explorer/create/index.html',
+          controller: 'ContainerExplorerCreateController',
+        },
+      },
+    };
+
+    const containerExplorerUpload = {
+      name: 'docker.containers.container.explorer.upload',
+      url: '/upload',
+      views: {
+        'content@': {
+          templateUrl: './views/containers/explorer/upload/index.html',
+          controller: 'ContainerExplorerUploadController',
         },
       },
     };
@@ -655,7 +666,8 @@ angular.module('portainer.docker', ['portainer.app', containersModule, component
     $stateRegistryProvider.register(containerLogs);
     $stateRegistryProvider.register(containerStats);
     $stateRegistryProvider.register(containerExplorer);
-    $stateRegistryProvider.register(containerExplorerNew);
+    $stateRegistryProvider.register(containerExplorerCreate);
+    $stateRegistryProvider.register(containerExplorerUpload);
     $stateRegistryProvider.register(customTemplates);
     $stateRegistryProvider.register(customTemplatesNew);
     $stateRegistryProvider.register(customTemplatesEdit);

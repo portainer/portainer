@@ -23,12 +23,29 @@ angular.module('portainer.docker').controller('ContainerExplorerController', [
       return $scope.explorerService.currentPath.indexOf(path) !== -1;
     };
 
+    $scope.onTextFilterChange = function () {
+      return null;
+    };
+
+    $scope.changeOrderBy = function (name) {
+      console.log(name);
+      return null;
+    };
+
     $scope.smartClick = function (item) {
       if (item.isFolder()) {
         return ExplorerService.folderClick(item);
       } else {
         Notifications.error('Failure', null, 'not supported');
       }
+    };
+
+    $scope.modal = function (id, hide, returnElement) {
+      var element = angular.element('#' + id);
+      element.modal(hide ? 'hide' : 'show');
+      $scope.explorerService.error = '';
+
+      return returnElement ? element : true;
     };
 
     function initView() {
