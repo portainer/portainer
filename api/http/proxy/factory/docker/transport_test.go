@@ -1,11 +1,12 @@
 package docker
 
 import (
-	portainer "github.com/portainer/portainer/api"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/stretchr/testify/assert"
 )
 
 type noopGitService struct{}
@@ -16,7 +17,12 @@ func (s *noopGitService) CloneRepository(destination string, repositoryURL, refe
 func (s *noopGitService) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
 	return "my-latest-commit-id", nil
 }
-
+func (g *noopGitService) ListRemote(repositoryURL, username, password string) ([]string, error) {
+	return nil, nil
+}
+func (g *noopGitService) ListTree(repositoryURL, referenceName, username, password string) ([]string, error) {
+	return nil, nil
+}
 func TestTransport_updateDefaultGitBranch(t *testing.T) {
 	type fields struct {
 		gitService portainer.GitService

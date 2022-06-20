@@ -294,3 +294,12 @@ func getVersionType(name string) string {
 	}
 	return "commit"
 }
+
+func (a *azureDownloader) listRemote(ctx context.Context, opt cloneOptions) ([]string, error) {
+
+	return nil, nil
+}
+
+func (a *azureDownloader) listTree(ctx context.Context, opt fetchOptions) ([]string, error) {
+	return nil, nil
+}

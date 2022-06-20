@@ -26,6 +26,14 @@ func (g *gitService) LatestCommitID(repositoryURL, referenceName, username, pass
 	return g.id, nil
 }
 
+func (g *gitService) ListRemote(repositoryURL, username, password string) ([]string, error) {
+	return nil, nil
+}
+
+func (g *gitService) ListTree(repositoryURL, referenceName, username, password string) ([]string, error) {
+	return nil, nil
+}
+
 type noopDeployer struct{}
 
 func (s *noopDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool) error {

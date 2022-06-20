@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
@@ -153,6 +154,14 @@ func (t *testDownloader) latestCommitID(_ context.Context, _ fetchOptions) (stri
 	return "", nil
 }
 
+func (t *testDownloader) listRemote(_ context.Context, _ cloneOptions) ([]string, error) {
+	return nil, nil
+}
+
+func (t *testDownloader) listTree(_ context.Context, _ fetchOptions) ([]string, error) {
+	return nil, nil
+}
+
 func Test_cloneRepository_azure(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -187,6 +196,62 @@ func Test_cloneRepository_azure(t *testing.T) {
 			// if azure API is called, git isn't and vice versa
 			assert.Equal(t, tt.called, azure.called)
 			assert.Equal(t, tt.called, !git.called)
+		})
+	}
+}
+
+func Test_listRemote(t *testing.T) {
+	service := Service{git: gitClient{
+		preserveGitDirectory: true,
+		repoRefCache:         make(map[string][]*plumbing.Reference),
+		repoTreeCache:        make(map[string][]string),
+	}} // no need for http client since the test access the repo via file system.
+
+	repositoryURL := bareRepoDir
+
+	refs, err := service.ListRemote(repositoryURL, "", "")
+	assert.NoError(t, err)
+	log.Println(refs)
+	assert.GreaterOrEqual(t, len(refs), 1)
+}
+
+func Test_lsTree(t *testing.T) {
+	tests := []struct {
+		name  string
+		url   string
+		ref   string
+		found bool
+	}{
+		{
+			name:  "list tree on exisitng ref",
+			url:   bareRepoDir,
+			ref:   "refs/heads/main",
+			found: true,
+		},
+		{
+			name:  "list tree on non-exisitng ref",
+			url:   bareRepoDir,
+			ref:   "refs/heads/feat",
+			found: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			service := Service{git: gitClient{
+				preserveGitDirectory: true,
+				repoRefCache:         make(map[string][]*plumbing.Reference),
+				repoTreeCache:        make(map[string][]string),
+			}} // no need for http client since the test access the repo via file system.
+
+			paths, err := service.ListTree(tt.url, tt.ref, "", "")
+			if tt.found {
+				assert.NoError(t, err)
+				assert.GreaterOrEqual(t, len(paths), 1)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, len(paths), 0)
+			}
 		})
 	}
 }

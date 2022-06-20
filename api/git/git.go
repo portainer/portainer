@@ -2,45 +2,27 @@ package git
 
 import (
 	"context"
-	"crypto/tls"
-	"net/http"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/transport/client"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
 )
 
-type fetchOptions struct {
-	repositoryUrl string
-	username      string
-	password      string
-	referenceName string
-}
-
-type cloneOptions struct {
-	repositoryUrl string
-	username      string
-	password      string
-	referenceName string
-	depth         int
-}
-
-type downloader interface {
-	download(ctx context.Context, dst string, opt cloneOptions) error
-	latestCommitID(ctx context.Context, opt fetchOptions) (string, error)
-}
-
 type gitClient struct {
 	preserveGitDirectory bool
+	// Cache the result of repository refs, key is repository URL
+	repoRefCache map[string][]*plumbing.Reference
+	// Cache the result of repository file tree, key is the concat of repository URL and ref value
+	repoTreeCache map[string][]string
 }
 
 func (c gitClient) download(ctx context.Context, dst string, opt cloneOptions) error {
@@ -114,66 +96,92 @@ func getAuth(username, password string) *githttp.BasicAuth {
 	return nil
 }
 
-// Service represents a service for managing Git.
-type Service struct {
-	httpsCli *http.Client
-	azure    downloader
-	git      downloader
+func (c gitClient) listRemote(ctx context.Context, opt cloneOptions) ([]string, error) {
+	rem := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
+		Name: "origin",
+		URLs: []string{opt.repositoryUrl},
+	})
+
+	refs, err := rem.List(&git.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []string
+	for _, ref := range refs {
+		ret = append(ret, ref.Name().String())
+	}
+
+	c.repoRefCache[opt.repositoryUrl] = refs
+	return ret, nil
 }
 
-// NewService initializes a new service.
-func NewService() *Service {
-	httpsCli := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           http.ProxyFromEnvironment,
-		},
-		Timeout: 300 * time.Second,
+func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, error) {
+	repoKey := getRepoKey(opt.repositoryUrl, opt.referenceName)
+	treeCache, ok := c.repoTreeCache[repoKey]
+	if ok {
+		return treeCache, nil
 	}
 
-	client.InstallProtocol("https", githttp.NewClient(httpsCli))
+	refs := make([]*plumbing.Reference, 0)
+	var err error
+	refCache, ok := c.repoRefCache[opt.repositoryUrl]
+	if ok {
+		refs = refCache
+	} else {
+		rem := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
+			Name: "origin",
+			URLs: []string{opt.repositoryUrl},
+		})
 
-	return &Service{
-		httpsCli: httpsCli,
-		azure:    NewAzureDownloader(httpsCli),
-		git:      gitClient{},
+		refs, err = rem.List(&git.ListOptions{})
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	var ret []string
+	for _, r := range refs {
+		if r.Name().String() == opt.referenceName {
+			repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
+				URL:           opt.repositoryUrl,
+				NoCheckout:    true,
+				Depth:         1,
+				SingleBranch:  true,
+				ReferenceName: r.Name(),
+			})
+
+			if err != nil {
+				return nil, err
+			}
+
+			head, err := repo.Head()
+			if err != nil {
+				return nil, err
+			}
+
+			commit, err := repo.CommitObject(head.Hash())
+			if err != nil {
+				return nil, err
+			}
+
+			tree, err := commit.Tree()
+			if err != nil {
+				return nil, err
+			}
+
+			tree.Files().ForEach(func(f *object.File) error {
+				ret = append(ret, f.Name)
+				return nil
+			})
+
+			c.repoTreeCache[repoKey] = ret
+			break
+		}
+	}
+	return ret, nil
 }
 
-// CloneRepository clones a git repository using the specified URL in the specified
-// destination folder.
-func (service *Service) CloneRepository(destination, repositoryURL, referenceName, username, password string) error {
-	options := cloneOptions{
-		repositoryUrl: repositoryURL,
-		username:      username,
-		password:      password,
-		referenceName: referenceName,
-		depth:         1,
-	}
-
-	return service.cloneRepository(destination, options)
-}
-
-func (service *Service) cloneRepository(destination string, options cloneOptions) error {
-	if isAzureUrl(options.repositoryUrl) {
-		return service.azure.download(context.TODO(), destination, options)
-	}
-
-	return service.git.download(context.TODO(), destination, options)
-}
-
-// LatestCommitID returns SHA1 of the latest commit of the specified reference
-func (service *Service) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
-	options := fetchOptions{
-		repositoryUrl: repositoryURL,
-		username:      username,
-		password:      password,
-		referenceName: referenceName,
-	}
-
-	if isAzureUrl(options.repositoryUrl) {
-		return service.azure.latestCommitID(context.TODO(), options)
-	}
-
-	return service.git.latestCommitID(context.TODO(), options)
+func getRepoKey(repositoryURL, referenceName string) string {
+	return fmt.Sprintf("%s%s", repositoryURL, referenceName)
 }
