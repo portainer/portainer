@@ -9,8 +9,9 @@ import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { isEdgeEnvironment } from '@/portainer/environments/utils';
 
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
+import { GpusListAngular } from 'Portainer/views/endpoints/edit/GpusList';
 
-angular.module('portainer.app').controller('EndpointController', EndpointController);
+angular.module('portainer.app').component('gpusList', GpusListAngular).controller('EndpointController', EndpointController);
 
 /* @ngInject */
 function EndpointController(
@@ -152,8 +153,7 @@ function EndpointController(
     });
   }
 
-  $scope.removeAction = removeAction;
-  $scope.addAction = addAction;
+  $scope.onGpusChange = onGpusChange;
 
   Array.prototype.indexOf = function (val) {
     for (var i = 0; i < this.length; i++) {
@@ -168,21 +168,16 @@ function EndpointController(
     }
   };
 
-  function removeAction(selectedItems) {
-    for (let item of selectedItems) {
-      $scope.endpoint.Gpus.remove(item);
-    }
-    $scope.state.selectedItems=[];
-  }
-
-  function addAction() {
-    $scope.endpoint.Gpus.push({ 'name': null, 'value': null });
+  function onGpusChange(value) {
+    return $async(async () => {
+      $scope.endpoint.Gpus = value;
+    });
   }
 
   function verifyGpus() {
     var i = $scope.endpoint.Gpus.length;
     while (i--) {
-      if ($scope.endpoint.Gpus[i].name === '' || $scope.endpoint.Gpus[i].name === null ) {
+      if ($scope.endpoint.Gpus[i].name === '' || $scope.endpoint.Gpus[i].name === null) {
         $scope.endpoint.Gpus.splice(i, 1);
       }
     }
