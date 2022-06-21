@@ -102,7 +102,11 @@ func (c gitClient) listRemote(ctx context.Context, opt cloneOptions) ([]string, 
 		URLs: []string{opt.repositoryUrl},
 	})
 
-	refs, err := rem.List(&git.ListOptions{})
+	listOptions := &git.ListOptions{
+		Auth: getAuth(opt.username, opt.password),
+	}
+
+	refs, err := rem.List(listOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -123,6 +127,10 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 		return treeCache, nil
 	}
 
+	listOptions := &git.ListOptions{
+		Auth: getAuth(opt.username, opt.password),
+	}
+
 	refs := make([]*plumbing.Reference, 0)
 	var err error
 	refCache, ok := c.repoRefCache[opt.repositoryUrl]
@@ -134,7 +142,7 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 			URLs: []string{opt.repositoryUrl},
 		})
 
-		refs, err = rem.List(&git.ListOptions{})
+		refs, err = rem.List(listOptions)
 		if err != nil {
 			return nil, err
 		}
@@ -143,14 +151,16 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 	var ret []string
 	for _, r := range refs {
 		if r.Name().String() == opt.referenceName {
-			repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
+			cloneOption := &git.CloneOptions{
 				URL:           opt.repositoryUrl,
 				NoCheckout:    true,
 				Depth:         1,
 				SingleBranch:  true,
 				ReferenceName: r.Name(),
-			})
+				Auth:          getAuth(opt.username, opt.password),
+			}
 
+			repo, err := git.Clone(memory.NewStorage(), nil, cloneOption)
 			if err != nil {
 				return nil, err
 			}

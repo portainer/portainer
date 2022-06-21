@@ -211,7 +211,6 @@ func Test_listRemote(t *testing.T) {
 
 	refs, err := service.ListRemote(repositoryURL, "", "")
 	assert.NoError(t, err)
-	log.Println(refs)
 	assert.GreaterOrEqual(t, len(refs), 1)
 }
 

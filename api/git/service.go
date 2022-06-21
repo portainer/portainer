@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport/client"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 )
@@ -55,6 +56,7 @@ func NewService() *Service {
 		httpsCli: httpsCli,
 		azure:    NewAzureDownloader(httpsCli),
 		git: gitClient{
+			repoRefCache:  make(map[string][]*plumbing.Reference),
 			repoTreeCache: make(map[string][]string),
 		},
 	}
