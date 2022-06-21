@@ -64,7 +64,7 @@ func TestService_ListTree_GitHub(t *testing.T) {
 	service := NewService()
 
 	repositoryUrl := privateGitRepoURL
-	paths, err := service.ListTree(repositoryUrl, "refs/heads/main", username, accessToken)
+	paths, err := service.ListTree(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(paths), 1)
 }

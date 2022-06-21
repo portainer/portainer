@@ -181,7 +181,9 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 			}
 
 			tree.Files().ForEach(func(f *object.File) error {
-				ret = append(ret, f.Name)
+				if matchExtensions(f.Name, opt.extensions) {
+					ret = append(ret, f.Name)
+				}
 				return nil
 			})
 
@@ -194,4 +196,13 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 
 func getRepoKey(repositoryURL, referenceName string) string {
 	return fmt.Sprintf("%s%s", repositoryURL, referenceName)
+}
+
+func matchExtensions(target string, exts []string) bool {
+	for _, ext := range exts {
+		if strings.HasSuffix(target, ext) {
+			return true
+		}
+	}
+	return false
 }

@@ -16,6 +16,7 @@ type fetchOptions struct {
 	username      string
 	password      string
 	referenceName string
+	extensions    []string
 }
 
 type cloneOptions struct {
@@ -114,12 +115,13 @@ func (service *Service) ListRemote(repositoryURL, username, password string) ([]
 	return service.git.listRemote(context.TODO(), options)
 }
 
-func (service *Service) ListTree(repositoryURL, referenceName, username, password string) ([]string, error) {
+func (service *Service) ListTree(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
 	options := fetchOptions{
 		repositoryUrl: repositoryURL,
 		username:      username,
 		password:      password,
 		referenceName: referenceName,
+		extensions:    includedExts,
 	}
 
 	if isAzureUrl(options.repositoryUrl) {

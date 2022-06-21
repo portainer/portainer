@@ -30,7 +30,7 @@ func (g *gitService) ListRemote(repositoryURL, username, password string) ([]str
 	return nil, nil
 }
 
-func (g *gitService) ListTree(repositoryURL, referenceName, username, password string) ([]string, error) {
+func (g *gitService) ListTree(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
 	return nil, nil
 }
 

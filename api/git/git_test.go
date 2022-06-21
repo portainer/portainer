@@ -243,7 +243,7 @@ func Test_lsTree(t *testing.T) {
 				repoTreeCache:        make(map[string][]string),
 			}} // no need for http client since the test access the repo via file system.
 
-			paths, err := service.ListTree(tt.url, tt.ref, "", "")
+			paths, err := service.ListTree(tt.url, tt.ref, "", "", []string{})
 			if tt.found {
 				assert.NoError(t, err)
 				assert.GreaterOrEqual(t, len(paths), 1)

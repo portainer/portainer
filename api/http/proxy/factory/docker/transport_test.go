@@ -20,7 +20,7 @@ func (s *noopGitService) LatestCommitID(repositoryURL, referenceName, username, 
 func (g *noopGitService) ListRemote(repositoryURL, username, password string) ([]string, error) {
 	return nil, nil
 }
-func (g *noopGitService) ListTree(repositoryURL, referenceName, username, password string) ([]string, error) {
+func (g *noopGitService) ListTree(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
 	return nil, nil
 }
 func TestTransport_updateDefaultGitBranch(t *testing.T) {
