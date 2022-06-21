@@ -1,56 +1,43 @@
+:global(#page-wrapper) {
+  padding-left: var(--sidebar-closed-width);
+  transition: all 0.4s ease 0s;
+}
+
+@media only screen and (min-width: 561px) {
+  :global(#page-wrapper.open) {
+    padding-left: var(--sidebar-width);
+  }
+}
+@media only screen and (max-width: 560px) {
+  :global(#page-wrapper.open) {
+    padding-left: var(--sidebar-closed-width);
+  }
+}
+
+:global(#page-wrapper) {
+  --sidebar-width: 300px;
+  --sidebar-closed-width: 75px;
+}
+
 :global(#page-wrapper.open) .root {
-  left: 150px;
+  width: var(--sidebar-width);
 }
 
 .root {
-  margin-left: -150px;
-  left: -30px;
-  width: 250px;
-  position: fixed;
+  width: var(--sidebar-closed-width);
   height: 100%;
+
+  position: fixed;
+  left: 0;
+
   z-index: 999;
   transition: all 0.4s ease 0s;
-
-  display: flex;
-  flex-flow: column;
 }
 
-.root {
-  background-color: var(--blue-5);
-}
-:global(:root[theme='dark']) .root {
-  background-color: var(--grey-1);
-}
-:global(:root[theme='highcontrast']) .root {
-  background-color: var(--black-color);
-}
-:global(:root[data-edition='BE']) .root {
-  background-color: var(--grey-5);
-}
-:global(:root[data-edition='BE'][theme='dark']) .root {
-  background-color: var(--grey-1);
-}
-:global(:root[data-edition='BE'][theme='highcontrast']) .root {
-  background-color: var(--black-color);
-}
-
-ul.sidebar {
+.root ul {
   top: 0;
   bottom: 0;
   padding: 0;
   margin: 0;
   list-style: none;
-  text-indent: 20px;
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.sidebar-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100%;
 }

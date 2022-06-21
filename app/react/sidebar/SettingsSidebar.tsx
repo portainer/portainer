@@ -1,3 +1,12 @@
+import {
+  Users,
+  Award,
+  Settings,
+  HardDrive,
+  Radio,
+  FileText,
+} from 'react-feather';
+
 import { usePublicSettings } from '@/portainer/settings/queries';
 
 import { SidebarItem } from './SidebarItem';
@@ -18,11 +27,7 @@ export function SettingsSidebar({ isAdmin }: Props) {
   return (
     <SidebarSection title="Settings">
       {showUsersSection && (
-        <SidebarItem
-          to="portainer.users"
-          label="Users"
-          iconClass="fa-users fa-fw"
-        >
+        <SidebarItem to="portainer.users" label="Users" icon={Users}>
           <SidebarItem to="portainer.teams" label="Teams" />
 
           {isAdmin && <SidebarItem to="portainer.roles" label="Roles" />}
@@ -33,7 +38,7 @@ export function SettingsSidebar({ isAdmin }: Props) {
           <SidebarItem
             label="Environments"
             to="portainer.endpoints"
-            iconClass="fa-plug fa-fw"
+            icon={HardDrive}
             openOnPaths={['portainer.wizard.endpoints']}
           >
             <SidebarItem to="portainer.groups" label="Groups" />
@@ -43,22 +48,26 @@ export function SettingsSidebar({ isAdmin }: Props) {
           <SidebarItem
             label="Registries"
             to="portainer.registries"
-            iconClass="fa-database fa-fw"
+            icon={Radio}
           />
+
+          {process.env.PORTAINER_EDITION !== 'CE' && (
+            <SidebarItem
+              to="portainer.licenses"
+              label="Licenses"
+              icon={Award}
+            />
+          )}
 
           <SidebarItem
             label="Authentication logs"
             to="portainer.authLogs"
-            iconClass="fa-history fa-fw"
+            icon={FileText}
           >
             <SidebarItem to="portainer.activityLogs" label="Activity Logs" />
           </SidebarItem>
 
-          <SidebarItem
-            to="portainer.settings"
-            label="Settings"
-            iconClass="fa-cogs fa-fw"
-          >
+          <SidebarItem to="portainer.settings" label="Settings" icon={Settings}>
             {!window.ddExtension && (
               <SidebarItem
                 to="portainer.settings.authentication"
@@ -81,6 +90,7 @@ export function SettingsSidebar({ isAdmin }: Props) {
                 }
                 target="_blank"
                 rel="noreferrer"
+                className="px-3 rounded flex h-full items-center"
               >
                 Help / About
               </a>

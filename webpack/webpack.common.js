@@ -14,6 +14,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const pkg = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
+/** @type {import('webpack').Configuration} */
 module.exports = {
   entry: {
     main: './app',
@@ -62,6 +63,21 @@ module.exports = {
       {
         test: /.xml$/,
         type: 'asset/resource',
+      },
+      {
+        test: /\.(gif|png|jpe?g)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.svg$/i,
+        type: 'asset',
+        resourceQuery: { not: [/c/] }, // exclude react component if *.svg?url
+      },
+      {
+        test: /\.svg$/i,
+        issuer: /\.tsx?$/,
+        resourceQuery: /c/, // *.svg?c
+        use: [{ loader: '@svgr/webpack', options: { icon: true } }],
       },
       {
         test: /\.css$/,
