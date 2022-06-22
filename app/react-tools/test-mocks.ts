@@ -80,5 +80,16 @@ export function createMockEnvironment(): Environment {
       CommandInterval: 0,
       SnapshotInterval: 0,
     },
+    SecuritySettings: {
+      allowBindMountsForRegularUsers: false,
+      allowPrivilegedModeForRegularUsers: false,
+      allowContainerCapabilitiesForRegularUsers: false,
+      allowDeviceMappingForRegularUsers: false,
+      allowHostNamespaceForRegularUsers: false,
+      allowStackManagementForRegularUsers: false,
+      allowSysctlSettingForRegularUsers: false,
+      allowVolumeBrowserForRegularUsers: false,
+      enableHostManagementFeatures: false,
+    },
   };
 }
