@@ -188,8 +188,6 @@
     "copy-webpack-plugin": "^10.2.0",
     "css-loader": "^6.6.0",
     "cssnano": "^5.0.16",
-    "cypress": "8.7",
-    "cypress-wait-until": "^1.7.1",
     "dotenv-webpack": "^7.0.3",
     "eslint": "^8.4.1",
     "eslint-config-airbnb": "^19.0.2",
