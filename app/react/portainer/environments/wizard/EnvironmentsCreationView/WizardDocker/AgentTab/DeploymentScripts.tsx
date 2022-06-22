@@ -28,7 +28,7 @@ export function DeploymentScripts() {
     return null;
   }
 
-  const { agentVersion } = agentDetailsQuery;
+  const { agentVersion, agentSecret } = agentDetailsQuery;
 
   const options = deployments.map((c) => {
     const code = c.command(agentVersion);
@@ -36,7 +36,7 @@ export function DeploymentScripts() {
     return {
       id: c.id,
       label: c.label,
-      children: <DeployCode code={code} />,
+      children: <DeployCode agentSecret={agentSecret} code={code} />,
     };
   });
 
@@ -50,12 +50,24 @@ export function DeploymentScripts() {
 }
 
 interface DeployCodeProps {
+  agentSecret?: string;
   code: string;
 }
 
-function DeployCode({ code }: DeployCodeProps) {
+function DeployCode({ agentSecret, code }: DeployCodeProps) {
   return (
     <>
+      {agentSecret && (
+        <p className="text-muted small my-6">
+          <i
+            className="fa fa-info-circle blue-icon space-right"
+            aria-hidden="true"
+          />
+          Note that the environment variable AGENT_SECRET will need to be set to
+          <code>{agentSecret}</code>. Please update the manifest that will be
+          downloaded from the following script.
+        </p>
+      )}
       <span className="text-muted small">
         CLI script for installing agent on your environment with Docker Swarm:
       </span>
