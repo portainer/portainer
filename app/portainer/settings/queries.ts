@@ -17,9 +17,13 @@ export function usePublicSettings() {
   });
 }
 
-export function useSettings<T = Settings>(select?: (settings: Settings) => T) {
+export function useSettings<T = Settings>(
+  select?: (settings: Settings) => T,
+  enabled?: boolean
+) {
   return useQuery(['settings'], getSettings, {
     select,
+    enabled,
     meta: {
       error: {
         title: 'Failure',

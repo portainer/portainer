@@ -125,4 +125,10 @@ export interface Settings {
   AllowStackManagementForRegularUsers: boolean;
   AllowDeviceMappingForRegularUsers: boolean;
   AllowContainerCapabilitiesForRegularUsers: boolean;
+  Edge: {
+    PingInterval: number;
+    SnapshotInterval: number;
+    CommandInterval: number;
+    AsyncMode: boolean;
+  };
 }
