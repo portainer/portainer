@@ -17,7 +17,7 @@ export function DashboardView() {
     subscriptionsQuery.data
   );
 
-  const subscriptionsCount = subscriptionsQuery?.data?.length;
+  const subscriptionsCount = subscriptionsQuery.data?.length;
   const resourceGroupsCount = Object.values(
     resourceGroupsQuery.resourceGroups
   ).flatMap((x) => Object.values(x)).length;
