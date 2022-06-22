@@ -12,19 +12,30 @@
       <rd-widget-header icon="fa-folder-open" title-text="{{ explorerService.currentPath }}"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" autocomplete="off">
+          <div class="col-sm-12 form-section-title"> Upload </div>
           <!-- name-input -->
           <div class="form-group">
-            <label class="col-sm-1 control-label text-left">Upload files</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="fileName" id="file_name" type="file" multiple placeholder="select file" />
+            <div class="col-sm-1">
+              <button class="btn btn-primary btn-block" ngf-select="addForUpload($files)" accept="application/zip,application/rar,*/*" ngf-multiple="true"> select files </button>
+            </div>
+            <div class="col-sm-11"></div>
+
+            <div class="col-sm-12 upload-list">
+              <ul class="list-group">
+                <li class="list-group-item" ng-repeat="(index, uploadFile) in uploadFileList">
+                  <button class="btn btn-sm btn-danger pull-right" ng-click="removeFromUpload(index)"> &times; </button>
+                  <h5 class="list-group-item-heading">{{ uploadFile.name }}</h5>
+                  <p class="list-group-item-text">{{ uploadFile.size | humansize }}</p>
+                </li>
+              </ul>
             </div>
           </div>
 
           <div class="col-sm-12 form-section-title"> Actions </div>
           <div class="form-group">
             <div class="col-sm-4 col-md-3">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="createFolder(folderName)">
-                <span>Create</span>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="upload()">
+                <span>Upload</span>
               </button>
               <button type="button" class="btn btn-primary btn-sm" ng-click="goBack()">
                 <span>Cancel</span>

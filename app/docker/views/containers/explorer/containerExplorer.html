@@ -41,35 +41,31 @@
                       ng-model-options="{ debounce: 300 }"
                     />
                   </div>
-                  <table class="table">
+                  <table class="table table-files">
                     <thead>
                       <tr>
                         <th>
-                          <a ng-click="explorerService.changeOrderBy('Name')">
+                          <a href="" ng-click="order('model.name')">
                             Name
-                            <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                            <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                            <span class="sortorder" ng-show="predicate[1] === 'model.name'" ng-class="{ reverse: reverse }"></span>
                           </a>
                         </th>
-                        <th>
-                          <a ng-click="explorerService.changeOrderBy('Size')">
+                        <th class="hidden-xs" ng-hide="config.hideSize">
+                          <a href="" ng-click="order('model.size')">
                             Size
-                            <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && !$ctrl.state.reverseOrder"></i>
-                            <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"></i>
+                            <span class="sortorder" ng-show="predicate[1] === 'model.size'" ng-class="{ reverse: reverse }"></span>
                           </a>
                         </th>
-                        <th>
-                          <a ng-click="explorerService.changeOrderBy('Date')">
+                        <th class="hidden-sm hidden-xs" ng-hide="config.hideDate">
+                          <a href="" ng-click="order('model.date')">
                             Date
-                            <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Date' && !$ctrl.state.reverseOrder"></i>
-                            <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Date' && $ctrl.state.reverseOrder"></i>
+                            <span class="sortorder" ng-show="predicate[1] === 'model.date'" ng-class="{ reverse: reverse }"></span>
                           </a>
                         </th>
-                        <th>
-                          <a ng-click="explorerService.changeOrderBy('Data')">
+                        <th class="hidden-sm hidden-xs" ng-hide="config.hidePermissions">
+                          <a href="" ng-click="order('model.permissions')">
                             Permissions
-                            <i class="fa fa-sort-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Permissions' && !$ctrl.state.reverseOrder"></i>
-                            <i class="fa fa-sort-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Permissions' && $ctrl.state.reverseOrder"></i>
+                            <span class="sortorder" ng-show="predicate[1] === 'model.permissions'" ng-class="{ reverse: reverse }"></span>
                           </a>
                         </th>
                       </tr>
@@ -79,9 +75,16 @@
                         <td colspan="4"> No files in this folder... </td>
                       </tr>
 
-                      <tr class="item-list" ng-repeat="item in explorerService.fileList">
+                      <tr
+                        class="item-list"
+                        ng-repeat="item in explorerService.fileList"
+                        ng-click="selectOrUnselect(item, $event)"
+                        ng-dblclick="smartClick(item)"
+                        ng-right-click="selectOrUnselect(item, $event)"
+                        ng-class="{ selected: isSelected(item) }"
+                      >
                         <td>
-                          <a href="" ng-dblclick="smartClick(item)">
+                          <a href="">
                             <i class="fa fa-archive" ng-show="item.model.type === 'dir'"></i>
                             <i class="fa fa-file" ng-show="item.model.type === 'file'"></i>
                             {{ item.model.name }}

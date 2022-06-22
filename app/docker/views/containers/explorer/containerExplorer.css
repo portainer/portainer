@@ -18,6 +18,25 @@
   padding-left: 0px;
 }
 
+.table-files .selected,
+.iconset .thumbnail.selected {
+  background: #eeeeee;
+}
+
+.upload-list {
+  margin-top: 20px;
+}
+
+.sortorder:after {
+  color: #2196f3;
+  content: '\25bc';
+}
+
+.sortorder.reverse:after {
+  color: #2196f3;
+  content: '\25b2';
+}
+
 .animated {
   -webkit-animation-duration: 0.7s;
   animation-duration: 0.7s;

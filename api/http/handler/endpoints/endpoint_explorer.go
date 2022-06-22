@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -32,7 +33,7 @@ type ListDirEntry struct {
 	Type   string `json:"type" binding:"Required"`
 }
 
-// @id EndpointExplorer
+// @id endpointExplorer
 // @summary Inspect an environment(endpoint)
 // @description Retrieve details about an environment(endpoint).
 // @description **Access policy**: restricted
@@ -49,36 +50,32 @@ type ListDirEntry struct {
 func (handler *Handler) endpointExplorer(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment identifier route variable", Err: err}
 	}
-
 	containerId, err := request.RetrieveRouteVariableValue(r, "containerId")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment containerId", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment containerId", Err: err}
 	}
-
 	path, err := request.RetrieveMultiPartFormValue(r, "path", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment path", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment path", Err: err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
 	}
-
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access environment", Err: err}
 	}
 
-	//"4ef06f706a584656e6d15df9f0c2674903595a3289ecc882a5b8e21485f6cfbc"
 	timeout := dockerClientTimeout
 	docker, err := handler.DockerClientFactory.CreateClient(endpoint, containerId, &timeout)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Docker Client connection", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to create Docker Client connection", Err: err}
 	}
 	defer docker.Close()
 
@@ -87,14 +84,14 @@ func (handler *Handler) endpointExplorer(w http.ResponseWriter, r *http.Request)
 
 	resp, err := containerRunCmd(docker, containerId, cmdLine)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "containerRunCmd error.", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "containerRunCmd error.", Err: err}
 	}
 
 	data := parseLsOutput(string(resp))
 	return response.JSON(w, data)
 }
 
-// @id EndpointExplorerCreate
+// @id endpointExplorerCreate
 // @summary Inspect an environment(endpoint)
 // @description Retrieve details about an environment(endpoint).
 // @description **Access policy**: restricted
@@ -111,36 +108,36 @@ func (handler *Handler) endpointExplorer(w http.ResponseWriter, r *http.Request)
 func (handler *Handler) endpointExplorerCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment identifier route variable", Err: err}
 	}
 
 	containerId, err := request.RetrieveRouteVariableValue(r, "containerId")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment containerId", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment containerId", Err: err}
 	}
 
 	path, err := request.RetrieveMultiPartFormValue(r, "path", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment path", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment path", Err: err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access environment", Err: err}
 	}
 
 	//"4ef06f706a584656e6d15df9f0c2674903595a3289ecc882a5b8e21485f6cfbc"
 	timeout := dockerClientTimeout
 	docker, err := handler.DockerClientFactory.CreateClient(endpoint, containerId, &timeout)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Docker Client connection", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to create Docker Client connection", Err: err}
 	}
 	defer docker.Close()
 
@@ -149,7 +146,7 @@ func (handler *Handler) endpointExplorerCreate(w http.ResponseWriter, r *http.Re
 
 	_, err = containerRunCmd(docker, containerId, cmdLine)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "containerRunCmd error.", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "containerRunCmd error.", Err: err}
 	}
 
 	var resp = make(map[string]interface{}, 2)
@@ -159,7 +156,7 @@ func (handler *Handler) endpointExplorerCreate(w http.ResponseWriter, r *http.Re
 	return response.JSON(w, resp)
 }
 
-// @id EndpointExplorerCreate
+// @id endpointExplorerRemove
 // @summary Inspect an environment(endpoint)
 // @description Retrieve details about an environment(endpoint).
 // @description **Access policy**: restricted
@@ -176,48 +173,132 @@ func (handler *Handler) endpointExplorerCreate(w http.ResponseWriter, r *http.Re
 func (handler *Handler) endpointExplorerRemove(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment identifier route variable", Err: err}
 	}
 
 	containerId, err := request.RetrieveRouteVariableValue(r, "containerId")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment containerId", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment containerId", Err: err}
 	}
 
 	path, err := request.RetrieveMultiPartFormValue(r, "path", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment path", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment path", Err: err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access environment", Err: err}
 	}
 
-	//"4ef06f706a584656e6d15df9f0c2674903595a3289ecc882a5b8e21485f6cfbc"
 	timeout := dockerClientTimeout
 	docker, err := handler.DockerClientFactory.CreateClient(endpoint, containerId, &timeout)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Docker Client connection", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to create Docker Client connection", Err: err}
 	}
 	defer docker.Close()
 
 	cmdLine := []string{"rm", "--interactive=never", "-r"}
 	cmdLine = append(cmdLine, normalizePath(path))
-
 	resp, err := containerRunCmd(docker, containerId, cmdLine)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "containerRunCmd error.", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "containerRunCmd error.", Err: err}
 	}
 
 	data := string(resp)
+	return response.JSON(w, data)
+}
+
+// @id endpointExplorerUpload
+// @summary Inspect an environment(endpoint)
+// @description Retrieve details about an environment(endpoint).
+// @description **Access policy**: restricted
+// @tags endpoints
+// @security ApiKeyAuth
+// @security jwt
+// @produce json
+// @param id path int true "Environment(Endpoint) identifier"
+// @success 200 {object} portainer.Endpoint "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Environment(Endpoint) not found"
+// @failure 500 "Server error"
+// @router /endpoints/{id}/explorer/{containerId}/upload [post]
+func (handler *Handler) endpointExplorerUpload(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment identifier route variable", Err: err}
+	}
+
+	containerId, err := request.RetrieveRouteVariableValue(r, "containerId")
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment containerId", Err: err}
+	}
+
+	reader, err := r.MultipartReader()
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment", Err: err}
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
+	} else if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an environment with the specified identifier inside the database", Err: err}
+	}
+
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access environment", Err: err}
+	}
+
+	timeout := dockerClientTimeout
+	docker, err := handler.DockerClientFactory.CreateClient(endpoint, containerId, &timeout)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to create Docker Client connection", Err: err}
+	}
+	defer docker.Close()
+
+	ctx := context.TODO()
+	destination := ""
+	for {
+		part, err := reader.NextPart()
+		if err == io.EOF {
+			break
+		}
+
+		if part.FormName() == "destination" {
+			buf := new(bytes.Buffer)
+			_, err := buf.ReadFrom(part)
+			if err != nil {
+				return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment", Err: err}
+			}
+			destination = buf.String()
+		}
+
+		if part.FileName() == "" {
+			continue
+		}
+		if len(destination) == 0 {
+			continue
+		}
+
+		fmt.Println("part.FileName = " + part.FileName() + "  destination=" + destination)
+
+		err = docker.CopyToContainer(ctx, containerId, destination, part, types.CopyToContainerOptions{})
+
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "upload failed.", Err: err}
+		}
+	}
+
+	data := ""
 	return response.JSON(w, data)
 }
 
@@ -236,7 +317,6 @@ func containerRunCmd(docker *client.Client, containerId string, cmd []string) ([
 		return nil, err
 	}
 
-	fmt.Println("execId = " + execId.ID)
 	resp, err := docker.ContainerExecAttach(ctx, execId.ID, types.ExecStartCheck{})
 
 	//var outBuf bytes.Buffer
@@ -244,7 +324,6 @@ func containerRunCmd(docker *client.Client, containerId string, cmd []string) ([
 	outputDone := make(chan error)
 
 	go func() {
-		// StdCopy demultiplexes the stream into two buffers
 		_, err = stdcopy.StdCopy(&outBuf, &errBuf, resp.Reader)
 		outputDone <- err
 	}()
@@ -291,31 +370,18 @@ func parseLsOutput(lsout string) []ListDirEntry {
 	lines := strings.Split(lsout, "\n")
 	var results []ListDirEntry
 
-	for idx, line := range lines {
+	for _, line := range lines {
 		if len(line) == 0 {
 			continue
 		}
 		if strings.HasPrefix(line, "total") {
 			continue
 		}
-
 		if strings.HasPrefix(line, "总用量") {
 			continue
 		}
 
-		// our Dirty LS Fix with AWK return line as follow:
-		// drwxr-xr-x|2|root|root|4096|2016-07-13|17:47|bin
-		//tmpTokens := strings.SplitN(line, "|", 8)
-		//var tokens []string
-		//for _, token := range tmpTokens {
-		//	tokens = append(tokens, strings.TrimSpace(token))
-		//}
-
 		tokens := strings.Fields(line)
-
-		fmt.Println(idx, line)
-
-		// fmt.Println(tokens)
 		if len(tokens) >= 8 {
 			ftype := "file"
 			if strings.HasPrefix(tokens[0], "d") {
