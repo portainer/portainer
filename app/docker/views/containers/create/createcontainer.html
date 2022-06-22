@@ -704,84 +704,17 @@
               </div>
               <!-- !sysctls -->
               <!-- #region GPU -->
-              <div class="col-sm-12 form-section-title">
-                GPU
-              </div>
-              <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.4">
-                <label class="col-xs-3 col-sm-3 col-lg-2 control-label text-left">
-                  Enable GPU
-                </label>
-                <div class="col-xs-9 col-sm-9 col-lg-4">
-                  <label class="switch" style="margin-left: 5px;"> <input type="checkbox" name="use_gpu" ng-model="formValues.GPU.enabled" /><i></i> </label>
-                </div>
-              </div>
-              <div ng-if="formValues.GPU.enabled">
-                <!-- #region GPU DEVICES -->
-                <div class="form-group">
-                  <label class="col-xs-3 col-sm-3 col-lg-2 control-label text-left">
-                    Use specific GPUs
-                    <portainer-tooltip
-                      position="top"
-                      message="By default all GPUs will be usable by the container. Enable this if you want to give access to only specific host GPUs. Accept GPU indexes or UUIDs."
-                    >
-                    </portainer-tooltip>
-                  </label>
-                  <div class="col-xs-9 col-lg-4">
-                    <label class="switch" style="margin-left: 5px;"> <input type="checkbox" name="use_gpu" ng-model="formValues.GPU.useSpecific" /><i></i> </label>
-                    <span class="label label-default interactive" style="margin-left: 10px;" ng-if="formValues.GPU.useSpecific" ng-click="addGPU()">
-                      <i class="fa fa-plus-circle" aria-hidden="true"></i> add gpu
-                    </span>
-                  </div>
-                  <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="formValues.GPU.useSpecific && formValues.GPU.selectedGPUs.length">
-                    <div ng-repeat="gpu in formValues.GPU.selectedGPUs track by $index" style="margin-top: 2px;">
-                      <div class="input-group col-sm-8 input-group-sm"> 
-                        <span class="input-group-addon">index or UUID</span>
-                        <input type="text" class="form-control" typeahead-no-results="noResults" typeahead-min-length=0 typeahead-editable=false typeahead-select-on-exact=true uib-typeahead="item.name as item.mark+item.name+' : '+item.value for item in getGpusInfo() | filter:$viewValue | limitTo:all" ng-model="gpu.key" placeholder="e.g. 0 or GPU-fef8089b" typeahead-wait-ms=100 />
-                      </div>
-                      <button class="btn btn-sm btn-danger" type="button" ng-click="removeGPU($index)">
-                        <i class="fa fa-trash" aria-hidden="true"></i>
-                      </button>
-                      <div ng-if="noResults">No Available GPU</div>
-                    </div>
-                  </div>
-                </div>
-                <!-- #endregion -->
+              <div class="col-sm-12 form-section-title"> GPU </div>
 
-                <div class="form-group">
-                  <label class="col-xs-3 col-sm-3 col-lg-2 control-label text-left">
-                    Capabilities
-                    <portainer-tooltip
-                      position="top"
-                      message="'compute' and 'utility' capabilities are preselected by Portainer because they are used by default when you don't explicitly specify capabilities with docker CLI '--gpus' option."
-                    >
-                    </portainer-tooltip>
-                  </label>
-                  <div class="col-xs-12 col-sm-9 col-lg-4">
-                    <span
-                      isteven-multi-select
-                      input-model="state.nvidiaCapabilities"
-                      output-model="formValues.GPU.capabilities"
-                      output-properties="name"
-                      button-label="name"
-                      item-label="name - description"
-                      tick-property="selected"
-                      directive-id="nvidia_capabilities"
-                      helper-elements=""
-                      translation="{nothingSelected: 'No capabilities selected'}"
-                    >
-                    </span>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-xs-3 col-sm-3 col-lg-2 control-label text-left">
-                    Control
-                    <portainer-tooltip position="top" message="This is the generated equivalent of the '--gpus' docker CLI parameter based on your settings."> </portainer-tooltip>
-                  </label>
-                  <label class="col-xs-12 col-sm-9 col-lg-4">
-                    <code>{{ computeDockerGPUCommand() }}</code>
-                  </label>
-                </div>
-              </div>
+              <gpu
+                ng-if="applicationState.endpoint.apiVersion >= 1.4"
+                values="formValues.GPU"
+                on-change="(onGpuChange)"
+                gpus="endpoint.Gpus"
+                used-gpus="gpuUseList"
+                used-all-gpus="gpuUseAll"
+              >
+              </gpu>
 
               <!-- #endregion GPU -->
               <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">

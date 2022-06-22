@@ -73,7 +73,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         enabled: false,
         useSpecific: false,
         selectedGPUs: [],
-        capabilities: [],
+        capabilities: ['compute', 'utility'],
       },
       Console: 'none',
       Volumes: [],
@@ -108,15 +108,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       mode: '',
       pullImageValidity: true,
       settingUnlimitedResources: false,
-      nvidiaCapabilities: [
-        // Taken from https://github.com/containerd/containerd/blob/master/contrib/nvidia/nvidia.go#L40
-        { name: 'compute', description: 'required for CUDA and OpenCL applications', selected: true },
-        { name: 'compat32', description: 'required for running 32-bit applications', selected: false },
-        { name: 'graphics', description: 'required for running OpenGL and Vulkan applications', selected: false },
-        { name: 'utility', description: 'required for using nvidia-smi and NVML', selected: true },
-        { name: 'video', description: 'required for using the Video Codec SDK', selected: false },
-        { name: 'display', description: 'required for leveraging X11 display', selected: false },
-      ],
     };
 
     $scope.handleEnvVarChange = handleEnvVarChange;
@@ -215,18 +206,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       $scope.config.HostConfig.Devices.splice(index, 1);
     };
 
-    $scope.addGPU = () => $scope.formValues.GPU.selectedGPUs.push({ key: '' });
-    $scope.removeGPU = (index) => $scope.formValues.GPU.selectedGPUs.splice(index, 1);
-    $scope.computeDockerGPUCommand = () => {
-      const useSpecific = $scope.formValues.GPU.useSpecific;
-      let gpuStr = 'all';
-      if (useSpecific) {
-        const computeGPUs = _.flow([(arr) => _.map(arr, 'key'), (arr) => _.join(arr, ',')]);
-        gpuStr = `"device=${computeGPUs($scope.formValues.GPU.selectedGPUs)}"`;
-      }
-      const computeCapabilities = _.flow([(arr) => _.map(arr, 'name'), (arr) => _.join(arr, ',')]);
-      const capStr = `"capabilities=${computeCapabilities($scope.formValues.GPU.capabilities)}"`;
-      return `--gpus '${gpuStr},${capStr}'`;
+    $scope.onGpuChange = function (values) {
+      return $async(async () => {
+        $scope.formValues.GPU = values;
+      });
     };
 
     $scope.addSysctl = function () {
@@ -448,15 +431,20 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function prepareGPUOptions(config) {
-      const gpuOptions = $scope.formValues.GPU;
-      if (!gpuOptions.enabled) {
-        return;
-      }
       const driver = 'nvidia';
-      const existingDeviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function(o) { return (o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu') });
+      const gpuOptions = $scope.formValues.GPU;
+
+      const existingDeviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function (o) {
+        return o.Driver === driver || o.Capabilities[0][0] === 'gpu';
+      });
       if (existingDeviceRequest) {
         _.pullAllBy(config.HostConfig.DeviceRequests, [existingDeviceRequest], 'Driver');
       }
+
+      if (!gpuOptions.enabled) {
+        return;
+      }
+
       const deviceRequest = existingDeviceRequest || {
         Driver: driver,
         Count: -1,
@@ -464,15 +452,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         Capabilities: [], // array of ORed arrays of ANDed capabilites = [ [c1 AND c2] OR [c1 AND c3] ] : https://github.com/moby/moby/blob/master/api/types/container/host_config.go#L272
         // Options: { property1: "string", property2: "string" }, // seems to never be evaluated/used in docker API ?
       };
-      if (gpuOptions.useSpecific) {
-        const gpuIds = _.map(gpuOptions.selectedGPUs, 'key');
-        deviceRequest.DeviceIDs = gpuIds;
-        deviceRequest.Count = 0;
-      }
-      const caps = _.map(gpuOptions.capabilities, 'name');
-      // we only support a single set of capabilities for now
-      // UI needs to be reworked in order to support OR combinations of AND capabilities
-      deviceRequest.Capabilities = [caps];
+
+      deviceRequest.DeviceIDs = gpuOptions.selectedGPUs;
+      deviceRequest.Count = 0;
+      deviceRequest.Capabilities = [gpuOptions.capabilities];
 
       config.HostConfig.DeviceRequests.push(deviceRequest);
     }
@@ -633,29 +616,25 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function loadFromContainerDeviceRequests() {
-      const deviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function(o) { return (o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu') });
+      window.console.log('loadFromContainerDeviceRequests');
+      const deviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function (o) {
+        return o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu';
+      });
+      window.console.log('deviceRequest = ', JSON.stringify(deviceRequest));
       if (deviceRequest) {
         $scope.formValues.GPU.enabled = true;
         $scope.formValues.GPU.useSpecific = deviceRequest.Count !== -1;
+        $scope.formValues.GPU.selectedGPUs = deviceRequest.DeviceIDs || [];
+        window.console.log('deviceRequest.DevicesIDs = ', deviceRequest.DeviceIDs);
         if ($scope.formValues.GPU.useSpecific) {
-          $scope.formValues.GPU.selectedGPUs = _.map(deviceRequest.DevicesIDs, (id) => {
-            return { key: id };
-          });
+          $scope.formValues.GPU.selectedGPUs = deviceRequest.DeviceIDs;
         }
         // we only support a single set of capabilities for now
         // UI needs to be reworked in order to support OR combinations of AND capabilities
-        const caps = deviceRequest.Capabilities[0];
-        const fvCaps = _.map(caps, (cap) => {
-          return { name: cap };
-        });
-        $scope.formValues.GPU.capabilities = fvCaps;
-        _.forEach(caps, (cap) => {
-          const c = _.find($scope.state.nvidiaCapabilities, { name: cap });
-          if (c) {
-            c.selected = true;
-          }
-        });
+        $scope.formValues.GPU.capabilities = deviceRequest.Capabilities[0];
+        $scope.formValues.GPU = { ...$scope.formValues.GPU };
       }
+      window.console.log('$scope.formValues.GPU = ', $scope.formValues.GPU);
     }
 
     function loadFromContainerSysctls() {
@@ -760,26 +739,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       });
     }
 
-    $scope.getGpusInfo = function() {
-      var gpusInfo = new Array();
-      var selectedGPUs = _.map($scope.formValues.GPU.selectedGPUs, 'key');
-      var gpuUseSet = new Set($scope.gpuUseList);
-      var mark = '';
-      for(let gpu of endpoint.Gpus){
-        if(selectedGPUs.includes(gpu.name)){
-          continue;
-        }
-        else if($scope.gpuUseAll === true || gpuUseSet.has(gpu.name)){
-          mark = '<i class="fa fa-ban space-right red-icon"></i>';
-        }          
-        else {
-          mark = '<i class="fa fa-check space-right green-icon"></i>';
-        }
-        gpusInfo.push({'name':gpu.name,'value':gpu.value,'mark':mark});
-      }
-      return gpusInfo;
-    }
-
     async function initView() {
       var nodeName = $transition$.params().nodeName;
       $scope.formValues.NodeName = nodeName;
@@ -825,6 +784,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           $scope.runningContainers = containers;
           $scope.gpuUseAll = $scope.endpoint.Snapshots[0].GpuUseAll;
           $scope.gpuUseList = $scope.endpoint.Snapshots[0].GpuUseList;
+          window.console.log('$scope.gpuUseList  ', $scope.gpuUseList);
           if ($transition$.params().from) {
             loadFromContainerSpec();
           } else {
