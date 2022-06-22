@@ -22,12 +22,14 @@ type Handler struct {
 	OAuthService                portainer.OAuthService
 	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
+	passwordStrengthChecker     security.PasswordStrengthChecker
 }
 
 // NewHandler creates a handler to manage authentication operations.
-func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, passwordStrengthChecker security.PasswordStrengthChecker) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:                  mux.NewRouter(),
+		passwordStrengthChecker: passwordStrengthChecker,
 	}
 
 	h.Handle("/auth/oauth/validate",

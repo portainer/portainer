@@ -4,11 +4,13 @@ import { useQueryClient } from 'react-query';
 import _ from 'lodash';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
-import { PageHeader } from '@/portainer/components/PageHeader';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
 import { ResourceControlType } from '@/portainer/access-control/types';
 import { DockerContainer } from '@/docker/containers/types';
+import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+
+import { PageHeader } from '@@/PageHeader';
 
 import { useNetwork, useDeleteNetwork } from '../queries';
 import { isSystemNetwork } from '../network.helper';
@@ -50,6 +52,12 @@ export function NetworkDetailsView() {
     return null;
   }
 
+  const network = networkQuery.data;
+
+  const resourceControl = network.Portainer?.ResourceControl
+    ? new ResourceControlViewModel(network.Portainer.ResourceControl)
+    : undefined;
+
   return (
     <>
       <PageHeader
@@ -77,7 +85,7 @@ export function NetworkDetailsView() {
             networkId,
           ])
         }
-        resourceControl={networkQuery.data.Portainer?.ResourceControl}
+        resourceControl={resourceControl}
         resourceType={ResourceControlType.Network}
         disableOwnershipChange={isSystemNetwork(networkQuery.data.Name)}
         resourceId={networkId}

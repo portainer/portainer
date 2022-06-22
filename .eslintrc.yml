@@ -31,7 +31,12 @@ rules:
     [
       'error',
       {
-        pathGroups: [{ pattern: '@/**', group: 'internal' }, { pattern: '{Kubernetes,Portainer,Agent,Azure,Docker}/**', group: 'internal' }],
+        pathGroups:
+          [
+            { pattern: '@@/**', group: 'internal', position: 'after' },
+            { pattern: '@/**', group: 'internal' },
+            { pattern: '{Kubernetes,Portainer,Agent,Azure,Docker}/**', group: 'internal' },
+          ],
         groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
         pathGroupsExcludedImportTypes: ['internal'],
       },
@@ -41,6 +46,7 @@ settings:
   'import/resolver':
     alias:
       map:
+        - ['@@', './app/react/components']
         - ['@', './app']
       extensions: ['.js', '.ts', '.tsx']
 
@@ -68,7 +74,14 @@ overrides:
         version: 'detect'
     rules:
       import/order:
-        ['error', { pathGroups: [{ pattern: '@/**', group: 'internal' }], groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'], 'newlines-between': 'always' }]
+        [
+          'error',
+          {
+            pathGroups: [{ pattern: '@@/**', group: 'internal', position: 'after' }, { pattern: '@/**', group: 'internal' }],
+            groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+            'newlines-between': 'always',
+          },
+        ]
       func-style: [error, 'declaration']
       import/prefer-default-export: off
       no-use-before-define: ['error', { functions: false }]

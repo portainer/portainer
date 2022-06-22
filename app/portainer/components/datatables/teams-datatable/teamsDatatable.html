@@ -4,7 +4,7 @@
       <div class="toolBar">
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
       </div>
-      <div class="actionBar">
+      <div class="actionBar" ng-show="$ctrl.isAdmin">
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
@@ -25,7 +25,7 @@
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox">
+                <span class="md-checkbox" ng-show="$ctrl.isAdmin">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -43,7 +43,7 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox">
+                <span class="md-checkbox" ng-show="$ctrl.isAdmin">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>

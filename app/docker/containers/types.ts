@@ -1,11 +1,12 @@
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+
 import {
   PaginationTableSettings,
   RefreshableTableSettings,
   SettableColumnsTableSettings,
   SettableQuickActionsTableSettings,
   SortableTableSettings,
-} from '@/portainer/components/datatables/types';
+} from '@@/datatables/types';
 
 export type DockerContainerStatus =
   | 'paused'

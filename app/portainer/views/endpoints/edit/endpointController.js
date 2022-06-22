@@ -8,6 +8,8 @@ import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { isEdgeEnvironment } from '@/portainer/environments/utils';
 
+import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
+
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
 /* @ngInject */
@@ -20,7 +22,7 @@ function EndpointController(
   clipboard,
   EndpointService,
   GroupService,
-  TagService,
+
   Notifications,
   Authentication,
   SettingsService,
@@ -28,6 +30,8 @@ function EndpointController(
 ) {
   $scope.onChangeCheckInInterval = onChangeCheckInInterval;
   $scope.setFieldValue = setFieldValue;
+  $scope.onChangeTags = onChangeTags;
+  const isBE = process.env.PORTAINER_EDITION === 'BE';
 
   $scope.state = {
     uploadInProgress: false,
@@ -40,6 +44,11 @@ function EndpointController(
     allowCreate: Authentication.isAdmin(),
     allowSelfSignedCerts: true,
     showAMTInfo: false,
+    showNomad: isBE,
+    edgeScriptCommands: {
+      linux: _.compact([commandsTabs.k8sLinux, commandsTabs.swarmLinux, commandsTabs.standaloneLinux, isBE && commandsTabs.nomadLinux]),
+      win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
+    },
   };
 
   $scope.formValues = {
@@ -51,25 +60,11 @@ function EndpointController(
     $('#copyNotificationEdgeKey').show().fadeOut(2500);
   };
 
-  $scope.onCreateTag = function onCreateTag(tagName) {
-    return $async(onCreateTagAsync, tagName);
-  };
-
   $scope.onToggleAllowSelfSignedCerts = function onToggleAllowSelfSignedCerts(checked) {
     return $scope.$evalAsync(() => {
       $scope.state.allowSelfSignedCerts = checked;
     });
   };
-
-  async function onCreateTagAsync(tagName) {
-    try {
-      const tag = await TagService.createTag(tagName);
-      $scope.availableTags = $scope.availableTags.concat(tag);
-      $scope.endpoint.TagIds = $scope.endpoint.TagIds.concat(tag.Id);
-    } catch (err) {
-      Notifications.error('Failue', err, 'Unable to create tag');
-    }
-  }
 
   $scope.onDisassociateEndpoint = async function () {
     ModalService.confirmDisassociate((confirmed) => {
@@ -96,6 +91,10 @@ function EndpointController(
 
   function onChangeCheckInInterval(value) {
     setFieldValue('EdgeCheckinInterval', value);
+  }
+
+  function onChangeTags(value) {
+    setFieldValue('TagIds', value);
   }
 
   function setFieldValue(name, value) {
@@ -229,12 +228,7 @@ function EndpointController(
   async function initView() {
     return $async(async () => {
       try {
-        const [endpoint, groups, tags, settings] = await Promise.all([
-          EndpointService.endpoint($transition$.params().id),
-          GroupService.groups(),
-          TagService.tags(),
-          SettingsService.settings(),
-        ]);
+        const [endpoint, groups, settings] = await Promise.all([EndpointService.endpoint($transition$.params().id), GroupService.groups(), SettingsService.settings()]);
 
         if (endpoint.URL.indexOf('unix://') === 0 || endpoint.URL.indexOf('npipe://') === 0) {
           $scope.endpointType = 'local';
@@ -254,7 +248,6 @@ function EndpointController(
         $scope.endpoint = endpoint;
         $scope.initialTagIds = endpoint.TagIds.slice();
         $scope.groups = groups;
-        $scope.availableTags = tags;
 
         configureState();
 

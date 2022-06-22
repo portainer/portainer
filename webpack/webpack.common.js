@@ -172,12 +172,13 @@ module.exports = {
   },
   resolve: {
     alias: {
+      '@@': path.resolve(projectRoot, 'app/react/components'),
+      '@': path.resolve(projectRoot, 'app'),
       Agent: path.resolve(projectRoot, 'app/agent'),
       Azure: path.resolve(projectRoot, 'app/azure'),
       Docker: path.resolve(projectRoot, 'app/docker'),
       Kubernetes: path.resolve(projectRoot, 'app/kubernetes'),
       Portainer: path.resolve(projectRoot, 'app/portainer'),
-      '@': path.resolve(projectRoot, 'app'),
       'lodash-es': 'lodash',
     },
     extensions: ['.js', '.ts', '.tsx'],

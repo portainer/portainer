@@ -202,17 +202,6 @@ angular
         },
       };
 
-      var endpointCreation = {
-        name: 'portainer.endpoints.new',
-        url: '/new',
-        views: {
-          'content@': {
-            templateUrl: './views/endpoints/create/createendpoint.html',
-            controller: 'CreateEndpointController',
-          },
-        },
-      };
-
       var edgeDeviceCreation = {
         name: 'portainer.endpoints.newEdgeDevice',
         url: '/newEdgeDevice',
@@ -341,26 +330,6 @@ angular
         url: '/init',
         views: {
           'sidebar@': {},
-        },
-      };
-
-      const wizard = {
-        name: 'portainer.wizard',
-        url: '/wizard',
-        views: {
-          'content@': {
-            component: 'wizardView',
-          },
-        },
-      };
-
-      const wizardEndpoints = {
-        name: 'portainer.wizard.endpoints',
-        url: '/endpoints',
-        views: {
-          'content@': {
-            component: 'wizardEndpoints',
-          },
         },
       };
 
@@ -518,7 +487,6 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(edgeDeviceCreation);
-      $stateRegistryProvider.register(endpointCreation);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);
@@ -529,8 +497,6 @@ angular
       $stateRegistryProvider.register(groupCreation);
       $stateRegistryProvider.register(home);
       $stateRegistryProvider.register(init);
-      $stateRegistryProvider.register(wizard);
-      $stateRegistryProvider.register(wizardEndpoints);
       $stateRegistryProvider.register(initEndpoint);
       $stateRegistryProvider.register(initAdmin);
       $stateRegistryProvider.register(registries);

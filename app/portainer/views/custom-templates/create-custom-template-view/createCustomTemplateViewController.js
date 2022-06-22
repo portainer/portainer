@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
+import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
@@ -19,6 +21,8 @@ class CreateCustomTemplateViewController {
       StateManager,
     });
 
+    this.isTemplateVariablesEnabled = isBE;
+
     this.formValues = {
       Title: '',
       FileContent: '',
@@ -35,6 +39,7 @@ class CreateCustomTemplateViewController {
       Platform: 1,
       Type: 1,
       AccessControlData: new AccessControlFormData(),
+      Variables: [],
     };
 
     this.state = {
@@ -45,6 +50,7 @@ class CreateCustomTemplateViewController {
       loading: true,
       isEditorDirty: false,
       templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
+      isTemplateValid: true,
     };
 
     this.templates = [];
@@ -58,7 +64,21 @@ class CreateCustomTemplateViewController {
     this.createCustomTemplateFromGitRepository = this.createCustomTemplateFromGitRepository.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
-    this.onChangeFormValues = this.onChangeFormValues.bind(this);
+    this.onVariablesChange = this.onVariablesChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  onVariablesChange(value) {
+    this.handleChange({ Variables: value });
+  }
+
+  handleChange(values) {
+    return this.$async(async () => {
+      this.formValues = {
+        ...this.formValues,
+        ...values,
+      };
+    });
   }
 
   createCustomTemplate() {
@@ -67,6 +87,7 @@ class CreateCustomTemplateViewController {
 
   onChangeMethod() {
     this.formValues.FileContent = '';
+    this.formValues.Variables = [];
     this.selectedTemplate = null;
   }
 
@@ -151,12 +172,26 @@ class CreateCustomTemplateViewController {
   }
 
   editorUpdate(cm) {
-    this.formValues.FileContent = cm.getValue();
+    const value = cm.getValue();
+    this.formValues.FileContent = value;
     this.state.isEditorDirty = true;
+    this.parseTemplate(value);
   }
 
-  onChangeFormValues(newValues) {
-    this.formValues = newValues;
+  parseTemplate(templateStr) {
+    if (!this.isTemplateVariablesEnabled) {
+      return;
+    }
+
+    const variables = getTemplateVariables(templateStr);
+
+    const isValid = !!variables;
+
+    this.state.isTemplateValid = isValid;
+
+    if (isValid) {
+      this.onVariablesChange(intersectVariables(this.formValues.Variables, variables));
+    }
   }
 
   async $onInit() {

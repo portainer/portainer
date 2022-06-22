@@ -1,13 +1,24 @@
 import { useMutation } from 'react-query';
 import { useEffect } from 'react';
 
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
-import { EdgeScriptForm } from '@/edge/components/EdgeScriptForm';
 import { generateKey } from '@/portainer/environments/environment.service/edge';
+import { useSettings } from '@/portainer/settings/queries';
+import { EdgeScriptForm } from '@/react/edge/components/EdgeScriptForm';
+import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
 
-import { useSettings } from '../../settings.service';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 
 import { AutoEnvCreationSettingsForm } from './AutoEnvCreationSettingsForm';
+
+const commands = {
+  linux: [
+    commandsTabs.k8sLinux,
+    commandsTabs.swarmLinux,
+    commandsTabs.standaloneLinux,
+    commandsTabs.nomadLinux,
+  ],
+  win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
+};
 
 export function AutomaticEdgeEnvCreation() {
   const edgeKeyMutation = useGenerateKeyMutation();
@@ -40,7 +51,13 @@ export function AutomaticEdgeEnvCreation() {
         {edgeKeyMutation.isLoading ? (
           <div>Generating key for {url} ... </div>
         ) : (
-          edgeKey && <EdgeScriptForm edgeKey={edgeKey} />
+          edgeKey && (
+            <EdgeScriptForm
+              edgeInfo={{ key: edgeKey }}
+              commands={commands}
+              isNomadTokenVisible
+            />
+          )
         )}
       </WidgetBody>
     </Widget>

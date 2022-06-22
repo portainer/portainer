@@ -27,7 +27,7 @@
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <div class="col-sm-12">
-                    <label for="toggle_logo" class="control-label text-left"> Use namespace(s) specificed from manifest </label>
+                    <label for="toggle_logo" class="control-label text-left"> Use namespace(s) specified from manifest </label>
                     <portainer-tooltip
                       position="bottom"
                       message="If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment"
@@ -84,13 +84,21 @@
                 ></git-form>
                 <!-- !repository -->
 
-                <custom-template-selector
-                  ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE"
-                  new-template-path="kubernetes.templates.custom.new"
-                  stack-type="3"
-                  on-change="(ctrl.onChangeTemplateId)"
-                  value="ctrl.state.templateId"
-                ></custom-template-selector>
+                <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE">
+                  <custom-template-selector
+                    new-template-path="kubernetes.templates.custom.new"
+                    stack-type="3"
+                    on-change="(ctrl.onChangeTemplateId)"
+                    value="ctrl.state.templateId"
+                  ></custom-template-selector>
+
+                  <custom-templates-variables-field
+                    ng-if="$ctrl.isTemplateVariablesEnabled && ctrl.state.template"
+                    definitions="ctrl.state.template.Variables"
+                    value="ctrl.formValues.Variables"
+                    on-change="(ctrl.onChangeTemplateVariables)"
+                  ></custom-templates-variables-field>
+                </div>
 
                 <!-- editor -->
                 <web-editor-form

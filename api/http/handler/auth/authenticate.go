@@ -13,7 +13,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/portainer/portainer/api/internal/passwordutils"
 )
 
 type authenticatePayload struct {
@@ -101,7 +100,7 @@ func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portai
 		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized}
 	}
 
-	forceChangePassword := !passwordutils.StrengthCheck(password)
+	forceChangePassword := !handler.passwordStrengthChecker.Check(password)
 	return handler.writeToken(w, user, forceChangePassword)
 }
 

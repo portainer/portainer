@@ -1,7 +1,8 @@
 import { react2angular } from '@/react-tools/react2angular';
 import { EnvironmentProvider } from '@/portainer/environments/useEnvironment';
-import { TableSettingsProvider } from '@/portainer/components/datatables/components/useTableSettings';
 import type { Environment } from '@/portainer/environments/types';
+
+import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 
 import {
   ContainersDatatable,

@@ -3,12 +3,13 @@ import { PropsWithChildren } from 'react';
 import _ from 'lodash';
 
 import { ownershipIcon, truncate } from '@/portainer/filters/filters';
-import { Tooltip } from '@/portainer/components/Tip/Tooltip';
-import { Link } from '@/portainer/components/Link';
 import { UserId } from '@/portainer/users/types';
 import { TeamId } from '@/portainer/teams/types';
 import { useTeams } from '@/portainer/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
+
+import { Link } from '@@/Link';
+import { Tooltip } from '@@/Tip/Tooltip';
 
 import {
   ResourceControlOwnership,

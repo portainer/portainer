@@ -1,4 +1,3 @@
-import PortainerError from '@/portainer/error';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { type EnvironmentGroupId } from '@/portainer/environment-groups/types';
 import { type TagId } from '@/portainer/tags/types';
@@ -7,66 +6,87 @@ import { type Environment, EnvironmentCreationTypes } from '../types';
 
 import { arrayToJson, buildUrl, json2formData } from './utils';
 
-export async function createLocalEndpoint(
-  name = 'local',
-  url = '',
+export interface EnvironmentMetadata {
+  groupId?: EnvironmentGroupId;
+  tagIds?: TagId[];
+}
+
+interface CreateLocalDockerEnvironment {
+  name: string;
+  socketPath?: string;
+  publicUrl?: string;
+  meta?: EnvironmentMetadata;
+}
+
+export async function createLocalDockerEnvironment({
+  name,
+  socketPath = '',
   publicUrl = '',
-  groupId: EnvironmentGroupId = 1,
-  tagIds: TagId[] = []
-) {
-  let endpointUrl = url;
-  if (endpointUrl !== '') {
-    if (endpointUrl.includes('//./pipe/')) {
-      endpointUrl = `unix://${url}`;
-    } else {
-      // Windows named pipe
-      endpointUrl = `npipe://${url}`;
+  meta = { tagIds: [] },
+}: CreateLocalDockerEnvironment) {
+  const url = prefixPath(socketPath);
+
+  return createEnvironment(
+    name,
+    EnvironmentCreationTypes.LocalDockerEnvironment,
+    {
+      url,
+      publicUrl,
+      meta,
     }
-  }
+  );
 
-  try {
-    return await createEndpoint(
-      name,
-      EnvironmentCreationTypes.LocalDockerEnvironment,
-      { url: endpointUrl, publicUrl, groupId, tagIds }
-    );
-  } catch (err) {
-    throw new PortainerError('Unable to create environment', err as Error);
+  function prefixPath(path: string) {
+    if (path === '') {
+      return path;
+    }
+
+    // Windows named pipe
+    if (path.startsWith('//./pipe/')) {
+      return `npipe://${path}`;
+    }
+
+    return `unix://${path}`;
   }
 }
 
-export async function createLocalKubernetesEndpoint(
-  name = 'local',
-  tagIds: TagId[] = []
-) {
-  try {
-    return await createEndpoint(
-      name,
-      EnvironmentCreationTypes.LocalKubernetesEnvironment,
-      { tagIds, groupId: 1, tls: { skipClientVerify: true, skipVerify: true } }
-    );
-  } catch (err) {
-    throw new PortainerError('Unable to create environment', err as Error);
-  }
+interface CreateLocalKubernetesEnvironment {
+  name: string;
+  meta?: EnvironmentMetadata;
 }
 
-export async function createAzureEndpoint(
-  name: string,
-  applicationId: string,
-  tenantId: string,
-  authenticationKey: string,
-  groupId: EnvironmentGroupId,
-  tagIds: TagId[]
-) {
-  try {
-    await createEndpoint(name, EnvironmentCreationTypes.AzureEnvironment, {
-      groupId,
-      tagIds,
-      azure: { applicationId, tenantId, authenticationKey },
-    });
-  } catch (err) {
-    throw new PortainerError('Unable to connect to Azure', err as Error);
-  }
+export async function createLocalKubernetesEnvironment({
+  name,
+  meta = { tagIds: [] },
+}: CreateLocalKubernetesEnvironment) {
+  return createEnvironment(
+    name,
+    EnvironmentCreationTypes.LocalKubernetesEnvironment,
+    { meta, tls: { skipClientVerify: true, skipVerify: true } }
+  );
+}
+
+interface AzureSettings {
+  applicationId: string;
+  tenantId: string;
+  authenticationKey: string;
+}
+
+interface CreateAzureEnvironment {
+  name: string;
+  azure: AzureSettings;
+  meta?: EnvironmentMetadata;
+}
+
+export async function createAzureEnvironment({
+  name,
+  azure,
+  meta = { tagIds: [] },
+}: CreateAzureEnvironment) {
+  return createEnvironment(name, EnvironmentCreationTypes.AzureEnvironment, {
+    meta,
+    azure,
+  });
 }
 
 interface TLSSettings {
@@ -77,47 +97,93 @@ interface TLSSettings {
   keyFile?: File;
 }
 
-interface AzureSettings {
-  applicationId: string;
-  tenantId: string;
-  authenticationKey: string;
-}
-
-interface EndpointOptions {
+export interface EnvironmentOptions {
   url?: string;
   publicUrl?: string;
-  groupId?: EnvironmentGroupId;
-  tagIds?: TagId[];
+  meta?: EnvironmentMetadata;
   checkinInterval?: number;
   azure?: AzureSettings;
   tls?: TLSSettings;
   isEdgeDevice?: boolean;
 }
 
-export async function createRemoteEndpoint(
-  name: string,
-  creationType: EnvironmentCreationTypes,
-  options?: EndpointOptions
-) {
-  let endpointUrl = options?.url;
-  if (creationType !== EnvironmentCreationTypes.EdgeAgentEnvironment) {
-    endpointUrl = `tcp://${endpointUrl}`;
-  }
-
-  try {
-    return await createEndpoint(name, creationType, {
-      ...options,
-      url: endpointUrl,
-    });
-  } catch (err) {
-    throw new PortainerError('Unable to create environment', err as Error);
-  }
+interface CreateRemoteEnvironment {
+  name: string;
+  creationType: Exclude<
+    EnvironmentCreationTypes,
+    EnvironmentCreationTypes.EdgeAgentEnvironment
+  >;
+  url: string;
+  options?: Omit<EnvironmentOptions, 'url'>;
 }
 
-async function createEndpoint(
+export async function createRemoteEnvironment({
+  creationType,
+  name,
+  url,
+  options = {},
+}: CreateRemoteEnvironment) {
+  return createEnvironment(name, creationType, {
+    ...options,
+    url: `tcp://${url}`,
+  });
+}
+
+export interface CreateAgentEnvironmentValues {
+  name: string;
+  environmentUrl: string;
+  meta: EnvironmentMetadata;
+}
+
+export function createAgentEnvironment({
+  name,
+  environmentUrl,
+  meta = { tagIds: [] },
+}: CreateAgentEnvironmentValues) {
+  return createRemoteEnvironment({
+    name,
+    url: environmentUrl,
+    creationType: EnvironmentCreationTypes.AgentEnvironment,
+    options: {
+      meta,
+      tls: {
+        skipVerify: true,
+        skipClientVerify: true,
+      },
+    },
+  });
+}
+
+interface CreateEdgeAgentEnvironment {
+  name: string;
+  portainerUrl: string;
+  meta?: EnvironmentMetadata;
+  pollFrequency: number;
+}
+
+export function createEdgeAgentEnvironment({
+  name,
+  portainerUrl,
+  meta = { tagIds: [] },
+}: CreateEdgeAgentEnvironment) {
+  return createEnvironment(
+    name,
+    EnvironmentCreationTypes.EdgeAgentEnvironment,
+    {
+      url: portainerUrl,
+      ...meta,
+      tls: {
+        skipVerify: true,
+        skipClientVerify: true,
+      },
+    }
+  );
+}
+
+async function createEnvironment(
   name: string,
   creationType: EnvironmentCreationTypes,
-  options?: EndpointOptions
+  options?: EnvironmentOptions
 ) {
   let payload: Record<string, unknown> = {
     Name: name,
@@ -125,12 +191,14 @@ async function createEndpoint(
   };
 
   if (options) {
+    const { groupId, tagIds = [] } = options.meta || {};
+
     payload = {
       ...payload,
       URL: options.url,
       PublicURL: options.publicUrl,
-      GroupID: options.groupId,
-      TagIds: arrayToJson(options.tagIds),
+      GroupID: groupId,
+      TagIds: arrayToJson(tagIds),
       CheckinInterval: options.checkinInterval,
       IsEdgeDevice: options.isEdgeDevice,
     };
@@ -161,12 +229,9 @@ async function createEndpoint(
 
   const formPayload = json2formData(payload);
   try {
-    const { data: endpoint } = await axios.post<Environment>(
-      buildUrl(),
-      formPayload
-    );
+    const { data } = await axios.post<Environment>(buildUrl(), formPayload);
 
-    return endpoint;
+    return data;
   } catch (e) {
     throw parseAxiosError(e as Error);
   }

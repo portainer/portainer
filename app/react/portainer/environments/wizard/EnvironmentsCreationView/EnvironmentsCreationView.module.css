@@ -1,0 +1,16 @@
+.wizard-step-action {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  text-align: right;
+  border-top: 1px solid #777;
+}
+
+.wizard-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  grid-template-areas:
+    'main sidebar'
+    'footer sidebar';
+  gap: 10px;
+  margin: 0 15px;
+}
