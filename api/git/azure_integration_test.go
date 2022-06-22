@@ -90,6 +90,32 @@ func TestService_LatestCommitID_Azure(t *testing.T) {
 	assert.NotEmpty(t, id, "cannot guarantee commit id, but it should be not empty")
 }
 
+func TestService_ListRemote_Azure(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
+	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
+	service := NewService()
+
+	repositoryUrl := "https://oscarzhouportainer@dev.azure.com/oscarzhouportainer/private-hello-world/_git/private-hello-world"
+	refs, err := service.ListRemote(repositoryUrl, username, accessToken)
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, len(refs), 1)
+}
+
+func TestService_ListTree_Azure(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
+	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
+	service := NewService()
+
+	repositoryUrl := "https://oscarzhouportainer@dev.azure.com/oscarzhouportainer/private-hello-world/_git/private-hello-world"
+	paths, err := service.ListTree(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, len(paths), 1)
+}
+
 func getRequiredValue(t *testing.T, name string) string {
 	value, ok := os.LookupEnv(name)
 	if !ok {

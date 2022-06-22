@@ -109,7 +109,7 @@ func (service *Service) ListRemote(repositoryURL, username, password string) ([]
 	}
 
 	if isAzureUrl(options.repositoryUrl) {
-		service.azure.listRemote(context.TODO(), options)
+		return service.azure.listRemote(context.TODO(), options)
 	}
 
 	return service.git.listRemote(context.TODO(), options)

@@ -32,9 +32,24 @@ type azureOptions struct {
 	username, password string
 }
 
+// azureRef abstracts from the response of https://docs.microsoft.com/en-us/rest/api/azure/devops/git/refs/list?view=azure-devops-rest-6.0#refs
+type azureRef struct {
+	Name     string `json:"name"`
+	ObjectID string `json:"objectId"`
+}
+
+// azureItem abstracts from the response of https://docs.microsoft.com/en-us/rest/api/azure/devops/git/items/get?view=azure-devops-rest-6.0#download
+type azureItem struct {
+	ObjectID string `json:"objectId"`
+	CommitId string `json:"commitId"`
+	Path     string `json:"path"`
+}
+
 type azureDownloader struct {
 	client  *http.Client
 	baseUrl string
+	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
+	repoTreeCache map[string][]string
 }
 
 func NewAzureDownloader(client *http.Client) *azureDownloader {
@@ -103,14 +118,22 @@ func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, option
 }
 
 func (a *azureDownloader) latestCommitID(ctx context.Context, options fetchOptions) (string, error) {
+	rootItem, err := a.getRootItem(ctx, options)
+	if err != nil {
+		return "", err
+	}
+	return rootItem.CommitId, nil
+}
+
+func (a *azureDownloader) getRootItem(ctx context.Context, options fetchOptions) (*azureItem, error) {
 	config, err := parseUrl(options.repositoryUrl)
 	if err != nil {
-		return "", errors.WithMessage(err, "failed to parse url")
+		return nil, errors.WithMessage(err, "failed to parse url")
 	}
 
 	rootItemUrl, err := a.buildRootItemUrl(config, options.referenceName)
 	if err != nil {
-		return "", errors.WithMessage(err, "failed to build azure root item url")
+		return nil, errors.WithMessage(err, "failed to build azure root item url")
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", rootItemUrl, nil)
@@ -121,34 +144,31 @@ func (a *azureDownloader) latestCommitID(ctx context.Context, options fetchOptio
 	}
 
 	if err != nil {
-		return "", errors.WithMessage(err, "failed to create a new HTTP request")
+		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
 	resp, err := a.client.Do(req)
 	if err != nil {
-		return "", errors.WithMessage(err, "failed to make an HTTP request")
+		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to get repository root item with a status \"%v\"", resp.Status)
+		return nil, fmt.Errorf("failed to get repository root item with a status \"%v\"", resp.Status)
 	}
 
 	var items struct {
-		Value []struct {
-			CommitId string `json:"commitId"`
-		}
+		Value []azureItem
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&items); err != nil {
-		return "", errors.Wrap(err, "could not parse Azure items response")
+		return nil, errors.Wrap(err, "could not parse Azure items response")
 	}
 
 	if len(items.Value) == 0 || items.Value[0].CommitId == "" {
-		return "", errors.Errorf("failed to get latest commitID in the repository")
+		return nil, errors.Errorf("failed to get latest commitID in the repository")
 	}
-
-	return items.Value[0].CommitId, nil
+	return &items.Value[0], nil
 }
 
 func parseUrl(rawUrl string) (*azureOptions, error) {
@@ -270,6 +290,49 @@ func (a *azureDownloader) buildRootItemUrl(config *azureOptions, referenceName s
 	return u.String(), nil
 }
 
+func (a *azureDownloader) buildRefsUrl(config *azureOptions) (string, error) {
+	// ref@https://docs.microsoft.com/en-us/rest/api/azure/devops/git/refs/list?view=azure-devops-rest-6.0#gitref
+	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/refs",
+		a.baseUrl,
+		url.PathEscape(config.organisation),
+		url.PathEscape(config.project),
+		url.PathEscape(config.repository))
+	u, err := url.Parse(rawUrl)
+
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to parse list refs url path %s", rawUrl)
+	}
+
+	q := u.Query()
+	q.Set("api-version", "6.0")
+	u.RawQuery = q.Encode()
+
+	return u.String(), nil
+}
+
+func (a *azureDownloader) buildTreeUrl(config *azureOptions, rootObjectHash string) (string, error) {
+	// ref@https://docs.microsoft.com/en-us/rest/api/azure/devops/git/trees/get?view=azure-devops-rest-6.0
+	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/trees/%s",
+		a.baseUrl,
+		url.PathEscape(config.organisation),
+		url.PathEscape(config.project),
+		url.PathEscape(config.repository),
+		url.PathEscape(rootObjectHash),
+	)
+	u, err := url.Parse(rawUrl)
+
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to parse list tree url path %s", rawUrl)
+	}
+	q := u.Query()
+	// projectId={projectId}&recursive=true&fileName={fileName}&$format={$format}&api-version=6.0
+	q.Set("recursive", "true")
+	q.Set("api-version", "6.0")
+	u.RawQuery = q.Encode()
+
+	return u.String(), nil
+}
+
 const (
 	branchPrefix = "refs/heads/"
 	tagPrefix    = "refs/tags/"
@@ -295,11 +358,114 @@ func getVersionType(name string) string {
 	return "commit"
 }
 
-func (a *azureDownloader) listRemote(ctx context.Context, opt cloneOptions) ([]string, error) {
+func (a *azureDownloader) listRemote(ctx context.Context, options cloneOptions) ([]string, error) {
+	config, err := parseUrl(options.repositoryUrl)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to parse url")
+	}
 
-	return nil, nil
+	listRefsUrl, err := a.buildRefsUrl(config)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to build list refs url")
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", listRefsUrl, nil)
+	if options.username != "" || options.password != "" {
+		req.SetBasicAuth(options.username, options.password)
+	} else if config.username != "" || config.password != "" {
+		req.SetBasicAuth(config.username, config.password)
+	}
+
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
+	}
+
+	resp, err := a.client.Do(req)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to make an HTTP request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to list refs url with a status \"%v\"", resp.Status)
+	}
+
+	var refs struct {
+		Value []azureRef
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&refs); err != nil {
+		return nil, errors.Wrap(err, "could not parse Azure refs response")
+	}
+
+	var ret []string
+	for _, value := range refs.Value {
+		ret = append(ret, value.Name)
+	}
+
+	return ret, nil
 }
 
-func (a *azureDownloader) listTree(ctx context.Context, opt fetchOptions) ([]string, error) {
-	return nil, nil
+func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([]string, error) {
+	repoKey := generateCacheKey(options.repositoryUrl, options.referenceName)
+	treeCache, ok := a.repoTreeCache[repoKey]
+	if ok {
+		return treeCache, nil
+	}
+
+	var ret []string
+	rootItem, err := a.getRootItem(ctx, options)
+	if err != nil {
+		return ret, err
+	}
+
+	config, err := parseUrl(options.repositoryUrl)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to parse url")
+	}
+
+	listTreeUrl, err := a.buildTreeUrl(config, rootItem.ObjectID)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to build list tree url")
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", listTreeUrl, nil)
+	if options.username != "" || options.password != "" {
+		req.SetBasicAuth(options.username, options.password)
+	} else if config.username != "" || config.password != "" {
+		req.SetBasicAuth(config.username, config.password)
+	}
+
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
+	}
+
+	resp, err := a.client.Do(req)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to make an HTTP request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to list tree url with a status \"%v\"", resp.Status)
+	}
+
+	var tree struct {
+		TreeEntries []struct {
+			RelativePath string `json:"relativePath"`
+		} `json:"treeEntries"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&tree); err != nil {
+		return nil, errors.Wrap(err, "could not parse Azure tree response")
+	}
+
+	for _, treeEntry := range tree.TreeEntries {
+		if matchExtensions(treeEntry.RelativePath, options.extensions) {
+			ret = append(ret, treeEntry.RelativePath)
+		}
+	}
+	a.repoTreeCache[repoKey] = ret
+
+	return ret, nil
 }

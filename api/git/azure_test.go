@@ -45,6 +45,40 @@ func Test_buildRootItemUrl(t *testing.T) {
 	assert.Equal(t, expectedUrl.Query(), actualUrl.Query())
 }
 
+func Test_buildRefsUrl(t *testing.T) {
+	a := NewAzureDownloader(nil)
+	u, err := a.buildRefsUrl(&azureOptions{
+		organisation: "organisation",
+		project:      "project",
+		repository:   "repository",
+	})
+
+	expectedUrl, _ := url.Parse("https://dev.azure.com/organisation/project/_apis/git/repositories/repository/refs?api-version=6.0")
+	actualUrl, _ := url.Parse(u)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedUrl.Host, actualUrl.Host)
+	assert.Equal(t, expectedUrl.Scheme, actualUrl.Scheme)
+	assert.Equal(t, expectedUrl.Path, actualUrl.Path)
+	assert.Equal(t, expectedUrl.Query(), actualUrl.Query())
+}
+
+func Test_buildTreeUrl(t *testing.T) {
+	a := NewAzureDownloader(nil)
+	u, err := a.buildTreeUrl(&azureOptions{
+		organisation: "organisation",
+		project:      "project",
+		repository:   "repository",
+	}, "sha1")
+
+	expectedUrl, _ := url.Parse("https://dev.azure.com/organisation/project/_apis/git/repositories/repository/trees/sha1?api-version=6.0&recursive=true")
+	actualUrl, _ := url.Parse(u)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedUrl.Host, actualUrl.Host)
+	assert.Equal(t, expectedUrl.Scheme, actualUrl.Scheme)
+	assert.Equal(t, expectedUrl.Path, actualUrl.Path)
+	assert.Equal(t, expectedUrl.Query(), actualUrl.Query())
+}
+
 func Test_parseAzureUrl(t *testing.T) {
 	type args struct {
 		url string

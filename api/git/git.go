@@ -2,7 +2,6 @@ package git
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,7 +20,7 @@ type gitClient struct {
 	preserveGitDirectory bool
 	// Cache the result of repository refs, key is repository URL
 	repoRefCache map[string][]*plumbing.Reference
-	// Cache the result of repository file tree, key is the concat of repository URL and ref value
+	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
 	repoTreeCache map[string][]string
 }
 
@@ -121,7 +120,7 @@ func (c gitClient) listRemote(ctx context.Context, opt cloneOptions) ([]string, 
 }
 
 func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, error) {
-	repoKey := getRepoKey(opt.repositoryUrl, opt.referenceName)
+	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
 	treeCache, ok := c.repoTreeCache[repoKey]
 	if ok {
 		return treeCache, nil
@@ -194,11 +193,15 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 	return ret, nil
 }
 
-func getRepoKey(repositoryURL, referenceName string) string {
-	return fmt.Sprintf("%s%s", repositoryURL, referenceName)
+func generateCacheKey(names ...string) string {
+	return strings.Join(names, "-")
 }
 
 func matchExtensions(target string, exts []string) bool {
+	if len(exts) == 0 {
+		return true
+	}
+
 	for _, ext := range exts {
 		if strings.HasSuffix(target, ext) {
 			return true
