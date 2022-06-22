@@ -65,7 +65,7 @@
 .pagination > .active > span:focus,
 .pagination > .active > button:focus {
   z-index: 3;
-  color: #1d2939;
+  color: var(ui-blue-7);
   cursor: default;
   background-color: var(--text-pagination-span-color);
   border-color: var(--text-pagination-span-color);
