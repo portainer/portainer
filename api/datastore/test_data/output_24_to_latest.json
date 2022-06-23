@@ -35,6 +35,12 @@
         "TenantID": ""
       },
       "ComposeSyntaxMaxVersion": "",
+      "Edge": {
+        "AsyncMode": false,
+        "CommandInterval": 0,
+        "PingInterval": 0,
+        "SnapshotInterval": 0
+      },
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
       "GroupId": 1,
@@ -682,6 +688,12 @@
     "BlackListedLabels": [],
     "DisplayDonationHeader": false,
     "DisplayExternalContributors": false,
+    "Edge": {
+      "AsyncMode": false,
+      "CommandInterval": 0,
+      "PingInterval": 0,
+      "SnapshotInterval": 0
+    },
     "EdgeAgentCheckinInterval": 5,
     "EdgePortainerUrl": "",
     "EnableEdgeComputeFeatures": false,
