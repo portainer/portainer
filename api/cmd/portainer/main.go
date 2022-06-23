@@ -752,7 +752,7 @@ func main() {
 			"YarnVersion":    build.YarnVersion,
 			"WebpackVersion": build.WebpackVersion,
 			"GoVersion":      build.GoVersion},
-		).Printf("[INFO] [cmd,main] Starting Portainer version %s\n", portainer.APIVersion)
+		).Printf("[INFO] [cmd,main] Starting Portainer\n")
 		err := server.Start()
 		logrus.Printf("[INFO] [cmd,main] Http server exited: %v\n", err)
 	}
