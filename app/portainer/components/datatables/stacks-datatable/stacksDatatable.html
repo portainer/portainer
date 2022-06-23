@@ -3,10 +3,45 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle"><i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
+        <div class="searchBar">
+          <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="stack-searchInput"
+          />
+        </div>
+        <div class="actionBar" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
+          <button
+            type="button"
+            class="btn btn-sm btn-danger"
+            authorization="PortainerStackDelete"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+            data-cy="stack-removeStackButton"
+          >
+            <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
+          </button>
+          <button
+            ng-disabled="!$ctrl.createEnabled"
+            type="button"
+            class="btn btn-sm btn-primary"
+            ui-sref="docker.stacks.newstack"
+            authorization="PortainerStackCreate"
+            data-cy="stack-addStackButton"
+          >
+            <i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack
+          </button>
+        </div>
         <div class="settings">
           <datatable-columns-visibility columns="$ctrl.columnVisibility.columns" on-change="($ctrl.onColumnVisibilityChange)"></datatable-columns-visibility>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+            <span uib-dropdown-toggle aria-label="Settings"><i class="fa fa-cog" aria-hidden="true"></i></span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader"> Table settings </div>
@@ -43,41 +78,7 @@
           </span>
         </div>
       </div>
-      <div class="actionBar" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
-        <button
-          type="button"
-          class="btn btn-sm btn-danger"
-          authorization="PortainerStackDelete"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-          data-cy="stack-removeStackButton"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button
-          ng-disabled="!$ctrl.createEnabled"
-          type="button"
-          class="btn btn-sm btn-primary"
-          ui-sref="docker.stacks.newstack"
-          authorization="PortainerStackCreate"
-          data-cy="stack-addStackButton"
-        >
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack
-        </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-          data-cy="stack-searchInput"
-        />
-      </div>
+
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells" data-cy="stack-stackTable">
           <thead>

@@ -10,7 +10,7 @@ export interface Crumb {
   linkParams?: Record<string, unknown>;
 }
 interface Props {
-  breadcrumbs: Crumb[];
+  breadcrumbs: (Crumb | string)[];
 }
 
 export function Breadcrumbs({ breadcrumbs }: Props) {
@@ -26,7 +26,11 @@ export function Breadcrumbs({ breadcrumbs }: Props) {
   );
 }
 
-function renderCrumb(crumb: Crumb) {
+function renderCrumb(crumb: Crumb | string) {
+  if (typeof crumb === 'string') {
+    return crumb;
+  }
+
   if (crumb.link) {
     return (
       <Link to={crumb.link} params={crumb.linkParams}>

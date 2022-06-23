@@ -24,7 +24,9 @@ test('dashboard items should render correctly', async () => {
 
   const subscriptionElements = within(subscriptionsItem);
   expect(subscriptionElements.getByLabelText('value')).toBeVisible();
-  expect(subscriptionElements.getByLabelText('icon')).toHaveClass('fa-th-list');
+  expect(subscriptionElements.getByRole('img', { hidden: true })).toHaveClass(
+    'fa-th-list'
+  );
   expect(subscriptionElements.getByLabelText('resourceType')).toHaveTextContent(
     'Subscriptions'
   );
@@ -34,7 +36,7 @@ test('dashboard items should render correctly', async () => {
 
   const resourceGroupElements = within(resourceGroupsItem);
   expect(resourceGroupElements.getByLabelText('value')).toBeVisible();
-  expect(resourceGroupElements.getByLabelText('icon')).toHaveClass(
+  expect(resourceGroupElements.getByRole('img', { hidden: true })).toHaveClass(
     'fa-th-list'
   );
   expect(

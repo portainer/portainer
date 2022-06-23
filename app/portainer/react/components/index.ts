@@ -1,7 +1,10 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
+import { Icon } from '@/react/components/Icon';
+import { ReactQueryDevtoolsWrapper } from '@/react/components/ReactQueryDevtoolsWrapper';
 
+import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
 import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
@@ -24,4 +27,10 @@ export const componentsModule = angular
     r2a(PasswordCheckHint, ['forceChangePassword', 'passwordValid'])
   )
   .component('rdLoading', r2a(Loading, []))
-  .component('viewLoading', r2a(ViewLoading, ['message'])).name;
+  .component('viewLoading', r2a(ViewLoading, ['message']))
+  .component(
+    'pageHeader',
+    r2a(PageHeader, ['title', 'breadcrumbs', 'loading', 'onReload', 'reload'])
+  )
+  .component('prIcon', r2a(Icon, ['className', 'feather', 'icon']))
+  .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, [])).name;

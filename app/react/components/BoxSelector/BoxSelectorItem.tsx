@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import ReactTooltip from 'react-tooltip';
 
 import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import { Icon } from '@/react/components/Icon';
 
 import './BoxSelectorItem.css';
 
@@ -53,9 +54,10 @@ export function BoxSelectorItem<T extends number | string>({
 
         <div className="boxselector_header">
           {!!option.icon && (
-            <i
-              className={clsx(option.icon, 'space-right')}
-              aria-hidden="true"
+            <Icon
+              icon={option.icon}
+              feather={option.featherIcon}
+              className="space-right"
             />
           )}
           {option.label}

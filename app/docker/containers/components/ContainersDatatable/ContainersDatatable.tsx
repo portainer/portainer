@@ -141,6 +141,14 @@ export function ContainersDatatable({
   return (
     <TableContainer>
       <TableTitle icon="fa-cubes" label="Containers">
+        <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
+        <TableActions>
+          <ContainersDatatableActions
+            selectedItems={selectedFlatRows.map((row) => row.original)}
+            isAddActionVisible={isAddActionVisible}
+            endpointId={endpoint.Id}
+          />
+        </TableActions>
         <TableTitleActions>
           <ColumnVisibilityMenu<DockerContainer>
             columns={columnsToHide}
@@ -155,16 +163,6 @@ export function ContainersDatatable({
           </TableSettingsMenu>
         </TableTitleActions>
       </TableTitle>
-
-      <TableActions>
-        <ContainersDatatableActions
-          selectedItems={selectedFlatRows.map((row) => row.original)}
-          isAddActionVisible={isAddActionVisible}
-          endpointId={endpoint.Id}
-        />
-      </TableActions>
-
-      <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
 
       <Table
         className={tableProps.className}

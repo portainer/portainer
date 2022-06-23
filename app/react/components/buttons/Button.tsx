@@ -2,7 +2,15 @@ import { MouseEventHandler, PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
 type Type = 'submit' | 'button' | 'reset';
-type Color = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'link';
+type Color =
+  | 'default'
+  | 'primary'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'link'
+  | 'light'
+  | 'dangerlight';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
 export interface Props {

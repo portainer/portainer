@@ -68,7 +68,7 @@ export function ContainersDatatableActions({
       <ButtonGroup>
         <Authorized authorizations="DockerContainerStart">
           <Button
-            color="success"
+            color="light"
             onClick={() => onStartClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasStoppedItemsSelected}
           >
@@ -79,7 +79,7 @@ export function ContainersDatatableActions({
 
         <Authorized authorizations="DockerContainerStop">
           <Button
-            color="danger"
+            color="light"
             onClick={() => onStopClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
           >
@@ -90,7 +90,7 @@ export function ContainersDatatableActions({
 
         <Authorized authorizations="DockerContainerKill">
           <Button
-            color="danger"
+            color="light"
             onClick={() => onKillClick(selectedItems)}
             disabled={selectedItemCount === 0}
           >
@@ -101,6 +101,7 @@ export function ContainersDatatableActions({
 
         <Authorized authorizations="DockerContainerRestart">
           <Button
+            color="light"
             onClick={() => onRestartClick(selectedItems)}
             disabled={selectedItemCount === 0}
           >
@@ -111,6 +112,7 @@ export function ContainersDatatableActions({
 
         <Authorized authorizations="DockerContainerPause">
           <Button
+            color="light"
             onClick={() => onPauseClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
           >
@@ -121,6 +123,7 @@ export function ContainersDatatableActions({
 
         <Authorized authorizations="DockerContainerUnpause">
           <Button
+            color="light"
             onClick={() => onResumeClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasPausedItemsSelected}
           >
@@ -131,7 +134,7 @@ export function ContainersDatatableActions({
 
         <Authorized authorizations="DockerContainerDelete">
           <Button
-            color="danger"
+            color="dangerlight"
             onClick={() => onRemoveClick(selectedItems)}
             disabled={selectedItemCount === 0}
           >
