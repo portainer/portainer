@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 
 PLATFORM=$1
 ARCH=$2
