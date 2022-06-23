@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
 import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
 
 import { CopyButton } from '@@/buttons/CopyButton';
@@ -32,12 +31,12 @@ export function DeploymentScripts() {
   const { agentVersion, agentSecret } = agentDetailsQuery;
 
   const options = deployments.map((c) => {
-    const code = c.command(agentVersion);
+    const code = c.command(agentVersion, agentSecret);
 
     return {
       id: c.id,
       label: c.label,
-      children: <DeployCode agentSecret={agentSecret} code={code} />,
+      children: <DeployCode code={code} />,
     };
   });
 
@@ -51,24 +50,12 @@ export function DeploymentScripts() {
 }
 
 interface DeployCodeProps {
-  agentSecret?: string;
   code: string;
 }
 
-function DeployCode({ agentSecret, code }: DeployCodeProps) {
+function DeployCode({ code }: DeployCodeProps) {
   return (
     <>
-      {agentSecret && (
-        <p className="text-muted small my-6">
-          <i
-            className="fa fa-info-circle blue-icon space-right"
-            aria-hidden="true"
-          />
-          Note that the environment variable AGENT_SECRET will need to be set to
-          <code>{agentSecret}</code>. Please update the manifest that will be
-          downloaded from the following script.
-        </p>
-      )}
       <span className="text-muted small">
         CLI script for installing agent on your environment with Docker Swarm:
       </span>
@@ -78,14 +65,41 @@ function DeployCode({ agentSecret, code }: DeployCodeProps) {
   );
 }
 
-function linuxCommand(agentVersion: string) {
-  const agentShortVersion = getAgentShortVersion(agentVersion);
+function linuxCommand(agentVersion: string, agentSecret: string) {
+  const secret =
+    agentSecret === '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
 
-  return `curl -L https://downloads.portainer.io/ee${agentShortVersion}/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent`;
+  return `docker network create \\
+--driver overlay \\
+  portainer_agent_network
+
+docker service create \\
+  --name portainer_agent \\
+  --network portainer_agent_network \\
+  -p 9001:9001/tcp ${secret}\\
+  --mode global \\
+  --constraint 'node.platform.os == linux' \\
+  --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \\
+  --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
+  portainer/agent:${agentVersion}
+`;
 }
 
-function winCommand(agentVersion: string) {
-  const agentShortVersion = getAgentShortVersion(agentVersion);
+function winCommand(agentVersion: string, agentSecret: string) {
+  const secret =
+    agentSecret === '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
 
-  return `curl -L https://downloads.portainer.io/ee${agentShortVersion}/agent-stack-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent `;
+  return `docker network create \\
+--driver overlay \\
+  portainer_agent_network && \\
+docker service create \\
+  --name portainer_agent \\
+  --network portainer_agent_network \\
+  -p 9001:9001/tcp ${secret}\\
+  --mode global \\
+  --constraint 'node.platform.os == windows' \\
+  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
+  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
+  portainer/agent:${agentVersion}
+`;
 }
