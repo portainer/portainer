@@ -92,7 +92,7 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
                     <div className="col-sm-12">
                       <LoadingButton
                         disabled={!isValid}
-                        dataCy="team-createTeamButton"
+                        data-cy="team-createTeamButton"
                         isLoading={isSubmitting}
                         loadingText="Creating team..."
                       >

@@ -66,7 +66,7 @@ export function NetworkContainersTable({
                   <td>
                     <Authorized authorizations="DockerNetworkDisconnect">
                       <Button
-                        dataCy={`networkDetails-disconnect${container.Name}`}
+                        data-cy={`networkDetails-disconnect${container.Name}`}
                         size="xsmall"
                         color="danger"
                         onClick={() => {

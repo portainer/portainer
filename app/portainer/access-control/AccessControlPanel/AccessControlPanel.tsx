@@ -106,9 +106,9 @@ export function AccessControlPanel({
 function useRestrictions(resourceControl?: ResourceControlViewModel) {
   const { user, isAdmin } = useUser();
 
-  const memberships = useUserMembership(user?.Id);
+  const memberships = useUserMembership(user.Id);
 
-  if (!resourceControl || isAdmin || !user) {
+  if (!resourceControl || isAdmin) {
     return {
       isPartOfRestrictedUsers: false,
       isLeaderOfAnyRestrictedTeams: false,

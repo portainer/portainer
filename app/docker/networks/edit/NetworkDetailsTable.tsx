@@ -41,7 +41,7 @@ export function NetworkDetailsTable({
                 {allowRemoveNetwork && (
                   <Authorized authorizations="DockerNetworkDelete">
                     <Button
-                      dataCy="networkDetails-deleteNetwork"
+                      data-cy="networkDetails-deleteNetwork"
                       size="xsmall"
                       color="danger"
                       onClick={() => onRemoveNetworkClicked()}
