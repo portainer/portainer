@@ -1264,6 +1264,7 @@ type (
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
 		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
+		StoreDockerContainerTempFile(fileName string, r io.Reader) error
 	}
 
 	// GitService represents a service for managing Git

@@ -685,3 +685,45 @@ func (service *Service) StoreFDOProfileFileFromBytes(fdoProfileIdentifier string
 
 	return service.wrapFileStore(filePath), nil
 }
+
+func (service *Service) StoreDockerContainerTempFile(fileName string, r io.Reader) error {
+	path := filepath.Dir(fileName)
+	err := ForceDirectories(path)
+	if err != nil {
+		return errors.New("mkdir failed")
+	}
+
+	out, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, r)
+	return err
+}
+
+func ForceDirectories(path string) error {
+	if len(path) == 0 {
+		return errors.New("path length is zero")
+	}
+
+	if IsDirExists(path) {
+		return nil
+	} else {
+		if err := os.MkdirAll(path, 0777); err != nil {
+			return errors.New("create dir fail")
+		} else {
+			return nil
+		}
+	}
+	return errors.New("create dir fail")
+}
+
+func IsDirExists(path string) bool {
+	if fi, err := os.Stat(path); err != nil {
+		return os.IsExist(err)
+	} else {
+		return fi.IsDir()
+	}
+}

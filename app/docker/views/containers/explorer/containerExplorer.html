@@ -80,7 +80,7 @@
                         ng-repeat="item in explorerService.fileList"
                         ng-click="selectOrUnselect(item, $event)"
                         ng-dblclick="smartClick(item)"
-                        ng-right-click="selectOrUnselect(item, $event)"
+                        ng-right-click="showContextMenu(item, $event)"
                         ng-class="{ selected: isSelected(item) }"
                       >
                         <td>
@@ -102,6 +102,42 @@
           </div>
         </rd-widget-body>
       </rd-widget>
+    </div>
+  </div>
+</div>
+
+<div id="context-menu" ng-show="menuShow">
+  <ul class="dropdown-menu dropdown-right-click" role="menu" aria-labelledby="dropdownMenu">
+    <li>
+      <a href="" tabindex="-1" ng-click="modal('remove')"> <i class="fa fa-trash"></i> remove </a>
+    </li>
+    <li>
+      <a href="" tabindex="-1" ng-click="modal('changepermissions')"> <i class="fa fa-lock"></i> permissions </a>
+    </li>
+  </ul>
+</div>
+
+<div class="modal animated fadeIn" id="remove" ng-show="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form ng-submit="remove()">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">close</span>
+          </button>
+          <h4 class="modal-title">confirm</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure to delete?
+          <span ng-include data-src="'selected-files-msg'"></span>
+          <div ng-include data-src="'error-bar'" class="clearfix"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="apiMiddleware.apiHandler.inprocess">cancel</button>
+          <button type="submit" class="btn btn-primary" ng-disabled="apiMiddleware.apiHandler.inprocess" autofocus="autofocus">remove</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

@@ -1,12 +1,18 @@
 package endpoints
 
 import (
+	"archive/tar"
 	"bytes"
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -133,7 +139,6 @@ func (handler *Handler) endpointExplorerCreate(w http.ResponseWriter, r *http.Re
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access environment", Err: err}
 	}
 
-	//"4ef06f706a584656e6d15df9f0c2674903595a3289ecc882a5b8e21485f6cfbc"
 	timeout := dockerClientTimeout
 	docker, err := handler.DockerClientFactory.CreateClient(endpoint, containerId, &timeout)
 	if err != nil {
@@ -216,6 +221,18 @@ func (handler *Handler) endpointExplorerRemove(w http.ResponseWriter, r *http.Re
 	return response.JSON(w, data)
 }
 
+func (Handler *Handler) DeleteTarFile(filename string) error {
+	return os.RemoveAll(filename)
+}
+
+func (handler *Handler) cleanUp(projectPath string) error {
+	err := handler.FileService.RemoveDirectory(projectPath)
+	if err != nil {
+		log.Printf("http error: Unable to cleanup stack creation (err=%s)\n", err)
+	}
+	return nil
+}
+
 // @id endpointExplorerUpload
 // @summary Inspect an environment(endpoint)
 // @description Retrieve details about an environment(endpoint).
@@ -265,8 +282,16 @@ func (handler *Handler) endpointExplorerUpload(w http.ResponseWriter, r *http.Re
 	}
 	defer docker.Close()
 
-	ctx := context.TODO()
+	projectPath, err := handler.FileService.GetTemporaryPath()
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to create temporary folder", Err: err}
+	}
+	defer handler.cleanUp(projectPath)
+
 	destination := ""
+	idx := 0
+	var files []*os.File
+
 	for {
 		part, err := reader.NextPart()
 		if err == io.EOF {
@@ -281,25 +306,113 @@ func (handler *Handler) endpointExplorerUpload(w http.ResponseWriter, r *http.Re
 			}
 			destination = buf.String()
 		}
-
 		if part.FileName() == "" {
 			continue
 		}
 		if len(destination) == 0 {
 			continue
 		}
-
 		fmt.Println("part.FileName = " + part.FileName() + "  destination=" + destination)
 
-		err = docker.CopyToContainer(ctx, containerId, destination, part, types.CopyToContainerOptions{})
-
+		absPath := projectPath + string(os.PathSeparator) + part.FileName()
+		err = handler.FileService.StoreDockerContainerTempFile(absPath, part)
 		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "upload failed.", Err: err}
+			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "store temp file failed.", Err: err}
 		}
+
+		srcFile, err := os.Open(absPath)
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "store temp file failed.", Err: err}
+		}
+		defer srcFile.Close()
+		files = append(files, srcFile)
+
+		idx++
 	}
 
-	data := ""
-	return response.JSON(w, data)
+	dest := filepath.Join(projectPath, "../") + string(os.PathSeparator) + filepath.Base(projectPath) + ".tar.gz"
+	fmt.Println("gen tar file: " + dest)
+	if err = Compress(files, dest); err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "store gzip files failed.", Err: err}
+	}
+
+	srcFile, err := os.Open(dest)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "store temp file failed.", Err: err}
+	}
+	defer func() {
+		srcFile.Close()
+		handler.DeleteTarFile(dest)
+	}()
+
+	ctx := context.TODO()
+	if err = docker.CopyToContainer(ctx, containerId, destination, srcFile, types.CopyToContainerOptions{}); err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "CopyToContainer failed.", Err: err}
+	}
+
+	var resp = make(map[string]interface{}, 2)
+	resp["result"] = "ok"
+	resp["message"] = strconv.Itoa(idx) + " files uploaded successfully"
+	return response.JSON(w, resp)
+}
+
+func Compress(files []*os.File, dest string) error {
+	d, _ := os.Create(dest)
+	defer d.Close()
+
+	gw := gzip.NewWriter(d)
+	defer gw.Close()
+
+	tw := tar.NewWriter(gw)
+	defer tw.Close()
+
+	for _, file := range files {
+		err := compress(file, "", tw)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func compress(file *os.File, prefix string, tw *tar.Writer) error {
+	info, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	if info.IsDir() {
+		prefix = prefix + "/" + info.Name()
+		fileInfos, err := file.Readdir(-1)
+		if err != nil {
+			return err
+		}
+		for _, fi := range fileInfos {
+			f, err := os.Open(file.Name() + "/" + fi.Name())
+			if err != nil {
+				return err
+			}
+			err = compress(f, prefix, tw)
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		header, err := tar.FileInfoHeader(info, "")
+		header.Name = prefix + "/" + header.Name
+		if err != nil {
+			return err
+		}
+		err = tw.WriteHeader(header)
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(tw, file)
+		file.Close()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func containerRunCmd(docker *client.Client, containerId string, cmd []string) ([]byte, error) {
@@ -319,7 +432,6 @@ func containerRunCmd(docker *client.Client, containerId string, cmd []string) ([
 
 	resp, err := docker.ContainerExecAttach(ctx, execId.ID, types.ExecStartCheck{})
 
-	//var outBuf bytes.Buffer
 	var outBuf, errBuf bytes.Buffer
 	outputDone := make(chan error)
 
