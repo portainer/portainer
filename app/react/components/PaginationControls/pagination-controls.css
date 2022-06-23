@@ -65,7 +65,7 @@
 .pagination > .active > span:focus,
 .pagination > .active > button:focus {
   z-index: 3;
-  color: #fff;
+  color: #1d2939;
   cursor: default;
   background-color: var(--text-pagination-span-color);
   border-color: var(--text-pagination-span-color);

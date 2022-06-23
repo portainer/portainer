@@ -1,15 +1,18 @@
-import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
+
+import { Icon } from '@/react/components/Icon';
 
 import { useTableContext } from './TableContainer';
 
 interface Props {
   icon: string;
   label: string;
+  featherIcon?: boolean;
 }
 
 export function TableTitle({
   icon,
+  featherIcon,
   label,
   children,
 }: PropsWithChildren<Props>) {
@@ -18,7 +21,8 @@ export function TableTitle({
   return (
     <div className="toolBar">
       <div className="toolBarTitle">
-        <i className={clsx('space-right', 'fa', icon)} aria-hidden="true" />
+        <Icon icon={icon} feather={featherIcon} className="space-right" />
+
         {label}
       </div>
       {children}

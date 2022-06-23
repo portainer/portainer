@@ -3,6 +3,7 @@ export const rdWidgetTitle = {
   bindings: {
     titleText: '@',
     icon: '@',
+    featherIcon: '<',
     classes: '@?',
   },
   transclude: {
@@ -12,7 +13,7 @@ export const rdWidgetTitle = {
     <div class="widget-header">
       <div class="row">
         <span ng-class="$ctrl.classes" class="pull-left">
-          <i class="fa" ng-class="$ctrl.icon"></i>
+          <pr-icon icon="$ctrl.icon" feather="$ctrl.featherIcon"></pr-icon>
           <span ng-transclude="title">{{ $ctrl.titleText }}</span>
         </span>
         <span ng-class="$ctrl.classes" class="pull-right" ng-transclude></span>

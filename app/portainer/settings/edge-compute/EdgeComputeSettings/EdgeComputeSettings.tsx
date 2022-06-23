@@ -115,7 +115,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                       isLoading={isSubmitting}
                       loadingText="Saving settings..."
                     >
-                      Save Settings
+                      Save settings
                     </LoadingButton>
                   </div>
                 </div>

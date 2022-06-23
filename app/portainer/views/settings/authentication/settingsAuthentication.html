@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Authentication settings"></rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.settings">Settings</a> &gt; Authentication </rd-header-content>
-</rd-header>
+<page-header title="'Authentication settings'" breadcrumbs="[{label:'Settings', link:'portainer.settings'}, 'Authentication']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -13,7 +10,7 @@
           <div class="form-group">
             <label for="user_timeout" class="col-sm-2 control-label text-left">
               Session lifetime
-              <portainer-tooltip message="Time before users are forced to relogin."></portainer-tooltip>
+              <portainer-tooltip message="Time before users are forced to relogin." position="bottom"></portainer-tooltip>
             </label>
             <div class="col-sm-10">
               <select

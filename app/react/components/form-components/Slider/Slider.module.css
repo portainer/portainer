@@ -28,5 +28,5 @@
 
 .slider :global .rc-slider-mark-text,
 .slider :global .rc-slider-tooltip-inner {
-  font-family: Montserrat, serif;
+  font-family: Inter, serif;
 }

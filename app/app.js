@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import feather from 'feather-icons';
 import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 /* @ngInject */
@@ -19,6 +20,10 @@ export function onStartupAngular($rootScope, $state, $interval, LocalStorage, En
 
   $transitions.onBefore({}, () => {
     HttpRequestHelper.resetAgentHeaders();
+  });
+
+  $transitions.onSuccess({}, () => {
+    feather.replace();
   });
 
   // Keep-alive Edge endpoints by sending a ping request every minute
