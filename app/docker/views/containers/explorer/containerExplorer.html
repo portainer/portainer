@@ -23,10 +23,10 @@
           <div class="row">
             <div class="col-sm-4 col-md-3 sidebar file-tree animated slow fadeIn">
               <ul class="nav nav-sidebar file-tree-root">
-                <li ng-repeat="node in explorerService.history[0].nodes" ng-include="'folder-branch-item'" ng-class="{ active: true }"></li>
+                <li ng-repeat="node in explorerService.history[0].nodes" ng-include="'folder-branch-item'" class="active"></li>
               </ul>
             </div>
-            <div class="col-sm-8 col-md-9">
+            <div class="col-sm-8 col-md-9" ngf-model-options="{updateOn: 'drop', allowInvalid: false, debounce: 0}">
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-xs-12">
                   <div class="searchBar">
@@ -41,7 +41,7 @@
                       ng-model-options="{ debounce: 300 }"
                     />
                   </div>
-                  <table class="table table-files">
+                  <table class="table mb0 table-files noselect">
                     <thead>
                       <tr>
                         <th>
@@ -50,19 +50,19 @@
                             <span class="sortorder" ng-show="predicate[1] === 'model.name'" ng-class="{ reverse: reverse }"></span>
                           </a>
                         </th>
-                        <th class="hidden-xs" ng-hide="config.hideSize">
+                        <th class="hidden-xs">
                           <a href="" ng-click="order('model.size')">
                             Size
                             <span class="sortorder" ng-show="predicate[1] === 'model.size'" ng-class="{ reverse: reverse }"></span>
                           </a>
                         </th>
-                        <th class="hidden-sm hidden-xs" ng-hide="config.hideDate">
+                        <th class="hidden-sm hidden-xs">
                           <a href="" ng-click="order('model.date')">
                             Date
                             <span class="sortorder" ng-show="predicate[1] === 'model.date'" ng-class="{ reverse: reverse }"></span>
                           </a>
                         </th>
-                        <th class="hidden-sm hidden-xs" ng-hide="config.hidePermissions">
+                        <th class="hidden-sm hidden-xs">
                           <a href="" ng-click="order('model.permissions')">
                             Permissions
                             <span class="sortorder" ng-show="predicate[1] === 'model.permissions'" ng-class="{ reverse: reverse }"></span>
@@ -70,6 +70,7 @@
                         </th>
                       </tr>
                     </thead>
+
                     <tbody>
                       <tr ng-show="!explorerService.requesting &amp;&amp; explorerService.fileList.length < 1 &amp;&amp; !explorerService.error">
                         <td colspan="4"> No files in this folder... </td>
@@ -77,10 +78,11 @@
 
                       <tr
                         class="item-list"
-                        ng-repeat="item in explorerService.fileList"
+                        ng-repeat="item in $parent.fileList = (explorerService.fileList | filter: {model:{name: query}} | orderBy:predicate:reverse)"
+                        ng-show="!explorerService.requesting"
                         ng-click="selectOrUnselect(item, $event)"
                         ng-dblclick="smartClick(item)"
-                        ng-right-click="showContextMenu(item, $event)"
+                        ng-right-click="selectOrUnselect(item, $event)"
                         ng-class="{ selected: isSelected(item) }"
                       >
                         <td>
@@ -90,9 +92,9 @@
                             {{ item.model.name }}
                           </a>
                         </td>
-                        <td>{{ item.model.size | humansize }}</td>
-                        <td>{{ item.model.date | date: 'yyyy-MM-dd hh:mm:ss' }}</td>
-                        <td>{{ item.model.perms }}</td>
+                        <td class="hidden-xs">{{ item.model.size | humansize }}</td>
+                        <td class="hidden-sm hidden-xs">{{ item.model.date | date: 'yyyy-MM-dd hh:mm:ss' }}</td>
+                        <td class="hidden-sm hidden-xs">{{ item.model.perms }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -106,18 +108,22 @@
   </div>
 </div>
 
-<div id="context-menu" ng-show="menuShow">
-  <ul class="dropdown-menu dropdown-right-click" role="menu" aria-labelledby="dropdownMenu">
-    <li>
-      <a href="" tabindex="-1" ng-click="modal('remove')"> <i class="fa fa-trash"></i> remove </a>
+<div id="context-menu" class="dropdown clearfix animated fast fadeIn">
+  <ul class="dropdown-menu dropdown-right-click" role="menu" aria-labelledby="dropdownMenu" ng-show="temps.length">
+    <li ng-show="singleSelection() && singleSelection().isFolder()">
+      <a href="" tabindex="-1" ng-click="smartClick(singleSelection())"> <i class="fa fa-folder-open"></i> open </a>
     </li>
     <li>
-      <a href="" tabindex="-1" ng-click="modal('changepermissions')"> <i class="fa fa-lock"></i> permissions </a>
+      <a href="" tabindex="-1" ng-click="modal('changePermissions')"> <i class="fa fa-lock"></i> permissions </a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="" tabindex="-1" ng-click="modal('remove')"> <i class="fa fa-trash"></i> remove </a>
     </li>
   </ul>
 </div>
 
-<div class="modal animated fadeIn" id="remove" ng-show="false">
+<div id="remove" class="modal animated fadeIn" ng-show="temps.length">
   <div class="modal-dialog">
     <div class="modal-content">
       <form ng-submit="remove()">
@@ -134,8 +140,8 @@
           <div ng-include data-src="'error-bar'" class="clearfix"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="apiMiddleware.apiHandler.inprocess">cancel</button>
-          <button type="submit" class="btn btn-primary" ng-disabled="apiMiddleware.apiHandler.inprocess" autofocus="autofocus">remove</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+          <button type="submit" class="btn btn-primary" autofocus="autofocus">remove</button>
         </div>
       </form>
     </div>

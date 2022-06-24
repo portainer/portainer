@@ -191,6 +191,28 @@ angular.module('portainer.docker').factory('ExplorerService', [
       return deferred.promise;
     };
 
+    service.remove = function (item) {
+      const deferred = $q.defer();
+      const self = this;
+      console.log(item);
+      console.log(self.containerId);
+      console.log(item.currentPath);
+
+      const parameters = {
+        id: self.containerId,
+        path: item.currentPath,
+      };
+      Explorer.remove(parameters)
+        .$promise.then(function success(data) {
+          deferred.resolve(data);
+        })
+        .catch(function error(err) {
+          deferred.reject(err);
+        });
+
+      return deferred.promise;
+    };
+
     return service;
   },
 ]);

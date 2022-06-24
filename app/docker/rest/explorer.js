@@ -28,6 +28,14 @@ angular.module('portainer.docker').factory('Explorer', [
             path: '@path',
           },
         },
+        remove: {
+          method: 'POST',
+          params: {
+            id: '@id',
+            action: 'remove',
+            path: '@path',
+          },
+        },
       }
     );
   },

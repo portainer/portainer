@@ -93,6 +93,25 @@
   }
 }
 
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Chrome/Safari/Opera */
+  -khtml-user-select: none;
+  /* Konqueror */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE/Edge */
+  user-select: none;
+  /* non-prefixed version, currently */
+}
+
+.mb0 {
+  margin-bottom: 0;
+}
+
 .modal {
   word-wrap: break-word;
 }
@@ -213,7 +232,6 @@
 
 #context-menu {
   position: absolute;
+  display: none;
   z-index: 9999;
-  width: 200px;
-  height: 200px;
 }
