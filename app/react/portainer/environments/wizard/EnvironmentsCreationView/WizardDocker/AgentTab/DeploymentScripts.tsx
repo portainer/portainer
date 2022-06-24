@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { getAgentShortVersion } from '@/portainer/views/endpoints/helpers';
 import { useAgentDetails } from '@/portainer/environments/queries/useAgentDetails';
 
 import { CopyButton } from '@@/buttons/CopyButton';
@@ -29,10 +28,10 @@ export function DeploymentScripts() {
     return null;
   }
 
-  const { agentVersion } = agentDetailsQuery;
+  const { agentVersion, agentSecret } = agentDetailsQuery;
 
   const options = deployments.map((c) => {
-    const code = c.command(agentVersion);
+    const code = c.command(agentVersion, agentSecret);
 
     return {
       id: c.id,
@@ -66,14 +65,41 @@ function DeployCode({ code }: DeployCodeProps) {
   );
 }
 
-function linuxCommand(agentVersion: string) {
-  const agentShortVersion = getAgentShortVersion(agentVersion);
+function linuxCommand(agentVersion: string, agentSecret: string) {
+  const secret =
+    agentSecret === '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
 
-  return `curl -L https://downloads.portainer.io/ee${agentShortVersion}/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent`;
+  return `docker network create \\
+--driver overlay \\
+  portainer_agent_network
+
+docker service create \\
+  --name portainer_agent \\
+  --network portainer_agent_network \\
+  -p 9001:9001/tcp ${secret}\\
+  --mode global \\
+  --constraint 'node.platform.os == linux' \\
+  --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \\
+  --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
+  portainer/agent:${agentVersion}
+`;
 }
 
-function winCommand(agentVersion: string) {
-  const agentShortVersion = getAgentShortVersion(agentVersion);
+function winCommand(agentVersion: string, agentSecret: string) {
+  const secret =
+    agentSecret === '' ? '' : `\\\n  -e AGENT_SECRET=${agentSecret} `;
 
-  return `curl -L https://downloads.portainer.io/ee${agentShortVersion}/agent-stack-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent `;
+  return `docker network create \\
+--driver overlay \\
+  portainer_agent_network && \\
+docker service create \\
+  --name portainer_agent \\
+  --network portainer_agent_network \\
+  -p 9001:9001/tcp ${secret}\\
+  --mode global \\
+  --constraint 'node.platform.os == windows' \\
+  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
+  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
+  portainer/agent:${agentVersion}
+`;
 }
