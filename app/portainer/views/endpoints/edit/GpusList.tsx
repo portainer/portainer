@@ -1,3 +1,5 @@
+import { array, object, string } from 'yup';
+
 import { r2a } from '@/react-tools/react2angular';
 
 import { InputList } from '@@/form-components/InputList';
@@ -11,7 +13,6 @@ export interface Gpu {
 
 interface Props {
   value: Gpu[];
-
   onChange(value: Gpu[]): void;
 }
 
@@ -44,7 +45,6 @@ function Item({ item, onChange }: ItemProps<Gpu>) {
 }
 
 export function GpusList({ value, onChange }: Props) {
-  window.console.log('onChange = ', onChange);
   return (
     <InputList<Gpu>
       label="GPU"
@@ -55,6 +55,14 @@ export function GpusList({ value, onChange }: Props) {
       item={Item}
     />
   );
+}
+
+export function gpusListValidation() {
+  const gpuShape = object().shape({
+    name: string().required(),
+    value: string().required(),
+  });
+  return array().of(gpuShape).default([]);
 }
 
 export const GpusListAngular = r2a(GpusList, ['value', 'onChange']);

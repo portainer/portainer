@@ -1,4 +1,5 @@
 import { boolean, object, SchemaOf, string } from 'yup';
+import { gpusListValidation } from 'Portainer/views/endpoints/edit/GpusList';
 
 import { metadataValidation } from '../../shared/MetadataFieldset/validation';
 import { nameValidation } from '../../shared/NameField';
@@ -19,5 +20,6 @@ export function validation(): SchemaOf<FormValues> {
             )
           : schema
       ),
+    gpus: gpusListValidation(),
   });
 }

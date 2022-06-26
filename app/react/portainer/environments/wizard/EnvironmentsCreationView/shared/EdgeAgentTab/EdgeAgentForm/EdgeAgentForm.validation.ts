@@ -1,4 +1,5 @@
 import { number, object, SchemaOf } from 'yup';
+import { gpusListValidation } from 'Portainer/views/endpoints/edit/GpusList';
 
 import { metadataValidation } from '../../MetadataFieldset/validation';
 import { nameValidation } from '../../NameField';
@@ -12,5 +13,6 @@ export function validationSchema(): SchemaOf<FormValues> {
     portainerUrl: urlValidation(),
     pollFrequency: number().required(),
     meta: metadataValidation(),
+    gpus: gpusListValidation(),
   });
 }

@@ -142,7 +142,14 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		publicURL, _ := request.RetrieveMultiPartFormValue(r, "PublicURL", true)
 		payload.PublicURL = publicURL
 	}
-	payload.Gpus = []portainer.Pair{}
+
+	var gpus []portainer.Pair
+	err = request.RetrieveMultiPartFormJSONValue(r, "Gpus", &gpus, true)
+	if err != nil {
+		return errors.New("Invalid Gpus parameter")
+	}
+	payload.Gpus = gpus
+
 	checkinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
 	payload.EdgeCheckinInterval = checkinInterval
 

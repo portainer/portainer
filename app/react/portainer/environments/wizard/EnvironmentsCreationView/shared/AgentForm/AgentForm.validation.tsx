@@ -1,4 +1,5 @@
 import { object, SchemaOf, string } from 'yup';
+import { gpusListValidation } from 'Portainer/views/endpoints/edit/GpusList';
 
 import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
 
@@ -10,5 +11,6 @@ export function validation(): SchemaOf<CreateAgentEnvironmentValues> {
     name: nameValidation(),
     environmentUrl: string().required('This field is required.'),
     meta: metadataValidation(),
+    gpus: gpusListValidation(),
   });
 }
