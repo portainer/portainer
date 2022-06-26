@@ -3,12 +3,19 @@ package git
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport/client"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+)
+
+var (
+	ErrIncorrectRepositoryURL = errors.New("Git repository could not be found, please ensure that the URL is correct.")
+	ErrAuthenticationFailure  = errors.New("Authentication failed, please ensure that the git credentials are correct.")
+	ErrRefNotFound            = errors.New("The target ref is not found")
 )
 
 type fetchOptions struct {

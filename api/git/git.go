@@ -107,7 +107,7 @@ func (c gitClient) listRemote(ctx context.Context, opt cloneOptions) ([]string, 
 
 	refs, err := rem.List(listOptions)
 	if err != nil {
-		return nil, err
+		return nil, checkGitError(err)
 	}
 
 	var ret []string
@@ -120,10 +120,21 @@ func (c gitClient) listRemote(ctx context.Context, opt cloneOptions) ([]string, 
 }
 
 func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, error) {
+	var (
+		allPaths    []string
+		filteredRet []string
+	)
+
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
 	treeCache, ok := c.repoTreeCache[repoKey]
 	if ok {
-		return treeCache, nil
+		for _, path := range treeCache {
+			if matchExtensions(path, opt.extensions) {
+				filteredRet = append(filteredRet, path)
+			}
+		}
+
+		return filteredRet, nil
 	}
 
 	listOptions := &git.ListOptions{
@@ -143,13 +154,14 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 
 		refs, err = rem.List(listOptions)
 		if err != nil {
-			return nil, err
+			return nil, checkGitError(err)
 		}
 	}
 
-	var ret []string
+	matchedRef := false
 	for _, r := range refs {
 		if r.Name().String() == opt.referenceName {
+			matchedRef = true
 			cloneOption := &git.CloneOptions{
 				URL:           opt.repositoryUrl,
 				NoCheckout:    true,
@@ -161,7 +173,7 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 
 			repo, err := git.Clone(memory.NewStorage(), nil, cloneOption)
 			if err != nil {
-				return nil, err
+				return nil, checkGitError(err)
 			}
 
 			head, err := repo.Head()
@@ -180,17 +192,22 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 			}
 
 			tree.Files().ForEach(func(f *object.File) error {
+				allPaths = append(allPaths, f.Name)
 				if matchExtensions(f.Name, opt.extensions) {
-					ret = append(ret, f.Name)
+					filteredRet = append(filteredRet, f.Name)
 				}
 				return nil
 			})
 
-			c.repoTreeCache[repoKey] = ret
+			c.repoTreeCache[repoKey] = allPaths
 			break
 		}
 	}
-	return ret, nil
+
+	if !matchedRef {
+		return nil, ErrRefNotFound
+	}
+	return filteredRet, nil
 }
 
 func generateCacheKey(names ...string) string {
@@ -208,4 +225,14 @@ func matchExtensions(target string, exts []string) bool {
 		}
 	}
 	return false
+}
+
+func checkGitError(err error) error {
+	errMsg := err.Error()
+	if errMsg == "repository not found" {
+		return ErrIncorrectRepositoryURL
+	} else if errMsg == "" {
+		return ErrAuthenticationFailure
+	}
+	return err
 }

@@ -48,14 +48,18 @@ type azureItem struct {
 type azureDownloader struct {
 	client  *http.Client
 	baseUrl string
+	// Cache the result of repository refs, key is repository URL
+	repoRefCache map[string][]string
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
 	repoTreeCache map[string][]string
 }
 
 func NewAzureDownloader(client *http.Client) *azureDownloader {
 	return &azureDownloader{
-		client:  client,
-		baseUrl: "https://dev.azure.com",
+		client:        client,
+		baseUrl:       "https://dev.azure.com",
+		repoRefCache:  make(map[string][]string),
+		repoTreeCache: make(map[string][]string),
 	}
 }
 
@@ -387,6 +391,11 @@ func (a *azureDownloader) listRemote(ctx context.Context, options cloneOptions) 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusNotFound {
+			return nil, ErrIncorrectRepositoryURL
+		} else if resp.StatusCode == http.StatusUnauthorized {
+			return nil, ErrAuthenticationFailure
+		}
 		return nil, fmt.Errorf("failed to list refs url with a status \"%v\"", resp.Status)
 	}
 
@@ -403,20 +412,59 @@ func (a *azureDownloader) listRemote(ctx context.Context, options cloneOptions) 
 		ret = append(ret, value.Name)
 	}
 
+	a.repoRefCache[options.repositoryUrl] = ret
 	return ret, nil
 }
 
 func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([]string, error) {
+	var (
+		allPaths    []string
+		filteredRet []string
+		refs        []string
+		err         error
+	)
+
 	repoKey := generateCacheKey(options.repositoryUrl, options.referenceName)
 	treeCache, ok := a.repoTreeCache[repoKey]
 	if ok {
-		return treeCache, nil
+		for _, path := range treeCache {
+			if matchExtensions(path, options.extensions) {
+				filteredRet = append(filteredRet, path)
+			}
+		}
+		return filteredRet, nil
 	}
 
-	var ret []string
+	// Check if the reference exists
+	refCache, ok := a.repoRefCache[options.repositoryUrl]
+	if ok {
+		refs = refCache
+	} else {
+		opt := cloneOptions{
+			repositoryUrl: options.repositoryUrl,
+			username:      options.username,
+			password:      options.password,
+		}
+		refs, err = a.listRemote(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	matchedRef := false
+	for _, ref := range refs {
+		if ref == options.referenceName {
+			matchedRef = true
+			break
+		}
+	}
+	if !matchedRef {
+		return nil, ErrRefNotFound
+	}
+
+	//
 	rootItem, err := a.getRootItem(ctx, options)
 	if err != nil {
-		return ret, err
+		return nil, err
 	}
 
 	config, err := parseUrl(options.repositoryUrl)
@@ -461,11 +509,12 @@ func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([
 	}
 
 	for _, treeEntry := range tree.TreeEntries {
+		allPaths = append(allPaths, treeEntry.RelativePath)
 		if matchExtensions(treeEntry.RelativePath, options.extensions) {
-			ret = append(ret, treeEntry.RelativePath)
+			filteredRet = append(filteredRet, treeEntry.RelativePath)
 		}
 	}
-	a.repoTreeCache[repoKey] = ret
+	a.repoTreeCache[repoKey] = allPaths
 
-	return ret, nil
+	return filteredRet, nil
 }

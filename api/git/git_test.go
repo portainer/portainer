@@ -1,7 +1,6 @@
 package git
 
 import (
-	"context"
 	"io/ioutil"
 	"log"
 	"os"
@@ -141,115 +140,133 @@ func getCommitHistoryLength(t *testing.T, err error, dir string) int {
 	return count
 }
 
-type testDownloader struct {
-	called bool
-}
+func Test_listRemote(t *testing.T) {
+	service := Service{git: gitClient{
+		preserveGitDirectory: true,
+		repoRefCache:         make(map[string][]*plumbing.Reference),
+		repoTreeCache:        make(map[string][]string),
+	}}
 
-func (t *testDownloader) download(_ context.Context, _ string, _ cloneOptions) error {
-	t.called = true
-	return nil
-}
+	type expectResult struct {
+		err       error
+		refsCount int
+	}
 
-func (t *testDownloader) latestCommitID(_ context.Context, _ fetchOptions) (string, error) {
-	return "", nil
-}
-
-func (t *testDownloader) listRemote(_ context.Context, _ cloneOptions) ([]string, error) {
-	return nil, nil
-}
-
-func (t *testDownloader) listTree(_ context.Context, _ fetchOptions) ([]string, error) {
-	return nil, nil
-}
-
-func Test_cloneRepository_azure(t *testing.T) {
 	tests := []struct {
 		name   string
 		url    string
-		called bool
+		expect expectResult
 	}{
 		{
-			name:   "Azure HTTP URL",
-			url:    "https://Organisation@dev.azure.com/Organisation/Project/_git/Repository",
-			called: true,
+			name: "list refs of a real repository",
+			url:  bareRepoDir,
+			expect: expectResult{
+				err:       nil,
+				refsCount: 1,
+			},
 		},
 		{
-			name:   "Azure SSH URL",
-			url:    "git@ssh.dev.azure.com:v3/Organisation/Project/Repository",
-			called: true,
-		},
-		{
-			name:   "Something else",
-			url:    "https://example.com",
-			called: false,
+			name: "list refs of a fake repository",
+			url:  bareRepoDir + "fake",
+			expect: expectResult{
+				err:       ErrIncorrectRepositoryURL,
+				refsCount: 0,
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			azure := &testDownloader{}
-			git := &testDownloader{}
-
-			s := &Service{azure: azure, git: git}
-			s.cloneRepository("", cloneOptions{repositoryUrl: tt.url, depth: 1})
-
-			// if azure API is called, git isn't and vice versa
-			assert.Equal(t, tt.called, azure.called)
-			assert.Equal(t, tt.called, !git.called)
+			refs, err := service.ListRemote(tt.url, "", "")
+			if tt.expect.err == nil {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expect.refsCount, len(refs))
+			} else {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expect.err, err)
+			}
 		})
 	}
 }
 
-func Test_listRemote(t *testing.T) {
+func Test_listTree(t *testing.T) {
 	service := Service{git: gitClient{
 		preserveGitDirectory: true,
 		repoRefCache:         make(map[string][]*plumbing.Reference),
 		repoTreeCache:        make(map[string][]string),
 	}} // no need for http client since the test access the repo via file system.
 
-	repositoryURL := bareRepoDir
+	type expectResult struct {
+		err          error
+		matchedCount int
+	}
 
-	refs, err := service.ListRemote(repositoryURL, "", "")
-	assert.NoError(t, err)
-	assert.GreaterOrEqual(t, len(refs), 1)
-}
-
-func Test_lsTree(t *testing.T) {
 	tests := []struct {
-		name  string
-		url   string
-		ref   string
-		found bool
+		name   string
+		url    string
+		ref    string
+		exts   []string
+		expect expectResult
 	}{
 		{
-			name:  "list tree on exisitng ref",
-			url:   bareRepoDir,
-			ref:   "refs/heads/main",
-			found: true,
+			name: "list tree with real repository and head ref",
+			url:  bareRepoDir,
+			ref:  "refs/heads/main",
+			exts: []string{},
+			expect: expectResult{
+				err:          nil,
+				matchedCount: 2,
+			},
 		},
 		{
-			name:  "list tree on non-exisitng ref",
-			url:   bareRepoDir,
-			ref:   "refs/heads/feat",
-			found: false,
+			name: "list tree with real repository and head ref and existing file extension",
+			url:  bareRepoDir,
+			ref:  "refs/heads/main",
+			exts: []string{"yml"},
+			expect: expectResult{
+				err:          nil,
+				matchedCount: 1,
+			},
+		},
+		{
+			name: "list tree with real repository and head ref and non-existing file extension",
+			url:  bareRepoDir,
+			ref:  "refs/heads/main",
+			exts: []string{"hcl"},
+			expect: expectResult{
+				err:          nil,
+				matchedCount: 0,
+			},
+		},
+		{
+			name: "list tree with real repository but non-existing ref",
+			url:  bareRepoDir,
+			ref:  "refs/fake/feature",
+			exts: []string{},
+			expect: expectResult{
+				err: ErrRefNotFound,
+			},
+		},
+		{
+			name: "list tree with fake repository ",
+			url:  bareRepoDir + "fake",
+			ref:  "refs/fake/feature",
+			exts: []string{},
+			expect: expectResult{
+				err: ErrIncorrectRepositoryURL,
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			service := Service{git: gitClient{
-				preserveGitDirectory: true,
-				repoRefCache:         make(map[string][]*plumbing.Reference),
-				repoTreeCache:        make(map[string][]string),
-			}} // no need for http client since the test access the repo via file system.
-
-			paths, err := service.ListTree(tt.url, tt.ref, "", "", []string{})
-			if tt.found {
+			paths, err := service.ListTree(tt.url, tt.ref, "", "", tt.exts)
+			if tt.expect.err == nil {
 				assert.NoError(t, err)
-				assert.GreaterOrEqual(t, len(paths), 1)
+				assert.Equal(t, tt.expect.matchedCount, len(paths))
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, len(paths), 0)
+				assert.Error(t, err)
+				assert.Equal(t, tt.expect.err, err)
 			}
 		})
 	}

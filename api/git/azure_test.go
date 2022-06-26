@@ -10,6 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	privateAzureRepoURL = "https://oscarzhouportainer@dev.azure.com/oscarzhouportainer/private-hello-world/_git/private-hello-world"
+)
+
 func Test_buildDownloadUrl(t *testing.T) {
 	a := NewAzureDownloader(nil)
 	u, err := a.buildDownloadUrl(&azureOptions{
@@ -350,6 +354,234 @@ func Test_azureDownloader_latestCommitID(t *testing.T) {
 				return
 			}
 			assert.Equal(t, tt.want, id)
+		})
+	}
+}
+
+type testDownloader struct {
+	called bool
+}
+
+func (t *testDownloader) download(_ context.Context, _ string, _ cloneOptions) error {
+	t.called = true
+	return nil
+}
+
+func (t *testDownloader) latestCommitID(_ context.Context, _ fetchOptions) (string, error) {
+	return "", nil
+}
+
+func (t *testDownloader) listRemote(_ context.Context, _ cloneOptions) ([]string, error) {
+	return nil, nil
+}
+
+func (t *testDownloader) listTree(_ context.Context, _ fetchOptions) ([]string, error) {
+	return nil, nil
+}
+
+func Test_cloneRepository_azure(t *testing.T) {
+	tests := []struct {
+		name   string
+		url    string
+		called bool
+	}{
+		{
+			name:   "Azure HTTP URL",
+			url:    "https://Organisation@dev.azure.com/Organisation/Project/_git/Repository",
+			called: true,
+		},
+		{
+			name:   "Azure SSH URL",
+			url:    "git@ssh.dev.azure.com:v3/Organisation/Project/Repository",
+			called: true,
+		},
+		{
+			name:   "Something else",
+			url:    "https://example.com",
+			called: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			azure := &testDownloader{}
+			git := &testDownloader{}
+
+			s := &Service{azure: azure, git: git}
+			s.cloneRepository("", cloneOptions{repositoryUrl: tt.url, depth: 1})
+
+			// if azure API is called, git isn't and vice versa
+			assert.Equal(t, tt.called, azure.called)
+			assert.Equal(t, tt.called, !git.called)
+		})
+	}
+}
+
+func Test_listRemote_azure(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	service := NewService()
+	type expectResult struct {
+		err       error
+		refsCount int
+	}
+
+	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
+	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
+	tests := []struct {
+		name        string
+		url         string
+		username    string
+		accessToken string
+		expect      expectResult
+	}{
+		{
+			name:        "list refs of a real repository",
+			url:         privateAzureRepoURL,
+			username:    username,
+			accessToken: accessToken,
+			expect: expectResult{
+				err:       nil,
+				refsCount: 1,
+			},
+		},
+		{
+			name:        "list refs of a real repository with incorrect credential",
+			url:         privateAzureRepoURL,
+			username:    "",
+			accessToken: "",
+			expect: expectResult{
+				err: ErrAuthenticationFailure,
+			},
+		},
+		{
+			name:        "list refs of a fake repository",
+			url:         privateAzureRepoURL + "fake",
+			username:    username,
+			accessToken: accessToken,
+			expect: expectResult{
+				err:       ErrIncorrectRepositoryURL,
+				refsCount: 0,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			refs, err := service.ListRemote(tt.url, tt.username, tt.accessToken)
+			if tt.expect.err == nil {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expect.refsCount, len(refs))
+			} else {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expect.err, err)
+			}
+		})
+	}
+
+}
+
+func Test_listTree_azure(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	service := NewService()
+	type expectResult struct {
+		err          error
+		matchedCount int
+	}
+
+	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
+	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
+	tests := []struct {
+		name        string
+		url         string
+		ref         string
+		username    string
+		accessToken string
+		exts        []string
+		expect      expectResult
+	}{
+		{
+			name:        "list tree with real repository and head ref but incorrect credential",
+			url:         privateAzureRepoURL,
+			ref:         "refs/heads/main",
+			username:    "",
+			accessToken: "",
+			exts:        []string{},
+			expect: expectResult{
+				err: ErrAuthenticationFailure,
+			},
+		},
+		{
+			name:        "list tree with real repository and head ref",
+			url:         privateAzureRepoURL,
+			ref:         "refs/heads/main",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{},
+			expect: expectResult{
+				err:          nil,
+				matchedCount: 13,
+			},
+		},
+		{
+			name:        "list tree with real repository and head ref and existing file extension",
+			url:         privateAzureRepoURL,
+			ref:         "refs/heads/main",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{"yml"},
+			expect: expectResult{
+				err:          nil,
+				matchedCount: 2,
+			},
+		},
+		{
+			name:        "list tree with real repository and head ref and non-existing file extension",
+			url:         privateAzureRepoURL,
+			ref:         "refs/heads/main",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{"hcl"},
+			expect: expectResult{
+				err:          nil,
+				matchedCount: 0,
+			},
+		},
+		{
+			name:        "list tree with real repository but non-existing ref",
+			url:         privateAzureRepoURL,
+			ref:         "refs/fake/feature",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{},
+			expect: expectResult{
+				err: ErrRefNotFound,
+			},
+		},
+		{
+			name:        "list tree with fake repository ",
+			url:         privateAzureRepoURL + "fake",
+			ref:         "refs/fake/feature",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{},
+			expect: expectResult{
+				err: ErrIncorrectRepositoryURL,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			paths, err := service.ListTree(tt.url, tt.ref, tt.username, tt.accessToken, tt.exts)
+			if tt.expect.err == nil {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expect.matchedCount, len(paths))
+			} else {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expect.err, err)
+			}
 		})
 	}
 }
