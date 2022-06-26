@@ -6,7 +6,7 @@ import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import type {
   ContainersTableSettings,
   DockerContainer,
-} from '@/docker/containers/types';
+} from '@/react/docker/containers/types';
 
 import { useTableSettings } from '@@/datatables/useTableSettings';
 

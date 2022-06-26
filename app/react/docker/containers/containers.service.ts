@@ -1,9 +1,9 @@
 import { EnvironmentId } from '@/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 import axios from '@/portainer/services/axios';
+import { genericHandler } from '@/docker/rest/response/handlers';
 
 import { NetworkId } from '../networks/types';
-import { genericHandler } from '../rest/response/handlers';
 
 import { ContainerId, DockerContainer } from './types';
 

@@ -5,8 +5,7 @@ import {
   error as notifyError,
   success as notifySuccess,
 } from '@/portainer/services/notifications';
-
-import { ContainerId } from '../containers/types';
+import { ContainerId } from '@/react/docker/containers/types';
 
 import {
   getNetwork,

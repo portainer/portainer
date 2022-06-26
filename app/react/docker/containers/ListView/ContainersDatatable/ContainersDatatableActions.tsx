@@ -4,7 +4,10 @@ import * as notifications from '@/portainer/services/notifications';
 import { useAuthorizations, Authorized } from '@/portainer/hooks/useUser';
 import { confirmContainerDeletion } from '@/portainer/services/modal.service/prompt';
 import { setPortainerAgentTargetHeader } from '@/portainer/services/http-request.helper';
-import type { ContainerId, DockerContainer } from '@/docker/containers/types';
+import type {
+  ContainerId,
+  DockerContainer,
+} from '@/react/docker/containers/types';
 import {
   killContainer,
   pauseContainer,
@@ -13,7 +16,7 @@ import {
   resumeContainer,
   startContainer,
   stopContainer,
-} from '@/docker/containers/containers.service';
+} from '@/react/docker/containers/containers.service';
 import type { EnvironmentId } from '@/portainer/environments/types';
 
 import { Link } from '@@/Link';

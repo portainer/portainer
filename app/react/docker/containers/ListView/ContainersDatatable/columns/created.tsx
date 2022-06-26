@@ -1,7 +1,7 @@
 import { Column } from 'react-table';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
-import type { DockerContainer } from '@/docker/containers/types';
+import type { DockerContainer } from '@/react/docker/containers/types';
 
 export const created: Column<DockerContainer> = {
   Header: 'Created',

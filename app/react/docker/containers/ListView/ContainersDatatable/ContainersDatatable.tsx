@@ -13,7 +13,7 @@ import { useDebounce } from '@/portainer/hooks/useDebounce';
 import type {
   ContainersTableSettings,
   DockerContainer,
-} from '@/docker/containers/types';
+} from '@/react/docker/containers/types';
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
 
 import { PaginationControls } from '@@/PaginationControls';

@@ -5,7 +5,7 @@ import _ from 'lodash';
 import type {
   DockerContainer,
   DockerContainerStatus,
-} from '@/docker/containers/types';
+} from '@/react/docker/containers/types';
 
 import { DefaultFilter } from '@@/datatables/Filter';
 

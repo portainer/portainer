@@ -2,11 +2,11 @@ import { CellProps, Column } from 'react-table';
 
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import { useAuthorizations } from '@/portainer/hooks/useUser';
-import { ContainerQuickActions } from '@/docker/components/container-quick-actions/ContainerQuickActions';
+import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions/ContainerQuickActions';
 import type {
   ContainersTableSettings,
   DockerContainer,
-} from '@/docker/containers/types';
+} from '@/react/docker/containers/types';
 import { EnvironmentStatus } from '@/portainer/environments/types';
 
 import { useTableSettings } from '@@/datatables/useTableSettings';

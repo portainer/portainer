@@ -3,7 +3,7 @@ import { useSref } from '@uirouter/react';
 
 import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import { EnvironmentStatus } from '@/portainer/environments/types';
-import type { DockerContainer } from '@/docker/containers/types';
+import type { DockerContainer } from '@/react/docker/containers/types';
 
 export const image: Column<DockerContainer> = {
   Header: 'Image',
