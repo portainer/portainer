@@ -2,9 +2,17 @@ import colors from './colors.json';
 
 const element = document.createElement('style');
 
-element.innerHTML = `:root {  
+element.innerHTML = `:root {
   ${Object.entries(colors)
-    .map(([color, hex]) => `--ui-${color}: ${hex}`)
+    .map(([color, hex]) => {
+      if (typeof hex === 'string') {
+        return `--ui-${color}: ${hex}`;
+      }
+
+      return Object.entries(hex)
+        .map(([key, value]) => `--ui-${color}-${key}: ${value}`)
+        .join(';\n');
+    })
     .join(';\n')}
 }`;
 
