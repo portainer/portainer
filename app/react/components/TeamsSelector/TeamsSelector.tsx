@@ -1,4 +1,4 @@
-import { Team, TeamId } from '@/portainer/teams/types';
+import { Team, TeamId } from '@/react/portainer/users/teams/types';
 
 import { Select } from '@@/form-components/ReactSelect';
 

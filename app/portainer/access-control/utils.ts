@@ -1,4 +1,5 @@
-import { TeamId } from '../teams/types';
+import { TeamId } from '@/react/portainer/users/teams/types';
+
 import { UserId } from '../users/types';
 
 import {

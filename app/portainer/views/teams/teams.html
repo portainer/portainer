@@ -1,9 +1,0 @@
-<page-header title="'Teams'" breadcrumbs="['Teams management']" reload="true"> </page-header>
-
-<create-team-form ng-if="isAdmin && users" users="users" action-in-progress="state.actionInProgress" teams="teams" on-submit="(addTeam)"></create-team-form>
-
-<div class="row">
-  <div class="col-sm-12">
-    <teams-datatable title-text="Teams" title-icon="users" dataset="teams" table-key="teams" order-by="Name" remove-action="removeAction" is-admin="isAdmin"></teams-datatable>
-  </div>
-</div>

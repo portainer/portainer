@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { PropsWithChildren, ReactNode } from 'react';
 import { TableHeaderProps } from 'react-table';
 
-import { useTableContext } from './TableContainer';
 import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 import styles from './TableHeaderCell.module.css';
 
@@ -27,8 +26,6 @@ export function TableHeaderCell({
   canFilter,
   renderFilter,
 }: Props) {
-  useTableContext();
-
   return (
     <th role={role} style={style} className={className}>
       <div className="flex flex-row flex-nowrap h-full items-center gap-1">

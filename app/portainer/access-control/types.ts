@@ -1,4 +1,4 @@
-import { TeamId } from '@/portainer/teams/types';
+import { TeamId } from '@/react/portainer/users/teams/types';
 import { UserId } from '@/portainer/users/types';
 
 export type ResourceControlId = number;

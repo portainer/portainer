@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { buildOption } from '@/portainer/components/BoxSelector';
 import { ownershipIcon } from '@/portainer/filters/filters';
-import { Team } from '@/portainer/teams/types';
+import { Team } from '@/react/portainer/users/teams/types';
 
 import { BoxSelectorOption } from '@@/BoxSelector/types';
 import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';

@@ -1,4 +1,4 @@
-import { useTeams } from '@/portainer/teams/queries';
+import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
 
 export function useLoadState() {

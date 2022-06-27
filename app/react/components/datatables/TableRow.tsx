@@ -1,7 +1,5 @@
 import { Cell, TableRowProps } from 'react-table';
 
-import { useTableContext } from './TableContainer';
-
 interface Props<D extends Record<string, unknown> = Record<string, unknown>>
   extends Omit<TableRowProps, 'key'> {
   cells: Cell<D>[];
@@ -10,8 +8,6 @@ interface Props<D extends Record<string, unknown> = Record<string, unknown>>
 export function TableRow<
   D extends Record<string, unknown> = Record<string, unknown>
 >({ cells, className, role, style }: Props<D>) {
-  useTableContext();
-
   return (
     <tr className={className} role={role} style={style}>
       {cells.map((cell) => {

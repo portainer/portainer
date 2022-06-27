@@ -12,7 +12,6 @@ import {
   EdgeTypes,
 } from '@/portainer/environments/types';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
-import { useIsAdmin } from '@/portainer/hooks/useUser';
 import {
   HomepageFilter,
   useHomePageFilter,
@@ -27,6 +26,7 @@ import { useTags } from '@/portainer/tags/queries';
 import { Filter } from '@/portainer/home/types';
 import { useAgentVersionsList } from '@/portainer/environments/queries/useAgentVersionsList';
 import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service';
+import { useUser } from '@/portainer/hooks/useUser';
 
 import { TableFooter } from '@@/datatables/TableFooter';
 import { TableActions, TableContainer, TableTitle } from '@@/datatables';
@@ -69,7 +69,7 @@ enum ConnectionType {
 const storageKey = 'home_endpoints';
 
 export function EnvironmentList({ onClickItem, onRefresh }: Props) {
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useUser();
 
   const [platformTypes, setPlatformTypes] = useHomePageFilter<
     Filter<PlatformType>[]
