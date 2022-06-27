@@ -241,9 +241,10 @@ a[ng-click] {
 }
 
 .blocklist-item:hover {
+  @apply border border-blue-7;
+
   background-color: var(--bg-blocklist-hover-color);
   color: var(--text-blocklist-hover-color);
-  border: 1px solid var(--ui-blue-4);
 }
 
 .blocklist-item-box {

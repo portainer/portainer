@@ -1,22 +1,7 @@
 /* Color Variable */
 :root {
-  --ui-blue-1: #0086c9;
-  --ui-blue-2: #026aa2;
-  --ui-blue-3: #e0f2fe;
-  --ui-blue-4: #0ba5ec;
-  --ui-red-1: #d92d20;
-  --ui-red-2: #fef3f2;
-  --ui-green-1: #12b76a;
-  --ui-yellow: #fdb022;
-  --ui-grey-1: #d0d5dd;
-  --ui-grey-2: #f9fafb;
-  --ui-grey-3: #344054;
-  --ui-grey-4: #667085;
-  --ui-grey-5: #101828;
-  --ui-grey-6: #f2f4f7;
-
-  --black-color: #000;
-  --white-color: #fff;
+  --black-color: var(--ui-black);
+  --white-color: var(--ui-white);
 
   --grey-1: #212121;
   --grey-2: #181818;
@@ -68,7 +53,6 @@
   --grey-49: rgba(0, 0, 0, 0.54);
   --grey-50: rgba(161, 170, 166, 0.5);
   --grey-51: rgba(0, 0, 0, 0.15);
-  --grey-52: rgba(255, 255, 255, 0.3);
   --grey-53: rgba(255, 255, 255, 0.6);
   --grey-54: rgb(54, 54, 54);
   --grey-55: rgba(255, 255, 255, 0.8);
@@ -91,7 +75,6 @@
   --blue-10: #61b6ff;
   --blue-11: #3ea5ff;
   --blue-12: #41a6ff;
-  --blue-13: #2361ae;
   --blue-14: #357ebd;
 
   --red-1: #a94442;
@@ -99,7 +82,6 @@
   --red-3: #a11;
   --red-4: #d9534f;
   --red-5: #ff2727;
-  --red-6: #ff00e0;
   --red-7: #f00;
 
   --green-1: #164;
@@ -121,8 +103,8 @@
   --bg-widget-table-color: var(--grey-13);
   --bg-header-color: var(--white-color);
   --bg-hover-table-color: var(--grey-14);
-  --bg-switch-box-color: var(--ui-grey-1);
-  --bg-input-group-addon-color: var(--ui-grey-6);
+  --bg-switch-box-color: var(--ui-gray-5);
+  --bg-input-group-addon-color: var(--ui-gray-3);
   --bg-btn-default-color: var(--white-color);
   --bg-blocklist-hover-color: var(--ui-blue-3);
   --bg-boxselector-color: var(--white-color);
@@ -154,7 +136,7 @@
   --bg-panel-body-color: var(--white-color);
   --bg-codemirror-color: var(--white-color);
   --bg-codemirror-selected-color: var(--grey-22);
-  --bg-tooltip-color: var(--ui-grey-5);
+  --bg-tooltip-color: var(--ui-gray-11);
   --bg-input-sm-color: var(--white-color);
   --bg-service-datatable-thead: var(--grey-23);
   --bg-app-datatable-thead: var(--grey-23);
@@ -181,9 +163,9 @@
   --bg-stepper-item-counter: var(--grey-61);
   --bg-sortbutton-color: var(--white-color);
   --bg-dashboard-item: var(--ui-blue-3);
-  --bg-searchbar: var(--ui-grey-2);
-  --bg-inputbox: var(--ui-grey-2);
-  --bg-dropdown-hover: var(--ui-grey-6);
+  --bg-searchbar: var(--ui-gray-2);
+  --bg-inputbox: var(--ui-gray-2);
+  --bg-dropdown-hover: var(--ui-gray-3);
 
   --text-main-color: var(--grey-7);
   --text-body-color: var(--grey-6);
@@ -215,7 +197,7 @@
   --text-blocklist-item-selected-color: var(--grey-37);
   --text-progress-bar-color: var(--grey-27);
   --text-pagination-color: var(--grey-26);
-  --text-pagination-span-color: var(--ui-grey-6);
+  --text-pagination-span-color: var(--ui-gray-3);
   --text-pagination-span-hover-color: var(--blue-4);
   --text-ui-select-color: var(--grey-6);
   --text-ui-select-hover-color: var(--grey-28);
@@ -229,7 +211,7 @@
   --text-input-autofill-color: var(--black-color);
   --text-button-hover-color: var(--grey-6);
   --text-small-select-color: var(--grey-25);
-  --text-bootbox: var(--ui-grey-4);
+  --text-bootbox: var(--ui-gray-7);
 
   --border-color: var(--grey-42);
   --border-widget-color: var(--grey-43);
@@ -264,9 +246,9 @@
   --border-tooltip-color: var(--grey-47);
   --border-modal: 0px;
   --border-sortbutton: var(--grey-8);
-  --border-bootbox: var(--ui-grey-1);
-  --border-blocklist: var(--ui-grey-1);
-  --border-widget: var(--ui-grey-1);
+  --border-bootbox: var(--ui-gray-5);
+  --border-blocklist: var(--ui-gray-5);
+  --border-widget: var(--ui-gray-5);
 
   --shadow-box-color: 0 3px 10px -2px var(--grey-50);
   --shadow-boxselector-color: 0 3px 10px -2px var(--grey-50);
@@ -288,12 +270,12 @@
   --bg-multiselect-helpercontainer: var(--white-color);
   --text-input-textarea: var(--white-color);
 
-  --border-checkbox: var(--ui-grey-1);
+  --border-checkbox: var(--ui-gray-5);
   --bg-checkbox: var(--white-color);
-  --border-searchbar: var(--ui-grey-1);
+  --border-searchbar: var(--ui-gray-5);
   --bg-button-group: var(--white-color);
-  --border-button-group: var(--ui-grey-1);
-  --text-button-group: var(--ui-grey-3);
+  --border-button-group: var(--ui-gray-5);
+  --text-button-group: var(--ui-gray-9);
 }
 
 :root[theme='dark'] {
@@ -396,7 +378,7 @@
   --text-blocklist-item-selected-color: var(--white-color);
   --text-progress-bar-color: var(--white-color);
   --text-pagination-color: var(--white-color);
-  --text-pagination-span-color: var(--ui-grey-6);
+  --text-pagination-span-color: var(--ui-gray-3);
   --text-pagination-span-hover-color: var(--white-color);
   --text-ui-select-color: var(--white-color);
   --text-ui-select-hover-color: var(--white-color);
@@ -446,9 +428,9 @@
   --border-tooltip-color: var(--grey-3);
   --border-modal: 0px;
   --border-sortbutton: var(--grey-3);
-  --border-bootbox: var(--ui-grey-3);
-  --border-blocklist: var(--ui-grey-3);
-  --border-widget: var(--ui-grey-3);
+  --border-bootbox: var(--ui-gray-9);
+  --border-blocklist: var(--ui-gray-9);
+  --border-widget: var(--ui-gray-9);
 
   --blue-color: var(--blue-2);
   --button-close-color: var(--white-color);
@@ -468,12 +450,12 @@
   --bg-multiselect-helpercontainer: var(--grey-1);
   --text-input-textarea: var(--grey-1);
 
-  --border-checkbox: var(--ui-grey-1);
+  --border-checkbox: var(--ui-gray-5);
   --bg-checkbox: var(--white-color);
-  --border-searchbar: var(--ui-grey-1);
+  --border-searchbar: var(--ui-gray-5);
   --bg-button-group: var(--white-color);
-  --border-button-group: var(--ui-grey-1);
-  --text-button-group: var(--ui-grey-3);
+  --border-button-group: var(--ui-gray-5);
+  --text-button-group: var(--ui-gray-9);
 }
 
 :root[theme='highcontrast'] {
@@ -586,7 +568,7 @@
   --text-btn-default-color: var(--white-color);
   --text-small-select-color: var(--white-color);
   --text-multiselect-item-color: var(--white-color);
-  --text-pagination-span-color: var(--ui-grey-6);
+  --text-pagination-span-color: var(--ui-gray-3);
   --text-bootbox: var(--white-color);
 
   --border-color: var(--grey-55);
@@ -640,10 +622,10 @@
   --text-cm-string-color: var(--red-7);
   --text-progress-bar-color: var(--black-color);
 
-  --border-checkbox: var(--ui-grey-1);
+  --border-checkbox: var(--ui-gray-5);
   --bg-checkbox: var(--white-color);
-  --border-searchbar: var(--ui-grey-1);
+  --border-searchbar: var(--ui-gray-5);
   --bg-button-group: var(--white-color);
-  --border-button-group: var(--ui-grey-1);
-  --text-button-group: var(--ui-grey-3);
+  --border-button-group: var(--ui-gray-5);
+  --text-button-group: var(--ui-gray-9);
 }

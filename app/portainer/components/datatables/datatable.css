@@ -25,7 +25,7 @@
 }
 
 .datatable .toolBar .setting-active {
-  color: var(--ui-blue-4);
+  @apply text-blue-7;
 }
 
 .datatable .searchBar {
