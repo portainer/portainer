@@ -345,6 +345,17 @@ type (
 		// Whether the device has been trusted or not by the user
 		UserTrusted bool
 
+		Edge struct {
+			// Whether the device has been started in edge async mode
+			AsyncMode bool
+			// The ping interval for edge agent - used in edge async mode [seconds]
+			PingInterval int `json:"PingInterval" example:"60"`
+			// The snapshot interval for edge agent - used in edge async mode [seconds]
+			SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+			// The command list interval for edge agent - used in edge async mode [seconds]
+			CommandInterval int `json:"CommandInterval" example:"60"`
+		}
+
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
 		TLS           bool   `json:"TLS,omitempty"`
@@ -836,6 +847,17 @@ type (
 		AgentSecret string `json:"AgentSecret"`
 		// EdgePortainerURL is the URL that is exposed to edge agents
 		EdgePortainerURL string `json:"EdgePortainerUrl"`
+
+		Edge struct {
+			// The command list interval for edge agent - used in edge async mode (in seconds)
+			CommandInterval int `json:"CommandInterval" example:"5"`
+			// The ping interval for edge agent - used in edge async mode (in seconds)
+			PingInterval int `json:"PingInterval" example:"5"`
+			// The snapshot interval for edge agent - used in edge async mode (in seconds)
+			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
+			// EdgeAsyncMode enables edge async mode by default
+			AsyncMode bool
+		}
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
