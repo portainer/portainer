@@ -25,7 +25,7 @@
 }
 
 .datatable .toolBar .setting-active {
-  @apply text-pr-blue7;
+  @apply text-pr-blue-7;
 }
 
 .datatable .searchBar {

@@ -10,21 +10,21 @@
 }
 
 .btn-primary {
-  background-color: var(--ui-pr-blue8);
+  background-color: var(--ui-pr-blue-8);
 }
 
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active .active {
-  background-color: var(--ui-pr-blue2);
+  background-color: var(--ui-pr-blue-2);
 }
 
 .btn-danger {
-  background-color: var(--ui-error8);
+  background-color: var(--ui-error-8);
 }
 
 .btn-success {
-  background-color: var(--ui-success7);
+  background-color: var(--ui-success-7);
 }
 
 /* Toggle switch */
@@ -68,11 +68,11 @@
 }
 
 input:checked + .slider {
-  background-color: var(--ui-pr-blue8);
+  background-color: var(--ui-pr-blue-8);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px var(--ui-pr-blue8);
+  box-shadow: 0 0 1px var(--ui-pr-blue-8);
 }
 
 input:checked + .slider:before {
@@ -102,9 +102,9 @@ input:checked + .slider:before {
 }
 
 .md-checkbox input[type='checkbox']:checked + label:before {
-  background-color: var(--ui-pr-blue8) !important;
-  color: var(--ui-pr-blue8) !important;
-  border: 1px solid var(--ui-pr-blue8) !important;
+  background-color: var(--ui-pr-blue-8) !important;
+  color: var(--ui-pr-blue-8) !important;
+  border: 1px solid var(--ui-pr-blue-8) !important;
 }
 
 .md-checkbox input[type='checkbox']:checked + .checkmark {
@@ -116,20 +116,20 @@ input:checked + .slider:before {
 
 .rzslider .rz-pointer {
   background-color: var(--white-color);
-  border: 3px solid var(--ui-pr-blue8);
+  border: 3px solid var(--ui-pr-blue-8);
   width: 25px;
   height: 25px;
   top: -10px;
 }
 
 .rzslider .rz-bar {
-  background-color: var(--ui-gray5);
+  background-color: var(--ui-gray-5);
   height: 8px;
   border-radius: 5px;
 }
 
 .rzslider .rz-selection {
-  background-color: var(--ui-pr-blue8);
+  background-color: var(--ui-pr-blue-8);
 }
 
 .rzslider .rz-pointer:after {
@@ -205,7 +205,7 @@ input:checked + .slider:before {
 /* Widget */
 
 .widget .widget-icon i {
-  color: var(--ui-pr-blue8);
+  color: var(--ui-pr-blue-8);
 }
 
 .widget .widget-body table thead {
@@ -245,9 +245,9 @@ input:checked + .slider:before {
 }
 
 .btn-group .btn-dangerlight {
-  background-color: var(--ui-error2);
+  background-color: var(--ui-error-2);
   border: 1px solid var(--border-button-group);
-  color: var(--ui-error8);
+  color: var(--ui-error-8);
 }
 
 .btn.active {
@@ -271,17 +271,17 @@ input:checked + .slider:before {
 }
 
 .toast-success .toast-progress {
-  background-color: var(--ui-success7);
+  background-color: var(--ui-success-7);
 }
 .toast-warning .toast-progress {
-  background-color: var(--ui-warning6);
+  background-color: var(--ui-warning-6);
 }
 .toast-error .toast-progress {
-  background-color: var(--ui-error8);
+  background-color: var(--ui-error-8);
 }
 
 #toast-container > div {
-  color: var(--ui-gray7);
+  color: var(--ui-gray-7);
   background-color: var(--white-color);
   border-radius: 8px;
   padding: 20px 20px 20px 80px;
@@ -292,9 +292,9 @@ input:checked + .slider:before {
 }
 
 #toast-container > div:hover {
-  -moz-box-shadow: 0 0 12px var(--ui-gray7);
-  -webkit-box-shadow: 0 0 12px var(--ui-gray7);
-  box-shadow: 0 0 12px var(--ui-gray7);
+  -moz-box-shadow: 0 0 12px var(--ui-gray-7);
+  -webkit-box-shadow: 0 0 12px var(--ui-gray-7);
+  box-shadow: 0 0 12px var(--ui-gray-7);
 }
 
 .toast-close-button {
@@ -379,20 +379,20 @@ input:checked + .slider:before {
 
 .boxselector_wrapper input[type='radio']:checked + label,
 .box-selector-item input[type='radio']:checked + label {
-  background: var(--ui-pr-blue3) !important;
+  background: var(--ui-pr-blue-3) !important;
   color: black !important;
   border-radius: 8px;
-  border-color: var(--ui-pr-blue7);
+  border-color: var(--ui-pr-blue-7);
   padding: 15px;
   box-shadow: none;
 }
 
 .boxselector_wrapper input[type='radio']:not(:disabled) + label,
 .box-selector-item input[type='radio']:not(:disabled) + label {
-  background: var(--ui-gray2);
+  background: var(--ui-gray-2);
   color: var(--black-color) !important;
   border-radius: 8px;
-  border-color: var(--ui-gray5);
+  border-color: var(--ui-gray-5);
   padding: 15px;
   box-shadow: none;
 }
@@ -449,11 +449,11 @@ input:checked + .slider:before {
 }
 
 .label-danger {
-  background-color: var(--ui-error8);
+  background-color: var(--ui-error-8);
 }
 
 .label-success {
-  background-color: var(--ui-success7);
+  background-color: var(--ui-success-7);
 }
 
 /* Feather Icon */
