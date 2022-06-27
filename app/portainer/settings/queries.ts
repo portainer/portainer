@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { notifyError } from '@/portainer/services/notifications';
 
+import { PublicSettingsViewModel } from '../models/settings';
+
 import {
   publicSettings,
   getSettings,
@@ -9,11 +11,19 @@ import {
 } from './settings.service';
 import { Settings } from './types';
 
-export function usePublicSettings() {
+export function usePublicSettings<T = PublicSettingsViewModel>({
+  enabled,
+  select,
+}: {
+  select?: (settings: PublicSettingsViewModel) => T;
+  enabled?: boolean;
+} = {}) {
   return useQuery(['settings', 'public'], () => publicSettings(), {
     onError: (err) => {
       notifyError('Failure', err as Error, 'Unable to retrieve settings');
     },
+    select,
+    enabled,
   });
 }
 
