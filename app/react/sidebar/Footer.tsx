@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { useQuery } from 'react-query';
-import { DialogOverlay } from '@reach/dialog';
-import { Database, Hash, Server, Tag, Tool } from 'react-feather';
 import clsx from 'clsx';
+import { Database, Hash, Server, Tag, Tool } from 'react-feather';
+import { DialogOverlay } from '@reach/dialog';
 
 import { getStatus } from '@/portainer/services/api/status.service';
 
-import { UpdateNotification } from './UpdateNotifications';
-import styles from './Footer.module.css';
-
 import { Button } from '@@/buttons';
 
+import { UpdateNotification } from './UpdateNotifications';
+import styles from './Footer.module.css';
 import '@reach/dialog/styles.css';
 
 export function Footer() {
