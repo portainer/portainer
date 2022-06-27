@@ -1,5 +1,3 @@
-// import {ItemViewModel} from '../../../models/item'
-
 import './containerExplorer.css';
 import { ItemViewModel } from 'Docker/models/item';
 
@@ -36,7 +34,7 @@ angular
           $scope.temp = $scope.singleSelection();
         } else {
           $scope.temp = new ItemViewModel({
-            rights: 644,
+            perms: '',
           });
           $scope.temp.multiple = true;
         }
@@ -64,15 +62,8 @@ angular
         var indexInTemp = $scope.temps.indexOf(item);
         const isRightClick = $event && $event.which === 3;
 
-        console.log('isRightClick', isRightClick);
+        var menu = angular.element('#context-menu');
         if (isRightClick) {
-          // var sidebar = angular.element('sidebar');
-          var menu = angular.element('#context-menu');
-          // var rightWidth =  menu.width() + sidebar.width()
-
-          // if ($event.pageX >= $window.innerWidth - rightWidth) {
-          //   $event.pageX = $event.pageX - 250;
-          // }
           if ($event.pageY >= $window.innerHeight - menu.height()) {
             $event.pageY -= menu.height();
           }
@@ -80,14 +71,9 @@ angular
             left: $event.pageX - 250,
             top: $event.pageY,
           });
-
-          // menu.css({
-          //   left: $event.pageX - 250,
-          //   top: $event.pageY - 5,
-          // });
           menu.show();
         } else {
-          angular.element('#context-menu').hide();
+          menu.hide();
         }
 
         if ($event && $event.target.hasAttribute('prevent')) {
@@ -153,8 +139,17 @@ angular
       };
 
       $scope.remove = function () {
-        ExplorerService.remove($transition$.params().id, ExplorerService.currentPath);
-
+        let files = ($scope.temps || []).map(function (f) {
+          return f && f.model.fullPath();
+        });
+        ExplorerService.remove(files)
+          .then(function () {
+            Notifications.success('files delete successfully');
+            ExplorerService.refresh($transition$.params().id, ExplorerService.currentPath);
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'files delete filed.');
+          });
         $scope.modal('remove', true);
       };
 
@@ -163,11 +158,7 @@ angular
       };
 
       $scope.modal = function (id, hide, returnElement) {
-        console.log('id', id);
-        console.log('hide', hide);
-        console.log('returnElement', returnElement);
-
-        var element = angular.element('#' + id);
+        const element = angular.element('#' + id);
         element.modal(hide ? 'hide' : 'show');
         $scope.explorerService.error = '';
 

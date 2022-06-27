@@ -1,7 +1,7 @@
 export function ItemViewModel(model, path) {
   this.rawModel = {
     name: (model && model.name) || '',
-    path: path || [],
+    path: path,
     type: (model && model.type) || 'file',
     size: model && parseInt(model.size || 0),
     date: model && model.date,
@@ -9,8 +9,7 @@ export function ItemViewModel(model, path) {
     content: (model && model.content) || '',
     recursive: false,
     fullPath: function () {
-      var path = this.path.filter(Boolean);
-      return ('/' + path.join('/') + '/' + this.name).replace(/\/\//, '/');
+      return this.path + '/' + this.name;
     },
   };
 
