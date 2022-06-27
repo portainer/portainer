@@ -59,6 +59,7 @@
             edge-info="{ key: endpoint.EdgeKey, id: endpoint.EdgeID }"
             commands="state.edgeScriptCommands"
             is-nomad-token-visible="state.showNomad"
+            hide-async-mode="!endpoint.IsEdgeDevice"
           ></edge-script-form>
 
           <span class="small text-muted">
