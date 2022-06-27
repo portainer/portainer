@@ -11,6 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	privateAzureRepoURL = "https://portainer.visualstudio.com/gitops-test/_git/gitops-test"
+)
+
 func TestService_ClonePublicRepository_Azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
@@ -31,7 +35,7 @@ func TestService_ClonePublicRepository_Azure(t *testing.T) {
 		{
 			name: "Clone Azure DevOps repo branch",
 			args: args{
-				repositoryURLFormat: "https://:%s@portainer.visualstudio.com/Playground/_git/dev_integration",
+				repositoryURLFormat: "https://:%s@portainer.visualstudio.com/gitops-test/_git/gitops-test",
 				referenceName:       "refs/heads/main",
 				username:            "",
 				password:            pat,
@@ -41,8 +45,8 @@ func TestService_ClonePublicRepository_Azure(t *testing.T) {
 		{
 			name: "Clone Azure DevOps repo tag",
 			args: args{
-				repositoryURLFormat: "https://:%s@portainer.visualstudio.com/Playground/_git/dev_integration",
-				referenceName:       "refs/tags/v1.1",
+				repositoryURLFormat: "https://:%s@portainer.visualstudio.com/gitops-test/_git/gitops-test",
+				referenceName:       "refs/heads/tags/v1.1",
 				username:            "",
 				password:            pat,
 			},
@@ -72,8 +76,7 @@ func TestService_ClonePrivateRepository_Azure(t *testing.T) {
 	assert.NoError(t, err)
 	defer os.RemoveAll(dst)
 
-	repositoryUrl := "https://portainer.visualstudio.com/Playground/_git/dev_integration"
-	err = service.CloneRepository(dst, repositoryUrl, "refs/heads/main", "", pat)
+	err = service.CloneRepository(dst, privateAzureRepoURL, "refs/heads/main", "", pat)
 	assert.NoError(t, err)
 	assert.FileExists(t, filepath.Join(dst, "README.md"))
 }
@@ -84,8 +87,7 @@ func TestService_LatestCommitID_Azure(t *testing.T) {
 	pat := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	service := NewService()
 
-	repositoryUrl := "https://portainer.visualstudio.com/Playground/_git/dev_integration"
-	id, err := service.LatestCommitID(repositoryUrl, "refs/heads/main", "", pat)
+	id, err := service.LatestCommitID(privateAzureRepoURL, "refs/heads/main", "", pat)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, id, "cannot guarantee commit id, but it should be not empty")
 }
@@ -97,8 +99,7 @@ func TestService_ListRemote_Azure(t *testing.T) {
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	service := NewService()
 
-	repositoryUrl := "https://oscarzhouportainer@dev.azure.com/oscarzhouportainer/private-hello-world/_git/private-hello-world"
-	refs, err := service.ListRemote(repositoryUrl, username, accessToken)
+	refs, err := service.ListRemote(privateAzureRepoURL, username, accessToken)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(refs), 1)
 }
@@ -110,8 +111,7 @@ func TestService_ListTree_Azure(t *testing.T) {
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	service := NewService()
 
-	repositoryUrl := "https://oscarzhouportainer@dev.azure.com/oscarzhouportainer/private-hello-world/_git/private-hello-world"
-	paths, err := service.ListTree(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
+	paths, err := service.ListTree(privateAzureRepoURL, "refs/heads/main", username, accessToken, []string{})
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(paths), 1)
 }

@@ -140,7 +140,12 @@ func getCommitHistoryLength(t *testing.T, err error, dir string) int {
 	return count
 }
 
-func Test_listRemote(t *testing.T) {
+func Test_listRemotePrivateRepository(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	accessToken := getRequiredValue(t, "GITHUB_PAT")
+	username := getRequiredValue(t, "GITHUB_USERNAME")
+
 	service := Service{git: gitClient{
 		preserveGitDirectory: true,
 		repoRefCache:         make(map[string][]*plumbing.Reference),
@@ -153,31 +158,45 @@ func Test_listRemote(t *testing.T) {
 	}
 
 	tests := []struct {
-		name   string
-		url    string
-		expect expectResult
+		name        string
+		url         string
+		username    string
+		accessToken string
+		expect      expectResult
 	}{
 		{
-			name: "list refs of a real repository",
-			url:  bareRepoDir,
+			name:        "list refs of a real private repository",
+			url:         privateGitRepoURL,
+			username:    username,
+			accessToken: accessToken,
 			expect: expectResult{
 				err:       nil,
-				refsCount: 1,
+				refsCount: 3,
 			},
 		},
 		{
-			name: "list refs of a fake repository",
-			url:  bareRepoDir + "fake",
+			name:        "list refs of a real private repository with incorrect credential",
+			url:         privateGitRepoURL,
+			username:    "",
+			accessToken: "",
 			expect: expectResult{
-				err:       ErrIncorrectRepositoryURL,
-				refsCount: 0,
+				err: ErrAuthenticationFailure,
+			},
+		},
+		{
+			name:        "list refs of a fake repository",
+			url:         privateGitRepoURL + "fake",
+			username:    username,
+			accessToken: accessToken,
+			expect: expectResult{
+				err: ErrIncorrectRepositoryURL,
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			refs, err := service.ListRemote(tt.url, "", "")
+			refs, err := service.ListRemote(tt.url, tt.username, tt.accessToken)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expect.refsCount, len(refs))
@@ -189,9 +208,12 @@ func Test_listRemote(t *testing.T) {
 	}
 }
 
-func Test_listTree(t *testing.T) {
+func Test_listTreePrivateRepository(t *testing.T) {
+	ensureIntegrationTest(t)
+
 	service := Service{git: gitClient{
 		preserveGitDirectory: true,
+		cacheEnabled:         false,
 		repoRefCache:         make(map[string][]*plumbing.Reference),
 		repoTreeCache:        make(map[string][]string),
 	}} // no need for http client since the test access the repo via file system.
@@ -201,57 +223,83 @@ func Test_listTree(t *testing.T) {
 		matchedCount int
 	}
 
+	accessToken := getRequiredValue(t, "GITHUB_PAT")
+	username := getRequiredValue(t, "GITHUB_USERNAME")
+
 	tests := []struct {
-		name   string
-		url    string
-		ref    string
-		exts   []string
-		expect expectResult
+		name        string
+		url         string
+		ref         string
+		username    string
+		accessToken string
+		exts        []string
+		expect      expectResult
 	}{
 		{
-			name: "list tree with real repository and head ref",
-			url:  bareRepoDir,
-			ref:  "refs/heads/main",
-			exts: []string{},
+			name:        "list tree with real repository and head ref but incorrect credential",
+			url:         privateGitRepoURL,
+			ref:         "refs/heads/main",
+			username:    "",
+			accessToken: "",
+			exts:        []string{},
+			expect: expectResult{
+				err: ErrAuthenticationFailure,
+			},
+		},
+		{
+			name:        "list tree with real repository and head ref",
+			url:         privateGitRepoURL,
+			ref:         "refs/heads/main",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{},
+			expect: expectResult{
+				err:          nil,
+				matchedCount: 15,
+			},
+		},
+		{
+			name:        "list tree with real repository and head ref and existing file extension",
+			url:         privateGitRepoURL,
+			ref:         "refs/heads/main",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{"yml"},
 			expect: expectResult{
 				err:          nil,
 				matchedCount: 2,
 			},
 		},
 		{
-			name: "list tree with real repository and head ref and existing file extension",
-			url:  bareRepoDir,
-			ref:  "refs/heads/main",
-			exts: []string{"yml"},
+			name:        "list tree with real repository and head ref and non-existing file extension",
+			url:         privateGitRepoURL,
+			ref:         "refs/heads/main",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{"hcl"},
 			expect: expectResult{
 				err:          nil,
-				matchedCount: 1,
+				matchedCount: 2,
 			},
 		},
 		{
-			name: "list tree with real repository and head ref and non-existing file extension",
-			url:  bareRepoDir,
-			ref:  "refs/heads/main",
-			exts: []string{"hcl"},
-			expect: expectResult{
-				err:          nil,
-				matchedCount: 0,
-			},
-		},
-		{
-			name: "list tree with real repository but non-existing ref",
-			url:  bareRepoDir,
-			ref:  "refs/fake/feature",
-			exts: []string{},
+			name:        "list tree with real repository but non-existing ref",
+			url:         privateGitRepoURL,
+			ref:         "refs/fake/feature",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{},
 			expect: expectResult{
 				err: ErrRefNotFound,
 			},
 		},
 		{
-			name: "list tree with fake repository ",
-			url:  bareRepoDir + "fake",
-			ref:  "refs/fake/feature",
-			exts: []string{},
+			name:        "list tree with fake repository ",
+			url:         privateGitRepoURL + "fake",
+			ref:         "refs/fake/feature",
+			username:    username,
+			accessToken: accessToken,
+			exts:        []string{},
 			expect: expectResult{
 				err: ErrIncorrectRepositoryURL,
 			},
@@ -260,7 +308,7 @@ func Test_listTree(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			paths, err := service.ListTree(tt.url, tt.ref, "", "", tt.exts)
+			paths, err := service.ListTree(tt.url, tt.ref, tt.username, tt.accessToken, tt.exts)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expect.matchedCount, len(paths))

@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,7 +11,10 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/go-git/go-git/v5/plumbing/transport/client"
+	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 )
@@ -46,18 +50,30 @@ type azureItem struct {
 }
 
 type azureDownloader struct {
-	client  *http.Client
-	baseUrl string
+	client       *http.Client
+	baseUrl      string
+	cacheEnabled bool
 	// Cache the result of repository refs, key is repository URL
 	repoRefCache map[string][]string
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
 	repoTreeCache map[string][]string
 }
 
-func NewAzureDownloader(client *http.Client) *azureDownloader {
+func NewAzureDownloader(enableCache bool) *azureDownloader {
+	httpsCli := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			Proxy:           http.ProxyFromEnvironment,
+		},
+		Timeout: 300 * time.Second,
+	}
+
+	client.InstallProtocol("https", githttp.NewClient(httpsCli))
+
 	return &azureDownloader{
-		client:        client,
+		client:        httpsCli,
 		baseUrl:       "https://dev.azure.com",
+		cacheEnabled:  enableCache,
 		repoRefCache:  make(map[string][]string),
 		repoTreeCache: make(map[string][]string),
 	}
@@ -393,7 +409,7 @@ func (a *azureDownloader) listRemote(ctx context.Context, options cloneOptions) 
 	if resp.StatusCode != http.StatusOK {
 		if resp.StatusCode == http.StatusNotFound {
 			return nil, ErrIncorrectRepositoryURL
-		} else if resp.StatusCode == http.StatusUnauthorized {
+		} else if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusNonAuthoritativeInfo {
 			return nil, ErrAuthenticationFailure
 		}
 		return nil, fmt.Errorf("failed to list refs url with a status \"%v\"", resp.Status)
@@ -412,7 +428,9 @@ func (a *azureDownloader) listRemote(ctx context.Context, options cloneOptions) 
 		ret = append(ret, value.Name)
 	}
 
-	a.repoRefCache[options.repositoryUrl] = ret
+	if a.cacheEnabled {
+		a.repoRefCache[options.repositoryUrl] = ret
+	}
 	return ret, nil
 }
 
@@ -514,7 +532,10 @@ func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([
 			filteredRet = append(filteredRet, treeEntry.RelativePath)
 		}
 	}
-	a.repoTreeCache[repoKey] = allPaths
+
+	if a.cacheEnabled {
+		a.repoTreeCache[repoKey] = allPaths
+	}
 
 	return filteredRet, nil
 }

@@ -2,14 +2,9 @@ package git
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
-	"net/http"
-	"time"
 
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/transport/client"
-	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
 var (
@@ -43,27 +38,16 @@ type downloader interface {
 
 // Service represents a service for managing Git.
 type Service struct {
-	httpsCli *http.Client
-	azure    downloader
-	git      downloader
+	azure downloader
+	git   downloader
 }
 
 // NewService initializes a new service.
 func NewService() *Service {
-	httpsCli := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           http.ProxyFromEnvironment,
-		},
-		Timeout: 300 * time.Second,
-	}
-
-	client.InstallProtocol("https", githttp.NewClient(httpsCli))
-
 	return &Service{
-		httpsCli: httpsCli,
-		azure:    NewAzureDownloader(httpsCli),
+		azure: NewAzureDownloader(true),
 		git: gitClient{
+			cacheEnabled:  true,
 			repoRefCache:  make(map[string][]*plumbing.Reference),
 			repoTreeCache: make(map[string][]string),
 		},

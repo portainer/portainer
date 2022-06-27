@@ -10,12 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	privateAzureRepoURL = "https://oscarzhouportainer@dev.azure.com/oscarzhouportainer/private-hello-world/_git/private-hello-world"
-)
-
 func Test_buildDownloadUrl(t *testing.T) {
-	a := NewAzureDownloader(nil)
+	a := NewAzureDownloader(false)
 	u, err := a.buildDownloadUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -33,7 +29,7 @@ func Test_buildDownloadUrl(t *testing.T) {
 }
 
 func Test_buildRootItemUrl(t *testing.T) {
-	a := NewAzureDownloader(nil)
+	a := NewAzureDownloader(false)
 	u, err := a.buildRootItemUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -50,7 +46,7 @@ func Test_buildRootItemUrl(t *testing.T) {
 }
 
 func Test_buildRefsUrl(t *testing.T) {
-	a := NewAzureDownloader(nil)
+	a := NewAzureDownloader(false)
 	u, err := a.buildRefsUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -67,7 +63,7 @@ func Test_buildRefsUrl(t *testing.T) {
 }
 
 func Test_buildTreeUrl(t *testing.T) {
-	a := NewAzureDownloader(nil)
+	a := NewAzureDownloader(false)
 	u, err := a.buildTreeUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -420,7 +416,9 @@ func Test_cloneRepository_azure(t *testing.T) {
 func Test_listRemote_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	service := NewService()
+	service := Service{
+		azure: NewAzureDownloader(false),
+	}
 	type expectResult struct {
 		err       error
 		refsCount int
@@ -442,11 +440,20 @@ func Test_listRemote_azure(t *testing.T) {
 			accessToken: accessToken,
 			expect: expectResult{
 				err:       nil,
-				refsCount: 1,
+				refsCount: 2,
 			},
 		},
 		{
 			name:        "list refs of a real repository with incorrect credential",
+			url:         privateAzureRepoURL,
+			username:    "test-username",
+			accessToken: "test-token",
+			expect: expectResult{
+				err: ErrAuthenticationFailure,
+			},
+		},
+		{
+			name:        "list refs of a real repository without providing credential",
 			url:         privateAzureRepoURL,
 			username:    "",
 			accessToken: "",
@@ -460,8 +467,7 @@ func Test_listRemote_azure(t *testing.T) {
 			username:    username,
 			accessToken: accessToken,
 			expect: expectResult{
-				err:       ErrIncorrectRepositoryURL,
-				refsCount: 0,
+				err: ErrIncorrectRepositoryURL,
 			},
 		},
 	}
@@ -484,7 +490,10 @@ func Test_listRemote_azure(t *testing.T) {
 func Test_listTree_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	service := NewService()
+	service := Service{
+		azure: NewAzureDownloader(false),
+	}
+
 	type expectResult struct {
 		err          error
 		matchedCount int
@@ -505,6 +514,17 @@ func Test_listTree_azure(t *testing.T) {
 			name:        "list tree with real repository and head ref but incorrect credential",
 			url:         privateAzureRepoURL,
 			ref:         "refs/heads/main",
+			username:    "test-username",
+			accessToken: "test-token",
+			exts:        []string{},
+			expect: expectResult{
+				err: ErrAuthenticationFailure,
+			},
+		},
+		{
+			name:        "list tree with real repository and head ref but no  credential",
+			url:         privateAzureRepoURL,
+			ref:         "refs/heads/main",
 			username:    "",
 			accessToken: "",
 			exts:        []string{},
@@ -521,7 +541,7 @@ func Test_listTree_azure(t *testing.T) {
 			exts:        []string{},
 			expect: expectResult{
 				err:          nil,
-				matchedCount: 13,
+				matchedCount: 19,
 			},
 		},
 		{
@@ -545,7 +565,7 @@ func Test_listTree_azure(t *testing.T) {
 			exts:        []string{"hcl"},
 			expect: expectResult{
 				err:          nil,
-				matchedCount: 0,
+				matchedCount: 2,
 			},
 		},
 		{

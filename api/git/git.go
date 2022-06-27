@@ -18,6 +18,7 @@ import (
 
 type gitClient struct {
 	preserveGitDirectory bool
+	cacheEnabled         bool
 	// Cache the result of repository refs, key is repository URL
 	repoRefCache map[string][]*plumbing.Reference
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
@@ -115,7 +116,9 @@ func (c gitClient) listRemote(ctx context.Context, opt cloneOptions) ([]string, 
 		ret = append(ret, ref.Name().String())
 	}
 
-	c.repoRefCache[opt.repositoryUrl] = refs
+	if c.cacheEnabled {
+		c.repoRefCache[opt.repositoryUrl] = refs
+	}
 	return ret, nil
 }
 
@@ -199,7 +202,9 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 				return nil
 			})
 
-			c.repoTreeCache[repoKey] = allPaths
+			if c.cacheEnabled {
+				c.repoTreeCache[repoKey] = allPaths
+			}
 			break
 		}
 	}
@@ -231,7 +236,7 @@ func checkGitError(err error) error {
 	errMsg := err.Error()
 	if errMsg == "repository not found" {
 		return ErrIncorrectRepositoryURL
-	} else if errMsg == "" {
+	} else if errMsg == "authentication required" {
 		return ErrAuthenticationFailure
 	}
 	return err
