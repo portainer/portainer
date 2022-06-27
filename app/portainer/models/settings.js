@@ -34,6 +34,8 @@ export function PublicSettingsViewModel(settings) {
   this.EnableTelemetry = settings.EnableTelemetry;
   this.OAuthLogoutURI = settings.OAuthLogoutURI;
   this.KubeconfigExpiry = settings.KubeconfigExpiry;
+  this.Features = settings.Features;
+  this.Edge = new EdgeSettingsViewModel(settings.Edge);
 }
 
 export function InternalAuthSettingsViewModel(data) {
@@ -74,4 +76,12 @@ export function OAuthSettingsViewModel(data) {
   this.DefaultTeamID = data.DefaultTeamID;
   this.SSO = data.SSO;
   this.LogoutURI = data.LogoutURI;
+}
+
+export function EdgeSettingsViewModel(data = {}) {
+  this.CheckinInterval = data.CheckinInterval;
+  this.PingInterval = data.PingInterval;
+  this.SnapshotInterval = data.SnapshotInterval;
+  this.CommandInterval = data.CommandInterval;
+  this.AsyncMode = data.AsyncMode;
 }
