@@ -10,13 +10,13 @@
 }
 
 .btn-primary {
-  background-color: var(--ui-pr-blue-8);
+  background-color: var(--ui-blue-8);
 }
 
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active .active {
-  background-color: var(--ui-pr-blue-2);
+  background-color: var(--ui-blue-2);
 }
 
 .btn-danger {
@@ -68,11 +68,11 @@
 }
 
 input:checked + .slider {
-  background-color: var(--ui-pr-blue-8);
+  background-color: var(--ui-blue-8);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px var(--ui-pr-blue-8);
+  box-shadow: 0 0 1px var(--ui-blue-8);
 }
 
 input:checked + .slider:before {
@@ -102,9 +102,9 @@ input:checked + .slider:before {
 }
 
 .md-checkbox input[type='checkbox']:checked + label:before {
-  background-color: var(--ui-pr-blue-8) !important;
-  color: var(--ui-pr-blue-8) !important;
-  border: 1px solid var(--ui-pr-blue-8) !important;
+  background-color: var(--ui-blue-8) !important;
+  color: var(--ui-blue-8) !important;
+  border: 1px solid var(--ui-blue-8) !important;
 }
 
 .md-checkbox input[type='checkbox']:checked + .checkmark {
@@ -116,7 +116,7 @@ input:checked + .slider:before {
 
 .rzslider .rz-pointer {
   background-color: var(--white-color);
-  border: 3px solid var(--ui-pr-blue-8);
+  border: 3px solid var(--ui-blue-8);
   width: 25px;
   height: 25px;
   top: -10px;
@@ -129,7 +129,7 @@ input:checked + .slider:before {
 }
 
 .rzslider .rz-selection {
-  background-color: var(--ui-pr-blue-8);
+  background-color: var(--ui-blue-8);
 }
 
 .rzslider .rz-pointer:after {
@@ -205,7 +205,7 @@ input:checked + .slider:before {
 /* Widget */
 
 .widget .widget-icon i {
-  color: var(--ui-pr-blue-8);
+  color: var(--ui-blue-8);
 }
 
 .widget .widget-body table thead {
@@ -379,10 +379,10 @@ input:checked + .slider:before {
 
 .boxselector_wrapper input[type='radio']:checked + label,
 .box-selector-item input[type='radio']:checked + label {
-  background: var(--ui-pr-blue-3) !important;
+  background: var(--ui-blue-3) !important;
   color: black !important;
   border-radius: 8px;
-  border-color: var(--ui-pr-blue-7);
+  border-color: var(--ui-blue-7);
   padding: 15px;
   box-shadow: none;
 }

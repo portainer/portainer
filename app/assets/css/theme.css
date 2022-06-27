@@ -106,7 +106,7 @@
   --bg-switch-box-color: var(--ui-gray-5);
   --bg-input-group-addon-color: var(--ui-gray-3);
   --bg-btn-default-color: var(--white-color);
-  --bg-blocklist-hover-color: var(--ui-pr-blue-3);
+  --bg-blocklist-hover-color: var(--ui-blue-3);
   --bg-boxselector-color: var(--white-color);
   --bg-table-color: var(--white-color);
   --bg-md-checkbox-color: var(--grey-12);
@@ -162,7 +162,7 @@
   --bg-stepper-item-active: var(--white-color);
   --bg-stepper-item-counter: var(--grey-61);
   --bg-sortbutton-color: var(--white-color);
-  --bg-dashboard-item: var(--ui-pr-blue-3);
+  --bg-dashboard-item: var(--ui-blue-3);
   --bg-searchbar: var(--ui-gray-2);
   --bg-inputbox: var(--ui-gray-2);
   --bg-dropdown-hover: var(--ui-gray-3);
