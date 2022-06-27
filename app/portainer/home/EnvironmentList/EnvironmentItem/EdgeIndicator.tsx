@@ -2,8 +2,8 @@ import clsx from 'clsx';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { Environment } from '@/portainer/environments/types';
-import { useSettings } from '@/portainer/settings/queries';
-import { Settings } from '@/portainer/settings/types';
+import { usePublicSettings } from '@/portainer/settings/queries';
+import { PublicSettingsViewModel } from '@/portainer/models/settings';
 
 interface Props {
   showLastCheckInDate?: boolean;
@@ -58,7 +58,7 @@ export function EdgeIndicator({
 }
 
 function useHasHeartbeat(environment: Environment, associated: boolean) {
-  const settingsQuery = useSettings(undefined, associated);
+  const settingsQuery = usePublicSettings({ enabled: associated });
 
   if (!associated) {
     return false;
@@ -81,7 +81,10 @@ function useHasHeartbeat(environment: Environment, associated: boolean) {
   return false;
 }
 
-function getCheckinInterval(environment: Environment, settings: Settings) {
+function getCheckinInterval(
+  environment: Environment,
+  settings: PublicSettingsViewModel
+) {
   const asyncMode = environment.Edge.AsyncMode;
 
   if (asyncMode) {
@@ -104,7 +107,7 @@ function getCheckinInterval(environment: Environment, settings: Settings) {
     !environment.EdgeCheckinInterval ||
     environment.EdgeCheckinInterval === 0
   ) {
-    return settings.EdgeAgentCheckinInterval;
+    return settings.Edge.CheckinInterval;
   }
 
   return environment.EdgeCheckinInterval;

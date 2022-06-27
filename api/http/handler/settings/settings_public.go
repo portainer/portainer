@@ -30,6 +30,19 @@ type publicSettingsResponse struct {
 	KubeconfigExpiry string `example:"24h" default:"0"`
 	// Whether team sync is enabled
 	TeamSync bool `json:"TeamSync" example:"true"`
+
+	Edge struct {
+		// Whether the device has been started in edge async mode
+		AsyncMode bool
+		// The ping interval for edge agent - used in edge async mode [seconds]
+		PingInterval int `json:"PingInterval" example:"60"`
+		// The snapshot interval for edge agent - used in edge async mode [seconds]
+		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+		// The command list interval for edge agent - used in edge async mode [seconds]
+		CommandInterval int `json:"CommandInterval" example:"60"`
+		// The check in interval for edge agent (in seconds) - used in non async mode [seconds]
+		CheckinInterval int `example:"60"`
+	}
 }
 
 // @id SettingsPublic
@@ -61,6 +74,13 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
 		Features:                  appSettings.FeatureFlagSettings,
 	}
+
+	publicSettings.Edge.AsyncMode = appSettings.Edge.AsyncMode
+	publicSettings.Edge.PingInterval = appSettings.Edge.PingInterval
+	publicSettings.Edge.SnapshotInterval = appSettings.Edge.SnapshotInterval
+	publicSettings.Edge.CommandInterval = appSettings.Edge.CommandInterval
+	publicSettings.Edge.CheckinInterval = appSettings.EdgeAgentCheckinInterval
+
 	//if OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {
 		publicSettings.OAuthLogoutURI = appSettings.OAuthSettings.LogoutURI

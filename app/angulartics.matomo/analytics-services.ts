@@ -64,9 +64,9 @@ export function push(
 }
 
 export function useAnalytics() {
-  const telemetryQuery = usePublicSettings(
-    (settings) => settings.EnableTelemetry
-  );
+  const telemetryQuery = usePublicSettings({
+    select: (settings) => settings.EnableTelemetry,
+  });
 
   return { trackEvent: handleTrackEvent };
 
