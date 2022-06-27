@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import feather from 'feather-icons';
 import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 /* @ngInject */
@@ -6,7 +7,14 @@ export function onStartupAngular($rootScope, $state, $interval, LocalStorage, En
   EndpointProvider.initialize();
 
   $rootScope.$state = $state;
-  $rootScope.defaultTitle = document.title;
+  const defaultTitle = document.title;
+
+  $transitions.onEnter({}, () => {
+    const endpoint = EndpointProvider.currentEndpoint();
+    if (endpoint) {
+      document.title = `${defaultTitle} | ${endpoint.Name}`;
+    }
+  });
 
   // Workaround to prevent the loading bar from going backward
   // https://github.com/chieffancypants/angular-loading-bar/issues/273
@@ -19,6 +27,10 @@ export function onStartupAngular($rootScope, $state, $interval, LocalStorage, En
 
   $transitions.onBefore({}, () => {
     HttpRequestHelper.resetAgentHeaders();
+  });
+
+  $transitions.onSuccess({}, () => {
+    feather.replace();
   });
 
   // Keep-alive Edge endpoints by sending a ping request every minute

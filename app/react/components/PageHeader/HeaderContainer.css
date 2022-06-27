@@ -2,10 +2,6 @@
   padding-top: 7px;
 }
 
-body.hamburg .row.header .meta {
-  margin-left: 70px;
-}
-
 .row.header {
   min-height: 60px;
   background: var(--bg-row-header-color);

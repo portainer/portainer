@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="<%= name %>" ng-strict-di>
+<html lang="en" ng-app="<%= name %>" ng-strict-di data-edition="<%= process.env.PORTAINER_EDITION %>">
   <head>
     <meta charset="utf-8" />
     <title>Portainer</title>
@@ -35,10 +35,11 @@
   </head>
 
   <body ng-controller="MainController">
+    <react-query-dev-tools></react-query-dev-tools>
     <div
       id="page-wrapper"
       ng-class="{
-        open: toggle && ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) === -1,
+        open: isSidebarOpen() && ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) === -1,
         nopadding: ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint', 'portainer.logout'].indexOf($state.current.name) > -1 || applicationState.loading
       }"
       ng-cloak

@@ -177,30 +177,6 @@ export function confirmStackUpdate(
   switchEle.prop('style', 'margin-left:20px');
 }
 
-export function confirmKubeconfigSelection(
-  options: InputOption[],
-  expiryMessage: string,
-  callback: PromptCallback
-) {
-  const message = sanitize(
-    `Select the kubernetes environment(s) to add to the kubeconfig file.</br>${expiryMessage}`
-  );
-  const box = prompt({
-    title: 'Download kubeconfig file',
-    inputType: 'checkbox',
-    inputOptions: options,
-    buttons: {
-      confirm: {
-        label: 'Download file',
-        className: 'btn-primary',
-      },
-    },
-    callback,
-  });
-
-  customizeCheckboxPrompt(box, message, true, true);
-}
-
 function customizeCheckboxPrompt(
   box: JQuery<HTMLElement>,
   message: string,

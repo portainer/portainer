@@ -1,0 +1,29 @@
+.root {
+  color: white;
+}
+
+.toggle-button {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: initial;
+  float: right;
+  padding-right: 28px;
+  line-height: 60px;
+}
+
+.root {
+  height: 60px;
+  list-style: none;
+  text-indent: 20px;
+  font-size: 18px;
+  background: var(--bg-sidebar-header-color);
+}
+
+.root a {
+  color: #fff;
+}
+
+.root a:hover {
+  text-decoration: none;
+}

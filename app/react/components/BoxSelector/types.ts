@@ -3,6 +3,7 @@ import type { FeatureId } from '@/portainer/feature-flags/enums';
 export interface BoxSelectorOption<T> {
   id: string;
   icon: string;
+  featherIcon?: boolean;
   label: string;
   description: string;
   value: T;

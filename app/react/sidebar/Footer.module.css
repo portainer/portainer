@@ -1,0 +1,28 @@
+:global(#page-wrapper:not(.open)) .root {
+  display: none;
+}
+
+.root {
+  text-align: center;
+}
+
+.logo {
+  display: inline;
+  width: 100%;
+  max-width: 100px;
+  height: 100%;
+  max-height: 35px;
+  margin: 2px 0 2px 20px;
+}
+
+.version {
+  font-size: 11px;
+  margin: 11px 20px 0 7px;
+  color: #fff;
+}
+
+.edition-version {
+  font-size: 10px;
+  margin-bottom: 8px;
+  color: #fff;
+}

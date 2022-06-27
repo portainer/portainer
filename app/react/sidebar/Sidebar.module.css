@@ -1,0 +1,56 @@
+:global(#page-wrapper.open) .root {
+  left: 150px;
+}
+
+.root {
+  margin-left: -150px;
+  left: -30px;
+  width: 250px;
+  position: fixed;
+  height: 100%;
+  z-index: 999;
+  transition: all 0.4s ease 0s;
+
+  display: flex;
+  flex-flow: column;
+}
+
+.root {
+  background-color: var(--blue-5);
+}
+:global(:root[theme='dark']) .root {
+  background-color: var(--grey-1);
+}
+:global(:root[theme='highcontrast']) .root {
+  background-color: var(--black-color);
+}
+:global(:root[data-edition='BE']) .root {
+  background-color: var(--grey-5);
+}
+:global(:root[data-edition='BE'][theme='dark']) .root {
+  background-color: var(--grey-1);
+}
+:global(:root[data-edition='BE'][theme='highcontrast']) .root {
+  background-color: var(--black-color);
+}
+
+ul.sidebar {
+  top: 0;
+  bottom: 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  text-indent: 20px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+}

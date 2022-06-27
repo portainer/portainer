@@ -66,12 +66,7 @@ export function WizardEndpointsList({ environmentIds }: Props) {
             </div>
             {isEdgeEnvironment(environment.Type) && (
               <div className={styles.wizardListEdgeStatus}>
-                <EdgeIndicator
-                  edgeId={environment.EdgeID}
-                  checkInInterval={environment.EdgeCheckinInterval}
-                  queryDate={environment.QueryDate}
-                  lastCheckInDate={environment.LastCheckInDate}
-                />
+                <EdgeIndicator environment={environment} />
               </div>
             )}
           </div>

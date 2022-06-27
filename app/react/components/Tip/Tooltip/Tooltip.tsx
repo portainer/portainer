@@ -1,5 +1,5 @@
 import ReactTooltip from 'react-tooltip';
-import clsx from 'clsx';
+import { HelpCircle } from 'react-feather';
 
 import styles from './Tooltip.module.css';
 
@@ -12,12 +12,8 @@ export interface Props {
 
 export function Tooltip({ message, position = 'bottom' }: Props) {
   return (
-    <span className="interactive">
-      <i
-        className={clsx('fa fa-question-circle blue-icon', styles.icon)}
-        aria-hidden="true"
-        data-tip={message}
-      />
+    <span data-tip={message} className={styles.icon}>
+      <HelpCircle className="feather" aria-hidden="true" />
       <ReactTooltip
         multiline
         type="info"

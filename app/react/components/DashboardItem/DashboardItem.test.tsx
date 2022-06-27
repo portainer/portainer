@@ -10,12 +10,6 @@ test('should show provided resource value', async () => {
   expect(value).toHaveTextContent('1');
 });
 
-test('should show provided icon', async () => {
-  const { getByLabelText } = renderComponent(0, 'fa fa-th-list');
-  const icon = getByLabelText('icon');
-  expect(icon).toHaveClass('fa-th-list');
-});
-
 test('should show provided resource type', async () => {
   const { getByLabelText } = renderComponent(0, '', 'Test');
   const title = getByLabelText('resourceType');

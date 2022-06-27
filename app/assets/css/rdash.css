@@ -15,39 +15,6 @@
   }
 }
 
-/**
- * Hamburg Menu
- * When the class of 'hamburg' is applied to the body tag of the document, 
- * the sidebar changes it's style to attempt to mimic a menu on a phone app,
- * where the content is overlaying the content, rather than push it.
- */
-@media only screen and (max-width: 560px) {
-  body.hamburg #page-wrapper {
-    padding-left: 0;
-  }
-  body.hamburg #page-wrapper:not(.open) #sidebar-wrapper {
-    position: absolute;
-    left: -100px;
-  }
-  body.hamburg #page-wrapper:not(.open) ul.sidebar .sidebar-title.separator {
-    display: none;
-  }
-  body.hamburg #page-wrapper.open #sidebar-wrapper {
-    position: fixed;
-  }
-  body.hamburg #page-wrapper.open #sidebar-wrapper ul.sidebar li.sidebar-main {
-    margin-left: 0px;
-  }
-  body.hamburg #sidebar-wrapper ul.sidebar li.sidebar-main,
-  body.hamburg .row.header .meta {
-    margin-left: 70px;
-  }
-  body.hamburg #sidebar-wrapper ul.sidebar li.sidebar-main,
-  body.hamburg #page-wrapper.open #sidebar-wrapper ul.sidebar li.sidebar-main {
-    transition: margin-left 0.4s ease 0s;
-  }
-}
-
 .loading {
   width: 40px;
   height: 40px;
@@ -94,20 +61,18 @@
 
 /* Fonts */
 @font-face {
-  font-family: 'Montserrat';
-  src: url('../fonts/montserrat-regular-webfont.eot');
-  src: url('../fonts/montserrat-regular-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/montserrat-regular-webfont.woff') format('woff'),
-    url('../fonts/montserrat-regular-webfont.ttf') format('truetype'), url('../fonts/montserrat-regular-webfont.svg#montserratregular') format('svg');
+  font-family: 'Inter';
+  src: url('../fonts/Inter-VariableFont.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
   @font-face {
-    font-family: 'Montserrat';
-    src: url('../fonts/montserrat-regular-webfont.svg') format('svg');
+    font-family: 'Inter';
+    src: url('../fonts/Inter-VariableFont.ttf') format('truetype');
   }
   select {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Inter, Arial, Helvetica, sans-serif;
   }
 }
 /* Base */
@@ -116,7 +81,7 @@ html {
 }
 body {
   background: var(--bg-body-color);
-  font-family: 'Montserrat';
+  font-family: 'Inter';
   color: var(--text-body-color) !important;
 }
 .row {
@@ -133,16 +98,8 @@ body {
   padding-left: 70px;
   height: 100%;
 }
-#sidebar-wrapper {
-  margin-left: -150px;
-  left: -30px;
-  width: 250px;
-  position: fixed;
-  height: 100%;
-  z-index: 999;
-}
-#page-wrapper,
-#sidebar-wrapper {
+
+#page-wrapper {
   transition: all 0.4s ease 0s;
 }
 .green {
@@ -172,9 +129,8 @@ div.input-mask {
   -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   background: var(--bg-widget-color);
-  border: 1px solid transparent;
-  border-radius: 2px;
-  border-color: var(--border-widget-color);
+  border: 1px solid var(--border-widget);
+  border-radius: 8px;
 }
 .widget .widget-header .pagination,
 .widget .widget-footer .pagination {
@@ -182,9 +138,7 @@ div.input-mask {
 }
 .widget .widget-header {
   color: var(--text-widget-header-color);
-  background-color: var(--bg-widget-header-color);
   padding: 10px 15px;
-  border-bottom: 1px solid var(--border-widget-color);
   line-height: 30px;
 }
 .widget .widget-header i {
@@ -192,6 +146,7 @@ div.input-mask {
 }
 .widget .widget-body {
   padding: 20px;
+  border-radius: 8px;
 }
 .widget .widget-body table thead {
   background: var(--bg-widget-table-color);

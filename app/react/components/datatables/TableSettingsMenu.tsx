@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { PropsWithChildren, ReactNode } from 'react';
+import { MoreVertical } from 'react-feather';
 
 import { useTableContext } from './TableContainer';
 
@@ -23,7 +24,13 @@ export function TableSettingsMenu({
               'setting-active': isExpanded,
             })}
           >
-            <i className="fa fa-cog" aria-hidden="true" /> Settings
+            <MoreVertical
+              size="13"
+              className="space-right"
+              strokeWidth="3px"
+              aria-hidden="true"
+              aria-label="Settings"
+            />
           </MenuButton>
           <MenuList>
             <div className="tableMenu">

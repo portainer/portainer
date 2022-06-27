@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { ColumnInstance } from 'react-table';
+import { Columns } from 'react-feather';
 
 import { Checkbox } from '@@/form-components/Checkbox';
 
@@ -28,7 +29,13 @@ export function ColumnVisibilityMenu<D extends object>({
               'setting-active': isExpanded,
             })}
           >
-            <i className="fa fa-columns" aria-hidden="true" /> Columns
+            <Columns
+              size="13"
+              className="space-right"
+              strokeWidth="3px"
+              aria-hidden="true"
+              aria-label="Columns"
+            />
           </MenuButton>
           <MenuList>
             <div className="tableMenu">

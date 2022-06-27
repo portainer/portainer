@@ -67,7 +67,6 @@ body,
 }
 
 .form-section-title {
-  border-bottom: 1px solid var(--border-form-section-title-color);
   margin-top: 5px;
   margin-bottom: 15px;
   color: var(--text-form-section-title-color);
@@ -149,7 +148,7 @@ a[ng-click] {
 }
 
 .fa.red-icon {
-  color: #ae2323;
+  color: #f04438;
 }
 
 .fa.orange-icon {
@@ -221,12 +220,13 @@ a[ng-click] {
 }
 
 .blocklist-item {
-  padding: 7px;
-  margin-bottom: 7px;
+  padding: 10px;
+  margin-bottom: 10px;
   cursor: pointer;
-  border: 1px solid var(--border-blocklist-color);
-  border-radius: 2px;
+  border: 1px solid var(--border-blocklist);
+  border-radius: 8px;
   box-shadow: var(--shadow-box-color);
+  margin-right: 10px;
 }
 
 .blocklist-item--disabled {
@@ -243,6 +243,7 @@ a[ng-click] {
 .blocklist-item:hover {
   background-color: var(--bg-blocklist-hover-color);
   color: var(--text-blocklist-hover-color);
+  border: 1px solid var(--ui-blue-4);
 }
 
 .blocklist-item-box {
@@ -379,12 +380,13 @@ a[ng-click] {
 }
 
 .panel-body {
-  padding-top: 30px;
-  background-color: var(--white-color) fff;
+  padding: 30px 25px;
+  background-color: var(--white-color);
+  border-radius: 8px;
 }
 
 .user-box {
-  margin-right: 25px;
+  margin-right: 15px;
 }
 
 .select-endpoint {
@@ -807,11 +809,12 @@ json-tree .branch-preview {
 }
 /* !spinkit override */
 
-.kubectl-shell {
-  display: block;
-  text-align: center;
-  padding-bottom: 5px;
+/* uib-typeahead override */
+#scrollable-dropdown-menu .dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
 }
+/* !uib-typeahead override */
 
 .no-margin {
   margin: 0 !important;

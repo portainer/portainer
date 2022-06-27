@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { Team } from '@/portainer/teams/types';
 import { Role, User, UserId } from '@/portainer/users/types';
+import { Environment } from '@/portainer/environments/types';
 
 export function createMockUsers(
   count: number,
@@ -58,4 +59,37 @@ export function createMockResourceGroups(subscription: string, count: number) {
   }));
 
   return { value: resourceGroups };
+}
+
+export function createMockEnvironment(): Environment {
+  return {
+    TagIds: [],
+    GroupId: 1,
+    Type: 1,
+    Name: 'environment',
+    Status: 1,
+    URL: 'url',
+    Snapshots: [],
+    Kubernetes: { Snapshots: [] },
+    EdgeKey: '',
+    Id: 3,
+    UserTrusted: false,
+    Edge: {
+      AsyncMode: false,
+      PingInterval: 0,
+      CommandInterval: 0,
+      SnapshotInterval: 0,
+    },
+    SecuritySettings: {
+      allowBindMountsForRegularUsers: false,
+      allowPrivilegedModeForRegularUsers: false,
+      allowContainerCapabilitiesForRegularUsers: false,
+      allowDeviceMappingForRegularUsers: false,
+      allowHostNamespaceForRegularUsers: false,
+      allowStackManagementForRegularUsers: false,
+      allowSysctlSettingForRegularUsers: false,
+      allowVolumeBrowserForRegularUsers: false,
+      enableHostManagementFeatures: false,
+    },
+  };
 }

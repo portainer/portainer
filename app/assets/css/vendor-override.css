@@ -1,7 +1,7 @@
 /* Overide Vendor CSS */
 .form-control {
-  background-color: var(--bg-main-color) !important;
   border: 1px solid var(--border-form-control-color);
+  background-color: var(--bg-inputbox);
   color: var(--text-form-control-color);
 }
 
@@ -10,7 +10,7 @@
 }
 
 .table > thead > tr > th {
-  border-bottom: 2px solid var(--border-table-color);
+  border-bottom: 1px solid var(--border-table-color);
 }
 
 .table-hover > tbody > tr:hover {
@@ -243,6 +243,10 @@ json-tree .branch-preview {
 .panel {
   border: 1px solid var(--border-panel-color);
   background-color: var(--bg-panel-body-color);
+  border-radius: 8px;
+  -webkit-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
 }
 
 .theme-information .col-sm-12 {
@@ -380,4 +384,11 @@ fieldset[disabled] .btn {
 
 .multiSelect.inlineBlock button {
   margin: 0;
+}
+
+.nav-tabs > li.active > a {
+  border-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  border-bottom: 3px solid red;
 }

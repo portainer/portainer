@@ -15,12 +15,5 @@ export const heartbeat: Column<Environment> = {
 export function StatusCell({
   row: { original: environment },
 }: CellProps<Environment>) {
-  return (
-    <EdgeIndicator
-      checkInInterval={environment.EdgeCheckinInterval}
-      edgeId={environment.EdgeID}
-      lastCheckInDate={environment.LastCheckInDate}
-      queryDate={environment.QueryDate}
-    />
-  );
+  return <EdgeIndicator environment={environment} />;
 }

@@ -1,12 +1,11 @@
 .datatable .toolBar {
   background-color: var(--bg-card-color);
-  color: var(--text-main-color);
   overflow: auto;
   padding: 10px;
+  font-size: 16px;
 }
 
 .datatable .actionBar {
-  color: #767676;
   padding: 10px;
 }
 
@@ -26,12 +25,11 @@
 }
 
 .datatable .toolBar .setting-active {
-  color: #337ab7;
+  color: var(--ui-blue-4);
 }
 
 .datatable .searchBar {
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
+  border: 1px solid var(--border-color);
   padding: 8px;
   background: var(--bg-main-color);
 }
@@ -116,7 +114,7 @@
 
 .tableMenu {
   color: #767676;
-  padding: 10px;
+  padding: 15px;
   background-color: var(--bg-dropdown-menu-color) !important;
 }
 
@@ -125,11 +123,8 @@
 }
 
 .tableMenu .menuContent {
-  border-bottom: 1px solid #777;
   font-size: 12px;
   margin: 10px 0;
-  max-height: 140px;
-  overflow-y: auto;
 }
 
 .tableMenu .menuContent .md-radio:first-child {
