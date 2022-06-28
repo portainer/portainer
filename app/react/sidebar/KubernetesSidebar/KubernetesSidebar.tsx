@@ -21,13 +21,18 @@ export function KubernetesSidebar({ environmentId }: Props) {
     <>
       {isOpen && <KubectlShellButton environmentId={environmentId} />}
 
-      <DashboardLink environmentId={environmentId} platformPath="kubernetes" />
+      <DashboardLink
+        environmentId={environmentId}
+        platformPath="kubernetes"
+        data-cy="k8sSidebar-dashboard"
+      />
 
       <SidebarItem
         to="kubernetes.templates.custom"
         params={{ endpointId: environmentId }}
         icon={Edit}
         label="Custom Templates"
+        data-cy="k8sSidebar-customTemplates"
       />
 
       <SidebarItem
@@ -35,6 +40,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         params={{ endpointId: environmentId }}
         icon={Layers}
         label="Namespaces"
+        data-cy="k8sSidebar-namespaces"
       />
 
       <Authorized authorizations="HelmInstallChart">
@@ -43,6 +49,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
           params={{ endpointId: environmentId }}
           icon={Loader}
           label="Helm"
+          data-cy="k8sSidebar-helm"
         />
       </Authorized>
 
@@ -51,6 +58,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         params={{ endpointId: environmentId }}
         icon={Box}
         label="Applications"
+        data-cy="k8sSidebar-applications"
       />
 
       <SidebarItem
@@ -58,21 +66,28 @@ export function KubernetesSidebar({ environmentId }: Props) {
         params={{ endpointId: environmentId }}
         icon={Lock}
         label="ConfigMaps & Secrets"
+        data-cy="k8sSidebar-configurations"
       />
 
-      <VolumesLink environmentId={environmentId} platformPath="kubernetes" />
+      <VolumesLink
+        environmentId={environmentId}
+        platformPath="kubernetes"
+        data-cy="k8sSidebar-volumes"
+      />
 
       <SidebarItem
         label="Cluster"
         to="kubernetes.cluster"
         icon={Server}
         params={{ endpointId: environmentId }}
+        data-cy="k8sSidebar-cluster"
       >
         <Authorized authorizations="K8sClusterSetupRW" adminOnlyCE>
           <SidebarItem
             to="portainer.k8sendpoint.kubernetesConfig"
             params={{ id: environmentId }}
             label="Setup"
+            data-cy="k8sSidebar-setup"
           />
         </Authorized>
 
@@ -81,6 +96,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
             to="portainer.k8sendpoint.securityConstraint"
             params={{ id: environmentId }}
             label="Security constraints"
+            data-cy="k8sSidebar-securityConstraints"
           />
         </Authorized>
 
@@ -88,6 +104,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
           to="kubernetes.registries"
           params={{ endpointId: environmentId }}
           label="Registries"
+          data-cy="k8sSidebar-registries"
         />
       </SidebarItem>
     </>

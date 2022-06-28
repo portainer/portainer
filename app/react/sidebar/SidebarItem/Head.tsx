@@ -6,12 +6,17 @@ import {
 import clsx from 'clsx';
 import { ComponentProps } from 'react';
 
+import { AutomationTestingProps } from '@/types';
+
 import { Link } from '@@/Link';
 import { IconProps, Icon } from '@@/Icon';
 
 import { useSidebarState } from '../useSidebarState';
 
-interface Props extends IconProps, ComponentProps<typeof Link> {
+interface Props
+  extends IconProps,
+    ComponentProps<typeof Link>,
+    AutomationTestingProps {
   label: string;
   ignorePaths?: string[];
 }
@@ -23,6 +28,7 @@ export function Head({
   label,
   icon,
   ignorePaths = [],
+  'data-cy': dataCy,
 }: Props) {
   const { isOpen } = useSidebarState();
   const anchorProps = useSrefActive(
@@ -43,6 +49,7 @@ export function Head({
         'text-inherit no-underline hover:no-underline hover:text-inherit focus:no-underline focus:text-inherit w-full flex-1 rounded-md',
         { 'px-3': isOpen }
       )}
+      data-cy={dataCy}
     >
       <div
         className={clsx('flex items-center h-8 space-x-4 text-sm', {

@@ -1,12 +1,14 @@
 import { ReactNode } from 'react';
 import { Icon } from 'react-feather';
 
+import { AutomationTestingProps } from '@/types';
+
 import { Wrapper } from './Wrapper';
 import { Menu } from './Menu';
 import { Head } from './Head';
 import { getPathsForChildren } from './utils';
 
-interface Props {
+interface Props extends AutomationTestingProps {
   icon?: Icon;
   to: string;
   params?: object;
@@ -22,6 +24,7 @@ export function SidebarItem({
   params,
   label,
   openOnPaths = [],
+  'data-cy': dataCy,
 }: Props) {
   const childrenPath = getPathsForChildren(children);
   const head = (
@@ -31,6 +34,7 @@ export function SidebarItem({
       params={params}
       label={label}
       ignorePaths={childrenPath}
+      data-cy={dataCy}
     />
   );
 

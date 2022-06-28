@@ -58,27 +58,35 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         label: 'Swarm',
         icon: Trello,
         to: 'docker.swarm',
+        dataCy: 'portainerSidebar-swarm',
       }
     : {
         label: 'Host',
         icon: Trello,
         to: 'docker.host',
+        dataCy: 'portainerSidebar-host',
       };
 
   return (
     <>
-      <DashboardLink environmentId={environmentId} platformPath="docker" />
+      <DashboardLink
+        environmentId={environmentId}
+        platformPath="docker"
+        data-cy="dockerSidebar-dashboard"
+      />
 
       <SidebarItem
         label="App Templates"
         icon={Edit}
         to="docker.templates"
         params={{ endpointId: environmentId }}
+        data-cy="portainerSidebar-appTemplates"
       >
         <SidebarItem
           label="Custom Templates"
           to="docker.templates.custom"
           params={{ endpointId: environmentId }}
+          data-cy="dockerSidebar-customTemplates"
         />
       </SidebarItem>
 
@@ -88,6 +96,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           params={{ endpointId: environmentId }}
           icon={Layers}
           label="Stacks"
+          data-cy="dockerSidebar-stacks"
         />
       )}
 
@@ -97,6 +106,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           params={{ endpointId: environmentId }}
           icon={Shuffle}
           label="Services"
+          data-cy="dockerSidebar-services"
         />
       )}
 
@@ -105,6 +115,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         params={{ endpointId: environmentId }}
         icon={Box}
         label="Containers"
+        data-cy="dockerSidebar-containers"
       />
 
       <SidebarItem
@@ -112,6 +123,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         params={{ endpointId: environmentId }}
         icon={List}
         label="Images"
+        data-cy="dockerSidebar-images"
       />
 
       <SidebarItem
@@ -119,9 +131,14 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         params={{ endpointId: environmentId }}
         icon={Share2}
         label="Networks"
+        data-cy="dockerSidebar-networks"
       />
 
-      <VolumesLink environmentId={environmentId} platformPath="docker" />
+      <VolumesLink
+        environmentId={environmentId}
+        platformPath="docker"
+        data-cy="dockerSidebar-volumes"
+      />
 
       {apiVersion >= 1.3 && isSwarmManager && (
         <SidebarItem
@@ -129,6 +146,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           params={{ endpointId: environmentId }}
           icon={Clipboard}
           label="Configs"
+          data-cy="dockerSidebar-configs"
         />
       )}
 
@@ -138,6 +156,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           params={{ endpointId: environmentId }}
           icon={Lock}
           label="Secrets"
+          data-cy="dockerSidebar-secrets"
         />
       )}
 
@@ -147,6 +166,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           params={{ endpointId: environmentId }}
           icon={Clock}
           label="Events"
+          data-cy="dockerSidebar-events"
         />
       )}
 
@@ -155,6 +175,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         icon={setupSubMenuProps.icon}
         to={setupSubMenuProps.to}
         params={{ endpointId: environmentId }}
+        data-cy={setupSubMenuProps.dataCy}
       >
         <Authorized
           authorizations="PortainerEndpointUpdateSettings"

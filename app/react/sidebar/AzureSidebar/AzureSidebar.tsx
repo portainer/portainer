@@ -12,12 +12,17 @@ interface Props {
 export function AzureSidebar({ environmentId }: Props) {
   return (
     <>
-      <DashboardLink environmentId={environmentId} platformPath="azure" />
+      <DashboardLink
+        environmentId={environmentId}
+        platformPath="azure"
+        data-cy="azureSidebar-dashboard"
+      />
       <SidebarItem
         to="azure.containerinstances"
         params={{ endpointId: environmentId }}
         icon={Box}
         label="Container instances"
+        data-cy="azureSidebar-containerInstances"
       />
     </>
   );

@@ -27,10 +27,25 @@ export function SettingsSidebar({ isAdmin }: Props) {
   return (
     <SidebarSection title="Settings">
       {showUsersSection && (
-        <SidebarItem to="portainer.users" label="Users" icon={Users}>
-          <SidebarItem to="portainer.teams" label="Teams" />
+        <SidebarItem
+          to="portainer.users"
+          label="Users"
+          icon={Users}
+          data-cy="portainerSidebar-users"
+        >
+          <SidebarItem
+            to="portainer.teams"
+            label="Teams"
+            data-cy="portainerSidebar-teams"
+          />
 
-          {isAdmin && <SidebarItem to="portainer.roles" label="Roles" />}
+          {isAdmin && (
+            <SidebarItem
+              to="portainer.roles"
+              label="Roles"
+              data-cy="portainerSidebar-roles"
+            />
+          )}
         </SidebarItem>
       )}
       {isAdmin && (
@@ -40,15 +55,25 @@ export function SettingsSidebar({ isAdmin }: Props) {
             to="portainer.endpoints"
             icon={HardDrive}
             openOnPaths={['portainer.wizard.endpoints']}
+            data-cy="portainerSidebar-environments"
           >
-            <SidebarItem to="portainer.groups" label="Groups" />
-            <SidebarItem to="portainer.tags" label="Tags" />
+            <SidebarItem
+              to="portainer.groups"
+              label="Groups"
+              data-cy="portainerSidebar-environmentGroups"
+            />
+            <SidebarItem
+              to="portainer.tags"
+              label="Tags"
+              data-cy="portainerSidebar-environmentTags"
+            />
           </SidebarItem>
 
           <SidebarItem
             label="Registries"
             to="portainer.registries"
             icon={Radio}
+            data-cy="portainerSidebar-registries"
           />
 
           {process.env.PORTAINER_EDITION !== 'CE' && (
@@ -56,6 +81,7 @@ export function SettingsSidebar({ isAdmin }: Props) {
               to="portainer.licenses"
               label="Licenses"
               icon={Award}
+              data-cy="portainerSidebar-licenses"
             />
           )}
 
@@ -63,22 +89,38 @@ export function SettingsSidebar({ isAdmin }: Props) {
             label="Authentication logs"
             to="portainer.authLogs"
             icon={FileText}
+            data-cy="portainerSidebar-authLogs"
           >
-            <SidebarItem to="portainer.activityLogs" label="Activity Logs" />
+            <SidebarItem
+              to="portainer.activityLogs"
+              label="Activity Logs"
+              data-cy="portainerSidebar-activityLogs"
+            />
           </SidebarItem>
 
-          <SidebarItem to="portainer.settings" label="Settings" icon={Settings}>
+          <SidebarItem
+            to="portainer.settings"
+            label="Settings"
+            icon={Settings}
+            data-cy="portainerSidebar-settings"
+          >
             {!window.ddExtension && (
               <SidebarItem
                 to="portainer.settings.authentication"
                 label="Authentication"
+                data-cy="portainerSidebar-authentication"
               />
             )}
-            <SidebarItem to="portainer.settings.cloud" label="Cloud" />
+            <SidebarItem
+              to="portainer.settings.cloud"
+              label="Cloud"
+              data-cy="portainerSidebar-cloud"
+            />
 
             <SidebarItem
               to="portainer.settings.edgeCompute"
               label="Edge Compute"
+              data-cy="portainerSidebar-edgeCompute"
             />
 
             <SidebarItem.Wrapper label="Help / About">
@@ -90,7 +132,7 @@ export function SettingsSidebar({ isAdmin }: Props) {
                 }
                 target="_blank"
                 rel="noreferrer"
-                className="px-3 rounded flex h-full items-center"
+                className="px-3 rounded flex h-8 items-center"
               >
                 Help / About
               </a>
