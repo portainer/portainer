@@ -10,7 +10,7 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 
 import { NameField } from '../NameField';
 import { MoreSettingsSection } from '../MoreSettingsSection';
-import { Hardware } from '../Hardware';
+import { Hardware } from '../Hardware/Hardware';
 
 import { EnvironmentUrlField } from './EnvironmentUrlField';
 import { validation } from './AgentForm.validation';

@@ -9,7 +9,7 @@ import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons/LoadingButton';
 
 import { MoreSettingsSection } from '../../MoreSettingsSection';
-import { Hardware } from '../../Hardware';
+import { Hardware } from '../../Hardware/Hardware';
 
 import { EdgeAgentFieldset } from './EdgeAgentFieldset';
 import { validationSchema } from './EdgeAgentForm.validation';

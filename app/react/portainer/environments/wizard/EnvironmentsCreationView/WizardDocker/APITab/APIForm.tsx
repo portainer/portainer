@@ -2,7 +2,7 @@ import { Field, Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
 import { useCreateRemoteEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
-import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware';
+import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
 import {
   Environment,
