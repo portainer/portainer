@@ -18,7 +18,7 @@ export function Footer() {
   return (
     <div className={clsx(styles.root, 'text-center')}>
       {process.env.PORTAINER_EDITION === 'CE' && <UpdateNotification />}
-      <div className="text-xs space-x-1 text-grey-8">
+      <div className="text-xs space-x-1 text-gray-5 be:text-gray-6">
         <span>&copy;</span>
         <span>Portainer {Edition}</span>
 
