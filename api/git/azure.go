@@ -539,3 +539,9 @@ func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([
 
 	return filteredRet, nil
 }
+
+func (a *azureDownloader) removeCache(ctx context.Context, opt cloneOptions) {
+	delete(a.repoRefCache, opt.repositoryUrl)
+	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
+	delete(a.repoTreeCache, repoKey)
+}

@@ -177,6 +177,15 @@ func Test_listRemotePrivateRepository(t *testing.T) {
 		{
 			name:        "list refs of a real private repository with incorrect credential",
 			url:         privateGitRepoURL,
+			username:    "test-username",
+			accessToken: "test-token",
+			expect: expectResult{
+				err: ErrAuthenticationFailure,
+			},
+		},
+		{
+			name:        "list refs of a fake repository without providing credential",
+			url:         privateGitRepoURL + "fake",
 			username:    "",
 			accessToken: "",
 			expect: expectResult{
@@ -238,6 +247,17 @@ func Test_listTreePrivateRepository(t *testing.T) {
 		{
 			name:        "list tree with real repository and head ref but incorrect credential",
 			url:         privateGitRepoURL,
+			ref:         "refs/heads/main",
+			username:    "test-username",
+			accessToken: "test-token",
+			exts:        []string{},
+			expect: expectResult{
+				err: ErrAuthenticationFailure,
+			},
+		},
+		{
+			name:        "list tree with real repository and head ref but no credential",
+			url:         privateGitRepoURL + "fake",
 			ref:         "refs/heads/main",
 			username:    "",
 			accessToken: "",
@@ -318,4 +338,38 @@ func Test_listTreePrivateRepository(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_removeCache(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	repository := privateGitRepoURL
+	referenceName := "refs/heads/main"
+	accessToken := getRequiredValue(t, "GITHUB_PAT")
+	username := getRequiredValue(t, "GITHUB_USERNAME")
+
+	client := gitClient{
+		preserveGitDirectory: true,
+		cacheEnabled:         true,
+		repoRefCache:         make(map[string][]*plumbing.Reference),
+		repoTreeCache:        make(map[string][]string),
+	}
+	service := Service{git: client}
+
+	_, err := service.ListRemote(repository, username, accessToken)
+	assert.NoError(t, err)
+	_, ok := client.repoRefCache[repository]
+	assert.Equal(t, true, ok)
+
+	_, err = service.ListTree(repository, referenceName, username, accessToken, []string{})
+	assert.NoError(t, err)
+	repoKey := generateCacheKey(repository, referenceName)
+	_, ok = client.repoTreeCache[repoKey]
+	assert.Equal(t, true, ok)
+
+	service.RemoveCache(repository, referenceName)
+	_, ok = client.repoRefCache[repository]
+	assert.Equal(t, false, ok)
+	_, ok = client.repoTreeCache[repoKey]
+	assert.Equal(t, false, ok)
 }

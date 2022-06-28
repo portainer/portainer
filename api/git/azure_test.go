@@ -375,6 +375,9 @@ func (t *testDownloader) listTree(_ context.Context, _ fetchOptions) ([]string, 
 	return nil, nil
 }
 
+func (t *testDownloader) removeCache(_ context.Context, _ cloneOptions) {
+}
+
 func Test_cloneRepository_azure(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -522,7 +525,7 @@ func Test_listTree_azure(t *testing.T) {
 			},
 		},
 		{
-			name:        "list tree with real repository and head ref but no  credential",
+			name:        "list tree with real repository and head ref but no credential",
 			url:         privateAzureRepoURL,
 			ref:         "refs/heads/main",
 			username:    "",
@@ -604,4 +607,32 @@ func Test_listTree_azure(t *testing.T) {
 			}
 		})
 	}
+}
+func Test_removeCache_azure(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	repository := privateAzureRepoURL
+	referenceName := "refs/heads/main"
+	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
+	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
+
+	client := NewAzureDownloader(true)
+	service := Service{azure: client}
+
+	_, err := service.ListRemote(repository, username, accessToken)
+	assert.NoError(t, err)
+	_, ok := client.repoRefCache[repository]
+	assert.Equal(t, true, ok)
+
+	_, err = service.ListTree(repository, referenceName, username, accessToken, []string{})
+	assert.NoError(t, err)
+	repoKey := generateCacheKey(repository, referenceName)
+	_, ok = client.repoTreeCache[repoKey]
+	assert.Equal(t, true, ok)
+
+	service.RemoveCache(repository, referenceName)
+	_, ok = client.repoRefCache[repository]
+	assert.Equal(t, false, ok)
+	_, ok = client.repoTreeCache[repoKey]
+	assert.Equal(t, false, ok)
 }

@@ -1313,6 +1313,7 @@ type (
 		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
 		ListRemote(repositoryURL, username, password string) ([]string, error)
 		ListTree(repositoryURL, referenceName, username, password string, includeExts []string) ([]string, error)
+		RemoveCache(repositoryURL, referenceName string)
 	}
 
 	// OpenAMTService represents a service for managing OpenAMT

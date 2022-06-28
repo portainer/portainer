@@ -215,6 +215,12 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 	return filteredRet, nil
 }
 
+func (c gitClient) removeCache(ctx context.Context, opt cloneOptions) {
+	delete(c.repoRefCache, opt.repositoryUrl)
+	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
+	delete(c.repoTreeCache, repoKey)
+}
+
 func generateCacheKey(names ...string) string {
 	return strings.Join(names, "-")
 }

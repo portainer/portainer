@@ -34,6 +34,7 @@ type downloader interface {
 	latestCommitID(ctx context.Context, opt fetchOptions) (string, error)
 	listRemote(ctx context.Context, opt cloneOptions) ([]string, error)
 	listTree(ctx context.Context, opt fetchOptions) ([]string, error)
+	removeCache(ctx context.Context, opt cloneOptions)
 }
 
 // Service represents a service for managing Git.
@@ -120,4 +121,17 @@ func (service *Service) ListTree(repositoryURL, referenceName, username, passwor
 	}
 
 	return service.git.listTree(context.TODO(), options)
+}
+
+func (service *Service) RemoveCache(repositoryURL, referenceName string) {
+	options := cloneOptions{
+		repositoryUrl: repositoryURL,
+		referenceName: referenceName,
+	}
+
+	if isAzureUrl(options.repositoryUrl) {
+		service.azure.removeCache(context.TODO(), options)
+	} else {
+		service.git.removeCache(context.TODO(), options)
+	}
 }

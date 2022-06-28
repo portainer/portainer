@@ -43,6 +43,9 @@ func (g *gitService) ListTree(repositoryURL, referenceName, username, password s
 	return nil, nil
 }
 
+func (g *gitService) RemoveCache(repositoryURL, referenceName string) {
+}
+
 // Helpers
 func setupHandler(t *testing.T) (*Handler, string, func()) {
 	t.Helper()

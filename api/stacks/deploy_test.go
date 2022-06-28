@@ -34,6 +34,9 @@ func (g *gitService) ListTree(repositoryURL, referenceName, username, password s
 	return nil, nil
 }
 
+func (g *gitService) RemoveCache(repositoryURL, referenceName string) {
+}
+
 type noopDeployer struct{}
 
 func (s *noopDeployer) DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool) error {
