@@ -119,9 +119,11 @@ export default class CreateEdgeStackViewController {
   }
 
   onChangeGroups(groups) {
-    this.formValues.Groups = groups;
+    return this.$scope.$evalAsync(() => {
+      this.formValues.Groups = groups;
 
-    this.checkIfEndpointTypes(groups);
+      this.checkIfEndpointTypes(groups);
+    });
   }
 
   checkIfEndpointTypes(groups) {
