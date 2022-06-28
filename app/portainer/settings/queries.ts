@@ -15,12 +15,17 @@ import {
 } from './settings.service';
 import { Settings } from './types';
 
-export function usePublicSettings<T = PublicSettingsViewModel>(
-  select?: (settings: PublicSettingsViewModel) => T
-) {
+export function usePublicSettings<T = PublicSettingsViewModel>({
+  enabled,
+  select,
+}: {
+  select?: (settings: PublicSettingsViewModel) => T;
+  enabled?: boolean;
+} = {}) {
   return useQuery(['settings', 'public'], () => getPublicSettings(), {
     select,
     ...withError('Unable to retrieve public settings'),
+    enabled,
   });
 }
 

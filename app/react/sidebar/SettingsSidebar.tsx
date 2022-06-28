@@ -8,9 +8,9 @@ interface Props {
 }
 
 export function SettingsSidebar({ isAdmin }: Props) {
-  const teamSyncQuery = usePublicSettings<boolean>(
-    (settings) => settings.TeamSync
-  );
+  const teamSyncQuery = usePublicSettings<boolean>({
+    select: (settings) => settings.TeamSync,
+  });
 
   const showUsersSection =
     !window.ddExtension && (isAdmin || teamSyncQuery.data);

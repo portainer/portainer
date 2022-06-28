@@ -30,9 +30,9 @@ export function KubeconfigPrompt({
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
 
-  const expiryQuery = usePublicSettings((settings) =>
-    expiryMessage(settings.KubeconfigExpiry)
-  );
+  const expiryQuery = usePublicSettings({
+    select: (settings) => expiryMessage(settings.KubeconfigExpiry),
+  });
 
   const { selection, toggle: toggleSelection, selectionSize } = useSelection();
   const { environments, totalCount } = useEnvironmentList({

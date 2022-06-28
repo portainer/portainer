@@ -15,6 +15,8 @@ import 'angular-multiselect/isteven-multi-select.css';
 import 'spinkit/spinkit.min.css';
 import '@reach/menu-button/styles.css';
 
+import './colors';
+
 import './rdash.css';
 import './app.css';
 
