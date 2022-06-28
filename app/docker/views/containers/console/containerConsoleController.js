@@ -174,7 +174,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         url = url.replace('http://', 'ws://');
       }
 
-      url = url.replace('8999', '9000');
+      // url = url.replace('8999', '9000');
 
       socket = new WebSocket(url);
 

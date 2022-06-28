@@ -312,7 +312,6 @@ func (handler *Handler) endpointExplorerUpload(w http.ResponseWriter, r *http.Re
 		if len(destination) == 0 {
 			continue
 		}
-		fmt.Println("part.FileName = " + part.FileName() + "  destination=" + destination)
 
 		absPath := projectPath + string(os.PathSeparator) + part.FileName()
 		err = handler.FileService.StoreDockerContainerTempFile(absPath, part)
@@ -331,7 +330,6 @@ func (handler *Handler) endpointExplorerUpload(w http.ResponseWriter, r *http.Re
 	}
 
 	dest := filepath.Join(projectPath, "../") + string(os.PathSeparator) + filepath.Base(projectPath) + ".tar.gz"
-	fmt.Println("gen tar file: " + dest)
 	if err = Compress(files, dest); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "store gzip files failed.", Err: err}
 	}
