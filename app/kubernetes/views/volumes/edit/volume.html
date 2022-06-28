@@ -43,11 +43,7 @@
                       <td>Shared Access Policy</td>
                       <td data-cy="k8sVolDetail-volAccessPolicy"
                         >{{ ctrl.state.volumeSharedAccessPolicy }}
-                        <portainer-tooltip
-                          position="bottom"
-                          ng-if="ctrl.state.volumeSharedAccessPolicyTooltip"
-                          message="{{ ctrl.state.volumeSharedAccessPolicyTooltip }}"
-                        ></portainer-tooltip
+                        <portainer-tooltip ng-if="ctrl.state.volumeSharedAccessPolicyTooltip" message="ctrl.state.volumeSharedAccessPolicyTooltip"></portainer-tooltip
                       ></td>
                     </tr>
                     <tr>

@@ -33,10 +33,7 @@
             <div class="col-sm-12" style="margin-top: 5px">
               <label class="control-label text-left">
                 Driver options
-                <portainer-tooltip
-                  position="bottom"
-                  message="Driver options are specific to the selected driver. Please refer to the selected driver documentation."
-                ></portainer-tooltip>
+                <portainer-tooltip message="'Driver options are specific to the selected driver. Please refer to the selected driver documentation.'"></portainer-tooltip>
               </label>
               <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDriverOption()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> add driver option
@@ -189,7 +186,7 @@
             <div class="col-sm-12">
               <label for="ownership" class="control-label text-left">
                 Isolated network
-                <portainer-tooltip position="bottom" message="An isolated network has no inbound or outbound communications."></portainer-tooltip>
+                <portainer-tooltip message="'An isolated network has no inbound or outbound communications.'"></portainer-tooltip>
               </label>
               <label name="ownership" class="switch" style="margin-left: 20px">
                 <input type="checkbox" ng-model="config.Internal" />
