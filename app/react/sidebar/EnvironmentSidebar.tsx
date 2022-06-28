@@ -106,9 +106,10 @@ function Title({ className, environment, onClear }: TitleProps) {
   return (
     <li className={className}>
       <div className="flex items-center gap-2">
-        <span>Environment</span>
         <EnvironmentIcon className="text-2xl" />
-        <span className="text-white">{environment.Name}</span>
+        <span className="text-white text-ellipsis overflow-hidden whitespace-nowrap">
+          {environment.Name}
+        </span>
 
         <button
           type="button"
