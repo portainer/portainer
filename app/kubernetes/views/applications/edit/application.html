@@ -422,7 +422,7 @@
             <div class="small text-muted" style="margin-bottom: 15px">
               Data access policy: <i class="fa {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyIcon }}" aria-hidden="true"></i>
               {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyText }}
-              <portainer-tooltip position="'right'" message="'{{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyTooltip }}'"> </portainer-tooltip>
+              <portainer-tooltip position="'right'" message="ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyTooltip"> </portainer-tooltip>
             </div>
 
             <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED">
