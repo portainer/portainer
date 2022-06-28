@@ -3,10 +3,10 @@ import { HelpCircle } from 'react-feather';
 
 import styles from './Tooltip.module.css';
 
-type Place = 'top' | 'right' | 'bottom' | 'left';
+type Position = 'top' | 'right' | 'bottom' | 'left';
 
 export interface Props {
-  position?: Place;
+  position?: Position;
   message: string;
 }
 
