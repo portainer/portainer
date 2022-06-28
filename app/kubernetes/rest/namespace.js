@@ -26,6 +26,14 @@ angular.module('portainer.kubernetes').factory('KubernetesNamespaces', [
             transformResponse: rawResponse,
             ignoreLoadingBar: true,
           },
+          getJSON: {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+            transformResponse: rawResponse,
+            ignoreLoadingBar: true,
+          },
           create: { method: 'POST' },
           update: { method: 'PUT' },
           delete: { method: 'DELETE' },

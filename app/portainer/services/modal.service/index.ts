@@ -16,6 +16,7 @@ import {
   confirmWebEditorDiscard,
   confirm,
   confirmForceChangePassword,
+  confirmWithTitle,
 } from './confirm';
 import {
   confirmContainerDeletion,
@@ -58,5 +59,6 @@ export function ModalServiceAngular() {
     selectRegistry,
     confirmContainerDeletion,
     confirmForceChangePassword,
+    confirmWithTitle,
   };
 }
