@@ -113,7 +113,7 @@
     <li ng-show="singleSelection() && singleSelection().isFolder()">
       <a href="" tabindex="-1" ng-click="smartClick(singleSelection())"> <i class="fa fa-folder-open"></i> open </a>
     </li>
-    <li class="divider"></li>
+    <li class="divider" ng-show="singleSelection() && singleSelection().isFolder()"></li>
     <li>
       <a href="" tabindex="-1" ng-click="modal('remove')"> <i class="fa fa-trash"></i> remove </a>
     </li>

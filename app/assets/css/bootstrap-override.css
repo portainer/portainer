@@ -174,7 +174,7 @@ input:checked + .slider:before {
 }
 
 .toolBar > .searchBar {
-  /*flex: right;*/
+  flex: right;
   margin-right: 10px;
   width: 500px;
   height: 30px;
@@ -186,7 +186,7 @@ input:checked + .slider:before {
 }
 
 .toolBar > .actionBar {
-  /*flex: right;*/
+  flex: right;
   margin-right: 10px;
 }
 

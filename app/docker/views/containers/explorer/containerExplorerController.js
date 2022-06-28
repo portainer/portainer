@@ -5,13 +5,13 @@ angular
   .module('portainer.docker')
   .controller('ContainerExplorerController', [
     '$scope',
-    '$window',
+    '$document',
     '$transition$',
     'Notifications',
     'ContainerService',
     'HttpRequestHelper',
     'ExplorerService',
-    function ($scope, $window, $transition$, Notifications, ContainerService, HttpRequestHelper, ExplorerService) {
+    function ($scope, $document, $transition$, Notifications, ContainerService, HttpRequestHelper, ExplorerService) {
       $scope.explorerService = ExplorerService;
       $scope.fileList = [];
       $scope.temps = [];
@@ -27,6 +27,40 @@ angular
         $scope.explorerService.fileList = [];
         $scope.explorerService.history = [];
         $scope.fileList = [];
+      });
+
+      $document.on('click', function () {
+        angular.element('#context-menu').hide();
+      });
+
+      $document.on('shown.bs.modal', '.modal', function () {
+        window.setTimeout(
+          function () {
+            angular.element('[autofocus]', this).focus();
+          }.bind(this),
+          100
+        );
+      });
+
+      $document.on('contextmenu', '.table-files tr.item-list:has("td"), .item-list', function (e) {
+        var menu = angular.element('#context-menu');
+
+        if (e.pageX >= window.innerWidth - menu.width()) {
+          e.pageX -= menu.width();
+        }
+        if (e.pageY >= window.innerHeight - menu.height()) {
+          e.pageY -= menu.height();
+        }
+
+        menu
+          .hide()
+          .css({
+            left: e.pageX,
+            top: e.pageY,
+          })
+          .appendTo('body')
+          .show();
+        e.preventDefault();
       });
 
       $scope.$watch('temps', function () {
@@ -61,20 +95,6 @@ angular
       $scope.selectOrUnselect = function (item, $event) {
         var indexInTemp = $scope.temps.indexOf(item);
         const isRightClick = $event && $event.which === 3;
-
-        var menu = angular.element('#context-menu');
-        if (isRightClick) {
-          if ($event.pageY >= $window.innerHeight - menu.height()) {
-            $event.pageY -= menu.height();
-          }
-          menu.css({
-            left: $event.pageX - 250,
-            top: $event.pageY,
-          });
-          menu.show();
-        } else {
-          menu.hide();
-        }
 
         if ($event && $event.target.hasAttribute('prevent')) {
           $scope.temps = [];
