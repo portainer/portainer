@@ -9,7 +9,7 @@ import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { isEdgeEnvironment } from '@/portainer/environments/utils';
 
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
-import { GpusListAngular } from 'Portainer/views/endpoints/edit/GpusList';
+import { GpusListAngular } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
 
 angular.module('portainer.app').component('gpusList', GpusListAngular).controller('EndpointController', EndpointController);
 

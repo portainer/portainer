@@ -1,5 +1,9 @@
 import { useField } from 'formik';
-import { Gpu, GpusList } from 'Portainer/views/endpoints/edit/GpusList';
+
+import {
+  Gpu,
+  GpusList,
+} from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
 
 import { FormSection } from '@@/form-components/FormSection';
 

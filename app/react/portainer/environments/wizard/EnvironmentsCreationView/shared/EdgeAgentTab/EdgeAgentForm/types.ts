@@ -1,5 +1,4 @@
-import { Gpu } from 'Portainer/views/endpoints/edit/GpusList';
-
+import { Gpu } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
 import { EnvironmentMetadata } from '@/portainer/environments/environment.service/create';
 
 export interface FormValues {

@@ -1,5 +1,6 @@
 import { boolean, object, SchemaOf, string } from 'yup';
-import { gpusListValidation } from 'Portainer/views/endpoints/edit/GpusList';
+
+import { gpusListValidation } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
 
 import { metadataValidation } from '../../shared/MetadataFieldset/validation';
 import { nameValidation } from '../../shared/NameField';
