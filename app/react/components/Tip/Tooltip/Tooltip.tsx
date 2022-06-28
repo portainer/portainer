@@ -1,5 +1,6 @@
 import ReactTooltip from 'react-tooltip';
 import { HelpCircle } from 'react-feather';
+import clsx from 'clsx';
 
 import styles from './Tooltip.module.css';
 
@@ -12,7 +13,10 @@ export interface Props {
 
 export function Tooltip({ message, position = 'bottom' }: Props) {
   return (
-    <span data-tip={message} className={styles.icon}>
+    <span
+      data-tip={message}
+      className={clsx(styles.icon, 'inline-flex text-base')}
+    >
       <HelpCircle className="feather" aria-hidden="true" />
       <ReactTooltip
         multiline

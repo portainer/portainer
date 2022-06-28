@@ -479,10 +479,9 @@ input:checked + .slider:before {
 /* Feather Icon Variants */
 
 .feather {
-  display: block;
-  color: var(--text-body-color);
-  height: 18px;
-  width: 18px;
+  height: 1em;
+  width: 1em;
+  color: inherit;
 }
 
 .icon-xs {
@@ -571,4 +570,12 @@ input:checked + .slider:before {
 .required:after {
   content: '*';
   color: var(--ui-error-9);
+}
+
+portainer-tooltip {
+  @apply inline-flex;
+}
+
+.control-label {
+  @apply inline-flex items-center;
 }

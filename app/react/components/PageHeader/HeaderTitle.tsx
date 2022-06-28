@@ -27,7 +27,12 @@ export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
       {title}
       <span className="header_title_content">{children}</span>
       <Menu>
-        <MenuButton className={clsx('pull-right', styles.menuButton)}>
+        <MenuButton
+          className={clsx(
+            'pull-right flex items-center gap-1',
+            styles.menuButton
+          )}
+        >
           <User className="icon-nested-gray" />
           {user && <span>{user.Username}</span>}
           <ChevronDown className={styles.arrowDown} />
