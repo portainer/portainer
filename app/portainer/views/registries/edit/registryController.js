@@ -63,6 +63,26 @@ export default class RegistryController {
     );
   }
 
+  getRegistryProvider(registryType) {
+    switch (registryType) {
+      case RegistryTypes.QUAY:
+        return 'Quay.io';
+      case RegistryTypes.AZURE:
+        return 'Azure';
+      case RegistryTypes.CUSTOM:
+        return 'Custom';
+      case RegistryTypes.GITLAB:
+        return 'Gitlab';
+      case RegistryTypes.PROGET:
+        return 'ProGet';
+      case RegistryTypes.DOCKERHUB:
+        return 'Docker Hub';
+      case RegistryTypes.ECR:
+        return 'AWS ECR';
+      default:
+        return '';
+    }
+  }
   async $onInit() {
     try {
       this.state.loading = true;
@@ -70,6 +90,7 @@ export default class RegistryController {
       const registryId = this.$state.params.id;
       const registry = await this.RegistryService.registry(registryId);
       this.registry = registry;
+      this.provider = this.getRegistryProvider(registry.Type);
       this.formValues.Name = registry.Name;
 
       const registries = await this.RegistryService.registries();
