@@ -31,7 +31,7 @@ export function SettingsSidebar({ isAdmin }: Props) {
           to="portainer.users"
           label="Users"
           icon={Users}
-          data-cy="portainerSidebar-Users"
+          data-cy="portainerSidebar-users"
         >
           <SidebarItem
             to="portainer.teams"
@@ -55,17 +55,17 @@ export function SettingsSidebar({ isAdmin }: Props) {
             to="portainer.endpoints"
             icon={HardDrive}
             openOnPaths={['portainer.wizard.endpoints']}
-            data-cy="portainerSidebar-Environments"
+            data-cy="portainerSidebar-environments"
           >
             <SidebarItem
               to="portainer.groups"
               label="Groups"
-              data-cy="portainerSidebar-endpointGroups"
+              data-cy="portainerSidebar-environmentGroups"
             />
             <SidebarItem
               to="portainer.tags"
               label="Tags"
-              data-cy="portainerSidebar-endpointTags"
+              data-cy="portainerSidebar-environmentTags"
             />
           </SidebarItem>
 
@@ -102,7 +102,7 @@ export function SettingsSidebar({ isAdmin }: Props) {
             to="portainer.settings"
             label="Settings"
             icon={Settings}
-            data-cy="portainerSidebar-Settings"
+            data-cy="portainerSidebar-settings"
           >
             {!window.ddExtension && (
               <SidebarItem

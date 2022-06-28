@@ -58,13 +58,13 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         label: 'Swarm',
         icon: Trello,
         to: 'docker.swarm',
-        dataCy: 'portainerSidebar-Swarm',
+        dataCy: 'portainerSidebar-swarm',
       }
     : {
         label: 'Host',
         icon: Trello,
         to: 'docker.host',
-        dataCy: 'portainerSidebar-Host',
+        dataCy: 'portainerSidebar-host',
       };
 
   return (
@@ -80,7 +80,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         icon={Edit}
         to="docker.templates"
         params={{ endpointId: environmentId }}
-        data-cy="portainerSidebar-App Templates"
+        data-cy="portainerSidebar-appTemplates"
       >
         <SidebarItem
           label="Custom Templates"
