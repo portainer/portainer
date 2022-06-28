@@ -1,7 +1,12 @@
+import { Box, Edit, Layers, Loader, Lock, Server } from 'react-feather';
+
 import { EnvironmentId } from '@/portainer/environments/types';
 import { Authorized } from '@/portainer/hooks/useUser';
 
+import { DashboardLink } from '../items/DashboardLink';
 import { SidebarItem } from '../SidebarItem';
+import { VolumesLink } from '../items/VolumesLink';
+import { useSidebarState } from '../useSidebarState';
 
 import { KubectlShellButton } from './KubectlShell';
 
@@ -10,28 +15,25 @@ interface Props {
 }
 
 export function KubernetesSidebar({ environmentId }: Props) {
+  const { isOpen } = useSidebarState();
+
   return (
     <>
-      <KubectlShellButton environmentId={environmentId} />
+      {isOpen && <KubectlShellButton environmentId={environmentId} />}
 
-      <SidebarItem
-        to="kubernetes.dashboard"
-        params={{ endpointId: environmentId }}
-        iconClass="fa-tachometer-alt fa-fw"
-        label="Dashboard"
-      />
+      <DashboardLink environmentId={environmentId} platformPath="kubernetes" />
 
       <SidebarItem
         to="kubernetes.templates.custom"
         params={{ endpointId: environmentId }}
-        iconClass="fa-rocket fa-fw"
+        icon={Edit}
         label="Custom Templates"
       />
 
       <SidebarItem
         to="kubernetes.resourcePools"
         params={{ endpointId: environmentId }}
-        iconClass="fa-layer-group fa-fw"
+        icon={Layers}
         label="Namespaces"
       />
 
@@ -39,7 +41,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         <SidebarItem
           to="kubernetes.templates.helm"
           params={{ endpointId: environmentId }}
-          iconClass="fa-dharmachakra fa-fw"
+          icon={Loader}
           label="Helm"
         />
       </Authorized>
@@ -47,28 +49,23 @@ export function KubernetesSidebar({ environmentId }: Props) {
       <SidebarItem
         to="kubernetes.applications"
         params={{ endpointId: environmentId }}
-        iconClass="fa-laptop-code fa-fw"
+        icon={Box}
         label="Applications"
       />
 
       <SidebarItem
         to="kubernetes.configurations"
         params={{ endpointId: environmentId }}
-        iconClass="fa-file-code fa-fw"
+        icon={Lock}
         label="ConfigMaps & Secrets"
       />
 
-      <SidebarItem
-        to="kubernetes.volumes"
-        params={{ endpointId: environmentId }}
-        iconClass="fa-database fa-fw"
-        label="Volumes"
-      />
+      <VolumesLink environmentId={environmentId} platformPath="kubernetes" />
 
       <SidebarItem
-        iconClass="fa-server fa-fw"
         label="Cluster"
         to="kubernetes.cluster"
+        icon={Server}
         params={{ endpointId: environmentId }}
       >
         <Authorized authorizations="K8sClusterSetupRW" adminOnlyCE>

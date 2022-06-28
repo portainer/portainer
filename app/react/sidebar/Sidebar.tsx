@@ -1,3 +1,6 @@
+import clsx from 'clsx';
+import { Home } from 'react-feather';
+
 import { useUser } from '@/portainer/hooks/useUser';
 import { useIsTeamLeader } from '@/portainer/users/queries';
 import { usePublicSettings } from '@/portainer/settings/queries';
@@ -26,15 +29,19 @@ export function Sidebar() {
   return (
     /* in the future (when we remove r2a) this should wrap the whole app - to change root styles */
     <SidebarProvider>
-      <nav id="sidebar-wrapper" className={styles.root} aria-label="Main">
+      <nav
+        className={clsx(
+          styles.root,
+          'p-5 flex flex-col be:bg-gray-11 bg-blue-10'
+        )}
+        aria-label="Main"
+      >
         <Header logo={LogoURL} />
-        <div className={styles.sidebarContent}>
-          <ul className={styles.sidebar}>
-            <SidebarItem
-              to="portainer.home"
-              iconClass="fa-home fa-fw"
-              label="Home"
-            />
+
+        {/* negative margin + padding -> scrollbar won't hide the content */}
+        <div className="mt-6 overflow-y-auto flex-1 -mr-4 pr-4">
+          <ul className="space-y-9">
+            <SidebarItem to="portainer.home" icon={Home} label="Home" />
 
             <EnvironmentSidebar />
 
@@ -44,7 +51,9 @@ export function Sidebar() {
           </ul>
         </div>
 
-        <Footer />
+        <div className="mt-auto pt-8">
+          <Footer />
+        </div>
       </nav>
     </SidebarProvider>
   );

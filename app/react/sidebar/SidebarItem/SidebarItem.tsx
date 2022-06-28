@@ -1,38 +1,43 @@
 import { ReactNode } from 'react';
+import { Icon } from 'react-feather';
 
 import { Wrapper } from './Wrapper';
-import { Link } from './Link';
 import { Menu } from './Menu';
-import { Icon } from './Icon';
+import { Head } from './Head';
+import { getPathsForChildren } from './utils';
 
-type Props = {
-  iconClass?: string;
+interface Props {
+  icon?: Icon;
   to: string;
   params?: object;
   label: string;
   children?: ReactNode;
   openOnPaths?: string[];
-};
+}
 
 export function SidebarItem({
   children,
-  iconClass,
+  icon,
   to,
   params,
   label,
-  openOnPaths,
+  openOnPaths = [],
 }: Props) {
+  const childrenPath = getPathsForChildren(children);
   const head = (
-    <Link to={to} params={params}>
-      {label}
-      {iconClass && <Icon iconClass={iconClass} />}
-    </Link>
+    <Head
+      icon={icon}
+      to={to}
+      params={params}
+      label={label}
+      ignorePaths={childrenPath}
+    />
   );
 
   return (
     <Wrapper label={label}>
       {children ? (
-        <Menu head={head} openOnPaths={openOnPaths}>
+        <Menu head={head} openOnPaths={[...openOnPaths, ...childrenPath]}>
           {children}
         </Menu>
       ) : (

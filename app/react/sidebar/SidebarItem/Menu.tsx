@@ -1,17 +1,16 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
-import clsx from 'clsx';
 import {
   Children,
   PropsWithChildren,
-  ReactElement,
   ReactNode,
   useMemo,
   useReducer,
 } from 'react';
+import { ChevronDown, ChevronUp } from 'react-feather';
 
 import { useSidebarState } from '../useSidebarState';
 
-import styles from './Menu.module.css';
+import { getPaths } from './utils';
 
 interface Props {
   head: ReactNode;
@@ -26,38 +25,32 @@ export function Menu({
   const { isOpen: isSidebarOpen } = useSidebarState();
 
   const paths = useMemo(
-    () => [
-      ...getPaths(head, []),
-      ...getPathsForChildren(children),
-      ...openOnPaths,
-    ],
-    [children, openOnPaths, head]
+    () => [...getPaths(head, []), ...openOnPaths],
+    [openOnPaths, head]
   );
 
   const { isOpen, toggleOpen } = useIsOpen(isSidebarOpen, paths);
 
+  const CollapseButtonIcon = isOpen ? ChevronUp : ChevronDown;
+
   return (
-    <>
-      <div className={styles.sidebarMenuHead}>
-        {Children.count(children) > 0 && (
+    <div className="flex-1">
+      <div className="flex w-full justify-between items-center relative ">
+        {head}
+        {isSidebarOpen && Children.count(children) > 0 && (
           <button
-            className={clsx('small', styles.sidebarMenuIndicator)}
+            className="bg-transparent border-0 w-6 h-6 flex items-center justify-center absolute right-2 text-gray-5"
             onClick={handleClickArrow}
             type="button"
+            aria-label="Collapse button"
           >
-            <i
-              className={clsx(
-                'fas',
-                isOpen ? 'fa-chevron-down' : 'fa-chevron-right'
-              )}
-            />
+            <CollapseButtonIcon className="w-4 h-4" />
           </button>
         )}
-        {head}
       </div>
 
-      {isOpen && <ul className={styles.items}>{children}</ul>}
-    </>
+      {isOpen && <ul className="!pl-8">{children}</ul>}
+    </div>
   );
 
   function handleClickArrow(e: React.MouseEvent<HTMLButtonElement>) {
@@ -99,31 +92,4 @@ function useIsOpen(
 
     return isOpenByState;
   }
-}
-
-function isReactElement(element: ReactNode): element is ReactElement {
-  return (
-    !!element &&
-    typeof element === 'object' &&
-    'type' in element &&
-    'props' in element
-  );
-}
-
-function getPathsForChildren(children: ReactNode): string[] {
-  return Children.map(children, (child) => getPaths(child, []))?.flat() || [];
-}
-
-function getPaths(element: ReactNode, paths: string[]): string[] {
-  if (!isReactElement(element)) {
-    return paths;
-  }
-
-  if (typeof element.props.to === 'undefined') {
-    return Children.map(element.props.children, (child) =>
-      getPaths(child, paths)
-    );
-  }
-
-  return [element.props.to, ...paths];
 }
