@@ -1,3 +1,7 @@
+:global(portainer-tooltip) {
+  @apply inline-flex;
+}
+
 .tooltip-wrapper {
   display: inline-block;
   position: relative;
