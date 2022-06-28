@@ -69,7 +69,6 @@ export function SocketForm({ onCreate }: Props) {
   );
 
   function handleSubmit(values: FormValues) {
-    window.console.log('values = ', values);
     mutation.mutate(
       {
         name: values.name,

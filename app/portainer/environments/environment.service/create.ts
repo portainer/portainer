@@ -201,7 +201,6 @@ async function createEnvironment(
   };
 
   if (options) {
-    window.console.log('options= ', options);
     const { groupId, tagIds = [] } = options.meta || {};
 
     payload = {

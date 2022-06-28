@@ -88,8 +88,6 @@ export function Gpu({
   usedGpus = [],
   usedAllGpus,
 }: Props) {
-  window.console.log('values = ', values);
-  window.console.log('usedGpus = ', usedGpus);
   const options = useMemo(() => {
     const options = gpus.map((gpu) => ({
       value: gpu.value,

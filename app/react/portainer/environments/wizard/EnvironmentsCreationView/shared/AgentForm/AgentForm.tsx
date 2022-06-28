@@ -68,7 +68,6 @@ export function AgentForm({ onCreate, showGpus = false }: Props) {
   );
 
   function handleSubmit(values: CreateAgentEnvironmentValues) {
-    window.console.log('values = ', values);
     mutation.mutate(values, {
       onSuccess(environment) {
         notifySuccess('Environment created', environment.Name);

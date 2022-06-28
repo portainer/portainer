@@ -616,16 +616,13 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function loadFromContainerDeviceRequests() {
-      window.console.log('loadFromContainerDeviceRequests');
       const deviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function (o) {
         return o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu';
       });
-      window.console.log('deviceRequest = ', JSON.stringify(deviceRequest));
       if (deviceRequest) {
         $scope.formValues.GPU.enabled = true;
         $scope.formValues.GPU.useSpecific = deviceRequest.Count !== -1;
         $scope.formValues.GPU.selectedGPUs = deviceRequest.DeviceIDs || [];
-        window.console.log('deviceRequest.DevicesIDs = ', deviceRequest.DeviceIDs);
         if ($scope.formValues.GPU.useSpecific) {
           $scope.formValues.GPU.selectedGPUs = deviceRequest.DeviceIDs;
         }
@@ -634,7 +631,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         $scope.formValues.GPU.capabilities = deviceRequest.Capabilities[0];
         $scope.formValues.GPU = { ...$scope.formValues.GPU };
       }
-      window.console.log('$scope.formValues.GPU = ', $scope.formValues.GPU);
     }
 
     function loadFromContainerSysctls() {
@@ -784,7 +780,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           $scope.runningContainers = containers;
           $scope.gpuUseAll = $scope.endpoint.Snapshots[0].GpuUseAll;
           $scope.gpuUseList = $scope.endpoint.Snapshots[0].GpuUseList;
-          window.console.log('$scope.gpuUseList  ', $scope.gpuUseList);
           if ($transition$.params().from) {
             loadFromContainerSpec();
           } else {
