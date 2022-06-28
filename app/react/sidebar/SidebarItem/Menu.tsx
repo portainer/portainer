@@ -39,7 +39,7 @@ export function Menu({
         {head}
         {isSidebarOpen && Children.count(children) > 0 && (
           <button
-            className="bg-transparent border-0 w-6 h-6 flex items-center justify-center absolute right-2 text-grey-1"
+            className="bg-transparent border-0 w-6 h-6 flex items-center justify-center absolute right-2 text-gray-5"
             onClick={handleClickArrow}
             type="button"
             aria-label="Collapse button"

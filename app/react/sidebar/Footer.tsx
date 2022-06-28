@@ -27,7 +27,7 @@ export function Footer() {
         {process.env.PORTAINER_EDITION === 'CE' && (
           <a
             href="https://www.portainer.io/install-BE-now"
-            className="text-[#36BFFA] font-medium"
+            className="text-blue-6 font-medium"
             target="_blank"
             rel="noreferrer"
           >

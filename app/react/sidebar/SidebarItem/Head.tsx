@@ -27,7 +27,7 @@ export function Head({
   const { isOpen } = useSidebarState();
   const anchorProps = useSrefActive(
     to,
-    'bg-blue-1 be:bg-grey-7',
+    'bg-blue-8 be:bg-gray-8',
     params,
     options,
     ignorePaths
@@ -40,7 +40,7 @@ export function Head({
       title={label}
       className={clsx(
         anchorProps.className,
-        'text-white no-underline hover:no-underline hover:text-white focus:no-underline focus:text-white w-full flex-1 rounded-md',
+        'text-inherit no-underline hover:no-underline hover:text-inherit focus:no-underline focus:text-inherit w-full flex-1 rounded-md',
         { 'px-3': isOpen }
       )}
     >
@@ -70,7 +70,7 @@ function useSrefActive(
   const anchorProps = useUiRouterSrefActive(
     to,
     params || {},
-    'bg-blue-1 be:bg-grey-7',
+    activeClassName,
     options
   );
 

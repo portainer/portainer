@@ -30,7 +30,7 @@ export function EnvironmentSidebar() {
   const Sidebar = getSidebar(platform);
 
   return (
-    <div className="rounded border border-dotted py-2 be:bg-blue-7 bg-blue-8 be:border-grey-7 border-blue-2">
+    <div className="rounded border border-dotted py-2 be:bg-gray-10 bg-blue-11 be:border-gray-8 border-blue-9">
       <SidebarSection
         title={PlatformType[platform]}
         renderTitle={(className) => (
@@ -113,7 +113,7 @@ function Title({ className, environment, onClear }: TitleProps) {
         <button
           type="button"
           onClick={onClear}
-          className="flex items-center justify-center be:bg-grey-3 bg-blue-5 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-grey-8 hover:text-white"
+          className="flex items-center justify-center be:bg-gray-9 bg-blue-10 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white"
         >
           <X />
         </button>

@@ -17,7 +17,7 @@ export function Wrapper({
       className={clsx(
         'flex',
         className,
-        'text-white min-h-8 [&>a]:text-inherit [&>a]:hover:text-inherit [&>a]:hover:no-underline'
+        'text-gray-3 min-h-8 [&>a]:text-inherit [&>a]:hover:text-inherit [&>a]:hover:no-underline'
       )}
       title={label}
       aria-label={label}

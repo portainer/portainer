@@ -1,7 +1,5 @@
-import clsx from 'clsx';
 import { PropsWithChildren, ReactNode } from 'react';
 
-import styles from './SidebarSection.module.css';
 import { useSidebarState } from './useSidebarState';
 
 interface Props {
@@ -15,7 +13,9 @@ export function SidebarSection({
   children,
 }: PropsWithChildren<Props>) {
   const { isOpen } = useSidebarState();
-  const titleClassName = clsx(styles.sidebarTitle, 'ml-3 text-sm text-grey-8');
+  const titleClassName =
+    'ml-3 text-sm text-gray-3 be:text-gray-6 transition-all duration-500 ease-in-out';
+
   return (
     <div>
       {renderTitle
