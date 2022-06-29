@@ -32,6 +32,12 @@ angular.module('portainer.app').controller('UsersController', [
       });
     };
 
+    $scope.onChangeTeams = function (teams) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.Teams = teams;
+      });
+    };
+
     $scope.checkUsernameValidity = function () {
       var valid = true;
       for (var i = 0; i < $scope.users.length; i++) {
