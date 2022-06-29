@@ -1,6 +1,6 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect, useState } from 'react';
-import { X } from 'react-feather';
+import { X, Slash } from 'react-feather';
 
 import {
   PlatformType,
@@ -15,35 +15,56 @@ import { getPlatformIcon } from '../portainer/environments/utils/get-platform-ic
 import { AzureSidebar } from './AzureSidebar';
 import { DockerSidebar } from './DockerSidebar';
 import { KubernetesSidebar } from './KubernetesSidebar';
-import { SidebarSection } from './SidebarSection';
+import { SidebarSection, SidebarSectionTitle } from './SidebarSection';
 import { useSidebarState } from './useSidebarState';
 
 export function EnvironmentSidebar() {
   const { query: currentEnvironmentQuery, clearEnvironment } =
     useCurrentEnvironment();
   const environment = currentEnvironmentQuery.data;
-  if (!environment) {
+
+  const { isOpen } = useSidebarState();
+
+  if (!isOpen && !environment) {
     return null;
   }
 
+  return (
+    <div className="rounded border border-dotted py-2 be:bg-gray-10 bg-blue-11 be:border-gray-8 border-blue-9">
+      {environment ? (
+        <Content environment={environment} onClear={clearEnvironment} />
+      ) : (
+        <SidebarSectionTitle>
+          <div className="flex items-center gap-1">
+            <span>Environment:</span>
+            <Slash size="1em" className="text-xl text-gray-7" />
+            <span className="text-gray-7 text-sm font-medium">
+              None selected
+            </span>
+          </div>
+        </SidebarSectionTitle>
+      )}
+    </div>
+  );
+}
+
+interface ContentProps {
+  environment: Environment;
+  onClear: () => void;
+}
+
+function Content({ environment, onClear }: ContentProps) {
   const platform = getPlatformType(environment.Type);
   const Sidebar = getSidebar(platform);
 
   return (
-    <div className="rounded border border-dotted py-2 be:bg-gray-10 bg-blue-11 be:border-gray-8 border-blue-9">
-      <SidebarSection
-        title={PlatformType[platform]}
-        renderTitle={(className) => (
-          <Title
-            className={className}
-            environment={environment}
-            onClear={clearEnvironment}
-          />
-        )}
-      >
+    <SidebarSection title="Environment">
+      <Title environment={environment} onClear={onClear} />
+
+      <div className="mt-2">
         <Sidebar environmentId={environment.Id} environment={environment} />
-      </SidebarSection>
-    </div>
+      </div>
+    </SidebarSection>
   );
 
   function getSidebar(platform: PlatformType) {
@@ -86,13 +107,17 @@ function useCurrentEnvironment() {
 }
 
 interface TitleProps {
-  className: string;
   environment: Environment;
   onClear(): void;
 }
 
-function Title({ className, environment, onClear }: TitleProps) {
+function Title({ environment, onClear }: TitleProps) {
   const { isOpen } = useSidebarState();
+
+  if (!environment) {
+    return null;
+  }
+
   const EnvironmentIcon = getPlatformIcon(environment.Type);
 
   if (!isOpen) {
@@ -104,21 +129,19 @@ function Title({ className, environment, onClear }: TitleProps) {
   }
 
   return (
-    <li className={className}>
-      <div className="flex items-center gap-2">
-        <EnvironmentIcon className="text-2xl" />
-        <span className="text-white text-ellipsis overflow-hidden whitespace-nowrap">
-          {environment.Name}
-        </span>
+    <li className="ml-3 flex items-center">
+      <EnvironmentIcon className="text-2xl mr-3" />
+      <span className="text-white text-ellipsis overflow-hidden whitespace-nowrap">
+        {environment.Name}
+      </span>
 
-        <button
-          type="button"
-          onClick={onClear}
-          className="flex items-center justify-center be:bg-gray-9 bg-blue-10 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white"
-        >
-          <X />
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={onClear}
+        className="flex items-center justify-center be:bg-gray-9 bg-blue-10 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white"
+      >
+        <X />
+      </button>
     </li>
   );
 }
