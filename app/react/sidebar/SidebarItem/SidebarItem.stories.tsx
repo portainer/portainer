@@ -1,4 +1,5 @@
 import { Meta, Story } from '@storybook/react';
+import { Clock, Icon } from 'react-feather';
 
 import { SidebarItem } from '.';
 
@@ -9,33 +10,30 @@ const meta: Meta = {
 export default meta;
 
 interface StoryProps {
-  iconClass?: string;
-  className: string;
+  icon?: Icon;
   label: string;
 }
 
-function Template({ iconClass, className, label: linkName }: StoryProps) {
+function Template({ icon, label }: StoryProps) {
   return (
     <ul className="sidebar">
-      <SidebarItem.Wrapper className={className}>
-        <SidebarItem.Link to="example.path" params={{ endpointId: 1 }}>
-          {linkName}
-          {iconClass && <SidebarItem.Icon iconClass={iconClass} />}
-        </SidebarItem.Link>
-      </SidebarItem.Wrapper>
+      <SidebarItem
+        to="example.path"
+        params={{ endpointId: 1 }}
+        icon={icon}
+        label={label}
+      />
     </ul>
   );
 }
 
 export const Primary: Story<StoryProps> = Template.bind({});
 Primary.args = {
-  iconClass: 'fa-tachometer-alt fa-fw',
-  className: 'exampleItemClass',
+  icon: Clock,
   label: 'Item with icon',
 };
 
 export const WithoutIcon: Story<StoryProps> = Template.bind({});
 WithoutIcon.args = {
-  className: 'exampleItemClass',
   label: 'Item without icon',
 };

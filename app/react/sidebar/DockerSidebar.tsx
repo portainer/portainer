@@ -1,4 +1,17 @@
 import {
+  Box,
+  Clock,
+  Layers,
+  List,
+  Lock,
+  Share2,
+  Shuffle,
+  Trello,
+  Clipboard,
+  Edit,
+} from 'react-feather';
+
+import {
   type Environment,
   type EnvironmentId,
   EnvironmentStatus,
@@ -11,6 +24,8 @@ import {
 import { useInfo, useVersion } from '@/docker/services/system.service';
 
 import { SidebarItem } from './SidebarItem';
+import { DashboardLink } from './items/DashboardLink';
+import { VolumesLink } from './items/VolumesLink';
 
 interface Props {
   environmentId: EnvironmentId;
@@ -41,45 +56,47 @@ export function DockerSidebar({ environmentId, environment }: Props) {
   const setupSubMenuProps = isSwarmManager
     ? {
         label: 'Swarm',
-        iconClass: 'fa-object-group fa-fw',
+        icon: Trello,
         to: 'docker.swarm',
+        dataCy: 'portainerSidebar-swarm',
       }
     : {
         label: 'Host',
-        iconClass: 'fa-th fa-fw',
+        icon: Trello,
         to: 'docker.host',
+        dataCy: 'portainerSidebar-host',
       };
 
   return (
     <>
-      <SidebarItem
-        to="docker.dashboard"
-        params={{ endpointId: environmentId }}
-        iconClass="fa-tachometer-alt fa-fw"
-        label="Dashboard"
+      <DashboardLink
+        environmentId={environmentId}
+        platformPath="docker"
+        data-cy="dockerSidebar-dashboard"
       />
 
-      {!offlineMode && (
+      <SidebarItem
+        label="App Templates"
+        icon={Edit}
+        to="docker.templates"
+        params={{ endpointId: environmentId }}
+        data-cy="portainerSidebar-appTemplates"
+      >
         <SidebarItem
-          label="App Templates"
-          iconClass="fa-rocket fa-fw"
-          to="docker.templates"
+          label="Custom Templates"
+          to="docker.templates.custom"
           params={{ endpointId: environmentId }}
-        >
-          <SidebarItem
-            label="Custom Templates"
-            to="docker.templates.custom"
-            params={{ endpointId: environmentId }}
-          />
-        </SidebarItem>
-      )}
+          data-cy="dockerSidebar-customTemplates"
+        />
+      </SidebarItem>
 
       {areStacksVisible && (
         <SidebarItem
           to="docker.stacks"
           params={{ endpointId: environmentId }}
-          iconClass="fa-th-list fa-fw"
+          icon={Layers}
           label="Stacks"
+          data-cy="dockerSidebar-stacks"
         />
       )}
 
@@ -87,45 +104,49 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         <SidebarItem
           to="docker.services"
           params={{ endpointId: environmentId }}
-          iconClass="fa-list-alt fa-fw"
+          icon={Shuffle}
           label="Services"
+          data-cy="dockerSidebar-services"
         />
       )}
 
       <SidebarItem
         to="docker.containers"
         params={{ endpointId: environmentId }}
-        iconClass="fa-cubes fa-fw"
+        icon={Box}
         label="Containers"
+        data-cy="dockerSidebar-containers"
       />
 
       <SidebarItem
         to="docker.images"
         params={{ endpointId: environmentId }}
-        iconClass="fa-clone fa-fw"
+        icon={List}
         label="Images"
+        data-cy="dockerSidebar-images"
       />
 
       <SidebarItem
         to="docker.networks"
         params={{ endpointId: environmentId }}
-        iconClass="fa-sitemap fa-fw"
+        icon={Share2}
         label="Networks"
+        data-cy="dockerSidebar-networks"
       />
 
-      <SidebarItem
-        to="docker.volumes"
-        params={{ endpointId: environmentId }}
-        iconClass="fa-hdd fa-fw"
-        label="Volumes"
+      <VolumesLink
+        environmentId={environmentId}
+        platformPath="docker"
+        data-cy="dockerSidebar-volumes"
       />
 
       {apiVersion >= 1.3 && isSwarmManager && (
         <SidebarItem
           to="docker.configs"
           params={{ endpointId: environmentId }}
-          iconClass="fa-file-code fa-fw"
+          icon={Clipboard}
           label="Configs"
+          data-cy="dockerSidebar-configs"
         />
       )}
 
@@ -133,8 +154,9 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         <SidebarItem
           to="docker.secrets"
           params={{ endpointId: environmentId }}
-          iconClass="fa-user-secret fa-fw"
+          icon={Lock}
           label="Secrets"
+          data-cy="dockerSidebar-secrets"
         />
       )}
 
@@ -142,16 +164,18 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         <SidebarItem
           to="docker.events"
           params={{ endpointId: environmentId }}
-          iconClass="fa-history fa-fw"
+          icon={Clock}
           label="Events"
+          data-cy="dockerSidebar-events"
         />
       )}
 
       <SidebarItem
         label={setupSubMenuProps.label}
-        iconClass={setupSubMenuProps.iconClass}
+        icon={setupSubMenuProps.icon}
         to={setupSubMenuProps.to}
         params={{ endpointId: environmentId }}
+        data-cy={setupSubMenuProps.dataCy}
       >
         <Authorized
           authorizations="PortainerEndpointUpdateSettings"

@@ -2,6 +2,8 @@ import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { render, within } from '@/react-tools/test-utils';
 
+import { TestSidebarProvider } from '../useSidebarState';
+
 import { AzureSidebar } from './AzureSidebar';
 
 test('dashboard items should render correctly', () => {
@@ -11,11 +13,9 @@ test('dashboard items should render correctly', () => {
   expect(dashboardItem).toHaveTextContent('Dashboard');
 
   const dashboardItemElements = within(dashboardItem);
-  expect(dashboardItemElements.getByLabelText('itemIcon')).toBeVisible();
-  expect(dashboardItemElements.getByLabelText('itemIcon')).toHaveClass(
-    'fa-tachometer-alt',
-    'fa-fw'
-  );
+  expect(
+    dashboardItemElements.getByRole('img', { hidden: true })
+  ).toBeVisible();
 
   const containerInstancesItem = getByLabelText(/Container Instances/i);
   expect(containerInstancesItem).toBeVisible();
@@ -23,12 +23,8 @@ test('dashboard items should render correctly', () => {
 
   const containerInstancesItemElements = within(containerInstancesItem);
   expect(
-    containerInstancesItemElements.getByLabelText('itemIcon')
+    containerInstancesItemElements.getByRole('img', { hidden: true })
   ).toBeVisible();
-  expect(containerInstancesItemElements.getByLabelText('itemIcon')).toHaveClass(
-    'fa-cubes',
-    'fa-fw'
-  );
 });
 
 function renderComponent() {
@@ -36,7 +32,9 @@ function renderComponent() {
 
   return render(
     <UserContext.Provider value={{ user }}>
-      <AzureSidebar environmentId={1} />
+      <TestSidebarProvider>
+        <AzureSidebar environmentId={1} />
+      </TestSidebarProvider>
     </UserContext.Provider>
   );
 }

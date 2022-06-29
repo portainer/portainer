@@ -1,3 +1,5 @@
+import { Box, Clock, Grid, Layers } from 'react-feather';
+
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';
 
@@ -6,23 +8,27 @@ export function EdgeComputeSidebar() {
     <SidebarSection title="Edge compute">
       <SidebarItem
         to="edge.devices"
-        iconClass="fas fa-laptop-code fa-fw"
         label="Edge Devices"
+        icon={Box}
+        data-cy="portainerSidebar-edgeDevices"
       />
       <SidebarItem
         to="edge.groups"
-        iconClass="fa-object-group fa-fw"
         label="Edge Groups"
+        icon={Grid}
+        data-cy="portainerSidebar-edgeGroups"
       />
       <SidebarItem
         to="edge.stacks"
-        iconClass="fa-layer-group fa-fw"
         label="Edge Stacks"
+        icon={Layers}
+        data-cy="portainerSidebar-edgeStacks"
       />
       <SidebarItem
         to="edge.jobs"
-        iconClass="fa-clock fa-fw"
         label="Edge Jobs"
+        icon={Clock}
+        data-cy="portainerSidebar-edgeJobs"
       />
     </SidebarSection>
   );

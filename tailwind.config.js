@@ -1,4 +1,5 @@
 const plugin = require('tailwindcss/plugin');
+const defaultTheme = require('tailwindcss/defaultTheme');
 const colors = require('./app/assets/css/colors.json');
 
 /** @type {import('tailwindcss').Config} */
@@ -17,6 +18,11 @@ module.exports = {
       'legacy-grey-3': 'var(--grey-3)',
       'legacy-blue-2': 'var(--blue-2)',
       'legacy-blue-9': 'var(--blue-9)',
+    },
+    extend: {
+      fontFamily: {
+        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+      },
     },
   },
 

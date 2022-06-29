@@ -1,5 +1,8 @@
+import { Box } from 'react-feather';
+
 import { EnvironmentId } from '@/portainer/environments/types';
 
+import { DashboardLink } from '../items/DashboardLink';
 import { SidebarItem } from '../SidebarItem';
 
 interface Props {
@@ -9,17 +12,17 @@ interface Props {
 export function AzureSidebar({ environmentId }: Props) {
   return (
     <>
-      <SidebarItem
-        to="azure.dashboard"
-        params={{ endpointId: environmentId }}
-        iconClass="fa-tachometer-alt fa-fw"
-        label="Dashboard"
+      <DashboardLink
+        environmentId={environmentId}
+        platformPath="azure"
+        data-cy="azureSidebar-dashboard"
       />
       <SidebarItem
         to="azure.containerinstances"
         params={{ endpointId: environmentId }}
-        iconClass="fa-cubes fa-fw"
+        icon={Box}
         label="Container instances"
+        data-cy="azureSidebar-containerInstances"
       />
     </>
   );

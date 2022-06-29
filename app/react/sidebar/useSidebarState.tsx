@@ -1,11 +1,13 @@
 import {
   createContext,
+  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
+  useReducer,
 } from 'react';
 import angular, { IScope } from 'angular';
 import _ from 'lodash';
@@ -21,7 +23,7 @@ interface State {
   toggle(): void;
 }
 
-const Context = createContext<State | null>(null);
+export const Context = createContext<State | null>(null);
 
 export function useSidebarState() {
   const context = useContext(Context);
@@ -35,6 +37,17 @@ export function useSidebarState() {
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const state = useSidebarStateLocal();
+
+  return <Context.Provider value={state}> {children} </Context.Provider>;
+}
+
+export function TestSidebarProvider({ children }: PropsWithChildren<unknown>) {
+  const [isOpen, toggle] = useReducer((state) => !state, true);
+
+  const state = useMemo(
+    () => ({ isOpen, toggle: () => toggle() }),
+    [isOpen, toggle]
+  );
 
   return <Context.Provider value={state}> {children} </Context.Provider>;
 }

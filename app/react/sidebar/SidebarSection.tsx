@@ -1,26 +1,30 @@
 import { PropsWithChildren, ReactNode } from 'react';
 
-import styles from './SidebarSection.module.css';
+import { useSidebarState } from './useSidebarState';
 
 interface Props {
-  title: ReactNode;
-  label?: string;
+  title: string;
+  renderTitle?: (className: string) => ReactNode;
 }
 
 export function SidebarSection({
   title,
-  label,
+  renderTitle,
   children,
 }: PropsWithChildren<Props>) {
-  const labelText = typeof title === 'string' ? title : label;
+  const { isOpen } = useSidebarState();
+  const titleClassName =
+    'ml-3 text-sm text-gray-3 be:text-gray-6 transition-all duration-500 ease-in-out';
 
   return (
-    <>
-      <li className={styles.sidebarTitle}>{title}</li>
+    <div>
+      {renderTitle
+        ? renderTitle(titleClassName)
+        : isOpen && <li className={titleClassName}>{title}</li>}
 
-      <nav aria-label={labelText}>
+      <nav aria-label={title} className="mt-4">
         <ul>{children}</ul>
       </nav>
-    </>
+    </div>
   );
 }

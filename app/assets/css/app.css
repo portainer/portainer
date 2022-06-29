@@ -2,8 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter-VariableFont.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  select {
+    font-family: Inter, Arial, Helvetica, sans-serif;
+  }
+}
+
 html {
   font-size: 16px;
+  overflow-y: scroll;
+}
+
+body {
+  background: var(--bg-body-color);
+  font-family: 'Inter';
+  color: var(--text-body-color) !important;
 }
 
 html,
