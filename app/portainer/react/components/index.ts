@@ -17,6 +17,8 @@ import { withI18nSuspense } from '@/react-tools/withI18nSuspense';
 import { SettingsFDO } from '@/react/portainer/settings/EdgeComputeView/SettingsFDO';
 import { SettingsOpenAMT } from '@/react/portainer/settings/EdgeComputeView/SettingsOpenAMT';
 import { InternalAuth } from '@/react/portainer/settings/AuthenticationView/InternalAuth';
+import { PorAccessControlFormTeamSelector } from '@/react/portainer/access-control/PorAccessControlForm/TeamsSelector';
+import { PorAccessControlFormUserSelector } from '@/react/portainer/access-control/PorAccessControlForm/UsersSelector';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -152,5 +154,23 @@ export const componentsModule = angular
       'name',
       'placeholder',
       'teams',
+    ])
+  )
+  .component(
+    'porAccessControlFormTeamSelector',
+    r2a(PorAccessControlFormTeamSelector, [
+      'inputId',
+      'onChange',
+      'options',
+      'value',
+    ])
+  )
+  .component(
+    'porAccessControlFormUserSelector',
+    r2a(PorAccessControlFormUserSelector, [
+      'inputId',
+      'onChange',
+      'options',
+      'value',
     ])
   ).name;
