@@ -61,7 +61,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.1 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.1 // indirect
 	github.com/aws/smithy-go v1.9.0 // indirect
-	github.com/containerd/containerd v1.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.8.0+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
@@ -95,6 +94,9 @@ require (
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/morikuni/aec v1.0.0 // indirect
+	github.com/onsi/ginkgo v1.16.4 // indirect
+	github.com/onsi/gomega v1.15.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -112,12 +114,11 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
-	google.golang.org/grpc v1.43.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gotest.tools/v3 v3.0.3 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20211109043538-20434351676c // indirect
 	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b // indirect
