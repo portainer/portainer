@@ -81,7 +81,6 @@ angular.module('portainer.app').controller('porAccessControlFormController', [
           return $q.when(ctrl.resourceControl && ResourceControlService.retrieveOwnershipDetails(ctrl.resourceControl));
         })
         .then(function success(data) {
-          console.log({ data });
           if (data) {
             var authorizedUsers = data.authorizedUsers;
             var authorizedTeams = data.authorizedTeams;
