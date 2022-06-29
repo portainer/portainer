@@ -80,11 +80,11 @@
                       <td>Creation</td>
                       <td>
                         <span ng-if="ctrl.application.ApplicationOwner" style="margin-right: 5px" data-cy="k8sAppDetail-owner">
-                          <i class="fas fa-user"></i> {{ ctrl.application.ApplicationOwner }}
+                          <pr-icon icon="'user'" feather="true"></pr-icon> {{ ctrl.application.ApplicationOwner }}
                         </span>
                         <span> <i class="fas fa-clock"></i> {{ ctrl.application.CreationDate | getisodate }}</span>
                         <span ng-if="ctrl.application.ApplicationOwner" data-cy="k8sAppDetail-creationMethod">
-                          <i class="fa fa-file-code space-left space-right" aria-hidden="true"></i> Deployed from {{ ctrl.state.appType }}</span
+                          <pr-icon icon="'clock'" feather="true"></pr-icon> Deployed from {{ ctrl.state.appType }}</span
                         >
                       </td>
                     </tr>
@@ -93,11 +93,12 @@
                         <form class="form-horizontal" name="kubernetesApplicationNoteForm">
                           <div class="form-group">
                             <div class="col-sm-12">
-                              <i class="fa fa-edit" aria-hidden="true"></i> Note
+                              <pr-icon icon="'edit'" feather="true"></pr-icon> Note
                               <button class="btn btn-xs btn-primary" ng-click="ctrl.state.expandedNote = !ctrl.state.expandedNote;" data-cy="k8sAppDetail-expandNoteButton"
                                 >{{ ctrl.state.expandedNote ? 'Collapse' : 'Expand' }}
-                                <i class="fas {{ ctrl.state.expandedNote ? 'fa-angle-up' : 'fa-angle-down' }}" aria-hidden="true"></i
-                              ></button>
+                                <pr-icon icon="'chevron-up'" feather="true" ng-if="ctrl.state.expandedNote"></pr-icon>
+                                <pr-icon icon="'chevron-down'" feather="true" ng-if="!ctrl.state.expandedNote"></pr-icon>
+                              </button>
                             </div>
                           </div>
                           <div class="form-group" ng-if="ctrl.state.expandedNote">
@@ -154,12 +155,12 @@
               <uib-tab-heading>
                 <i class="fas fa-compress-arrows-alt space-right" aria-hidden="true"></i> Placement
                 <div ng-if="ctrl.state.placementWarning">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
                   warning
                 </div>
               </uib-tab-heading>
               <div class="small text-muted" style="padding: 20px">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
                 The placement component helps you understand whether or not this application can be deployed on a specific node.
               </div>
               <kubernetes-application-placements-datatable
@@ -178,7 +179,7 @@
               <uib-tab-heading>
                 <i class="fa fa-history space-right" aria-hidden="true"></i> Events
                 <div ng-if="ctrl.hasEventWarnings()">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
@@ -195,7 +196,7 @@
             </uib-tab>
 
             <uib-tab index="3" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
-              <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'code'" feather="true"></pr-icon> YAML </uib-tab-heading>
               <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="application-yaml" data="ctrl.application.Yaml"></kubernetes-yaml-inspector>
               </div>
