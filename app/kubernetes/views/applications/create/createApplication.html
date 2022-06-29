@@ -487,6 +487,13 @@
                       </span>
                     </div>
 
+                    <div class="col-sm-12" style="margin-top: 5px" ng-if="ctrl.allQuotasExhaustedAndNoVolumesAvailable()">
+                      <span class="small text-muted">
+                        <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                        This namespace has exhausted its storage capacity. Contact your administrator to expand the capacity of the namespace.
+                      </span>
+                    </div>
+
                     <div class="col-sm-12 form-inline" style="margin-top: 10px" ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders">
                       <div style="margin-top: 2px">
                         <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
