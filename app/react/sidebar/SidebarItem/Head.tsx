@@ -73,7 +73,7 @@ function useSrefActive(
   options: TransitionOptions = {},
   ignorePaths: string[] = []
 ) {
-  const { state } = useCurrentStateAndParams();
+  const { state: { name: stateName = '' } = {} } = useCurrentStateAndParams();
   const anchorProps = useUiRouterSrefActive(
     to,
     params || {},
@@ -81,7 +81,7 @@ function useSrefActive(
     options
   );
 
-  const className = ignorePaths.includes(state.name || '')
+  const className = ignorePaths.some((path) => stateName.includes(path))
     ? ''
     : anchorProps.className;
 
