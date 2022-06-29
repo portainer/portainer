@@ -322,8 +322,20 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const endpointKubernetesConfiguration = {
+      name: 'kubernetes.cluster.setup',
+      url: '/configure',
+      views: {
+        'content@': {
+          templateUrl: './views/configure/configure.html',
+          controller: 'KubernetesConfigureController',
+          controllerAs: 'ctrl',
+        },
+      },
+    };
+
     const endpointKubernetesSecurityConstraint = {
-      name: 'portainer.k8sendpoint.securityConstraint',
+      name: 'kubernetes.cluster.securityConstraint',
       url: '/securityConstraint',
       views: {
         'content@': {
@@ -362,6 +374,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(volume);
     $stateRegistryProvider.register(registries);
     $stateRegistryProvider.register(registriesAccess);
+    $stateRegistryProvider.register(endpointKubernetesConfiguration);
     $stateRegistryProvider.register(endpointKubernetesSecurityConstraint);
   },
 ]);

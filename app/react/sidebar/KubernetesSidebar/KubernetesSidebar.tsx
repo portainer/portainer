@@ -95,7 +95,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
           environmentId={environmentId}
         >
           <SidebarItem
-            to="portainer.k8sendpoint.kubernetesConfig"
+            to="kubernetes.cluster.setup"
             params={{ id: environmentId }}
             label="Setup"
             data-cy="k8sSidebar-setup"
@@ -108,7 +108,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
           environmentId={environmentId}
         >
           <SidebarItem
-            to="portainer.k8sendpoint.securityConstraint"
+            to="kubernetes.cluster.securityConstraint"
             params={{ id: environmentId }}
             label="Security constraints"
             data-cy="k8sSidebar-securityConstraints"
