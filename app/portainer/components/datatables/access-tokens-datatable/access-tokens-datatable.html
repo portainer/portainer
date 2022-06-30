@@ -2,30 +2,37 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
-      </div>
-      <div class="actionBar">
-        <button
-          ng-if="!$ctrl.endpointType"
-          type="button"
-          class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.onClickAdd()"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add access token </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          ng-model-options="{ debounce: 300 }"
-        />
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-blue'"></pr-icon>
+          <span>{{ $ctrl.titleText }}</span>
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true" class="searchIcon"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
+        <div class="actionBar">
+          <button
+            ng-if="!$ctrl.endpointType"
+            type="button"
+            class="btn btn-sm btn-danger"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          >
+            <pr-icon icon="'trash-2'" feather="true" class-name="'icon-white'"></pr-icon>
+            <span>Remove</span>
+          </button>
+          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.onClickAdd()">
+            <pr-icon icon="'plus'" feather="true" class-name="'icon-white'"></pr-icon>
+            <span>Add access token</span>
+          </button>
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
