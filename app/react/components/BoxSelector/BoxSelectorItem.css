@@ -24,6 +24,8 @@
 .boxselector_wrapper input[type='radio']:not(:disabled) ~ label {
   cursor: pointer;
   background-color: var(--bg-boxselector-wrapper-disabled-color);
+  text-align: left;
+  height: 100%;
 }
 
 .boxselector_wrapper input[type='radio']:not(:disabled):hover ~ label:hover {
@@ -38,7 +40,7 @@
   border: 1px solid var(--border-boxselector-color);
   border-radius: 2px;
   padding: 10px 10px 0 10px;
-  text-align: center;
+  text-align: left;
   box-shadow: var(--shadow-boxselector-color);
   position: relative;
 }
@@ -52,31 +54,30 @@
   pointer-events: none;
 }
 
-.boxselector_wrapper input[type='radio']:checked + label {
-  background: var(--selected-item-color);
+.boxselector_wrapper input[type='radio']:checked + label,
+.box-selector-item input[type='radio']:checked + label {
   color: white;
-  padding-top: 20px;
+  background-image: url(../../../assets/ico/checked.svg);
+  background-repeat: no-repeat;
+  background-position: right 15px top 15px;
   border-color: var(--selected-item-color);
 }
 
-.boxselector_wrapper input[type='radio']:checked + label::after {
+.box-selector-item input[type='radio']:checked:disabled + label {
+  color: #787878;
+}
+
+.boxselector_wrapper input[type='radio']:checked + label .box_selector_mask_icon {
   color: var(--selected-item-color);
-  font-family: 'Font Awesome 5 Free';
-  border: 2px solid var(--selected-item-color);
-  content: '\f00c';
-  font-size: 16px;
-  font-weight: bold;
-  position: absolute;
-  top: -15px;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 30px;
-  width: 30px;
-  line-height: 26px;
-  text-align: center;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 2px 5px -2px rgba(0, 0, 0, 0.25);
+}
+
+:root[theme='highcontrast'] .box_selector_mask_icon,
+:root[theme='dark'] .box_selector_mask_icon {
+  color: var(--bg-boxselector-wrapper-disabled-color);
+}
+
+.box_selector_mask_icon {
+  color: var(--bg-boxselector-color);
 }
 
 @media only screen and (max-width: 700px) {
@@ -109,4 +110,24 @@
 
 .box-selector-item.limited.business :checked + label {
   color: initial;
+}
+
+.boxselector_img_container {
+  width: 100%;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.boxselector_img {
+  height: 48px;
+  width: 48px;
+  left: 5px;
+}
+
+.boxselector_icon,
+.boxselector_icon img {
+  height: 48px;
+  width: 48px;
+  color: var(--ui-blue-4);
+  font-size: 48px;
 }

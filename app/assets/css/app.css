@@ -90,6 +90,7 @@ body,
   margin-bottom: 15px;
   color: var(--text-form-section-title-color);
   padding-left: 0;
+  font-weight: 500;
 }
 
 .form-horizontal .control-label.text-left {

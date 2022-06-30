@@ -12,6 +12,8 @@
 .datatable .toolBar .toolBarTitle {
   float: left;
   margin: 5px 0 0 10px;
+  color: var(--text-widget-header-color);
+  font-weight: 500;
 }
 
 .datatable .toolBar .settings {
@@ -37,7 +39,7 @@
 .datatable .searchInput {
   background: none;
   border: none;
-  width: 95%;
+  width: 90%;
 }
 
 .datatable .searchIcon {
