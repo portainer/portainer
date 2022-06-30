@@ -6,22 +6,22 @@
         <div class="searchBar">
           <i class="fa fa-search searchIcon" aria-hidden="true"></i>
           <input
-                  type="text"
-                  class="searchInput"
-                  ng-model="$ctrl.state.textFilter"
-                  ng-change="$ctrl.onTextFilterChange()"
-                  placeholder="Search..."
-                  auto-focus
-                  ng-model-options="{ debounce: 300 }"
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
           />
         </div>
         <div class="actionBar" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
           <button
-                  type="button"
-                  class="btn btn-sm btn-danger"
-                  authorization="DockerVolumeDelete"
-                  ng-disabled="$ctrl.state.selectedItemCount === 0"
-                  ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+            type="button"
+            class="btn btn-sm btn-danger"
+            authorization="DockerVolumeDelete"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
           >
             <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
           </button>
