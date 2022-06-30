@@ -1,6 +1,13 @@
 <div class="datatable">
   <div class="toolBar">
-    <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
+    <div class="toolBarTitle flex">
+      <div class="iconWrapper flex justify-center content-center mr-2">
+        <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true"></i>
+      </div>
+      <span>
+        {{ $ctrl.titleText }}
+      </span>
+    </div>
     <div class="searchBar">
       <pr-icon icon="'search'" feather="true"></pr-icon>
       <input
@@ -16,7 +23,7 @@
     </div>
     <div class="settings">
       <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-        <span uib-dropdown-toggle><pr-icon icon="'settings'" feather="true"></pr-icon></span>
+        <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
         <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
           <div class="tableMenu">
             <div class="menuHeader"> Table settings </div>
@@ -54,32 +61,32 @@
       <thead>
         <tr>
           <th>
-            <a ng-click="$ctrl.changeOrderBy('Date')">
+            <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Date')">
               Date
-              <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Date' && !$ctrl.state.reverseOrder"></i>
-              <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Date' && $ctrl.state.reverseOrder"></i>
-            </a>
+              <pr-icon icon="'arrow-down'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Date' && !$ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-up'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Date' && $ctrl.state.reverseOrder"></pr-icon>
+            </div>
           </th>
           <th>
-            <a ng-click="$ctrl.changeOrderBy('Involved.kind')">
+            <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Involved.kind')">
               Kind
-              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && !$ctrl.state.reverseOrder"></i>
-              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && $ctrl.state.reverseOrder"></i>
-            </a>
+              <pr-icon icon="'arrow-down'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && !$ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-up'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && $ctrl.state.reverseOrder"></pr-icon>
+            </div>
           </th>
           <th>
-            <a ng-click="$ctrl.changeOrderBy('Type')">
+            <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Type')">
               Type
-              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></i>
-              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
-            </a>
+              <pr-icon icon="'arrow-down'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-up'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></pr-icon>
+            </div>
           </th>
           <th>
-            <a ng-click="$ctrl.changeOrderBy('Message')">
+            <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Message')">
               Message
-              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Message' && !$ctrl.state.reverseOrder"></i>
-              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Message' && $ctrl.state.reverseOrder"></i>
-            </a>
+              <pr-icon icon="'arrow-down'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Message' && !$ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-up'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Message' && $ctrl.state.reverseOrder"></pr-icon>
+            </div>
           </th>
         </tr>
       </thead>

@@ -1,6 +1,13 @@
 <div class="datatable">
   <div class="toolBar">
-    <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
+    <div class="toolBarTitle flex">
+      <div class="iconWrapper flex justify-center content-center mr-2">
+        <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true"></i>
+      </div>
+      <span>
+        {{ $ctrl.titleText }}
+      </span>
+    </div>
     <div class="searchBar">
       <pr-icon icon="'search'" feather="true"></pr-icon>
       <input
@@ -15,7 +22,7 @@
     </div>
     <div class="settings">
       <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-        <span uib-dropdown-toggle><pr-icon icon="'settings'" feather="true"></pr-icon></span>
+        <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
         <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
           <div class="tableMenu">
             <div class="menuHeader"> Table settings </div>
@@ -54,15 +61,16 @@
         <tr>
           <th style="width: 2%">
             <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
-              <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
+              <pr-icon icon="'chevron-down'" feather="true" ng-if="$ctrl.state.expandAll"></pr-icon>
+              <pr-icon icon="'chevron-up'" feather="true" ng-if="!$ctrl.state.expandAll"></pr-icon>
             </a>
           </th>
           <th style="width: 98%">
-            <a ng-click="$ctrl.changeOrderBy('Name')">
+            <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Node')">
               Node
-              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-            </a>
+              <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Node' && !$ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Node' && $ctrl.state.reverseOrder"></pr-icon>
+            </div>
           </th>
         </tr>
       </thead>
@@ -75,7 +83,8 @@
         >
           <td>
             <a ng-if="$ctrl.itemCanExpand(item)">
-              <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
+              <pr-icon icon="'chevron-down'" class="mr-1" feather="true" ng-if="item.Expanded"></pr-icon>
+              <pr-icon icon="'chevron-up'" class="mr-1" feather="true" ng-if="!item.Expanded"></pr-icon>
             </a>
             <pr-icon icon="'check'" ng-if="item.AcceptsApplication" mode="'success'" feather="true"></pr-icon>
             <pr-icon icon="'x'" ng-if="!item.AcceptsApplication" mode="'error'" feather="true"></pr-icon>

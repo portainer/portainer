@@ -2,10 +2,28 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
+        <div class="toolBarTitle flex">
+          <div class="iconWrapper flex justify-center content-center mr-2">
+            <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true"></i>
+          </div>
+          <span>
+            {{ $ctrl.titleText }}
+          </span>
+        </div>
+        <div class="searchBar">
+          <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
         <div ng-if="$ctrl.refreshCallback" class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
+            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader"> Table settings </div>
@@ -25,7 +43,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
+                        <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'" feather="true"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -38,76 +56,65 @@
           </span>
         </div>
       </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          ng-model-options="{ debounce: 300 }"
-        />
-      </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells" data-cy="k8sAppDetail-containerTable">
           <thead>
             <tr>
               <th ng-if="!$ctrl.isPod">
-                <a ng-click="$ctrl.changeOrderBy('PodName')">
+                <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('PodName')">
                   Pod
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PodName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PodName' && $ctrl.state.reverseOrder"></i>
-                </a>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'PodName' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'PodName' && $ctrl.state.reverseOrder"></pr-icon>
+                </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
+                <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Name')">
                   Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-                </a>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></pr-icon>
+                </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Image')">
+                <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Image')">
                   Image
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
-                </a>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></pr-icon>
+                </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('ImagePullPolicy')">
+                <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('ImagePullPolicy')">
                   Image Pull Policy
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImagePullPolicy' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImagePullPolicy' && $ctrl.state.reverseOrder"></i>
-                </a>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'ImagePullPolicy' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'ImagePullPolicy' && $ctrl.state.reverseOrder"></pr-icon>
+                </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Status')">
+                <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Status')">
                   Status
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
-                </a>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></pr-icon>
+                </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Node')">
+                <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Node')">
                   Node
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Node' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Node' && $ctrl.state.reverseOrder"></i>
-                </a>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Node' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Node' && $ctrl.state.reverseOrder"></pr-icon>
+                </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('IP')">
+                <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('IP')">
                   Pod IP
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
-                </a>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></pr-icon>
+                </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('CreationDate')">
+                <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('CreationDate')">
                   Creation date
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></i>
-                </a>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></pr-icon>
+                </div>
               </th>
               <th>Actions</th>
             </tr>
@@ -140,11 +147,13 @@
                   ui-sref="kubernetes.applications.application.stats({ pod: item.PodName, container: item.Name })"
                   style="margin-right: 10px"
                 >
-                  <i class="fa fa-chart-area" aria-hidden="true"></i> Stats
+                  <pr-icon icon="'pie-chart'" class="mr-1" feather="true"></pr-icon>Stats
                 </a>
-                <a ui-sref="kubernetes.applications.application.logs({ pod: item.PodName, container: item.Name })"> <i class="fa fa-file-alt" aria-hidden="true"></i> Logs </a>
+                <a ui-sref="kubernetes.applications.application.logs({ pod: item.PodName, container: item.Name })">
+                  <pr-icon icon="'file-text'" class="mr-1" feather="true"></pr-icon>Logs
+                </a>
                 <a ng-if="item.Status === 'Running'" ui-sref="kubernetes.applications.application.console({ pod: item.PodName, container: item.Name })" style="margin-left: 10px">
-                  <i class="fa fa-terminal" aria-hidden="true"></i> Console
+                  <pr-icon icon="'terminal'" class="mr-1" feather="true"></pr-icon>Console
                 </a>
               </td>
             </tr>
