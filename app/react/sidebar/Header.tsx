@@ -18,7 +18,7 @@ export function Header({ logo }: Props) {
       <Link
         to="portainer.home"
         data-cy="portainerSidebar-homeImage"
-        className="text-2xl text-white no-underline hover:no-underline hover:text-white"
+        className="text-2xl text-white no-underline hover:no-underline hover:text-white focus:no-underline focus:text-white focus:outline-none"
       >
         <img
           src={logo || defaultLogo}
