@@ -30,16 +30,17 @@
 .root :global .selector__menu {
   background-color: var(--bg-multiselect-color);
   border: 1px solid var(--border-multiselect);
+  padding: 5px;
 }
 
 .root :global .selector__option {
   background-color: var(--bg-multiselect-color);
-  border: 1px solid var(--border-multiselect);
+  border-radius: 5px;
 }
 
 .root :global .selector__option:active,
 .root :global .selector__option--is-focused {
-  background-color: var(--blue-8);
+  background-color: var(--ui-gray-3);
 }
 
 :global :root[theme='dark'] :local .root :global .selector__option:active,

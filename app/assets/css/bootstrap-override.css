@@ -1,14 +1,45 @@
-/* Main Color UI Override*/
+/* Label, Section Title */
+
+.control-label {
+  color: var(--ui-gray-7);
+  font-weight: 500;
+}
+
+.form-section-title {
+  color: var(--ui-gray-9);
+  font-size: 16px;
+}
+
+.vertical-center {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
 
 .blue {
   background: var(--bg-dashboard-item) !important;
 }
 
-/* Button */
 .btn {
+  border-radius: 5px;
+  display: inline-flex;
+  justify-content: space-around;
+  gap: 5px;
+}
+
+pr-icon {
+  display: inline-block;
+}
+
+.btn.active {
+  box-shadow: none;
+}
+
+.form-control {
   border-radius: 5px;
 }
 
+/* Button Primary */
 .btn-primary {
   background-color: var(--ui-blue-8);
 }
@@ -16,7 +47,19 @@
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active .active {
-  background-color: var(--ui-blue-2);
+  background-color: var(--ui-blue-9);
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+  background-color: var(--ui-blue-9);
+}
+
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  background-color: var(--ui-blue-8);
 }
 
 .btn-danger {
@@ -25,6 +68,69 @@
 
 .btn-success {
   background-color: var(--ui-success-7);
+}
+
+.btn-dangerlight {
+  background-color: var(--ui-error-2) !important;
+  border: 1px solid var(--border-button-group);
+  color: var(--ui-error-8);
+}
+
+.btn-dangerlight:hover {
+  color: var(--ui-error-9) !important;
+  background-color: var(--ui-error-3) !important;
+}
+
+.btn-light {
+  background-color: var(--bg-button-group);
+  border: 1px solid var(--border-button-group);
+  color: var(--text-button-group);
+}
+
+.btn-light:hover {
+  background-color: var(--ui-gray-2) !important;
+}
+
+.btn-light:active,
+.btn-light.active,
+.open > .dropdown-toggle.btn-light {
+  background-color: var(--ui-gray-3);
+}
+
+/* Button Secondary */
+.btn-secondary {
+  background-color: var(--ui-blue-2);
+  border: 1px solid var(--ui-blue-8);
+  color: var(--ui-blue-9);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active .active {
+  background-color: var(--ui-blue-3) !important;
+  color: var(--ui-blue-9) !important;
+}
+
+.btn-secondary:disabled {
+  background-color: var(--ui-blue-1);
+  border: 1px solid var(--ui-blue-1);
+  color: var(--ui-blue-5);
+}
+
+/* Input Group Addon */
+.input-group-addon:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.input-group .form-control:not(:first-child):not(:last-child) {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.input-group-btn:last-child .btn {
+  margin-left: 5px;
+  border-radius: 5px;
 }
 
 /* Toggle switch */
@@ -39,6 +145,10 @@
   opacity: 0;
   width: 0;
   height: 0;
+}
+
+.switch input[type='checkbox']:disabled + .slider {
+  background-color: var(--ui-gray-3);
 }
 
 /* Toggle */
@@ -196,6 +306,7 @@ input:checked + .slider:before {
 
 .toolBar > .settings {
   width: 60px;
+  text-align: right;
 }
 
 .datatable .toolBar .settings {
@@ -210,48 +321,6 @@ input:checked + .slider:before {
 
 .widget .widget-body table thead {
   border-top: 1px solid var(--border-table-color);
-}
-
-/* Button Group */
-.input-group-addon:first-child {
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-}
-
-.input-group .form-control:not(:first-child):not(:last-child) {
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
-.input-group-btn:last-child .btn {
-  margin-left: 5px;
-  border-radius: 5px;
-}
-
-.form-control {
-  border-radius: 5px;
-}
-
-.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
-  background-color: var(--bg-button-group);
-  border: 1px solid var(--border-button-group);
-  color: var(--text-button-group);
-}
-
-.btn-group .btn-light {
-  background-color: var(--bg-button-group);
-  border: 1px solid var(--border-button-group);
-  color: var(--text-button-group);
-}
-
-.btn-group .btn-dangerlight {
-  background-color: var(--ui-error-2);
-  border: 1px solid var(--border-button-group);
-  color: var(--ui-error-8);
-}
-
-.btn.active {
-  box-shadow: none;
 }
 
 /* Toaster */
@@ -375,33 +444,6 @@ input:checked + .slider:before {
   border: 0px;
 }
 
-/* Boxselector */
-
-.boxselector_wrapper input[type='radio']:checked + label,
-.box-selector-item input[type='radio']:checked + label {
-  background: var(--ui-blue-3) !important;
-  color: black !important;
-  border-radius: 8px;
-  border-color: var(--ui-blue-7);
-  padding: 15px;
-  box-shadow: none;
-}
-
-.boxselector_wrapper input[type='radio']:not(:disabled) + label,
-.box-selector-item input[type='radio']:not(:disabled) + label {
-  background: var(--ui-gray-2);
-  color: var(--black-color) !important;
-  border-radius: 8px;
-  border-color: var(--ui-gray-5);
-  padding: 15px;
-  box-shadow: none;
-}
-
-.row.header {
-  background-color: var(--bg-body-color) !important;
-  margin-bottom: 5px !important;
-}
-
 /* Databatle Setting Menu */
 
 .tableMenu {
@@ -421,48 +463,112 @@ input:checked + .slider:before {
   border: 0px;
 }
 
-/* Myaccount Dropdown Menu */
-
-.myaccount-dropdown {
-  color: var(--text-body-color);
-  font-size: 17px;
-}
-
-.myaccount-container {
-  margin-top: -25px;
-}
-
-.myaccount-icon {
-  padding-left: 8px;
-}
-
-.myaccount-link {
-  display: inline;
-  border: 0px;
-  background: none;
-  padding: 10px 0px;
-}
-
-/* Status Indicator Label Style */
-.label {
+/* Status Indicator Inside Table Section Label Style */
+.table .label {
   border-radius: 8px !important;
 }
 
-.label-danger {
+.table .label .label-danger {
   background-color: var(--ui-error-8);
 }
 
-.label-success {
+.table .label .label-success {
   background-color: var(--ui-success-7);
 }
 
-/* Feather Icon */
+/* Feather Icon Variants */
 
 .feather {
+  display: block;
+  color: var(--text-body-color);
   height: 18px;
   width: 18px;
-  position: relative;
-  top: 3px;
+}
+
+.icon-xs {
+  height: 10px;
+  width: 10px;
+}
+
+.icon-sm {
+  height: 14px;
+  width: 14px;
+}
+
+.icon-md {
+  height: 16px;
+  width: 16px;
+}
+
+.icon-lg {
+  height: 22px;
+  width: 22px;
+}
+
+.icon-xl {
+  height: 26px;
+  width: 26px;
+}
+
+.icon-primary {
+  color: var(--ui-blue-8);
+}
+
+.icon-white {
+  color: var(--white-color);
+}
+
+.icon-dark {
+  color: var(--ui-black);
+}
+
+.icon-secondary {
+  color: var(--ui-gray-8);
+}
+
+.icon-warning {
+  color: var(--ui-warning-8);
+}
+
+.icon-danger {
+  color: var(--ui-error-8);
+}
+
+.icon-success {
+  color: var(--ui-success-6);
+}
+
+.icon-nested-gray {
+  width: 18px;
+  height: 18px;
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: var(--ui-gray-4);
   margin-right: 5px;
-  color: var(--text-body-color);
+}
+
+.icon-nested-blue {
+  width: 18px;
+  height: 18px;
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: var(--ui-blue-3);
+  margin-right: 5px;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+}
+/* Required Label with asterisk */
+
+.required:after {
+  content: '*';
+  color: var(--ui-error-9);
 }

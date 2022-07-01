@@ -98,6 +98,7 @@ div.input-mask {
   color: var(--text-widget-header-color);
   padding: 10px 15px;
   line-height: 30px;
+  font-weight: 500;
 }
 .widget .widget-header i {
   margin-right: 5px;
