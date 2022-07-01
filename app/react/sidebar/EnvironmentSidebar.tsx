@@ -58,9 +58,11 @@ function Content({ environment, onClear }: ContentProps) {
   const Sidebar = getSidebar(platform);
 
   return (
-    <SidebarSection title="Environment">
-      <Title environment={environment} onClear={onClear} />
-
+    <SidebarSection
+      title={<Title environment={environment} onClear={onClear} />}
+      aria-label={environment.Name}
+      showTitleWhenOpen
+    >
       <div className="mt-2">
         <Sidebar environmentId={environment.Id} environment={environment} />
       </div>
@@ -114,22 +116,18 @@ interface TitleProps {
 function Title({ environment, onClear }: TitleProps) {
   const { isOpen } = useSidebarState();
 
-  if (!environment) {
-    return null;
-  }
-
   const EnvironmentIcon = getPlatformIcon(environment.Type);
 
   if (!isOpen) {
     return (
-      <li className="w-full flex justify-center" title={environment.Name}>
+      <div className="w-8 flex justify-center -ml-3" title={environment.Name}>
         <EnvironmentIcon className="text-2xl" />
-      </li>
+      </div>
     );
   }
 
   return (
-    <li className="ml-3 flex items-center">
+    <div className="flex items-center">
       <EnvironmentIcon className="text-2xl mr-3" />
       <span className="text-white text-ellipsis overflow-hidden whitespace-nowrap">
         {environment.Name}
@@ -142,6 +140,6 @@ function Title({ environment, onClear }: TitleProps) {
       >
         <X />
       </button>
-    </li>
+    </div>
   );
 }

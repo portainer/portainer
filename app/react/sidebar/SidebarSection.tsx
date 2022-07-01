@@ -1,27 +1,46 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 import { useSidebarState } from './useSidebarState';
 
 interface Props {
-  title: string;
+  title: ReactNode;
+  showTitleWhenOpen?: boolean;
+  'aria-label'?: string;
 }
 
-export function SidebarSection({ title, children }: PropsWithChildren<Props>) {
+export function SidebarSection({
+  title,
+  children,
+  showTitleWhenOpen,
+  'aria-label': ariaLabel,
+}: PropsWithChildren<Props>) {
   return (
     <div>
-      <SidebarSectionTitle>{title}</SidebarSectionTitle>
+      <SidebarSectionTitle showWhenOpen={showTitleWhenOpen}>
+        {title}
+      </SidebarSectionTitle>
 
-      <nav aria-label={title} className="mt-4">
+      <nav
+        aria-label={typeof title === 'string' ? title : ariaLabel}
+        className="mt-4"
+      >
         <ul>{children}</ul>
       </nav>
     </div>
   );
 }
 
-export function SidebarSectionTitle({ children }: PropsWithChildren<unknown>) {
+interface TitleProps {
+  showWhenOpen?: boolean;
+}
+
+export function SidebarSectionTitle({
+  showWhenOpen,
+  children,
+}: PropsWithChildren<TitleProps>) {
   const { isOpen } = useSidebarState();
 
-  if (!isOpen) {
+  if (!isOpen && !showWhenOpen) {
     return null;
   }
 
