@@ -37,10 +37,8 @@ export function EnvironmentSidebar() {
         <SidebarSectionTitle>
           <div className="flex items-center gap-1">
             <span>Environment:</span>
-            <Slash size="1em" className="text-xl text-gray-7" />
-            <span className="text-gray-7 text-sm font-medium">
-              None selected
-            </span>
+            <Slash size="1em" className="text-xl text-gray-6" />
+            <span className="text-gray-6 text-sm">None selected</span>
           </div>
         </SidebarSectionTitle>
       )}
