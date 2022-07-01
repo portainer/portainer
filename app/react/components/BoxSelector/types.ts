@@ -10,4 +10,5 @@ export interface BoxSelectorOption<T> extends IconProps {
   disabled?: () => boolean;
   tooltip?: () => string;
   feature?: FeatureId;
+  hide?: boolean;
 }
