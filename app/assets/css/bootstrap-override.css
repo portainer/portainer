@@ -1,4 +1,20 @@
-/* Main Color UI Override*/
+/* Label, Section Title */
+
+.control-label {
+  color: var(--ui-gray-7);
+  font-weight: 500;
+}
+
+.form-section-title {
+  color: var(--ui-gray-9);
+  font-size: 16px;
+}
+
+.vertical-center {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
 
 .blue {
   background: var(--bg-dashboard-item) !important;
@@ -6,6 +22,13 @@
 
 .btn {
   border-radius: 5px;
+  display: inline-flex;
+  justify-content: space-around;
+  gap: 5px;
+}
+
+pr-icon {
+  display: inline-block;
 }
 
 .btn.active {
@@ -456,11 +479,10 @@ input:checked + .slider:before {
 /* Feather Icon Variants */
 
 .feather {
+  display: block;
+  color: var(--text-body-color);
   height: 18px;
   width: 18px;
-  position: relative;
-  top: 3px;
-  color: var(--text-body-color);
 }
 
 .icon-xs {
@@ -488,28 +510,32 @@ input:checked + .slider:before {
   width: 26px;
 }
 
+.icon-primary {
+  color: var(--ui-blue-8);
+}
+
 .icon-white {
   color: var(--white-color);
 }
 
-.icon-gray {
+.icon-dark {
+  color: var(--ui-black);
+}
+
+.icon-secondary {
   color: var(--ui-gray-8);
 }
 
-.icon-yellow {
+.icon-warning {
   color: var(--ui-warning-8);
 }
 
-.icon-red {
+.icon-danger {
   color: var(--ui-error-8);
 }
 
-.icon-green {
+.icon-success {
   color: var(--ui-success-6);
-}
-
-.icon-blue {
-  color: var(--ui-blue-8);
 }
 
 .icon-nested-gray {
@@ -545,16 +571,4 @@ input:checked + .slider:before {
 .required:after {
   content: '*';
   color: var(--ui-error-9);
-}
-
-/* Testing */
-
-.control-label {
-  color: var(--ui-gray-7);
-  font-weight: 500;
-}
-
-.form-section-title {
-  color: var(--ui-gray-9);
-  font-size: 16px;
 }

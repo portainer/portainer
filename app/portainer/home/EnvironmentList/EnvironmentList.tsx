@@ -288,7 +288,10 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                     <Button
                       onClick={onRefresh}
                       data-cy="home-refreshEndpointsButton"
-                      className={clsx(styles.refreshEnvironmentsButton)}
+                      className={clsx(
+                        'vertical-center',
+                        styles.refreshEnvironmentsButton
+                      )}
                     >
                       <RefreshCcw
                         className="feather icon-sm icon-white"
