@@ -134,9 +134,10 @@ function Title({ environment, onClear }: TitleProps) {
       </span>
 
       <button
+        title="Clear environment"
         type="button"
         onClick={onClear}
-        className="flex items-center justify-center be:bg-gray-9 bg-blue-10 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white"
+        className="flex items-center justify-center be:bg-gray-9 bg-blue-10 hover:bg-blue-9 be:hover:bg-gray-7 transition-colors duration-200 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white be:hover:text-white"
       >
         <X />
       </button>
