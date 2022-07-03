@@ -20,14 +20,14 @@ export function DashboardItem({
   featherIcon,
 }: Props) {
   return (
-    <Widget aria-label={type}>
+    <Widget>
       <WidgetBody
         className={clsx(
           'border-solid rounded-lg border hover:border-2 hover:-m-px border-gray-5 hover:border-blue-7',
           'bg-gray-2 hover:bg-blue-2'
         )}
       >
-        <div className="flex">
+        <div className="flex" aria-label={type}>
           <div className="widget-icon blue">
             <Icon icon={icon} feather={featherIcon} />
           </div>

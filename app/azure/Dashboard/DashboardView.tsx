@@ -60,13 +60,13 @@ export function DashboardView() {
             <DashboardItem
               value={subscriptionsCount as number}
               icon="fa fa-th-list"
-              type="Subscriptions"
+              type="Subscription"
             />
             {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (
               <DashboardItem
                 value={resourceGroupsCount}
                 icon="fa fa-th-list"
-                type="Resource groups"
+                type="Resource group"
               />
             )}
           </DashboardGrid>
