@@ -5,10 +5,10 @@
     <div class="col-sm-12">
       <label for="ownership" class="control-label text-left">
         Enable access control
-        <portainer-tooltip position="bottom" message="When enabled, you can restrict the access and management of this resource."></portainer-tooltip>
+        <tooltip message="'When enabled, you can restrict the access and management of this resource.'"></tooltip>
       </label>
       <label class="switch" style="margin-left: 20px">
-        <input name="ownership" type="checkbox" ng-model="$ctrl.formData.AccessControlEnabled" /><i data-cy="portainer-accessMgmtToggle"></i>
+        <input name="ownership" type="checkbox" ng-model="$ctrl.formData.AccessControlEnabled" /><span class="slider round" data-cy="portainer-accessMgmtToggle"></span>
       </label>
     </div>
   </div>

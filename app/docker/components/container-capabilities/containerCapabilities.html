@@ -4,13 +4,13 @@
     <div ng-repeat="cap in $ctrl.capabilities" class="col-xs-12 col-sm-6 col-md-4">
       <div class="row">
         <div class="col-xs-8">
-          <label for="capability" class="control-label text-left" style="display: flex; padding: 0">
+          <label for="capability" class="col-sm-2 control-label text-left" style="display: flex; padding: 0">
             {{ cap.capability }}
-            <portainer-tooltip position="bottom" message="{{ cap.description }}"></portainer-tooltip>
+            <tooltip message="cap.description"></tooltip>
           </label>
         </div>
         <div class="col-xs-4">
-          <label class="switch"> <input type="checkbox" name="capability" ng-model="cap.allowed" /><i></i> </label>
+          <label class="switch"> <input type="checkbox" name="capability" ng-model="cap.allowed" /><span class="slider round"></span> </label>
         </div>
       </div>
     </div>
