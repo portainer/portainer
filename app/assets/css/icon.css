@@ -1,8 +1,8 @@
 .feather {
   display: block;
-  color: var(--text-body-color);
-  height: 18px;
-  width: 18px;
+  height: 1em;
+  width: 1em;
+  color: inherit;
 }
 
 pr-icon {
