@@ -12,9 +12,25 @@ interface Props {
   icon: ReactNode | ComponentType<unknown>;
   feather?: boolean;
   className?: string;
+  mode?:
+    | 'alt'
+    | 'white'
+    | 'white-alt'
+    | 'black'
+    | 'black-alt'
+    | 'primary'
+    | 'primary-alt'
+    | 'secondary'
+    | 'secondary-alt'
+    | 'warning'
+    | 'warning-alt'
+    | 'danger'
+    | 'danger-alt'
+    | 'success'
+    | 'success-alt';
 }
 
-export function Icon({ icon, feather, className }: Props) {
+export function Icon({ icon, feather, className, mode }: Props) {
   useEffect(() => {
     if (feather) {
       featherIcons.replace();
@@ -31,11 +47,13 @@ export function Icon({ icon, feather, className }: Props) {
     );
   }
 
+  const classes = clsx(className, 'icon', { [`icon-${mode}`]: mode });
+
   if (feather) {
     return (
       <i
         data-feather={icon}
-        className={className}
+        className={classes}
         aria-hidden="true"
         role="img"
       />
