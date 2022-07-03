@@ -38,7 +38,7 @@
                 <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
                   <div class="col-sm-12">
                     <label class="control-label text-left"> Resource assignment </label>
-                    <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
+                    <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><span class="slider round"></span></label>
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable && !ctrl.isQuotaValid()">
@@ -174,7 +174,7 @@
 
                     <div class="col-sm-12" style="margin-top: 10px">
                       <label class="control-label text-left"> Allow users to use this ingress </label>
-                      <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="ic.Selected" /><i></i> </label>
+                      <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="ic.Selected" /><span class="slider round"></span></label>
                     </div>
                   </div>
 
