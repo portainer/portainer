@@ -18,9 +18,10 @@ export interface Props {
   dataCy?: string;
   disabled?: boolean;
   featureId?: FeatureId;
-  showSwitchText?: boolean;
-  switchOnText?: string;
-  switchOffText?: string;
+  switchValues?: {
+    on: string;
+    off: string;
+  };
 }
 
 export function SwitchField({
@@ -33,9 +34,7 @@ export function SwitchField({
   disabled,
   onChange,
   featureId,
-  showSwitchText,
-  switchOnText = 'Yes',
-  switchOffText = 'No',
+  switchValues,
 }: Props) {
   const toggleName = name ? `toggle_${name}` : '';
 
@@ -61,11 +60,11 @@ export function SwitchField({
         featureId={featureId}
         dataCy={dataCy}
       />
-      {showSwitchText && checked && (
-        <span className="ml-2">{switchOnText}</span>
+      {switchValues && checked && (
+        <span className="ml-2">{switchValues.on}</span>
       )}
-      {showSwitchText && !checked && (
-        <span className="ml-2">{switchOffText}</span>
+      {switchValues && !checked && (
+        <span className="ml-2">{switchValues.off}</span>
       )}
     </label>
   );
