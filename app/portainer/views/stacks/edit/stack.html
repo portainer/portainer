@@ -168,8 +168,8 @@
                     <label class="control-label text-left">
                       Create a Stack webhook
                       <portainer-tooltip
-                        position="top"
-                        message="Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack."
+                        position="'top'"
+                        message="'Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack.'"
                       ></portainer-tooltip>
                     </label>
                     <label class="switch box-selector-item limited business" style="margin-left: 20px">
@@ -196,7 +196,7 @@
                   <div class="col-sm-12">
                     <label for="prune" class="control-label text-left">
                       Prune services
-                      <portainer-tooltip position="bottom" message="Prune services that are no longer referenced."></portainer-tooltip>
+                      <portainer-tooltip message="'Prune services that are no longer referenced.'"></portainer-tooltip>
                     </label>
                     <label class="switch" style="margin-left: 20px"> <input name="prune" type="checkbox" ng-model="formValues.Prune" /><i></i> </label>
                   </div>

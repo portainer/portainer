@@ -43,7 +43,7 @@ export function SwitchField({
         )}
       >
         {label}
-        {tooltip && <Tooltip position="bottom" message={tooltip} />}
+        {tooltip && <Tooltip message={tooltip} />}
       </span>
       <Switch
         className="space-right"
