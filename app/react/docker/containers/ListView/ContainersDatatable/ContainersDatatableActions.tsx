@@ -67,7 +67,7 @@ export function ContainersDatatableActions({
   }
 
   return (
-    <div className="actionBar">
+    <>
       <ButtonGroup>
         <Authorized authorizations="DockerContainerStart">
           <Button
@@ -157,7 +157,7 @@ export function ContainersDatatableActions({
           </Link>
         </Authorized>
       )}
-    </div>
+    </>
   );
 
   function onStartClick(selectedItems: DockerContainer[]) {

@@ -27,6 +27,10 @@
   gap: 5px;
 }
 
+.btn-group {
+  display: inline-flex;
+}
+
 pr-icon {
   display: inline-block;
 }
@@ -277,10 +281,13 @@ input:checked + .slider:before {
 .toolBar {
   display: flex;
   flex-direction: row;
+  gap: 5px;
 }
 
 .toolBar > .toolBarTitle {
   flex: auto;
+  display: inline-flex;
+  flex-wrap: nowarp;
 }
 
 .toolBar > .searchBar {
@@ -288,6 +295,7 @@ input:checked + .slider:before {
   margin-right: 10px;
   width: 500px;
   height: 30px;
+  display: inline-flex;
 }
 
 .datatable .searchBar {
@@ -296,8 +304,8 @@ input:checked + .slider:before {
 }
 
 .toolBar > .actionBar {
-  flex: right;
   margin-right: 10px;
+  display: inline-flex;
 }
 
 .datatable .actionBar {
@@ -307,6 +315,7 @@ input:checked + .slider:before {
 .toolBar > .settings {
   width: 60px;
   text-align: right;
+  display: inline-flex;
 }
 
 .datatable .toolBar .settings {
