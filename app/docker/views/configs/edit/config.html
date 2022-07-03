@@ -1,13 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Config details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.configs.config({id: config.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.configs">Configs</a> &gt; <a ui-sref="docker.configs.config({id: config.Id})">{{ config.Name }}</a>
-  </rd-header-content>
-</rd-header>
+<page-header title="'Config details'" breadcrumbs="[{label:'Configs', link:'docker.configs'}, config.Name]" reload="true"> </page-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">

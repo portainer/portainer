@@ -1,11 +1,5 @@
-<rd-header>
-  <rd-header-title title-text="Volume list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.volumes" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Volumes</rd-header-content>
-</rd-header>
+<page-header title="'Volume list'" breadcrumbs="['Volumes']" reload="true"> </page-header>
+
 <information-panel-offline ng-if="offlineMode"></information-panel-offline>
 <div class="row">
   <div class="col-sm-12">
