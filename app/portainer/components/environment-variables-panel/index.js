@@ -11,5 +11,6 @@ angular.module('portainer.app').component('environmentVariablesPanel', {
     ngModel: '<',
     explanation: '@',
     onChange: '<',
+    showHelpMessage: '<',
   },
 });
