@@ -29,86 +29,88 @@ export function Footer() {
 
   return (
     <>
-      {showBuildInfo && (
-        <DialogOverlay className={styles.dialog}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <button
-                  type="button"
-                  className="close"
-                  onClick={() => setShowBuildInfo(!showBuildInfo)}
-                >
-                  ×
-                </button>
-                <h5 className="modal-title">Portainer {Edition}</h5>
+      <DialogOverlay
+        className={styles.dialog}
+        isOpen={showBuildInfo}
+        onDismiss={() => setShowBuildInfo(!showBuildInfo)}
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <button
+                type="button"
+                className="close"
+                onClick={() => setShowBuildInfo(!showBuildInfo)}
+              >
+                ×
+              </button>
+              <h5 className="modal-title">Portainer {Edition}</h5>
+            </div>
+            <div className="modal-body">
+              <div className={styles.versionInfo}>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <span className="inline-flex items-center">
+                          <Server size="13" className="space-right" />
+                          Server Version: {ServerVersion}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="inline-flex items-center">
+                          <Database size="13" className="space-right" />
+                          Database Version: {DatabaseVersion}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span className="inline-flex items-center">
+                          <Hash size="13" className="space-right" />
+                          CI Build Number: {Build.BuildNumber}
+                        </span>
+                      </td>
+                      <td>
+                        <span>
+                          <Tag size="13" className="space-right" />
+                          Image Tag: {Build.ImageTag}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div className="modal-body">
-                <div className={styles.versionInfo}>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <span className="inline-flex items-center">
-                            <Server size="13" className="space-right" />
-                            Server Version: {ServerVersion}
-                          </span>
-                        </td>
-                        <td>
-                          <span className="inline-flex items-center">
-                            <Database size="13" className="space-right" />
-                            Database Version: {DatabaseVersion}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <span className="inline-flex items-center">
-                            <Hash size="13" className="space-right" />
-                            CI Build Number: {Build.BuildNumber}
-                          </span>
-                        </td>
-                        <td>
-                          <span>
-                            <Tag size="13" className="space-right" />
-                            Image Tag: {Build.ImageTag}
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className={styles.toolsList}>
-                  <span className="inline-flex items-center">
-                    <Tool size="13" className="space-right" />
-                    Compilation tools:
-                  </span>
+              <div className={styles.toolsList}>
+                <span className="inline-flex items-center">
+                  <Tool size="13" className="space-right" />
+                  Compilation tools:
+                </span>
 
-                  <div className={styles.tools}>
-                    <span className="text-muted small">
-                      Nodejs v{Build.NodejsVersion}
-                    </span>
-                    <span className="text-muted small">
-                      Yarn v{Build.YarnVersion}
-                    </span>
-                    <span className="text-muted small">
-                      Webpack v{Build.WebpackVersion}
-                    </span>
-                    <span className="text-muted small">
-                      Go v{Build.GoVersion}
-                    </span>
-                  </div>
+                <div className={styles.tools}>
+                  <span className="text-muted small">
+                    Nodejs v{Build.NodejsVersion}
+                  </span>
+                  <span className="text-muted small">
+                    Yarn v{Build.YarnVersion}
+                  </span>
+                  <span className="text-muted small">
+                    Webpack v{Build.WebpackVersion}
+                  </span>
+                  <span className="text-muted small">
+                    Go v{Build.GoVersion}
+                  </span>
                 </div>
-              </div>
-              <div className="modal-footer">
-                <Button onClick={() => setShowBuildInfo(!showBuildInfo)}>
-                  Ok
-                </Button>
               </div>
             </div>
+            <div className="modal-footer">
+              <Button onClick={() => setShowBuildInfo(!showBuildInfo)}>
+                Ok
+              </Button>
+            </div>
           </div>
-        </DialogOverlay>
-      )}
+        </div>
+      </DialogOverlay>
 
       <div className={clsx(styles.root, 'text-center')}>
         {process.env.PORTAINER_EDITION === 'CE' && <UpdateNotification />}
