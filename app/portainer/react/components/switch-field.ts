@@ -12,4 +12,5 @@ export const switchField = r2a(SwitchField, [
   'disabled',
   'onChange',
   'featureId',
+  'switchValues',
 ]);
