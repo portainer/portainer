@@ -2,8 +2,11 @@ import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
 
 angular.module('portainer.app').controller('StackDuplicationFormController', [
   'Notifications',
-  function StackDuplicationFormController(Notifications) {
+  '$scope',
+  function StackDuplicationFormController(Notifications, $scope) {
     var ctrl = this;
+
+    ctrl.environmentSelectorOptions = null;
 
     ctrl.state = {
       duplicationInProgress: false,
@@ -23,6 +26,8 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     ctrl.migrateStack = migrateStack;
     ctrl.isMigrationButtonDisabled = isMigrationButtonDisabled;
     ctrl.isEndpointSelected = isEndpointSelected;
+    ctrl.onChangeEnvironment = onChangeEnvironment;
+    ctrl.$onChanges = $onChanges;
 
     function isFormValidForMigration() {
       return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
@@ -30,6 +35,12 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
 
     function isFormValidForDuplication() {
       return isFormValidForMigration() && ctrl.formValues.newName && !ctrl.yamlError;
+    }
+
+    function onChangeEnvironment(value) {
+      return $scope.$evalAsync(() => {
+        ctrl.formValues.endpoint = value;
+      });
     }
 
     function duplicateStack() {
@@ -71,5 +82,36 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     function isEndpointSelected() {
       return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
     }
+
+    function $onChanges() {
+      ctrl.environmentSelectorOptions = getOptions(ctrl.groups, ctrl.endpoints);
+    }
   },
 ]);
+
+function getOptions(groups, environments) {
+  if (!groups || !environments) {
+    return [];
+  }
+
+  const groupSet = environments.reduce((groupSet, environment) => {
+    const groupEnvironments = groupSet[environment.GroupId] || [];
+
+    return {
+      ...groupSet,
+      [environment.GroupId]: [...groupEnvironments, { label: environment.Name, value: environment.Id }],
+    };
+  }, {});
+
+  return Object.entries(groupSet).map(([groupId, environments]) => {
+    const group = groups.find((group) => group.Id === parseInt(groupId, 10));
+    if (!group) {
+      throw new Error('missing group');
+    }
+
+    return {
+      label: group.Name,
+      options: environments,
+    };
+  });
+}
