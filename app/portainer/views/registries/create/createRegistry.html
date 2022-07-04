@@ -93,6 +93,7 @@
             form-action="$ctrl.createRegistry"
             form-action-label="Add registry"
             action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
           ></registry-form-quay>
 
           <registry-form-azure
@@ -141,7 +142,6 @@
             action-in-progress="$ctrl.state.actionInProgress"
             reset-defaults="$ctrl.useDefaultGitlabConfiguration"
           ></registry-form-gitlab>
-
           <registry-form-dockerhub
             ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.DOCKERHUB"
             model="$ctrl.model"

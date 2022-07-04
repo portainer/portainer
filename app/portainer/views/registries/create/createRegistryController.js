@@ -150,6 +150,7 @@ class CreateRegistryController {
     return this.$async(async () => {
       this.model = new RegistryCreateFormValues();
       this.model.Type = RegistryTypes.DOCKERHUB;
+      this.selectDockerHub();
 
       const from = this.$transition$.from();
       const params = this.$transition$.params('from');
