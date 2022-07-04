@@ -10,6 +10,7 @@ import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { ViewLoading } from '@@/ViewLoading';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { TableHeaderSortIcons } from '@@/datatables';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -29,6 +30,10 @@ export const componentsModule = angular
     r2a(PasswordCheckHint, ['forceChangePassword', 'passwordValid'])
   )
   .component('rdLoading', r2a(Loading, []))
+  .component(
+    'tableHeaderSortIcons',
+    r2a(TableHeaderSortIcons, ['sortedAscending', 'sortedDescending'])
+  )
   .component('viewLoading', r2a(ViewLoading, ['message']))
   .component(
     'pageHeader',

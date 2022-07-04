@@ -5,7 +5,7 @@ import { TableHeaderProps } from 'react-table';
 import { Button } from '@@/buttons';
 
 import { useTableContext } from './TableContainer';
-import styles from './TableHeaderCell.module.css';
+import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 
 interface Props {
   canFilter: boolean;
@@ -32,15 +32,17 @@ export function TableHeaderCell({
 
   return (
     <th role={role} style={style} className={className}>
-      <SortWrapper
-        canSort={canSort}
-        onClick={onSortClick}
-        isSorted={isSorted}
-        isSortedDesc={isSortedDesc}
-      >
-        {render()}
-      </SortWrapper>
-      {canFilter ? renderFilter() : null}
+      <div className="flex flex-row flex-nowrap">
+        <SortWrapper
+          canSort={canSort}
+          onClick={onSortClick}
+          isSorted={isSorted}
+          isSortedDesc={isSortedDesc}
+        >
+          {render()}
+        </SortWrapper>
+        {canFilter ? renderFilter() : null}
+      </div>
     </th>
   );
 }
@@ -65,26 +67,23 @@ function SortWrapper({
 
   return (
     <Button
-      color="link"
+      color="table-header"
       type="button"
       onClick={() => onClick(!isSortedDesc)}
-      className="sortable"
-    >
-      <span className="sortable-label">{children}</span>
-
-      {isSorted ? (
-        <i
-          className={clsx(
-            'fa',
-            'space-left',
-            isSortedDesc ? 'fa-sort-alpha-up' : 'fa-sort-alpha-down',
-            styles.sortIcon
-          )}
-          aria-hidden="true"
-        />
-      ) : (
-        <div className={styles.sortIcon} />
+      className={clsx(
+        'sortable w-full !ml-0 !px-0',
+        isSorted && 'sortingActive'
       )}
+    >
+      <div className="flex flex-row justify-start items-center w-full h-full">
+        {children}
+        {canSort && (
+          <TableHeaderSortIcons
+            sortedAscending={isSorted && !isSortedDesc}
+            sortedDescending={isSorted && !!isSortedDesc}
+          />
+        )}
+      </div>
     </Button>
   );
 }

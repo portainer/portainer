@@ -88,11 +88,15 @@
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <button ng-class="$ctrl.state.orderBy === 'Name' && 'sortingActive'" class="btn-table-header" ng-click="$ctrl.changeOrderBy('Name')">
+                  <div>
+                    Name
+                    <table-header-sort-icons
+                      sorted-ascending="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"
+                      sorted-descending="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                    ></table-header-sort-icons>
+                  </div>
+                </button>
                 <div>
                   <span uib-dropdown-toggle ng-class="['table-filter', { 'filter-active': $ctrl.filters.state.enabled }]">
                     Filter
@@ -119,33 +123,61 @@
                 </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Type')">
-                  Type
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <button ng-class="$ctrl.state.orderBy === 'Type' && 'sortingActive'" class="btn-table-header" ng-click="$ctrl.changeOrderBy('Type')">
+                  <div>
+                    Type
+                    <table-header-sort-icons
+                      sorted-ascending="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"
+                      sorted-descending="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"
+                    ></table-header-sort-icons>
+                  </div>
+                </button>
               </th>
               <th>Control</th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('ResourceControl.CreationDate')">
-                  Created
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <button
+                  ng-class="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && 'sortingActive'"
+                  class="btn-table-header"
+                  ng-click="$ctrl.changeOrderBy('ResourceControl.CreationDate')"
+                >
+                  <div>
+                    Created
+                    <table-header-sort-icons
+                      sorted-ascending="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && !$ctrl.state.reverseOrder"
+                      sorted-descending="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && $ctrl.state.reverseOrder"
+                    ></table-header-sort-icons>
+                  </div>
+                </button>
               </th>
               <th ng-if="$ctrl.columnVisibility.columns.updated.display">
-                <a ng-click="$ctrl.changeOrderBy('ResourceControl.UpdateDate')">
-                  Updated
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <button
+                  ng-class="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && 'sortingActive'"
+                  class="btn-table-header"
+                  ng-click="$ctrl.changeOrderBy('ResourceControl.UpdateDate')"
+                >
+                  <div>
+                    Updated
+                    <table-header-sort-icons
+                      sorted-ascending="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && !$ctrl.state.reverseOrder"
+                      sorted-descending="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && $ctrl.state.reverseOrder"
+                    ></table-header-sort-icons>
+                  </div>
+                </button>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
-                  Ownership
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <button
+                  ng-class="$ctrl.state.orderBy === 'ResourceControl.Ownership' && 'sortingActive'"
+                  class="btn-table-header"
+                  ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')"
+                >
+                  <div>
+                    Ownership
+                    <table-header-sort-icons
+                      sorted-ascending="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"
+                      sorted-descending="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"
+                    ></table-header-sort-icons>
+                  </div>
+                </button>
               </th>
             </tr>
           </thead>

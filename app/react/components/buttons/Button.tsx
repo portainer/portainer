@@ -13,7 +13,8 @@ type Color =
   | 'danger'
   | 'link'
   | 'light'
-  | 'dangerlight';
+  | 'dangerlight'
+  | 'table-header';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
 export interface Props extends AriaAttributes, AutomationTestingProps {

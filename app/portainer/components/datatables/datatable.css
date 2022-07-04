@@ -278,18 +278,6 @@
   width: 30px;
 }
 
-.table th button.sortable {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  color: var(--text-link-color);
-}
-
-.table th button.sortable:hover .sortable-label {
-  text-decoration: underline;
-}
-
 .datatable .table-setting-menu-btn {
   border: none;
   background: none;

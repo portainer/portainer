@@ -1,0 +1,13 @@
+.sort-icon > path {
+  fill: var(--sort-icon-muted);
+}
+
+.active-sort-icon > path {
+  fill: var(--sort-icon);
+}
+
+.sort-icon {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+}

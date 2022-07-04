@@ -24,6 +24,11 @@
   border-radius: 5px;
 }
 
+/* highlight the sort icons for columns that aren't actively sorting */
+button:not(.sortingActive):hover path {
+  fill: var(--sort-icon-hover);
+}
+
 /* Input Group Addon */
 .input-group-addon:first-child {
   border-top-left-radius: 5px;

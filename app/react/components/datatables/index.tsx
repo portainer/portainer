@@ -9,12 +9,14 @@ import { TableHeaderRow } from './TableHeaderRow';
 import { TableRow } from './TableRow';
 import { TableContent } from './TableContent';
 import { TableFooter } from './TableFooter';
+import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 
 interface SubComponents {
   Container: typeof TableContainer;
   Actions: typeof TableActions;
   TitleActions: typeof TableTitleActions;
   HeaderCell: typeof TableHeaderCell;
+  HeaderSortIcons: typeof TableHeaderSortIcons;
   SettingsMenu: typeof TableSettingsMenu;
   Title: typeof TableTitle;
   Row: typeof TableRow;
@@ -30,6 +32,7 @@ Table.Actions = TableActions;
 Table.TitleActions = TableTitleActions;
 Table.Container = TableContainer;
 Table.HeaderCell = TableHeaderCell;
+Table.HeaderSortIcons = TableHeaderSortIcons;
 Table.SettingsMenu = TableSettingsMenu;
 Table.Title = TableTitle;
 Table.Row = TableRow;
@@ -42,6 +45,7 @@ export {
   TableActions,
   TableTitleActions,
   TableHeaderCell,
+  TableHeaderSortIcons,
   TableSettingsMenu,
   TableTitle,
   TableContainer,
