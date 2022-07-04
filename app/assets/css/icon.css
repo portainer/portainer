@@ -1,0 +1,115 @@
+.feather {
+  display: block;
+  height: 1em;
+  width: 1em;
+  color: inherit;
+}
+
+pr-icon {
+  display: inline-block;
+}
+
+.icon {
+  color: currentColor;
+  margin: 0;
+}
+
+.icon-xs {
+  height: 10px;
+  width: 10px;
+}
+
+.icon-sm {
+  height: 14px;
+  width: 14px;
+}
+
+.icon-md {
+  height: 16px;
+  width: 16px;
+}
+
+.icon-lg {
+  height: 22px;
+  width: 22px;
+}
+
+.icon-xl {
+  height: 26px;
+  width: 26px;
+}
+
+.icon.icon-alt {
+  fill: var(--black-color);
+  stroke: var(--white-color);
+}
+
+.icon-primary {
+  color: var(--ui-blue-8);
+}
+
+.icon.icon-primary-alt {
+  fill: var(--ui-blue-8);
+  stroke: var(--white-color);
+}
+
+.icon-secondary {
+  color: var(--ui-gray-8);
+}
+
+.icon.icon-secondary-alt {
+  fill: var(--ui-gray-8);
+  stroke: var(--black-color);
+}
+
+.icon-warning {
+  color: var(--ui-warning-8);
+}
+
+.icon.icon-warning-alt {
+  fill: var(--ui-warning-8);
+  stroke: var(--white-color);
+}
+
+.icon-danger {
+  color: var(--ui-error-8);
+}
+
+.icon.icon-danger-alt {
+  fill: var(--ui-error-8);
+  stroke: var(--white-color);
+}
+
+.icon-success {
+  color: var(--ui-success-6);
+}
+
+.icon.icon-success-alt {
+  fill: var(--ui-success-8);
+  stroke: var(--white-color);
+}
+
+.icon-nested-gray {
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: var(--ui-gray-4);
+  margin-right: 5px;
+}
+
+.icon-nested-blue {
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: var(--ui-blue-3);
+  margin-right: 5px;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+}
