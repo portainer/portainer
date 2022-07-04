@@ -55,7 +55,7 @@
       <div class="form-group" ng-show="macvlanConfigurationForm.network_card.$invalid">
         <div class="col-sm-12 small text-warning">
           <div ng-messages="macvlanConfigurationForm.network_card.$error">
-            <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Parent network card must be specified.</p>
+            <p ng-message="required"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Parent network card must be specified.</p>
           </div>
         </div>
       </div>
@@ -82,7 +82,7 @@
         <div class="form-group" ng-show="macvlanConfigurationForm.node_selector.$invalid">
           <div class="col-sm-12 small text-warning">
             <div ng-messages="macvlanConfigurationForm.node_selector.$error">
-              <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> At least one node must be selected.</p>
+              <p ng-message="required"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> At least one node must be selected.</p>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@
       <div class="form-group" ng-show="macvlanConfigurationForm.config_network.$invalid">
         <div class="col-sm-12 small text-warning">
           <div ng-messages="macvlanConfigurationForm.config_network.$error">
-            <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Select a configuration network.</p>
+            <p ng-message="required"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Select a configuration network.</p>
           </div>
         </div>
       </div>

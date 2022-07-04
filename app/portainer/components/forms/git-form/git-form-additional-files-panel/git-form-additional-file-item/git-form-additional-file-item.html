@@ -20,8 +20,8 @@
     <div ng-show="$ctrl[$ctrl.formName].name.$invalid">
       <div class="col-sm-12 small text-warning">
         <div ng-messages="$ctrl[$ctrl.formName].name.$error">
-          <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required. </p>
-          <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> File path must include yaml, yml, json, or hcl extension </p>
+          <p ng-message="required"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Path is required. </p>
+          <p ng-message="pattern"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> File path must include yaml, yml, json, or hcl extension </p>
         </div>
       </div>
     </div>

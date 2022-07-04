@@ -20,7 +20,7 @@
           <div class="form-group" ng-show="$ctrl.state.nameAlreadyExists">
             <div class="col-sm-12 small text-warning">
               <div>
-                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A registry with the same name already exists.</p>
+                <p><pr-icon feather="true" icon="'alert-triangle'"></pr-icon> A registry with the same name already exists.</p>
               </div>
             </div>
           </div>
@@ -114,7 +114,7 @@
             <div class="form-group" ng-show="registryFormEcr.registry_region.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="registryFormEcr.registry_region.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required"><pr-icon feather="true" icon="'alert-triangle'"></pr-icon> This field is required.</p>
                 </div>
               </div>
             </div>

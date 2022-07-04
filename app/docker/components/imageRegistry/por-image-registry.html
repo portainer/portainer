@@ -46,7 +46,7 @@
     <div class="form-group">
       <span class="small">
         <p class="text-muted" style="margin-left: 15px">
-          <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+          <pr-icon feather="true" icon="'alert-circle'" style="margin-right: 2px"></pr-icon>
           When using advanced mode, image and repository <b>must be</b> publicly available.
         </p>
       </span>
@@ -62,7 +62,7 @@
     <div class="col-sm-12 small text-warning">
       <div ng-messages="$ctrl.form.image_name.$error">
         <p ng-message="required">
-          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Image name is required.
+          <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Image name is required.
           <span ng-if="$ctrl.canPull">Tag must be specified otherwise Portainer will pull all tags associated to the image.</span>
         </p>
       </div>
