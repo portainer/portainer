@@ -34,5 +34,8 @@ export const componentsModule = angular
     'pageHeader',
     r2a(PageHeader, ['title', 'breadcrumbs', 'loading', 'onReload', 'reload'])
   )
-  .component('prIcon', r2a(Icon, ['className', 'feather', 'icon']))
+  .component(
+    'prIcon',
+    r2a(Icon, ['className', 'feather', 'icon', 'mode', 'size'])
+  )
   .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, [])).name;
