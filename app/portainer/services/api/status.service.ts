@@ -44,6 +44,16 @@ export interface VersionResponse {
   UpdateAvailable: boolean;
   // The latest version available
   LatestVersion: string;
+  ServerVersion: string;
+  DatabaseVersion: string;
+  Build: {
+    BuildNumber: string;
+    ImageTag: string;
+    NodejsVersion: string;
+    YarnVersion: string;
+    WebpackVersion: string;
+    GoVersion: string;
+  };
 }
 
 export async function getVersionStatus() {
