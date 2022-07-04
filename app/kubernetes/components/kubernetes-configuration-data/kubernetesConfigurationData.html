@@ -4,12 +4,8 @@
   <div class="form-group" ng-if="$ctrl.isCreation">
     <div class="col-sm-12">
       <p>
-        <a class="small interactive" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
-          <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode
-        </a>
-        <a class="small interactive" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
-          <i class="fa fa-edit space-right" aria-hidden="true"></i> Simple mode
-        </a>
+        <a class="small interactive" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()"> <pr-icon icon="'globe'" feather="true"> </pr-icon>Advanced mode </a>
+        <a class="small interactive" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()"> <pr-icon icon="'database'" feather="true"> </pr-icon> Simple mode </a>
       </p>
     </div>
     <div class="col-sm-12 small text-muted" ng-if="$ctrl.formValues.IsSimple">
@@ -107,7 +103,7 @@
           <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove entry
         </button>
         <span class="small text-muted" ng-if="entry.Used">
-          <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+          <pr-icon feather="true" icon="'alert-circle'"></pr-icon>
           This key is currently used by one or more applications
         </span>
       </div>

@@ -270,7 +270,7 @@
                             <span class="input-group-addon">container</span>
                             <input type="text" class="form-control" ng-model="volume.Target" placeholder="e.g. /path/in/container" />
                           </div>
-                          <div class="small text-warning" ng-show="!volume.Target"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Target is required. </div>
+                          <div class="small text-warning" ng-show="!volume.Target"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Target is required. </div>
                         </div>
                         <!-- !container-path -->
                         <!-- volume-type -->
@@ -303,7 +303,7 @@
                               <option selected disabled value="">Select a volume</option>
                             </select>
                           </div>
-                          <div class="small text-warning" ng-show="!volume.Source"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Source is required. </div>
+                          <div class="small text-warning" ng-show="!volume.Source"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Source is required. </div>
                         </div>
                         <!-- !volume -->
                         <!-- bind -->
@@ -312,7 +312,7 @@
                             <span class="input-group-addon">host</span>
                             <input type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/on/host" />
                           </div>
-                          <div class="small text-warning" ng-show="!volume.Source"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Source is required. </div>
+                          <div class="small text-warning" ng-show="!volume.Source"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Source is required. </div>
                         </div>
                         <!-- !bind -->
                         <!-- read-only -->
