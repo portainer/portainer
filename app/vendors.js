@@ -18,7 +18,6 @@ import 'bootstrap/dist/js/bootstrap.js';
 import 'js-yaml/dist/js-yaml.js';
 import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
-import 'angular-multiselect/isteven-multi-select.js';
 import 'angulartics/dist/angulartics.min.js';
 
 window.angular = angular;

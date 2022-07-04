@@ -11,7 +11,6 @@ import 'codemirror/addon/lint/lint.css';
 import 'angular-json-tree/dist/angular-json-tree.css';
 import 'angular-loading-bar/build/loading-bar.css';
 import 'angular-moment-picker/dist/angular-moment-picker.min.css';
-import 'angular-multiselect/isteven-multi-select.css';
 import 'spinkit/spinkit.min.css';
 import '@reach/menu-button/styles.css';
 

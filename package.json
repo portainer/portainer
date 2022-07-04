@@ -85,7 +85,6 @@
     "angular-messages": "1.8.2",
     "angular-mocks": "1.8.2",
     "angular-moment-picker": "^0.10.2",
-    "angular-multiselect": "https://github.com/portainer/angular-multi-select.git#5f6cb6f966b0bd89f211338fc41dcf70ecacbde7",
     "angular-resource": "1.8.2",
     "angular-sanitize": "1.8.2",
     "angular-ui-bootstrap": "~2.5.0",
