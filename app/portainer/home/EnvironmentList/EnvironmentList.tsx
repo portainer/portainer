@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
+import { RefreshCcw } from 'react-feather';
 
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
 import {
@@ -287,10 +288,13 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                     <Button
                       onClick={onRefresh}
                       data-cy="home-refreshEndpointsButton"
-                      className={clsx(styles.refreshEnvironmentsButton)}
+                      className={clsx(
+                        'vertical-center',
+                        styles.refreshEnvironmentsButton
+                      )}
                     >
-                      <i
-                        className="fa fa-sync space-right"
+                      <RefreshCcw
+                        className="feather icon-sm icon-white"
                         aria-hidden="true"
                       />
                       Refresh

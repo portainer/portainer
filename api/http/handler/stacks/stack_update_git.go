@@ -18,6 +18,7 @@ import (
 type stackGitUpdatePayload struct {
 	AutoUpdate               *portainer.StackAutoUpdate
 	Env                      []portainer.Pair
+	Prune                    bool
 	RepositoryReferenceName  string
 	RepositoryAuthentication bool
 	RepositoryUsername       string
@@ -130,6 +131,12 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	stack.Env = payload.Env
 	stack.UpdatedBy = user.Username
 	stack.UpdateDate = time.Now().Unix()
+
+	if stack.Type == portainer.DockerSwarmStack {
+		stack.Option = &portainer.StackOption{
+			Prune: payload.Prune,
+		}
+	}
 
 	if payload.RepositoryAuthentication {
 		password := payload.RepositoryPassword

@@ -7,6 +7,7 @@ export function StackViewModel(data) {
   this.EndpointId = data.EndpointId;
   this.SwarmId = data.SwarmId;
   this.Env = data.Env ? data.Env : [];
+  this.Option = data.Option;
   this.IsComposeFormat = data.IsComposeFormat;
   if (data.ResourceControl && data.ResourceControl.Id !== 0) {
     this.ResourceControl = new ResourceControlViewModel(data.ResourceControl);
@@ -44,6 +45,7 @@ export function OrphanedStackViewModel(data) {
   this.EndpointId = data.EndpointId;
   this.SwarmId = data.SwarmId;
   this.Env = data.Env ? data.Env : [];
+  this.Option = data.Option;
   if (data.ResourceControl && data.ResourceControl.Id !== 0) {
     this.ResourceControl = new ResourceControlViewModel(data.ResourceControl);
   }

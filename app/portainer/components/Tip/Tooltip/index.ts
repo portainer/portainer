@@ -1,1 +1,0 @@
-export { TooltipAngular } from './TooltipAngular';

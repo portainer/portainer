@@ -20,17 +20,19 @@ export function BoxSelector<T extends number | string>({
 }: Props<T>) {
   return (
     <div className={clsx('boxselector_wrapper', styles.root)} role="radiogroup">
-      {options.map((option) => (
-        <BoxSelectorItem
-          key={option.id}
-          radioName={radioName}
-          option={option}
-          onChange={onChange}
-          selectedValue={value}
-          disabled={option.disabled && option.disabled()}
-          tooltip={option.tooltip && option.tooltip()}
-        />
-      ))}
+      {options.map((option) =>
+        option.hide ? null : (
+          <BoxSelectorItem
+            key={option.id}
+            radioName={radioName}
+            option={option}
+            onChange={onChange}
+            selectedValue={value}
+            disabled={option.disabled && option.disabled()}
+            tooltip={option.tooltip && option.tooltip()}
+          />
+        )
+      )}
     </div>
   );
 }

@@ -5,6 +5,10 @@ declare module '*.png' {
   export default '' as string;
 }
 
+declare module '*.svg' {
+  export default '' as string;
+}
+
 type SvgrComponent = React.StatelessComponent<React.SVGAttributes<SVGElement>>;
 
 declare module '*.svg?c' {

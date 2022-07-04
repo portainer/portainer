@@ -165,8 +165,7 @@
 
   --text-main-color: var(--grey-7);
   --text-body-color: var(--grey-6);
-  --text-sidebar-title-color: var(--blue-3);
-  --text-widget-header-color: var(--grey-7);
+  --text-widget-header-color: var(--ui-gray-11);
   --text-form-control-color: var(--grey-25);
   --text-muted-color: var(--grey-26);
   --text-link-color: var(--blue-2);
@@ -346,7 +345,6 @@
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
-  --text-sidebar-title-color: var(--grey-8);
   --text-widget-header-color: var(--white-color);
   --text-form-control-color: var(--white-color);
   --text-muted-color: var(--grey-8);
@@ -526,7 +524,6 @@
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
-  --text-sidebar-title-color: var(--grey-8);
   --text-widget-header-color: var(--white-color);
   --text-link-color: var(--blue-9);
   --text-link-hover-color: var(--blue-9);

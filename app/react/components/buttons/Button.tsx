@@ -7,6 +7,7 @@ type Type = 'submit' | 'button' | 'reset';
 type Color =
   | 'default'
   | 'primary'
+  | 'secondary'
   | 'success'
   | 'warning'
   | 'danger'

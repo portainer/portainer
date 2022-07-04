@@ -9,7 +9,7 @@
     <div class="form-group">
       <label for="ldap_group_basedn_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
         Group Base DN
-        <portainer-tooltip position="bottom" message="The distinguished name of the element from which the LDAP server will search for groups."></portainer-tooltip>
+        <portainer-tooltip message="'The distinguished name of the element from which the LDAP server will search for groups.'"></portainer-tooltip>
       </label>
       <div class="col-sm-8 col-md-4">
         <input type="text" class="form-control" id="ldap_group_basedn_{{ $index }}" ng-model="config.GroupBaseDN" placeholder="dc=ldap,dc=domain,dc=tld" />
@@ -17,7 +17,7 @@
 
       <label for="ldap_group_att_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
         Group Membership Attribute
-        <portainer-tooltip position="bottom" message="LDAP attribute which denotes the group membership."></portainer-tooltip>
+        <portainer-tooltip message="'LDAP attribute which denotes the group membership.'"></portainer-tooltip>
       </label>
       <div class="col-sm-8 col-md-4">
         <input type="text" class="form-control" id="ldap_group_att_{{ $index }}" ng-model="config.GroupAttribute" placeholder="member" />
@@ -26,7 +26,7 @@
     <div class="form-group">
       <label for="ldap_group_filter_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
         Group Filter
-        <portainer-tooltip position="bottom" message="The LDAP search filter used to select group elements, optional."></portainer-tooltip>
+        <portainer-tooltip message="'The LDAP search filter used to select group elements, optional.'"></portainer-tooltip>
       </label>
       <div ng-class="{ 'col-sm-7 col-md-9': $index, 'col-sm-8 col-md-10': !$index }">
         <input type="text" class="form-control" id="ldap_group_filter_{{ $index }}" ng-model="config.GroupFilter" placeholder="(objectClass=account)" />

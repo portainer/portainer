@@ -39,6 +39,7 @@ const options: BoxSelectorOption<
     label: 'Edge Agent',
     description: '',
     value: EnvironmentCreationTypes.EdgeAgentEnvironment,
+    hide: window.ddExtension,
   },
   {
     id: 'kubeconfig_endpoint',
