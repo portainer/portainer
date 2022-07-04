@@ -1,9 +1,14 @@
-<rd-header>
-  <rd-header-title title-text="Container statistics"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a> &gt; Stats
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'Container statistics'"
+  breadcrumbs="[
+    { label:'Containers', link:'docker.containers' },
+    { 
+      label:(container.Name | trimcontainername),
+      link: 'docker.containers.container', 
+      linkParams:container.Id
+    }, 'Stats']"
+>
+</page-header>
 
 <div class="row">
   <div class="col-md-12">
