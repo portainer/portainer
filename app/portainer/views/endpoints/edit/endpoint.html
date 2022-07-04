@@ -112,8 +112,7 @@
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
               Environment URL
               <portainer-tooltip
-                position="bottom"
-                message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
+                message="'URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it.'"
               >
               </portainer-tooltip>
             </label>
@@ -133,10 +132,7 @@
           <div class="form-group" ng-if="!state.azureEndpoint">
             <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
               Public IP
-              <portainer-tooltip
-                position="bottom"
-                message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the environment URL."
-              >
+              <portainer-tooltip message="'URL or IP address where exposed containers will be reachable. This field is optional and will default to the environment URL.'">
               </portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">

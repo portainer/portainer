@@ -6,10 +6,7 @@
 <div class="form-group" ng-if="!$ctrl.settings.TLSConfig.TLS">
   <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0">
     Use StartTLS
-    <portainer-tooltip
-      position="bottom"
-      message="Enable this option if want to use StartTLS to secure the connection to the server. Ignored if Use TLS is selected."
-    ></portainer-tooltip>
+    <portainer-tooltip message="'Enable this option if want to use StartTLS to secure the connection to the server. Ignored if Use TLS is selected.'"></portainer-tooltip>
   </label>
   <div class="col-sm-9">
     <label class="switch">
@@ -23,7 +20,7 @@
 <div class="form-group" ng-if="!$ctrl.settings.StartTLS">
   <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0">
     Use TLS
-    <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the LDAP server."></portainer-tooltip>
+    <portainer-tooltip message="'Enable this option if you need to specify TLS certificates to connect to the LDAP server.'"></portainer-tooltip>
   </label>
   <div class="col-sm-9">
     <label class="switch">
@@ -37,7 +34,7 @@
 <div class="form-group">
   <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0">
     Skip verification of server certificate
-    <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
+    <portainer-tooltip message="'Skip the verification of the server TLS certificate. Not recommended on unsecured networks.'"></portainer-tooltip>
   </label>
   <div class="col-sm-9">
     <label class="switch">

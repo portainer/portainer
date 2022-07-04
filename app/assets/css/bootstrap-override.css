@@ -20,101 +20,8 @@
   background: var(--bg-dashboard-item) !important;
 }
 
-.btn {
-  border-radius: 5px;
-  display: inline-flex;
-  justify-content: space-around;
-  gap: 5px;
-}
-
-pr-icon {
-  display: inline-block;
-}
-
-.btn.active {
-  box-shadow: none;
-}
-
 .form-control {
   border-radius: 5px;
-}
-
-/* Button Primary */
-.btn-primary {
-  background-color: var(--ui-blue-8);
-}
-
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary:active .active {
-  background-color: var(--ui-blue-9);
-}
-
-.btn-primary:active,
-.btn-primary.active,
-.open > .dropdown-toggle.btn-primary {
-  background-color: var(--ui-blue-9);
-}
-
-.nav-pills > li.active > a,
-.nav-pills > li.active > a:hover,
-.nav-pills > li.active > a:focus {
-  background-color: var(--ui-blue-8);
-}
-
-.btn-danger {
-  background-color: var(--ui-error-8);
-}
-
-.btn-success {
-  background-color: var(--ui-success-7);
-}
-
-.btn-dangerlight {
-  background-color: var(--ui-error-2) !important;
-  border: 1px solid var(--border-button-group);
-  color: var(--ui-error-8);
-}
-
-.btn-dangerlight:hover {
-  color: var(--ui-error-9) !important;
-  background-color: var(--ui-error-3) !important;
-}
-
-.btn-light {
-  background-color: var(--bg-button-group);
-  border: 1px solid var(--border-button-group);
-  color: var(--text-button-group);
-}
-
-.btn-light:hover {
-  background-color: var(--ui-gray-2) !important;
-}
-
-.btn-light:active,
-.btn-light.active,
-.open > .dropdown-toggle.btn-light {
-  background-color: var(--ui-gray-3);
-}
-
-/* Button Secondary */
-.btn-secondary {
-  background-color: var(--ui-blue-2);
-  border: 1px solid var(--ui-blue-8);
-  color: var(--ui-blue-9);
-}
-
-.btn-secondary:hover,
-.btn-secondary:focus,
-.btn-secondary:active .active {
-  background-color: var(--ui-blue-3) !important;
-  color: var(--ui-blue-9) !important;
-}
-
-.btn-secondary:disabled {
-  background-color: var(--ui-blue-1);
-  border: 1px solid var(--ui-blue-1);
-  color: var(--ui-blue-5);
 }
 
 /* Input Group Addon */
@@ -277,10 +184,13 @@ input:checked + .slider:before {
 .toolBar {
   display: flex;
   flex-direction: row;
+  gap: 5px;
 }
 
 .toolBar > .toolBarTitle {
   flex: auto;
+  display: inline-flex;
+  flex-wrap: nowarp;
 }
 
 .toolBar > .searchBar {
@@ -288,6 +198,7 @@ input:checked + .slider:before {
   margin-right: 10px;
   width: 500px;
   height: 30px;
+  display: inline-flex;
 }
 
 .datatable .searchBar {
@@ -296,8 +207,8 @@ input:checked + .slider:before {
 }
 
 .toolBar > .actionBar {
-  flex: right;
   margin-right: 10px;
+  display: inline-flex;
 }
 
 .datatable .actionBar {
@@ -307,6 +218,7 @@ input:checked + .slider:before {
 .toolBar > .settings {
   width: 60px;
   text-align: right;
+  display: inline-flex;
 }
 
 .datatable .toolBar .settings {
@@ -476,99 +388,13 @@ input:checked + .slider:before {
   background-color: var(--ui-success-7);
 }
 
-/* Feather Icon Variants */
-
-.feather {
-  display: block;
-  color: var(--text-body-color);
-  height: 18px;
-  width: 18px;
-}
-
-.icon-xs {
-  height: 10px;
-  width: 10px;
-}
-
-.icon-sm {
-  height: 14px;
-  width: 14px;
-}
-
-.icon-md {
-  height: 16px;
-  width: 16px;
-}
-
-.icon-lg {
-  height: 22px;
-  width: 22px;
-}
-
-.icon-xl {
-  height: 26px;
-  width: 26px;
-}
-
-.icon-primary {
-  color: var(--ui-blue-8);
-}
-
-.icon-white {
-  color: var(--white-color);
-}
-
-.icon-dark {
-  color: var(--ui-black);
-}
-
-.icon-secondary {
-  color: var(--ui-gray-8);
-}
-
-.icon-warning {
-  color: var(--ui-warning-8);
-}
-
-.icon-danger {
-  color: var(--ui-error-8);
-}
-
-.icon-success {
-  color: var(--ui-success-6);
-}
-
-.icon-nested-gray {
-  width: 18px;
-  height: 18px;
-  height: 30px;
-  width: 30px;
-  padding: 5px;
-  text-align: center;
-  border-radius: 50%;
-  background-color: var(--ui-gray-4);
-  margin-right: 5px;
-}
-
-.icon-nested-blue {
-  width: 18px;
-  height: 18px;
-  height: 30px;
-  width: 30px;
-  padding: 5px;
-  text-align: center;
-  border-radius: 50%;
-  background-color: var(--ui-blue-3);
-  margin-right: 5px;
-}
-
-.icon-container {
-  display: flex;
-  align-items: center;
-}
 /* Required Label with asterisk */
 
 .required:after {
   content: '*';
   color: var(--ui-error-9);
+}
+
+.control-label {
+  @apply inline-flex items-center;
 }
