@@ -10,10 +10,6 @@ module.exports = merge(commonConfig, {
         test: /\.(woff|woff2|eot|ttf|ico)$/,
         type: 'asset/inline',
       },
-      {
-        test: /\.(gif|png|jpe?g|svg)$/i,
-        type: 'asset/resource',
-      },
     ],
   },
 });

@@ -35,6 +35,7 @@ export function HomepageFilter({
 }: Props) {
   return (
     <Select
+      closeMenuOnSelect={false}
       placeholder={placeHolder}
       options={filterOptions}
       value={value}

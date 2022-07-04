@@ -16,13 +16,13 @@ import {
   confirmWebEditorDiscard,
   confirm,
   confirmForceChangePassword,
+  confirmWithTitle,
 } from './confirm';
 import {
   confirmContainerDeletion,
   confirmContainerRecreation,
   confirmServiceForceUpdate,
   confirmStackUpdate,
-  confirmKubeconfigSelection,
   selectRegistry,
 } from './prompt';
 
@@ -58,7 +58,7 @@ export function ModalServiceAngular() {
     confirmStackUpdate,
     selectRegistry,
     confirmContainerDeletion,
-    confirmKubeconfigSelection,
     confirmForceChangePassword,
+    confirmWithTitle,
   };
 }

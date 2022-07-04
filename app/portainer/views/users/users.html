@@ -17,11 +17,7 @@
           <div class="form-group">
             <label for="username" class="col-sm-3 col-lg-2 control-label text-left">
               Username
-              <portainer-tooltip
-                ng-if="AuthenticationMethod === 2"
-                position="bottom"
-                message="Username must exactly match username defined in external LDAP source."
-              ></portainer-tooltip>
+              <portainer-tooltip ng-if="AuthenticationMethod === 2" message="'Username must exactly match username defined in external LDAP source.'"></portainer-tooltip>
             </label>
             <div class="col-sm-8">
               <div class="input-group">
@@ -94,8 +90,7 @@
               <label for="permissions" class="control-label text-left">
                 Administrator
                 <portainer-tooltip
-                  position="bottom"
-                  message="Administrators have access to Portainer settings management as well as full control over all defined environments and their resources."
+                  message="'Administrators have access to Portainer settings management as well as full control over all defined environments and their resources.'"
                 ></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="formValues.Administrator" data-cy="user-adminCheckbox" /><i></i> </label>

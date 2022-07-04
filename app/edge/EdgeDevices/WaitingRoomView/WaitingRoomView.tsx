@@ -3,6 +3,8 @@ import { useRouter } from '@uirouter/react';
 import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
 import { r2a } from '@/react-tools/react2angular';
 
+import { InformationPanel } from '@@/InformationPanel';
+import { TextTip } from '@@/Tip/TextTip';
 import { TableSettingsProvider } from '@@/datatables/useTableSettings';
 import { PageHeader } from '@@/PageHeader';
 
@@ -30,6 +32,15 @@ export function WaitingRoomView() {
           { label: 'Waiting Room' },
         ]}
       />
+
+      <InformationPanel>
+        <TextTip color="blue">
+          Only environments generated from the AEEC script will appear here,
+          manually added environments and edge devices will bypass the waiting
+          room.
+        </TextTip>
+      </InformationPanel>
+
       <TableSettingsProvider<TableSettings>
         defaults={{ pageSize: 10, sortBy: { desc: false, id: 'name' } }}
         storageKey={storageKey}

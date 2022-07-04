@@ -1,11 +1,4 @@
-<rd-header id="view-top">
-  <rd-header-title title-text="Application templates list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.templates" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Templates</rd-header-content>
-</rd-header>
+<page-header title="'Application templates list'" breadcrumbs="['Templates']"> </page-header>
 
 <div class="row">
   <!-- stack-form -->
@@ -58,7 +51,7 @@
           <div ng-repeat="var in state.selectedTemplate.Env" ng-if="!var.preset || var.select" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">
               {{ var.label }}
-              <portainer-tooltip ng-if="var.description" position="bottom" message="{{ var.description }}"></portainer-tooltip>
+              <portainer-tooltip ng-if="var.description" message="var.description"></portainer-tooltip>
             </label>
             <div class="col-sm-10">
               <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}" />

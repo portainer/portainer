@@ -13,6 +13,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
   'HttpRequestHelper',
   'LocalStorage',
   'CONSOLE_COMMANDS_LABEL_PREFIX',
+  'SidebarService',
   function (
     $scope,
     $state,
@@ -24,7 +25,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     ExecService,
     HttpRequestHelper,
     LocalStorage,
-    CONSOLE_COMMANDS_LABEL_PREFIX
+    CONSOLE_COMMANDS_LABEL_PREFIX,
+    SidebarService
   ) {
     var socket, term;
 
@@ -189,7 +191,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           $scope.$apply();
         };
 
-        $scope.$watch('toggle', function () {
+        $scope.$watch(SidebarService.isSidebarOpen, function () {
           setTimeout(resizefun, 400);
         });
 

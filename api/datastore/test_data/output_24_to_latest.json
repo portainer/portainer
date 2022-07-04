@@ -35,6 +35,12 @@
         "TenantID": ""
       },
       "ComposeSyntaxMaxVersion": "",
+      "Edge": {
+        "AsyncMode": false,
+        "CommandInterval": 0,
+        "PingInterval": 0,
+        "SnapshotInterval": 0
+      },
       "EdgeCheckinInterval": 0,
       "EdgeKey": "",
       "GroupId": 1,
@@ -682,6 +688,12 @@
     "BlackListedLabels": [],
     "DisplayDonationHeader": false,
     "DisplayExternalContributors": false,
+    "Edge": {
+      "AsyncMode": false,
+      "CommandInterval": 0,
+      "PingInterval": 0,
+      "SnapshotInterval": 0
+    },
     "EdgeAgentCheckinInterval": 5,
     "EdgePortainerUrl": "",
     "EnableEdgeComputeFeatures": false,
@@ -778,6 +790,7 @@
       "IsComposeFormat": false,
       "Name": "alpine",
       "Namespace": "",
+      "Option": null,
       "ProjectPath": "/home/prabhat/portainer/data/ce1.25/compose/2",
       "ResourceControl": null,
       "Status": 1,
@@ -800,6 +813,7 @@
       "IsComposeFormat": false,
       "Name": "redis",
       "Namespace": "",
+      "Option": null,
       "ProjectPath": "/home/prabhat/portainer/data/ce1.25/compose/5",
       "ResourceControl": null,
       "Status": 1,
@@ -822,6 +836,7 @@
       "IsComposeFormat": false,
       "Name": "nginx",
       "Namespace": "",
+      "Option": null,
       "ProjectPath": "/home/prabhat/portainer/data/ce1.25/compose/6",
       "ResourceControl": null,
       "Status": 1,

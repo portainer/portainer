@@ -1,12 +1,14 @@
 import type { FeatureId } from '@/portainer/feature-flags/enums';
 
-export interface BoxSelectorOption<T> {
+import { IconProps } from '@@/Icon';
+
+export interface BoxSelectorOption<T> extends IconProps {
   id: string;
-  icon: string;
   label: string;
   description: string;
   value: T;
   disabled?: () => boolean;
   tooltip?: () => string;
   feature?: FeatureId;
+  hide?: boolean;
 }

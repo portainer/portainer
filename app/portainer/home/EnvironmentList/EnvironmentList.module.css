@@ -1,14 +1,26 @@
+.actionBar {
+  margin-left: 15px !important;
+  margin-right: 15px !important;
+}
+
 .actionBar .description {
   margin-bottom: 10px;
 }
 
 .refresh-environments-button {
   margin-left: 0 !important;
+  padding: 8px 15px;
 }
 
 .filter-container {
   display: flex;
   justify-content: flex-start;
+  padding: 0px 5px;
+}
+
+.filter-container input[type='text'] {
+  background: none !important;
+  border: 0px !important;
 }
 
 .filter-left {
@@ -60,4 +72,9 @@
   display: inline-block;
   width: 100%;
   padding-left: 10px;
+}
+
+.filterSearchbar input[type='text'] {
+  background: none !important;
+  border: 0px !important;
 }

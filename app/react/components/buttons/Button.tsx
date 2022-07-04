@@ -1,17 +1,27 @@
-import { MouseEventHandler, PropsWithChildren } from 'react';
+import { AriaAttributes, MouseEventHandler, PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
+import { AutomationTestingProps } from '@/types';
+
 type Type = 'submit' | 'button' | 'reset';
-type Color = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'link';
+type Color =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'link'
+  | 'light'
+  | 'dangerlight';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
-export interface Props {
+export interface Props extends AriaAttributes, AutomationTestingProps {
   color?: Color;
   size?: Size;
   disabled?: boolean;
   title?: string;
   className?: string;
-  dataCy?: string;
   type?: Type;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }
@@ -22,20 +32,21 @@ export function Button({
   size = 'small',
   disabled = false,
   className,
-  dataCy,
   onClick,
   title,
   children,
+  ...ariaProps
 }: PropsWithChildren<Props>) {
   return (
     <button
-      data-cy={dataCy}
       /* eslint-disable-next-line react/button-has-type */
       type={type}
       disabled={disabled}
       className={clsx('btn', `btn-${color}`, sizeClass(size), className)}
       onClick={onClick}
       title={title}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...ariaProps}
     >
       {children}
     </button>

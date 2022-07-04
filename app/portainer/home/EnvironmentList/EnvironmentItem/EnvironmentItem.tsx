@@ -69,10 +69,8 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
                   <span className="space-left blocklist-item-subtitle">
                     {isEdge ? (
                       <EdgeIndicator
-                        edgeId={environment.EdgeID}
-                        checkInInterval={environment.EdgeCheckinInterval}
-                        lastCheckInDate={environment.LastCheckInDate}
-                        queryDate={environment.QueryDate}
+                        environment={environment}
+                        showLastCheckInDate
                       />
                     ) : (
                       <>

@@ -300,7 +300,7 @@
                     <td style="width: 33%">Maximum instances</td>
                     <td style="width: 33%">
                       Target CPU usage
-                      <portainer-tooltip position="bottom" message="The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances.">
+                      <portainer-tooltip message="'The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances.'">
                       </portainer-tooltip>
                     </td>
                   </tr>
@@ -422,7 +422,7 @@
             <div class="small text-muted" style="margin-bottom: 15px">
               Data access policy: <i class="fa {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyIcon }}" aria-hidden="true"></i>
               {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyText }}
-              <portainer-tooltip position="right" message="{{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyTooltip }}"> </portainer-tooltip>
+              <portainer-tooltip position="'right'" message="ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyTooltip"> </portainer-tooltip>
             </div>
 
             <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED">
