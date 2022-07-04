@@ -1,32 +1,36 @@
 <div class="datatable">
   <rd-widget>
-    <rd-widget-header icon="{{ $ctrl.titleIcon }}" title-text="Edge Groups"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
-      <div class="actionBar">
-        <button
-          type="button"
-          class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-          data-cy="edgeGroup-removeEdgeGroupButton"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.groups.new" data-cy="edgeGroup-addEdgeGroupButton">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Edge group
-        </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          ng-model-options="{ debounce: 300 }"
-          data-cy="edgeGroup-searchInput"
-        />
+      <div class="toolBar">
+        <div class="toolBarTitle vertical-center">
+          <span><pr-icon icon="'grid'" feather="true"></pr-icon></span> Edge Groups
+        </div>
+        <div class="searchBar">
+          <span><pr-icon icon="'search'" feather="'true'" class-name="'searchIcon'"></pr-icon></span>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            ng-model-options="{ debounce: 300 }"
+            data-cy="edgeGroup-searchInput"
+          />
+        </div>
+        <div class="actionBar">
+          <button
+            type="button"
+            class="btn btn-sm btn-danger"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+            data-cy="edgeGroup-removeEdgeGroupButton"
+          >
+            <span><pr-icon icon="'trash'" feather="true"></pr-icon></span> Remove
+          </button>
+          <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.groups.new" data-cy="edgeGroup-addEdgeGroupButton">
+            <span><pr-icon icon="'plus'" feather="true"></pr-icon></span> Add Edge group
+          </button>
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells" data-cy="edgeGroup-edgeGroupTable">
@@ -39,22 +43,22 @@
                 </span>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                  <span><pr-icon icon="'arrow-down'" feather="'true'" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></pr-icon></span>
+                  <span><pr-icon icon="'arrow-up'" feather="'true'" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></pr-icon></span>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Endpoints.length')">
                   Environments Count
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Endpoints.length' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Endpoints.length' && $ctrl.state.reverseOrder"></i>
+                  <span><pr-icon icon="'arrow-down'" feather="'true'" ng-if="$ctrl.state.orderBy === 'Endpoints.length' && !$ctrl.state.reverseOrder"></pr-icon></span>
+                  <span><pr-icon icon="'arrow-up'" feather="'true'" ng-if="$ctrl.state.orderBy === 'Endpoints.length' && $ctrl.state.reverseOrder"></pr-icon></span>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Dynamic')">
                   Group Type
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Dynamic' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Dynamic' && $ctrl.state.reverseOrder"></i>
+                  <span><pr-icon icon="'arrow-down'" feather="'true'" ng-if="$ctrl.state.orderBy === 'Dynamic' && !$ctrl.state.reverseOrder"></pr-icon></span>
+                  <span><pr-icon icon="'arrow-up'" feather="'true'" ng-if="$ctrl.state.orderBy === 'Dynamic' && $ctrl.state.reverseOrder"></pr-icon></span>
                 </a>
               </th>
             </tr>
