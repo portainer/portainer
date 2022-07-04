@@ -118,6 +118,7 @@
                 model="stack.GitConfig"
                 stack="stack"
                 authorization="PortainerStackUpdate"
+                endpoint="applicationState.endpoint"
               >
               </stack-redeploy-git-form>
               <stack-duplication-form
@@ -196,7 +197,7 @@
                   <div class="col-sm-12">
                     <label for="prune" class="control-label text-left">
                       Prune services
-                      <portainer-tooltip message="'Prune services that are no longer referenced.'"></portainer-tooltip>
+                      <portainer-tooltip position="'top'" message="'Prune services that are no longer referenced.'"></portainer-tooltip>
                     </label>
                     <label class="switch" style="margin-left: 20px"> <input name="prune" type="checkbox" ng-model="formValues.Prune" /><i></i> </label>
                   </div>
