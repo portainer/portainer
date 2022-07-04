@@ -90,7 +90,7 @@ interface AngularTableCellProps {
   isSortedDesc?: boolean;
 }
 
-export function TableHeaderCellAngular({
+export function TableColumnHeaderAngular({
   canSort,
   isSorted,
   colTitle,

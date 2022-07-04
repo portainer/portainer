@@ -10,7 +10,7 @@ import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { ViewLoading } from '@@/ViewLoading';
 import { Tooltip } from '@@/Tip/Tooltip';
-import { TableHeaderCellAngular } from '@@/datatables/TableHeaderCell';
+import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -32,7 +32,7 @@ export const componentsModule = angular
   .component('rdLoading', r2a(Loading, []))
   .component(
     'tableColumnHeader',
-    r2a(TableHeaderCellAngular, [
+    r2a(TableColumnHeaderAngular, [
       'colTitle',
       'canSort',
       'isSorted',
