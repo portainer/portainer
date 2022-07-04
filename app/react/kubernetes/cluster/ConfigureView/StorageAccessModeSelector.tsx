@@ -58,21 +58,3 @@ function MultiValueLabel({
     </components.MultiValueLabel>
   );
 }
-
-/*
-
-
- <span
-                          isteven-multi-select
-                          input-model="class.availableAccessModes"
-                          output-model="class.AccessModes"
-                          button-label="Name"
-                          item-label="Description"
-                          tick-property="selected"
-                          directive-id="{{ class.Name }}"
-                          helper-elements=""
-                          translation="{nothingSelected: 'Not configured'}"
-                          data-cy="kubeSetup-storageAccessSelect{{ class.Name }}"
-                        >
-                        </span>
-                        */
