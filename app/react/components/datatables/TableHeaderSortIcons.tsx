@@ -6,21 +6,17 @@ import SortUpIcon from '@/assets/images/sort-arrow-up.svg?c';
 import styles from './TableHeaderSortIcons.module.css';
 
 interface Props {
-  // sortedAscending and sortedDescending can both be false, showing two muted looking icons
-  sortedAscending: boolean;
-  sortedDescending: boolean;
+  sorted: boolean;
+  descending: boolean;
 }
 
-export function TableHeaderSortIcons({
-  sortedAscending,
-  sortedDescending,
-}: Props) {
+export function TableHeaderSortIcons({ sorted, descending }: Props) {
   return (
     <div className="flex flex-row no-wrap w-min-max">
       <SortDownIcon
         className={clsx(
           'space-left',
-          sortedAscending && styles.activeSortIcon,
+          sorted && !descending && styles.activeSortIcon,
           styles.sortIcon
         )}
         aria-hidden="true"
@@ -28,7 +24,7 @@ export function TableHeaderSortIcons({
       <SortUpIcon
         className={clsx(
           '-ml-1', // shift closer to SortDownIcon to match the mockup
-          sortedDescending && styles.activeSortIcon,
+          sorted && descending && styles.activeSortIcon,
           styles.sortIcon
         )}
         aria-hidden="true"

@@ -2,8 +2,6 @@ import clsx from 'clsx';
 import { PropsWithChildren, ReactNode } from 'react';
 import { TableHeaderProps } from 'react-table';
 
-import { Button } from '@@/buttons';
-
 import { useTableContext } from './TableContainer';
 import { TableHeaderSortIcons } from './TableHeaderSortIcons';
 
@@ -32,7 +30,7 @@ export function TableHeaderCell({
 
   return (
     <th role={role} style={style} className={className}>
-      <div className="flex flex-row flex-nowrap">
+      <div className="flex flex-row flex-nowrap h-full items-center gap-1">
         <SortWrapper
           canSort={canSort}
           onClick={onSortClick}
@@ -51,7 +49,7 @@ interface SortWrapperProps {
   canSort: boolean;
   isSorted: boolean;
   isSortedDesc?: boolean;
-  onClick: (desc: boolean) => void;
+  onClick?: (desc: boolean) => void;
 }
 
 function SortWrapper({
@@ -66,24 +64,47 @@ function SortWrapper({
   }
 
   return (
-    <Button
-      color="table-header"
+    <button
       type="button"
-      onClick={() => onClick(!isSortedDesc)}
+      onClick={() => onClick && onClick(!isSortedDesc)}
       className={clsx(
-        'sortable w-full !ml-0 !px-0',
+        'sortable !bg-transparent w-full h-full !ml-0 !px-0 border-none focus:border-none text-gray-9 !hover:text-gray-9',
         isSorted && 'sortingActive'
       )}
     >
       <div className="flex flex-row justify-start items-center w-full h-full">
         {children}
-        {canSort && (
-          <TableHeaderSortIcons
-            sortedAscending={isSorted && !isSortedDesc}
-            sortedDescending={isSorted && !!isSortedDesc}
-          />
-        )}
+        <TableHeaderSortIcons
+          sorted={isSorted}
+          descending={isSorted && !!isSortedDesc}
+        />
       </div>
-    </Button>
+    </button>
+  );
+}
+
+interface AngularTableCellProps {
+  colTitle: string;
+  canSort: boolean;
+  isSorted?: boolean;
+  isSortedDesc?: boolean;
+}
+
+export function TableHeaderCellAngular({
+  canSort,
+  isSorted,
+  colTitle,
+  isSortedDesc,
+}: AngularTableCellProps) {
+  return (
+    <div className="flex flex-row flex-nowrap h-full">
+      <SortWrapper
+        canSort={canSort}
+        isSorted={!!isSorted}
+        isSortedDesc={isSortedDesc}
+      >
+        {colTitle}
+      </SortWrapper>
+    </div>
   );
 }

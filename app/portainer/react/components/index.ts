@@ -10,7 +10,7 @@ import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { ViewLoading } from '@@/ViewLoading';
 import { Tooltip } from '@@/Tip/Tooltip';
-import { TableHeaderSortIcons } from '@@/datatables';
+import { TableHeaderCellAngular } from '@@/datatables/TableHeaderCell';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -31,8 +31,13 @@ export const componentsModule = angular
   )
   .component('rdLoading', r2a(Loading, []))
   .component(
-    'tableHeaderSortIcons',
-    r2a(TableHeaderSortIcons, ['sortedAscending', 'sortedDescending'])
+    'tableColumnHeader',
+    r2a(TableHeaderCellAngular, [
+      'colTitle',
+      'canSort',
+      'isSorted',
+      'isSortedDesc',
+    ])
   )
   .component('viewLoading', r2a(ViewLoading, ['message']))
   .component(
