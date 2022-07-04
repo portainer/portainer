@@ -36,16 +36,6 @@ export const componentsModule = angular
   )
   .component(
     'prIcon',
-    r2a(Icon, [
-      'className',
-      'feather',
-      'icon',
-      'mode',
-      'xsmall',
-      'small',
-      'medium',
-      'large',
-      'xlarge',
-    ])
+    r2a(Icon, ['className', 'feather', 'icon', 'mode', 'size'])
   )
   .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, [])).name;
