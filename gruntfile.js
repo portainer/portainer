@@ -8,6 +8,14 @@ let arch = os.arch();
 if (arch === 'x64') {
   arch = 'amd64';
 }
+let platform = os.platform();
+switch (platform) {
+  case 'windows':
+  case 'darwin':
+    break;
+  default:
+    platform = 'linux';
+}
 
 module.exports = function (grunt) {
   loadGruntTasks(grunt, {
@@ -32,15 +40,17 @@ module.exports = function (grunt) {
 
   grunt.registerTask('lint', ['eslint']);
 
-  grunt.registerTask('build:server', [`shell:build_binary:linux:${arch}`, `download_binaries:linux:${arch}`]);
+  grunt.task.registerTask('build:server', 'build:server:<platform>:<arch>', function (p = platform, a = arch) {
+    grunt.task.run([`shell:build_binary:${p}:${a}`, `download_binaries:${p}:${a}`]);
+  });
 
   grunt.registerTask('build:client', ['webpack:dev']);
 
   grunt.registerTask('build', ['build:server', 'build:client']);
 
-  grunt.registerTask('start:server', ['build:server', 'shell:run_container']);
+  grunt.registerTask('start:server', ['build:server:linux', 'shell:run_container']);
 
-  grunt.registerTask('start:localserver', [`shell:build_binary:linux:${arch}`, 'shell:run_localserver']);
+  grunt.registerTask('start:localserver', [`shell:build_binary:${platform}:${arch}`, 'shell:run_localserver']);
 
   grunt.registerTask('start:client', ['shell:install_yarndeps', 'webpack:devWatch']);
 

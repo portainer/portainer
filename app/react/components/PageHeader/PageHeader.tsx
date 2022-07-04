@@ -33,6 +33,9 @@ export function PageHeader({
 
   return (
     <HeaderContainer>
+      <HeaderContent>
+        <Breadcrumbs breadcrumbs={breadcrumbs} />
+      </HeaderContent>
       <HeaderTitle title={title}>
         {reload && (
           <Button
@@ -46,9 +49,6 @@ export function PageHeader({
           </Button>
         )}
       </HeaderTitle>
-      <HeaderContent>
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
-      </HeaderContent>
     </HeaderContainer>
   );
 }

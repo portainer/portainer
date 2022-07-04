@@ -95,8 +95,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
         .filter(({ Host, IP }) => Host || IP)
         .map(({ Host, IP, Port, Path }) => {
           let scheme = Port === 443 ? 'https' : 'http';
-          let urlPort = Port === 80 || Port === 443 ? '' : `:${Port}`;
-          return `${scheme}://${Host || IP}${urlPort}${Path}`;
+          return `${scheme}://${Host || IP}${Path}`;
         });
 
       // Map all load balancer service ports to ip address

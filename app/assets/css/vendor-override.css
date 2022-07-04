@@ -53,7 +53,7 @@ a:focus {
 }
 
 .text-danger {
-  color: var(--text-danger-color);
+  color: var(--ui-error-9);
 }
 
 .table .table {
@@ -370,6 +370,10 @@ input:-webkit-autofill {
 }
 
 .btn-danger:hover {
+  color: var(--white-color);
+}
+
+.btn-success:hover {
   color: var(--white-color);
 }
 

@@ -922,6 +922,8 @@ type (
 		AdditionalFiles []string `json:"AdditionalFiles"`
 		// The auto update settings of a git stack
 		AutoUpdate *StackAutoUpdate `json:"AutoUpdate"`
+		// The stack deployment option
+		Option *StackOption `json:"Option"`
 		// The git config of this stack
 		GitConfig *gittypes.RepoConfig
 		// Whether the stack is from a app template
@@ -940,6 +942,12 @@ type (
 		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
 		// Autoupdate job id
 		JobID string `example:"15"`
+	}
+
+	// StackOption represents the options for stack deployment
+	StackOption struct {
+		// Prune services that are no longer referenced
+		Prune bool `example:"false"`
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
