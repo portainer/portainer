@@ -12,12 +12,13 @@ interface Props {
   icon: ReactNode | ComponentType<unknown>;
   feather?: boolean;
   className?: string;
+  xsmall?: boolean;
+  small?: boolean;
+  medium?: boolean;
+  large?: boolean;
+  xlarge?: boolean;
   mode?:
     | 'alt'
-    | 'white'
-    | 'white-alt'
-    | 'black'
-    | 'black-alt'
     | 'primary'
     | 'primary-alt'
     | 'secondary'
@@ -30,7 +31,7 @@ interface Props {
     | 'success-alt';
 }
 
-export function Icon({ icon, feather, className, mode }: Props) {
+export function Icon({ icon, feather, className, mode, ...others }: Props) {
   useEffect(() => {
     if (feather) {
       featherIcons.replace();
@@ -47,7 +48,16 @@ export function Icon({ icon, feather, className, mode }: Props) {
     );
   }
 
-  const classes = clsx(className, 'icon', { [`icon-${mode}`]: mode });
+  const classes = clsx(
+    className,
+    'icon',
+    { [`icon-${mode}`]: mode },
+    { [`icon-xs`]: others.xsmall },
+    { [`icon-sm`]: others.small },
+    { [`icon-md`]: others.medium },
+    { [`icon-lg`]: others.large },
+    { [`icon-xl`]: others.xlarge }
+  );
 
   if (feather) {
     return (

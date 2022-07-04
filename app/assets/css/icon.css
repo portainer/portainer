@@ -53,24 +53,6 @@ pr-icon {
   stroke: var(--white-color);
 }
 
-.icon-white {
-  color: var(--white-color);
-}
-
-.icon.icon-white-alt {
-  fill: var(--black-color);
-  stroke: var(--white-color);
-}
-
-.icon-dark {
-  color: var(--ui-black);
-}
-
-.icon.icon-dark-alt {
-  fill: var(--white-color);
-  stroke: var(--black-color);
-}
-
 .icon-secondary {
   color: var(--ui-gray-8);
 }
