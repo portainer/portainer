@@ -23,6 +23,10 @@
       <div class="form-group" style="margin-left: 1px">
         <code-editor identifier="environment-variables-editor" placeholder="e.g. key=value" value="$ctrl.editorText" yml="false" on-change="($ctrl.editorUpdate)"></code-editor>
       </div>
+      <div class="col-sm-12 small text-muted">
+        <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+        Environment changes will not take effect until redeployment occurs manually or via webhook.
+      </div>
     </div>
   </div>
 </ng-form>
