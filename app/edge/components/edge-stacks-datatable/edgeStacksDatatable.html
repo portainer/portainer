@@ -2,16 +2,51 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i>
-          Edge Stacks
+        <div class="toolBarTitle vertical-center">
+          <span><pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon></span> Edge Stacks
         </div>
-        <div class="settings" data-cy="edgeStack-stackTableSettings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle> <i class="fa fa-cog" aria-hidden="true"></i> Settings </span>
+        <div class="searchBar">
+          <span><pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon></span>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
+        <div class="actionBar">
+          <button
+            type="button"
+            class="btn btn-sm btn-danger"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+            data-cy="edgeStack-removeStackButton"
+          >
+            <span><pr-icon icon="'trash'" feather="true"></pr-icon></span> Remove
+          </button>
+          <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.stacks.new" data-cy="edgeStack-addStackButton">
+            <span><pr-icon icon="'plus'" feather="true"></pr-icon></span> Add stack
+          </button>
+        </div>
+        <div class="settings" style="width: 10px" data-cy="edgeStack-stackTableSettings">
+          <span
+            class="setting"
+            style="margin-right: 0"
+            ng-class="{ 'setting-active': $ctrl.settings.open }"
+            uib-dropdown
+            dropdown-append-to-body
+            auto-close="disabled"
+            is-open="$ctrl.settings.open"
+          >
+            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
-                <div class="menuHeader"> Table settings </div>
+                <div class="menuHeader">
+                  <span><pr-icon icon="'settings'" feather="true"></pr-icon></span> Table settings
+                </div>
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox">
@@ -47,32 +82,6 @@
           </span>
         </div>
       </div>
-      <div class="actionBar">
-        <button
-          type="button"
-          class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-          data-cy="edgeStack-removeStackButton"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.stacks.new" data-cy="edgeStack-addStackButton">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack
-        </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
-      </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells" data-cy="edgeStack-stackTable">
           <thead>
@@ -84,16 +93,16 @@
                 </span>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                  <span><pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></pr-icon></span>
+                  <span><pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></pr-icon></span>
                 </a>
               </th>
               <th> Status </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('CreationDate')">
                   Creation Date
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></i>
+                  <span><pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></pr-icon></span>
+                  <span><pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></pr-icon></span>
                 </a>
               </th>
             </tr>
