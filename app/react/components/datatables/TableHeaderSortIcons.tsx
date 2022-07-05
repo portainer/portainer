@@ -1,8 +1,7 @@
 import clsx from 'clsx';
 
-import SortDownIcon from '@/assets/images/sort-arrow-down.svg?c';
-import SortUpIcon from '@/assets/images/sort-arrow-up.svg?c';
-
+import SortDownIcon from './sort-arrow-down.svg?c';
+import SortUpIcon from './sort-arrow-up.svg?c';
 import styles from './TableHeaderSortIcons.module.css';
 
 interface Props {
