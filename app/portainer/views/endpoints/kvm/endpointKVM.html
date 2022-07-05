@@ -1,10 +1,16 @@
-<rd-header>
-  <rd-header-title title-text="KVM Control"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.endpoints">Environments</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: $state.endpoint.Id})">{{ $state.endpoint.Name }}</a> &gt;
-    {{ $state.deviceName }} > KVM Control
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'KVM Control'"
+  breadcrumbs="[
+    { label:'Environments', link:'portainer.endpoints' },
+    { 
+      label:$state.endpoint.Name,
+      link: 'portainer.endpoints.endpoint', 
+      linkParams:{id: $state.endpoint.Id}
+    }, 
+    $state.deviceName,
+    'KVM Control']"
+>
+</page-header>
 
 <div class="row">
   <div class="col-sm-12">
