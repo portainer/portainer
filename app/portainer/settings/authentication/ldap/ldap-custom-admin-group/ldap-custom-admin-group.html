@@ -117,14 +117,15 @@
 <div class="form-group" ng-if="$ctrl.settings.AdminAutoPopulate">
   <label for="group-access" class="control-label text-left col-sm-2"> Select Group(s) </label>
   <div class="col-sm-8">
-    <por-multi-select
+    <por-select
       data-cy="'group-access-selector'"
       input-id="'group-access'"
       value="$ctrl.selectedAdminGroups"
       on-change="($ctrl.onAdminGroupChange)"
       options="$ctrl.groups"
       placeholder="'Select one or more groups'"
+      is-multi="true"
     >
-    </por-multi-select>
+    </por-select>
   </div>
 </div>
