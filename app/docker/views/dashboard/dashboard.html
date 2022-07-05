@@ -73,7 +73,7 @@
 
   <div class="dashboard-grid mx-4">
     <a ui-sref="docker.stacks" ng-if="showStacks">
-      <dashboard-item icon="'fa-th-list'" type="'Stack'" value="stackCount"></dashboard-item>
+      <dashboard-item icon="'layers'" feather-icon="true" type="'Stack'" value="stackCount"></dashboard-item>
     </a>
 
     <div ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
