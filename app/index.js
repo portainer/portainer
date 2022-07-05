@@ -28,7 +28,6 @@ angular
     'ui.bootstrap',
     'ui.router',
     UI_ROUTER_REACT_HYBRID,
-    'ui.select',
     'ngSanitize',
     'ngFileUpload',
     'ngMessages',

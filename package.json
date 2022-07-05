@@ -138,7 +138,6 @@
     "splitargs": "github:deviantony/splitargs#semver:~0.2.0",
     "strip-ansi": "^6.0.0",
     "toastr": "^2.1.4",
-    "ui-select": "^0.19.8",
     "uuid": "^3.3.2",
     "x256": "^0.0.2",
     "xterm": "^3.8.0",

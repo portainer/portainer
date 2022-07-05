@@ -1,6 +1,5 @@
 import angular from 'angular';
 import 'moment';
-import 'ui-select';
 import 'angular-sanitize';
 import 'ng-file-upload';
 import 'angular-messages';

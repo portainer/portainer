@@ -10,9 +10,17 @@
 
 .sort-button {
   background-color: var(--bg-sortbutton-color);
-  color: var(--text-ui-select-color);
+  color: var(--grey-6);
   border: 1px solid var(--border-sortbutton);
   display: inline-block;
   padding: 8px 10px;
   border-radius: 5px;
+}
+
+:global(:root[theme='dark']) .sort-button {
+  color: var(--white-color);
+}
+
+:global(:root[theme='highcontrast']) .sort-button {
+  color: var(--white-color);
 }

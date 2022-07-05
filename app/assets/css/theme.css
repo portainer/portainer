@@ -125,7 +125,6 @@
   --border-pagination-color: var(--ui-white);
   --bg-pagination-span-color: var(--white-color);
   --bg-pagination-hover-color: var(--ui-blue-3);
-  --bg-ui-select-hover-color: var(--grey-14);
   --bg-motd-body-color: var(--grey-20);
   --bg-item-highlighted-color: var(--grey-21);
   --bg-item-highlighted-null-color: var(--grey-14);
@@ -194,8 +193,6 @@
   --text-pagination-color: var(--grey-26);
   --text-pagination-span-color: var(--grey-3);
   --text-pagination-span-hover-color: var(--grey-3);
-  --text-ui-select-color: var(--grey-6);
-  --text-ui-select-hover-color: var(--grey-28);
   --text-summary-color: var(--black-color);
   --text-tooltip-color: var(--white-color);
   --text-rzslider-color: var(--grey-36);
@@ -315,7 +312,6 @@
   --bg-pagination-color: var(--grey-3);
   --bg-pagination-span-color: var(--grey-1);
   --bg-pagination-hover-color: var(--grey-3);
-  --bg-ui-select-hover-color: var(--grey-3);
   --bg-motd-body-color: var(--grey-1);
   --bg-item-highlighted-color: var(--grey-2);
   --bg-item-highlighted-null-color: var(--grey-2);
@@ -386,8 +382,6 @@
   --text-pagination-color: var(--white-color);
   --text-pagination-span-color: var(--ui-white);
   --text-pagination-span-hover-color: var(--ui-white);
-  --text-ui-select-color: var(--white-color);
-  --text-ui-select-hover-color: var(--white-color);
   --text-summary-color: var(--white-color);
   --text-boxselector-wrapper-color: var(--white-color);
   --text-tooltip-color: var(--white-color);
@@ -568,7 +562,6 @@
   --text-daterangepicker-end-date: var(--ui-white);
   --text-daterangepicker-in-range: var(--white-color);
   --text-daterangepicker-active: var(--white-color);
-  --text-ui-select-color: var(--white-color);
   --text-json-tree-color: var(--white-color);
   --text-json-tree-leaf-color: var(--white-color);
   --text-json-tree-branch-preview-color: var(--white-color);
