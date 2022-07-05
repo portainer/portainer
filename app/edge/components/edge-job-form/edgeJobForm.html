@@ -20,8 +20,8 @@
   <div class="form-group" ng-show="edgeJobForm.edgejob_name.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="edgeJobForm.edgejob_name.$error">
-        <p ng-message="required"><pr-icon feather="true" icon="'alert-triangle'"></pr-icon> This field is required.</p>
-        <p ng-message="pattern"><pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Allowed characters are: [a-zA-Z0-9_.-]</p>
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+        <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Allowed characters are: [a-zA-Z0-9_.-]</p>
       </div>
     </div>
   </div>
@@ -74,7 +74,7 @@
         <div ng-show="edgeJobForm.datepicker.$invalid">
           <div class="col-sm-12 small text-warning">
             <div ng-messages="edgeJobForm.datepicker.$error">
-              <p ng-message="required"><pr-icon feather="true" icon="'alert-triangle'"></pr-icon> This field is required.</p>
+              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
             </div>
           </div>
         </div>
@@ -98,7 +98,7 @@
         <div ng-show="edgeJobForm.edgejob_value.$invalid">
           <div class="col-sm-12 small text-warning">
             <div ng-messages="edgeJobForm.edgejob_value.$error">
-              <p ng-message="required"><pr-icon feather="true" icon="'alert-triangle'"></pr-icon> This field is required.</p>
+              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
             </div>
           </div>
         </div>
@@ -128,8 +128,8 @@
     <div class="form-group" ng-show="edgeJobForm.edgejob_cron.$invalid && edgeJobForm.edgejob_cron.$dirty">
       <div class="col-sm-12 small text-warning">
         <div ng-messages="edgeJobForm.edgejob_cron.$error">
-          <p ng-message="required"><pr-icon feather="true" icon="'alert-triangle'"></pr-icon> This field is required.</p>
-          <p ng-message="pattern"><pr-icon feather="true" icon="'alert-triangle'"></pr-icon> This field format is invalid.</p>
+          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field format is invalid.</p>
         </div>
       </div>
     </div>
