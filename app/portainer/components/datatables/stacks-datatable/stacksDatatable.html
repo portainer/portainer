@@ -102,9 +102,10 @@
                     ng-click="$ctrl.changeOrderBy('Name')"
                   ></table-column-header>
                   <div>
-                    <span uib-dropdown-toggle ng-class="['table-filter', { 'filter-active': $ctrl.filters.state.enabled }]">
+                    <span uib-dropdown-toggle ng-class="['table-filter vertical-center', { 'filter-active': $ctrl.filters.state.enabled }]">
                       Filter
-                      <i ng-class="['fa', { 'fa-filter': !$ctrl.filters.state.enabled, 'fa-check': $ctrl.filters.state.enabled }]" aria-hidden="true"></i>
+                      <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'" feather="true" class-name="'icon icon-sm'"></pr-icon>
+                      <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'" feather="true" class-name="'icon icon-sm'"></pr-icon>
                     </span>
                   </div>
                   <div class="dropdown-menu" uib-dropdown-menu>
@@ -182,7 +183,7 @@
                   >{{ item.Name }}</a
                 >
                 <span ng-if="$ctrl.offlineMode">{{ item.Name }}</span>
-                <span ng-if="item.Regular && item.Status == 2" style="margin-left: 10px" class="label label-warning image-tag space-left">Inactive</span>
+                <span ng-if="item.Regular && item.Status == 2" class="label label-warning image-tag space-left">Inactive</span>
               </td>
               <td>{{ item.Type === 1 ? 'Swarm' : 'Compose' }}</td>
               <td>
