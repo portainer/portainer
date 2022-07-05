@@ -4,6 +4,7 @@ import { TableHeaderProps } from 'react-table';
 
 import { useTableContext } from './TableContainer';
 import { TableHeaderSortIcons } from './TableHeaderSortIcons';
+import styles from './TableHeaderCell.module.css';
 
 interface Props {
   canFilter: boolean;
@@ -55,7 +56,7 @@ interface SortWrapperProps {
 function SortWrapper({
   canSort,
   children,
-  onClick,
+  onClick = () => {},
   isSorted,
   isSortedDesc,
 }: PropsWithChildren<SortWrapperProps>) {
@@ -69,7 +70,7 @@ function SortWrapper({
       onClick={() => onClick && onClick(!isSortedDesc)}
       className={clsx(
         'sortable !bg-transparent w-full h-full !ml-0 !px-0 border-none focus:border-none',
-        isSorted && 'sortingActive'
+        isSorted && styles.sortingActive
       )}
     >
       <div className="flex flex-row justify-start items-center w-full h-full">
@@ -83,7 +84,7 @@ function SortWrapper({
   );
 }
 
-interface AngularTableCellProps {
+interface TableColumnHeaderAngularProps {
   colTitle: string;
   canSort: boolean;
   isSorted?: boolean;
@@ -95,7 +96,7 @@ export function TableColumnHeaderAngular({
   isSorted,
   colTitle,
   isSortedDesc,
-}: AngularTableCellProps) {
+}: TableColumnHeaderAngularProps) {
   return (
     <div className="flex flex-row flex-nowrap h-full">
       <SortWrapper
