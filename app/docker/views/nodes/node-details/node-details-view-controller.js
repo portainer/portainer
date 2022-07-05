@@ -38,7 +38,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         if (ctrl.state.isAgent) {
           var agentApiVersion = applicationState.endpoint.agentApiVersion;
           ctrl.state.agentApiVersion = agentApiVersion;
-          if (agentApiVersion < 2) {
+          if (agentApiVersion < 2 || !ctrl.state.enableHostManagementFeatures) {
             return;
           }
 
