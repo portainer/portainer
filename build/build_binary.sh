@@ -5,10 +5,10 @@ mkdir -p dist
 # populate tool versions
 BUILDNUMBER="N/A"
 CONTAINER_IMAGE_TAG="N/A"
-NODE_VERSION=$(node -v | cut -c2-)
-YARN_VERSION=$(yarn --version)
-WEBPACK_VERSION=$(npm view webpack version)
-GO_VERSION=$(go version | { read _ _ v _; echo ${v#go}; })
+NODE_VERSION="0"
+YARN_VERSION="0"
+WEBPACK_VERSION="0"
+GO_VERSION="0"
 
 cd api
 # the go get adds 8 seconds
