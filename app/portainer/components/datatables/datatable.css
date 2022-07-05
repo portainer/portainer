@@ -285,18 +285,13 @@
   width: 30px;
 }
 
-.table th:first-child {
-  padding-left: 20px;
-}
-
+.table tr > th:first-child,
 .table tr > td:first-child {
   padding-left: 20px;
 }
 
-.table th:last-child {
-  padding-right: 20px;
-}
-.table tr > td:last-child {
+.table tr > th:last-child,
+.table tr > last-child {
   padding-right: 20px;
 }
 
