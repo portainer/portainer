@@ -20,7 +20,7 @@
     <div class="col-sm-12 small text-warning">
       <div ng-messages="commonCustomTemplateForm.template_title.$error">
         <p ng-message="pattern">
-          <pr-icon feather="true" icon="'alert-triangle'"></pr-icon>
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
           <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
         </p>
       </div>
@@ -29,7 +29,7 @@
   <div class="form-group" ng-show="commonCustomTemplateForm.template_title.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="commonCustomTemplateForm.template_title.$error">
-        <p ng-message="required"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Title is required.</p>
+        <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Title is required.</p>
       </div>
     </div>
   </div>
@@ -45,7 +45,7 @@
   <div class="form-group" ng-show="commonCustomTemplateForm.description.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="commonCustomTemplateForm.description.$error">
-        <p ng-message="required"> <pr-icon feather="true" icon="'alert-triangle'"></pr-icon> Description is required.</p>
+        <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Description is required.</p>
       </div>
     </div>
   </div>
