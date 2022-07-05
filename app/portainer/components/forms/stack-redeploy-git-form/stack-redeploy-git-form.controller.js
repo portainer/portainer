@@ -28,6 +28,9 @@ class StackRedeployGitFormController {
       RepositoryUsername: '',
       RepositoryPassword: '',
       Env: [],
+      Option: {
+        Prune: false,
+      },
       // auto update
       AutoUpdate: {
         RepositoryAutomaticUpdates: false,
@@ -41,6 +44,7 @@ class StackRedeployGitFormController {
     this.onChangeRef = this.onChangeRef.bind(this);
     this.onChangeAutoUpdate = this.onChangeAutoUpdate.bind(this);
     this.onChangeEnvVar = this.onChangeEnvVar.bind(this);
+    this.onChangeOption = this.onChangeOption.bind(this);
   }
 
   buildAnalyticsProperties() {
@@ -88,6 +92,15 @@ class StackRedeployGitFormController {
     this.onChange({ Env: value });
   }
 
+  onChangeOption(values) {
+    this.onChange({
+      Option: {
+        ...this.formValues.Option,
+        ...values,
+      },
+    });
+  }
+
   async submit() {
     const tplCrop =
       '<div>Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption.</div>' +
@@ -101,7 +114,13 @@ class StackRedeployGitFormController {
       }
       try {
         this.state.redeployInProgress = true;
-        await this.StackService.updateGit(this.stack.Id, this.stack.EndpointId, this.FormHelper.removeInvalidEnvVars(this.formValues.Env), false, this.formValues);
+        await this.StackService.updateGit(
+          this.stack.Id,
+          this.stack.EndpointId,
+          this.FormHelper.removeInvalidEnvVars(this.formValues.Env),
+          this.formValues.Option.Prune,
+          this.formValues
+        );
         this.Notifications.success('Pulled and redeployed stack successfully');
         this.$state.reload();
       } catch (err) {
@@ -148,6 +167,9 @@ class StackRedeployGitFormController {
   $onInit() {
     this.formValues.RefName = this.model.ReferenceName;
     this.formValues.Env = this.stack.Env;
+    if (this.stack.Option) {
+      this.formValues.Option = this.stack.Option;
+    }
 
     // Init auto update
     if (this.stack.AutoUpdate && (this.stack.AutoUpdate.Interval || this.stack.AutoUpdate.Webhook)) {

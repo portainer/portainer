@@ -3,6 +3,8 @@
   font-size: 17px;
   background: none;
   margin-right: 15px;
+  display: flex;
+  align-items: center;
 }
 
 .menu-list {
@@ -23,6 +25,13 @@
   font-size: 14px;
   color: var(--text-dropdown-menu-color);
   text-decoration: none !important;
+  border-radius: 5px;
+}
+
+.arrow-down {
+  width: 18px;
+  height: 18px;
+  margin-left: 10px;
 }
 
 .menu-link:hover {

@@ -387,7 +387,8 @@ angular.module('portainer.docker').controller('ContainerController', [
     }
 
     $scope.recreate = function () {
-      ModalService.confirmContainerRecreation(function (result) {
+      const cannotPullImage = !$scope.container.Config.Image || $scope.container.Config.Image.toLowerCase().startsWith('sha256');
+      ModalService.confirmContainerRecreation(cannotPullImage, function (result) {
         if (!result) {
           return;
         }

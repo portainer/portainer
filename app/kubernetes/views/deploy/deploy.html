@@ -28,10 +28,7 @@
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <div class="col-sm-12">
                     <label for="toggle_logo" class="control-label text-left"> Use namespace(s) specified from manifest </label>
-                    <portainer-tooltip
-                      position="bottom"
-                      message="If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment"
-                    >
+                    <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
                     </portainer-tooltip>
                     <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" /><i></i> </label>
                   </div>

@@ -41,7 +41,12 @@ export function Sidebar() {
         {/* negative margin + padding -> scrollbar won't hide the content */}
         <div className="mt-6 overflow-y-auto flex-1 -mr-4 pr-4">
           <ul className="space-y-9">
-            <SidebarItem to="portainer.home" icon={Home} label="Home" />
+            <SidebarItem
+              to="portainer.home"
+              icon={Home}
+              label="Home"
+              data-cy="portainerSidebar-home"
+            />
 
             <EnvironmentSidebar />
 

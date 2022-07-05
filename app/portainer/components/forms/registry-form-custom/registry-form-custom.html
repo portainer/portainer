@@ -27,7 +27,7 @@
   <div class="form-group">
     <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
       Registry URL
-      <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry. Any protocol and trailing slash will be stripped if present."></portainer-tooltip>
+      <portainer-tooltip message="'URL or IP address of a Docker registry. Any protocol and trailing slash will be stripped if present.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="10.0.0.10:5000 or myregistry.domain.tld" required />
@@ -46,7 +46,7 @@
     <div class="col-sm-12">
       <label for="registry_auth" class="control-label text-left">
         Authentication
-        <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
+        <portainer-tooltip message="'Enable this option if you need to specify credentials to connect to this registry.'"></portainer-tooltip>
       </label>
       <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.model.Authentication" /><i></i> </label>
     </div>

@@ -90,6 +90,7 @@ body,
   margin-bottom: 15px;
   color: var(--text-form-section-title-color);
   padding-left: 0;
+  font-weight: 500;
 }
 
 .form-horizontal .control-label.text-left {
@@ -857,4 +858,13 @@ json-tree .branch-preview {
 /* used for bootbox prompt with inputType radio */
 .form-check.radio {
   margin-left: 15px;
+}
+
+.inline-text {
+  display: inline;
+  position: absolute;
+  font-family: 'Montserrat';
+  font-size: smaller;
+  margin-left: 5px;
+  margin-right: 5px;
 }
