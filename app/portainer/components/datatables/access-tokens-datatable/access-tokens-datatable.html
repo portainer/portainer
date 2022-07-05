@@ -3,7 +3,7 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-blue'"></pr-icon>
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-primary icon-nested-blue'"></pr-icon>
           <span>{{ $ctrl.titleText }}</span>
         </div>
         <div class="searchBar vertical-center">
@@ -21,14 +21,14 @@
           <button
             ng-if="!$ctrl.endpointType"
             type="button"
-            class="btn btn-sm btn-danger"
+            class="btn btn-sm btn-dangerlight vertical-center"
             ng-disabled="$ctrl.state.selectedItemCount === 0"
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
           >
             <pr-icon icon="'trash-2'" feather="true" class-name="'icon-white'"></pr-icon>
             <span>Remove</span>
           </button>
-          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.onClickAdd()">
+          <button type="button" class="btn btn-sm btn-primary vertical-center" ng-click="$ctrl.onClickAdd()">
             <pr-icon icon="'plus'" feather="true" class-name="'icon-white'"></pr-icon>
             <span>Add access token</span>
           </button>
