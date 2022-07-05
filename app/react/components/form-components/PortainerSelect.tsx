@@ -14,36 +14,43 @@ type Group<TValue> = { label: string; options: Option<TValue>[] };
 
 type Options<TValue> = OptionsOrGroups<Option<TValue>, Group<TValue>>;
 
-interface SharedProps {
+interface SharedProps extends AutomationTestingProps {
   name?: string;
   inputId?: string;
   placeholder?: string;
   disabled?: boolean;
 }
 
-interface MultiProps<TValue> extends AutomationTestingProps {
+interface MultiProps<TValue> extends SharedProps {
   value: Option<TValue>[];
   onChange(value: readonly Option<TValue>[]): void;
   options: Options<TValue>;
+  isMulti: true;
 }
 
-interface SingleProps<TValue> extends AutomationTestingProps {
+interface SingleProps<TValue> extends SharedProps {
   value: TValue;
   onChange(value: TValue | null): void;
   options: Options<TValue>;
+  isMulti?: never;
 }
 
-type Props<TValue> = SharedProps &
-  (SingleProps<TValue> | (MultiProps<TValue> & { isMulti: true }));
+type Props<TValue> = MultiProps<TValue> | SingleProps<TValue>;
 
-export function Select<TValue>(props: Props<TValue>) {
-  return 'isMulti' in props ? (
+export function Select<TValue = string>(props: Props<TValue>) {
+  return isMultiProps(props) ? (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <MultiSelect {...props} />
   ) : (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <SingleSelect {...props} />
   );
+}
+
+function isMultiProps<TValue>(
+  props: Props<TValue>
+): props is MultiProps<TValue> {
+  return 'isMulti' in props && !!props.isMulti;
 }
 
 export function SingleSelect<TValue = string>({
@@ -55,7 +62,7 @@ export function SingleSelect<TValue = string>({
   disabled,
   inputId,
   placeholder,
-}: SharedProps & SingleProps<TValue>) {
+}: SingleProps<TValue>) {
   const selectedValue = findOption<TValue>(options, value);
 
   return (
@@ -101,7 +108,7 @@ export function MultiSelect<TValue = string>({
   inputId,
   placeholder,
   disabled,
-}: SharedProps & MultiProps<TValue>) {
+}: Omit<MultiProps<TValue>, 'isMulti'>) {
   return (
     <ReactSelect
       name={name}
