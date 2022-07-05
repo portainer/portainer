@@ -182,8 +182,7 @@ input:checked + .slider:before {
 }
 
 .datatable .toolBar {
-  padding-top: 20px !important;
-  padding-bottom: 20px !important;
+  padding: 20px !important;
 }
 
 .toolBar {
@@ -195,13 +194,12 @@ input:checked + .slider:before {
 .toolBar > .toolBarTitle {
   flex: auto;
   display: inline-flex;
-  flex-wrap: nowarp;
+  flex-wrap: nowrap;
 }
 
 .toolBar > .searchBar {
   flex: right;
-  margin-right: 10px;
-  width: 500px;
+  width: fit-content;
   height: 30px;
   display: inline-flex;
 }

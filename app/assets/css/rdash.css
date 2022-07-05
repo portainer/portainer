@@ -113,6 +113,9 @@ div.input-mask {
 .widget .widget-body table thead * {
   font-size: 14px !important;
 }
+.widget .widget-body table thead svg {
+  font-size: 12px !important;
+}
 .widget .widget-body table tbody * {
   font-size: 13px !important;
 }

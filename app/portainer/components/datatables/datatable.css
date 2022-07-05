@@ -1,7 +1,6 @@
 .datatable .toolBar {
   background-color: var(--bg-card-color);
   overflow: auto;
-  padding: 10px;
   font-size: 16px;
 }
 
@@ -11,7 +10,6 @@
 
 .datatable .toolBar .toolBarTitle {
   float: left;
-  margin: 5px 0 0 10px;
   color: var(--text-widget-header-color);
   font-weight: 500;
 }
@@ -276,6 +274,21 @@
 .table th.selection,
 .table td.selection {
   width: 30px;
+}
+
+.table th:first-child {
+  padding-left: 20px;
+}
+
+.table tr > td:first-child {
+  padding-left: 20px;
+}
+
+.table th:last-child {
+  padding-right: 20px;
+}
+.table tr > td:last-child {
+  padding-right: 20px;
 }
 
 .datatable .table-setting-menu-btn {
