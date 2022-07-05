@@ -23,11 +23,12 @@ function ContainersController($scope, ContainerService, Notifications, endpoint)
             var Id = data.Id;
             for (var i = 0; i < $scope.containers_t.length; i++) {
               if (Id == $scope.containers_t[i].Id) {
-                const gpuOptions = _.find(data.HostConfig.DeviceRequests, function (o) { return (o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu') });
+                const gpuOptions = _.find(data.HostConfig.DeviceRequests, function (o) {
+                  return o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu';
+                });
                 if (!gpuOptions) {
                   $scope.containers_t[i]['Gpus'] = 'none';
-                }
-                else {
+                } else {
                   let gpuStr = 'all';
                   if (gpuOptions.Count !== -1) {
                     gpuStr = `id:${_.join(gpuOptions.DeviceIDs, ',')}`;
