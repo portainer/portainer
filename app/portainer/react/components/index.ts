@@ -32,6 +32,7 @@ import { SearchBar } from '@@/datatables/SearchBar';
 import { FallbackImage } from '@@/FallbackImage';
 import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 import { TeamsSelector } from '@@/TeamsSelector';
+import { MultiSelect } from '@@/form-components/MultiSelect';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -172,5 +173,17 @@ export const componentsModule = angular
       'onChange',
       'options',
       'value',
+    ])
+  )
+  .component(
+    'porMultiSelect',
+    r2a(MultiSelect, [
+      'dataCy',
+      'inputId',
+      'name',
+      'value',
+      'onChange',
+      'options',
+      'placeholder',
     ])
   ).name;

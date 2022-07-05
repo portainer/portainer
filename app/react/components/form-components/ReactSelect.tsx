@@ -1,22 +1,51 @@
-import ReactSelectCreatable, { CreatableProps } from 'react-select/creatable';
-import ReactSelect, { GroupBase, Props as SelectProps } from 'react-select';
+import ReactSelectCreatable, {
+  CreatableProps as ReactSelectCreatableProps,
+} from 'react-select/creatable';
+import ReactSelect, {
+  GroupBase,
+  Props as ReactSelectProps,
+} from 'react-select';
 import clsx from 'clsx';
 import { RefAttributes } from 'react';
 import ReactSelectType from 'react-select/dist/declarations/src/Select';
 
 import styles from './ReactSelect.module.css';
 
-export function Select<
-  Option = unknown,
+interface DefaultOption {
+  value: string;
+  label: string;
+}
+
+type RegularProps<
+  Option = DefaultOption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
->({
-  className,
-  ...props
-}: SelectProps<Option, IsMulti, Group> &
-  RefAttributes<ReactSelectType<Option, IsMulti, Group>>) {
+> = { isCreatable?: false } & ReactSelectProps<Option, IsMulti, Group> &
+  RefAttributes<ReactSelectType<Option, IsMulti, Group>>;
+
+type CreatableProps<
+  Option = DefaultOption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>
+> = { isCreatable: true } & ReactSelectCreatableProps<Option, IsMulti, Group>;
+
+type Props<
+  Option = DefaultOption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>
+> =
+  | CreatableProps<Option, IsMulti, Group>
+  | RegularProps<Option, IsMulti, Group>;
+
+export function Select<
+  Option = DefaultOption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>
+>({ className, isCreatable = false, ...props }: Props<Option, IsMulti, Group>) {
+  const Component = isCreatable ? ReactSelectCreatable : ReactSelect;
+
   return (
-    <ReactSelect
+    <Component
       className={clsx(styles.root, className)}
       classNamePrefix="selector"
       // eslint-disable-next-line react/jsx-props-no-spreading
@@ -26,10 +55,10 @@ export function Select<
 }
 
 export function Creatable<
-  Option = unknown,
+  Option = DefaultOption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
->({ className, ...props }: CreatableProps<Option, IsMulti, Group>) {
+>({ className, ...props }: ReactSelectCreatableProps<Option, IsMulti, Group>) {
   return (
     <ReactSelectCreatable
       className={clsx(styles.root, className)}
