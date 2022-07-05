@@ -21,7 +21,7 @@
     <div ng-show="!$ctrl.multiItemDisable" class="mt-5 mb-5">
       <label class="control-label text-left">Published ports</label>
       <span class="label label-default interactive ml-10" ng-click="$ctrl.addPort()" data-cy="k8sAppCreate-addNewPortButton">
-        <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
+        <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> publish a new port
       </span>
     </div>
     <div ng-repeat="servicePort in $ctrl.servicePorts" style="margin-top: 10px">
@@ -138,7 +138,7 @@
       <div class="input-group col-sm-2 input-group-sm">
         <div class="btn-group btn-group-sm">
           <label
-            class="btn btn-primary"
+            class="btn btn-light"
             ng-model="servicePort.protocol"
             uib-btn-radio="'TCP'"
             ng-change="ctrl.onChangePortProtocol($index)"
@@ -147,7 +147,7 @@
             >TCP</label
           >
           <label
-            class="btn btn-primary"
+            class="btn btn-light"
             ng-model="servicePort.protocol"
             uib-btn-radio="'UDP'"
             ng-change="ctrl.onChangePortProtocol($index)"
@@ -159,17 +159,17 @@
         <button
           ng-disabled="$ctrl.servicePorts.length === 1"
           ng-show="!$ctrl.multiItemDisable"
-          class="btn btn-sm btn-danger"
+          class="btn btn-sm btn-light btn-only-icon"
           type="button"
           ng-click="$ctrl.removePort($index)"
           data-cy="k8sAppCreate-rmPortButton_{{ $index }}"
         >
-          <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+          <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
         </button>
       </div>
 
       <div class="col-sm-12 input-group input-group-sm">
-        <div class="col-sm-2">
+        <div class="col-sm-3">
           <div class="small mt-5" ng-if="$ctrl.state.duplicates.targetPort.refs[$index] !== undefined">
             <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This container port is already used.
           </div>
@@ -180,7 +180,7 @@
           </div>
         </div>
 
-        <div class="col-sm-2">
+        <div class="col-sm-3">
           <div class="small mt-5" ng-if="$ctrl.state.duplicates.servicePort.refs[$index] !== undefined">
             <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This service port is already used.
           </div>
@@ -193,7 +193,7 @@
           </div>
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="small mt-5">
             <div ng-messages="serviceForm['node_port_'+$index].$error">
               <p ng-message="min"

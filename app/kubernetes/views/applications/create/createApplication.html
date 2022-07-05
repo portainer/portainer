@@ -33,7 +33,7 @@
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 <div ng-if="ctrl.state.viewReady">
-  <div class="row kubernetes_create">
+  <div class="row kubernetes-create">
     <div class="col-xs-12">
       <rd-widget>
         <rd-widget-body>
@@ -144,7 +144,7 @@
                 <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid || ctrl.state.alreadyExists">
                   <div class="col-sm-12 small">
                     <div ng-messages="kubernetesApplicationCreationForm.application_name.$error">
-                      <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p>
+                      <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p>
                       <p ng-message="pattern">
                         <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                         This field must consist of lower case alphanumeric characters or '-', contain at most 63 characters, start with an alphabetic character, and end with an
@@ -219,7 +219,7 @@
                         ng-click="ctrl.addEnvironmentVariable()"
                         data-cy="k8sAppCreate-addEnvVarButton"
                       >
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
+                        <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> add environment variable
                       </span>
                     </div>
 
@@ -258,17 +258,17 @@
                           </div>
 
                           <div class="col-sm-2 input-group input-group-sm" ng-if="ctrl.formValues.Containers.length <= 1">
-                            <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable(envVar)">
-                              <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+                            <button ng-if="!envVar.NeedsDeletion" class="btn btn-md btn-light btn-only-icon" type="button" ng-click="ctrl.removeEnvironmentVariable(envVar)">
+                              <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
                             </button>
                             <button
                               ng-if="envVar.NeedsDeletion"
-                              class="btn btn-sm btn-primary"
+                              class="btn btn-sm btn-light btn-only-icon"
                               type="button"
                               ng-click="ctrl.restoreEnvironmentVariable(envVar)"
                               data-cy="k8sAppCreate-removeEnvVarButton_{{ $index }}"
                             >
-                              <pr-icon icon="'rotate-cw'" feather="true"></pr-icon>
+                              <pr-icon icon="'rotate-cw'" size="'md'" feather="true"></pr-icon>
                             </button>
                           </div>
                         </div>
@@ -319,7 +319,7 @@
                         ng-if="ctrl.formValues.Containers.length <= 1"
                         data-cy="k8sAppCreate-addConfigButton"
                       >
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i> add configuration
+                        <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> add configuration
                       </span>
                     </div>
                     <div class="col-sm-12 small text-muted" style="margin-top: 15px" ng-if="ctrl.formValues.Configurations.length">
@@ -344,33 +344,33 @@
                     </div>
                     <div class="col-sm-6" style="margin-top: 2px">
                       <button
-                        class="btn btn-sm btn-primary"
+                        class="btn btn-sm btn-light vertical-center"
                         type="button"
                         ng-if="!config.Overriden"
                         ng-click="ctrl.overrideConfiguration(index)"
                         ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
                         data-cy="k8sAppCreate-configOverrideButton_{{ $index }}"
                       >
-                        <pr-icon icon="'list'" feather="true"></pr-icon> Override
+                        <pr-icon icon="'list'" size="'md'" feather="true"></pr-icon> Override
                       </button>
                       <button
-                        class="btn btn-sm btn-primary"
+                        class="btn btn-sm btn-light vertical-center"
                         type="button"
                         ng-if="config.Overriden"
                         ng-click="ctrl.resetConfiguration(index)"
                         ng-disabled="ctrl.formValues.Containers.length > 1"
                         data-cy="k8sAppCreate-configAutoButton_{{ $index }}"
                       >
-                        <pr-icon icon="'rotate-cw'" feather="true"></pr-icon> Auto
+                        <pr-icon icon="'rotate-cw'" size="'md'" feather="true"></pr-icon> Auto
                       </button>
                       <button
-                        class="btn btn-sm btn-danger"
+                        class="btn btn-sm btn-light vertical-center"
                         type="button"
                         ng-click="ctrl.removeConfiguration(index)"
                         ng-if="ctrl.formValues.Containers.length <= 1"
                         data-cy="k8sAppCreate-configRemoveButton"
                       >
-                        <pr-icon icon="'trash-2'" feather="true"></pr-icon> Remove
+                        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon> Remove
                       </button>
                     </div>
                     <!-- no-override -->
@@ -476,7 +476,7 @@
                         ng-if="ctrl.isAddPersistentFolderButtonShowed()"
                         data-cy="k8sAppCreate-addPersistentFolderButton"
                       >
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i> add persisted folder
+                        <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> add persisted folder
                       </span>
                     </div>
 
@@ -1141,7 +1141,7 @@
                       <div class="col-sm-12">
                         <label class="control-label text-left">Placement rules</label>
                         <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addPlacement()">
-                          <i class="fa fa-plus-circle" aria-hidden="true"></i> add rule
+                          <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> add rule
                         </span>
                       </div>
 
@@ -1177,21 +1177,21 @@
                           <div class="col-sm-1 input-group">
                             <button
                               ng-if="!placement.NeedsDeletion"
-                              class="btn btn-sm btn-danger"
+                              class="btn btn-sm btn-light btn-only-icon"
                               type="button"
                               ng-click="ctrl.removePlacement($index)"
                               data-cy="k8sAppCreate-deletePlacementButton"
                             >
-                              <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+                              <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
                             </button>
                             <button
                               ng-if="placement.NeedsDeletion"
-                              class="btn btn-sm btn-primary"
+                              class="btn btn-sm btn-light btn-only-icon"
                               type="button"
                               ng-click="ctrl.restorePlacement($index)"
                               data-cy="k8sAppCreate-restorePlacementButton"
                             >
-                              <pr-icon icon="'rotate-cw'" feather="true"></pr-icon>
+                              <pr-icon icon="'rotate-cw'" size="'md'" feather="true"></pr-icon>
                             </button>
                           </div>
                         </div>

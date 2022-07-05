@@ -1,0 +1,13 @@
+.kubernetes-deploy pr-icon,
+.kubernetes-create pr-icon {
+  vertical-align: middle;
+  margin-top: -3px;
+}
+
+.btn-only-icon {
+  padding: 6px;
+}
+
+.btn-only-icon pr-icon {
+  margin-top: 0;
+}

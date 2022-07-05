@@ -122,9 +122,3 @@ pr-icon {
   display: flex;
   align-items: center;
 }
-
-.kubernetes_deploy pr-icon,
-.kubernetes_create pr-icon {
-  vertical-align: middle;
-  margin-top: -3px;
-}
