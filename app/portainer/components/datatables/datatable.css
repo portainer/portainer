@@ -106,6 +106,15 @@
   padding: 15px 0;
 }
 
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.table > tbody > tr {
+  height: 50px;
+  vertical-align: middle;
+}
+
 [data-reach-menu-list],
 [data-reach-menu-items] {
   padding: 0px;
