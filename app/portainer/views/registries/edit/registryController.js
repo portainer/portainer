@@ -13,9 +13,7 @@ export default class RegistryController {
       loading: false,
     };
 
-    this.formValues = {
-      Password: '',
-    };
+    this.Password = '';
   }
 
   passwordLabel() {
@@ -35,8 +33,7 @@ export default class RegistryController {
       try {
         this.state.actionInProgress = true;
         const registry = this.registry;
-        registry.Password = this.formValues.Password;
-        registry.Name = this.formValues.Name;
+        registry.Password = this.Password;
 
         await this.RegistryService.updateRegistry(registry);
         this.Notifications.success('Registry successfully updated');
@@ -50,7 +47,7 @@ export default class RegistryController {
   }
 
   onChangeName() {
-    this.state.nameAlreadyExists = _.includes(this.registriesNames, this.formValues.Name);
+    this.state.nameAlreadyExists = _.includes(this.registriesNames, this.registry.Name);
   }
 
   isUpdateButtonDisabled() {
@@ -91,7 +88,6 @@ export default class RegistryController {
       const registry = await this.RegistryService.registry(registryId);
       this.registry = registry;
       this.provider = this.getRegistryProvider(registry.Type);
-      this.formValues.Name = registry.Name;
 
       const registries = await this.RegistryService.registries();
       _.pullAllBy(registries, [registry], 'Id');
