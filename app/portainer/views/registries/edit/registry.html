@@ -51,7 +51,10 @@
           <!-- !name-input -->
           <!-- registry-url-input -->
           <div class="form-group">
-            <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left"> Registry URL </label>
+            <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Registry URL
+              <portainer-tooltip message="'URL or IP address of a Docker registry. Any protocol or trailing slash will be stripped if present.'"> </portainer-tooltip>
+            </label>
             <div class="col-sm-9 col-lg-10">
               <input
                 type="text"
@@ -76,7 +79,10 @@
           <!-- base-url-input -->
           <div ng-if="$ctrl.registry.Type === $ctrl.RegistryTypes.PROGET">
             <div class="form-group">
-              <label for="registry_base_url" class="col-sm-3 col-lg-2 control-label text-left"> Base URL </label>
+              <label for="registry_base_url" class="col-sm-3 col-lg-2 control-label text-left">
+                Base URL
+                <portainer-tooltip message="The base URL of the ProGet registry."> </portainer-tooltip>
+              </label>
               <div class="col-sm-9 col-lg-10">
                 <input
                   type="text"
@@ -110,7 +116,10 @@
             "
           >
             <div class="col-sm-12">
-              <label for="registry_auth" class="control-label text-left"> Authentication </label>
+              <label for="registry_auth" class="control-label text-left">
+                Authentication
+                <portainer-tooltip message="'Enable this option if you need to specify credentials to connect to this registry.'"> </portainer-tooltip>
+              </label>
               <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.registry.Authentication" /><i></i> </label>
             </div>
           </div>
