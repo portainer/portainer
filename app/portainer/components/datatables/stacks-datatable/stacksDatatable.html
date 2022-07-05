@@ -183,7 +183,7 @@
                   >{{ item.Name }}</a
                 >
                 <span ng-if="$ctrl.offlineMode">{{ item.Name }}</span>
-                <span ng-if="item.Regular && item.Status == 2" class="label label-warning image-tag space-left">Inactive</span>
+                <span ng-if="item.Regular && item.Status == 2" class="label label-warning image-tag ml-2">Inactive</span>
               </td>
               <td>{{ item.Type === 1 ? 'Swarm' : 'Compose' }}</td>
               <td>
