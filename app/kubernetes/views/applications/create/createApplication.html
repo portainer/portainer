@@ -33,7 +33,7 @@
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 <div ng-if="ctrl.state.viewReady">
-  <div class="row">
+  <div class="row kubernetes_create">
     <div class="col-xs-12">
       <rd-widget>
         <rd-widget-body>
@@ -98,7 +98,7 @@
                 <editor-description>
                   <span class="text-muted small" ng-show="ctrl.stack.IsComposeFormat">
                     <p>
-                      <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                       Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not
                       all the Compose format options are supported by Kompose at the moment.
                     </p>
@@ -109,7 +109,7 @@
                   </span>
                   <span class="text-muted small" ng-show="!ctrl.stack.IsComposeFormat">
                     <p>
-                      <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
                     </p>
                     <p>
@@ -144,15 +144,15 @@
                 <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid || ctrl.state.alreadyExists">
                   <div class="col-sm-12 small">
                     <div ng-messages="kubernetesApplicationCreationForm.application_name.$error">
-                      <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This field is required.</p>
+                      <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p>
                       <p ng-message="pattern">
-                        <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon>
+                        <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                         This field must consist of lower case alphanumeric characters or '-', contain at most 63 characters, start with an alphabetic character, and end with an
                         alphanumeric character (e.g. 'my-name', or 'abc-123').
                       </p>
                     </div>
                     <p ng-if="ctrl.state.alreadyExists">
-                      <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                       An application with the same name already exists inside the selected namespace.
                     </p>
                   </div>
@@ -183,7 +183,7 @@
                   <!-- #region STACK -->
                   <div class="form-group">
                     <div class="col-sm-12 small text-muted">
-                      <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to
                       use the application name.
                     </div>
@@ -288,14 +288,14 @@
                               "
                             >
                               <ng-messages for="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$error">
-                                <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Environment variable name is required.</p>
+                                <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Environment variable name is required.</p>
                                 <p ng-message="pattern"
-                                  ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This field must consist of alphabetic characters, digits, '_', '-', or
-                                  '.', and must not start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.</p
+                                  ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field must consist of alphabetic characters, digits, '_', '-',
+                                  or '.', and must not start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.</p
                                 >
                               </ng-messages>
                               <p ng-if="ctrl.state.duplicates.environmentVariables.refs[$index] !== undefined"
-                                ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This environment variable is already defined.</p
+                                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This environment variable is already defined.</p
                               >
                             </div>
                           </div>
@@ -323,7 +323,7 @@
                       </span>
                     </div>
                     <div class="col-sm-12 small text-muted" style="margin-top: 15px" ng-if="ctrl.formValues.Configurations.length">
-                      <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       Portainer will automatically expose all the keys of a configuration as environment variables. This behavior can be overridden to filesystem mounts for each
                       key via the override button.
                     </div>
@@ -441,10 +441,10 @@
                               "
                             >
                               <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
-                                <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Path is required.</p>
+                                <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required.</p>
                               </ng-messages>
                               <p ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined"
-                                ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This path is already used.</p
+                                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This path is already used.</p
                               >
                             </div>
                           </div>
@@ -461,7 +461,7 @@
                   <!-- #region PERSISTED FOLDERS -->
                   <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
                     <div class="col-sm-12 small text-muted">
-                      <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       No storage option is available to persist data, contact your administrator to enable a storage option.
                     </div>
                   </div>
@@ -482,7 +482,7 @@
 
                     <div class="col-sm-12" style="margin-top: 5px" ng-if="ctrl.allQuotasExhaustedAndNoVolumesAvailable()">
                       <span class="small text-muted">
-                        <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                        <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                         This namespace has exhausted its storage capacity. Contact your administrator to expand the capacity of the namespace.
                       </span>
                     </div>
@@ -635,10 +635,10 @@
                             "
                           >
                             <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$error">
-                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Path is required.</p>
+                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required.</p>
                             </ng-messages>
                             <p ng-if="ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined"
-                              ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This path is already defined.</p
+                              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This path is already defined.</p
                             >
                           </div>
                         </div>
@@ -654,11 +654,11 @@
                             "
                           >
                             <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$error">
-                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Size is required.</p>
-                              <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This value must be greater than zero.</p>
+                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Size is required.</p>
+                              <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This value must be greater than zero.</p>
                             </ng-messages>
                             <p ng-if="ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined">
-                              <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon>
+                              <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                               You can only request up to
                               {{ ctrl.state.storages.availabilities[persistedFolder.StorageClass.Name] | kubernetesAppStorageRequestSizeHumanReadable }} for
                               {{ persistedFolder.StorageClass.Name }}
@@ -669,10 +669,10 @@
                             ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid || ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined"
                           >
                             <ng-messages for="kubernetesApplicationCreationForm['existing_volumes_' + $index].$error">
-                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Volume is required.</p>
+                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Volume is required.</p>
                             </ng-messages>
                             <p ng-if="ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined"
-                              ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This volume is already used.</p
+                              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This volume is already used.</p
                             >
                           </div>
                         </div>
@@ -784,14 +784,14 @@
                   <!-- #region RESOURCE RESERVATIONS -->
                   <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota">
                     <div class="col-sm-12 small text-muted">
-                      <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       Resource reservations are applied per instance of the application.
                     </div>
                   </div>
 
                   <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
                     <div class="col-sm-12 small text-muted">
-                      <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       A resource quota is set on this namespace, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums
                       are inherited from the namespace quota.
                     </div>
@@ -799,7 +799,7 @@
 
                   <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
                     <div class="col-sm-12 small text-danger">
-                      <pr-icon icon="'alert-circle'" mode="'error'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                       This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of
                       the namespace.
                     </div>
@@ -843,7 +843,7 @@
                     <div class="col-sm-12 small text-warning">
                       <div ng-messages="kubernetesApplicationCreationForm.memory_limit.$error">
                         <p
-                          ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Value must be between {{ ctrl.state.sliders.memory.min }} and
+                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Value must be between {{ ctrl.state.sliders.memory.min }} and
                           {{ ctrl.state.sliders.memory.max }}
                         </p>
                       </div>
@@ -874,7 +874,7 @@
 
                   <div class="form-group" ng-if="ctrl.nodeLimitsOverflow()">
                     <div class="col-sm-12 small text-danger">
-                      <pr-icon icon="'alert-circle'" mode="'error'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                       These reservations would exceed the resources currently available in the cluster.
                     </div>
                   </div>
@@ -967,8 +967,8 @@
                   <div class="form-group" ng-if="kubernetesApplicationCreationForm['replica_count'].$invalid">
                     <div class="col-sm-12 small">
                       <ng-messages for="kubernetesApplicationCreationForm['replica_count'].$error">
-                        <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Instance count is required.</p>
-                        <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Instance count must be greater than 0.</p>
+                        <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count is required.</p>
+                        <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count must be greater than 0.</p>
                       </ng-messages>
                     </div>
                   </div>
@@ -979,7 +979,7 @@
                     ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1 && (ctrl.formValues.CpuLimit !== 0 || ctrl.formValues.MemoryLimit !== 0)"
                   >
                     <div class="col-sm-12 small text-muted">
-                      <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       This application will reserve the following resources:
                       <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount | kubernetesApplicationCPUValue }} CPU</b> and
                       <b>{{ ctrl.formValues.MemoryLimit * ctrl.formValues.ReplicaCount }} MB</b> of memory.
@@ -988,21 +988,21 @@
 
                   <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
                     <div class="col-sm-12 small">
-                      <pr-icon icon="'alert-circle'" mode="'error'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                       This application would exceed available resources. Please review resource reservations or the instance count.
                     </div>
                   </div>
 
                   <div class="form-group" ng-if="ctrl.state.storages.quotaExceeded">
                     <div class="col-sm-12 small text-muted">
-                      <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                       This application would exceed available storage. Please review the persisted folders or the instance count.
                     </div>
                   </div>
 
                   <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
                     <div class="col-sm-12 small text-muted">
-                      <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                      <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                       The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code
                       >. You will not be able to scale that application.
                     </div>
@@ -1067,10 +1067,10 @@
                             <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_min'].$invalid">
                               <div class="small text-warning" style="margin-top: 5px">
                                 <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_min'].$error">
-                                  <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Minimum instances is required.</p>
-                                  <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Minimum instances must be greater than 0.</p>
+                                  <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Minimum instances is required.</p>
+                                  <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Minimum instances must be greater than 0.</p>
                                   <p ng-message="max"
-                                    ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Minimum instances must be smaller than maximum instances.</p
+                                    ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Minimum instances must be smaller than maximum instances.</p
                                   >
                                 </ng-messages>
                               </div>
@@ -1089,9 +1089,9 @@
                             <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_max'].$invalid || ctrl.autoScalerOverflow()">
                               <div class="small text-warning" style="margin-top: 5px">
                                 <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_max'].$error">
-                                  <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Maximum instances is required.</p>
+                                  <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Maximum instances is required.</p>
                                   <p ng-message="min"
-                                    ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Maximum instances must be greater than minimum instances.</p
+                                    ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Maximum instances must be greater than minimum instances.</p
                                   >
                                 </ng-messages>
                               </div>
@@ -1113,9 +1113,9 @@
                             <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_cpu'].$invalid">
                               <div class="small text-warning" style="margin-top: 5px">
                                 <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_cpu'].$error">
-                                  <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Target CPU usage is required.</p>
-                                  <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Target CPU usage must be greater than 0.</p>
-                                  <p ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Target CPU usage must be smaller than 100.</p>
+                                  <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target CPU usage is required.</p>
+                                  <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target CPU usage must be greater than 0.</p>
+                                  <p ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target CPU usage must be smaller than 100.</p>
                                 </ng-messages>
                               </div>
                             </div>
@@ -1126,7 +1126,7 @@
 
                     <div class="form-group" ng-if="ctrl.autoScalerOverflow()" style="margin-bottom: 10px">
                       <div class="col-sm-12 small text-danger">
-                        <pr-icon icon="'alert-circle'" mode="'error'" feather="true"></pr-icon>
+                        <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                         This application would exceed available resources. Please review resource reservations or the maximum instance count of the auto-scaling policy.
                       </div>
                     </div>
@@ -1146,7 +1146,7 @@
                       </div>
 
                       <div class="col-sm-12 small text-muted" ng-if="ctrl.formValues.Placements.length > 0" style="margin-top: 10px">
-                        <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+                        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                         Deploy this application on nodes that respect <b>ALL</b> of the following placement rules. Placement rules are based on node labels.
                       </div>
 
@@ -1199,7 +1199,7 @@
                           <div class="col-sm-5 input-group">
                             <div class="small text-warning" style="margin-top: 5px" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
                               <p ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
-                                <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This label is already defined.
+                                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This label is already defined.
                               </p>
                             </div>
                           </div>
@@ -1291,14 +1291,14 @@
               </div>
               <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
                 <div class="col-sm-12 small text-danger">
-                  <pr-icon icon="'alert-circle'" mode="'error'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                   This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
                   namespace.
                 </div>
               </div>
               <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
                 <div class="col-sm-12 small text-muted">
-                  <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   You do not have access to any namespace. Contact your administrator to get access to a namespace.
                 </div>
               </div>

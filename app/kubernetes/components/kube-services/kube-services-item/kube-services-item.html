@@ -171,24 +171,24 @@
       <div class="col-sm-12 input-group input-group-sm">
         <div class="col-sm-2">
           <div class="small mt-5" ng-if="$ctrl.state.duplicates.targetPort.refs[$index] !== undefined">
-            <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This container port is already used.
+            <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This container port is already used.
           </div>
           <div class="small" ng-messages="serviceForm['container_port_'+$index].$error">
-            <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Container port number is required.</p>
-            <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
-            <p ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
+            <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number is required.</p>
+            <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
+            <p ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
           </div>
         </div>
 
         <div class="col-sm-2">
           <div class="small mt-5" ng-if="$ctrl.state.duplicates.servicePort.refs[$index] !== undefined">
-            <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This service port is already used.
+            <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This service port is already used.
           </div>
           <div class="small">
             <div ng-messages="serviceForm['service_port_'+$index].$error">
-              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Service port number is required.</p>
-              <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
-              <p ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
+              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Service port number is required.</p>
+              <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
+              <p ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
             </div>
           </div>
         </div>
@@ -197,10 +197,10 @@
           <div class="small mt-5">
             <div ng-messages="serviceForm['node_port_'+$index].$error">
               <p ng-message="min"
-                ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Node port number must be inside the range 30000-32767 or blank for system allocated.</p
+                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Node port number must be inside the range 30000-32767 or blank for system allocated.</p
               >
               <p ng-message="max"
-                ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Node port number must be inside the range 30000-32767 or blank for system allocated.</p
+                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Node port number must be inside the range 30000-32767 or blank for system allocated.</p
               >
             </div>
           </div>
@@ -209,7 +209,7 @@
         <div class="col-sm-2">
           <div class="small mt-5">
             <div ng-messages="serviceForm['ingress_port_'+$index].$error">
-              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Ingress selection is required.</p>
+              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress selection is required.</p>
             </div>
           </div>
         </div>
@@ -217,17 +217,17 @@
         <div class="col-sm-2">
           <div class="small mt-5">
             <div ng-messages="serviceForm['hostname_port_'+$index].$error">
-              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Host is required.</p>
+              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Host is required.</p>
             </div>
           </div>
         </div>
         <div class="col-sm-8" ng-show="">
           <div class="small mt-5">
             <div ng-messages="serviceForm['ingress_route_'+$index].$error">
-              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Route is required.</p>
+              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Route is required.</p>
               <p ng-message="pattern"
-                ><pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This field must consist of alphanumeric characters or the special characters: '-', '_' or
-                '/'. It must start and end with an alphanumeric character (e.g. 'my-route', or 'route-123').</p
+                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field must consist of alphanumeric characters or the special characters: '-', '_'
+                or '/'. It must start and end with an alphanumeric character (e.g. 'my-route', or 'route-123').</p
               >
             </div>
           </div>

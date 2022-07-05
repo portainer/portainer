@@ -1,8 +1,8 @@
 <ng-form name="pathForm">
   <div class="form-group">
     <span class="col-sm-12 text-muted small"
-      ><pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon> Indicate the path to the {{ $ctrl.deployMethod == 'compose' ? 'Compose' : 'Manifest' }} file from the
-      root of your repository (requires a yaml, yml, json, or hcl file extension)
+      ><pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon> Indicate the path to the {{ $ctrl.deployMethod == 'compose' ? 'Compose' : 'Manifest' }} file from
+      the root of your repository (requires a yaml, yml, json, or hcl file extension)
     </span>
   </div>
   <div class="form-group">
@@ -19,7 +19,7 @@
         ng-pattern="/.+\.(yml|yaml|json|hcl)$/i"
         required
       />
-      <p class="mt-2" ng-show="pathForm.repoPathField.$error.pattern"> <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Invalid file path </p>
+      <p class="mt-2" ng-show="pathForm.repoPathField.$error.pattern"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Invalid file path </p>
     </div>
   </div>
 </ng-form>

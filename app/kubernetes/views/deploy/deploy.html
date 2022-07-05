@@ -5,7 +5,7 @@
 <div ng-if="ctrl.state.viewReady">
   <kubernetes-feedback-panel></kubernetes-feedback-panel>
 
-  <div class="row">
+  <div class="row kubernetes_deploy">
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
@@ -26,11 +26,16 @@
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
-                  <div class="col-sm-12">
-                    <label for="toggle_logo" class="control-label text-left"> Use namespace(s) specified from manifest </label>
+                  <label for="toggle_logo" class="col-lg-2 col-sm-3 control-label text-left">
+                    Use namespace(s) specified from manifest
                     <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
                     </portainer-tooltip>
-                    <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" /><i></i> </label>
+                  </label>
+                  <div class="col-sm-8">
+                    <label class="switch">
+                      <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" />
+                      <i></i>
+                    </label>
                   </div>
                 </div>
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">
@@ -110,7 +115,7 @@
                   <editor-description>
                     <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
                       <p>
-                        <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                        <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                         Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
                         not all the Compose format options are supported by Kompose at the moment.
                       </p>
@@ -121,7 +126,7 @@
                     </span>
                     <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
                       <p>
-                        <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+                        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                         This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
                       </p>
                       <p>

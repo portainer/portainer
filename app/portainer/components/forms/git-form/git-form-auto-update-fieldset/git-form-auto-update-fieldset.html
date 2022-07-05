@@ -5,7 +5,7 @@
     </div>
   </div>
   <div class="small text-warning" style="margin: 5px 0 10px 0" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
-    <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+    <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
     <span class="text-muted">Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption.</span>
   </div>
   <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
@@ -54,9 +54,9 @@
   <div class="form-group col-md-12" ng-show="autoUpdateForm.repository_fetch_interval.$touched && autoUpdateForm.repository_fetch_interval.$invalid">
     <div class="small">
       <div ng-messages="autoUpdateForm.repository_fetch_interval.$error">
-        <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> This field is required.</p>
-        <p ng-message="invalidIntervalFormat"> <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Please enter a valid time interval.</p>
-        <p ng-message="minimumInterval"> <pr-icon icon="'alert-triangle'" mode="'warn'" feather="true"></pr-icon> Minimum interval is 1m</p>
+        <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p>
+        <p ng-message="invalidIntervalFormat"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Please enter a valid time interval.</p>
+        <p ng-message="minimumInterval"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Minimum interval is 1m</p>
       </div>
     </div>
   </div>
@@ -84,7 +84,7 @@
     </div>
   </div>
   <div class="small text-warning" style="margin: 5px 0 10px 0" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
-    <pr-icon icon="'alert-circle'" mode="'info'" feather="true"></pr-icon>
+    <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
     <span class="text-muted">When enabled, enforces automatic deployment at each interval or webhook invocation.</span>
   </div>
   <div class="small text-warning" style="margin: 5px 0 10px 0" ng-if="!$ctrl.model.RepositoryAutomaticUpdates">
