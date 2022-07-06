@@ -122,7 +122,3 @@ pr-icon {
   display: flex;
   align-items: center;
 }
-
-.icon-docker {
-  color: var(--ui-blue-6);
-}
