@@ -20,7 +20,11 @@ export function NameCell({
   row: { original: container },
 }: CellProps<ContainerGroup, string>) {
   return (
-    <Link to="azure.containerinstances.container" params={{ id: container.id }}>
+    <Link
+      to="azure.containerinstances.container"
+      params={{ id: container.id }}
+      className="hover:underline"
+    >
       {name}
     </Link>
   );

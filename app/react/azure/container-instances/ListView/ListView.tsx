@@ -41,7 +41,7 @@ export function ListView() {
   return (
     <>
       <PageHeader
-        breadcrumbs={[{ label: 'Container instances' }]}
+        breadcrumbs="Container instances"
         reload
         title="Container list"
       />

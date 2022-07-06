@@ -6,6 +6,7 @@ import {
   usePagination,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
+import { Plus, Trash2 } from 'react-feather';
 
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import { ContainerGroup } from '@/react/azure/types';
@@ -97,37 +98,35 @@ export function ContainersDatatable({
     <div className="row">
       <div className="col-sm-12">
         <TableContainer>
-          <TableTitle icon="fa-cubes" label="Containers" />
+          <TableTitle icon="fa-cubes" label="Containers">
+            <SearchBar
+              value={searchBarValue}
+              onChange={handleSearchBarChange}
+            />
 
-          <TableActions>
-            <Authorized authorizations="AzureContainerGroupDelete">
-              <Button
-                color="danger"
-                size="small"
-                disabled={selectedFlatRows.length === 0}
-                onClick={() =>
-                  handleRemoveClick(
-                    selectedFlatRows.map((row) => row.original.id)
-                  )
-                }
-              >
-                <i className="fa fa-trash-alt space-right" aria-hidden="true" />
-                Remove
-              </Button>
-            </Authorized>
-
-            <Authorized authorizations="AzureContainerGroupCreate">
-              <Link to="azure.containerinstances.new" className="space-left">
-                <Button>
-                  <i className="fa fa-plus space-right" aria-hidden="true" />
-                  Add container
+            <TableActions>
+              <Authorized authorizations="AzureContainerGroupDelete">
+                <Button
+                  color="dangerlight"
+                  disabled={selectedFlatRows.length === 0}
+                  onClick={() =>
+                    handleRemoveClick(
+                      selectedFlatRows.map((row) => row.original.id)
+                    )
+                  }
+                  icon={Trash2}
+                >
+                  Remove
                 </Button>
-              </Link>
-            </Authorized>
-          </TableActions>
+              </Authorized>
 
-          <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
-
+              <Authorized authorizations="AzureContainerGroupCreate">
+                <Link to="azure.containerinstances.new" className="space-left">
+                  <Button icon={Plus}>Add container</Button>
+                </Link>
+              </Authorized>
+            </TableActions>
+          </TableTitle>
           <Table
             className={tableProps.className}
             role={tableProps.role}
