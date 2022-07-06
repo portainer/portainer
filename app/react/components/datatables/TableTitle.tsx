@@ -20,7 +20,7 @@ export function TableTitle({
 
   return (
     <div className="toolBar">
-      <div className="toolBarTitle">
+      <div className="toolBarTitle vertical-center">
         <Icon icon={icon} feather={featherIcon} className="space-right" />
 
         {label}

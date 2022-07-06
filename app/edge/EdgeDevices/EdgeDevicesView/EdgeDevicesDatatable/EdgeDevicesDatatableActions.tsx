@@ -33,13 +33,13 @@ export function EdgeDevicesDatatableActions({
         disabled={selectedItems.length < 1}
         color="danger"
         onClick={() => onDeleteEdgeDeviceClick()}
+        icon="trash-2"
+        featherIcon
       >
-        <i className="fa fa-trash-alt space-right" aria-hidden="true" />
         Remove
       </Button>
 
-      <Button onClick={() => onAddNewDeviceClick()}>
-        <i className="fa fa-plus-circle space-right" aria-hidden="true" />
+      <Button onClick={() => onAddNewDeviceClick()} icon="plus" featherIcon>
         Add Device
       </Button>
 
@@ -47,8 +47,9 @@ export function EdgeDevicesDatatableActions({
         <Button
           disabled={selectedItems.length !== 1}
           onClick={() => onAssociateOpenAMTClick(selectedItems)}
+          icon="link"
+          featherIcon
         >
-          <i className="fa fa-link space-right" aria-hidden="true" />
           Associate with OpenAMT
         </Button>
       )}
