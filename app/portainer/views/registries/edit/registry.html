@@ -1,9 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Registry details"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: $ctrl.registry.Id})">{{ $ctrl.registry.Name }}</a>
-  </rd-header-content>
-</rd-header>
+<page-header title="'Registry details'" breadcrumbs="[{label:'Registries', link:'portainer.registries'}, $ctrl.registry.Name]"> </page-header>
 
 <div class="row" ng-if="!$ctrl.state.loading">
   <div class="col-sm-12">

@@ -1,6 +1,9 @@
-<kubernetes-view-header title="Create configuration" state="kubernetes.configurations.new" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.configurations">ConfigMaps and Secrets</a> &gt; Create a configuration
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Create configuration'"
+  breadcrumbs="[{ label:'ConfigMaps and Secrets', link:'kubernetes.configurations' }, 'Create a configuration']"
+  reload="true"
+></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 

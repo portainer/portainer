@@ -1,9 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Host Browser"></rd-header-title>
-  <rd-header-content>
-    Host &gt; <a ui-sref="docker.host">{{ $ctrl.host.Name }}</a> &gt; browse
-  </rd-header-content>
-</rd-header>
+<page-header title="'Host Browser'" breadcrumbs="['Host', {label:$ctrl.host.Name, link:'docker.host'},  'browse']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
