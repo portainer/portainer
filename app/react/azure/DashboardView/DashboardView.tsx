@@ -1,3 +1,5 @@
+import { Book, Package } from 'react-feather';
+
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 
 import { PageHeader } from '@@/PageHeader';
@@ -31,13 +33,13 @@ export function DashboardView() {
           <DashboardGrid>
             <DashboardItem
               value={subscriptionsCount as number}
-              icon="fa fa-th-list"
+              icon={Book}
               type="Subscription"
             />
             {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (
               <DashboardItem
                 value={resourceGroupsCount}
-                icon="fa fa-th-list"
+                icon={Package}
                 type="Resource group"
               />
             )}
