@@ -11,6 +11,7 @@ import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { ViewLoading } from '@@/ViewLoading';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { DashboardItem } from '@@/DashboardItem';
+import { SearchBar } from '@@/datatables/SearchBar';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -43,4 +44,8 @@ export const componentsModule = angular
   .component(
     'dashboardItem',
     r2a(DashboardItem, ['featherIcon', 'icon', 'type', 'value', 'children'])
+  )
+  .component(
+    'datatableSearchbar',
+    r2a(SearchBar, ['data-cy', 'onChange', 'value', 'placeholder'])
   ).name;
