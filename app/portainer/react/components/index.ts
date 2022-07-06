@@ -10,6 +10,7 @@ import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { ViewLoading } from '@@/ViewLoading';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { DashboardItem } from '@@/DashboardItem';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -38,4 +39,8 @@ export const componentsModule = angular
     'prIcon',
     r2a(Icon, ['className', 'feather', 'icon', 'mode', 'size'])
   )
-  .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, [])).name;
+  .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, []))
+  .component(
+    'dashboardItem',
+    r2a(DashboardItem, ['featherIcon', 'icon', 'type', 'value', 'children'])
+  ).name;

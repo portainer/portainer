@@ -89,6 +89,14 @@ pr-icon {
   stroke: var(--white-color);
 }
 
+.icon-badge {
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5%;
+}
+
 .icon-nested-gray {
   height: 30px;
   width: 30px;
