@@ -1,0 +1,39 @@
+.datatable .searchBar .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.datatable .searchBar input {
+  font-size: 12px;
+}
+
+.datatable .toolBarTitle {
+  margin-top: 0;
+  margin-left: 10px;
+  line-height: 16px;
+}
+
+.datatable .toolBarTitle .iconWrapper {
+  height: 32px;
+  width: 32px;
+  background-color: var(--ui-blue-3);
+  border-radius: 16px;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+.datatable .toolBarTitle .iconWrapper i,
+.datatable .toolBarTitle .iconWrapper svg {
+  height: 16px;
+  width: 16px;
+  top: 8px;
+  left: 8px;
+  align-self: center;
+  position: absolute;
+  color: var(--ui-blue-8);
+}
+
+.datatable .toolBarTitle span {
+  line-height: 32px;
+}
