@@ -27,21 +27,17 @@ export function Footer() {
   const { Edition, Version } = statusQuery.data;
   const { ServerVersion, DatabaseVersion, Build } = versionQuery.data;
 
+  function toggleModal() {
+    setShowBuildInfo(!showBuildInfo);
+  }
+
   return (
     <>
-      <DialogOverlay
-        className={styles.dialog}
-        isOpen={showBuildInfo}
-        onDismiss={() => setShowBuildInfo(!showBuildInfo)}
-      >
+      <DialogOverlay className={styles.dialog} isOpen={showBuildInfo}>
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <button
-                type="button"
-                className="close"
-                onClick={() => setShowBuildInfo(!showBuildInfo)}
-              >
+              <button type="button" className="close" onClick={toggleModal}>
                 ×
               </button>
               <h5 className="modal-title">Portainer {Edition}</h5>
@@ -104,9 +100,7 @@ export function Footer() {
               </div>
             </div>
             <div className="modal-footer">
-              <Button onClick={() => setShowBuildInfo(!showBuildInfo)}>
-                Ok
-              </Button>
+              <Button onClick={toggleModal}>Ok</Button>
             </div>
           </div>
         </div>
@@ -120,13 +114,9 @@ export function Footer() {
 
           <span
             data-cy="portainerSidebar-versionNumber"
-            onClick={() => {
-              setShowBuildInfo(!showBuildInfo);
-            }}
+            onClick={toggleModal}
             // Accessibility requirements for a clickable span
-            onKeyPress={() => {
-              setShowBuildInfo(!showBuildInfo);
-            }}
+            onKeyPress={toggleModal}
             role="button"
             tabIndex={0}
           >
