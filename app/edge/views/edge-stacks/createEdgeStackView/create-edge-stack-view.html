@@ -43,7 +43,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <div class="small text-muted space-right" ng-if="$ctrl.formValues.DeploymentType === 0 && $ctrl.hasKubeEndpoint()">
-                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span>
                 Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not all
                 the Compose format options are supported by Kompose at the moment.
               </div>
