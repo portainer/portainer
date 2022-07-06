@@ -155,30 +155,20 @@ export function ContainersDatatable({
               role={tbodyProps.role}
               style={tbodyProps.style}
             >
-              {page.length > 0 ? (
-                page.map((row) => {
-                  prepareRow(row);
-                  const { key, className, role, style } = row.getRowProps();
-                  return (
-                    <TableRow<ContainerGroup>
-                      cells={row.cells}
-                      key={key}
-                      className={className}
-                      role={role}
-                      style={style}
-                    />
-                  );
-                })
-              ) : (
-                <tr>
-                  <td
-                    colSpan={columns.length}
-                    className="text-center text-muted"
-                  >
-                    No container available.
-                  </td>
-                </tr>
-              )}
+              <Table.Content
+                prepareRow={prepareRow}
+                renderRow={(row, { key, className, role, style }) => (
+                  <TableRow<ContainerGroup>
+                    cells={row.cells}
+                    key={key}
+                    className={className}
+                    role={role}
+                    style={style}
+                  />
+                )}
+                rows={page}
+                emptyContent="No container available."
+              />
             </tbody>
           </Table>
 
