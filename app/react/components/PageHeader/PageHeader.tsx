@@ -39,7 +39,7 @@ export function PageHeader({
       <HeaderTitle title={title}>
         {reload && (
           <Button
-            color="link"
+            color="refresh"
             size="medium"
             onClick={onClickedRefresh}
             className={styles.reloadButton}

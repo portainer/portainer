@@ -90,3 +90,7 @@
   border: 1px solid var(--ui-blue-1);
   color: var(--ui-blue-5);
 }
+
+.btn-refresh {
+  background-color: transparent;
+}

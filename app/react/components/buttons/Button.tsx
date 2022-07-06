@@ -21,7 +21,8 @@ type Color =
   | 'danger'
   | 'link'
   | 'light'
-  | 'dangerlight';
+  | 'dangerlight'
+  | 'refresh';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
 export interface Props extends AriaAttributes, AutomationTestingProps {
