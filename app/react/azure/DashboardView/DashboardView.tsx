@@ -1,4 +1,4 @@
-import { Book, Package } from 'react-feather';
+import { Package } from 'react-feather';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 
@@ -8,6 +8,8 @@ import { DashboardGrid } from '@@/DashboardItem/DashboardGrid';
 
 import { useResourceGroups } from '../queries/useResourceGroups';
 import { useSubscriptions } from '../queries/useSubscriptions';
+
+import SubscriptionsIcon from './icon-subscription.svg?c';
 
 export function DashboardView() {
   const environmentId = useEnvironmentId();
@@ -33,7 +35,7 @@ export function DashboardView() {
           <DashboardGrid>
             <DashboardItem
               value={subscriptionsCount as number}
-              icon={Book}
+              icon={SubscriptionsIcon}
               type="Subscription"
             />
             {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (
