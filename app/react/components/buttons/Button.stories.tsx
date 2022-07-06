@@ -1,5 +1,6 @@
 import { Meta, Story } from '@storybook/react';
 import { PropsWithChildren } from 'react';
+import { Download } from 'react-feather';
 
 import { Button, Props } from './Button';
 
@@ -16,7 +17,7 @@ function Template({
 }: JSX.IntrinsicAttributes & PropsWithChildren<Props>) {
   return (
     <Button onClick={onClick} color={color} size={size} disabled={disabled}>
-      <i className="fa fa-download" aria-hidden="true" /> Primary Button
+      Primary Button
     </Button>
   );
 }
@@ -63,11 +64,42 @@ export function Danger() {
   );
 }
 
+export function ButtonIcon() {
+  return (
+    <Button color="primary" onClick={() => {}} icon={Download}>
+      Button with an icon
+    </Button>
+  );
+}
+
+export function ButtonIconLarge() {
+  return (
+    <Button color="primary" onClick={() => {}} icon={Download} size="large">
+      Button with an icon
+    </Button>
+  );
+}
+
+export function ButtonIconMedium() {
+  return (
+    <Button color="primary" onClick={() => {}} icon={Download} size="medium">
+      Button with an icon
+    </Button>
+  );
+}
+
+export function ButtonIconXSmall() {
+  return (
+    <Button color="primary" onClick={() => {}} icon={Download} size="xsmall">
+      Button with an icon
+    </Button>
+  );
+}
+
 export function Default() {
   return (
     <Button color="default" onClick={() => {}}>
-      <i className="fa fa-plus-circle" aria-hidden="true" /> Add an environment
-      variable
+      Default
     </Button>
   );
 }
