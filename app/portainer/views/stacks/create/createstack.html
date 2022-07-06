@@ -128,13 +128,21 @@
             path-placeholder="docker-compose.yml"
           ></git-form>
 
-          <custom-template-selector
-            ng-show="state.Method === 'template'"
-            new-template-path="docker.templates.custom.new"
-            stack-type="state.StackType"
-            on-change="(onChangeTemplateId)"
-            value="state.selectedTemplateId"
-          ></custom-template-selector>
+          <div ng-show="state.Method === 'template'">
+            <custom-template-selector
+              new-template-path="docker.templates.custom.new"
+              stack-type="state.StackType"
+              on-change="(onChangeTemplateId)"
+              value="state.selectedTemplateId"
+            ></custom-template-selector>
+
+            <custom-templates-variables-field
+              ng-if="isTemplateVariablesEnabled && state.selectedTemplate"
+              definitions="state.selectedTemplate.Variables"
+              value="formValues.Variables"
+              on-change="(onChangeTemplateVariables)"
+            ></custom-templates-variables-field>
+          </div>
 
           <web-editor-form
             ng-if="state.Method === 'editor' || (state.Method === 'template' && state.selectedTemplateId)"
