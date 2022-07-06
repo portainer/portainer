@@ -177,7 +177,7 @@ input:checked + .slider:before {
 }
 
 .datatable .toolBar {
-  padding: 20px !important;
+  padding: 20px;
 }
 
 .toolBar {
