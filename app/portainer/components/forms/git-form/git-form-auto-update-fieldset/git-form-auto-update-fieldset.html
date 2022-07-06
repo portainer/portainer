@@ -13,10 +13,10 @@
     <div class="col-sm-8">
       <div class="input-group col-sm-10 input-group-sm">
         <div class="btn-group btn-group-sm">
-          <label class="btn btn-primary" ng-click="$ctrl.onChangeMechanism($ctrl.model.RepositoryMechanism)" ng-model="$ctrl.model.RepositoryMechanism" uib-btn-radio="'Interval'"
+          <label class="btn btn-light" ng-click="$ctrl.onChangeMechanism($ctrl.model.RepositoryMechanism)" ng-model="$ctrl.model.RepositoryMechanism" uib-btn-radio="'Interval'"
             >Polling</label
           >
-          <label class="btn btn-primary" ng-click="$ctrl.onChangeMechanism($ctrl.model.RepositoryMechanism)" ng-model="$ctrl.model.RepositoryMechanism" uib-btn-radio="'Webhook'"
+          <label class="btn btn-light" ng-click="$ctrl.onChangeMechanism($ctrl.model.RepositoryMechanism)" ng-model="$ctrl.model.RepositoryMechanism" uib-btn-radio="'Webhook'"
             >Webhook</label
           >
         </div>
@@ -28,11 +28,11 @@
     <label for="repository_mechanism" class="col-sm-3 col-lg-2 control-label text-left"> Webhook </label>
     <div class="col-sm-8">
       <span class="text-muted"> {{ $ctrl.model.RepositoryWebhookURL | truncatelr }} </span>
-      <button type="button" class="btn btn-sm btn-primary btn-sm space-left" ng-if="$ctrl.model.RepositoryWebhookURL" ng-click="$ctrl.copyWebhook()">
-        <span><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy link</span>
+      <button type="button" class="btn btn-sm btn-light btn-sm space-left" ng-if="$ctrl.model.RepositoryWebhookURL" ng-click="$ctrl.copyWebhook()">
+        <span><pr-icon icon="'copy'" size="'sm'" feather="true"></pr-icon> Copy link</span>
       </button>
       <span>
-        <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none"></i>
+        <pr-icon icon="'check'" mode="'success'" feather="true" style="display: none"></pr-icon>
       </span>
     </div>
   </div>
@@ -83,12 +83,12 @@
       ></por-switch-field>
     </div>
   </div>
-  <div class="small text-warning" style="margin: 5px 0 10px 0" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
+  <div class="small" style="margin: 5px 0 10px 0" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
     <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
     <span class="text-muted">When enabled, enforces automatic deployment at each interval or webhook invocation.</span>
   </div>
-  <div class="small text-warning" style="margin: 5px 0 10px 0" ng-if="!$ctrl.model.RepositoryAutomaticUpdates">
-    <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true"></i>
+  <div class="small" style="margin: 5px 0 10px 0" ng-if="!$ctrl.model.RepositoryAutomaticUpdates">
+    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
     <span class="text-muted">When enabled, updates from the git repository will occur automatically at an interval or webhook.</span>
   </div>
 </ng-form>
