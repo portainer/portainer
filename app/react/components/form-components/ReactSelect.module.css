@@ -1,3 +1,16 @@
+.root {
+  --bg-multiselect-color: var(--white-color);
+  --border-multiselect: var(--grey-48);
+}
+:global(:root[theme='dark']) .root {
+  --bg-multiselect-color: var(--grey-1);
+  --border-multiselect: var(--grey-3);
+}
+:global(:root[theme='highcontrast']) .root {
+  --bg-multiselect-color: var(--grey-1);
+  --border-multiselect: var(--black-color);
+}
+
 .root :global .selector__control {
   border: 1px solid var(--border-multiselect);
   background-color: var(--bg-multiselect-color);

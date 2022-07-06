@@ -134,7 +134,6 @@
   --bg-input-sm-color: var(--white-color);
   --bg-app-datatable-thead: var(--grey-23);
   --bg-app-datatable-tbody: var(--grey-24);
-  --bg-multiselect-color: var(--white-color);
   --bg-daterangepicker-color: var(--white-color);
   --bg-calendar-color: var(--white-color);
   --bg-calendar-table-color: var(--white-color);
@@ -250,16 +249,6 @@
   --button-opacity: 0.2;
   --button-opacity-hover: 0.5;
 
-  --bg-image-multiselect: linear-gradient(var(--blue-2), var(--blue-2));
-  --bg-image-multiselect-button: linear-gradient(var(--white-color), var(--grey-17));
-  --bg-image-multiselect-hover: linear-gradient(var(--white-color), var(--grey-43));
-  --border-multiselect: var(--grey-48);
-  --border-multiselect-checkboxlayer: var(--grey-51);
-  --text-multiselect: var(--grey-29);
-  --text-multiselect-selectitem: var(--white-color);
-  --bg-multiselect-checkboxcontainer: var(--white-color);
-  --text-multiselect-item: var(--grey-30);
-  --bg-multiselect-helpercontainer: var(--white-color);
   --text-input-textarea: var(--white-color);
 
   --user-menu-icon-color: var(--ui-gray-4);
@@ -324,7 +313,6 @@
   --bg-app-datatable-thead: var(--grey-1);
   --bg-service-datatable-tbody: var(--grey-1);
   --bg-app-datatable-tbody: var(--grey-1);
-  --bg-multiselect-color: var(--grey-1);
   --bg-daterangepicker-color: var(--grey-3);
   --bg-calendar-color: var(--grey-3);
   --bg-calendar-table-color: var(--grey-3);
@@ -441,15 +429,6 @@
   --shadow-box-color: none;
   --shadow-boxselector-color: none;
 
-  --bg-image-multiselect: linear-gradient(var(--grey-38), var(--grey-38));
-  --bg-image-multiselect-button: linear-gradient(var(--grey-1), var(--grey-1));
-  --bg-image-multiselect-hover: linear-gradient(var(--grey-3), var(--grey-3));
-  --border-multiselect: var(--grey-3);
-  --border-multiselect-checkboxlayer: var(--grey-3);
-  --text-multiselect: var(--white-color);
-  --bg-multiselect-checkboxcontainer: var(--grey-3);
-  --text-multiselect-item: var(--white-color);
-  --bg-multiselect-helpercontainer: var(--grey-1);
   --text-input-textarea: var(--grey-1);
 
   --user-menu-icon-color: var(--grey-3);
@@ -502,7 +481,6 @@
   --bg-app-datatable-tbody: var(--black-color);
   --bg-pagination-color: var(--grey-3);
   --bg-pagination-span-color: var(--ui-black);
-  --bg-multiselect-color: var(--grey-1);
   --bg-daterangepicker-color: var(--black-color);
   --bg-calendar-color: var(--black-color);
   --bg-calendar-table-color: var(--black-color);
@@ -612,15 +590,6 @@
   --shadow-box-color: none;
   --shadow-boxselector-color: none;
 
-  --bg-image-multiselect: linear-gradient(var(--black-color), var(--black-color));
-  --bg-image-multiselect-button: linear-gradient(var(--grey-1), var(--grey-1));
-  --bg-image-multiselect-hover: linear-gradient(var(--grey-3), var(--grey-3));
-  --border-multiselect: var(--black-color);
-  --border-multiselect-checkboxlayer: var(--grey-3);
-  --text-multiselect: var(--white-color);
-  --bg-multiselect-checkboxcontainer: var(--grey-3);
-  --text-multiselect-item: var(--white-color);
-  --bg-multiselect-helpercontainer: var(--grey-1);
   --text-input-textarea: var(--black-color);
   --bg-item-highlighted-null-color: var(--grey-2);
   --text-cm-default-color: var(--blue-9);
