@@ -22,8 +22,8 @@ interface SharedProps extends AutomationTestingProps {
 }
 
 interface MultiProps<TValue> extends SharedProps {
-  value: Option<TValue>[];
-  onChange(value: readonly Option<TValue>[]): void;
+  value: readonly TValue[];
+  onChange(value: readonly TValue[]): void;
   options: Options<TValue>;
   isMulti: true;
 }
@@ -63,7 +63,7 @@ export function SingleSelect<TValue = string>({
   inputId,
   placeholder,
 }: SingleProps<TValue>) {
-  const selectedValue = findOption<TValue>(options, value);
+  const selectedValue = _.first(findSelectedOptions<TValue>(options, value));
 
   return (
     <ReactSelect<Option<TValue>>
@@ -81,21 +81,23 @@ export function SingleSelect<TValue = string>({
   );
 }
 
-function findOption<TValue>(options: Options<TValue>, value: TValue) {
-  return _.first(
-    _.compact(
-      options.flatMap((option) => {
-        if (isGroup(option)) {
-          return option.options.find((option) => option.value === value);
-        }
+function findSelectedOptions<TValue>(
+  options: Options<TValue>,
+  value: TValue | readonly TValue[]
+) {
+  const valueArr = Array.isArray(value) ? value : [value];
+  return _.compact(
+    options.flatMap((option) => {
+      if (isGroup(option)) {
+        return option.options.find((option) => valueArr.includes(option.value));
+      }
 
-        if (option.value === value) {
-          return option;
-        }
+      if (valueArr.includes(option.value)) {
+        return option;
+      }
 
-        return null;
-      })
-    )
+      return null;
+    })
   );
 }
 
@@ -109,6 +111,7 @@ export function MultiSelect<TValue = string>({
   placeholder,
   disabled,
 }: Omit<MultiProps<TValue>, 'isMulti'>) {
+  const selectedOptions = findSelectedOptions(options, value);
   return (
     <ReactSelect
       name={name}
@@ -116,9 +119,9 @@ export function MultiSelect<TValue = string>({
       getOptionLabel={(option) => option.label}
       getOptionValue={(option) => String(option.value)}
       options={options}
-      value={value}
+      value={selectedOptions}
       closeMenuOnSelect={false}
-      onChange={onChange}
+      onChange={(newValue) => onChange(newValue.map((option) => option.value))}
       data-cy={dataCy}
       inputId={inputId}
       placeholder={placeholder}

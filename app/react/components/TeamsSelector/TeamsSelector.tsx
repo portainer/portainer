@@ -4,8 +4,8 @@ import { Select } from '@@/form-components/PortainerSelect';
 
 interface Props {
   name?: string;
-  value: TeamId[];
-  onChange(value: TeamId[]): void;
+  value: TeamId[] | readonly TeamId[];
+  onChange(value: readonly TeamId[]): void;
   teams: Team[];
   dataCy?: string;
   inputId?: string;
@@ -23,14 +23,13 @@ export function TeamsSelector({
 }: Props) {
   const options = teams.map((team) => ({ label: team.Name, value: team.Id }));
 
-  const values = options.filter((option) => value.includes(option.value));
   return (
     <Select<number>
       name={name}
       isMulti
       options={options}
-      value={values}
-      onChange={(value) => onChange(value.map((team) => team.value))}
+      value={value}
+      onChange={(value) => onChange(value)}
       data-cy={dataCy}
       inputId={inputId}
       placeholder={placeholder}
