@@ -1,11 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Image list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.images" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Images</rd-header-content>
-</rd-header>
+<page-header title="'Image list'" breadcrumbs="['Images']" reload="true"> </page-header>
 
 <div class="row" ng-if="!offlineMode" authorization="DockerImageCreate">
   <div class="col-lg-12 col-md-12 col-xs-12">

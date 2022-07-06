@@ -193,7 +193,7 @@ input:checked + .slider:before {
   flex-wrap: nowarp;
 }
 
-.toolBar > .searchBar {
+.toolBar .searchBar {
   flex: right;
   margin-right: 10px;
   width: 500px;

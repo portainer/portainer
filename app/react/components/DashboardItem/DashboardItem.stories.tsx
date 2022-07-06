@@ -34,3 +34,11 @@ export function WithLink() {
     </Link>
   );
 }
+
+export function WithChildren() {
+  return (
+    <DashboardItem value={1} icon="fa fa-th-list" type="Example resource">
+      <div>Children</div>
+    </DashboardItem>
+  );
+}

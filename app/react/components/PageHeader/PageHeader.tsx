@@ -45,7 +45,7 @@ export function PageHeader({
             className={styles.reloadButton}
             disabled={loading}
           >
-            <RefreshCw className="feather" />
+            <RefreshCw className="feather icon-sm" />
           </Button>
         )}
       </HeaderTitle>

@@ -19,7 +19,11 @@ export function KubernetesSidebar({ environmentId }: Props) {
 
   return (
     <>
-      {isOpen && <KubectlShellButton environmentId={environmentId} />}
+      {isOpen && (
+        <div className="mb-3">
+          <KubectlShellButton environmentId={environmentId} />
+        </div>
+      )}
 
       <DashboardLink
         environmentId={environmentId}
