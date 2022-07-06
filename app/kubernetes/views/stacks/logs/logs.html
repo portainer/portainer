@@ -1,8 +1,16 @@
-<kubernetes-view-header title="Stacks logs" state="kubernetes.stacks.stack.logs" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a>
-  &gt; <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.state.transition.namespace })">{{ ctrl.state.transition.namespace }}</a> &gt;
-  <a ui-sref="kubernetes.applications">Applications</a> &gt; Stacks &gt; {{ ctrl.state.transition.name }} &gt; Logs
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Stacks logs'"
+  breadcrumbs="[
+{ label:'Namespaces', link:'kubernetes.resourcePools' }, 
+{ label:ctrl.state.transition.namespace, link:'kubernetes.resourcePools.resourcePool', linkParams:{ id: ctrl.state.transition.namespace } }, 
+{ label:'Applications', link:'kubernetes.applications' },
+'Stacks',
+ctrl.state.transition.name,
+'Logs'
+]"
+  reload="true"
+></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 

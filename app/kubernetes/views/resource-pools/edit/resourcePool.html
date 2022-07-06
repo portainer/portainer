@@ -1,6 +1,9 @@
-<kubernetes-view-header title="Namespace details" state="kubernetes.resourcePools.resourcePool" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt; {{ ctrl.pool.Namespace.Name }}
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Namespace details'"
+  breadcrumbs="[{ label:'Namespaces', link:'kubernetes.resourcePools' }, ctrl.pool.Namespace.Name]"
+  reload="true"
+></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 

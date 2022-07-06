@@ -1,6 +1,9 @@
-<kubernetes-view-header title="Create a namespace" state="kubernetes.resourcePools.new" view-ready="$ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt; Create a namespace
-</kubernetes-view-header>
+<page-header
+  ng-if="$ctrl.state.viewReady"
+  title="'Create a namespace'"
+  breadcrumbs="[{ label:'Namespaces', link:'kubernetes.resourcePools' }, 'Create a namespace']"
+  reload="true"
+></page-header>
 
 <kubernetes-view-loading view-ready="$ctrl.state.viewReady"></kubernetes-view-loading>
 
