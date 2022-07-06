@@ -1,6 +1,9 @@
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { Search } from 'react-feather';
 
-interface Props {
+import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { AutomationTestingProps } from '@/types';
+
+interface Props extends AutomationTestingProps {
   value: string;
   placeholder?: string;
   onChange(value: string): void;
@@ -10,16 +13,18 @@ export function SearchBar({
   value,
   placeholder = 'Search...',
   onChange,
+  'data-cy': dataCy,
 }: Props) {
   return (
-    <div className="searchBar">
-      <i className="fa fa-search searchIcon" aria-hidden="true" />
+    <div className="searchBar items-center flex">
+      <Search className="searchIcon feather" />
       <input
         type="text"
         className="searchInput"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        data-cy={dataCy}
       />
     </div>
   );
