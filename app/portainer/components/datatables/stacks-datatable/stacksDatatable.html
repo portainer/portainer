@@ -3,19 +3,9 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle"><i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
-        <div class="searchBar">
-          <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-          <input
-            type="text"
-            class="searchInput"
-            ng-model="$ctrl.state.textFilter"
-            ng-change="$ctrl.onTextFilterChange()"
-            placeholder="Search..."
-            auto-focus
-            ng-model-options="{ debounce: 300 }"
-            data-cy="stack-searchInput"
-          />
-        </div>
+
+        <datatable-searchbar value="$ctrl.state.textFilter" placeholder="'Search...'" on-change="($ctrl.onTextFilterChange)" data-cy="stack-searchInput"></datatable-searchbar>
+
         <div class="actionBar" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
           <button
             type="button"
