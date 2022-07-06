@@ -6,7 +6,7 @@ import {
   usePagination,
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
-import { Plus, Trash2 } from 'react-feather';
+import { Box, Plus, Trash2 } from 'react-feather';
 
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import { ContainerGroup } from '@/react/azure/types';
@@ -98,7 +98,7 @@ export function ContainersDatatable({
     <div className="row">
       <div className="col-sm-12">
         <TableContainer>
-          <TableTitle icon="fa-cubes" label="Containers">
+          <TableTitle icon={Box} label="Containers">
             <SearchBar
               value={searchBarValue}
               onChange={handleSearchBarChange}
