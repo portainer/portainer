@@ -100,7 +100,9 @@ export function Footer() {
               </div>
             </div>
             <div className="modal-footer">
-              <Button onClick={toggleModal}>Ok</Button>
+              <Button className="bootbox-accept" onClick={toggleModal}>
+                Ok
+              </Button>
             </div>
           </div>
         </div>
