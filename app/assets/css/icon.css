@@ -12,31 +12,32 @@ pr-icon {
 .icon {
   color: currentColor;
   margin: 0;
+
+  font-size: var(--icon-size);
+  height: var(--icon-size);
+  width: var(--icon-size);
+
+  --icon-size: 1em;
 }
 
 .icon-xs {
-  height: 10px;
-  width: 10px;
+  --icon-size: 10px;
 }
 
 .icon-sm {
-  height: 14px;
-  width: 14px;
+  --icon-size: 14px;
 }
 
 .icon-md {
-  height: 16px;
-  width: 16px;
+  --icon-size: 16px;
 }
 
 .icon-lg {
-  height: 22px;
-  width: 22px;
+  --icon-size: 22px;
 }
 
 .icon-xl {
-  height: 26px;
-  width: 26px;
+  --icon-size: 26px;
 }
 
 .icon.icon-alt {
