@@ -135,7 +135,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !state.validUsername || formValues.Username === '' || !formValues.Password || !formValues.ConfirmPassword || (AuthenticationMethod === 1 && form.$invalid) || (AuthenticationMethod === 1 && form.password.$viewValue !== formValues.ConfirmPassword)"
+                ng-disabled="state.actionInProgress || !state.validUsername || formValues.Username === '' || (AuthenticationMethod === 1 && (!formValues.Password || form.$invalid || formValues.Password !== formValues.ConfirmPassword))"
                 ng-click="addUser()"
                 button-spinner="state.actionInProgress"
                 data-cy="user-createUserButton"
