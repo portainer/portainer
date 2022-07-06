@@ -3,11 +3,11 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="'layers'" feather="true" class-name="'icon-primary icon-nested-blue vertical-center'"></pr-icon>
+          <pr-icon icon="'layers'" feather="true" class-name="'icon-nested-blue vertical-center'" mode="'primary'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class-name="'icon'"></pr-icon>
+          <pr-icon icon="'search'" feather="true"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -28,7 +28,7 @@
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="stack-removeStackButton"
           >
-            <pr-icon icon="'trash'" feather="true" class-name="'icon-danger'"></pr-icon>Remove
+            <pr-icon icon="'trash'" feather="true" mode="'danger'"></pr-icon>Remove
           </button>
           <button
             ng-disabled="!$ctrl.createEnabled"
@@ -38,14 +38,14 @@
             authorization="PortainerStackCreate"
             data-cy="stack-addStackButton"
           >
-            <pr-icon icon="'plus'" feather="true" class-name="'icon'"></pr-icon>Add stack
+            <pr-icon icon="'plus'" feather="true"></pr-icon>Add stack
           </button>
         </div>
         <div class="settings">
           <datatable-columns-visibility columns="$ctrl.columnVisibility.columns" on-change="($ctrl.onColumnVisibilityChange)"></datatable-columns-visibility>
           <span class="setting ml-2" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle aria-label="Settings">
-              <pr-icon icon="'settings'" feather="true" class-name="'icon'"></pr-icon>
+              <pr-icon icon="'settings'" feather="true"></pr-icon>
             </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
@@ -70,7 +70,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <pr-icon id="refreshRateChange" icon="'check'" feather="true" class-name="'icon icon-success icon-sm'"></pr-icon>
+                        <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -104,8 +104,8 @@
                   <div>
                     <span uib-dropdown-toggle ng-class="['table-filter vertical-center', { 'filter-active': $ctrl.filters.state.enabled }]">
                       Filter
-                      <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'" feather="true" class-name="'icon icon-sm'"></pr-icon>
-                      <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'" feather="true" class-name="'icon icon-sm'"></pr-icon>
+                      <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'" feather="true" size="'sm'"></pr-icon>
+                      <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'" feather="true" size="'sm'"></pr-icon>
                     </span>
                   </div>
                   <div class="dropdown-menu" uib-dropdown-menu>
@@ -196,7 +196,7 @@
                   uib-tooltip="This stack was created inside an environment that is no longer registered inside Portainer."
                 >
                   Orphaned
-                  <pr-icon icon="'alert-circle'" feather="true" class-name="'icon icon-warning ml-0.5'"></pr-icon>
+                  <pr-icon icon="'alert-circle'" feather="true" class-name="'ml-0.5'" mode="'warning'"></pr-icon>
                 </span>
                 <span
                   ng-if="item.External"
@@ -207,7 +207,7 @@
                   uib-tooltip="This stack was created outside of Portainer. Control over this stack is limited."
                 >
                   Limited
-                  <pr-icon icon="'alert-circle'" feather="true" class-name="'icon icon-warning ml-0.5'"></pr-icon>
+                  <pr-icon icon="'alert-circle'" feather="true" class-name="'ml-0.5'" mode="'warning'"></pr-icon>
                 </span>
                 <span ng-if="item.Regular">Total</span>
               </td>
