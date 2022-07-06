@@ -98,7 +98,7 @@ export function Gpu({
     }));
 
     return options;
-  }, [gpus, usedGpus]);
+  }, [gpus, usedGpus, usedAllGpus]);
 
   function onChangeValues(key: string, newValue: boolean | string[]) {
     const newValues = {
@@ -135,7 +135,7 @@ export function Gpu({
   const gpuValue = useMemo(
     () =>
       options.filter((option) => values.selectedGPUs.includes(option.value)),
-    [values.selectedGPUs]
+    [values.selectedGPUs, options]
   );
 
   const capValue = useMemo(
