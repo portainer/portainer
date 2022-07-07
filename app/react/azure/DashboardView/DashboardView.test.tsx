@@ -24,9 +24,7 @@ test('dashboard items should render correctly', async () => {
 
   const subscriptionElements = within(subscriptionsItem);
   expect(subscriptionElements.getByLabelText('value')).toBeVisible();
-  expect(subscriptionElements.getByRole('img', { hidden: true })).toHaveClass(
-    'fa-th-list'
-  );
+
   expect(subscriptionElements.getByLabelText('resourceType')).toHaveTextContent(
     'Subscriptions'
   );
@@ -36,9 +34,7 @@ test('dashboard items should render correctly', async () => {
 
   const resourceGroupElements = within(resourceGroupsItem);
   expect(resourceGroupElements.getByLabelText('value')).toBeVisible();
-  expect(resourceGroupElements.getByRole('img', { hidden: true })).toHaveClass(
-    'fa-th-list'
-  );
+
   expect(
     resourceGroupElements.getByLabelText('resourceType')
   ).toHaveTextContent('Resource groups');
@@ -74,7 +70,7 @@ test('should correctly show total number of resource groups across multiple subs
   expect(resourceGroupElements.getByLabelText('value')).toHaveTextContent('5');
 });
 
-test('when only subscriptions fail to load, dont show the dashboard', async () => {
+test("when only subscriptions fail to load, don't show the dashboard", async () => {
   const { queryByLabelText } = await renderComponent(
     1,
     { 'subscription-1': 1 },
