@@ -214,7 +214,7 @@
                       <label class="control-label text-left">Environment variables</label>
                       <span
                         ng-if="ctrl.formValues.Containers.length <= 1"
-                        class="label label-default interactive"
+                        class="label label-default interactive vertical-center"
                         style="margin-left: 10px"
                         ng-click="ctrl.addEnvironmentVariable()"
                         data-cy="k8sAppCreate-addEnvVarButton"
@@ -313,7 +313,7 @@
                     <div class="col-sm-12">
                       <label class="control-label text-left">Configurations</label>
                       <span
-                        class="label label-default interactive"
+                        class="label label-default interactive vertical-center"
                         style="margin-left: 10px"
                         ng-click="ctrl.addConfiguration()"
                         ng-if="ctrl.formValues.Containers.length <= 1"
@@ -364,7 +364,7 @@
                         <pr-icon icon="'rotate-cw'" size="'md'" feather="true"></pr-icon> Auto
                       </button>
                       <button
-                        class="btn btn-sm btn-light vertical-center"
+                        class="btn btn-sm btn-dangerlight vertical-center"
                         type="button"
                         ng-click="ctrl.removeConfiguration(index)"
                         ng-if="ctrl.formValues.Containers.length <= 1"
@@ -1140,7 +1140,7 @@
                     <div class="form-group">
                       <div class="col-sm-12">
                         <label class="control-label text-left">Placement rules</label>
-                        <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addPlacement()">
+                        <span class="label label-default interactive vertical-center" style="margin-left: 10px" ng-click="ctrl.addPlacement()">
                           <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> add rule
                         </span>
                       </div>

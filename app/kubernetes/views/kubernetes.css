@@ -1,13 +1,19 @@
-.kubernetes-deploy pr-icon,
-.kubernetes-create pr-icon {
-  vertical-align: middle;
-  margin-top: -3px;
-}
-
 .btn-only-icon {
   padding: 6px;
 }
 
 .btn-only-icon pr-icon {
   margin-top: 0;
+}
+
+.service-form .form-group {
+  vertical-align: top;
+}
+
+.service-form .form-group .input-group {
+  width: 100%;
+}
+
+.service-form .clear-both {
+  clear: both;
 }
