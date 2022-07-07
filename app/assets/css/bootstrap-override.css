@@ -153,38 +153,6 @@ input:checked + .slider:before {
   display: none;
 }
 
-/* Datatable */
-
-.datatable .searchBar {
-  border: 1px solid var(--border-searchbar);
-  padding: 4px 10px;
-  font-size: 14px;
-  background: var(--bg-searchbar);
-  border-radius: 5px;
-}
-
-.toolBar > .toolBarTitle {
-  flex: auto;
-  display: inline-flex;
-  flex-wrap: nowrap;
-}
-
-.toolBar .searchBar {
-  flex: right;
-  width: fit-content;
-  height: 30px;
-  display: inline-flex;
-}
-
-.toolBar > .actionBar {
-  display: inline-flex;
-}
-
-.toolBar > .settings {
-  text-align: right;
-  display: inline-flex;
-}
-
 /* Widget */
 
 .widget .widget-icon i {

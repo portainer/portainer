@@ -39,7 +39,6 @@
 }
 
 .toolBar .actionBar {
-  margin-right: 10px;
   display: inline-flex;
 }
 
@@ -50,10 +49,9 @@
 
 .datatable .searchBar {
   border: 1px solid var(--border-searchbar);
-  padding: 5px;
   background: var(--bg-searchbar) !important;
   border-radius: 5px;
-  padding: 4px 10px !important;
+  padding: 4px 10px;
   font-size: 14px;
 }
 
@@ -66,7 +64,6 @@
 .toolBar .searchBar {
   flex: right;
   margin-right: 10px;
-  width: 500px;
   height: 30px;
   display: inline-flex;
 }
