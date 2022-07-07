@@ -42,9 +42,8 @@ export default class ThemeSettingsController {
         defaultTheme: 'auto',
         isDemo: state.application.demoEnvironment.enabled,
       };
-
       this.state.availableThemes = options;
-
+      
       try {
         this.state.userId = await this.Authentication.getUserDetails().ID;
         const data = await this.UserService.user(this.state.userId);
