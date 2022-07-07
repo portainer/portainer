@@ -28,7 +28,7 @@
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="stack-removeStackButton"
           >
-            <pr-icon icon="'trash'" feather="true" mode="'danger'"></pr-icon>Remove
+            <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>Remove
           </button>
           <button
             ng-disabled="!$ctrl.createEnabled"
@@ -45,7 +45,7 @@
           <datatable-columns-visibility columns="$ctrl.columnVisibility.columns" on-change="($ctrl.onColumnVisibilityChange)"></datatable-columns-visibility>
           <span class="setting ml-2" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle aria-label="Settings">
-              <pr-icon icon="'settings'" feather="true"></pr-icon>
+              <pr-icon icon="'more-vertical'" feather="true"></pr-icon>
             </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
