@@ -104,6 +104,9 @@ func (store *Store) backupWithOptions(options *BackupOptions) (string, error) {
 
 	options = store.setupOptions(options)
 
+	store.Close()
+	defer store.Open()
+
 	return options.BackupPath, store.copyDBFile(store.databasePath(), options.BackupPath)
 }
 
