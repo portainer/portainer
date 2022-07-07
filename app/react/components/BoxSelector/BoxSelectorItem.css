@@ -1,6 +1,6 @@
 .boxselector_wrapper > div,
-.boxselector_wrapper box-selector-item {
-  --selected-item-color: var(--blue-2);
+.box-selector-item {
+  --selected-item-color: var(--ui-blue-6);
   flex: 1;
   padding: 5px;
 }
@@ -128,6 +128,15 @@
 .boxselector_icon img {
   height: 48px;
   width: 48px;
-  color: var(--ui-blue-4);
+  color: var(--ui-blue-8);
   font-size: 48px;
+  margin-top: 20px;
+}
+
+.boxselector_header pr-icon {
+  margin-right: 5px;
+}
+
+.boxselector_content {
+  padding-left: 20px;
 }
