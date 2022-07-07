@@ -141,7 +141,7 @@
 }
 
 .datatable .table-filters thead tr > th {
-  height: 32px;
+  white-space: nowrap;
   vertical-align: middle;
 }
 
