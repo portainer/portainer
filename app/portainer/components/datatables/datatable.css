@@ -38,6 +38,15 @@
   @apply text-blue-7;
 }
 
+.datatable tr > td a {
+  color: var(--ui-blue-8);
+}
+
+.datatable tr > td a:hover,
+.datatable tr > td a:focus {
+  text-decoration: underline;
+}
+
 .toolBar .actionBar {
   display: inline-flex;
 }
