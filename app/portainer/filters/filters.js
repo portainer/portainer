@@ -106,13 +106,13 @@ export function environmentTypeIcon(type) {
 export function ownershipIcon(ownership) {
   switch (ownership) {
     case RCO.PRIVATE:
-      return 'fa fa-eye-slash';
+      return 'eye-off';
     case RCO.ADMINISTRATORS:
-      return 'fa fa-eye-slash';
+      return 'eye-off';
     case RCO.RESTRICTED:
-      return 'fa fa-users';
+      return 'users';
     default:
-      return 'fa fa-eye';
+      return 'eye';
   }
 }
 

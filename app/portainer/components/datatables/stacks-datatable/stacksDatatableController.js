@@ -33,13 +33,6 @@ angular.module('portainer.app').controller('StacksDatatableController', [
       DatatableService.setColumnVisibilitySettings(this.tableKey, this.columnVisibility);
     }
 
-    this.onTextFilterChange = onTextFilterChange.bind(this);
-
-    function onTextFilterChange(value) {
-      this.state.textFilter = value;
-      this.onTextFilterChangeGeneric();
-    }
-
     /**
      * Do not allow external items
      */

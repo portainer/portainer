@@ -1,7 +1,7 @@
 .datatable .toolBar {
   background-color: var(--bg-card-color);
   overflow: auto;
-  padding: 20px 10px;
+  padding: 20px;
   font-size: 16px;
   border-radius: 8px;
 
@@ -26,7 +26,7 @@
 
 .datatable .toolBar .settings {
   float: right;
-  margin-right: 5px;
+  margin-top: 5px;
 }
 
 .datatable .toolBar .setting {
@@ -38,23 +38,29 @@
   @apply text-blue-7;
 }
 
+.datatable tr > td a {
+  color: var(--ui-blue-8);
+}
+
+.datatable tr > td a:hover,
+.datatable tr > td a:focus {
+  text-decoration: underline;
+}
+
 .toolBar .actionBar {
-  margin-right: 10px;
   display: inline-flex;
 }
 
 .toolBar .settings {
-  width: 60px;
   text-align: right;
   display: inline-flex;
 }
 
 .datatable .searchBar {
   border: 1px solid var(--border-searchbar);
-  padding: 5px;
   background: var(--bg-searchbar) !important;
   border-radius: 5px;
-  padding: 4px 10px !important;
+  padding: 4px 10px;
   font-size: 14px;
 }
 
@@ -67,7 +73,6 @@
 .toolBar .searchBar {
   flex: right;
   margin-right: 10px;
-  width: 500px;
   height: 30px;
   display: inline-flex;
 }
@@ -146,6 +151,15 @@
   padding: 15px 0;
 }
 
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.table > tbody > tr {
+  height: 50px;
+  vertical-align: middle;
+}
+
 [data-reach-menu-list],
 [data-reach-menu-items] {
   padding: 0px;
@@ -172,7 +186,7 @@
 }
 
 .datatable .table-filters thead tr > th {
-  height: 32px;
+  white-space: nowrap;
   vertical-align: middle;
 }
 
@@ -316,16 +330,14 @@
   width: 30px;
 }
 
-.table th button.sortable {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  color: var(--text-link-color);
+.table tr > th:first-child,
+.table tr > td:first-child {
+  padding-left: 20px;
 }
 
-.table th button.sortable:hover .sortable-label {
-  text-decoration: underline;
+.table tr > th:last-child,
+.table tr > last-child {
+  padding-right: 20px;
 }
 
 .datatable .table-setting-menu-btn {
