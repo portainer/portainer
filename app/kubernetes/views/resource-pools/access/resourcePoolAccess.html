@@ -1,7 +1,18 @@
-<kubernetes-view-header title="Namespace access management" state="kubernetes.resourcePools.resourcePool.access" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({id: ctrl.pool.Namespace.Name})">{{ ctrl.pool.Namespace.Name }}</a> &gt; Access management
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Namespace access management'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { 
+      label:ctrl.pool.Namespace.Name,
+      link: 'kubernetes.resourcePools.resourcePool', 
+      linkParams:{id: ctrl.pool.Namespace.Name}
+    },
+     'Access management'
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 

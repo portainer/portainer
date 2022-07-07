@@ -1,12 +1,35 @@
-<kubernetes-view-header ng-if="!ctrl.state.isEdit" title="Create application" state="kubernetes.applications.new" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.applications">Applications</a> &gt; Create an application
-</kubernetes-view-header>
-<kubernetes-view-header ng-if="ctrl.state.isEdit" title="Edit application" state="kubernetes.applications.application.edit" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
-  <a ui-sref="kubernetes.applications">Applications</a> &gt;
-  <a ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">{{ ctrl.application.Name }}</a> &gt; Edit
-</kubernetes-view-header>
+<page-header
+  ng-if="!ctrl.state.isEdit"
+  title="'Create application'"
+  breadcrumbs="[
+    { label:'Applications', link:'kubernetes.applications' },
+     'Create an application'
+     ]"
+  reload="true"
+>
+</page-header>
+
+<page-header
+  ng-if="ctrl.state.isEdit"
+  title="'Edit application'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { 
+      label:ctrl.application.ResourcePool,
+      link: 'kubernetes.resourcePools.resourcePool', 
+      linkParams:{ id: ctrl.application.ResourcePool }
+    },
+    { label:'Applications', link:'kubernetes.applications' },
+    { 
+      label:ctrl.application.Name,
+      link: 'kubernetes.applications.application', 
+      linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
+    },
+     'Edit',
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 <div ng-if="ctrl.state.viewReady">

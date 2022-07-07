@@ -1,9 +1,14 @@
-<rd-header>
-  <rd-header-title title-text="Volume browser"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.volumes">Volumes</a> &gt; <a ui-sref="docker.volumes.volume({ id: volumeId })">{{ volumeId }}</a> &gt; browse
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'Volume browser'"
+  breadcrumbs="[
+    { label:'Volumes', link:'docker.volumes' },
+    { 
+      label:volumeId,
+      link: 'docker.volumes.volume', 
+      linkParams:{ id: volumeId }
+    }, 'browse']"
+>
+</page-header>
 
 <div class="row">
   <div class="col-sm-12">
