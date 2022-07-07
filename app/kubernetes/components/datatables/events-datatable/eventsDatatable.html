@@ -1,10 +1,10 @@
 <div class="datatable">
   <div class="toolBar">
     <div class="toolBarTitle flex">
-      <div class="iconWrapper flex justify-center content-center mr-2">
-        <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true"></i>
+      <div class="flex justify-center content-center mr-2 icon-nested-blue vertical-center">
+        <i class="fa icon icon-primary icon-sm" ng-class="$ctrl.titleIcon" aria-hidden="true"></i>
       </div>
-      <span>
+      <span class="vertical-center">
         {{ $ctrl.titleText }}
       </span>
     </div>
@@ -63,29 +63,29 @@
           <th>
             <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Date')">
               Date
-              <pr-icon icon="'arrow-down'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Date' && !$ctrl.state.reverseOrder"></pr-icon>
-              <pr-icon icon="'arrow-up'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Date' && $ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Date' && !$ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Date' && $ctrl.state.reverseOrder"></pr-icon>
             </div>
           </th>
           <th>
             <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Involved.kind')">
               Kind
-              <pr-icon icon="'arrow-down'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && !$ctrl.state.reverseOrder"></pr-icon>
-              <pr-icon icon="'arrow-up'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && $ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && !$ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && $ctrl.state.reverseOrder"></pr-icon>
             </div>
           </th>
           <th>
             <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Type')">
               Type
-              <pr-icon icon="'arrow-down'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></pr-icon>
-              <pr-icon icon="'arrow-up'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></pr-icon>
             </div>
           </th>
           <th>
             <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Message')">
               Message
-              <pr-icon icon="'arrow-down'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Message' && !$ctrl.state.reverseOrder"></pr-icon>
-              <pr-icon icon="'arrow-up'" class-name="'icon'" feather="true" ng-if="$ctrl.state.orderBy === 'Message' && $ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Message' && !$ctrl.state.reverseOrder"></pr-icon>
+              <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Message' && $ctrl.state.reverseOrder"></pr-icon>
             </div>
           </th>
         </tr>

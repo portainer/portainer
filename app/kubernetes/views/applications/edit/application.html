@@ -24,7 +24,7 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading> <pr-icon icon="'fa-laptop-code'"></pr-icon> Application </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'fa-laptop-code'" class-name="'mr-1'"></pr-icon> Application </uib-tab-heading>
               <div style="padding: 20px">
                 <table class="table">
                   <tbody>
@@ -82,10 +82,10 @@
                         <span ng-if="ctrl.application.ApplicationOwner" class="mr-1 vertical-center" data-cy="k8sAppDetail-owner">
                           <pr-icon icon="'user'" feather="true"></pr-icon> {{ ctrl.application.ApplicationOwner }}
                         </span>
-                        <span class="vertical-center"> <pr-icon icon="'clock'" mode="'alt'" feather="true"></pr-icon> {{ ctrl.application.CreationDate | getisodate }}</span>
+                        <span class="vertical-center"> <pr-icon icon="'clock'" mode="'alt'" feather="true"></pr-icon> {{ ctrl.application.CreationDate | getisodate }} </span>
                         <span ng-if="ctrl.application.ApplicationOwner" data-cy="k8sAppDetail-creationMethod" class="vertical-center">
-                          <pr-icon icon="'clock'" feather="true"></pr-icon> Deployed from {{ ctrl.state.appType }}</span
-                        >
+                          <pr-icon icon="'clock'" feather="true"></pr-icon> Deployed from {{ ctrl.state.appType }}
+                        </span>
                       </td>
                     </tr>
                     <tr>
@@ -95,7 +95,7 @@
                             <div class="col-sm-12 vertical-center">
                               <pr-icon icon="'edit'" feather="true"></pr-icon> Note
                               <button
-                                class="btn btn-xs btn-primary vertical-center"
+                                class="btn btn-xs btn-light vertical-center"
                                 ng-click="ctrl.state.expandedNote = !ctrl.state.expandedNote;"
                                 data-cy="k8sAppDetail-expandNoteButton"
                                 >{{ ctrl.state.expandedNote ? 'Collapse' : 'Expand' }}
@@ -158,12 +158,12 @@
               <uib-tab-heading>
                 <pr-icon icon="'fa-compress-arrows-alt'"></pr-icon> Placement
                 <div ng-if="ctrl.state.placementWarning" class="vertical-center">
-                  <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   warning
                 </div>
               </uib-tab-heading>
               <div class="small text-muted vertical-center" style="padding: 20px">
-                <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                 The placement component helps you understand whether or not this application can be deployed on a specific node.
               </div>
               <kubernetes-application-placements-datatable
@@ -182,7 +182,7 @@
               <uib-tab-heading>
                 <pr-icon icon="'fa-history'"></pr-icon> Events
                 <div ng-if="ctrl.hasEventWarnings()" class="vertical-center">
-                  <pr-icon icon="'alert-circle'" mode="'warn'" feather="true"></pr-icon>
+                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
@@ -229,27 +229,27 @@
               authorization="K8sApplicationDetailsW"
               ng-if="ctrl.isExternalApplication()"
               type="button"
-              class="btn btn-sm btn-primary"
+              class="btn btn-sm btn-light"
               ui-sref="kubernetes.applications.application.edit"
               style="margin-left: 0"
               data-cy="k8sAppDetail-editAppButton"
             >
-              <pr-icon icon="'code'" class="mr-1" feather="true"></pr-icon>Edit External application
+              <pr-icon icon="'code'" class-name="'mr-1'" feather="true"></pr-icon>Edit External application
             </button>
             <button
               ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
               type="button"
-              class="btn btn-sm btn-primary"
+              class="btn btn-sm btn-light"
               style="margin-left: 0"
               ng-click="ctrl.redeployApplication()"
               data-cy="k8sAppDetail-redeployButton"
             >
-              <pr-icon icon="'rotate-cw'" class="mr-1" feather="true"></pr-icon>Redeploy
+              <pr-icon icon="'rotate-cw'" class="'mr-1'" feather="true"></pr-icon>Redeploy
             </button>
             <button
               ng-if="!ctrl.isExternalApplication()"
               type="button"
-              class="btn btn-sm btn-primary"
+              class="btn btn-sm btn-light"
               style="margin-left: 0"
               ng-click="ctrl.rollbackApplication()"
               ng-disabled="ctrl.application.Revisions.length < 2 || ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
@@ -270,14 +270,14 @@
           <div class="text-muted" style="margin-bottom: 15px"> <pr-icon icon="'external-link'" class="mr-1" feather="true"></pr-icon>Accessing the application </div>
 
           <div class="small text-muted" ng-if="ctrl.application.PublishedPorts.length === 0" style="margin-bottom: 15px">
-            <pr-icon icon="'alert-circle'" mode="'info'" class="mr-1" feather="true"></pr-icon>This application is not exposing any port.
+            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is not exposing any port.
           </div>
 
           <div ng-if="ctrl.application.Services.length !== 0">
             <!-- Services notice -->
             <div>
               <div class="small text-muted">
-                <p> <pr-icon icon="'alert-circle'" mode="'info'" class="mr-1" feather="true"></pr-icon>This application is exposed through service(s) as below: </p>
+                <p> <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is exposed through service(s) as below: </p>
               </div>
             </div>
 
@@ -298,7 +298,7 @@
           <div class="text-muted" style="margin-bottom: 15px"> <pr-icon icon="'move'" class="mr-1" feather="true"></pr-icon>Auto-scaling </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.AutoScaler" style="margin-bottom: 15px">
-            <pr-icon icon="'alert-circle'" mode="'info'" class="mr-1" feather="true"></pr-icon>
+            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application does not have an autoscaling policy defined.
           </div>
 
@@ -333,7 +333,7 @@
           </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.Env.length > 0 && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px">
-            <pr-icon icon="'alert-circle'" mode="'info'" class="mr-1" feather="true"></pr-icon>
+            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application is not using any environment variable or configuration.
           </div>
 
@@ -434,7 +434,7 @@
           </div>
 
           <div class="small text-muted" ng-if="!ctrl.hasPersistedFolders()">
-            <pr-icon icon="'alert-circle'" mode="'info'" class="mr-1" feather="true"></pr-icon>
+            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application has no persisted folders.
           </div>
 
