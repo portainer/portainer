@@ -1,24 +1,32 @@
 .datatable .toolBar {
   background-color: var(--bg-card-color);
   overflow: auto;
-  padding: 10px;
+  padding: 20px 10px;
   font-size: 16px;
+  border-radius: 8px;
+
+  display: flex;
+  gap: 5px;
 }
 
 .datatable .actionBar {
-  padding: 10px;
+  padding: 0;
 }
 
 .datatable .toolBar .toolBarTitle {
+  @apply items-center gap-1;
   float: left;
-  margin: 5px 0 0 10px;
   color: var(--text-widget-header-color);
   font-weight: 500;
+
+  flex: auto;
+  display: inline-flex;
+  flex-wrap: nowrap;
 }
 
 .datatable .toolBar .settings {
   float: right;
-  margin: 5px 10px 0 0;
+  margin-right: 5px;
 }
 
 .datatable .toolBar .setting {
@@ -30,16 +38,42 @@
   @apply text-blue-7;
 }
 
+.toolBar .actionBar {
+  margin-right: 10px;
+  display: inline-flex;
+}
+
+.toolBar .settings {
+  width: 60px;
+  text-align: right;
+  display: inline-flex;
+}
+
 .datatable .searchBar {
-  border: 1px solid var(--border-color);
-  padding: 8px;
-  background: var(--bg-main-color);
+  border: 1px solid var(--border-searchbar);
+  padding: 5px;
+  background: var(--bg-searchbar) !important;
+  border-radius: 5px;
+  padding: 4px 10px !important;
+  font-size: 14px;
 }
 
 .datatable .searchInput {
   background: none;
   border: none;
   width: 90%;
+}
+
+.toolBar .searchBar {
+  flex: right;
+  margin-right: 10px;
+  width: 500px;
+  height: 30px;
+  display: inline-flex;
+}
+
+.datatable .searchBar input[type='text'] {
+  border: 0px !important;
 }
 
 .datatable .searchIcon {
@@ -65,6 +99,10 @@
   color: var(--text-main-color);
   overflow: auto;
   border-top: 1px solid var(--border-datatable-top-color);
+
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding-bottom: 10px;
 }
 
 .datatable .footer .infoBar {
