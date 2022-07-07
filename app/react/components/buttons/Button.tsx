@@ -1,7 +1,15 @@
-import { AriaAttributes, MouseEventHandler, PropsWithChildren } from 'react';
+import {
+  AriaAttributes,
+  ComponentType,
+  MouseEventHandler,
+  PropsWithChildren,
+  ReactNode,
+} from 'react';
 import clsx from 'clsx';
 
 import { AutomationTestingProps } from '@/types';
+
+import { Icon } from '@@/Icon';
 
 type Type = 'submit' | 'button' | 'reset';
 type Color =
@@ -17,6 +25,9 @@ type Color =
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
 export interface Props extends AriaAttributes, AutomationTestingProps {
+  icon?: ReactNode | ComponentType<unknown>;
+  featherIcon?: boolean;
+
   color?: Color;
   size?: Size;
   disabled?: boolean;
@@ -34,7 +45,10 @@ export function Button({
   className,
   onClick,
   title,
+  icon,
+  featherIcon,
   children,
+
   ...ariaProps
 }: PropsWithChildren<Props>) {
   return (
@@ -42,15 +56,44 @@ export function Button({
       /* eslint-disable-next-line react/button-has-type */
       type={type}
       disabled={disabled}
-      className={clsx('btn', `btn-${color}`, sizeClass(size), className)}
+      className={clsx(
+        {
+          'opacity-60': disabled,
+        },
+        `btn btn-${color}`,
+        sizeClass(size),
+        className
+      )}
       onClick={onClick}
       title={title}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...ariaProps}
     >
+      {icon && (
+        <Icon
+          icon={icon}
+          size={getIconSize(size)}
+          className="inline-flex"
+          feather={featherIcon}
+        />
+      )}
       {children}
     </button>
   );
+}
+
+function getIconSize(size: Size) {
+  switch (size) {
+    case 'xsmall':
+      return 'xs';
+    case 'medium':
+      return 'md';
+    case 'large':
+      return 'lg';
+    case 'small':
+    default:
+      return 'sm';
+  }
 }
 
 function sizeClass(size?: Size) {

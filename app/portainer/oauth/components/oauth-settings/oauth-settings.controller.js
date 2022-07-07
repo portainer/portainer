@@ -32,10 +32,10 @@ export default class OAuthSettingsController {
   onMicrosoftTenantIDChange() {
     const tenantID = this.state.microsoftTenantID || MS_TENANT_ID_PLACEHOLDER;
 
-    this.settings.AuthorizationURI = `https://login.microsoftonline.com/${tenantID}/oauth2/authorize`;
-    this.settings.AccessTokenURI = `https://login.microsoftonline.com/${tenantID}/oauth2/token`;
-    this.settings.ResourceURI = `https://graph.windows.net/${tenantID}/me?api-version=2013-11-08`;
-    this.settings.LogoutURI = `https://login.microsoftonline.com/${tenantID}/oauth2/logout`;
+    this.settings.AuthorizationURI = `https://login.microsoftonline.com/${tenantID}/oauth2/v2.0/authorize`;
+    this.settings.AccessTokenURI = `https://login.microsoftonline.com/${tenantID}/oauth2/v2.0/token`;
+    this.settings.ResourceURI = `https://graph.microsoft.com/v1.0/me`;
+    this.settings.LogoutURI = `https://login.microsoftonline.com/${tenantID}/oauth2/v2.0/logout`;
   }
 
   useDefaultProviderConfiguration(providerId) {

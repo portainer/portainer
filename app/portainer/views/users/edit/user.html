@@ -1,9 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="User details"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.users">Users</a> &gt; <a ui-sref="portainer.users.user({id: user.Id})">{{ formValues.username }}</a>
-  </rd-header-content>
-</rd-header>
+<page-header title="'User details'" breadcrumbs="[{label:'Users', link:'portainer.users'}, formValues.username]"> </page-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">

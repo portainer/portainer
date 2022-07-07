@@ -235,49 +235,6 @@ angular
       return runningTasks;
     };
   })
-  .filter('runningcontainers', function () {
-    'use strict';
-    return function runningContainersFilter(containers) {
-      return containers.filter(function (container) {
-        return container.State === 'running';
-      }).length;
-    };
-  })
-  .filter('stoppedcontainers', function () {
-    'use strict';
-    return function stoppedContainersFilter(containers) {
-      return containers.filter(function (container) {
-        return container.State === 'exited';
-      }).length;
-    };
-  })
-  .filter('healthycontainers', function () {
-    'use strict';
-    return function healthyContainersFilter(containers) {
-      return containers.filter(function (container) {
-        return container.Status === 'healthy';
-      }).length;
-    };
-  })
-  .filter('unhealthycontainers', function () {
-    'use strict';
-    return function unhealthyContainersFilter(containers) {
-      return containers.filter(function (container) {
-        return container.Status === 'unhealthy';
-      }).length;
-    };
-  })
-  .filter('imagestotalsize', function () {
-    'use strict';
-    return function (images) {
-      var totalImageSize = 0;
-      for (var i = 0; i < images.length; i++) {
-        var item = images[i];
-        totalImageSize += item.VirtualSize;
-      }
-      return totalImageSize;
-    };
-  })
   .filter('tasknodename', function () {
     'use strict';
     return function (nodeId, nodes) {

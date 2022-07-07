@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create registry"></rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.registries">Registries</a> &gt; Add registry </rd-header-content>
-</rd-header>
+<page-header title="'Create registry'" breadcrumbs="[{label:'Registries', link:'portainer.registries'}, 'Add registry']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -93,6 +90,7 @@
             form-action="$ctrl.createRegistry"
             form-action-label="Add registry"
             action-in-progress="$ctrl.state.actionInProgress"
+            name-is-used="($ctrl.nameIsUsed)"
           ></registry-form-quay>
 
           <registry-form-azure
@@ -141,7 +139,6 @@
             action-in-progress="$ctrl.state.actionInProgress"
             reset-defaults="$ctrl.useDefaultGitlabConfiguration"
           ></registry-form-gitlab>
-
           <registry-form-dockerhub
             ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.DOCKERHUB"
             model="$ctrl.model"
