@@ -102,7 +102,7 @@
                     ng-click="$ctrl.changeOrderBy('Name')"
                   ></table-column-header>
                   <div>
-                    <span uib-dropdown-toggle ng-class="['table-filter vertical-center', { 'filter-active': $ctrl.filters.state.enabled }]">
+                    <span uib-dropdown-toggle ng-class="['table-filter vertical-center !ml-1', { 'filter-active': $ctrl.filters.state.enabled }]">
                       Filter
                       <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'" feather="true" size="'sm'"></pr-icon>
                       <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'" feather="true" size="'sm'"></pr-icon>
