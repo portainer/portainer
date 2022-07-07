@@ -104,10 +104,22 @@ func (store *Store) backupWithOptions(options *BackupOptions) (string, error) {
 
 	options = store.setupOptions(options)
 
-	store.Close()
-	defer store.Open()
+	if err := store.Close(); err != nil {
+		return options.BackupPath, fmt.Errorf(
+			"error closing datastore before creating backup: %v",
+			err,
+		)
+	}
 
-	return options.BackupPath, store.copyDBFile(store.databasePath(), options.BackupPath)
+	if err := store.copyDBFile(store.databasePath(), options.BackupPath); err != nil {
+		return options.BackupDir, err
+	}
+
+	_, err := store.Open()
+	return options.BackupDir, fmt.Errorf(
+		"error opening datastore after creating backup: %v",
+		err,
+	)
 }
 
 // RestoreWithOptions previously saved backup for the current Edition  with options
