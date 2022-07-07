@@ -331,8 +331,8 @@
 
                   <!-- config-element -->
                   <div class="form-group" ng-repeat="(index, config) in ctrl.formValues.Configurations">
-                    <label for="stack_name" class="col-md-1 col-sm-2 control-label text-left">Configuration</label>
-                    <div class="col-sm-5">
+                    <label for="stack_name" class="col-sm-3 col-lg-2 control-label text-left">Configuration</label>
+                    <div class="col-sm-6">
                       <select
                         class="form-control"
                         ng-model="config.SelectedConfiguration"
@@ -342,7 +342,7 @@
                         data-cy="k8sAppCreate-addConfigSelect_{{ $index }}"
                       ></select>
                     </div>
-                    <div class="col-sm-6" style="margin-top: 2px">
+                    <div class="col-sm-3" style="margin-top: 2px">
                       <button
                         class="btn btn-sm btn-light vertical-center"
                         type="button"
@@ -375,8 +375,8 @@
                     </div>
                     <!-- no-override -->
                     <div class="col-sm-12" style="margin-top: 10px" ng-if="config.SelectedConfiguration && !config.Overriden">
-                      <div class="col-md-1 col-sm-2"></div>
-                      <div class="col-md-11 col-sm-10 small text-muted" style="padding-left: 5px">
+                      <div class="col-sm-3 col-lg-2"></div>
+                      <div class="col-sm-6 small text-muted" style="padding-left: 5px">
                         The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> configuration as environment variables:
                         <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
                           <code>{{ key }}</code
