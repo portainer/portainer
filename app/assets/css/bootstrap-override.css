@@ -157,33 +157,10 @@ input:checked + .slider:before {
 
 .datatable .searchBar {
   border: 1px solid var(--border-searchbar);
-  padding: 5px;
-  background: var(--bg-searchbar) !important;
+  padding: 4px 10px;
+  font-size: 14px;
+  background: var(--bg-searchbar);
   border-radius: 5px;
-}
-
-.datatable .searchBar input[type='text'] {
-  border: 0px !important;
-}
-
-.datatable .toolBar {
-  border-radius: 8px;
-}
-
-.datatable .footer {
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  padding-bottom: 10px;
-}
-
-.datatable .toolBar {
-  padding: 20px;
-}
-
-.toolBar {
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
 }
 
 .toolBar > .toolBarTitle {
@@ -199,18 +176,8 @@ input:checked + .slider:before {
   display: inline-flex;
 }
 
-.datatable .searchBar {
-  padding: 4px 10px !important;
-  font-size: 14px;
-}
-
 .toolBar > .actionBar {
-  margin-right: 10px;
   display: inline-flex;
-}
-
-.datatable .actionBar {
-  padding: 0px !important;
 }
 
 .toolBar > .settings {
