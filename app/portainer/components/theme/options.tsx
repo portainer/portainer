@@ -1,6 +1,6 @@
 import Lightmode from '@/assets/ico/theme/lightmode.svg?c';
 import Darkmode from '@/assets/ico/theme/darkmode.svg?c';
-import Highcontrastmode from '@/assets/ico/theme/Highcontrastmode.svg?c';
+import Highcontrastmode from '@/assets/ico/theme/highcontrastmode.svg?c';
 import Automode from '@/assets/ico/theme/auto.svg?c';
 
 export const options = [

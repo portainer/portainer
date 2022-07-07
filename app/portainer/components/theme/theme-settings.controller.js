@@ -1,5 +1,3 @@
-//import { buildOption } from '@/portainer/components/BoxSelector';
-
 import { options } from './options';
 
 export default class ThemeSettingsController {
