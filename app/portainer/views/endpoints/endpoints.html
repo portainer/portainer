@@ -1,11 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Environments">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.endpoints" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Environment management</rd-header-content>
-</rd-header>
+<page-header title="'Environments'" breadcrumbs="['Environment management']" reload="true"> </page-header>
 
 <view-loading ng-if="state.loadingMessage" message="state.loadingMessage"></view-loading>
 

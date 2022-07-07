@@ -1,13 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Environment details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.endpoints">Environments</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a>
-  </rd-header-content>
-</rd-header>
+<page-header title="'Environment details'" breadcrumbs="[{label:'Environments', link:'portainer.endpoints'}, endpoint.Name]" reload="true"> </page-header>
 
 <div class="row">
   <div ng-if="state.edgeEndpoint">

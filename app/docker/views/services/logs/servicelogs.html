@@ -1,9 +1,19 @@
-<rd-header>
-  <rd-header-title title-text="Service logs"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.services">Services</a> > <a ui-sref="docker.services.service({id: service.Id})">{{ service.Name }}</a> &gt; Logs
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'Service logs'"
+  breadcrumbs="[
+    {
+      label: 'Services',
+      link: 'docker.services'
+    },
+    {
+      label: service.Name,
+      link: 'docker.services.service',
+      linkParams: { id: service.Id }
+    },
+    'Logs'
+  ]"
+>
+</page-header>
 
 <log-viewer
   data="logs"

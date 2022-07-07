@@ -1,6 +1,9 @@
-<kubernetes-view-header title="Helm details" state="kubernetes.helm" view-ready="$ctrl.state.viewReady">
-  <a ui-sref="kubernetes.applications">Applications</a> &gt; {{ $ctrl.state.params.name }}
-</kubernetes-view-header>
+<page-header
+  ng-if="$ctrl.state.viewReady"
+  title="'Helm details'"
+  breadcrumbs="[{label:'Applications', link:'kubernetes.applications'}, $ctrl.state.params.name]"
+  reload="true"
+></page-header>
 
 <kubernetes-view-loading view-ready="$ctrl.state.viewReady"></kubernetes-view-loading>
 

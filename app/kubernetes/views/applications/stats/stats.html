@@ -1,12 +1,28 @@
-<kubernetes-view-header title="Application stats" state="kubernetes.applications.application.stats" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.state.transition.namespace })">{{ ctrl.state.transition.namespace }}</a> &gt;
-  <a ui-sref="kubernetes.applications">Applications</a> &gt;
-  <a ui-sref="kubernetes.applications.application({ name: ctrl.state.transition.applicationName, namespace: ctrl.state.transition.namespace })">{{
-    ctrl.state.transition.applicationName
-  }}</a>
-  &gt; Pods &gt; {{ ctrl.state.transition.podName }} &gt; Containers &gt; {{ ctrl.state.transition.containerName }} &gt; Stats
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Application stats'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { 
+      label:ctrl.state.transition.namespace,
+      link: 'kubernetes.resourcePools.resourcePool', 
+      linkParams:{ id: ctrl.state.transition.namespace }
+    },
+    { label:'Applications', link:'kubernetes.applications' },
+    { 
+      label:ctrl.state.transition.applicationName,
+      link: 'kubernetes.applications.application', 
+      linkParams:{ name: ctrl.state.transition.applicationName, namespace: ctrl.state.transition.namespace }
+    },
+     'Pods',
+     ctrl.state.transition.podName,
+     'Containers',
+     ctrl.state.transition.containerName,
+     'Stats'
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 

@@ -6,19 +6,9 @@
           <pr-icon icon="'layers'" feather="true" class-name="'icon-nested-blue vertical-center'" mode="'primary'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
-        <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true"></pr-icon>
-          <input
-            type="text"
-            class="searchInput"
-            ng-model="$ctrl.state.textFilter"
-            ng-change="$ctrl.onTextFilterChange()"
-            placeholder="Search for a stack..."
-            auto-focus
-            ng-model-options="{ debounce: 300 }"
-            data-cy="stack-searchInput"
-          />
-        </div>
+        
+        <datatable-searchbar value="$ctrl.state.textFilter" placeholder="'Search for a stack...'" on-change="($ctrl.onTextFilterChange)" data-cy="stack-searchInput"></datatable-searchbar>
+        
         <div class="actionBar !gap-3 !mr-0" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
           <button
             type="button"

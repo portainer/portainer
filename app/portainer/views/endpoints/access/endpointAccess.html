@@ -1,9 +1,14 @@
-<rd-header>
-  <rd-header-title title-text="Environment access"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.endpoints">Environments</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Access management
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'Environment access'"
+  breadcrumbs="[
+    { label:'Environments', link:'portainer.endpoints' },
+    { 
+      label:ctrl.endpoint.Name,
+      link: 'portainer.endpoints.endpoint', 
+      linkParams:{id: ctrl.endpoint.Id}
+    }, 'Access management']"
+>
+</page-header>
 
 <div class="row" ng-if="ctrl.endpoint">
   <div class="col-sm-12">

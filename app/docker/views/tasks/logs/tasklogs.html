@@ -1,10 +1,20 @@
-<rd-header>
-  <rd-header-title title-text="Task details"></rd-header-title>
-  <rd-header-content ng-if="task && service">
-    <a ui-sref="docker.services">Services</a> &gt; <a ui-sref="docker.services.service({id: service.Id })">{{ service.Name }}</a> &gt;
-    <a ui-sref="docker.tasks.task({id: task.Id })">{{ task.Id }}</a> &gt; Logs
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'Task details'"
+  breadcrumbs="[
+    { label:'Services', link:'docker.services' },
+    { 
+      label:service.Name,
+      link:'docker.services.service', 
+      linkParams:{ id: service.Id }
+    }, 
+    { 
+      label:task.Id,
+      link:'docker.tasks.task', 
+      linkParams:{ id: task.Id }
+    },
+    'Logs']"
+>
+</page-header>
 
 <log-viewer
   data="logs"
