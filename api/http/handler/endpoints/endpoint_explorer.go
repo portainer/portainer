@@ -428,7 +428,10 @@ func containerRunCmd(docker *client.Client, containerId string, cmd []string) ([
 		return nil, err
 	}
 
-	resp, err := docker.ContainerExecAttach(ctx, execId.ID, types.ExecStartCheck{})
+	resp, err := docker.ContainerExecAttach(ctx, execId.ID, types.ExecStartCheck{Detach: false, Tty: false})
+	if err != nil {
+		return nil, err
+	}
 
 	var outBuf, errBuf bytes.Buffer
 	outputDone := make(chan error)
