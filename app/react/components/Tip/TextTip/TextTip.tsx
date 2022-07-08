@@ -1,6 +1,8 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
+import { Icon } from '@@/Icon';
+
 type Color = 'orange' | 'blue';
 
 export interface Props {
@@ -11,15 +13,25 @@ export function TextTip({
   color = 'orange',
   children,
 }: PropsWithChildren<Props>) {
+  let iconClass: string;
+
+  switch (color) {
+    case 'blue':
+      iconClass = 'icon-primary';
+      break;
+    case 'orange':
+      iconClass = 'icon-warning';
+      break;
+    default:
+      iconClass = 'icon-warning';
+  }
+
   return (
-    <p className="text-muted small">
-      <i
-        aria-hidden="true"
-        className={clsx(
-          'fa fa-exclamation-circle',
-          `${color}-icon`,
-          'space-right'
-        )}
+    <p className="text-muted small vertical-center">
+      <Icon
+        icon="alert-circle"
+        feather
+        className={clsx(`${iconClass}`, 'space-right')}
       />
       {children}
     </p>
