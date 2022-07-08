@@ -95,7 +95,7 @@ func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx con
 // be found inside the database, it will generate a new one randomly and persist it.
 // It starts the tunnel status verification process in the background.
 // The snapshotter is used in the tunnel status verification process.
-func (service *Service) StartTunnelServer(addr, port string, snapshotService portainer.SnapshotService) error {
+func (service *Service) StartTunnelServer(addr, port, certPath, keyPath string, snapshotService portainer.SnapshotService) error {
 	keySeed, err := service.retrievePrivateKeySeed()
 	if err != nil {
 		return err
@@ -104,6 +104,10 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotService por
 	config := &chserver.Config{
 		Reverse: true,
 		KeySeed: keySeed,
+		TLS: chserver.TLSConfig{
+			Cert: certPath,
+			Key:  keyPath,
+		},
 	}
 
 	chiselServer, err := chserver.NewServer(config)

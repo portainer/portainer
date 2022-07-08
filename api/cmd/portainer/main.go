@@ -685,7 +685,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		}
 	}
 
-	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotService)
+	certPath, keyPath := fileService.GetDefaultSSLCertsPath()
+
+	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, certPath, keyPath, snapshotService)
 	if err != nil {
 		logrus.Fatalf("Failed starting tunnel server: %v", err)
 	}

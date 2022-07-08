@@ -1356,9 +1356,9 @@ type (
 
 	// ReverseTunnelService represents a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
-		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
+		StartTunnelServer(addr, port, certPath, keyPath string, snapshotService SnapshotService) error
 		StopTunnelServer() error
-		GenerateEdgeKey(url, host string, endpointIdentifier int) string
+		GenerateEdgeKey(url, host string, endpointIdentifier int) (string, error)
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error
 		SetTunnelStatusToIdle(endpointID EndpointID)

@@ -315,7 +315,10 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		return nil, httperror.BadRequest("Unable to parse host", err)
 	}
 
-	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
+	edgeKey, err := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
+	if err != nil {
+		return nil, httperror.BadRequest("Unable to generate Edge key", err)
+	}
 
 	endpoint := &portainer.Endpoint{
 		ID:      portainer.EndpointID(endpointID),

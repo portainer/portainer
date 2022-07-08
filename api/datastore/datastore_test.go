@@ -153,7 +153,8 @@ func (store *Store) CreateEndpoint(t *testing.T, name string, endpointType porta
 	case portainer.EdgeAgentOnKubernetesEnvironment:
 		cs := chisel.NewService(store, nil)
 		expectedEndpoint = newEndpoint(endpointType, id, name, URL, tls)
-		edgeKey := cs.GenerateEdgeKey(URL, "", int(id))
+		edgeKey, err := cs.GenerateEdgeKey(URL, "", int(id))
+		is.NoError(err, "GenerateEdgeKey() should not return an error")
 		expectedEndpoint.EdgeKey = edgeKey
 		store.testTunnelServer(t)
 
