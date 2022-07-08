@@ -30,7 +30,7 @@
   <div class="form-group">
     <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
       Registry URL
-      <portainer-tooltip position="bottom" message="URL of an Amazon Elastic Container Registry, which contains an account id and region."></portainer-tooltip>
+      <portainer-tooltip message="'URL of an Amazon Elastic Container Registry, which contains an account id and region.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input
@@ -58,7 +58,7 @@
     <div class="col-sm-12">
       <label class="control-label text-left">
         Authentication
-        <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to a private registry."></portainer-tooltip>
+        <portainer-tooltip message="'Enable this option if you need to specify credentials to connect to a private registry.'"></portainer-tooltip>
       </label>
       <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.model.Authentication" /><i></i> </label>
     </div>
@@ -97,24 +97,24 @@
       </div>
     </div>
     <!-- !aws-secret-access-key -->
-
-    <!-- region -->
-    <div class="form-group">
-      <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left">Region</label>
-      <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" id="registry_region" name="registry_region" placeholder="us-west-1" ng-model="$ctrl.model.Ecr.Region" required />
-      </div>
-    </div>
-    <div class="form-group" ng-show="$ctrl.registryFormEcr.registry_region.$invalid">
-      <div class="col-sm-12 small text-warning">
-        <div ng-messages="$ctrl.registryFormEcr.registry_region.$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-          <p ng-message="used"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A registry with the same name already exists.</p>
-        </div>
-      </div>
-    </div>
-    <!-- !region -->
   </div>
+
+  <!-- region -->
+  <div class="form-group">
+    <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left">Region</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="registry_region" name="registry_region" placeholder="us-west-1" ng-model="$ctrl.model.Ecr.Region" required />
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.registryFormEcr.registry_region.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="$ctrl.registryFormEcr.registry_region.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+        <p ng-message="used"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A registry with the same name already exists.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !region -->
 
   <!-- actions -->
   <div class="col-sm-12 form-section-title"> Actions </div>

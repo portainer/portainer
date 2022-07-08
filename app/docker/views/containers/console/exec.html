@@ -1,9 +1,14 @@
-<rd-header>
-  <rd-header-title title-text="Container console"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a> &gt; Console
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'Container console'"
+  breadcrumbs="[
+    { label:'Containers', link:'docker.containers' },
+    { 
+      label:(container.Name | trimcontainername),
+      link: 'docker.containers.container', 
+      linkParams:container.Id
+    }, 'Console']"
+>
+</page-header>
 
 <div class="row" ng-init="initView()" ng-show="loaded">
   <div class="col-lg-12 col-md-12 col-xs-12">
@@ -41,7 +46,7 @@
             <div class="form-group">
               <label class="col-lg-1 text-left col-sm-2 control-label">
                 User
-                <portainer-tooltip position="bottom" message="Format is one of: user, user:group, uid or uid:gid"></portainer-tooltip>
+                <portainer-tooltip message="'Format is one of: user, user:group, uid or uid:gid'"></portainer-tooltip>
               </label>
               <div class="col-lg-11 col-sm-10">
                 <input class="form-control" type="text" ng-model="formValues.user" placeholder="root" />

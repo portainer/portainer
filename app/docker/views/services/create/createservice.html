@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create service"></rd-header-title>
-  <rd-header-content> <a ui-sref="docker.services">Services</a> &gt; Add service </rd-header-content>
-</rd-header>
+<page-header title="'Create service'" breadcrumbs="[{label:'Services', link:'docker.services'}, 'Add service']"> </page-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
@@ -102,8 +99,8 @@
                 <label class="control-label text-left">
                   Create a service webhook
                   <portainer-tooltip
-                    position="top"
-                    message="Create a webhook (or callback URI) to automate the update of this service. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this service."
+                    position="'top'"
+                    message="'Create a webhook (or callback URI) to automate the update of this service. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this service.'"
                   ></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="formValues.Webhook" /><i></i> </label>
@@ -213,8 +210,8 @@
                   <label class="control-label text-left">
                     Options
                     <portainer-tooltip
-                      position="top"
-                      message="Add button is disabled unless a driver other than none or default is selected. Options are specific to the selected driver, refer to the driver documentation."
+                      position="'top'"
+                      message="'Add button is disabled unless a driver other than none or default is selected. Options are specific to the selected driver, refer to the driver documentation.'"
                     ></portainer-tooltip>
                   </label>
                   <span

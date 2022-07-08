@@ -1,9 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Container details"> </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a>
-  </rd-header-content>
-</rd-header>
+<page-header title="'Container details'" breadcrumbs="[{label:'Containers', link:'docker.containers'}, (container.Name | trimcontainername)]"> </page-header>
 
 <div
   class="row"
@@ -116,8 +111,8 @@
               <td colspan="1">
                 Container webhook
                 <portainer-tooltip
-                  position="top"
-                  message="Webhook (or callback URI) used to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container."
+                  position="'top'"
+                  message="'Webhook (or callback URI) used to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container.'"
                 ></portainer-tooltip>
                 <label class="switch box-selector-item limited business" style="margin-left: 20px">
                   <input disable-authorization="DockerContainerUpdate" type="checkbox" ng-model="WebhookExists" disabled="disabled" ng-checked="true" /><i></i>

@@ -171,7 +171,7 @@ function InheritanceMessage({
       <td colSpan={2} aria-label="inheritance-message">
         <i className="fa fa-info-circle space-right" aria-hidden="true" />
         {children}
-        <Tooltip message={tooltip} position="bottom" />
+        <Tooltip message={tooltip} />
       </td>
     </tr>
   );

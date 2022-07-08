@@ -1,11 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Edge job details">
-    <a data-toggle="tooltip" title-text="Refresh" ui-sref="edge.jobs.job({id: $ctrl.edgeJob.Id, tab: $ctrl.state.activeTab})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content> <a ui-sref="edge.jobs">Edge jobs</a> &gt; {{ ::$ctrl.edgeJob.Name }} </rd-header-content>
-</rd-header>
+<page-header title="'Edge job details'" breadcrumbs="[{label:'Edge jobs', link:'edge.jobs'}, $ctrl.edgeJob.Name]" reload="true"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">

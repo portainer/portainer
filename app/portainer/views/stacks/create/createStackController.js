@@ -5,6 +5,8 @@ import { AccessControlFormData } from '@/portainer/components/accessControlForm/
 import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
 import { RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
 import { FeatureId } from 'Portainer/feature-flags/enums';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
+import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 
 angular
   .module('portainer.app')
@@ -31,6 +33,8 @@ angular
       endpoint
     ) {
       $scope.onChangeTemplateId = onChangeTemplateId;
+      $scope.onChangeTemplateVariables = onChangeTemplateVariables;
+      $scope.isTemplateVariablesEnabled = isBE;
       $scope.buildAnalyticsProperties = buildAnalyticsProperties;
       $scope.stackWebhookFeature = FeatureId.STACK_WEBHOOK;
       $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
@@ -53,6 +57,7 @@ angular
         RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
         RepositoryFetchInterval: '5m',
         RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
+        Variables: {},
       };
 
       $scope.state = {
@@ -265,11 +270,12 @@ angular
           });
       };
 
-      $scope.onChangeFileContent = function onChangeFileContent(value) {
+      $scope.onChangeFileContent = onChangeFileContent;
+      function onChangeFileContent(value) {
         $scope.formValues.StackFileContent = value;
         $scope.state.editorYamlValidationError = StackHelper.validateYAML($scope.formValues.StackFileContent, $scope.containerNames);
         $scope.state.isEditorDirty = true;
-      };
+      }
 
       async function onFileLoadAsync(event) {
         $scope.state.uploadYamlValidationError = StackHelper.validateYAML(event.target.result, $scope.containerNames);
@@ -292,16 +298,36 @@ angular
 
       function onChangeTemplateId(templateId, template) {
         return $async(async () => {
+          if (!template || ($scope.state.selectedTemplateId === templateId && $scope.state.selectedTemplate === template)) {
+            return;
+          }
+
           try {
             $scope.state.selectedTemplateId = templateId;
             $scope.state.selectedTemplate = template;
 
             const fileContent = await CustomTemplateService.customTemplateFile(templateId);
-            $scope.onChangeFileContent(fileContent);
+            $scope.state.templateContent = fileContent;
+            onChangeFileContent(fileContent);
+
+            if (template.Variables && template.Variables.length > 0) {
+              const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
+              onChangeTemplateVariables(variables);
+            }
           } catch (err) {
-            this.Notifications.error('Failure', err, 'Unable to retrieve Custom Template file');
+            Notifications.error('Failure', err, 'Unable to retrieve Custom Template file');
           }
         });
+      }
+
+      function onChangeTemplateVariables(value) {
+        onChangeFormValues({ Variables: value });
+
+        if (!$scope.isTemplateVariablesEnabled) {
+          return;
+        }
+        const rendered = renderTemplate($scope.state.templateContent, $scope.formValues.Variables, $scope.state.selectedTemplate.Variables);
+        onChangeFormValues({ StackFileContent: rendered });
       }
 
       async function initView() {
@@ -328,8 +354,11 @@ angular
 
       initView();
 
-      function onChangeFormValues(newValues) {
-        $scope.formValues = newValues;
+      function onChangeFormValues(values) {
+        $scope.formValues = {
+          ...$scope.formValues,
+          ...values,
+        };
       }
     }
   );

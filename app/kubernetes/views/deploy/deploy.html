@@ -1,4 +1,4 @@
-<kubernetes-view-header title="Advanced deployment" state="kubernetes.deploy" view-ready="ctrl.state.viewReady"> Deploy Kubernetes resources </kubernetes-view-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Advanced deployment'" breadcrumbs="['Deploy Kubernetes resources']" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -28,10 +28,7 @@
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <div class="col-sm-12">
                     <label for="toggle_logo" class="control-label text-left"> Use namespace(s) specified from manifest </label>
-                    <portainer-tooltip
-                      position="bottom"
-                      message="If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment"
-                    >
+                    <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
                     </portainer-tooltip>
                     <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" /><i></i> </label>
                   </div>
@@ -93,7 +90,7 @@
                   ></custom-template-selector>
 
                   <custom-templates-variables-field
-                    ng-if="$ctrl.isTemplateVariablesEnabled && ctrl.state.template"
+                    ng-if="ctrl.isTemplateVariablesEnabled && ctrl.state.template"
                     definitions="ctrl.state.template.Variables"
                     value="ctrl.formValues.Variables"
                     on-change="(ctrl.onChangeTemplateVariables)"

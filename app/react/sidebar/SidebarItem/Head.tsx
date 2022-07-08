@@ -5,6 +5,7 @@ import {
 } from '@uirouter/react';
 import clsx from 'clsx';
 import { ComponentProps } from 'react';
+import ReactTooltip from 'react-tooltip';
 
 import { AutomationTestingProps } from '@/types';
 
@@ -43,25 +44,32 @@ export function Head({
     <a
       href={anchorProps.href}
       onClick={anchorProps.onClick}
-      title={label}
       className={clsx(
         anchorProps.className,
-        'text-inherit no-underline hover:no-underline hover:text-inherit focus:no-underline focus:text-inherit w-full flex-1 rounded-md',
-        { 'px-3': isOpen }
+        'text-inherit no-underline hover:no-underline hover:text-inherit focus:no-underline focus:text-inherit',
+        'w-full flex-1 rounded-md flex items-center h-8 space-x-4 text-sm',
+        'hover:bg-blue-9 be:hover:bg-gray-9 transition-colors duration-200',
+        {
+          'px-3 justify-start w-full': isOpen,
+          'justify-center w-8': !isOpen,
+        }
       )}
+      data-tip={label}
       data-cy={dataCy}
     >
-      <div
-        className={clsx('flex items-center h-8 space-x-4 text-sm', {
-          'justify-start w-full': isOpen,
-          'justify-center w-8': !isOpen,
-        })}
-      >
-        {!!icon && (
-          <Icon icon={icon} feather className={clsx('flex [&>svg]:w-4')} />
-        )}
-        {isOpen && <span>{label}</span>}
-      </div>
+      {!!icon && (
+        <Icon icon={icon} feather className={clsx('flex [&>svg]:w-4')} />
+      )}
+      {isOpen && <span>{label}</span>}
+
+      <ReactTooltip
+        type="info"
+        place="right"
+        effect="solid"
+        className="!opacity-100 bg-blue-9 be:bg-gray-9 !rounded-md !py-1 !px-2"
+        arrowColor="transparent"
+        disable={isOpen}
+      />
     </a>
   );
 }
@@ -73,7 +81,7 @@ function useSrefActive(
   options: TransitionOptions = {},
   ignorePaths: string[] = []
 ) {
-  const { state } = useCurrentStateAndParams();
+  const { state: { name: stateName = '' } = {} } = useCurrentStateAndParams();
   const anchorProps = useUiRouterSrefActive(
     to,
     params || {},
@@ -81,7 +89,7 @@ function useSrefActive(
     options
   );
 
-  const className = ignorePaths.includes(state.name || '')
+  const className = ignorePaths.some((path) => stateName.includes(path))
     ? ''
     : anchorProps.className;
 
