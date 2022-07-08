@@ -185,7 +185,7 @@
   margin: 0;
 }
 
-.datatable .table-filters thead tr > th {
+.datatable thead tr > th {
   white-space: nowrap;
   vertical-align: middle;
 }
