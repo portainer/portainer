@@ -42,7 +42,7 @@ export default class ThemeSettingsController {
         defaultTheme: 'auto',
         isDemo: state.application.demoEnvironment.enabled,
       };
-      
+
       this.state.availableThemes = options;
 
       try {
