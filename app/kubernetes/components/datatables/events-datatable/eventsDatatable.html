@@ -61,32 +61,40 @@
       <thead>
         <tr>
           <th>
-            <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Date')">
-              Date
-              <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Date' && !$ctrl.state.reverseOrder"></pr-icon>
-              <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Date' && $ctrl.state.reverseOrder"></pr-icon>
-            </div>
+            <table-column-header
+              col-title="'Date'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Date'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Date' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Date')"
+            ></table-column-header>
           </th>
           <th>
-            <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Involved.kind')">
-              Kind
-              <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && !$ctrl.state.reverseOrder"></pr-icon>
-              <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && $ctrl.state.reverseOrder"></pr-icon>
-            </div>
+            <table-column-header
+              col-title="'Kind'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Involved.kind'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Involved.kind' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Involved.kind')"
+            ></table-column-header>
           </th>
           <th>
-            <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Type')">
-              Type
-              <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></pr-icon>
-              <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></pr-icon>
-            </div>
+            <table-column-header
+              col-title="'Type'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Type'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Type')"
+            ></table-column-header>
           </th>
           <th>
-            <div class="cursor-pointer flex no-wrap gap-1" ng-click="$ctrl.changeOrderBy('Message')">
-              Message
-              <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Message' && !$ctrl.state.reverseOrder"></pr-icon>
-              <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Message' && $ctrl.state.reverseOrder"></pr-icon>
-            </div>
+            <table-column-header
+              col-title="'Message'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Message'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Message' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Message')"
+            ></table-column-header>
           </th>
         </tr>
       </thead>
