@@ -81,7 +81,7 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 	}
 
 	filePaths := stackutils.GetStackFilePaths(stack)
-	err = manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths)
+	err = manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths, "")
 	return errors.Wrap(err, "failed to remove a stack")
 }
 
