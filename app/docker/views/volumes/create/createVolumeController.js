@@ -38,6 +38,17 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       $scope.formValues.DriverOptions.splice(index, 1);
     };
 
+    $scope.handleUseNFSChange = handleUseNFSChange.bind(this);
+    $scope.handleUseCIFSChange = handleUseCIFSChange.bind(this);
+
+    function handleUseNFSChange() {
+      $scope.formValues.NFSData.useNFS = !$scope.formValues.NFSData.useNFS;
+    }
+
+    function handleUseCIFSChange() {
+      $scope.formValues.CIFSData.useCIFS = !$scope.formValues.CIFSData.useCIFS;
+    }
+
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';

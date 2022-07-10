@@ -181,25 +181,25 @@
           <!-- internal -->
           <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">
-                Isolated network
-                <portainer-tooltip message="'An isolated network has no inbound or outbound communications.'"></portainer-tooltip>
-              </label>
-              <label name="ownership" class="switch" style="margin-left: 20px">
-                <input type="checkbox" ng-model="config.Internal" />
-                <i></i>
-              </label>
+              <por-switch-field
+                label-class="'col-sm-7 col-lg-4'"
+                checked="$ctrl.config.Internal"
+                label="'Isolated network'"
+                on-change="($ctrl.handleInternalChange)"
+                tooltip="'An isolated network has no inbound or outbound communications.'"
+              ></por-switch-field>
             </div>
           </div>
           <!-- !internal -->
           <!-- attachable -->
           <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">
-              <label for="attachable" class="control-label text-left"> Enable manual container attachment </label>
-              <label name="attachable" class="switch" style="margin-left: 20px">
-                <input type="checkbox" ng-model="config.Attachable" />
-                <i></i>
-              </label>
+              <por-switch-field
+                label-class="'col-sm-7 col-lg-4'"
+                checked="$ctrl.config.Attachable"
+                label="'Enable manual container attachment'"
+                on-change="($ctrl.handleAttachableChange)"
+              ></por-switch-field>
             </div>
           </div>
           <!-- !attachable -->
