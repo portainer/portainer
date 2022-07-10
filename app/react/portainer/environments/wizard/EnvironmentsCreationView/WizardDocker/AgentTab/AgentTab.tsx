@@ -14,7 +14,7 @@ export function AgentTab({ onCreate }: Props) {
       <DeploymentScripts />
 
       <div className="mt-5">
-        <AgentForm onCreate={onCreate} showGpus />
+        <AgentForm onCreate={onCreate} />
       </div>
     </>
   );

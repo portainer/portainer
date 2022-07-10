@@ -98,7 +98,6 @@ export function WizardDocker({ onCreate }: Props) {
               linux: [commandsTabs.swarmLinux, commandsTabs.standaloneLinux],
               win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
             }}
-            showGpus
           />
         );
       default:

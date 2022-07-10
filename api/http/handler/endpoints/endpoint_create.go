@@ -143,7 +143,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		payload.PublicURL = publicURL
 	}
 
-	var gpus []portainer.Pair
+	gpus := make([]portainer.Pair, 0)
 	err = request.RetrieveMultiPartFormJSONValue(r, "Gpus", &gpus, true)
 	if err != nil {
 		return errors.New("Invalid Gpus parameter")
