@@ -62,8 +62,7 @@
   <!-- organisation-checkbox -->
   <div class="form-group">
     <div class="col-sm-12">
-      <label class="control-label text-left"> Use organisation registry </label>
-      <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.model.Quay.useOrganisation" /><i></i> </label>
+      <por-switch-field label="'Use organisation registry'" checked="$ctrl.model.Quay.useOrganisation" on-change="($ctrl.toggleOrganisation)"></por-switch-field>
     </div>
   </div>
   <!-- !organisation-checkbox -->

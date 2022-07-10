@@ -65,11 +65,13 @@
   <!-- authentication-checkbox -->
   <div class="form-group">
     <div class="col-sm-12">
-      <label class="control-label text-left">
-        Authentication
-        <portainer-tooltip message="'Enable this option if you need to specify credentials to connect to a private registry.'"></portainer-tooltip>
-      </label>
-      <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.model.Authentication" /><i></i> </label>
+      <por-switch-field
+        label="'Authentication'"
+        tooltip="'Enable this option if you need to specify credentials to connect to a private registry.'"
+        name="'administrator'"
+        checked="$ctrl.model.Authentication"
+        on-change="($ctrl.toggleAuthentication)"
+      ></por-switch-field>
     </div>
   </div>
   <!-- !authentication-checkbox -->
