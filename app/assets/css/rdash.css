@@ -111,10 +111,10 @@ div.input-mask {
   background: var(--bg-widget-table-color);
 }
 .widget .widget-body table thead * {
-  font-size: 14px !important;
+  font-size: 14px;
 }
 .widget .widget-body table tbody * {
-  font-size: 13px !important;
+  font-size: 13px;
 }
 .widget .widget-body .error {
   color: #ff0000;

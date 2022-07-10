@@ -33,4 +33,8 @@
       on-remove="($ctrl.remove)"
     ></environment-variables-simple-mode-item>
   </div>
+  <div class="col-sm-12 small text-muted" ng-if="$ctrl.ngModel.length > 0 && $ctrl.showHelpMessage">
+    <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+    Environment changes will not take effect until redeployment occurs manually or via webhook.
+  </div>
 </div>

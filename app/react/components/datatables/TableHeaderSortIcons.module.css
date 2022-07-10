@@ -1,0 +1,12 @@
+.sort-icon > path {
+  fill: var(--sort-icon-muted);
+}
+
+.active-sort-icon > path {
+  fill: var(--sort-icon);
+}
+
+.sort-icon {
+  display: inline-block;
+  font-size: 12px !important;
+}

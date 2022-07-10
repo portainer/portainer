@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Registry access"></rd-header-title>
-  <rd-header-content> <a ui-sref="kubernetes.registries">Registries</a> &gt; {{ $ctrl.registry.Name }} &gt; Access management </rd-header-content>
-</rd-header>
+<page-header title="'Registry access'" breadcrumbs="[{label:'Registries', link:'kubernetes.registries'}, $ctrl.registry.Name, 'Access management']"> </page-header>
 
 <registry-details registry="$ctrl.registry" ng-if="$ctrl.registry"></registry-details>
 

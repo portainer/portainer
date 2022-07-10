@@ -32,12 +32,14 @@
 }
 
 a {
-  color: var(--text-link-color);
+  color: inherit;
+  cursor: pointer;
 }
 
 a:hover,
 a:focus {
-  color: var(--text-link-hover-color);
+  color: inherit;
+  text-decoration: none;
 }
 
 .input-group-addon {

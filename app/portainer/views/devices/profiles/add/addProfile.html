@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create profile"></rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.settings">Settings</a> &gt; Edge Compute </rd-header-content>
-</rd-header>
+<page-header title="'Create profile'" breadcrumbs="[{label:'Settings', link:'portainer.settings'}, 'Edge Compute']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -26,7 +23,7 @@
                 <input type="radio" id="method_editor" ng-model="state.method" value="editor" />
                 <label for="method_editor">
                   <div class="boxselector_header">
-                    <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px"></i>
+                    <pr-icon icon="'edit'" feather="true"></pr-icon>
                     Web editor
                   </div>
                   <p>Use our Web editor</p>
