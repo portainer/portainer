@@ -13,15 +13,15 @@
           required
         />
       </div>
-      <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeValue()">
-        <i class="fa fa-trash" aria-hidden="true"></i>
+      <button class="btn btn-sm btn-light btn-only-icon" type="button" ng-click="$ctrl.removeValue()" title="Remove">
+        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
       </button>
     </div>
     <div ng-show="$ctrl[$ctrl.formName].name.$invalid">
-      <div class="col-sm-12 small text-warning">
-        <div ng-messages="$ctrl[$ctrl.formName].name.$error">
-          <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required. </p>
-          <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> File path must include yaml, yml, json, or hcl extension </p>
+      <div class="small">
+        <div ng-messages="$ctrl[$ctrl.formName].name.$error" class="mt-1">
+          <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required. </p>
+          <p ng-message="pattern"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> File path must include yaml, yml, json, or hcl extension </p>
         </div>
       </div>
     </div>
