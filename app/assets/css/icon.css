@@ -122,3 +122,11 @@ pr-icon {
   display: flex;
   align-items: center;
 }
+
+.btn-only-icon {
+  padding: 6px;
+}
+
+.btn-only-icon pr-icon {
+  margin-top: 0;
+}

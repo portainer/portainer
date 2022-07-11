@@ -1,8 +1,8 @@
 <!-- use registry -->
-<div>
+<div class="row">
   <div class="form-group" ng-if="$ctrl.model.UseRegistry">
-    <label for="image_registry" class="control-label text-left" ng-class="$ctrl.labelClass"> Registry </label>
-    <div ng-class="$ctrl.inputClass">
+    <label for="image_registry" class="control-label text-left col-sm-3 col-lg-2" ng-class="$ctrl.labelClass"> Registry </label>
+    <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <select
         ng-options="registry as registry.Name for registry in $ctrl.registries track by registry.Id"
         ng-model="$ctrl.model.Registry"
@@ -11,8 +11,10 @@
         data-cy="component-registrySelect"
       ></select>
     </div>
-    <label for="image_name" ng-class="$ctrl.labelClass" class="margin-sm-top control-label text-left">Image</label>
-    <div ng-class="$ctrl.inputClass" class="margin-sm-top">
+  </div>
+  <div class="form-group" ng-if="$ctrl.model.UseRegistry">
+    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left col-sm-3 col-lg-2">Image</label>
+    <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <div class="input-group">
         <span class="input-group-addon" id="registry-name">{{ $ctrl.displayedRegistryURL() }}</span>
         <input
@@ -30,11 +32,11 @@
         <span ng-if="$ctrl.isDockerHubRegistry()" class="input-group-btn">
           <a
             href="https://hub.docker.com/search?type=image&q={{ $ctrl.model.Image | trimshasum | trimversiontag }}"
-            class="btn btn-default"
+            class="btn btn-default vertical-center"
             title="Search image on Docker Hub"
             target="_blank"
           >
-            <i class="fab fa-docker"></i> Search
+            <i class="fab fa-docker text-blue-6"></i> Search
           </a>
         </span>
       </div>
@@ -45,13 +47,13 @@
   <div ng-if="!$ctrl.model.UseRegistry">
     <div class="form-group">
       <span class="small">
-        <p class="text-muted" style="margin-left: 15px">
-          <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+        <p class="text-muted mb-5" style="margin-left: 15px">
+          <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
           When using advanced mode, image and repository <b>must be</b> publicly available.
         </p>
       </span>
-      <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left">Image </label>
-      <div ng-class="$ctrl.inputClass">
+      <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left col-sm-3 col-lg-2">Image </label>
+      <div ng-class="$ctrl.inputClass" class="col-sm-8">
         <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/my-image:my-tag" required />
       </div>
     </div>
@@ -59,10 +61,10 @@
   <!-- ! don't use registry -->
   <!-- info message -->
   <div class="form-group" ng-show="$ctrl.form.image_name.$invalid">
-    <div class="col-sm-12 small text-warning">
+    <div class="col-sm-12 small">
       <div ng-messages="$ctrl.form.image_name.$error">
         <p ng-message="required">
-          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Image name is required.
+          <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Image name is required.
           <span ng-if="$ctrl.canPull">Tag must be specified otherwise Portainer will pull all tags associated to the image.</span>
         </p>
       </div>
