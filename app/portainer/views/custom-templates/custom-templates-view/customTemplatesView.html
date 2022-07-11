@@ -1,11 +1,5 @@
-<rd-header id="view-top">
-  <rd-header-title title-text="Custom Templates">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.templates.custom" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Custom Templates</rd-header-content>
-</rd-header>
+<page-header title="'Custom Templates'" breadcrumbs="['Custom Templates']" reload="true"> </page-header>
+
 <div class="row">
   <stack-from-template-form
     ng-if="$ctrl.state.selectedTemplate"

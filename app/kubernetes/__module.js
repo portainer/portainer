@@ -1,6 +1,7 @@
 import registriesModule from './registries';
 import customTemplateModule from './custom-templates';
 import { reactModule } from './react';
+import './views/kubernetes.css';
 
 angular.module('portainer.kubernetes', ['portainer.app', registriesModule, customTemplateModule, reactModule]).config([
   '$stateRegistryProvider',

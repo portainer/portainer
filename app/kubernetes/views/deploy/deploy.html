@@ -1,22 +1,22 @@
-<kubernetes-view-header title="Advanced deployment" state="kubernetes.deploy" view-ready="ctrl.state.viewReady"> Deploy Kubernetes resources </kubernetes-view-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Advanced deployment'" breadcrumbs="['Deploy Kubernetes resources']" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
   <kubernetes-feedback-panel></kubernetes-feedback-panel>
 
-  <div class="row">
+  <div class="row kubernetes-deploy">
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0">
-              <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> Deploy </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'code'" feather="true"></pr-icon> Deploy </uib-tab-heading>
               <div class="col-sm-12 form-section-title"> Namespace </div>
               <form class="form-horizontal" style="margin-top: 20px" name="deploymentForm">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
-                  <label for="target_node" class="col-lg-1 col-sm-2 control-label text-left">Namespace</label>
-                  <div class="col-lg-11 col-sm-10">
+                  <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
+                  <div class="col-sm-8">
                     <select
                       ng-disabled="ctrl.formValues.namespace_toggle"
                       class="form-control"
@@ -26,11 +26,16 @@
                   </div>
                 </div>
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
-                  <div class="col-sm-12">
-                    <label for="toggle_logo" class="control-label text-left"> Use namespace(s) specified from manifest </label>
+                  <label for="toggle_logo" class="col-lg-2 col-sm-3 control-label text-left">
+                    Use namespace(s) specified from manifest
                     <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
                     </portainer-tooltip>
-                    <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" /><i></i> </label>
+                  </label>
+                  <div class="col-sm-8">
+                    <label class="switch">
+                      <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" />
+                      <i></i>
+                    </label>
                   </div>
                 </div>
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">
@@ -41,8 +46,8 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
-                  <div class="col-lg-11 col-sm-10">
+                  <label for="stack_name" class="col-lg-2 col-sm-3 control-label text-left">Name</label>
+                  <div class="col-sm-8">
                     <input type="text" class="form-control" ng-model="ctrl.formValues.StackName" id="stack_name" placeholder="my-app" auto-focus />
                   </div>
                 </div>
@@ -90,7 +95,7 @@
                   ></custom-template-selector>
 
                   <custom-templates-variables-field
-                    ng-if="$ctrl.isTemplateVariablesEnabled && ctrl.state.template"
+                    ng-if="ctrl.isTemplateVariablesEnabled && ctrl.state.template"
                     definitions="ctrl.state.template.Variables"
                     value="ctrl.formValues.Variables"
                     on-change="(ctrl.onChangeTemplateVariables)"
@@ -110,7 +115,7 @@
                   <editor-description>
                     <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
                       <p>
-                        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                         Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
                         not all the Compose format options are supported by Kompose at the moment.
                       </p>
@@ -119,12 +124,9 @@
                         <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
                       </p>
                     </span>
-                    <span
-                      class="col-sm-12 text-muted small"
-                      ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES && ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR"
-                    >
+                    <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
                       <p>
-                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                         This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
                       </p>
                       <p>
@@ -144,8 +146,8 @@
                     <span class="col-sm-12 text-muted small"> Indicate the URL to the manifest. </span>
                   </div>
                   <div class="form-group">
-                    <label for="manifest_url" class="col-sm-1 control-label text-left">URL</label>
-                    <div class="col-sm-11">
+                    <label for="manifest_url" class="col-sm-3 col-lg-2 control-label text-left">URL</label>
+                    <div class="col-sm-8">
                       <input
                         type="text"
                         class="form-control"
@@ -166,7 +168,7 @@
                     <button
                       type="button"
                       class="btn btn-primary btn-sm"
-                      ng-disabled="!deploymentForm.$valid || ctrl.disableDeploy()"
+                      ng-disabled="!deploymentForm.$valid ||ctrl.disableDeploy()"
                       ng-click="ctrl.deploy()"
                       button-spinner="ctrl.state.actionInProgress"
                       data-cy="k8sAppDeploy-deployButton"
@@ -185,7 +187,7 @@
             </uib-tab>
 
             <uib-tab index="1" disable="ctrl.state.tabLogsDisabled">
-              <uib-tab-heading> <i class="fa fa-file space-right" aria-hidden="true"></i> Logs </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'file-text'" feather="true"></pr-icon> Logs </uib-tab-heading>
               <form class="form-horizontal" style="margin-top: 20px">
                 <div class="form-group" ng-if="ctrl.state.activeTab === 1">
                   <div class="col-sm-12">

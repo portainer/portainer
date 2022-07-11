@@ -1,9 +1,19 @@
-<rd-header>
-  <rd-header-title title-text="Node Browser"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.swarm">Swarm</a> &gt; <a ui-sref="docker.nodes.node({ id: $ctrl.nodeId })">{{ $ctrl.node.Hostname }}</a> &gt; browse
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'Node Browser'"
+  breadcrumbs="[
+    {
+      label:'swarm',
+      link:'docker.swarm'
+    },
+    {
+      label: $ctrl.node.Hostname,
+      link: 'docker.nodes.node',
+      linkParams: { id: $ctrl.nodeId }
+    },
+    'browse'
+  ]"
+>
+</page-header>
 
 <div class="row">
   <div class="col-sm-12">
