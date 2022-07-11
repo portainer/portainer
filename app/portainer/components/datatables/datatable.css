@@ -47,6 +47,10 @@
   text-decoration: underline;
 }
 
+.datatable tr > td a.actions {
+  color: currentColor;
+}
+
 .toolBar .actionBar {
   display: inline-flex;
 }
