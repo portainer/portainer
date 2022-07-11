@@ -51,14 +51,14 @@ export function useAuthorizations(
 ) {
   const { user } = useUser();
   const {
-    params: { endpointId },
+    params: { endpointId, id },
   } = useCurrentStateAndParams();
 
   if (!user) {
     return false;
   }
 
-  return hasAuthorizations(user, authorizations, endpointId, adminOnlyCE);
+  return hasAuthorizations(user, authorizations, endpointId ?? id, adminOnlyCE);
 }
 
 export function isEnvironmentAdmin(
