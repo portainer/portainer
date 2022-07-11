@@ -401,7 +401,7 @@ a[ng-click] {
 }
 
 .panel-body {
-  padding: 30px 25px;
+  padding: 20px 25px;
   background-color: var(--white-color);
   border-radius: 8px;
 }

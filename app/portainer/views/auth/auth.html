@@ -1,13 +1,18 @@
 <div class="page-wrapper">
   <!-- login box -->
   <div class="container simple-box">
-    <div class="col-sm-6 col-sm-offset-3">
+    <div class="col-sm-4 col-sm-offset-4">
       <!-- login box logo -->
       <div class="row">
         <img ng-if="!ctrl.logo" src="~@/assets/images/logo_alt.svg" class="simple-box-logo" alt="Portainer" />
         <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo" />
       </div>
       <!-- !login box logo -->
+
+      <div class="row text-center p-5">
+        <p class="text-xl">Log in your account</p>
+        <p class="text-md text-muted fw-bold">Welcome back! Please enter your details</p>
+      </div>
 
       <!-- login panel -->
       <div class="panel panel-default" ng-if="!ctrl.state.loginInProgress">
@@ -17,16 +22,16 @@
             <div class="form-group">
               <div class="col-sm-12" style="display: flex; justify-content: center" ng-if="ctrl.state.showOAuthLogin">
                 <a ng-href="{{ ctrl.OAuthLoginURI }}">
-                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px" ng-if="ctrl.state.OAuthProvider === 'Microsoft'">
+                  <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'Microsoft'">
                     <i class="fab fa-microsoft" aria-hidden="true"></i> Login with Microsoft
                   </div>
-                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px" ng-if="ctrl.state.OAuthProvider === 'Google'">
+                  <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'Google'">
                     <i class="fab fa-google" aria-hidden="true"></i> Login with Google
                   </div>
-                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px" ng-if="ctrl.state.OAuthProvider === 'Github'">
+                  <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'Github'">
                     <i class="fab fa-github" aria-hidden="true"></i> Login with Github
                   </div>
-                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px" ng-if="ctrl.state.OAuthProvider === 'OAuth'">
+                  <div class="btn btn-primary btn-lg btn-block" ng-if="ctrl.state.OAuthProvider === 'OAuth'">
                     <i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login with OAuth
                   </div>
                 </a>
@@ -43,34 +48,51 @@
             <!-- use internal auth button -->
             <div class="form-group" ng-if="ctrl.state.showOAuthLogin && !ctrl.state.showStandardLogin">
               <div class="col-sm-12" style="display: flex; justify-content: center">
-                <div class="btn btn-sm btn-primary pull-left" style="margin-left: 2px" ng-click="ctrl.toggleStandardLogin()"> Use internal authentication </div>
+                <div class="btn btn-primary btn-md btn-block" style="margin-left: 2px" ng-click="ctrl.toggleStandardLogin()"> Use internal authentication </div>
               </div>
             </div>
 
             <!-- !username input -->
-            <div class="input-group" ng-if="ctrl.state.showStandardLogin">
-              <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
-              <input id="username" type="text" class="form-control" name="username" ng-model="ctrl.formValues.Username" auto-focus data-cy="auth-usernameInput" />
+            <div ng-if="ctrl.state.showStandardLogin">
+              <div class="pb-2">Username</div>
+              <input
+                id="username"
+                type="text"
+                class="form-control"
+                name="username"
+                ng-model="ctrl.formValues.Username"
+                auto-focus
+                data-cy="auth-usernameInput"
+                placeholder="Enter your username"
+              />
             </div>
 
             <!-- password input -->
-            <div class="input-group" ng-if="ctrl.state.showStandardLogin">
-              <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-              <input id="password" type="password" class="form-control" name="password" ng-model="ctrl.formValues.Password" data-cy="auth-passwordInput" />
+            <div ng-if="ctrl.state.showStandardLogin">
+              <div class="pb-2">Password</div>
+              <input
+                id="password"
+                type="password"
+                class="form-control"
+                name="password"
+                ng-model="ctrl.formValues.Password"
+                data-cy="auth-passwordInput"
+                placeholder="Enter your password"
+              />
             </div>
 
             <div class="form-group" ng-if="ctrl.state.showStandardLogin">
               <!-- login button -->
-              <div class="col-sm-12" style="display: flex; align-items: center; justify-content: center">
+              <div class="col-sm-12 d-flex">
                 <button
                   type="submit"
-                  class="btn btn-primary btn-sm pull-right"
+                  class="btn btn-primary btn-lg btn-block"
                   ng-click="ctrl.authenticateUser()"
                   button-spinner="ctrl.state.loginInProgress"
                   ng-disabled="ctrl.state.loginInProgress"
                   data-cy="auth-loginButton"
                 >
-                  <span ng-hide="ctrl.state.loginInProgress"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login</span>
+                  <span ng-hide="ctrl.state.loginInProgress">Login</span>
                   <span ng-show="ctrl.state.loginInProgress">Login in progress...</span>
                 </button>
               </div>
