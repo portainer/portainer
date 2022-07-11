@@ -10,6 +10,7 @@
       ng-model="$ctrl.ngModel"
       on-change="($ctrl.handleSimpleChange)"
       on-switch-mode-click="($ctrl.switchEnvMode)"
+      show-help-message="$ctrl.showHelpMessage"
     ></environment-variables-simple-mode>
 
     <div ng-if="$ctrl.mode == 'advanced'" class="environment-variables-panel--advanced">
@@ -22,6 +23,10 @@
       </div>
       <div class="form-group" style="margin-left: 1px">
         <code-editor identifier="environment-variables-editor" placeholder="e.g. key=value" value="$ctrl.editorText" yml="false" on-change="($ctrl.editorUpdate)"></code-editor>
+      </div>
+      <div class="col-sm-12 small text-muted" ng-if="$ctrl.showHelpMessage">
+        <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+        Environment changes will not take effect until redeployment occurs manually or via webhook.
       </div>
     </div>
   </div>
