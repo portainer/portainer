@@ -98,8 +98,8 @@
                         <label class="btn btn-light" ng-model="portBinding.protocol" uib-btn-radio="'tcp'">TCP</label>
                         <label class="btn btn-light" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                       </div>
-                      <button class="btn btn-dangerlight" type="button" ng-click="removePortBinding($index)">
-                        <i class="fa fa-trash" aria-hidden="true"></i>
+                      <button class="btn btn-light" type="button" ng-click="removePortBinding($index)">
+                        <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                       </button>
                     </div>
                     <!-- !protocol-actions -->
@@ -131,8 +131,8 @@
                           <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.bind = ''">Volume</label>
                           <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.bind = ''" ng-if="isAdmin || allowBindMounts">Bind</label>
                         </div>
-                        <button class="btn btn-dangerlight" type="button" ng-click="removeVolume($index)">
-                          <i class="fa fa-trash" aria-hidden="true"></i>
+                        <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
+                          <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                         </button>
                       </div>
                       <!-- !volume-type -->
@@ -186,8 +186,8 @@
                       <span class="input-group-addon">value</span>
                       <input type="text" class="form-control" ng-model="state.selectedTemplate.Hosts[idx]" placeholder="e.g. host:IP" />
                     </div>
-                    <button class="btn btn-dangerlight" type="button" ng-click="removeExtraHost($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
+                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -210,8 +210,8 @@
                       <span class="input-group-addon">value</span>
                       <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                     </div>
-                    <button class="btn btn-dangerlight" type="button" ng-click="removeLabel($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    <button class="btn btn-light" type="button" ng-click="removeLabel($index)">
+                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
