@@ -104,8 +104,8 @@ angular.module('portainer.docker').controller('DashboardController', [
           $scope.info = data.info;
 
           $scope.gpuInfoStr = $scope.buildGpusStr(new Set());
-          $scope.gpuUseAll = $scope.endpoint.Snapshots[0].GpuUseAll;
-          $scope.gpuUseList = $scope.endpoint.Snapshots[0].GpuUseList;
+          $scope.gpuUseAll = _.get($scope, 'endpoint.Snapshots[0].GpuUseAll', false);
+          $scope.gpuUseList = _.get($scope, 'endpoint.Snapshots[0].GpuUseList', []);
           $scope.gpuFreeStr = 'all';
           if ($scope.gpuUseAll == true) $scope.gpuFreeStr = 'none';
           else $scope.gpuFreeStr = $scope.buildGpusStr(new Set($scope.gpuUseList));
