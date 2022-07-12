@@ -3,7 +3,8 @@ import { RegistryTypes } from '@/portainer/models/registryTypes';
 
 export default class RegistryController {
   /* @ngInject */
-  constructor($async, $state, RegistryService, Notifications) {
+  constructor($scope, $async, $state, RegistryService, Notifications) {
+    this.$scope = $scope;
     Object.assign(this, { $async, $state, RegistryService, Notifications });
 
     this.RegistryTypes = RegistryTypes;
@@ -14,6 +15,14 @@ export default class RegistryController {
     };
 
     this.Password = '';
+
+    this.toggleAuthentication = this.toggleAuthentication.bind(this);
+  }
+
+  toggleAuthentication(newValue) {
+    this.$scope.$evalAsync(() => {
+      this.registry.Authentication = newValue;
+    });
   }
 
   passwordLabel() {

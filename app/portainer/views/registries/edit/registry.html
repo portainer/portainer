@@ -15,7 +15,7 @@
 
           <!-- name-input -->
           <div class="form-group">
-            <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
             <div class="col-sm-9 col-lg-10">
               <input
                 type="text"
@@ -47,7 +47,7 @@
           <!-- registry-url-input -->
           <div class="form-group">
             <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
-              Registry URL
+              <span class="required">Registry URL</span>
               <portainer-tooltip message="'URL or IP address of a Docker registry. Any protocol or trailing slash will be stripped if present.'"> </portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
@@ -75,7 +75,7 @@
           <div ng-if="$ctrl.registry.Type === $ctrl.RegistryTypes.PROGET">
             <div class="form-group">
               <label for="registry_base_url" class="col-sm-3 col-lg-2 control-label text-left">
-                Base URL
+                <span class="required">Base URL</span>
                 <portainer-tooltip message="'The base URL of the ProGet registry.'"> </portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
@@ -110,12 +110,12 @@
               $ctrl.registry.Type !== $ctrl.RegistryTypes.AZURE
             "
           >
-            <div class="col-sm-12">
-              <label for="registry_auth" class="control-label text-left">
-                Authentication
-                <portainer-tooltip message="'Enable this option if you need to specify credentials to connect to this registry.'"> </portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.registry.Authentication" /><i></i> </label>
+            <label for="registry_auth" class="col-sm-3 col-lg-2 control-label text-left">
+              Authentication
+              <portainer-tooltip message="'Enable this option if you need to specify credentials to connect to this registry.'"> </portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <por-switch-field checked="$ctrl.registry.Authentication" on-change="($ctrl.toggleAuthentication)" switch-values="{on:'Yes',off:'No'}"></por-switch-field>
             </div>
           </div>
           <!-- !authentication-checkbox -->
@@ -124,7 +124,7 @@
           <div ng-if="$ctrl.registry.Authentication">
             <!-- credentials-user -->
             <div class="form-group">
-              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">
+              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left required">
                 {{ $ctrl.registry.Type === $ctrl.RegistryTypes.ECR ? 'AWS Access Key' : 'Username' }}
               </label>
               <div class="col-sm-9 col-lg-10">
@@ -141,7 +141,7 @@
             <!-- !credentials-user -->
             <!-- credentials-password -->
             <div class="form-group">
-              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">
+              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left required">
                 {{ $ctrl.passwordLabel() }}
               </label>
               <div class="col-sm-9 col-lg-10">
@@ -171,7 +171,7 @@
             <div ng-if="$ctrl.registry.Quay.UseOrganisation">
               <!-- organisation_name -->
               <div class="form-group">
-                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label text-left">Organisation name</label>
+                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label text-left required">Organisation name</label>
                 <div class="col-sm-9 col-lg-10">
                   <input type="text" class="form-control" id="organisation_name" name="organisation_name" ng-model="$ctrl.registry.Quay.OrganisationName" required />
                 </div>
@@ -190,7 +190,7 @@
           <div ng-if="$ctrl.registry.Type == $ctrl.RegistryTypes.ECR">
             <!-- region -->
             <div class="form-group">
-              <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left">Region</label>
+              <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left required">Region</label>
               <div class="col-sm-9 col-lg-10">
                 <input type="text" class="form-control" id="registry_region" name="registry_region" ng-model="$ctrl.registry.Ecr.Region" placeholder="us-west-1" required />
               </div>
