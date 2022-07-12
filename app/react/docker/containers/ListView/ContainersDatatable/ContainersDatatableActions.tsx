@@ -44,7 +44,11 @@ export function ContainersDatatableActions({
     (item) => item.State === ContainerStatus.Paused
   );
   const hasStoppedItemsSelected = selectedItems.some((item) =>
-    [ContainerStatus.Stopped, ContainerStatus.Created].includes(item.Status)
+    [
+      ContainerStatus.Stopped,
+      ContainerStatus.Created,
+      ContainerStatus.Exited,
+    ].includes(item.Status)
   );
   const hasRunningItemsSelected = selectedItems.some((item) =>
     [
