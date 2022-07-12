@@ -333,8 +333,8 @@ angular.module('portainer.docker').controller('ServiceController', [
 
     $scope.onWebhookChange = function (enabled) {
       $scope.$evalAsync(() => {
-        $scope.updateWebhook($scope.service, false);
         $scope.WebhookExists = enabled;
+        $scope.updateWebhook($scope.service, false);
       });
     };
 
