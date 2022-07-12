@@ -40,16 +40,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     $scope.states = states;
     $scope.state = states.disconnected;
 
-    $scope.formValues = {
-      isCustomCommand: false,
-    };
+    $scope.formValues = {};
     $scope.containerCommands = [];
-
-    $scope.handleIsCustomCommandChange = handleIsCustomCommandChange.bind(this);
-
-    function handleIsCustomCommandChange() {
-      $scope.formValues.isCustomCommand = !$scope.formValues.isCustomCommand;
-    }
 
     // Ensure the socket is closed before leaving the view
     $scope.$on('$stateChangeStart', function () {

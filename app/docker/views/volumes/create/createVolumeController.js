@@ -37,6 +37,7 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
     $scope.removeDriverOption = function (index) {
       $scope.formValues.DriverOptions.splice(index, 1);
     };
+
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';
