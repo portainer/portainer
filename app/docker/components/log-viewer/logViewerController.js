@@ -3,10 +3,11 @@ import _ from 'lodash-es';
 import { NEW_LINE_BREAKER } from '@/constants';
 
 angular.module('portainer.docker').controller('LogViewerController', [
+  '$scope',
   'clipboard',
   'Blob',
   'FileSaver',
-  function (clipboard, Blob, FileSaver) {
+  function ($scope, clipboard, Blob, FileSaver) {
     this.state = {
       availableSinceDatetime: [
         { desc: 'Last day', value: moment().subtract(1, 'days').format() },
@@ -22,6 +23,30 @@ angular.module('portainer.docker').controller('LogViewerController', [
       filteredLogs: [],
       selectedLines: [],
     };
+
+    this.handleLogsCollectionChange = handleLogsCollectionChange.bind(this);
+    this.handleLogsWrapLinesChange = handleLogsWrapLinesChange.bind(this);
+    this.handleDisplayTimestampsChange = handleDisplayTimestampsChange.bind(this);
+
+    function handleLogsCollectionChange(enabled) {
+      $scope.$evalAsync(() => {
+        this.state.logCollection = enabled;
+        this.state.autoScroll = enabled;
+        this.logCollectionChange(enabled);
+      });
+    }
+
+    function handleLogsWrapLinesChange(enabled) {
+      $scope.$evalAsync(() => {
+        this.state.wrapLines = enabled;
+      });
+    }
+
+    function handleDisplayTimestampsChange(enabled) {
+      $scope.$evalAsync(() => {
+        this.displayTimestamps = enabled;
+      });
+    }
 
     this.copy = function () {
       clipboard.copyText(this.state.filteredLogs.map((log) => log.line).join(NEW_LINE_BREAKER));
