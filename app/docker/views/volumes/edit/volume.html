@@ -1,9 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Volume details"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.volumes">Volumes</a> &gt; <a ui-sref="docker.volumes.volume({id: volume.Id})">{{ volume.Id }}</a>
-  </rd-header-content>
-</rd-header>
+<page-header title="'Volume details'" breadcrumbs="[{label:'Volumes', link:'docker.volumes'}, volume.Id]"> </page-header>
 
 <div class="row" ng-if="volume">
   <div class="col-sm-12">

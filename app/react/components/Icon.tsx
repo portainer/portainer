@@ -9,7 +9,7 @@ export interface IconProps {
 }
 
 interface Props {
-  icon: ReactNode | ComponentType<unknown>;
+  icon: ReactNode | ComponentType<{ size?: string | number }>;
   feather?: boolean;
   className?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -34,22 +34,22 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
     }
   }, [feather]);
 
-  if (typeof icon !== 'string') {
-    const Icon = isValidElementType(icon) ? icon : null;
-
-    return (
-      <span className={className} aria-hidden="true" role="img">
-        {Icon == null ? <>{icon}</> : <Icon />}
-      </span>
-    );
-  }
-
   const classes = clsx(
     className,
     'icon',
     { [`icon-${mode}`]: mode },
     { [`icon-${size}`]: size }
   );
+
+  if (typeof icon !== 'string') {
+    const Icon = isValidElementType(icon) ? icon : null;
+
+    return (
+      <span className={classes} aria-hidden="true" role="img">
+        {Icon == null ? <>{icon}</> : <Icon size="1em" />}
+      </span>
+    );
+  }
 
   if (feather) {
     return (
@@ -63,6 +63,6 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
   }
 
   return (
-    <i className={clsx('fa', icon, className)} aria-hidden="true" role="img" />
+    <i className={clsx('fa', icon, classes)} aria-hidden="true" role="img" />
   );
 }

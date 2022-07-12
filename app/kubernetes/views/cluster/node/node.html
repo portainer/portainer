@@ -1,6 +1,4 @@
-<kubernetes-view-header title="Node details" state="kubernetes.cluster.node" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.cluster">Cluster</a> &gt; {{ ctrl.node.Name }}
-</kubernetes-view-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Node details'" breadcrumbs="[{ label:'Cluster', link:'kubernetes.cluster' }, ctrl.node.Name]" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 

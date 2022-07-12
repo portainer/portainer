@@ -1,4 +1,4 @@
-<kubernetes-view-header title="Application list" state="kubernetes.applications" view-ready="ctrl.state.viewReady"> Applications </kubernetes-view-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Application list'" breadcrumbs="['Applications']" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 

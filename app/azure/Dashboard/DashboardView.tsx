@@ -7,6 +7,7 @@ import { r2a } from '@/react-tools/react2angular';
 
 import { DashboardItem } from '@@/DashboardItem';
 import { PageHeader } from '@@/PageHeader';
+import { DashboardGrid } from '@@/DashboardItem/DashboardGrid';
 
 import { useResourceGroups, useSubscriptions } from '../queries';
 
@@ -53,22 +54,24 @@ export function DashboardView() {
     <>
       <PageHeader title="Home" breadcrumbs={[{ label: 'Dashboard' }]} />
 
-      {!subscriptionsQuery.isError && (
-        <div className="row">
-          <DashboardItem
-            value={subscriptionsCount as number}
-            icon="fa fa-th-list"
-            type="Subscriptions"
-          />
-          {!resourceGroupsQuery.isError && (
+      <div className="mx-4">
+        {subscriptionsQuery.data && (
+          <DashboardGrid>
             <DashboardItem
-              value={resourceGroupsCount as number}
+              value={subscriptionsCount as number}
               icon="fa fa-th-list"
-              type="Resource groups"
+              type="Subscription"
             />
-          )}
-        </div>
-      )}
+            {!resourceGroupsQuery.isError && !resourceGroupsQuery.isLoading && (
+              <DashboardItem
+                value={resourceGroupsCount}
+                icon="fa fa-th-list"
+                type="Resource group"
+              />
+            )}
+          </DashboardGrid>
+        )}
+      </div>
     </>
   );
 }

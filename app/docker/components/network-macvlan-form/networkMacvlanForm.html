@@ -14,7 +14,7 @@
           <input type="radio" id="network_config" ng-model="$ctrl.data.Scope" value="local" />
           <label for="network_config">
             <div class="boxselector_header">
-              <i class="fa fa-cog" aria-hidden="true" style="margin-right: 2px"></i>
+              <pr-icon icon="'sliders'" feather="true"></pr-icon>
               Configuration
             </div>
             <p>I want to configure a network before deploying it</p>
@@ -24,7 +24,7 @@
           <input type="radio" id="network_deploy" ng-model="$ctrl.data.Scope" value="swarm" ng-disabled="$ctrl.availableNetworks.length === 0" />
           <label for="network_deploy" ng-class="$ctrl.availableNetworks.length === 0 ? 'boxselector_disabled' : ''">
             <div class="boxselector_header">
-              <i class="fa fa-sitemap" aria-hidden="true" style="margin-right: 2px"></i>
+              <pr-icon icon="'share-2'" feather="true"></pr-icon>
               Creation
             </div>
             <p>I want to create a network from a configuration</p>
