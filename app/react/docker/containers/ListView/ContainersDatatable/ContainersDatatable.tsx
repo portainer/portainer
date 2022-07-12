@@ -68,6 +68,7 @@ export function ContainersDatatable({
           />
         )}
         isLoading={containersQuery.isLoading}
+        isRowSelectable={(row) => !row.original.IsPortainer}
         initialTableState={{ hiddenColumns: settings.hiddenColumns }}
         renderTableSettings={(tableInstance) => {
           const columnsToHide = tableInstance.allColumns.filter((colInstance) =>

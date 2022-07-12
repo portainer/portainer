@@ -5,6 +5,7 @@ import {
   useSortBy,
   usePagination,
   Column,
+  Row,
   TableInstance,
   TableState,
 } from 'react-table';
@@ -37,7 +38,7 @@ interface Props<
   settingsStore: TSettings;
   disableSelect?: boolean;
   getRowId?(row: D): string;
-  isRowSelectable?(row: D): boolean;
+  isRowSelectable?(row: Row<D>): boolean;
   emptyContentLabel?: string;
   titleOptions: {
     title: string;
