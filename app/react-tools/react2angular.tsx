@@ -67,13 +67,7 @@ export function react2angular<T, U extends PropNames<T>[]>(
         el
       );
     };
-    this.$onDestroy = () => {
-      // eslint-disable-next-line react/no-find-dom-node
-      const domNode = ReactDOM.findDOMNode(el);
-      if (domNode != null && domNode.parentElement != null) {
-        ReactDOM.unmountComponentAtNode(domNode.parentElement);
-      }
-    };
+    this.$onDestroy = () => ReactDOM.unmountComponentAtNode(el);
   }
 }
 
