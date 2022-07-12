@@ -23,10 +23,12 @@ angular.module('portainer.docker').controller('CreateSecretController', [
       actionInProgress: false,
     };
 
-    this.handleEncodeSecretChange = handleEncodeSecretChange.bind(this);
+    $scope.handleEncodeSecretChange = handleEncodeSecretChange;
 
-    function handleEncodeSecretChange() {
-      $scope.formValues.encodeSecret = !$scope.formValues.encodeSecret;
+    function handleEncodeSecretChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.encodeSecret = checked;
+      });
     }
 
     $scope.addLabel = function () {

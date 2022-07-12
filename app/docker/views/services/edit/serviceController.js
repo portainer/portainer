@@ -331,6 +331,13 @@ angular.module('portainer.docker').controller('ServiceController', [
       updateServiceArray(service, 'Hosts', service.Hosts);
     };
 
+    $scope.onWebhookChange = function (enabled) {
+      $scope.$evalAsync(() => {
+        $scope.updateWebhook($scope.service, false);
+        $scope.WebhookExists = enabled;
+      });
+    };
+
     $scope.updateWebhook = function updateWebhook(service) {
       if ($scope.WebhookExists) {
         WebhookService.deleteWebhook($scope.webhookID)

@@ -57,15 +57,19 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
       Labels: {},
     };
 
-    this.handleInternalChange = handleInternalChange.bind(this);
-    this.handleAttachableChange = handleAttachableChange.bind(this);
+    $scope.handleInternalChange = handleInternalChange;
+    $scope.handleAttachableChange = handleAttachableChange;
 
-    function handleInternalChange() {
-      $scope.config.Internal = !$scope.config.Internal;
+    function handleInternalChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.Internal = checked;
+      });
     }
 
-    function handleAttachableChange() {
-      $scope.formValues.config.Attachable = !$scope.formValues.config.Attachable;
+    function handleAttachableChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.Attachable = checked;
+      });
     }
 
     $scope.addDriverOption = function () {
