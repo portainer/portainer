@@ -115,13 +115,13 @@
     <table class="table table-hover table-filters nowrap-cells" data-cy="k8sApp-appTable">
       <thead ng-class="{ 'secondary-heading': !$ctrl.isPrimary }">
         <tr role="row">
-          <th role="columnheader" class="datatable-wide">
+          <th role="columnheader" class="datatable-wide dropdown">
             <div ng-if="$ctrl.isPrimary" class="flex no-wrap min-w-max">
-              <span class="md-checkbox">
+              <span class="md-checkbox vertical-center">
                 <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8sApp-selectAllCheckbox" />
                 <label for="select_all"></label>
               </span>
-              <div class="cursor-pointer" ng-click="$ctrl.expandAll()">
+              <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
                 <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" feather="true" class-name="'icon'"></pr-icon>
                 <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" feather="true" class-name="'icon'"></pr-icon>
               </div>
@@ -219,7 +219,7 @@
           ng-class="{ active: item.Checked, interactive: $ctrl.isExpandable(item), 'secondary-body': !$ctrl.isPrimary }"
           pagination-id="$ctrl.tableKey"
         >
-          <td class="flex no-wrap items-center h-[50px]">
+          <td class="h-[50px]">
             <span ng-if="$ctrl.isPrimary" class="md-checkbox vertical-center">
               <input
                 id="select_{{ $index }}"
