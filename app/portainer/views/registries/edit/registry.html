@@ -32,14 +32,20 @@
           <div class="form-group" ng-show="$ctrl.state.nameAlreadyExists">
             <div class="col-sm-12 small text-warning">
               <div>
-                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A registry with the same name already exists.</p>
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                  A registry with the same name already exists.
+                </p>
               </div>
             </div>
           </div>
           <div class="form-group" ng-show="editRegistry.registry_name.$invalid">
             <div class="col-sm-12 small text-warning">
               <div ng-messages="editRegistry.registry_name.$error">
-                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="required" class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                  This field is required.
+                </p>
               </div>
             </div>
           </div>
@@ -66,7 +72,10 @@
           <div class="form-group" ng-show="editRegistry.registry_url.$invalid">
             <div class="col-sm-12 small text-warning">
               <div ng-messages="editRegistry.registry_url.$error">
-                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="required" class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                  This field is required.
+                </p>
               </div>
             </div>
           </div>
@@ -93,7 +102,10 @@
             <div class="form-group" ng-show="editRegistry.registry_base_url.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="editRegistry.registry_base_url.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required" class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                    This field is required.
+                  </p>
                 </div>
               </div>
             </div>
@@ -134,7 +146,10 @@
             <div class="form-group" ng-show="editRegistry.credentials_username.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="editRegistry.credentials_username.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required" class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                    This field is required.
+                  </p>
                 </div>
               </div>
             </div>
@@ -151,7 +166,10 @@
             <div class="form-group" ng-show="editRegistry.credentials_password.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="editRegistry.credentials_password.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required" class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                    This field is required.
+                  </p>
                 </div>
               </div>
             </div>
@@ -179,7 +197,10 @@
               <div class="form-group" ng-show="editRegistry.organisation_name.$invalid">
                 <div class="col-sm-12 small text-warning">
                   <div ng-messages="editRegistry.organisation_name.$error">
-                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                    <p ng-message="required" class="vertical-center">
+                      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                      This field is required.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -198,7 +219,10 @@
             <div class="form-group" ng-show="editRegistry.registry_region.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="editRegistry.registry_region.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required" class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                    This field is required.
+                  </p>
                 </div>
               </div>
             </div>
