@@ -255,7 +255,7 @@
               ng-disabled="ctrl.application.Revisions.length < 2 || ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
               data-cy="k8sAppDetail-rollbackButton"
             >
-              <pr-icon icon="'fa-history'" class="mr-1"></pr-icon>Rollback to previous configuration
+              <pr-icon icon="'rotate-ccw'" feather="true" class="mr-1"></pr-icon>Rollback to previous configuration
             </button>
             <a
               ng-if="ctrl.isStack() && ctrl.stackFileContent"

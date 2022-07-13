@@ -14,10 +14,10 @@
           <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
           <input
             type="text"
-            class="searchInput"
+            class="searchInput ml-1"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
-            placeholder="Search..."
+            placeholder="Search for an application..."
             ng-model-options="{ debounce: 300 }"
           />
         </div>
@@ -163,13 +163,13 @@
                   ui-sref="kubernetes.applications.application.stats({ pod: item.PodName, container: item.Name })"
                   style="margin-right: 10px"
                 >
-                  <pr-icon icon="'pie-chart'" class="mr-1" feather="true"></pr-icon>Stats
+                  <pr-icon icon="'pie-chart'" class="mr-1" feather="true"></pr-icon>
                 </a>
                 <a ui-sref="kubernetes.applications.application.logs({ pod: item.PodName, container: item.Name })">
-                  <pr-icon icon="'file-text'" class="mr-1" feather="true"></pr-icon>Logs
+                  <pr-icon icon="'file-text'" class="mr-1" feather="true"></pr-icon>
                 </a>
                 <a ng-if="item.Status === 'Running'" ui-sref="kubernetes.applications.application.console({ pod: item.PodName, container: item.Name })" style="margin-left: 10px">
-                  <pr-icon icon="'terminal'" class="mr-1" feather="true"></pr-icon>Console
+                  <pr-icon icon="'terminal'" class="mr-1" feather="true"></pr-icon>
                 </a>
               </td>
             </tr>
