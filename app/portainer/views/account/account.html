@@ -32,15 +32,19 @@
               <div class="input-group">
                 <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password" />
                 <span class="input-group-addon">
-                  <i
-                    ng-class="
-                      { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[
-                        formValues.newPassword === formValues.confirmPassword
-                      ]
-                    "
-                    aria-hidden="true"
-                  ></i
-                ></span>
+                  <pr-icon
+                    icon="'check'"
+                    feather="true"
+                    class="icon-success"
+                    ng-if="formValues.newPassword === formValues.confirmPassword"
+                  ></pr-icon>
+                  <pr-icon
+                    icon="'x'"
+                    feather="true"
+                    class="icon-danger"
+                    ng-if="!(formValues.newPassword === formValues.confirmPassword)"
+                  ></pr-icon>
+                </span>
               </div>
             </div>
           </div>
@@ -59,12 +63,12 @@
               <button type="submit" class="btn btn-primary btn-sm" ng-click="skipPasswordChange()" ng-if="forceChangePassword && timesPasswordChangeSkipped < 2">
                 Remind me later
               </button>
-              <span class="text-muted small" style="margin-left: 5px" ng-if="AuthenticationMethod === 2 && !isInitialAdmin">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+              <span class="text-muted small vertical-center" style="margin-left: 5px" ng-if="AuthenticationMethod === 2 && !isInitialAdmin">
+                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                 You cannot change your password when using LDAP authentication.
               </span>
-              <span class="text-muted small" style="margin-left: 5px" ng-if="AuthenticationMethod === 3 && !isInitialAdmin">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+              <span class="text-muted small vertical-center" style="margin-left: 5px" ng-if="AuthenticationMethod === 3 && !isInitialAdmin">
+                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                 You cannot change your password when using OAuth authentication.
               </span>
             </div>
