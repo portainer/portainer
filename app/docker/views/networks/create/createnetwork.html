@@ -48,7 +48,9 @@
                   <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                 </button>
               </div>
-              <div class="small interactive text-muted" ng-click="addDriverOption()"> <i class="fa fa-plus space-right mt-2" aria-hidden="true"></i> Add driver option </div>
+              <div class="small interactive text-muted vertical-center mt-1" ng-click="addDriverOption()">
+                <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add driver option
+              </div>
             </div>
             <!-- !driver-options-input-list -->
           </div>
@@ -93,12 +95,14 @@
                 <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
               </button>
               <div class="col-sm-12 small text-warning" ng-if="state.IPV4AuxiliaryAddressesError[$index]">
-                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Exclude ip cannot be the same as gateway.</p>
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Exclude ip cannot be the same as gateway.</p>
               </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
-              <div class="col-sm-12 small interactive text-muted" ng-click="addIPV4AuxAddress()"> <i class="fa fa-plus space-right" aria-hidden="true"></i> Add excluded IP </div>
+              <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV4AuxAddress()">
+                <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add excluded IP
+              </div>
             </div>
           </div>
           <div ng-show="config.Driver === 'bridge' || (config.Driver === 'macvlan' && formValues.Macvlan.Scope !== 'swarm')">
@@ -138,12 +142,14 @@
                 <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
               </button>
               <div class="col-sm-12 small text-warning" ng-show="state.IPV6AuxiliaryAddressesError[$index]">
-                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Exclude ip cannot be the same as gateway.</p>
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Exclude ip cannot be the same as gateway.</p>
               </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
-              <div class="col-sm-12 small interactive text-muted" ng-click="addIPV6AuxAddress()"> <i class="fa fa-plus space-right" aria-hidden="true"></i> Add excluded IP </div>
+              <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV6AuxAddress()">
+                <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add excluded IP
+              </div>
             </div>
           </div>
           <div class="col-sm-12 form-section-title"> Advanced configuration </div>
@@ -164,7 +170,11 @@
                   <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                 </button>
               </div>
-              <div class="form-group col-sm-12 small interactive text-muted" ng-click="addLabel()"> <i class="fa fa-plus space-right mt-2" aria-hidden="true"></i> Add label </div>
+              <div class="form-group">
+                <div class="col-sm-12 small interactive text-muted vertical-center mt-1" ng-click="addLabel()">
+                  <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add label
+                </div>
+              </div>
             </div>
             <!-- !labels-input-list -->
           </div>
@@ -172,25 +182,25 @@
           <!-- internal -->
           <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">
-                Isolated network
-                <portainer-tooltip message="'An isolated network has no inbound or outbound communications.'"></portainer-tooltip>
-              </label>
-              <label name="ownership" class="switch space-left">
-                <input type="checkbox" ng-model="config.Internal" />
-                <i></i>
-              </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="config.Internal"
+                label="'Isolated network'"
+                tooltip="'An isolated network has no inbound or outbound communications.'"
+                on-change="(onChangeInternal)"
+              ></por-switch-field>
             </div>
           </div>
           <!-- !internal -->
           <!-- attachable -->
           <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">
-              <label for="attachable" class="control-label text-left"> Enable manual container attachment </label>
-              <label name="attachable" class="switch space-left">
-                <input type="checkbox" ng-model="config.Attachable" />
-                <i></i>
-              </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="config.Attachable"
+                label="'Enable manual container attachment'"
+                on-change="(onChangeAttachable)"
+              ></por-switch-field>
             </div>
           </div>
           <!-- !attachable -->
