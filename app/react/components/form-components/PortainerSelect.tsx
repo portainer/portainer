@@ -19,6 +19,7 @@ interface SharedProps extends AutomationTestingProps {
   inputId?: string;
   placeholder?: string;
   disabled?: boolean;
+  isClearable?: boolean;
 }
 
 interface MultiProps<TValue> extends SharedProps {
@@ -62,12 +63,14 @@ export function SingleSelect<TValue = string>({
   disabled,
   inputId,
   placeholder,
+  isClearable,
 }: SingleProps<TValue>) {
   const selectedValue = _.first(findSelectedOptions<TValue>(options, value));
 
   return (
     <ReactSelect<Option<TValue>>
       name={name}
+      isClearable={isClearable}
       getOptionLabel={(option) => option.label}
       getOptionValue={(option) => String(option.value)}
       options={options}
@@ -110,12 +113,14 @@ export function MultiSelect<TValue = string>({
   inputId,
   placeholder,
   disabled,
+  isClearable,
 }: Omit<MultiProps<TValue>, 'isMulti'>) {
   const selectedOptions = findSelectedOptions(options, value);
   return (
     <ReactSelect
       name={name}
       isMulti
+      isClearable={isClearable}
       getOptionLabel={(option) => option.label}
       getOptionValue={(option) => String(option.value)}
       options={options}

@@ -23,7 +23,13 @@
           />
         </div>
         <div>
-          <por-select placeholder="'Select a category'" value="$ctrl.state.selectedCategory" options="$ctrl.state.categories" on-change="($ctrl.onCategoryChange)"></por-select>
+          <por-select
+            placeholder="'Select a category'"
+            value="$ctrl.state.selectedCategory"
+            options="$ctrl.state.categories"
+            on-change="($ctrl.onCategoryChange)"
+            is-clearable="true"
+          ></por-select>
         </div>
       </div>
 
