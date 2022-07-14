@@ -163,13 +163,13 @@
                   ui-sref="kubernetes.applications.application.stats({ pod: item.PodName, container: item.Name })"
                   style="margin-right: 10px"
                 >
-                  <pr-icon icon="'pie-chart'" class="mr-1" feather="true"></pr-icon>
+                  <pr-icon icon="'pie-chart'" class="mr-1" feather="true"></pr-icon> Stats
                 </a>
                 <a ui-sref="kubernetes.applications.application.logs({ pod: item.PodName, container: item.Name })">
-                  <pr-icon icon="'file-text'" class="mr-1" feather="true"></pr-icon>
+                  <pr-icon icon="'file-text'" class="mr-1" feather="true"></pr-icon> Logs
                 </a>
                 <a ng-if="item.Status === 'Running'" ui-sref="kubernetes.applications.application.console({ pod: item.PodName, container: item.Name })" style="margin-left: 10px">
-                  <pr-icon icon="'terminal'" class="mr-1" feather="true"></pr-icon>
+                  <pr-icon icon="'terminal'" class="mr-1" feather="true"></pr-icon> Console
                 </a>
               </td>
             </tr>
