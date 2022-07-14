@@ -217,6 +217,18 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
       }
     }
 
+    $scope.onChangeInternal = function (enable) {
+      $scope.$evalAsync(() => {
+        $scope.config.Internal = enable;
+      });
+    };
+
+    $scope.onChangeAttachable = function (enable) {
+      $scope.$evalAsync(() => {
+        $scope.config.Attachable = enable;
+      });
+    };
+
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';
