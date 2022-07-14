@@ -1,7 +1,7 @@
 export default class CreateEdgeStackViewController {
   /* @ngInject */
-  constructor($state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async) {
-    Object.assign(this, { $state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async });
+  constructor($state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async, $scope) {
+    Object.assign(this, { $state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async, $scope });
 
     this.formValues = {
       Name: '',
