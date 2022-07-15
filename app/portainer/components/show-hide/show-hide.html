@@ -4,6 +4,12 @@
 </div>
 
 <button type="button" class="btn btn-link nopadding" ng-click="$ctrl.show = !$ctrl.show" title="Show/Hide value">
-  <div ng-if="!$ctrl.show"> <i class="fa fa-eye-slash"></i> Show</div>
-  <div ng-if="$ctrl.show"> <i class="fa fa-eye"></i> Hide</div>
+  <div ng-if="!$ctrl.show">
+    <pr-icon icon="'eye-off'" feather="true"></pr-icon>
+    Show</div
+  >
+  <div ng-if="$ctrl.show">
+    <pr-icon icon="'eye'" feather="true"></pr-icon>
+    Hide</div
+  >
 </button>
