@@ -11,5 +11,6 @@ angular.module('portainer.app').component('environmentVariablesSimpleMode', {
     ngModel: '<',
     onSwitchModeClick: '<',
     onChange: '<',
+    showHelpMessage: '<',
   },
 });

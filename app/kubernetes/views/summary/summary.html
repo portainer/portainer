@@ -6,19 +6,19 @@
 >
   Summary
   <span class="small space-left">
-    <a ng-if="!$ctrl.state.expandedTemplate"><i class="fa fa-angle-down" aria-hidden="true"></i> expand</a>
-    <a ng-if="$ctrl.state.expandedTemplate"><i class="fa fa-angle-up" aria-hidden="true"></i> collapse</a>
+    <a ng-if="!$ctrl.state.expandedTemplate"><pr-icon icon="'chevron-down'" feather="true"></pr-icon> expand</a>
+    <a ng-if="$ctrl.state.expandedTemplate"><pr-icon icon="'chevron-up'" feather="true"></pr-icon> collapse</a>
   </span>
 </div>
 
 <div class="form-group" ng-if="$ctrl.state.expandedTemplate">
   <div class="col-sm-12 small text-muted">
-    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+    <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
     Portainer will execute the following Kubernetes actions.
   </div>
 
   <div class="col-sm-12 small text-muted" style="padding-top: 1em" ng-if="$ctrl.state.resources.length > 0">
-    <ul>
+    <ul class="ml-5">
       <li ng-repeat="summary in $ctrl.state.resources" ng-if="summary.action && summary.kind && summary.name">
         {{ summary.action }}
         {{ $ctrl.getArticle(summary.kind, summary.action) }}

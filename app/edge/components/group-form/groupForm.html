@@ -23,7 +23,7 @@
         <input type="radio" id="static-group" ng-model="$ctrl.model.Dynamic" ng-value="false" ng-checked="!$ctrl.model.Dynamic" />
         <label for="static-group">
           <div class="boxselector_header">
-            <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'list'" feather="true"></pr-icon>
             Static
           </div>
           <p>Manually select Edge environments</p>
@@ -75,7 +75,7 @@
           <input type="radio" id="or-selector" ng-model="$ctrl.model.PartialMatch" ng-value="true" ng-checked="$ctrl.model.PartialMatch" />
           <label for="or-selector">
             <div class="boxselector_header">
-              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px"></i>
+              <pr-icon icon="'tag'" feather="true"></pr-icon>
               Partial match
             </div>
             <p>Associate any environment matching at least one of the selected tags</p>
