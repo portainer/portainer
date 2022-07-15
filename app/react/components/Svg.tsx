@@ -2,7 +2,7 @@ import lightmode from '@/assets/ico/theme/lightmode.svg?c';
 import darkmode from '@/assets/ico/theme/darkmode.svg?c';
 import highcontrastmode from '@/assets/ico/theme/highcontrastmode.svg?c';
 import automode from '@/assets/ico/theme/auto.svg?c';
-import git from '@/assets/icons/git-logo.svg?c';
+import git from '@/assets/ico/git.svg?c';
 import aws from '@/assets/ico/vendor/aws.svg?c';
 import azure from '@/assets/ico/vendor/azure.svg?c';
 import civo from '@/assets/ico/vendor/civo.svg?c';
@@ -21,6 +21,10 @@ import nomad from '@/assets/ico/vendor/nomad.svg?c';
 import openldap from '@/assets/ico/vendor/openldap.svg?c';
 import proget from '@/assets/ico/vendor/proget.svg?c';
 import quay from '@/assets/ico/vendor/quay.svg?c';
+import template from '@/assets/ico/template.svg?c';
+import upload from '@/assets/ico/upload.svg?c';
+import url from '@/assets/ico/url.svg?c';
+import Placeholder from '@/assets/ico/placeholder.svg?c'; // when an icon name cant be found
 
 export const SvgIcons = {
   lightmode,
@@ -46,6 +50,9 @@ export const SvgIcons = {
   openldap,
   proget,
   quay,
+  template,
+  upload,
+  url,
 };
 
 interface SvgProps {
@@ -55,8 +62,17 @@ interface SvgProps {
 
 function Svg({ icon, className }: SvgProps) {
   const SvgIcon = SvgIcons[icon];
+
+  if (!SvgIcon) {
+    return (
+      <span className={className} aria-hidden="true">
+        <Placeholder />
+      </span>
+    );
+  }
+
   return (
-    <span className={className}>
+    <span className={className} aria-hidden="true">
       <SvgIcon />
     </span>
   );
