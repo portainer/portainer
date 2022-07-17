@@ -16,6 +16,12 @@
   gap: 5px;
 }
 
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .blue {
   background: var(--bg-dashboard-item) !important;
 }
