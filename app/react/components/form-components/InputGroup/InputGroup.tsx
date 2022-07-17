@@ -15,12 +15,19 @@ export function useInputGroupContext() {
 
 interface Props {
   size?: Size;
+  className?: string;
 }
 
-export function InputGroup({ children, size }: PropsWithChildren<Props>) {
+export function InputGroup({
+  children,
+  size,
+  className,
+}: PropsWithChildren<Props>) {
   return (
     <Context.Provider value>
-      <div className={clsx('input-group', sizeClass(size))}>{children}</div>
+      <div className={clsx('input-group', sizeClass(size), className)}>
+        {children}
+      </div>
     </Context.Provider>
   );
 }

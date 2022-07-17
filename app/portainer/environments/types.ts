@@ -40,6 +40,8 @@ export interface DockerSnapshot {
   ServiceCount: number;
   Swarm: boolean;
   DockerVersion: string;
+  GpuUseAll: boolean;
+  GpuUseList: string[];
 }
 
 export interface KubernetesSnapshot {
@@ -103,6 +105,7 @@ export type Environment = {
   AMTDeviceGUID?: string;
   Edge: EnvironmentEdge;
   SecuritySettings: EnvironmentSecuritySettings;
+  Gpus: { name: string; value: string }[];
 };
 /**
  * TS reference of endpoint_create.go#EndpointCreationType iota
