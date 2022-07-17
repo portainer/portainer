@@ -17,11 +17,18 @@ export default class RegistryController {
     this.Password = '';
 
     this.toggleAuthentication = this.toggleAuthentication.bind(this);
+    this.toggleQuayUseOrganisation = this.toggleQuayUseOrganisation.bind(this);
   }
 
   toggleAuthentication(newValue) {
     this.$scope.$evalAsync(() => {
       this.registry.Authentication = newValue;
+    });
+  }
+
+  toggleQuayUseOrganisation(newValue) {
+    this.$scope.$evalAsync(() => {
+      this.registry.Quay.UseOrganisation = newValue;
     });
   }
 
