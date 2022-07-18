@@ -16,6 +16,12 @@
   gap: 5px;
 }
 
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .blue {
   background: var(--bg-dashboard-item) !important;
 }
@@ -325,4 +331,22 @@ input:checked + .slider:before {
 
 .control-label {
   @apply inline-flex items-center;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 4px;
+  width: 50%;
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.progress .progress-bar {
+  background-color: var(--ui-blue-8);
+}
+
+.progress + span {
+  display: inline-block;
+  font-size: 85%;
+  margin-left: 10px;
 }

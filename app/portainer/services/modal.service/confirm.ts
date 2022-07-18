@@ -161,7 +161,7 @@ export function confirmUpdate(message: string, callback: ConfirmCallback) {
     buttons: {
       confirm: {
         label: 'Update',
-        className: 'btn-warning',
+        className: 'btn-primary',
       },
     },
     callback,
