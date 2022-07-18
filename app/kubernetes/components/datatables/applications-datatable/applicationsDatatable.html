@@ -122,8 +122,8 @@
                 <label for="select_all"></label>
               </span>
               <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
-                <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" feather="true" class-name="'icon'"></pr-icon>
-                <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" feather="true" class-name="'icon'"></pr-icon>
+                <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" feather="true"></pr-icon>
+                <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" feather="true"></pr-icon>
               </div>
             </div>
           </th>
@@ -174,8 +174,8 @@
               ></table-column-header>
               <div class="flex flex-row no-wrap gap-1 items-center" uib-dropdown-toggle>
                 <span class="table-filter">Filters</span>
-                <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'" class-name="'icon'" feather="true"></pr-icon>
-                <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'" class-name="'icon'" feather="true"></pr-icon>
+                <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'" feather="true"></pr-icon>
+                <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'" feather="true"></pr-icon>
               </div>
               <div class="dropdown-menu" uib-dropdown-menu>
                 <div class="tableMenu">
@@ -231,8 +231,8 @@
               <label for="select_{{ $index }}"></label>
             </span>
             <div ng-if="$ctrl.isExpandable(item)" class="vertical-center">
-              <pr-icon ng-if="$ctrl.isItemExpanded(item)" icon="'chevron-down'" feather="true" class-name="'icon'"></pr-icon>
-              <pr-icon ng-if="!$ctrl.isItemExpanded(item)" icon="'chevron-right'" feather="true" class-name="'icon'"></pr-icon>
+              <pr-icon ng-if="$ctrl.isItemExpanded(item)" icon="'chevron-down'" feather="true"></pr-icon>
+              <pr-icon ng-if="!$ctrl.isItemExpanded(item)" icon="'chevron-right'" feather="true"></pr-icon>
             </div>
           </td>
           <td>
