@@ -54,6 +54,10 @@
                 <td>{{ endpoint.URL | stripprotocol }}</td>
               </tr>
               <tr>
+                <td>{{ endpoint.Gpus.length <= 1 ? 'GPU' : 'GPUs' }}</td>
+                <td>{{ gpuInfoStr }}</td>
+              </tr>
+              <tr>
                 <td>Tags</td>
                 <td>{{ endpointTags }}</td>
               </tr>
@@ -97,5 +101,9 @@
     <a ui-sref="docker.networks">
       <dashboard-item icon="'fa-sitemap'" type="'Network'" value="networkCount"></dashboard-item>
     </a>
+
+    <div>
+      <dashboard-item icon="'fa-digital-tachograph'" type="'GPU'" value="endpoint.Gpus.length"></dashboard-item>
+    </div>
   </div>
 </div>
