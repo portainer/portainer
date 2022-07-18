@@ -60,8 +60,8 @@
     <table class="table table-hover nowrap-cells">
       <thead>
         <tr>
-          <th class="datatable-wide dropdown">
-            <div ng-if="$ctrl.hasExpandableItems()" class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
+          <th class="datatable-wide dropdown" ng-if="$ctrl.hasExpandableItems()">
+            <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
               <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" feather="true"></pr-icon>
               <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" feather="true"></pr-icon>
             </div>
@@ -93,7 +93,7 @@
           ng-click="$ctrl.expandItem(item, !item.Expanded)"
           pagination-id="$ctrl.tableKey"
         >
-          <td>
+          <td ng-if="$ctrl.hasExpandableItems()">
             <div ng-if="$ctrl.itemCanExpand(item)" class="vertical-center">
               <pr-icon ng-if="item.Expanded" icon="'chevron-down'" feather="true"></pr-icon>
               <pr-icon ng-if="!item.Expanded" icon="'chevron-right'" feather="true"></pr-icon>
