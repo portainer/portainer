@@ -9,7 +9,7 @@
     <div class="col-sm-12 small text-warning">
       <div ng-messages="EdgeGroupForm.group_name.$error">
         <p ng-message="required" class="vertical-center">
-          <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+          <pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon> This field is required.
         </p>
       </div>
     </div>
@@ -21,7 +21,7 @@
       <div class="boxselector">
         <input type="radio" id="static-group" ng-model="$ctrl.model.Dynamic" ng-value="false" ng-checked="!$ctrl.model.Dynamic" />
         <label for="static-group">
-          <div class="boxselector_header">
+          <div class="boxselector_header vertical-center">
             <pr-icon icon="'list'" feather="true"></pr-icon>
             Static
           </div>
@@ -31,8 +31,8 @@
       <div class="boxselector">
         <input type="radio" id="dynamic-group" ng-model="$ctrl.model.Dynamic" ng-value="true" ng-checked="$ctrl.model.Dynamic" />
         <label for="dynamic-group">
-          <div class="boxselector_header">
-            <div><pr-icon icon="'tag'" feather="true" className="'feather'"></pr-icon></div>
+          <div class="boxselector_header vertical-center">
+            <pr-icon icon="'tag'" feather="true" className="'feather'"></pr-icon>
             Dynamic
           </div>
           <p>Automatically associate environments via tags</p>
@@ -73,7 +73,7 @@
         <div class="boxselector">
           <input type="radio" id="or-selector" ng-model="$ctrl.model.PartialMatch" ng-value="true" ng-checked="$ctrl.model.PartialMatch" />
           <label for="or-selector">
-            <div class="boxselector_header">
+            <div class="boxselector_header vertical-center">
               <pr-icon icon="'tag'" feather="true"></pr-icon>
               Partial match
             </div>
@@ -83,8 +83,8 @@
         <div class="boxselector">
           <input type="radio" id="and-selector" ng-model="$ctrl.model.PartialMatch" ng-value="false" ng-checked="!$ctrl.model.PartialMatch" />
           <label for="and-selector">
-            <div class="boxselector_header">
-              <div><pr-icon icon="'tag'" feather="true" className="'feather'"></pr-icon></div>
+            <div class="boxselector_header vertical-center">
+              <pr-icon icon="'tag'" feather="true" className="'feather'"></pr-icon>
               Full match
             </div>
             <p>Associate any environment matching all of the selected tags</p>
