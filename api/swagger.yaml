@@ -693,6 +693,12 @@ definitions:
         $ref: '#/definitions/portainer.DockerSnapshotRaw'
       DockerVersion:
         type: string
+      GpuUseAll:
+        type: boolean
+      GpuUseList:
+        items:
+          type: string
+        type: array
       HealthyContainerCount:
         type: integer
       ImageCount:
@@ -849,6 +855,11 @@ definitions:
       EdgeKey:
         description: The key which is used to map the agent to Portainer
         type: string
+      Gpus:
+        description: Endpoint Gpus information
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
       GroupId:
         description: Endpoint group identifier
         example: 1

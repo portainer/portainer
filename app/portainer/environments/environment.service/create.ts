@@ -1,3 +1,4 @@
+import { Gpu } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { type EnvironmentGroupId } from '@/portainer/environment-groups/types';
 import { type TagId } from '@/portainer/tags/types';
@@ -16,6 +17,7 @@ interface CreateLocalDockerEnvironment {
   socketPath?: string;
   publicUrl?: string;
   meta?: EnvironmentMetadata;
+  gpus?: Gpu[];
 }
 
 export async function createLocalDockerEnvironment({
@@ -23,6 +25,7 @@ export async function createLocalDockerEnvironment({
   socketPath = '',
   publicUrl = '',
   meta = { tagIds: [] },
+  gpus = [],
 }: CreateLocalDockerEnvironment) {
   const url = prefixPath(socketPath);
 
@@ -33,6 +36,7 @@ export async function createLocalDockerEnvironment({
       url,
       publicUrl,
       meta,
+      gpus,
     }
   );
 
@@ -105,6 +109,7 @@ export interface EnvironmentOptions {
   azure?: AzureSettings;
   tls?: TLSSettings;
   isEdgeDevice?: boolean;
+  gpus?: Gpu[];
 }
 
 interface CreateRemoteEnvironment {
@@ -133,6 +138,7 @@ export interface CreateAgentEnvironmentValues {
   name: string;
   environmentUrl: string;
   meta: EnvironmentMetadata;
+  gpus: Gpu[];
 }
 
 export function createAgentEnvironment({
@@ -159,12 +165,14 @@ interface CreateEdgeAgentEnvironment {
   portainerUrl: string;
   meta?: EnvironmentMetadata;
   pollFrequency: number;
+  gpus?: Gpu[];
 }
 
 export function createEdgeAgentEnvironment({
   name,
   portainerUrl,
   meta = { tagIds: [] },
+  gpus = [],
 }: CreateEdgeAgentEnvironment) {
   return createEnvironment(
     name,
@@ -176,6 +184,7 @@ export function createEdgeAgentEnvironment({
         skipVerify: true,
         skipClientVerify: true,
       },
+      gpus,
     }
   );
 }
@@ -201,6 +210,7 @@ async function createEnvironment(
       TagIds: arrayToJson(tagIds),
       CheckinInterval: options.checkinInterval,
       IsEdgeDevice: options.isEdgeDevice,
+      Gpus: arrayToJson(options.gpus),
     };
 
     const { tls, azure } = options;

@@ -694,6 +694,20 @@
                 <!-- !sysctls-input-list -->
               </div>
               <!-- !sysctls -->
+              <!-- #region GPU -->
+              <div class="col-sm-12 form-section-title"> GPU </div>
+
+              <gpu
+                ng-if="applicationState.endpoint.apiVersion >= 1.4"
+                values="formValues.GPU"
+                on-change="(onGpuChange)"
+                gpus="endpoint.Gpus"
+                used-gpus="gpuUseList"
+                used-all-gpus="gpuUseAll"
+              >
+              </gpu>
+
+              <!-- #endregion GPU -->
               <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">
                 <div class="col-sm-12 form-section-title"> Resources </div>
                 <!-- memory-reservation-input -->

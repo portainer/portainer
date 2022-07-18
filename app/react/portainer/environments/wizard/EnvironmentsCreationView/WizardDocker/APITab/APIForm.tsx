@@ -2,6 +2,7 @@ import { Field, Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
 import { useCreateRemoteEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
+import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
 import {
   Environment,
@@ -33,6 +34,7 @@ export function APIForm({ onCreate }: Props) {
       groupId: 1,
       tagIds: [],
     },
+    gpus: [],
   };
 
   const mutation = useCreateRemoteEnvironmentMutation(
@@ -67,7 +69,9 @@ export function APIForm({ onCreate }: Props) {
 
           <TLSFieldset />
 
-          <MoreSettingsSection />
+          <MoreSettingsSection>
+            <Hardware />
+          </MoreSettingsSection>
 
           <div className="form-group">
             <div className="col-sm-12">
@@ -96,6 +100,7 @@ export function APIForm({ onCreate }: Props) {
         options: {
           tls,
           meta: values.meta,
+          gpus: values.gpus,
         },
       },
       {
