@@ -199,6 +199,8 @@ type (
 		StackCount              int               `json:"StackCount"`
 		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
 		NodeCount               int               `json:"NodeCount"`
+		GpuUseAll               bool              `json:"GpuUseAll"`
+		GpuUseList              []string          `json:"GpuUseList"`
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
@@ -310,6 +312,7 @@ type (
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
 		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
+		Gpus             []Pair           `json:"Gpus"`
 		TLSConfig        TLSConfiguration `json:"TLSConfig"`
 		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" example:""`
 		// List of tag identifiers to which this environment(endpoint) is associated
