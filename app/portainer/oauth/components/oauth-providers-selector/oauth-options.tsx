@@ -1,5 +1,5 @@
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import Microsoft from '@/assets/ico/microsoft.svg?c';
+import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import Google from '@/assets/ico/vendor/google.svg?c';
 import Github from '@/assets/ico/vendor/github.svg?c';
 import Custom from '@/assets/ico/custom.svg?c';
