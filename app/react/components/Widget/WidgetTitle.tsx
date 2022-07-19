@@ -25,7 +25,11 @@ export function WidgetTitle({
     <div className="widget-header">
       <div className="row">
         <span className={clsx('pull-left', className)}>
-          <Icon icon={icon} feather={featherIcon} className="space-right" />
+          <Icon
+            icon={icon}
+            feather={featherIcon}
+            className="icon-nested-blue icon-primary space-right"
+          />
           <span>{title}</span>
         </span>
         <span className={clsx('pull-right', className)}>{children}</span>
