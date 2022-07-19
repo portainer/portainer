@@ -1,15 +1,15 @@
 import _ from 'lodash-es';
 import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 
+import { getEnvironments } from '@/portainer/environments/environment.service';
 import AccessViewerPolicyModel from '../../models/access';
 
 export default class AccessViewerController {
   /* @ngInject */
-  constructor(Notifications, RoleService, UserService, EndpointService, GroupService, TeamService, TeamMembershipService, Authentication) {
+  constructor(Notifications, RoleService, UserService, GroupService, TeamService, TeamMembershipService, Authentication) {
     this.Notifications = Notifications;
     this.RoleService = RoleService;
     this.UserService = UserService;
-    this.EndpointService = EndpointService;
     this.GroupService = GroupService;
     this.TeamService = TeamService;
     this.TeamMembershipService = TeamMembershipService;
@@ -138,7 +138,7 @@ export default class AccessViewerController {
 
       this.isAdmin = this.Authentication.isAdmin();
       this.allUsers = await this.UserService.users();
-      this.endpoints = _.keyBy((await this.EndpointService.endpoints()).value, 'Id');
+      this.endpoints = _.keyBy((await getEnvironments()).value, 'Id');
       const groups = await this.GroupService.groups();
       this.groupUserAccessPolicies = {};
       this.groupTeamAccessPolicies = {};

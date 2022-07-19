@@ -20,6 +20,11 @@ export enum EnvironmentType {
   EdgeAgentOnKubernetes,
 }
 
+export const EdgeTypes = [
+  EnvironmentType.EdgeAgentOnDocker,
+  EnvironmentType.EdgeAgentOnKubernetes,
+] as const;
+
 export enum EnvironmentStatus {
   Up = 1,
   Down,
