@@ -60,7 +60,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-server" title-text="Container status"></rd-widget-header>
+      <rd-widget-header icon="box" feather-icon="true" title-text="Container status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -197,7 +197,7 @@
 <div class="row" authorization="DockerImageCreate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title-text="Create image"></rd-widget-header>
+      <rd-widget-header icon="list" feather-icon="true" title-text="Create image"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- tag-description -->
@@ -249,7 +249,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-server" title-text="Container details"></rd-widget-header>
+      <rd-widget-header icon="list" feather-icon="true" title-text="Container details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table container-details-table">
           <tbody>
@@ -336,7 +336,7 @@
 <div class="row" ng-if="container.Mounts.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-hdd" title-text="Volumes"></rd-widget-header>
+      <rd-widget-header icon="database" feather-icon="true" title-text="Volumes"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
@@ -365,7 +365,7 @@
     <container-networks-datatable
       ng-if="container.NetworkSettings.Networks"
       title-text="Connected networks"
-      title-icon="fa-sitemap"
+      title-icon="share-2"
       dataset="container.NetworkSettings.Networks"
       table-key="container-networks"
       container="container"
