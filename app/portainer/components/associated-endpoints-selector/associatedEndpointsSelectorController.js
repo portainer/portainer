@@ -27,7 +27,7 @@ class AssoicatedEndpointsSelectorController {
       available: null,
     };
 
-    this.getEndpoints = this.getEndpoints.bind(this);
+    this.getAvailableEndpoints = this.getAvailableEndpoints.bind(this);
     this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
     this.getAssociatedEndpoints = this.getAssociatedEndpoints.bind(this);
     this.getAssociatedEndpointsAsync = this.getAssociatedEndpointsAsync.bind(this);
@@ -47,10 +47,10 @@ class AssoicatedEndpointsSelectorController {
 
   loadData() {
     this.getAssociatedEndpoints();
-    this.getEndpoints();
+    this.getAvailableEndpoints();
   }
 
-  getEndpoints() {
+  getAvailableEndpoints() {
     return this.$async(this.getEndpointsAsync);
   }
 
