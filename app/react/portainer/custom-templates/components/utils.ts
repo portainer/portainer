@@ -68,5 +68,5 @@ export function renderTemplate(
     )
   );
 
-  return Mustache.render(template, state);
+  return Mustache.render(template, state, undefined, { escape: (t) => t });
 }
