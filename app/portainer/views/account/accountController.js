@@ -118,6 +118,7 @@ angular.module('portainer.app').controller('AccountController', [
       $scope.userID = userDetails.ID;
       $scope.userRole = Authentication.getUserDetails().role;
       $scope.forceChangePassword = userDetails.forceChangePassword;
+      $scope.isInitialAdmin = userDetails.ID === 1;
 
       if (state.application.demoEnvironment.enabled) {
         $scope.isDemoUser = state.application.demoEnvironment.users.includes($scope.userID);

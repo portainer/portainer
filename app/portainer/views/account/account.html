@@ -39,14 +39,7 @@
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
                 <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password" />
                 <span class="input-group-addon"
-                  ><i
-                    ng-class="
-                      { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[
-                        form.new_password.$viewValue !== '' && form.new_password.$viewValue === formValues.confirmPassword
-                      ]
-                    "
-                    aria-hidden="true"
-                  ></i
+                  ><i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.newPassword === formValues.confirmPassword]" aria-hidden="true"></i
                 ></span>
               </div>
             </div>
@@ -64,7 +57,7 @@
               <button
                 type="submit"
                 class="btn btn-primary btn-sm"
-                ng-disabled="isDemoUser || (AuthenticationMethod !== 1 && !initialUser) || !formValues.currentPassword || !formValues.newPassword || !formValues.confirmPassword || form.$invalid || form.new_password.$viewValue !== formValues.confirmPassword"
+                ng-disabled="isDemoUser || (AuthenticationMethod !== 1 && !isInitialAdmin) || !formValues.currentPassword || !formValues.newPassword || form.$invalid || formValues.newPassword !== formValues.confirmPassword"
                 ng-click="updatePassword()"
               >
                 Update password
@@ -72,11 +65,11 @@
               <button type="submit" class="btn btn-primary btn-sm" ng-click="skipPasswordChange()" ng-if="forceChangePassword && timesPasswordChangeSkipped < 2"
                 >Remind me later</button
               >
-              <span class="text-muted small" style="margin-left: 5px" ng-if="AuthenticationMethod === 2 && !initialUser">
+              <span class="text-muted small" style="margin-left: 5px" ng-if="AuthenticationMethod === 2 && !isInitialAdmin">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 You cannot change your password when using LDAP authentication.
               </span>
-              <span class="text-muted small" style="margin-left: 5px" ng-if="AuthenticationMethod === 3 && !initialUser">
+              <span class="text-muted small" style="margin-left: 5px" ng-if="AuthenticationMethod === 3 && !isInitialAdmin">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 You cannot change your password when using OAuth authentication.
               </span>
