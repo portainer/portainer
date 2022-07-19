@@ -83,7 +83,7 @@
       </div>
     </div>
     <div class="flex flex-row w-full">
-      <span class="small text-muted mt-1 vertical-center" ng-if="!ctrl.isAdmin && !$ctrl.settings.showSystem">
+      <span ng-if="!ctrl.isAdmin && !$ctrl.settings.showSystem" class="small text-muted mt-1 vertical-center">
         <pr-icon icon="'info'" feather="true" class-name="'!mb-0.5'" mode="'primary'"></pr-icon>
         <div> System resources are hidden, this can be changed in the table settings. </div>
       </span>
