@@ -3,12 +3,12 @@
 <div class="row" ng-if="isAdmin">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-plus" title-text="Add a new user"> </rd-widget-header>
+      <rd-widget-header icon="plus" feather-icon="true" title-text="Add a new user"> </rd-widget-header>
       <rd-widget-body>
         <form name="form" class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="username" class="col-sm-3 col-lg-2 control-label text-left">
+            <label for="username" class="col-sm-3 col-lg-2 control-label text-left required">
               Username
               <portainer-tooltip ng-if="AuthenticationMethod === 2" message="'Username must exactly match username defined in external LDAP source.'"></portainer-tooltip>
             </label>
@@ -24,17 +24,20 @@
                   auto-focus
                   data-cy="user-usernameInput"
                 />
-                <span class="input-group-addon"><i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[state.validUsername]" aria-hidden="true"></i></span>
+                <span class="input-group-addon">
+                  <pr-icon class="fa green-icon" icon="'check'" feather="true" aria-hidden="true" ng-if="state.validUsername"></pr-icon>
+                  <pr-icon class="fa red-icon" icon="'x'" feather="true" aria-hidden="true" ng-if="!state.validUsername"></pr-icon>
+                </span>
               </div>
             </div>
           </div>
           <!-- !name-input -->
           <!-- new-password-input -->
           <div class="form-group" ng-if="AuthenticationMethod === 1">
-            <label for="password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+            <label for="password" class="col-sm-3 col-lg-2 control-label text-left required">Password</label>
             <div class="col-sm-8">
               <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+                <span class="input-group-addon"><pr-icon icon="'lock'" feather="true" aria-hidden="true"></pr-icon></span>
                 <input
                   type="password"
                   class="form-control"
@@ -50,19 +53,33 @@
           <!-- !new-password-input -->
           <!-- confirm-password-input -->
           <div class="form-group" ng-if="AuthenticationMethod === 1">
-            <label for="confirm_password" class="col-sm-3 col-lg-2 control-label text-left">Confirm password</label>
+            <label for="confirm_password" class="col-sm-3 col-lg-2 control-label text-left required">Confirm password</label>
             <div class="col-sm-8">
               <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.ConfirmPassword" id="confirm_password" data-cy="user-passwordConfirmInput" />
-                <span class="input-group-addon"
-                  ><i
-                    ng-class="
-                      { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword]
-                    "
+                <span class="input-group-addon"><pr-icon icon="'lock'" feather="true" aria-hidden="true"></pr-icon></span>
+                <input
+                  type="password"
+                  class="form-control form-control--has-icon"
+                  ng-model="formValues.ConfirmPassword"
+                  id="confirm_password"
+                  data-cy="user-passwordConfirmInput"
+                />
+                <span class="input-group-addon">
+                  <pr-icon
+                    class="fa green-icon"
+                    icon="'check'"
+                    feather="true"
                     aria-hidden="true"
-                  ></i
-                ></span>
+                    ng-if="form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword"
+                  ></pr-icon>
+                  <pr-icon
+                    class="fa red-icon"
+                    icon="'x'"
+                    feather="true"
+                    aria-hidden="true"
+                    ng-if="!(form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword)"
+                  ></pr-icon>
+                </span>
               </div>
             </div>
           </div>
@@ -137,7 +154,7 @@
                 <span ng-show="state.actionInProgress">Creating user...</span>
               </button>
               <span class="text-danger" ng-if="state.userCreationError" style="margin: 5px">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.userCreationError }}
+                <pr-icon class="fa fa-exclamation-circle" aria-hidden="true"></pr-icon> {{ state.userCreationError }}
               </span>
             </div>
           </div>
@@ -151,7 +168,7 @@
   <div class="col-sm-12">
     <users-datatable
       title-text="Users"
-      title-icon="fa-user"
+      title-icon="user"
       dataset="users"
       table-key="users"
       order-by="Username"

@@ -50,6 +50,11 @@
   border-radius: 5px;
 }
 
+.input-group .form-control--has-icon {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
 /* Toggle switch */
 .switch {
   position: relative;
