@@ -1,23 +1,32 @@
 .datatable .toolBar {
   background-color: var(--bg-card-color);
-  color: var(--text-main-color);
   overflow: auto;
-  padding: 10px;
+  padding: 20px;
+  font-size: 16px;
+  border-radius: 8px;
+
+  display: flex;
+  gap: 5px;
 }
 
 .datatable .actionBar {
-  color: #767676;
-  padding: 10px;
+  padding: 0;
 }
 
 .datatable .toolBar .toolBarTitle {
+  @apply items-center gap-1;
   float: left;
-  margin: 5px 0 0 10px;
+  color: var(--text-widget-header-color);
+  font-weight: 500;
+
+  flex: auto;
+  display: inline-flex;
+  flex-wrap: nowrap;
 }
 
 .datatable .toolBar .settings {
   float: right;
-  margin: 5px 10px 0 0;
+  margin-top: 5px;
 }
 
 .datatable .toolBar .setting {
@@ -26,20 +35,54 @@
 }
 
 .datatable .toolBar .setting-active {
-  color: #337ab7;
+  @apply text-blue-7;
+}
+
+.datatable tr > td a {
+  color: var(--ui-blue-8);
+}
+
+.datatable tr > td a:hover,
+.datatable tr > td a:focus {
+  text-decoration: underline;
+}
+
+.datatable tr > td a.actions {
+  color: currentColor;
+}
+
+.toolBar .actionBar {
+  display: inline-flex;
+}
+
+.toolBar .settings {
+  text-align: right;
+  display: inline-flex;
 }
 
 .datatable .searchBar {
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-  padding: 8px;
-  background: var(--bg-main-color);
+  border: 1px solid var(--border-searchbar);
+  background: var(--bg-searchbar) !important;
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 14px;
 }
 
 .datatable .searchInput {
   background: none;
   border: none;
-  width: 95%;
+  width: 90%;
+}
+
+.toolBar .searchBar {
+  flex: right;
+  margin-right: 10px;
+  height: 30px;
+  display: inline-flex;
+}
+
+.datatable .searchBar input[type='text'] {
+  border: 0px !important;
 }
 
 .datatable .searchIcon {
@@ -65,6 +108,10 @@
   color: var(--text-main-color);
   overflow: auto;
   border-top: 1px solid var(--border-datatable-top-color);
+
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding-bottom: 10px;
 }
 
 .datatable .footer .infoBar {
@@ -108,6 +155,15 @@
   padding: 15px 0;
 }
 
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.table > tbody > tr {
+  height: 50px;
+  vertical-align: middle;
+}
+
 [data-reach-menu-list],
 [data-reach-menu-items] {
   padding: 0px;
@@ -116,7 +172,7 @@
 
 .tableMenu {
   color: #767676;
-  padding: 10px;
+  padding: 15px;
   background-color: var(--bg-dropdown-menu-color) !important;
 }
 
@@ -125,19 +181,16 @@
 }
 
 .tableMenu .menuContent {
-  border-bottom: 1px solid #777;
   font-size: 12px;
   margin: 10px 0;
-  max-height: 140px;
-  overflow-y: auto;
 }
 
 .tableMenu .menuContent .md-radio:first-child {
   margin: 0;
 }
 
-.datatable .table-filters thead tr > th {
-  height: 32px;
+.datatable thead tr > th {
+  white-space: nowrap;
   vertical-align: middle;
 }
 
@@ -281,16 +334,14 @@
   width: 30px;
 }
 
-.table th button.sortable {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  color: var(--text-link-color);
+.table tr > th:first-child,
+.table tr > td:first-child {
+  padding-left: 20px;
 }
 
-.table th button.sortable:hover .sortable-label {
-  text-decoration: underline;
+.table tr > th:last-child,
+.table tr > last-child {
+  padding-right: 20px;
 }
 
 .datatable .table-setting-menu-btn {

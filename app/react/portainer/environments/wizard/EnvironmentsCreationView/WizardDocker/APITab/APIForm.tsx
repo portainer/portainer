@@ -1,18 +1,20 @@
 import { Field, Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { useCreateRemoteEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
+import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Input } from '@/portainer/components/form-components/Input';
 import {
   Environment,
   EnvironmentCreationTypes,
 } from '@/portainer/environments/types';
 
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { FormControl } from '@@/form-components/FormControl';
+import { Input } from '@@/form-components/Input';
+
 import { NameField } from '../../shared/NameField';
-import { MetadataFieldset } from '../../shared/MetadataFieldset';
+import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { validation } from './APIForm.validation';
 import { FormValues } from './types';
@@ -32,6 +34,7 @@ export function APIForm({ onCreate }: Props) {
       groupId: 1,
       tagIds: [],
     },
+    gpus: [],
   };
 
   const mutation = useCreateRemoteEnvironmentMutation(
@@ -66,7 +69,9 @@ export function APIForm({ onCreate }: Props) {
 
           <TLSFieldset />
 
-          <MetadataFieldset />
+          <MoreSettingsSection>
+            <Hardware />
+          </MoreSettingsSection>
 
           <div className="form-group">
             <div className="col-sm-12">
@@ -95,6 +100,7 @@ export function APIForm({ onCreate }: Props) {
         options: {
           tls,
           meta: values.meta,
+          gpus: values.gpus,
         },
       },
       {

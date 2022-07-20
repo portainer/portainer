@@ -8,6 +8,14 @@ let arch = os.arch();
 if (arch === 'x64') {
   arch = 'amd64';
 }
+let platform = os.platform();
+switch (platform) {
+  case 'windows':
+  case 'darwin':
+    break;
+  default:
+    platform = 'linux';
+}
 
 module.exports = function (grunt) {
   loadGruntTasks(grunt, {
@@ -18,14 +26,11 @@ module.exports = function (grunt) {
     root: 'dist',
     distdir: 'dist/public',
     binaries: {
-      dockerLinuxVersion: '19.03.13',
-      dockerWindowsVersion: '19-03-12',
-      dockerLinuxComposeVersion: '1.27.4',
-      dockerWindowsComposeVersion: '1.28.0',
-      dockerComposePluginVersion: '2.0.0-rc.2',
-      helmVersion: 'v3.8.0',
+      dockerVersion: 'v20.10.9',
+      dockerComposePluginVersion: 'v2.5.1',
+      helmVersion: 'v3.9.0',
       komposeVersion: 'v1.22.0',
-      kubectlVersion: 'v1.18.0',
+      kubectlVersion: 'v1.24.1',
     },
     env: gruntConfig.env,
     clean: gruntConfig.clean,
@@ -35,15 +40,17 @@ module.exports = function (grunt) {
 
   grunt.registerTask('lint', ['eslint']);
 
-  grunt.registerTask('build:server', [`shell:build_binary:linux:${arch}`, `download_binaries:linux:${arch}`]);
+  grunt.task.registerTask('build:server', 'build:server:<platform>:<arch>', function (p = platform, a = arch) {
+    grunt.task.run([`shell:build_binary:${p}:${a}`, `download_binaries:${p}:${a}`]);
+  });
 
   grunt.registerTask('build:client', ['webpack:dev']);
 
   grunt.registerTask('build', ['build:server', 'build:client']);
 
-  grunt.registerTask('start:server', ['build:server', 'shell:run_container']);
+  grunt.registerTask('start:server', ['build:server:linux', 'shell:run_container']);
 
-  grunt.registerTask('start:localserver', [`shell:build_binary:linux:${arch}`, 'shell:run_localserver']);
+  grunt.registerTask('start:localserver', [`shell:build_binary:${platform}:${arch}`, 'shell:run_localserver']);
 
   grunt.registerTask('start:client', ['shell:install_yarndeps', 'webpack:devWatch']);
 
@@ -109,9 +116,9 @@ gruntConfig.shell = {
   build_binary: { command: shell_build_binary },
   build_binary_azuredevops: { command: shell_build_binary_azuredevops },
   download_docker_binary: { command: shell_download_docker_binary },
+  download_helm_binary: { command: shell_download_helm_binary },
   download_kompose_binary: { command: shell_download_kompose_binary },
   download_kubectl_binary: { command: shell_download_kubectl_binary },
-  download_helm_binary: { command: shell_download_helm_binary },
   download_docker_compose_binary: { command: shell_download_docker_compose_binary },
   run_container: { command: shell_run_container },
   run_localserver: { command: shell_run_localserver, options: { async: true } },
@@ -186,47 +193,27 @@ function shell_install_yarndeps() {
 }
 
 function shell_download_docker_binary(platform, arch) {
-  const ps = { windows: 'win', darwin: 'mac' };
-  const as = { amd64: 'x86_64', arm: 'armhf', arm64: 'aarch64' };
-
-  const ip = ps[platform] === undefined ? platform : ps[platform];
-  const ia = as[arch] === undefined ? arch : as[arch];
-  const binaryVersion = platform === 'windows' ? '<%= binaries.dockerWindowsVersion %>' : '<%= binaries.dockerLinuxVersion %>';
+  const binaryVersion = '<%= binaries.dockerVersion %>';
 
   return `
     if [ -f dist/docker ] || [ -f dist/docker.exe ]; then
       echo "docker binary exists";
     else
-      build/download_docker_binary.sh ${ip} ${ia} ${binaryVersion};
+      build/download_docker_binary.sh ${platform} ${arch} ${binaryVersion};
     fi
   `;
 }
 
-function shell_download_docker_compose_binary(p, a) {
-  var ps = { windows: 'win', darwin: 'mac' };
-  var as = { arm: 'armhf', arm64: 'aarch64' };
-  var ip = ps[p] || p;
-  var ia = as[a] || a;
-  var binaryVersion = p === 'windows' ? '<%= binaries.dockerWindowsComposeVersion %>' : '<%= binaries.dockerLinuxComposeVersion %>';
-
-  // plugin
-  if (p === 'linux' && a !== 'amd64') {
-    if (a === 'arm64') {
-      ia = 'arm64';
-    }
-
-    if (a === 'arm') {
-      ia = 'armv7';
-    }
-    binaryVersion = '<%= binaries.dockerComposePluginVersion %>';
-  }
+function shell_download_docker_compose_binary(platform, arch) {
+  var binaryVersion = '<%= binaries.dockerComposePluginVersion %>';
 
   return `
-    if [ -f dist/docker-compose ] || [ -f dist/docker-compose.exe ] || [ -f dist/docker-compose.plugin ] || [ -f dist/docker-compose.plugin.exe ]; then
-      echo "Docker Compose binary exists";
+    if [ -f dist/docker-compose.plugin ] || [ -f dist/docker-compose.plugin.exe ]; then
+    echo "docker compose binary exists";
     else
-      build/download_docker_compose_binary.sh ${ip} ${ia} ${binaryVersion};
-    fi`;
+      build/download_docker_compose_binary.sh ${platform} ${arch} ${binaryVersion};
+    fi
+  `;
 }
 
 function shell_download_helm_binary(platform, arch) {

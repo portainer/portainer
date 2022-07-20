@@ -47,6 +47,9 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 			EnableTelemetry:      true,
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			BlackListedLabels:    make([]portainer.Pair, 0),
+			InternalAuthSettings: portainer.InternalAuthSettings{
+				RequiredPasswordLength: 12,
+			},
 			LDAPSettings: portainer.LDAPSettings{
 				AnonymousMode:   true,
 				AutoCreateUsers: true,

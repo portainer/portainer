@@ -9,8 +9,14 @@
         ng-options="item.typeValue as item.typeName for item in $ctrl.state.serviceType"
         data-cy="k8sAppCreate-publishingModeDropdown"
       ></select>
-      <button type="button" class="btn btn-sm btn-default" style="margin-left: 0" ng-click="$ctrl.addEntry( $ctrl.state.selected )" data-cy="k8sAppCreate-createServiceButton">
-        <i class="fa fa-plus-circle" aria-hidden="true"></i> Create service
+      <button
+        type="button"
+        class="btn btn-sm btn-default vertical-center"
+        style="margin-left: 0"
+        ng-click="$ctrl.addEntry( $ctrl.state.selected )"
+        data-cy="k8sAppCreate-createServiceButton"
+      >
+        <pr-icon icon="'plus'" size="'sm'" feather="true"></pr-icon> Create service
       </button>
     </div>
   </div>
@@ -33,12 +39,12 @@
       ></kube-services-item-view>
       <button
         type="button"
-        class="btn btn-sm btn-danger space-right"
+        class="btn btn-sm btn-dangerlight space-right vertical-center"
         style="margin-left: 0; margin-top: 10px"
         ng-click="$ctrl.deleteService( $index )"
         data-cy="k8sConfigCreate-removeButton"
       >
-        <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
+        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon> Remove
       </button>
     </div>
 
@@ -47,25 +53,26 @@
         <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px"></i>
         Ingress
       </div>
-      <div ng-if="$ctrl.isAdmin()" class="small text-warning">
+      <div ng-if="$ctrl.isAdmin()" class="small">
         <p style="margin-top: 10px">
-          <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Ingress is not configured in this namespace, select another namespace or click
+          <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress is not configured in this namespace, select another namespace or click
           <a ui-sref="portainer.k8sendpoint.kubernetesConfig({id: $ctrl.state.endpointId})">here</a> to configure ingress.
         </p>
       </div>
-      <div ng-if="!$ctrl.isAdmin()" class="small text-warning">
+      <div ng-if="!$ctrl.isAdmin()" class="small">
         <p style="margin-top: 10px">
-          <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Ingress is not configured in this namespace, select another namespace or contact your administrator.
+          <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress is not configured in this namespace, select another namespace or contact your
+          administrator.
         </p>
       </div>
       <button
         type="button"
-        class="btn btn-sm btn-danger space-right"
+        class="btn btn-sm btn-dangerlight space-right vertical-center"
         style="margin-left: 0; margin-top: 10px"
         ng-click="$ctrl.deleteService( $index )"
         data-cy="k8sConfigCreate-removeButton"
       >
-        <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
+        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon> Remove
       </button>
     </div>
 
@@ -85,12 +92,12 @@
       ></kube-services-item-view>
       <button
         type="button"
-        class="btn btn-sm btn-danger space-right"
+        class="btn btn-sm btn-dangerlight space-right vertical-center"
         style="margin-left: 0; margin-top: 10px"
         ng-click="$ctrl.deleteService( $index )"
         data-cy="k8sConfigCreate-removeButton"
       >
-        <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
+        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon> Remove
       </button>
     </div>
   </div>

@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Formik, Field, Form } from 'formik';
 
-import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
-import { TextTip } from '@/portainer/components/Tip/TextTip';
-import { Input } from '@/portainer/components/form-components/Input';
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
 import { FDOProfilesDatatableContainer } from '@/portainer/settings/edge-compute/FDOProfilesDatatable/FDOProfilesDatatableContainer';
+
+import { Switch } from '@@/form-components/SwitchField/Switch';
+import { FormControl } from '@@/form-components/FormControl';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { TextTip } from '@@/Tip/TextTip';
+import { Input } from '@@/form-components/Input';
 
 import styles from './SettingsFDO.module.css';
 import { validationSchema } from './SettingsFDO.validation';
@@ -144,11 +145,11 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                   <div className="col-sm-12">
                     <LoadingButton
                       disabled={!isValid || !dirty}
-                      dataCy="settings-fdoButton"
+                      data-cy="settings-fdoButton"
                       isLoading={isSubmitting}
                       loadingText="Saving settings..."
                     >
-                      Save Settings
+                      Save settings
                     </LoadingButton>
                   </div>
                 </div>

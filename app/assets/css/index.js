@@ -15,8 +15,14 @@ import 'angular-multiselect/isteven-multi-select.css';
 import 'spinkit/spinkit.min.css';
 import '@reach/menu-button/styles.css';
 
+import './colors';
+
 import './rdash.css';
 import './app.css';
 
 import './theme.css';
 import './vendor-override.css';
+import '../fonts/nomad-icon.css';
+import './bootstrap-override.css';
+import './icon.css';
+import './button.css';

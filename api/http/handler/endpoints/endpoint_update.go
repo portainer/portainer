@@ -22,6 +22,8 @@ type endpointUpdatePayload struct {
 	// URL or IP address where exposed containers will be reachable.\
 	// Defaults to URL if not specified
 	PublicURL *string `example:"docker.mydomain.tld:2375"`
+	// GPUs information
+	Gpus []portainer.Pair
 	// Group identifier
 	GroupID *int `example:"1"`
 	// Require TLS to connect against this environment(endpoint)
@@ -108,6 +110,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.PublicURL != nil {
 		endpoint.PublicURL = *payload.PublicURL
+	}
+
+	if payload.Gpus != nil {
+		endpoint.Gpus = payload.Gpus
 	}
 
 	if payload.EdgeCheckinInterval != nil {
@@ -265,7 +271,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if payload.URL != nil || payload.TLS != nil || endpoint.Type == portainer.AzureEnvironment {
+	if (payload.URL != nil && *payload.URL != endpoint.URL) || (payload.TLS != nil && endpoint.TLSConfig.TLS != *payload.TLS) || endpoint.Type == portainer.AzureEnvironment {
 		handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {

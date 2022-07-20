@@ -1,11 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Edit Edge stack">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.stacks.edit({stackId:$ctrl.stack.Id, tab: $ctrl.state.activeTab})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content> <a ui-sref="edge.stacks">Edge Stacks</a> &gt; {{ $ctrl.stack.Name }} </rd-header-content>
-</rd-header>
+<page-header title="'Edit Edge stack'" breadcrumbs="[{label:'Edge Stacks', link:'edge.stacks'}, $ctrl.stack.Name]" reload="true"> </page-header>
 
 <div class="row" ng-if="$ctrl.stack">
   <div class="col-sm-12">

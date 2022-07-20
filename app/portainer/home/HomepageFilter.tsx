@@ -1,8 +1,9 @@
 import { components, OptionProps } from 'react-select';
 
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
-import { Select } from '@/portainer/components/form-components/ReactSelect';
 import { Filter } from '@/portainer/home/types';
+
+import { Select } from '@@/form-components/ReactSelect';
 
 interface Props {
   filterOptions: Filter[];
@@ -34,6 +35,7 @@ export function HomepageFilter({
 }: Props) {
   return (
     <Select
+      closeMenuOnSelect={false}
       placeholder={placeHolder}
       options={filterOptions}
       value={value}

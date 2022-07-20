@@ -1,4 +1,4 @@
-import { Select } from '@/portainer/components/form-components/ReactSelect';
+import { Select } from '@@/form-components/ReactSelect';
 
 interface Filter {
   label?: string;

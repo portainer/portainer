@@ -1,11 +1,14 @@
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 
 class KubeEditCustomTemplateViewController {
   /* @ngInject */
   constructor($async, $state, ModalService, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService) {
     Object.assign(this, { $async, $state, ModalService, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService });
+
+    this.isTemplateVariablesEnabled = isBE;
 
     this.formValues = null;
     this.state = {
@@ -60,6 +63,10 @@ class KubeEditCustomTemplateViewController {
   }
 
   parseTemplate(templateStr) {
+    if (!this.isTemplateVariablesEnabled) {
+      return;
+    }
+
     const variables = getTemplateVariables(templateStr);
 
     const isValid = !!variables;

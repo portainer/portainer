@@ -1,16 +1,9 @@
-<rd-header>
-  <rd-header-title title-text="Teams">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.teams" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Teams management</rd-header-content>
-</rd-header>
+<page-header title="'Teams'" breadcrumbs="['Teams management']" reload="true"> </page-header>
 
 <create-team-form ng-if="isAdmin && users" users="users" action-in-progress="state.actionInProgress" teams="teams" on-submit="(addTeam)"></create-team-form>
 
 <div class="row">
   <div class="col-sm-12">
-    <teams-datatable title-text="Teams" title-icon="fa-users" dataset="teams" table-key="teams" order-by="Name" remove-action="removeAction"></teams-datatable>
+    <teams-datatable title-text="Teams" title-icon="fa-users" dataset="teams" table-key="teams" order-by="Name" remove-action="removeAction" is-admin="isAdmin"></teams-datatable>
   </div>
 </div>

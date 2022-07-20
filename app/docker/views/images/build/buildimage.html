@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Build image"></rd-header-title>
-  <rd-header-content> <a ui-sref="docker.images">Images</a> &gt; Build image </rd-header-content>
-</rd-header>
+<page-header title="'Build image'" breadcrumbs="[{label:'Images', link:'docker.images'}, 'Build image']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -47,7 +44,7 @@
                           <span class="input-group-addon">name</span>
                           <input type="text" class="form-control" ng-model="item.Name" placeholder="e.g. my-image:my-tag" auto-focus />
                           <span class="input-group-addon"
-                            ><i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[item.Name !== '']" aria-hidden="true"></i
+                            ><i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[checkName(item.Name)]" aria-hidden="true"></i
                           ></span>
                         </div>
                         <!-- !name-input -->
@@ -73,7 +70,7 @@
                     <input type="radio" id="method_editor" ng-model="state.BuildType" value="editor" ng-click="toggleEditor()" />
                     <label for="method_editor">
                       <div class="boxselector_header">
-                        <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon icon="'edit'" feather="true"></pr-icon>
                         Web editor
                       </div>
                       <p>Use our Web editor</p>
@@ -83,7 +80,7 @@
                     <input type="radio" id="method_upload" ng-model="state.BuildType" value="upload" ng-click="saveEditorContent()" />
                     <label for="method_upload">
                       <div class="boxselector_header">
-                        <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon icon="'upload'" feather="true"></pr-icon>
                         Upload
                       </div>
                       <p>Upload a tarball or a Dockerfile from your computer</p>
@@ -93,7 +90,7 @@
                     <input type="radio" id="method_url" ng-model="state.BuildType" value="url" ng-click="saveEditorContent()" />
                     <label for="method_url">
                       <div class="boxselector_header">
-                        <i class="fa fa-globe" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon icon="'globe'" feather="true"></pr-icon>
                         URL
                       </div>
                       <p>Specify a URL to a file</p>

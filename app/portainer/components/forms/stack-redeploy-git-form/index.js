@@ -7,6 +7,7 @@ export const stackRedeployGitForm = {
   bindings: {
     model: '<',
     stack: '<',
+    endpoint: '<',
   },
 };
 

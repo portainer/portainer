@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create network"></rd-header-title>
-  <rd-header-content> <a ui-sref="docker.networks">Networks</a> &gt; Add network </rd-header-content>
-</rd-header>
+<page-header title="'Create network'" breadcrumbs="[{label:'Networks', link:'docker.networks'}, 'Add network']"> </page-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
@@ -30,21 +27,15 @@
           <!-- !driver-input -->
           <!-- driver-options -->
           <div class="form-group">
-            <div class="col-sm-12" style="margin-top: 5px">
+            <div class="col-sm-12 mt-1">
               <label class="control-label text-left">
                 Driver options
-                <portainer-tooltip
-                  position="bottom"
-                  message="Driver options are specific to the selected driver. Please refer to the selected driver documentation."
-                ></portainer-tooltip>
+                <portainer-tooltip message="'Driver options are specific to the selected driver. Please refer to the selected driver documentation.'"></portainer-tooltip>
               </label>
-              <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDriverOption()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add driver option
-              </span>
             </div>
             <!-- driver-options-input-list -->
-            <div class="col-sm-12 form-inline" style="margin-top: 10px">
-              <div ng-repeat="option in formValues.DriverOptions" style="margin-top: 2px">
+            <div class="col-sm-12 form-inline mt-2">
+              <div ng-repeat="option in formValues.DriverOptions" class="mt-1">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
                   <input type="text" class="form-control" ng-model="option.name" placeholder="e.g. com.docker.network.bridge.enable_icc" />
@@ -53,9 +44,12 @@
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. true" />
                 </div>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="removeDriverOption($index)">
-                  <i class="fa fa-trash" aria-hidden="true"></i>
+                <button class="btn btn-sm btn-light" type="button" ng-click="removeDriverOption($index)">
+                  <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                 </button>
+              </div>
+              <div class="small interactive text-muted vertical-center mt-1" ng-click="addDriverOption()">
+                <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add driver option
               </div>
             </div>
             <!-- !driver-options-input-list -->
@@ -97,18 +91,18 @@
                   placeholder="e.g. my-router=172.20.10.129"
                 />
               </div>
-              <button class="btn btn-sm btn-danger" type="button" ng-click="removeIPV4AuxAddress($index)">
-                <i class="fa fa-trash" aria-hidden="true"></i>
+              <button class="btn btn-md btn-light" type="button" ng-click="removeIPV4AuxAddress($index)">
+                <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
               </button>
-              <div class="col-sm-12 small text-warning" ng-show="state.IPV4AuxiliaryAddressesError[$index]">
-                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Exclude ip cannot be the same as gateway.</p>
+              <div class="col-sm-12 small text-warning" ng-if="state.IPV4AuxiliaryAddressesError[$index]">
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Exclude ip cannot be the same as gateway.</p>
               </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
-              <span class="label label-default interactive" style="margin-left: 10px" ng-click="addIPV4AuxAddress()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add excluded IP
-              </span>
+              <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV4AuxAddress()">
+                <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add excluded IP
+              </div>
             </div>
           </div>
           <div ng-show="config.Driver === 'bridge' || (config.Driver === 'macvlan' && formValues.Macvlan.Scope !== 'swarm')">
@@ -144,30 +138,26 @@
                   placeholder="e.g. my-router=2001:db8::1"
                 />
               </div>
-              <button class="btn btn-sm btn-danger" type="button" ng-click="removeIPV6AuxAddress($index)">
-                <i class="fa fa-trash" aria-hidden="true"></i>
+              <button class="btn btn-md btn-light" type="button" ng-click="removeIPV6AuxAddress($index)">
+                <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
               </button>
               <div class="col-sm-12 small text-warning" ng-show="state.IPV6AuxiliaryAddressesError[$index]">
-                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Exclude ip cannot be the same as gateway.</p>
+                <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Exclude ip cannot be the same as gateway.</p>
               </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
-              <span class="label label-default interactive" style="margin-left: 10px" ng-click="addIPV6AuxAddress()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add excluded IP
-              </span>
+              <div class="col-sm-12 small interactive text-muted vertical-center" ng-click="addIPV6AuxAddress()">
+                <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add excluded IP
+              </div>
             </div>
           </div>
           <div class="col-sm-12 form-section-title"> Advanced configuration </div>
           <!-- labels -->
           <div class="form-group">
-            <div class="col-sm-12" style="margin-top: 5px">
-              <label class="control-label text-left">Labels</label>
-              <span class="label label-default interactive" style="margin-left: 10px" ng-click="addLabel()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> add label </span>
-            </div>
             <!-- labels-input-list -->
-            <div class="col-sm-12 form-inline" style="margin-top: 10px">
-              <div ng-repeat="label in formValues.Labels" style="margin-top: 2px">
+            <div class="col-sm-12 form-inline">
+              <div ng-repeat="label in formValues.Labels" class="mt-1">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
                   <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" />
@@ -176,9 +166,14 @@
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                 </div>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="removeLabel($index)">
-                  <i class="fa fa-trash" aria-hidden="true"></i>
+                <button class="btn btn-sm btn-light" type="button" ng-click="removeLabel($index)">
+                  <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                 </button>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12 small interactive text-muted vertical-center mt-1" ng-click="addLabel()">
+                  <pr-icon icon="'plus'" size="'md'" feather="true"></pr-icon> Add label
+                </div>
               </div>
             </div>
             <!-- !labels-input-list -->
@@ -187,25 +182,25 @@
           <!-- internal -->
           <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">
-                Isolated network
-                <portainer-tooltip position="bottom" message="An isolated network has no inbound or outbound communications."></portainer-tooltip>
-              </label>
-              <label name="ownership" class="switch" style="margin-left: 20px">
-                <input type="checkbox" ng-model="config.Internal" />
-                <i></i>
-              </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="config.Internal"
+                label="'Isolated network'"
+                tooltip="'An isolated network has no inbound or outbound communications.'"
+                on-change="(onChangeInternal)"
+              ></por-switch-field>
             </div>
           </div>
           <!-- !internal -->
           <!-- attachable -->
           <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">
-              <label for="attachable" class="control-label text-left"> Enable manual container attachment </label>
-              <label name="attachable" class="switch" style="margin-left: 20px">
-                <input type="checkbox" ng-model="config.Attachable" />
-                <i></i>
-              </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="config.Attachable"
+                label="'Enable manual container attachment'"
+                on-change="(onChangeAttachable)"
+              ></por-switch-field>
             </div>
           </div>
           <!-- !attachable -->
@@ -239,8 +234,7 @@
                 <span ng-hide="state.actionInProgress">Create the network</span>
                 <span ng-show="state.actionInProgress">Creating network...</span>
               </button>
-              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none"></i>
-              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px">{{ state.formValidationError }}</span>
+              <span class="text-danger space-left" ng-if="state.formValidationError">{{ state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->

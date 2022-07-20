@@ -7,10 +7,14 @@ import {
   useEffect,
   useState,
   useMemo,
+  PropsWithChildren,
 } from 'react';
+
+import { isAdmin } from '@/portainer/users/user.helpers';
 
 import { getUser } from '../users/user.service';
 import { User, UserId } from '../users/types';
+import { EnvironmentId } from '../environments/types';
 
 import { useLocalStorage } from './useLocalStorage';
 
@@ -27,9 +31,17 @@ export function useUser() {
     throw new Error('should be nested under UserProvider');
   }
 
+  const { user } = context;
+  if (typeof user === 'undefined') {
+    throw new Error('should be authenticated');
+  }
+
   return useMemo(
-    () => ({ user: context.user, isAdmin: isAdmin(context.user) }),
-    [context.user]
+    () => ({
+      user,
+      isAdmin: isAdmin(user),
+    }),
+    [user]
   );
 }
 
@@ -37,22 +49,49 @@ export function useAuthorizations(
   authorizations: string | string[],
   adminOnlyCE = false
 ) {
-  const authorizationsArray =
-    typeof authorizations === 'string' ? [authorizations] : authorizations;
-
   const { user } = useUser();
-  const { params } = useCurrentStateAndParams();
+  const {
+    params: { endpointId },
+  } = useCurrentStateAndParams();
 
   if (!user) {
     return false;
+  }
+
+  return hasAuthorizations(user, authorizations, endpointId, adminOnlyCE);
+}
+
+export function isEnvironmentAdmin(
+  user: User,
+  environmentId: EnvironmentId,
+  adminOnlyCE = false
+) {
+  return hasAuthorizations(
+    user,
+    ['EndpointResourcesAccess'],
+    environmentId,
+    adminOnlyCE
+  );
+}
+
+export function hasAuthorizations(
+  user: User,
+  authorizations: string | string[],
+  environmentId?: EnvironmentId,
+  adminOnlyCE = false
+) {
+  const authorizationsArray =
+    typeof authorizations === 'string' ? [authorizations] : authorizations;
+
+  if (authorizationsArray.length === 0) {
+    return true;
   }
 
   if (process.env.PORTAINER_EDITION === 'CE') {
     return !adminOnlyCE || isAdmin(user);
   }
 
-  const { endpointId } = params;
-  if (!endpointId) {
+  if (!environmentId) {
     return false;
   }
 
@@ -62,12 +101,12 @@ export function useAuthorizations(
 
   if (
     !user.EndpointAuthorizations ||
-    !user.EndpointAuthorizations[endpointId]
+    !user.EndpointAuthorizations[environmentId]
   ) {
     return false;
   }
 
-  const userEndpointAuthorizations = user.EndpointAuthorizations[endpointId];
+  const userEndpointAuthorizations = user.EndpointAuthorizations[environmentId];
   return authorizationsArray.some(
     (authorization) => userEndpointAuthorizations[authorization]
   );
@@ -75,11 +114,15 @@ export function useAuthorizations(
 
 interface AuthorizedProps {
   authorizations: string | string[];
-  children: ReactNode;
+  adminOnlyCE?: boolean;
 }
 
-export function Authorized({ authorizations, children }: AuthorizedProps) {
-  const isAllowed = useAuthorizations(authorizations);
+export function Authorized({
+  authorizations,
+  adminOnlyCE = false,
+  children,
+}: PropsWithChildren<AuthorizedProps>) {
+  const isAllowed = useAuthorizations(authorizations, adminOnlyCE);
 
   return isAllowed ? <>{children}</> : null;
 }
@@ -90,7 +133,7 @@ interface UserProviderProps {
 
 export function UserProvider({ children }: UserProviderProps) {
   const [jwt] = useLocalStorage('JWT', '');
-  const [user, setUser] = useState<User | undefined>();
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
     if (jwt !== '') {
@@ -106,7 +149,7 @@ export function UserProvider({ children }: UserProviderProps) {
     return null;
   }
 
-  if (providerState.user === null) {
+  if (!providerState.user) {
     return null;
   }
 
@@ -120,10 +163,6 @@ export function UserProvider({ children }: UserProviderProps) {
     const user = await getUser(id);
     setUser(user);
   }
-}
-
-function isAdmin(user?: User): boolean {
-  return !!user && user.Role === 1;
 }
 
 export function useIsAdmin() {

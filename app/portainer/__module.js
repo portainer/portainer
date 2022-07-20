@@ -10,6 +10,7 @@ import teamsModule from './teams';
 import homeModule from './home';
 import { accessControlModule } from './access-control';
 import { reactModule } from './react';
+import { sidebarModule } from './react/views/sidebar';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -40,6 +41,7 @@ angular
     teamsModule,
     accessControlModule,
     reactModule,
+    sidebarModule,
   ])
   .config([
     '$stateRegistryProvider',
@@ -68,8 +70,7 @@ angular
         },
         views: {
           'sidebar@': {
-            templateUrl: './views/sidebar/sidebar.html',
-            controller: 'SidebarController',
+            component: 'sidebar',
           },
         },
       };
@@ -198,17 +199,6 @@ angular
             templateUrl: '../kubernetes/views/configure/configure.html',
             controller: 'KubernetesConfigureController',
             controllerAs: 'ctrl',
-          },
-        },
-      };
-
-      var endpointCreation = {
-        name: 'portainer.endpoints.new',
-        url: '/new',
-        views: {
-          'content@': {
-            templateUrl: './views/endpoints/create/createendpoint.html',
-            controller: 'CreateEndpointController',
           },
         },
       };
@@ -498,7 +488,6 @@ angular
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(edgeDeviceCreation);
-      $stateRegistryProvider.register(endpointCreation);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);

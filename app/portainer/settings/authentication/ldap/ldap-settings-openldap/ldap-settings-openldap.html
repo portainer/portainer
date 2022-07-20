@@ -1,5 +1,5 @@
 <ng-form limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-class="limited-be" class="ldap-settings-openldap">
-  <be-feature-indicator feature="$ctrl.limitedFeatureId" class="my-8 block"></be-feature-indicator>
+  <be-feature-indicator feature="$ctrl.limitedFeatureId"></be-feature-indicator>
 
   <div>
     <div class="col-sm-12 form-section-title"> Information </div>
@@ -61,12 +61,13 @@
 
   <!-- Anonymous mode-->
   <div class="form-group">
-    <label for="anonymous_mode" class="control-label text-left col-sm-3" style="padding-top: 0">
-      Anonymous mode
-      <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
-    </label>
-    <div class="col-sm-9">
-      <label class="switch">
+    <div class="col-sm-12">
+      <label for="anonymous_mode" class="control-label text-left">
+        Anonymous mode
+        <portainer-tooltip message="'Enable this option if the server is configured for Anonymous access.'"></portainer-tooltip>
+      </label>
+
+      <label class="switch" style="margin-left: 20px">
         <input
           type="checkbox"
           id="anonymous_mode"
@@ -81,11 +82,11 @@
 
   <div ng-if="!$ctrl.settings.AnonymousMode">
     <div class="form-group">
-      <label for="ldap_username" class="col-sm-3 control-label text-left">
+      <label for="ldap_username" class="col-sm-3 col-lg-2 control-label text-left">
         Reader DN
-        <portainer-tooltip position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
+        <portainer-tooltip message="'Account that will be used to search for users.'"></portainer-tooltip>
       </label>
-      <div class="col-sm-9">
+      <div class="col-sm-9 col-lg-10">
         <input
           type="text"
           class="form-control"
@@ -100,9 +101,9 @@
     </div>
 
     <div class="form-group">
-      <label for="ldap_password" class="col-sm-3 control-label text-left">
+      <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
         Password
-        <portainer-tooltip position="bottom" message="If you do not enter a password, Portainer will leave the current password unchanged."></portainer-tooltip>
+        <portainer-tooltip message="'If you do not enter a password, Portainer will leave the current password unchanged.'"></portainer-tooltip>
       </label>
       <div class="col-sm-9">
         <input
@@ -120,7 +121,7 @@
   </div>
 
   <div class="form-group" ng-if="$ctrl.settings.AnonymousMode">
-    <label for="ldap_domain_root" class="col-sm-3 control-label text-left"> Domain root </label>
+    <label for="ldap_domain_root" class="col-sm-3 col-lg-2 control-label text-left"> Domain root </label>
     <div class="col-sm-9">
       <input
         type="text"

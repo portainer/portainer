@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 
 import axios, { parseAxiosError } from '../axios';
 
-interface NodesCountResponse {
+export interface NodesCountResponse {
   nodes: number;
 }
 
@@ -16,6 +16,7 @@ export async function getNodesCount() {
 }
 
 export interface StatusResponse {
+  Edition: string;
   Version: string;
   InstanceID: string;
 }
@@ -23,6 +24,8 @@ export interface StatusResponse {
 export async function getStatus() {
   try {
     const { data } = await axios.get<StatusResponse>(buildUrl());
+
+    data.Edition = 'Community Edition';
 
     return data;
   } catch (error) {
@@ -34,6 +37,32 @@ export function useStatus<T = StatusResponse>(
   select?: (status: StatusResponse) => T
 ) {
   return useQuery(['status'], () => getStatus(), { select });
+}
+
+export interface VersionResponse {
+  // Whether portainer has an update available
+  UpdateAvailable: boolean;
+  // The latest version available
+  LatestVersion: string;
+  ServerVersion: string;
+  DatabaseVersion: string;
+  Build: {
+    BuildNumber: string;
+    ImageTag: string;
+    NodejsVersion: string;
+    YarnVersion: string;
+    WebpackVersion: string;
+    GoVersion: string;
+  };
+}
+
+export async function getVersionStatus() {
+  try {
+    const { data } = await axios.get<VersionResponse>(buildUrl('version'));
+    return data;
+  } catch (error) {
+    throw parseAxiosError(error as Error);
+  }
 }
 
 function buildUrl(action?: string) {

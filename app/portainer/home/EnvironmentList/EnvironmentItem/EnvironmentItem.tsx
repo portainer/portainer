@@ -13,10 +13,11 @@ import {
   isEdgeEnvironment,
 } from '@/portainer/environments/utils';
 import type { TagId } from '@/portainer/tags/types';
-import { Button } from '@/portainer/components/Button';
-import { Link } from '@/portainer/components/Link';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
 import { useTags } from '@/portainer/tags/queries';
+
+import { Button } from '@@/buttons';
+import { Link } from '@@/Link';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EdgeIndicator } from './EdgeIndicator';
@@ -68,10 +69,8 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
                   <span className="space-left blocklist-item-subtitle">
                     {isEdge ? (
                       <EdgeIndicator
-                        edgeId={environment.EdgeID}
-                        checkInInterval={environment.EdgeCheckinInterval}
-                        lastCheckInDate={environment.LastCheckInDate}
-                        queryDate={environment.QueryDate}
+                        environment={environment}
+                        showLastCheckInDate
                       />
                     ) : (
                       <>
@@ -101,6 +100,8 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
                           {environment.Snapshots[0].TotalCPU}
                           <i className="fa fa-memory space-left space-right" />
                           {humanize(environment.Snapshots[0].TotalMemory)}
+                          <i className="fa fa-digital-tachograph space-left space-right" />
+                          {environment.Gpus.length}
                         </span>
                       )}
                       <span className="space-left space-right">-</span>

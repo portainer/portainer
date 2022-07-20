@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Settings"></rd-header-title>
-  <rd-header-content>Settings</rd-header-content>
-</rd-header>
+<page-header title="'Settings'" breadcrumbs="['Settings']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -22,7 +19,7 @@
             <div class="col-sm-12">
               <por-switch-field
                 label="'Use custom logo'"
-                value="formValues.customLogo"
+                checked="formValues.customLogo"
                 name="'toggle_logo'"
                 disabled="state.isDemo"
                 on-change="(onToggleCustomLogo)"
@@ -50,7 +47,7 @@
             <div class="col-sm-12">
               <por-switch-field
                 label="'Allow the collection of anonymous statistics'"
-                value="formValues.enableTelemetry"
+                checked="formValues.enableTelemetry"
                 name="'toggle_enableTelemetry'"
                 on-change="(onToggleEnableTelemetry)"
                 disabled="state.isDemo"
@@ -70,7 +67,7 @@
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 You can specify the URL to your own template definitions file here. See
-                <a href="https://documentation.portainer.io/v2.0/settings/apps/#build-and-host-your-own-templates" target="_blank">Portainer documentation</a> for more details.
+                <a href="https://docs.portainer.io/advanced/app-templates/build" target="_blank">Portainer documentation</a> for more details.
               </span>
             </div>
             <div class="form-group">

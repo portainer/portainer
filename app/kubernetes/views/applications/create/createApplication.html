@@ -1,16 +1,39 @@
-<kubernetes-view-header ng-if="!ctrl.state.isEdit" title="Create application" state="kubernetes.applications.new" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.applications">Applications</a> &gt; Create an application
-</kubernetes-view-header>
-<kubernetes-view-header ng-if="ctrl.state.isEdit" title="Edit application" state="kubernetes.applications.application.edit" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
-  <a ui-sref="kubernetes.applications">Applications</a> &gt;
-  <a ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">{{ ctrl.application.Name }}</a> &gt; Edit
-</kubernetes-view-header>
+<page-header
+  ng-if="!ctrl.state.isEdit"
+  title="'Create application'"
+  breadcrumbs="[
+    { label:'Applications', link:'kubernetes.applications' },
+     'Create an application'
+     ]"
+  reload="true"
+>
+</page-header>
+
+<page-header
+  ng-if="ctrl.state.isEdit"
+  title="'Edit application'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { 
+      label:ctrl.application.ResourcePool,
+      link: 'kubernetes.resourcePools.resourcePool', 
+      linkParams:{ id: ctrl.application.ResourcePool }
+    },
+    { label:'Applications', link:'kubernetes.applications' },
+    { 
+      label:ctrl.application.Name,
+      link: 'kubernetes.applications.application', 
+      linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
+    },
+     'Edit',
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 <div ng-if="ctrl.state.viewReady">
-  <div class="row">
+  <div class="row kubernetes-create">
     <div class="col-xs-12">
       <rd-widget>
         <rd-widget-body>
@@ -27,8 +50,8 @@
               <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"> Namespace </div>
               <!-- #region NAMESPACE -->
               <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
-                <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
-                <div class="col-sm-11">
+                <label for="resource-pool-selector" class="col-sm-3 col-lg-2 control-label text-left">Namespace</label>
+                <div class="col-sm-8">
                   <select
                     class="form-control"
                     id="resource-pool-selector"
@@ -42,14 +65,14 @@
               </div>
               <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
                 <div class="col-sm-12 small text-danger">
-                  <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
                   This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
                   namespace.
                 </div>
               </div>
               <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
                 <div class="col-sm-12 small text-muted">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
                   You do not have access to any namespace. Contact your administrator to get access to a namespace.
                 </div>
               </div>
@@ -75,7 +98,7 @@
                 <editor-description>
                   <span class="text-muted small" ng-show="ctrl.stack.IsComposeFormat">
                     <p>
-                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                       Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not
                       all the Compose format options are supported by Kompose at the moment.
                     </p>
@@ -86,7 +109,7 @@
                   </span>
                   <span class="text-muted small" ng-show="!ctrl.stack.IsComposeFormat">
                     <p>
-                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
                     </p>
                     <p>
@@ -101,8 +124,8 @@
                 <div class="col-sm-12 form-section-title"> Application </div>
                 <!-- #region NAME FIELD -->
                 <div class="form-group">
-                  <label for="application_name" class="col-sm-1 control-label text-left">Name</label>
-                  <div class="col-sm-11">
+                  <label for="application_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+                  <div class="col-sm-8">
                     <input
                       type="text"
                       class="form-control"
@@ -119,17 +142,17 @@
                   </div>
                 </div>
                 <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid || ctrl.state.alreadyExists">
-                  <div class="col-sm-12 small text-warning">
+                  <div class="col-sm-12 small">
                     <div ng-messages="kubernetesApplicationCreationForm.application_name.$error">
-                      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                      <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p>
                       <p ng-message="pattern">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                         This field must consist of lower case alphanumeric characters or '-', contain at most 63 characters, start with an alphabetic character, and end with an
                         alphanumeric character (e.g. 'my-name', or 'abc-123').
                       </p>
                     </div>
                     <p ng-if="ctrl.state.alreadyExists">
-                      <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                       An application with the same name already exists inside the selected namespace.
                     </p>
                   </div>
@@ -137,8 +160,7 @@
                 <!-- #endregion -->
 
                 <!-- #region IMAGE FIELD -->
-
-                <div class="form-group">
+                <div class="form-group mb-0">
                   <div class="col-sm-12">
                     <por-image-registry
                       model="ctrl.formValues.ImageModel"
@@ -154,20 +176,22 @@
                     ></por-image-registry>
                   </div>
                 </div>
+                <!-- #end region IMAGE FIELD -->
+
                 <div ng-if="ctrl.formValues.ResourcePool">
                   <div class="col-sm-12 form-section-title"> Stack </div>
                   <!-- #region STACK -->
                   <div class="form-group">
                     <div class="col-sm-12 small text-muted">
-                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to
                       use the application name.
                     </div>
                   </div>
 
                   <div class="form-group">
-                    <label for="stack_name" class="col-sm-1 control-label text-left">Stack</label>
-                    <div class="col-sm-11">
+                    <label for="stack_name" class="col-sm-3 col-lg-2 control-label text-left">Stack</label>
+                    <div class="col-sm-8">
                       <input
                         type="text"
                         class="form-control"
@@ -190,12 +214,12 @@
                       <label class="control-label text-left">Environment variables</label>
                       <span
                         ng-if="ctrl.formValues.Containers.length <= 1"
-                        class="label label-default interactive"
+                        class="label label-default interactive vertical-center"
                         style="margin-left: 10px"
                         ng-click="ctrl.addEnvironmentVariable()"
                         data-cy="k8sAppCreate-addEnvVarButton"
                       >
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
+                        <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> add environment variable
                       </span>
                     </div>
 
@@ -234,17 +258,17 @@
                           </div>
 
                           <div class="col-sm-2 input-group input-group-sm" ng-if="ctrl.formValues.Containers.length <= 1">
-                            <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable(envVar)">
-                              <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                            <button ng-if="!envVar.NeedsDeletion" class="btn btn-md btn-light btn-only-icon" type="button" ng-click="ctrl.removeEnvironmentVariable(envVar)">
+                              <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
                             </button>
                             <button
                               ng-if="envVar.NeedsDeletion"
-                              class="btn btn-sm btn-primary"
+                              class="btn btn-sm btn-light btn-only-icon"
                               type="button"
                               ng-click="ctrl.restoreEnvironmentVariable(envVar)"
                               data-cy="k8sAppCreate-removeEnvVarButton_{{ $index }}"
                             >
-                              <i class="fa fa-trash-restore" aria-hidden="true"></i>
+                              <pr-icon icon="'rotate-cw'" size="'md'" feather="true"></pr-icon>
                             </button>
                           </div>
                         </div>
@@ -256,7 +280,7 @@
                         >
                           <div class="col-sm-4 input-group input-group-sm">
                             <div
-                              class="small text-warning"
+                              class="small"
                               style="margin-top: 5px"
                               ng-show="
                                 kubernetesApplicationCreationForm['environment_variable_name_' + $index].$invalid ||
@@ -264,14 +288,14 @@
                               "
                             >
                               <ng-messages for="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$error">
-                                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Environment variable name is required.</p>
+                                <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Environment variable name is required.</p>
                                 <p ng-message="pattern"
-                                  ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of alphabetic characters, digits, '_', '-', or '.', and
-                                  must not start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.</p
+                                  ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field must consist of alphabetic characters, digits, '_', '-',
+                                  or '.', and must not start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.</p
                                 >
                               </ng-messages>
                               <p ng-if="ctrl.state.duplicates.environmentVariables.refs[$index] !== undefined"
-                                ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This environment variable is already defined.</p
+                                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This environment variable is already defined.</p
                               >
                             </div>
                           </div>
@@ -289,26 +313,26 @@
                     <div class="col-sm-12">
                       <label class="control-label text-left">Configurations</label>
                       <span
-                        class="label label-default interactive"
+                        class="label label-default interactive vertical-center"
                         style="margin-left: 10px"
                         ng-click="ctrl.addConfiguration()"
                         ng-if="ctrl.formValues.Containers.length <= 1"
                         data-cy="k8sAppCreate-addConfigButton"
                       >
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i> add configuration
+                        <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> add configuration
                       </span>
                     </div>
                     <div class="col-sm-12 small text-muted" style="margin-top: 15px" ng-if="ctrl.formValues.Configurations.length">
-                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-                      Portainer will automatically expose all the keys of a configuration as environment variables. This behavior can be overriden to filesystem mounts for each key
-                      via the override button.
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                      Portainer will automatically expose all the keys of a configuration as environment variables. This behavior can be overridden to filesystem mounts for each
+                      key via the override button.
                     </div>
                   </div>
 
                   <!-- config-element -->
                   <div class="form-group" ng-repeat="(index, config) in ctrl.formValues.Configurations">
-                    <label for="stack_name" class="col-md-1 col-sm-2 control-label text-left">Configuration</label>
-                    <div class="col-sm-5">
+                    <label for="stack_name" class="col-sm-3 col-lg-2 control-label text-left">Configuration</label>
+                    <div class="col-sm-6">
                       <select
                         class="form-control"
                         ng-model="config.SelectedConfiguration"
@@ -318,41 +342,41 @@
                         data-cy="k8sAppCreate-addConfigSelect_{{ $index }}"
                       ></select>
                     </div>
-                    <div class="col-sm-6" style="margin-top: 2px">
+                    <div class="col-sm-3" style="margin-top: 2px">
                       <button
-                        class="btn btn-sm btn-primary"
+                        class="btn btn-sm btn-light vertical-center"
                         type="button"
                         ng-if="!config.Overriden"
                         ng-click="ctrl.overrideConfiguration(index)"
                         ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
                         data-cy="k8sAppCreate-configOverrideButton_{{ $index }}"
                       >
-                        <i class="fa fa-list" aria-hidden="true"></i> Override
+                        <pr-icon icon="'list'" size="'md'" feather="true"></pr-icon> Override
                       </button>
                       <button
-                        class="btn btn-sm btn-primary"
+                        class="btn btn-sm btn-light vertical-center"
                         type="button"
                         ng-if="config.Overriden"
                         ng-click="ctrl.resetConfiguration(index)"
                         ng-disabled="ctrl.formValues.Containers.length > 1"
                         data-cy="k8sAppCreate-configAutoButton_{{ $index }}"
                       >
-                        <i class="fa fa-undo" aria-hidden="true"></i> Auto
+                        <pr-icon icon="'rotate-cw'" size="'md'" feather="true"></pr-icon> Auto
                       </button>
                       <button
-                        class="btn btn-sm btn-danger"
+                        class="btn btn-sm btn-dangerlight vertical-center"
                         type="button"
                         ng-click="ctrl.removeConfiguration(index)"
                         ng-if="ctrl.formValues.Containers.length <= 1"
                         data-cy="k8sAppCreate-configRemoveButton"
                       >
-                        <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
+                        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon> Remove
                       </button>
                     </div>
                     <!-- no-override -->
                     <div class="col-sm-12" style="margin-top: 10px" ng-if="config.SelectedConfiguration && !config.Overriden">
-                      <div class="col-md-1 col-sm-2"></div>
-                      <div class="col-md-11 col-sm-10 small text-muted" style="padding-left: 5px">
+                      <div class="col-sm-3 col-lg-2"></div>
+                      <div class="col-sm-6 small text-muted" style="padding-left: 5px">
                         The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> configuration as environment variables:
                         <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
                           <code>{{ key }}</code
@@ -391,10 +415,10 @@
 
                           <div class="input-group col-sm-4 btn-group btn-group-sm">
                             <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT">
-                              <i class="fa fa-list" aria-hidden="true"></i> Environment
+                              <pr-icon icon="'list'" feather="true"></pr-icon> Environment
                             </label>
                             <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
-                              <i class="fa fa-file" aria-hidden="true"></i> Filesystem
+                              <pr-icon icon="'file-text'" feather="true"></pr-icon> Filesystem
                             </label>
                           </div>
                         </div>
@@ -417,10 +441,10 @@
                               "
                             >
                               <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
-                                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required.</p>
+                                <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required.</p>
                               </ng-messages>
                               <p ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined"
-                                ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This path is already used.</p
+                                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This path is already used.</p
                               >
                             </div>
                           </div>
@@ -437,13 +461,13 @@
                   <!-- #region PERSISTED FOLDERS -->
                   <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
                     <div class="col-sm-12 small text-muted">
-                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       No storage option is available to persist data, contact your administrator to enable a storage option.
                     </div>
                   </div>
 
                   <div class="form-group" ng-if="ctrl.storageClassAvailable()">
-                    <div class="col-sm-12" style="margin-top: 5px">
+                    <div class="col-sm-12" style="margin-top: 5px" ng-if="!ctrl.allQuotasExhaustedAndNoVolumesAvailable()">
                       <label class="control-label text-left">Persisted folders</label>
                       <span
                         class="label label-default interactive"
@@ -452,7 +476,14 @@
                         ng-if="ctrl.isAddPersistentFolderButtonShowed()"
                         data-cy="k8sAppCreate-addPersistentFolderButton"
                       >
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i> add persisted folder
+                        <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> add persisted folder
+                      </span>
+                    </div>
+
+                    <div class="col-sm-12" style="margin-top: 5px" ng-if="ctrl.allQuotasExhaustedAndNoVolumesAvailable()">
+                      <span class="small text-muted">
+                        <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                        This namespace has exhausted its storage capacity. Contact your administrator to expand the capacity of the namespace.
                       </span>
                     </div>
 
@@ -513,6 +544,7 @@
                             ng-min="0"
                             required
                             ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
+                            ng-change="ctrl.onChangeVolumeRequestedSize()"
                           />
                           <span class="input-group-addon" style="padding: 0">
                             <select
@@ -520,6 +552,7 @@
                               ng-style="{ width: '100%', height: '100%', cursor: ctrl.isEditAndExistingPersistedFolder($index) ? 'not-allowed' : 'auto' }"
                               ng-options="unit for unit in ctrl.state.availableSizeUnits"
                               ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
+                              ng-change="ctrl.onChangeVolumeRequestedSize()"
                             ></select>
                           </span>
                         </div>
@@ -568,7 +601,7 @@
                               ng-click="ctrl.removePersistedFolder($index)"
                               data-cy="k8sAppCreate-rmPersistentFolderButton"
                             >
-                              <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                              <pr-icon icon="'trash-2'" feather="true"></pr-icon>
                             </button>
                             <button
                               ng-if="persistedFolder.NeedsDeletion"
@@ -577,7 +610,7 @@
                               ng-click="ctrl.restorePersistedFolder($index)"
                               data-cy="k8sAppCreate-restorePersistentButton"
                             >
-                              <i class="fa fa-trash-restore" aria-hidden="true"></i>
+                              <pr-icon icon="'rotate-cw'" feather="true"></pr-icon>
                             </button>
                           </div>
                         </div>
@@ -588,6 +621,7 @@
                           kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid ||
                           ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined ||
                           kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid ||
+                          ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined ||
                           kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid ||
                           ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined
                         "
@@ -601,10 +635,10 @@
                             "
                           >
                             <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$error">
-                              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required.</p>
+                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required.</p>
                             </ng-messages>
                             <p ng-if="ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined"
-                              ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This path is already defined.</p
+                              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This path is already defined.</p
                             >
                           </div>
                         </div>
@@ -612,21 +646,33 @@
                         <div class="input-group col-sm-2 input-group-sm"></div>
 
                         <div class="input-group col-sm-5 input-group-sm">
-                          <div class="small text-warning" style="margin-top: 5px" ng-show="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid">
+                          <div
+                            class="small text-warning"
+                            style="margin-top: 5px"
+                            ng-show="
+                              kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid || ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined
+                            "
+                          >
                             <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$error">
-                              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Size is required.</p>
-                              <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This value must be greater than zero.</p>
+                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Size is required.</p>
+                              <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This value must be greater than zero.</p>
                             </ng-messages>
+                            <p ng-if="ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined">
+                              <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                              You can only request up to
+                              {{ ctrl.state.storages.availabilities[persistedFolder.StorageClass.Name] | kubernetesAppStorageRequestSizeHumanReadable }} for
+                              {{ persistedFolder.StorageClass.Name }}
+                            </p>
                           </div>
                           <div
                             class="small text-warning"
                             ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid || ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined"
                           >
                             <ng-messages for="kubernetesApplicationCreationForm['existing_volumes_' + $index].$error">
-                              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Volume is required.</p>
+                              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Volume is required.</p>
                             </ng-messages>
                             <p ng-if="ctrl.state.duplicates.existingVolumes.refs[$index] !== undefined"
-                              ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This volume is already used.</p
+                              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This volume is already used.</p
                             >
                           </div>
                         </div>
@@ -667,7 +713,7 @@
                           />
                           <label for="data_access_isolated">
                             <div class="boxselector_header">
-                              <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px"></i>
+                              <pr-icon icon="'box'" feather="true"></pr-icon>
                               Isolated
                             </div>
                             <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
@@ -689,7 +735,7 @@
                             style="cursor: pointer; border-color: #767676"
                           >
                             <div class="boxselector_header">
-                              <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px"></i>
+                              <pr-icon icon="'box'" feather="true"></pr-icon>
                               Isolated
                             </div>
                             <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
@@ -705,7 +751,7 @@
                           />
                           <label for="data_access_shared">
                             <div class="boxselector_header">
-                              <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px"></i>
+                              <pr-icon icon="'sliders'" feather="true"></pr-icon>
                               Shared
                             </div>
                             <p>Application will be deployed as a Deployment with a shared storage access</p>
@@ -722,7 +768,7 @@
                             style="cursor: pointer; border-color: #767676"
                           >
                             <div class="boxselector_header">
-                              <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px"></i>
+                              <pr-icon icon="'sliders'" feather="true"></pr-icon>
                               Shared
                             </div>
                             <p>Application will be deployed as a Deployment with a shared storage access</p>
@@ -738,14 +784,14 @@
                   <!-- #region RESOURCE RESERVATIONS -->
                   <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota">
                     <div class="col-sm-12 small text-muted">
-                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       Resource reservations are applied per instance of the application.
                     </div>
                   </div>
 
                   <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
                     <div class="col-sm-12 small text-muted">
-                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       A resource quota is set on this namespace, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums
                       are inherited from the namespace quota.
                     </div>
@@ -753,7 +799,7 @@
 
                   <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
                     <div class="col-sm-12 small text-danger">
-                      <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                       This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of
                       the namespace.
                     </div>
@@ -769,8 +815,7 @@
                     <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px">
                       Memory
                       <portainer-tooltip
-                        position="bottom"
-                        message="An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM."
+                        message="'An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM.'"
                       >
                       </portainer-tooltip>
                     </label>
@@ -798,7 +843,7 @@
                     <div class="col-sm-12 small text-warning">
                       <div ng-messages="kubernetesApplicationCreationForm.memory_limit.$error">
                         <p
-                          ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.state.sliders.memory.min }} and
+                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Value must be between {{ ctrl.state.sliders.memory.min }} and
                           {{ ctrl.state.sliders.memory.max }}
                         </p>
                       </div>
@@ -815,8 +860,7 @@
                     <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px">
                       CPU
                       <portainer-tooltip
-                        position="bottom"
-                        message="An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling."
+                        message="'An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling.'"
                       >
                       </portainer-tooltip>
                     </label>
@@ -830,7 +874,7 @@
 
                   <div class="form-group" ng-if="ctrl.nodeLimitsOverflow()">
                     <div class="col-sm-12 small text-danger">
-                      <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                       These reservations would exceed the resources currently available in the cluster.
                     </div>
                   </div>
@@ -856,7 +900,7 @@
                         />
                         <label for="deployment_replicated">
                           <div class="boxselector_header">
-                            <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px"></i>
+                            <pr-icon icon="'sliders'" feather="true"></pr-icon>
                             Replicated
                           </div>
                           <p>Run one or multiple instances of this container</p>
@@ -921,10 +965,10 @@
                     </div>
                   </div>
                   <div class="form-group" ng-if="kubernetesApplicationCreationForm['replica_count'].$invalid">
-                    <div class="col-sm-12 small text-warning">
+                    <div class="col-sm-12 small">
                       <ng-messages for="kubernetesApplicationCreationForm['replica_count'].$error">
-                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Instance count is required.</p>
-                        <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Instance count must be greater than 0.</p>
+                        <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count is required.</p>
+                        <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count must be greater than 0.</p>
                       </ng-messages>
                     </div>
                   </div>
@@ -935,7 +979,7 @@
                     ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1 && (ctrl.formValues.CpuLimit !== 0 || ctrl.formValues.MemoryLimit !== 0)"
                   >
                     <div class="col-sm-12 small text-muted">
-                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                       This application will reserve the following resources:
                       <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount | kubernetesApplicationCPUValue }} CPU</b> and
                       <b>{{ ctrl.formValues.MemoryLimit * ctrl.formValues.ReplicaCount }} MB</b> of memory.
@@ -943,15 +987,22 @@
                   </div>
 
                   <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
-                    <div class="col-sm-12 small text-danger">
-                      <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                    <div class="col-sm-12 small">
+                      <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                       This application would exceed available resources. Please review resource reservations or the instance count.
+                    </div>
+                  </div>
+
+                  <div class="form-group" ng-if="ctrl.state.storages.quotaExceeded">
+                    <div class="col-sm-12 small text-muted">
+                      <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                      This application would exceed available storage. Please review the persisted folders or the instance count.
                     </div>
                   </div>
 
                   <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
                     <div class="col-sm-12 small text-muted">
-                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                       The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code
                       >. You will not be able to scale that application.
                     </div>
@@ -995,10 +1046,7 @@
                           <td style="width: 33%; border: none; padding: 2px 0 2px 0">Maximum instances</td>
                           <td style="width: 33%; border: none; padding: 2px 0 2px 0">
                             Target CPU usage (<b>%</b>)
-                            <portainer-tooltip
-                              position="bottom"
-                              message="The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances."
-                            >
+                            <portainer-tooltip message="'The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances.'">
                             </portainer-tooltip>
                           </td>
                         </tr>
@@ -1019,9 +1067,11 @@
                             <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_min'].$invalid">
                               <div class="small text-warning" style="margin-top: 5px">
                                 <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_min'].$error">
-                                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum instances is required.</p>
-                                  <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum instances must be greater than 0.</p>
-                                  <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum instances must be smaller than maximum instances.</p>
+                                  <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Minimum instances is required.</p>
+                                  <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Minimum instances must be greater than 0.</p>
+                                  <p ng-message="max"
+                                    ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Minimum instances must be smaller than maximum instances.</p
+                                  >
                                 </ng-messages>
                               </div>
                             </div>
@@ -1039,8 +1089,10 @@
                             <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_max'].$invalid || ctrl.autoScalerOverflow()">
                               <div class="small text-warning" style="margin-top: 5px">
                                 <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_max'].$error">
-                                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum instances is required.</p>
-                                  <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum instances must be greater than minimum instances.</p>
+                                  <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Maximum instances is required.</p>
+                                  <p ng-message="min"
+                                    ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Maximum instances must be greater than minimum instances.</p
+                                  >
                                 </ng-messages>
                               </div>
                             </div>
@@ -1061,9 +1113,9 @@
                             <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_cpu'].$invalid">
                               <div class="small text-warning" style="margin-top: 5px">
                                 <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_cpu'].$error">
-                                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Target CPU usage is required.</p>
-                                  <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Target CPU usage must be greater than 0.</p>
-                                  <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Target CPU usage must be smaller than 100.</p>
+                                  <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target CPU usage is required.</p>
+                                  <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target CPU usage must be greater than 0.</p>
+                                  <p ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target CPU usage must be smaller than 100.</p>
                                 </ng-messages>
                               </div>
                             </div>
@@ -1074,7 +1126,7 @@
 
                     <div class="form-group" ng-if="ctrl.autoScalerOverflow()" style="margin-bottom: 10px">
                       <div class="col-sm-12 small text-danger">
-                        <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                         This application would exceed available resources. Please review resource reservations or the maximum instance count of the auto-scaling policy.
                       </div>
                     </div>
@@ -1088,13 +1140,13 @@
                     <div class="form-group">
                       <div class="col-sm-12">
                         <label class="control-label text-left">Placement rules</label>
-                        <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addPlacement()">
-                          <i class="fa fa-plus-circle" aria-hidden="true"></i> add rule
+                        <span class="label label-default interactive vertical-center" style="margin-left: 10px" ng-click="ctrl.addPlacement()">
+                          <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> add rule
                         </span>
                       </div>
 
                       <div class="col-sm-12 small text-muted" ng-if="ctrl.formValues.Placements.length > 0" style="margin-top: 10px">
-                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                         Deploy this application on nodes that respect <b>ALL</b> of the following placement rules. Placement rules are based on node labels.
                       </div>
 
@@ -1125,21 +1177,21 @@
                           <div class="col-sm-1 input-group">
                             <button
                               ng-if="!placement.NeedsDeletion"
-                              class="btn btn-sm btn-danger"
+                              class="btn btn-sm btn-light btn-only-icon"
                               type="button"
                               ng-click="ctrl.removePlacement($index)"
                               data-cy="k8sAppCreate-deletePlacementButton"
                             >
-                              <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                              <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
                             </button>
                             <button
                               ng-if="placement.NeedsDeletion"
-                              class="btn btn-sm btn-primary"
+                              class="btn btn-sm btn-light btn-only-icon"
                               type="button"
                               ng-click="ctrl.restorePlacement($index)"
                               data-cy="k8sAppCreate-restorePlacementButton"
                             >
-                              <i class="fa fa-trash-restore" aria-hidden="true"></i>
+                              <pr-icon icon="'rotate-cw'" size="'md'" feather="true"></pr-icon>
                             </button>
                           </div>
                         </div>
@@ -1147,7 +1199,7 @@
                           <div class="col-sm-5 input-group">
                             <div class="small text-warning" style="margin-top: 5px" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
                               <p ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
-                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This label is already defined.
+                                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This label is already defined.
                               </p>
                             </div>
                           </div>
@@ -1178,7 +1230,7 @@
                             />
                             <label for="placement_hard">
                               <div class="boxselector_header">
-                                <i class="fa fa-tasks" aria-hidden="true" style="margin-right: 2px"></i>
+                                <pr-icon icon="'sliders'" feather="true"></pr-icon>
                                 Mandatory
                               </div>
                               <p>Schedule this application <b>ONLY</b> on nodes that match <b>ALL</b> Rules</p>
@@ -1194,7 +1246,7 @@
                             />
                             <label for="placement_soft">
                               <div class="boxselector_header">
-                                <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px"></i>
+                                <pr-icon icon="'align-justify'" feather="true"></pr-icon>
                                 Preferred
                               </div>
                               <p>Schedule this application on nodes that match the rules if possible</p>
@@ -1239,14 +1291,14 @@
               </div>
               <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
                 <div class="col-sm-12 small text-danger">
-                  <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-circle'" mode="'danger'" feather="true"></pr-icon>
                   This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
                   namespace.
                 </div>
               </div>
               <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
                 <div class="col-sm-12 small text-muted">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   You do not have access to any namespace. Contact your administrator to get access to a namespace.
                 </div>
               </div>

@@ -12,7 +12,7 @@ export function APITab({ onCreate }: Props) {
     <>
       <DeploymentScripts />
 
-      <div className="wizard-form">
+      <div className="mt-5">
         <APIForm onCreate={onCreate} />
       </div>
     </>

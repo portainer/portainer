@@ -2,19 +2,21 @@ import { Field, Form, Formik } from 'formik';
 import { useReducer, useState } from 'react';
 import { object, SchemaOf, string } from 'yup';
 
-import { BoxSelector, buildOption } from '@/portainer/components/BoxSelector';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Input } from '@/portainer/components/form-components/Input';
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
+import { buildOption } from '@/portainer/components/BoxSelector';
 import { useCreateAzureEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { Environment } from '@/portainer/environments/types';
 import { EnvironmentMetadata } from '@/portainer/environments/environment.service/create';
 
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { Input } from '@@/form-components/Input';
+import { FormControl } from '@@/form-components/FormControl';
+import { BoxSelector } from '@@/BoxSelector';
+
 import { NameField, nameValidation } from '../shared/NameField';
 import { AnalyticsStateKey } from '../types';
-import { MetadataFieldset } from '../shared/MetadataFieldset';
 import { metadataValidation } from '../shared/MetadataFieldset/validation';
+import { MoreSettingsSection } from '../shared/MoreSettingsSection';
 
 interface FormValues {
   name: string;
@@ -109,7 +111,7 @@ export function WizardAzure({ onCreate }: Props) {
               />
             </FormControl>
 
-            <MetadataFieldset />
+            <MoreSettingsSection />
 
             <div className="row">
               <div className="col-sm-12">

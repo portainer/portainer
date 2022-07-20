@@ -1,11 +1,13 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
+import { EdgeTypes } from '@/portainer/environments/types';
+import { getEnvironments } from '@/portainer/environments/environment.service';
+
 class AssoicatedEndpointsSelectorController {
   /* @ngInject */
-  constructor($async, EndpointService) {
+  constructor($async) {
     this.$async = $async;
-    this.EndpointService = EndpointService;
 
     this.state = {
       available: {
@@ -27,12 +29,11 @@ class AssoicatedEndpointsSelectorController {
       available: null,
     };
 
-    this.getEndpoints = this.getEndpoints.bind(this);
-    this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
+    this.getAvailableEndpoints = this.getAvailableEndpoints.bind(this);
     this.getAssociatedEndpoints = this.getAssociatedEndpoints.bind(this);
-    this.getAssociatedEndpointsAsync = this.getAssociatedEndpointsAsync.bind(this);
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
+    this.loadData = this.loadData.bind(this);
   }
 
   $onInit() {
@@ -46,41 +47,41 @@ class AssoicatedEndpointsSelectorController {
   }
 
   loadData() {
+    this.getAvailableEndpoints();
     this.getAssociatedEndpoints();
-    this.getEndpoints();
   }
 
-  getEndpoints() {
-    return this.$async(this.getEndpointsAsync);
-  }
+  /* #region  internal queries to retrieve endpoints per "side" of the selector */
+  getAvailableEndpoints() {
+    return this.$async(async () => {
+      const { start, search, limit } = this.getPaginationData('available');
+      const query = { search, types: EdgeTypes };
 
-  async getEndpointsAsync() {
-    const { start, search, limit } = this.getPaginationData('available');
-    const query = { search, types: [4, 7] };
+      const response = await getEnvironments({ start, limit, query });
 
-    const response = await this.EndpointService.endpoints(start, limit, query);
-
-    const endpoints = _.filter(response.value, (endpoint) => !_.includes(this.endpointIds, endpoint.Id));
-    this.setTableData('available', endpoints, response.totalCount);
-    this.noEndpoints = this.state.available.totalCount === 0;
+      const endpoints = _.filter(response.value, (endpoint) => !_.includes(this.endpointIds, endpoint.Id));
+      this.setTableData('available', endpoints, response.totalCount);
+      this.noEndpoints = this.state.available.totalCount === 0;
+    });
   }
 
   getAssociatedEndpoints() {
-    return this.$async(this.getAssociatedEndpointsAsync);
+    return this.$async(async () => {
+      let response = { value: [], totalCount: 0 };
+      if (this.endpointIds.length > 0) {
+        // fetch only if already has associated endpoints
+        const { start, search, limit } = this.getPaginationData('associated');
+        const query = { search, types: EdgeTypes, endpointIds: this.endpointIds };
+
+        response = await getEnvironments({ start, limit, query });
+      }
+
+      this.setTableData('associated', response.value, response.totalCount);
+    });
   }
+  /* #endregion */
 
-  async getAssociatedEndpointsAsync() {
-    let response = { value: [], totalCount: 0 };
-    if (this.endpointIds.length > 0) {
-      const { start, search, limit } = this.getPaginationData('associated');
-      const query = { search, types: [4, 7], endpointIds: this.endpointIds };
-
-      response = await this.EndpointService.endpoints(start, limit, query);
-    }
-
-    this.setTableData('associated', response.value, response.totalCount);
-  }
-
+  /* #region  On endpoint click (either available or associated) */
   associateEndpoint(endpoint) {
     this.onAssociate(endpoint);
   }
@@ -88,7 +89,9 @@ class AssoicatedEndpointsSelectorController {
   dissociateEndpoint(endpoint) {
     this.onDissociate(endpoint);
   }
+  /* #endregion */
 
+  /* #region  Utils funcs */
   getPaginationData(tableType) {
     const { pageNumber, limit, search } = this.state[tableType];
     const start = (pageNumber - 1) * limit + 1;
@@ -100,6 +103,7 @@ class AssoicatedEndpointsSelectorController {
     this.endpoints[tableType] = endpoints;
     this.state[tableType].totalCount = parseInt(totalCount, 10);
   }
+  /* #endregion */
 }
 
 angular.module('portainer.app').controller('AssoicatedEndpointsSelectorController', AssoicatedEndpointsSelectorController);

@@ -1,0 +1,132 @@
+.feather {
+  display: block;
+  height: 1em;
+  width: 1em;
+  color: inherit;
+}
+
+pr-icon {
+  display: inline-block;
+}
+
+.icon {
+  color: currentColor;
+  margin: 0;
+
+  font-size: var(--icon-size);
+  height: var(--icon-size);
+  width: var(--icon-size);
+
+  --icon-size: 1em;
+}
+
+.icon-xs {
+  --icon-size: 10px;
+}
+
+.icon-sm {
+  --icon-size: 14px;
+}
+
+.icon-md {
+  --icon-size: 16px;
+}
+
+.icon-lg {
+  --icon-size: 22px;
+}
+
+.icon-xl {
+  --icon-size: 26px;
+}
+
+.icon.icon-alt {
+  fill: var(--black-color);
+  stroke: var(--white-color);
+}
+
+.icon-primary {
+  color: var(--ui-blue-8);
+}
+
+.icon.icon-primary-alt {
+  fill: var(--ui-blue-8);
+  stroke: var(--white-color);
+}
+
+.icon-secondary {
+  color: var(--ui-gray-8);
+}
+
+.icon.icon-secondary-alt {
+  fill: var(--ui-gray-8);
+  stroke: var(--black-color);
+}
+
+.icon-warning {
+  color: var(--ui-warning-8);
+}
+
+.icon.icon-warning-alt {
+  fill: var(--ui-warning-8);
+  stroke: var(--white-color);
+}
+
+.icon-danger {
+  color: var(--ui-error-8);
+}
+
+.icon.icon-danger-alt {
+  fill: var(--ui-error-8);
+  stroke: var(--white-color);
+}
+
+.icon-success {
+  color: var(--ui-success-6);
+}
+
+.icon.icon-success-alt {
+  fill: var(--ui-success-8);
+  stroke: var(--white-color);
+}
+
+.icon-badge {
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5%;
+}
+
+.icon-nested-gray {
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: var(--ui-gray-4);
+  margin-right: 5px;
+}
+
+.icon-nested-blue {
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: var(--ui-blue-3);
+  margin-right: 5px;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+}
+
+.btn-only-icon {
+  padding: 6px;
+}
+
+.btn-only-icon pr-icon {
+  margin-top: 0;
+}

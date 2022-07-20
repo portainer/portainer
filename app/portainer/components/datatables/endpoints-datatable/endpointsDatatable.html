@@ -14,7 +14,7 @@
         >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.endpoints.new" data-cy="endpoint-addEndpointButton">
+        <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.setReferrer()" ui-sref="portainer.wizard.endpoints" data-cy="endpoint-addEndpointButton">
           <i class="fa fa-plus-circle space-right" aria-hidden="true"></i>Add environment
         </button>
       </div>

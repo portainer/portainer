@@ -1,11 +1,91 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-      <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
+      <div class="toolBar show-dropdown">
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          {{ $ctrl.titleText }}
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="image-searchInput"
+          />
+        </div>
+        <div class="actionBar !gap-3" ng-if="!$ctrl.offlineMode" authorization="DockerImageDelete, DockerImageBuild, DockerImageLoad, DockerImageGet">
+          <div class="btn-group" authorization="DockerImageDelete">
+            <button
+              type="button"
+              class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+              authorization="DockerImageDelete"
+              ng-disabled="$ctrl.state.selectedItemCount === 0"
+              ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+              data-cy="image-removeImageButton"
+            >
+              <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>Remove
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-dangerlight dropdown-toggle"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              ng-disabled="$ctrl.state.selectedItemCount === 0"
+            >
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a ng-click="$ctrl.forceRemoveAction($ctrl.state.selectedItems, true)" ng-disabled="$ctrl.state.selectedItemCount === 0">Force Remove</a></li>
+            </ul>
+          </div>
+          <button
+            type="button"
+            class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+            ui-sref="docker.images.build"
+            authorization="DockerImageBuild"
+            data-cy="image-buildImageButton"
+          >
+            <pr-icon icon="'plus'" feather="true"></pr-icon>Build a new image
+          </button>
+          <div class="btn-group">
+            <button
+              type="button"
+              class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+              ui-sref="docker.images.import"
+              authorization="DockerImageLoad"
+              ng-disabled="$ctrl.exportInProgress"
+              data-cy="image-importImageButton"
+            >
+              <pr-icon icon="'upload'" feather="true"></pr-icon>Import
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+              ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.exportInProgress"
+              ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)"
+              button-spinner="$ctrl.exportInProgress"
+              authorization="DockerImageGet"
+              data-cy="image-exportImageButton"
+            >
+              <pr-icon icon="'download'" feather="true"></pr-icon>
+              <span ng-hide="$ctrl.exportInProgress">Export</span>
+              <span ng-show="$ctrl.exportInProgress">Export in progress...</span>
+            </button>
+          </div>
+        </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+            <span uib-dropdown-toggle aria-label="Settings">
+              <pr-icon icon="'more-vertical'" feather="true"></pr-icon>
+            </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader"> Table settings </div>
@@ -37,59 +117,6 @@
             </div>
           </span>
         </div>
-      </div>
-      <div class="actionBar" ng-if="!$ctrl.offlineMode" authorization="DockerImageDelete, DockerImageBuild, DockerImageLoad, DockerImageGet">
-        <div class="btn-group" authorization="DockerImageDelete">
-          <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems, false)">
-            <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-          </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-danger dropdown-toggle"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-            ng-disabled="$ctrl.state.selectedItemCount === 0"
-          >
-            <span class="caret"></span>
-            <span class="sr-only">Toggle Dropdown</span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a ng-click="$ctrl.forceRemoveAction($ctrl.state.selectedItems, true)" ng-disabled="$ctrl.state.selectedItemCount === 0">Force Remove</a></li>
-          </ul>
-        </div>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.images.build" authorization="DockerImageBuild">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Build a new image
-        </button>
-        <div class="btn-group">
-          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.exportInProgress" ui-sref="docker.images.import" authorization="DockerImageLoad">
-            <i class="fa fa-upload space-right" aria-hidden="true"></i>Import
-          </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-primary"
-            ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.exportInProgress"
-            ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)"
-            button-spinner="$ctrl.exportInProgress"
-            authorization="DockerImageGet"
-          >
-            <i class="fa fa-download space-right" aria-hidden="true"></i>
-            <span ng-hide="$ctrl.exportInProgress">Export</span>
-            <span ng-show="$ctrl.exportInProgress">Export in progress...</span>
-          </button>
-        </div>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
       </div>
       <div class="table-responsive">
         <table class="table table-hover table-filters nowrap-cells">
@@ -193,7 +220,7 @@
       <div class="footer" ng-if="$ctrl.dataset">
         <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
-          <form class="form-inline">
+          <form class="form-inline vertical-center">
             <span class="limitSelector">
               <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">

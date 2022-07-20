@@ -14,6 +14,8 @@ type publicSettingsResponse struct {
 	LogoURL string `json:"LogoURL" example:"https://mycompany.mydomain.tld/logo.png"`
 	// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 	AuthenticationMethod portainer.AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
+	// The minimum required length for a password of any user when using internal auth mode
+	RequiredPasswordLength int `json:"RequiredPasswordLength" example:"1"`
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
 	// Supported feature flags
@@ -26,6 +28,21 @@ type publicSettingsResponse struct {
 	EnableTelemetry bool `json:"EnableTelemetry" example:"true"`
 	// The expiry of a Kubeconfig
 	KubeconfigExpiry string `example:"24h" default:"0"`
+	// Whether team sync is enabled
+	TeamSync bool `json:"TeamSync" example:"true"`
+
+	Edge struct {
+		// Whether the device has been started in edge async mode
+		AsyncMode bool
+		// The ping interval for edge agent - used in edge async mode [seconds]
+		PingInterval int `json:"PingInterval" example:"60"`
+		// The snapshot interval for edge agent - used in edge async mode [seconds]
+		SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+		// The command list interval for edge agent - used in edge async mode [seconds]
+		CommandInterval int `json:"CommandInterval" example:"60"`
+		// The check in interval for edge agent (in seconds) - used in non async mode [seconds]
+		CheckinInterval int `example:"60"`
+	}
 }
 
 // @id SettingsPublic
@@ -51,11 +68,19 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 	publicSettings := &publicSettingsResponse{
 		LogoURL:                   appSettings.LogoURL,
 		AuthenticationMethod:      appSettings.AuthenticationMethod,
+		RequiredPasswordLength:    appSettings.InternalAuthSettings.RequiredPasswordLength,
 		EnableEdgeComputeFeatures: appSettings.EnableEdgeComputeFeatures,
 		EnableTelemetry:           appSettings.EnableTelemetry,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
 		Features:                  appSettings.FeatureFlagSettings,
 	}
+
+	publicSettings.Edge.AsyncMode = appSettings.Edge.AsyncMode
+	publicSettings.Edge.PingInterval = appSettings.Edge.PingInterval
+	publicSettings.Edge.SnapshotInterval = appSettings.Edge.SnapshotInterval
+	publicSettings.Edge.CommandInterval = appSettings.Edge.CommandInterval
+	publicSettings.Edge.CheckinInterval = appSettings.EdgeAgentCheckinInterval
+
 	//if OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {
 		publicSettings.OAuthLogoutURI = appSettings.OAuthSettings.LogoutURI
@@ -68,6 +93,10 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		if !appSettings.OAuthSettings.SSO {
 			publicSettings.OAuthLoginURI += "&prompt=login"
 		}
+	}
+	//if LDAP authentication is on, compose the related fields from application settings
+	if publicSettings.AuthenticationMethod == portainer.AuthenticationLDAP {
+		publicSettings.TeamSync = len(appSettings.LDAPSettings.GroupSearchSettings) > 0
 	}
 	return publicSettings
 }

@@ -1,6 +1,7 @@
-import { PageHeader } from '@/portainer/components/PageHeader';
-import { Widget, WidgetBody } from '@/portainer/components/widget';
 import { r2a } from '@/react-tools/react2angular';
+
+import { PageHeader } from '@@/PageHeader';
+import { Widget, WidgetBody } from '@@/Widget';
 
 import { CreateContainerInstanceForm } from './CreateContainerInstanceForm';
 

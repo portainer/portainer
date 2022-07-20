@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Container Instance"></rd-header-title>
-  <rd-header-content> <a ui-sref="azure.containerinstances">Container instances</a> &gt; {{ $ctrl.container.Name }} </rd-header-content>
-</rd-header>
+<page-header title="'Container Instance'" breadcrumbs="[{label:'Container instances', link:'azure.containerinstances'}, $ctrl.container.Name]"> </page-header>
 
 <div class="row" ng-if="!$ctrl.state.loading">
   <div class="col-sm-12">

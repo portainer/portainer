@@ -34,9 +34,9 @@ func TestMigrateData(t *testing.T) {
 		wantPath string
 	}{
 		{
-			testName: "migrate version 24 to 35",
+			testName: "migrate version 24 to latest",
 			srcPath:  "test_data/input_24.json",
-			wantPath: "test_data/output_35.json",
+			wantPath: "test_data/output_24_to_latest.json",
 		},
 	}
 	for _, test := range snapshotTests {

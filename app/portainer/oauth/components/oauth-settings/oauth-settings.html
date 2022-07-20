@@ -102,7 +102,7 @@
     <div class="form-group">
       <label class="col-sm-3 col-lg-2 control-label text-left">
         Claim name
-        <portainer-tooltip position="bottom" message="The OpenID Connect UserInfo Claim name that contains the team identifier the user belongs to."></portainer-tooltip>
+        <portainer-tooltip message="'The OpenID Connect UserInfo Claim name that contains the team identifier the user belongs to.'"></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
         <div class="col-xs-11 col-lg-10">
@@ -168,7 +168,7 @@
   <div class="form-group" ng-if="$ctrl.state.provider == 'microsoft'">
     <label for="oauth_microsoft_tenant_id" class="col-sm-3 col-lg-2 control-label text-left">
       Tenant ID
-      <portainer-tooltip position="bottom" message="ID of the Azure Directory you wish to authenticate against. Also known as the Directory ID"></portainer-tooltip>
+      <portainer-tooltip message="'ID of the Azure Directory you wish to authenticate against. Also known as the Directory ID'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input
@@ -190,7 +190,7 @@
   <div class="form-group">
     <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
       {{ $ctrl.state.provider == 'microsoft' ? 'Application ID' : 'Client ID' }}
-      <portainer-tooltip position="bottom" message="Public identifier of the OAuth application"></portainer-tooltip>
+      <portainer-tooltip message="'Public identifier of the OAuth application'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input
@@ -228,10 +228,7 @@
     <div class="form-group">
       <label for="oauth_authorization_uri" class="col-sm-3 col-lg-2 control-label text-left">
         Authorization URL
-        <portainer-tooltip
-          position="bottom"
-          message="URL used to authenticate against the OAuth provider. Will redirect the user to the OAuth provider login view"
-        ></portainer-tooltip>
+        <portainer-tooltip message="'URL used to authenticate against the OAuth provider. Will redirect the user to the OAuth provider login view'"></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
         <input
@@ -249,7 +246,7 @@
     <div class="form-group">
       <label for="oauth_access_token_uri" class="col-sm-3 col-lg-2 control-label text-left">
         Access token URL
-        <portainer-tooltip position="bottom" message="URL used by Portainer to exchange a valid OAuth authentication code for an access token"></portainer-tooltip>
+        <portainer-tooltip message="'URL used by Portainer to exchange a valid OAuth authentication code for an access token'"></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
         <input
@@ -267,7 +264,7 @@
     <div class="form-group">
       <label for="oauth_resource_uri" class="col-sm-3 col-lg-2 control-label text-left">
         Resource URL
-        <portainer-tooltip position="bottom" message="URL used by Portainer to retrieve information about the authenticated user"></portainer-tooltip>
+        <portainer-tooltip message="'URL used by Portainer to retrieve information about the authenticated user'"></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
         <input
@@ -286,8 +283,7 @@
       <label for="oauth_redirect_uri" class="col-sm-3 col-lg-2 control-label text-left">
         Redirect URL
         <portainer-tooltip
-          position="bottom"
-          message="URL used by the OAuth provider to redirect the user after successful authentication. Should be set to your Portainer instance URL"
+          message="'URL used by the OAuth provider to redirect the user after successful authentication. Should be set to your Portainer instance URL'"
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
@@ -307,8 +303,7 @@
       <label for="oauth_logout_url" class="col-sm-3 col-lg-2 control-label text-left">
         Logout URL
         <portainer-tooltip
-          position="bottom"
-          message="URL used by Portainer to redirect the user to the OAuth provider in order to log the user out of the identity provider session."
+          message="'URL used by Portainer to redirect the user to the OAuth provider in order to log the user out of the identity provider session.'"
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
@@ -327,8 +322,7 @@
       <label for="oauth_user_identifier" class="col-sm-3 col-lg-2 control-label text-left">
         User identifier
         <portainer-tooltip
-          position="bottom"
-          message="Identifier that will be used by Portainer to create an account for the authenticated user. Retrieved from the resource server specified via the Resource URL field"
+          message="'Identifier that will be used by Portainer to create an account for the authenticated user. Retrieved from the resource server specified via the Resource URL field'"
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
@@ -348,8 +342,7 @@
       <label for="oauth_scopes" class="col-sm-3 col-lg-2 control-label text-left">
         Scopes
         <portainer-tooltip
-          position="bottom"
-          message="Scopes required by the OAuth provider to retrieve information about the authenticated user. Refer to your OAuth provider documentation for more information about this"
+          message="'Scopes required by the OAuth provider to retrieve information about the authenticated user. Refer to your OAuth provider documentation for more information about this'"
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">

@@ -1,16 +1,18 @@
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import { useReducer } from 'react';
 
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
 import { useCreateLocalDockerEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
+import { Hardware } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/Hardware';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Input } from '@/portainer/components/form-components/Input';
-import { SwitchField } from '@/portainer/components/form-components/SwitchField';
 import { Environment } from '@/portainer/environments/types';
 
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { FormControl } from '@@/form-components/FormControl';
+import { Input } from '@@/form-components/Input';
+import { SwitchField } from '@@/form-components/SwitchField';
+
 import { NameField } from '../../shared/NameField';
-import { MetadataFieldset } from '../../shared/MetadataFieldset';
+import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
 import { validation } from './SocketForm.validation';
 import { FormValues } from './types';
@@ -26,6 +28,7 @@ export function SocketForm({ onCreate }: Props) {
     socketPath: '',
     overridePath: false,
     meta: { groupId: 1, tagIds: [] },
+    gpus: [],
   };
 
   const mutation = useCreateLocalDockerEnvironmentMutation();
@@ -44,7 +47,9 @@ export function SocketForm({ onCreate }: Props) {
 
           <OverrideSocketFieldset />
 
-          <MetadataFieldset />
+          <MoreSettingsSection>
+            <Hardware />
+          </MoreSettingsSection>
 
           <div className="form-group">
             <div className="col-sm-12">
@@ -68,6 +73,7 @@ export function SocketForm({ onCreate }: Props) {
       {
         name: values.name,
         socketPath: values.overridePath ? values.socketPath : '',
+        gpus: values.gpus,
       },
       {
         onSuccess(environment) {

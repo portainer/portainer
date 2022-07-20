@@ -2,11 +2,13 @@ import { PublicSettingsViewModel } from '@/portainer/models/settings';
 
 import axios, { parseAxiosError } from '../services/axios';
 
-import { Settings } from './types';
+import { PublicSettingsResponse, Settings } from './types';
 
-export async function publicSettings() {
+export async function getPublicSettings() {
   try {
-    const { data } = await axios.get(buildUrl('public'));
+    const { data } = await axios.get<PublicSettingsResponse>(
+      buildUrl('public')
+    );
     return new PublicSettingsViewModel(data);
   } catch (e) {
     throw parseAxiosError(

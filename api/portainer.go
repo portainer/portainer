@@ -199,6 +199,8 @@ type (
 		StackCount              int               `json:"StackCount"`
 		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
 		NodeCount               int               `json:"NodeCount"`
+		GpuUseAll               bool              `json:"GpuUseAll"`
+		GpuUseList              []string          `json:"GpuUseList"`
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
@@ -310,6 +312,7 @@ type (
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
 		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
+		Gpus             []Pair           `json:"Gpus"`
 		TLSConfig        TLSConfiguration `json:"TLSConfig"`
 		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" example:""`
 		// List of tag identifiers to which this environment(endpoint) is associated
@@ -344,6 +347,17 @@ type (
 		IsEdgeDevice bool
 		// Whether the device has been trusted or not by the user
 		UserTrusted bool
+
+		Edge struct {
+			// Whether the device has been started in edge async mode
+			AsyncMode bool
+			// The ping interval for edge agent - used in edge async mode [seconds]
+			PingInterval int `json:"PingInterval" example:"60"`
+			// The snapshot interval for edge agent - used in edge async mode [seconds]
+			SnapshotInterval int `json:"SnapshotInterval" example:"60"`
+			// The command list interval for edge agent - used in edge async mode [seconds]
+			CommandInterval int `json:"CommandInterval" example:"60"`
+		}
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -547,6 +561,11 @@ type (
 		PodName          string
 		ContainerName    string
 		ShellExecCommand string
+	}
+
+	// InternalAuthSettings represents settings used for the default 'internal' authentication
+	InternalAuthSettings struct {
+		RequiredPasswordLength int
 	}
 
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
@@ -799,6 +818,7 @@ type (
 		BlackListedLabels []Pair `json:"BlackListedLabels"`
 		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
+		InternalAuthSettings InternalAuthSettings `json:"InternalAuthSettings" example:""`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
 		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration" example:""`
@@ -830,6 +850,17 @@ type (
 		AgentSecret string `json:"AgentSecret"`
 		// EdgePortainerURL is the URL that is exposed to edge agents
 		EdgePortainerURL string `json:"EdgePortainerUrl"`
+
+		Edge struct {
+			// The command list interval for edge agent - used in edge async mode (in seconds)
+			CommandInterval int `json:"CommandInterval" example:"5"`
+			// The ping interval for edge agent - used in edge async mode (in seconds)
+			PingInterval int `json:"PingInterval" example:"5"`
+			// The snapshot interval for edge agent - used in edge async mode (in seconds)
+			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
+			// EdgeAsyncMode enables edge async mode by default
+			AsyncMode bool
+		}
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -894,6 +925,8 @@ type (
 		AdditionalFiles []string `json:"AdditionalFiles"`
 		// The auto update settings of a git stack
 		AutoUpdate *StackAutoUpdate `json:"AutoUpdate"`
+		// The stack deployment option
+		Option *StackOption `json:"Option"`
 		// The git config of this stack
 		GitConfig *gittypes.RepoConfig
 		// Whether the stack is from a app template
@@ -912,6 +945,12 @@ type (
 		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
 		// Autoupdate job id
 		JobID string `example:"15"`
+	}
+
+	// StackOption represents the options for stack deployment
+	StackOption struct {
+		// Prune services that are no longer referenced
+		Prune bool `example:"false"`
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -1357,9 +1396,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.13.0"
+	APIVersion = "2.15.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 35
+	DBVersion = 60
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server

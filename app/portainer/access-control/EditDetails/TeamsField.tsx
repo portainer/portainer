@@ -1,7 +1,8 @@
-import { TeamsSelector } from '@/portainer/components/TeamsSelector';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Link } from '@/portainer/components/Link';
 import { Team } from '@/portainer/teams/types';
+
+import { TeamsSelector } from '@@/TeamsSelector';
+import { FormControl } from '@@/form-components/FormControl';
+import { Link } from '@@/Link';
 
 interface Props {
   name: string;

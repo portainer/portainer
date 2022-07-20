@@ -1,13 +1,10 @@
-<rd-header>
-  <rd-header-title title-text="Edge Jobs">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.jobs" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Edge Jobs</rd-header-content>
-</rd-header>
+<page-header title="'Edge Jobs'" breadcrumbs="['Edge Jobs']" reload="true"> </page-header>
 
-<beta-panel></beta-panel>
+<information-panel title-text="Information">
+  <span class="small">
+    <p class="text-muted">Edge Jobs requires Docker Standalone and a cron implementation that reads jobs from <code>/etc/cron.d</code></p>
+  </span>
+</information-panel>
 
 <div class="row">
   <div class="col-sm-12">

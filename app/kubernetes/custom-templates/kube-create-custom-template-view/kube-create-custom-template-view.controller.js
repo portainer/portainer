@@ -1,6 +1,7 @@
 import { buildOption } from '@/portainer/components/BoxSelector';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class KubeCreateCustomTemplateViewController {
   /* @ngInject */
@@ -13,6 +14,7 @@ class KubeCreateCustomTemplateViewController {
     ];
 
     this.templates = null;
+    this.isTemplateVariablesEnabled = isBE;
 
     this.state = {
       method: 'editor',
@@ -53,6 +55,10 @@ class KubeCreateCustomTemplateViewController {
   }
 
   parseTemplate(templateStr) {
+    if (!this.isTemplateVariablesEnabled) {
+      return;
+    }
+
     const variables = getTemplateVariables(templateStr);
 
     const isValid = !!variables;

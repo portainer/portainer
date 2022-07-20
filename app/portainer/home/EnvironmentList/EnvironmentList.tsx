@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
+import { RefreshCcw } from 'react-feather';
 
-import { PaginationControls } from '@/portainer/components/pagination-controls';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
 import {
   Environment,
@@ -9,23 +9,11 @@ import {
   EnvironmentStatus,
 } from '@/portainer/environments/types';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
-import { Button } from '@/portainer/components/Button';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
-import {
-  FilterSearchBar,
-  useSearchBarState,
-} from '@/portainer/components/datatables/components/FilterSearchBar';
-import { SortbySelector } from '@/portainer/components/datatables/components/SortbySelector';
 import {
   HomepageFilter,
   useHomePageFilter,
 } from '@/portainer/home/HomepageFilter';
-import {
-  TableActions,
-  TableContainer,
-  TableTitle,
-} from '@/portainer/components/datatables/components';
-import { TableFooter } from '@/portainer/components/datatables/components/TableFooter';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
   refetchIfAnyOffline,
@@ -34,6 +22,16 @@ import {
 import { useGroups } from '@/portainer/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
 import { Filter } from '@/portainer/home/types';
+
+import { TableFooter } from '@@/datatables/TableFooter';
+import { TableActions, TableContainer, TableTitle } from '@@/datatables';
+import { SortbySelector } from '@@/datatables/SortbySelector';
+import {
+  FilterSearchBar,
+  useSearchBarState,
+} from '@@/datatables/FilterSearchBar';
+import { Button } from '@@/buttons';
+import { PaginationControls } from '@@/PaginationControls';
 
 import { EnvironmentItem } from './EnvironmentItem';
 import { KubeconfigButton } from './KubeconfigButton';
@@ -135,7 +133,8 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
         groupIds: groupFilter,
         sort: sortByFilter,
         order: sortByDescending ? 'desc' : 'asc',
-        edgeDeviceFilter: 'none',
+        provisioned: true,
+        edgeDevice: false,
         tagsPartialMatch: true,
       },
       refetchIfAnyOffline
@@ -282,7 +281,6 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
 
             <TableActions className={styles.actionBar}>
               <div className={styles.description}>
-                <i className="fa fa-exclamation-circle blue-icon space-right" />
                 Click on an environment to manage
               </div>
               <div className={styles.actionButton}>
@@ -291,10 +289,13 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                     <Button
                       onClick={onRefresh}
                       data-cy="home-refreshEndpointsButton"
-                      className={clsx(styles.refreshEnvironmentsButton)}
+                      className={clsx(
+                        'vertical-center',
+                        styles.refreshEnvironmentsButton
+                      )}
                     >
-                      <i
-                        className="fa fa-sync space-right"
+                      <RefreshCcw
+                        className="feather icon-sm icon-white"
                         aria-hidden="true"
                       />
                       Refresh
@@ -302,7 +303,19 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                   )}
                 </div>
                 <div className={styles.kubeconfigButton}>
-                  <KubeconfigButton environments={environments} />
+                  <KubeconfigButton
+                    environments={environments}
+                    envQueryParams={{
+                      types: platformType,
+                      search: debouncedTextFilter,
+                      status: statusFilter,
+                      tagIds: tagFilter?.length ? tagFilter : undefined,
+                      groupIds: groupFilter,
+                      sort: sortByFilter,
+                      order: sortByDescending ? 'desc' : 'asc',
+                      edgeDevice: false,
+                    }}
+                  />
                 </div>
                 <div className={styles.filterSearchbar}>
                   <FilterSearchBar

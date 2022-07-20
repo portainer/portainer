@@ -1,4 +1,4 @@
-import { FormSection } from '@/portainer/components/form-components/FormSection';
+import { FormSection } from '@@/form-components/FormSection';
 
 import { Option } from '../components/Option';
 
@@ -23,6 +23,7 @@ export function EnvironmentSelector({ value, onChange }: Props) {
           {environmentTypes.map((eType) => (
             <Option
               key={eType.id}
+              featureId={eType.featureId}
               title={eType.title}
               description={eType.description}
               icon={eType.icon}

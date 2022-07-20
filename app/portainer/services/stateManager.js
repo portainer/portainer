@@ -25,12 +25,8 @@ function StateManagerFactory(
     UI: {
       dismissedInfoPanels: {},
       dismissedInfoHash: '',
+      timesPasswordChangeSkipped: {},
     },
-  };
-
-  manager.setVersionInfo = function (versionInfo) {
-    state.application.versionStatus = versionInfo;
-    LocalStorage.storeApplicationState(state.application);
   };
 
   manager.dismissInformationPanel = function (id) {
@@ -40,6 +36,27 @@ function StateManagerFactory(
 
   manager.dismissImportantInformation = function (hash) {
     state.UI.dismissedInfoHash = hash;
+    LocalStorage.storeUIState(state.UI);
+  };
+
+  manager.setRequiredPasswordLength = function (length) {
+    state.UI.requiredPasswordLength = length;
+    LocalStorage.storeUIState(state.UI);
+  };
+
+  manager.setPasswordChangeSkipped = function (userID) {
+    state.UI.instanceId = state.UI.instanceId || state.application.instanceId;
+    state.UI.timesPasswordChangeSkipped[userID] = state.UI.timesPasswordChangeSkipped[userID] + 1 || 1;
+    LocalStorage.storeUIState(state.UI);
+  };
+
+  manager.resetPasswordChangeSkips = function (userID) {
+    if (state.UI.timesPasswordChangeSkipped[userID]) state.UI.timesPasswordChangeSkipped[userID] = 0;
+    LocalStorage.storeUIState(state.UI);
+  };
+
+  manager.clearPasswordChangeSkips = function () {
+    state.UI.timesPasswordChangeSkipped = {};
     LocalStorage.storeUIState(state.UI);
   };
 
@@ -120,11 +137,6 @@ function StateManagerFactory(
   manager.initialize = initialize;
   async function initialize() {
     return $async(async () => {
-      const UIState = LocalStorage.getUIState();
-      if (UIState) {
-        state.UI = UIState;
-      }
-
       const endpointState = LocalStorage.getEndpointState();
       if (endpointState) {
         state.endpoint = endpointState;
@@ -135,6 +147,16 @@ function StateManagerFactory(
         state.application = applicationState;
       } else {
         await loadApplicationState();
+      }
+
+      const UIState = LocalStorage.getUIState();
+      if (UIState) {
+        state.UI = UIState;
+        if (state.UI.instanceId && state.UI.instanceId !== state.application.instanceId) {
+          state.UI.instanceId = state.application.instanceId;
+          state.UI.timesPasswordChangeSkipped = {};
+          LocalStorage.storeUIState(state.UI);
+        }
       }
 
       state.loading = false;

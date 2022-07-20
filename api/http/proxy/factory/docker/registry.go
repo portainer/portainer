@@ -23,7 +23,7 @@ type (
 	}
 
 	portainerRegistryAuthenticationHeader struct {
-		RegistryId portainer.RegistryID `json:"registryId"`
+		RegistryId *portainer.RegistryID `json:"registryId"`
 	}
 )
 

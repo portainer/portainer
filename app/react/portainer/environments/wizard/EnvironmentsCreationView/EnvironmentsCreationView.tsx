@@ -3,14 +3,15 @@ import { useState } from 'react';
 import _ from 'lodash';
 import clsx from 'clsx';
 
-import { Stepper } from '@/react/components/Stepper';
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { notifyError } from '@/portainer/services/notifications';
-import { PageHeader } from '@/portainer/components/PageHeader';
-import { Button } from '@/portainer/components/Button';
 import { Environment, EnvironmentId } from '@/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
-import { FormSection } from '@/portainer/components/form-components/FormSection';
+
+import { Stepper } from '@@/Stepper';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { PageHeader } from '@@/PageHeader';
+import { Button } from '@@/buttons';
+import { FormSection } from '@@/form-components/FormSection';
 
 import { environmentTypes } from '../EnvironmentTypeSelectView/environment-types';
 import { EnvironmentSelectorValue } from '../EnvironmentTypeSelectView/EnvironmentSelector';
@@ -118,6 +119,11 @@ export function EnvironmentCreationView() {
         ])
       ),
     });
+    if (localStorage.getItem('wizardReferrer') === 'environments') {
+      localStorage.removeItem('wizardReferrer');
+      router.stateService.go('portainer.endpoints');
+      return;
+    }
     router.stateService.go('portainer.home');
   }
 }
@@ -193,6 +199,7 @@ function useAnalyticsState() {
     aciApi: 0,
     localEndpoint: 0,
     nomadEdgeAgent: 0,
+    dockerEdgeAgent: 0,
   });
 
   return { analytics, setAnalytics };

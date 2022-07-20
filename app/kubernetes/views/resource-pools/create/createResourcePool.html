@@ -1,6 +1,9 @@
-<kubernetes-view-header title="Create a namespace" state="kubernetes.resourcePools.new" view-ready="$ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt; Create a namespace
-</kubernetes-view-header>
+<page-header
+  ng-if="$ctrl.state.viewReady"
+  title="'Create a namespace'"
+  breadcrumbs="[{ label:'Namespaces', link:'kubernetes.resourcePools' }, 'Create a namespace']"
+  reload="true"
+></page-header>
 
 <kubernetes-view-loading view-ready="$ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -218,8 +221,7 @@
                     <label class="control-label text-left">
                       Hostnames
                       <portainer-tooltip
-                        position="bottom"
-                        message="Hostnames associated to the ingress inside this namespace. Users will be able to expose and access their applications over the ingress via one of these hostname."
+                        message="'Hostnames associated to the ingress inside this namespace. Users will be able to expose and access their applications over the ingress via one of these hostname.'"
                       >
                       </portainer-tooltip>
                     </label>
@@ -297,8 +299,7 @@
                     <i class="fa fa-plus-circle" aria-hidden="true"></i> add annotation
                   </span>
                   <portainer-tooltip
-                    position="bottom"
-                    message="Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type."
+                    message="'Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type.'"
                   >
                   </portainer-tooltip>
                   <span
@@ -312,8 +313,7 @@
                   </span>
                   <portainer-tooltip
                     ng-if="ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX"
-                    position="bottom"
-                    message="When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to."
+                    message="'When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to.'"
                   >
                   </portainer-tooltip>
                   <span
@@ -327,8 +327,7 @@
                   </span>
                   <portainer-tooltip
                     ng-if="ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX"
-                    position="bottom"
-                    message="Enable use of regular expressions in ingress paths (set in the ingress details of an application). Use this along with rewrite-target to specify the regex capturing group to be replaced, e.g. path regex of ^/foo/(,*) and rewrite-target of /bar/$1 rewrites example.com/foo/account to example.com/bar/account."
+                    message="'Enable use of regular expressions in ingress paths (set in the ingress details of an application). Use this along with rewrite-target to specify the regex capturing group to be replaced, e.g. path regex of ^/foo/(,*) and rewrite-target of /bar/$1 rewrites example.com/foo/account to example.com/bar/account.'"
                   >
                   </portainer-tooltip>
                 </div>

@@ -1,6 +1,6 @@
 import sanitize from 'sanitize-html';
 import bootbox from 'bootbox';
-import '@/portainer/components/BoxSelector/BoxSelectorItem.css';
+import '@@/BoxSelector/BoxSelectorItem.css';
 
 import { applyBoxCSS, ButtonsOptions, confirmButtons } from './utils';
 
@@ -85,7 +85,10 @@ export function selectRegistry(options: PromptOptions) {
   prompt(options);
 }
 
-export function confirmContainerRecreation(callback: PromptCallback) {
+export function confirmContainerRecreation(
+  cannotPullImage: boolean | null,
+  callback: PromptCallback
+) {
   const box = prompt({
     title: 'Are you sure?',
 
@@ -105,9 +108,26 @@ export function confirmContainerRecreation(callback: PromptCallback) {
     callback,
   });
 
-  const message = `You're about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.`;
+  const message = `You're about to recreate this container and any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.`;
+  box.find('.bootbox-body').prepend(`<p>${message}</p>`);
+  const label = box.find('.form-check-label');
+  label.css('padding-left', '5px');
+  label.css('padding-right', '25px');
 
-  customizeCheckboxPrompt(box, message);
+  if (cannotPullImage) {
+    label.css('cursor', 'not-allowed');
+    label.find('i').css('cursor', 'not-allowed');
+    const checkbox = box.find('.bootbox-input-checkbox');
+    checkbox.prop('disabled', true);
+    const formCheck = box.find('.form-check');
+    formCheck.prop('style', 'height: 45px;');
+    const cannotPullImageMessage = `<div class="fa fa-exclamation-triangle text-warning"/>
+               <div class="inline-text text-warning">
+                   <span>Cannot pull latest as the image is inaccessible - either it no longer exists or the tag or name is no longer correct.
+                   </span>
+               </div>`;
+    formCheck.append(`${cannotPullImageMessage}`);
+  }
 }
 
 export function confirmServiceForceUpdate(
@@ -175,30 +195,6 @@ export function confirmStackUpdate(
   checkboxLabel.addClass('switch box-selector-item limited business');
   const switchEle = checkboxLabel.find('i');
   switchEle.prop('style', 'margin-left:20px');
-}
-
-export function confirmKubeconfigSelection(
-  options: InputOption[],
-  expiryMessage: string,
-  callback: PromptCallback
-) {
-  const message = sanitize(
-    `Select the kubernetes environment(s) to add to the kubeconfig file.</br>${expiryMessage}`
-  );
-  const box = prompt({
-    title: 'Download kubeconfig file',
-    inputType: 'checkbox',
-    inputOptions: options,
-    buttons: {
-      confirm: {
-        label: 'Download file',
-        className: 'btn-primary',
-      },
-    },
-    callback,
-  });
-
-  customizeCheckboxPrompt(box, message, true, true);
 }
 
 function customizeCheckboxPrompt(

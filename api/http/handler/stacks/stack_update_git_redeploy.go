@@ -24,6 +24,7 @@ type stackGitRedployPayload struct {
 	RepositoryUsername       string
 	RepositoryPassword       string
 	Env                      []portainer.Pair
+	Prune                    bool
 }
 
 func (payload *stackGitRedployPayload) Validate(r *http.Request) error {
@@ -118,6 +119,11 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 	stack.Env = payload.Env
+	if stack.Type == portainer.DockerSwarmStack {
+		stack.Option = &portainer.StackOption{
+			Prune: payload.Prune,
+		}
+	}
 
 	backupProjectPath := fmt.Sprintf("%s-old", stack.ProjectPath)
 	err = filesystem.MoveDirectory(stack.ProjectPath, backupProjectPath)
@@ -187,7 +193,11 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	switch stack.Type {
 	case portainer.DockerSwarmStack:
-		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+		prune := false
+		if stack.Option != nil {
+			prune = stack.Option.Prune
+		}
+		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, prune)
 		if httpErr != nil {
 			return httpErr
 		}

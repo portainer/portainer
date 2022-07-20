@@ -1,9 +1,10 @@
 import { useField } from 'formik';
 
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Select } from '@/portainer/components/form-components/Input';
 import { useGroups } from '@/portainer/environment-groups/queries';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+
+import { FormControl } from '@@/form-components/FormControl';
+import { Select } from '@@/form-components/Input';
 
 export function GroupField() {
   const [fieldProps, metaProps, helpers] =

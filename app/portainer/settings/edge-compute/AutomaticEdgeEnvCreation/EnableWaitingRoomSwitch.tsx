@@ -1,8 +1,9 @@
 import { useField } from 'formik';
 
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
+
+import { FormControl } from '@@/form-components/FormControl';
+import { Switch } from '@@/form-components/SwitchField/Switch';
 
 export function EnabledWaitingRoomSwitch() {
   const [inputProps, meta, helpers] = useField<boolean>('TrustOnFirstConnect');

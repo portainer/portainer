@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { useSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/portainer/settings/queries';
 
 const categories = [
   'docker',
@@ -64,7 +64,9 @@ export function push(
 }
 
 export function useAnalytics() {
-  const telemetryQuery = useSettings((settings) => settings.EnableTelemetry);
+  const telemetryQuery = usePublicSettings({
+    select: (settings) => settings.EnableTelemetry,
+  });
 
   return { trackEvent: handleTrackEvent };
 

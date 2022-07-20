@@ -8,7 +8,7 @@ import {
   resumeContainer,
   startContainer,
   stopContainer,
-} from '@/docker/containers/containers.service';
+} from '@/react/docker/containers/containers.service';
 import { ContainerDetailsViewModel, ContainerStatsViewModel, ContainerViewModel } from '../models/container';
 
 angular.module('portainer.docker').factory('ContainerService', ContainerServiceFactory);

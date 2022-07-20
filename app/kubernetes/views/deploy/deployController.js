@@ -7,6 +7,7 @@ import PortainerError from '@/portainer/error';
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { buildOption } from '@/portainer/components/BoxSelector';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class KubernetesDeployController {
   /* @ngInject */
@@ -23,9 +24,11 @@ class KubernetesDeployController {
     this.CustomTemplateService = CustomTemplateService;
     this.DeployMethod = 'manifest';
 
+    this.isTemplateVariablesEnabled = isBE;
+
     this.deployOptions = [
       buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
-      buildOption('method_compose', 'fab fa-docker', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),
+      buildOption('method_compose', 'fab fa-docker', 'Compose', 'Docker compose format', KubernetesDeployManifestTypes.COMPOSE),
     ];
 
     this.methodOptions = [
@@ -83,6 +86,10 @@ class KubernetesDeployController {
   }
 
   renderTemplate() {
+    if (!this.isTemplateVariablesEnabled) {
+      return;
+    }
+
     const rendered = renderTemplate(this.state.templateContent, this.formValues.Variables, this.state.template.Variables);
     this.onChangeFormValues({ EditorContent: rendered });
   }

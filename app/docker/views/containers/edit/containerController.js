@@ -52,6 +52,7 @@ angular.module('portainer.docker').controller('ContainerController', [
     $scope.activityTime = 0;
     $scope.portBindings = [];
     $scope.displayRecreateButton = false;
+    $scope.displayCreateWebhookButton = false;
     $scope.containerWebhookFeature = FeatureId.CONTAINER_WEBHOOK;
 
     $scope.config = {
@@ -75,6 +76,23 @@ angular.module('portainer.docker').controller('ContainerController', [
 
     $scope.onUpdateResourceControlSuccess = function () {
       $state.reload();
+    };
+
+    $scope.computeDockerGPUCommand = () => {
+      const gpuOptions = _.find($scope.container.HostConfig.DeviceRequests, function (o) {
+        return o.Driver === 'nvidia' || o.Capabilities[0][0] === 'gpu';
+      });
+      if (!gpuOptions) {
+        return 'No GPU config found';
+      }
+      let gpuStr = 'all';
+      if (gpuOptions.Count !== -1) {
+        gpuStr = `"device=${_.join(gpuOptions.DeviceIDs, ',')}"`;
+      }
+      // we only support a single set of capabilities for now
+      // creation UI needs to be reworked in order to support OR combinations of AND capabilities
+      const capStr = `"capabilities=${_.join(gpuOptions.Capabilities[0], ',')}"`;
+      return `${gpuStr},${capStr}`;
     };
 
     var update = function () {
@@ -133,6 +151,7 @@ angular.module('portainer.docker').controller('ContainerController', [
             !allowPrivilegedModeForRegularUsers;
 
           $scope.displayRecreateButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers);
+          $scope.displayCreateWebhookButton = $scope.displayRecreateButton;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve container info');
@@ -372,7 +391,8 @@ angular.module('portainer.docker').controller('ContainerController', [
     }
 
     $scope.recreate = function () {
-      ModalService.confirmContainerRecreation(function (result) {
+      const cannotPullImage = !$scope.container.Config.Image || $scope.container.Config.Image.toLowerCase().startsWith('sha256');
+      ModalService.confirmContainerRecreation(cannotPullImage, function (result) {
         if (!result) {
           return;
         }

@@ -1,11 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Stack details">
-    <a data-toggle="tooltip" title-text="Refresh" ui-sref="docker.stacks.stack({id: stack.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content> <a ui-sref="docker.stacks">Stacks</a> &gt; {{ stackName }} </rd-header-content>
-</rd-header>
+<page-header title="'Stack details'" breadcrumbs="[{label:'Stacks', link:'docker.stacks'}, stackName]" reload="true"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -24,7 +17,7 @@
                     <p class="text-muted">
                       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                       <span ng-if="external">This stack was created outside of Portainer. Control over this stack is limited.</span>
-                      <span ng-if="orphaned">This stack is orphaned. You can reassociate it with the current environment using the "Associate to this environment" feature.</span>
+                      <span ng-if="orphaned">This stack is orphaned. You can re-associate it with the current environment using the "Associate to this environment" feature.</span>
                     </p>
                   </span>
                 </div>
@@ -90,7 +83,7 @@
               <!-- associate -->
               <div ng-if="orphaned">
                 <div class="col-sm-12 form-section-title"> Associate to this environment </div>
-                <p class="small text-muted"> This feature allows you to reassociate this stack to the current environment. </p>
+                <p class="small text-muted"> This feature allows you to re-associate this stack to the current environment. </p>
                 <form class="form-horizontal">
                   <por-access-control-form form-data="formValues.AccessControlData" hide-title="true"></por-access-control-form>
                   <div class="form-group">
@@ -118,6 +111,7 @@
                 model="stack.GitConfig"
                 stack="stack"
                 authorization="PortainerStackUpdate"
+                endpoint="applicationState.endpoint"
               >
               </stack-redeploy-git-form>
               <stack-duplication-form
@@ -139,10 +133,10 @@
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px" name="stackUpdateForm">
               <div class="form-group">
                 <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion == 2">
-                  This stack will be deployed using the equivalent of <code>docker-compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
+                  This stack will be deployed using the equivalent of <code>docker compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
                 </span>
                 <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion > 2">
-                  This stack will be deployed using <code>docker-compose</code>.
+                  This stack will be deployed using <code>docker compose</code>.
                 </span>
                 <span class="col-sm-12 text-muted small">
                   You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
@@ -153,7 +147,7 @@
                   <code-editor
                     read-only="orphaned"
                     identifier="stack-editor"
-                    placeholder="# Define or paste the content of your docker-compose file here"
+                    placeholder="# Define or paste the content of your docker compose file here"
                     yml="true"
                     on-change="(editorUpdate)"
                     value="stackFileContent"
@@ -168,12 +162,12 @@
                     <label class="control-label text-left">
                       Create a Stack webhook
                       <portainer-tooltip
-                        position="top"
-                        message="Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack."
+                        position="'top'"
+                        message="'Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack.'"
                       ></portainer-tooltip>
                     </label>
                     <label class="switch box-selector-item limited business" style="margin-left: 20px">
-                      <input type="checkbox" ng-model="formValues.EnableWebhook" disabled="disabled" ng-checked="true" /><i></i>
+                      <input type="checkbox" ng-model="formValues.EnableWebhook" disabled="disabled" ng-checked="false" /><i></i>
                     </label>
                     <be-feature-indicator feature="stackWebhookFeature"></be-feature-indicator>
                   </div>
@@ -186,6 +180,7 @@
                   ng-model="formValues.Env"
                   explanation="These values will be used as substitutions in the stack file"
                   on-change="(handleEnvVarChange)"
+                  show-help-message="true"
                 ></environment-variables-panel>
               </div>
               <!-- !environment-variables -->
@@ -196,7 +191,7 @@
                   <div class="col-sm-12">
                     <label for="prune" class="control-label text-left">
                       Prune services
-                      <portainer-tooltip position="bottom" message="Prune services that are no longer referenced."></portainer-tooltip>
+                      <portainer-tooltip position="'top'" message="'Prune services that are no longer referenced.'"></portainer-tooltip>
                     </label>
                     <label class="switch" style="margin-left: 20px"> <input name="prune" type="checkbox" ng-model="formValues.Prune" /><i></i> </label>
                   </div>
@@ -239,7 +234,7 @@
   <div class="col-sm-12">
     <services-datatable
       title-text="Services"
-      title-icon="fa-list-alt"
+      title-icon="list"
       dataset="services"
       table-key="stack-services"
       order-by="Name"

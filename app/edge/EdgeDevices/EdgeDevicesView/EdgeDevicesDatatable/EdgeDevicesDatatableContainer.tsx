@@ -1,13 +1,14 @@
 import { useState } from 'react';
 
+import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
+import { EdgeTypes, Environment } from '@/portainer/environments/types';
+import { useDebounce } from '@/portainer/hooks/useDebounce';
+
+import { useSearchBarState } from '@@/datatables/SearchBar';
 import {
   TableSettingsProvider,
   useTableSettings,
-} from '@/portainer/components/datatables/components/useTableSettings';
-import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
-import { Environment } from '@/portainer/environments/types';
-import { useSearchBarState } from '@/portainer/components/datatables/components/SearchBar';
-import { useDebounce } from '@/portainer/hooks/useDebounce';
+} from '@@/datatables/useTableSettings';
 
 import {
   EdgeDevicesDatatable,
@@ -88,8 +89,9 @@ function Loader({ children, storageKey }: LoaderProps) {
 
   const { environments, isLoading, totalCount } = useEnvironmentList(
     {
-      edgeDeviceFilter: 'trusted',
+      edgeDevice: true,
       search: debouncedSearchValue,
+      types: EdgeTypes,
       ...pagination,
     },
     settings.autoRefreshRate * 1000

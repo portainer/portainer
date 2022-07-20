@@ -1,12 +1,13 @@
 import { Formik, Field, Form } from 'formik';
 
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { UserViewModel } from '@/portainer/models/user';
 import { TeamViewModel } from '@/portainer/models/team';
-import { Input } from '@/portainer/components/form-components/Input';
-import { UsersSelector } from '@/portainer/components/UsersSelector';
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
+
+import { FormControl } from '@@/form-components/FormControl';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Input } from '@@/form-components/Input';
+import { UsersSelector } from '@@/UsersSelector';
+import { LoadingButton } from '@@/buttons/LoadingButton';
 
 import { validationSchema } from './CreateTeamForm.validation';
 
@@ -91,7 +92,7 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
                     <div className="col-sm-12">
                       <LoadingButton
                         disabled={!isValid}
-                        dataCy="team-createTeamButton"
+                        data-cy="team-createTeamButton"
                         isLoading={isSubmitting}
                         loadingText="Creating team..."
                       >

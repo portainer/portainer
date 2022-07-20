@@ -6,29 +6,28 @@
         <form class="form-horizontal">
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="tls" class="control-label text-left">
-                Auto-refresh logs
-                <portainer-tooltip position="bottom" message="Disabling this option allows you to pause the log collection process and the auto-scrolling."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px">
-                <input
-                  type="checkbox"
-                  ng-model="$ctrl.state.logCollection"
-                  ng-change="$ctrl.state.autoScroll = $ctrl.state.logCollection; $ctrl.logCollectionChange($ctrl.state.logCollection)"
-                /><i></i>
-              </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="$ctrl.state.logCollection"
+                label="'Auto-refresh logs'"
+                tooltip="'Disabling this option allows you to pause the log collection process and the auto-scrolling.'"
+                on-change="($ctrl.handleLogsCollectionChange)"
+              ></por-switch-field>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="tls" class="control-label text-left"> Wrap lines </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.state.wrapLines" /><i></i> </label>
+              <por-switch-field label-class="'col-sm-2'" checked="$ctrl.state.wrapLines" label="'Wrap lines'" on-change="($ctrl.handleLogsWrapLinesChange)"></por-switch-field>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="tls" class="control-label text-left"> Display timestamps </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.displayTimestamps" /><i></i> </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="$ctrl.displayTimestamps"
+                label="'Display timestamps'"
+                on-change="($ctrl.handleDisplayTimestampsChange)"
+              ></por-switch-field>
             </div>
           </div>
           <div class="form-group">

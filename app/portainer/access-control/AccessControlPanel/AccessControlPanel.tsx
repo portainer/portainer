@@ -1,11 +1,12 @@
 import { useReducer } from 'react';
 
-import { Button } from '@/portainer/components/Button';
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { useUser } from '@/portainer/hooks/useUser';
 import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, Role } from '@/portainer/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
+
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Button } from '@@/buttons';
 
 import { ResourceControlType, ResourceId } from '../types';
 import { ResourceControlViewModel } from '../models/ResourceControlViewModel';
@@ -105,9 +106,9 @@ export function AccessControlPanel({
 function useRestrictions(resourceControl?: ResourceControlViewModel) {
   const { user, isAdmin } = useUser();
 
-  const memberships = useUserMembership(user?.Id);
+  const memberships = useUserMembership(user.Id);
 
-  if (!resourceControl || isAdmin || !user) {
+  if (!resourceControl || isAdmin) {
     return {
       isPartOfRestrictedUsers: false,
       isLeaderOfAnyRestrictedTeams: false,

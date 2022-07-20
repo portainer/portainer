@@ -21,7 +21,7 @@
           <!-- !toggle -->
 
           <!-- init password form -->
-          <form class="simple-box-form form-horizontal" style="padding-left: 30px" ng-if="state.showInitPassword">
+          <form name="form" class="simple-box-form form-horizontal" style="padding-left: 30px" ng-if="state.showInitPassword">
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
@@ -41,7 +41,7 @@
             <div class="form-group">
               <label for="password" class="col-sm-4 control-label text-left">Password</label>
               <div class="col-sm-8">
-                <input type="password" class="form-control" ng-model="formValues.Password" id="password" ng-change="onPasswordChange()" auto-focus />
+                <input type="password" class="form-control" ng-model="formValues.Password" id="password" name="password" ng-minlength="requiredPasswordLength" auto-focus />
               </div>
             </div>
             <!-- !new-password-input -->
@@ -53,7 +53,11 @@
                   <input type="password" class="form-control" ng-model="formValues.ConfirmPassword" id="confirm_password" />
                   <span class="input-group-addon"
                     ><i
-                      ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.Password !== '' && formValues.Password === formValues.ConfirmPassword]"
+                      ng-class="
+                        { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[
+                          form.password.$viewValue !== '' && form.password.$viewValue === formValues.ConfirmPassword
+                        ]
+                      "
                       aria-hidden="true"
                     ></i
                   ></span>
@@ -63,12 +67,11 @@
             <!-- !confirm-password-input -->
             <!-- note -->
             <div class="form-group">
-              <div class="col-sm-12 text-muted" ng-if="!state.passwordStrength">
-                <!-- below code is duplicated with component of <force-password-update-hint>  -->
-                <!-- it is a workaround for firefox that does not render component <force-password-update-hint>  -->
+              <div class="col-sm-12 text-muted">
                 <p>
-                  <i class="fa fa-times red-icon space-right" aria-hidden="true"></i>
-                  <span>The password must be at least {{ MinPasswordLen }} characters long.</span>
+                  <i class="fa fa-exclamation-triangle orange-icon space-right" aria-hidden="true"></i>
+                  <span>The password must be at least {{ requiredPasswordLength }} characters long.</span>
+                  <i class="fa fa-check green-icon space-left" aria-hidden="true" ng-if="form.password.$valid && formValues.Password"></i>
                 </p>
               </div>
             </div>
@@ -79,7 +82,7 @@
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="state.actionInProgress || !state.passwordStrength || formValues.Password !== formValues.ConfirmPassword"
+                  ng-disabled="state.actionInProgress || form.$invalid || !formValues.Password || !formValues.ConfirmPassword ||  form.password.$viewValue !== formValues.ConfirmPassword"
                   ng-click="createAdminUser()"
                   button-spinner="state.actionInProgress"
                 >
@@ -185,8 +188,7 @@
               <label for="password" class="col-sm-3 control-label text-left">
                 Password
                 <portainer-tooltip
-                  position="bottom"
-                  message="If the backup is password protected, provide the password in order to extract the backup file, otherwise this field can be left empty."
+                  message="'If the backup is password protected, provide the password in order to extract the backup file, otherwise this field can be left empty.'"
                 ></portainer-tooltip>
               </label>
               <div class="col-sm-4">

@@ -1,8 +1,19 @@
-<kubernetes-view-header title="Volume details" state="kubernetes.volumes.volume" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })">{{ ctrl.volume.ResourcePool.Namespace.Name }}</a> &gt;
-  <a ui-sref="kubernetes.volumes">Volumes</a> &gt; {{ ctrl.volume.PersistentVolumeClaim.Name }}
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Volume details'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { 
+      label:ctrl.volume.ResourcePool.Namespace.Name,
+      link: 'kubernetes.resourcePools.resourcePool', 
+      linkParams:{ id: ctrl.volume.ResourcePool.Namespace.Name }
+    },
+    { label:'Volumes', link:'kubernetes.volumes' },
+     ctrl.volume.PersistentVolumeClaim.Name,
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -43,11 +54,7 @@
                       <td>Shared Access Policy</td>
                       <td data-cy="k8sVolDetail-volAccessPolicy"
                         >{{ ctrl.state.volumeSharedAccessPolicy }}
-                        <portainer-tooltip
-                          position="bottom"
-                          ng-if="ctrl.state.volumeSharedAccessPolicyTooltip"
-                          message="{{ ctrl.state.volumeSharedAccessPolicyTooltip }}"
-                        ></portainer-tooltip
+                        <portainer-tooltip ng-if="ctrl.state.volumeSharedAccessPolicyTooltip" message="ctrl.state.volumeSharedAccessPolicyTooltip"></portainer-tooltip
                       ></td>
                     </tr>
                     <tr>

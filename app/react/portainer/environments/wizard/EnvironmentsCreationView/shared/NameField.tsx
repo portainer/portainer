@@ -2,9 +2,10 @@ import { Field, useField } from 'formik';
 import { string } from 'yup';
 import { debounce } from 'lodash';
 
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Input } from '@/portainer/components/form-components/Input';
-import { getEndpoints } from '@/portainer/environments/environment.service';
+import { getEnvironments } from '@/portainer/environments/environment.service';
+
+import { FormControl } from '@@/form-components/FormControl';
+import { Input } from '@@/form-components/Input';
 
 interface Props {
   readonly?: boolean;
@@ -29,13 +30,13 @@ export function NameField({ readonly }: Props) {
   );
 }
 
-async function isNameUnique(name?: string) {
+export async function isNameUnique(name?: string) {
   if (!name) {
     return true;
   }
 
   try {
-    const result = await getEndpoints(0, 1, { name });
+    const result = await getEnvironments({ limit: 1, query: { name } });
     if (result.totalCount > 0) {
       return false;
     }

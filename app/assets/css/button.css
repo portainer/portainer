@@ -1,0 +1,92 @@
+.btn {
+  border-radius: 5px;
+  display: inline-flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-group {
+  display: inline-flex;
+}
+
+.btn.active {
+  box-shadow: none;
+}
+
+.btn-primary {
+  background-color: var(--ui-blue-8);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active .active {
+  background-color: var(--ui-blue-9);
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+  background-color: var(--ui-blue-9);
+}
+
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  background-color: var(--ui-blue-8);
+}
+
+.btn-danger {
+  background-color: var(--ui-error-8);
+}
+
+.btn-success {
+  background-color: var(--ui-success-7);
+}
+
+.btn-dangerlight {
+  background-color: var(--ui-error-2) !important;
+  border: 1px solid var(--border-button-group);
+  color: var(--ui-error-8);
+}
+
+.btn-dangerlight:hover {
+  color: var(--ui-error-9) !important;
+  background-color: var(--ui-error-3) !important;
+}
+
+.btn-light {
+  background-color: var(--bg-button-group);
+  border: 1px solid var(--border-button-group);
+  color: var(--text-button-group);
+}
+
+.btn-light:hover {
+  background-color: var(--ui-gray-2) !important;
+}
+
+.btn-light:active,
+.btn-light.active,
+.open > .dropdown-toggle.btn-light {
+  background-color: var(--ui-gray-3);
+}
+
+/* Button Secondary */
+.btn-secondary {
+  background-color: var(--ui-blue-2);
+  border: 1px solid var(--ui-blue-8);
+  color: var(--ui-blue-9);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active .active {
+  background-color: var(--ui-blue-3) !important;
+  color: var(--ui-blue-9) !important;
+}
+
+.btn-secondary:disabled {
+  background-color: var(--ui-blue-1);
+  border: 1px solid var(--ui-blue-1);
+  color: var(--ui-blue-5);
+}

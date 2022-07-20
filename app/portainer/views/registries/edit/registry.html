@@ -1,20 +1,32 @@
-<rd-header>
-  <rd-header-title title-text="Registry details"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: $ctrl.registry.Id})">{{ $ctrl.registry.Name }}</a>
-  </rd-header-content>
-</rd-header>
+<page-header title="'Registry details'" breadcrumbs="[{label:'Registries', link:'portainer.registries'}, $ctrl.registry.Name]"> </page-header>
 
 <div class="row" ng-if="!$ctrl.state.loading">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="editRegistry">
+          <!-- provider -->
+          <div class="form-group">
+            <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Provider</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" ng-model="$ctrl.provider" disabled />
+            </div>
+          </div>
+
           <!-- name-input -->
           <div class="form-group">
             <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="registry_name" ng-model="$ctrl.formValues.Name" placeholder="e.g. my-registry" ng-change="$ctrl.onChangeName()" />
+              <input
+                type="text"
+                class="form-control"
+                id="registry_name"
+                name="registry_name"
+                ng-model="$ctrl.registry.Name"
+                placeholder="e.g. my-registry"
+                ng-change="$ctrl.onChangeName()"
+                required
+              />
             </div>
           </div>
           <div class="form-group" ng-show="$ctrl.state.nameAlreadyExists">
@@ -24,16 +36,66 @@
               </div>
             </div>
           </div>
+          <div class="form-group" ng-show="editRegistry.registry_name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="editRegistry.registry_name.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              </div>
+            </div>
+          </div>
           <!-- !name-input -->
           <!-- registry-url-input -->
-          <div class="form-group" ng-if="registry.Type !== RegistryTypes.DOCKERHUB && registry.Type !== RegistryTypes.QUAY && registry.Type !== RegistryTypes.GITLAB">
+          <div class="form-group">
             <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
               Registry URL
-              <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry. Any protocol or trailing slash will be stripped if present.">
-              </portainer-tooltip>
+              <portainer-tooltip message="'URL or IP address of a Docker registry. Any protocol or trailing slash will be stripped if present.'"> </portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="registry_url" ng-model="$ctrl.registry.URL" placeholder="e.g. 10.0.0.10:5000 or myregistry.domain.tld" />
+              <input
+                type="text"
+                class="form-control"
+                id="registry_url"
+                name="registry_url"
+                ng-model="$ctrl.registry.URL"
+                placeholder="e.g. 10.0.0.10:5000 or myregistry.domain.tld"
+                ng-disabled="$ctrl.registry.Type === $ctrl.RegistryTypes.DOCKERHUB || $ctrl.registry.Type === $ctrl.RegistryTypes.QUAY || $ctrl.registry.Type === $ctrl.RegistryTypes.GITLAB"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-group" ng-show="editRegistry.registry_url.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="editRegistry.registry_url.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- base-url-input -->
+          <div ng-if="$ctrl.registry.Type === $ctrl.RegistryTypes.PROGET">
+            <div class="form-group">
+              <label for="registry_base_url" class="col-sm-3 col-lg-2 control-label text-left">
+                Base URL
+                <portainer-tooltip message="'The base URL of the ProGet registry.'"> </portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="registry_base_url"
+                  name="registry_base_url"
+                  ng-model="$ctrl.registry.BaseURL"
+                  placeholder="e.g. 10.0.0.10:5000 or myregistry.domain.tld"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group" ng-show="editRegistry.registry_base_url.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="editRegistry.registry_base_url.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
             </div>
           </div>
           <!-- !registry-url-input -->
@@ -51,7 +113,7 @@
             <div class="col-sm-12">
               <label for="registry_auth" class="control-label text-left">
                 Authentication
-                <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."> </portainer-tooltip>
+                <portainer-tooltip message="'Enable this option if you need to specify credentials to connect to this registry.'"> </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.registry.Authentication" /><i></i> </label>
             </div>
@@ -66,7 +128,14 @@
                 {{ $ctrl.registry.Type === $ctrl.RegistryTypes.ECR ? 'AWS Access Key' : 'Username' }}
               </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="credentials_username" ng-model="$ctrl.registry.Username" />
+                <input type="text" class="form-control" id="credentials_username" name="credentials_username" ng-model="$ctrl.registry.Username" required />
+              </div>
+            </div>
+            <div class="form-group" ng-show="editRegistry.credentials_username.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="editRegistry.credentials_username.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
               </div>
             </div>
             <!-- !credentials-user -->
@@ -76,7 +145,14 @@
                 {{ $ctrl.passwordLabel() }}
               </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="credentials_password" ng-model="$ctrl.formValues.Password" placeholder="*******" />
+                <input type="password" class="form-control" id="credentials_password" name="credentials_password" ng-model="$ctrl.Password" autocomplete="off" required />
+              </div>
+            </div>
+            <div class="form-group" ng-show="editRegistry.credentials_password.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="editRegistry.credentials_password.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
               </div>
             </div>
             <!-- !credentials-password -->
@@ -100,6 +176,13 @@
                   <input type="text" class="form-control" id="organisation_name" name="organisation_name" ng-model="$ctrl.registry.Quay.OrganisationName" required />
                 </div>
               </div>
+              <div class="form-group" ng-show="editRegistry.organisation_name.$invalid">
+                <div class="col-sm-12 small text-warning">
+                  <div ng-messages="editRegistry.organisation_name.$error">
+                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  </div>
+                </div>
+              </div>
               <!-- !organisation_name -->
             </div>
           </div>
@@ -109,12 +192,12 @@
             <div class="form-group">
               <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left">Region</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="registry_region" name="registry_region" placeholder="us-west-1" ng-model="$ctrl.registry.Ecr.Region" required />
+                <input type="text" class="form-control" id="registry_region" name="registry_region" ng-model="$ctrl.registry.Ecr.Region" placeholder="us-west-1" required />
               </div>
             </div>
-            <div class="form-group" ng-show="registryFormEcr.registry_region.$invalid">
+            <div class="form-group" ng-show="editRegistry.registry_region.$invalid">
               <div class="col-sm-12 small text-warning">
-                <div ng-messages="registryFormEcr.registry_region.$error">
+                <div ng-messages="editRegistry.registry_region.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                 </div>
               </div>
@@ -127,7 +210,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="$ctrl.isUpdateButtonDisabled()"
+                ng-disabled="$ctrl.isUpdateButtonDisabled() || editRegistry.$invalid"
                 ng-click="$ctrl.updateRegistry()"
                 button-spinner="$ctrl.state.actionInProgress"
               >

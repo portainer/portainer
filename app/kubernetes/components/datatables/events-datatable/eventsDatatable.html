@@ -1,134 +1,140 @@
 <div class="datatable">
-  <rd-widget>
-    <rd-widget-body classes="no-padding">
-      <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
-        <div class="settings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
-            <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
-              <div class="tableMenu">
-                <div class="menuHeader"> Table settings </div>
-                <div class="menuContent">
-                  <div>
-                    <div class="md-checkbox">
-                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
-                      <label for="setting_auto_refresh">Auto refresh</label>
-                    </div>
-                    <div ng-if="$ctrl.settings.repeater.autoRefresh">
-                      <label for="settings_refresh_rate"> Refresh rate </label>
-                      <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
-                        <option value="10">10s</option>
-                        <option value="30">30s</option>
-                        <option value="60">1min</option>
-                        <option value="120">2min</option>
-                        <option value="300">5min</option>
-                      </select>
-                      <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
-                      </span>
-                    </div>
-                  </div>
+  <div class="toolBar">
+    <div class="toolBarTitle flex">
+      <div class="flex justify-center content-center mr-2 icon-nested-blue vertical-center">
+        <pr-icon icon="'rotate-ccw'" size="'sm'" mode="'primary'" feather="true"></pr-icon>
+      </div>
+      <span class="vertical-center">
+        {{ $ctrl.titleText }}
+      </span>
+    </div>
+    <div class="searchBar">
+      <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
+      <input
+        type="text"
+        class="searchInput ml-1"
+        ng-model="$ctrl.state.textFilter"
+        ng-change="$ctrl.onTextFilterChange()"
+        placeholder="Search for an event..."
+        auto-focus
+        ng-model-options="{ debounce: 300 }"
+        data-cy="k8sConfigDetail-eventsTableSearchInput"
+      />
+    </div>
+    <div class="settings">
+      <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
+        <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
+        <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+          <div class="tableMenu">
+            <div class="menuHeader"> Table settings </div>
+            <div class="menuContent">
+              <div>
+                <div class="md-checkbox">
+                  <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                  <label for="setting_auto_refresh">Auto refresh</label>
                 </div>
-                <div>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                <div ng-if="$ctrl.settings.repeater.autoRefresh">
+                  <label for="settings_refresh_rate"> Refresh rate </label>
+                  <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                    <option value="10">10s</option>
+                    <option value="30">30s</option>
+                    <option value="60">1min</option>
+                    <option value="120">2min</option>
+                    <option value="300">5min</option>
+                  </select>
+                  <span>
+                    <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'" feather="true"></pr-icon>
+                  </span>
                 </div>
               </div>
             </div>
-          </span>
+            <div>
+              <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-          data-cy="k8sConfigDetail-eventsTableSearchInput"
-        />
-      </div>
-      <div class="table-responsive">
-        <table class="table table-hover nowrap-cells" data-cy="k8sConfigDetail-eventsTable">
-          <thead>
-            <tr>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Date')">
-                  Date
-                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Date' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Date' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Involved.kind')">
-                  Kind
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Involved.kind' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Type')">
-                  Type
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Message')">
-                  Message
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Message' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Message' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
-              pagination-id="$ctrl.tableKey"
-            >
-              <td>{{ item.Date | getisodate }}</td>
-              <td>{{ item.Involved.kind }}</td>
-              <td
-                ><span class="label label-{{ item.Type | kubernetesEventTypeColor }}">{{ item.Type }}</span></td
-              >
-              <td>{{ item.Message }}</td>
-            </tr>
-            <tr ng-if="$ctrl.loading">
-              <td colspan="4" class="text-center text-muted">Loading...</td>
-            </tr>
-            <tr ng-if="!$ctrl.loading && (!$ctrl.dataset || $ctrl.state.filteredDataSet.length === 0)">
-              <td colspan="4" class="text-center text-muted">No event available.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="footer" ng-if="$ctrl.dataset">
-        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
-        <div class="paginationControls">
-          <form class="form-inline">
-            <span class="limitSelector">
-              <span style="margin-right: 5px"> Items per page </span>
-              <select
-                class="form-control"
-                ng-model="$ctrl.state.paginatedItemLimit"
-                ng-change="$ctrl.changePaginationLimit()"
-                data-cy="k8sConfigDetail-eventsTablePaginationDropdown"
-              >
-                <option value="0">All</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </span>
-            <dir-pagination-controls max-size="5" pagination-id="$ctrl.tableKey"></dir-pagination-controls>
-          </form>
-        </div>
-      </div>
-    </rd-widget-body>
-  </rd-widget>
+      </span>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover nowrap-cells" data-cy="k8sConfigDetail-eventsTable">
+      <thead>
+        <tr>
+          <th>
+            <table-column-header
+              col-title="'Date'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Date'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Date' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Date')"
+            ></table-column-header>
+          </th>
+          <th>
+            <table-column-header
+              col-title="'Kind'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Involved.kind'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Involved.kind' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Involved.kind')"
+            ></table-column-header>
+          </th>
+          <th>
+            <table-column-header
+              col-title="'Type'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Type'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Type')"
+            ></table-column-header>
+          </th>
+          <th>
+            <table-column-header
+              col-title="'Message'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Message'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Message' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Message')"
+            ></table-column-header>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
+          pagination-id="$ctrl.tableKey"
+        >
+          <td>{{ item.Date | getisodate }}</td>
+          <td>{{ item.Involved.kind }}</td>
+          <td
+            ><span class="label label-{{ item.Type | kubernetesEventTypeColor }}">{{ item.Type }}</span></td
+          >
+          <td>{{ item.Message }}</td>
+        </tr>
+        <tr ng-if="$ctrl.loading">
+          <td colspan="4" class="text-center text-muted">Loading...</td>
+        </tr>
+        <tr ng-if="!$ctrl.loading && (!$ctrl.dataset || $ctrl.state.filteredDataSet.length === 0)">
+          <td colspan="4" class="text-center text-muted">No event available.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer" ng-if="$ctrl.dataset">
+    <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
+    <div class="paginationControls">
+      <form class="form-inline">
+        <span class="limitSelector">
+          <span style="margin-right: 5px"> Items per page </span>
+          <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="k8sConfigDetail-eventsTablePaginationDropdown">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </span>
+        <dir-pagination-controls max-size="5" pagination-id="$ctrl.tableKey"></dir-pagination-controls>
+      </form>
+    </div>
+  </div>
 </div>
