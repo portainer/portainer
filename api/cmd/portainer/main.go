@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
+	"github.com/portainer/portainer/api/build"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
@@ -743,7 +744,15 @@ func main() {
 
 	for {
 		server := buildServer(flags)
-		logrus.Printf("[INFO] [cmd,main] Starting Portainer version %s\n", portainer.APIVersion)
+		logrus.WithFields(logrus.Fields{
+			"Version":        portainer.APIVersion,
+			"BuildNumber":    build.BuildNumber,
+			"ImageTag":       build.ImageTag,
+			"NodejsVersion":  build.NodejsVersion,
+			"YarnVersion":    build.YarnVersion,
+			"WebpackVersion": build.WebpackVersion,
+			"GoVersion":      build.GoVersion},
+		).Print("[INFO] [cmd,main] Starting Portainer")
 		err := server.Start()
 		logrus.Printf("[INFO] [cmd,main] Http server exited: %v\n", err)
 	}

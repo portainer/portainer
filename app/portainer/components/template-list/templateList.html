@@ -2,47 +2,47 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
+        <div class="toolBarTitle"> <i class="fa mr-1" ng-class="$ctrl.titleIcon" aria-hidden="true"></i> {{ $ctrl.titleText }} </div>
       </div>
+      <div class="mx-3">
+        <div class="actionBar">
+          <div>
+            <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.templates.new" ng-if="$ctrl.showAddAction">
+              <i class="fa fa-plus space-right" aria-hidden="true"></i>Add template
+            </button>
+            <span ng-class="{ 'pull-right': $ctrl.showAddAction }">
+              <ui-select ng-model="$ctrl.state.selectedCategory">
+                <ui-select-match placeholder="Select a category" allow-clear="true">
+                  <span>{{ $select.selected }}</span>
+                </ui-select-match>
+                <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
+                  <span>{{ category }}</span>
+                </ui-select-choices>
+              </ui-select>
+            </span>
+          </div>
 
-      <div class="actionBar">
-        <div>
-          <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.templates.new" ng-if="$ctrl.showAddAction">
-            <i class="fa fa-plus space-right" aria-hidden="true"></i>Add template
-          </button>
-          <span ng-class="{ 'pull-right': $ctrl.showAddAction }" style="width: 25%">
-            <ui-select ng-model="$ctrl.state.selectedCategory">
-              <ui-select-match placeholder="Select a category" allow-clear="true">
-                <span>{{ $select.selected }}</span>
-              </ui-select-match>
-              <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
-                <span>{{ category }}</span>
-              </ui-select-choices>
-            </ui-select>
-          </span>
+          <div class="small text-muted mt-3">
+            <label for="show_stacks" class="control-label text-left"> Show container templates </label>
+            <label class="switch space-left">
+              <input type="checkbox" name="show_stacks" ng-model="$ctrl.state.showContainerTemplates" ng-change="$ctrl.updateCategories()" /><i></i>
+            </label>
+          </div>
         </div>
 
-        <div class="small text-muted" style="margin: 15px 0 0 5px">
-          <label for="show_stacks" class="control-label text-left"> Show container templates </label>
-          <label class="switch" style="margin-left: 20px">
-            <input type="checkbox" name="show_stacks" ng-model="$ctrl.state.showContainerTemplates" ng-change="$ctrl.updateCategories()" /><i></i>
-          </label>
+        <div class="searchBar">
+          <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
         </div>
       </div>
-
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
-      </div>
-
       <div class="blocklist">
         <template-item
           ng-repeat="template in $ctrl.templates | filter: $ctrl.filterByTemplateType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"

@@ -19,7 +19,7 @@
             <div class="col-sm-12">
               <por-switch-field
                 label="'Use custom logo'"
-                value="formValues.customLogo"
+                checked="formValues.customLogo"
                 name="'toggle_logo'"
                 disabled="state.isDemo"
                 on-change="(onToggleCustomLogo)"
@@ -47,7 +47,7 @@
             <div class="col-sm-12">
               <por-switch-field
                 label="'Allow the collection of anonymous statistics'"
-                value="formValues.enableTelemetry"
+                checked="formValues.enableTelemetry"
                 name="'toggle_enableTelemetry'"
                 on-change="(onToggleEnableTelemetry)"
                 disabled="state.isDemo"

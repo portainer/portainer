@@ -10,6 +10,7 @@ import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { ViewLoading } from '@@/ViewLoading';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
 import { DashboardItem } from '@@/DashboardItem';
 import { SearchBar } from '@@/datatables/SearchBar';
 
@@ -31,6 +32,15 @@ export const componentsModule = angular
     r2a(PasswordCheckHint, ['forceChangePassword', 'passwordValid'])
   )
   .component('rdLoading', r2a(Loading, []))
+  .component(
+    'tableColumnHeader',
+    r2a(TableColumnHeaderAngular, [
+      'colTitle',
+      'canSort',
+      'isSorted',
+      'isSortedDesc',
+    ])
+  )
   .component('viewLoading', r2a(ViewLoading, ['message']))
   .component(
     'pageHeader',

@@ -112,10 +112,10 @@
                 Container webhook
                 <portainer-tooltip
                   position="'top'"
-                  message="'Webhook (or callback URI) used to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container.'"
+                  message="'Webhook (or callback URI) used to automate the recreation of this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container.'"
                 ></portainer-tooltip>
                 <label class="switch box-selector-item limited business" style="margin-left: 20px">
-                  <input disable-authorization="DockerContainerUpdate" type="checkbox" ng-model="WebhookExists" disabled="disabled" ng-checked="true" /><i></i>
+                  <input disable-authorization="DockerContainerUpdate" type="checkbox" ng-model="WebhookExists" disabled="disabled" ng-checked="false" /><i></i>
                 </label>
                 <be-feature-indicator feature="containerWebhookFeature"></be-feature-indicator>
               </td>
@@ -321,6 +321,10 @@
                   </tr>
                 </table>
               </td>
+            </tr>
+            <tr ng-if="container.HostConfig.DeviceRequests.length">
+              <td>GPUS</td>
+              <td>{{ computeDockerGPUCommand() }}</td>
             </tr>
           </tbody>
         </table>

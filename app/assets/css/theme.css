@@ -147,7 +147,6 @@
   --bg-daterangepicker-hover: var(--grey-16);
   --bg-daterangepicker-in-range: var(--grey-58);
   --bg-daterangepicker-active: var(--blue-14);
-  --bg-tooltip-color: var(--white-color);
   --bg-input-autofill-color: var(--white-color);
   --bg-btn-default-hover-color: var(--grey-59);
   --bg-btn-focus: var(--grey-59);
@@ -265,6 +264,9 @@
   --bg-multiselect-helpercontainer: var(--white-color);
   --text-input-textarea: var(--white-color);
 
+  --sort-icon-muted: var(--ui-gray-5);
+  --sort-icon-hover: var(--ui-gray-6);
+  --sort-icon: var(--ui-gray-9);
   --border-checkbox: var(--ui-gray-5);
   --bg-checkbox: var(--white-color);
   --border-searchbar: var(--ui-gray-5);
@@ -444,6 +446,9 @@
   --bg-multiselect-helpercontainer: var(--grey-1);
   --text-input-textarea: var(--grey-1);
 
+  --sort-icon-muted: var(--ui-gray-7);
+  --sort-icon-hover: var(--ui-gray-6);
+  --sort-icon: var(--ui-gray-3);
   --border-checkbox: var(--ui-gray-5);
   --bg-checkbox: var(--white-color);
   --border-searchbar: var(--ui-gray-5);
@@ -615,6 +620,9 @@
   --text-cm-string-color: var(--red-7);
   --text-progress-bar-color: var(--black-color);
 
+  --sort-icon-muted: var(--ui-gray-7);
+  --sort-icon-hover: var(--ui-gray-6);
+  --sort-icon: var(--ui-gray-3);
   --border-checkbox: var(--ui-gray-5);
   --bg-checkbox: var(--white-color);
   --border-searchbar: var(--ui-gray-5);

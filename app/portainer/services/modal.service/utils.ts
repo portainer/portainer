@@ -22,6 +22,7 @@ export function confirmButtons(options: ButtonsOptions) {
         options.cancel && options.cancel.label
           ? sanitize(options.cancel.label)
           : 'Cancel',
+      className: 'btn-default',
     },
   };
 }

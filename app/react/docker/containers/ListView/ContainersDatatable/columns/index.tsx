@@ -10,6 +10,7 @@ import { ports } from './ports';
 import { quickActions } from './quick-actions';
 import { stack } from './stack';
 import { state } from './state';
+import { gpus } from './gpus';
 
 export function useColumns() {
   return useMemo(
@@ -22,6 +23,7 @@ export function useColumns() {
       created,
       ip,
       host,
+      gpus,
       ports,
       ownership,
     ],
