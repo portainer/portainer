@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/pkg/errors"
 
@@ -19,6 +20,7 @@ import (
 type gitClient struct {
 	preserveGitDirectory bool
 	cacheEnabled         bool
+	mu                   sync.Mutex
 	// Cache the result of repository refs, key is repository URL
 	repoRefCache map[string][]*plumbing.Reference
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
@@ -113,10 +115,15 @@ func (c gitClient) listRemote(ctx context.Context, opt cloneOptions) ([]string, 
 
 	var ret []string
 	for _, ref := range refs {
+		if ref.Name().String() == "HEAD" {
+			continue
+		}
 		ret = append(ret, ref.Name().String())
 	}
 
 	if c.cacheEnabled {
+		c.mu.Lock()
+		defer c.mu.Unlock()
 		c.repoRefCache[opt.repositoryUrl] = refs
 	}
 	return ret, nil
@@ -203,6 +210,8 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 			})
 
 			if c.cacheEnabled {
+				c.mu.Lock()
+				defer c.mu.Unlock()
 				c.repoTreeCache[repoKey] = allPaths
 			}
 			break
@@ -216,6 +225,8 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 }
 
 func (c gitClient) removeCache(ctx context.Context, opt cloneOptions) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	delete(c.repoRefCache, opt.repositoryUrl)
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
 	delete(c.repoTreeCache, repoKey)

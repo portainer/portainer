@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-git/go-git/v5/plumbing/transport/client"
@@ -53,6 +54,7 @@ type azureDownloader struct {
 	client       *http.Client
 	baseUrl      string
 	cacheEnabled bool
+	mu           sync.Mutex
 	// Cache the result of repository refs, key is repository URL
 	repoRefCache map[string][]string
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
@@ -425,10 +427,15 @@ func (a *azureDownloader) listRemote(ctx context.Context, options cloneOptions) 
 
 	var ret []string
 	for _, value := range refs.Value {
+		if value.Name == "HEAD" {
+			continue
+		}
 		ret = append(ret, value.Name)
 	}
 
 	if a.cacheEnabled {
+		a.mu.Lock()
+		defer a.mu.Unlock()
 		a.repoRefCache[options.repositoryUrl] = ret
 	}
 	return ret, nil
@@ -534,6 +541,8 @@ func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([
 	}
 
 	if a.cacheEnabled {
+		a.mu.Lock()
+		defer a.mu.Unlock()
 		a.repoTreeCache[repoKey] = allPaths
 	}
 
@@ -541,6 +550,8 @@ func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([
 }
 
 func (a *azureDownloader) removeCache(ctx context.Context, opt cloneOptions) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
 	delete(a.repoRefCache, opt.repositoryUrl)
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
 	delete(a.repoTreeCache, repoKey)
