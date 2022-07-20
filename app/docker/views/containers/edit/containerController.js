@@ -52,6 +52,7 @@ angular.module('portainer.docker').controller('ContainerController', [
     $scope.activityTime = 0;
     $scope.portBindings = [];
     $scope.displayRecreateButton = false;
+    $scope.displayCreateWebhookButton = false;
     $scope.containerWebhookFeature = FeatureId.CONTAINER_WEBHOOK;
 
     $scope.config = {
@@ -150,6 +151,7 @@ angular.module('portainer.docker').controller('ContainerController', [
             !allowPrivilegedModeForRegularUsers;
 
           $scope.displayRecreateButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers);
+          $scope.displayCreateWebhookButton = $scope.displayRecreateButton;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve container info');

@@ -31,14 +31,22 @@
           <div class="col-sm-12 form-section-title"> Options </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <label class="control-label text-left"> Only display running tasks </label>
-              <label class="switch" style="margin-left: 20px">
-                <input type="checkbox" ng-model="state.DisplayOnlyRunningTasks" ng-change="changeDisplayOnlyRunningTasks()" /><i></i>
-              </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="state.DisplayOnlyRunningTasks"
+                label="'Only display running tasks'"
+                on-change="(handleChangeDisplayOnlyRunningTasks)"
+              ></por-switch-field>
             </div>
+          </div>
+          <div class="form-group">
             <div class="col-sm-12">
-              <label class="control-label text-left"> Display node labels </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="state.DisplayNodeLabels" ng-change="changeDisplayNodeLabels()" /><i></i> </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="state.DisplayNodeLabels"
+                label="'Display node labels'"
+                on-change="(handleChangeDisplayNodeLabels)"
+              ></por-switch-field>
             </div>
           </div>
         </form>
