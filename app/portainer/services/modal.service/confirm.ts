@@ -1,7 +1,13 @@
 import sanitize from 'sanitize-html';
 import bootbox from 'bootbox';
 
-import { applyBoxCSS, ButtonsOptions, confirmButtons } from './utils';
+import {
+  applyBoxCSS,
+  ButtonsOptions,
+  confirmButtons,
+  buildTitle,
+  ModalTypeIcon,
+} from './utils';
 
 type ConfirmCallback = (confirmed: boolean) => void;
 
@@ -17,7 +23,7 @@ interface ConfirmOptions extends ConfirmAsyncOptions {
 
 export function confirmWebEditorDiscard() {
   const options = {
-    title: 'Are you sure ?',
+    title: buildTitle('Are you sure?'),
     message:
       'You currently have unsaved changes in the editor. Are you sure you want to leave?',
     buttons: {
@@ -57,7 +63,7 @@ export function confirm(options: ConfirmOptions) {
 
 export function confirmImageForceRemoval(callback: ConfirmCallback) {
   confirm({
-    title: 'Are you sure?',
+    title: buildTitle('Are you sure?', ModalTypeIcon.Destructive),
     message:
       'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
     buttons: {
@@ -72,7 +78,7 @@ export function confirmImageForceRemoval(callback: ConfirmCallback) {
 
 export function cancelRegistryRepositoryAction(callback: ConfirmCallback) {
   confirm({
-    title: 'Are you sure?',
+    title: buildTitle('Are you sure?', ModalTypeIcon.Destructive),
     message:
       'WARNING: interrupting this operation before it has finished will result in the loss of all tags. Are you sure you want to do this?',
     buttons: {
@@ -88,7 +94,7 @@ export function cancelRegistryRepositoryAction(callback: ConfirmCallback) {
 export function confirmDeletion(message: string, callback: ConfirmCallback) {
   const messageSanitized = sanitize(message);
   confirm({
-    title: 'Are you sure ?',
+    title: buildTitle('Are you sure?', ModalTypeIcon.Destructive),
     message: messageSanitized,
     buttons: {
       confirm: {
@@ -107,7 +113,7 @@ export function confirmWithTitle(
 ) {
   const messageSanitized = sanitize(message);
   confirm({
-    title: sanitize(title),
+    title: buildTitle(title, ModalTypeIcon.Destructive),
     message: messageSanitized,
     buttons: {
       confirm: {
@@ -122,7 +128,7 @@ export function confirmWithTitle(
 export function confirmDetachment(message: string, callback: ConfirmCallback) {
   const messageSanitized = sanitize(message);
   confirm({
-    title: 'Are you sure ?',
+    title: buildTitle('Are you sure?'),
     message: messageSanitized,
     buttons: {
       confirm: {
@@ -140,7 +146,7 @@ export function confirmDisassociate(callback: ConfirmCallback) {
     '<p>Any agent started with the Edge key associated to this environment will be able to re-associate with this environment.</p>' +
     '<p>You can re-use the Edge ID and Edge key that you used to deploy the existing Edge agent to associate a new Edge device to this environment.</p>';
   confirm({
-    title: 'About disassociating',
+    title: buildTitle('About disassociating'),
     message: sanitize(message),
     buttons: {
       confirm: {
@@ -156,7 +162,7 @@ export function confirmUpdate(message: string, callback: ConfirmCallback) {
   const messageSanitized = sanitize(message);
 
   confirm({
-    title: 'Are you sure ?',
+    title: buildTitle('Are you sure?'),
     message: messageSanitized,
     buttons: {
       confirm: {
@@ -195,7 +201,7 @@ export function confirmDeletionAsync(message: string) {
 
 export function confirmImageExport(callback: ConfirmCallback) {
   confirm({
-    title: 'Caution',
+    title: buildTitle('Caution'),
     message:
       'The export may take several minutes, do not navigate away whilst the export is in progress.',
     buttons: {
@@ -210,7 +216,7 @@ export function confirmImageExport(callback: ConfirmCallback) {
 
 export function confirmChangePassword() {
   return confirmAsync({
-    title: 'Are you sure?',
+    title: buildTitle('Are you sure?'),
     message:
       'You will be logged out after the password change. Do you want to change your password?',
     buttons: {
