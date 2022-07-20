@@ -34,8 +34,8 @@
               </div>
 
               <div class="col-sm-12">
-                <label class="control-label text-left"> Allow users to use external load balancer </label>
-                <label class="switch mb-0 ml-2">
+                <label class="control-label text-left col-sm-3 col-lg-2 px-0"> Allow users to use external load balancer </label>
+                <label class="switch mb-0 ml-2 col-sm-8">
                   <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><span class="slider round" data-cy="kubeSetup-loadBalancerToggle"></span>
                 </label>
               </div>
@@ -165,6 +165,8 @@
                   feature-id="ctrl.limitedFeatureAutoWindow"
                   tooltip="'Specify a timeframe during which automatic updates can occur in this environment.'"
                   on-change="(ctrl.onToggleAutoUpdate)"
+                  label-class="'col-sm-3 col-lg-2 px-0'"
+                  switch-class="'col-sm-8'"
                 >
                 </por-switch-field>
               </div>
@@ -214,6 +216,8 @@
                   feature-id="ctrl.limitedFeature"
                   checked="ctrl.formValues.EnableResourceOverCommit"
                   on-change="(ctrl.onChangeEnableResourceOverCommit)"
+                  label-class="'col-sm-3 col-lg-2 px-0'"
+                  switch-class="'col-sm-8'"
                 ></por-switch-field>
               </div>
             </div>
