@@ -1,25 +1,29 @@
 <div class="datatable">
   <rd-widget>
-    <rd-widget-header icon="{{ $ctrl.titleIcon }}" feather-icon="true" title-text="{{ $ctrl.titleText }}"></rd-widget-header>
     <rd-widget-body classes="no-padding">
-      <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-primary" ui-state="$ctrl.createPath"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Custom Template </button>
+      <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
+        <rd-widget-header icon="{{ $ctrl.titleIcon }}" feather-icon="true" title-text="Custom Templates" class="!flex-auto !mr-0" parent-classes="!p-0"></rd-widget-header>
+        <div class="searchBar vertical-center !mr-0">
+          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for a template..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
+        <div class="actionBar">
+          <button type="button" class="btn btn-sm btn-primary" ui-state="$ctrl.createPath">
+            <pr-icon icon="'plus'" feather="true"></pr-icon>
+            Add Custom Template
+          </button>
+        </div>
       </div>
 
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
-      </div>
-
-      <div class="blocklist">
+      <div class="blocklist !px-[20px] gap-y-2 !pb-[20px]">
         <template-item
           ng-repeat="template in $ctrl.templates | filter:$ctrl.state.textFilter"
           model="template"
@@ -27,11 +31,15 @@
           on-select="($ctrl.onSelectClick)"
         >
           <template-item-actions>
-            <div ng-if="$ctrl.isEditAllowed(template)" style="display: flex">
-              <a ui-state="$ctrl.editPath" ui-state-params="{id: template.Id}" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px">
+            <div ng-if="$ctrl.isEditAllowed(template)" class="vertical-center">
+              <a ui-state="$ctrl.editPath" ui-state-params="{id: template.Id}" ng-click="$event.stopPropagation();" class="btn btn-secondary btn-sm vertical-center">
+                <pr-icon icon="'edit'" feather="true"></pr-icon>
                 Edit
               </a>
-              <button class="btn btn-danger btn-xs" ng-click="$ctrl.onDeleteClick(template.Id); $event.stopPropagation();">Delete</button>
+              <button class="btn btn-dangerlight btn-sm vertical-center" ng-click="$ctrl.onDeleteClick(template.Id); $event.stopPropagation();">
+                <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>
+                Delete
+              </button>
             </div>
           </template-item-actions>
         </template-item>
