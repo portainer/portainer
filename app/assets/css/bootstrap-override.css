@@ -318,6 +318,10 @@ input:checked + .slider:before {
   background-color: var(--ui-error-8);
 }
 
+.table .label .label-warn {
+  background-color: var(--ui-warning-8);
+}
+
 .table .label .label-success {
   background-color: var(--ui-success-7);
 }
