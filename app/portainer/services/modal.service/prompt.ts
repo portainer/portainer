@@ -61,7 +61,10 @@ export function prompt(options: PromptOptions) {
   return box;
 }
 
-export function confirmContainerDeletion(title: string, callback: PromptCallback) {
+export function confirmContainerDeletion(
+  title: string,
+  callback: PromptCallback
+) {
   prompt({
     title: buildTitle(title, ModalTypeIcon.Destructive),
     inputType: 'checkbox',
@@ -159,8 +162,9 @@ export function confirmServiceForceUpdate(
 
 export function confirmStackUpdate(
   message: string,
+  defaultDisabled: boolean,
   defaultToggle: boolean,
-  confirmButtonClass: string | undefined,
+  confirmButtonClassName: string | undefined,
   callback: PromptCallback
 ) {
   const sanitizedMessage = sanitize(message);
@@ -177,13 +181,25 @@ export function confirmStackUpdate(
     buttons: {
       confirm: {
         label: 'Update',
-        className: 'btn-primary',
+        className: confirmButtonClassName || 'btn-primary',
       },
     },
     callback,
   });
-
-  customizeCheckboxPrompt(box, sanitizedMessage, defaultToggle);
+  box.find('.bootbox-body').prepend(sanitizedMessage);
+  const checkbox = box.find('.bootbox-input-checkbox');
+  checkbox.prop('checked', defaultToggle);
+  checkbox.prop('disabled', defaultDisabled);
+  const checkboxDiv = box.find('.checkbox');
+  checkboxDiv.removeClass('checkbox');
+  checkboxDiv.prop(
+    'style',
+    'position: relative; display: block; margin-top: 10px; margin-bottom: 10px;'
+  );
+  const checkboxLabel = box.find('.form-check-label');
+  checkboxLabel.addClass('switch box-selector-item limited business');
+  const switchEle = checkboxLabel.find('i');
+  switchEle.prop('style', 'margin-left:20px');
 }
 
 function customizeCheckboxPrompt(
