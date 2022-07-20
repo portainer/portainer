@@ -6,9 +6,45 @@
           <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="config-searchInput"
+          />
+        </div>
+        <div class="actionBar !gap-3" ng-if="!$ctrl.offlineMode" authorization="DockerConfigDelete, DockerConfigCreate">
+          <button
+            type="button"
+            class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+            authorization="DockerConfigDelete"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+            data-cy="config-removeConfigButton"
+          >
+            <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>Remove
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+            ui-sref="docker.configs.new"
+            authorization="DockerConfigCreate"
+            data-cy="config-addConfigButton"
+          >
+            <pr-icon icon="'plus'" feather="true"></pr-icon>Add config
+          </button>
+        </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+            <span uib-dropdown-toggle aria-label="Settings">
+              <pr-icon icon="'more-vertical'" feather="true"></pr-icon>
+            </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader"> Table settings </div>
@@ -40,32 +76,6 @@
             </div>
           </span>
         </div>
-      </div>
-      <div class="actionBar" authorization="DockerConfigDelete, DockerConfigCreate">
-        <button
-          type="button"
-          class="btn btn-sm btn-danger"
-          authorization="DockerConfigDelete"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.configs.new" authorization="DockerConfigCreate">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add config
-        </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
@@ -130,7 +140,7 @@
       <div class="footer" ng-if="$ctrl.dataset">
         <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
-          <form class="form-inline">
+          <form class="form-inline vertical-center">
             <span class="limitSelector">
               <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
