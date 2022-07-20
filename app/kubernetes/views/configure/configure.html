@@ -35,8 +35,8 @@
 
               <div class="col-sm-12">
                 <label class="control-label text-left"> Allow users to use external load balancer </label>
-                <label class="switch" style="margin-left: 20px">
-                  <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><i data-cy="kubeSetup-loadBalancerToggle"></i>
+                <label class="switch mb-0 ml-2">
+                  <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><span class="slider round" data-cy="kubeSetup-loadBalancerToggle"></span>
                 </label>
               </div>
             </div>
@@ -185,7 +185,7 @@
               <div class="col-sm-12">
                 <label class="control-label text-left col-sm-3 col-lg-2 px-0"> Restrict access to the default namespace </label>
                 <label class="switch col-sm-8">
-                  <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><i data-cy="kubeSetup-restrictDefaultNsToggle"></i>
+                  <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><span class="slider round" data-cy="kubeSetup-restrictDefaultNsToggle"></span>
                 </label>
               </div>
             </div>
@@ -232,7 +232,8 @@
               <div class="col-sm-12">
                 <label class="control-label text-left col-sm-3 col-lg-2 px-0"> Enable features using the metrics API </label>
                 <label class="switch col-sm-8">
-                  <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" /><i data-cy="kubeSetup-metricsToggle"></i>
+                  <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" />
+                  <span class="slider round" data-cy="kubeSetup-metricsToggle"></span>
                 </label>
               </div>
               <div ng-if="ctrl.state.metrics.pending && ctrl.state.metrics.userClick" class="col-sm-12 small text-muted" style="margin-top: 5px">
@@ -286,9 +287,9 @@
                     </tr>
                     <tr ng-repeat="class in ctrl.StorageClasses">
                       <td>
-                        <div style="margin: 5px">
-                          <label class="switch" style="margin-right: 10px">
-                            <input type="checkbox" ng-model="class.selected" /><i data-cy="kubeSetup-storageToggle{{ class.Name }}"></i>
+                        <div class="flex-center justify-left">
+                          <label class="switch mr-2 mb-0">
+                            <input type="checkbox" ng-model="class.selected" /><span class="slider round" data-cy="kubeSetup-storageToggle{{ class.Name }}"></span>
                           </label>
                           <span>{{ class.Name }}</span>
                         </div>
@@ -310,8 +311,11 @@
                       </td>
                       <td>
                         <div style="margin: 5px">
-                          <label class="switch"
-                            ><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><i data-cy="kubeSetup-storageExpansionToggle{{ class.Name }}"></i>
+                          <label class="switch mr-2 mb-0"
+                            ><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><span
+                              class="slider round"
+                              data-cy="kubeSetup-storageExpansionToggle{{ class.Name }}"
+                            ></span>
                           </label>
                         </div>
                       </td>
