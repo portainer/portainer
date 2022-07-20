@@ -110,6 +110,42 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       settingUnlimitedResources: false,
     };
 
+    $scope.onAlwaysPullChange = onAlwaysPullChange;
+    $scope.handlePublishAllPortsChange = handlePublishAllPortsChange;
+    $scope.handleAutoRemoveChange = handleAutoRemoveChange;
+    $scope.handlePrivilegedChange = handlePrivilegedChange;
+    $scope.handleInitChange = handleInitChange;
+
+    function onAlwaysPullChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.alwaysPull = checked;
+      });
+    }
+
+    function handlePublishAllPortsChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.HostConfig.PublishAllPorts = checked;
+      });
+    }
+
+    function handleAutoRemoveChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.HostConfig.AutoRemove = checked;
+      });
+    }
+
+    function handlePrivilegedChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.HostConfig.Privileged = checked;
+      });
+    }
+
+    function handleInitChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.HostConfig.Init = checked;
+      });
+    }
+
     $scope.handleEnvVarChange = handleEnvVarChange;
     function handleEnvVarChange(value) {
       $scope.formValues.Env = value;

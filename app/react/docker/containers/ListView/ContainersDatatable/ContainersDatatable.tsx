@@ -141,7 +141,7 @@ export function ContainersDatatable({
 
   return (
     <TableContainer>
-      <TableTitle icon="fa-cubes" label="Containers">
+      <TableTitle icon="box" featherIcon label="Containers">
         <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
         <TableActions>
           <ContainersDatatableActions
