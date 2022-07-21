@@ -115,7 +115,7 @@ func TestKubeClusterAccessService_GetKubeConfigInternal(t *testing.T) {
 		clusterAccessDetails := kcs.GetData("mysite.com", 1)
 
 		wantClusterAccessDetails := kubernetesClusterAccessData{
-			ClusterServerURL:         "https://mysite.com:9443/api/endpoints/1/kubernetes",
+			ClusterServerURL:         "https://mysite.com/api/endpoints/1/kubernetes",
 			CertificateAuthorityFile: "",
 			CertificateAuthorityData: "",
 		}
