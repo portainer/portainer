@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$scope',
   '$controller',
@@ -23,6 +25,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
         .then((data) => {
           this.state.filteredDataSet = data.endpoints;
           this.state.totalFilteredDataSet = data.totalCount;
+          this.refreshSelectedItems();
         })
         .finally(() => {
           this.state.loading = false;
@@ -53,6 +56,17 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
     this.changePaginationLimit = function () {
       PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
       this.paginationChanged();
+    };
+
+    this.refreshSelectedItems = function () {
+      let selected = [];
+      _.forEach(this.state.filteredDataSet, (item) => {
+        if (_.filter(this.state.selectedItems, (i) => i.Id == item.Id).length > 0) {
+          item.Checked = true;
+          selected.push(item);
+        }
+      });
+      this.state.selectedItems = selected;
     };
 
     /**
