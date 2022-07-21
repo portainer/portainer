@@ -910,7 +910,7 @@
   ],
   "version": {
     "DB_UPDATING": "false",
-    "DB_VERSION": "51",
+    "DB_VERSION": "52",
     "INSTANCE_ID": "null"
   }
 }
