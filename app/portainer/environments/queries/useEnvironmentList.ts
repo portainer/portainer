@@ -3,16 +3,21 @@ import { useQuery } from 'react-query';
 import { withError } from '@/react-tools/react-query';
 
 import { EnvironmentStatus } from '../types';
-import { EnvironmentsQueryParams, getEndpoints } from '../environment.service';
+import {
+  EnvironmentsQueryParams,
+  getEnvironments,
+} from '../environment.service';
 
 export const ENVIRONMENTS_POLLING_INTERVAL = 30000; // in ms
 
-interface Query extends EnvironmentsQueryParams {
+export interface Query extends EnvironmentsQueryParams {
   page?: number;
   pageLimit?: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
 }
 
-type GetEndpointsResponse = Awaited<ReturnType<typeof getEndpoints>>;
+type GetEndpointsResponse = Awaited<ReturnType<typeof getEnvironments>>;
 
 export function refetchIfAnyOffline(data?: GetEndpointsResponse) {
   if (!data) {
@@ -31,7 +36,7 @@ export function refetchIfAnyOffline(data?: GetEndpointsResponse) {
 }
 
 export function useEnvironmentList(
-  { page = 1, pageLimit = 100, ...query }: Query = {},
+  { page = 1, pageLimit = 100, sort, order, ...query }: Query = {},
   refetchInterval?:
     | number
     | false
@@ -45,12 +50,19 @@ export function useEnvironmentList(
       {
         page,
         pageLimit,
+        sort,
+        order,
         ...query,
       },
     ],
     async () => {
       const start = (page - 1) * pageLimit + 1;
-      return getEndpoints(start, pageLimit, query);
+      return getEnvironments({
+        start,
+        limit: pageLimit,
+        sort: { by: sort, order },
+        query,
+      });
     },
     {
       staleTime,

@@ -60,7 +60,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-server" title-text="Container status"></rd-widget-header>
+      <rd-widget-header icon="box" feather-icon="true" title-text="Container status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -107,17 +107,18 @@
               <td>Finished</td>
               <td>{{ container.State.FinishedAt | getisodate }}</td>
             </tr>
-            <tr ng-if="isAdmin && displayRecreateButton && applicationState.endpoint.type !== 4">
-              <td colspan="1">
-                Container webhook
-                <portainer-tooltip
-                  position="'top'"
-                  message="'Webhook (or callback URI) used to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container.'"
-                ></portainer-tooltip>
-                <label class="switch box-selector-item limited business" style="margin-left: 20px">
-                  <input disable-authorization="DockerContainerUpdate" type="checkbox" ng-model="WebhookExists" disabled="disabled" ng-checked="true" /><i></i>
-                </label>
-                <be-feature-indicator feature="containerWebhookFeature"></be-feature-indicator>
+            <tr ng-if="isAdmin && displayCreateWebhookButton && applicationState.endpoint.type !== 4">
+              <td colspan="6">
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <por-switch-field
+                      tooltip="'Webhook (or callback URI) used to automate the recreation of this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container.'"
+                      label-class="'col-sm-2'"
+                      label="'Container webhook'"
+                      feature-id="'container-webhook'"
+                    ></por-switch-field>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr authorization="DockerContainerLogs, DockerContainerInspect, DockerContainerStats, DockerExecStart">
@@ -197,7 +198,7 @@
 <div class="row" authorization="DockerImageCreate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title-text="Create image"></rd-widget-header>
+      <rd-widget-header icon="list" feather-icon="true" title-text="Create image"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- tag-description -->
@@ -249,7 +250,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-server" title-text="Container details"></rd-widget-header>
+      <rd-widget-header icon="list" feather-icon="true" title-text="Container details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table container-details-table">
           <tbody>
@@ -322,6 +323,10 @@
                 </table>
               </td>
             </tr>
+            <tr ng-if="container.HostConfig.DeviceRequests.length">
+              <td>GPUS</td>
+              <td>{{ computeDockerGPUCommand() }}</td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
@@ -332,7 +337,7 @@
 <div class="row" ng-if="container.Mounts.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-hdd" title-text="Volumes"></rd-widget-header>
+      <rd-widget-header icon="database" feather-icon="true" title-text="Volumes"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
@@ -361,7 +366,7 @@
     <container-networks-datatable
       ng-if="container.NetworkSettings.Networks"
       title-text="Connected networks"
-      title-icon="fa-sitemap"
+      title-icon="share-2"
       dataset="container.NetworkSettings.Networks"
       table-key="container-networks"
       container="container"

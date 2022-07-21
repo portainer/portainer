@@ -21,7 +21,11 @@ export function TableTitle({
   return (
     <div className="toolBar">
       <div className="toolBarTitle">
-        <Icon icon={icon} feather={featherIcon} className="space-right" />
+        <Icon
+          icon={icon}
+          feather={featherIcon}
+          className="icon-nested-blue icon-primary space-right"
+        />
 
         {label}
       </div>

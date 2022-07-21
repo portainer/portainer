@@ -3,6 +3,8 @@ import { ComponentType, ReactNode, useEffect } from 'react';
 import featherIcons from 'feather-icons';
 import { isValidElementType } from 'react-is';
 
+import Svg, { SvgIcons } from './Svg';
+
 export interface IconProps {
   icon: ReactNode | ComponentType<unknown>;
   featherIcon?: boolean;
@@ -49,6 +51,11 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
         {Icon == null ? <>{icon}</> : <Icon size="1em" />}
       </span>
     );
+  }
+
+  if (icon.indexOf('svg-') === 0) {
+    const svgIcon = icon.replace('svg-', '');
+    return <Svg icon={svgIcon as keyof typeof SvgIcons} className={classes} />;
   }
 
   if (feather) {

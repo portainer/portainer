@@ -5,7 +5,7 @@ angular.module('portainer.kubernetes').factory('HelmFactory', HelmFactory);
 /* @ngInject */
 function HelmFactory($resource, API_ENDPOINT_ENDPOINTS) {
   const helmUrl = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/helm';
-  const templatesUrl = '/api/templates/helm';
+  const templatesUrl = 'api/templates/helm';
 
   return $resource(
     helmUrl,

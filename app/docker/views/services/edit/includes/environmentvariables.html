@@ -1,6 +1,6 @@
 <ng-form ng-if="service.EnvironmentVariables" id="service-env-variables" name="serviceEnvForm">
   <rd-widget>
-    <rd-widget-header icon="fa-tasks" title-text="Environment variables">
+    <rd-widget-header icon="list" feather-icon="true" title-text="Environment variables">
       <div class="nopadding" authorization="DockerServiceUpdate">
         <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating || addEnvironmentVariable(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable

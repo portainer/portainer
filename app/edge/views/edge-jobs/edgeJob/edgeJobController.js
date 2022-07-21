@@ -1,8 +1,9 @@
 import _ from 'lodash-es';
+import { getEnvironments } from '@/portainer/environments/environment.service';
 
 export class EdgeJobController {
   /* @ngInject */
-  constructor($async, $q, $state, $window, ModalService, EdgeJobService, EndpointService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
+  constructor($async, $q, $state, $window, ModalService, EdgeJobService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
       showEditorTab: false,
@@ -15,7 +16,6 @@ export class EdgeJobController {
     this.$window = $window;
     this.ModalService = ModalService;
     this.EdgeJobService = EdgeJobService;
-    this.EndpointService = EndpointService;
     this.FileSaver = FileSaver;
     this.GroupService = GroupService;
     this.HostBrowserService = HostBrowserService;
@@ -114,7 +114,7 @@ export class EdgeJobController {
     const results = await this.EdgeJobService.jobResults(id);
     if (results.length > 0) {
       const endpointIds = _.map(results, (result) => result.EndpointId);
-      const endpoints = await this.EndpointService.endpoints(undefined, undefined, { endpointIds });
+      const endpoints = await getEnvironments({ query: { endpointIds } });
       this.results = this.associateEndpointsToResults(results, endpoints.value);
     } else {
       this.results = results;
@@ -155,7 +155,7 @@ export class EdgeJobController {
 
       if (results.length > 0) {
         const endpointIds = _.map(results, (result) => result.EndpointId);
-        const endpoints = await this.EndpointService.endpoints(undefined, undefined, { endpointIds });
+        const endpoints = await getEnvironments({ query: { endpointIds } });
         this.results = this.associateEndpointsToResults(results, endpoints.value);
       } else {
         this.results = results;
