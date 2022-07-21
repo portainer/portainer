@@ -2,6 +2,7 @@ import clsx from 'clsx';
 
 import { DockerContainerStatus } from '@/react/docker/containers/types';
 import { Authorized } from '@/portainer/hooks/useUser';
+import { Icon } from '@/react/components/Icon';
 import { react2angular } from '@/react-tools/react2angular';
 
 import { Link } from '@@/Link';
@@ -48,7 +49,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Logs"
           >
-            <i className="fa fa-file-alt space-right" aria-hidden="true" />
+            <Icon icon="file" feather className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -60,7 +61,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Inspect"
           >
-            <i className="fa fa-info-circle space-right" aria-hidden="true" />
+            <Icon icon="info" feather className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -72,7 +73,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Stats"
           >
-            <i className="fa fa-chart-area space-right" aria-hidden="true" />
+            <Icon icon="bar-chart-2" feather className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -84,7 +85,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Exec Console"
           >
-            <i className="fa fa-terminal space-right" aria-hidden="true" />
+            <Icon icon="terminal" feather className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -96,7 +97,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Attach Console"
           >
-            <i className="fa fa-plug space-right" aria-hidden="true" />
+            <Icon icon="link" feather className="space-right" />
           </Link>
         </Authorized>
       )}

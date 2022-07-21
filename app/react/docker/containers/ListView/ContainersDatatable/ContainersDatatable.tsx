@@ -141,7 +141,11 @@ export function ContainersDatatable({
   return (
     <TableContainer>
       <TableTitle icon="box" featherIcon label="Containers">
-        <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
+        <SearchBar
+          value={searchBarValue}
+          onChange={handleSearchBarChange}
+          placeholder="Search for a container..."
+        />
         <TableActions>
           <ContainersDatatableActions
             selectedItems={selectedFlatRows.map((row) => row.original)}
