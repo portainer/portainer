@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -145,8 +144,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 }
 
 func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
-	hostURL := strings.Split(r.Host, ":")[0]
-	kubeConfigInternal := handler.kubeClusterAccessService.GetData(hostURL, endpoint.ID)
+	kubeConfigInternal := handler.kubeClusterAccessService.GetData(r.Host, endpoint.ID)
 	return clientV1.NamedCluster{
 		Name: buildClusterName(endpoint.Name),
 		Cluster: clientV1.Cluster{
