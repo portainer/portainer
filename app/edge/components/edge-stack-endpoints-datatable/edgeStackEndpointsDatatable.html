@@ -2,11 +2,9 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle vertical-center">
-          <span><pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon></span> {{ $ctrl.titleText }}
-        </div>
-        <div class="searchBar">
-          <span><pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon></span>
+        <div class="toolBarTitle vertical-center"> <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon> {{ $ctrl.titleText }} </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -23,25 +21,31 @@
           <thead>
             <tr>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Name
-                  <span><pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></pr-icon></span>
-                  <span><pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></pr-icon></span>
-                </a>
+                <table-column-header
+                  col-title="'Name'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Name'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Name')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Status')">
-                  Status
-                  <span><pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></pr-icon></span>
-                  <span><pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></pr-icon></span>
-                </a>
+                <table-column-header
+                  col-title="'Status'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Status'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Status')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Error')">
-                  Error
-                  <span><pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Error' && !$ctrl.state.reverseOrder"></pr-icon></span>
-                  <span><pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Error' && $ctrl.state.reverseOrder"></pr-icon></span>
-                </a>
+                <table-column-header
+                  col-title="'Error'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Error'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Error' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Error')"
+                ></table-column-header>
               </th>
             </tr>
           </thead>
