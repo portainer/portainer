@@ -49,7 +49,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Logs"
           >
-            <Icon icon="file" feather className="space-right" />
+            <Icon icon="file-text" feather className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -97,7 +97,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Attach Console"
           >
-            <Icon icon="link" feather className="space-right" />
+            <Icon icon="paperclip" feather className="space-right" />
           </Link>
         </Authorized>
       )}
