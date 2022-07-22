@@ -22,6 +22,10 @@
   justify-content: center;
 }
 
+.justify-left {
+  justify-content: left;
+}
+
 .blue {
   background: var(--bg-dashboard-item) !important;
 }

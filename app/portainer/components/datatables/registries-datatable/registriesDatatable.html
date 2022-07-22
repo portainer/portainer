@@ -1,32 +1,39 @@
 <div class="datatable">
   <rd-widget>
-    <rd-widget-header icon="{{ $ctrl.titleIcon }}" feather-icon="true" title-text="{{ $ctrl.titleText }}"></rd-widget-header>
     <rd-widget-body classes="no-padding">
-      <div class="actionBar" ng-if="$ctrl.isAdmin">
-        <button
-          ng-if="!$ctrl.endpointType"
-          type="button"
-          class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.registries.new" data-cy="add-registry">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add registry
-        </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
+      <div class="toolBar">
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          {{ $ctrl.titleText }}
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="volume-searchInput"
+          />
+        </div>
+        <div class="actionBar !gap-3" ng-if="$ctrl.isAdmin">
+          <button
+            ng-if="!$ctrl.endpointType"
+            type="button"
+            class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+            data-cy="registry-removeRegistryButton"
+          >
+            <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>Remove
+          </button>
+          <button type="button" class="btn btn-sm btn-primary h-fit vertical-center !ml-0" ui-sref="portainer.registries.new" data-cy="registry-addRegistryButton">
+            <pr-icon icon="'plus'" feather="true"></pr-icon>Add registry
+          </button>
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
