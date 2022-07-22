@@ -54,11 +54,10 @@ type azureDownloader struct {
 	client       *http.Client
 	baseUrl      string
 	cacheEnabled bool
-	mu           sync.Mutex
 	// Cache the result of repository refs, key is repository URL
-	repoRefCache map[string][]string
+	repoRefCache sync.Map
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
-	repoTreeCache map[string][]string
+	repoTreeCache sync.Map
 }
 
 func NewAzureDownloader(enableCache bool) *azureDownloader {
@@ -73,16 +72,14 @@ func NewAzureDownloader(enableCache bool) *azureDownloader {
 	client.InstallProtocol("https", githttp.NewClient(httpsCli))
 
 	return &azureDownloader{
-		client:        httpsCli,
-		baseUrl:       "https://dev.azure.com",
-		cacheEnabled:  enableCache,
-		repoRefCache:  make(map[string][]string),
-		repoTreeCache: make(map[string][]string),
+		client:       httpsCli,
+		baseUrl:      "https://dev.azure.com",
+		cacheEnabled: enableCache,
 	}
 }
 
-func (a *azureDownloader) download(ctx context.Context, destination string, options cloneOptions) error {
-	zipFilepath, err := a.downloadZipFromAzureDevOps(ctx, options)
+func (a *azureDownloader) download(ctx context.Context, destination string, opt option) error {
+	zipFilepath, err := a.downloadZipFromAzureDevOps(ctx, opt)
 	if err != nil {
 		return errors.Wrap(err, "failed to download a zip file from Azure DevOps")
 	}
@@ -96,12 +93,12 @@ func (a *azureDownloader) download(ctx context.Context, destination string, opti
 	return nil
 }
 
-func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, options cloneOptions) (string, error) {
-	config, err := parseUrl(options.repositoryUrl)
+func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, opt option) (string, error) {
+	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to parse url")
 	}
-	downloadUrl, err := a.buildDownloadUrl(config, options.referenceName)
+	downloadUrl, err := a.buildDownloadUrl(config, opt.referenceName)
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to build download url")
 	}
@@ -112,8 +109,8 @@ func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, option
 	defer zipFile.Close()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", downloadUrl, nil)
-	if options.username != "" || options.password != "" {
-		req.SetBasicAuth(options.username, options.password)
+	if opt.username != "" || opt.password != "" {
+		req.SetBasicAuth(opt.username, opt.password)
 	} else if config.username != "" || config.password != "" {
 		req.SetBasicAuth(config.username, config.password)
 	}
@@ -139,28 +136,28 @@ func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, option
 	return zipFile.Name(), nil
 }
 
-func (a *azureDownloader) latestCommitID(ctx context.Context, options fetchOptions) (string, error) {
-	rootItem, err := a.getRootItem(ctx, options)
+func (a *azureDownloader) latestCommitID(ctx context.Context, opt option) (string, error) {
+	rootItem, err := a.getRootItem(ctx, opt)
 	if err != nil {
 		return "", err
 	}
 	return rootItem.CommitId, nil
 }
 
-func (a *azureDownloader) getRootItem(ctx context.Context, options fetchOptions) (*azureItem, error) {
-	config, err := parseUrl(options.repositoryUrl)
+func (a *azureDownloader) getRootItem(ctx context.Context, opt option) (*azureItem, error) {
+	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to parse url")
 	}
 
-	rootItemUrl, err := a.buildRootItemUrl(config, options.referenceName)
+	rootItemUrl, err := a.buildRootItemUrl(config, opt.referenceName)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to build azure root item url")
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", rootItemUrl, nil)
-	if options.username != "" || options.password != "" {
-		req.SetBasicAuth(options.username, options.password)
+	if opt.username != "" || opt.password != "" {
+		req.SetBasicAuth(opt.username, opt.password)
 	} else if config.username != "" || config.password != "" {
 		req.SetBasicAuth(config.username, config.password)
 	}
@@ -380,8 +377,8 @@ func getVersionType(name string) string {
 	return "commit"
 }
 
-func (a *azureDownloader) listRemote(ctx context.Context, options cloneOptions) ([]string, error) {
-	config, err := parseUrl(options.repositoryUrl)
+func (a *azureDownloader) listRemote(ctx context.Context, opt option) ([]string, error) {
+	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to parse url")
 	}
@@ -392,8 +389,8 @@ func (a *azureDownloader) listRemote(ctx context.Context, options cloneOptions) 
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", listRefsUrl, nil)
-	if options.username != "" || options.password != "" {
-		req.SetBasicAuth(options.username, options.password)
+	if opt.username != "" || opt.password != "" {
+		req.SetBasicAuth(opt.username, opt.password)
 	} else if config.username != "" || config.password != "" {
 		req.SetBasicAuth(config.username, config.password)
 	}
@@ -434,50 +431,55 @@ func (a *azureDownloader) listRemote(ctx context.Context, options cloneOptions) 
 	}
 
 	if a.cacheEnabled {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		a.repoRefCache[options.repositoryUrl] = ret
+		a.repoRefCache.Store(opt.repositoryUrl, ret)
 	}
 	return ret, nil
 }
 
-func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([]string, error) {
+func (a *azureDownloader) listTree(ctx context.Context, opt option) ([]string, error) {
 	var (
 		allPaths    []string
 		filteredRet []string
 		refs        []string
 		err         error
+		success     bool
 	)
 
-	repoKey := generateCacheKey(options.repositoryUrl, options.referenceName)
-	treeCache, ok := a.repoTreeCache[repoKey]
+	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
+	cache, ok := a.repoTreeCache.Load(repoKey)
 	if ok {
-		for _, path := range treeCache {
-			if matchExtensions(path, options.extensions) {
-				filteredRet = append(filteredRet, path)
+		treeCache, success := cache.([]string)
+		if success {
+			for _, path := range treeCache {
+				if matchExtensions(path, opt.extensions) {
+					filteredRet = append(filteredRet, path)
+				}
 			}
+			return filteredRet, nil
 		}
-		return filteredRet, nil
 	}
 
 	// Check if the reference exists
-	refCache, ok := a.repoRefCache[options.repositoryUrl]
+	cache, ok = a.repoRefCache.Load(opt.repositoryUrl)
 	if ok {
-		refs = refCache
-	} else {
-		opt := cloneOptions{
-			repositoryUrl: options.repositoryUrl,
-			username:      options.username,
-			password:      options.password,
+		refs, success = cache.([]string)
+	}
+
+	if !ok || !success {
+		opt := option{
+			repositoryUrl: opt.repositoryUrl,
+			username:      opt.username,
+			password:      opt.password,
 		}
 		refs, err = a.listRemote(ctx, opt)
 		if err != nil {
 			return nil, err
 		}
 	}
+
 	matchedRef := false
 	for _, ref := range refs {
-		if ref == options.referenceName {
+		if ref == opt.referenceName {
 			matchedRef = true
 			break
 		}
@@ -487,12 +489,12 @@ func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([
 	}
 
 	//
-	rootItem, err := a.getRootItem(ctx, options)
+	rootItem, err := a.getRootItem(ctx, opt)
 	if err != nil {
 		return nil, err
 	}
 
-	config, err := parseUrl(options.repositoryUrl)
+	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to parse url")
 	}
@@ -503,8 +505,8 @@ func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", listTreeUrl, nil)
-	if options.username != "" || options.password != "" {
-		req.SetBasicAuth(options.username, options.password)
+	if opt.username != "" || opt.password != "" {
+		req.SetBasicAuth(opt.username, opt.password)
 	} else if config.username != "" || config.password != "" {
 		req.SetBasicAuth(config.username, config.password)
 	}
@@ -535,24 +537,20 @@ func (a *azureDownloader) listTree(ctx context.Context, options fetchOptions) ([
 
 	for _, treeEntry := range tree.TreeEntries {
 		allPaths = append(allPaths, treeEntry.RelativePath)
-		if matchExtensions(treeEntry.RelativePath, options.extensions) {
+		if matchExtensions(treeEntry.RelativePath, opt.extensions) {
 			filteredRet = append(filteredRet, treeEntry.RelativePath)
 		}
 	}
 
 	if a.cacheEnabled {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		a.repoTreeCache[repoKey] = allPaths
+		a.repoTreeCache.Store(repoKey, allPaths)
 	}
 
 	return filteredRet, nil
 }
 
-func (a *azureDownloader) removeCache(ctx context.Context, opt cloneOptions) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	delete(a.repoRefCache, opt.repositoryUrl)
+func (a *azureDownloader) removeCache(ctx context.Context, opt option) {
+	a.repoRefCache.Delete(opt.repositoryUrl)
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	delete(a.repoTreeCache, repoKey)
+	a.repoTreeCache.Delete(repoKey)
 }

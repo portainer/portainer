@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -234,7 +235,7 @@ func Test_isAzureUrl(t *testing.T) {
 
 func Test_azureDownloader_downloadZipFromAzureDevOps(t *testing.T) {
 	type args struct {
-		options cloneOptions
+		options option
 	}
 	type basicAuth struct {
 		username, password string
@@ -247,7 +248,7 @@ func Test_azureDownloader_downloadZipFromAzureDevOps(t *testing.T) {
 		{
 			name: "username, password embedded",
 			args: args{
-				options: cloneOptions{
+				options: option{
 					repositoryUrl: "https://username:password@dev.azure.com/Organisation/Project/_git/Repository",
 				},
 			},
@@ -259,7 +260,7 @@ func Test_azureDownloader_downloadZipFromAzureDevOps(t *testing.T) {
 		{
 			name: "username, password embedded, clone options take precedence",
 			args: args{
-				options: cloneOptions{
+				options: option{
 					repositoryUrl: "https://username:password@dev.azure.com/Organisation/Project/_git/Repository",
 					username:      "u",
 					password:      "p",
@@ -273,7 +274,7 @@ func Test_azureDownloader_downloadZipFromAzureDevOps(t *testing.T) {
 		{
 			name: "no credentials",
 			args: args{
-				options: cloneOptions{
+				options: option{
 					repositoryUrl: "https://dev.azure.com/Organisation/Project/_git/Repository",
 				},
 			},
@@ -328,13 +329,13 @@ func Test_azureDownloader_latestCommitID(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		args    fetchOptions
+		args    option
 		want    string
 		wantErr bool
 	}{
 		{
 			name: "should be able to parse response",
-			args: fetchOptions{
+			args: option{
 				referenceName: "",
 				repositoryUrl: "https://dev.azure.com/Organisation/Project/_git/Repository"},
 			want:    "27104ad7549d9e66685e115a497533f18024be9c",
@@ -358,24 +359,24 @@ type testDownloader struct {
 	called bool
 }
 
-func (t *testDownloader) download(_ context.Context, _ string, _ cloneOptions) error {
+func (t *testDownloader) download(_ context.Context, _ string, _ option) error {
 	t.called = true
 	return nil
 }
 
-func (t *testDownloader) latestCommitID(_ context.Context, _ fetchOptions) (string, error) {
+func (t *testDownloader) latestCommitID(_ context.Context, _ option) (string, error) {
 	return "", nil
 }
 
-func (t *testDownloader) listRemote(_ context.Context, _ cloneOptions) ([]string, error) {
+func (t *testDownloader) listRemote(_ context.Context, _ option) ([]string, error) {
 	return nil, nil
 }
 
-func (t *testDownloader) listTree(_ context.Context, _ fetchOptions) ([]string, error) {
+func (t *testDownloader) listTree(_ context.Context, _ option) ([]string, error) {
 	return nil, nil
 }
 
-func (t *testDownloader) removeCache(_ context.Context, _ cloneOptions) {
+func (t *testDownloader) removeCache(_ context.Context, _ option) {
 }
 
 func Test_cloneRepository_azure(t *testing.T) {
@@ -407,7 +408,7 @@ func Test_cloneRepository_azure(t *testing.T) {
 			git := &testDownloader{}
 
 			s := &Service{azure: azure, git: git}
-			s.cloneRepository("", cloneOptions{repositoryUrl: tt.url, depth: 1})
+			s.cloneRepository("", option{repositoryUrl: tt.url, depth: 1})
 
 			// if azure API is called, git isn't and vice versa
 			assert.Equal(t, tt.called, azure.called)
@@ -419,9 +420,8 @@ func Test_cloneRepository_azure(t *testing.T) {
 func Test_listRemote_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	service := Service{
-		azure: NewAzureDownloader(false),
-	}
+	client := NewAzureDownloader(false)
+
 	type expectResult struct {
 		err       error
 		refsCount int
@@ -430,45 +430,51 @@ func Test_listRemote_azure(t *testing.T) {
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	tests := []struct {
-		name        string
-		url         string
-		username    string
-		accessToken string
-		expect      expectResult
+		name   string
+		args   option
+		expect expectResult
 	}{
 		{
-			name:        "list refs of a real repository",
-			url:         privateAzureRepoURL,
-			username:    username,
-			accessToken: accessToken,
+			name: "list refs of a real repository",
+			args: option{
+				repositoryUrl: privateAzureRepoURL,
+				username:      username,
+				password:      accessToken,
+			},
 			expect: expectResult{
 				err:       nil,
 				refsCount: 2,
 			},
 		},
 		{
-			name:        "list refs of a real repository with incorrect credential",
-			url:         privateAzureRepoURL,
-			username:    "test-username",
-			accessToken: "test-token",
+			name: "list refs of a real repository with incorrect credential",
+			args: option{
+				repositoryUrl: privateAzureRepoURL,
+				username:      "test-username",
+				password:      "test-token",
+			},
 			expect: expectResult{
 				err: ErrAuthenticationFailure,
 			},
 		},
 		{
-			name:        "list refs of a real repository without providing credential",
-			url:         privateAzureRepoURL,
-			username:    "",
-			accessToken: "",
+			name: "list refs of a real repository without providing credential",
+			args: option{
+				repositoryUrl: privateAzureRepoURL,
+				username:      "",
+				password:      "",
+			},
 			expect: expectResult{
 				err: ErrAuthenticationFailure,
 			},
 		},
 		{
-			name:        "list refs of a fake repository",
-			url:         privateAzureRepoURL + "fake",
-			username:    username,
-			accessToken: accessToken,
+			name: "list refs of a fake repository",
+			args: option{
+				repositoryUrl: privateAzureRepoURL + "fake",
+				username:      username,
+				password:      accessToken,
+			},
 			expect: expectResult{
 				err: ErrIncorrectRepositoryURL,
 			},
@@ -477,7 +483,7 @@ func Test_listRemote_azure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			refs, err := service.ListRemote(tt.url, tt.username, tt.accessToken)
+			refs, err := client.listRemote(context.TODO(), tt.args)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				if tt.expect.refsCount > 0 {
@@ -495,9 +501,7 @@ func Test_listRemote_azure(t *testing.T) {
 func Test_listTree_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	service := Service{
-		azure: NewAzureDownloader(false),
-	}
+	client := NewAzureDownloader(false)
 
 	type expectResult struct {
 		err          error
@@ -507,90 +511,100 @@ func Test_listTree_azure(t *testing.T) {
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	tests := []struct {
-		name        string
-		url         string
-		ref         string
-		username    string
-		accessToken string
-		exts        []string
-		expect      expectResult
+		name   string
+		args   option
+		expect expectResult
 	}{
 		{
-			name:        "list tree with real repository and head ref but incorrect credential",
-			url:         privateAzureRepoURL,
-			ref:         "refs/heads/main",
-			username:    "test-username",
-			accessToken: "test-token",
-			exts:        []string{},
+			name: "list tree with real repository and head ref but incorrect credential",
+			args: option{
+				repositoryUrl: privateAzureRepoURL,
+				referenceName: "refs/heads/main",
+				username:      "test-username",
+				password:      "test-token",
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err: ErrAuthenticationFailure,
 			},
 		},
 		{
-			name:        "list tree with real repository and head ref but no credential",
-			url:         privateAzureRepoURL,
-			ref:         "refs/heads/main",
-			username:    "",
-			accessToken: "",
-			exts:        []string{},
+			name: "list tree with real repository and head ref but no credential",
+			args: option{
+				repositoryUrl: privateAzureRepoURL,
+				referenceName: "refs/heads/main",
+				username:      "",
+				password:      "",
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err: ErrAuthenticationFailure,
 			},
 		},
 		{
-			name:        "list tree with real repository and head ref",
-			url:         privateAzureRepoURL,
-			ref:         "refs/heads/main",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{},
+			name: "list tree with real repository and head ref",
+			args: option{
+				repositoryUrl: privateAzureRepoURL,
+				referenceName: "refs/heads/main",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err:          nil,
 				matchedCount: 19,
 			},
 		},
 		{
-			name:        "list tree with real repository and head ref and existing file extension",
-			url:         privateAzureRepoURL,
-			ref:         "refs/heads/main",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{"yml"},
+			name: "list tree with real repository and head ref and existing file extension",
+			args: option{
+				repositoryUrl: privateAzureRepoURL,
+				referenceName: "refs/heads/main",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{"yml"},
+			},
 			expect: expectResult{
 				err:          nil,
 				matchedCount: 2,
 			},
 		},
 		{
-			name:        "list tree with real repository and head ref and non-existing file extension",
-			url:         privateAzureRepoURL,
-			ref:         "refs/heads/main",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{"hcl"},
+			name: "list tree with real repository and head ref and non-existing file extension",
+			args: option{
+				repositoryUrl: privateAzureRepoURL,
+				referenceName: "refs/heads/main",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{"hcl"},
+			},
 			expect: expectResult{
 				err:          nil,
 				matchedCount: 2,
 			},
 		},
 		{
-			name:        "list tree with real repository but non-existing ref",
-			url:         privateAzureRepoURL,
-			ref:         "refs/fake/feature",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{},
+			name: "list tree with real repository but non-existing ref",
+			args: option{
+				repositoryUrl: privateAzureRepoURL,
+				referenceName: "refs/fake/feature",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err: ErrRefNotFound,
 			},
 		},
 		{
-			name:        "list tree with fake repository ",
-			url:         privateAzureRepoURL + "fake",
-			ref:         "refs/fake/feature",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{},
+			name: "list tree with fake repository ",
+			args: option{
+				repositoryUrl: privateAzureRepoURL + "fake",
+				referenceName: "refs/fake/feature",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err: ErrIncorrectRepositoryURL,
 			},
@@ -599,7 +613,7 @@ func Test_listTree_azure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			paths, err := service.ListTree(tt.url, tt.ref, tt.username, tt.accessToken, tt.exts)
+			paths, err := client.listTree(context.TODO(), tt.args)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				if tt.expect.matchedCount > 0 {
@@ -615,28 +629,73 @@ func Test_listTree_azure(t *testing.T) {
 func Test_removeCache_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	repository := privateAzureRepoURL
-	referenceName := "refs/heads/main"
-	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
-	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
+	opt := option{
+		repositoryUrl: privateAzureRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
+		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
+		extensions:    []string{},
+	}
 
 	client := NewAzureDownloader(true)
-	service := Service{azure: client}
 
-	_, err := service.ListRemote(repository, username, accessToken)
+	_, err := client.listRemote(context.TODO(), opt)
 	assert.NoError(t, err)
-	_, ok := client.repoRefCache[repository]
+	_, ok := client.repoRefCache.Load(opt.repositoryUrl)
 	assert.Equal(t, true, ok)
 
-	_, err = service.ListTree(repository, referenceName, username, accessToken, []string{})
+	_, err = client.listTree(context.TODO(), opt)
 	assert.NoError(t, err)
-	repoKey := generateCacheKey(repository, referenceName)
-	_, ok = client.repoTreeCache[repoKey]
+	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
+	_, ok = client.repoTreeCache.Load(repoKey)
 	assert.Equal(t, true, ok)
 
-	service.RemoveCache(repository, referenceName)
-	_, ok = client.repoRefCache[repository]
+	client.removeCache(context.TODO(), opt)
+	_, ok = client.repoRefCache.Load(opt.repositoryUrl)
 	assert.Equal(t, false, ok)
-	_, ok = client.repoTreeCache[repoKey]
+	_, ok = client.repoTreeCache.Load(repoKey)
 	assert.Equal(t, false, ok)
+}
+
+func Test_listRef_removeCache_Concurrently_azure(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	opt := option{
+		repositoryUrl: privateAzureRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
+		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
+	}
+
+	client := NewAzureDownloader(true)
+
+	go client.listRemote(context.TODO(), opt)
+	client.listRemote(context.TODO(), opt)
+
+	go client.removeCache(context.TODO(), opt)
+	client.removeCache(context.TODO(), opt)
+
+	time.Sleep(2 * time.Second)
+}
+
+func Test_listTree_removeCache_Concurrently_azure(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	opt := option{
+		repositoryUrl: privateAzureRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
+		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
+		extensions:    []string{},
+	}
+
+	client := NewAzureDownloader(true)
+
+	go client.listTree(context.TODO(), opt)
+	client.listTree(context.TODO(), opt)
+
+	go client.removeCache(context.TODO(), opt)
+	client.removeCache(context.TODO(), opt)
+
+	time.Sleep(2 * time.Second)
 }

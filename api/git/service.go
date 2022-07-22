@@ -3,8 +3,6 @@ package git
 import (
 	"context"
 	"errors"
-
-	"github.com/go-git/go-git/v5/plumbing"
 )
 
 var (
@@ -13,28 +11,21 @@ var (
 	ErrRefNotFound            = errors.New("The target ref is not found")
 )
 
-type fetchOptions struct {
-	repositoryUrl string
-	username      string
-	password      string
-	referenceName string
-	extensions    []string
-}
-
-type cloneOptions struct {
+type option struct {
 	repositoryUrl string
 	username      string
 	password      string
 	referenceName string
 	depth         int
+	extensions    []string
 }
 
 type downloader interface {
-	download(ctx context.Context, dst string, opt cloneOptions) error
-	latestCommitID(ctx context.Context, opt fetchOptions) (string, error)
-	listRemote(ctx context.Context, opt cloneOptions) ([]string, error)
-	listTree(ctx context.Context, opt fetchOptions) ([]string, error)
-	removeCache(ctx context.Context, opt cloneOptions)
+	download(ctx context.Context, dst string, opt option) error
+	latestCommitID(ctx context.Context, opt option) (string, error)
+	listRemote(ctx context.Context, opt option) ([]string, error)
+	listTree(ctx context.Context, opt option) ([]string, error)
+	removeCache(ctx context.Context, opt option)
 }
 
 // Service represents a service for managing Git.
@@ -47,10 +38,8 @@ type Service struct {
 func NewService() *Service {
 	return &Service{
 		azure: NewAzureDownloader(true),
-		git: gitClient{
-			cacheEnabled:  true,
-			repoRefCache:  make(map[string][]*plumbing.Reference),
-			repoTreeCache: make(map[string][]string),
+		git: &gitClient{
+			cacheEnabled: true,
 		},
 	}
 }
@@ -58,7 +47,7 @@ func NewService() *Service {
 // CloneRepository clones a git repository using the specified URL in the specified
 // destination folder.
 func (service *Service) CloneRepository(destination, repositoryURL, referenceName, username, password string) error {
-	options := cloneOptions{
+	options := option{
 		repositoryUrl: repositoryURL,
 		username:      username,
 		password:      password,
@@ -69,7 +58,7 @@ func (service *Service) CloneRepository(destination, repositoryURL, referenceNam
 	return service.cloneRepository(destination, options)
 }
 
-func (service *Service) cloneRepository(destination string, options cloneOptions) error {
+func (service *Service) cloneRepository(destination string, options option) error {
 	if isAzureUrl(options.repositoryUrl) {
 		return service.azure.download(context.TODO(), destination, options)
 	}
@@ -79,7 +68,7 @@ func (service *Service) cloneRepository(destination string, options cloneOptions
 
 // LatestCommitID returns SHA1 of the latest commit of the specified reference
 func (service *Service) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
-	options := fetchOptions{
+	options := option{
 		repositoryUrl: repositoryURL,
 		username:      username,
 		password:      password,
@@ -94,7 +83,7 @@ func (service *Service) LatestCommitID(repositoryURL, referenceName, username, p
 }
 
 func (service *Service) ListRemote(repositoryURL, username, password string) ([]string, error) {
-	options := cloneOptions{
+	options := option{
 		repositoryUrl: repositoryURL,
 		username:      username,
 		password:      password,
@@ -108,7 +97,7 @@ func (service *Service) ListRemote(repositoryURL, username, password string) ([]
 }
 
 func (service *Service) ListTree(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
-	options := fetchOptions{
+	options := option{
 		repositoryUrl: repositoryURL,
 		username:      username,
 		password:      password,
@@ -124,7 +113,7 @@ func (service *Service) ListTree(repositoryURL, referenceName, username, passwor
 }
 
 func (service *Service) RemoveCache(repositoryURL, referenceName string) {
-	options := cloneOptions{
+	options := option{
 		repositoryUrl: repositoryURL,
 		referenceName: referenceName,
 	}

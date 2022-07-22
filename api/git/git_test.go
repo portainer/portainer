@@ -1,14 +1,15 @@
 package git
 
 import (
+	"context"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
@@ -49,7 +50,7 @@ func testMain(m *testing.M) error {
 }
 
 func Test_ClonePublicRepository_Shallow(t *testing.T) {
-	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
+	service := Service{git: &gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
 	destination := "shallow"
@@ -66,7 +67,7 @@ func Test_ClonePublicRepository_Shallow(t *testing.T) {
 }
 
 func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
-	service := Service{git: gitClient{preserveGitDirectory: false}} // no need for http client since the test access the repo via file system.
+	service := Service{git: &gitClient{preserveGitDirectory: false}} // no need for http client since the test access the repo via file system.
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
 	destination := "shallow"
@@ -85,7 +86,7 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 }
 
 func Test_cloneRepository(t *testing.T) {
-	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
+	service := Service{git: &gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
 
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
@@ -98,7 +99,7 @@ func Test_cloneRepository(t *testing.T) {
 	defer os.RemoveAll(dir)
 	t.Logf("Cloning into %s", dir)
 
-	err = service.cloneRepository(dir, cloneOptions{
+	err = service.cloneRepository(dir, option{
 		repositoryUrl: repositoryURL,
 		referenceName: referenceName,
 		depth:         10,
@@ -109,7 +110,7 @@ func Test_cloneRepository(t *testing.T) {
 }
 
 func Test_latestCommitID(t *testing.T) {
-	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
+	service := Service{git: &gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
 
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
@@ -146,11 +147,9 @@ func Test_listRemotePrivateRepository(t *testing.T) {
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
 	username := getRequiredValue(t, "GITHUB_USERNAME")
 
-	service := Service{git: gitClient{
+	client := &gitClient{
 		preserveGitDirectory: true,
-		repoRefCache:         make(map[string][]*plumbing.Reference),
-		repoTreeCache:        make(map[string][]string),
-	}}
+	}
 
 	type expectResult struct {
 		err       error
@@ -158,45 +157,51 @@ func Test_listRemotePrivateRepository(t *testing.T) {
 	}
 
 	tests := []struct {
-		name        string
-		url         string
-		username    string
-		accessToken string
-		expect      expectResult
+		name   string
+		args   option
+		expect expectResult
 	}{
 		{
-			name:        "list refs of a real private repository",
-			url:         privateGitRepoURL,
-			username:    username,
-			accessToken: accessToken,
+			name: "list refs of a real private repository",
+			args: option{
+				repositoryUrl: privateGitRepoURL,
+				username:      username,
+				password:      accessToken,
+			},
 			expect: expectResult{
 				err:       nil,
 				refsCount: 2,
 			},
 		},
 		{
-			name:        "list refs of a real private repository with incorrect credential",
-			url:         privateGitRepoURL,
-			username:    "test-username",
-			accessToken: "test-token",
+			name: "list refs of a real private repository with incorrect credential",
+			args: option{
+				repositoryUrl: privateGitRepoURL,
+				username:      "test-username",
+				password:      "test-token",
+			},
 			expect: expectResult{
 				err: ErrAuthenticationFailure,
 			},
 		},
 		{
-			name:        "list refs of a fake repository without providing credential",
-			url:         privateGitRepoURL + "fake",
-			username:    "",
-			accessToken: "",
+			name: "list refs of a fake repository without providing credential",
+			args: option{
+				repositoryUrl: privateGitRepoURL + "fake",
+				username:      "",
+				password:      "",
+			},
 			expect: expectResult{
 				err: ErrAuthenticationFailure,
 			},
 		},
 		{
-			name:        "list refs of a fake repository",
-			url:         privateGitRepoURL + "fake",
-			username:    username,
-			accessToken: accessToken,
+			name: "list refs of a fake repository",
+			args: option{
+				repositoryUrl: privateGitRepoURL + "fake",
+				username:      username,
+				password:      accessToken,
+			},
 			expect: expectResult{
 				err: ErrIncorrectRepositoryURL,
 			},
@@ -205,7 +210,7 @@ func Test_listRemotePrivateRepository(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			refs, err := service.ListRemote(tt.url, tt.username, tt.accessToken)
+			refs, err := client.listRemote(context.TODO(), tt.args)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				if tt.expect.refsCount > 0 {
@@ -222,12 +227,10 @@ func Test_listRemotePrivateRepository(t *testing.T) {
 func Test_listTreePrivateRepository(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	service := Service{git: gitClient{
+	client := &gitClient{
 		preserveGitDirectory: true,
 		cacheEnabled:         false,
-		repoRefCache:         make(map[string][]*plumbing.Reference),
-		repoTreeCache:        make(map[string][]string),
-	}} // no need for http client since the test access the repo via file system.
+	}
 
 	type expectResult struct {
 		err          error
@@ -238,90 +241,100 @@ func Test_listTreePrivateRepository(t *testing.T) {
 	username := getRequiredValue(t, "GITHUB_USERNAME")
 
 	tests := []struct {
-		name        string
-		url         string
-		ref         string
-		username    string
-		accessToken string
-		exts        []string
-		expect      expectResult
+		name   string
+		args   option
+		expect expectResult
 	}{
 		{
-			name:        "list tree with real repository and head ref but incorrect credential",
-			url:         privateGitRepoURL,
-			ref:         "refs/heads/main",
-			username:    "test-username",
-			accessToken: "test-token",
-			exts:        []string{},
+			name: "list tree with real repository and head ref but incorrect credential",
+			args: option{
+				repositoryUrl: privateGitRepoURL,
+				referenceName: "refs/heads/main",
+				username:      "test-username",
+				password:      "test-token",
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err: ErrAuthenticationFailure,
 			},
 		},
 		{
-			name:        "list tree with real repository and head ref but no credential",
-			url:         privateGitRepoURL + "fake",
-			ref:         "refs/heads/main",
-			username:    "",
-			accessToken: "",
-			exts:        []string{},
+			name: "list tree with real repository and head ref but no credential",
+			args: option{
+				repositoryUrl: privateGitRepoURL + "fake",
+				referenceName: "refs/heads/main",
+				username:      "",
+				password:      "",
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err: ErrAuthenticationFailure,
 			},
 		},
 		{
-			name:        "list tree with real repository and head ref",
-			url:         privateGitRepoURL,
-			ref:         "refs/heads/main",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{},
+			name: "list tree with real repository and head ref",
+			args: option{
+				repositoryUrl: privateGitRepoURL,
+				referenceName: "refs/heads/main",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err:          nil,
 				matchedCount: 15,
 			},
 		},
 		{
-			name:        "list tree with real repository and head ref and existing file extension",
-			url:         privateGitRepoURL,
-			ref:         "refs/heads/main",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{"yml"},
+			name: "list tree with real repository and head ref and existing file extension",
+			args: option{
+				repositoryUrl: privateGitRepoURL,
+				referenceName: "refs/heads/main",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{"yml"},
+			},
 			expect: expectResult{
 				err:          nil,
 				matchedCount: 2,
 			},
 		},
 		{
-			name:        "list tree with real repository and head ref and non-existing file extension",
-			url:         privateGitRepoURL,
-			ref:         "refs/heads/main",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{"hcl"},
+			name: "list tree with real repository and head ref and non-existing file extension",
+			args: option{
+				repositoryUrl: privateGitRepoURL,
+				referenceName: "refs/heads/main",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{"hcl"},
+			},
 			expect: expectResult{
 				err:          nil,
 				matchedCount: 2,
 			},
 		},
 		{
-			name:        "list tree with real repository but non-existing ref",
-			url:         privateGitRepoURL,
-			ref:         "refs/fake/feature",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{},
+			name: "list tree with real repository but non-existing ref",
+			args: option{
+				repositoryUrl: privateGitRepoURL,
+				referenceName: "refs/fake/feature",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err: ErrRefNotFound,
 			},
 		},
 		{
-			name:        "list tree with fake repository ",
-			url:         privateGitRepoURL + "fake",
-			ref:         "refs/fake/feature",
-			username:    username,
-			accessToken: accessToken,
-			exts:        []string{},
+			name: "list tree with fake repository ",
+			args: option{
+				repositoryUrl: privateGitRepoURL + "fake",
+				referenceName: "refs/fake/feature",
+				username:      username,
+				password:      accessToken,
+				extensions:    []string{},
+			},
 			expect: expectResult{
 				err: ErrIncorrectRepositoryURL,
 			},
@@ -330,7 +343,7 @@ func Test_listTreePrivateRepository(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			paths, err := service.ListTree(tt.url, tt.ref, tt.username, tt.accessToken, tt.exts)
+			paths, err := client.listTree(context.TODO(), tt.args)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				if tt.expect.matchedCount > 0 {
@@ -347,33 +360,82 @@ func Test_listTreePrivateRepository(t *testing.T) {
 func Test_removeCache(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	repository := privateGitRepoURL
-	referenceName := "refs/heads/main"
-	accessToken := getRequiredValue(t, "GITHUB_PAT")
-	username := getRequiredValue(t, "GITHUB_USERNAME")
+	opt := option{
+		repositoryUrl: privateGitRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "GITHUB_PAT"),
+		username:      getRequiredValue(t, "GITHUB_USERNAME"),
+		extensions:    []string{},
+	}
 
-	client := gitClient{
+	client := &gitClient{
 		preserveGitDirectory: true,
 		cacheEnabled:         true,
-		repoRefCache:         make(map[string][]*plumbing.Reference),
-		repoTreeCache:        make(map[string][]string),
 	}
-	service := Service{git: client}
 
-	_, err := service.ListRemote(repository, username, accessToken)
+	_, err := client.listRemote(context.TODO(), opt)
 	assert.NoError(t, err)
-	_, ok := client.repoRefCache[repository]
+	_, ok := client.repoRefCache.Load(opt.repositoryUrl)
 	assert.Equal(t, true, ok)
 
-	_, err = service.ListTree(repository, referenceName, username, accessToken, []string{})
+	_, err = client.listTree(context.TODO(), opt)
 	assert.NoError(t, err)
-	repoKey := generateCacheKey(repository, referenceName)
-	_, ok = client.repoTreeCache[repoKey]
+	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
+	_, ok = client.repoTreeCache.Load(repoKey)
 	assert.Equal(t, true, ok)
 
-	service.RemoveCache(repository, referenceName)
-	_, ok = client.repoRefCache[repository]
+	client.removeCache(context.TODO(), opt)
+	_, ok = client.repoRefCache.Load(opt.repositoryUrl)
 	assert.Equal(t, false, ok)
-	_, ok = client.repoTreeCache[repoKey]
+	_, ok = client.repoTreeCache.Load(repoKey)
 	assert.Equal(t, false, ok)
+}
+
+func Test_listRef_removeCache_Concurrently(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	opt := option{
+		repositoryUrl: privateGitRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "GITHUB_PAT"),
+		username:      getRequiredValue(t, "GITHUB_USERNAME"),
+	}
+
+	client := &gitClient{
+		preserveGitDirectory: true,
+		cacheEnabled:         true,
+	}
+
+	go client.listRemote(context.TODO(), opt)
+	client.listRemote(context.TODO(), opt)
+
+	go client.removeCache(context.TODO(), opt)
+	client.removeCache(context.TODO(), opt)
+
+	time.Sleep(2 * time.Second)
+}
+
+func Test_listTree_removeCache_Concurrently(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	opt := option{
+		repositoryUrl: privateGitRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "GITHUB_PAT"),
+		username:      getRequiredValue(t, "GITHUB_USERNAME"),
+		extensions:    []string{},
+	}
+
+	client := &gitClient{
+		preserveGitDirectory: true,
+		cacheEnabled:         true,
+	}
+
+	go client.listTree(context.TODO(), opt)
+	client.listTree(context.TODO(), opt)
+
+	go client.removeCache(context.TODO(), opt)
+	client.removeCache(context.TODO(), opt)
+
+	time.Sleep(2 * time.Second)
 }

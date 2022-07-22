@@ -20,14 +20,13 @@ import (
 type gitClient struct {
 	preserveGitDirectory bool
 	cacheEnabled         bool
-	mu                   sync.Mutex
 	// Cache the result of repository refs, key is repository URL
-	repoRefCache map[string][]*plumbing.Reference
+	repoRefCache sync.Map
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
-	repoTreeCache map[string][]string
+	repoTreeCache sync.Map
 }
 
-func (c gitClient) download(ctx context.Context, dst string, opt cloneOptions) error {
+func (c *gitClient) download(ctx context.Context, dst string, opt option) error {
 	gitOptions := git.CloneOptions{
 		URL:   opt.repositoryUrl,
 		Depth: opt.depth,
@@ -51,7 +50,7 @@ func (c gitClient) download(ctx context.Context, dst string, opt cloneOptions) e
 	return nil
 }
 
-func (c gitClient) latestCommitID(ctx context.Context, opt fetchOptions) (string, error) {
+func (c *gitClient) latestCommitID(ctx context.Context, opt option) (string, error) {
 	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 		Name: "origin",
 		URLs: []string{opt.repositoryUrl},
@@ -98,7 +97,7 @@ func getAuth(username, password string) *githttp.BasicAuth {
 	return nil
 }
 
-func (c gitClient) listRemote(ctx context.Context, opt cloneOptions) ([]string, error) {
+func (c *gitClient) listRemote(ctx context.Context, opt option) ([]string, error) {
 	rem := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 		Name: "origin",
 		URLs: []string{opt.repositoryUrl},
@@ -122,29 +121,32 @@ func (c gitClient) listRemote(ctx context.Context, opt cloneOptions) ([]string, 
 	}
 
 	if c.cacheEnabled {
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		c.repoRefCache[opt.repositoryUrl] = refs
+		c.repoRefCache.Store(opt.repositoryUrl, ret)
 	}
 	return ret, nil
 }
 
-func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, error) {
+func (c *gitClient) listTree(ctx context.Context, opt option) ([]string, error) {
 	var (
 		allPaths    []string
 		filteredRet []string
+		err         error
+		sucess      bool
 	)
 
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	treeCache, ok := c.repoTreeCache[repoKey]
+	cache, ok := c.repoTreeCache.Load(repoKey)
 	if ok {
-		for _, path := range treeCache {
-			if matchExtensions(path, opt.extensions) {
-				filteredRet = append(filteredRet, path)
+		treeCache, success := cache.([]string)
+		if success {
+			for _, path := range treeCache {
+				if matchExtensions(path, opt.extensions) {
+					filteredRet = append(filteredRet, path)
+				}
 			}
-		}
 
-		return filteredRet, nil
+			return filteredRet, nil
+		}
 	}
 
 	listOptions := &git.ListOptions{
@@ -152,11 +154,13 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 	}
 
 	refs := make([]*plumbing.Reference, 0)
-	var err error
-	refCache, ok := c.repoRefCache[opt.repositoryUrl]
+
+	cache, ok = c.repoRefCache.Load(opt.repositoryUrl)
 	if ok {
-		refs = refCache
-	} else {
+		refs, sucess = cache.([]*plumbing.Reference)
+	}
+
+	if !ok || !sucess {
 		rem := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 			Name: "origin",
 			URLs: []string{opt.repositoryUrl},
@@ -210,9 +214,7 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 			})
 
 			if c.cacheEnabled {
-				c.mu.Lock()
-				defer c.mu.Unlock()
-				c.repoTreeCache[repoKey] = allPaths
+				c.repoTreeCache.Store(repoKey, allPaths)
 			}
 			break
 		}
@@ -224,12 +226,10 @@ func (c gitClient) listTree(ctx context.Context, opt fetchOptions) ([]string, er
 	return filteredRet, nil
 }
 
-func (c gitClient) removeCache(ctx context.Context, opt cloneOptions) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	delete(c.repoRefCache, opt.repositoryUrl)
+func (c *gitClient) removeCache(ctx context.Context, opt option) {
+	c.repoRefCache.Delete(opt.repositoryUrl)
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	delete(c.repoTreeCache, repoKey)
+	c.repoTreeCache.Delete(repoKey)
 }
 
 func generateCacheKey(names ...string) string {
