@@ -73,7 +73,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="Stats"
           >
-            <Icon icon="bar-chart-2" feather className="space-right" />
+            <Icon icon="bar-chart" feather className="space-right" />
           </Link>
         </Authorized>
       )}
