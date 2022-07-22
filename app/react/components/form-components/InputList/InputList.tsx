@@ -1,6 +1,8 @@
 import { ComponentType } from 'react';
 import clsx from 'clsx';
 
+import { Icon } from '@/react/components/Icon';
+
 import { AddButton, Button } from '@@/buttons';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
@@ -100,7 +102,11 @@ export function InputList<T = DefaultType>({
           return (
             <div
               key={key}
-              className={clsx(styles.itemLine, { [styles.hasError]: !!error })}
+              className={clsx(
+                styles.itemLine,
+                { [styles.hasError]: !!error },
+                'vertical-center'
+              )}
             >
               {Item ? (
                 <Item
@@ -119,28 +125,28 @@ export function InputList<T = DefaultType>({
                 {movable && (
                   <>
                     <Button
-                      size="small"
+                      size="medium"
                       disabled={index === 0}
                       onClick={() => handleMoveUp(index)}
                     >
-                      <i className="fa fa-arrow-up" aria-hidden="true" />
+                      <Icon icon="arrow-up" feather />
                     </Button>
                     <Button
-                      size="small"
+                      size="medium"
                       type="button"
                       disabled={index === value.length - 1}
                       onClick={() => handleMoveDown(index)}
                     >
-                      <i className="fa fa-arrow-down" aria-hidden="true" />
+                      <Icon icon="arrow-down" feather />
                     </Button>
                   </>
                 )}
                 <Button
-                  color="danger"
-                  size="small"
+                  color="dangerlight"
+                  size="medium"
                   onClick={() => handleRemoveItem(key, item)}
                 >
-                  <i className="fa fa-trash" aria-hidden="true" />
+                  <Icon icon="trash-2" feather />
                 </Button>
               </div>
             </div>
