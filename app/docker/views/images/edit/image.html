@@ -251,7 +251,7 @@
                     {{ layer.CreatedBy | imagelayercommand | truncate: 130 }}
                     <span ng-if="layer.CreatedBy.length > 130" style="margin-left: 5px">
                       <a id="layer-command-expander{{ $index }}" class="btn" ng-click="toggleLayerCommand($index)">
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon>
                       </a>
                     </span>
                   </span>
