@@ -162,7 +162,8 @@
               <td>{{ item.Namespace.CreationDate | getisodate }} {{ item.Namespace.ResourcePoolOwner ? 'by ' + item.Namespace.ResourcePoolOwner : '' }}</td>
               <td ng-if="$ctrl.isAdmin">
                 <a class="vertical-center" ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
-                  <pr-icon icon="'users'" feather="true"></pr-icon> Manage access
+                  <pr-icon icon="'users'" feather="true"></pr-icon>
+                   Manage access
                 </a>
                 <span ng-if="!$ctrl.canManageAccess(item)">-</span>
               </td>
