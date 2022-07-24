@@ -5,7 +5,7 @@ import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, Role } from '@/portainer/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
 
-import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Table, TableContainer, TableTitle } from '@@/datatables';
 import { Button } from '@@/buttons';
 
 import { ResourceControlType, ResourceId } from '../types';
@@ -45,9 +45,9 @@ export function AccessControlPanel({
   return (
     <div className="row">
       <div className="col-sm-12">
-        <Widget>
-          <WidgetTitle title="Access control" icon="fa-eye" />
-          <WidgetBody className="no-padding">
+        <TableContainer>
+          <TableTitle label="Access control" icon="eye" featherIcon />
+          <Table className="no-padding">
             <AccessControlPanelDetails
               resourceType={resourceType}
               resourceControl={resourceControl}
@@ -73,8 +73,8 @@ export function AccessControlPanel({
                 onUpdateSuccess={handleUpdateSuccess}
               />
             )}
-          </WidgetBody>
-        </Widget>
+          </Table>
+        </TableContainer>
       </div>
     </div>
   );
