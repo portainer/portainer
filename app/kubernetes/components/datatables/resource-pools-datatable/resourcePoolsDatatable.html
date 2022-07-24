@@ -163,7 +163,7 @@
               <td ng-if="$ctrl.isAdmin">
                 <a class="vertical-center" ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
                   <pr-icon icon="'users'" feather="true"></pr-icon>
-                   Manage access
+                  Manage access
                 </a>
                 <span ng-if="!$ctrl.canManageAccess(item)">-</span>
               </td>
