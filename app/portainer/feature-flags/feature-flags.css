@@ -20,12 +20,18 @@ button.limited-be.oauth-save-settings-button {
 ng-form.limited-be,
 form.limited-be,
 div.limited-be {
-  border: solid 1px var(--BE-only);
-  box-shadow: var(--shadow-boxselector-color);
+  border: solid 2px var(--ui-warning-7);
+  border-radius: 8px;
   padding: 10px;
   pointer-events: none;
   touch-action: none;
   display: block;
+  background: rgba(247, 144, 9, 0.1);
+}
+
+.limited-be input,
+.limited-be .widget-body {
+  background: rgba(247, 144, 9, 0.05);
 }
 
 .form-control.limited-be[disabled] {

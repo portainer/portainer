@@ -1,6 +1,5 @@
+<be-feature-indicator feature="$ctrl.limitedFeatureId" class="my-8 block"></be-feature-indicator>
 <ng-form class="ad-settings" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-class="limited-be">
-  <be-feature-indicator feature="$ctrl.limitedFeatureId" class="my-8 block"></be-feature-indicator>
-
   <auto-user-provision-toggle ng-model="$ctrl.settings.AutoCreateUsers">
     <field-description>
       With automatic user provisioning enabled, Portainer will create user(s) automatically with standard user role and assign them to team(s) which matches to LDAP group name(s).
