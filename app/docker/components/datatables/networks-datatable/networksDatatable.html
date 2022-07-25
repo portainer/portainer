@@ -93,78 +93,78 @@
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('StackName')">
                   Stack
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Driver')">
                   Driver
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Driver' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Driver' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Driver' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Driver' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Attachable')">
                   Attachable
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Attachable' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Attachable' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Attachable' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Attachable' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('IPAM.Driver')">
                   IPAM Driver
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Driver' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Driver' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.Driver' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.Driver' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('IPAM.IPV4Configs[0].Subnet')">
                   IPV4 IPAM Subnet
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Subnet' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Subnet' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Subnet' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Subnet' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('IPAM.IPV4Configs[0].Gateway')">
                   IPV4 IPAM Gateway
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Gateway' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Gateway' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Gateway' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Gateway' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('IPAM.IPV6Configs[0].Subnet')">
                   IPV6 IPAM Subnet
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Subnet' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Subnet' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Subnet' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Subnet' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('IPAM.IPV6Configs[0].Gateway')">
                   IPV6 IPAM Gateway
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Gateway' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Gateway' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Gateway' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Gateway' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th ng-if="$ctrl.showHostColumn">
                 <a ng-click="$ctrl.changeOrderBy('NodeName')">
                   Host
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"> </pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"> </pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
             </tr>

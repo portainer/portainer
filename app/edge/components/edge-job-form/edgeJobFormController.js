@@ -59,7 +59,10 @@ export class EdgeJobFormController {
     }
 
     if (this.formValues.cronMethod === 'basic') {
-      if (!this.model.Recurring) {
+      if (!this.model.Recurring && (this.formValues.datetime === undefined || !this.formValues.datetime.isValid())) {
+        this.state.formValidationError = 'Schedule date must not be empty';
+        return;
+      } else if (!this.model.Recurring) {
         this.model.CronExpression = datetimeToCron(this.formValues.datetime);
       } else {
         this.model.CronExpression = this.formValues.scheduleValue.cron;

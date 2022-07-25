@@ -269,7 +269,7 @@ class KubernetesConfigureController {
       actionInProgress: false,
       displayConfigureClassPanel: {},
       viewReady: false,
-      endpointId: this.$state.params.id,
+      endpointId: this.$state.params.endpointId,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
       },

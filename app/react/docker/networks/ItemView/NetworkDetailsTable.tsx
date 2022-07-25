@@ -3,9 +3,10 @@ import DockerNetworkHelper from 'Docker/helpers/networkHelper';
 
 import { Authorized } from '@/portainer/hooks/useUser';
 
-import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Table, TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
 import { Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
 
 import { isSystemNetwork } from '../network.helper';
 import { DockerNetwork, IPConfig } from '../types';
@@ -30,9 +31,9 @@ export function NetworkDetailsTable({
   return (
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
-        <Widget>
-          <WidgetTitle title="Network details" icon="fa-sitemap" />
-          <WidgetBody className="nopadding">
+        <TableContainer>
+          <TableTitle label="Network details" icon="share-2" featherIcon />
+          <Table className="nopadding">
             <DetailsTable dataCy="networkDetails-detailsTable">
               {/* networkRowContent */}
               <DetailsTable.Row label="Name">{network.Name}</DetailsTable.Row>
@@ -46,8 +47,10 @@ export function NetworkDetailsTable({
                       color="danger"
                       onClick={() => onRemoveNetworkClicked()}
                     >
-                      <i
-                        className="fa fa-trash-alt space-right"
+                      <Icon
+                        icon="trash-2"
+                        feather
+                        className="space-right"
                         aria-hidden="true"
                       />
                       Delete this network
@@ -102,8 +105,8 @@ export function NetworkDetailsTable({
                 </Fragment>
               ))}
             </DetailsTable>
-          </WidgetBody>
-        </Widget>
+          </Table>
+        </TableContainer>
       </div>
     </div>
   );
