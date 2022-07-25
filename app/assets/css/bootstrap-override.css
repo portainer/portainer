@@ -409,3 +409,12 @@ input:checked + .slider:before {
   cursor: pointer;
   color: var(--ui-gray-9) !important;
 }
+
+.widget-header {
+  font-size: 16px;
+}
+
+.widget-header .icon > svg {
+  position: relative;
+  top: -3px;
+}
