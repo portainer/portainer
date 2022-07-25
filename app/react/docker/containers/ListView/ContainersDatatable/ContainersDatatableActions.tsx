@@ -105,7 +105,7 @@ export function ContainersDatatableActions({
           <Button
             color="light"
             onClick={() => onKillClick(selectedItems)}
-            disabled={selectedItemCount === 0}
+            disabled={selectedItemCount === 0 || hasStoppedItemsSelected}
           >
             <i className="fa fa-bomb space-right" aria-hidden="true" />
             Kill
