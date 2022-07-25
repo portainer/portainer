@@ -1,7 +1,7 @@
 import { Authorized } from '@/portainer/hooks/useUser';
 import { EnvironmentId } from '@/portainer/environments/types';
 
-import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Table, TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
@@ -39,9 +39,9 @@ export function NetworkContainersTable({
   return (
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
-        <Widget>
-          <WidgetTitle title="Containers in network" icon="fa-server" />
-          <WidgetBody className="nopadding">
+        <TableContainer>
+          <TableTitle label="Containers in network" icon="server" featherIcon />
+          <Table className="nopadding">
             <DetailsTable
               headers={tableHeaders}
               dataCy="networkDetails-networkContainers"
@@ -90,8 +90,8 @@ export function NetworkContainersTable({
                 </tr>
               ))}
             </DetailsTable>
-          </WidgetBody>
-        </Widget>
+          </Table>
+        </TableContainer>
       </div>
     </div>
   );
