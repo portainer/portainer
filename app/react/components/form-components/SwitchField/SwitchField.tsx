@@ -15,6 +15,7 @@ export interface Props {
   name?: string;
   tooltip?: string;
   labelClass?: string;
+  switchClass?: string;
   dataCy?: string;
   disabled?: boolean;
   featureId?: FeatureId;
@@ -35,6 +36,7 @@ export function SwitchField({
   onChange,
   featureId,
   switchValues,
+  switchClass,
 }: Props) {
   const toggleName = name ? `toggle_${name}` : '';
 
@@ -51,7 +53,7 @@ export function SwitchField({
         {tooltip && <Tooltip message={tooltip} />}
       </span>
       <Switch
-        className="space-right"
+        className={clsx('space-right', switchClass)}
         name={toggleName}
         id={toggleName}
         checked={checked}

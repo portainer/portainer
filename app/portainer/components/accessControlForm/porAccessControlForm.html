@@ -3,13 +3,14 @@
   <!-- access-control-switch -->
   <div class="form-group">
     <div class="col-sm-12">
-      <label for="ownership" class="control-label text-left">
-        Enable access control
-        <portainer-tooltip message="'When enabled, you can restrict the access and management of this resource.'"></portainer-tooltip>
-      </label>
-      <label class="switch" style="margin-left: 20px">
-        <input name="ownership" type="checkbox" ng-model="$ctrl.formData.AccessControlEnabled" /><i data-cy="portainer-accessMgmtToggle"></i>
-      </label>
+      <por-switch-field
+        label-class="'col-sm-2'"
+        checked="$ctrl.formData.AccessControlEnabled"
+        label="'Enable access control'"
+        tooltip="'When enabled, you can restrict the access and management of this resource.'"
+        on-change="($ctrl.onChangeEnablement)"
+        data-cy="portainer-accessMgmtToggle"
+      ></por-switch-field>
     </div>
   </div>
   <!-- !access-control-switch -->
