@@ -31,7 +31,7 @@ export default class LdapSettingsController {
   }
 
   $onInit() {
-    this.tlscaCert = this.settings.TLSCACert;
+    this.tlscaCert = this.settings.TLSConfig.TLSCACert;
   }
 
   onChangeServerType(serverType) {
