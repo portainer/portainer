@@ -175,7 +175,7 @@ function EndpointController(
   }
 
   function verifyGpus() {
-    var i = $scope.endpoint.Gpus.length;
+    var i = ($scope.endpoint.Gpus || []).length;
     while (i--) {
       if ($scope.endpoint.Gpus[i].name === '' || $scope.endpoint.Gpus[i].name === null) {
         $scope.endpoint.Gpus.splice(i, 1);
