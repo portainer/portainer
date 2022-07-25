@@ -64,7 +64,7 @@
           children-paths="['portainer.users.user' ,'portainer.teams' ,'portainer.teams.team' ,'portainer.roles' ,'portainer.roles.role' ,'portainer.roles.new']"
         >
           <sidebar-menu-item path="portainer.teams" class-name="sidebar-sublist" data-cy="portainerSidebar-teams" title="Teams">Teams</sidebar-menu-item>
-          <sidebar-menu-item path="portainer.roles" class-name="sidebar-sublist" data-cy="portainerSidebar-roles" title="Roles">Roles</sidebar-menu-item>
+          <sidebar-menu-item ng-if="isAdmin" path="portainer.roles" class-name="sidebar-sublist" data-cy="portainerSidebar-roles" title="Roles">Roles</sidebar-menu-item>
         </sidebar-menu>
 
         <div ng-if="isAdmin">
