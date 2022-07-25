@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import angular from 'angular';
 import _ from 'lodash-es';
 import chardet from 'chardet';
