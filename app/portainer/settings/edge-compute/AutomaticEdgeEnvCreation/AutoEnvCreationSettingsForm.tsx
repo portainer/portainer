@@ -2,13 +2,14 @@ import { Field, Form, Formik } from 'formik';
 import * as yup from 'yup';
 import { useCallback, useEffect } from 'react';
 
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
-import { Input } from '@/portainer/components/form-components/Input';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { useUpdateSettingsMutation } from '@/portainer/settings/settings.service';
+import { useUpdateSettingsMutation } from '@/portainer/settings/queries';
+
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { FormControl } from '@@/form-components/FormControl';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
+import { Input } from '@@/form-components/Input';
 
 import { Settings } from '../types';
 
@@ -107,7 +108,7 @@ export function AutoEnvCreationSettingsForm({ settings }: Props) {
                 isLoading={mutation.isLoading}
                 disabled={!isValid || !dirty}
               >
-                Save Settings
+                Save settings
               </LoadingButton>
             </div>
           </div>

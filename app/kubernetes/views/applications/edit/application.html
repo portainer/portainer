@@ -1,19 +1,30 @@
-<kubernetes-view-header title="Application details" state="kubernetes.applications.application" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
-  <a ui-sref="kubernetes.applications">Applications</a> &gt; {{ ctrl.application.Name }}
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Application details'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { 
+      label:ctrl.application.ResourcePool,
+      link: 'kubernetes.resourcePools.resourcePool', 
+      linkParams:{ id: ctrl.application.ResourcePool }
+    },
+    { label:'Applications', link:'kubernetes.applications' },
+    ctrl.application.Name
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
-  <div class="row">
+  <div class="row kubernetes-application">
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading> <i class="fa fa-laptop-code space-right" aria-hidden="true"></i> Application </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'fa-laptop-code'" class-name="'mr-1'"></pr-icon> Application </uib-tab-heading>
               <div style="padding: 20px">
                 <table class="table">
                   <tbody>
@@ -68,25 +79,29 @@
                     <tr>
                       <td>Creation</td>
                       <td>
-                        <span ng-if="ctrl.application.ApplicationOwner" style="margin-right: 5px" data-cy="k8sAppDetail-owner">
-                          <i class="fas fa-user"></i> {{ ctrl.application.ApplicationOwner }}
+                        <span ng-if="ctrl.application.ApplicationOwner" class="mr-1 vertical-center" data-cy="k8sAppDetail-owner">
+                          <pr-icon icon="'user'" feather="true"></pr-icon> {{ ctrl.application.ApplicationOwner }}
                         </span>
-                        <span> <i class="fas fa-clock"></i> {{ ctrl.application.CreationDate | getisodate }}</span>
-                        <span ng-if="ctrl.application.ApplicationOwner" data-cy="k8sAppDetail-creationMethod">
-                          <i class="fa fa-file-code space-left space-right" aria-hidden="true"></i> Deployed from {{ ctrl.state.appType }}</span
-                        >
+                        <span class="vertical-center"> <pr-icon icon="'clock'" mode="'alt'" feather="true"></pr-icon> {{ ctrl.application.CreationDate | getisodate }} </span>
+                        <span ng-if="ctrl.application.ApplicationOwner" data-cy="k8sAppDetail-creationMethod" class="vertical-center">
+                          <pr-icon icon="'clock'" feather="true"></pr-icon> Deployed from {{ ctrl.state.appType }}
+                        </span>
                       </td>
                     </tr>
                     <tr>
                       <td colspan="2">
                         <form class="form-horizontal" name="kubernetesApplicationNoteForm">
                           <div class="form-group">
-                            <div class="col-sm-12">
-                              <i class="fa fa-edit" aria-hidden="true"></i> Note
-                              <button class="btn btn-xs btn-primary" ng-click="ctrl.state.expandedNote = !ctrl.state.expandedNote;" data-cy="k8sAppDetail-expandNoteButton"
+                            <div class="col-sm-12 vertical-center">
+                              <pr-icon icon="'edit'" feather="true"></pr-icon> Note
+                              <button
+                                class="btn btn-xs btn-light vertical-center"
+                                ng-click="ctrl.state.expandedNote = !ctrl.state.expandedNote;"
+                                data-cy="k8sAppDetail-expandNoteButton"
                                 >{{ ctrl.state.expandedNote ? 'Collapse' : 'Expand' }}
-                                <i class="fas {{ ctrl.state.expandedNote ? 'fa-angle-up' : 'fa-angle-down' }}" aria-hidden="true"></i
-                              ></button>
+                                <pr-icon icon="'chevron-up'" feather="true" ng-if="ctrl.state.expandedNote"></pr-icon>
+                                <pr-icon icon="'chevron-down'" feather="true" ng-if="!ctrl.state.expandedNote"></pr-icon>
+                              </button>
                             </div>
                           </div>
                           <div class="form-group" ng-if="ctrl.state.expandedNote">
@@ -141,14 +156,14 @@
 
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading>
-                <i class="fas fa-compress-arrows-alt space-right" aria-hidden="true"></i> Placement
-                <div ng-if="ctrl.state.placementWarning">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                <pr-icon icon="'fa-compress-arrows-alt'"></pr-icon> Placement
+                <div ng-if="ctrl.state.placementWarning" class="vertical-center">
+                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   warning
                 </div>
               </uib-tab-heading>
-              <div class="small text-muted" style="padding: 20px">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+              <div class="small text-muted vertical-center" style="padding: 20px">
+                <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                 The placement component helps you understand whether or not this application can be deployed on a specific node.
               </div>
               <kubernetes-application-placements-datatable
@@ -165,9 +180,9 @@
 
             <uib-tab index="2" classes="btn-sm" select="ctrl.selectTab(2)">
               <uib-tab-heading>
-                <i class="fa fa-history space-right" aria-hidden="true"></i> Events
-                <div ng-if="ctrl.hasEventWarnings()">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                <pr-icon icon="'fa-history'"></pr-icon> Events
+                <div ng-if="ctrl.hasEventWarnings()" class="vertical-center">
+                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
@@ -184,7 +199,7 @@
             </uib-tab>
 
             <uib-tab index="3" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
-              <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'code'" feather="true"></pr-icon> YAML </uib-tab-heading>
               <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="application-yaml" data="ctrl.application.Yaml"></kubernetes-yaml-inspector>
               </div>
@@ -203,70 +218,66 @@
             <button
               ng-if="!ctrl.isExternalApplication()"
               type="button"
-              class="btn btn-sm btn-primary"
+              class="btn btn-sm btn-light vertical-center"
               ui-sref="kubernetes.applications.application.edit"
               style="margin-left: 0"
               data-cy="k8sAppDetail-editAppButton"
             >
-              <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit this application
+              <pr-icon icon="'code'" class="mr-1" feather="true"></pr-icon>Edit this application
             </button>
             <button
               authorization="K8sApplicationDetailsW"
               ng-if="ctrl.isExternalApplication()"
               type="button"
-              class="btn btn-sm btn-primary"
+              class="btn btn-sm btn-light"
               ui-sref="kubernetes.applications.application.edit"
               style="margin-left: 0"
               data-cy="k8sAppDetail-editAppButton"
             >
-              <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit External application
+              <pr-icon icon="'code'" class-name="'mr-1'" feather="true"></pr-icon>Edit External application
             </button>
             <button
               ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
               type="button"
-              class="btn btn-sm btn-primary"
+              class="btn btn-sm btn-light"
               style="margin-left: 0"
               ng-click="ctrl.redeployApplication()"
               data-cy="k8sAppDetail-redeployButton"
             >
-              <i class="fa fa-redo space-right" aria-hidden="true"></i>Redeploy
+              <pr-icon icon="'rotate-cw'" class="'mr-1'" feather="true"></pr-icon>Redeploy
             </button>
             <button
               ng-if="!ctrl.isExternalApplication()"
               type="button"
-              class="btn btn-sm btn-primary"
+              class="btn btn-sm btn-light"
               style="margin-left: 0"
               ng-click="ctrl.rollbackApplication()"
               ng-disabled="ctrl.application.Revisions.length < 2 || ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
               data-cy="k8sAppDetail-rollbackButton"
             >
-              <i class="fas fa-history space-right" aria-hidden="true"></i>Rollback to previous configuration
+              <pr-icon icon="'rotate-ccw'" feather="true" class="mr-1"></pr-icon>Rollback to previous configuration
             </button>
             <a
               ng-if="ctrl.isStack() && ctrl.stackFileContent"
               class="btn btn-sm btn-primary space-left"
               ui-sref="kubernetes.templates.custom.new({fileContent: ctrl.stackFileContent})"
             >
-              <i class="fas fa-plus space-right" aria-hidden="true"></i>Create template from application
+              <pr-icon icon="'plus'" class="mr-1" feather="true"></pr-icon>Create template from application
             </a>
           </div>
 
           <!-- ACCESSING APPLICATION -->
-          <div class="text-muted" style="margin-bottom: 15px"> <i class="fa fa-external-link-alt" aria-hidden="true" style="margin-right: 2px"></i> Accessing the application </div>
+          <div class="text-muted" style="margin-bottom: 15px"> <pr-icon icon="'external-link'" class="mr-1" feather="true"></pr-icon>Accessing the application </div>
 
           <div class="small text-muted" ng-if="ctrl.application.PublishedPorts.length === 0" style="margin-bottom: 15px">
-            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-            This application is not exposing any port.
+            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is not exposing any port.
           </div>
 
           <div ng-if="ctrl.application.Services.length !== 0">
             <!-- Services notice -->
             <div>
               <div class="small text-muted">
-                <p>
-                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-                  This application is exposed through service(s) as below:
-                </p>
+                <p> <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is exposed through service(s) as below: </p>
               </div>
             </div>
 
@@ -284,10 +295,10 @@
           </div>
           <!-- !ACCESSING APPLICATION -->
           <!-- AUTO SCALING -->
-          <div class="text-muted" style="margin-bottom: 15px"> <i class="fa fa-expand-arrows-alt" aria-hidden="true" style="margin-right: 2px"></i> Auto-scaling</div>
+          <div class="text-muted" style="margin-bottom: 15px"> <pr-icon icon="'move'" class="mr-1" feather="true"></pr-icon>Auto-scaling </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.AutoScaler" style="margin-bottom: 15px">
-            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application does not have an autoscaling policy defined.
           </div>
 
@@ -300,7 +311,7 @@
                     <td style="width: 33%">Maximum instances</td>
                     <td style="width: 33%">
                       Target CPU usage
-                      <portainer-tooltip position="bottom" message="The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances.">
+                      <portainer-tooltip message="'The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances.'">
                       </portainer-tooltip>
                     </td>
                   </tr>
@@ -316,10 +327,13 @@
           <!-- !AUTO SCALING -->
 
           <!-- CONFIGURATIONS -->
-          <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px"> <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px"></i> Configuration </div>
+          <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px">
+            <pr-icon icon="'file'" class="mr-1" feather="true"></pr-icon>
+            Configuration
+          </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.Env.length > 0 && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px">
-            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application is not using any environment variable or configuration.
           </div>
 
@@ -335,7 +349,7 @@
                 <td data-cy="k8sAppDetail-containerName">
                   {{ container.Name }}
                   <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
-                    ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                    ><pr-icon icon="'fa-asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
                       href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
                       target="_blank"
                       >init container</a
@@ -346,13 +360,13 @@
                 <td>
                   <span ng-if="envvar.value" data-cy="k8sAppDetail-envVarValue">{{ envvar.value }}</span>
                   <span ng-if="envvar.valueFrom.configMapKeyRef" data-cy="k8sAppDetail-envVarValue"
-                    ><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.key }}</span
+                    ><pr-icon icon="'key'" class="mr-1" feather="true"></pr-icon>{{ envvar.valueFrom.configMapKeyRef.key }}</span
                   >
                   <span ng-if="envvar.valueFrom.secretKeyRef" data-cy="k8sAppDetail-envVarValue"
-                    ><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.key }}</span
+                    ><pr-icon icon="'key'" class="mr-1" feather="true"></pr-icon>{{ envvar.valueFrom.secretKeyRef.key }}</span
                   >
                   <span ng-if="envvar.valueFrom.fieldRef" data-cy="k8sAppDetail-envVarValue"
-                    ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                    ><pr-icon icon="'fa-asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
                       href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#capabilities-of-the-downward-api"
                       target="_blank"
                       >downward API</a
@@ -364,12 +378,12 @@
                   <span ng-if="envvar.value || envvar.valueFrom.fieldRef || (!envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef)">-</span>
                   <span ng-if="envvar.valueFrom.configMapKeyRef" data-cy="k8sAppDetail-configName"
                     ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"
-                      ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a
+                      ><pr-icon icon="'file'" class="mr-1" feather="true"></pr-icon>{{ envvar.valueFrom.configMapKeyRef.name }}</a
                     ></span
                   >
                   <span ng-if="envvar.valueFrom.secretKeyRef" data-cy="k8sAppDetail-configName"
                     ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"
-                      ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a
+                      ><pr-icon icon="'file'" class="mr-1" feather="true"></pr-icon>{{ envvar.valueFrom.secretKeyRef.name }}</a
                     ></span
                   >
                 </td>
@@ -389,7 +403,7 @@
                 <td>
                   {{ container.Name }}
                   <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
-                    ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                    ><pr-icon icon="'fa-asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
                       href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
                       target="_blank"
                       >init container</a
@@ -399,10 +413,13 @@
                 <td>
                   {{ volume.fileMountPath }}
                 </td>
-                <td> <i class="fa fa-key" ng-if="volume.configurationKey" aria-hidden="true"></i> {{ volume.configurationKey ? volume.configurationKey : '-' }} </td>
+                <td>
+                  <pr-icon icon="'plus'" class="mr-1" feather="true" ng-if="volume.configurationKey"></pr-icon>
+                  {{ volume.configurationKey ? volume.configurationKey : '-' }}
+                </td>
                 <td>
                   <a ui-sref="kubernetes.configurations.configuration({ name: volume.configurationName, namespace: ctrl.application.ResourcePool })"
-                    ><i class="fa fa-file-code" aria-hidden="true"></i> {{ volume.configurationName }}</a
+                    ><pr-icon icon="'plus'" class="mr-1" feather="true"></pr-icon>{{ volume.configurationName }}</a
                   >
                 </td>
               </tr>
@@ -411,10 +428,13 @@
           <!-- !CONFIGURATIONS -->
 
           <!-- DATA PERSISTENCE -->
-          <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px"> <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px"></i> Data persistence </div>
+          <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px">
+            <pr-icon icon="'database'" class="mr-1" feather="true"></pr-icon>
+            Data persistence
+          </div>
 
           <div class="small text-muted" ng-if="!ctrl.hasPersistedFolders()">
-            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application has no persisted folders.
           </div>
 
@@ -422,7 +442,7 @@
             <div class="small text-muted" style="margin-bottom: 15px">
               Data access policy: <i class="fa {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyIcon }}" aria-hidden="true"></i>
               {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyText }}
-              <portainer-tooltip position="right" message="{{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyTooltip }}"> </portainer-tooltip>
+              <portainer-tooltip position="'right'" message="ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyTooltip"> </portainer-tooltip>
             </div>
 
             <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED">
@@ -437,7 +457,7 @@
                   </td>
                   <td ng-if="volume.PersistentVolumeClaimName">
                     <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName, namespace: ctrl.application.ResourcePool })" data-cy="k8sAppDetail-volClaimName"
-                      ><i class="fa fa-database" aria-hidden="true"></i> {{ volume.PersistentVolumeClaimName }}</a
+                      ><pr-icon icon="'database'" class="mr-1" feather="true"></pr-icon>{{ volume.PersistentVolumeClaimName }}</a
                     >
                   </td>
                   <td ng-if="volume.HostPath"> {{ volume.HostPath }} on host filesystem </td>
@@ -459,7 +479,7 @@
                   <td>
                     {{ container.Name }}
                     <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
-                      ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                      ><pr-icon icon="'fa-asterisk'"></pr-icon> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
                         href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
                         target="_blank"
                         >init container</a
@@ -472,7 +492,7 @@
                   </td>
                   <td ng-if="volume.PersistentVolumeClaimName">
                     <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + container.PodName, namespace: ctrl.application.ResourcePool })">
-                      <i class="fa fa-database" aria-hidden="true"></i> {{ volume.PersistentVolumeClaimName + '-' + container.PodName }}</a
+                      <pr-icon icon="'database'" class="mr-1" feather="true"></pr-icon>{{ volume.PersistentVolumeClaimName + '-' + container.PodName }}</a
                     >
                   </td>
                   <td ng-if="volume.HostPath"> {{ volume.HostPath }} on host filesystem </td>
@@ -490,7 +510,7 @@
     <div class="col-sm-12">
       <kubernetes-containers-datatable
         title-text="Application containers"
-        title-icon="fa-server"
+        title-icon="server"
         dataset="ctrl.allContainers"
         table-key="kubernetes.application.containers"
         is-pod="ctrl.application.ApplicationType === ctrl.KubernetesApplicationTypes.POD"

@@ -20,6 +20,7 @@ angular.module('portainer.app').controller('SettingsController', [
     ];
 
     $scope.state = {
+      isDemo: false,
       actionInProgress: false,
       availableKubeconfigExpiryOptions: [
         {
@@ -58,6 +59,18 @@ angular.module('portainer.app').controller('SettingsController', [
       passwordProtect: false,
       password: '',
       backupFormType: $scope.BACKUP_FORM_TYPES.FILE,
+    };
+
+    $scope.onToggleEnableTelemetry = function onToggleEnableTelemetry(checked) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.enableTelemetry = checked;
+      });
+    };
+
+    $scope.onToggleCustomLogo = function onToggleCustomLogo(checked) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.customLogo = checked;
+      });
     };
 
     $scope.onToggleAutoBackups = function onToggleAutoBackups(checked) {
@@ -142,6 +155,9 @@ angular.module('portainer.app').controller('SettingsController', [
     }
 
     function initView() {
+      const state = StateManager.getState();
+      $scope.state.isDemo = state.application.demoEnvironment.enabled;
+
       SettingsService.settings()
         .then(function success(data) {
           var settings = data;

@@ -1,11 +1,13 @@
 import { useReducer } from 'react';
 
-import { Button } from '@/portainer/components/Button';
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { useUser } from '@/portainer/hooks/useUser';
+import { Icon } from '@/react/components/Icon';
 import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, Role } from '@/portainer/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
+
+import { Table, TableContainer, TableTitle } from '@@/datatables';
+import { Button } from '@@/buttons';
 
 import { ResourceControlType, ResourceId } from '../types';
 import { ResourceControlViewModel } from '../models/ResourceControlViewModel';
@@ -44,9 +46,9 @@ export function AccessControlPanel({
   return (
     <div className="row">
       <div className="col-sm-12">
-        <Widget>
-          <WidgetTitle title="Access control" icon="fa-eye" />
-          <WidgetBody className="no-padding">
+        <TableContainer>
+          <TableTitle label="Access control" icon="eye" featherIcon />
+          <Table className="no-padding">
             <AccessControlPanelDetails
               resourceType={resourceType}
               resourceControl={resourceControl}
@@ -56,7 +58,7 @@ export function AccessControlPanel({
               <div className="row">
                 <div>
                   <Button color="link" onClick={toggleEditMode}>
-                    <i className="fa fa-edit space-right" aria-hidden="true" />
+                    <Icon icon="edit" className="space-right" feather />
                     Change ownership
                   </Button>
                 </div>
@@ -72,8 +74,8 @@ export function AccessControlPanel({
                 onUpdateSuccess={handleUpdateSuccess}
               />
             )}
-          </WidgetBody>
-        </Widget>
+          </Table>
+        </TableContainer>
       </div>
     </div>
   );
@@ -105,9 +107,9 @@ export function AccessControlPanel({
 function useRestrictions(resourceControl?: ResourceControlViewModel) {
   const { user, isAdmin } = useUser();
 
-  const memberships = useUserMembership(user?.Id);
+  const memberships = useUserMembership(user.Id);
 
-  if (!resourceControl || isAdmin || !user) {
+  if (!resourceControl || isAdmin) {
     return {
       isPartOfRestrictedUsers: false,
       isLeaderOfAnyRestrictedTeams: false,

@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create Custom template"></rd-header-title>
-  <rd-header-content> <a ui-sref="docker.templates.custom">Custom Templates</a> &gt; Create Custom template </rd-header-content>
-</rd-header>
+<page-header title="'Create Custom template'" breadcrumbs="[{label:'Custom Templates', link:'docker.templates.custom'}, 'Create Custom template']"> </page-header>
 
 <div class="row" ng-if="!$ctrl.state.loading">
   <div class="col-sm-12">
@@ -25,7 +22,7 @@
                   <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor" ng-change="$ctrl.onChangeMethod()" />
                   <label for="method_editor">
                     <div class="boxselector_header">
-                      <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'edit'" feather="true"></pr-icon>
                       Web editor
                     </div>
                     <p>Use our Web editor</p>
@@ -35,7 +32,7 @@
                   <input type="radio" id="method_upload" ng-model="$ctrl.state.Method" value="upload" ng-change="$ctrl.onChangeMethod()" />
                   <label for="method_upload">
                     <div class="boxselector_header">
-                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'upload'" feather="true"></pr-icon>
                       Upload
                     </div>
                     <p>Upload from your computer</p>
@@ -45,7 +42,7 @@
                   <input type="radio" id="method_repository" ng-model="$ctrl.state.Method" value="repository" ng-change="$ctrl.onChangeMethod()" />
                   <label for="method_repository">
                     <div class="boxselector_header">
-                      <i class="fab fa-git" aria-hidden="true" style="margin-right: 2px"></i>
+                      <pr-icon icon="'git-pull-request'" feather="true"></pr-icon>
                       Repository
                     </div>
                     <p>Use a git repository</p>
@@ -69,7 +66,7 @@
               <div class="col-sm-12">
                 <code-editor
                   identifier="custom-template-creation-editor"
-                  placeholder="# Define or paste the content of your docker-compose file here"
+                  placeholder="# Define or paste the content of your docker compose file here"
                   yml="true"
                   value="$ctrl.formValues.FileContent"
                   on-change="($ctrl.editorUpdate)"
@@ -96,7 +93,24 @@
           </div>
           <!-- !upload -->
           <!-- repository -->
-          <git-form ng-if="$ctrl.state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
+          <git-form ng-if="$ctrl.state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.handleChange)"></git-form>
+
+          <div class="form-group" ng-if="!$ctrl.state.isTemplateValid">
+            <div class="col-sm-12">
+              <div class="small text-warning">
+                <i class="fa fa-exclamation-triangle space-right" aria-hidden="true"></i>
+                Template is invalid.
+              </div>
+            </div>
+          </div>
+
+          <custom-templates-variables-definition-field
+            ng-if="$ctrl.isTemplateVariablesEnabled"
+            value="$ctrl.formValues.Variables"
+            on-change="($ctrl.onVariablesChange)"
+            is-variables-names-from-parent="$ctrl.state.Method === 'editor'"
+          ></custom-templates-variables-definition-field>
+
           <!-- !repository -->
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData"></por-access-control-form>
 
@@ -111,7 +125,8 @@
               || ($ctrl.state.Method === 'editor' && !$ctrl.formValues.FileContent)
               || ($ctrl.state.Method === 'upload' && !$ctrl.formValues.File)
               || ($ctrl.state.Method === 'repository' && ((!$ctrl.formValues.RepositoryURL || !$ctrl.formValues.ComposeFilePathInRepository) || ($ctrl.formValues.RepositoryAuthentication && (!$ctrl.formValues.RepositoryUsername || !$ctrl.formValues.RepositoryPassword))))
-              || !$ctrl.formValues.Title"
+              || !$ctrl.formValues.Title
+              || !$ctrl.state.isTemplateValid"
                 ng-click="$ctrl.createCustomTemplate()"
                 button-spinner="$ctrl.state.actionInProgress"
               >

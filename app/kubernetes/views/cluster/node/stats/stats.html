@@ -1,7 +1,17 @@
-<kubernetes-view-header title="Node stats" state="kubernetes.cluster.node.stats" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.cluster">Cluster</a> &gt; <a ui-sref="kubernetes.cluster.node({name: ctrl.state.transition.nodeName})"> {{ ctrl.state.transition.nodeName }} </a> >
-  {{ ctrl.state.transition.nodeName }}
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Node stats'"
+  breadcrumbs="[
+{ label:'Cluster', link:'kubernetes.cluster' },
+{ 
+  label:ctrl.state.transition.nodeName,
+  link: 'kubernetes.cluster.node', 
+  linkParams:{name: ctrl.state.transition.nodeName}
+},
+ ctrl.state.transition.nodeName,
+ ]"
+  reload="true"
+></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 

@@ -44,7 +44,7 @@
 <div class="form-group">
   <label for="anonymous_mode" class="control-label text-left col-sm-3 col-lg-2">
     Anonymous mode
-    <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
+    <portainer-tooltip message="'Enable this option if the server is configured for Anonymous access.'"></portainer-tooltip>
   </label>
   <div class="col-sm-9 col-lg-10">
     <label class="switch">
@@ -58,17 +58,17 @@
   <div class="form-group">
     <label for="ldap_username" class="col-sm-3 col-lg-2 control-label text-left">
       Reader DN
-      <portainer-tooltip position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
+      <portainer-tooltip message="'Account that will be used to search for users.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="ldap_username" ng-model="$ctrl.settings.ReaderDN" placeholder="{{ $ctrl.clickToSetValues.readerDNPlaceholder }}" />
+      <input type="text" class="form-control" id="ldap_username" ng-model="$ctrl.settings.ReaderDN" placeholder="cn=user,dc=domain,dc=tld" />
     </div>
   </div>
 
   <div class="form-group">
     <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
       Password
-      <portainer-tooltip position="bottom" message="If you do not enter a password, Portainer will leave the current password unchanged."></portainer-tooltip>
+      <portainer-tooltip message="'If you do not enter a password, Portainer will leave the current password unchanged.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="password" class="form-control" id="ldap_password" ng-model="$ctrl.settings.Password" placeholder="password" autocomplete="new-password" />

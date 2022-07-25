@@ -1,10 +1,28 @@
-<kubernetes-view-header title="Application console" state="kubernetes.applications.application.console" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
-  <a ui-sref="kubernetes.applications">Applications</a> &gt;
-  <a ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">{{ ctrl.application.Name }}</a> &gt; Pods &gt;
-  {{ ctrl.podName }} &gt; Containers &gt; {{ ctrl.containerName }} &gt; Console
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Application console'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { 
+      label:ctrl.application.ResourcePool,
+      link: 'kubernetes.resourcePools.resourcePool', 
+      linkParams:{ id: ctrl.application.ResourcePool }
+    },
+    { label:'Applications', link:'kubernetes.applications' },
+    { 
+      label:ctrl.application.Name,
+      link: 'kubernetes.applications.application', 
+      linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
+    },
+     'Pods',
+     ctrl.podName,
+     'Containers',
+     ctrl.containerName,
+     'Console'
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -17,10 +35,10 @@
             <div class="col-sm-12 form-section-title"> Console </div>
             <!-- Command -->
             <div class="form-group">
-              <label for="console_command" class="col-sm-1 control-label text-left">Command</label>
-              <div class="col-sm-10 input-group">
+              <label for="console_command" class="col-sm-3 col-lg-2 control-label text-left">Command</label>
+              <div class="col-sm-8 input-group">
                 <span class="input-group-addon">
-                  <i class="fas fa-terminal" aria-hidden="true"></i>
+                  <pr-icon icon="'terminal'" class="mr-1" feather="true"></pr-icon>
                 </span>
                 <input
                   type="text"

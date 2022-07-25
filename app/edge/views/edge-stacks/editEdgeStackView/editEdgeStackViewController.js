@@ -1,15 +1,15 @@
 import _ from 'lodash-es';
+import { getEnvironments } from '@/portainer/environments/environment.service';
 
 export class EditEdgeStackViewController {
   /* @ngInject */
-  constructor($async, $state, $window, ModalService, EdgeGroupService, EdgeStackService, EndpointService, Notifications) {
+  constructor($async, $state, $window, ModalService, EdgeGroupService, EdgeStackService, Notifications) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
     this.ModalService = ModalService;
     this.EdgeGroupService = EdgeGroupService;
     this.EdgeStackService = EdgeStackService;
-    this.EndpointService = EndpointService;
     this.Notifications = Notifications;
 
     this.stack = null;
@@ -99,8 +99,8 @@ export class EditEdgeStackViewController {
 
   async getPaginatedEndpointsAsync(lastId, limit, search) {
     try {
-      const query = { search, types: [4, 7], endpointIds: this.stackEndpointIds };
-      const { value, totalCount } = await this.EndpointService.endpoints(lastId, limit, query);
+      const query = { search, endpointIds: this.stackEndpointIds };
+      const { value, totalCount } = await getEnvironments({ start: lastId, limit, query });
       const endpoints = _.map(value, (endpoint) => {
         const status = this.stack.Status[endpoint.Id];
         endpoint.Status = status;

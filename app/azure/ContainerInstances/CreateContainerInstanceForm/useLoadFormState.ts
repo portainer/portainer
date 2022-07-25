@@ -4,12 +4,13 @@ import { useEffect } from 'react';
 import * as notifications from '@/portainer/services/notifications';
 import PortainerError from '@/portainer/error';
 import { EnvironmentId } from '@/portainer/environments/types';
-import { Option } from '@/portainer/components/form-components/Input/Select';
 import { getResourceGroups } from '@/azure/services/resource-groups.service';
 import { getSubscriptions } from '@/azure/services/subscription.service';
 import { getContainerInstanceProvider } from '@/azure/services/provider.service';
 import { ContainerInstanceFormValues, Subscription } from '@/azure/types';
 import { parseAccessControlFormData } from '@/portainer/access-control/utils';
+
+import { Option } from '@@/form-components/Input/Select';
 
 import {
   getSubscriptionLocations,

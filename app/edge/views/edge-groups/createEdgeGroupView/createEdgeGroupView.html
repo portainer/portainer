@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create edge group"></rd-header-title>
-  <rd-header-content> <a ui-sref="edge.groups">Edge groups</a> &gt; Add edge group </rd-header-content>
-</rd-header>
+<page-header title="'Create edge group'" breadcrumbs="[{label:'Edge groups', link:'edge.groups'}, 'Add edge group']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -13,9 +10,7 @@
           form-action-label="Add edge group"
           form-action="$ctrl.createGroup"
           groups="$ctrl.endpointGroups"
-          tags="$ctrl.tags"
           model="$ctrl.model"
-          on-change-tags="($ctrl.onChangeTags)"
         ></edge-group-form>
       </rd-widget-body>
     </rd-widget>

@@ -2,12 +2,13 @@ import angular from 'angular';
 
 class KubernetesResourcePoolsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, ModalService, KubernetesResourcePoolService) {
+  constructor($async, $state, Notifications, ModalService, KubernetesResourcePoolService, KubernetesNamespaceService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
+    this.KubernetesNamespaceService = KubernetesNamespaceService;
 
     this.onInit = this.onInit.bind(this);
     this.getResourcePools = this.getResourcePools.bind(this);
@@ -20,7 +21,19 @@ class KubernetesResourcePoolsController {
     let actionCount = selectedItems.length;
     for (const pool of selectedItems) {
       try {
-        await this.KubernetesResourcePoolService.delete(pool);
+        const isTerminating = pool.Namespace.Status === 'Terminating';
+        if (isTerminating) {
+          const ns = await this.KubernetesNamespaceService.getJSONAsync(pool.Namespace.Name);
+          ns.$promise.then(async (namespace) => {
+            const n = JSON.parse(namespace.data);
+            if (n.spec && n.spec.finalizers) {
+              delete n.spec.finalizers;
+            }
+            await this.KubernetesNamespaceService.updateFinalizeAsync(n);
+          });
+        } else {
+          await this.KubernetesResourcePoolService.delete(pool);
+        }
         this.Notifications.success('Namespace successfully removed', pool.Namespace.Name);
         const index = this.resourcePools.indexOf(pool);
         this.resourcePools.splice(index, 1);
@@ -36,14 +49,15 @@ class KubernetesResourcePoolsController {
   }
 
   removeAction(selectedItems) {
-    this.ModalService.confirmDeletion(
-      'Do you want to remove the selected namespace(s)? All the resources associated to the selected namespace(s) will be removed too.',
-      (confirmed) => {
-        if (confirmed) {
-          return this.$async(this.removeActionAsync, selectedItems);
-        }
+    const isTerminatingNS = selectedItems.some((pool) => pool.Namespace.Status === 'Terminating');
+    const message = isTerminatingNS
+      ? 'At least one namespace is in a terminating state. For terminating state namespaces, you may continue and force removal, but doing so without having properly cleaned up may lead to unstable and unpredictable behavior. Are you sure you wish to proceed?'
+      : 'Do you want to remove the selected namespace(s)? All the resources associated to the selected namespace(s) will be removed too. Are you sure you wish to proceed?';
+    this.ModalService.confirmWithTitle(isTerminatingNS ? 'Force namespace removal' : 'Are you sure?', message, (confirmed) => {
+      if (confirmed) {
+        return this.$async(this.removeActionAsync, selectedItems);
       }
-    );
+    });
   }
 
   async getResourcePoolsAsync() {

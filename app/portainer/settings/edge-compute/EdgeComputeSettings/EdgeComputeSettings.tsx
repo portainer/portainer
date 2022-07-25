@@ -1,16 +1,16 @@
 import { Formik, Form } from 'formik';
 
-import { Switch } from '@/portainer/components/form-components/SwitchField/Switch';
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
-import { TextTip } from '@/portainer/components/Tip/TextTip';
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
-import { FormSectionTitle } from '@/portainer/components/form-components/FormSectionTitle';
+
+import { Switch } from '@@/form-components/SwitchField/Switch';
+import { FormControl } from '@@/form-components/FormControl';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { LoadingButton } from '@@/buttons/LoadingButton';
+import { TextTip } from '@@/Tip/TextTip';
+import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 
 import { Settings } from '../types';
 
-import styles from './EdgeComputeSettings.module.css';
 import { validationSchema } from './EdgeComputeSettings.validation';
 
 export interface FormValues {
@@ -107,16 +107,15 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                   tooltip="Interval used by default by each Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
                 />
 
-                <div className="form-group">
+                <div className="form-group mt-5">
                   <div className="col-sm-12">
                     <LoadingButton
                       disabled={!isValid || !dirty}
-                      dataCy="settings-edgeComputeButton"
-                      className={styles.saveButton}
+                      data-cy="settings-edgeComputeButton"
                       isLoading={isSubmitting}
                       loadingText="Saving settings..."
                     >
-                      Save Settings
+                      Save settings
                     </LoadingButton>
                   </div>
                 </div>

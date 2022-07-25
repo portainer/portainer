@@ -3,6 +3,7 @@ export const datatableTitlebar = {
     icon: '@',
     title: '@',
     feature: '@',
+    featherIcon: '<',
   },
   templateUrl: './datatable-titlebar.html',
 };

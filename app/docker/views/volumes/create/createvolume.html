@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create volume"></rd-header-title>
-  <rd-header-content> <a ui-sref="docker.volumes">Volumes</a> &gt; Add volume </rd-header-content>
-</rd-header>
+<page-header title="'Create volume'" breadcrumbs="[{label:'Volumes', link:'docker.volumes'}, 'Add volume']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -33,10 +30,7 @@
             <div class="col-sm-12" style="margin-top: 5px">
               <label class="control-label text-left">
                 Driver options
-                <portainer-tooltip
-                  position="bottom"
-                  message="Driver options are specific to the selected driver. Please refer to the selected driver documentation."
-                ></portainer-tooltip>
+                <portainer-tooltip message="'Driver options are specific to the selected driver. Please refer to the selected driver documentation.'"></portainer-tooltip>
               </label>
               <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDriverOption()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> add driver option

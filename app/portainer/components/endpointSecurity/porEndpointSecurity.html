@@ -4,7 +4,7 @@
     <div class="col-sm-12">
       <label for="tls" class="control-label text-left">
         TLS
-        <portainer-tooltip position="bottom" message="Enable this option if you need to connect to the Docker environment with TLS."></portainer-tooltip>
+        <portainer-tooltip message="'Enable this option if you need to connect to the Docker environment with TLS.'"></portainer-tooltip>
       </label>
       <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.formData.TLS" /><i></i> </label>
     </div>
@@ -28,7 +28,7 @@
         <input type="radio" id="tls_client_ca" ng-model="$ctrl.formData.TLSMode" value="tls_client_ca" />
         <label for="tls_client_ca">
           <div class="boxselector_header">
-            <i class="fa fa-shield-alt" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'shield'" feather="true"></pr-icon>
             TLS with server and client verification
           </div>
           <p>Use client certificates and server verification</p>
@@ -38,7 +38,7 @@
         <input type="radio" id="tls_client_noca" ng-model="$ctrl.formData.TLSMode" value="tls_client_noca" />
         <label for="tls_client_noca">
           <div class="boxselector_header">
-            <i class="fa fa-shield-alt" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'shield'" feather="true"></pr-icon>
             TLS with client verification only
           </div>
           <p>Use client certificates without server verification</p>
@@ -48,7 +48,7 @@
         <input type="radio" id="tls_ca" ng-model="$ctrl.formData.TLSMode" value="tls_ca" />
         <label for="tls_ca">
           <div class="boxselector_header">
-            <i class="fa fa-shield-alt" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'shield'" feather="true"></pr-icon>
             TLS with server verification only
           </div>
           <p>Only verify the server certificate</p>
@@ -58,7 +58,7 @@
         <input type="radio" id="tls_only" ng-model="$ctrl.formData.TLSMode" value="tls_only" />
         <label for="tls_only">
           <div class="boxselector_header">
-            <i class="fa fa-shield-alt" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'shield'" feather="true"></pr-icon>
             TLS only
           </div>
           <p>No server/client verification</p>

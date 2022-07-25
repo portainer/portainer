@@ -1,6 +1,6 @@
 import { EndpointGroupDefaultModel } from '../../../models/group';
 
-angular.module('portainer.app').controller('CreateGroupController', function CreateGroupController($async, $scope, $state, GroupService, TagService, Notifications) {
+angular.module('portainer.app').controller('CreateGroupController', function CreateGroupController($async, $scope, $state, GroupService, Notifications) {
   $scope.state = {
     actionInProgress: false,
   };
@@ -28,31 +28,10 @@ angular.module('portainer.app').controller('CreateGroupController', function Cre
       });
   };
 
-  $scope.onCreateTag = function onCreateTag(tagName) {
-    return $async(onCreateTagAsync, tagName);
-  };
-
-  async function onCreateTagAsync(tagName) {
-    try {
-      const tag = await TagService.createTag(tagName);
-      $scope.availableTags = $scope.availableTags.concat(tag);
-      $scope.model.TagIds = $scope.model.TagIds.concat(tag.Id);
-    } catch (err) {
-      Notifications.error('Failue', err, 'Unable to create tag');
-    }
-  }
-
   function initView() {
-    TagService.tags()
-      .then((tags) => {
-        $scope.availableTags = tags;
-        $scope.associatedEndpoints = [];
-        $scope.model = new EndpointGroupDefaultModel();
-        $scope.loaded = true;
-      })
-      .catch((err) => {
-        Notifications.error('Failure', err, 'Unable to retrieve tags');
-      });
+    $scope.associatedEndpoints = [];
+    $scope.model = new EndpointGroupDefaultModel();
+    $scope.loaded = true;
   }
 
   initView();

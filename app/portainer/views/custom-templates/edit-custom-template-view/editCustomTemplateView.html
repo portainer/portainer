@@ -1,11 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Edit Custom Template">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.templates.custom.edit({id:$ctrl.formValues.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content> <a ui-sref="docker.templates.custom">Custom templates</a> &gt; {{ $ctrl.formValues.Title }} </rd-header-content>
-</rd-header>
+<page-header title="'Edit Custom Template'" breadcrumbs="[{label:'Custom templates', link:'docker.templates.custom'}, $ctrl.formValues.Title]" reload="true"> </page-header>
 
 <div class="row" ng-if="$ctrl.formValues">
   <div class="col-sm-12">
@@ -27,7 +20,7 @@
             <div class="col-sm-12">
               <code-editor
                 identifier="custom-template-creation-editor"
-                placeholder="# Define or paste the content of your docker-compose file here"
+                placeholder="# Define or paste the content of your docker compose file here"
                 yml="true"
                 value="$ctrl.formValues.FileContent"
                 on-change="($ctrl.editorUpdate)"
@@ -35,6 +28,22 @@
             </div>
           </div>
           <!-- !web-editor -->
+
+          <div class="form-group" ng-if="!$ctrl.state.isTemplateValid">
+            <div class="col-sm-12">
+              <div class="small text-warning">
+                <i class="fa fa-exclamation-triangle space-right" aria-hidden="true"></i>
+                Template is invalid.
+              </div>
+            </div>
+          </div>
+
+          <custom-templates-variables-definition-field
+            ng-if="$ctrl.isTemplateVariablesEnabled"
+            value="$ctrl.formValues.Variables"
+            on-change="($ctrl.onVariablesChange)"
+            is-variables-names-from-parent="true"
+          ></custom-templates-variables-definition-field>
 
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData" resource-control="$ctrl.formValues.ResourceControl"></por-access-control-form>
 
@@ -46,7 +55,9 @@
                 class="btn btn-primary btn-sm"
                 ng-disabled="$ctrl.actionInProgress || customTemplateForm.$invalid
                   || !$ctrl.formValues.Title
-                  || !$ctrl.formValues.FileContent"
+                  || !$ctrl.formValues.FileContent
+                  || !$ctrl.state.isTemplateValid
+                  "
                 ng-click="$ctrl.submitAction()"
                 button-spinner="$ctrl.actionInProgress"
               >

@@ -1,4 +1,4 @@
-<kubernetes-view-header title="Application list" state="kubernetes.applications" view-ready="ctrl.state.viewReady"> Applications </kubernetes-view-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Application list'" breadcrumbs="['Applications']" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -9,7 +9,7 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading> <i class="fa fa-laptop-code space-right" aria-hidden="true"></i> Applications </uib-tab-heading>
+              <uib-tab-heading class="vertical-center"> <pr-icon icon="'box'" feather="true"></pr-icon> Applications </uib-tab-heading>
               <kubernetes-applications-datatable
                 dataset="ctrl.state.applications"
                 table-key="kubernetes.applications"
@@ -23,12 +23,12 @@
               </kubernetes-applications-datatable>
             </uib-tab>
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
-              <uib-tab-heading> <i class="fa fa-exchange-alt space-right" aria-hidden="true"></i> Port mappings </uib-tab-heading>
+              <uib-tab-heading class="vertical-center"> <pr-icon icon="'repeat'" feather="true"></pr-icon> Port mappings </uib-tab-heading>
               <kubernetes-applications-ports-datatable dataset="ctrl.state.ports" table-key="kubernetes.applications.ports" order-by="Name" refresh-callback="ctrl.getApplications">
               </kubernetes-applications-ports-datatable>
             </uib-tab>
             <uib-tab index="2" classes="btn-sm" select="ctrl.selectTab(2)">
-              <uib-tab-heading> <i class="fa fa-th-list space-right" aria-hidden="true"></i> Stacks </uib-tab-heading>
+              <uib-tab-heading class="vertical-center"> <pr-icon icon="'list'" feather="true"></pr-icon> Stacks </uib-tab-heading>
               <kubernetes-applications-stacks-datatable
                 dataset="ctrl.state.stacks"
                 table-key="kubernetes.applications.stacks"

@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter-VariableFont.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  select {
+    font-family: Inter, Arial, Helvetica, sans-serif;
+  }
+}
+
+html {
+  font-size: 16px;
+  overflow-y: scroll;
+}
+
+body {
+  background: var(--bg-body-color);
+  font-family: 'Inter';
+  color: var(--text-body-color) !important;
+}
+
 html,
 body,
 #page-wrapper,
@@ -63,11 +86,11 @@ body,
 }
 
 .form-section-title {
-  border-bottom: 1px solid var(--border-form-section-title-color);
   margin-top: 5px;
   margin-bottom: 15px;
   color: var(--text-form-section-title-color);
   padding-left: 0;
+  font-weight: 500;
 }
 
 .form-horizontal .control-label.text-left {
@@ -145,7 +168,7 @@ a[ng-click] {
 }
 
 .fa.red-icon {
-  color: #ae2323;
+  color: #f04438;
 }
 
 .fa.orange-icon {
@@ -217,12 +240,13 @@ a[ng-click] {
 }
 
 .blocklist-item {
-  padding: 0.7rem;
-  margin-bottom: 0.7rem;
+  padding: 10px;
+  margin-bottom: 10px;
   cursor: pointer;
-  border: 1px solid var(--border-blocklist-color);
-  border-radius: 2px;
+  border: 1px solid var(--border-blocklist);
+  border-radius: 8px;
   box-shadow: var(--shadow-box-color);
+  margin-right: 10px;
 }
 
 .blocklist-item--disabled {
@@ -237,6 +261,8 @@ a[ng-click] {
 }
 
 .blocklist-item:hover {
+  @apply border border-blue-7;
+
   background-color: var(--bg-blocklist-hover-color);
   color: var(--text-blocklist-hover-color);
 }
@@ -375,12 +401,13 @@ a[ng-click] {
 }
 
 .panel-body {
-  padding-top: 30px;
-  background-color: var(--white-color) fff;
+  padding: 30px 25px;
+  background-color: var(--white-color);
+  border-radius: 8px;
 }
 
 .user-box {
-  margin-right: 25px;
+  margin-right: 15px;
 }
 
 .select-endpoint {
@@ -810,12 +837,6 @@ json-tree .branch-preview {
 }
 /* !uib-typeahead override */
 
-.kubectl-shell {
-  display: block;
-  text-align: center;
-  padding-bottom: 5px;
-}
-
 .no-margin {
   margin: 0 !important;
 }
@@ -837,4 +858,13 @@ json-tree .branch-preview {
 /* used for bootbox prompt with inputType radio */
 .form-check.radio {
   margin-left: 15px;
+}
+
+.inline-text {
+  display: inline;
+  position: absolute;
+  font-family: 'Montserrat';
+  font-size: smaller;
+  margin-left: 5px;
+  margin-right: 5px;
 }

@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create Custom template"></rd-header-title>
-  <rd-header-content> <a ui-sref="kubernetes.templates.custom">Custom Templates</a> &gt; Create Custom template </rd-header-content>
-</rd-header>
+<page-header title="'Create Custom template'" breadcrumbs="[{label:'Custom Templates', link:'kubernetes.templates.custom'}, 'Create Custom template']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -36,6 +33,13 @@
             <file-upload-description> You can upload a Manifest file from your computer. </file-upload-description>
           </file-upload-form>
 
+          <custom-templates-variables-definition-field
+            ng-if="$ctrl.isTemplateVariablesEnabled"
+            value="$ctrl.formValues.Variables"
+            on-change="($ctrl.onVariablesChange)"
+            is-variables-names-from-parent="$ctrl.state.method === 'editor'"
+          ></custom-templates-variables-definition-field>
+
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData"></por-access-control-form>
 
           <!-- actions -->
@@ -45,7 +49,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="$ctrl.state.actionInProgress || $ctrl.form.$invalid || ($ctrl.state.method === 'editor' && !$ctrl.formValues.FileContent)"
+                ng-disabled="!$ctrl.state.isTemplateValid ||$ctrl.state.actionInProgress || $ctrl.form.$invalid || ($ctrl.state.method === 'editor' && !$ctrl.formValues.FileContent)"
                 ng-click="$ctrl.createCustomTemplate()"
                 button-spinner="$ctrl.state.actionInProgress"
               >

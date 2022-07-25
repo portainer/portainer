@@ -7,7 +7,7 @@ module.exports = merge(commonConfig, {
   module: {
     rules: [
       {
-        test: /\.(woff|woff2|eot|ttf|svg|ico|png|jpg|gif)$/,
+        test: /\.(woff|woff2|eot|ttf|ico)$/,
         type: 'asset/resource',
       },
     ],

@@ -100,6 +100,25 @@ export function confirmDeletion(message: string, callback: ConfirmCallback) {
   });
 }
 
+export function confirmWithTitle(
+  title: string,
+  message: string,
+  callback: ConfirmCallback
+) {
+  const messageSanitized = sanitize(message);
+  confirm({
+    title: sanitize(title),
+    message: messageSanitized,
+    buttons: {
+      confirm: {
+        label: 'Remove',
+        className: 'btn-danger',
+      },
+    },
+    callback,
+  });
+}
+
 export function confirmDetachment(message: string, callback: ConfirmCallback) {
   const messageSanitized = sanitize(message);
   confirm({
@@ -142,7 +161,7 @@ export function confirmUpdate(message: string, callback: ConfirmCallback) {
     buttons: {
       confirm: {
         label: 'Update',
-        className: 'btn-warning',
+        className: 'btn-primary',
       },
     },
     callback,

@@ -16,24 +16,12 @@ angular.module('portainer.app').factory('EndpointService', [
       return Endpoints.get({ id: endpointID }).$promise;
     };
 
-    service.endpoints = function (start, limit, { search, types, tagIds, endpointIds, tagsPartialMatch } = {}) {
-      if (tagIds && !tagIds.length) {
-        return Promise.resolve({ value: [], totalCount: 0 });
-      }
-      return Endpoints.query({ start, limit, search, types: JSON.stringify(types), tagIds: JSON.stringify(tagIds), endpointIds: JSON.stringify(endpointIds), tagsPartialMatch })
-        .$promise;
-    };
-
     service.snapshotEndpoints = function () {
       return Endpoints.snapshots({}, {}).$promise;
     };
 
     service.snapshotEndpoint = function (endpointID) {
       return Endpoints.snapshot({ id: endpointID }, {}).$promise;
-    };
-
-    service.endpointsByGroup = function (start, limit, search, groupId) {
-      return Endpoints.query({ start, limit, search, groupId }).$promise;
     };
 
     service.updateAccess = function (id, userAccessPolicies, teamAccessPolicies) {

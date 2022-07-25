@@ -8,17 +8,15 @@ import {
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 
-import { Button } from '@/portainer/components/Button';
-import { Table } from '@/portainer/components/datatables/components';
-import {
-  SearchBar,
-  useSearchBarState,
-} from '@/portainer/components/datatables/components/SearchBar';
-import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
-import { PaginationControls } from '@/portainer/components/pagination-controls';
 import { Environment } from '@/portainer/environments/types';
-import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
 import { notifySuccess } from '@/portainer/services/notifications';
+
+import { Button } from '@@/buttons';
+import { Table } from '@@/datatables';
+import { SearchBar, useSearchBarState } from '@@/datatables/SearchBar';
+import { SelectedRowsCount } from '@@/datatables/SelectedRowsCount';
+import { PaginationControls } from '@@/PaginationControls';
+import { useTableSettings } from '@@/datatables/useTableSettings';
 
 import { useAssociateDeviceMutation } from '../queries';
 

@@ -1,5 +1,6 @@
 import { Edition, FeatureId, FeatureState } from './enums';
 
+export const isBE = process.env.PORTAINER_EDITION === 'BE';
 interface ServiceState {
   currentEdition: Edition;
   features: Record<FeatureId, Edition>;
@@ -16,6 +17,9 @@ export async function init(edition: Edition) {
   const features = {
     [FeatureId.K8S_RESOURCE_POOL_LB_QUOTA]: Edition.BE,
     [FeatureId.K8S_RESOURCE_POOL_STORAGE_QUOTA]: Edition.BE,
+    [FeatureId.K8S_CREATE_FROM_KUBECONFIG]: Edition.BE,
+    [FeatureId.KAAS_PROVISIONING]: Edition.BE,
+    [FeatureId.NOMAD]: Edition.BE,
     [FeatureId.ACTIVITY_AUDIT]: Edition.BE,
     [FeatureId.EXTERNAL_AUTH_LDAP]: Edition.BE,
     [FeatureId.HIDE_INTERNAL_AUTH]: Edition.BE,
@@ -30,6 +34,7 @@ export async function init(edition: Edition) {
     [FeatureId.STACK_PULL_IMAGE]: Edition.BE,
     [FeatureId.STACK_WEBHOOK]: Edition.BE,
     [FeatureId.CONTAINER_WEBHOOK]: Edition.BE,
+    [FeatureId.POD_SECURITY_POLICY_CONSTRAINT]: Edition.BE,
   };
 
   state.currentEdition = currentEdition;

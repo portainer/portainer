@@ -40,9 +40,15 @@ angular.module('portainer.app').controller('GenericDatatableController', [
       _.map(this.state.filteredDataSet, (item) => (item.Checked = false));
     };
 
-    this.onTextFilterChange = function () {
-      DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+    this.onTextFilterChangeGeneric = onTextFilterChangeGeneric;
+
+    this.onTextFilterChange = function onTextFilterChange() {
+      return this.onTextFilterChangeGeneric();
     };
+
+    function onTextFilterChangeGeneric() {
+      DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+    }
 
     this.changeOrderBy = function changeOrderBy(orderField) {
       this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;

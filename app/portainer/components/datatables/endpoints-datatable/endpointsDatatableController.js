@@ -34,6 +34,10 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       this.paginationChanged();
     };
 
+    this.setReferrer = function () {
+      window.localStorage.setItem('wizardReferrer', 'environments');
+    };
+
     /**
      * Overridden
      */

@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Authentication settings"></rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.settings">Settings</a> &gt; Authentication </rd-header-content>
-</rd-header>
+<page-header title="'Authentication settings'" breadcrumbs="[{label:'Settings', link:'portainer.settings'}, 'Authentication']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -13,7 +10,7 @@
           <div class="form-group">
             <label for="user_timeout" class="col-sm-2 control-label text-left">
               Session lifetime
-              <portainer-tooltip message="Time before users are forced to relogin."></portainer-tooltip>
+              <portainer-tooltip message="'Time before users are forced to relogin.'"></portainer-tooltip>
             </label>
             <div class="col-sm-10">
               <select
@@ -25,13 +22,22 @@
             </div>
           </div>
           <div class="form-group">
-            <span class="col-sm-12 text-muted small"> Changing from default is only recommended if you have additional layers of authentication in front of Portainer. </span>
+            <span class="col-sm-12 text-muted small"
+              ><pr-icon icon="'alert-triangle'" feather="true" class-name="'icon-sm icon-yellow'"></pr-icon> Changing from default is only recommended if you have additional layers
+              of authentication in front of Portainer.
+            </span>
           </div>
 
           <div class="col-sm-12 form-section-title"> Authentication method </div>
           <box-selector radio-name="'authOptions'" value="authMethod" options="authOptions" on-change="(onChangeAuthMethod)"></box-selector>
 
-          <internal-auth ng-if="authenticationMethodSelected(1)" on-save-settings="(saveSettings)" save-button-state="state.actionInProgress"></internal-auth>
+          <internal-auth
+            ng-if="authenticationMethodSelected(1)"
+            on-save-settings="(saveSettings)"
+            is-loading="state.actionInProgress"
+            value="settings.InternalAuthSettings"
+            on-change="(onChangePasswordLength)"
+          ></internal-auth>
 
           <ldap-settings
             ng-if="authenticationMethodSelected(2)"

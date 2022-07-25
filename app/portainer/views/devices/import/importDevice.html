@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="FDO Device Configuration"></rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.endpoints">Environments</a> &gt; Import FDO Device </rd-header-content>
-</rd-header>
+<page-header title="'FDO Device Configuration'" breadcrumbs="[{label:'Environments', link:'portainer.endpoints'}, 'Import FDO Device']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -126,7 +123,7 @@
             <div class="form-group">
               <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
                 Portainer server URL
-                <portainer-tooltip position="bottom" message="URL of the Portainer instance that the agent will use to initiate the communications."></portainer-tooltip>
+                <portainer-tooltip message="'URL of the Portainer instance that the agent will use to initiate the communications.'"></portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
                 <input
@@ -188,12 +185,9 @@
               </div>
             </div>
             <!-- !group -->
-            <!-- tags -->
-            <div class="form-group">
-              <tag-selector ng-if="formValues && availableTags" tags="availableTags" model="formValues.TagIds" allow-create="state.allowCreateTag" on-create="(onCreateTag)">
-              </tag-selector>
-            </div>
-            <!-- !tags -->
+
+            <tag-selector ng-if="formValues" value="formValues.TagIds" allow-create="state.allowCreateTag" on-change="(onChangeTags)"> </tag-selector>
+
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">

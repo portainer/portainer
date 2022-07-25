@@ -1,0 +1,360 @@
+/* Label, Section Title */
+
+.control-label {
+  color: var(--ui-gray-7);
+  font-weight: 500;
+}
+
+.form-section-title {
+  color: var(--ui-gray-9);
+  font-size: 16px;
+}
+
+.vertical-center {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.justify-left {
+  justify-content: left;
+}
+
+.blue {
+  background: var(--bg-dashboard-item) !important;
+}
+
+.form-control {
+  border-radius: 5px;
+}
+
+/* Input Group Addon */
+.input-group-addon:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.input-group .form-control:not(:first-child):not(:last-child) {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.input-group-btn:last-child .btn {
+  margin-left: 5px;
+  border-radius: 5px;
+}
+
+/* Toggle switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 25px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch input[type='checkbox']:disabled + .slider {
+  background-color: var(--ui-gray-3);
+}
+
+/* Toggle */
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-switch-box-color);
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 19px;
+  width: 19px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--white-color);
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: var(--ui-blue-8);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--ui-blue-8);
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(17px);
+  -ms-transform: translateX(17px);
+  transform: translateX(17px);
+}
+
+.slider.round {
+  border-radius: 25px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Checkbox */
+
+.md-checkbox input[type='checkbox']:enabled + label:before {
+  background-color: var(--bg-checkbox) !important;
+  border: 1px solid var(--border-checkbox) !important;
+  border-radius: 5px;
+}
+
+.md-checkbox input[type='checkbox']:disabled + label:before {
+  border-radius: 5px;
+}
+
+.md-checkbox input[type='checkbox']:checked + label:before {
+  background-color: var(--ui-blue-8) !important;
+  color: var(--ui-blue-8) !important;
+  border: 1px solid var(--ui-blue-8) !important;
+}
+
+.md-checkbox input[type='checkbox']:checked + .checkmark {
+  border-color: var(--grey-6);
+  background-color: var(--bg-checkbox);
+}
+
+/* Slider */
+
+.rzslider .rz-pointer {
+  background-color: var(--white-color);
+  border: 3px solid var(--ui-blue-8);
+  width: 25px;
+  height: 25px;
+  top: -10px;
+}
+
+.rzslider .rz-bar {
+  background-color: var(--ui-gray-5);
+  height: 8px;
+  border-radius: 5px;
+}
+
+.rzslider .rz-selection {
+  background-color: var(--ui-blue-8);
+}
+
+.rzslider .rz-pointer:after {
+  display: none;
+}
+
+/* Widget */
+
+.widget .widget-icon i {
+  color: var(--ui-blue-8);
+}
+
+.widget .widget-body table thead {
+  border-top: 1px solid var(--border-table-color);
+}
+
+/* Toaster */
+
+#toast-container > .toast-success {
+  background-image: url(../images/icon-success.svg) !important;
+  background-position: top 20px left 20px;
+}
+
+#toast-container > .toast-error {
+  background-image: url(../images/icon-error.svg) !important;
+  background-position: top 20px left 20px;
+}
+
+#toast-container > .toast-warning {
+  background-image: url(../images/icon-warning.svg) !important;
+}
+
+.toast-success .toast-progress {
+  background-color: var(--ui-success-7);
+}
+.toast-warning .toast-progress {
+  background-color: var(--ui-warning-6);
+}
+.toast-error .toast-progress {
+  background-color: var(--ui-error-8);
+}
+
+#toast-container > div {
+  color: var(--ui-gray-7);
+  background-color: var(--white-color);
+  border-radius: 8px;
+  padding: 20px 20px 20px 80px;
+  width: 300px;
+  opacity: 1;
+  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  filter: alpha(opacity=100);
+}
+
+#toast-container > div:hover {
+  -moz-box-shadow: 0 0 12px var(--ui-gray-7);
+  -webkit-box-shadow: 0 0 12px var(--ui-gray-7);
+  box-shadow: 0 0 12px var(--ui-gray-7);
+}
+
+.toast-close-button {
+  color: var(--black-color);
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.4;
+  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
+  filter: alpha(opacity=40);
+}
+
+.toast-close-button:hover,
+.toast-close-button:focus {
+  color: var(--black-color);
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.6;
+  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+  filter: alpha(opacity=60);
+}
+
+.toast-title {
+  color: var(--black-color);
+  padding: 10px 0px;
+}
+
+/* Modal */
+
+.modal-dialog {
+  width: 450px;
+}
+
+.modal-content {
+  padding: 55px 20px 20px 20px;
+  background-image: url(../images/icon-warning.svg);
+  background-repeat: no-repeat;
+  background-position: top 10px left 10px;
+}
+
+.modal-header {
+  padding: 10px 0px 10px 0px;
+  border-bottom: none;
+}
+
+.modal-header .close {
+  margin-top: -40px;
+}
+
+.modal-header .modal-title {
+  font-weight: bold;
+}
+
+.modal-body {
+  padding: 10px 0px;
+  border-bottom: none;
+}
+
+.modal-body .bootbox-body {
+  font-size: 12px;
+  color: var(--text-bootbox);
+}
+
+.modal-footer {
+  padding: 10px 0px;
+  border-top: none;
+  display: flex;
+}
+
+.modal-footer .bootbox-cancel {
+  width: 100%;
+}
+
+.modal-footer .bootbox-accept {
+  width: 100%;
+}
+
+.bootbox-checkbox-list {
+  border: 0px;
+}
+
+/* Databatle Setting Menu */
+
+.tableMenu {
+  border: 1px solid var(--border-bootbox);
+  border-radius: 8px;
+}
+
+[data-reach-menu-list],
+[data-reach-menu-items] {
+  background: none;
+}
+
+.dropdown-menu {
+  border-radius: 8px;
+}
+.dropdown-menu .tableMenu {
+  border: 0px;
+}
+
+/* Status Indicator Inside Table Section Label Style */
+.table .label {
+  border-radius: 8px !important;
+}
+
+.table .label .label-danger {
+  background-color: var(--ui-error-8);
+}
+
+.table .label .label-warn {
+  background-color: var(--ui-warning-8);
+}
+
+.table .label .label-success {
+  background-color: var(--ui-success-7);
+}
+
+/* Required Label with asterisk */
+
+.required:after {
+  content: '*';
+  color: var(--ui-error-9);
+}
+
+.control-label {
+  @apply inline-flex items-center;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 4px;
+  width: 50%;
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.progress .progress-bar {
+  background-color: var(--ui-blue-8);
+}
+
+.progress + span {
+  display: inline-block;
+  font-size: 85%;
+  margin-left: 10px;
+}

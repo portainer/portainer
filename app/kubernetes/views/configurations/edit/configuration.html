@@ -1,8 +1,19 @@
-<kubernetes-view-header title="Configuration details" state="kubernetes.configurations.configuration" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.configuration.Namespace })">{{ ctrl.configuration.Namespace }}</a> &gt;
-  <a ui-sref="kubernetes.configurations">ConfigMaps and Secrets</a> &gt; {{ ctrl.configuration.Name }}
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Configuration details'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { 
+      label:ctrl.configuration.Namespace,
+      link: 'kubernetes.resourcePools.resourcePool', 
+      linkParams:{ id: ctrl.configuration.Namespace }
+    },
+    { label:'ConfigMaps and Secrets', link:'kubernetes.configurations' },
+    ctrl.configuration.Name,
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 

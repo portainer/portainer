@@ -1,0 +1,15 @@
+<ng-form class="form-horizontal" name="$ctrl.optionForm">
+  <div class="form-group">
+    <div class="col-sm-12 form-section-title" style="margin-top: 10px; margin-left: 15px; width: 98%"> Options </div>
+
+    <!-- Prune service -->
+    <div class="col-sm-12">
+      <label class="control-label text-left">
+        Prune services
+        <portainer-tooltip position="'top'" message="'Prune services that are no longer referenced.'"></portainer-tooltip>
+      </label>
+      <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.ngModel.Prune" ng-change="$ctrl.switchPruneService()" /><i></i> </label>
+    </div>
+    <!-- !Prune service -->
+  </div>
+</ng-form>

@@ -1,8 +1,20 @@
 <div class="page white-space-normal">
   {{ $ctrl.titleText }}
   <span class="header_title_content" ng-transclude></span>
-  <span class="pull-right user-box" ng-if="$ctrl.username && $ctrl.display">
-    <i class="fa fa-user-circle" aria-hidden="true"></i>
-    {{ $ctrl.username }}
-  </span>
 </div>
+
+<span class="pull-right myaccount-container" uib-dropdown on-toggle="toggled(open)">
+  <a href class="myaccount-dropdown" uib-dropdown-toggle data-cy="userMenu-button" aria-label="User menu toggle">
+    <span class="pull-right user-box" ng-if="$ctrl.username">
+      <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $ctrl.username }} <i class="fa fa-angle-down myaccount-icon" aria-hidden="true"></i>
+    </span>
+  </a>
+  <ul class="dropdown-menu" uib-dropdown-menu aria-label="User Menu" data-cy="userMenu">
+    <li>
+      <a ui-sref="portainer.account" data-cy="userMenu-myAccount">My account</a>
+    </li>
+    <li>
+      <a ui-sref="portainer.logout({performApiLogout: true})" data-cy="userMenu-logOut">Log out</a>
+    </li>
+  </ul>
+</span>

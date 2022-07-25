@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query';
-import _ from 'lodash-es';
+import _ from 'lodash';
 
 import { useUIState } from '@/portainer/hooks/UIStateProvider';
 
-import { InformationPanel } from '../components/InformationPanel/InformationPanel';
+import { InformationPanel } from '@@/InformationPanel';
 
 import { getMotd } from './home.service';
 

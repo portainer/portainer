@@ -1,4 +1,4 @@
-import { buildOption } from '@/portainer/components/BoxSelector';
+import { options } from './options';
 
 export default class ThemeSettingsController {
   /* @ngInject */
@@ -20,8 +20,12 @@ export default class ThemeSettingsController {
       } else {
         this.ThemeManager.setTheme(theme);
       }
+
       this.state.userTheme = theme;
-      await this.UserService.updateUserTheme(this.state.userId, this.state.userTheme);
+      if (!this.state.isDemo) {
+        await this.UserService.updateUserTheme(this.state.userId, this.state.userTheme);
+      }
+
       this.Notifications.success('Success', 'User theme successfully updated');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update user theme');
@@ -30,18 +34,16 @@ export default class ThemeSettingsController {
 
   $onInit() {
     return this.$async(async () => {
+      const state = this.StateManager.getState();
+
       this.state = {
         userId: null,
         userTheme: '',
         defaultTheme: 'auto',
+        isDemo: state.application.demoEnvironment.enabled,
       };
 
-      this.state.availableThemes = [
-        buildOption('light', 'fas fa-sun', 'Light Theme', 'Default color mode', 'light'),
-        buildOption('dark', 'fas fa-moon', 'Dark Theme', 'Dark color mode', 'dark'),
-        buildOption('highcontrast', 'fas fa-adjust', 'High Contrast', 'High contrast color mode', 'highcontrast'),
-        buildOption('auto', 'fas fa-sync-alt', 'Auto', 'Sync with system theme', 'auto'),
-      ];
+      this.state.availableThemes = options;
 
       try {
         this.state.userId = await this.Authentication.getUserDetails().ID;

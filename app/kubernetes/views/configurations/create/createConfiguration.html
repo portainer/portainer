@@ -1,6 +1,9 @@
-<kubernetes-view-header title="Create configuration" state="kubernetes.configurations.new" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.configurations">ConfigMaps and Secrets</a> &gt; Create a configuration
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Create configuration'"
+  breadcrumbs="[{ label:'ConfigMaps and Secrets', link:'kubernetes.configurations' }, 'Create a configuration']"
+  reload="true"
+></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -88,7 +91,7 @@
                     <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
                     <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
                       <div class="boxselector_header">
-                        <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon icon="'code'" feather="true"></pr-icon>
                         ConfigMap
                       </div>
                       <p>This configuration holds non-sensitive information</p>
@@ -98,7 +101,7 @@
                     <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
                     <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
                       <div class="boxselector_header">
-                        <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px"></i>
+                        <pr-icon icon="'shield'" feather="true"></pr-icon>
                         Secret
                       </div>
                       <p>This configuration holds sensitive information</p>

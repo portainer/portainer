@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create environment"></rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.endpoints">Environments</a> &gt; Add environment </rd-header-content>
-</rd-header>
+<page-header title="'Create environment'" breadcrumbs="[{label:'Environments', link:'portainer.endpoints'}, 'Add environment']"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -220,7 +217,7 @@
               <div class="form-group">
                 <label for="socket_path" class="col-sm-3 col-lg-2 control-label text-left">
                   Socket path
-                  <portainer-tooltip position="bottom" message="Path to the Docker socket. Remember to bind-mount the socket, see the important notice above for more information.">
+                  <portainer-tooltip message="'Path to the Docker socket. Remember to bind-mount the socket, see the important notice above for more information.'">
                   </portainer-tooltip>
                 </label>
                 <div class="col-sm-9 col-lg-10">
@@ -251,8 +248,7 @@
               <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
                 Environment URL
                 <portainer-tooltip
-                  position="bottom"
-                  message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
+                  message="'URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it.'"
                 >
                 </portainer-tooltip>
               </label>
@@ -293,7 +289,7 @@
             <div class="form-group">
               <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
                 Portainer server URL
-                <portainer-tooltip position="bottom" message="URL of the Portainer instance that the agent will use to initiate the communications."></portainer-tooltip>
+                <portainer-tooltip message="'URL of the Portainer instance that the agent will use to initiate the communications.'"></portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
                 <input
@@ -326,10 +322,7 @@
             <div class="form-group">
               <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
                 Public IP
-                <portainer-tooltip
-                  position="bottom"
-                  message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the environment URL."
-                >
+                <portainer-tooltip message="'URL or IP address where exposed containers will be reachable. This field is optional and will default to the environment URL.'">
                 </portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
@@ -436,12 +429,9 @@
             </div>
           </div>
           <!-- !group -->
-          <!-- tags -->
-          <div class="form-group">
-            <tag-selector ng-if="formValues && availableTags" tags="availableTags" model="formValues.TagIds" allow-create="state.allowCreateTag" on-create="(onCreateTag)">
-            </tag-selector>
-          </div>
-          <!-- !tags -->
+
+          <tag-selector ng-if="formValues" value="formValues.TagIds" allow-create="state.allowCreateTag" on-change="(onChangeTags)"> </tag-selector>
+
           <div class="col-sm-12 form-section-title"> Actions </div>
           <!-- actions -->
           <div class="form-group">

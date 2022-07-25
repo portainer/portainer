@@ -1,11 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Edit Custom Template">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.templates.custom.edit({id:$ctrl.formValues.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content> <a ui-sref="kubernetes.templates.custom">Custom templates</a> &gt; {{ $ctrl.formValues.Title }} </rd-header-content>
-</rd-header>
+<page-header title="'Edit Custom Template'" breadcrumbs="[{label:'Custom templates', link:'kubernetes.templates.custom'}, $ctrl.formValues.Title]" reload="true"> </page-header>
 
 <div class="row" ng-if="$ctrl.formValues">
   <div class="col-sm-12">
@@ -30,6 +23,13 @@
               </p>
             </editor-description>
           </web-editor-form>
+
+          <custom-templates-variables-definition-field
+            ng-if="$ctrl.isTemplateVariablesEnabled"
+            value="$ctrl.formValues.Variables"
+            on-change="($ctrl.onVariablesChange)"
+            is-variables-names-from-parent="true"
+          ></custom-templates-variables-definition-field>
 
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData" resource-control="$ctrl.formValues.ResourceControl"></por-access-control-form>
 

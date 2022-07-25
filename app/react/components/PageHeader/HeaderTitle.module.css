@@ -1,0 +1,40 @@
+.menu-button {
+  border: 0px;
+  font-size: 17px;
+  background: none;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.menu-list {
+  background: var(--bg-dropdown-menu-color);
+  border-radius: 8px;
+  border: 1px solid var(--ui-gray-5) !important;
+  width: 180px;
+  padding: 5px !important;
+  box-shadow: 0 6px 12px rgb(0 0 0 / 18%);
+}
+
+.menu-link {
+  display: block;
+  padding: 5px 20px;
+  font-weight: 500;
+  line-height: 1.42857143;
+  white-space: nowrap;
+  font-size: 14px;
+  color: var(--text-dropdown-menu-color);
+  text-decoration: none !important;
+  border-radius: 5px;
+}
+
+.arrow-down {
+  width: 18px;
+  height: 18px;
+  margin-left: 10px;
+}
+
+.menu-link:hover {
+  background: var(--bg-dropdown-hover);
+  color: var(--text-dropdown-menu-color);
+}

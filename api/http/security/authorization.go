@@ -103,6 +103,16 @@ func AuthorizedTeamManagement(teamID portainer.TeamID, context *RestrictedReques
 	return false
 }
 
+// AuthorizedIsTeamLeader ensure that the user is an admin or a team leader
+func AuthorizedIsTeamLeader(context *RestrictedRequestContext) bool {
+	return context.IsAdmin || context.IsTeamLeader
+}
+
+// AuthorizedIsAdmin ensure that the user is an admin
+func AuthorizedIsAdmin(context *RestrictedRequestContext) bool {
+	return context.IsAdmin
+}
+
 // authorizedEndpointAccess ensure that the user can access the specified environment(endpoint).
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams of the environment(endpoint) and the associated group.

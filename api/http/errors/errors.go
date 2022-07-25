@@ -9,4 +9,6 @@ var (
 	ErrUnauthorized = errors.New("Unauthorized")
 	// ErrResourceAccessDenied Access denied to resource error
 	ErrResourceAccessDenied = errors.New("Access denied to resource")
+	// ErrNotAvailableInDemo feature is not allowed in demo
+	ErrNotAvailableInDemo = errors.New("This feature is not available in the demo version of Portainer")
 )

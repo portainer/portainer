@@ -1,4 +1,4 @@
-import { MinPasswordLen, StrengthCheck } from 'Portainer/helpers/password';
+import { getEnvironments } from '@/portainer/environments/environment.service';
 
 angular.module('portainer.app').controller('InitAdminController', [
   '$scope',
@@ -8,10 +8,9 @@ angular.module('portainer.app').controller('InitAdminController', [
   'StateManager',
   'SettingsService',
   'UserService',
-  'EndpointService',
   'BackupService',
   'StatusService',
-  function ($scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, BackupService, StatusService) {
+  function ($scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, BackupService, StatusService) {
     $scope.uploadBackup = uploadBackup;
 
     $scope.logo = StateManager.getState().application.logo;
@@ -27,16 +26,9 @@ angular.module('portainer.app').controller('InitAdminController', [
       actionInProgress: false,
       showInitPassword: true,
       showRestorePortainer: false,
-      passwordStrength: false,
     };
-
-    $scope.MinPasswordLen = MinPasswordLen;
 
     createAdministratorFlow();
-
-    $scope.onPasswordChange = function () {
-      $scope.state.passwordStrength = StrengthCheck($scope.formValues.Password);
-    };
 
     $scope.togglePanel = function () {
       $scope.state.showInitPassword = !$scope.state.showInitPassword;
@@ -59,7 +51,7 @@ angular.module('portainer.app').controller('InitAdminController', [
           return StateManager.initialize();
         })
         .then(function () {
-          return EndpointService.endpoints(0, 100);
+          return getEnvironments({ limit: 100 });
         })
         .then(function success(data) {
           if (data.value.length === 0) {
@@ -88,6 +80,14 @@ angular.module('portainer.app').controller('InitAdminController', [
     }
 
     function createAdministratorFlow() {
+      SettingsService.publicSettings()
+        .then(function success(data) {
+          $scope.requiredPasswordLength = data.RequiredPasswordLength;
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve application settings');
+        });
+
       UserService.administratorExists()
         .then(function success(exists) {
           if (exists) {

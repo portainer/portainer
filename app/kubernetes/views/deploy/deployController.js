@@ -2,10 +2,12 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import stripAnsi from 'strip-ansi';
 import uuidv4 from 'uuid/v4';
-import PortainerError from 'Portainer/error';
 
+import PortainerError from '@/portainer/error';
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { buildOption } from '@/portainer/components/BoxSelector';
+import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class KubernetesDeployController {
   /* @ngInject */
@@ -22,9 +24,11 @@ class KubernetesDeployController {
     this.CustomTemplateService = CustomTemplateService;
     this.DeployMethod = 'manifest';
 
+    this.isTemplateVariablesEnabled = isBE;
+
     this.deployOptions = [
       buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
-      buildOption('method_compose', 'fab fa-docker', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),
+      buildOption('method_compose', 'fab fa-docker', 'Compose', 'Docker compose format', KubernetesDeployManifestTypes.COMPOSE),
     ];
 
     this.methodOptions = [
@@ -42,6 +46,7 @@ class KubernetesDeployController {
       viewReady: false,
       isEditorDirty: false,
       templateId: null,
+      template: null,
     };
 
     this.formValues = {
@@ -56,7 +61,8 @@ class KubernetesDeployController {
       RepositoryAutomaticUpdates: false,
       RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
       RepositoryFetchInterval: '5m',
-      RepositoryWebhookURL: this.WebhookHelper.returnStackWebhookUrl(uuidv4()),
+      RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
+      Variables: {},
     };
 
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
@@ -70,6 +76,22 @@ class KubernetesDeployController {
     this.buildAnalyticsProperties = this.buildAnalyticsProperties.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
     this.onChangeDeployType = this.onChangeDeployType.bind(this);
+    this.onChangeTemplateVariables = this.onChangeTemplateVariables.bind(this);
+  }
+
+  onChangeTemplateVariables(value) {
+    this.onChangeFormValues({ Variables: value });
+
+    this.renderTemplate();
+  }
+
+  renderTemplate() {
+    if (!this.isTemplateVariablesEnabled) {
+      return;
+    }
+
+    const rendered = renderTemplate(this.state.templateContent, this.formValues.Variables, this.state.template.Variables);
+    this.onChangeFormValues({ EditorContent: rendered });
   }
 
   buildAnalyticsProperties() {
@@ -157,17 +179,24 @@ class KubernetesDeployController {
     };
   }
 
-  onChangeTemplateId(templateId) {
+  onChangeTemplateId(templateId, template) {
     return this.$async(async () => {
-      if (this.state.templateId === templateId) {
+      if (!template || (this.state.templateId === templateId && this.state.template === template)) {
         return;
       }
 
       this.state.templateId = templateId;
+      this.state.template = template;
 
       try {
         const fileContent = await this.CustomTemplateService.customTemplateFile(templateId);
+        this.state.templateContent = fileContent;
         this.onChangeFileContent(fileContent);
+
+        if (template.Variables && template.Variables.length > 0) {
+          const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
+          this.onChangeTemplateVariables(variables);
+        }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load template file');
       }
@@ -307,7 +336,7 @@ class KubernetesDeployController {
         const templateId = parseInt(this.$state.params.templateId, 10);
         if (templateId && !Number.isNaN(templateId)) {
           this.state.BuildMethod = KubernetesDeployBuildMethods.CUSTOM_TEMPLATE;
-          this.onChangeTemplateId(templateId);
+          this.state.templateId = templateId;
         }
       }
 

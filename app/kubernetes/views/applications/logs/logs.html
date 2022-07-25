@@ -1,10 +1,28 @@
-<kubernetes-view-header title="Application logs" state="kubernetes.applications.application.logs" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
-  <a ui-sref="kubernetes.applications">Applications</a> &gt;
-  <a ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">{{ ctrl.application.Name }}</a> &gt; Pods &gt;
-  {{ ctrl.podName }} &gt; Containers &gt; {{ ctrl.containerName }} &gt; Logs
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Application logs'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    { 
+      label:ctrl.application.ResourcePool,
+      link: 'kubernetes.resourcePools.resourcePool', 
+      linkParams:{ id: ctrl.application.ResourcePool }
+    },
+    { label:'Applications', link:'kubernetes.applications' },
+    { 
+      label:ctrl.application.Name,
+      link: 'kubernetes.applications.application', 
+      linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
+    },
+     'Pods',
+     ctrl.podName,
+     'Containers',
+     ctrl.containerName,
+     'Logs'
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -13,23 +31,21 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <form class="form-horizontal" autocomplete="off">
+          <form class="form-horizontal row" autocomplete="off">
             <div class="col-sm-12 form-section-title"> Actions </div>
             <!-- auto-refresh -->
             <div class="form-group">
-              <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Auto-refresh
-                  <portainer-tooltip position="bottom" message="Automatically refresh logs every 5 seconds"></portainer-tooltip>
-                </label>
-                <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="ctrl.state.autoRefresh" ng-change="ctrl.updateAutoRefresh()" /><i></i> </label>
-              </div>
+              <label class="col-sm-3 col-lg-2 control-label text-left">
+                Auto-refresh
+                <portainer-tooltip message="'Automatically refresh logs every 5 seconds'"></portainer-tooltip>
+              </label>
+              <label class="switch col-sm-8"> <input type="checkbox" ng-model="ctrl.state.autoRefresh" ng-change="ctrl.updateAutoRefresh()" /><i></i> </label>
             </div>
             <!-- !auto-refresh -->
             <!-- search -->
             <div class="form-group">
-              <label for="logs_search" class="col-sm-1 control-label text-left"> Search </label>
-              <div class="col-sm-11">
+              <label for="logs_search" class="col-sm-3 col-lg-2 control-label text-left"> Search </label>
+              <div class="col-sm-8">
                 <input
                   class="form-control"
                   type="text"
@@ -45,7 +61,9 @@
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">
-                <button class="btn btn-primary btn-sm" type="button" ng-click="ctrl.downloadLogs()" style="margin-left: 0"><i class="fa fa-download"></i> Download logs</button>
+                <button class="btn btn-primary btn-sm !ml-0" type="button" ng-click="ctrl.downloadLogs()">
+                  <pr-icon icon="'download'" feather="true"></pr-icon> Download logs
+                </button>
               </div>
             </div>
             <!-- !actions -->

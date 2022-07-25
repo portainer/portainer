@@ -22,16 +22,13 @@ export function confirmButtons(options: ButtonsOptions) {
         options.cancel && options.cancel.label
           ? sanitize(options.cancel.label)
           : 'Cancel',
+      className: 'btn-default',
     },
   };
 }
 
 export function applyBoxCSS(box: JQuery<HTMLElement>) {
   box.css({
-    top: '50%',
-    'margin-top': function marginTop() {
-      const height = box.height() || 0;
-      return -(height / 2);
-    },
+    'vertical-align': 'middle',
   });
 }

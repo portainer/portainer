@@ -177,9 +177,6 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if govalidator.IsNull(payload.RepositoryReferenceName) {
-		payload.RepositoryReferenceName = defaultGitReferenceName
-	}
 	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
 		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}

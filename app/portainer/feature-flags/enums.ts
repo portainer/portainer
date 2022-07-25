@@ -12,6 +12,9 @@ export enum FeatureState {
 export enum FeatureId {
   K8S_RESOURCE_POOL_LB_QUOTA = 'k8s-resourcepool-Ibquota',
   K8S_RESOURCE_POOL_STORAGE_QUOTA = 'k8s-resourcepool-storagequota',
+  K8S_CREATE_FROM_KUBECONFIG = 'k8s-create-from-kubeconfig',
+  KAAS_PROVISIONING = 'kaas-provisioning',
+  NOMAD = 'nomad',
   RBAC_ROLES = 'rbac-roles',
   REGISTRY_MANAGEMENT = 'registry-management',
   K8S_SETUP_DEFAULT = 'k8s-setup-default',
@@ -26,4 +29,5 @@ export enum FeatureId {
   STACK_PULL_IMAGE = 'stack-pull-image',
   STACK_WEBHOOK = 'stack-webhook',
   CONTAINER_WEBHOOK = 'container-webhook',
+  POD_SECURITY_POLICY_CONSTRAINT = 'pod-security-policy-constraint',
 }

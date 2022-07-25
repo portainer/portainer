@@ -25,12 +25,8 @@ export async function getUser(id: UserId) {
   }
 }
 
-export async function getUserMemberships(id?: UserId) {
+export async function getUserMemberships(id: UserId) {
   try {
-    if (!id) {
-      throw new Error('missing id');
-    }
-
     const { data } = await axios.get<TeamMembership[]>(
       buildUrl(id, 'memberships')
     );

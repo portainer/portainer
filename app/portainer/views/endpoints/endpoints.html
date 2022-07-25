@@ -1,34 +1,12 @@
-<rd-header>
-  <rd-header-title title-text="Environments">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.endpoints" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Environment management</rd-header-content>
-</rd-header>
+<page-header title="'Environments'" breadcrumbs="['Environment management']" reload="true"> </page-header>
 
-<div
-  class="row"
-  style="width: 100%; height: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center"
-  ng-if="state.loadingMessage"
->
-  <div class="sk-fold">
-    <div class="sk-fold-cube"></div>
-    <div class="sk-fold-cube"></div>
-    <div class="sk-fold-cube"></div>
-    <div class="sk-fold-cube"></div>
-  </div>
-  <span style="margin-top: 25px">
-    {{ state.loadingMessage }}
-    <i class="fa fa-cog fa-spin"></i>
-  </span>
-</div>
+<view-loading ng-if="state.loadingMessage" message="state.loadingMessage"></view-loading>
 
 <div class="row" ng-if="!state.loadingMessage">
   <div class="col-sm-12">
     <endpoints-datatable
       title-text="Environments"
-      title-icon="fa-plug"
+      title-icon="hard-drive"
       table-key="endpoints"
       order-by="Name"
       remove-action="removeAction"

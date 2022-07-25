@@ -1,0 +1,35 @@
+.boxselector_wrapper {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+@media only screen and (max-width: 700px) {
+  .boxselector_wrapper {
+    flex-direction: column;
+  }
+}
+
+.boxselector_wrapper input[type='radio']:checked + label,
+.box-selector-item input[type='radio']:checked + label {
+  background-color: var(--bg-blocklist-hover-color) !important;
+  color: black !important;
+  border-radius: 8px;
+  border-color: var(--ui-blue-7);
+  padding: 15px;
+  box-shadow: none;
+}
+
+.boxselector_wrapper input[type='radio']:not(:disabled) + label,
+.box-selector-item input[type='radio']:not(:disabled) + label {
+  background: var(--ui-gray-2);
+  color: var(--black-color) !important;
+  border-radius: 8px;
+  border-color: var(--ui-gray-5);
+  padding: 15px;
+  box-shadow: none;
+}
+
+.row.header {
+  background-color: var(--bg-body-color) !important;
+  margin-bottom: 5px !important;
+}

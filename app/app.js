@@ -6,7 +6,14 @@ export function onStartupAngular($rootScope, $state, $interval, LocalStorage, En
   EndpointProvider.initialize();
 
   $rootScope.$state = $state;
-  $rootScope.defaultTitle = document.title;
+  const defaultTitle = document.title;
+
+  $transitions.onEnter({}, () => {
+    const endpoint = EndpointProvider.currentEndpoint();
+    if (endpoint) {
+      document.title = `${defaultTitle} | ${endpoint.Name}`;
+    }
+  });
 
   // Workaround to prevent the loading bar from going backward
   // https://github.com/chieffancypants/angular-loading-bar/issues/273

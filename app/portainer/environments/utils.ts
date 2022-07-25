@@ -13,7 +13,7 @@ export function getPlatformType(envType: EnvironmentType) {
     case EnvironmentType.Azure:
       return PlatformType.Azure;
     default:
-      throw new Error(`Environment Type ${envType} is not supported`);
+      throw new Error(`${envType} is not a supported environment type`);
   }
 }
 
@@ -30,6 +30,10 @@ export function isEdgeEnvironment(envType: EnvironmentType) {
     EnvironmentType.EdgeAgentOnDocker,
     EnvironmentType.EdgeAgentOnKubernetes,
   ].includes(envType);
+}
+
+export function isUnassociatedEdgeEnvironment(env: Environment) {
+  return isEdgeEnvironment(env.Type) && !env.EdgeID;
 }
 
 export function getRoute(environment: Environment) {
