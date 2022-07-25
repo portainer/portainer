@@ -111,12 +111,13 @@ export function SettingsSidebar({ isAdmin }: Props) {
                 data-cy="portainerSidebar-authentication"
               />
             )}
-            <SidebarItem
-              to="portainer.settings.cloud"
-              label="Cloud"
-              data-cy="portainerSidebar-cloud"
-            />
-
+            {process.env.PORTAINER_EDITION !== 'CE' && (
+              <SidebarItem
+                to="portainer.settings.cloud"
+                label="Cloud"
+                data-cy="portainerSidebar-cloud"
+              />
+            )}
             <SidebarItem
               to="portainer.settings.edgeCompute"
               label="Edge Compute"
