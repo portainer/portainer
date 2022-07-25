@@ -91,5 +91,6 @@ export function createMockEnvironment(): Environment {
       allowVolumeBrowserForRegularUsers: false,
       enableHostManagementFeatures: false,
     },
+    Gpus: [],
   };
 }

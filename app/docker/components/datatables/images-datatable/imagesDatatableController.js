@@ -1,3 +1,4 @@
+import './imagesDatatable.css';
 angular.module('portainer.docker').controller('ImagesDatatableController', [
   '$scope',
   '$controller',

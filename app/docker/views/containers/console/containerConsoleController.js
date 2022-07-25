@@ -242,5 +242,11 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           Notifications.error('Error', err, 'Unable to retrieve container details');
         });
     };
+
+    $scope.handleIsCustomCommandChange = function (enabled) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.isCustomCommand = enabled;
+      });
+    };
   },
 ]);

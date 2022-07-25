@@ -94,7 +94,7 @@ class InitEndpointController {
     try {
       this.state.actionInProgress = true;
       const endpoint = await this.EndpointService.createLocalKubernetesEndpoint();
-      this.$state.go('portainer.k8sendpoint.kubernetesConfig', { id: endpoint.Id });
+      this.$state.go('kubernetes.cluster.setup', { endpointId: endpoint.Id });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to connect to the Kubernetes environment');
     } finally {
@@ -130,8 +130,8 @@ class InitEndpointController {
         null,
         null
       );
-      const routeName = endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment ? 'portainer.k8sendpoint.kubernetesConfig' : 'portainer.home';
-      this.$state.go(routeName, { id: endpoint.Id });
+      const routeName = endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment ? 'kubernetes.cluster.setup' : 'portainer.home';
+      this.$state.go(routeName, { endpointId: endpoint.Id });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
     } finally {
