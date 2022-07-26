@@ -27,6 +27,10 @@ export function Breadcrumbs({ breadcrumbs }: Props) {
 }
 
 function renderCrumb(crumb: Crumb | string) {
+  if (!crumb) {
+    return '';
+  }
+
   if (typeof crumb === 'string') {
     return crumb;
   }
