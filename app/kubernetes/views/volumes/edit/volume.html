@@ -163,7 +163,7 @@
 
             <uib-tab index="2" ng-if="ctrl.volume.PersistentVolumeClaim.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center" data-cy="k8sVolDetail-volYamlTab"> <pr-icon icon="'code'" feather="true"></pr-icon> YAML </uib-tab-heading>
-              <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
+              <div class="px-5" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="volume-yaml" data="ctrl.volume.PersistentVolumeClaim.Yaml"></kubernetes-yaml-inspector>
               </div>
             </uib-tab>
