@@ -57,7 +57,7 @@
                 ng-disabled="isUpdating || (!isAdmin && !allowBindMounts && mount.Type === 'bind')"
                 ng-if="mount.Type === 'bind'"
               />
-              <div class="col-sm-12 small text-warning" ng-show="!mount.Source"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Source is required. </div>
+              <div class="col-sm-12 small" ng-show="!mount.Source"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Source is required. </div>
             </td>
             <td>
               <input
@@ -69,7 +69,7 @@
                 ng-disabled="isUpdating"
                 disable-authorization="DockerServiceUpdate"
               />
-              <div class="col-sm-12 small text-warning" ng-show="!mount.Target"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Target is required. </div>
+              <div class="col-sm-12 small" ng-show="!mount.Target"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target is required. </div>
             </td>
             <td authorization="DockerServiceUpdate">
               <input type="checkbox" class="form-control" ng-model="mount.ReadOnly" ng-change="updateMount(service, mount)" ng-disabled="isUpdating" />

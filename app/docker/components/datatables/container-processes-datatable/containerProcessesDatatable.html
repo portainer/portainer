@@ -2,11 +2,23 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" />
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          {{ $ctrl.titleText }}
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for a process..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="process-searchInput"
+          />
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">

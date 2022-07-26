@@ -1,6 +1,7 @@
 import { useReducer } from 'react';
 
 import { useUser } from '@/portainer/hooks/useUser';
+import { Icon } from '@/react/components/Icon';
 import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, Role } from '@/portainer/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
@@ -57,7 +58,7 @@ export function AccessControlPanel({
               <div className="row">
                 <div>
                   <Button color="link" onClick={toggleEditMode}>
-                    <i className="fa fa-edit space-right" aria-hidden="true" />
+                    <Icon icon="edit" className="space-right" feather />
                     Change ownership
                   </Button>
                 </div>
