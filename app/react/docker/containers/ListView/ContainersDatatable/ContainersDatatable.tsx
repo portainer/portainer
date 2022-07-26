@@ -140,8 +140,12 @@ export function ContainersDatatable({
 
   return (
     <TableContainer>
-      <TableTitle icon="fa-cubes" label="Containers">
-        <SearchBar value={searchBarValue} onChange={handleSearchBarChange} />
+      <TableTitle icon="box" featherIcon label="Containers">
+        <SearchBar
+          value={searchBarValue}
+          onChange={handleSearchBarChange}
+          placeholder="Search for a container..."
+        />
         <TableActions>
           <ContainersDatatableActions
             selectedItems={selectedFlatRows.map((row) => row.original)}

@@ -180,6 +180,7 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         <Authorized
           authorizations="PortainerEndpointUpdateSettings"
           adminOnlyCE
+          environmentId={environmentId}
         >
           <SidebarItem
             to="docker.featuresConfiguration"

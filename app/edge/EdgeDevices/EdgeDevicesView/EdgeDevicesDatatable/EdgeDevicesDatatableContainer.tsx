@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
-import { Environment } from '@/portainer/environments/types';
+import { EdgeTypes, Environment } from '@/portainer/environments/types';
 import { useDebounce } from '@/portainer/hooks/useDebounce';
 
 import { useSearchBarState } from '@@/datatables/SearchBar';
@@ -89,8 +89,9 @@ function Loader({ children, storageKey }: LoaderProps) {
 
   const { environments, isLoading, totalCount } = useEnvironmentList(
     {
-      edgeDeviceFilter: 'trusted',
+      edgeDevice: true,
       search: debouncedSearchValue,
+      types: EdgeTypes,
       ...pagination,
     },
     settings.autoRefreshRate * 1000

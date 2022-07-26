@@ -3,12 +3,13 @@ import { ResourceControlOwnership as RCO } from '@/portainer/access-control/type
 
 angular.module('portainer.app').controller('porAccessControlFormController', [
   '$q',
+  '$scope',
   'UserService',
   'TeamService',
   'Notifications',
   'Authentication',
   'ResourceControlService',
-  function ($q, UserService, TeamService, Notifications, Authentication, ResourceControlService) {
+  function ($q, $scope, UserService, TeamService, Notifications, Authentication, ResourceControlService) {
     var ctrl = this;
 
     ctrl.RCO = RCO;
@@ -79,6 +80,12 @@ angular.module('portainer.app').controller('porAccessControlFormController', [
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve access control information');
         });
+
+      this.onChangeEnablement = function (enable) {
+        $scope.$evalAsync(() => {
+          ctrl.formData.AccessControlEnabled = enable;
+        });
+      };
     }
   },
 ]);

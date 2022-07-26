@@ -11,6 +11,7 @@ import (
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/sirupsen/logrus"
 )
 
 // KubeClusterAccessService represents a service that is responsible for centralizing kube cluster access data
@@ -94,11 +95,20 @@ func (service *kubeClusterAccessService) IsSecure() bool {
 // - pass down params to binaries
 func (service *kubeClusterAccessService) GetData(hostURL string, endpointID portainer.EndpointID) kubernetesClusterAccessData {
 	baseURL := service.baseURL
+
+	// When the api call is internal, the baseURL should not be used.
+	if hostURL == "localhost" {
+		hostURL = hostURL + service.httpsBindAddr
+		baseURL = "/"
+	}
+
 	if baseURL != "/" {
 		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
 	}
 
-	clusterURL := hostURL + service.httpsBindAddr + baseURL
+	logrus.Infof("[kubeconfig] [hostURL: %s, httpsBindAddr: %s, baseURL: %s]", hostURL, service.httpsBindAddr, baseURL)
+
+	clusterURL := hostURL + baseURL
 
 	clusterServerURL := fmt.Sprintf("https://%sapi/endpoints/%d/kubernetes", clusterURL, endpointID)
 

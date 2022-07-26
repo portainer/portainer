@@ -62,7 +62,7 @@
                 <a ui-sref="portainer.groups.group({id: item.Id})">{{ item.Name }}</a>
               </td>
               <td>
-                <a ui-sref="portainer.groups.group.access({id: item.Id})"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
+                <a ui-sref="portainer.groups.group.access({id: item.Id})"> <pr-icon icon="'users'" feather="true"></pr-icon> Manage access </a>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

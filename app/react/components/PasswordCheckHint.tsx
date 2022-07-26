@@ -1,5 +1,7 @@
 import { usePublicSettings } from '@/portainer/settings/queries';
 
+import { Icon } from '@@/Icon';
+
 interface Props {
   passwordValid: boolean;
   forceChangePassword?: boolean;
@@ -14,11 +16,8 @@ export function PasswordCheckHint({
 
   return (
     <div>
-      <p className="text-muted">
-        <i
-          className="fa fa-exclamation-triangle orange-icon space-right"
-          aria-hidden="true"
-        />
+      <p className="text-muted vertical-center">
+        <Icon icon="alert-triangle" className="icon-warning" feather />
         {forceChangePassword &&
           'An administrator has changed your password requirements, '}
         The password must be at least {minPasswordLength} characters long.

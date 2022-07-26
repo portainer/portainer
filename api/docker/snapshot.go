@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	_container "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 // Snapshotter represents a service used to create environment(endpoint) snapshots
@@ -154,11 +155,35 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 	healthyContainers := 0
 	unhealthyContainers := 0
 	stacks := make(map[string]struct{})
+	gpuUseSet := make(map[string]struct{})
+	gpuUseAll := false
 	for _, container := range containers {
 		if container.State == "exited" {
 			stoppedContainers++
 		} else if container.State == "running" {
 			runningContainers++
+
+			// snapshot GPUs
+			response, err := cli.ContainerInspect(context.Background(), container.ID)
+			if err != nil {
+				return err
+			}
+
+			var gpuOptions *_container.DeviceRequest = nil
+			for _, deviceRequest := range response.HostConfig.Resources.DeviceRequests {
+				if deviceRequest.Driver == "nvidia" || deviceRequest.Capabilities[0][0] == "gpu" {
+					gpuOptions = &deviceRequest
+				}
+			}
+
+			if gpuOptions != nil {
+				if gpuOptions.Count == -1 {
+					gpuUseAll = true
+				}
+				for _, id := range gpuOptions.DeviceIDs {
+					gpuUseSet[id] = struct{}{}
+				}
+			}
 		}
 
 		if strings.Contains(container.Status, "(healthy)") {
@@ -173,6 +198,14 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 			}
 		}
 	}
+
+	gpuUseList := make([]string, 0, len(gpuUseSet))
+	for gpuUse := range gpuUseSet {
+		gpuUseList = append(gpuUseList, gpuUse)
+	}
+
+	snapshot.GpuUseAll = gpuUseAll
+	snapshot.GpuUseList = gpuUseList
 
 	snapshot.RunningContainerCount = runningContainers
 	snapshot.StoppedContainerCount = stoppedContainers

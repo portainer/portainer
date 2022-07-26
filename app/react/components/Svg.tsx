@@ -1,8 +1,52 @@
-import lightmode from '@/assets/ico/theme/lightmode.svg?c';
-import darkmode from '@/assets/ico/theme/darkmode.svg?c';
-import highcontrastmode from '@/assets/ico/theme/highcontrastmode.svg?c';
+// theme icons
 import automode from '@/assets/ico/theme/auto.svg?c';
-import git from '@/assets/icons/git-logo.svg?c';
+import darkmode from '@/assets/ico/theme/darkmode.svg?c';
+import lightmode from '@/assets/ico/theme/lightmode.svg?c';
+import highcontrastmode from '@/assets/ico/theme/highcontrastmode.svg?c';
+// general icons
+import arrowsupdown from '@/assets/ico/arrows-updown.svg?c';
+import arrowright from '@/assets/ico/arrow-right-long.svg?c';
+import bomb from '@/assets/ico/bomb.svg?c';
+import checked from '@/assets/ico/checked.svg?c';
+import circlenotch from '@/assets/ico/circle-notch.svg?c';
+import clockrewind from '@/assets/ico/clock-rewind.svg?c';
+import compress from '@/assets/ico/compress.svg?c';
+import custom from '@/assets/ico/custom.svg?c';
+import dataflow from '@/assets/ico/dataflow-1.svg?c';
+import dataflow2 from '@/assets/ico/dataflow-2.svg?c';
+import expand from '@/assets/ico/expand.svg?c';
+import filecode from '@/assets/ico/file-code.svg?c';
+import filesignature from '@/assets/ico/file-signature.svg?c';
+import fileupload from '@/assets/ico/file-upload.svg?c';
+import flask from '@/assets/ico/flask.svg?c';
+import git from '@/assets/ico/git.svg?c';
+import hacker from '@/assets/ico/hacker.svg?c';
+import heartbeat from '@/assets/ico/heartbeat.svg?c';
+import laptop from '@/assets/ico/laptop.svg?c';
+import laptopcode from '@/assets/ico/laptop-code.svg?c';
+import ldap from '@/assets/ico/ldap.svg?c';
+import magicwand from '@/assets/ico/magic-wand.svg?c';
+import memory from '@/assets/ico/memory.svg?c';
+import objectgroup from '@/assets/ico/object-group.svg?c';
+import palette from '@/assets/ico/palette.svg?c';
+import plug from '@/assets/ico/plug.svg?c';
+import restore from '@/assets/ico/restore.svg?c';
+import restorewindow from '@/assets/ico/restore-window.svg?c';
+import rocket from '@/assets/ico/rocket.svg?c';
+import route from '@/assets/ico/route.svg?c';
+import share from '@/assets/ico/share.svg?c';
+import sort from '@/assets/ico/sort.svg?c';
+import tachometer from '@/assets/ico/tachometer.svg?c';
+import template from '@/assets/ico/template.svg?c';
+import tag from '@/assets/ico/tag-2.svg?c';
+import tag2 from '@/assets/ico/tags.svg?c';
+import tools from '@/assets/ico/tools.svg?c';
+import upload from '@/assets/ico/upload.svg?c';
+import url from '@/assets/ico/url.svg?c';
+import usercircle from '@/assets/ico/user-circle.svg?c';
+import userlock from '@/assets/ico/user-lock.svg?c';
+import Placeholder from '@/assets/ico/placeholder.svg?c'; // Placeholder is used when an icon name cant be matched
+// vendor icons
 import aws from '@/assets/ico/vendor/aws.svg?c';
 import azure from '@/assets/ico/vendor/azure.svg?c';
 import civo from '@/assets/ico/vendor/civo.svg?c';
@@ -23,14 +67,54 @@ import proget from '@/assets/ico/vendor/proget.svg?c';
 import quay from '@/assets/ico/vendor/quay.svg?c';
 
 export const SvgIcons = {
-  lightmode,
-  darkmode,
-  highcontrastmode,
   automode,
+  darkmode,
+  lightmode,
+  highcontrastmode,
+  dataflow,
+  dataflow2,
+  arrowsupdown,
+  arrowright,
+  bomb,
+  checked,
+  circlenotch,
+  clockrewind,
+  compress,
+  custom,
+  expand,
+  filecode,
+  filesignature,
+  fileupload,
+  flask,
   git,
+  hacker,
+  heartbeat,
+  laptop,
+  laptopcode,
+  ldap,
+  magicwand,
+  memory,
+  objectgroup,
+  palette,
+  plug,
+  restore,
+  restorewindow,
+  rocket,
+  route,
+  share,
+  sort,
+  tachometer,
+  template,
+  tag,
+  tag2,
+  tools,
+  upload,
+  url,
+  usercircle,
+  userlock,
   aws,
-  civo,
   azure,
+  civo,
   digitalocean,
   docker,
   dockercompose,
@@ -55,8 +139,17 @@ interface SvgProps {
 
 function Svg({ icon, className }: SvgProps) {
   const SvgIcon = SvgIcons[icon];
+
+  if (!SvgIcon) {
+    return (
+      <span className={className} aria-hidden="true">
+        <Placeholder />
+      </span>
+    );
+  }
+
   return (
-    <span className={className}>
+    <span className={className} aria-hidden="true">
       <SvgIcon />
     </span>
   );

@@ -1,9 +1,7 @@
 <div class="datatable">
   <rd-widget>
+    <rd-widget-header icon="{{ $ctrl.titleIcon }}" feather-icon="true" title-text="{{ $ctrl.titleText }}"></rd-widget-header>
     <rd-widget-body classes="no-padding">
-      <div class="toolBar">
-        <div class="toolBarTitle"> <pr-icon icon="$ctrl.titleIcon" class-name="space-right"></pr-icon> {{ $ctrl.titleText }} </div>
-      </div>
       <div class="actionBar">
         <button type="button" class="btn btn-sm btn-primary" ui-state="$ctrl.createPath"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Custom Template </button>
       </div>
