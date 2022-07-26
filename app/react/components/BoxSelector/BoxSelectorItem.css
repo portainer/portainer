@@ -2,11 +2,11 @@
 .box-selector-item {
   --selected-item-color: var(--ui-blue-6);
   flex: 1;
-  padding: 5px;
 }
 
-.boxselector_wrapper .boxselector_header {
-  font-size: 14px;
+.boxselector_wrapper .boxselector_header,
+.box-selector-item .boxselector_header {
+  font-size: 18px;
   margin-bottom: 5px;
   font-weight: bold;
   user-select: none;
@@ -17,22 +17,26 @@
   font-weight: normal;
 }
 
-.boxselector_wrapper input[type='radio'] {
+.boxselector_wrapper input[type='radio'],
+.box-selector-item input[type='radio'] {
   display: none;
 }
 
-.boxselector_wrapper input[type='radio']:not(:disabled) ~ label {
+.boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
+.box-selector-item input[type='radio']:not(:disabled) ~ label {
   cursor: pointer;
   background-color: var(--bg-boxselector-wrapper-disabled-color);
   text-align: left;
   height: 100%;
 }
 
-.boxselector_wrapper input[type='radio']:not(:disabled):hover ~ label:hover {
+.boxselector_wrapper input[type='radio']:not(:disabled):hover ~ label:hover,
+.box-selector-item input[type='radio']:not(:disabled):hover ~ label:hover {
   cursor: pointer;
 }
 
-.boxselector_wrapper label {
+.boxselector_wrapper label,
+.box-selector-item label {
   font-weight: normal;
   font-size: 12px;
   display: block;
@@ -109,6 +113,7 @@
 }
 
 .box-selector-item.limited.business :checked + label {
+  background-color: initial;
   color: initial;
 }
 
@@ -126,11 +131,9 @@
 
 .boxselector_icon,
 .boxselector_icon img {
-  height: 48px;
-  width: 48px;
   color: var(--ui-blue-8);
-  font-size: 48px;
-  margin-top: 20px;
+  font-size: 90px;
+  display: block;
 }
 
 .boxselector_header pr-icon {
@@ -139,4 +142,18 @@
 
 .boxselector_content {
   padding-left: 20px;
+}
+
+.boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
+.box-selector-item input[type='radio']:not(:disabled) ~ label {
+  background-color: var(--ui-gray-2);
+}
+
+.boxselector_img_container {
+  line-height: 90px;
+  margin-bottom: 0;
+}
+
+.box-selector-item p {
+  margin-bottom: 0;
 }

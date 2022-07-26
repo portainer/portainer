@@ -13,7 +13,7 @@
             <uib-tab index="0">
               <uib-tab-heading> <pr-icon icon="'code'" feather="true"></pr-icon> Deploy </uib-tab-heading>
               <div class="col-sm-12 form-section-title"> Namespace </div>
-              <form class="form-horizontal" style="margin-top: 20px" name="deploymentForm">
+              <form class="form-horizontal mt-3" name="deploymentForm">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
                   <div class="col-sm-8">
@@ -31,16 +31,18 @@
                     <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
                     </portainer-tooltip>
                   </label>
-                  <div class="col-sm-8">
+                  <div class="col-sm-8 vertical-center pt-3">
                     <label class="switch">
                       <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" />
-                      <i></i>
+                      <span class="slider round"></span>
                     </label>
+                    <span class="ml-2 mb-1 switch-values" ng-if="ctrl.formValues.namespace_toggle">Yes</span>
+                    <span class="ml-2 mb-1 switch-values" ng-if="!ctrl.formValues.namespace_toggle">No</span>
                   </div>
                 </div>
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">
                   <div class="col-sm-12 small text-muted">
-                    <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                    <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                     You do not have access to any namespace. Contact your administrator to get access to a namespace.
                   </div>
                 </div>
@@ -188,7 +190,7 @@
 
             <uib-tab index="1" disable="ctrl.state.tabLogsDisabled">
               <uib-tab-heading> <pr-icon icon="'file-text'" feather="true"></pr-icon> Logs </uib-tab-heading>
-              <form class="form-horizontal" style="margin-top: 20px">
+              <form class="form-horizontal mt-3">
                 <div class="form-group" ng-if="ctrl.state.activeTab === 1">
                   <div class="col-sm-12">
                     <code-editor identifier="kubernetes-deploy-logs" read-only="true" yml="false" value="ctrl.errorLog"></code-editor>
