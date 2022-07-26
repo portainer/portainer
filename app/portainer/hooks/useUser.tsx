@@ -47,6 +47,7 @@ export function useUser() {
 
 export function useAuthorizations(
   authorizations: string | string[],
+  forceEnvironmentId?: EnvironmentId,
   adminOnlyCE = false
 ) {
   const { user } = useUser();
@@ -58,7 +59,12 @@ export function useAuthorizations(
     return false;
   }
 
-  return hasAuthorizations(user, authorizations, endpointId, adminOnlyCE);
+  return hasAuthorizations(
+    user,
+    authorizations,
+    forceEnvironmentId || endpointId,
+    adminOnlyCE
+  );
 }
 
 export function isEnvironmentAdmin(
@@ -114,15 +120,21 @@ export function hasAuthorizations(
 
 interface AuthorizedProps {
   authorizations: string | string[];
+  environmentId?: EnvironmentId;
   adminOnlyCE?: boolean;
 }
 
 export function Authorized({
   authorizations,
+  environmentId,
   adminOnlyCE = false,
   children,
 }: PropsWithChildren<AuthorizedProps>) {
-  const isAllowed = useAuthorizations(authorizations, adminOnlyCE);
+  const isAllowed = useAuthorizations(
+    authorizations,
+    environmentId,
+    adminOnlyCE
+  );
 
   return isAllowed ? <>{children}</> : null;
 }

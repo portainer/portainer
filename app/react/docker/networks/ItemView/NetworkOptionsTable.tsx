@@ -1,4 +1,4 @@
-import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Table, TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
 
 import { NetworkOptions } from '../types';
@@ -17,9 +17,9 @@ export function NetworkOptionsTable({ options }: Props) {
   return (
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
-        <Widget>
-          <WidgetTitle title="Network options" icon="fa-cogs" />
-          <WidgetBody className="nopadding">
+        <TableContainer>
+          <TableTitle label="Network options" icon="share-2" featherIcon />
+          <Table className="nopadding">
             <DetailsTable dataCy="networkDetails-networkOptionsTable">
               {networkEntries.map(([key, value]) => (
                 <DetailsTable.Row key={key} label={key}>
@@ -27,8 +27,8 @@ export function NetworkOptionsTable({ options }: Props) {
                 </DetailsTable.Row>
               ))}
             </DetailsTable>
-          </WidgetBody>
-        </Widget>
+          </Table>
+        </TableContainer>
       </div>
     </div>
   );

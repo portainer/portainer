@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-file-alt" title-text="Log viewer settings"></rd-widget-header>
+      <rd-widget-header icon="file" feather-icon="true" title-text="Log viewer settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -54,21 +54,23 @@
           <div class="form-group" ng-if="$ctrl.state.copySupported">
             <label class="col-sm-1 control-label text-left"> Actions </label>
             <div class="col-sm-11">
-              <button class="btn btn-primary btn-sm" type="button" ng-click="$ctrl.downloadLogs()" style="margin-left: 0"><i class="fa fa-download"></i> Download logs</button>
+              <button class="btn btn-primary btn-sm" type="button" ng-click="$ctrl.downloadLogs()" style="margin-left: 0"
+                ><pr-icon icon="'download'" feather="true"></pr-icon> Download logs</button
+              >
               <button
                 class="btn btn-primary btn-sm"
                 ng-click="$ctrl.copy()"
                 ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line) || !$ctrl.state.filteredLogs.length"
-                ><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</button
+                ><pr-icon icon="'copy'" feather="true" class-name="space-right"></pr-icon>Copy</button
               >
               <button
                 class="btn btn-primary btn-sm"
                 ng-click="$ctrl.copySelection()"
                 ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line) || !$ctrl.state.filteredLogs.length || !$ctrl.state.selectedLines.length"
-                ><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy selected lines</button
+                ><pr-icon icon="'copy'" feather="true" class-name="space-right"></pr-icon>Copy selected lines</button
               >
               <button class="btn btn-primary btn-sm" ng-click="$ctrl.clearSelection()" ng-disabled="$ctrl.state.selectedLines.length === 0"
-                ><i class="fa fa-times space-right" aria-hidden="true"></i>Unselect</button
+                ><pr-icon icon="'x'" feather="true" class-name="space-right"></pr-icon>Unselect</button
               >
               <span>
                 <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none"></i>
