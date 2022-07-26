@@ -4197,9 +4197,9 @@
   integrity sha512-C6N5s2ZFtuZRj54k2/zyRhNDjJwwcViAM3Nbm8zjBpbqAdZ00mr0CFxvSKeO8Y/e03WVFLpQMdHYVfUd6SB+Hw==
 
 "@types/express-serve-static-core@*", "@types/express-serve-static-core@^4.17.18":
-  version "4.17.28"
-  resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.28.tgz#c47def9f34ec81dc6328d0b1b5303d1ec98d86b8"
-  integrity sha512-P1BJAEAW3E2DJUlkgq4tOL3RyMunoWXqbSCygWo5ZIWTjUgN1YnaXWW4VWl/oc8vs/XoYibEGBKP0uZyF4AHig==
+  version "4.17.29"
+  resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.29.tgz#2a1795ea8e9e9c91b4a4bbe475034b20c1ec711c"
+  integrity sha512-uMd++6dMKS32EOuw1Uli3e3BPgdLIXmezcfHv7N4c1s3gkhikBplORPpMq3fuWkxncZN1reb16d5n8yhQ80x7Q==
   dependencies:
     "@types/node" "*"
     "@types/qs" "*"
@@ -4214,11 +4214,6 @@
     "@types/express-serve-static-core" "^4.17.18"
     "@types/qs" "*"
     "@types/serve-static" "*"
-
-"@types/feather-icons@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@types/feather-icons/-/feather-icons-4.7.0.tgz#ec66bc046bcd1513835f87541ecef54b50c57ec9"
-  integrity sha512-vflOrmlHMGIGVN4AEl6ErPCNKBLcP1ehEpLqnJkTgf69r5QmJzy7BF1WzbBc8Hqs9KffROPT/JqlSKH4o5vB/w==
 
 "@types/file-saver@^2.0.4":
   version "2.0.4"
@@ -7340,11 +7335,6 @@ core-js@^3.0.4, core-js@^3.19.3, core-js@^3.6.5, core-js@^3.8.2:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.21.0.tgz#f479dbfc3dffb035a0827602dd056839a774aa71"
   integrity sha512-YUdI3fFu4TF/2WykQ2xzSiTQdldLB4KVuL9WeAy5XONZYt5Cun/fpQvctoKbCgvPhmzADeesTk/j2Rdx77AcKQ==
 
-core-js@^3.1.3:
-  version "3.23.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.23.1.tgz#9f9a9255115f62c512db56d567f636da32ca0b78"
-  integrity sha512-wfMYHWi1WQjpgZNC9kAlN4ut04TM9fUTdi7CqIoTVM7yaiOUQTklOzfb+oWH3r9edQcT3F887swuVmxrV+CC8w==
-
 core-util-is@~1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.3.tgz#a6042d3634c2b27e9328f837b965fac83808db85"
@@ -9218,14 +9208,6 @@ fd-slicer@~1.1.0:
   integrity sha1-JcfInLH5B3+IkbvmHY85Dq4lbx4=
   dependencies:
     pend "~1.2.0"
-
-feather-icons@^4.29.0:
-  version "4.29.0"
-  resolved "https://registry.yarnpkg.com/feather-icons/-/feather-icons-4.29.0.tgz#4e40e3cbb7bf359ffbbf700edbebdde4e4a74ab6"
-  integrity sha512-Y7VqN9FYb8KdaSF0qD1081HCkm0v4Eq/fpfQYQnubpqi0hXx14k+gF9iqtRys1SIcTEi97xDi/fmsPFZ8xo0GQ==
-  dependencies:
-    classnames "^2.2.5"
-    core-js "^3.1.3"
 
 fecha@^4.2.0:
   version "4.2.1"

@@ -1,5 +1,6 @@
 import angular from 'angular';
-import EndpointHelper from 'Portainer/helpers/endpointHelper';
+import EndpointHelper from '@/portainer/helpers/endpointHelper';
+import { getEnvironments } from '@/portainer/environments/environment.service';
 
 angular.module('portainer.app').controller('EndpointsController', EndpointsController);
 
@@ -46,10 +47,10 @@ function EndpointsController($q, $scope, $state, $async, EndpointService, GroupS
   }
 
   $scope.getPaginatedEndpoints = getPaginatedEndpoints;
-  function getPaginatedEndpoints(lastId, limit, search) {
+  function getPaginatedEndpoints(start, limit, search) {
     const deferred = $q.defer();
     $q.all({
-      endpoints: EndpointService.endpoints(lastId, limit, { search }),
+      endpoints: getEnvironments({ start, limit, query: { search } }),
       groups: GroupService.groups(),
     })
       .then(function success(data) {

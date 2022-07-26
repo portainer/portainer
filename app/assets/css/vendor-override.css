@@ -398,3 +398,7 @@ fieldset[disabled] .btn {
   border-right: 0px;
   border-bottom: 3px solid red;
 }
+
+.label-default {
+  line-height: 11px;
+}

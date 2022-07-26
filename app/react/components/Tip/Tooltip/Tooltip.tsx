@@ -13,7 +13,7 @@ export interface Props {
 }
 
 export function Tooltip({ message, position = 'bottom' }: Props) {
-  const id = `tooltip-${_.uniqueId()}`;
+  const id = _.uniqueId('tooltip-');
 
   return (
     <span

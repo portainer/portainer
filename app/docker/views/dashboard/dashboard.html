@@ -54,13 +54,17 @@
                 <td>{{ endpoint.URL | stripprotocol }}</td>
               </tr>
               <tr>
+                <td>{{ endpoint.Gpus.length <= 1 ? 'GPU' : 'GPUs' }}</td>
+                <td>{{ gpuInfoStr }}</td>
+              </tr>
+              <tr>
                 <td>Tags</td>
                 <td>{{ endpointTags }}</td>
               </tr>
               <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
                 <td colspan="2">
                   <div class="btn-group" role="group" aria-label="...">
-                    <a ui-sref="docker.swarm.visualizer"><i class="fa fa-object-group space-right" aria-hidden="true"></i>Go to cluster visualizer</a>
+                    <a ui-sref="docker.swarm.visualizer" class="vertical-center"><pr-icon icon="'trello'" feather="true" class-name="'icon'"></pr-icon>Go to cluster visualizer</a>
                   </div>
                 </td>
               </tr>
@@ -97,5 +101,9 @@
     <a ui-sref="docker.networks">
       <dashboard-item icon="'fa-sitemap'" type="'Network'" value="networkCount"></dashboard-item>
     </a>
+
+    <div>
+      <dashboard-item icon="'fa-digital-tachograph'" type="'GPU'" value="endpoint.Gpus.length"></dashboard-item>
+    </div>
   </div>
 </div>

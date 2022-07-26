@@ -22,7 +22,7 @@ export function TableTitle({
         <Icon
           icon={icon}
           feather={featherIcon}
-          className="space-right inline-flex"
+          className="icon-nested-blue icon-primary space-right"
         />
 
         {label}

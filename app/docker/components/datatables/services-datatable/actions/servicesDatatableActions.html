@@ -3,21 +3,23 @@
     <button
       ng-if="$ctrl.showUpdateAction"
       type="button"
-      class="btn btn-sm btn-primary"
+      class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
       authorization="DockerServiceUpdate"
       ng-disabled="$ctrl.selectedItemCount === 0"
       ng-click="$ctrl.updateAction($ctrl.selectedItems)"
+      data-cy="service-updateServiceButton"
     >
-      <i class="fa fa-sync space-right" aria-hidden="true"></i>Update
+      <pr-icon icon="'refresh-cw'" feather="true" mode="'danger'"></pr-icon>Update
     </button>
     <button
       type="button"
-      class="btn btn-sm btn-danger"
+      class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
       authorization="DockerServiceDelete"
       ng-disabled="$ctrl.selectedItemCount === 0"
       ng-click="$ctrl.removeAction($ctrl.selectedItems)"
+      data-cy="service-removeServiceButton"
     >
-      <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
+      <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>Remove
     </button>
   </div>
   <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.services.new" ng-if="$ctrl.showAddAction" authorization="DockerServiceCreate">

@@ -1,289 +1,330 @@
 <div class="datatable">
-  <rd-widget>
-    <rd-widget-body classes="no-padding">
-      <div ng-if="$ctrl.isPrimary" class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
-        <span class="small text-muted" style="float: left; margin-top: 5px" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-          System resources are hidden, this can be changed in the table settings.
-        </span>
-        <div class="settings" data-cy="k8sApp-tableSettings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
-            <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
-              <div class="tableMenu">
-                <div class="menuHeader"> Table settings </div>
-                <div class="menuContent">
-                  <div>
-                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
-                      <input id="applications_setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
-                      <label for="applications_setting_show_system">Show system resources</label>
-                    </div>
-                    <div class="md-checkbox">
-                      <input
-                        id="setting_auto_refresh"
-                        type="checkbox"
-                        ng-model="$ctrl.settings.repeater.autoRefresh"
-                        ng-change="$ctrl.onSettingsRepeaterChange()"
-                        data-cy="k8sApp-autoRefreshCheckbox"
-                      />
-                      <label for="setting_auto_refresh">Auto refresh</label>
-                    </div>
-                    <div ng-if="$ctrl.settings.repeater.autoRefresh">
-                      <label for="settings_refresh_rate"> Refresh rate </label>
-                      <select
-                        id="settings_refresh_rate"
-                        ng-model="$ctrl.settings.repeater.refreshRate"
-                        ng-change="$ctrl.onSettingsRepeaterChange()"
-                        class="small-select"
-                        data-cy="k8sApp-refreshRateDropdown"
-                      >
-                        <option value="10">10s</option>
-                        <option value="30">30s</option>
-                        <option value="60">1min</option>
-                        <option value="120">2min</option>
-                        <option value="300">5min</option>
-                      </select>
-                      <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sApp-tableSettingsCloseButton">Close</a>
-                </div>
-              </div>
-            </div>
-          </span>
-        </div>
+  <!-- toolbar header actions and settings -->
+  <div ng-if="$ctrl.isPrimary" class="toolBar !flex-col gap-1">
+    <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
+      <div class="toolBarTitle vertical-center">
+        <pr-icon icon="'box'" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+        Applications
       </div>
-      <div ng-if="$ctrl.isPrimary" class="actionBar">
-        <button
-          type="button"
-          class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-          data-cy="k8sApp-removeAppButton"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.new" data-cy="k8sApp-addApplicationButton">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add application with form
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.deploy" data-cy="k8sApp-deployFromManifestButton">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Create from manifest
-        </button>
-      </div>
-      <div ng-if="$ctrl.isPrimary" class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+      <div class="searchBar vertical-center">
+        <pr-icon icon="'search'" feather="true"></pr-icon>
         <input
           type="text"
           class="searchInput"
           ng-model="$ctrl.state.textFilter"
           ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
+          placeholder="Search for an application..."
           auto-focus
           ng-model-options="{ debounce: 300 }"
           data-cy="k8sApp-searchApplicationsInput"
         />
       </div>
-      <div class="table-responsive">
-        <table class="table table-hover nowrap-cells" data-cy="k8sApp-appTable">
-          <thead ng-class="{ 'secondary-heading': !$ctrl.isPrimary }">
-            <tr>
-              <th class="datatable-wide">
-                <span ng-if="$ctrl.isPrimary">
-                  <span class="md-checkbox">
-                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8sApp-selectAllCheckbox" />
-                    <label for="select_all"></label>
-                  </span>
-                  <a ng-click="$ctrl.expandAll()">
-                    <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
-                  </a>
-                </span>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('StackName')">
-                  Stack
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('ResourcePool')">
-                  Namespace
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourcePool' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourcePool' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Image')">
-                  Image
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
-                <a ng-click="$ctrl.changeOrderBy('ApplicationType')">
-                  Application Type
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ApplicationType' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ApplicationType' && $ctrl.state.reverseOrder"></i>
-                </a>
+      <div class="actionBar !gap-3 !mr-0" ng-if="!$ctrl.offlineMode">
+        <button
+          ng-if="$ctrl.isPrimary"
+          type="button"
+          class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          data-cy="k8sApp-removeAppButton"
+        >
+          <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+          Remove
+        </button>
+        <button
+          ng-if="$ctrl.isPrimary"
+          type="button"
+          class="btn btn-sm btn-secondary h-fit vertical-center !ml-0"
+          ui-sref="kubernetes.applications.new"
+          data-cy="k8sApp-addApplicationButton"
+        >
+          <pr-icon icon="'plus'" feather="true" class-name="'!h-3'"></pr-icon>Add with form
+        </button>
+        <button
+          ng-if="$ctrl.isPrimary"
+          type="button"
+          class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+          ui-sref="kubernetes.deploy"
+          data-cy="k8sApp-deployFromManifestButton"
+        >
+          <pr-icon icon="'plus'" feather="true" class-name="'!h-3'"></pr-icon>Create from manifest
+        </button>
+      </div>
+      <div class="settings" data-cy="k8sApp-tableSettings">
+        <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
+          <span uib-dropdown-toggle aria-label="Settings">
+            <pr-icon icon="'more-vertical'" feather="true" class-name="'!mr-0 !h-4'"></pr-icon>
+          </span>
+          <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+            <div class="tableMenu">
+              <div class="menuHeader"> Table settings </div>
+              <div class="menuContent">
                 <div>
-                  <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
-                  <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
-                </div>
-                <div class="dropdown-menu" uib-dropdown-menu>
-                  <div class="tableMenu">
-                    <div class="menuHeader"> Filter by application type </div>
-                    <div class="menuContent">
-                      <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
-                        <input id="filter_state_{{ $index }}" type="checkbox" ng-model="filter.display" ng-change="$ctrl.onStateFilterChange()" />
-                        <label for="filter_state_{{ $index }}">{{ filter.type | kubernetesApplicationTypeText }}</label>
-                      </div>
-                    </div>
-                    <div>
-                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.state.open = false;">Close</a>
-                    </div>
+                  <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                    <input id="applications_setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
+                    <label for="applications_setting_show_system">Show system resources</label>
+                  </div>
+                  <div class="md-checkbox">
+                    <input
+                      id="setting_auto_refresh"
+                      type="checkbox"
+                      ng-model="$ctrl.settings.repeater.autoRefresh"
+                      ng-change="$ctrl.onSettingsRepeaterChange()"
+                      data-cy="k8sApp-autoRefreshCheckbox"
+                    />
+                    <label for="setting_auto_refresh">Auto refresh</label>
+                  </div>
+                  <div ng-if="$ctrl.settings.repeater.autoRefresh">
+                    <label for="settings_refresh_rate"> Refresh rate </label>
+                    <select
+                      id="settings_refresh_rate"
+                      ng-model="$ctrl.settings.repeater.refreshRate"
+                      ng-change="$ctrl.onSettingsRepeaterChange()"
+                      class="small-select"
+                      data-cy="k8sApp-refreshRateDropdown"
+                    >
+                      <option value="10">10s</option>
+                      <option value="30">30s</option>
+                      <option value="60">1min</option>
+                      <option value="120">2min</option>
+                      <option value="300">5min</option>
+                    </select>
+                    <span>
+                      <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
+                    </span>
                   </div>
                 </div>
-              </th>
-              <th> Status </th>
-              <th> Published </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('CreationDate')">
-                  Created
-                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              ng-click="$ctrl.expandItem(item, !$ctrl.isItemExpanded(item))"
-              dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset  | filter:$ctrl.applyFilters | filter:$ctrl.state.textFilter | filter:$ctrl.isDisplayed | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
-              ng-class="{ active: item.Checked, interactive: $ctrl.isExpandable(item), 'secondary-body': !$ctrl.isPrimary }"
-              pagination-id="$ctrl.tableKey"
-            >
-              <td>
-                <span ng-if="$ctrl.isPrimary" class="md-checkbox">
-                  <input
-                    id="select_{{ $index }}"
-                    type="checkbox"
-                    ng-model="item.Checked"
-                    ng-click="$ctrl.selectItem(item, $event); $event.stopPropagation()"
-                    ng-disabled="$ctrl.isSystemNamespace(item)"
-                  />
-                  <label for="select_{{ $index }}"></label>
-                </span>
-                <a ng-if="$ctrl.isExpandable(item)">
-                  <i ng-class="{ 'fas fa-angle-down': $ctrl.isItemExpanded(item), 'fas fa-angle-right': !$ctrl.isItemExpanded(item) }" class="space-right" aria-hidden="true"></i>
-                </a>
-              </td>
-              <td>
-                <a ng-if="item.KubernetesApplications" ui-sref="kubernetes.helm({ name: item.Name, namespace: item.ResourcePool })" ng-click="$event.stopPropagation()"
-                  >{{ item.Name }}
-                </a>
-                <a
-                  ng-if="!item.KubernetesApplications"
-                  ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })"
-                  ng-click="$event.stopPropagation()"
-                  >{{ item.Name }}
-                </a>
-                <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
-                <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalApplication(item)">external</span>
-              </td>
-              <td>{{ item.StackName || '-' }}</td>
-              <td>
-                <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })" ng-click="$event.stopPropagation()">{{ item.ResourcePool }}</a>
-              </td>
-              <td title="{{ item.Image }}"
-                >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
-              >
-              <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
-              <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD">
-                <status-indicator ok="(item.TotalPodsCount > 0 && item.TotalPodsCount === item.RunningPodsCount) || item.Status === 'Ready'"></status-indicator>
-                <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
-                <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
-                <span ng-if="item.RunningPodsCount >= 0 && item.TotalPodsCount >= 0">
-                  <code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code>
-                </span>
-                <span ng-if="item.KubernetesApplications">{{ item.Status }}</span>
-              </td>
-              <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.POD">
-                {{ item.Pods[0].Status }}
-              </td>
-              <td>
-                <span>
-                  {{ item.Services.length === 0 ? 'No' : 'Yes' }}
-                </span>
-              </td>
-              <td>{{ item.CreationDate | getisodate }} {{ item.ApplicationOwner ? 'by ' + item.ApplicationOwner : '' }}</td>
-            </tr>
-            <tr dir-paginate-end ng-show="$ctrl.isExpandable(item) && $ctrl.isItemExpanded(item)" ng-class="{ 'secondary-body': $ctrl.isPrimary && !item.KubernetesApplications }">
-              <td></td>
-              <td colspan="8" class="datatable-padding-vertical">
-                <span ng-if="item.KubernetesApplications">
-                  <kubernetes-applications-datatable
-                    dataset="item.KubernetesApplications"
-                    table-key="{{ item.Id }}_table"
-                    settings-key="{{ $ctrl.tableKey }}"
-                    order-by="Name"
-                    remove-action="$ctrl.removeAction"
-                    refresh-callback="$ctrl.refreshCallback"
-                    on-publishing-mode-click="($ctrl.onPublishingModeClick)"
-                    is-primary="false"
-                  >
-                  </kubernetes-applications-datatable>
-                </span>
-                <span ng-if="!item.KubernetesApplications">
-                  <kubernetes-applications-datatable-url
-                    ng-if="$ctrl.getPublishedUrl(item)"
-                    published-url="{{ $ctrl.getPublishedUrl(item) }}"
-                  ></kubernetes-applications-datatable-url>
-                  <kubernetes-applications-datatable-details
-                    ng-if="$ctrl.hasConfigurationSecrets(item)"
-                    configurations="item.Configurations"
-                  ></kubernetes-applications-datatable-details>
-                </span>
-              </td>
-            </tr>
-            <tr ng-if="!$ctrl.dataset">
-              <td colspan="8" class="text-center text-muted">Loading...</td>
-            </tr>
-            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="8" class="text-center text-muted">No application available.</td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+              <div>
+                <a type="button" class="btn btn-sm btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sApp-tableSettingsCloseButton">Close</a>
+              </div>
+            </div>
+          </div>
+        </span>
       </div>
-      <div ng-if="$ctrl.isPrimary" class="footer" ng-if="$ctrl.dataset">
-        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
-        <div class="paginationControls">
-          <form class="form-inline">
-            <span class="limitSelector">
-              <span style="margin-right: 5px"> Items per page </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
-                <option value="0">All</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
+    </div>
+    <div class="flex flex-row w-full">
+      <span class="small text-muted mt-1" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+        <pr-icon icon="'info'" feather="true" class-name="'icon'"></pr-icon>
+        System resources are hidden, this can be changed in the table settings.
+      </span>
+    </div>
+  </div>
+  <!-- data table content -->
+  <div class="table-responsive">
+    <table class="table table-hover table-filters nowrap-cells" data-cy="k8sApp-appTable">
+      <thead ng-class="{ 'secondary-heading': !$ctrl.isPrimary }">
+        <tr role="row">
+          <th role="columnheader" class="datatable-wide dropdown">
+            <div ng-if="$ctrl.isPrimary" class="flex no-wrap min-w-max">
+              <span class="md-checkbox vertical-center">
+                <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8sApp-selectAllCheckbox" />
+                <label for="select_all"></label>
+              </span>
+              <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
+                <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" feather="true" class-name="'icon'"></pr-icon>
+                <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" feather="true" class-name="'icon'"></pr-icon>
+              </div>
+            </div>
+          </th>
+          <th>
+            <table-column-header
+              col-title="'Name'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Name'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Name')"
+            ></table-column-header>
+          </th>
+          <th>
+            <table-column-header
+              col-title="'Stack'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'StackName'"
+              is-sorted-desc="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('StackName')"
+            ></table-column-header>
+          </th>
+          <th>
+            <table-column-header
+              col-title="'Namespace'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'ResourcePool'"
+              is-sorted-desc="$ctrl.state.orderBy === 'ResourcePool' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('ResourcePool')"
+            ></table-column-header>
+          </th>
+          <th>
+            <table-column-header
+              col-title="'Image'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Image'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Image')"
+            ></table-column-header>
+          </th>
+          <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
+            <div class="flex flex-row no-wrap gap-2">
+              <table-column-header
+                col-title="'Application Type'"
+                can-sort="true"
+                is-sorted="$ctrl.state.orderBy === 'ApplicationType'"
+                is-sorted-desc="$ctrl.state.orderBy === 'ApplicationType' && $ctrl.state.reverseOrder"
+                ng-click="$ctrl.changeOrderBy('ApplicationType')"
+              ></table-column-header>
+              <div class="flex flex-row no-wrap gap-1 items-center" uib-dropdown-toggle>
+                <span class="table-filter">Filters</span>
+                <pr-icon ng-if="!$ctrl.filters.state.enabled" icon="'filter'" class-name="'icon'" feather="true"></pr-icon>
+                <pr-icon ng-if="$ctrl.filters.state.enabled" icon="'check'" class-name="'icon'" feather="true"></pr-icon>
+              </div>
+              <div class="dropdown-menu" uib-dropdown-menu>
+                <div class="tableMenu">
+                  <div class="menuHeader"> Filter by application type </div>
+                  <div class="menuContent">
+                    <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
+                      <input id="filter_state_{{ $index }}" type="checkbox" ng-model="filter.display" ng-change="$ctrl.onStateFilterChange()" />
+                      <label for="filter_state_{{ $index }}">{{ filter.type | kubernetesApplicationTypeText }}</label>
+                    </div>
+                  </div>
+                  <div>
+                    <a type="button" class="btn btn-sm btn-default btn-sm" ng-click="$ctrl.filters.state.open = false;">Close</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </th>
+          <th>
+            <table-column-header col-title="'Status'" can-sort="false"></table-column-header>
+            <!-- Status -->
+          </th>
+          <th>
+            <table-column-header col-title="'Published'" can-sort="false"></table-column-header>
+            <!-- Published -->
+          </th>
+          <th>
+            <table-column-header
+              col-title="'Created'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'CreationDate'"
+              is-sorted-desc="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('CreationDate')"
+            ></table-column-header>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          ng-click="$ctrl.expandItem(item, !$ctrl.isItemExpanded(item))"
+          dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.applyFilters | filter:$ctrl.state.textFilter | filter:$ctrl.isDisplayed | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
+          ng-class="{ active: item.Checked, interactive: $ctrl.isExpandable(item), 'secondary-body': !$ctrl.isPrimary }"
+          pagination-id="$ctrl.tableKey"
+        >
+          <td class="h-[50px]">
+            <span ng-if="$ctrl.isPrimary" class="md-checkbox vertical-center">
+              <input
+                id="select_{{ $index }}"
+                type="checkbox"
+                ng-model="item.Checked"
+                ng-click="$ctrl.selectItem(item, $event); $event.stopPropagation()"
+                ng-disabled="$ctrl.isSystemNamespace(item)"
+              />
+              <label for="select_{{ $index }}"></label>
             </span>
-            <dir-pagination-controls max-size="5" pagination-id="$ctrl.tableKey"></dir-pagination-controls>
-          </form>
-        </div>
-      </div>
-    </rd-widget-body>
-  </rd-widget>
+            <div ng-if="$ctrl.isExpandable(item)" class="vertical-center">
+              <pr-icon ng-if="$ctrl.isItemExpanded(item)" icon="'chevron-down'" feather="true" class-name="'icon'"></pr-icon>
+              <pr-icon ng-if="!$ctrl.isItemExpanded(item)" icon="'chevron-right'" feather="true" class-name="'icon'"></pr-icon>
+            </div>
+          </td>
+          <td>
+            <a ng-if="item.KubernetesApplications" ui-sref="kubernetes.helm({ name: item.Name, namespace: item.ResourcePool })" ng-click="$event.stopPropagation()"
+              >{{ item.Name }}
+            </a>
+            <a
+              ng-if="!item.KubernetesApplications"
+              ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })"
+              ng-click="$event.stopPropagation()"
+              >{{ item.Name }}
+            </a>
+            <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
+            <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalApplication(item)">external</span>
+          </td>
+          <td>{{ item.StackName || '-' }}</td>
+          <td>
+            <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })" ng-click="$event.stopPropagation()">{{ item.ResourcePool }}</a>
+          </td>
+          <td title="{{ item.Image }}"
+            >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
+          >
+          <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
+          <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD">
+            <status-indicator ok="(item.TotalPodsCount > 0 && item.TotalPodsCount === item.RunningPodsCount) || item.Status === 'Ready'"></status-indicator>
+            <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
+            <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
+            <span ng-if="item.RunningPodsCount >= 0 && item.TotalPodsCount >= 0"
+              ><code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code></span
+            >
+            <span ng-if="item.KubernetesApplications">{{ item.Status }}</span>
+          </td>
+          <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.POD">
+            {{ item.Pods[0].Status }}
+          </td>
+          <td>
+            <span>
+              {{ item.Services.length === 0 ? 'No' : 'Yes' }}
+            </span>
+          </td>
+          <td>{{ item.CreationDate | getisodate }} {{ item.ApplicationOwner ? 'by ' + item.ApplicationOwner : '' }}</td>
+        </tr>
+        <tr dir-paginate-end ng-show="$ctrl.isExpandable(item) && $ctrl.isItemExpanded(item)" ng-class="{ 'secondary-body': $ctrl.isPrimary && !item.KubernetesApplications }">
+          <td></td>
+          <td colspan="8" class="datatable-padding-vertical">
+            <span ng-if="item.KubernetesApplications">
+              <kubernetes-applications-datatable
+                dataset="item.KubernetesApplications"
+                table-key="{{ item.Id }}_table"
+                settings-key="{{ $ctrl.tableKey }}"
+                order-by="Name"
+                remove-action="$ctrl.removeAction"
+                refresh-callback="$ctrl.refreshCallback"
+                on-publishing-mode-click="($ctrl.onPublishingModeClick)"
+                is-primary="false"
+              >
+              </kubernetes-applications-datatable>
+            </span>
+            <span ng-if="!item.KubernetesApplications">
+              <kubernetes-applications-datatable-url ng-if="$ctrl.getPublishedUrl(item)" published-url="{{ $ctrl.getPublishedUrl(item) }}"></kubernetes-applications-datatable-url>
+              <kubernetes-applications-datatable-details
+                ng-if="$ctrl.hasConfigurationSecrets(item)"
+                configurations="item.Configurations"
+              ></kubernetes-applications-datatable-details>
+            </span>
+          </td>
+        </tr>
+        <tr ng-if="!$ctrl.dataset">
+          <td colspan="8" class="text-center text-muted">Loading...</td>
+        </tr>
+        <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+          <td colspan="8" class="text-center text-muted">No application available.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div ng-if="$ctrl.isPrimary" class="footer pl-5" ng-if="$ctrl.dataset">
+    <div class="infoBar !ml-0" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
+    <div class="paginationControls">
+      <form class="form-inline">
+        <span class="limitSelector">
+          <span class="mr-1"> Items per page </span>
+          <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </span>
+        <dir-pagination-controls max-size="5" pagination-id="$ctrl.tableKey"></dir-pagination-controls>
+      </form>
+    </div>
+  </div>
 </div>

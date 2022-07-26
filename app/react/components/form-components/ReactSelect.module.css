@@ -31,6 +31,7 @@
   background-color: var(--bg-multiselect-color);
   border: 1px solid var(--border-multiselect);
   padding: 5px;
+  z-index: 10;
 }
 
 .root :global .selector__option {

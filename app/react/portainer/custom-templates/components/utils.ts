@@ -38,12 +38,15 @@ export function intersectVariables(
 ) {
   const oldVariablesWithLabel = oldVariables.filter((v) => !!v.label);
 
-  return [
-    ...oldVariablesWithLabel,
-    ...newVariables.filter(
-      (v) => !oldVariablesWithLabel.find(({ name }) => name === v.name)
-    ),
-  ];
+  return _.uniqBy(
+    [
+      ...oldVariablesWithLabel,
+      ...newVariables.filter(
+        (v) => !oldVariablesWithLabel.find(({ name }) => name === v.name)
+      ),
+    ],
+    'name'
+  );
 }
 
 export function renderTemplate(
@@ -68,5 +71,5 @@ export function renderTemplate(
     )
   );
 
-  return Mustache.render(template, state);
+  return Mustache.render(template, state, undefined, { escape: (t) => t });
 }

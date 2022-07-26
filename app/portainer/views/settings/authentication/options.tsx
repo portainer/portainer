@@ -1,5 +1,5 @@
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import Microsoft from '@/assets/ico/microsoft.svg?c';
+import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import Ldap from '@/assets/ico/ldap.svg?c';
 import Oauth from '@/assets/ico/oauth.svg?c';
 

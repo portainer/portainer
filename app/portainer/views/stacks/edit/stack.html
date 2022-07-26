@@ -133,10 +133,10 @@
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px" name="stackUpdateForm">
               <div class="form-group">
                 <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion == 2">
-                  This stack will be deployed using the equivalent of <code>docker-compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
+                  This stack will be deployed using the equivalent of <code>docker compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
                 </span>
                 <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion > 2">
-                  This stack will be deployed using <code>docker-compose</code>.
+                  This stack will be deployed using <code>docker compose</code>.
                 </span>
                 <span class="col-sm-12 text-muted small">
                   You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
@@ -147,7 +147,7 @@
                   <code-editor
                     read-only="orphaned"
                     identifier="stack-editor"
-                    placeholder="# Define or paste the content of your docker-compose file here"
+                    placeholder="# Define or paste the content of your docker compose file here"
                     yml="true"
                     on-change="(editorUpdate)"
                     value="stackFileContent"
@@ -167,7 +167,7 @@
                       ></portainer-tooltip>
                     </label>
                     <label class="switch box-selector-item limited business" style="margin-left: 20px">
-                      <input type="checkbox" ng-model="formValues.EnableWebhook" disabled="disabled" ng-checked="true" /><i></i>
+                      <input type="checkbox" ng-model="formValues.EnableWebhook" disabled="disabled" ng-checked="false" /><i></i>
                     </label>
                     <be-feature-indicator feature="stackWebhookFeature"></be-feature-indicator>
                   </div>
@@ -180,6 +180,7 @@
                   ng-model="formValues.Env"
                   explanation="These values will be used as substitutions in the stack file"
                   on-change="(handleEnvVarChange)"
+                  show-help-message="true"
                 ></environment-variables-panel>
               </div>
               <!-- !environment-variables -->
@@ -233,7 +234,7 @@
   <div class="col-sm-12">
     <services-datatable
       title-text="Services"
-      title-icon="fa-list-alt"
+      title-icon="list"
       dataset="services"
       table-key="stack-services"
       order-by="Name"
