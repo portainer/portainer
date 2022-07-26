@@ -39,8 +39,8 @@
             <td>{{ config.Gid }}</td>
             <td>{{ config.Mode }}</td>
             <td authorization="DockerServiceUpdate">
-              <button class="btn btn-xs btn-danger pull-right" type="button" ng-click="removeConfig(service, $index)" ng-disabled="isUpdating">
-                <i class="fa fa-trash" aria-hidden="true"></i> Remove config
+              <button class="btn btn-xs btn-light pull-right" type="button" ng-click="removeConfig(service, $index)" ng-disabled="isUpdating">
+                <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon> Remove config
               </button>
             </td>
           </tr>
