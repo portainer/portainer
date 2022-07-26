@@ -6,14 +6,14 @@
           <pr-icon icon="$ctrl.titleIcon" feather="true" mode="'primary'" class-name="'icon-nested-blue'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
-        <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true" class="searchIcon"></pr-icon>
+        <div class="searchBar">
+          <pr-icon icon="'search'" feather="true" class="vertical-center"></pr-icon>
           <input
             type="text"
-            class="searchInput"
+            class="searchInput ml-1"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
-            placeholder="Search for an application"
+            placeholder="Search for an application..."
             auto-focus
             ng-model-options="{ debounce: 300 }"
           />
