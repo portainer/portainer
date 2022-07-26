@@ -316,7 +316,7 @@ angular.module('portainer.app').controller('StackController', [
     }
 
     function loadStack(id) {
-      return $async(() => {
+      return $async(async () => {
         var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
         getEnvironments()
