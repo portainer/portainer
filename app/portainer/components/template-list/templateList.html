@@ -39,6 +39,22 @@
             ></template-list-sort>
           </div>
         </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="searchBar items-center flex gap-1">
+              <pr-icon icon="'search'" feather="true"></pr-icon>
+              <input
+                type="text"
+                class="searchInput"
+                ng-model="$ctrl.state.textFilter"
+                ng-change="$ctrl.onTextFilterChange()"
+                placeholder="Search..."
+                auto-focus
+                ng-model-options="{ debounce: 300 }"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="blocklist">
