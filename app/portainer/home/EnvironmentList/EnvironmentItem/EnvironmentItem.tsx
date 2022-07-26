@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import _ from 'lodash';
-import { Edit2, Tag, Cpu, Trello } from 'react-feather';
+import { Edit2, Tag, Cpu } from 'react-feather';
 
 import {
   isoDateFromTimestamp,
@@ -17,8 +17,9 @@ import type { TagId } from '@/portainer/tags/types';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
 import { useTags } from '@/portainer/tags/queries';
 
-import { Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
+import { Button } from '@@/buttons';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EdgeIndicator } from './EdgeIndicator';
@@ -102,16 +103,16 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
                             aria-hidden="true"
                           />
                           {environment.Snapshots[0].TotalCPU} CPU
+                          <Icon
+                            icon="svg-memory"
+                            className="icon icon-sm space-right"
+                          />
+                          {humanize(environment.Snapshots[0].TotalMemory)} RAM
                           <Cpu
                             className="icon icon-sm space-right"
                             aria-hidden="true"
                           />
-                          {humanize(environment.Snapshots[0].TotalMemory)} RAM
-                          <Trello
-                            className="icon icon-sm space-right"
-                            aria-hidden="true"
-                          />
-                          {environment.Gpus?.length}
+                          {environment.Gpus?.length} GPU
                         </span>
                       )}
                     </span>
