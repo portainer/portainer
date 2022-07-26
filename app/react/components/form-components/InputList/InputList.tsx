@@ -2,6 +2,7 @@ import { ComponentType } from 'react';
 import clsx from 'clsx';
 
 import { AddButton, Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
 
@@ -115,7 +116,13 @@ export function InputList<T = DefaultType>({
                   error
                 )
               )}
-              <div className={clsx(styles.itemActions, 'items-start')}>
+              <div
+                className={clsx(
+                  styles.itemActions,
+                  'items-start',
+                  'vertical-center'
+                )}
+              >
                 {movable && (
                   <>
                     <Button
@@ -123,7 +130,7 @@ export function InputList<T = DefaultType>({
                       disabled={index === 0}
                       onClick={() => handleMoveUp(index)}
                     >
-                      <i className="fa fa-arrow-up" aria-hidden="true" />
+                      <Icon icon="arrow-up" feather />
                     </Button>
                     <Button
                       size="small"
@@ -131,16 +138,16 @@ export function InputList<T = DefaultType>({
                       disabled={index === value.length - 1}
                       onClick={() => handleMoveDown(index)}
                     >
-                      <i className="fa fa-arrow-down" aria-hidden="true" />
+                      <Icon icon="arrow-down" feather />
                     </Button>
                   </>
                 )}
                 <Button
-                  color="danger"
-                  size="small"
+                  color="light"
+                  size="medium"
                   onClick={() => handleRemoveItem(key, item)}
                 >
-                  <i className="fa fa-trash" aria-hidden="true" />
+                  <Icon icon="trash-2" feather />
                 </Button>
               </div>
             </div>
