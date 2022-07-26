@@ -59,12 +59,15 @@ import gitlab from '@/assets/ico/vendor/gitlab.svg?c';
 import google from '@/assets/ico/vendor/google.svg?c';
 import googlecloud from '@/assets/ico/vendor/googlecloud.svg?c';
 import kubernetes from '@/assets/ico/vendor/kubernetes.svg?c';
+import helm from '@/assets/ico/vendor/helm.svg?c';
 import linode from '@/assets/ico/vendor/linode.svg?c';
 import microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import nomad from '@/assets/ico/vendor/nomad.svg?c';
 import openldap from '@/assets/ico/vendor/openldap.svg?c';
 import proget from '@/assets/ico/vendor/proget.svg?c';
 import quay from '@/assets/ico/vendor/quay.svg?c';
+
+const placeholder = Placeholder;
 
 export const SvgIcons = {
   automode,
@@ -96,6 +99,7 @@ export const SvgIcons = {
   memory,
   objectgroup,
   palette,
+  placeholder,
   plug,
   restore,
   restorewindow,
@@ -124,6 +128,7 @@ export const SvgIcons = {
   google,
   googlecloud,
   kubernetes,
+  helm,
   linode,
   microsoft,
   nomad,

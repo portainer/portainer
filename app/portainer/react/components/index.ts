@@ -13,6 +13,7 @@ import { Tooltip } from '@@/Tip/Tooltip';
 import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
 import { DashboardItem } from '@@/DashboardItem';
 import { SearchBar } from '@@/datatables/SearchBar';
+import { FallbackImage } from '@@/FallbackImage';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -45,6 +46,19 @@ export const componentsModule = angular
   .component(
     'pageHeader',
     r2a(PageHeader, ['title', 'breadcrumbs', 'loading', 'onReload', 'reload'])
+  )
+  .component(
+    'fallbackImage',
+    r2a(FallbackImage, [
+      'src',
+      'fallbackIcon',
+      'alt',
+      'size',
+      'className',
+      'fallbackMode',
+      'fallbackClassName',
+      'feather',
+    ])
   )
   .component(
     'prIcon',

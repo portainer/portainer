@@ -96,7 +96,7 @@ div.input-mask {
 }
 .widget .widget-header {
   color: var(--text-widget-header-color);
-  padding: 10px 15px;
+  padding: 20px 20px 10px 20px;
   line-height: 30px;
   font-weight: 500;
 }
