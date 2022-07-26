@@ -288,6 +288,14 @@ json-tree .branch-preview {
 .rzslider .rz-bubble.rz-limit {
   color: var(--text-rzslider-limit-color);
 }
+
+.rz-bubble.rz-limit.rz-ceil {
+  position: absolute;
+  right: 0;
+  left: auto !important;
+  top: -26px;
+}
+
 input,
 button,
 select,
