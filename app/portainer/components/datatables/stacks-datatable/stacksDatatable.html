@@ -6,7 +6,7 @@
           <pr-icon icon="'layers'" feather="true" class-name="'icon-nested-blue vertical-center'" mode="'primary'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
-        <div class="searchBar vertical-center">
+        <div class="searchBar vertical-center !mr-0">
           <pr-icon icon="'search'" feather="true"></pr-icon>
           <input
             type="text"
@@ -235,8 +235,8 @@
           </tbody>
         </table>
       </div>
-      <div class="footer" ng-if="$ctrl.dataset">
-        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0">
+      <div class="footer pl-5" ng-if="$ctrl.dataset">
+        <div class="infoBar !ml-0" ng-if="$ctrl.state.selectedItemCount !== 0">
           {{ $ctrl.state.selectedItemCount }}
           item(s) selected
         </div>

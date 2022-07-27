@@ -1,13 +1,13 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget ng-if="ctrl.availableUsersAndTeams && ctrl.accessControlledEntity">
-      <rd-widget-header icon="fa-user-lock" title-text="Create access"></rd-widget-header>
+      <rd-widget-header icon="user-check" feather-icon="true" title-text="Create access"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div ng-if="ctrl.entityType !== 'registry'" class="form-group">
             <span class="col-sm-12 small text-warning">
               <p>
-                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                 Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
               </p>
             </span>
@@ -35,13 +35,13 @@
             <div class="col-sm-12">
               <button
                 type="submit"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm vertical-center"
                 ng-disabled="(ctrl.availableUsersAndTeams | filter:{ticked:true}).length === 0 || ctrl.actionInProgress"
                 ng-click="ctrl.authorizeAccess()"
                 button-spinner="ctrl.actionInProgress"
                 data-cy="access-createAccess"
               >
-                <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create access</span>
+                <span ng-hide="ctrl.state.actionInProgress"><pr-icon icon="'plus'" feather="true"></pr-icon> Create access</span>
                 <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
               </button>
             </div>
@@ -57,7 +57,7 @@
     <access-datatable
       ng-if="ctrl.authorizedUsersAndTeams"
       title-text="Access"
-      title-icon="fa-user-lock"
+      title-icon="user-x"
       table-key="{{ 'access_' + ctrl.entityType }}"
       order-by="Name"
       show-warning="ctrl.entityType !== 'registry'"

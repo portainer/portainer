@@ -11,6 +11,7 @@ import homeModule from './home';
 import { accessControlModule } from './access-control';
 import { reactModule } from './react';
 import { sidebarModule } from './react/views/sidebar';
+import environmentsModule from './environments';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -42,6 +43,7 @@ angular
     accessControlModule,
     reactModule,
     sidebarModule,
+    environmentsModule,
   ])
   .config([
     '$stateRegistryProvider',
