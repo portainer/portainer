@@ -121,7 +121,7 @@
   --bg-progress-color: var(--grey-14);
   --bg-pagination-color: var(--white-color);
   --bg-pagination-span-color: var(--white-color);
-  --bg-pagination-hover-color: var(--grey-11);
+  --bg-pagination-hover-color: var(--ui-blue-3);
   --bg-ui-select-hover-color: var(--grey-14);
   --bg-motd-body-color: var(--grey-20);
   --bg-item-highlighted-color: var(--grey-21);
@@ -192,7 +192,7 @@
   --text-blocklist-item-selected-color: var(--grey-37);
   --text-progress-bar-color: var(--grey-27);
   --text-pagination-color: var(--grey-26);
-  --text-pagination-span-color: var(--ui-gray-3);
+  --text-pagination-span-color: var(--ui-blue-3);
   --text-pagination-span-hover-color: var(--blue-4);
   --text-ui-select-color: var(--grey-6);
   --text-ui-select-hover-color: var(--grey-28);
@@ -227,9 +227,9 @@
   --border-codemirror-gutters-color: var(--grey-19);
   --border-pre-color: var(--grey-43);
   --border-blocklist-item-selected-color: var(--grey-46);
-  --border-pagination-color: var(--grey-19);
-  --border-pagination-span-color: var(--grey-19);
-  --border-pagination-hover-color: var(--grey-19);
+  --border-pagination-color: var(--ui-white);
+  --border-pagination-span-color: var(--ui-white);
+  --border-pagination-hover-color: var(--ui-white);
   --border-multiselect-button-color: var(--grey-48);
   --border-searchbar-color: var(--grey-10);
   --border-panel-color: var(--white-color);

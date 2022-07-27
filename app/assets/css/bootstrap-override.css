@@ -392,7 +392,7 @@ input:checked + .slider:before {
 
 /* Pagination */
 .datatable .footer .paginationControls .pagination {
-  border: 1px solid #fff;
+  border: 1px solid var(--ui-white);
 }
 
 .pagination li button {
@@ -402,4 +402,10 @@ input:checked + .slider:before {
 .pagination li:active button,
 .pagination li:focus button {
   border: 1px solid var(--ui-gray-5) !important;
+}
+
+.pagination li a {
+  text-decoration: none !important;
+  cursor: pointer;
+  color: var(--ui-gray-9) !important;
 }

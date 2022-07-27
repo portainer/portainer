@@ -23,8 +23,7 @@
 .pagination > .disabled > a:focus {
   color: var(--text-pagination-color);
   background-color: var(--bg-pagination-color);
-  border-color: #fff;
-  border-radius: 8px;
+  border-color: var(--border-pagination-color);
 }
 
 .pagination > li > button {
@@ -34,14 +33,14 @@
   margin-left: -1px !important;
   line-height: 1.42857143;
   text-decoration: none;
-  border: 1px solid #fff;
+  border: 1px solid var(--ui-white);
 }
 
 .pagination > li > a,
 .pagination > li > button,
 .pagination > li > span {
   background-color: var(--bg-pagination-span-color);
-  border-color: #fff;
+  border-color: var(--border-pagination-span-color);
   color: var(--text-pagination-span-color);
 }
 
@@ -51,8 +50,9 @@
 .pagination > li > a:focus,
 .pagination > li > button:focus,
 .pagination > li > span:focus {
-  background-color: var(--ui-blue-3);
-  color: var(--ui-blue-8);
+  background-color: var(--bg-pagination-hover-color);
+  border-color: var(--border-pagination-hover-color);
+  color: var(--text-pagination-span-hover-color);
   border-radius: 8px;
 }
 
@@ -68,7 +68,7 @@
   @apply text-blue-7;
   z-index: 3;
   cursor: default;
-  background-color: var(--ui-blue-3);
+  background-color: var(--text-pagination-span-color);
+  border-color: var(--text-pagination-span-color);
   border-radius: 8px;
-  color: var(--ui-blue-8);
 }
