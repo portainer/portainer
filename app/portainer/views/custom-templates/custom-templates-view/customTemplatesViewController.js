@@ -259,8 +259,8 @@ class CustomTemplatesViewController {
     }
   }
 
-  editorUpdate(cm) {
-    this.formValues.fileContent = cm.getValue();
+  editorUpdate(value) {
+    this.formValues.fileContent = value;
   }
 
   isDeployable(endpoint, templateType) {

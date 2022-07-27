@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { FormikErrors } from 'formik';
 
 import { AddButton, Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
 
@@ -131,7 +132,7 @@ export function InputList<T = DefaultType>({
                       disabled={disabled || index === 0}
                       onClick={() => handleMoveUp(index)}
                     >
-                      <i className="fa fa-arrow-up" aria-hidden="true" />
+                      <Icon icon="arrow-up" feather />
                     </Button>
                     <Button
                       size="small"
@@ -139,7 +140,7 @@ export function InputList<T = DefaultType>({
                       disabled={disabled || index === value.length - 1}
                       onClick={() => handleMoveDown(index)}
                     >
-                      <i className="fa fa-arrow-down" aria-hidden="true" />
+                      <Icon icon="arrow-down" feather />
                     </Button>
                   </>
                 )}
