@@ -31,7 +31,7 @@
             <div class="col-sm-12" style="margin-top: 5px">
               <label class="control-label text-left">Labels</label>
               <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addLabel()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
+                <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add label
               </span>
             </div>
             <!-- labels-input-list -->
@@ -45,8 +45,8 @@
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                 </div>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeLabel($index)">
-                  <i class="fa fa-trash" aria-hidden="true"></i>
+                <button class="btn btn-light" type="button" ng-click="ctrl.removeLabel($index)">
+                  <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                 </button>
               </div>
             </div>

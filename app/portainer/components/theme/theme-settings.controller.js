@@ -1,4 +1,4 @@
-import { buildOption } from '@/portainer/components/BoxSelector';
+import { options } from './options';
 
 export default class ThemeSettingsController {
   /* @ngInject */
@@ -43,12 +43,7 @@ export default class ThemeSettingsController {
         isDemo: state.application.demoEnvironment.enabled,
       };
 
-      this.state.availableThemes = [
-        buildOption('light', 'fas fa-sun', 'Light Theme', 'Default color mode', 'light'),
-        buildOption('dark', 'fas fa-moon', 'Dark Theme', 'Dark color mode', 'dark'),
-        buildOption('highcontrast', 'fas fa-adjust', 'High Contrast', 'High contrast color mode', 'highcontrast'),
-        buildOption('auto', 'fas fa-sync-alt', 'Auto', 'Sync with system theme', 'auto'),
-      ];
+      this.state.availableThemes = options;
 
       try {
         this.state.userId = await this.Authentication.getUserDetails().ID;

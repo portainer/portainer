@@ -33,7 +33,7 @@
                 <portainer-tooltip message="'Driver options are specific to the selected driver. Please refer to the selected driver documentation.'"></portainer-tooltip>
               </label>
               <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDriverOption()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add driver option
+                <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add driver option
               </span>
             </div>
             <!-- driver-options-input-list -->
@@ -47,8 +47,8 @@
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. /path/on/host" />
                 </div>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="removeDriverOption($index)">
-                  <i class="fa fa-trash" aria-hidden="true"></i>
+                <button class="btn btn-sm btn-light" type="button" ng-click="removeDriverOption($index)">
+                  <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                 </button>
               </div>
             </div>

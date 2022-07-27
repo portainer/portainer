@@ -3,7 +3,8 @@ import { RegistryTypes } from '@/portainer/models/registryTypes';
 
 export default class RegistryController {
   /* @ngInject */
-  constructor($async, $state, RegistryService, Notifications) {
+  constructor($scope, $async, $state, RegistryService, Notifications) {
+    this.$scope = $scope;
     Object.assign(this, { $async, $state, RegistryService, Notifications });
 
     this.RegistryTypes = RegistryTypes;
@@ -13,9 +14,22 @@ export default class RegistryController {
       loading: false,
     };
 
-    this.formValues = {
-      Password: '',
-    };
+    this.Password = '';
+
+    this.toggleAuthentication = this.toggleAuthentication.bind(this);
+    this.toggleQuayUseOrganisation = this.toggleQuayUseOrganisation.bind(this);
+  }
+
+  toggleAuthentication(newValue) {
+    this.$scope.$evalAsync(() => {
+      this.registry.Authentication = newValue;
+    });
+  }
+
+  toggleQuayUseOrganisation(newValue) {
+    this.$scope.$evalAsync(() => {
+      this.registry.Quay.UseOrganisation = newValue;
+    });
   }
 
   passwordLabel() {
@@ -35,8 +49,7 @@ export default class RegistryController {
       try {
         this.state.actionInProgress = true;
         const registry = this.registry;
-        registry.Password = this.formValues.Password;
-        registry.Name = this.formValues.Name;
+        registry.Password = this.Password;
 
         await this.RegistryService.updateRegistry(registry);
         this.Notifications.success('Registry successfully updated');
@@ -50,7 +63,7 @@ export default class RegistryController {
   }
 
   onChangeName() {
-    this.state.nameAlreadyExists = _.includes(this.registriesNames, this.formValues.Name);
+    this.state.nameAlreadyExists = _.includes(this.registriesNames, this.registry.Name);
   }
 
   isUpdateButtonDisabled() {
@@ -63,6 +76,26 @@ export default class RegistryController {
     );
   }
 
+  getRegistryProvider(registryType) {
+    switch (registryType) {
+      case RegistryTypes.QUAY:
+        return 'Quay.io';
+      case RegistryTypes.AZURE:
+        return 'Azure';
+      case RegistryTypes.CUSTOM:
+        return 'Custom';
+      case RegistryTypes.GITLAB:
+        return 'Gitlab';
+      case RegistryTypes.PROGET:
+        return 'ProGet';
+      case RegistryTypes.DOCKERHUB:
+        return 'Docker Hub';
+      case RegistryTypes.ECR:
+        return 'AWS ECR';
+      default:
+        return '';
+    }
+  }
   async $onInit() {
     try {
       this.state.loading = true;
@@ -70,7 +103,7 @@ export default class RegistryController {
       const registryId = this.$state.params.id;
       const registry = await this.RegistryService.registry(registryId);
       this.registry = registry;
-      this.formValues.Name = registry.Name;
+      this.provider = this.getRegistryProvider(registry.Type);
 
       const registries = await this.RegistryService.registries();
       _.pullAllBy(registries, [registry], 'Id');

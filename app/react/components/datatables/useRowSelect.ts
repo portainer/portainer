@@ -25,7 +25,7 @@ interface UseRowSelectTableInstance<D extends DefaultType = DefaultType>
   isAllRowSelected: boolean;
   selectSubRows: boolean;
   getSubRows(row: Row<D>): Row<D>[];
-  isRowSelectable(row: Row<D>): boolean;
+  isRowSelectable?(row: Row<D>): boolean;
 }
 
 const pluginName = 'useRowSelect';
@@ -73,7 +73,10 @@ function defaultGetToggleRowSelectedProps<D extends DefaultType>(
   props: D,
   { instance, row }: { instance: UseRowSelectTableInstance<D>; row: Row<D> }
 ) {
-  const { manualRowSelectedKey = 'isSelected' } = instance;
+  const {
+    manualRowSelectedKey = 'isSelected',
+    isRowSelectable = defaultIsRowSelectable,
+  } = instance;
   let checked = false;
 
   if (row.original && row.original[manualRowSelectedKey]) {
@@ -94,7 +97,7 @@ function defaultGetToggleRowSelectedProps<D extends DefaultType>(
       checked,
       title: 'Toggle Row Selected',
       indeterminate: row.isSomeSelected,
-      disabled: !instance.isRowSelectable(row),
+      disabled: !isRowSelectable(row),
     },
   ];
 }
@@ -317,7 +320,7 @@ function useInstance<D extends Record<string, unknown>>(
     dispatch,
     page,
     getSubRows,
-    isRowSelectable,
+    isRowSelectable = defaultIsRowSelectable,
   } = instance;
 
   ensurePluginOrder(
@@ -474,5 +477,5 @@ function getRowIsSelected<D extends Record<string, unknown>>(
 }
 
 function defaultIsRowSelectable<D extends DefaultType>(row: Row<D>) {
-  return !!row.original.disabled;
+  return !row.original.disabled;
 }

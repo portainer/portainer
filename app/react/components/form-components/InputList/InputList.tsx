@@ -1,7 +1,9 @@
 import { ComponentType } from 'react';
 import clsx from 'clsx';
+import { FormikErrors } from 'formik';
 
 import { AddButton, Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
 
@@ -11,12 +13,12 @@ import { FormError } from '../FormError';
 import styles from './InputList.module.css';
 import { arrayMove } from './utils';
 
-export type InputListError<T> = Record<keyof T, string>;
-
 export interface ItemProps<T> {
   item: T;
   onChange(value: T): void;
-  error?: InputListError<T>;
+  error?: string | FormikErrors<T>;
+  disabled?: boolean;
+  readOnly?: boolean;
 }
 type Key = string | number;
 type ChangeType = 'delete' | 'create' | 'update';
@@ -36,7 +38,7 @@ type OnChangeEvent<T> =
 type RenderItemFunction<T> = (
   item: T,
   onChange: (value: T) => void,
-  error?: InputListError<T>
+  error?: string | FormikErrors<T>
 ) => React.ReactNode;
 
 interface Props<T> {
@@ -50,9 +52,11 @@ interface Props<T> {
   addLabel?: string;
   itemKeyGetter?(item: T, index: number): Key;
   movable?: boolean;
-  errors?: InputListError<T>[] | string;
+  errors?: FormikErrors<T>[] | string | string[];
   textTip?: string;
   isAddButtonHidden?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
 }
 
 export function InputList<T = DefaultType>({
@@ -69,6 +73,8 @@ export function InputList<T = DefaultType>({
   errors,
   textTip,
   isAddButtonHidden = false,
+  disabled,
+  readOnly,
 }: Props<T>) {
   return (
     <div className={clsx('form-group', styles.root)}>
@@ -77,11 +83,12 @@ export function InputList<T = DefaultType>({
           {label}
           {tooltip && <Tooltip message={tooltip} />}
         </div>
-        {!isAddButtonHidden && (
+        {!(isAddButtonHidden || readOnly) && (
           <AddButton
             label={addLabel}
             className="space-left"
             onClick={handleAdd}
+            disabled={disabled}
           />
         )}
       </div>
@@ -107,6 +114,8 @@ export function InputList<T = DefaultType>({
                   item={item}
                   onChange={(value: T) => handleChangeItem(key, value)}
                   error={error}
+                  disabled={disabled}
+                  readOnly={readOnly}
                 />
               ) : (
                 renderItem(
@@ -116,32 +125,35 @@ export function InputList<T = DefaultType>({
                 )
               )}
               <div className={clsx(styles.itemActions, 'items-start')}>
-                {movable && (
+                {!readOnly && movable && (
                   <>
                     <Button
                       size="small"
-                      disabled={index === 0}
+                      disabled={disabled || index === 0}
                       onClick={() => handleMoveUp(index)}
                     >
-                      <i className="fa fa-arrow-up" aria-hidden="true" />
+                      <Icon icon="arrow-up" feather />
                     </Button>
                     <Button
                       size="small"
                       type="button"
-                      disabled={index === value.length - 1}
+                      disabled={disabled || index === value.length - 1}
                       onClick={() => handleMoveDown(index)}
                     >
-                      <i className="fa fa-arrow-down" aria-hidden="true" />
+                      <Icon icon="arrow-down" feather />
                     </Button>
                   </>
                 )}
-                <Button
-                  color="danger"
-                  size="small"
-                  onClick={() => handleRemoveItem(key, item)}
-                >
-                  <i className="fa fa-trash" aria-hidden="true" />
-                </Button>
+                {!readOnly && (
+                  <Button
+                    color="danger"
+                    size="small"
+                    onClick={() => handleRemoveItem(key, item)}
+                    disabled={disabled}
+                  >
+                    <i className="fa fa-trash" aria-hidden="true" />
+                  </Button>
+                )}
               </div>
             </div>
           );
@@ -210,13 +222,21 @@ function defaultItemBuilder(): DefaultType {
   return { value: '' };
 }
 
-function DefaultItem({ item, onChange, error }: ItemProps<DefaultType>) {
+function DefaultItem({
+  item,
+  onChange,
+  error,
+  disabled,
+  readOnly,
+}: ItemProps<DefaultType>) {
   return (
     <>
       <Input
         value={item.value}
         onChange={(e) => onChange({ value: e.target.value })}
         className={styles.defaultItem}
+        disabled={disabled}
+        readOnly={readOnly}
       />
       {error && <FormError>{error}</FormError>}
     </>
@@ -226,7 +246,7 @@ function DefaultItem({ item, onChange, error }: ItemProps<DefaultType>) {
 function renderDefaultItem(
   item: DefaultType,
   onChange: (value: DefaultType) => void,
-  error?: InputListError<DefaultType>
+  error?: FormikErrors<DefaultType>
 ) {
   return <DefaultItem item={item} onChange={onChange} error={error} />;
 }

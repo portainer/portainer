@@ -1,13 +1,13 @@
 <div class="environment-variables-simple-mode">
   <div class="col-sm-12">
-    <a class="small interactive" ng-click="$ctrl.onSwitchModeClick()"> <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode </a>
+    <a class="small interactive" ng-click="$ctrl.onSwitchModeClick()"> <pr-icon icon="'list'" feather="true"></pr-icon> Advanced mode </a>
   </div>
   <div class="col-sm-12 small text-muted">
-    <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+    <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
     Switch to advanced mode to copy & paste multiple variables
   </div>
   <div class="col-sm-12 environment-variables-simple-mode--actions">
-    <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.add()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add an environment variable </button>
+    <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.add()"> <pr-icon icon="'plus'" feather="true"></pr-icon> Add an environment variable </button>
     <button
       type="button"
       class="btn btn-sm btn-default"
@@ -17,7 +17,7 @@
       ngf-max-size="1MB"
       ngf-model-invalid="errorFile"
     >
-      <i class="fa fa-file-upload" aria-hidden="true"></i> Load variables from .env file
+      <pr-icon icon="'upload'" feather="true"></pr-icon>
     </button>
     <span class="space-left" ng-if="errorFile.$error == 'maxSize'">
       <i class="fa fa-times red-icon space-right" aria-hidden="true"></i>
@@ -32,5 +32,9 @@
       on-change="($ctrl.onChangeVariable)"
       on-remove="($ctrl.remove)"
     ></environment-variables-simple-mode-item>
+  </div>
+  <div class="col-sm-12 small text-muted" ng-if="$ctrl.ngModel.length > 0 && $ctrl.showHelpMessage">
+    <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+    Environment changes will not take effect until redeployment occurs manually or via webhook.
   </div>
 </div>

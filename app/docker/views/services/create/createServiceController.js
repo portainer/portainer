@@ -111,6 +111,14 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     $scope.allowBindMounts = false;
 
+    $scope.handleWebHookChange = handleWebHookChange;
+
+    function handleWebHookChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.Webhook = checked;
+      });
+    }
+
     $scope.handleEnvVarChange = handleEnvVarChange;
     function handleEnvVarChange(value) {
       $scope.formValues.Env = value;

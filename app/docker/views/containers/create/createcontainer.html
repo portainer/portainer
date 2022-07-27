@@ -48,11 +48,15 @@
               <!-- always-pull -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <label for="ownership" class="control-label text-left">
-                    Always pull the image
-                    <portainer-tooltip message="'When enabled, Portainer will automatically try to pull the specified image before creating the container.'"></portainer-tooltip>
-                  </label>
-                  <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="formValues.alwaysPull" ng-disabled="!state.pullImageValidity" /><i></i> </label>
+                  <por-switch-field
+                    name="'alwaysPull'"
+                    label-class="'col-sm-2'"
+                    checked="formValues.alwaysPull"
+                    disabled="!state.pullImageValidity"
+                    label="'Always pull the image'"
+                    on-change="(onAlwaysPullChange)"
+                    tooltip="'When enabled, Portainer will automatically try to pull the specified image before creating the container.'"
+                  ></por-switch-field>
                 </div>
               </div>
               <!-- !always-pull -->
@@ -64,18 +68,12 @@
             <div class="col-sm-12 form-section-title"> Webhooks </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Create a container webhook
-                  <portainer-tooltip
-                    position="'top'"
-                    message="'Create a webhook (or callback URI) to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container.'"
-                  ></portainer-tooltip>
-                </label>
-                <label class="switch box-selector-item limited business" style="margin-left: 20px">
-                  <input type="checkbox" ng-model="formValues.EnableWebhook" disabled="disabled" ng-checked="true" />
-                  <i class="orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
-                </label>
-                <be-feature-indicator feature="containerWebhookFeature"></be-feature-indicator>
+                <por-switch-field
+                  feature-id="'container-webhook'"
+                  label-class="'col-sm-2'"
+                  label="'Create a container webhook'"
+                  tooltip="'Create a webhook (or callback URI) to automate the recreate this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container.'"
+                ></por-switch-field>
               </div>
             </div>
           </div>
@@ -85,13 +83,13 @@
           <!-- publish-exposed-ports -->
           <div class="form-group">
             <div class="col-sm-12">
-              <label class="control-label text-left">
-                Publish all exposed network ports to random host ports
-                <portainer-tooltip
-                  message="'When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile.'"
-                ></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="config.HostConfig.PublishAllPorts" /><i></i> </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="config.HostConfig.PublishAllPorts"
+                label="'Publish all exposed network ports to random host ports'"
+                on-change="(handlePublishAllPortsChange)"
+                tooltip="'When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile.'"
+              ></por-switch-field>
             </div>
           </div>
           <!-- !publish-exposed-ports -->
@@ -105,7 +103,7 @@
                 ></portainer-tooltip>
               </label>
               <span class="label label-default interactive" style="margin-left: 10px" ng-click="addPortBinding()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new network port
+                <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> publish a new network port
               </span>
             </div>
             <!-- port-mapping-input-list -->
@@ -132,8 +130,8 @@
                     <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'tcp'">TCP</label>
                     <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                   </div>
-                  <button class="btn btn-sm btn-danger" type="button" ng-click="removePortBinding($index)">
-                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  <button class="btn btn-light" type="button" ng-click="removePortBinding($index)">
+                    <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                   </button>
                 </div>
                 <!-- !protocol-actions -->
@@ -156,13 +154,13 @@
           <!-- autoremove -->
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">
-                Auto remove
-                <portainer-tooltip
-                  message="'When enabled, Portainer will automatically remove the container when it exits. This is useful when you want to use the container only once.'"
-                ></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="config.HostConfig.AutoRemove" /><i></i> </label>
+              <por-switch-field
+                label-class="'col-sm-2'"
+                checked="config.HostConfig.AutoRemove"
+                label="'Auto remove'"
+                on-change="(handleAutoRemoveChange)"
+                tooltip="'When enabled, Portainer will automatically remove the container when it exits. This is useful when you want to use the container only once.'"
+              ></por-switch-field>
             </div>
           </div>
           <!-- !autoremove -->
@@ -215,8 +213,8 @@
                 <div class="col-sm-9">
                   <div class="input-group">
                     <div class="input-group-btn">
-                      <button class="btn btn-primary" ng-model="formValues.CmdMode" uib-btn-radio="'default'" style="margin-left: 0px"> Default</button>
-                      <button class="btn btn-primary" ng-model="formValues.CmdMode" uib-btn-radio="'override'">Override</button>
+                      <button class="btn btn-light" ng-model="formValues.CmdMode" uib-btn-radio="'default'" style="margin-left: 0px"> Default</button>
+                      <button class="btn btn-light" ng-model="formValues.CmdMode" uib-btn-radio="'override'">Override</button>
                     </div>
                     <input
                       type="text"
@@ -241,8 +239,8 @@
                 <div class="col-sm-9">
                   <div class="input-group">
                     <div class="input-group-btn">
-                      <label class="btn btn-primary" ng-model="formValues.EntrypointMode" uib-btn-radio="'default'" style="margin-left: 0px"> Default</label>
-                      <label class="btn btn-primary" ng-model="formValues.EntrypointMode" uib-btn-radio="'override'">Override</label>
+                      <label class="btn btn-light" ng-model="formValues.EntrypointMode" uib-btn-radio="'default'" style="margin-left: 0px"> Default</label>
+                      <label class="btn btn-light" ng-model="formValues.EntrypointMode" uib-btn-radio="'override'">Override</label>
                     </div>
                     <input
                       type="text"
@@ -336,7 +334,7 @@
                     style="margin-left: 10px"
                     ng-click="!formValues.LogDriverName || formValues.LogDriverName === 'none' || addLogDriverOpt(formValues.LogDriverName)"
                   >
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add logging driver option
+                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add logging driver option
                   </span>
                 </div>
                 <!-- logging-opts-input-list -->
@@ -369,7 +367,7 @@
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Volume mapping</label>
                   <span class="label label-default interactive" style="margin-left: 10px" ng-click="addVolume()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional volume
+                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> map additional volume
                   </span>
                 </div>
                 <!-- volumes-input-list -->
@@ -386,11 +384,11 @@
                       <!-- volume-type -->
                       <div class="input-group col-sm-5" style="margin-left: 5px">
                         <div class="btn-group btn-group-sm" ng-if="allowBindMounts">
-                          <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
-                          <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
+                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
+                          <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
                         </div>
-                        <button class="btn btn-sm btn-danger" type="button" ng-click="removeVolume($index)">
-                          <i class="fa fa-trash" aria-hidden="true"></i>
+                        <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
+                          <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                         </button>
                       </div>
                       <!-- !volume-type -->
@@ -417,8 +415,8 @@
                       <!-- read-only -->
                       <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px">
                         <div class="btn-group btn-group-sm">
-                          <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
-                          <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                          <label class="btn btn-light" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
+                          <label class="btn btn-light" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
                         </div>
                       </div>
                       <!-- !read-only -->
@@ -527,7 +525,7 @@
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Hosts file entries</label>
                   <span class="label label-default interactive" style="margin-left: 10px" ng-click="addExtraHost()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add additional entry
+                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add additional entry
                   </span>
                 </div>
                 <!-- extra-hosts-input-list -->
@@ -537,8 +535,8 @@
                       <span class="input-group-addon">value</span>
                       <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP" />
                     </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeExtraHost($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
+                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -556,7 +554,7 @@
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Labels</label>
                   <span class="label label-default interactive" style="margin-left: 10px" ng-click="addLabel()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
+                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add label
                   </span>
                 </div>
                 <!-- labels-input-list -->
@@ -570,8 +568,8 @@
                       <span class="input-group-addon">value</span>
                       <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                     </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeLabel($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    <button class="btn btn-sm btn-light" type="button" ng-click="removeLabel($index)">
+                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -597,10 +595,10 @@
                 <div class="col-sm-12">
                   <label class="control-label text-left"> Restart policy </label>
                   <div class="btn-group btn-group-sm" style="margin-left: 20px">
-                    <label class="btn btn-primary" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'no'"> Never </label>
-                    <label class="btn btn-primary" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'always'"> Always </label>
-                    <label class="btn btn-primary" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'on-failure'"> On failure </label>
-                    <label class="btn btn-primary" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'unless-stopped'"> Unless stopped </label>
+                    <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'no'"> Never </label>
+                    <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'always'"> Always </label>
+                    <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'on-failure'"> On failure </label>
+                    <label class="btn btn-light" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'unless-stopped'"> Unless stopped </label>
                   </div>
                 </div>
               </div>
@@ -614,16 +612,19 @@
               <!-- privileged-mode -->
               <div class="form-group" ng-if="isAdmin || allowPrivilegedMode">
                 <div class="col-sm-12">
-                  <label for="privileged_mode" class="control-label text-left"> Privileged mode </label>
-                  <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="privileged_mode" ng-model="config.HostConfig.Privileged" /><i></i> </label>
+                  <por-switch-field
+                    label-class="'col-sm-2'"
+                    checked="config.HostConfig.Privileged"
+                    label="'Privileged mode'"
+                    on-change="(handlePrivilegedChange)"
+                  ></por-switch-field>
                 </div>
               </div>
               <!-- !privileged-mode -->
               <!-- init -->
               <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.37">
                 <div class="col-sm-12">
-                  <label for="init" class="control-label text-left"> Init </label>
-                  <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="init" ng-model="config.HostConfig.Init" /><i></i> </label>
+                  <por-switch-field label-class="'col-sm-2'" checked="config.HostConfig.Init" label="'Init'" on-change="(handleInitChange)"></por-switch-field>
                 </div>
               </div>
               <!-- !init -->
@@ -644,7 +645,7 @@
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Devices</label>
                   <span class="label label-default interactive" style="margin-left: 10px" ng-click="addDevice()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add device
+                    <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add device
                   </span>
                 </div>
                 <!-- devices-input-list -->
@@ -658,8 +659,8 @@
                       <span class="input-group-addon">container</span>
                       <input type="text" class="form-control" ng-model="device.pathInContainer" placeholder="e.g. /dev/tty0" />
                     </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeDevice($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    <button class="btn btn-sm btn-light" type="button" ng-click="removeDevice($index)">
+                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -671,7 +672,7 @@
                 <div class="col-sm-12" style="margin-top: 5px">
                   <label class="control-label text-left">Sysctls</label>
                   <span class="label label-default interactive" style="margin-left: 10px" ng-click="addSysctl()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add sysctl
+                    <pr-icon icon="'plus'" feather="true"></pr-icon> add sysctl
                   </span>
                 </div>
                 <!-- sysctls-input-list -->
@@ -685,14 +686,28 @@
                       <span class="input-group-addon">value</span>
                       <input type="text" class="form-control" ng-model="sysctl.value" placeholder="e.g. bar" />
                     </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeSysctl($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    <button class="btn btn-sm btn-light" type="button" ng-click="removeSysctl($index)">
+                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
                 <!-- !sysctls-input-list -->
               </div>
               <!-- !sysctls -->
+              <!-- #region GPU -->
+              <div class="col-sm-12 form-section-title"> GPU </div>
+
+              <gpu
+                ng-if="applicationState.endpoint.apiVersion >= 1.4"
+                values="formValues.GPU"
+                on-change="(onGpuChange)"
+                gpus="endpoint.Gpus"
+                used-gpus="gpuUseList"
+                used-all-gpus="gpuUseAll"
+              >
+              </gpu>
+
+              <!-- #endregion GPU -->
               <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">
                 <div class="col-sm-12 form-section-title"> Resources </div>
                 <!-- memory-reservation-input -->
