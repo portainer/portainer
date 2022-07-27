@@ -36,8 +36,8 @@
                 <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
                   <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.</p>
                   <p ng-message="pattern" class="vertical-center"
-                    ><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field must consist of lower case alphanumeric characters, '-' or '.', and
-                    contain at most 63 characters, and must start and end with an alphanumeric character.</p
+                    ><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon> This field must consist of lower case alphanumeric
+                    characters, '-' or '.', and contain at most 63 characters, and must start and end with an alphanumeric character.</p
                   >
                 </div>
                 <p ng-if="ctrl.state.alreadyExist" class="vertical-center"

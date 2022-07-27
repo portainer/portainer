@@ -13,11 +13,11 @@
       </p>
     </div>
     <div class="col-sm-12 small text-muted vertical-center" ng-if="$ctrl.formValues.IsSimple">
-      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true" class="vertical-center"></pr-icon>
       Switch to advanced mode to copy and paste multiple key/values
     </div>
     <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple">
-      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true" class="vertical-center"></pr-icon>
       Generate a configuration entry per line, use YAML format
     </div>
   </div>
@@ -25,10 +25,10 @@
   <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
     <div class="col-sm-12">
       <button type="button" class="btn btn-sm btn-default" style="margin-left: 0" ng-click="$ctrl.addEntry()" data-cy="k8sConfigCreate-createEntryButton">
-        <pr-icon icon="'plus'" feather="true"></pr-icon> Create entry
+        <pr-icon icon="'plus'" feather="true" class="vertical-center"></pr-icon> Create entry
       </button>
       <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addEntryFromFile($file)" style="margin-left: 0" data-cy="k8sConfigCreate-createConfigsFromFileButton">
-        <pr-icon icon="'upload'" feather="true"></pr-icon> Create key/value from file
+        <pr-icon icon="'upload'" feather="true" class="vertical-center"></pr-icon> Create key/value from file
       </button>
     </div>
   </div>
