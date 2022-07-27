@@ -15,6 +15,8 @@ interface Props<T> {
   onChange(value: T): void;
   options: Option<T>[];
   size?: Size;
+  disabled?: boolean;
+  readOnly?: boolean;
 }
 
 export function ButtonSelector<T extends string | number>({
@@ -22,6 +24,8 @@ export function ButtonSelector<T extends string | number>({
   onChange,
   size,
   options,
+  disabled,
+  readOnly,
 }: Props<T>) {
   return (
     <ButtonGroup size={size} className={styles.group}>
@@ -30,6 +34,8 @@ export function ButtonSelector<T extends string | number>({
           key={option.value}
           selected={value === option.value}
           onChange={() => onChange(option.value)}
+          disabled={disabled}
+          readOnly={readOnly}
         >
           {option.label || option.value.toString()}
         </OptionItem>
@@ -41,17 +47,32 @@ export function ButtonSelector<T extends string | number>({
 interface OptionItemProps {
   selected: boolean;
   onChange(): void;
+  disabled?: boolean;
+  readOnly?: boolean;
 }
 
 function OptionItem({
   selected,
   children,
   onChange,
+  disabled,
+  readOnly,
 }: PropsWithChildren<OptionItemProps>) {
   return (
-    <label className={clsx('btn btn-primary', { active: selected })}>
+    <label
+      className={clsx('btn btn-primary', {
+        active: selected,
+        disabled: readOnly || disabled,
+      })}
+    >
       {children}
-      <input type="radio" checked={selected} onChange={onChange} />
+      <input
+        type="radio"
+        checked={selected}
+        onChange={onChange}
+        disabled={disabled}
+        readOnly={readOnly}
+      />
     </label>
   );
 }
