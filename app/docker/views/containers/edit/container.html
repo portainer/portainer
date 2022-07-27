@@ -72,7 +72,9 @@
               <td>Name</td>
               <td ng-if="!container.edit">
                 {{ container.Name | trimcontainername }}
-                <a authorization="DockerContainerRename" href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;"><i class="fa fa-edit"></i></a>
+                <a authorization="DockerContainerRename" href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;"
+                  ><pr-icon icon="'edit'" feather="true" className="'space-right'"></pr-icon
+                ></a>
               </td>
               <td ng-if="container.edit">
                 <form ng-submit="renameContainer()">
@@ -125,19 +127,19 @@
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
                   <a authorization="DockerContainerLogs" class="btn" type="button" ui-sref="docker.containers.container.logs({ id: container.Id })"
-                    ><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Logs</a
+                    ><pr-icon icon="'file-text'" feather="true" className="'space-right'"></pr-icon>Logs</a
                   >
                   <a authorization="DockerContainerInspect" class="btn" type="button" ui-sref="docker.containers.container.inspect({ id: container.Id })"
-                    ><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Inspect</a
+                    ><pr-icon icon="'info'" feather="true" className="'space-right'"></pr-icon>Inspect</a
                   >
                   <a authorization="DockerContainerStats" class="btn" type="button" ui-sref="docker.containers.container.stats({ id: container.Id })"
-                    ><i class="fa fa-chart-area space-right" aria-hidden="true"></i>Stats</a
+                    ><pr-icon icon="'bar-chart'" feather="true" className="'space-right'"></pr-icon>Stats</a
                   >
                   <a authorization="DockerExecStart" class="btn" type="button" ui-sref="docker.containers.container.exec({ id: container.Id })"
-                    ><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a
+                    ><pr-icon icon="'terminal'" feather="true" className="'space-right'"></pr-icon>Console</a
                   >
                   <a authorization="DockerContainerAttach" class="btn" type="button" ui-sref="docker.containers.container.attach({ id: container.Id })"
-                    ><i class="fa fa-plug space-right" aria-hidden="true"></i>Attach</a
+                    ><pr-icon icon="'paperclip'" feather="true" className="'space-right'"></pr-icon>Attach</a
                   >
                 </div>
               </td>
