@@ -4,20 +4,20 @@
   <div class="form-group" ng-if="$ctrl.isCreation">
     <div class="col-sm-12">
       <p>
-        <a class="small interactive" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
-          <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode
+        <a class="small interactive vertical-center" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
+          <pr-icon icon="'list'" feather="true"></pr-icon> Advanced mode
         </a>
-        <a class="small interactive" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
-          <i class="fa fa-edit space-right" aria-hidden="true"></i> Simple mode
+        <a class="small interactive vertical-center" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
+          <pr-icon icon="'edit'" feather="true"></pr-icon> Simple mode
         </a>
       </p>
     </div>
-    <div class="col-sm-12 small text-muted" ng-if="$ctrl.formValues.IsSimple">
-      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+    <div class="col-sm-12 small text-muted vertical-center" ng-if="$ctrl.formValues.IsSimple">
+      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true" class="vertical-center"></pr-icon>
       Switch to advanced mode to copy and paste multiple key/values
     </div>
-    <div class="col-sm-12 small text-muted" ng-if="!$ctrl.formValues.IsSimple">
-      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+    <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple">
+      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true" class="vertical-center"></pr-icon>
       Generate a configuration entry per line, use YAML format
     </div>
   </div>
@@ -25,18 +25,18 @@
   <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
     <div class="col-sm-12">
       <button type="button" class="btn btn-sm btn-default" style="margin-left: 0" ng-click="$ctrl.addEntry()" data-cy="k8sConfigCreate-createEntryButton">
-        <i class="fa fa-plus-circle" aria-hidden="true"></i> Create entry
+        <pr-icon icon="'plus'" feather="true" class="vertical-center"></pr-icon> Create entry
       </button>
       <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addEntryFromFile($file)" style="margin-left: 0" data-cy="k8sConfigCreate-createConfigsFromFileButton">
-        <i class="fa fa-file-upload" aria-hidden="true"></i> Create key/value from file
+        <pr-icon icon="'upload'" feather="true" class="vertical-center"></pr-icon> Create key/value from file
       </button>
     </div>
   </div>
 
   <div ng-repeat="(index, entry) in $ctrl.formValues.Data" ng-if="$ctrl.formValues.IsSimple">
     <div class="form-group">
-      <label for="configuration_data_key_{{ index }}" class="col-sm-1 control-label text-left">Key</label>
-      <div class="col-sm-11">
+      <label for="configuration_data_key_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left">Key</label>
+      <div class="col-sm-8">
         <input
           type="text"
           class="form-control"
@@ -49,7 +49,7 @@
         />
       </div>
       <div
-        class="col-sm-11 small text-warning"
+        class="col-sm-11 small text-muted"
         style="margin-top: 5px"
         ng-show="
           kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid ||
@@ -58,18 +58,22 @@
         "
       >
         <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required. </p>
         </ng-messages>
-        <p ng-if="$ctrl.state.duplicateKeys[index] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This key is already defined.</p>
-        <p ng-if="$ctrl.state.invalidKeys[index]"
-          ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This key is invalid. A valid key must consist of alphanumeric characters, '-', '_' or '.'</p
-        >
+        <div>
+          <p ng-if="$ctrl.state.duplicateKeys[index] !== undefined" class="vertical-center">
+            <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This key is already defined.
+          </p>
+        </div>
+        <p ng-if="$ctrl.state.invalidKeys[index]" class="vertical-center">
+          <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This key is invalid. A valid key must consist of alphanumeric characters, '-', '_' or '.'
+        </p>
       </div>
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple && !entry.IsBinary">
-      <label for="configuration_data_value_{{ index }}" class="col-sm-1 control-label text-left">Value</label>
-      <div class="col-sm-11">
+      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left">Value</label>
+      <div class="col-sm-8">
         <textarea
           class="form-control"
           rows="5"
@@ -79,35 +83,35 @@
           required
         ></textarea>
       </div>
-      <div class="col-sm-11 small text-warning" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
+      <div class="col-sm-11 small text-muted" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
         <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.</p>
         </ng-messages>
       </div>
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple && entry.IsBinary">
-      <label for="configuration_data_value_{{ index }}" class="col-sm-1 control-label text-left">Value</label>
-      <div class="col-sm-11 control-label small text-muted text-left"
+      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left">Value</label>
+      <div class="col-sm-8 control-label small text-muted text-left"
         >Binary data <portainer-tooltip message="'This key holds binary data and cannot be displayed.'"></portainer-tooltip
       ></div>
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
-      <div class="col-sm-1"></div>
-      <div class="col-sm-11">
+      <div class="col-sm-3 col-lg-2"></div>
+      <div class="col-sm-8">
         <button
           type="button"
-          class="btn btn-sm btn-danger space-right"
+          class="btn btn-sm btn-dangerlight !ml-0"
           style="margin-left: 0"
           ng-disabled="entry.Used"
           ng-click="$ctrl.removeEntry(index, entry)"
           data-cy="k8sConfigDetail-removeEntryButton{{ index }}"
         >
-          <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove entry
+          <pr-icon icon="'trash-2'" feather="true"></pr-icon> Remove entry
         </button>
         <span class="small text-muted" ng-if="entry.Used">
-          <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+          <pr-icon icon="'alert-circle'" feather="true" mode="'primary'"></pr-icon>
           This key is currently used by one or more applications
         </span>
       </div>
