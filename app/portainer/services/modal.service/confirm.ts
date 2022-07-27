@@ -45,6 +45,17 @@ export function confirmAsync(options: ConfirmAsyncOptions) {
   return new Promise((resolve) => {
     confirm({
       ...options,
+      title: buildTitle(options.title),
+      callback: (confirmed) => resolve(confirmed),
+    });
+  });
+}
+
+export function confirmDestructiveAsync(options: ConfirmAsyncOptions) {
+  return new Promise((resolve) => {
+    confirm({
+      ...options,
+      title: buildTitle(options.title, ModalTypeIcon.Destructive),
       callback: (confirmed) => resolve(confirmed),
     });
   });
@@ -59,6 +70,17 @@ export function confirm(options: ConfirmOptions) {
   });
 
   applyBoxCSS(box);
+}
+
+export function confirmWarn(options: ConfirmOptions) {
+  confirm({ ...options, title: buildTitle(options.title, ModalTypeIcon.Warn) });
+}
+
+export function confirmDestructive(options: ConfirmOptions) {
+  confirm({
+    ...options,
+    title: buildTitle(options.title, ModalTypeIcon.Destructive),
+  });
 }
 
 export function confirmImageForceRemoval(callback: ConfirmCallback) {
