@@ -5,10 +5,11 @@ import styles from './AddButton.module.css';
 export interface Props {
   className?: string;
   label: string;
+  disabled?: boolean;
   onClick: () => void;
 }
 
-export function AddButton({ label, onClick, className }: Props) {
+export function AddButton({ label, onClick, className, disabled }: Props) {
   return (
     <button
       className={clsx(
@@ -20,6 +21,7 @@ export function AddButton({ label, onClick, className }: Props) {
       )}
       type="button"
       onClick={onClick}
+      disabled={disabled}
     >
       <i className="fa fa-plus-circle space-right" aria-hidden="true" /> {label}
     </button>

@@ -14,7 +14,7 @@ interface Props {
   reload?: boolean;
   loading?: boolean;
   onReload?(): Promise<void> | void;
-  breadcrumbs?: Crumb[];
+  breadcrumbs?: (Crumb | string)[] | string;
   title: string;
 }
 

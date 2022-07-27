@@ -1,13 +1,11 @@
 import { PropsWithChildren } from 'react';
 
-import { Icon } from '@/react/components/Icon';
+import { Icon, IconProps } from '@@/Icon';
 
 import { useTableContext } from './TableContainer';
 
-interface Props {
-  icon: string;
+interface Props extends IconProps {
   label: string;
-  featherIcon?: boolean;
 }
 
 export function TableTitle({
