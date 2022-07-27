@@ -2,34 +2,39 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
-      </div>
-      <div class="actionBar">
-        <button
-          type="button"
-          class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-          data-cy="endpointGroup-removeGroupButton"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.groups.new" data-cy="endpointGroup-addGroupButton">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add group
-        </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-          data-cy="endpointGroup-searchInput"
-        />
+        <div class="toolBarTitle">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          {{ $ctrl.titleText }}
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="endpointGroup-searchInput"
+          />
+        </div>
+        <div class="actionBar">
+          <button
+            type="button"
+            class="btn btn-sm btn-dangerlight"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+            data-cy="endpointGroup-removeGroupButton"
+          >
+            <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>
+            Remove
+          </button>
+          <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.groups.new" data-cy="endpointGroup-addGroupButton">
+            <pr-icon icon="'plus'" feather="true"></pr-icon>
+            Add group
+          </button>
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells" data-cy="endpointGroup-endpointGroupTable">
