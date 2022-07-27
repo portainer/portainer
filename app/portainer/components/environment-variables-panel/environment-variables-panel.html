@@ -18,14 +18,14 @@
         <a class="small interactive" ng-click="$ctrl.switchEnvMode()"> <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Simple mode </a>
       </div>
       <div class="col-sm-12 small text-muted">
-        <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
         Switch to simple mode to define variables line by line, or load from .env file
       </div>
       <div class="form-group" style="margin-left: 1px">
         <code-editor identifier="environment-variables-editor" placeholder="e.g. key=value" value="$ctrl.editorText" yml="false" on-change="($ctrl.editorUpdate)"></code-editor>
       </div>
       <div class="col-sm-12 small text-muted" ng-if="$ctrl.showHelpMessage">
-        <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
         Environment changes will not take effect until redeployment occurs manually or via webhook.
       </div>
     </div>
