@@ -1,6 +1,7 @@
 import { ChangeEvent, createRef } from 'react';
 
 import { Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
 
 import styles from './FileUploadField.module.css';
 
@@ -44,12 +45,8 @@ export function FileUploadField({
         {title}
       </Button>
 
-      <span className="space-left">
-        {value ? (
-          value.name
-        ) : (
-          <i className="fa fa-times red-icon" aria-hidden="true" />
-        )}
+      <span className="space-left vertical-center">
+        {value ? value.name : <Icon icon="x" feather mode="danger" />}
       </span>
     </div>
   );
