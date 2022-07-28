@@ -219,8 +219,9 @@
 
               <div class="form-group" ng-repeat-start="ic in $ctrl.formValues.IngressClasses track by ic.IngressClass.Name">
                 <div class="row">
-                  <div class="text-muted col-sm-12">
-                    <span class="vertical-center"><pr-icon icon="'svg-route'"></pr-icon> {{ ic.IngressClass.Name }}</span>
+                  <div class="col-sm-12">
+                    <span class="text-muted vertical-center"><pr-icon icon="'svg-route'"></pr-icon> {{ ic.IngressClass.Name }}</span>
+                    <hr class="mt-2 mb-0" />
                   </div>
                 </div>
 
