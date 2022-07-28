@@ -16,7 +16,7 @@
           <div ng-if="!$ctrl.state.fromStack">
             <div class="col-sm-12 form-section-title"> Build method </div>
             <div class="form-group"></div>
-            <div class="form-group" style="margin-bottom: 0">
+            <div class="form-group mb-0">
               <div class="boxselector_wrapper">
                 <div>
                   <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor" ng-change="$ctrl.onChangeMethod()" />
@@ -53,27 +53,23 @@
           </div>
           <!-- !build-method -->
           <!-- web-editor -->
-          <div ng-show="$ctrl.state.Method === 'editor'">
-            <div class="col-sm-12 form-section-title"> Web editor </div>
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small">
+          <web-editor-form
+            ng-if="$ctrl.state.Method === 'editor'"
+            identifier="custom-template-creation-editor"
+            value="$ctrl.formValues.FileContent"
+            on-change="($ctrl.editorUpdate)"
+            ng-required="true"
+            yml="true"
+            placeholder="# Define or paste the content of your docker compose file here"
+          >
+            <editor-description>
+              <span class="col-sm-12 text-muted">
                 You can get more information about Compose file format in the
                 <a href="https://docs.docker.com/compose/compose-file/" target="_blank"> official documentation </a>
                 .
               </span>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <code-editor
-                  identifier="custom-template-creation-editor"
-                  placeholder="# Define or paste the content of your docker compose file here"
-                  yml="true"
-                  value="$ctrl.formValues.FileContent"
-                  on-change="($ctrl.editorUpdate)"
-                ></code-editor>
-              </div>
-            </div>
-          </div>
+            </editor-description>
+          </web-editor-form>
           <!-- !web-editor -->
           <!-- upload -->
           <div ng-show="$ctrl.state.Method === 'upload'">
@@ -84,9 +80,11 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.File"> Select file </button>
-                <span style="margin-left: 5px">
+                <span class="space-left">
                   {{ $ctrl.formValues.File.name }}
-                  <i class="fa fa-times red-icon" ng-if="!$ctrl.formValues.File" aria-hidden="true"></i>
+                  <span ng-if="$ctrl.formValues.File">
+                    <pr-icon icon="'x'" feather="true" mode="'danger'"></pr-icon>
+                  </span>
                 </span>
               </div>
             </div>
@@ -98,7 +96,7 @@
           <div class="form-group" ng-if="!$ctrl.state.isTemplateValid">
             <div class="col-sm-12">
               <div class="small text-warning">
-                <i class="fa fa-exclamation-triangle space-right" aria-hidden="true"></i>
+                <pr-icon icon="'alert-triangle'" feather="true" class-name="space-right"></pr-icon>
                 Template is invalid.
               </div>
             </div>
@@ -133,7 +131,7 @@
                 <span ng-hide="$ctrl.state.actionInProgress">Create custom template</span>
                 <span ng-show="$ctrl.state.actionInProgress">Creation in progress...</span>
               </button>
-              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px">
+              <span class="text-danger space-left" ng-if="$ctrl.state.formValidationError">
                 {{ $ctrl.state.formValidationError }}
               </span>
             </div>

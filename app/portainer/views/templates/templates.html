@@ -64,11 +64,11 @@
           <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <div class="form-group col-sm-12">
-            <a class="small interactive" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
-              <i class="fa fa-plus space-right" aria-hidden="true"></i> Show advanced options
+            <a class="small interactive vertical-center" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
+              <pr-icon icon="'plus'" feather="true"></pr-icon> Show advanced options
             </a>
-            <a class="small interactive" ng-if="state.showAdvancedOptions" ng-click="state.showAdvancedOptions = false;">
-              <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide advanced options
+            <a class="small interactive vertical-center" ng-if="state.showAdvancedOptions" ng-click="state.showAdvancedOptions = false;">
+              <pr-icon icon="'minus'" feather="true"></pr-icon> Hide advanced options
             </a>
           </div>
           <div ng-if="state.showAdvancedOptions">
@@ -85,7 +85,7 @@
                       <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)" />
                     </div>
                     <!-- !host-port -->
-                    <i class="fa fa-long-arrow-alt-right space-left space-right" aria-hidden="true"></i>
+                    <pr-icon icon="'arrow-right'" feather="true"></pr-icon>
                     <!-- container-port -->
                     <div class="input-group col-sm-4 input-group-sm">
                       <span class="input-group-addon">container</span>
@@ -99,13 +99,13 @@
                         <label class="btn btn-light" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                       </div>
                       <button class="btn btn-light" type="button" ng-click="removePortBinding($index)">
-                        <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                        <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                       </button>
                     </div>
                     <!-- !protocol-actions -->
                   </div>
                 </div>
-                <div class="small interactive text-muted" ng-click="addPortBinding()"> <i class="fa fa-plus space-right mt-3" aria-hidden="true"></i> Add map additional port </div>
+                <div class="small interactive text-muted mt-2" ng-click="addPortBinding()"> <pr-icon icon="'plus'" feather="true"></pr-icon> Add map additional port </div>
               </div>
             </div>
             <!-- !port-mapping -->
@@ -132,7 +132,7 @@
                           <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.bind = ''" ng-if="isAdmin || allowBindMounts">Bind</label>
                         </div>
                         <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
-                          <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                          <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                         </button>
                       </div>
                       <!-- !volume-type -->
@@ -140,7 +140,7 @@
                     <!-- !volume-line1 -->
                     <!-- volume-line2 -->
                     <div class="form-inline mt-1" ng-if="volume.type !== 'auto'">
-                      <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
+                      <pr-icon icon="'arrow-right'" feather="true"></pr-icon>
                       <!-- volume -->
                       <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
                         <div class="col-sm-12 input-group">
@@ -171,7 +171,7 @@
                     <!-- !volume-line2 -->
                   </div>
                 </div>
-                <div class="small interactive text-muted" ng-click="addVolume()"> <i class="fa fa-plus space-right mt-3" aria-hidden="true"></i> Add map additional volume </div>
+                <div class="small interactive text-muted mt-2" ng-click="addVolume()"> <pr-icon icon="'plus'" feather="true"></pr-icon> Add map additional volume </div>
               </div>
             </div>
             <!-- !volume-mapping -->
@@ -187,11 +187,11 @@
                       <input type="text" class="form-control" ng-model="state.selectedTemplate.Hosts[idx]" placeholder="e.g. host:IP" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
-                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
-                <div class="small interactive text-muted" ng-click="addExtraHost()"> <i class="fa fa-plus space-right mt-3" aria-hidden="true"></i> Add additional entry </div>
+                <div class="small interactive text-muted mt-2" ng-click="addExtraHost()"> <pr-icon icon="'plus'" feather="true"></pr-icon> Add additional entry </div>
               </div>
             </div>
             <!-- !extra-host -->
@@ -211,12 +211,12 @@
                       <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeLabel($index)">
-                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
                 <!-- !labels-input-list -->
-                <div class="small interactive text-muted" ng-click="addLabel()"> <i class="fa fa-plus space-right mt-3" aria-hidden="true"></i> Add label </div>
+                <div class="small interactive text-muted mt-2" ng-click="addLabel()"> <pr-icon icon="'plus'" feather="true"></pr-icon> Add label </div>
               </div>
             </div>
             <!-- !labels -->

@@ -1,5 +1,5 @@
 import { react2angular } from '@/react-tools/react2angular';
-import { confirm } from '@/portainer/services/modal.service/confirm';
+import { confirmDestructive } from '@/portainer/services/modal.service/confirm';
 
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 
@@ -23,7 +23,7 @@ export function InternalAuth({
 }: Props) {
   function onSubmit() {
     if (value.RequiredPasswordLength < 10) {
-      confirm({
+      confirmDestructive({
         title: 'Allow weak passwords?',
         message:
           'You have set an insecure minimum password length. This could leave your system vulnerable to attack, are you sure?',

@@ -247,19 +247,31 @@ input:checked + .slider:before {
 }
 
 .modal-content {
-  padding: 55px 20px 20px 20px;
+  padding: 20px;
+}
+
+.background-error {
+  padding-top: 55px;
+  background-image: url(../images/icon-error.svg);
+  background-repeat: no-repeat;
+  background-position: top left;
+}
+
+.background-warning {
+  padding-top: 55px;
   background-image: url(../images/icon-warning.svg);
   background-repeat: no-repeat;
-  background-position: top 10px left 10px;
+  background-position: top left;
 }
 
 .modal-header {
-  padding: 10px 0px 10px 0px;
+  margin-bottom: 10px;
+  padding: 0px;
   border-bottom: none;
 }
 
 .modal-header .close {
-  margin-top: -40px;
+  margin-top: 0px;
 }
 
 .modal-header .modal-title {

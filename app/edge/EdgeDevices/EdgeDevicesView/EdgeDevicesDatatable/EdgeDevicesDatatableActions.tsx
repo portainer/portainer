@@ -1,7 +1,10 @@
 import { useRouter } from '@uirouter/react';
 
 import type { Environment } from '@/portainer/environments/types';
-import { confirmAsync } from '@/portainer/services/modal.service/confirm';
+import {
+  confirmAsync,
+  confirmDestructiveAsync,
+} from '@/portainer/services/modal.service/confirm';
 import { promptAsync } from '@/portainer/services/modal.service/prompt';
 import * as notifications from '@/portainer/services/notifications';
 import { activateDevice } from '@/portainer/hostmanagement/open-amt/open-amt.service';
@@ -33,13 +36,13 @@ export function EdgeDevicesDatatableActions({
         disabled={selectedItems.length < 1}
         color="danger"
         onClick={() => onDeleteEdgeDeviceClick()}
+        icon="trash-2"
+        featherIcon
       >
-        <i className="fa fa-trash-alt space-right" aria-hidden="true" />
         Remove
       </Button>
 
-      <Button onClick={() => onAddNewDeviceClick()}>
-        <i className="fa fa-plus-circle space-right" aria-hidden="true" />
+      <Button onClick={() => onAddNewDeviceClick()} icon="plus" featherIcon>
         Add Device
       </Button>
 
@@ -47,8 +50,9 @@ export function EdgeDevicesDatatableActions({
         <Button
           disabled={selectedItems.length !== 1}
           onClick={() => onAssociateOpenAMTClick(selectedItems)}
+          icon="link"
+          featherIcon
         >
-          <i className="fa fa-link space-right" aria-hidden="true" />
           Associate with OpenAMT
         </Button>
       )}
@@ -62,7 +66,7 @@ export function EdgeDevicesDatatableActions({
   );
 
   async function onDeleteEdgeDeviceClick() {
-    const confirmed = await confirmAsync({
+    const confirmed = await confirmDestructiveAsync({
       title: 'Are you sure ?',
       message:
         'This action will remove all configurations associated to your environment(s). Continue?',

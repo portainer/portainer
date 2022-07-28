@@ -1,6 +1,7 @@
 <div class="form-group">
   <div class="col-sm-12">
     <por-switch-field
+      label-class="'col-sm-2'"
       checked="$ctrl.model.RepositoryAuthentication"
       label="'Authentication'"
       name="'authSwitch'"
@@ -9,7 +10,7 @@
     ></por-switch-field>
   </div>
 </div>
-<div class="small" style="margin: 5px 0 15px 0" ng-if="$ctrl.model.RepositoryAuthentication && $ctrl.showAuthExplanation">
+<div class="small mt-1 mb-3" ng-if="$ctrl.model.RepositoryAuthentication && $ctrl.showAuthExplanation">
   <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
   <span class="text-muted">Enabling authentication will store the credentials and it is advisable to use a git service account</span>
 </div>
