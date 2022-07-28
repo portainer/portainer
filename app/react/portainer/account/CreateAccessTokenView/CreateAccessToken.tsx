@@ -84,27 +84,27 @@ export function CreateAccessToken({
         </div>
         {accessToken && (
           <div className="mt-5">
-              <FormSectionTitle>
-                <Trans ns={translationNS}>New access token</Trans>
-              </FormSectionTitle>
-              <TextTip>
-                <Trans ns={translationNS}>
-                  Please copy the new access token. You won&#39;t be able to
-                  view the token again.
-                </Trans>
-              </TextTip>
-              <Code>{accessToken}</Code>
-              <CopyButton copyText={accessToken}>
-                <Trans ns={translationNS}>Copy access token</Trans>
-              </CopyButton>
-              <hr />
-              <Button
-                type="button"
-                onClick={() => router.stateService.go('portainer.account')}
-              >
-                <Trans ns={translationNS}>Done</Trans>
-              </Button>
-            </div>
+            <FormSectionTitle>
+              <Trans ns={translationNS}>New access token</Trans>
+            </FormSectionTitle>
+            <TextTip>
+              <Trans ns={translationNS}>
+                Please copy the new access token. You won&#39;t be able to view
+                the token again.
+              </Trans>
+            </TextTip>
+            <Code>{accessToken}</Code>
+            <CopyButton copyText={accessToken}>
+              <Trans ns={translationNS}>Copy access token</Trans>
+            </CopyButton>
+            <hr />
+            <Button
+              type="button"
+              onClick={() => router.stateService.go('portainer.account')}
+            >
+              <Trans ns={translationNS}>Done</Trans>
+            </Button>
+          </div>
         )}
       </WidgetBody>
     </Widget>
