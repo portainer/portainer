@@ -45,7 +45,7 @@
 }
 
 .btn-dangerlight {
-  border: 1px solid var(--ui-error-5);
+  border: 1px solid var(--text-button-dangerlight-color);
   color: var(--ui-error-9);
 }
 
@@ -55,9 +55,9 @@
 }
 
 .btn-light {
-  background-color: var(--bg-button-group);
+  background-color: var(--bg-button-group-color);
   border: 1px solid var(--border-button-group);
-  color: var(--text-button-group);
+  color: var(--text-button-group-color);
 }
 
 .btn-light:hover {
@@ -90,16 +90,18 @@
   color: var(--ui-blue-5);
 }
 
-form a {
+form a,
+.form-group a {
   color: var(--ui-blue-8);
 }
 
-form a:hover {
+form a:hover,
+.form-group a:hover {
   text-decoration: underline;
   color: var(--ui-blue-9);
 }
 
 .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
-  background: var(--ui-white) !important;
-  color: var(--ui-gray-9);
+  background: var(--bg-button-group-color) !important;
+  color: var(--text-button-group-color);
 }
