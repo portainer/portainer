@@ -25,7 +25,7 @@ export function FileUploadField({
   const fileRef = createRef<HTMLInputElement>();
 
   return (
-    <div className="file-upload-field">
+    <div className="file-upload-field vertical-center">
       <input
         id={inputId}
         ref={fileRef}
@@ -45,7 +45,7 @@ export function FileUploadField({
         {title}
       </Button>
 
-      <span className="space-left vertical-center">
+      <span className="vertical-center">
         {value ? value.name : <Icon icon="x" feather mode="danger" />}
       </span>
     </div>
