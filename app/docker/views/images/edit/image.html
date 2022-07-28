@@ -35,13 +35,13 @@
               </span>
             </div>
             <div class="col-sm-12">
-              <span id="downloadResourceHint" class="createResource" style="display: none; margin-left: 0">
+              <span id="downloadResourceHint" class="createResource ml-0" style="display: none">
                 Download in progress...
-                <i class="fa fa-circle-notch fa-spin" aria-hidden="true" style="margin-left: 2px"></i>
+                <i class="fa fa-circle-notch fa-spin ml-0.5" aria-hidden="true"></i>
               </span>
-              <span id="uploadResourceHint" class="createResource" style="display: none; margin-left: 0">
+              <span id="uploadResourceHint" class="createResource ml-0.5" style="display: none">
                 Upload in progress...
-                <i class="fa fa-circle-notch fa-spin" aria-hidden="true" style="margin-left: 2px"></i>
+                <i class="fa fa-circle-notch fa-spin ml-0.5" aria-hidden="true"></i>
               </span>
             </div>
           </div>
@@ -97,9 +97,9 @@
               <td>ID</td>
               <td>
                 {{ image.Id }}
-                <button authorization="DockerImageDelete" class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)"
-                  ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this image</button
-                >
+                <button authorization="DockerImageDelete" class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)">
+                  <pr-icon icon="'trash-2'" feather="true"></pr-icon> Delete this image
+                </button>
                 <button
                   authorization="DockerImageGet"
                   class="btn btn-xs btn-primary"
@@ -107,7 +107,7 @@
                   button-spinner="$ctrl.exportInProgress"
                   ng-disabled="state.exportInProgress"
                 >
-                  <i class="fa fa-download space-right" aria-hidden="true"></i>
+                  <pr-icon icon="'download'" feather="true"></pr-icon>
                   <span ng-hide="state.exportInProgress">Export this image</span>
                   <span ng-show="state.exportInProgress">Export in progress...</span>
                 </button>
@@ -212,34 +212,40 @@
       <rd-widget-body classes="no-padding">
         <table id="image-layers" class="table">
           <thead>
-            <th style="white-space: nowrap">
-              <a ng-click="order('Order')">
-                Order
-                <span ng-show="sortType == 'Order' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'Order' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-              </a>
+            <th class="whitespace-nowrap">
+              <table-column-header
+                col-title="'Order'"
+                can-sort="true"
+                is-sorted="$ctrl.state.orderBy === 'Order'"
+                is-sorted-desc="$ctrl.state.orderBy === 'Order' && $ctrl.state.reverseOrder"
+                ng-click="$ctrl.changeOrderBy('Order')"
+              ></table-column-header>
             </th>
             <th>
-              <a ng-click="order('Size')">
-                Size
-                <span ng-show="sortType == 'Size' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'Size' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-              </a>
+              <table-column-header
+                col-title="'Size'"
+                can-sort="true"
+                is-sorted="$ctrl.state.orderBy === 'Size'"
+                is-sorted-desc="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"
+                ng-click="$ctrl.changeOrderBy('Size')"
+              ></table-column-header>
             </th>
             <th>
-              <a ng-click="order('CreatedBy')">
-                Layer
-                <span ng-show="sortType == 'CreatedBy' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'CreatedBy' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-              </a>
+              <table-column-header
+                col-title="'Layer'"
+                can-sort="true"
+                is-sorted="$ctrl.state.orderBy === 'Layer'"
+                is-sorted-desc="$ctrl.state.orderBy === 'Layer' && $ctrl.state.reverseOrder"
+                ng-click="$ctrl.changeOrderBy('Layer')"
+              ></table-column-header>
             </th>
           </thead>
           <tbody>
             <tr ng-repeat="layer in history | orderBy:sortType:sortReverse">
-              <td style="white-space: nowrap">
+              <td class="whitespace-nowrap">
                 {{ layer.Order }}
               </td>
-              <td style="white-space: nowrap">
+              <td class="whitespace-nowrap">
                 {{ layer.Size | humansize }}
               </td>
               <td class="expand">
@@ -249,7 +255,7 @@
                   </span>
                   <span id="layer-command-{{ $index }}-short">
                     {{ layer.CreatedBy | imagelayercommand | truncate: 130 }}
-                    <span ng-if="layer.CreatedBy.length > 130" style="margin-left: 5px">
+                    <span ng-if="layer.CreatedBy.length > 130" class="ml-1">
                       <a id="layer-command-expander{{ $index }}" class="btn" ng-click="toggleLayerCommand($index)">
                         <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon>
                       </a>
