@@ -2,7 +2,10 @@ import { useQueryClient } from 'react-query';
 import { useRouter } from '@uirouter/react';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
-import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
+import {
+  confirmAsync,
+  confirmDestructiveAsync,
+} from '@/portainer/services/modal.service/confirm';
 import * as notifications from '@/portainer/services/notifications';
 import {
   deleteProfile,
@@ -54,7 +57,7 @@ export function FDOProfilesDatatableActions({
   );
 
   async function onDuplicateProfileClick() {
-    const confirmed = await confirmDestructiveAsync({
+    const confirmed = await confirmAsync({
       title: 'Are you sure ?',
       message: 'This action will duplicate the selected profile. Continue?',
       buttons: {
