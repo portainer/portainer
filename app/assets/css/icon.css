@@ -6,7 +6,7 @@
 }
 
 pr-icon {
-  display: inline-block;
+  display: inline-flex;
 }
 
 .icon {
