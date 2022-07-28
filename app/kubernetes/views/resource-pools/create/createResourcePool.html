@@ -268,7 +268,7 @@
                           />
                         </div>
                         <div class="col-sm-1 input-group input-group-sm" ng-if="$index > 0">
-                          <button class="btn btn-light btn-only-icon" type="button" ng-click="$ctrl.removeHostname(ic, $index)">
+                          <button class="btn btn-md btn-light btn-only-icon !h-[30px]" type="button" ng-click="$ctrl.removeHostname(ic, $index)">
                             <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
                           </button>
                         </div>
@@ -362,7 +362,7 @@
                         data-cy="namespaceCreate-annotationKey{{ ic.IngressClass.Name }}"
                       />
                     </div>
-                    <div class="input-group col-sm-5 input-group-sm">
+                    <div class="input-group input-group-sm col-sm-5">
                       <span class="input-group-addon">Value</span>
                       <input
                         type="text"
@@ -373,14 +373,14 @@
                         data-cy="namespaceCreate-annotationValue{{ ic.IngressClass.Name }}"
                       />
                     </div>
-                    <div class="col-sm-1 input-group input-group-sm">
+                    <div class="input-group input-group-sm col-sm-1">
                       <button
-                        class="btn btn-sm btn-light btn-only-icon"
+                        class="btn btn-sm btn-light btn-only-icon !h-[30px]"
                         type="button"
                         ng-click="$ctrl.removeAnnotation(ic, $index)"
                         data-cy="namespaceCreate-deleteAnnotationButton{{ ic.IngressClass.Name }}"
                       >
-                        <pr-icon size="'md'" icon="'trash-2'" feather="true"></pr-icon>
+                        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
                       </button>
                     </div>
                   </div>
