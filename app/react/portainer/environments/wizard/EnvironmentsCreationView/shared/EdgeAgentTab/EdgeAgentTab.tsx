@@ -48,7 +48,12 @@ export function EdgeAgentTab({
 
           <div className="row">
             <div className="flex justify-end">
-              <Button color="primary" type="reset" onClick={handleReset}>
+              <Button
+                color="primary"
+                type="reset"
+                onClick={handleReset}
+                data-cy="wizard_button-add-another-environment"
+              >
                 Add another environment
               </Button>
             </div>

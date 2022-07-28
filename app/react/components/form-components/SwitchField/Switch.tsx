@@ -48,8 +48,9 @@ export function Switch({
           checked={checked}
           disabled={disabled || limitedToBE}
           onChange={({ target: { checked } }) => onChange(checked)}
+          data-cy={dataCy}
         />
-        <span className="slider round" data-cy={dataCy} />
+        <span className="slider round" />
       </label>
       {limitedToBE && <BEFeatureIndicator featureId={featureId} />}
     </>

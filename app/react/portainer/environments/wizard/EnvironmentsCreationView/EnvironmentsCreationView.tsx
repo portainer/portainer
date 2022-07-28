@@ -82,10 +82,14 @@ export function EnvironmentCreationView() {
                     'flex justify-between'
                   )}
                 >
-                  <Button disabled={isFirstStep} onClick={onPreviousClick}>
+                  <Button
+                    disabled={isFirstStep}
+                    onClick={onPreviousClick}
+                    data-cy="wizard_button-previous"
+                  >
                     <i className="fas fa-arrow-left space-right" /> Previous
                   </Button>
-                  <Button onClick={onNextClick}>
+                  <Button onClick={onNextClick} data-cy="wizard_button-next">
                     {isLastStep ? 'Finish' : 'Next'}
                     <i className="fas fa-arrow-right space-left" />
                   </Button>

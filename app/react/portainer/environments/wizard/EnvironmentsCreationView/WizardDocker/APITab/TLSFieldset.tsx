@@ -16,6 +16,8 @@ export function TLSFieldset() {
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
+            dataCy="switch-enable-tls"
+            name="switch-enable-tls"
             label="TLS"
             checked={values.tls}
             onChange={(checked) => setFieldValue('tls', checked)}
@@ -28,6 +30,8 @@ export function TLSFieldset() {
           <div className="form-group">
             <div className="col-sm-12">
               <SwitchField
+                dataCy="switch-skip-cert-verification"
+                name="switch-skip-cert-verification"
                 label="Skip Certification Verification"
                 checked={!!values.skipVerify}
                 onChange={(checked) => setFieldValue('skipVerify', checked)}

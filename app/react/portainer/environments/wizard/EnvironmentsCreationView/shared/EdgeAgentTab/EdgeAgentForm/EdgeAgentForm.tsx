@@ -55,6 +55,7 @@ export function EdgeAgentForm({ onCreate, readonly, showGpus = false }: Props) {
                   isLoading={createMutation.isLoading}
                   loadingText="Creating environment..."
                   disabled={!isValid}
+                  data-cy="wizard_button-create"
                 >
                   <i className="fa fa-plug space-right" />
                   Create

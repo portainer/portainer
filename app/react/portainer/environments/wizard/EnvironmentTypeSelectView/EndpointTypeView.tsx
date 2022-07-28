@@ -43,6 +43,7 @@ export function EnvironmentTypeSelectView() {
               <Button
                 disabled={types.length === 0}
                 onClick={() => startWizard()}
+                data-cy="wizard_button-start-wizard"
               >
                 Start Wizard
               </Button>
