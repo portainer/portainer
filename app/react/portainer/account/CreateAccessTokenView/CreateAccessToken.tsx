@@ -74,39 +74,37 @@ export function CreateAccessToken({
             />
           </FormControl>
           <div className="row mt-5">
-            <div className="col-sm-12">
-              <Button
-                disabled={!!errorText || !!accessToken}
-                onClick={() => generateAccessToken()}
-              >
-                {t('Add access token')}
-              </Button>
-            </div>
+            <Button
+              disabled={!!errorText || !!accessToken}
+              onClick={() => generateAccessToken()}
+            >
+              {t('Add access token')}
+            </Button>
           </div>
         </div>
         {accessToken && (
-          <>
-            <FormSectionTitle>
-              <Trans ns={translationNS}>New access token</Trans>
-            </FormSectionTitle>
-            <TextTip>
-              <Trans ns={translationNS}>
-                Please copy the new access token. You won&#39;t be able to view
-                the token again.
-              </Trans>
-            </TextTip>
-            <Code>{accessToken}</Code>
-            <CopyButton copyText={accessToken}>
-              <Trans ns={translationNS}>Copy access token</Trans>
-            </CopyButton>
-            <hr />
-            <Button
-              type="button"
-              onClick={() => router.stateService.go('portainer.account')}
-            >
-              <Trans ns={translationNS}>Done</Trans>
-            </Button>
-          </>
+          <div className="mt-5">
+              <FormSectionTitle>
+                <Trans ns={translationNS}>New access token</Trans>
+              </FormSectionTitle>
+              <TextTip>
+                <Trans ns={translationNS}>
+                  Please copy the new access token. You won&#39;t be able to
+                  view the token again.
+                </Trans>
+              </TextTip>
+              <Code>{accessToken}</Code>
+              <CopyButton copyText={accessToken}>
+                <Trans ns={translationNS}>Copy access token</Trans>
+              </CopyButton>
+              <hr />
+              <Button
+                type="button"
+                onClick={() => router.stateService.go('portainer.account')}
+              >
+                <Trans ns={translationNS}>Done</Trans>
+              </Button>
+            </div>
         )}
       </WidgetBody>
     </Widget>
