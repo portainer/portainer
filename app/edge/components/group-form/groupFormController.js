@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { confirmAsync } from '@/portainer/services/modal.service/confirm';
+import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
 import { EdgeTypes } from '@/portainer/environments/types';
 import { getEnvironments } from '@/portainer/environments/environment.service';
 
@@ -50,7 +50,7 @@ export class EdgeGroupFormController {
 
   dissociateEndpoint(endpoint) {
     return this.$async(async () => {
-      const confirmed = await confirmAsync({
+      const confirmed = await confirmDestructiveAsync({
         title: 'Confirm action',
         message: 'Removing the environment from this group will remove its corresponding edge stacks',
         buttons: {

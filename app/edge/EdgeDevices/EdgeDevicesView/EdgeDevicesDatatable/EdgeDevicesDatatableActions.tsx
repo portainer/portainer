@@ -1,7 +1,10 @@
 import { useRouter } from '@uirouter/react';
 
 import type { Environment } from '@/portainer/environments/types';
-import { confirmAsync } from '@/portainer/services/modal.service/confirm';
+import {
+  confirmAsync,
+  confirmDestructiveAsync,
+} from '@/portainer/services/modal.service/confirm';
 import { promptAsync } from '@/portainer/services/modal.service/prompt';
 import * as notifications from '@/portainer/services/notifications';
 import { activateDevice } from '@/portainer/hostmanagement/open-amt/open-amt.service';
@@ -63,7 +66,7 @@ export function EdgeDevicesDatatableActions({
   );
 
   async function onDeleteEdgeDeviceClick() {
-    const confirmed = await confirmAsync({
+    const confirmed = await confirmDestructiveAsync({
       title: 'Are you sure ?',
       message:
         'This action will remove all configurations associated to your environment(s). Continue?',
