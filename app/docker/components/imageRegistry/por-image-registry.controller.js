@@ -90,7 +90,7 @@ class porImageRegistryController {
           this.registries.splice(0, 0, this.defaultRegistry);
         }
 
-        const id = this.model.Registry.Id;
+        const id = (this.model.Registry && this.model.Registry.Id) || 0;
         const registry = _.find(this.registries, { Id: id });
         if (!registry) {
           this.model.Registry = showDefaultRegistry ? this.defaultRegistry : this.registries[0];
