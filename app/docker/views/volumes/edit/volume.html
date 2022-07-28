@@ -12,7 +12,7 @@
               <td>
                 {{ volume.Id }}
                 <button authorization="DockerVolumeDelete" class="btn btn-xs btn-danger" ng-click="removeVolume()"
-                  ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove this volume</button
+                  ><pr-icon icon="'trash-2'" feather="true" class="leading-none"></pr-icon> Remove this volume</button
                 >
               </td>
             </tr>
@@ -60,7 +60,7 @@
 <div class="row" ng-if="!(volume.Options | emptyobject)">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cogs" title-text="Volume options"></rd-widget-header>
+      <rd-widget-header icon="settings" feather-icon="true" title-text="Volume options"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -77,7 +77,7 @@
 <div class="row" ng-if="containersUsingVolume.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cubes" title-text="Containers using volume"></rd-widget-header>
+      <rd-widget-header icon="box" feather-icon="true" title-text="Containers using volume"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
