@@ -42,7 +42,7 @@ export function AutomaticEdgeEnvCreation() {
   return (
     <Widget>
       <WidgetTitle
-        icon="fa-laptop"
+        icon="svg-laptop"
         title="Automatic Edge Environment Creation"
       />
       <WidgetBody>

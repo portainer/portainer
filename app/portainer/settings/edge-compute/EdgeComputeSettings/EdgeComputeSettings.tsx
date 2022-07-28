@@ -32,7 +32,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="fa-laptop" title="Edge Compute settings" />
+        <WidgetTitle icon="svg-laptop" title="Edge Compute settings" />
         <WidgetBody>
           <Formik
             initialValues={settings}
@@ -58,7 +58,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                 <FormControl
                   inputId="edge_enable"
                   label="Enable Edge Compute features"
-                  size="medium"
+                  size="small"
                   errors={errors.EnableEdgeComputeFeatures}
                 >
                   <Switch
@@ -80,7 +80,7 @@ export function EdgeComputeSettings({ settings, onSubmit }: Props) {
                 <FormControl
                   inputId="edge_enforce_id"
                   label="Enforce use of Portainer generated Edge ID"
-                  size="medium"
+                  size="small"
                   tooltip="This setting only applies to manually created environments."
                   errors={errors.EnforceEdgeID}
                 >

@@ -93,7 +93,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="fa-laptop" title="Intel OpenAMT" />
+        <WidgetTitle icon="svg-laptop" title="Intel OpenAMT" />
         <WidgetBody>
           <Formik
             initialValues={initialValues}
