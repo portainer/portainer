@@ -1,5 +1,5 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { X, Slash } from 'react-feather';
 
 import {
@@ -9,6 +9,7 @@ import {
 } from '@/portainer/environments/types';
 import { getPlatformType } from '@/portainer/environments/utils';
 import { useEnvironment } from '@/portainer/environments/queries/useEnvironment';
+import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
 
 import { getPlatformIcon } from '../portainer/environments/utils/get-platform-icon';
 
@@ -86,14 +87,16 @@ function Content({ environment, onClear }: ContentProps) {
 function useCurrentEnvironment() {
   const { params } = useCurrentStateAndParams();
   const router = useRouter();
-  const [environmentId, setEnvironmentId] = useState<EnvironmentId>();
+  const [environmentId, setEnvironmentId] = useLocalStorage<
+    EnvironmentId | undefined
+  >('environmentId', undefined, sessionStorage);
 
   useEffect(() => {
     const environmentId = parseInt(params.endpointId, 10);
     if (params.endpointId && !Number.isNaN(environmentId)) {
       setEnvironmentId(environmentId);
     }
-  }, [params.endpointId]);
+  }, [params.endpointId, setEnvironmentId]);
 
   return { query: useEnvironment(environmentId), clearEnvironment };
 
