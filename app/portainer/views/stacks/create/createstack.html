@@ -107,7 +107,10 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <button type="button" class="btn btn-sm btn-primary" ngf-select="uploadFile($file)">Select file</button>
+                <button type="button" class="btn btn-sm btn-light" ngf-select="uploadFile($file)">
+                  <pr-icon icon="'upload'" feather="true"></pr-icon>
+                  Select file</button
+                >
                 <span style="margin-left: 5px">
                   {{ formValues.StackFile.name }}
                   <i class="fa fa-times red-icon" ng-if="!formValues.StackFile" aria-hidden="true"></i>
@@ -168,7 +171,7 @@
               Webhooks
               <por-switch-field
                 name="EnableWebhook"
-                value="formValues.EnableWebhook"
+                checked="formValues.EnableWebhook"
                 label-class="'col-sm-2'"
                 tooltip="'Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack.'"
                 label="'Create a Stack webhook'"
