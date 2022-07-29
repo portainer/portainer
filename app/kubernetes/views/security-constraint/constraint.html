@@ -13,12 +13,9 @@
 
 <div ng-if="state.viewReady">
   <div class="row">
-    <div class="col-sm-12 space-left">
-      <i class="fas fa-shield-alt"></i>
-      Pod security constraints</div
-    >
     <div class="col-sm-12">
       <rd-widget>
+        <rd-widget-header icon="shield" feather-icon="true" title-text="Pod security constraints"></rd-widget-header>
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesSecurityConstraintForm">
             <!--  main toggle  -->
@@ -29,6 +26,8 @@
                   name="'disableSysctlSettingForRegularUsers'"
                   label="'Enable pod security constraints'"
                   feature-id="limitedFeaturePodSecurityPolicy"
+                  label-class="'col-sm-3 col-lg-2 px-0'"
+                  switch-class="'col-sm-8'"
                 >
                 </por-switch-field>
               </div>

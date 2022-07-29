@@ -113,8 +113,8 @@
                   placeholder="# Define or paste the content of your manifest file here"
                 >
                   <editor-description>
-                    <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
-                      <p>
+                    <div ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
+                      <p class="vertical-center">
                         <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                         Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
                         not all the Compose format options are supported by Kompose at the moment.
@@ -123,9 +123,9 @@
                         You can get more information about Compose file format in the
                         <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
                       </p>
-                    </span>
-                    <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
-                      <p>
+                    </div>
+                    <div ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
+                      <p class="vertical-center">
                         <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
                         This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
                       </p>
@@ -133,7 +133,7 @@
                         You can get more information about Kubernetes file format in the
                         <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
                       </p>
-                    </span>
+                    </div>
                   </editor-description>
                 </web-editor-form>
 

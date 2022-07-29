@@ -84,12 +84,12 @@ function Option(props: OptionProps<GpuOption, true>) {
 export function Gpu({
   values,
   onChange,
-  gpus,
+  gpus = [],
   usedGpus = [],
   usedAllGpus,
 }: Props) {
   const options = useMemo(() => {
-    const options = gpus.map((gpu) => ({
+    const options = (gpus || []).map((gpu) => ({
       value: gpu.value,
       label:
         usedGpus.includes(gpu.value) || usedAllGpus

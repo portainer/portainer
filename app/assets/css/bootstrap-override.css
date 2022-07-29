@@ -1,4 +1,15 @@
 /* Label, Section Title */
+.label {
+  border-radius: 5px;
+}
+
+.label-success {
+  background-color: var(--ui-success-7);
+}
+
+.label-danger {
+  background-color: var(--ui-error-6);
+}
 
 .control-label {
   color: var(--ui-gray-7);
