@@ -25,7 +25,7 @@ export function EnvironmentStatsKubernetes({ snapshots = [] }: Props) {
         <Stat icon="cpu" featherIcon value={`${snapshot.TotalCPU} CPU`} />
 
         <Stat
-          icon="cpu"
+          icon="svg-memory"
           featherIcon
           value={`${humanize(snapshot.TotalMemory)} RAM`}
         />
