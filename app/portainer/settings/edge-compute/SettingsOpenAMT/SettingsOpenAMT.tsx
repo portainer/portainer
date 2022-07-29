@@ -117,6 +117,7 @@ export function SettingsOpenAMT({ settings, onSubmit }: Props) {
                   inputId="edge_enableOpenAMT"
                   label="Enable OpenAMT"
                   errors={errors.enabled}
+                  size="small"
                 >
                   <Switch
                     id="edge_enableOpenAMT"
