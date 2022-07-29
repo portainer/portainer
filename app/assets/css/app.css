@@ -245,7 +245,6 @@ a[ng-click] {
   cursor: pointer;
   border: 1px solid var(--border-blocklist);
   border-radius: 8px;
-  box-shadow: var(--shadow-box-color);
   margin-right: 10px;
 }
 
