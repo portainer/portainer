@@ -163,12 +163,22 @@ code {
 
 .CodeMirror-gutters {
   background: var(--bg-codemirror-gutters-color);
-  border-right: 1px solid var(--border-codemirror-gutters-color);
+  border-right: 0px;
+}
+
+.CodeMirror-linenumber {
+  text-align: left;
+}
+
+.CodeMirror pre.CodeMirror-line,
+.CodeMirror pre.CodeMirror-line-like {
+  padding: 0 20px;
 }
 
 .CodeMirror {
   background: var(--bg-codemirror-color);
   color: var(--text-codemirror-color);
+  border-radius: 8px;
 }
 
 .CodeMirror-selected {
