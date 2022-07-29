@@ -2,23 +2,26 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
-      </div>
-      <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          ng-model-options="{ debounce: 300 }"
-        />
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-white icon-primary icon-nested-blue'"></pr-icon>
+          {{ $ctrl.titleText }}
+        </div>
+        <div class="searchBar">
+          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for a tag..."
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
+        <div class="actionBar !gap-3">
+          <button type="button" class="btn btn-sm btn-dangerlight h-fit" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+            <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+          </button>
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
@@ -31,8 +34,8 @@
                 </span>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
             </tr>
@@ -62,7 +65,7 @@
       <div class="footer" ng-if="$ctrl.dataset">
         <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
-          <form class="form-inline">
+          <form class="form-inline vertical-center">
             <span class="limitSelector">
               <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">

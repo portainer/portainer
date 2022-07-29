@@ -19,10 +19,10 @@
             data-cy="endpoint-searchInput"
           />
         </div>
-        <div class="actionBar">
+        <div class="actionBar !gap-3">
           <button
             type="button"
-            class="btn btn-sm btn-dangerlight vertical-center"
+            class="btn btn-sm btn-dangerlight h-fit"
             ng-disabled="$ctrl.state.selectedItemCount === 0"
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="endpoint-removeEndpointButton"
@@ -30,13 +30,7 @@
             <pr-icon icon="'trash-2'" feather="true" class-name="'icon-white'"></pr-icon>
             <span>Remove</span>
           </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-primary vertical-center"
-            ng-click="$ctrl.setReferrer()"
-            ui-sref="portainer.wizard.endpoints"
-            data-cy="endpoint-addEndpointButton"
-          >
+          <button type="button" class="btn btn-sm btn-primary h-fit" ng-click="$ctrl.setReferrer()" ui-sref="portainer.wizard.endpoints" data-cy="endpoint-addEndpointButton">
             <pr-icon icon="'plus'" feather="true" class-name="'icon-white'"></pr-icon>
             <span>Add environment</span>
           </button>
@@ -136,7 +130,7 @@
       <div class="footer" ng-if="!$ctrl.state.loading">
         <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
-          <form class="form-inline">
+          <form class="form-inline vertical-center">
             <span class="limitSelector">
               <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
