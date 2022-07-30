@@ -16,26 +16,52 @@
           <thead>
             <tr>
               <th class="small-column">
-                <a ng-click="$ctrl.changeSort('Timestamp')">
-                  Time
-                  <datatable-sort-icon key="Timestamp" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
-                </a>
+                <div class="vertical-center">
+                  <table-column-header
+                    col-title="'Time'"
+                    can-sort="true"
+                    is-sorted="$ctrl.sort.key === 'Timestamp'"
+                    is-sorted-desc="$ctrl.sort.key === 'Timestamp' && $ctrl.sort.desc"
+                    ng-click="$ctrl.changeSort('Timestamp')"
+                  >
+                  </table-column-header>
+                </div>
               </th>
               <th class="small-column">
-                <a ng-click="$ctrl.changeSort('Username')">
-                  User
-                  <datatable-sort-icon key="Username" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
-                </a>
+                <div class="vertical-center">
+                  <table-column-header
+                    col-title="'User'"
+                    can-sort="true"
+                    is-sorted="$ctrl.sort.key === 'Username'"
+                    is-sorted-desc="$ctrl.sort.key === 'Username' && $ctrl.sort.desc"
+                    ng-click="$ctrl.changeSort('Username')"
+                  >
+                  </table-column-header>
+                </div>
               </th>
               <th class="small-column">
-                <a ng-click="$ctrl.changeSort('Context')">
-                  Environment
-                  <datatable-sort-icon key="Context" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
-                </a>
+                <div class="vertical-center">
+                  <table-column-header
+                    col-title="'Environment'"
+                    can-sort="true"
+                    is-sorted="$ctrl.sort.key === 'Context'"
+                    is-sorted-desc="$ctrl.sort.key === 'Context' && $ctrl.sort.desc"
+                    ng-click="$ctrl.changeSort('Context')"
+                  >
+                  </table-column-header>
+                </div>
               </th>
 
-              <th> Action </th>
-              <th> Payload </th>
+              <th>
+                <div class="vertical-center">
+                  <table-column-header col-title="'Action'" can-sort="false"> </table-column-header>
+                </div>
+              </th>
+              <th>
+                <div class="vertical-center">
+                  <table-column-header col-title="'Payload'" can-sort="false"> </table-column-header>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
