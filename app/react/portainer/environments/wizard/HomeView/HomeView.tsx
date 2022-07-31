@@ -23,7 +23,7 @@ export function HomeView() {
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <WidgetTitle title="Environment Wizard" icon="fa-magic" />
+            <WidgetTitle title="Environment Wizard" icon="svg-magic" />
             <WidgetBody>
               <div className="row">
                 <div className="col-sm-12 form-section-title">
