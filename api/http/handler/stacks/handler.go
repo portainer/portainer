@@ -7,6 +7,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/portainer/portainer/api/internal/endpointutils"
+
 	"github.com/docker/docker/api/types"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
@@ -131,6 +133,22 @@ func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedR
 	}
 
 	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
+}
+
+// if stack management is disabled for non admins and the user isn't an admin, then return false. Otherwise return true
+func (handler *Handler) userCanManageStacks(securityContext *security.RestrictedRequestContext, endpoint *portainer.Endpoint) (bool, error) {
+	if endpointutils.IsDockerEndpoint(endpoint) && !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
+		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpoint.ID))
+
+		if err != nil {
+			return false, fmt.Errorf("Failed to get user from the database: %w", err)
+		}
+
+		if !canCreate {
+			return false, nil
+		}
+	}
+	return true, nil
 }
 
 func (handler *Handler) checkUniqueStackName(endpoint *portainer.Endpoint, name string, stackID portainer.StackID) (bool, error) {

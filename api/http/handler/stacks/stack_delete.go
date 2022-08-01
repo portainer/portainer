@@ -103,6 +103,15 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		}
 	}
 
+	canManage, err := handler.userCanManageStacks(securityContext, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack deletion", Err: err}
+	}
+	if !canManage {
+		errMsg := "Stack deletion is disabled for non-admin users"
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: errors.New(errMsg)}
+	}
+
 	// stop scheduler updates of the stack before removal
 	if stack.AutoUpdate != nil {
 		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)

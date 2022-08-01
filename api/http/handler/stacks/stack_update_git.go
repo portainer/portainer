@@ -120,6 +120,15 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	canManage, err := handler.userCanManageStacks(securityContext, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack deletion", Err: err}
+	}
+	if !canManage {
+		errMsg := "Stack editing is disabled for non-admin users"
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: errors.New(errMsg)}
+	}
+
 	//stop the autoupdate job if there is any
 	if stack.AutoUpdate != nil {
 		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
