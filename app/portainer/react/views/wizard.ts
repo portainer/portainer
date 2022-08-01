@@ -30,6 +30,19 @@ function config($stateRegistryProvider: StateRegistry) {
   });
 
   $stateRegistryProvider.register({
+    name: 'portainer.wizard.endpoints',
+    url: '/endpoints?edgeDevice',
+    views: {
+      'content@': {
+        component: 'wizardEnvironmentTypeSelectView',
+      },
+    },
+    params: {
+      localEndpointId: 0,
+    },
+  });
+
+  $stateRegistryProvider.register({
     name: 'portainer.wizard.endpoints.create',
     url: '/create?envType',
     views: {
@@ -39,19 +52,6 @@ function config($stateRegistryProvider: StateRegistry) {
     },
     params: {
       envType: '',
-    },
-  });
-
-  $stateRegistryProvider.register({
-    name: 'portainer.wizard.endpoints',
-    url: '/endpoints',
-    views: {
-      'content@': {
-        component: 'wizardEnvironmentTypeSelectView',
-      },
-    },
-    params: {
-      localEndpointId: 0,
     },
   });
 }

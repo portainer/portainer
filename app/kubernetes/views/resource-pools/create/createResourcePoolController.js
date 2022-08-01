@@ -38,6 +38,7 @@ class KubernetesCreateResourcePoolController {
 
     this.onToggleStorageQuota = this.onToggleStorageQuota.bind(this);
     this.onToggleLoadBalancerQuota = this.onToggleLoadBalancerQuota.bind(this);
+    this.onToggleResourceQuota = this.onToggleResourceQuota.bind(this);
   }
   /* #endregion */
 
@@ -50,6 +51,12 @@ class KubernetesCreateResourcePoolController {
   onToggleLoadBalancerQuota(enabled) {
     this.$scope.$evalAsync(() => {
       this.formValues.UseLoadBalancersQuota = enabled;
+    });
+  }
+
+  onToggleResourceQuota(enabled) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.HasQuota = enabled;
     });
   }
 

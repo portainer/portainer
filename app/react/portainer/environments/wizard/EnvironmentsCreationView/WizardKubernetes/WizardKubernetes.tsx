@@ -13,6 +13,7 @@ import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
 import { AnalyticsStateKey } from '../types';
 import { EdgeAgentTab } from '../shared/EdgeAgentTab';
+import { useFilterEdgeOptionsIfNeeded } from '../useOnlyEdgeOptions';
 
 import { AgentPanel } from './AgentPanel';
 import { KubeConfigTeaserForm } from './KubeConfigTeaserForm';
@@ -21,11 +22,7 @@ interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
 }
 
-const options: BoxSelectorOption<
-  | EnvironmentCreationTypes.AgentEnvironment
-  | EnvironmentCreationTypes.EdgeAgentEnvironment
-  | EnvironmentCreationTypes.KubeConfigEnvironment
->[] = [
+const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
   {
     id: 'agent_endpoint',
     icon: 'fa fa-bolt',
@@ -52,6 +49,11 @@ const options: BoxSelectorOption<
 ];
 
 export function WizardKubernetes({ onCreate }: Props) {
+  const options = useFilterEdgeOptionsIfNeeded(
+    defaultOptions,
+    EnvironmentCreationTypes.EdgeAgentEnvironment
+  );
+
   const [creationType, setCreationType] = useState(options[0].value);
 
   const tab = getTab(creationType);
