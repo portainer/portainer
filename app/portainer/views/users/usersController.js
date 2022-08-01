@@ -26,6 +26,12 @@ angular.module('portainer.app').controller('UsersController', [
       Teams: [],
     };
 
+    $scope.handleAdministratorChange = function (checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.Administrator = checked;
+      });
+    };
+
     $scope.checkUsernameValidity = function () {
       var valid = true;
       for (var i = 0; i < $scope.users.length; i++) {

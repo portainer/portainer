@@ -15,7 +15,7 @@
 
           <!-- name-input -->
           <div class="form-group">
-            <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
             <div class="col-sm-9 col-lg-10">
               <input
                 type="text"
@@ -32,14 +32,20 @@
           <div class="form-group" ng-show="$ctrl.state.nameAlreadyExists">
             <div class="col-sm-12 small text-warning">
               <div>
-                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A registry with the same name already exists.</p>
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                  A registry with the same name already exists.
+                </p>
               </div>
             </div>
           </div>
           <div class="form-group" ng-show="editRegistry.registry_name.$invalid">
             <div class="col-sm-12 small text-warning">
               <div ng-messages="editRegistry.registry_name.$error">
-                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="required" class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                  This field is required.
+                </p>
               </div>
             </div>
           </div>
@@ -47,7 +53,7 @@
           <!-- registry-url-input -->
           <div class="form-group">
             <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
-              Registry URL
+              <span class="required">Registry URL</span>
               <portainer-tooltip message="'URL or IP address of a Docker registry. Any protocol or trailing slash will be stripped if present.'"> </portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
@@ -66,7 +72,10 @@
           <div class="form-group" ng-show="editRegistry.registry_url.$invalid">
             <div class="col-sm-12 small text-warning">
               <div ng-messages="editRegistry.registry_url.$error">
-                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="required" class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                  This field is required.
+                </p>
               </div>
             </div>
           </div>
@@ -75,7 +84,7 @@
           <div ng-if="$ctrl.registry.Type === $ctrl.RegistryTypes.PROGET">
             <div class="form-group">
               <label for="registry_base_url" class="col-sm-3 col-lg-2 control-label text-left">
-                Base URL
+                <span class="required">Base URL</span>
                 <portainer-tooltip message="'The base URL of the ProGet registry.'"> </portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
@@ -93,7 +102,10 @@
             <div class="form-group" ng-show="editRegistry.registry_base_url.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="editRegistry.registry_base_url.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required" class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                    This field is required.
+                  </p>
                 </div>
               </div>
             </div>
@@ -110,12 +122,12 @@
               $ctrl.registry.Type !== $ctrl.RegistryTypes.AZURE
             "
           >
-            <div class="col-sm-12">
-              <label for="registry_auth" class="control-label text-left">
-                Authentication
-                <portainer-tooltip message="'Enable this option if you need to specify credentials to connect to this registry.'"> </portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.registry.Authentication" /><i></i> </label>
+            <label for="registry_auth" class="col-sm-3 col-lg-2 control-label text-left">
+              Authentication
+              <portainer-tooltip message="'Enable this option if you need to specify credentials to connect to this registry.'"> </portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <por-switch-field checked="$ctrl.registry.Authentication" on-change="($ctrl.toggleAuthentication)" switch-values="{on:'Yes',off:'No'}"></por-switch-field>
             </div>
           </div>
           <!-- !authentication-checkbox -->
@@ -124,7 +136,7 @@
           <div ng-if="$ctrl.registry.Authentication">
             <!-- credentials-user -->
             <div class="form-group">
-              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">
+              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left required">
                 {{ $ctrl.registry.Type === $ctrl.RegistryTypes.ECR ? 'AWS Access Key' : 'Username' }}
               </label>
               <div class="col-sm-9 col-lg-10">
@@ -134,14 +146,17 @@
             <div class="form-group" ng-show="editRegistry.credentials_username.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="editRegistry.credentials_username.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required" class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                    This field is required.
+                  </p>
                 </div>
               </div>
             </div>
             <!-- !credentials-user -->
             <!-- credentials-password -->
             <div class="form-group">
-              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">
+              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left required">
                 {{ $ctrl.passwordLabel() }}
               </label>
               <div class="col-sm-9 col-lg-10">
@@ -151,7 +166,10 @@
             <div class="form-group" ng-show="editRegistry.credentials_password.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="editRegistry.credentials_password.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required" class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                    This field is required.
+                  </p>
                 </div>
               </div>
             </div>
@@ -162,16 +180,20 @@
           <div ng-if="$ctrl.registry.Type == $ctrl.RegistryTypes.QUAY">
             <!-- organisation-checkbox -->
             <div class="form-group">
-              <div class="col-sm-12">
-                <label class="control-label text-left"> Use organisation registry </label>
-                <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="$ctrl.registry.Quay.UseOrganisation" /><i></i> </label>
+              <label class="col-sm-3 col-lg-2 control-label text-left"> Use organisation registry </label>
+              <div class="col-sm-9 col-lg-10">
+                <por-switch-field
+                  checked="$ctrl.registry.Quay.UseOrganisation"
+                  on-change="($ctrl.toggleQuayUseOrganisation)"
+                  switch-values="{on:'Yes',off:'No'}"
+                ></por-switch-field>
               </div>
             </div>
             <!-- !organisation-checkbox -->
             <div ng-if="$ctrl.registry.Quay.UseOrganisation">
               <!-- organisation_name -->
               <div class="form-group">
-                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label text-left">Organisation name</label>
+                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label text-left required">Organisation name</label>
                 <div class="col-sm-9 col-lg-10">
                   <input type="text" class="form-control" id="organisation_name" name="organisation_name" ng-model="$ctrl.registry.Quay.OrganisationName" required />
                 </div>
@@ -179,7 +201,10 @@
               <div class="form-group" ng-show="editRegistry.organisation_name.$invalid">
                 <div class="col-sm-12 small text-warning">
                   <div ng-messages="editRegistry.organisation_name.$error">
-                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                    <p ng-message="required" class="vertical-center">
+                      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                      This field is required.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -190,7 +215,7 @@
           <div ng-if="$ctrl.registry.Type == $ctrl.RegistryTypes.ECR">
             <!-- region -->
             <div class="form-group">
-              <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left">Region</label>
+              <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left required">Region</label>
               <div class="col-sm-9 col-lg-10">
                 <input type="text" class="form-control" id="registry_region" name="registry_region" ng-model="$ctrl.registry.Ecr.Region" placeholder="us-west-1" required />
               </div>
@@ -198,7 +223,10 @@
             <div class="form-group" ng-show="editRegistry.registry_region.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="editRegistry.registry_region.$error">
-                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="required" class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                    This field is required.
+                  </p>
                 </div>
               </div>
             </div>

@@ -74,18 +74,16 @@ export function CreateAccessToken({
             />
           </FormControl>
           <div className="row mt-5">
-            <div className="col-sm-12">
-              <Button
-                disabled={!!errorText || !!accessToken}
-                onClick={() => generateAccessToken()}
-              >
-                {t('Add access token')}
-              </Button>
-            </div>
+            <Button
+              disabled={!!errorText || !!accessToken}
+              onClick={() => generateAccessToken()}
+            >
+              {t('Add access token')}
+            </Button>
           </div>
         </div>
         {accessToken && (
-          <>
+          <div className="mt-5">
             <FormSectionTitle>
               <Trans ns={translationNS}>New access token</Trans>
             </FormSectionTitle>
@@ -106,7 +104,7 @@ export function CreateAccessToken({
             >
               <Trans ns={translationNS}>Done</Trans>
             </Button>
-          </>
+          </div>
         )}
       </WidgetBody>
     </Widget>

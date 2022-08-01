@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import { ComponentType, ReactNode, useEffect } from 'react';
-import featherIcons from 'feather-icons';
+import { ComponentType, ReactNode } from 'react';
+import * as featherIcons from 'react-feather';
 import { isValidElementType } from 'react-is';
 
 import Svg, { SvgIcons } from './Svg';
@@ -10,32 +10,30 @@ export interface IconProps {
   featherIcon?: boolean;
 }
 
+export type IconMode =
+  | 'alt'
+  | 'primary'
+  | 'primary-alt'
+  | 'secondary'
+  | 'secondary-alt'
+  | 'warning'
+  | 'warning-alt'
+  | 'danger'
+  | 'danger-alt'
+  | 'success'
+  | 'success-alt';
+
+export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
 interface Props {
   icon: ReactNode | ComponentType<{ size?: string | number }>;
   feather?: boolean;
   className?: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  mode?:
-    | 'alt'
-    | 'primary'
-    | 'primary-alt'
-    | 'secondary'
-    | 'secondary-alt'
-    | 'warning'
-    | 'warning-alt'
-    | 'danger'
-    | 'danger-alt'
-    | 'success'
-    | 'success-alt';
+  size?: IconSize;
+  mode?: IconMode;
 }
 
 export function Icon({ icon, feather, className, mode, size }: Props) {
-  useEffect(() => {
-    if (feather) {
-      featherIcons.replace();
-    }
-  }, [feather]);
-
   const classes = clsx(
     className,
     'icon',
@@ -59,14 +57,12 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
   }
 
   if (feather) {
-    return (
-      <i
-        data-feather={icon}
-        className={classes}
-        aria-hidden="true"
-        role="img"
-      />
-    );
+    const iconName = icon
+      .split('-')
+      .map((s) => s.slice(0, 1).toUpperCase() + s.slice(1))
+      .join('') as keyof typeof featherIcons;
+    const IconComponent = featherIcons[iconName];
+    return <IconComponent className={classes} />;
   }
 
   return (

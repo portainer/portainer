@@ -1,0 +1,10 @@
+.btn-none {
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  width: 1em;
+}
+
+.btn-none:focus {
+  outline: none;
+}

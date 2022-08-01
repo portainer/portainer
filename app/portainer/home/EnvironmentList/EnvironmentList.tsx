@@ -133,7 +133,8 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
         groupIds: groupFilter,
         sort: sortByFilter,
         order: sortByDescending ? 'desc' : 'asc',
-        edgeDeviceFilter: 'none',
+        provisioned: true,
+        edgeDevice: false,
         tagsPartialMatch: true,
       },
       refetchIfAnyOffline
@@ -276,7 +277,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
       <div className="row">
         <div className="col-sm-12">
           <TableContainer>
-            <TableTitle icon="fa-plug" label="Environments" />
+            <TableTitle icon="hard-drive" featherIcon label="Environments" />
 
             <TableActions className={styles.actionBar}>
               <div className={styles.description}>
@@ -312,7 +313,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                       groupIds: groupFilter,
                       sort: sortByFilter,
                       order: sortByDescending ? 'desc' : 'asc',
-                      edgeDeviceFilter: 'none',
+                      edgeDevice: false,
                     }}
                   />
                 </div>

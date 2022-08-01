@@ -1,13 +1,11 @@
 import { PropsWithChildren } from 'react';
 
-import { Icon } from '@/react/components/Icon';
+import { Icon, IconProps } from '@@/Icon';
 
 import { useTableContext } from './TableContainer';
 
-interface Props {
-  icon: string;
+interface Props extends IconProps {
   label: string;
-  featherIcon?: boolean;
 }
 
 export function TableTitle({
@@ -21,7 +19,11 @@ export function TableTitle({
   return (
     <div className="toolBar">
       <div className="toolBarTitle">
-        <Icon icon={icon} feather={featherIcon} className="space-right" />
+        <Icon
+          icon={icon}
+          feather={featherIcon}
+          className="icon-nested-blue icon-primary space-right"
+        />
 
         {label}
       </div>

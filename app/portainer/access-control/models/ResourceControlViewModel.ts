@@ -37,7 +37,7 @@ export class ResourceControlViewModel {
   }
 }
 
-function determineOwnership(resourceControl: ResourceControlResponse) {
+export function determineOwnership(resourceControl: ResourceControlResponse) {
   if (resourceControl.Public) {
     return ResourceControlOwnership.PUBLIC;
   }

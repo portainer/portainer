@@ -3,13 +3,15 @@
     <por-switch-field
       checked="$ctrl.model.RepositoryAuthentication"
       label="'Authentication'"
+      label-class="'col-sm-3 col-lg-2'"
       name="'authSwitch'"
       on-change="($ctrl.onChangeAuth)"
       data-cy="'component-gitAuthToggle'"
+      switch-values="{on:'Yes',off:'No'}"
     ></por-switch-field>
   </div>
 </div>
-<div class="small" style="margin: 5px 0 15px 0" ng-if="$ctrl.model.RepositoryAuthentication && $ctrl.showAuthExplanation">
+<div class="small mt-1 mb-3" ng-if="$ctrl.model.RepositoryAuthentication && $ctrl.showAuthExplanation">
   <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
   <span class="text-muted">Enabling authentication will store the credentials and it is advisable to use a git service account</span>
 </div>

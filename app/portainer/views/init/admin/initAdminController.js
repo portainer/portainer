@@ -1,3 +1,5 @@
+import { getEnvironments } from '@/portainer/environments/environment.service';
+
 angular.module('portainer.app').controller('InitAdminController', [
   '$scope',
   '$state',
@@ -6,10 +8,9 @@ angular.module('portainer.app').controller('InitAdminController', [
   'StateManager',
   'SettingsService',
   'UserService',
-  'EndpointService',
   'BackupService',
   'StatusService',
-  function ($scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, BackupService, StatusService) {
+  function ($scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, BackupService, StatusService) {
     $scope.uploadBackup = uploadBackup;
 
     $scope.logo = StateManager.getState().application.logo;
@@ -50,7 +51,7 @@ angular.module('portainer.app').controller('InitAdminController', [
           return StateManager.initialize();
         })
         .then(function () {
-          return EndpointService.endpoints(0, 100);
+          return getEnvironments({ limit: 100 });
         })
         .then(function success(data) {
           if (data.value.length === 0) {

@@ -1,14 +1,17 @@
 import clsx from 'clsx';
 
+import { Icon } from '@/react/components/Icon';
+
 import styles from './AddButton.module.css';
 
 export interface Props {
   className?: string;
   label: string;
+  disabled?: boolean;
   onClick: () => void;
 }
 
-export function AddButton({ label, onClick, className }: Props) {
+export function AddButton({ label, onClick, className, disabled }: Props) {
   return (
     <button
       className={clsx(
@@ -16,12 +19,15 @@ export function AddButton({ label, onClick, className }: Props) {
         'label',
         'label-default',
         'interactive',
+        'vertical-center',
         styles.addButton
       )}
       type="button"
       onClick={onClick}
+      disabled={disabled}
     >
-      <i className="fa fa-plus-circle space-right" aria-hidden="true" /> {label}
+      <Icon icon="plus" feather className="space-right" />
+      {label}
     </button>
   );
 }

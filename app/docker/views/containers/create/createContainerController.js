@@ -110,6 +110,42 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       settingUnlimitedResources: false,
     };
 
+    $scope.onAlwaysPullChange = onAlwaysPullChange;
+    $scope.handlePublishAllPortsChange = handlePublishAllPortsChange;
+    $scope.handleAutoRemoveChange = handleAutoRemoveChange;
+    $scope.handlePrivilegedChange = handlePrivilegedChange;
+    $scope.handleInitChange = handleInitChange;
+
+    function onAlwaysPullChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.alwaysPull = checked;
+      });
+    }
+
+    function handlePublishAllPortsChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.HostConfig.PublishAllPorts = checked;
+      });
+    }
+
+    function handleAutoRemoveChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.HostConfig.AutoRemove = checked;
+      });
+    }
+
+    function handlePrivilegedChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.HostConfig.Privileged = checked;
+      });
+    }
+
+    function handleInitChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.config.HostConfig.Init = checked;
+      });
+    }
+
     $scope.handleEnvVarChange = handleEnvVarChange;
     function handleEnvVarChange(value) {
       $scope.formValues.Env = value;
@@ -947,7 +983,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         function showConfirmationModal() {
           var deferred = $q.defer();
 
-          ModalService.confirm({
+          ModalService.confirmDestructive({
             title: 'Are you sure ?',
             message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
             buttons: {

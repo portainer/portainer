@@ -1,0 +1,18 @@
+.sort-by-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.sort-by-element {
+  display: inline-block;
+}
+
+.sort-button {
+  background-color: var(--bg-sortbutton-color);
+  color: var(--text-ui-select-color);
+  border: 1px solid var(--border-sortbutton);
+  display: inline-block;
+  padding: 8px 10px;
+  border-radius: 5px;
+}

@@ -1,10 +1,6 @@
 import { useFormikContext } from 'formik';
 
-import {
-  file,
-  withFileSize,
-  withFileType,
-} from '@/portainer/helpers/yup-file-validation';
+import { file, withFileSize } from '@/portainer/helpers/yup-file-validation';
 
 import { FileUploadField } from '@@/form-components/FileUpload';
 import { SwitchField } from '@@/form-components/SwitchField';
@@ -83,16 +79,9 @@ export function TLSFieldset() {
 }
 
 const MAX_FILE_SIZE = 5_242_880; // 5MB
-const ALLOWED_FILE_TYPES = [
-  'application/x-x509-ca-cert',
-  'application/x-pem-file',
-];
 
 function certValidation() {
-  return withFileType(
-    withFileSize(file(), MAX_FILE_SIZE),
-    ALLOWED_FILE_TYPES
-  ).when(['tls', 'skipVerify'], {
+  return withFileSize(file(), MAX_FILE_SIZE).when(['tls', 'skipVerify'], {
     is: (tls: boolean, skipVerify: boolean) => tls && !skipVerify,
     then: (schema) => schema.required('File is required'),
   });

@@ -11,6 +11,7 @@ import homeModule from './home';
 import { accessControlModule } from './access-control';
 import { reactModule } from './react';
 import { sidebarModule } from './react/views/sidebar';
+import environmentsModule from './environments';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -42,6 +43,7 @@ angular
     accessControlModule,
     reactModule,
     sidebarModule,
+    environmentsModule,
   ])
   .config([
     '$stateRegistryProvider',
@@ -182,37 +184,6 @@ angular
           'content@': {
             templateUrl: './views/endpoints/edit/endpoint.html',
             controller: 'EndpointController',
-          },
-        },
-      };
-
-      var k8sendpoint = {
-        name: 'portainer.k8sendpoint',
-        url: '/:id',
-      };
-
-      const endpointKubernetesConfiguration = {
-        name: 'portainer.k8sendpoint.kubernetesConfig',
-        url: '/configure',
-        views: {
-          'content@': {
-            templateUrl: '../kubernetes/views/configure/configure.html',
-            controller: 'KubernetesConfigureController',
-            controllerAs: 'ctrl',
-          },
-        },
-      };
-
-      var edgeDeviceCreation = {
-        name: 'portainer.endpoints.newEdgeDevice',
-        url: '/newEdgeDevice',
-        params: {
-          isEdgeDevice: true,
-        },
-        views: {
-          'content@': {
-            templateUrl: './views/endpoints/create/createendpoint.html',
-            controller: 'CreateEndpointController',
           },
         },
       };
@@ -484,14 +455,11 @@ angular
       $stateRegistryProvider.register(logout);
       $stateRegistryProvider.register(endpoints);
       $stateRegistryProvider.register(endpoint);
-      $stateRegistryProvider.register(k8sendpoint);
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
-      $stateRegistryProvider.register(edgeDeviceCreation);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);
-      $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
       $stateRegistryProvider.register(groupAccess);

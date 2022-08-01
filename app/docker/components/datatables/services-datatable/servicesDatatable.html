@@ -2,11 +2,36 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          {{ $ctrl.titleText }}
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for a service..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="service-searchInput"
+          />
+        </div>
+        <services-datatable-actions
+          selected-items="$ctrl.state.selectedItems"
+          selected-item-count="$ctrl.state.selectedItemCount"
+          show-add-action="$ctrl.showAddAction"
+          show-update-action="$ctrl.showUpdateAction"
+          endpoint-id="$ctrl.endpointId"
+        ></services-datatable-actions>
         <div class="settings">
           <datatable-columns-visibility columns="$ctrl.columnVisibility.columns" on-change="($ctrl.onColumnVisibilityChange)"></datatable-columns-visibility>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+            <span uib-dropdown-toggle aria-label="Settings">
+              <pr-icon icon="'more-vertical'" feather="true"></pr-icon>
+            </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader"> Table settings </div>
@@ -39,25 +64,6 @@
           </span>
         </div>
       </div>
-      <services-datatable-actions
-        selected-items="$ctrl.state.selectedItems"
-        selected-item-count="$ctrl.state.selectedItemCount"
-        show-add-action="$ctrl.showAddAction"
-        show-update-action="$ctrl.showUpdateAction"
-        endpoint-id="$ctrl.endpointId"
-      ></services-datatable-actions>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          focus-if="!$ctrl.notAutoFocus"
-          ng-model-options="{ debounce: 300 }"
-        />
-      </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
           <thead>
@@ -74,50 +80,50 @@
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-if="$ctrl.showStackColumn">
                 <a ng-click="$ctrl.changeOrderBy('StackName')">
                   Stack
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.image.display">
                 <a ng-click="$ctrl.changeOrderBy('Image')">
                   Image
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Mode')">
                   Scheduling Mode
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mode' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mode' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Mode' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Mode' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
                   Published Ports
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.updated.display">
                 <a ng-click="$ctrl.changeOrderBy('UpdatedAt')">
                   Last Update
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
             </tr>
@@ -212,7 +218,7 @@
       <div class="footer" ng-if="$ctrl.dataset">
         <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
-          <form class="form-inline">
+          <form class="form-inline vertical-center">
             <span class="limitSelector">
               <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">

@@ -19,7 +19,9 @@
         ng-pattern="/.+\.(yml|yaml|json|hcl)$/i"
         required
       />
-      <p class="mt-2" ng-show="pathForm.repoPathField.$error.pattern"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Invalid file path </p>
+      <p class="mt-2 text-muted small vertical-center" ng-show="pathForm.repoPathField.$error.pattern">
+        <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Invalid file path
+      </p>
     </div>
   </div>
 </ng-form>
