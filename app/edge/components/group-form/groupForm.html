@@ -2,21 +2,31 @@
   <div class="form-group">
     <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left required"> Name </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="group_name" name="group_name" ng-model="$ctrl.model.Name" required auto-focus data-cy="edgeGroupCreate-groupNameInput" />
+      <input
+        type="text"
+        class="form-control"
+        id="group_name"
+        name="group_name"
+        ng-model="$ctrl.model.Name"
+        required
+        auto-focus
+        data-cy="edgeGroupCreate-groupNameInput"
+        placeholder="e.g. mystack"
+      />
     </div>
   </div>
   <div class="form-group" ng-show="EdgeGroupForm.group_name.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="EdgeGroupForm.group_name.$error">
         <p ng-message="required" class="vertical-center">
-          <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+          <pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon> This field is required.
         </p>
       </div>
     </div>
   </div>
 
   <div class="col-sm-12 form-section-title"> Group type </div>
-  <div class="form-group col-sm-12">
+  <div class="col-sm-12 !pl-0">
     <div class="boxselector_wrapper">
       <div class="boxselector">
         <input type="radio" id="static-group" ng-model="$ctrl.model.Dynamic" ng-value="false" ng-checked="!$ctrl.model.Dynamic" />
