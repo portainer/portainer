@@ -39,17 +39,23 @@
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="endpointGroup-selectAllCheckbox" />
-                  <label for="select_all"></label>
-                </span>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Name
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <div class="vertical-center">
+                  <span class="md-checkbox">
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="endpointGroup-selectAllCheckbox" />
+                    <label for="select_all"></label>
+                  </span>
+                  <table-column-header
+                    col-title="'Name'"
+                    can-sort="true"
+                    is-sorted="$ctrl.state.orderBy === 'Name'"
+                    is-sorted-desc="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                    ng-click="$ctrl.changeOrderBy('Name')"
+                  ></table-column-header>
+                </div>
               </th>
-              <th>Actions</th>
+              <th>
+                <table-column-header col-title="'Actions'" can-sort="false"></table-column-header>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -65,7 +71,12 @@
                 <a ui-sref="portainer.groups.group({id: item.Id})">{{ item.Name }}</a>
               </td>
               <td>
-                <a ui-sref="portainer.groups.group.access({id: item.Id})"> <pr-icon icon="'users'" feather="true"></pr-icon> Manage access </a>
+                <div class="vertical-center">
+                  <a ui-sref="portainer.groups.group.access({id: item.Id})">
+                    <pr-icon icon="'users'" feather="true"></pr-icon>
+                    Manage access
+                  </a>
+                </div>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
