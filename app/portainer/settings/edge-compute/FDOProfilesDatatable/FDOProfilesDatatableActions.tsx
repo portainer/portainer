@@ -2,7 +2,10 @@ import { useQueryClient } from 'react-query';
 import { useRouter } from '@uirouter/react';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
-import { confirmAsync } from '@/portainer/services/modal.service/confirm';
+import {
+  confirmAsync,
+  confirmDestructiveAsync,
+} from '@/portainer/services/modal.service/confirm';
 import * as notifications from '@/portainer/services/notifications';
 import {
   deleteProfile,
@@ -86,7 +89,7 @@ export function FDOProfilesDatatableActions({
   }
 
   async function onDeleteProfileClick() {
-    const confirmed = await confirmAsync({
+    const confirmed = await confirmDestructiveAsync({
       title: 'Are you sure ?',
       message: 'This action will delete the selected profile(s). Continue?',
       buttons: {

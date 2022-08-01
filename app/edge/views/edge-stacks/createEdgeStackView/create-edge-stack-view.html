@@ -7,7 +7,7 @@
         <form class="form-horizontal" name="$ctrl.form">
           <!-- name-input -->
           <div class="form-group">
-            <label for="stack_name" class="col-sm-1 control-label text-left"> Name </label>
+            <label for="stack_name" class="col-sm-1 control-label text-left required"> Name </label>
             <div class="col-sm-11">
               <input
                 type="text"
@@ -43,7 +43,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <div class="small text-muted space-right" ng-if="$ctrl.formValues.DeploymentType === 0 && $ctrl.hasKubeEndpoint()">
-                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
+                <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                 Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not all
                 the Compose format options are supported by Kompose at the moment.
               </div>

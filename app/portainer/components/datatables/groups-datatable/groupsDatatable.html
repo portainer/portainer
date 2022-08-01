@@ -2,37 +2,35 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-white icon-primary icon-nested-blue'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
-        <div class="searchBar vertical-center">
+        <div class="searchBar">
           <pr-icon icon="'search'" feather="true"></pr-icon>
           <input
             type="text"
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
-            placeholder="Search..."
+            placeholder="Search for a group..."
             auto-focus
             ng-model-options="{ debounce: 300 }"
             data-cy="endpointGroup-searchInput"
           />
         </div>
-        <div class="actionBar">
+        <div class="actionBar !gap-3">
           <button
             type="button"
-            class="btn btn-sm btn-dangerlight"
+            class="btn btn-sm btn-dangerlight h-fit"
             ng-disabled="$ctrl.state.selectedItemCount === 0"
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="endpointGroup-removeGroupButton"
           >
-            <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>
-            Remove
+            <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
           </button>
-          <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.groups.new" data-cy="endpointGroup-addGroupButton">
-            <pr-icon icon="'plus'" feather="true"></pr-icon>
-            Add group
+          <button type="button" class="btn btn-sm btn-primary h-fit" ui-sref="portainer.groups.new" data-cy="endpointGroup-addGroupButton">
+            <pr-icon icon="'plus'" feather="true"></pr-icon>Add group
           </button>
         </div>
       </div>
@@ -93,7 +91,7 @@
       <div class="footer" ng-if="$ctrl.dataset">
         <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
-          <form class="form-inline">
+          <form class="form-inline vertical-center">
             <span class="limitSelector">
               <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">

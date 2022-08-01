@@ -83,7 +83,7 @@ export default class HelmTemplatesController {
   }
 
   async selectHelmChart(chart) {
-    this.$anchorScroll('view-top');
+    window.scrollTo(0, 0);
     this.state.showCustomValues = false;
     this.state.chart = chart;
     await this.getHelmValues();

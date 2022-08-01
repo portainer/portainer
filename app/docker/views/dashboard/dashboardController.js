@@ -46,7 +46,7 @@ angular.module('portainer.docker').controller('DashboardController', [
 
     $scope.buildGpusStr = function (gpuUseSet) {
       var gpusAvailable = new Object();
-      for (let i = 0; i < $scope.endpoint.Gpus.length; i++) {
+      for (let i = 0; i < ($scope.endpoint.Gpus || []).length; i++) {
         if (!gpuUseSet.has($scope.endpoint.Gpus[i].name)) {
           var exist = false;
           for (let gpuAvailable in gpusAvailable) {

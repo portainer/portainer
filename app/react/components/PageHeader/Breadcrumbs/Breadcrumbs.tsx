@@ -41,7 +41,11 @@ function renderCrumb(crumb: Crumb | string) {
 
   if (crumb.link) {
     return (
-      <Link to={crumb.link} params={crumb.linkParams}>
+      <Link
+        to={crumb.link}
+        params={crumb.linkParams}
+        className="text-blue-9 hover:underline"
+      >
         {crumb.label}
       </Link>
     );

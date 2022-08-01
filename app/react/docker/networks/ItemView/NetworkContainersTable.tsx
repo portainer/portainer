@@ -1,5 +1,6 @@
 import { Authorized } from '@/portainer/hooks/useUser';
 import { EnvironmentId } from '@/portainer/environments/types';
+import { Icon } from '@/react/components/Icon';
 
 import { Table, TableContainer, TableTitle } from '@@/datatables';
 import { DetailsTable } from '@@/DetailsTable';
@@ -68,7 +69,7 @@ export function NetworkContainersTable({
                       <Button
                         data-cy={`networkDetails-disconnect${container.Name}`}
                         size="xsmall"
-                        color="danger"
+                        color="dangerlight"
                         onClick={() => {
                           if (container.Id) {
                             disconnectContainer.mutate({
@@ -79,9 +80,10 @@ export function NetworkContainersTable({
                           }
                         }}
                       >
-                        <i
-                          className="fa fa-trash-alt space-right"
-                          aria-hidden="true"
+                        <Icon
+                          icon="trash-2"
+                          feather
+                          class-name="icon-secondary icon-md"
                         />
                         Leave Network
                       </Button>
