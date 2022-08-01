@@ -8,31 +8,28 @@
           <custom-template-common-fields form-values="$ctrl.formValues" show-platform-field="true" show-type-field="true"></custom-template-common-fields>
 
           <!-- web-editor -->
-          <div class="col-sm-12 form-section-title"> Web editor </div>
-          <div class="form-group">
-            <span class="col-sm-12 text-muted small">
-              You can get more information about Compose file format in the
-              <a href="https://docs.docker.com/compose/compose-file/" target="_blank"> official documentation </a>
-              .
-            </span>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <code-editor
-                identifier="custom-template-creation-editor"
-                placeholder="# Define or paste the content of your docker compose file here"
-                yml="true"
-                value="$ctrl.formValues.FileContent"
-                on-change="($ctrl.editorUpdate)"
-              ></code-editor>
-            </div>
-          </div>
+          <web-editor-form
+            identifier="custom-template-creation-editor"
+            value="$ctrl.formValues.FileContent"
+            on-change="($ctrl.editorUpdate)"
+            ng-required="true"
+            yml="true"
+            placeholder="# Define or paste the content of your docker compose file here"
+          >
+            <editor-description>
+              <span class="col-sm-12 text-muted">
+                You can get more information about Compose file format in the
+                <a href="https://docs.docker.com/compose/compose-file/" target="_blank"> official documentation </a>
+                .
+              </span>
+            </editor-description>
+          </web-editor-form>
           <!-- !web-editor -->
 
           <div class="form-group" ng-if="!$ctrl.state.isTemplateValid">
             <div class="col-sm-12">
               <div class="small text-warning">
-                <i class="fa fa-exclamation-triangle space-right" aria-hidden="true"></i>
+                <pr-icon icon="'alert-triangle'" feather="true" class-name="space-right"></pr-icon>
                 Template is invalid.
               </div>
             </div>
@@ -64,7 +61,7 @@
                 <span ng-hide="$ctrl.actionInProgress">Update the template</span>
                 <span ng-show="$ctrl.actionInProgress">Update in progress...</span>
               </button>
-              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px">
+              <span class="text-danger space-left" ng-if="$ctrl.state.formValidationError">
                 {{ $ctrl.state.formValidationError }}
               </span>
             </div>

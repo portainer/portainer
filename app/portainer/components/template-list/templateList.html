@@ -56,8 +56,7 @@
           </div>
         </div>
       </div>
-
-      <div class="blocklist">
+      <div class="blocklist !px-[20px] gap-y-2 !pb-[20px]">
         <template-item
           ng-repeat="template in $ctrl.templates | filter: $ctrl.filterByTemplateType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"
           model="template"

@@ -5,6 +5,7 @@ import { FormikErrors } from 'formik';
 import { Icon } from '@/react/components/Icon';
 
 import { AddButton, Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
 import { Tooltip } from '@@/Tip/Tooltip';
 import { TextTip } from '@@/Tip/TextTip';
 
