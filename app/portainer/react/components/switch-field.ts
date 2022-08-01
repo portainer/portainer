@@ -8,9 +8,11 @@ export const switchField = r2a(SwitchField, [
   'label',
   'name',
   'labelClass',
+  'fieldClass',
   'dataCy',
   'disabled',
   'onChange',
   'featureId',
   'switchValues',
+  'switchClass',
 ]);

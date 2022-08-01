@@ -163,12 +163,22 @@ code {
 
 .CodeMirror-gutters {
   background: var(--bg-codemirror-gutters-color);
-  border-right: 1px solid var(--border-codemirror-gutters-color);
+  border-right: 0px;
+}
+
+.CodeMirror-linenumber {
+  text-align: left;
+}
+
+.CodeMirror pre.CodeMirror-line,
+.CodeMirror pre.CodeMirror-line-like {
+  padding: 0 20px;
 }
 
 .CodeMirror {
   background: var(--bg-codemirror-color);
   color: var(--text-codemirror-color);
+  border-radius: 8px;
 }
 
 .CodeMirror-selected {
@@ -222,6 +232,27 @@ json-tree .branch-preview {
 
 .progress {
   background-color: var(--bg-progress-color);
+}
+
+.ui-select-search,
+.ui-select-toggle {
+  height: 30px;
+  min-width: 260px;
+  padding: 4px 12px;
+}
+
+.ui-select-toggle {
+  justify-content: flex-start !important;
+}
+
+.ui-select-match-text {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+
+.ui-select-match-text > a {
+  verical-align: middle;
 }
 
 .ui-select-bootstrap .ui-select-choices-row > span {
@@ -278,6 +309,14 @@ json-tree .branch-preview {
 .rzslider .rz-bubble.rz-limit {
   color: var(--text-rzslider-limit-color);
 }
+
+.rz-bubble.rz-limit.rz-ceil {
+  position: absolute;
+  right: 0;
+  left: auto !important;
+  top: -26px;
+}
+
 input,
 button,
 select,
@@ -397,4 +436,8 @@ fieldset[disabled] .btn {
   border-left: 0px;
   border-right: 0px;
   border-bottom: 3px solid red;
+}
+
+.label-default {
+  line-height: 11px;
 }

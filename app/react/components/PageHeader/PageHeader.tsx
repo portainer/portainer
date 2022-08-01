@@ -14,7 +14,7 @@ interface Props {
   reload?: boolean;
   loading?: boolean;
   onReload?(): Promise<void> | void;
-  breadcrumbs?: Crumb[];
+  breadcrumbs?: (Crumb | string)[] | string;
   title: string;
 }
 
@@ -39,13 +39,13 @@ export function PageHeader({
       <HeaderTitle title={title}>
         {reload && (
           <Button
-            color="link"
-            size="medium"
+            color="none"
+            size="large"
             onClick={onClickedRefresh}
             className={styles.reloadButton}
             disabled={loading}
           >
-            <RefreshCw className="feather icon-sm" />
+            <RefreshCw className="icon" />
           </Button>
         )}
       </HeaderTitle>

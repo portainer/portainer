@@ -25,6 +25,7 @@ type endpointCreatePayload struct {
 	URL                    string
 	EndpointCreationType   endpointCreationEnum
 	PublicURL              string
+	Gpus                   []portainer.Pair
 	GroupID                int
 	TLS                    bool
 	TLSSkipVerify          bool
@@ -141,6 +142,13 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		publicURL, _ := request.RetrieveMultiPartFormValue(r, "PublicURL", true)
 		payload.PublicURL = publicURL
 	}
+
+	gpus := make([]portainer.Pair, 0)
+	err = request.RetrieveMultiPartFormJSONValue(r, "Gpus", &gpus, true)
+	if err != nil {
+		return errors.New("Invalid Gpus parameter")
+	}
+	payload.Gpus = gpus
 
 	checkinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
 	payload.EdgeCheckinInterval = checkinInterval
@@ -290,6 +298,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		Type:               portainer.AzureEnvironment,
 		GroupID:            portainer.EndpointGroupID(payload.GroupID),
 		PublicURL:          payload.PublicURL,
+		Gpus:               payload.Gpus,
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		AzureCredentials:   credentials,
@@ -323,6 +332,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		URL:     portainerHost,
 		Type:    portainer.EdgeAgentOnDockerEnvironment,
 		GroupID: portainer.EndpointGroupID(payload.GroupID),
+		Gpus:    payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
@@ -378,6 +388,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		Type:      endpointType,
 		GroupID:   portainer.EndpointGroupID(payload.GroupID),
 		PublicURL: payload.PublicURL,
+		Gpus:      payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
@@ -412,6 +423,7 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 		Type:      portainer.KubernetesLocalEnvironment,
 		GroupID:   portainer.EndpointGroupID(payload.GroupID),
 		PublicURL: payload.PublicURL,
+		Gpus:      payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS:           payload.TLS,
 			TLSSkipVerify: payload.TLSSkipVerify,
@@ -441,6 +453,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 		Type:      endpointType,
 		GroupID:   portainer.EndpointGroupID(payload.GroupID),
 		PublicURL: payload.PublicURL,
+		Gpus:      payload.Gpus,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS:           payload.TLS,
 			TLSSkipVerify: payload.TLSSkipVerify,

@@ -1,5 +1,7 @@
 import { number, object, SchemaOf } from 'yup';
 
+import { gpusListValidation } from '@/react/portainer/environments/wizard/EnvironmentsCreationView/shared/Hardware/GpusList';
+
 import { metadataValidation } from '../../MetadataFieldset/validation';
 import { nameValidation } from '../../NameField';
 
@@ -12,5 +14,6 @@ export function validationSchema(): SchemaOf<FormValues> {
     portainerUrl: urlValidation(),
     pollFrequency: number().required(),
     meta: metadataValidation(),
+    gpus: gpusListValidation(),
   });
 }

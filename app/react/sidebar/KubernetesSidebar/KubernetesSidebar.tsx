@@ -1,7 +1,8 @@
-import { Box, Edit, Layers, Loader, Lock, Server } from 'react-feather';
+import { Box, Edit, Layers, Lock, Server } from 'react-feather';
 
 import { EnvironmentId } from '@/portainer/environments/types';
 import { Authorized } from '@/portainer/hooks/useUser';
+import Helm from '@/assets/ico/vendor/helm.svg?c';
 
 import { DashboardLink } from '../items/DashboardLink';
 import { SidebarItem } from '../SidebarItem';
@@ -47,11 +48,14 @@ export function KubernetesSidebar({ environmentId }: Props) {
         data-cy="k8sSidebar-namespaces"
       />
 
-      <Authorized authorizations="HelmInstallChart">
+      <Authorized
+        authorizations="HelmInstallChart"
+        environmentId={environmentId}
+      >
         <SidebarItem
           to="kubernetes.templates.helm"
           params={{ endpointId: environmentId }}
-          icon={Loader}
+          icon={Helm}
           label="Helm"
           data-cy="k8sSidebar-helm"
         />
@@ -86,18 +90,26 @@ export function KubernetesSidebar({ environmentId }: Props) {
         params={{ endpointId: environmentId }}
         data-cy="k8sSidebar-cluster"
       >
-        <Authorized authorizations="K8sClusterSetupRW" adminOnlyCE>
+        <Authorized
+          authorizations="K8sClusterSetupRW"
+          adminOnlyCE
+          environmentId={environmentId}
+        >
           <SidebarItem
-            to="portainer.k8sendpoint.kubernetesConfig"
+            to="kubernetes.cluster.setup"
             params={{ id: environmentId }}
             label="Setup"
             data-cy="k8sSidebar-setup"
           />
         </Authorized>
 
-        <Authorized authorizations="K8sClusterSetupRW" adminOnlyCE>
+        <Authorized
+          authorizations="K8sClusterSetupRW"
+          adminOnlyCE
+          environmentId={environmentId}
+        >
           <SidebarItem
-            to="portainer.k8sendpoint.securityConstraint"
+            to="kubernetes.cluster.securityConstraint"
             params={{ id: environmentId }}
             label="Security constraints"
             data-cy="k8sSidebar-securityConstraints"

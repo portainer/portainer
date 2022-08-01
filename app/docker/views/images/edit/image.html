@@ -3,7 +3,7 @@
 <div class="row" ng-if="image.RepoTags.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa fa-tags" title-text="Image tags"></rd-widget-header>
+      <rd-widget-header icon="tag" feather-icon="true" title-text="Image tags"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -54,7 +54,7 @@
 <div class="row" authorization="DockerImageCreate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tag" title-text="Tag the image"></rd-widget-header>
+      <rd-widget-header icon="tag" feather-icon="true" title-text="Tag the image"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- image-and-registry -->
@@ -89,7 +89,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title-text="Image details"></rd-widget-header>
+      <rd-widget-header icon="list" feather-icon="true" title-text="Image details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -156,7 +156,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title-text="Dockerfile details"></rd-widget-header>
+      <rd-widget-header icon="list" feather-icon="true" title-text="Dockerfile details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -208,7 +208,7 @@
 <div class="row" ng-if="history.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title-text="Image layers"></rd-widget-header>
+      <rd-widget-header icon="list" feather-icon="true" title-text="Image layers"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table id="image-layers" class="table">
           <thead>
@@ -251,7 +251,7 @@
                     {{ layer.CreatedBy | imagelayercommand | truncate: 130 }}
                     <span ng-if="layer.CreatedBy.length > 130" style="margin-left: 5px">
                       <a id="layer-command-expander{{ $index }}" class="btn" ng-click="toggleLayerCommand($index)">
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon>
                       </a>
                     </span>
                   </span>

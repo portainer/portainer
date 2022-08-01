@@ -2,7 +2,6 @@ package helm
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/portainer/libhelm"
@@ -108,7 +107,7 @@ func (handler *Handler) getHelmClusterAccess(r *http.Request) (*options.Kubernet
 
 	hostURL := "localhost"
 	if !sslSettings.SelfSigned {
-		hostURL = strings.Split(r.Host, ":")[0]
+		hostURL = r.Host
 	}
 
 	kubeConfigInternal := handler.kubeClusterAccessService.GetData(hostURL, endpoint.ID)

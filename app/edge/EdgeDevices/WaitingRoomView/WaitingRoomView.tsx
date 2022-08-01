@@ -2,6 +2,7 @@ import { useRouter } from '@uirouter/react';
 
 import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
 import { r2a } from '@/react-tools/react2angular';
+import { EdgeTypes } from '@/portainer/environments/types';
 
 import { InformationPanel } from '@@/InformationPanel';
 import { TextTip } from '@@/Tip/TextTip';
@@ -15,7 +16,9 @@ export function WaitingRoomView() {
   const storageKey = 'edge-devices-waiting-room';
   const router = useRouter();
   const { environments, isLoading, totalCount } = useEnvironmentList({
-    edgeDeviceFilter: 'untrusted',
+    edgeDevice: true,
+    edgeDeviceUntrusted: true,
+    types: EdgeTypes,
   });
 
   if (process.env.PORTAINER_EDITION !== 'BE') {

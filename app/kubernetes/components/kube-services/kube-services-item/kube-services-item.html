@@ -2,7 +2,7 @@
   <div ng-if="$ctrl.isAdmin()" class="small" ng-show="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">
     <p style="margin-top: 10px">
       <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon> No Load balancer is available in this cluster, click
-      <a ui-sref="portainer.k8sendpoint.kubernetesConfig({id: $ctrl.state.endpointId})">here</a> to configure load balancer.
+      <a ui-sref="kubernetes.cluster.setup">here</a> to configure load balancer.
     </p>
   </div>
   <div ng-if="!$ctrl.isAdmin()" class="small" ng-show="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">

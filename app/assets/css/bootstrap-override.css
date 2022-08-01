@@ -1,4 +1,15 @@
 /* Label, Section Title */
+.label {
+  border-radius: 5px;
+}
+
+.label-success {
+  background-color: var(--ui-success-7);
+}
+
+.label-danger {
+  background-color: var(--ui-error-6);
+}
 
 .control-label {
   color: var(--ui-gray-7);
@@ -14,6 +25,16 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.justify-left {
+  justify-content: left;
 }
 
 .blue {
@@ -56,6 +77,12 @@
 
 .switch input[type='checkbox']:disabled + .slider {
   background-color: var(--ui-gray-3);
+}
+
+.switch-values {
+  font-style: normal;
+  font-weight: 500;
+  margin-left: 5px;
 }
 
 /* Toggle */
@@ -237,19 +264,31 @@ input:checked + .slider:before {
 }
 
 .modal-content {
-  padding: 55px 20px 20px 20px;
+  padding: 20px;
+}
+
+.background-error {
+  padding-top: 55px;
+  background-image: url(../images/icon-error.svg);
+  background-repeat: no-repeat;
+  background-position: top left;
+}
+
+.background-warning {
+  padding-top: 55px;
   background-image: url(../images/icon-warning.svg);
   background-repeat: no-repeat;
-  background-position: top 10px left 10px;
+  background-position: top left;
 }
 
 .modal-header {
-  padding: 10px 0px 10px 0px;
+  margin-bottom: 10px;
+  padding: 0px;
   border-bottom: none;
 }
 
 .modal-header .close {
-  margin-top: -40px;
+  margin-top: 0px;
 }
 
 .modal-header .modal-title {
@@ -312,6 +351,10 @@ input:checked + .slider:before {
   background-color: var(--ui-error-8);
 }
 
+.table .label .label-warn {
+  background-color: var(--ui-warning-8);
+}
+
 .table .label .label-success {
   background-color: var(--ui-success-7);
 }
@@ -325,4 +368,22 @@ input:checked + .slider:before {
 
 .control-label {
   @apply inline-flex items-center;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 4px;
+  width: 50%;
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.progress .progress-bar {
+  background-color: var(--ui-blue-8);
+}
+
+.progress + span {
+  display: inline-block;
+  font-size: 85%;
+  margin-left: 10px;
 }

@@ -1,6 +1,6 @@
 <div id="service-logging-driver">
   <rd-widget>
-    <rd-widget-header icon="fa-tasks" title-text="Logging driver"> </rd-widget-header>
+    <rd-widget-header icon="list" feather-icon="true" title-text="Logging driver"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
       <div class="form-inline" style="padding: 10px" authorization="DockerServiceUpdate">
         Driver:
@@ -10,7 +10,7 @@
           <option value="none">none</option>
         </select>
         <a class="btn btn-default btn-sm" ng-click="!service.LogDriverName || service.LogDriverName === 'none' || addLogDriverOpt(service)">
-          <i class="fa fa-plus-circle" aria-hidden="true"></i> add logging driver option
+          <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add logging driver option
         </a>
       </div>
       <table class="table">
@@ -41,8 +41,8 @@
                   disable-authorization="DockerServiceUpdate"
                 />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
-                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeLogDriverOpt(service, $index)" ng-disabled="isUpdating">
-                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  <button class="btn btn-sm btn-light" type="button" ng-click="removeLogDriverOpt(service, $index)" ng-disabled="isUpdating">
+                    <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                   </button>
                 </span>
               </div>

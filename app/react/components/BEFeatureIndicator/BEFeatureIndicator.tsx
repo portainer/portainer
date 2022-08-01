@@ -1,6 +1,8 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
+import './BEFeatureIndicator.css';
+
 import { FeatureId } from '@/portainer/feature-flags/enums';
 
 import { getFeatureDetails } from './utils';

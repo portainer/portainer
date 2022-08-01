@@ -44,15 +44,15 @@
                     ng-if="regular && stack.Status === 1"
                     authorization="PortainerStackUpdate"
                     ng-disabled="state.actionInProgress"
-                    class="btn btn-xs btn-danger"
+                    class="btn btn-xs btn-light"
                     ng-click="stopStack()"
                   >
-                    <i class="fa fa-stop space-right" aria-hidden="true"></i>
+                    <pr-icon icon="'stop-circle'" feather="true"></pr-icon>
                     Stop this stack
                   </button>
 
-                  <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!external || stack.Type == 1">
-                    <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>
+                  <button authorization="PortainerStackDelete" class="btn btn-xs btn-light" ng-click="removeStack()" ng-if="!external || stack.Type == 1">
+                    <pr-icon icon="'trash-2'" feather="true"></pr-icon>
                     Delete this stack
                   </button>
 
@@ -61,7 +61,7 @@
                     class="btn btn-primary btn-xs"
                     ui-sref="docker.templates.custom.new({fileContent: stackFileContent, type: stack.Type})"
                   >
-                    <i class="fa fa-plus space-right" aria-hidden="true"></i>
+                    <pr-icon icon="'plus'" feather="true"></pr-icon>
                     Create template from stack
                   </button>
                   <button
@@ -133,10 +133,10 @@
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px" name="stackUpdateForm">
               <div class="form-group">
                 <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion == 2">
-                  This stack will be deployed using the equivalent of <code>docker-compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
+                  This stack will be deployed using the equivalent of <code>docker compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
                 </span>
                 <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion > 2">
-                  This stack will be deployed using <code>docker-compose</code>.
+                  This stack will be deployed using <code>docker compose</code>.
                 </span>
                 <span class="col-sm-12 text-muted small">
                   You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
@@ -147,7 +147,7 @@
                   <code-editor
                     read-only="orphaned"
                     identifier="stack-editor"
-                    placeholder="# Define or paste the content of your docker-compose file here"
+                    placeholder="# Define or paste the content of your docker compose file here"
                     yml="true"
                     on-change="(editorUpdate)"
                     value="stackFileContent"
@@ -156,21 +156,16 @@
               </div>
 
               <div ng-if="isAdmin && applicationState.endpoint.type !== 4">
-                <div class="col-sm-12 form-section-title"> Webhooks </div>
-                <div class="form-group">
-                  <div class="col-sm-12">
-                    <label class="control-label text-left">
-                      Create a Stack webhook
-                      <portainer-tooltip
-                        position="'top'"
-                        message="'Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack.'"
-                      ></portainer-tooltip>
-                    </label>
-                    <label class="switch box-selector-item limited business" style="margin-left: 20px">
-                      <input type="checkbox" ng-model="formValues.EnableWebhook" disabled="disabled" ng-checked="true" /><i></i>
-                    </label>
-                    <be-feature-indicator feature="stackWebhookFeature"></be-feature-indicator>
-                  </div>
+                <div class="col-sm-12 form-section-title">
+                  Webhooks
+                  <por-switch-field
+                    name="EnableWebhook"
+                    checked="formValues.EnableWebhook"
+                    label-class="'col-sm-2'"
+                    tooltip="'Create a webhook (or callback URI) to automate the update of this stack. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this stack.'"
+                    label="'Create a Stack webhook'"
+                    feature-id="'stack-webhook'"
+                  ></por-switch-field>
                 </div>
               </div>
 
@@ -189,11 +184,14 @@
                 <div class="col-sm-12 form-section-title"> Options </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <label for="prune" class="control-label text-left">
-                      Prune services
-                      <portainer-tooltip position="'top'" message="'Prune services that are no longer referenced.'"></portainer-tooltip>
-                    </label>
-                    <label class="switch" style="margin-left: 20px"> <input name="prune" type="checkbox" ng-model="formValues.Prune" /><i></i> </label>
+                    <por-switch-field
+                      name="prune"
+                      checked="formValues.Prune"
+                      tooltip="'Prune services that are no longer referenced.'"
+                      label-class="'col-sm-2'"
+                      label="'Prune services'"
+                      on-change="(onPruneChange)"
+                    ></por-switch-field>
                   </div>
                 </div>
               </div>
@@ -234,7 +232,7 @@
   <div class="col-sm-12">
     <services-datatable
       title-text="Services"
-      title-icon="fa-list-alt"
+      title-icon="list"
       dataset="services"
       table-key="stack-services"
       order-by="Name"

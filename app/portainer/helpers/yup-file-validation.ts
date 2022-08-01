@@ -22,22 +22,3 @@ export function withFileSize(fileValidation: FileSchema, maxSize: number) {
     return file.size <= maxSize;
   }
 }
-
-export function withFileType(
-  fileValidation: FileSchema,
-  fileTypes: File['type'][]
-) {
-  return fileValidation.test(
-    'file-type',
-    'Selected file has unsupported format.',
-    validateFileType
-  );
-
-  function validateFileType(file?: File) {
-    if (!file) {
-      return true;
-    }
-
-    return fileTypes.includes(file.type);
-  }
-}

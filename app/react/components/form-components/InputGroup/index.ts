@@ -8,6 +8,7 @@ interface InputGroupSubComponents {
   Addon: typeof InputGroupAddon;
   ButtonWrapper: typeof InputGroupButtonWrapper;
   Input: typeof Input;
+  className: string | undefined;
 }
 
 const InputGroup: typeof MainComponent & InputGroupSubComponents =

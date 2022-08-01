@@ -28,7 +28,7 @@ interface Props {
   resourceId: ResourceId;
   resourceControl?: ResourceControlViewModel;
   onCancelClick(): void;
-  onUpdateSuccess(): void;
+  onUpdateSuccess(): Promise<void>;
 }
 
 export function AccessControlPanelForm({
@@ -51,6 +51,9 @@ export function AccessControlPanelForm({
     {
       meta: {
         error: { title: 'Failure', message: 'Unable to update access control' },
+      },
+      onSuccess() {
+        return onUpdateSuccess();
       },
     }
   );
@@ -115,7 +118,6 @@ export function AccessControlPanelForm({
     updateAccess.mutate(accessControl, {
       onSuccess() {
         notifySuccess('Access control successfully updated');
-        onUpdateSuccess();
       },
     });
   }

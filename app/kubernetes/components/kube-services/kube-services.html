@@ -56,7 +56,7 @@
       <div ng-if="$ctrl.isAdmin()" class="small">
         <p style="margin-top: 10px">
           <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress is not configured in this namespace, select another namespace or click
-          <a ui-sref="portainer.k8sendpoint.kubernetesConfig({id: $ctrl.state.endpointId})">here</a> to configure ingress.
+          <a ui-sref="kubernetes.cluster.setup">here</a> to configure ingress.
         </p>
       </div>
       <div ng-if="!$ctrl.isAdmin()" class="small">
