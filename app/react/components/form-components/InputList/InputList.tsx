@@ -147,11 +147,11 @@ export function InputList<T = DefaultType>({
                 {!readOnly && (
                   <Button
                     color="danger"
-                    size="small"
+                    size="medium"
                     onClick={() => handleRemoveItem(key, item)}
                     disabled={disabled}
                   >
-                    <i className="fa fa-trash" aria-hidden="true" />
+                    <Icon icon="trash-2" feather />
                   </Button>
                 )}
               </div>

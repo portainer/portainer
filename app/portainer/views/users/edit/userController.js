@@ -36,7 +36,7 @@ angular.module('portainer.app').controller('UserController', [
       let promise = Promise.resolve(true);
       if (username != oldUsername) {
         promise = new Promise((resolve) =>
-          ModalService.confirm({
+          ModalService.confirmWarn({
             title: 'Are you sure?',
             message: `Are you sure you want to rename the user ${oldUsername} to ${username}?`,
             buttons: {

@@ -1,12 +1,19 @@
 <!-- helm chart -->
-<div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item template-item" ng-click="$ctrl.onSelect($ctrl.model)">
+<div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item template-item mx-[10px]" ng-click="$ctrl.onSelect($ctrl.model)">
   <div class="blocklist-item-box">
     <!-- helmchart-image -->
     <span ng-if="$ctrl.model.icon">
-      <img class="blocklist-item-logo" ng-src="{{ $ctrl.model.icon }}" />
+      <fallback-image
+        src="$ctrl.model.icon"
+        fallback-icon="'svg-helm'"
+        class-name="'blocklist-item-logo h-16 w-auto'"
+        fallback-class-name="'icon-nested-blue !h-12 !w-12'"
+        fallback-mode="'primary'"
+        size="'xl'"
+      ></fallback-image>
     </span>
-    <span class="blocklist-item-logo" ng-if="!$ctrl.model.icon">
-      <i class="fa fa-dharmachakra fa-4x blue-icon" aria-hidden="true"></i>
+    <span class="blocklist-item-logo vertical-center" ng-if="!$ctrl.model.icon">
+      <pr-icon icon="'svg-helm'" mode="'primary'" class-name="'icon-nested-blue'"></pr-icon>
     </span>
     <!-- !helmchart-image -->
     <!-- helmchart-details -->
@@ -18,8 +25,8 @@
             {{ $ctrl.model.name }}
           </span>
           <span class="space-left blocklist-item-subtitle">
-            <span>
-              <i class="fa fa-dharmachakra" aria-hidden="true"></i>
+            <span class="vertical-center">
+              <pr-icon icon="'svg-helm'" mode="'primary'"></pr-icon>
             </span>
             <span> Helm </span>
           </span>

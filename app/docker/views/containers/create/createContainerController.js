@@ -983,7 +983,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         function showConfirmationModal() {
           var deferred = $q.defer();
 
-          ModalService.confirm({
+          ModalService.confirmDestructive({
             title: 'Are you sure ?',
             message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
             buttons: {

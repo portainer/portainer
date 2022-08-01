@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import _ from 'lodash';
+import { Edit2, Tag, Cpu } from 'react-feather';
 
 import {
   isoDateFromTimestamp,
@@ -16,8 +17,9 @@ import type { TagId } from '@/portainer/tags/types';
 import { useIsAdmin } from '@/portainer/hooks/useUser';
 import { useTags } from '@/portainer/tags/queries';
 
-import { Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
+import { Button } from '@@/buttons';
 
 import { EnvironmentIcon } from './EnvironmentIcon';
 import { EdgeIndicator } from './EdgeIndicator';
@@ -91,24 +93,35 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
               </div>
               <EnvironmentStats environment={environment} />
               <div className="blocklist-item-line endpoint-item">
-                <span className="small text-muted">
+                <span className="small text-muted space-x-2">
                   {isDockerEnvironment(environment.Type) && (
                     <span>
                       {environment.Snapshots.length > 0 && (
-                        <span className="small text-muted">
-                          <i className="fa fa-microchip space-right" />
-                          {environment.Snapshots[0].TotalCPU}
-                          <i className="fa fa-memory space-left space-right" />
-                          {humanize(environment.Snapshots[0].TotalMemory)}
-                          <i className="fa fa-digital-tachograph space-left space-right" />
-                          {environment.Gpus?.length}
+                        <span className="small text-muted vertical-center">
+                          <Cpu
+                            className="icon icon-sm space-right"
+                            aria-hidden="true"
+                          />
+                          {environment.Snapshots[0].TotalCPU} CPU
+                          <Icon
+                            icon="svg-memory"
+                            className="icon icon-sm space-right"
+                          />
+                          {humanize(environment.Snapshots[0].TotalMemory)} RAM
+                          <Cpu
+                            className="icon icon-sm space-right"
+                            aria-hidden="true"
+                          />
+                          {environment.Gpus?.length} GPU
                         </span>
                       )}
-                      <span className="space-left space-right">-</span>
                     </span>
                   )}
-                  <span>
-                    <i className="fa fa-tags space-right" aria-hidden="true" />
+                  <span className="vertical-center">
+                    <Tag
+                      className="icon icon-sm space-right"
+                      aria-hidden="true"
+                    />
                     {tags}
                   </span>
                 </span>
@@ -129,7 +142,7 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
           className={styles.editButton}
         >
           <Button color="link">
-            <i className="fa fa-pencil-alt" />
+            <Edit2 className="icon icon-md" aria-hidden="true" />
           </Button>
         </Link>
       )}
