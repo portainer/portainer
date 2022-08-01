@@ -29,7 +29,7 @@ export function confirmWebEditorDiscard() {
     buttons: {
       confirm: {
         label: 'Yes',
-        className: 'btn-danger',
+        className: 'btn-primary',
       },
     },
   };
