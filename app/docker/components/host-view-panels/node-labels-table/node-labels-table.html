@@ -1,7 +1,7 @@
 <div ng-if="!$ctrl.labels.length"> There are no labels for this node. </div>
 
-<div class="col-sm-12 form-inline" style="padding: 0px" ng-if="$ctrl.labels.length">
-  <div ng-repeat="label in $ctrl.labels" style="margin-top: 2px">
+<div class="col-sm-12 form-inline !p-0" ng-if="$ctrl.labels.length">
+  <div ng-repeat="label in $ctrl.labels" class="mt-1">
     <div class="input-group col-sm-5 input-group-sm">
       <span class="input-group-addon">name</span>
       <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="$ctrl.updateLabel(label)" />
@@ -11,7 +11,7 @@
       <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="$ctrl.updateLabel(label)" />
     </div>
     <button class="btn btn-light" type="button" ng-click="$ctrl.removeLabel($index)">
-      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
     </button>
   </div>
 </div>
