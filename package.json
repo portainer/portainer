@@ -132,6 +132,7 @@
     "react-select": "^5.2.1",
     "react-table": "^7.7.0",
     "react-tooltip": "^4.2.21",
+    "react2angular": "^4.0.6",
     "sanitize-html": "^2.5.3",
     "spinkit": "^2.0.1",
     "splitargs": "github:deviantony/splitargs#semver:~0.2.0",
