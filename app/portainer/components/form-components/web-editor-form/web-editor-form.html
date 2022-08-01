@@ -6,7 +6,14 @@
     </div>
     <div class="form-group">
       <div class="col-sm-12 col-lg-12">
-        <code-editor identifier="{{ $ctrl.identifier }}" placeholder="{{ $ctrl.placeholder }}" yml="$ctrl.yml" value="$ctrl.value" on-change="($ctrl.editorUpdate)"></code-editor>
+        <code-editor
+          identifier="{{ $ctrl.identifier }}"
+          placeholder="{{ $ctrl.placeholder }}"
+          read-only="$ctrl.readOnly"
+          yml="$ctrl.yml"
+          value="$ctrl.value"
+          on-change="($ctrl.editorUpdate)"
+        ></code-editor>
       </div>
     </div>
   </div>

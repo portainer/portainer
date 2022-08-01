@@ -16,13 +16,13 @@
           <!-- config-data -->
           <div class="form-group">
             <div class="col-sm-12" ng-if="ctrl.formValues.displayCodeEditor">
-              <code-editor
+              <web-editor-form
                 identifier="config-creation-editor"
                 placeholder="Define or paste the content of your config here"
                 yml="false"
                 on-change="(ctrl.editorUpdate)"
                 value="ctrl.formValues.Data"
-              ></code-editor>
+              ></web-editor-form>
             </div>
           </div>
           <!-- !config-data -->
