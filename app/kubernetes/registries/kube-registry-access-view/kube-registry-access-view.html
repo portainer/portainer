@@ -27,7 +27,7 @@
               </span>
             </div>
             <div class="col-sm-12 small text-muted vertical-center">
-              <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+              <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
               Note: adding this registry will expose the registry credentials to all users of this namespace
             </div>
           </div>
@@ -37,7 +37,7 @@
             <div class="col-sm-12">
               <button
                 type="submit"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="$ctrl.selectedResourcePools.length === 0 || $ctrl.state.actionInProgress"
                 ng-click="$ctrl.submit()"
                 button-spinner="$ctrl.state.actionInProgress"
