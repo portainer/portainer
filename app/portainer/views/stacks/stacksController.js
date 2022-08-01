@@ -56,12 +56,13 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
       });
   }
 
-  async function loadCreateEnabled() {
+  async function canManageStacks() {
     return endpoint.SecuritySettings.allowStackManagementForRegularUsers || Authentication.isAdmin();
   }
 
   async function initView() {
-    $scope.createEnabled = await loadCreateEnabled();
+    // if the user is not an admin, and stack management is disabled for non admins, then take the user to the dashboard
+    $scope.createEnabled = await canManageStacks();
     if (!$scope.createEnabled) {
       $state.go('docker.dashboard');
     }
