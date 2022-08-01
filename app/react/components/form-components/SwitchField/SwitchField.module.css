@@ -7,3 +7,9 @@
 .label {
   padding: 0;
 }
+
+.switchValues {
+  font-style: normal;
+  font-weight: 500;
+  margin-left: 5px;
+}

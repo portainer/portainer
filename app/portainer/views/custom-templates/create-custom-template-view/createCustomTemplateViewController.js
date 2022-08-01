@@ -171,8 +171,7 @@ class CreateCustomTemplateViewController {
     return this.CustomTemplateService.createCustomTemplateFromGitRepository(this.formValues);
   }
 
-  editorUpdate(cm) {
-    const value = cm.getValue();
+  editorUpdate(value) {
     this.formValues.FileContent = value;
     this.state.isEditorDirty = true;
     this.parseTemplate(value);

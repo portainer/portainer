@@ -120,8 +120,7 @@ class EditCustomTemplateViewController {
     }
   }
 
-  editorUpdate(cm) {
-    const value = cm.getValue();
+  editorUpdate(value) {
     if (this.formValues.FileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
       this.formValues.FileContent = value;
       this.parseTemplate(value);

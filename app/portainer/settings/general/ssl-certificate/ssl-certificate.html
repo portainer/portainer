@@ -1,22 +1,27 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-key" title-text="SSL certificate"></rd-widget-header>
+      <rd-widget-header icon="key" feather-icon="true" title-text="SSL certificate"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" name="$ctrl.sslForm">
           <span class="small">
-            <p class="text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+            <p class="text-muted vertical-center">
+              <pr-icon icon="'alert-circle'" feather="true" class-name="'icon-warning =vertical-center'"></pr-icon>
               Forcing HTTPs only will cause Portainer to stop listening on the HTTP port. Any edge agent environment that is using HTTP will no longer be available.
             </p>
           </span>
-
-          <por-switch-field checked="$ctrl.formValues.forceHTTPS" label="'Force HTTPS only'" on-change="($ctrl.onChangeForceHTTPS)"></por-switch-field>
-
-          <hr />
+          <div class="form-group">
+            <por-switch-field
+              checked="$ctrl.formValues.forceHTTPS"
+              label="'Force HTTPS only'"
+              on-change="($ctrl.onChangeForceHTTPS)"
+              field-class="'col-sm-12'"
+              label-class="'col-sm-2'"
+            ></por-switch-field>
+          </div>
 
           <div class="form-group">
-            <span class="col-sm-12"> Provide a new SSL Certificate to replace the existing one that is used for HTTPS connections. </span>
+            <span class="col-sm-12 control-label"> Provide a new SSL Certificate to replace the existing one that is used for HTTPS connections. </span>
           </div>
 
           <div class="form-group">
@@ -28,7 +33,7 @@
               <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.certFile" ngf-pattern="$ctrl.certFilePattern" name="certFile"> Select file </button>
               <span style="margin-left: 5px">
                 {{ $ctrl.formValues.certFile.name }}
-                <i class="fa fa-times red-icon" ng-if="!$ctrl.formValues.certFile" aria-hidden="true"></i>
+                <pr-icon icon="'x-circle'" feather="true" class-name="'icon-danger'" ng-if="!$ctrl.formValues.certFile"></pr-icon>
               </span>
             </div>
           </div>
@@ -49,7 +54,7 @@
               <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.keyFile" ngf-pattern="$ctrl.keyFilePattern" name="keyFile"> Select file </button>
               <span style="margin-left: 5px">
                 {{ $ctrl.formValues.keyFile.name }}
-                <i class="fa fa-times red-icon" ng-if="!$ctrl.formValues.keyFile" aria-hidden="true"></i>
+                <pr-icon icon="'x-circle'" feather="true" class-name="'icon-danger'" ng-if="!$ctrl.formValues.keyFile"></pr-icon>
               </span>
             </div>
           </div>
@@ -61,7 +66,6 @@
             </div>
           </div>
 
-          <hr />
           <div class="form-group">
             <div class="col-sm-12">
               <button

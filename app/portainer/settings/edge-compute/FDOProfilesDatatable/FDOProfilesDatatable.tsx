@@ -12,7 +12,6 @@ import { useTableSettings } from '@@/datatables/useTableSettings';
 import { useRowSelect } from '@@/datatables/useRowSelect';
 import {
   Table,
-  TableActions,
   TableContainer,
   TableHeaderRow,
   TableRow,
@@ -78,14 +77,12 @@ export function FDOProfilesDatatable({
 
   return (
     <TableContainer>
-      <TableTitle icon="" label="Device Profiles" />
-
-      <TableActions>
+      <TableTitle icon="list" featherIcon label="Device Profiles">
         <FDOProfilesDatatableActions
           isFDOEnabled={isFDOEnabled}
           selectedItems={selectedFlatRows.map((row) => row.original)}
         />
-      </TableActions>
+      </TableTitle>
 
       <Table
         className={tableProps.className}

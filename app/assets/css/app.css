@@ -87,7 +87,7 @@ body,
 
 .form-section-title {
   margin-top: 5px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   color: var(--text-form-section-title-color);
   padding-left: 0;
   font-weight: 500;
@@ -245,7 +245,6 @@ a[ng-click] {
   cursor: pointer;
   border: 1px solid var(--border-blocklist);
   border-radius: 8px;
-  box-shadow: var(--shadow-box-color);
   margin-right: 10px;
 }
 
@@ -283,7 +282,6 @@ a[ng-click] {
 .blocklist-item-logo {
   width: 100%;
   max-width: 60px;
-  height: 100%;
   max-height: 60px;
 }
 
@@ -401,7 +399,7 @@ a[ng-click] {
 }
 
 .panel-body {
-  padding: 30px 25px;
+  padding: 20px 25px;
   background-color: var(--white-color);
   border-radius: 8px;
 }
@@ -867,4 +865,19 @@ json-tree .branch-preview {
   font-size: smaller;
   margin-left: 5px;
   margin-right: 5px;
+}
+
+.web-editor {
+  background-color: var(--bg-webeditor-color);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.web-editor a {
+  color: var(--text-link-color);
+}
+
+.web-editor a:hover {
+  color: var(--text-link-hover-color);
+  text-decoration-line: underline;
 }

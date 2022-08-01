@@ -1,10 +1,9 @@
+import { FormikErrors } from 'formik';
+
 import { FormError } from '@@/form-components/FormError';
 import { Input } from '@@/form-components/Input';
 import { InputList } from '@@/form-components/InputList';
-import {
-  InputListError,
-  ItemProps,
-} from '@@/form-components/InputList/InputList';
+import { ItemProps } from '@@/form-components/InputList/InputList';
 
 export interface VariableDefinition {
   name: string;
@@ -16,7 +15,7 @@ export interface VariableDefinition {
 interface Props {
   value: VariableDefinition[];
   onChange: (value: VariableDefinition[]) => void;
-  errors?: InputListError<VariableDefinition>[] | string;
+  errors?: FormikErrors<VariableDefinition>[];
   isVariablesNamesFromParent?: boolean;
 }
 
@@ -57,6 +56,8 @@ interface DefinitionItemProps extends ItemProps<VariableDefinition> {
 }
 
 function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
+  const errorObj = typeof error === 'object' ? error : {};
+
   return (
     <div className="flex gap-2">
       <div>
@@ -67,7 +68,7 @@ function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
           placeholder="Name (e.g var_name)"
           readOnly={isNameReadonly}
         />
-        {error?.name && <FormError>{error.name}</FormError>}
+        {errorObj?.name && <FormError>{errorObj.name}</FormError>}
       </div>
       <div>
         <Input
@@ -76,7 +77,7 @@ function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
           placeholder="Label"
           name="label"
         />
-        {error?.label && <FormError>{error.label}</FormError>}
+        {errorObj?.label && <FormError>{errorObj.label}</FormError>}
       </div>
       <div>
         <Input
@@ -85,7 +86,7 @@ function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
           onChange={handleChange}
           placeholder="Description"
         />
-        {error?.description && <FormError>{error.description}</FormError>}
+        {errorObj?.description && <FormError>{errorObj.description}</FormError>}
       </div>
       <div>
         <Input
@@ -94,7 +95,9 @@ function Item({ item, onChange, error, isNameReadonly }: DefinitionItemProps) {
           placeholder="Default Value"
           name="defaultValue"
         />
-        {error?.defaultValue && <FormError>{error.defaultValue}</FormError>}
+        {errorObj?.defaultValue && (
+          <FormError>{errorObj.defaultValue}</FormError>
+        )}
       </div>
     </div>
   );

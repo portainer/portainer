@@ -9,6 +9,7 @@ export const webEditorForm = {
     placeholder: '@',
     yml: '<',
     value: '<',
+    readOnly: '<',
     onChange: '<',
   },
 

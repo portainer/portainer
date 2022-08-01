@@ -10,6 +10,7 @@ import { Environment } from '../environments/types';
 import { snapshotEndpoints } from '../environments/environment.service';
 import { isEdgeEnvironment } from '../environments/utils';
 import { confirmAsync } from '../services/modal.service/confirm';
+import { buildTitle } from '../services/modal.service/utils';
 
 import { EnvironmentList } from './EnvironmentList';
 import { EdgeLoadingSpinner } from './EdgeLoadingSpinner';
@@ -76,7 +77,7 @@ export const HomeViewAngular = r2a(HomeView, []);
 
 async function confirmEndpointSnapshot() {
   return confirmAsync({
-    title: 'Are you sure?',
+    title: buildTitle('Are you sure?'),
     message:
       'Triggering a manual refresh will poll each environment to retrieve its information, this may take a few moments.',
     buttons: {

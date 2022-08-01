@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import { AutomationTestingProps } from '@/types';
 
 import { Icon } from '@@/Icon';
+import './Button.css';
 
 type Type = 'submit' | 'button' | 'reset';
 type Color =
@@ -21,7 +22,8 @@ type Color =
   | 'danger'
   | 'link'
   | 'light'
-  | 'dangerlight';
+  | 'dangerlight'
+  | 'none';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
 export interface Props extends AriaAttributes, AutomationTestingProps {

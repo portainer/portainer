@@ -550,7 +550,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     $scope.rollbackService = function (service) {
-      ModalService.confirm({
+      ModalService.confirmWarn({
         title: 'Rollback service',
         message: 'Are you sure you want to rollback?',
         buttons: {

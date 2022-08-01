@@ -5,7 +5,7 @@ import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
 import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
-import { confirmAsync } from '@/portainer/services/modal.service/confirm';
+import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
 import { isEdgeEnvironment } from '@/portainer/environments/utils';
 
 import { commandsTabs } from '@/react/edge/components/EdgeScriptForm/scripts';
@@ -175,7 +175,7 @@ function EndpointController(
   }
 
   function verifyGpus() {
-    var i = $scope.endpoint.Gpus.length;
+    var i = ($scope.endpoint.Gpus || []).length;
     while (i--) {
       if ($scope.endpoint.Gpus[i].name === '' || $scope.endpoint.Gpus[i].name === null) {
         $scope.endpoint.Gpus.splice(i, 1);
@@ -192,7 +192,7 @@ function EndpointController(
     var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
 
     if (isEdgeEnvironment(endpoint.Type) && _.difference($scope.initialTagIds, endpoint.TagIds).length > 0) {
-      let confirmed = await confirmAsync({
+      let confirmed = await confirmDestructiveAsync({
         title: 'Confirm action',
         message: 'Removing tags from this environment will remove the corresponding edge stacks when dynamic grouping is being used',
         buttons: {
