@@ -61,8 +61,11 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
   }
 
   async function initView() {
-    getStacks();
     $scope.createEnabled = await loadCreateEnabled();
+    if (!$scope.createEnabled) {
+      $state.go('docker.dashboard');
+    }
+    getStacks();
   }
 
   initView();
