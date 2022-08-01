@@ -65,10 +65,14 @@ export function SwitchField({
         dataCy={dataCy}
       />
       {switchValues && checked && (
-        <span className="ml-2">{switchValues.on}</span>
+        <span className={`"ml-2" ${styles.switchValues}`}>
+          {switchValues.on}
+        </span>
       )}
       {switchValues && !checked && (
-        <span className="ml-2">{switchValues.off}</span>
+        <span className={`"ml-2" ${styles.switchValues}`}>
+          {switchValues.off}
+        </span>
       )}
     </label>
   );

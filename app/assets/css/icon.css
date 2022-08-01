@@ -99,6 +99,9 @@ pr-icon {
 }
 
 .icon-nested-gray {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 30px;
   width: 30px;
   padding: 5px;
@@ -109,6 +112,9 @@ pr-icon {
 }
 
 .icon-nested-blue {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 30px;
   width: 30px;
   padding: 5px;

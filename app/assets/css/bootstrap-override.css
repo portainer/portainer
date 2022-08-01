@@ -79,6 +79,12 @@
   background-color: var(--ui-gray-3);
 }
 
+.switch-values {
+  font-style: normal;
+  font-weight: 500;
+  margin-left: 5px;
+}
+
 /* Toggle */
 
 .slider {

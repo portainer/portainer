@@ -27,15 +27,15 @@ class KubernetesDeployController {
     this.isTemplateVariablesEnabled = isBE;
 
     this.deployOptions = [
-      buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
-      buildOption('method_compose', 'fab fa-docker', 'Compose', 'Docker compose format', KubernetesDeployManifestTypes.COMPOSE),
+      buildOption('method_kubernetes', 'svg-kubernetes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
+      buildOption('method_compose', 'svg-dockercompose', 'Compose', 'Docker compose format', KubernetesDeployManifestTypes.COMPOSE),
     ];
 
     this.methodOptions = [
-      buildOption('method_repo', 'fab fa-github', 'Git Repository', 'Use a git repository', KubernetesDeployBuildMethods.GIT),
-      buildOption('method_editor', 'fa fa-edit', 'Web editor', 'Use our Web editor', KubernetesDeployBuildMethods.WEB_EDITOR),
-      buildOption('method_url', 'fa fa-globe', 'URL', 'Specify a URL to a file', KubernetesDeployBuildMethods.URL),
-      buildOption('method_template', 'fa fa-rocket', 'Custom Template', 'Use a custom template', KubernetesDeployBuildMethods.CUSTOM_TEMPLATE),
+      buildOption('method_repo', 'svg-git', 'Git Repository', 'Use a git repository', KubernetesDeployBuildMethods.GIT),
+      buildOption('method_editor', 'svg-custom', 'Web editor', 'Use our Web editor', KubernetesDeployBuildMethods.WEB_EDITOR),
+      buildOption('method_url', 'svg-url', 'URL', 'Specify a URL to a file', KubernetesDeployBuildMethods.URL),
+      buildOption('method_template', 'svg-template', 'Custom Template', 'Use a custom template', KubernetesDeployBuildMethods.CUSTOM_TEMPLATE),
     ];
 
     this.state = {
