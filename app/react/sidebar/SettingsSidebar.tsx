@@ -23,7 +23,7 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
   });
 
   const showUsersSection =
-    !window.ddExtension && (isAdmin || isTeamLeader || !teamSyncQuery.data);
+    !window.ddExtension && (isAdmin || (isTeamLeader && !teamSyncQuery.data));
 
   return (
     <SidebarSection title="Settings">
