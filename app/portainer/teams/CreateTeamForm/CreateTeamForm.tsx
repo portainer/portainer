@@ -63,6 +63,7 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
                     inputId="team_name"
                     label="Name"
                     errors={errors.name}
+                    required
                   >
                     <Field
                       as={Input}
