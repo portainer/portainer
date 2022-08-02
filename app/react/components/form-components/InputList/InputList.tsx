@@ -2,8 +2,6 @@ import { ComponentType } from 'react';
 import clsx from 'clsx';
 import { FormikErrors } from 'formik';
 
-import { Icon } from '@/react/components/Icon';
-
 import { AddButton, Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
 import { Tooltip } from '@@/Tip/Tooltip';
