@@ -25,14 +25,16 @@ interface Props {
 const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
   {
     id: 'agent_endpoint',
-    icon: 'svg-agent',
+    icon: 'zap',
+    featherIcon: true,
     label: 'Agent',
     value: EnvironmentCreationTypes.AgentEnvironment,
     description: '',
   },
   {
     id: 'edgeAgent',
-    icon: 'svg-edgeagent', // Todo cloud with docker
+    icon: 'cloud',
+    featherIcon: true,
     label: 'Edge Agent',
     description: '',
     value: EnvironmentCreationTypes.EdgeAgentEnvironment,
@@ -40,7 +42,8 @@ const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
   },
   {
     id: 'kubeconfig_endpoint',
-    icon: 'svg-import',
+    icon: 'upload-cloud',
+    featherIcon: true,
     label: 'Import',
     value: EnvironmentCreationTypes.KubeConfigEnvironment,
     description: 'Import an existing Kubernetes config',

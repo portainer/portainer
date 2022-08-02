@@ -65,7 +65,7 @@ export function EnvironmentCreationView() {
 
       <div className={styles.wizardWrapper}>
         <Widget>
-          <WidgetTitle icon="svg-magic" title="Environment Wizard" />
+          <WidgetTitle icon="svg-magicwand" title="Environment Wizard" />
           <WidgetBody>
             <Stepper steps={steps} currentStep={currentStepIndex + 1} />
 

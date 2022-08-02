@@ -45,16 +45,8 @@ export function FileUploadField({
         {title}
       </Button>
 
-      <span className="space-left vertical-center">
-        {value ? (
-          value.name
-        ) : (
-          <Icon
-            icon="x-circle"
-            feather
-            className="icon icon-sm icon-danger vertical-center"
-          />
-        )}
+      <span className="vertical-center">
+        {value ? value.name : <Icon icon="x-circle" feather mode="danger" />}
       </span>
     </div>
   );
