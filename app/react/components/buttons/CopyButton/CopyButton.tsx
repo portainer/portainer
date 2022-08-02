@@ -33,14 +33,16 @@ export function CopyButton({
         title="Copy Value"
         type="button"
       >
-        <Icon icon="copy" feather /> {children}
+        <Icon icon="copy" feather />
+        {children}
       </Button>
 
       <span
         className={clsx(
           copiedSuccessfully && styles.fadeout,
           styles.displayText,
-          'space-left'
+          'space-left',
+          'vertical-center'
         )}
       >
         <Icon icon="check" feather />
