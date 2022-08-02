@@ -13,7 +13,7 @@
             <uib-tab index="0">
               <uib-tab-heading> <pr-icon icon="'code'" feather="true"></pr-icon> Deploy </uib-tab-heading>
               <div class="col-sm-12 form-section-title"> Namespace </div>
-              <form class="form-horizontal" style="margin-top: 20px" name="deploymentForm">
+              <form class="form-horizontal mt-3" name="deploymentForm">
                 <div class="form-group" ng-if="ctrl.formValues.Namespace">
                   <label for="target_node" class="col-lg-2 col-sm-3 control-label text-left">Namespace</label>
                   <div class="col-sm-8">
@@ -31,16 +31,18 @@
                     <portainer-tooltip message="'If you have defined namespaces in your deployment file turning this on will enforce the use of those only in the deployment'">
                     </portainer-tooltip>
                   </label>
-                  <div class="col-sm-8">
+                  <div class="col-sm-8 vertical-center pt-3">
                     <label class="switch">
                       <input type="checkbox" name="toggle_logo" ng-model="ctrl.formValues.namespace_toggle" />
-                      <i></i>
+                      <span class="slider round"></span>
                     </label>
+                    <!-- <span class="ml-2 mb-1 switch-values" ng-if="ctrl.formValues.namespace_toggle">Yes</span>
+                    <span class="ml-2 mb-1 switch-values" ng-if="!ctrl.formValues.namespace_toggle">No</span> -->
                   </div>
                 </div>
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">
                   <div class="col-sm-12 small text-muted">
-                    <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                    <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                     You do not have access to any namespace. Contact your administrator to get access to a namespace.
                   </div>
                 </div>
@@ -103,40 +105,41 @@
                 </div>
 
                 <!-- editor -->
-                <web-editor-form
-                  ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR || (ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId)"
-                  identifier="kubernetes-deploy-editor"
-                  value="ctrl.formValues.EditorContent"
-                  on-change="(ctrl.onChangeFileContent)"
-                  ng-required="true"
-                  yml="true"
-                  placeholder="# Define or paste the content of your manifest file here"
-                >
-                  <editor-description>
-                    <div ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
-                      <p class="vertical-center">
-                        <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
-                        Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
-                        not all the Compose format options are supported by Kompose at the moment.
-                      </p>
-                      <p>
-                        You can get more information about Compose file format in the
-                        <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
-                      </p>
-                    </div>
-                    <div ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
-                      <p class="vertical-center">
-                        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
-                        This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
-                      </p>
-                      <p>
-                        You can get more information about Kubernetes file format in the
-                        <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
-                      </p>
-                    </div>
-                  </editor-description>
-                </web-editor-form>
-
+                <div class="mt-4">
+                  <web-editor-form
+                    ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR || (ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId)"
+                    identifier="kubernetes-deploy-editor"
+                    value="ctrl.formValues.EditorContent"
+                    on-change="(ctrl.onChangeFileContent)"
+                    ng-required="true"
+                    yml="true"
+                    placeholder="# Define or paste the content of your manifest file here"
+                  >
+                    <editor-description>
+                      <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
+                        <p>
+                          <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                          Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
+                          not all the Compose format options are supported by Kompose at the moment.
+                        </p>
+                        <p>
+                          You can get more information about Compose file format in the
+                          <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
+                        </p>
+                      </span>
+                      <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
+                        <p>
+                          <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                          This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
+                        </p>
+                        <p>
+                          You can get more information about Kubernetes file format in the
+                          <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
+                        </p>
+                      </span>
+                    </editor-description>
+                  </web-editor-form>
+                </div>
                 <!-- !editor -->
 
                 <!-- url -->
@@ -188,7 +191,7 @@
 
             <uib-tab index="1" disable="ctrl.state.tabLogsDisabled">
               <uib-tab-heading> <pr-icon icon="'file-text'" feather="true"></pr-icon> Logs </uib-tab-heading>
-              <form class="form-horizontal" style="margin-top: 20px">
+              <form class="form-horizontal mt-3">
                 <div class="form-group" ng-if="ctrl.state.activeTab === 1">
                   <div class="col-sm-12">
                     <code-editor identifier="kubernetes-deploy-logs" read-only="true" yml="false" value="ctrl.errorLog"></code-editor>
