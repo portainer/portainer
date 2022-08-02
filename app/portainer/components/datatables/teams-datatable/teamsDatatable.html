@@ -6,17 +6,6 @@
           <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-white icon-primary icon-nested-blue'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
-        <div class="actionBar" ng-show="$ctrl.isAdmin">
-          <button
-            type="button"
-            class="btn btn-sm btn-dangerlight vertical-center"
-            ng-disabled="$ctrl.state.selectedItemCount === 0"
-            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-          >
-            <pr-icon icon="'trash-2'" feather="true"></pr-icon>
-            Remove
-          </button>
-        </div>
         <div class="searchBar vertical-center">
           <pr-icon icon="'search'" feather="true"></pr-icon>
           <input
@@ -27,6 +16,17 @@
             placeholder="Search..."
             ng-model-options="{ debounce: 300 }"
           />
+        </div>
+        <div class="actionBar" ng-show="$ctrl.isAdmin">
+          <button
+            type="button"
+            class="btn btn-sm btn-dangerlight vertical-center"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          >
+            <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+            Remove
+          </button>
         </div>
       </div>
       <div class="table-responsive">
@@ -77,7 +77,7 @@
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">
-              <span style="margin-right: 5px"> Items per page </span>
+              <span class="space-right"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
