@@ -3,14 +3,14 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" mode="'primary'" class-name="'icon-nested-blue'"></pr-icon>
+          <pr-icon icon="$ctrl.titleIcon" class-name="'icon-nested-blue vertical-center'" mode="'primary'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
-        <div class="searchBar">
+        <div class="searchBar vertical-center">
           <pr-icon icon="'search'" feather="true" class="vertical-center"></pr-icon>
           <input
             type="text"
-            class="searchInput ml-1"
+            class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
             placeholder="Search for an application..."
@@ -20,7 +20,9 @@
         </div>
         <div ng-if="$ctrl.refreshCallback" class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
+            <span uib-dropdown-toggle aria-label="Settings">
+              <pr-icon icon="'more-vertical'" feather="true" class-name="'!mr-0 !h-4'"></pr-icon>
+            </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader"> Table settings </div>
@@ -40,7 +42,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'" feather="true"></pr-icon>
+                        <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
                       </span>
                     </div>
                   </div>

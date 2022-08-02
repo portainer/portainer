@@ -6,7 +6,9 @@
       <rd-widget-body classes="no-padding">
         <uib-tabset active="$ctrl.state.activeTab" justified="true" type="pills">
           <uib-tab index="0" classes="btn-sm">
-            <uib-tab-heading> <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Stack</uib-tab-heading>
+            <uib-tab-heading>
+              <span><pr-icon icon="'layers'" feather="true"></pr-icon></span> Stack
+            </uib-tab-heading>
 
             <div style="padding: 20px">
               <edit-edge-stack-form
@@ -19,13 +21,15 @@
             </div>
           </uib-tab>
           <uib-tab index="1" classes="btn-sm">
-            <uib-tab-heading> <i class="fa fa-plug space-right" aria-hidden="true"></i> Environments</uib-tab-heading>
+            <uib-tab-heading>
+              <span><pr-icon icon="'hard-drive'" feather="true"></pr-icon></span> Environments
+            </uib-tab-heading>
 
             <div style="margin-top: 25px">
               <edge-stack-endpoints-datatable
                 title-text="Environments Status"
                 dataset="$ctrl.endpoints"
-                title-icon="fa-plug"
+                title-icon="hard-drive"
                 table-key="edgeStackEndpoints"
                 order-by="Name"
                 retrieve-page="$ctrl.getPaginatedEndpoints"

@@ -80,50 +80,50 @@
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-if="$ctrl.showStackColumn">
                 <a ng-click="$ctrl.changeOrderBy('StackName')">
                   Stack
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.image.display">
                 <a ng-click="$ctrl.changeOrderBy('Image')">
                   Image
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Mode')">
                   Scheduling Mode
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mode' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mode' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Mode' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Mode' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
                   Published Ports
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.updated.display">
                 <a ng-click="$ctrl.changeOrderBy('UpdatedAt')">
                   Last Update
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
+                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></pr-icon>
+                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></pr-icon>
                 </a>
               </th>
             </tr>

@@ -94,7 +94,7 @@ export function InputList<T = DefaultType>({
       </div>
 
       {textTip && (
-        <div className="col-sm-12 my-5">
+        <div className="col-sm-12 mt-5">
           <TextTip color="blue">{textTip}</TextTip>
         </div>
       )}
@@ -131,6 +131,7 @@ export function InputList<T = DefaultType>({
                       size="small"
                       disabled={disabled || index === 0}
                       onClick={() => handleMoveUp(index)}
+                      className="vertical-center btn-only-icon"
                     >
                       <Icon icon="arrow-up" feather />
                     </Button>
@@ -139,6 +140,7 @@ export function InputList<T = DefaultType>({
                       type="button"
                       disabled={disabled || index === value.length - 1}
                       onClick={() => handleMoveDown(index)}
+                      className="vertical-center btn-only-icon"
                     >
                       <Icon icon="arrow-down" feather />
                     </Button>
@@ -146,12 +148,12 @@ export function InputList<T = DefaultType>({
                 )}
                 {!readOnly && (
                   <Button
-                    color="danger"
+                    color="dangerlight"
                     size="small"
                     onClick={() => handleRemoveItem(key, item)}
-                    disabled={disabled}
+                    className="vertical-center btn-only-icon"
                   >
-                    <i className="fa fa-trash" aria-hidden="true" />
+                    <Icon icon="trash-2" feather size="md" />
                   </Button>
                 )}
               </div>

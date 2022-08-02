@@ -1,7 +1,8 @@
-import { Box, Edit, Layers, Loader, Lock, Server } from 'react-feather';
+import { Box, Edit, Layers, Lock, Server } from 'react-feather';
 
 import { EnvironmentId } from '@/portainer/environments/types';
 import { Authorized } from '@/portainer/hooks/useUser';
+import Helm from '@/assets/ico/vendor/helm.svg?c';
 
 import { DashboardLink } from '../items/DashboardLink';
 import { SidebarItem } from '../SidebarItem';
@@ -54,7 +55,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         <SidebarItem
           to="kubernetes.templates.helm"
           params={{ endpointId: environmentId }}
-          icon={Loader}
+          icon={Helm}
           label="Helm"
           data-cy="k8sSidebar-helm"
         />

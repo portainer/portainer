@@ -334,13 +334,13 @@
   width: 30px;
 }
 
-.table tr > th:first-child,
-.table tr > td:first-child {
+.table-responsive tr > th:first-child,
+.table-responsive tr > td:first-child {
   padding-left: 20px;
 }
 
-.table tr > th:last-child,
-.table tr > last-child {
+.table-responsive tr > th:last-child,
+.table-responsive tr > last-child {
   padding-right: 20px;
 }
 

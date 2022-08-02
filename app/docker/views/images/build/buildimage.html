@@ -6,7 +6,7 @@
       <rd-widget-body>
         <uib-tabset active="state.activeTab">
           <uib-tab index="0">
-            <uib-tab-heading> <i class="fa fa-wrench space-right" aria-hidden="true"></i> Builder </uib-tab-heading>
+            <uib-tab-heading class="vertical-center"> <pr-icon icon="'tool'" feather="true" class="leading-none"></pr-icon> Builder </uib-tab-heading>
             <form class="form-horizontal">
               <div class="col-sm-12 form-section-title"> Naming </div>
               <!-- names -->
@@ -16,7 +16,7 @@
               <div class="form-group">
                 <div class="col-sm-12">
                   <label class="control-label text-left">Names</label>
-                  <span class="label label-default interactive" style="margin-left: 10px" ng-click="addImageName()">
+                  <span class="label label-default interactive" class="ml-2.5" ng-click="addImageName()">
                     <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add additional name
                   </span>
                 </div>
@@ -24,7 +24,9 @@
               <!-- !names -->
               <div class="form-group" ng-if="formValues.ImageNames.length === 0">
                 <span class="col-sm-12 text-danger small">
-                  <i class="fa fa-exclamation-triangle space-right" aria-hidden="true"></i>You must specify at least one name for the image.
+                  <p class="vertical-center">
+                    <pr-icon icon="'alert-triangle'" mode="'danger'" size="'sm'" feather="true"></pr-icon> You must specify at least one name for the image.
+                  </p>
                 </span>
               </div>
               <!-- name-input-list -->
@@ -37,21 +39,24 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                      <div ng-repeat="item in formValues.ImageNames track by $index" style="margin-top: 2px">
+                    <div class="col-sm-12 form-inline" class="mt-2.5">
+                      <div ng-repeat="item in formValues.ImageNames track by $index" class="mt-0.5">
                         <!-- name-input -->
                         <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">name</span>
                           <input type="text" class="form-control" ng-model="item.Name" placeholder="e.g. my-image:my-tag" auto-focus />
-                          <span class="input-group-addon"
-                            ><i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[checkName(item.Name)]" aria-hidden="true"></i
-                          ></span>
+                          <span class="input-group-addon" ng-if="!checkName(item.Name)">
+                            <pr-icon icon="'x'" mode="'danger'" feather="true"></pr-icon>
+                          </span>
+                          <span class="input-group-addon" ng-if="checkName(item.Name)">
+                            <pr-icon icon="'check'" mode="'success'" feather="true"></pr-icon>
+                          </span>
                         </div>
                         <!-- !name-input -->
                         <!-- actions -->
                         <div class="input-group col-sm-2 input-group-sm">
                           <button class="btn btn-sm btn-danger" type="button" ng-click="removeImageName($index)">
-                            <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                            <pr-icon icon="'trash-2'" feather="true"></pr-icon>
                           </button>
                         </div>
                         <!-- !actions -->
@@ -64,12 +69,12 @@
               <!-- build-method -->
               <div class="col-sm-12 form-section-title"> Build method </div>
               <div class="form-group"></div>
-              <div class="form-group" style="margin-bottom: 0">
+              <div class="form-group" class="mb-0">
                 <div class="boxselector_wrapper">
                   <div>
                     <input type="radio" id="method_editor" ng-model="state.BuildType" value="editor" ng-click="toggleEditor()" />
                     <label for="method_editor">
-                      <div class="boxselector_header">
+                      <div class="boxselector_header vertical-center">
                         <pr-icon icon="'edit'" feather="true"></pr-icon>
                         Web editor
                       </div>
@@ -79,7 +84,7 @@
                   <div>
                     <input type="radio" id="method_upload" ng-model="state.BuildType" value="upload" ng-click="saveEditorContent()" />
                     <label for="method_upload">
-                      <div class="boxselector_header">
+                      <div class="boxselector_header vertical-center">
                         <pr-icon icon="'upload'" feather="true"></pr-icon>
                         Upload
                       </div>
@@ -89,7 +94,7 @@
                   <div>
                     <input type="radio" id="method_url" ng-model="state.BuildType" value="url" ng-click="saveEditorContent()" />
                     <label for="method_url">
-                      <div class="boxselector_header">
+                      <div class="boxselector_header vertical-center">
                         <pr-icon icon="'globe'" feather="true"></pr-icon>
                         URL
                       </div>
@@ -130,11 +135,11 @@
                   </span>
                 </div>
                 <div class="form-group">
-                  <div class="col-sm-12">
+                  <div class="col-sm-12 vertical-center">
                     <button class="btn btn-sm btn-primary" ngf-select ngf-min-size="10" ng-model="formValues.UploadFile">Select file</button>
-                    <span style="margin-left: 5px">
+                    <span class="space-left">
                       {{ formValues.UploadFile.name }}
-                      <i class="fa fa-times red-icon" ng-if="!formValues.UploadFile" aria-hidden="true"></i>
+                      <span ng-if="!formValues.UploadFile"><pr-icon icon="'x'" mode="'danger'" feather="true" size="'md'"></pr-icon></span>
                     </span>
                   </div>
                 </div>
@@ -206,14 +211,14 @@
                     <span ng-hide="state.actionInProgress">Build the image</span>
                     <span ng-show="state.actionInProgress">Image building in progress...</span>
                   </button>
-                  <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px">{{ state.formValidationError }}</span>
+                  <span class="text-danger" ng-if="state.formValidationError" class="space-left">{{ state.formValidationError }}</span>
                 </div>
               </div>
               <!-- !actions -->
             </form>
           </uib-tab>
           <uib-tab index="1" disable="!buildLogs">
-            <uib-tab-heading> <i class="fa fa-file-alt space-right" aria-hidden="true"></i> Output </uib-tab-heading>
+            <uib-tab-heading class="vertical-center"> <pr-icon icon="'file-text'" feather="true" class="leading-none"></pr-icon> Output </uib-tab-heading>
             <pre class="log_viewer">
               <div ng-repeat="line in buildLogs track by $index" class="line"><p class="inner_line" ng-click="active=!active" ng-class="{'line_selected': active}">{{ line }}</p></div>
               <div ng-if="!buildLogs.length" class="line"><p class="inner_line">No build output available.</p></div>
