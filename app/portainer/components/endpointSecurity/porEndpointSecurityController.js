@@ -1,6 +1,13 @@
 angular.module('portainer.app').controller('porEndpointSecurityController', [
-  function () {
+  '$scope',
+  function ($scope) {
     var ctrl = this;
+
+    ctrl.onToggleTLS = function (newValue) {
+      $scope.$evalAsync(() => {
+        ctrl.formData.TLS = newValue;
+      });
+    };
 
     this.$onInit = $onInit;
     function $onInit() {

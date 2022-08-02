@@ -11,23 +11,25 @@
           <div class="col-sm-12 form-section-title"> Build method </div>
           <box-selector radio-name="'method'" value="$ctrl.state.method" options="$ctrl.methodOptions" on-change="($ctrl.onChangeMethod)"></box-selector>
 
-          <web-editor-form
-            ng-if="$ctrl.state.method === 'editor'"
-            identifier="template-creation-editor"
-            value="$ctrl.formValues.FileContent"
-            on-change="($ctrl.onChangeFileContent)"
-            ng-required="true"
-            yml="true"
-            placeholder="# Define or paste the content of your manifest file here"
-          >
-            <editor-description>
-              <p>Templates allow deploying any kind of Kubernetes resource (Deployment, Secret, ConfigMap...)</p>
-              <p>
-                You can get more information about Kubernetes file format in the
-                <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
-              </p>
-            </editor-description>
-          </web-editor-form>
+          <div class="mt-4">
+            <web-editor-form
+              ng-if="$ctrl.state.method === 'editor'"
+              identifier="template-creation-editor"
+              value="$ctrl.formValues.FileContent"
+              on-change="($ctrl.onChangeFileContent)"
+              ng-required="true"
+              yml="true"
+              placeholder="# Define or paste the content of your manifest file here"
+            >
+              <editor-description>
+                <p>Templates allow deploying any kind of Kubernetes resource (Deployment, Secret, ConfigMap...)</p>
+                <p>
+                  You can get more information about Kubernetes file format in the
+                  <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
+                </p>
+              </editor-description>
+            </web-editor-form>
+          </div>
 
           <file-upload-form ng-if="$ctrl.state.method === 'upload'" file="$ctrl.formValues.File" on-change="($ctrl.onChangeFile)" ng-required="true">
             <file-upload-description> You can upload a Manifest file from your computer. </file-upload-description>
@@ -48,7 +50,7 @@
             <div class="col-sm-12">
               <button
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="!$ctrl.state.isTemplateValid ||$ctrl.state.actionInProgress || $ctrl.form.$invalid || ($ctrl.state.method === 'editor' && !$ctrl.formValues.FileContent)"
                 ng-click="$ctrl.createCustomTemplate()"
                 button-spinner="$ctrl.state.actionInProgress"

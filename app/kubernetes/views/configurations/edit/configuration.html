@@ -3,9 +3,9 @@
   title="'Configuration details'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
-    { 
+    {
       label:ctrl.configuration.Namespace,
-      link: 'kubernetes.resourcePools.resourcePool', 
+      link: 'kubernetes.resourcePools.resourcePool',
       linkParams:{ id: ctrl.configuration.Namespace }
     },
     { label:'ConfigMaps and Secrets', link:'kubernetes.configurations' },
@@ -24,26 +24,29 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)" data-cy="k8sConfigDetail-configTab">
-              <uib-tab-heading> <i class="fa fa-file-code space-right" aria-hidden="true"></i> Configuration </uib-tab-heading>
+              <uib-tab-heading>
+                <pr-icon icon="'svg-filecode'"></pr-icon>
+                Configuration
+              </uib-tab-heading>
               <div style="padding: 20px">
                 <table class="table" data-cy="k8sConfigDetail-configTable">
                   <tbody>
                     <tr>
-                      <td>Name</td>
-                      <td>
+                      <td class="!pl-0 !border-none w-[40%]">Name</td>
+                      <td class="!border-none">
                         {{ ctrl.configuration.Name }}
                         <span style="margin-left: 5px" class="label label-info image-tag" ng-if="ctrl.configuration.IsRegistrySecret">system</span>
                       </td>
                     </tr>
                     <tr>
-                      <td>Namespace</td>
+                      <td class="!pl-0">Namespace</td>
                       <td>
                         <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.configuration.Namespace })">{{ ctrl.configuration.Namespace }}</a>
                         <span style="margin-left: 5px" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace()">system</span>
                       </td>
                     </tr>
                     <tr>
-                      <td>Configuration type</td>
+                      <td class="!pl-0">Configuration type</td>
                       <td>
                         {{ ctrl.configuration.Type | kubernetesConfigurationTypeText }}
                       </td>
@@ -54,7 +57,8 @@
             </uib-tab>
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)" data-cy="k8sConfigDetail-eventsTab">
               <uib-tab-heading>
-                <i class="fa fa-history space-right" aria-hidden="true"></i> Events
+                <pr-icon icon="'svg-clockrewind'"></pr-icon>
+                Events
                 <div ng-if="ctrl.hasEventWarnings()">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
                   {{ ctrl.state.eventWarningCount }} warning(s)
@@ -73,8 +77,11 @@
               </kubernetes-events-datatable>
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.configuration.Yaml" classes="btn-sm" select="ctrl.showEditor()" data-cy="k8sConfigDetail-yamlTab">
-              <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
-              <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
+              <uib-tab-heading>
+                <pr-icon icon="'code'" feather="true"></pr-icon>
+                YAML
+              </uib-tab-heading>
+              <div class="!pt-5 px-5" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="configuration-yaml" data="ctrl.configuration.Yaml"> </kubernetes-yaml-inspector>
               </div>
             </uib-tab>
@@ -109,7 +116,7 @@
               <div class="col-sm-12">
                 <button
                   type="button"
-                  class="btn btn-primary btn-sm"
+                  class="btn btn-primary btn-sm !ml-0"
                   ng-disabled="!ctrl.isFormValid() || !kubernetesConfigurationCreationForm.$valid || ctrl.state.actionInProgress"
                   ng-click="ctrl.updateConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"
@@ -159,7 +166,7 @@
         order-by="Name"
         refresh-callback="ctrl.getApplications"
         title-text="Applications using this configuration"
-        title-icon="fa-laptop-code"
+        title-icon="svg-laptopcode"
       >
       </kubernetes-integrated-applications-datatable>
     </div>

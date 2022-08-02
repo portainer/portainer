@@ -94,6 +94,18 @@ angular.module('portainer.app').controller('StackController', [
       $scope.formValues.Env = value;
     }
 
+    $scope.onEnableWebhookChange = function (enable) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.EnableWebhook = enable;
+      });
+    };
+
+    $scope.onPruneChange = function (enable) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.Prune = enable;
+      });
+    };
+
     $scope.duplicateStack = function duplicateStack(name, targetEndpointId) {
       var stack = $scope.stack;
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
@@ -120,7 +132,7 @@ angular.module('portainer.app').controller('StackController', [
 
     $scope.migrateStack = function (name, endpointId) {
       return $q(function (resolve) {
-        ModalService.confirm({
+        ModalService.confirmWarn({
           title: 'Are you sure?',
           message:
             'This action will deploy a new instance of this stack on the target environment, please note that this does NOT relocate the content of any persistent volumes that may be attached to this stack.',
@@ -316,7 +328,7 @@ angular.module('portainer.app').controller('StackController', [
     }
 
     function loadStack(id) {
-      return $async(() => {
+      return $async(async () => {
         var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
         getEnvironments()

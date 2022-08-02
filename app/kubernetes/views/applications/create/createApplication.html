@@ -389,15 +389,17 @@
                     <!-- has-override -->
                     <div class="col-sm-12 form-inline" style="margin-top: 10px" ng-if="config.Overriden">
                       <div ng-repeat="(keyIndex, overridenKey) in config.OverridenKeys" style="margin-top: 2px">
-                        <div style="margin-top: 2px">
-                          <div class="col-sm-1 input-group input-group-sm" style="margin-left: 3px"></div>
-                          <div class="col-sm-3 input-group input-group-sm">
-                            <span class="input-group-addon">configuration key</span>
-                            <input type="text" class="form-control" ng-value="overridenKey.Key" disabled />
+                        <div class="row">
+                          <div class="col-sm-3 col-lg-2 form-group !m-0"><span>&nbsp;</span></div>
+                          <div class="col-sm-3 form-group" style="margin-left: -11px">
+                            <div class="input-group input-group-sm">
+                              <span class="input-group-addon">configuration key</span>
+                              <input type="text" class="form-control" ng-value="overridenKey.Key" disabled />
+                            </div>
                           </div>
 
-                          <div class="col-sm-3 input-group input-group-sm" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
-                            <div class="col-sm-12 input-group input-group-sm">
+                          <div class="col-sm-3 form-group" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                            <div class="input-group input-group-sm">
                               <span class="input-group-addon">path on disk</span>
                               <input
                                 type="text"
@@ -411,44 +413,42 @@
                                 data-cy="k8sAppCreate-pathOnDiskInput"
                               />
                             </div>
-                          </div>
-
-                          <div class="input-group col-sm-4 btn-group btn-group-sm">
-                            <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT">
-                              <pr-icon icon="'list'" feather="true"></pr-icon> Environment
-                            </label>
-                            <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
-                              <pr-icon icon="'file-text'" feather="true"></pr-icon> Filesystem
-                            </label>
-                          </div>
-                        </div>
-
-                        <div
-                          ng-show="
-                            kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
-                            ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
-                          "
-                        >
-                          <div class="col-sm-1 input-group input-group-sm" style="margin-left: 3px"></div>
-                          <div class="col-sm-3 input-group input-group-sm"></div>
-                          <div class="col-sm-3 input-group input-group-sm" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
-                            <div
-                              class="small text-warning"
-                              style="margin-top: 5px"
+                            <span
                               ng-show="
                                 kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
                                 ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
                               "
                             >
-                              <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
-                                <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required.</p>
-                              </ng-messages>
-                              <p ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined"
-                                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This path is already used.</p
-                              >
+                              <div class="input-group input-group-sm text-muted" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                                <div
+                                  class="small"
+                                  style="margin-top: 5px"
+                                  ng-show="
+                                    kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
+                                    ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
+                                  "
+                                >
+                                  <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
+                                    <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required.</p>
+                                  </ng-messages>
+                                  <p ng-if="ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined"
+                                    ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This path is already used.</p
+                                  >
+                                </div>
+                              </div>
+                            </span>
+                          </div>
+
+                          <div class="col-sm-4 form-group">
+                            <div class="input-group btn-group btn-group-sm">
+                              <label class="btn btn-light" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT">
+                                <pr-icon icon="'list'" feather="true"></pr-icon> Environment
+                              </label>
+                              <label class="btn btn-light" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                                <pr-icon icon="'file-text'" feather="true"></pr-icon> Filesystem
+                              </label>
                             </div>
                           </div>
-                          <div class="col-sm-4 input-group input-group-sm"></div>
                         </div>
                       </div>
                     </div>

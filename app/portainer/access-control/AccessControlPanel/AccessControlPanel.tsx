@@ -6,7 +6,7 @@ import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, Role } from '@/portainer/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
 
-import { Table, TableContainer, TableTitle } from '@@/datatables';
+import { TableContainer, TableTitle } from '@@/datatables';
 import { Button } from '@@/buttons';
 
 import { ResourceControlType, ResourceId } from '../types';
@@ -48,33 +48,31 @@ export function AccessControlPanel({
       <div className="col-sm-12">
         <TableContainer>
           <TableTitle label="Access control" icon="eye" featherIcon />
-          <Table className="no-padding">
-            <AccessControlPanelDetails
-              resourceType={resourceType}
-              resourceControl={resourceControl}
-            />
+          <AccessControlPanelDetails
+            resourceType={resourceType}
+            resourceControl={resourceControl}
+          />
 
-            {!isEditDisabled && !isEditMode && (
-              <div className="row">
-                <div>
-                  <Button color="link" onClick={toggleEditMode}>
-                    <Icon icon="edit" className="space-right" feather />
-                    Change ownership
-                  </Button>
-                </div>
+          {!isEditDisabled && !isEditMode && (
+            <div className="row">
+              <div>
+                <Button color="link" onClick={toggleEditMode}>
+                  <Icon icon="edit" className="space-right" feather />
+                  Change ownership
+                </Button>
               </div>
-            )}
+            </div>
+          )}
 
-            {isEditMode && (
-              <AccessControlPanelForm
-                resourceControl={resourceControl}
-                onCancelClick={() => toggleEditMode()}
-                resourceId={resourceId}
-                resourceType={resourceType}
-                onUpdateSuccess={handleUpdateSuccess}
-              />
-            )}
-          </Table>
+          {isEditMode && (
+            <AccessControlPanelForm
+              resourceControl={resourceControl}
+              onCancelClick={() => toggleEditMode()}
+              resourceId={resourceId}
+              resourceType={resourceType}
+              onUpdateSuccess={handleUpdateSuccess}
+            />
+          )}
         </TableContainer>
       </div>
     </div>
