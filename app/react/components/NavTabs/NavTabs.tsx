@@ -19,7 +19,7 @@ export function NavTabs({ options, selectedId, onSelect = () => {} }: Props) {
   const selected = options.find((option) => option.id === selectedId);
 
   return (
-    <>
+    <div className="nav-container">
       <ul className="nav nav-tabs">
         {options.map((option) => (
           <li
@@ -49,7 +49,7 @@ export function NavTabs({ options, selectedId, onSelect = () => {} }: Props) {
       {selected && selected.children && (
         <div className="tab-content">{selected.children}</div>
       )}
-    </>
+    </div>
   );
 
   function handleSelect(option: Option) {

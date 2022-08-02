@@ -25,6 +25,7 @@ import heartbeat from '@/assets/ico/heartbeat.svg?c';
 import laptop from '@/assets/ico/laptop.svg?c';
 import laptopcode from '@/assets/ico/laptop-code.svg?c';
 import ldap from '@/assets/ico/ldap.svg?c';
+import magic from '@/assets/ico/magic.svg?c';
 import magicwand from '@/assets/ico/magic-wand.svg?c';
 import memory from '@/assets/ico/memory.svg?c';
 import objectgroup from '@/assets/ico/object-group.svg?c';
@@ -95,6 +96,7 @@ export const SvgIcons = {
   laptop,
   laptopcode,
   ldap,
+  magic,
   magicwand,
   memory,
   objectgroup,

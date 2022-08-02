@@ -10,6 +10,7 @@
   margin-bottom: 5px;
   font-weight: bold;
   user-select: none;
+  color: var(--text-boxselector-header);
 }
 
 .boxselector_header .fa,
@@ -146,7 +147,7 @@
 
 .boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
 .box-selector-item input[type='radio']:not(:disabled) ~ label {
-  background-color: var(--ui-gray-2);
+  background-color: var(--bg-boxselector-color);
 }
 
 .boxselector_img_container {

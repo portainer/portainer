@@ -7,6 +7,7 @@ import { Environment } from '@/portainer/environments/types';
 import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
+import { Icon } from '@@/Icon';
 
 import { NameField } from '../NameField';
 import { MoreSettingsSection } from '../MoreSettingsSection';
@@ -53,12 +54,16 @@ export function AgentForm({ onCreate, showGpus = false }: Props) {
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
-                className="wizard-connect-button"
+                className="wizard-connect-button vertical-center"
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
               >
-                <i className="fa fa-plug" aria-hidden="true" /> Connect
+                <Icon
+                  icon="svg-plug"
+                  className="icon icon-sm vertical-center"
+                />{' '}
+                Connect
               </LoadingButton>
             </div>
           </div>
