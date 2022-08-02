@@ -8,19 +8,27 @@
         <form class="form-horizontal">
           <div class="form-group">
             <div class="row">
-              <div class="pull-left" ng-repeat="tag in image.RepoTags" style="display: table">
-                <div class="input-group col-md-1" style="padding: 0 15px">
-                  <span class="input-group-addon">{{ tag }}</span>
-                  <span class="input-group-btn" authorization="DockerImagePush, DockerImageCreate, DockerImageDelete">
-                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushTag(tag)" authorization="DockerImagePush">
-                      <span class="fa fa-upload white-icon" aria-hidden="true"></span>
-                    </a>
-                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullTag(tag)" authorization="DockerImageCreate">
-                      <span class="fa fa-download white-icon" aria-hidden="true"></span>
-                    </a>
-                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)" authorization="DockerImageDelete">
-                      <span class="fa fa-trash-alt white-icon" aria-hidden="true"></span>
-                    </a>
+              <div class="pull-left table" ng-repeat="tag in image.RepoTags">
+                <div class="input-group col-md-1 py-0 px-4">
+                  <span class="input-group-addon rounded" style="border-right: 1px solid var(--border-input-group-addon-color)">{{ tag }}</span>
+                  <span class="input-group-btn py-0 px-1">
+                    <span class="my-0 mx-1" authorization="DockerImagePush">
+                      <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushTag(tag)">
+                        <pr-icon icon="'upload'" feather="true"></pr-icon>
+                      </a>
+                    </span>
+
+                    <span class="my-0 mx-1" authorization="DockerImageCreate">
+                      <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullTag(tag)">
+                        <pr-icon icon="'download'" feather="true"></pr-icon>
+                      </a>
+                    </span>
+
+                    <span class="my-0 mx-1" authorization="DockerImageDelete">
+                      <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)">
+                        <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+                      </a>
+                    </span>
                   </span>
                 </div>
               </div>
@@ -28,10 +36,9 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <span class="small text-muted">
-                Note: you can click on the upload icon <span class="fa fa-upload" aria-hidden="true"></span> to push an image or on the download icon
-                <span class="fa fa-download" aria-hidden="true"></span> to pull an image or on the trash icon <span class="fa fa-trash-alt" aria-hidden="true"></span> to delete a
-                tag.
+              <span class="small text-muted" authorization="DockerImageDelete">
+                Note: you can click on the upload icon <pr-icon icon="'upload'" feather="true"></pr-icon> to push an image or on the download icon
+                <pr-icon icon="'download'" feather="true"></pr-icon> to pull an image or on the trash icon <pr-icon icon="'trash-2'" feather="true"></pr-icon> to delete a tag.
               </span>
             </div>
             <div class="col-sm-12">
