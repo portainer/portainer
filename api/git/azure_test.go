@@ -368,17 +368,13 @@ func (t *testDownloader) latestCommitID(_ context.Context, _ option) (string, er
 	return "", nil
 }
 
-func (t *testDownloader) listRemote(_ context.Context, _ option) ([]string, error) {
+func (t *testDownloader) listRefs(_ context.Context, _ option) ([]string, error) {
 	return nil, nil
 }
 
-func (t *testDownloader) listTree(_ context.Context, _ option) ([]string, error) {
+func (t *testDownloader) listFiles(_ context.Context, _ option) ([]string, error) {
 	return nil, nil
 }
-
-func (t *testDownloader) removeCache(_ context.Context, _ option) {
-}
-
 func Test_cloneRepository_azure(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -417,7 +413,7 @@ func Test_cloneRepository_azure(t *testing.T) {
 	}
 }
 
-func Test_listRemote_azure(t *testing.T) {
+func Test_listRefs_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	client := NewAzureDownloader(false)
@@ -483,7 +479,7 @@ func Test_listRemote_azure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			refs, err := client.listRemote(context.TODO(), tt.args)
+			refs, err := client.listRefs(context.TODO(), tt.args)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				if tt.expect.refsCount > 0 {
@@ -498,7 +494,7 @@ func Test_listRemote_azure(t *testing.T) {
 
 }
 
-func Test_listTree_azure(t *testing.T) {
+func Test_listFiles_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	client := NewAzureDownloader(false)
@@ -613,7 +609,7 @@ func Test_listTree_azure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			paths, err := client.listTree(context.TODO(), tt.args)
+			paths, err := client.listFiles(context.TODO(), tt.args)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				if tt.expect.matchedCount > 0 {
@@ -626,38 +622,7 @@ func Test_listTree_azure(t *testing.T) {
 		})
 	}
 }
-func Test_removeCache_azure(t *testing.T) {
-	ensureIntegrationTest(t)
-
-	opt := option{
-		repositoryUrl: privateAzureRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
-		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
-		extensions:    []string{},
-	}
-
-	client := NewAzureDownloader(true)
-
-	_, err := client.listRemote(context.TODO(), opt)
-	assert.NoError(t, err)
-	_, ok := client.repoRefCache.Load(opt.repositoryUrl)
-	assert.Equal(t, true, ok)
-
-	_, err = client.listTree(context.TODO(), opt)
-	assert.NoError(t, err)
-	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	_, ok = client.repoTreeCache.Load(repoKey)
-	assert.Equal(t, true, ok)
-
-	client.removeCache(context.TODO(), opt)
-	_, ok = client.repoRefCache.Load(opt.repositoryUrl)
-	assert.Equal(t, false, ok)
-	_, ok = client.repoTreeCache.Load(repoKey)
-	assert.Equal(t, false, ok)
-}
-
-func Test_listRef_removeCache_Concurrently_azure(t *testing.T) {
+func Test_listRefs_removeCache_Concurrently_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	opt := option{
@@ -669,8 +634,8 @@ func Test_listRef_removeCache_Concurrently_azure(t *testing.T) {
 
 	client := NewAzureDownloader(true)
 
-	go client.listRemote(context.TODO(), opt)
-	client.listRemote(context.TODO(), opt)
+	go client.listRefs(context.TODO(), opt)
+	client.listRefs(context.TODO(), opt)
 
 	go client.removeCache(context.TODO(), opt)
 	client.removeCache(context.TODO(), opt)
@@ -678,7 +643,7 @@ func Test_listRef_removeCache_Concurrently_azure(t *testing.T) {
 	time.Sleep(2 * time.Second)
 }
 
-func Test_listTree_removeCache_Concurrently_azure(t *testing.T) {
+func Test_listFiles_removeCache_Concurrently_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	opt := option{
@@ -691,8 +656,8 @@ func Test_listTree_removeCache_Concurrently_azure(t *testing.T) {
 
 	client := NewAzureDownloader(true)
 
-	go client.listTree(context.TODO(), opt)
-	client.listTree(context.TODO(), opt)
+	go client.listFiles(context.TODO(), opt)
+	client.listFiles(context.TODO(), opt)
 
 	go client.removeCache(context.TODO(), opt)
 	client.removeCache(context.TODO(), opt)

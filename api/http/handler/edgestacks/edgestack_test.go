@@ -35,15 +35,12 @@ func (g *gitService) LatestCommitID(repositoryURL, referenceName, username, pass
 	return g.id, nil
 }
 
-func (g *gitService) ListRemote(repositoryURL, username, password string) ([]string, error) {
+func (g *gitService) ListRefs(repositoryURL, username, password string) ([]string, error) {
 	return nil, nil
 }
 
-func (g *gitService) ListTree(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
+func (g *gitService) ListFiles(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
 	return nil, nil
-}
-
-func (g *gitService) RemoveCache(repositoryURL, referenceName string) {
 }
 
 // Helpers

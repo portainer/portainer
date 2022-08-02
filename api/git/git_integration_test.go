@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -18,7 +19,7 @@ func TestService_ClonePrivateRepository_GitHub(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
 	username := getRequiredValue(t, "GITHUB_USERNAME")
-	service := NewService()
+	service := NewService(context.TODO())
 
 	dst, err := ioutils.TempDir("", "clone")
 	assert.NoError(t, err)
@@ -35,7 +36,7 @@ func TestService_LatestCommitID_GitHub(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
 	username := getRequiredValue(t, "GITHUB_USERNAME")
-	service := NewService()
+	service := NewService(context.TODO())
 
 	repositoryUrl := privateGitRepoURL
 	id, err := service.LatestCommitID(repositoryUrl, "refs/heads/main", username, accessToken)
@@ -43,28 +44,28 @@ func TestService_LatestCommitID_GitHub(t *testing.T) {
 	assert.NotEmpty(t, id, "cannot guarantee commit id, but it should be not empty")
 }
 
-func TestService_ListRemote_GitHub(t *testing.T) {
+func TestService_ListRefs_GitHub(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
 	username := getRequiredValue(t, "GITHUB_USERNAME")
-	service := NewService()
+	service := NewService(context.TODO())
 
 	repositoryUrl := privateGitRepoURL
-	refs, err := service.ListRemote(repositoryUrl, username, accessToken)
+	refs, err := service.ListRefs(repositoryUrl, username, accessToken)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(refs), 1)
 }
 
-func TestService_ListTree_GitHub(t *testing.T) {
+func TestService_ListFiles_GitHub(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
 	username := getRequiredValue(t, "GITHUB_USERNAME")
-	service := NewService()
+	service := NewService(context.TODO())
 
 	repositoryUrl := privateGitRepoURL
-	paths, err := service.ListTree(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
+	paths, err := service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(paths), 1)
 }

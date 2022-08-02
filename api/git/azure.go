@@ -50,7 +50,7 @@ type azureItem struct {
 	Path     string `json:"path"`
 }
 
-type azureDownloader struct {
+type azureClient struct {
 	client       *http.Client
 	baseUrl      string
 	cacheEnabled bool
@@ -60,7 +60,7 @@ type azureDownloader struct {
 	repoTreeCache sync.Map
 }
 
-func NewAzureDownloader(enableCache bool) *azureDownloader {
+func NewAzureClient(cacheSize int) *azureClient {
 	httpsCli := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -71,14 +71,14 @@ func NewAzureDownloader(enableCache bool) *azureDownloader {
 
 	client.InstallProtocol("https", githttp.NewClient(httpsCli))
 
-	return &azureDownloader{
+	return &azureClient{
 		client:       httpsCli,
 		baseUrl:      "https://dev.azure.com",
-		cacheEnabled: enableCache,
+		cacheEnabled: cacheSize > 0,
 	}
 }
 
-func (a *azureDownloader) download(ctx context.Context, destination string, opt option) error {
+func (a *azureClient) download(ctx context.Context, destination string, opt option) error {
 	zipFilepath, err := a.downloadZipFromAzureDevOps(ctx, opt)
 	if err != nil {
 		return errors.Wrap(err, "failed to download a zip file from Azure DevOps")
@@ -93,7 +93,7 @@ func (a *azureDownloader) download(ctx context.Context, destination string, opt 
 	return nil
 }
 
-func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, opt option) (string, error) {
+func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt option) (string, error) {
 	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to parse url")
@@ -136,7 +136,7 @@ func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, opt op
 	return zipFile.Name(), nil
 }
 
-func (a *azureDownloader) latestCommitID(ctx context.Context, opt option) (string, error) {
+func (a *azureClient) latestCommitID(ctx context.Context, opt option) (string, error) {
 	rootItem, err := a.getRootItem(ctx, opt)
 	if err != nil {
 		return "", err
@@ -144,7 +144,7 @@ func (a *azureDownloader) latestCommitID(ctx context.Context, opt option) (strin
 	return rootItem.CommitId, nil
 }
 
-func (a *azureDownloader) getRootItem(ctx context.Context, opt option) (*azureItem, error) {
+func (a *azureClient) getRootItem(ctx context.Context, opt option) (*azureItem, error) {
 	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to parse url")
@@ -258,7 +258,7 @@ func parseHttpUrl(rawUrl string) (*azureOptions, error) {
 	return &opt, nil
 }
 
-func (a *azureDownloader) buildDownloadUrl(config *azureOptions, referenceName string) (string, error) {
+func (a *azureClient) buildDownloadUrl(config *azureOptions, referenceName string) (string, error) {
 	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/items",
 		a.baseUrl,
 		url.PathEscape(config.organisation),
@@ -285,7 +285,7 @@ func (a *azureDownloader) buildDownloadUrl(config *azureOptions, referenceName s
 	return u.String(), nil
 }
 
-func (a *azureDownloader) buildRootItemUrl(config *azureOptions, referenceName string) (string, error) {
+func (a *azureClient) buildRootItemUrl(config *azureOptions, referenceName string) (string, error) {
 	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/items",
 		a.baseUrl,
 		url.PathEscape(config.organisation),
@@ -309,7 +309,7 @@ func (a *azureDownloader) buildRootItemUrl(config *azureOptions, referenceName s
 	return u.String(), nil
 }
 
-func (a *azureDownloader) buildRefsUrl(config *azureOptions) (string, error) {
+func (a *azureClient) buildRefsUrl(config *azureOptions) (string, error) {
 	// ref@https://docs.microsoft.com/en-us/rest/api/azure/devops/git/refs/list?view=azure-devops-rest-6.0#gitref
 	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/refs",
 		a.baseUrl,
@@ -329,7 +329,7 @@ func (a *azureDownloader) buildRefsUrl(config *azureOptions) (string, error) {
 	return u.String(), nil
 }
 
-func (a *azureDownloader) buildTreeUrl(config *azureOptions, rootObjectHash string) (string, error) {
+func (a *azureClient) buildTreeUrl(config *azureOptions, rootObjectHash string) (string, error) {
 	// ref@https://docs.microsoft.com/en-us/rest/api/azure/devops/git/trees/get?view=azure-devops-rest-6.0
 	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/trees/%s",
 		a.baseUrl,
@@ -377,7 +377,7 @@ func getVersionType(name string) string {
 	return "commit"
 }
 
-func (a *azureDownloader) listRemote(ctx context.Context, opt option) ([]string, error) {
+func (a *azureClient) listRefs(ctx context.Context, opt option) ([]string, error) {
 	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to parse url")
@@ -436,7 +436,7 @@ func (a *azureDownloader) listRemote(ctx context.Context, opt option) ([]string,
 	return ret, nil
 }
 
-func (a *azureDownloader) listTree(ctx context.Context, opt option) ([]string, error) {
+func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, error) {
 	var (
 		allPaths    []string
 		filteredRet []string
@@ -471,7 +471,7 @@ func (a *azureDownloader) listTree(ctx context.Context, opt option) ([]string, e
 			username:      opt.username,
 			password:      opt.password,
 		}
-		refs, err = a.listRemote(ctx, opt)
+		refs, err = a.listRefs(ctx, opt)
 		if err != nil {
 			return nil, err
 		}
@@ -549,8 +549,6 @@ func (a *azureDownloader) listTree(ctx context.Context, opt option) ([]string, e
 	return filteredRet, nil
 }
 
-func (a *azureDownloader) removeCache(ctx context.Context, opt option) {
-	a.repoRefCache.Delete(opt.repositoryUrl)
-	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	a.repoTreeCache.Delete(repoKey)
+func (a *azureClient) purgeCache() {
+
 }

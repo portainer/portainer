@@ -2,11 +2,13 @@ package git
 
 import (
 	"context"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 
 	"github.com/go-git/go-git/v5"
@@ -21,9 +23,25 @@ type gitClient struct {
 	preserveGitDirectory bool
 	cacheEnabled         bool
 	// Cache the result of repository refs, key is repository URL
-	repoRefCache sync.Map
+	// repoRefCache sync.Map
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
 	repoTreeCache sync.Map
+	repoRefCache  *lru.Cache
+}
+
+func NewGitClient(cacheSize int) *gitClient {
+	var err error
+	client := &gitClient{
+		cacheEnabled: cacheSize > 0,
+	}
+	if cacheSize > 0 {
+		client.repoRefCache, err = lru.New(cacheSize)
+		if err != nil {
+			log.Printf("[DEBUG] [git] [message: failed to create ref cache: %v\n", err)
+		}
+	}
+
+	return client
 }
 
 func (c *gitClient) download(ctx context.Context, dst string, opt option) error {
@@ -97,7 +115,7 @@ func getAuth(username, password string) *githttp.BasicAuth {
 	return nil
 }
 
-func (c *gitClient) listRemote(ctx context.Context, opt option) ([]string, error) {
+func (c *gitClient) listRefs(ctx context.Context, opt option) ([]string, error) {
 	rem := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 		Name: "origin",
 		URLs: []string{opt.repositoryUrl},
@@ -121,12 +139,14 @@ func (c *gitClient) listRemote(ctx context.Context, opt option) ([]string, error
 	}
 
 	if c.cacheEnabled {
-		c.repoRefCache.Store(opt.repositoryUrl, ret)
+		c.repoRefCache.Add(opt.repositoryUrl, ret)
+		// c.repoRefCache.Store(opt.repositoryUrl, ret)
+
 	}
 	return ret, nil
 }
 
-func (c *gitClient) listTree(ctx context.Context, opt option) ([]string, error) {
+func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error) {
 	var (
 		allPaths    []string
 		filteredRet []string
@@ -155,7 +175,8 @@ func (c *gitClient) listTree(ctx context.Context, opt option) ([]string, error) 
 
 	refs := make([]*plumbing.Reference, 0)
 
-	cache, ok = c.repoRefCache.Load(opt.repositoryUrl)
+	cache, ok = c.repoRefCache.Get(opt.repositoryUrl)
+	// cache, ok = c.repoRefCache.Load(opt.repositoryUrl)
 	if ok {
 		refs, sucess = cache.([]*plumbing.Reference)
 	}
@@ -226,10 +247,9 @@ func (c *gitClient) listTree(ctx context.Context, opt option) ([]string, error) 
 	return filteredRet, nil
 }
 
-func (c *gitClient) removeCache(ctx context.Context, opt option) {
-	c.repoRefCache.Delete(opt.repositoryUrl)
-	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	c.repoTreeCache.Delete(repoKey)
+func (c *gitClient) purgeCache() {
+	c.repoRefCache.Purge()
+
 }
 
 func generateCacheKey(names ...string) string {

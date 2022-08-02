@@ -3,12 +3,16 @@ package git
 import (
 	"context"
 	"errors"
+	"time"
 )
 
 var (
 	ErrIncorrectRepositoryURL = errors.New("Git repository could not be found, please ensure that the URL is correct.")
 	ErrAuthenticationFailure  = errors.New("Authentication failed, please ensure that the git credentials are correct.")
 	ErrRefNotFound            = errors.New("The target ref is not found")
+
+	REPOSITORY_CACHE_SIZE = 4
+	REPOSITORY_CACHE_TTL  = 30 * time.Minute
 )
 
 type option struct {
@@ -20,27 +24,48 @@ type option struct {
 	extensions    []string
 }
 
-type downloader interface {
+type repoManager interface {
 	download(ctx context.Context, dst string, opt option) error
 	latestCommitID(ctx context.Context, opt option) (string, error)
-	listRemote(ctx context.Context, opt option) ([]string, error)
-	listTree(ctx context.Context, opt option) ([]string, error)
-	removeCache(ctx context.Context, opt option)
+	listRefs(ctx context.Context, opt option) ([]string, error)
+	listFiles(ctx context.Context, opt option) ([]string, error)
+	purgeCache()
 }
 
 // Service represents a service for managing Git.
 type Service struct {
-	azure downloader
-	git   downloader
+	shutdownCtx context.Context
+	azure       repoManager
+	git         repoManager
 }
 
 // NewService initializes a new service.
-func NewService() *Service {
-	return &Service{
-		azure: NewAzureDownloader(true),
-		git: &gitClient{
-			cacheEnabled: true,
-		},
+func NewService(ctx context.Context) *Service {
+	service := &Service{
+		shutdownCtx: ctx,
+		azure:       NewAzureClient(REPOSITORY_CACHE_SIZE),
+		git:         NewGitClient(REPOSITORY_CACHE_SIZE),
+	}
+	go service.startCleanCacheTimer(REPOSITORY_CACHE_TTL)
+	return service
+}
+
+func (service *Service) startCleanCacheTimer(d time.Duration) {
+	ticker := time.NewTicker(d)
+	for {
+		select {
+		case <-ticker.C:
+			if service.git != nil {
+				service.git.purgeCache()
+			}
+
+			if service.azure != nil {
+				service.azure.purgeCache()
+			}
+		case <-service.shutdownCtx.Done():
+			ticker.Stop()
+			return
+		}
 	}
 }
 
@@ -82,7 +107,7 @@ func (service *Service) LatestCommitID(repositoryURL, referenceName, username, p
 	return service.git.latestCommitID(context.TODO(), options)
 }
 
-func (service *Service) ListRemote(repositoryURL, username, password string) ([]string, error) {
+func (service *Service) ListRefs(repositoryURL, username, password string) ([]string, error) {
 	options := option{
 		repositoryUrl: repositoryURL,
 		username:      username,
@@ -90,13 +115,13 @@ func (service *Service) ListRemote(repositoryURL, username, password string) ([]
 	}
 
 	if isAzureUrl(options.repositoryUrl) {
-		return service.azure.listRemote(context.TODO(), options)
+		return service.azure.listRefs(context.TODO(), options)
 	}
 
-	return service.git.listRemote(context.TODO(), options)
+	return service.git.listRefs(context.TODO(), options)
 }
 
-func (service *Service) ListTree(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
+func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
 	options := option{
 		repositoryUrl: repositoryURL,
 		username:      username,
@@ -106,21 +131,8 @@ func (service *Service) ListTree(repositoryURL, referenceName, username, passwor
 	}
 
 	if isAzureUrl(options.repositoryUrl) {
-		return service.azure.listTree(context.TODO(), options)
+		return service.azure.listFiles(context.TODO(), options)
 	}
 
-	return service.git.listTree(context.TODO(), options)
-}
-
-func (service *Service) RemoveCache(repositoryURL, referenceName string) {
-	options := option{
-		repositoryUrl: repositoryURL,
-		referenceName: referenceName,
-	}
-
-	if isAzureUrl(options.repositoryUrl) {
-		service.azure.removeCache(context.TODO(), options)
-	} else {
-		service.git.removeCache(context.TODO(), options)
-	}
+	return service.git.listFiles(context.TODO(), options)
 }

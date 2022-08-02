@@ -17,14 +17,13 @@ func (s *noopGitService) CloneRepository(destination string, repositoryURL, refe
 func (s *noopGitService) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
 	return "my-latest-commit-id", nil
 }
-func (g *noopGitService) ListRemote(repositoryURL, username, password string) ([]string, error) {
+func (g *noopGitService) ListRefs(repositoryURL, username, password string) ([]string, error) {
 	return nil, nil
 }
-func (g *noopGitService) ListTree(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
+func (g *noopGitService) ListFiles(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
 	return nil, nil
 }
-func (g *noopGitService) RemoveCache(repositoryURL, referenceName string) {
-}
+
 func TestTransport_updateDefaultGitBranch(t *testing.T) {
 	type fields struct {
 		gitService portainer.GitService

@@ -1311,9 +1311,11 @@ type (
 	GitService interface {
 		CloneRepository(destination string, repositoryURL, referenceName, username, password string) error
 		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
-		ListRemote(repositoryURL, username, password string) ([]string, error)
-		ListTree(repositoryURL, referenceName, username, password string, includeExts []string) ([]string, error)
-		RemoveCache(repositoryURL, referenceName string)
+		// ListRefs will list target repository's refs without cloning the repository
+		ListRefs(repositoryURL, username, password string) ([]string, error)
+		// ListFiles will list all the files of the target repository with specific extensions.
+		// If extension is not provided, it will list all the files under the target repository
+		ListFiles(repositoryURL, referenceName, username, password string, includeExts []string) ([]string, error)
 	}
 
 	// OpenAMTService represents a service for managing OpenAMT

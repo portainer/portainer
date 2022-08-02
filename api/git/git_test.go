@@ -141,7 +141,7 @@ func getCommitHistoryLength(t *testing.T, err error, dir string) int {
 	return count
 }
 
-func Test_listRemotePrivateRepository(t *testing.T) {
+func Test_listRefsPrivateRepository(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
@@ -210,7 +210,7 @@ func Test_listRemotePrivateRepository(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			refs, err := client.listRemote(context.TODO(), tt.args)
+			refs, err := client.listRefs(context.TODO(), tt.args)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				if tt.expect.refsCount > 0 {
@@ -224,7 +224,7 @@ func Test_listRemotePrivateRepository(t *testing.T) {
 	}
 }
 
-func Test_listTreePrivateRepository(t *testing.T) {
+func Test_listFilesPrivateRepository(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	client := &gitClient{
@@ -343,7 +343,7 @@ func Test_listTreePrivateRepository(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			paths, err := client.listTree(context.TODO(), tt.args)
+			paths, err := client.listFiles(context.TODO(), tt.args)
 			if tt.expect.err == nil {
 				assert.NoError(t, err)
 				if tt.expect.matchedCount > 0 {
@@ -357,41 +357,7 @@ func Test_listTreePrivateRepository(t *testing.T) {
 	}
 }
 
-func Test_removeCache(t *testing.T) {
-	ensureIntegrationTest(t)
-
-	opt := option{
-		repositoryUrl: privateGitRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "GITHUB_PAT"),
-		username:      getRequiredValue(t, "GITHUB_USERNAME"),
-		extensions:    []string{},
-	}
-
-	client := &gitClient{
-		preserveGitDirectory: true,
-		cacheEnabled:         true,
-	}
-
-	_, err := client.listRemote(context.TODO(), opt)
-	assert.NoError(t, err)
-	_, ok := client.repoRefCache.Load(opt.repositoryUrl)
-	assert.Equal(t, true, ok)
-
-	_, err = client.listTree(context.TODO(), opt)
-	assert.NoError(t, err)
-	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	_, ok = client.repoTreeCache.Load(repoKey)
-	assert.Equal(t, true, ok)
-
-	client.removeCache(context.TODO(), opt)
-	_, ok = client.repoRefCache.Load(opt.repositoryUrl)
-	assert.Equal(t, false, ok)
-	_, ok = client.repoTreeCache.Load(repoKey)
-	assert.Equal(t, false, ok)
-}
-
-func Test_listRef_removeCache_Concurrently(t *testing.T) {
+func Test_listRefs_Concurrently(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	opt := option{
@@ -401,21 +367,22 @@ func Test_listRef_removeCache_Concurrently(t *testing.T) {
 		username:      getRequiredValue(t, "GITHUB_USERNAME"),
 	}
 
-	client := &gitClient{
-		preserveGitDirectory: true,
-		cacheEnabled:         true,
+	opt1 := option{
+		repositoryUrl: "https://github.com/portainer/liblicense.git",
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "GITHUB_PAT"),
+		username:      getRequiredValue(t, "GITHUB_USERNAME"),
 	}
 
-	go client.listRemote(context.TODO(), opt)
-	client.listRemote(context.TODO(), opt)
+	client := NewGitClient(1)
 
-	go client.removeCache(context.TODO(), opt)
-	client.removeCache(context.TODO(), opt)
+	go client.listRefs(context.TODO(), opt1)
+	client.listRefs(context.TODO(), opt)
 
 	time.Sleep(2 * time.Second)
 }
 
-func Test_listTree_removeCache_Concurrently(t *testing.T) {
+func Test_listFiles_removeCache_Concurrently(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	opt := option{
@@ -431,11 +398,8 @@ func Test_listTree_removeCache_Concurrently(t *testing.T) {
 		cacheEnabled:         true,
 	}
 
-	go client.listTree(context.TODO(), opt)
-	client.listTree(context.TODO(), opt)
-
-	go client.removeCache(context.TODO(), opt)
-	client.removeCache(context.TODO(), opt)
+	go client.listFiles(context.TODO(), opt)
+	client.listFiles(context.TODO(), opt)
 
 	time.Sleep(2 * time.Second)
 }

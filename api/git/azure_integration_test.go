@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -19,7 +20,7 @@ func TestService_ClonePublicRepository_Azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	pat := getRequiredValue(t, "AZURE_DEVOPS_PAT")
-	service := NewService()
+	service := NewService(context.TODO())
 
 	type args struct {
 		repositoryURLFormat string
@@ -70,7 +71,7 @@ func TestService_ClonePrivateRepository_Azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	pat := getRequiredValue(t, "AZURE_DEVOPS_PAT")
-	service := NewService()
+	service := NewService(context.TODO())
 
 	dst, err := ioutils.TempDir("", "clone")
 	assert.NoError(t, err)
@@ -85,7 +86,7 @@ func TestService_LatestCommitID_Azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	pat := getRequiredValue(t, "AZURE_DEVOPS_PAT")
-	service := NewService()
+	service := NewService(context.TODO())
 
 	id, err := service.LatestCommitID(privateAzureRepoURL, "refs/heads/main", "", pat)
 	assert.NoError(t, err)
@@ -97,9 +98,9 @@ func TestService_ListRemote_Azure(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
-	service := NewService()
+	service := NewService(context.TODO())
 
-	refs, err := service.ListRemote(privateAzureRepoURL, username, accessToken)
+	refs, err := service.ListRefs(privateAzureRepoURL, username, accessToken)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(refs), 1)
 }
@@ -109,9 +110,9 @@ func TestService_ListTree_Azure(t *testing.T) {
 
 	accessToken := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
-	service := NewService()
+	service := NewService(context.TODO())
 
-	paths, err := service.ListTree(privateAzureRepoURL, "refs/heads/main", username, accessToken, []string{})
+	paths, err := service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, []string{})
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(paths), 1)
 }
