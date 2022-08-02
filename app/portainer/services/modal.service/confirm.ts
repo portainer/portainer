@@ -155,7 +155,7 @@ export function confirmDetachment(message: string, callback: ConfirmCallback) {
     buttons: {
       confirm: {
         label: 'Detach',
-        className: 'btn-danger',
+        className: 'btn-primary',
       },
     },
     callback,

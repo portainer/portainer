@@ -13,7 +13,7 @@
     </div>
   </div>
   <div class="form-group" ng-if="$ctrl.model.UseRegistry">
-    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left col-sm-3 col-lg-2">Image</label>
+    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left col-sm-3 col-lg-2 required">Image</label>
     <div ng-class="$ctrl.inputClass" class="col-sm-8">
       <div class="input-group">
         <span class="input-group-addon" id="registry-name">{{ $ctrl.displayedRegistryURL() }}</span>
@@ -47,12 +47,12 @@
   <div ng-if="!$ctrl.model.UseRegistry">
     <div class="form-group">
       <span class="small">
-        <p class="text-muted mb-5" style="margin-left: 15px">
+        <p class="text-muted ml-4">
           <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
           When using advanced mode, image and repository <b>must be</b> publicly available.
         </p>
       </span>
-      <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left col-sm-3 col-lg-2">Image </label>
+      <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left col-sm-3 col-lg-2 required">Image </label>
       <div ng-class="$ctrl.inputClass" class="col-sm-8">
         <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/my-image:my-tag" required />
       </div>
@@ -75,10 +75,10 @@
     <div class="col-sm-12">
       <p>
         <a class="small interactive" ng-if="!$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = true;">
-          <i class="fa fa-database space-right" aria-hidden="true"></i> Simple mode
+          <pr-icon icon="'database'" feather="true"> </pr-icon> Simple mode
         </a>
         <a class="small interactive" ng-if="$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = false;">
-          <i class="fa fa-globe space-right" aria-hidden="true"></i> Advanced mode
+          <pr-icon icon="'globe'" feather="true"> </pr-icon> Advanced mode
         </a>
       </p>
     </div>
