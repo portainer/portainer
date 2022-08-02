@@ -45,7 +45,8 @@ pr-icon {
   stroke: var(--white-color);
 }
 
-.icon-primary {
+.icon-primary,
+.icon-blue {
   color: var(--ui-blue-8);
 }
 
@@ -63,7 +64,8 @@ pr-icon {
   stroke: var(--black-color);
 }
 
-.icon-warning {
+.icon-warning,
+.icon-orange {
   color: var(--ui-warning-8);
 }
 
@@ -73,11 +75,11 @@ pr-icon {
 }
 
 .icon-danger {
-  color: var(--ui-error-8);
+  color: var(--ui-error-9);
 }
 
 .icon.icon-danger-alt {
-  fill: var(--ui-error-8);
+  fill: var(--ui-error-9);
   stroke: var(--white-color);
 }
 

@@ -45,20 +45,19 @@
 }
 
 .btn-dangerlight {
-  background-color: var(--ui-error-2) !important;
-  border: 1px solid var(--border-button-group);
-  color: var(--ui-error-8);
+  border: 1px solid var(--text-button-dangerlight-color);
+  color: var(--ui-error-9);
 }
 
 .btn-dangerlight:hover {
   color: var(--ui-error-9) !important;
-  background-color: var(--ui-error-3) !important;
+  background-color: var(--ui-error-2) !important;
 }
 
 .btn-light {
-  background-color: var(--bg-button-group);
+  background-color: var(--bg-button-group-color);
   border: 1px solid var(--border-button-group);
-  color: var(--text-button-group);
+  color: var(--text-button-group-color);
 }
 
 .btn-light:hover {
@@ -73,9 +72,9 @@
 
 /* Button Secondary */
 .btn-secondary {
-  background-color: var(--ui-blue-2);
-  border: 1px solid var(--ui-blue-8);
-  color: var(--ui-blue-9);
+  background-color: var(--ui-blue-2) !important;
+  border: 1px solid var(--ui-blue-8) !important;
+  color: var(--ui-blue-9) !important;
 }
 
 .btn-secondary:hover,
@@ -89,4 +88,22 @@
   background-color: var(--ui-blue-1);
   border: 1px solid var(--ui-blue-1);
   color: var(--ui-blue-5);
+}
+
+form a,
+.form-group a,
+.hyperlink {
+  color: var(--ui-blue-8);
+}
+
+form a:hover,
+.form-group a:hover,
+.hyperlink:hover {
+  text-decoration: underline;
+  color: var(--ui-blue-9);
+}
+
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+  background: var(--bg-button-group-color) !important;
+  color: var(--text-button-group-color);
 }

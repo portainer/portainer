@@ -345,6 +345,8 @@ input:checked + .slider:before {
 /* Status Indicator Inside Table Section Label Style */
 .table .label {
   border-radius: 8px !important;
+  display: inline-flex;
+  align-items: center;
 }
 
 .table .label .label-danger {
@@ -386,4 +388,24 @@ input:checked + .slider:before {
   display: inline-block;
   font-size: 85%;
   margin-left: 10px;
+}
+
+/* Pagination */
+.datatable .footer .paginationControls .pagination {
+  border: 1px solid var(--border-pagination-color);
+}
+
+.pagination li button {
+  color: var(--ui-gray-9) !important;
+}
+
+.pagination li:active button,
+.pagination li:focus button {
+  border: 1px solid var(--ui-gray-5) !important;
+}
+
+.pagination li a {
+  text-decoration: none !important;
+  cursor: pointer;
+  color: var(--ui-gray-9) !important;
 }
