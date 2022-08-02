@@ -12,7 +12,7 @@ import (
 )
 
 func Test_buildDownloadUrl(t *testing.T) {
-	a := NewAzureDownloader(false)
+	a := NewAzureClient(0)
 	u, err := a.buildDownloadUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -30,7 +30,7 @@ func Test_buildDownloadUrl(t *testing.T) {
 }
 
 func Test_buildRootItemUrl(t *testing.T) {
-	a := NewAzureDownloader(false)
+	a := NewAzureClient(0)
 	u, err := a.buildRootItemUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -47,7 +47,7 @@ func Test_buildRootItemUrl(t *testing.T) {
 }
 
 func Test_buildRefsUrl(t *testing.T) {
-	a := NewAzureDownloader(false)
+	a := NewAzureClient(0)
 	u, err := a.buildRefsUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -64,7 +64,7 @@ func Test_buildRefsUrl(t *testing.T) {
 }
 
 func Test_buildTreeUrl(t *testing.T) {
-	a := NewAzureDownloader(false)
+	a := NewAzureClient(0)
 	u, err := a.buildTreeUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -291,7 +291,7 @@ func Test_azureDownloader_downloadZipFromAzureDevOps(t *testing.T) {
 			}))
 			defer server.Close()
 
-			a := &azureDownloader{
+			a := &azureClient{
 				client:  server.Client(),
 				baseUrl: server.URL,
 			}
@@ -322,7 +322,7 @@ func Test_azureDownloader_latestCommitID(t *testing.T) {
 	}))
 	defer server.Close()
 
-	a := &azureDownloader{
+	a := &azureClient{
 		client:  server.Client(),
 		baseUrl: server.URL,
 	}
@@ -355,26 +355,27 @@ func Test_azureDownloader_latestCommitID(t *testing.T) {
 	}
 }
 
-type testDownloader struct {
+type testRepoManager struct {
 	called bool
 }
 
-func (t *testDownloader) download(_ context.Context, _ string, _ option) error {
+func (t *testRepoManager) download(_ context.Context, _ string, _ option) error {
 	t.called = true
 	return nil
 }
 
-func (t *testDownloader) latestCommitID(_ context.Context, _ option) (string, error) {
+func (t *testRepoManager) latestCommitID(_ context.Context, _ option) (string, error) {
 	return "", nil
 }
 
-func (t *testDownloader) listRefs(_ context.Context, _ option) ([]string, error) {
+func (t *testRepoManager) listRefs(_ context.Context, _ option) ([]string, error) {
 	return nil, nil
 }
 
-func (t *testDownloader) listFiles(_ context.Context, _ option) ([]string, error) {
+func (t *testRepoManager) listFiles(_ context.Context, _ option) ([]string, error) {
 	return nil, nil
 }
+func (t *testRepoManager) purgeCache() {}
 func Test_cloneRepository_azure(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -400,8 +401,8 @@ func Test_cloneRepository_azure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			azure := &testDownloader{}
-			git := &testDownloader{}
+			azure := &testRepoManager{}
+			git := &testRepoManager{}
 
 			s := &Service{azure: azure, git: git}
 			s.cloneRepository("", option{repositoryUrl: tt.url, depth: 1})
@@ -416,7 +417,7 @@ func Test_cloneRepository_azure(t *testing.T) {
 func Test_listRefs_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	client := NewAzureDownloader(false)
+	client := NewAzureClient(0)
 
 	type expectResult struct {
 		err       error
@@ -497,7 +498,7 @@ func Test_listRefs_azure(t *testing.T) {
 func Test_listFiles_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	client := NewAzureDownloader(false)
+	client := NewAzureClient(0)
 
 	type expectResult struct {
 		err          error
@@ -622,7 +623,7 @@ func Test_listFiles_azure(t *testing.T) {
 		})
 	}
 }
-func Test_listRefs_removeCache_Concurrently_azure(t *testing.T) {
+func Test_listRefs_Concurrently_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	opt := option{
@@ -632,18 +633,15 @@ func Test_listRefs_removeCache_Concurrently_azure(t *testing.T) {
 		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
 	}
 
-	client := NewAzureDownloader(true)
+	client := NewAzureClient(1)
 
 	go client.listRefs(context.TODO(), opt)
 	client.listRefs(context.TODO(), opt)
 
-	go client.removeCache(context.TODO(), opt)
-	client.removeCache(context.TODO(), opt)
-
 	time.Sleep(2 * time.Second)
 }
 
-func Test_listFiles_removeCache_Concurrently_azure(t *testing.T) {
+func Test_listFiles_Concurrently_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	opt := option{
@@ -654,13 +652,10 @@ func Test_listFiles_removeCache_Concurrently_azure(t *testing.T) {
 		extensions:    []string{},
 	}
 
-	client := NewAzureDownloader(true)
+	client := NewAzureClient(1)
 
 	go client.listFiles(context.TODO(), opt)
 	client.listFiles(context.TODO(), opt)
-
-	go client.removeCache(context.TODO(), opt)
-	client.removeCache(context.TODO(), opt)
 
 	time.Sleep(2 * time.Second)
 }

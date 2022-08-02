@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
@@ -23,10 +22,9 @@ type gitClient struct {
 	preserveGitDirectory bool
 	cacheEnabled         bool
 	// Cache the result of repository refs, key is repository URL
-	// repoRefCache sync.Map
+	repoRefCache *lru.Cache
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
-	repoTreeCache sync.Map
-	repoRefCache  *lru.Cache
+	repoFileCache *lru.Cache
 }
 
 func NewGitClient(cacheSize int) *gitClient {
@@ -34,10 +32,15 @@ func NewGitClient(cacheSize int) *gitClient {
 	client := &gitClient{
 		cacheEnabled: cacheSize > 0,
 	}
-	if cacheSize > 0 {
+	if client.cacheEnabled {
 		client.repoRefCache, err = lru.New(cacheSize)
 		if err != nil {
 			log.Printf("[DEBUG] [git] [message: failed to create ref cache: %v\n", err)
+		}
+
+		client.repoFileCache, err = lru.New(cacheSize)
+		if err != nil {
+			log.Printf("[DEBUG] [git] [message: failed to create file cache: %v\n", err)
 		}
 	}
 
@@ -138,9 +141,8 @@ func (c *gitClient) listRefs(ctx context.Context, opt option) ([]string, error) 
 		ret = append(ret, ref.Name().String())
 	}
 
-	if c.cacheEnabled {
+	if c.cacheEnabled && c.repoRefCache != nil {
 		c.repoRefCache.Add(opt.repositoryUrl, ret)
-		// c.repoRefCache.Store(opt.repositoryUrl, ret)
 
 	}
 	return ret, nil
@@ -152,20 +154,24 @@ func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error)
 		filteredRet []string
 		err         error
 		sucess      bool
+		ok          bool
+		cache       interface{}
 	)
 
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	cache, ok := c.repoTreeCache.Load(repoKey)
-	if ok {
-		treeCache, success := cache.([]string)
-		if success {
-			for _, path := range treeCache {
-				if matchExtensions(path, opt.extensions) {
-					filteredRet = append(filteredRet, path)
+	if c.repoFileCache != nil {
+		cache, ok = c.repoFileCache.Get(repoKey)
+		if ok {
+			treeCache, success := cache.([]string)
+			if success {
+				for _, path := range treeCache {
+					if matchExtensions(path, opt.extensions) {
+						filteredRet = append(filteredRet, path)
+					}
 				}
-			}
 
-			return filteredRet, nil
+				return filteredRet, nil
+			}
 		}
 	}
 
@@ -175,12 +181,12 @@ func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error)
 
 	refs := make([]*plumbing.Reference, 0)
 
-	cache, ok = c.repoRefCache.Get(opt.repositoryUrl)
-	// cache, ok = c.repoRefCache.Load(opt.repositoryUrl)
-	if ok {
-		refs, sucess = cache.([]*plumbing.Reference)
+	if c.repoRefCache != nil {
+		cache, ok = c.repoRefCache.Get(opt.repositoryUrl)
+		if ok {
+			refs, sucess = cache.([]*plumbing.Reference)
+		}
 	}
-
 	if !ok || !sucess {
 		rem := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 			Name: "origin",
@@ -234,8 +240,8 @@ func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error)
 				return nil
 			})
 
-			if c.cacheEnabled {
-				c.repoTreeCache.Store(repoKey, allPaths)
+			if c.cacheEnabled && c.repoFileCache != nil {
+				c.repoFileCache.Add(repoKey, allPaths)
 			}
 			break
 		}
@@ -248,8 +254,12 @@ func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error)
 }
 
 func (c *gitClient) purgeCache() {
-	c.repoRefCache.Purge()
-
+	if c.repoRefCache != nil {
+		c.repoRefCache.Purge()
+	}
+	if c.repoFileCache != nil {
+		c.repoFileCache.Purge()
+	}
 }
 
 func generateCacheKey(names ...string) string {

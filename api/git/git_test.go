@@ -227,10 +227,7 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 func Test_listFilesPrivateRepository(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	client := &gitClient{
-		preserveGitDirectory: true,
-		cacheEnabled:         false,
-	}
+	client := NewGitClient(0)
 
 	type expectResult struct {
 		err          error
@@ -382,7 +379,7 @@ func Test_listRefs_Concurrently(t *testing.T) {
 	time.Sleep(2 * time.Second)
 }
 
-func Test_listFiles_removeCache_Concurrently(t *testing.T) {
+func Test_listFiles_Concurrently(t *testing.T) {
 	ensureIntegrationTest(t)
 
 	opt := option{

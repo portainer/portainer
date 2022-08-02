@@ -7,15 +7,16 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/go-git/go-git/v5/plumbing/transport/client"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 )
@@ -55,9 +56,11 @@ type azureClient struct {
 	baseUrl      string
 	cacheEnabled bool
 	// Cache the result of repository refs, key is repository URL
-	repoRefCache sync.Map
+	// repoRefCache sync.Map
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
-	repoTreeCache sync.Map
+	// repoTreeCache sync.Map
+	repoRefCache  *lru.Cache
+	repoFileCache *lru.Cache
 }
 
 func NewAzureClient(cacheSize int) *azureClient {
@@ -71,11 +74,26 @@ func NewAzureClient(cacheSize int) *azureClient {
 
 	client.InstallProtocol("https", githttp.NewClient(httpsCli))
 
-	return &azureClient{
+	c := &azureClient{
 		client:       httpsCli,
 		baseUrl:      "https://dev.azure.com",
 		cacheEnabled: cacheSize > 0,
 	}
+
+	var err error
+	if c.cacheEnabled {
+		c.repoRefCache, err = lru.New(cacheSize)
+		if err != nil {
+			log.Printf("[DEBUG] [git] [message: failed to create ref cache: %v\n", err)
+		}
+
+		c.repoFileCache, err = lru.New(cacheSize)
+		if err != nil {
+			log.Printf("[DEBUG] [git] [message: failed to create file cache: %v\n", err)
+		}
+
+	}
+	return c
 }
 
 func (a *azureClient) download(ctx context.Context, destination string, opt option) error {
@@ -431,7 +449,8 @@ func (a *azureClient) listRefs(ctx context.Context, opt option) ([]string, error
 	}
 
 	if a.cacheEnabled {
-		a.repoRefCache.Store(opt.repositoryUrl, ret)
+		// a.repoRefCache.Store(opt.repositoryUrl, ret)
+		a.repoRefCache.Add(opt.repositoryUrl, ret)
 	}
 	return ret, nil
 }
@@ -446,7 +465,8 @@ func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, erro
 	)
 
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	cache, ok := a.repoTreeCache.Load(repoKey)
+	// cache, ok := a.repoTreeCache.Load(repoKey)
+	cache, ok := a.repoFileCache.Get(repoKey)
 	if ok {
 		treeCache, success := cache.([]string)
 		if success {
@@ -460,7 +480,8 @@ func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, erro
 	}
 
 	// Check if the reference exists
-	cache, ok = a.repoRefCache.Load(opt.repositoryUrl)
+	// cache, ok = a.repoRefCache.Load(opt.repositoryUrl)
+	cache, ok = a.repoRefCache.Get(opt.repositoryUrl)
 	if ok {
 		refs, success = cache.([]string)
 	}
@@ -543,12 +564,18 @@ func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, erro
 	}
 
 	if a.cacheEnabled {
-		a.repoTreeCache.Store(repoKey, allPaths)
+		// a.repoTreeCache.Store(repoKey, allPaths)
+		a.repoFileCache.Add(repoKey, allPaths)
 	}
 
 	return filteredRet, nil
 }
 
 func (a *azureClient) purgeCache() {
-
+	if a.repoRefCache != nil {
+		a.repoRefCache.Purge()
+	}
+	if a.repoFileCache != nil {
+		a.repoFileCache.Purge()
+	}
 }
