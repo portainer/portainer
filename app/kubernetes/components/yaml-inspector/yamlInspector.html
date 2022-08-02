@@ -1,17 +1,17 @@
 <div>
   <code-editor identifier="application-details-yaml" read-only="true" value="$ctrl.data"></code-editor>
-  <div style="margin: 15px">
+  <div class="py-5">
     <span class="btn btn-light btn-sm" ng-click="$ctrl.copyYAML()">
-      <pr-icon icon="'copy'" feather="true"></pr-icon>
+      <pr-icon class="vertical-center" icon="'copy'" feather="true"></pr-icon>
       Copy to clipboard
     </span>
     <span class="btn btn-light btn-sm space-left" ng-click="$ctrl.toggleYAMLInspectorExpansion()">
-      <pr-icon icon="'minus'" size="'sm'" ng-if="$ctrl.expanded" feather="true"></pr-icon>
-      <pr-icon icon="'plus'" size="'sm'" ng-if="!$ctrl.expanded" feather="true"></pr-icon>
+      <pr-icon class="vertical-center" icon="'minus'" size="'sm'" ng-if="$ctrl.expanded" feather="true"></pr-icon>
+      <pr-icon class="vertical-center" icon="'plus'" size="'sm'" ng-if="!$ctrl.expanded" feather="true"></pr-icon>
       {{ $ctrl.expanded ? 'Collapse' : 'Expand' }}
     </span>
     <span id="copyNotificationYAML" style="display: none" class="small vertical-center ml-1">
-      <pr-icon icon="'check'" size="'md'" mode="'success'" feather="true"></pr-icon> copied
+      <pr-icon class="vertical-center" icon="'check'" size="'md'" mode="'success'" feather="true"></pr-icon> copied
     </span>
   </div>
 </div>

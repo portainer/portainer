@@ -18,6 +18,7 @@ export function AddButton({ label, onClick, className, disabled }: Props) {
         className,
         'label',
         'label-default',
+        'vertical-center',
         'interactive',
         'vertical-center',
         styles.addButton

@@ -5,7 +5,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-user-lock" title-text="Create access"></rd-widget-header>
+      <rd-widget-header icon="svg-userlock" title-text="Create access"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -26,8 +26,8 @@
               >
               </span>
             </div>
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+            <div class="col-sm-12 small text-muted vertical-center">
+              <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
               Note: adding this registry will expose the registry credentials to all users of this namespace
             </div>
           </div>
@@ -37,12 +37,12 @@
             <div class="col-sm-12">
               <button
                 type="submit"
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm !ml-0"
                 ng-disabled="$ctrl.selectedResourcePools.length === 0 || $ctrl.state.actionInProgress"
                 ng-click="$ctrl.submit()"
                 button-spinner="$ctrl.state.actionInProgress"
               >
-                <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create access</span>
+                <span ng-hide="$ctrl.state.actionInProgress" class="vertical-center"><pr-icon icon="'plus'" size="'sm'" feather="true"></pr-icon> Create access</span>
                 <span ng-show="$ctrl.state.actionInProgress">Creating access...</span>
               </button>
             </div>
@@ -57,7 +57,7 @@
   <div class="col-sm-12">
     <strings-datatable
       title-text="Access"
-      title-icon="fa-user-lock"
+      title-icon="svg-userlock"
       table-key="access_registry_resourcepools"
       dataset="$ctrl.savedResourcePools"
       empty-dataset-message="No namespace has been authorized yet."

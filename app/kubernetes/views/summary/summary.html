@@ -1,14 +1,6 @@
-<div
-  class="col-xs-12 form-section-title interactive"
-  ng-click="$ctrl.toggleSummary()"
-  style="display: flex; justify-content: space-between"
-  ng-if="$ctrl.state.resources.length > 0"
->
+<div class="flex justify-start form-section-title interactive" ng-click="$ctrl.toggleSummary()" ng-if="$ctrl.state.resources.length > 0">
+  <pr-icon icon="$ctrl.state.expandedTemplate ? 'chevron-down' : 'chevron-right'" feather="true" class="!mr-1 vertical-center pb-1"></pr-icon>
   Summary
-  <span class="small space-left">
-    <a ng-if="!$ctrl.state.expandedTemplate"><pr-icon icon="'chevron-down'" feather="true"></pr-icon> expand</a>
-    <a ng-if="$ctrl.state.expandedTemplate"><pr-icon icon="'chevron-up'" feather="true"></pr-icon> collapse</a>
-  </span>
 </div>
 
 <div class="form-group" ng-if="$ctrl.state.expandedTemplate">
