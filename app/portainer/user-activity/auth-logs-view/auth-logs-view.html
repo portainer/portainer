@@ -16,7 +16,7 @@
         Portainer user authentication activity logs have a maximum retention of 7 days.
       </p>
       <div>
-        <button type="button" class="btn btn-sm btn-primary mt-2" ng-click="$ctrl.export()"
+        <button type="button" class="btn btn-sm btn-primary" limited-feature-dir="{{::$ctrl.limitedFeature}}" limited-feature-class="limited-be" limited-feature-disabled
           ><pr-icon icon="'download'" feather="true" icon-class="'icon icon-sm'"></pr-icon>Export as CSV
         </button>
         <be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator>
