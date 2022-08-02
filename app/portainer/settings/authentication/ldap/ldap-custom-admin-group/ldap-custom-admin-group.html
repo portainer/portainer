@@ -101,10 +101,13 @@
 </div>
 
 <div class="form-group">
-  <div class="col-sm-12">
-    <label for="admin-auto-populate" class="control-label text-left text-muted" ng-class="{ 'text-muted': !$ctrl.enableAssignAdminGroup }"> Assign admin rights to group(s) </label>
-    <label class="switch ml-7" ng-class="{ 'business limited': $ctrl.isLimitedFeatureSelfContained }">
-      <input id="admin-auto-populate" ng-disabled="!$ctrl.enableAssignAdminGroup" name="admin-auto-populate" type="checkbox" ng-model="$ctrl.settings.AdminAutoPopulate" /><i></i>
+  <div class="col-sm-12 vertical-center">
+    <label for="admin-auto-populate" class="control-label text-left text-muted !pt-0" ng-class="{ 'text-muted': !$ctrl.enableAssignAdminGroup }">
+      Assign admin rights to group(s)
+    </label>
+    <label class="switch ml-7 my-0" ng-class="{ 'business limited': $ctrl.isLimitedFeatureSelfContained }">
+      <input id="admin-auto-populate" ng-disabled="!$ctrl.enableAssignAdminGroup" name="admin-auto-populate" type="checkbox" ng-model="$ctrl.settings.AdminAutoPopulate" />
+      <span class="slider round"></span>
     </label>
   </div>
 </div>
