@@ -10,23 +10,27 @@ export interface IconProps {
   featherIcon?: boolean;
 }
 
+export type IconMode =
+  | 'alt'
+  | 'primary'
+  | 'primary-alt'
+  | 'secondary'
+  | 'secondary-alt'
+  | 'warning'
+  | 'warning-alt'
+  | 'danger'
+  | 'danger-alt'
+  | 'success'
+  | 'success-alt';
+
+export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
 interface Props {
   icon: ReactNode | ComponentType<{ size?: string | number }>;
   feather?: boolean;
   className?: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  mode?:
-    | 'alt'
-    | 'primary'
-    | 'primary-alt'
-    | 'secondary'
-    | 'secondary-alt'
-    | 'warning'
-    | 'warning-alt'
-    | 'danger'
-    | 'danger-alt'
-    | 'success'
-    | 'success-alt';
+  size?: IconSize;
+  mode?: IconMode;
 }
 
 export function Icon({ icon, feather, className, mode, size }: Props) {

@@ -1,6 +1,6 @@
 <ng-form class="env-item form-horizontal" name="$ctrl.{{ $ctrl.formName }}">
   <div class="form-group col-sm-12">
-    <div class="form-inline" style="margin-top: 10px">
+    <div class="form-inline mt-3">
       <div class="input-group col-sm-5 input-group-sm">
         <span class="input-group-addon">path</span>
         <input
@@ -18,10 +18,12 @@
       </button>
     </div>
     <div ng-show="$ctrl[$ctrl.formName].name.$invalid">
-      <div class="small">
+      <div class="small text-muted">
         <div ng-messages="$ctrl[$ctrl.formName].name.$error" class="mt-1">
-          <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required. </p>
-          <p ng-message="pattern"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> File path must include yaml, yml, json, or hcl extension </p>
+          <p class="vertical-center" ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required. </p>
+          <p class="vertical-center" ng-message="pattern">
+            <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> File path must include yaml, yml, json, or hcl extension
+          </p>
         </div>
       </div>
     </div>

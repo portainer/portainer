@@ -84,6 +84,12 @@ angular
 
       $scope.onChangeFormValues = onChangeFormValues;
 
+      $scope.onEnableWebhookChange = function (enable) {
+        $scope.$evalAsync(() => {
+          $scope.formValues.EnableWebhook = enable;
+        });
+      };
+
       $scope.addAdditionalFiles = function () {
         $scope.formValues.AdditionalFiles.push('');
       };

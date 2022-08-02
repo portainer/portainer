@@ -1,37 +1,37 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-      <div class="toolBar">
-        <div class="toolBarTitle"> <pr-icon icon="$ctrl.titleIcon" class-name="space-right"></pr-icon> {{ $ctrl.titleText }} </div>
-      </div>
-
-      <div class="actionBar">
-        <div>
-          <span style="width: 25%">
-            <ui-select ng-model="$ctrl.state.selectedCategory" theme="bootstrap">
-              <ui-select-match placeholder="Select a category">
-                <a class="btn btn-xs btn-link pull-right" ng-click="$ctrl.clearCategory()"><i class="glyphicon glyphicon-remove"></i></a>
-                <span>{{ $select.selected }}</span>
-              </ui-select-match>
-              <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
-                <span>{{ category }}</span>
-              </ui-select-choices>
-            </ui-select>
-          </span>
+      <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap w-full relative">
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" mode="'primary'" class-name="'icon-nested-blue space-right'"></pr-icon>
+          {{ $ctrl.titleText }}
         </div>
-      </div>
 
-      <div class="searchBar" style="border-top: 2px solid #f6f6f6">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
+        <div class="searchBar vertical-center !mr-0">
+          <pr-icon icon="'search'" feather="true" class="searchIcon"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
+        <div>
+          <ui-select ng-model="$ctrl.state.selectedCategory" theme="bootstrap" append-to-body="true">
+            <ui-select-match placeholder="Select a category">
+              <a class="btn btn-xs btn-link pull-right vertical-center" ng-click="$ctrl.clearCategory()">
+                <pr-icon icon="'x'" feather="true"></pr-icon>
+              </a>
+              <span class="vertical-center">{{ $select.selected }}</span>
+            </ui-select-match>
+            <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
+              <span>{{ category }}</span>
+            </ui-select-choices>
+          </ui-select>
+        </div>
       </div>
 
       <div class="blocklist">

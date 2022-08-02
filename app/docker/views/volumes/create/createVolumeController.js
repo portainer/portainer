@@ -38,6 +38,24 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       $scope.formValues.DriverOptions.splice(index, 1);
     };
 
+    $scope.onUseNFSChange = onUseNFSChange;
+
+    function onUseNFSChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.NFSData.useNFS = checked;
+        $scope.formValues.CIFSData.useCIFS = false;
+      });
+    }
+
+    $scope.onUseCIFSChange = onUseCIFSChange;
+
+    function onUseCIFSChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.CIFSData.useCIFS = checked;
+        $scope.formValues.NFSData.useNFS = false;
+      });
+    }
+
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';
