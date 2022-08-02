@@ -12,6 +12,7 @@ pr-icon {
 .icon {
   color: currentColor;
   margin: 0;
+  display: inline-block;
 
   font-size: var(--icon-size);
   height: var(--icon-size);

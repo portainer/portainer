@@ -1,14 +1,12 @@
 <div class="datatable">
   <rd-widget>
-    <rd-widget-header icon="{{ $ctrl.titleIcon }}" title-text="{{ $ctrl.titleText }}"> </rd-widget-header>
-    <rd-widget-body classes="no-padding">
-      <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.onRemove($ctrl.state.selectedItems)">
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
+    <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap w-full relative">
+      <div class="toolBarTitle vertical-center">
+        <pr-icon icon="$ctrl.titleIcon" feather="true" mode="'primary'" class-name="'icon-nested-blue space-right'"></pr-icon>
+        {{ $ctrl.titleText }}
       </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+      <div class="searchBar vertical-center">
+        <pr-icon icon="'search'" feather="true"></pr-icon>
         <input
           type="text"
           class="searchInput"
@@ -18,6 +16,18 @@
           ng-model-options="{ debounce: 300 }"
         />
       </div>
+      <div class="actionBar">
+        <button
+          type="button"
+          class="btn btn-sm btn-dangerlight vertical-center"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.onRemove($ctrl.state.selectedItems)"
+        >
+          <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+        </button>
+      </div>
+    </div>
+    <rd-widget-body classes="no-padding">
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
           <thead>
@@ -27,11 +37,14 @@
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  {{ $ctrl.columnHeader }}
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="$ctrl.columnHeader"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Name'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Name')"
+                  style="display: inline-block"
+                ></table-column-header>
               </th>
             </tr>
           </thead>
