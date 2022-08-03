@@ -28,9 +28,9 @@ module.exports = {
 
   plugins: [
     plugin(({ addVariant }) => {
-      addVariant('be', '[data-edition="BE"] &');
-      addVariant('th-highcontrast', '[theme="highcontrast"] &');
-      addVariant('th-dark', '[theme="dark"] &');
+      addVariant('be', '&:is([data-edition="BE"] *)');
+      addVariant('th-highcontrast', '&:is([theme="highcontrast"] *)');
+      addVariant('th-dark', '&:is([theme="dark"] *)');
     }),
   ],
 };
