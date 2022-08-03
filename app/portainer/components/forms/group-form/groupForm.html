@@ -1,7 +1,7 @@
 <form class="form-horizontal" name="endpointGroupForm">
   <!-- name-input -->
-  <div class="form-group" ng-class="{ 'has-error': endpointGroupForm.group_name.$invalid }">
-    <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+  <div class="form-group">
+    <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" name="group_name" ng-model="$ctrl.model.Name" placeholder="e.g. my-group" required auto-focus />
     </div>
@@ -9,7 +9,10 @@
   <div class="form-group" ng-show="endpointGroupForm.group_name.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="endpointGroupForm.group_name.$error">
-        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+        <p ng-message="required" class="vertical-center">
+          <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+          This field is required.
+        </p>
       </div>
     </div>
   </div>
