@@ -27,7 +27,7 @@ export function CustomTemplatesVariablesDefinitionField({
 }: Props) {
   return (
     <InputList
-      label="Variables Definition"
+      label="Variables definition"
       onChange={onChange}
       value={value}
       renderItem={(item, onChange, error) => (

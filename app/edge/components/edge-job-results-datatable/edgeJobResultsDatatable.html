@@ -2,14 +2,14 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i>
+        <div class="toolBarTitle vertical-center">
+          <span><pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon></span>
           {{ $ctrl.titleText }}
         </div>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" />
+        <div class="searchBar">
+          <span><pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon></span>
+          <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }" />
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover table-filters nowrap-cells">
@@ -17,9 +17,9 @@
             <tr>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Endpoint')">
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Endpoint' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Endpoint' && $ctrl.state.reverseOrder"></i>
                   Environment
+                  <span><pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Endpoint' && !$ctrl.state.reverseOrder"></pr-icon></span>
+                  <span><pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Endpoint' && $ctrl.state.reverseOrder"></pr-icon></span>
                 </a>
               </th>
               <th> Actions </th>
@@ -52,7 +52,7 @@
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">
-              <span style="margin-right: 5px"> Items per page </span>
+              <span class="mr-1"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>

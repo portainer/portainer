@@ -26,10 +26,13 @@ class porImageRegistryController {
   }
 
   isKnownRegistry(registry) {
-    return !(registry instanceof DockerHubViewModel) && registry.URL;
+    return registry && !(registry instanceof DockerHubViewModel) && registry.URL;
   }
 
   getRegistryURL(registry) {
+    if (!registry) {
+      return;
+    }
     let url = registry.URL;
     if (registry.Type === RegistryTypes.GITLAB) {
       url = registry.URL + '/' + registry.Gitlab.ProjectPath;
@@ -54,12 +57,12 @@ class porImageRegistryController {
   }
 
   isDockerHubRegistry() {
-    return this.model.UseRegistry && (this.model.Registry.Type === RegistryTypes.DOCKERHUB || this.model.Registry.Type === RegistryTypes.ANONYMOUS);
+    return this.model.UseRegistry && this.model.Registry && (this.model.Registry.Type === RegistryTypes.DOCKERHUB || this.model.Registry.Type === RegistryTypes.ANONYMOUS);
   }
 
   async onRegistryChange() {
     this.prepareAutocomplete();
-    if (this.model.Registry.Type === RegistryTypes.GITLAB && this.model.Image) {
+    if (this.model.Registry && this.model.Registry.Type === RegistryTypes.GITLAB && this.model.Image) {
       this.model.Image = _.replace(this.model.Image, this.model.Registry.Gitlab.ProjectPath, '');
     }
   }
@@ -71,7 +74,7 @@ class porImageRegistryController {
   }
 
   displayedRegistryURL() {
-    return this.getRegistryURL(this.model.Registry) || 'docker.io';
+    return (this.model.Registry && this.getRegistryURL(this.model.Registry)) || 'docker.io';
   }
 
   async reloadRegistries() {
@@ -90,7 +93,7 @@ class porImageRegistryController {
           this.registries.splice(0, 0, this.defaultRegistry);
         }
 
-        const id = this.model.Registry.Id;
+        const id = this.model.Registry && this.model.Registry.Id;
         const registry = _.find(this.registries, { Id: id });
         if (!registry) {
           this.model.Registry = showDefaultRegistry ? this.defaultRegistry : this.registries[0];

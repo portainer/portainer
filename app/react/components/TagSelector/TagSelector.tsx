@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import _ from 'lodash';
 
 import { TagId } from '@/portainer/tags/types';
+import { Icon } from '@/react/components/Icon';
 import { useCreateTagMutation, useTags } from '@/portainer/tags/queries';
 
 import { Creatable, Select } from '@@/form-components/ReactSelect';
@@ -63,15 +64,17 @@ export function TagSelector({ value, allowCreate = false, onChange }: Props) {
             <button
               type="button"
               title="Remove tag"
-              className={clsx(styles.removeTagBtn, 'space-left', 'tag')}
+              className={clsx(
+                styles.removeTagBtn,
+                'space-left',
+                'tag',
+                'vertical-center'
+              )}
               onClick={() => handleRemove(tag.value)}
               key={tag.value}
             >
               {tag.label}
-              <i
-                className="fa fa-trash-alt white-icon space-left"
-                aria-hidden="true"
-              />
+              <Icon icon="trash-2" feather />
             </button>
           ))}
         </FormControl>
