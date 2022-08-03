@@ -14,13 +14,13 @@
   <div class="col-sm-1">
     <button
       type="button"
-      class="btn btn-danger btn-sm"
+      class="btn btn-danger btn-md vertical-center"
       ng-if="$ctrl.onRemoveClick"
       ng-click="$ctrl.onRemoveClick()"
       limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
       limited-feature-tabindex="-1"
     >
-      <i class="fa fa-trash" aria-hidden="true"></i>
+      <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
     </button>
   </div>
 </div>

@@ -50,7 +50,7 @@
         Group Filter
         <portainer-tooltip message="'The LDAP search filter used to select group elements, optional.'"></portainer-tooltip>
       </label>
-      <div ng-class="{ 'col-sm-7 col-md-9': $index, 'col-sm-8 col-md-10': !$index }">
+      <div class="col-sm-8 col-md-10 vertical-center">
         <input
           type="text"
           class="form-control"
@@ -62,10 +62,8 @@
           ng-disabled="{{ $ctrl.isLimitedFeatureSelfContained }}"
           limited-feature-tabindex="-1"
         />
-      </div>
-      <div class="col-sm-1" ng-if="$index > 0">
-        <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.onRemoveClick($index)">
-          <i class="fa fa-trash" aria-hidden="true"></i>
+        <button class="btn btn-md btn-danger" type="button" ng-click="$ctrl.onRemoveClick($index)" ng-if="$index > 0">
+          <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
         </button>
       </div>
     </div>
@@ -75,16 +73,17 @@
 <div class="form-group mt-3">
   <div class="col-sm-12">
     <button
-      class="label label-default interactive no-border"
+      class="label label-default interactive no-border vertical-center"
       ng-click="$ctrl.onAddClick()"
       limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
       limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
       limited-feature-disabled
     >
-      <i class="fa fa-plus-circle" aria-hidden="true"></i> add group search configuration
+      <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+      add group search configuration
     </button>
   </div>
-  <div class="col-sm-12 mt-3">
+  <div class="col-sm-12 vertical-center mt-2">
     <button
       class="btn btm-sm btn-primary"
       type="button"
@@ -96,7 +95,10 @@
     >
       Fetch Admin Group(s)
     </button>
-    <span ng-if="$ctrl.groups && $ctrl.groups.length === 0" class="ml-5"> <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> No groups found</span>
+    <span ng-if="$ctrl.groups && $ctrl.groups.length === 0" class="ml-6 vertical-center">
+      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+      No groups found
+    </span>
   </div>
 </div>
 
