@@ -6,7 +6,7 @@ import type { DockerContainer } from '@/react/docker/containers/types';
 import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
 import { useCurrentEnvironment } from '@/portainer/hooks/useCurrentEnvironment';
 
-import { useTableSettings } from '@@/datatables/useTableSettings';
+import { useTableSettings } from '@@/datatables/useZustandTableSettings';
 
 import { TableSettings } from '../types';
 

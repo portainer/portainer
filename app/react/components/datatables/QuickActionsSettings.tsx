@@ -1,9 +1,14 @@
+import {
+  SettableQuickActionsTableSettings,
+  QuickAction,
+} from '@/react/docker/containers/ListView/ContainersDatatable/types';
+
 import { Checkbox } from '@@/form-components/Checkbox';
 
-import { useTableSettings } from './useTableSettings';
+import { useTableSettings } from './useZustandTableSettings';
 
 export interface Action {
-  id: string;
+  id: QuickAction;
   label: string;
 }
 
@@ -11,13 +16,9 @@ interface Props {
   actions: Action[];
 }
 
-export interface QuickActionsSettingsType {
-  hiddenQuickActions: string[];
-}
-
 export function QuickActionsSettings({ actions }: Props) {
-  const { settings, setTableSettings } =
-    useTableSettings<QuickActionsSettingsType>();
+  const { settings } =
+    useTableSettings<SettableQuickActionsTableSettings<QuickAction>>();
 
   return (
     <>
@@ -33,16 +34,17 @@ export function QuickActionsSettings({ actions }: Props) {
     </>
   );
 
-  function toggleAction(key: string, value: boolean) {
-    setTableSettings(({ hiddenQuickActions = [], ...settings }) => ({
-      ...settings,
-      hiddenQuickActions: value
-        ? hiddenQuickActions.filter((id) => id !== key)
-        : [...hiddenQuickActions, key],
-    }));
+  function toggleAction(key: QuickAction, visible: boolean) {
+    if (!visible) {
+      settings.setHiddenQuickActions([...settings.hiddenQuickActions, key]);
+    } else {
+      settings.setHiddenQuickActions(
+        settings.hiddenQuickActions.filter((action) => action !== key)
+      );
+    }
   }
 }
 
-export function buildAction(id: string, label: string): Action {
+export function buildAction(id: QuickAction, label: string): Action {
   return { id, label };
 }

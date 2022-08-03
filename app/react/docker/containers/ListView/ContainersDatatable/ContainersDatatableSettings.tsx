@@ -2,6 +2,7 @@ import { Checkbox } from '@@/form-components/Checkbox';
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
 
 import { TableSettings } from './types';
+import { TRUNCATE_LENGTH } from './datatable-store';
 
 interface Props {
   isRefreshVisible?: boolean;
@@ -20,7 +21,7 @@ export function ContainersDatatableSettings({
         checked={settings.truncateContainerName > 0}
         onChange={() =>
           settings.setTruncateContainerName(
-            settings.truncateContainerName > 0 ? 0 : 32
+            settings.truncateContainerName > 0 ? 0 : TRUNCATE_LENGTH
           )
         }
       />

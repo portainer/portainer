@@ -11,6 +11,8 @@ import {
 
 import { QuickAction, TableSettings } from './types';
 
+export const TRUNCATE_LENGTH = 32;
+
 export function createStore(storageKey: string) {
   return create<TableSettings>()(
     persist(
@@ -19,13 +21,14 @@ export function createStore(storageKey: string) {
         ...paginationSettings(set),
         ...hiddenColumnsSettings(set),
         ...refreshableSettings(set),
-        truncateContainerName: 32,
-        setTruncateContainerName: (truncateContainerName: number) =>
+        truncateContainerName: TRUNCATE_LENGTH,
+        setTruncateContainerName(truncateContainerName: number) {
           set({
             truncateContainerName,
-          }),
+          });
+        },
 
-        hiddenQuickActions: [],
+        hiddenQuickActions: [] as QuickAction[],
         setHiddenQuickActions: (hiddenQuickActions: QuickAction[]) =>
           set({ hiddenQuickActions }),
       }),
