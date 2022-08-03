@@ -50,7 +50,7 @@
 <!-- ca-input -->
 <div class="form-group" ng-if="$ctrl.settings.TLSConfig.TLS || ($ctrl.settings.StartTLS && !$ctrl.settings.TLSConfig.TLSSkipVerify)">
   <label class="col-sm-3 control-label text-left">TLS CA certificate</label>
-  <div class="col-sm-9">
+  <div class="col-sm-9 vertical-center">
     <button
       type="button"
       class="btn btn-sm btn-primary"
@@ -61,11 +61,11 @@
     >
       Select file
     </button>
-    <span style="margin-left: 5px">
+    <span class="vertical-center">
       {{ $ctrl.tlscaCert.name }}
-      <i class="fa fa-check green-icon" ng-if="$ctrl.tlscaCert && $ctrl.tlscaCert === $ctrl.settings.TLSConfig.TLSCACert" aria-hidden="true"></i>
-      <i class="fa fa-times red-icon" ng-if="!$ctrl.tlscaCert" aria-hidden="true"></i>
-      <i class="fa fa-circle-notch fa-spin" ng-if="$ctrl.uploadInProgress"></i>
+      <pr-icon icon="'check'" feather="true" class="icon-success" ng-if="$ctrl.tlscaCert && $ctrl.tlscaCert === $ctrl.settings.TLSConfig.TLSCACert"></pr-icon>
+      <pr-icon icon="'x'" feather="true" class="icon-danger" ng-if="!$ctrl.tlscaCert"></pr-icon>
+      <pr-icon icon="'fa fa-circle-notch fa-spin'" ng-if="$ctrl.uploadInProgress"></pr-icon>
     </span>
   </div>
 </div>
