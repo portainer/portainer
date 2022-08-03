@@ -20,6 +20,12 @@ angular.module('portainer.app').controller('UserController', [
       Administrator: false,
     };
 
+    $scope.handleAdministratorChange = function (checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.Administrator = checked;
+      });
+    };
+
     $scope.deleteUser = function () {
       ModalService.confirmDeletion('Do you want to remove this user? This user will not be able to login into Portainer anymore.', function onConfirm(confirmed) {
         if (!confirmed) {
