@@ -1,9 +1,9 @@
-<form class="form-horizontal" name="edgeJobForm">
+<form class="form-horizontal -mt-4" name="edgeJobForm">
   <div class="col-sm-12 form-section-title"> Edge job configuration </div>
   <!-- name-input -->
-  <div class="form-group">
-    <label for="edgejob_name" class="col-sm-1 control-label text-left">Name</label>
-    <div class="col-sm-11">
+  <div class="form-group mt-4">
+    <label for="edgejob_name" class="col-sm-2 control-label text-left required">Name </label>
+    <div class="col-sm-10">
       <input
         type="text"
         class="form-control"
@@ -11,7 +11,7 @@
         ng-pattern="/^[a-zA-Z0-9][a-zA-Z0-9_.-]+$/"
         id="edgejob_name"
         name="edgejob_name"
-        placeholder="backup-app-prod"
+        placeholder="e.g. backup-app-prod"
         required
         auto-focus
       />
@@ -20,8 +20,12 @@
   <div class="form-group" ng-show="edgeJobForm.edgejob_name.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="edgeJobForm.edgejob_name.$error">
-        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-        <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Allowed characters are: [a-zA-Z0-9_.-]</p>
+        <p ng-message="required" class="vertical-center">
+          <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+        </p>
+        <p ng-message="pattern" class="vertical-center">
+          <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> Allowed characters are: [a-zA-Z0-9_.-]
+        </p>
       </div>
     </div>
   </div>
@@ -30,12 +34,12 @@
   <!-- edge-job-method-select -->
   <div class="col-sm-12 form-section-title"> Edge job configuration </div>
   <div class="form-group"></div>
-  <div class="form-group" style="margin-bottom: 0">
-    <div class="boxselector_wrapper">
+  <div class="form-group px-4">
+    <div class="boxselector_wrapper !mt-0">
       <div>
         <input type="radio" id="config_basic" ng-model="$ctrl.formValues.cronMethod" value="basic" />
         <label for="config_basic">
-          <div class="boxselector_header">
+          <div class="boxselector_header vertical-center">
             <pr-icon icon="'calendar'" feather="true"></pr-icon>
             Basic configuration
           </div>
@@ -45,7 +49,7 @@
       <div>
         <input type="radio" id="config_advanced" ng-model="$ctrl.formValues.cronMethod" value="advanced" />
         <label for="config_advanced">
-          <div class="boxselector_header">
+          <div class="boxselector_header vertical-center">
             <pr-icon icon="'edit'" feather="true"></pr-icon>
             Advanced configuration
           </div>
@@ -60,7 +64,7 @@
     <div class="form-group">
       <label for="recurring" class="col-sm-2 control-label text-left">Recurring Edge job</label>
       <div class="col-sm-10">
-        <label class="switch" style="margin-left: 20px"> <input type="checkbox" name="recurring" ng-model="$ctrl.model.Recurring" /><i></i> </label>
+        <label class="switch"><input type="checkbox" name="recurring" ng-model="$ctrl.model.Recurring" /><span class="slider round"></span></label>
       </div>
     </div>
     <!-- not-recurring -->
@@ -70,11 +74,13 @@
         <div class="col-sm-10">
           <input class="form-control" moment-picker ng-model="$ctrl.formValues.datetime" format="YYYY-MM-DD HH:mm" />
         </div>
-        <div class="col-sm-12 small text-muted" style="margin-top: 10px"> Time should be set according to the chosen environments' timezone. </div>
+        <div class="col-sm-12 small text-muted mt-2.5"> Time should be set according to the chosen environments' timezone. </div>
         <div ng-show="edgeJobForm.datepicker.$invalid">
           <div class="col-sm-12 small text-warning">
             <div ng-messages="edgeJobForm.datepicker.$error">
-              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              <p ng-message="required" class="vertical-center">
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+              </p>
             </div>
           </div>
         </div>
@@ -98,7 +104,9 @@
         <div ng-show="edgeJobForm.edgejob_value.$invalid">
           <div class="col-sm-12 small text-warning">
             <div ng-messages="edgeJobForm.edgejob_value.$error">
-              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              <p ng-message="required" class="vertical-center">
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+              </p>
             </div>
           </div>
         </div>
@@ -118,18 +126,22 @@
           ng-model="$ctrl.model.CronExpression"
           id="edgejob_cron"
           name="edgejob_cron"
-          placeholder="0 2 * * *"
+          placeholder="e.g. 0 2 * * *"
           required
           ng-pattern="$ctrl.cronRegex"
         />
       </div>
-      <div class="col-sm-12 small text-muted" style="margin-top: 10px"> Time should be set according to the chosen environments' timezone. </div>
+      <div class="col-sm-12 small text-muted mt-2.5"> Time should be set according to the chosen environments' timezone. </div>
     </div>
     <div class="form-group" ng-show="edgeJobForm.edgejob_cron.$invalid && edgeJobForm.edgejob_cron.$dirty">
       <div class="col-sm-12 small text-warning">
         <div ng-messages="edgeJobForm.edgejob_cron.$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-          <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field format is invalid.</p>
+          <p ng-message="required" class="vertical-center">
+            <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+          </p>
+          <p ng-message="pattern" class="vertical-center">
+            <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field format is invalid.
+          </p>
         </div>
       </div>
     </div>
@@ -140,12 +152,12 @@
   <div ng-if="!$ctrl.model.Id">
     <div class="col-sm-12 form-section-title"> Job content </div>
     <div class="form-group"></div>
-    <div class="form-group" style="margin-bottom: 0">
-      <div class="boxselector_wrapper">
+    <div class="form-group px-4">
+      <div class="boxselector_wrapper !mt-0">
         <div>
           <input type="radio" id="method_editor" ng-model="$ctrl.formValues.method" value="editor" />
           <label for="method_editor">
-            <div class="boxselector_header">
+            <div class="boxselector_header vertical-center">
               <pr-icon icon="'edit'" feather="true"></pr-icon>
               Web editor
             </div>
@@ -155,8 +167,8 @@
         <div>
           <input type="radio" id="method_upload" ng-model="$ctrl.formValues.method" value="upload" />
           <label for="method_upload">
-            <div class="boxselector_header">
-              <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px"></i>
+            <div class="boxselector_header vertical-center">
+              <pr-icon icon="'upload'" feather="true"></pr-icon>
               Upload
             </div>
             <p>Upload from your computer</p>
@@ -190,9 +202,9 @@
     <div class="form-group">
       <div class="col-sm-12">
         <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.File">Select file</button>
-        <span style="margin-left: 5px">
+        <span class="space-left">
           {{ $ctrl.model.File.name }}
-          <i class="fa fa-times red-icon" ng-if="!$ctrl.model.File" aria-hidden="true"></i>
+          <span ng-if="!$ctrl.model.File"><pr-icon icon="'x'" class-name="'icon icon-danger'" feather="true"></pr-icon></span>
         </span>
       </div>
     </div>
@@ -227,7 +239,7 @@
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>
       </button>
-      <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px">
+      <span class="text-danger space-left" ng-if="$ctrl.state.formValidationError">
         {{ $ctrl.state.formValidationError }}
       </span>
     </div>

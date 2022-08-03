@@ -6,7 +6,9 @@
       <rd-widget-body>
         <uib-tabset active="$ctrl.state.activeTab">
           <uib-tab index="0" select="$ctrl.showEditor()">
-            <uib-tab-heading> <i class="fa fa-wrench" aria-hidden="true"></i> Configuration </uib-tab-heading>
+            <uib-tab-heading>
+              <span><pr-icon icon="'tool'" feather="true"></pr-icon></span> Configuration
+            </uib-tab-heading>
 
             <edge-job-form
               ng-if="$ctrl.edgeJob && $ctrl.state.showEditorTab"
@@ -22,13 +24,14 @@
           </uib-tab>
 
           <uib-tab index="1">
-            <uib-tab-heading> <i class="fa fa-tasks" aria-hidden="true"></i> Results </uib-tab-heading>
+            <uib-tab-heading>
+              <span><pr-icon icon="'list'" feather="true"></pr-icon></span> Results
+            </uib-tab-heading>
 
             <edge-job-results-datatable
-              style="display: block; margin-top: 10px"
               ng-if="$ctrl.results"
               title-text="Results"
-              title-icon="fa-tasks"
+              title-icon="list"
               dataset="$ctrl.results"
               table-key="edge-job-results"
               order-by="Status"

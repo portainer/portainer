@@ -107,7 +107,11 @@ export function InputList<T = DefaultType>({
           return (
             <div
               key={key}
-              className={clsx(styles.itemLine, { [styles.hasError]: !!error })}
+              className={clsx(
+                styles.itemLine,
+                { [styles.hasError]: !!error },
+                'vertical-center'
+              )}
             >
               {Item ? (
                 <Item
@@ -128,7 +132,7 @@ export function InputList<T = DefaultType>({
                 {!readOnly && movable && (
                   <>
                     <Button
-                      size="small"
+                      size="medium"
                       disabled={disabled || index === 0}
                       onClick={() => handleMoveUp(index)}
                       className="vertical-center btn-only-icon"
@@ -136,7 +140,7 @@ export function InputList<T = DefaultType>({
                       <Icon icon="arrow-up" feather />
                     </Button>
                     <Button
-                      size="small"
+                      size="medium"
                       type="button"
                       disabled={disabled || index === value.length - 1}
                       onClick={() => handleMoveDown(index)}
@@ -149,7 +153,7 @@ export function InputList<T = DefaultType>({
                 {!readOnly && (
                   <Button
                     color="dangerlight"
-                    size="small"
+                    size="medium"
                     onClick={() => handleRemoveItem(key, item)}
                     className="vertical-center btn-only-icon"
                   >

@@ -27,7 +27,7 @@ export function AddButton({ label, onClick, className, disabled }: Props) {
       onClick={onClick}
       disabled={disabled}
     >
-      <Icon icon="plus" feather className="space-right" />
+      <Icon icon="plus-circle" feather />
       {label}
     </button>
   );
