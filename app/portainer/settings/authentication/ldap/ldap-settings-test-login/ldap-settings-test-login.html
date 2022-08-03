@@ -37,20 +37,22 @@
     />
   </div>
 
-  <div class="form-group no-margin">
-    <button
-      type="submit"
-      class="btn btn-primary"
-      ng-disabled="$ctrl.state.testStatus === $ctrl.TEST_STATUS.LOADING || !$ctrl.username || !$ctrl.password"
-      ng-click="$ctrl.testLogin($ctrl.username, $ctrl.password)"
-      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
-      limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
-      limited-feature-tabindex="-1"
-    >
-      <span ng-if="$ctrl.state.testStatus !== $ctrl.TEST_STATUS.LOADING">Test</span>
-      <span ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.LOADING">Testing...</span>
-    </button>
-    <i ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.SUCCESS" class="fa fa-check green-icon"></i>
-    <i ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.FAILURE" class="fa fa-times red-icon"></i>
+  <div class="form-group !ml-0">
+    <div class="vertical-center">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        ng-disabled="$ctrl.state.testStatus === $ctrl.TEST_STATUS.LOADING || !$ctrl.username || !$ctrl.password"
+        ng-click="$ctrl.testLogin($ctrl.username, $ctrl.password)"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-class=" {{ $ctrl.isLimitedFeatureSelfContained && 'limited-be' }}"
+        limited-feature-tabindex="-1"
+      >
+        <span ng-if="$ctrl.state.testStatus !== $ctrl.TEST_STATUS.LOADING">Test</span>
+        <span ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.LOADING">Testing...</span>
+      </button>
+      <pr-icon icon="'check'" feather="true" class="icon-success" ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.SUCCESS"></pr-icon>
+      <pr-icon icon="'x'" feather="true" class="icon-danger" ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.FAILURE"></pr-icon>
+    </div>
   </div>
 </div>
