@@ -31,7 +31,7 @@ export function Header({ logo }: Props) {
       <button
         type="button"
         onClick={() => toggle()}
-        className="w-6 h-6 flex justify-center items-center text-gray-4 be:text-gray-5 border-0 rounded text-sm bg-blue-11 hover:bg-blue-10 be:bg-gray-10 be:hover:bg-gray-8 transition-colors duration-200  hover:text-white be:hover:text-white"
+        className="w-6 h-6 flex justify-center items-center text-gray-4 be:text-gray-5 border-0 rounded text-sm bg-blue-11 hover:bg-blue-10 be:bg-gray-10 be:hover:bg-gray-8 th-dark:bg-gray-warm-11 hover:th-dark:bg-gray-warm-9 transition-colors duration-200  hover:text-white be:hover:text-white"
         aria-label="Toggle Sidebar"
         title="Toggle Sidebar"
       >
