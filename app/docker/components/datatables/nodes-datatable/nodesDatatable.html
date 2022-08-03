@@ -61,60 +61,76 @@
           <thead>
             <tr>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Hostname')">
-                  Name
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Hostname' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Hostname' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Name'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Hostname'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Hostname' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Hostname')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Role')">
-                  Role
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Role' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Role' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Role'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Role'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Role' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Role')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('CPUs')">
-                  CPU
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'CPUs' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'CPUs' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'CPU'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'CPUs'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'CPUs' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('CPUs')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Memory')">
-                  Memory
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Memory' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Memory' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Memory'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Memory'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Memory' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Memory')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('EngineVersion')">
-                  Engine
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'EngineVersion' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'EngineVersion' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Engine'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'EngineVersion'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'EngineVersion' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('EngineVersion')"
+                ></table-column-header>
               </th>
               <th ng-if="$ctrl.showIpAddressColumn">
-                <a ng-click="$ctrl.changeOrderBy('Addr')">
-                  IP Address
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Addr' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Addr' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'IP Address'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Addr'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Addr' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Addr')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Status')">
-                  Status
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Status'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Status'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Status')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Availability')">
-                  Availability
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Availability' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Availability' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Availability'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Availability'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Availability' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Availability')"
+                ></table-column-header>
               </th>
             </tr>
           </thead>

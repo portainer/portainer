@@ -25,25 +25,31 @@
           <thead>
             <tr>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Time')">
-                  Date
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Time' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Time' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Date'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Time'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Time' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Time')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Type')">
-                  Category
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Category'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Type'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Type')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Details')">
-                  Details
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Details' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Details' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Details'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Details'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Details' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Details')"
+                ></table-column-header>
               </th>
             </tr>
           </thead>
