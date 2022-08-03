@@ -123,6 +123,15 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		}
 	}
 
+	canManage, err := handler.userCanManageStacks(securityContext, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack deletion", Err: err}
+	}
+	if !canManage {
+		errMsg := "Stack editing is disabled for non-admin users"
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: errors.New(errMsg)}
+	}
+
 	updateError := handler.updateAndDeployStack(r, stack, endpoint)
 	if updateError != nil {
 		return updateError
