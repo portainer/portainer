@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/stretchr/testify/assert"
@@ -364,16 +365,9 @@ func Test_listRefs_Concurrently(t *testing.T) {
 		username:      getRequiredValue(t, "GITHUB_USERNAME"),
 	}
 
-	opt1 := option{
-		repositoryUrl: "https://github.com/portainer/liblicense.git",
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "GITHUB_PAT"),
-		username:      getRequiredValue(t, "GITHUB_USERNAME"),
-	}
-
 	client := NewGitClient(1)
 
-	go client.listRefs(context.TODO(), opt1)
+	go client.listRefs(context.TODO(), opt)
 	client.listRefs(context.TODO(), opt)
 
 	time.Sleep(2 * time.Second)
@@ -390,13 +384,73 @@ func Test_listFiles_Concurrently(t *testing.T) {
 		extensions:    []string{},
 	}
 
-	client := &gitClient{
-		preserveGitDirectory: true,
-		cacheEnabled:         true,
-	}
+	client := NewGitClient(1)
 
 	go client.listFiles(context.TODO(), opt)
 	client.listFiles(context.TODO(), opt)
 
 	time.Sleep(2 * time.Second)
+}
+
+func Test_purgeCache(t *testing.T) {
+	ensureIntegrationTest(t)
+	opt := option{
+		repositoryUrl: privateGitRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "GITHUB_PAT"),
+		username:      getRequiredValue(t, "GITHUB_USERNAME"),
+		extensions:    []string{},
+	}
+
+	cacheSize := 2
+	client := &gitClient{
+		cacheEnabled: true,
+	}
+	client.repoRefCache, _ = lru.New(cacheSize)
+	client.repoFileCache, _ = lru.New(cacheSize)
+
+	client.listRefs(context.TODO(), opt)
+	client.listFiles(context.TODO(), opt)
+	assert.Equal(t, 1, client.repoRefCache.Len())
+	assert.Equal(t, 1, client.repoFileCache.Len())
+
+	client.purgeCache()
+	assert.Equal(t, 0, client.repoRefCache.Len())
+	assert.Equal(t, 0, client.repoFileCache.Len())
+}
+
+func Test_purgeCacheByTTL(t *testing.T) {
+	ensureIntegrationTest(t)
+	opt := option{
+		repositoryUrl: privateGitRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "GITHUB_PAT"),
+		username:      getRequiredValue(t, "GITHUB_USERNAME"),
+		extensions:    []string{},
+	}
+
+	timeout := 10 * time.Millisecond
+	cacheSize := 2
+	cacheTTL := 20 * timeout
+	client := &gitClient{
+		cacheEnabled: true,
+	}
+	client.repoRefCache, _ = lru.New(cacheSize)
+	client.repoFileCache, _ = lru.New(cacheSize)
+
+	service := Service{
+		shutdownCtx: context.TODO(),
+		git:         client,
+	}
+
+	client.listRefs(context.TODO(), opt)
+	client.listFiles(context.TODO(), opt)
+	assert.Equal(t, 1, client.repoRefCache.Len())
+	assert.Equal(t, 1, client.repoFileCache.Len())
+
+	go service.startCacheCleanTimer(cacheTTL)
+	time.Sleep(30 * timeout)
+
+	assert.Equal(t, 0, client.repoRefCache.Len())
+	assert.Equal(t, 0, client.repoFileCache.Len())
 }

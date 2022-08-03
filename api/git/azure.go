@@ -56,24 +56,13 @@ type azureClient struct {
 	baseUrl      string
 	cacheEnabled bool
 	// Cache the result of repository refs, key is repository URL
-	// repoRefCache sync.Map
+	repoRefCache *lru.Cache
 	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
-	// repoTreeCache sync.Map
-	repoRefCache  *lru.Cache
 	repoFileCache *lru.Cache
 }
 
 func NewAzureClient(cacheSize int) *azureClient {
-	httpsCli := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           http.ProxyFromEnvironment,
-		},
-		Timeout: 300 * time.Second,
-	}
-
-	client.InstallProtocol("https", githttp.NewClient(httpsCli))
-
+	httpsCli := newHttpClientForAzure()
 	c := &azureClient{
 		client:       httpsCli,
 		baseUrl:      "https://dev.azure.com",
@@ -94,6 +83,19 @@ func NewAzureClient(cacheSize int) *azureClient {
 
 	}
 	return c
+}
+
+func newHttpClientForAzure() *http.Client {
+	httpsCli := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			Proxy:           http.ProxyFromEnvironment,
+		},
+		Timeout: 300 * time.Second,
+	}
+
+	client.InstallProtocol("https", githttp.NewClient(httpsCli))
+	return httpsCli
 }
 
 func (a *azureClient) download(ctx context.Context, destination string, opt option) error {
@@ -449,7 +451,6 @@ func (a *azureClient) listRefs(ctx context.Context, opt option) ([]string, error
 	}
 
 	if a.cacheEnabled {
-		// a.repoRefCache.Store(opt.repositoryUrl, ret)
 		a.repoRefCache.Add(opt.repositoryUrl, ret)
 	}
 	return ret, nil
@@ -462,30 +463,33 @@ func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, erro
 		refs        []string
 		err         error
 		success     bool
+		ok          bool
+		cache       interface{}
 	)
 
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	// cache, ok := a.repoTreeCache.Load(repoKey)
-	cache, ok := a.repoFileCache.Get(repoKey)
-	if ok {
-		treeCache, success := cache.([]string)
-		if success {
-			for _, path := range treeCache {
-				if matchExtensions(path, opt.extensions) {
-					filteredRet = append(filteredRet, path)
+	if a.repoFileCache != nil {
+		cache, ok = a.repoFileCache.Get(repoKey)
+		if ok {
+			treeCache, success := cache.([]string)
+			if success {
+				for _, path := range treeCache {
+					if matchExtensions(path, opt.extensions) {
+						filteredRet = append(filteredRet, path)
+					}
 				}
+				return filteredRet, nil
 			}
-			return filteredRet, nil
 		}
 	}
 
 	// Check if the reference exists
-	// cache, ok = a.repoRefCache.Load(opt.repositoryUrl)
-	cache, ok = a.repoRefCache.Get(opt.repositoryUrl)
-	if ok {
-		refs, success = cache.([]string)
+	if a.repoRefCache != nil {
+		cache, ok = a.repoRefCache.Get(opt.repositoryUrl)
+		if ok {
+			refs, success = cache.([]string)
+		}
 	}
-
 	if !ok || !success {
 		opt := option{
 			repositoryUrl: opt.repositoryUrl,
@@ -564,7 +568,6 @@ func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, erro
 	}
 
 	if a.cacheEnabled {
-		// a.repoTreeCache.Store(repoKey, allPaths)
 		a.repoFileCache.Add(repoKey, allPaths)
 	}
 

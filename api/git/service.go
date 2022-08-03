@@ -3,6 +3,7 @@ package git
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 )
 
@@ -34,24 +35,29 @@ type repoManager interface {
 
 // Service represents a service for managing Git.
 type Service struct {
-	shutdownCtx context.Context
-	azure       repoManager
-	git         repoManager
+	shutdownCtx  context.Context
+	azure        repoManager
+	git          repoManager
+	timerStopped bool
+	mut          sync.Mutex
 }
 
 // NewService initializes a new service.
 func NewService(ctx context.Context) *Service {
 	service := &Service{
-		shutdownCtx: ctx,
-		azure:       NewAzureClient(REPOSITORY_CACHE_SIZE),
-		git:         NewGitClient(REPOSITORY_CACHE_SIZE),
+		shutdownCtx:  ctx,
+		azure:        NewAzureClient(REPOSITORY_CACHE_SIZE),
+		git:          NewGitClient(REPOSITORY_CACHE_SIZE),
+		timerStopped: false,
 	}
-	go service.startCleanCacheTimer(REPOSITORY_CACHE_TTL)
+	go service.startCacheCleanTimer(REPOSITORY_CACHE_TTL)
 	return service
 }
 
-func (service *Service) startCleanCacheTimer(d time.Duration) {
+// startCacheCleanTimer starts a timer to purge caches periodically
+func (service *Service) startCacheCleanTimer(d time.Duration) {
 	ticker := time.NewTicker(d)
+
 	for {
 		select {
 		case <-ticker.C:
@@ -64,9 +70,20 @@ func (service *Service) startCleanCacheTimer(d time.Duration) {
 			}
 		case <-service.shutdownCtx.Done():
 			ticker.Stop()
+			service.mut.Lock()
+			service.timerStopped = true
+			service.mut.Unlock()
 			return
 		}
 	}
+}
+
+// timerHasStopped shows the CacheClean timer state with thread-safe way
+func (service *Service) timerHasStopped() bool {
+	service.mut.Lock()
+	defer service.mut.Unlock()
+	ret := service.timerStopped
+	return ret
 }
 
 // CloneRepository clones a git repository using the specified URL in the specified

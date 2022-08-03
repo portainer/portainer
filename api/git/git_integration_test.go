@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
@@ -68,4 +69,16 @@ func TestService_ListFiles_GitHub(t *testing.T) {
 	paths, err := service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(paths), 1)
+}
+
+func TestService_canStopCacheCleanTimer_whenContextDone(t *testing.T) {
+	timeout := 10 * time.Millisecond
+	deadlineCtx, _ := context.WithDeadline(context.TODO(), time.Now().Add(10*timeout))
+
+	service := NewService(deadlineCtx)
+	assert.False(t, service.timerHasStopped(), "timer should not be stopped")
+
+	<-time.After(20 * timeout)
+
+	assert.True(t, service.timerHasStopped(), "timer should be stopped")
 }

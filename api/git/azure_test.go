@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -658,4 +659,71 @@ func Test_listFiles_Concurrently_azure(t *testing.T) {
 	client.listFiles(context.TODO(), opt)
 
 	time.Sleep(2 * time.Second)
+}
+
+func Test_purgeCache_azure(t *testing.T) {
+	ensureIntegrationTest(t)
+	opt := option{
+		repositoryUrl: privateAzureRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
+		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
+		extensions:    []string{},
+	}
+
+	cacheSize := 2
+	client := &azureClient{
+		client:       newHttpClientForAzure(),
+		baseUrl:      "https://dev.azure.com",
+		cacheEnabled: true,
+	}
+	client.repoRefCache, _ = lru.New(cacheSize)
+	client.repoFileCache, _ = lru.New(cacheSize)
+
+	client.listRefs(context.TODO(), opt)
+	client.listFiles(context.TODO(), opt)
+	assert.Equal(t, 1, client.repoRefCache.Len())
+	assert.Equal(t, 1, client.repoFileCache.Len())
+
+	client.purgeCache()
+	assert.Equal(t, 0, client.repoRefCache.Len())
+	assert.Equal(t, 0, client.repoFileCache.Len())
+}
+
+func Test_purgeCacheByTTL_azure(t *testing.T) {
+	ensureIntegrationTest(t)
+	opt := option{
+		repositoryUrl: privateAzureRepoURL,
+		referenceName: "refs/heads/main",
+		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
+		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
+		extensions:    []string{},
+	}
+
+	timeout := 10 * time.Millisecond
+	cacheSize := 2
+	cacheTTL := 20 * timeout
+	client := &azureClient{
+		client:       newHttpClientForAzure(),
+		baseUrl:      "https://dev.azure.com",
+		cacheEnabled: true,
+	}
+	client.repoRefCache, _ = lru.New(cacheSize)
+	client.repoFileCache, _ = lru.New(cacheSize)
+
+	service := Service{
+		shutdownCtx: context.TODO(),
+		azure:       client,
+	}
+
+	client.listRefs(context.TODO(), opt)
+	client.listFiles(context.TODO(), opt)
+	assert.Equal(t, 1, client.repoRefCache.Len())
+	assert.Equal(t, 1, client.repoFileCache.Len())
+
+	go service.startCacheCleanTimer(cacheTTL)
+	time.Sleep(30 * timeout)
+
+	assert.Equal(t, 0, client.repoRefCache.Len())
+	assert.Equal(t, 0, client.repoFileCache.Len())
 }
