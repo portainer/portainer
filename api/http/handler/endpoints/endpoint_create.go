@@ -258,10 +258,11 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 
 	endpointType := portainer.DockerEnvironment
 	if payload.EndpointCreationType == agentEnvironment {
-		if strings.HasPrefix(payload.URL, "https://") {
-			payload.URL = strings.TrimPrefix(payload.URL, "https://")
-		} else if strings.HasPrefix(payload.URL, "http://") {
-			payload.URL = strings.TrimPrefix(payload.URL, "http://")
+
+		// Case insensitive strip http or https scheme if URL entered
+		index := strings.Index(payload.URL, "://")
+		if index >= 0 {
+			payload.URL = payload.URL[index+3:]
 		}
 
 		payload.URL = "tcp://" + payload.URL
