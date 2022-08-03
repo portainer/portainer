@@ -211,7 +211,8 @@
                     ng-disabled="state.actionInProgress
                     || (state.BuildType === 'upload' && (!formValues.UploadFile || !formValues.Path))
                     || (state.BuildType === 'url' && (!formValues.URL || !formValues.Path))
-                    || (formValues.ImageNames.length === 0 || !validImageNames())"
+                    || (formValues.ImageNames.length === 0 || !validImageNames())
+                    || (formValues.DockerFileContent === '')"
                     ng-click="buildImage()"
                     button-spinner="state.actionInProgress"
                   >

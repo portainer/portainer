@@ -120,7 +120,7 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
       return false;
     }
     for (var i = 0; i < $scope.formValues.ImageNames.length; i++) {
-      if ($scope.formValues.ImageNames[i].Invalid) {
+      if (!$scope.formValues.ImageNames[i].Valid) {
         return false;
       }
     }
