@@ -25,10 +25,10 @@
   <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
     <div class="col-sm-12">
       <button type="button" class="btn btn-sm btn-default" style="margin-left: 0" ng-click="$ctrl.addEntry()" data-cy="k8sConfigCreate-createEntryButton">
-        <pr-icon icon="'plus'" feather="true" class="vertical-center"></pr-icon> Create entry
+        <pr-icon class="vertical-center" icon="'plus'" feather="true"></pr-icon> Create entry
       </button>
       <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addEntryFromFile($file)" style="margin-left: 0" data-cy="k8sConfigCreate-createConfigsFromFileButton">
-        <pr-icon icon="'upload'" feather="true" class="vertical-center"></pr-icon> Create key/value from file
+        <pr-icon class="vertical-center" icon="'upload'" feather="true"></pr-icon> Create key/value from file
       </button>
     </div>
   </div>
@@ -36,7 +36,7 @@
   <div ng-repeat="(index, entry) in $ctrl.formValues.Data" ng-if="$ctrl.formValues.IsSimple">
     <div class="form-group">
       <label for="configuration_data_key_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left">Key</label>
-      <div class="col-sm-8">
+      <div class="col-sm-8 col-lg-9">
         <input
           type="text"
           class="form-control"
@@ -47,33 +47,37 @@
           required
           ng-change="$ctrl.onChangeKey(entry)"
         />
-      </div>
-      <div
-        class="col-sm-11 small text-muted"
-        style="margin-top: 5px"
-        ng-show="
-          kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid ||
-          (!entry.Used && $ctrl.state.duplicateKeys[index] !== undefined) ||
-          $ctrl.state.invalidKeys[index]
-        "
-      >
-        <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$error">
-          <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required. </p>
-        </ng-messages>
-        <div>
-          <p ng-if="$ctrl.state.duplicateKeys[index] !== undefined" class="vertical-center">
-            <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This key is already defined.
+        <div
+          class="small text-muted"
+          style="margin-top: 5px"
+          ng-show="
+            kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid ||
+            (!entry.Used && $ctrl.state.duplicateKeys[index] !== undefined) ||
+            $ctrl.state.invalidKeys[index]
+          "
+        >
+          <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.
+            </p>
+          </ng-messages>
+          <div>
+            <p ng-if="$ctrl.state.duplicateKeys[index] !== undefined" class="vertical-center">
+              <pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon>This key is already defined.
+            </p>
+          </div>
+          <p ng-if="$ctrl.state.invalidKeys[index]" class="vertical-center">
+            <pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon> This key is invalid. A valid key must
+            consist of alphanumeric characters, '-', '_' or '.'
           </p>
         </div>
-        <p ng-if="$ctrl.state.invalidKeys[index]" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This key is invalid. A valid key must consist of alphanumeric characters, '-', '_' or '.'
-        </p>
       </div>
+      <div class="col-sm-3 col-lg-2"></div>
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple && !entry.IsBinary">
       <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left">Value</label>
-      <div class="col-sm-8">
+      <div class="col-sm-8 col-lg-9">
         <textarea
           class="form-control"
           rows="5"
@@ -82,11 +86,13 @@
           ng-model="$ctrl.formValues.Data[index].Value"
           required
         ></textarea>
-      </div>
-      <div class="col-sm-11 small text-muted" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
-        <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$error">
-          <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.</p>
-        </ng-messages>
+        <div class="small text-muted" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
+          <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$error">
+            <p ng-message="required" class="vertical-center"
+              ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.</p
+            >
+          </ng-messages>
+        </div>
       </div>
     </div>
 
@@ -108,7 +114,7 @@
           ng-click="$ctrl.removeEntry(index, entry)"
           data-cy="k8sConfigDetail-removeEntryButton{{ index }}"
         >
-          <pr-icon icon="'trash-2'" feather="true"></pr-icon> Remove entry
+          <pr-icon class="vertical-center" icon="'trash-2'" feather="true"></pr-icon> Remove entry
         </button>
         <span class="small text-muted" ng-if="entry.Used">
           <pr-icon icon="'alert-circle'" feather="true" mode="'primary'"></pr-icon>

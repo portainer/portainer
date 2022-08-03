@@ -3,12 +3,12 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-plus" title-text="Add a new tag"> </rd-widget-header>
+      <rd-widget-header icon="plus" feather-icon="true" title-text="Add a new tag"> </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" name="tagCreationForm" ng-submit="createTag()">
           <!-- name-input -->
           <div class="form-group">
-            <label for="name" class="col-sm-2 control-label text-left"> Name </label>
+            <label for="name" class="col-sm-2 control-label text-left required"> Name </label>
             <div class="col-sm-10">
               <input
                 type="text"
@@ -25,8 +25,14 @@
           <div class="form-group" ng-show="tagCreationForm.name.$invalid">
             <div class="col-sm-12 small text-warning">
               <div ng-messages="tagCreationForm.name.$error">
-                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-                <p ng-message="validName"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This tag already exists.</p>
+                <p ng-message="required" class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                  This field is required.
+                </p>
+                <p ng-message="validName" class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                  This tag already exists.
+                </p>
               </div>
             </div>
           </div>
@@ -40,7 +46,10 @@
                 ng-click="createTag()"
                 button-spinner="state.actionInProgress"
               >
-                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create tag</span>
+                <span ng-hide="state.actionInProgress" class="vertical-center">
+                  <pr-icon icon="'plus'" feather="true"></pr-icon>
+                  Create tag
+                </span>
                 <span ng-show="state.actionInProgress">Creating tag...</span>
               </button>
             </div>
@@ -53,6 +62,6 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <tags-datatable title-text="Tags" title-icon="fa-tags" dataset="tags" table-key="tags" order-by="Name" remove-action="removeAction"></tags-datatable>
+    <tags-datatable title-text="Tags" title-icon="svg-tag2" dataset="tags" table-key="tags" order-by="Name" remove-action="removeAction"></tags-datatable>
   </div>
 </div>

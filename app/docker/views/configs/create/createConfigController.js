@@ -147,8 +147,8 @@ class CreateConfigController {
     }
   }
 
-  editorUpdate(cm) {
-    this.formValues.ConfigContent = cm.getValue();
+  editorUpdate(value) {
+    this.formValues.ConfigContent = value;
     this.state.isEditorDirty = true;
   }
 }

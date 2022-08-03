@@ -1,6 +1,8 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
+import { Icon } from '@@/Icon';
+
 import { Button } from '../Button';
 
 import styles from './CopyButton.module.css';
@@ -31,17 +33,19 @@ export function CopyButton({
         title="Copy Value"
         type="button"
       >
-        <i className="fa fa-copy space-right" aria-hidden="true" /> {children}
+        <Icon icon="copy" feather />
+        {children}
       </Button>
 
       <span
         className={clsx(
           copiedSuccessfully && styles.fadeout,
           styles.displayText,
-          'space-left'
+          'space-left',
+          'vertical-center'
         )}
       >
-        <i className="fa fa-check" aria-hidden="true" />
+        <Icon icon="check" feather />
         {displayText && <span className="space-left">{displayText}</span>}
       </span>
     </div>

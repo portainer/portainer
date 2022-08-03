@@ -58,24 +58,24 @@
           <div class="btn-group">
             <button
               type="button"
-              class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+              class="btn btn-sm btn-secondary h-fit vertical-center !ml-0"
               ui-sref="docker.images.import"
               authorization="DockerImageLoad"
               ng-disabled="$ctrl.exportInProgress"
               data-cy="image-importImageButton"
             >
-              <pr-icon icon="'upload'" feather="true"></pr-icon>Import
+              <pr-icon icon="'upload'" feather="true" mode="'secondary'"></pr-icon>Import
             </button>
             <button
               type="button"
-              class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+              class="btn btn-sm btn-secondary h-fit vertical-center !ml-0"
               ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.exportInProgress"
               ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)"
               button-spinner="$ctrl.exportInProgress"
               authorization="DockerImageGet"
               data-cy="image-exportImageButton"
             >
-              <pr-icon icon="'download'" feather="true"></pr-icon>
+              <pr-icon icon="'download'" feather="true" mode="'secondary'"></pr-icon>
               <span ng-hide="$ctrl.exportInProgress">Export</span>
               <span ng-show="$ctrl.exportInProgress">Export in progress...</span>
             </button>

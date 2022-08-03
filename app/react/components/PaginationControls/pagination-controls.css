@@ -22,7 +22,7 @@
 .pagination > .disabled > a:hover,
 .pagination > .disabled > a:focus {
   color: var(--text-pagination-color);
-  background-color: var(--bg-pagination-color);
+  background-color: var(--bg-pagination-disabled-color);
   border-color: var(--border-pagination-color);
 }
 
@@ -33,7 +33,7 @@
   margin-left: -1px !important;
   line-height: 1.42857143;
   text-decoration: none;
-  border: 1px solid #ddd;
+  border: 1px solid var(--ui-white);
 }
 
 .pagination > li > a,
@@ -41,7 +41,7 @@
 .pagination > li > span {
   background-color: var(--bg-pagination-span-color);
   border-color: var(--border-pagination-span-color);
-  color: var(--text-pagination-span-color);
+  color: var(--text-pagination-span-color) !important;
 }
 
 .pagination > li > a:hover,
@@ -53,6 +53,7 @@
   background-color: var(--bg-pagination-hover-color);
   border-color: var(--border-pagination-hover-color);
   color: var(--text-pagination-span-hover-color);
+  border-radius: 8px;
 }
 
 .pagination > .active > a,
@@ -67,6 +68,9 @@
   @apply text-blue-7;
   z-index: 3;
   cursor: default;
-  background-color: var(--text-pagination-span-color);
-  border-color: var(--text-pagination-span-color);
+  /* background-color: var(--text-pagination-span-color); */
+  background-color: var(--bg-pagination-color);
+  border-radius: 8px;
+  color: var(--text-pagination-span-hover-color) !important;
+  border-color: var(--border-pagination-span-color);
 }

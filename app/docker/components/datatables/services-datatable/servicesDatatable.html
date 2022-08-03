@@ -78,53 +78,67 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Name'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Name'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Name')"
+                ></table-column-header>
               </th>
               <th ng-if="$ctrl.showStackColumn">
-                <a ng-click="$ctrl.changeOrderBy('StackName')">
-                  Stack
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Stack'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'StackName'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('StackName')"
+                ></table-column-header>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.image.display">
-                <a ng-click="$ctrl.changeOrderBy('Image')">
-                  Image
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Image'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Image'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Image')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Mode')">
-                  Scheduling Mode
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mode' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mode' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Scheduling Mode'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Mode'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Mode' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Mode')"
+                ></table-column-header>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.ports.display">
-                <a ng-click="$ctrl.changeOrderBy('Ports')">
-                  Published Ports
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Published Ports'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Ports'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Ports')"
+                ></table-column-header>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.updated.display">
-                <a ng-click="$ctrl.changeOrderBy('UpdatedAt')">
-                  Last Update
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Last Update'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'UpdatedAt'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'UpdatedAt' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('UpdatedAt')"
+                ></table-column-header>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.ownership.display">
-                <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
-                  Ownership
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Ownership'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'ResourceControl.Ownership'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')"
+                ></table-column-header>
               </th>
             </tr>
           </thead>

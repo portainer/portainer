@@ -1,8 +1,8 @@
 <ng-form name="commonCustomTemplateForm">
   <!-- title-input -->
-  <div class="form-group">
+  <div class="form-group mb-0">
     <label for="template_title" class="col-sm-3 col-lg-2 control-label text-left"> Title </label>
-    <div class="col-sm-9 col-lg-10">
+    <div class="col-sm-8">
       <input
         type="text"
         class="form-control"
@@ -14,39 +14,37 @@
         auto-focus
         required
       />
-    </div>
-  </div>
-  <div class="form-group" ng-show="commonCustomTemplateForm.template_title.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="commonCustomTemplateForm.template_title.$error">
-        <p ng-message="pattern">
-          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-          <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="form-group" ng-show="commonCustomTemplateForm.template_title.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="commonCustomTemplateForm.template_title.$error">
-        <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Title is required.</p>
-      </div>
+      <span class="help-block">
+        <div ng-show="commonCustomTemplateForm.template_title.$invalid">
+          <div class="mt-2 small text-muted">
+            <div ng-messages="commonCustomTemplateForm.template_title.$error">
+              <p class="vertical-center" ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Title is required. </p>
+              <p class="vertical-center" ng-message="pattern">
+                <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').
+              </p>
+            </div>
+          </div>
+        </div>
+      </span>
     </div>
   </div>
   <!-- !title-input -->
 
   <!-- description-input -->
-  <div class="form-group">
+  <div class="form-group mb-0">
     <label for="description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
-    <div class="col-sm-9 col-lg-10">
+    <div class="col-sm-8">
       <input type="text" class="form-control" id="description" ng-model="$ctrl.formValues.Description" name="description" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="commonCustomTemplateForm.description.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="commonCustomTemplateForm.description.$error">
-        <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Description is required.</p>
-      </div>
+      <span class="help-block">
+        <div class="mt-2 small text-muted">
+          <div ng-show="commonCustomTemplateForm.description.$invalid">
+            <div ng-messages="commonCustomTemplateForm.description.$error">
+              <p class="vertical-center" ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Description is required.</p>
+            </div>
+          </div>
+        </div>
+      </span>
     </div>
   </div>
   <!-- !description-input -->
@@ -54,7 +52,7 @@
   <!-- note-input -->
   <div class="form-group">
     <label for="note" class="col-sm-3 col-lg-2 control-label text-left">Note</label>
-    <div class="col-sm-9 col-lg-10">
+    <div class="col-sm-8">
       <input type="text" class="form-control" id="note" ng-model="$ctrl.formValues.Note" />
     </div>
   </div>
@@ -63,7 +61,7 @@
   <!-- icon-url-input -->
   <div class="form-group">
     <label for="icon-url" class="col-sm-3 col-lg-2 control-label text-left">Icon URL</label>
-    <div class="col-sm-9 col-lg-10">
+    <div class="col-sm-8">
       <input type="text" class="form-control" id="icon-url" ng-model="$ctrl.formValues.Logo" />
     </div>
   </div>
@@ -72,7 +70,7 @@
   <!-- platform-input -->
   <div ng-if="$ctrl.showPlatformField" class="form-group">
     <label for="platform" class="col-sm-3 col-lg-2 control-label text-left">Platform</label>
-    <div class="col-sm-9 col-lg-10">
+    <div class="col-sm-8">
       <select class="form-control" ng-model="$ctrl.formValues.Platform" ng-options="+(opt.value) as opt.label for opt in $ctrl.platformTypes"> </select>
     </div>
   </div>
@@ -81,7 +79,7 @@
   <!-- platform-input -->
   <div ng-if="$ctrl.showTypeField" class="form-group">
     <label for="platform" class="col-sm-3 col-lg-2 control-label text-left">Type</label>
-    <div class="col-sm-9 col-lg-10">
+    <div class="col-sm-8">
       <select class="form-control" ng-model="$ctrl.formValues.Type" ng-options="+(opt.value) as opt.label for opt in $ctrl.templateTypes"> </select>
     </div>
   </div>

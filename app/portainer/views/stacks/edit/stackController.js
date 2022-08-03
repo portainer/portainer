@@ -94,6 +94,18 @@ angular.module('portainer.app').controller('StackController', [
       $scope.formValues.Env = value;
     }
 
+    $scope.onEnableWebhookChange = function (enable) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.EnableWebhook = enable;
+      });
+    };
+
+    $scope.onPruneChange = function (enable) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.Prune = enable;
+      });
+    };
+
     $scope.duplicateStack = function duplicateStack(name, targetEndpointId) {
       var stack = $scope.stack;
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
@@ -316,7 +328,7 @@ angular.module('portainer.app').controller('StackController', [
     }
 
     function loadStack(id) {
-      return $async(() => {
+      return $async(async () => {
         var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
         getEnvironments()
@@ -465,7 +477,17 @@ angular.module('portainer.app').controller('StackController', [
       }
     };
 
+    async function canManageStacks() {
+      return endpoint.SecuritySettings.allowStackManagementForRegularUsers || Authentication.isAdmin();
+    }
+
     async function initView() {
+      // if the user is not an admin, and stack management is disabled for non admins, then take the user to the dashboard
+      $scope.createEnabled = await canManageStacks();
+      if (!$scope.createEnabled) {
+        $state.go('docker.dashboard');
+      }
+
       var stackName = $transition$.params().name;
       $scope.stackName = stackName;
 

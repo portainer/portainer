@@ -1,3 +1,5 @@
+import { Zap } from 'react-feather';
+
 import {
   DockerSnapshot,
   EnvironmentType,
@@ -24,16 +26,18 @@ export function EnvironmentStatsDocker({ snapshots = [], type }: Props) {
 
   return (
     <div className="blocklist-item-line endpoint-item">
-      <span className="blocklist-item-desc space-x-4">
+      <span className="blocklist-item-desc">
         <Stat
           value={addPlural(snapshot.StackCount, 'stack')}
-          icon="fa-th-list"
+          icon="layers"
+          featherIcon
         />
 
         {!!snapshot.Swarm && (
           <Stat
             value={addPlural(snapshot.ServiceCount, 'service')}
-            icon="fa-list-alt"
+            icon="shuffle"
+            featherIcon
           />
         )}
 
@@ -43,21 +47,34 @@ export function EnvironmentStatsDocker({ snapshots = [], type }: Props) {
           healthy={snapshot.HealthyContainerCount}
           unhealthy={snapshot.UnhealthyContainerCount}
         />
-
-        <Stat value={addPlural(snapshot.VolumeCount, 'volume')} icon="fa-hdd" />
-        <Stat value={addPlural(snapshot.ImageCount, 'image')} icon="fa-clone" />
+        <Stat
+          value={addPlural(snapshot.VolumeCount, 'volume')}
+          icon="database"
+          featherIcon
+        />
+        <Stat
+          value={addPlural(snapshot.ImageCount, 'image')}
+          icon="list"
+          featherIcon
+        />
       </span>
 
-      <span className="small text-muted space-x-3">
+      <span className="small text-muted space-x-2 vertical-center">
         <span>{snapshot.Swarm ? 'Swarm' : 'Standalone'}</span>
         <span>{snapshot.DockerVersion}</span>
         {type === EnvironmentType.AgentOnDocker && (
           <span>
-            + <i className="fa fa-bolt" aria-hidden="true" /> Agent
+            +{' '}
+            <Zap className="icon icon-xs vertical-center" aria-hidden="true" />{' '}
+            Agent
           </span>
         )}
         {snapshot.Swarm && (
-          <Stat value={addPlural(snapshot.NodeCount, 'node')} icon="fa-hdd" />
+          <Stat
+            value={addPlural(snapshot.NodeCount, 'node')}
+            icon="hard-drive"
+            featherIcon
+          />
         )}
       </span>
     </div>
@@ -80,15 +97,37 @@ function ContainerStats({
   const containersCount = running + stopped;
 
   return (
-    <Stat value={addPlural(containersCount, 'container')} icon="fa-cubes">
+    <Stat
+      value={addPlural(containersCount, 'container')}
+      icon="box"
+      featherIcon
+    >
       {containersCount > 0 && (
-        <span className="space-x-2">
-          <span>-</span>
-          <Stat value={running} icon="fa-power-off green-icon" />
-          <Stat value={stopped} icon="fa-power-off red-icon" />
-          <span>/</span>
-          <Stat value={healthy} icon="fa-heartbeat green-icon" />
-          <Stat value={unhealthy} icon="fa-heartbeat orange-icon" />
+        <span className="space-x-2 space-right">
+          <Stat
+            value={running}
+            icon="power"
+            featherIcon
+            iconClass="icon-success"
+          />
+          <Stat
+            value={stopped}
+            icon="power"
+            featherIcon
+            iconClass="icon-danger"
+          />
+          <Stat
+            value={healthy}
+            icon="heart"
+            featherIcon
+            iconClass="icon-success"
+          />
+          <Stat
+            value={unhealthy}
+            icon="heart"
+            featherIcon
+            iconClass="icon-warning"
+          />
         </span>
       )}
     </Stat>
