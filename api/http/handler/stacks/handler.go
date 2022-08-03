@@ -144,9 +144,7 @@ func (handler *Handler) userCanManageStacks(securityContext *security.Restricted
 			return false, fmt.Errorf("Failed to get user from the database: %w", err)
 		}
 
-		if !canCreate {
-			return false, nil
-		}
+		return canCreate, nil
 	}
 	return true, nil
 }

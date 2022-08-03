@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -96,7 +95,7 @@ func (handler *Handler) stackAssociate(w http.ResponseWriter, r *http.Request) *
 	}
 	if !canManage {
 		errMsg := "Stack management is disabled for non-admin users"
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: errors.New(errMsg)}
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: fmt.Errorf(errMsg)}
 	}
 
 	stack.EndpointID = portainer.EndpointID(endpointID)

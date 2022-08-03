@@ -109,7 +109,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	}
 	if !canManage {
 		errMsg := "Stack deletion is disabled for non-admin users"
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: errors.New(errMsg)}
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: fmt.Errorf(errMsg)}
 	}
 
 	// stop scheduler updates of the stack before removal
