@@ -23,10 +23,11 @@ export interface SortableTableSettings {
 }
 
 export function sortableSettings(
-  set: Set<SortableTableSettings>
+  set: Set<SortableTableSettings>,
+  initialSortBy = 'name'
 ): SortableTableSettings {
   return {
-    sortBy: { id: 'name', desc: false },
+    sortBy: { id: initialSortBy, desc: false },
     setSortBy: (id: string, desc: boolean) => set({ sortBy: { id, desc } }),
   };
 }

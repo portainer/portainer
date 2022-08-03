@@ -18,13 +18,21 @@ import { Table } from './Table';
 import { multiple } from './filter-types';
 import { SearchBar, useSearchBarState } from './SearchBar';
 import { SelectedRowsCount } from './SelectedRowsCount';
-import { TableSettingsProvider } from './useTableSettings';
+import { TableSettingsProvider } from './useZustandTableSettings';
 import { useRowSelect } from './useRowSelect';
 import { PaginationTableSettings, SortableTableSettings } from './types';
 
 interface DefaultTableSettings
   extends SortableTableSettings,
     PaginationTableSettings {}
+
+interface TitleOptionsVisible {
+  title: string;
+  icon?: string;
+  hide?: never;
+}
+
+type TitleOptions = TitleOptionsVisible | { hide: true };
 
 interface Props<
   D extends Record<string, unknown>,
@@ -40,10 +48,7 @@ interface Props<
   getRowId?(row: D): string;
   isRowSelectable?(row: Row<D>): boolean;
   emptyContentLabel?: string;
-  titleOptions: {
-    title: string;
-    icon?: string;
-  };
+  titleOptions: TitleOptions;
   initialTableState?: Partial<TableState<D>>;
   isLoading?: boolean;
   totalCount?: number;
@@ -78,7 +83,6 @@ export function Datatable<
       filterTypes: { multiple },
       initialState: {
         pageSize: settingsStore.pageSize || 10,
-
         sortBy: [settingsStore.sortBy],
         globalFilter: searchBarValue,
         ...initialTableState,
@@ -132,19 +136,21 @@ export function Datatable<
   return (
     <div className="row">
       <div className="col-sm-12">
-        <TableSettingsProvider defaults={settingsStore} storageKey={storageKey}>
+        <TableSettingsProvider settings={settingsStore}>
           <Table.Container>
-            <Table.Title label={titleOptions.title} icon={titleOptions.icon}>
-              <SearchBar value={searchBarValue} onChange={setGlobalFilter} />
-              {renderTableActions && (
-                <Table.Actions>
-                  {renderTableActions(selectedItems)}
-                </Table.Actions>
-              )}
-              <Table.TitleActions>
-                {!!renderTableSettings && renderTableSettings(tableInstance)}
-              </Table.TitleActions>
-            </Table.Title>
+            {isTitleVisible(titleOptions) && (
+              <Table.Title label={titleOptions.title} icon={titleOptions.icon}>
+                <SearchBar value={searchBarValue} onChange={setGlobalFilter} />
+                {renderTableActions && (
+                  <Table.Actions>
+                    {renderTableActions(selectedItems)}
+                  </Table.Actions>
+                )}
+                <Table.TitleActions>
+                  {!!renderTableSettings && renderTableSettings(tableInstance)}
+                </Table.TitleActions>
+              </Table.Title>
+            )}
             <Table
               className={tableProps.className}
               role={tableProps.role}
@@ -203,6 +209,12 @@ export function Datatable<
       </div>
     </div>
   );
+}
+
+function isTitleVisible(
+  titleSettings: TitleOptions
+): titleSettings is TitleOptionsVisible {
+  return !titleSettings.hide;
 }
 
 function defaultGetRowId<D extends Record<string, unknown>>(row: D): string {
