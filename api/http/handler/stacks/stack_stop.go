@@ -75,15 +75,6 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
 	}
 
-	canManage, err := handler.userCanManageStacks(securityContext, endpoint)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack deletion", Err: err}
-	}
-	if !canManage {
-		errMsg := "Stack management is disabled for non-admin users"
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: errors.New(errMsg)}
-	}
-
 	if stack.Status == portainer.StackStatusInactive {
 		return &httperror.HandlerError{http.StatusBadRequest, "Stack is already inactive", errors.New("Stack is already inactive")}
 	}

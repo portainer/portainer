@@ -70,7 +70,7 @@ export function useAuthorizations(
 export function isEnvironmentAdmin(
   user: User,
   environmentId: EnvironmentId,
-  adminOnlyCE = true
+  adminOnlyCE = false
 ) {
   return hasAuthorizations(
     user,
