@@ -14,15 +14,16 @@ import { SidebarSection } from './SidebarSection';
 
 interface Props {
   isAdmin: boolean;
+  isTeamLeader?: boolean;
 }
 
-export function SettingsSidebar({ isAdmin }: Props) {
+export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
   const teamSyncQuery = usePublicSettings<boolean>({
     select: (settings) => settings.TeamSync,
   });
 
   const showUsersSection =
-    !window.ddExtension && (isAdmin || teamSyncQuery.data);
+    !window.ddExtension && (isAdmin || (isTeamLeader && !teamSyncQuery.data));
 
   return (
     <SidebarSection title="Settings">

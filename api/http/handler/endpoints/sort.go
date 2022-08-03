@@ -39,8 +39,8 @@ func (e EndpointsByGroup) Less(i, j int) bool {
 		return false
 	}
 
-	groupA := endpointGroupNames[e.endpoints[i].GroupID]
-	groupB := endpointGroupNames[e.endpoints[j].GroupID]
+	groupA := e.endpointGroupNames[e.endpoints[i].GroupID]
+	groupB := e.endpointGroupNames[e.endpoints[j].GroupID]
 
 	return sortorder.NaturalLess(strings.ToLower(groupA), strings.ToLower(groupB))
 }

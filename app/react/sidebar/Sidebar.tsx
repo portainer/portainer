@@ -16,7 +16,7 @@ import { SidebarProvider } from './useSidebarState';
 
 export function Sidebar() {
   const { isAdmin, user } = useUser();
-  const isTeamLeader = useIsTeamLeader(user);
+  const isTeamLeader = useIsTeamLeader(user) as boolean;
 
   const settingsQuery = usePublicSettings();
 
@@ -52,7 +52,9 @@ export function Sidebar() {
 
             {isAdmin && EnableEdgeComputeFeatures && <EdgeComputeSidebar />}
 
-            {(isAdmin || isTeamLeader) && <SettingsSidebar isAdmin={isAdmin} />}
+            {(isAdmin || isTeamLeader) && (
+              <SettingsSidebar isAdmin={isAdmin} isTeamLeader={isTeamLeader} />
+            )}
           </ul>
         </div>
 

@@ -20,7 +20,7 @@
         />
       </div>
       <!-- actions -->
-      <div data-cy="k8sApp-tableSettings" class="settings">
+      <div data-cy="k8sApp-portTableSettings" class="settings">
         <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
           <span uib-dropdown-toggle aria-label="Settings">
             <pr-icon icon="'more-vertical'" feather="true" class-name="'icon !mr-0 !h-4'"></pr-icon>
@@ -40,7 +40,7 @@
                       type="checkbox"
                       ng-model="$ctrl.settings.repeater.autoRefresh"
                       ng-change="$ctrl.onSettingsRepeaterChange()"
-                      data-cy="k8sApp-autoRefreshCheckbox"
+                      data-cy="k8sApp-autoRefreshCheckbox-port"
                     />
                     <label for="setting_auto_refresh">Auto refresh</label>
                   </div>
@@ -51,7 +51,7 @@
                       ng-model="$ctrl.settings.repeater.refreshRate"
                       ng-change="$ctrl.onSettingsRepeaterChange()"
                       class="small-select"
-                      data-cy="k8sApp-refreshRateDropdown"
+                      data-cy="k8sApp-refreshRateDropdown-port"
                     >
                       <option value="10">10s</option>
                       <option value="30">30s</option>
@@ -66,7 +66,7 @@
                 </div>
               </div>
               <div>
-                <a type="button" class="btn btn-sm btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sApp-tableSettingsCloseButton">Close</a>
+                <a type="button" class="btn btn-sm btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sApp-tableSettingsCloseButton-port">Close</a>
               </div>
             </div>
           </div>
