@@ -13,10 +13,12 @@
         <div class="panel-body">
           <!-- toggle -->
           <div>
-            <a ng-click="togglePanel()">
-              <pr-icon icon="'arrow-down'" feather="true" ng-if="state.showInitPassword" aria-hidden="true"></pr-icon>
-              <pr-icon icon="'arrow-right'" feather="true" ng-if="!state.showInitPassword" aria-hidden="true"></pr-icon>
-              <span class="space-left form-section-title">New Portainer installation</span>
+            <a ng-click="togglePanel()" class="vertical-center">
+              <span>
+                <pr-icon icon="'chevron-down'" feather="true" ng-if="state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
+                <pr-icon icon="'chevron-right'" feather="true" ng-if="!state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
+              </span>
+              <span class="form-section-title">New Portainer installation</span>
             </a>
           </div>
           <!-- !toggle -->
@@ -69,10 +71,10 @@
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12 text-muted">
-                <p>
-                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" aria-hidden="true"></pr-icon>
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                   <span>The password must be at least {{ requiredPasswordLength }} characters long.</span>
-                  <pr-icon class="fa green-icon" icon="'check'" feather="true" aria-hidden="true" ng-if="form.password.$valid && formValues.Password"></pr-icon>
+                  <pr-icon class="fa green-icon" icon="'check'" feather="true" ng-if="form.password.$valid && formValues.Password"></pr-icon>
                 </p>
               </div>
             </div>
@@ -87,7 +89,7 @@
                   ng-click="createAdminUser()"
                   button-spinner="state.actionInProgress"
                 >
-                  <span ng-hide="state.actionInProgress"><pr-icon icon="'user-plus'" feather="true" aria-hidden="true"></pr-icon> Create user</span>
+                  <span ng-hide="state.actionInProgress">Create user</span>
                   <span ng-show="state.actionInProgress">Creating user...</span>
                 </button>
               </div>
@@ -95,11 +97,11 @@
             <!-- !actions -->
             <!-- enableTelemetry-->
             <div class="form-group">
-              <div class="col-sm-12">
+              <div class="col-sm-12 vertical-center">
                 <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" />
                 <span class="text-muted small"
                   >Allow collection of anonymous statistics. You can find more information about this in our
-                  <a href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.</span
+                  <a class="hyperlink" href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.</span
                 >
               </div>
             </div>
@@ -115,10 +117,12 @@
         <div class="panel-body">
           <!-- toggle -->
           <div>
-            <a ng-click="togglePanel()" data-cy="init-installPortainerFromBackup">
-              <pr-icon icon="'arrow-down'" feather="true" ng-if="state.showRestorePortainer" aria-hidden="true"></pr-icon>
-              <pr-icon icon="'arrow-right'" feather="true" ng-if="!state.showRestorePortainer" aria-hidden="true"></pr-icon
-              ><span class="space-left form-section-title">Restore Portainer from backup</span>
+            <a ng-click="togglePanel()" data-cy="init-installPortainerFromBackup" class="vertical-center">
+              <span
+                ><pr-icon icon="'chevron-down'" feather="true" ng-if="state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon>
+                <pr-icon icon="'chevron-right'" feather="true" ng-if="!state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon
+              ></span>
+              <span class="form-section-title">Restore Portainer from backup</span>
             </a>
           </div>
           <!-- !toggle -->
@@ -139,7 +143,7 @@
                 <input type="radio" id="restore_file" checked="checked" />
                 <label for="restore_file" data-cy="init-selectLocalFile">
                   <div class="boxselector_header">
-                    <pr-icon icon="'upload'" feather="true" aria-hidden="true"></pr-icon>
+                    <pr-icon icon="'upload'" feather="true"></pr-icon>
                     Upload backup file
                   </div>
                   <p></p>
@@ -149,10 +153,13 @@
                 <input type="radio" id="restore_s3" disabled />
                 <label for="restore_s3" class="boxselector_disabled">
                   <div class="boxselector_header">
-                    <pr-icon icon="'download'" feather="true" aria-hidden="true"></pr-icon>
+                    <pr-icon icon="'download'" feather="true"></pr-icon>
                     Retrieve from S3
                   </div>
-                  <p>This feature is available in <a href="https://www.portainer.io/business-upsell?from=restore-s3-form" target="_blank"> Portainer Business Edition</a></p>
+                  <p
+                    >This feature is available in
+                    <a class="hyperlink" href="https://www.portainer.io/business-upsell?from=restore-s3-form" target="_blank"> Portainer Business Edition</a></p
+                  >
                 </label>
               </div>
             </div>
@@ -165,7 +172,7 @@
             <!-- !note -->
             <!-- select-file-input -->
             <div class="form-group">
-              <div class="col-sm-12">
+              <div class="col-sm-12 vertical-center">
                 <button
                   class="btn btn-sm btn-primary"
                   ngf-select
@@ -176,9 +183,9 @@
                   data-cy="init-selectBackupFileButton"
                   >Select file</button
                 >
-                <span class="space-left">
+                <span class="space-left vertical-center">
                   {{ formValues.BackupFile.name }}
-                  <pr-icon class="fa red-icon" icon="'x'" feather="true" aria-hidden="true" ng-if="!formValues.BackupFile"></pr-icon>
+                  <pr-icon class="fa red-icon" icon="'x'" feather="true" ng-if="!formValues.BackupFile"></pr-icon>
                 </span>
               </div>
             </div>
