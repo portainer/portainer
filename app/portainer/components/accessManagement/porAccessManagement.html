@@ -6,7 +6,7 @@
         <form class="form-horizontal">
           <div ng-if="ctrl.entityType !== 'registry'" class="form-group">
             <span class="col-sm-12 small text-warning">
-              <p>
+              <p class="vertical-center">
                 <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                 Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
               </p>
@@ -19,12 +19,14 @@
             <label class="col-sm-3 col-lg-2 control-label text-left"> Role </label>
             <div class="col-sm-9 col-lg-6">
               <div class="flex items-center">
-                <select
-                  class="form-control"
-                  ng-model="ctrl.formValues.selectedRole"
-                  ng-options="role as ctrl.roleLabel(role) disable when ctrl.isRoleLimitedToBE(role) for role in ctrl.roles"
-                >
-                </select>
+                <div>
+                  <select
+                    class="form-control"
+                    ng-model="ctrl.formValues.selectedRole"
+                    ng-options="role as ctrl.roleLabel(role) disable when ctrl.isRoleLimitedToBE(role) for role in ctrl.roles"
+                  >
+                  </select>
+                </div>
                 <be-feature-indicator feature="ctrl.limitedFeature" class="space-left"></be-feature-indicator>
               </div>
             </div>
@@ -41,7 +43,10 @@
                 button-spinner="ctrl.actionInProgress"
                 data-cy="access-createAccess"
               >
-                <span ng-hide="ctrl.state.actionInProgress"><pr-icon icon="'plus'" feather="true"></pr-icon> Create access</span>
+                <span ng-hide="ctrl.state.actionInProgress" class="vertical-center">
+                  <pr-icon icon="'plus'" feather="true"></pr-icon>
+                  Create access
+                </span>
                 <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
               </button>
             </div>
