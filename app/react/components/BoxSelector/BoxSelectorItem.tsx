@@ -7,6 +7,7 @@ import { Icon } from '@/react/components/Icon';
 import './BoxSelectorItem.css';
 
 import { BoxSelectorOption } from './types';
+import { LimitedToBeIndicator } from './LimitedToBeIndicator';
 
 interface Props<T extends number | string> {
   radioName: string;
@@ -28,6 +29,7 @@ export function BoxSelectorItem<T extends number | string>({
   const limitedToBE = isLimitedToBE(option.feature);
 
   const tooltipId = `box-selector-item-${radioName}-${option.id}`;
+  const beIndicatorTooltipId = `box-selector-item-${radioName}-${option.id}-limited`;
   return (
     <div
       className={clsx('box-selector-item', {
@@ -51,19 +53,22 @@ export function BoxSelectorItem<T extends number | string>({
       />
 
       <label htmlFor={option.id} data-cy={`${radioName}_${option.value}`}>
-        {limitedToBE && <i className="fas fa-briefcase limited-icon" />}
-        <div className="boxselector_img_container">
-          {!!option.icon && (
-            <Icon
-              icon={option.icon}
-              feather={option.featherIcon}
-              className="boxselector_icon space-right"
-            />
-          )}
+        {limitedToBE && (
+          <LimitedToBeIndicator tooltipId={beIndicatorTooltipId} />
+        )}
+        <div className={clsx({ 'opacity-30': limitedToBE })}>
+          <div className="boxselector_img_container">
+            {!!option.icon && (
+              <Icon
+                icon={option.icon}
+                feather={option.featherIcon}
+                className="boxselector_icon space-right"
+              />
+            )}
+          </div>
+          <div className="boxselector_header">{option.label}</div>
+          <p className="box-selector-item-description">{option.description}</p>
         </div>
-        <div className="boxselector_header">{option.label}</div>
-
-        <p className="box-selector-item-description">{option.description}</p>
       </label>
       {tooltip && (
         <ReactTooltip
