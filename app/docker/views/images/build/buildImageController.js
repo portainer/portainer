@@ -57,6 +57,9 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
 
   $scope.removeImageName = function (index) {
     $scope.formValues.ImageNames.splice(index, 1);
+    for (var i = 0; i < $scope.formValues.ImageNames.length; i++) {
+      $scope.checkName(i);
+    }
   };
 
   function buildImageBasedOnBuildType(method, names) {
