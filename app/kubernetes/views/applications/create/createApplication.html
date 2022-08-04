@@ -14,15 +14,15 @@
   title="'Edit application'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
-    { 
+    {
       label:ctrl.application.ResourcePool,
-      link: 'kubernetes.resourcePools.resourcePool', 
+      link: 'kubernetes.resourcePools.resourcePool',
       linkParams:{ id: ctrl.application.ResourcePool }
     },
     { label:'Applications', link:'kubernetes.applications' },
-    { 
+    {
       label:ctrl.application.Name,
-      link: 'kubernetes.applications.application', 
+      link: 'kubernetes.applications.application',
       linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
     },
      'Edit',
@@ -1317,7 +1317,7 @@
                 <button
                   ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
                   type="button"
-                  class="btn btn-primary btn-sm"
+                  class="btn btn-primary btn-sm !ml-0"
                   ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.imageValidityIsValid()"
                   ng-click="ctrl.deployApplication()"
                   button-spinner="ctrl.state.actionInProgress"
