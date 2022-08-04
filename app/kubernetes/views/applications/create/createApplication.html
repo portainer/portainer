@@ -97,10 +97,12 @@
               >
                 <editor-description>
                   <span class="text-muted small" ng-show="ctrl.stack.IsComposeFormat">
-                    <p>
+                    <p class="vertical-center">
                       <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
-                      Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not
-                      all the Compose format options are supported by Kompose at the moment.
+                      <span>
+                        Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
+                        not all the Compose format options are supported by Kompose at the moment.
+                      </span>
                     </p>
                     <p>
                       You can get more information about Compose file format in the
@@ -108,8 +110,8 @@
                     </p>
                   </span>
                   <span class="text-muted small" ng-show="!ctrl.stack.IsComposeFormat">
-                    <p>
-                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                    <p class="vertical-center">
+                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                       This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
                     </p>
                     <p>
@@ -186,7 +188,7 @@
                   <!-- #region STACK -->
                   <div class="form-group">
                     <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                       Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to
                       use the application name.
                     </div>
@@ -331,7 +333,7 @@
                       </span>
                     </div>
                     <div class="col-sm-12 small text-muted vertical-center" style="margin-top: 15px" ng-if="ctrl.formValues.Configurations.length">
-                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                       Portainer will automatically expose all the keys of a configuration as environment variables. This behavior can be overridden to filesystem mounts for each
                       key via the override button.
                     </div>
@@ -471,7 +473,7 @@
                   <!-- #region PERSISTED FOLDERS -->
                   <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
                     <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                       No storage option is available to persist data, contact your administrator to enable a storage option.
                     </div>
                   </div>
@@ -798,14 +800,14 @@
                   <!-- #region RESOURCE RESERVATIONS -->
                   <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota">
                     <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                       Resource reservations are applied per instance of the application.
                     </div>
                   </div>
 
                   <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
                     <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                       A resource quota is set on this namespace, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums
                       are inherited from the namespace quota.
                     </div>
@@ -996,7 +998,7 @@
                     ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1 && (ctrl.formValues.CpuLimit !== 0 || ctrl.formValues.MemoryLimit !== 0)"
                   >
                     <div class="col-sm-12 small text-muted vertical-center">
-                      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                       <div>
                         This application will reserve the following resources:
                         <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount | kubernetesApplicationCPUValue }} CPU</b> and
@@ -1167,7 +1169,7 @@
                       </div>
 
                       <div class="col-sm-12 small text-muted vertical-center" ng-if="ctrl.formValues.Placements.length > 0" style="margin-top: 10px">
-                        <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                        <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                         <div> Deploy this application on nodes that respect <b>ALL</b> of the following placement rules. Placement rules are based on node labels. </div>
                       </div>
 
