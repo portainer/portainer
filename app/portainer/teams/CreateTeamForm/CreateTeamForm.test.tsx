@@ -12,7 +12,7 @@ test('filling the name should make the submit button clickable and emptying it s
   const button = await findByText('Create team');
   expect(button).toBeVisible();
 
-  const nameField = await findByLabelText('Name');
+  const nameField = await findByLabelText('Name*');
   expect(nameField).toBeVisible();
   expect(nameField).toHaveDisplayValue('');
 

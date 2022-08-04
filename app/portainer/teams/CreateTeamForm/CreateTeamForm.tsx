@@ -1,6 +1,7 @@
 import { Formik, Field, Form } from 'formik';
 
 import { UserViewModel } from '@/portainer/models/user';
+import { Icon } from '@/react/components/Icon';
 import { TeamViewModel } from '@/portainer/models/team';
 
 import { FormControl } from '@@/form-components/FormControl';
@@ -32,7 +33,12 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
         <Widget>
-          <WidgetTitle icon="fa-plus" title="Add a new team" />
+          <WidgetTitle
+            icon="plus"
+            title="Add a new team"
+            featherIcon
+            className="vertical-center"
+          />
           <WidgetBody>
             <Formik
               initialValues={initialValues}
@@ -57,6 +63,7 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
                     inputId="team_name"
                     label="Name"
                     errors={errors.name}
+                    required
                   >
                     <Field
                       as={Input}
@@ -96,10 +103,7 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
                         isLoading={isSubmitting}
                         loadingText="Creating team..."
                       >
-                        <i
-                          className="fa fa-plus space-right"
-                          aria-hidden="true"
-                        />
+                        <Icon icon="plus" feather size="md" />
                         Create team
                       </LoadingButton>
                     </div>
