@@ -7,11 +7,9 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/stretchr/testify/assert"
@@ -51,7 +49,7 @@ func testMain(m *testing.M) error {
 }
 
 func Test_ClonePublicRepository_Shallow(t *testing.T) {
-	service := Service{git: &gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
+	service := Service{git: NewGitClient(true)} // no need for http client since the test access the repo via file system.
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
 	destination := "shallow"
@@ -68,7 +66,7 @@ func Test_ClonePublicRepository_Shallow(t *testing.T) {
 }
 
 func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
-	service := Service{git: &gitClient{preserveGitDirectory: false}} // no need for http client since the test access the repo via file system.
+	service := Service{git: NewGitClient(false)} // no need for http client since the test access the repo via file system.
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
 	destination := "shallow"
@@ -87,7 +85,7 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 }
 
 func Test_cloneRepository(t *testing.T) {
-	service := Service{git: &gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
+	service := Service{git: NewGitClient(true)} // no need for http client since the test access the repo via file system.
 
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
@@ -111,7 +109,7 @@ func Test_cloneRepository(t *testing.T) {
 }
 
 func Test_latestCommitID(t *testing.T) {
-	service := Service{git: &gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
+	service := Service{git: NewGitClient(true)} // no need for http client since the test access the repo via file system.
 
 	repositoryURL := bareRepoDir
 	referenceName := "refs/heads/main"
@@ -148,9 +146,7 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 	accessToken := getRequiredValue(t, "GITHUB_PAT")
 	username := getRequiredValue(t, "GITHUB_USERNAME")
 
-	client := &gitClient{
-		preserveGitDirectory: true,
-	}
+	client := NewGitClient(false)
 
 	type expectResult struct {
 		err       error
@@ -228,7 +224,7 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 func Test_listFilesPrivateRepository(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	client := NewGitClient(0)
+	client := NewGitClient(false)
 
 	type expectResult struct {
 		shouldFail   bool
@@ -287,34 +283,6 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 			},
 		},
 		{
-			name: "list tree with real repository and head ref and existing file extension",
-			args: option{
-				repositoryUrl: privateGitRepoURL,
-				referenceName: "refs/heads/main",
-				username:      username,
-				password:      accessToken,
-				extensions:    []string{"yml"},
-			},
-			expect: expectResult{
-				err:          nil,
-				matchedCount: 2,
-			},
-		},
-		{
-			name: "list tree with real repository and head ref and non-existing file extension",
-			args: option{
-				repositoryUrl: privateGitRepoURL,
-				referenceName: "refs/heads/main",
-				username:      username,
-				password:      accessToken,
-				extensions:    []string{"hcl"},
-			},
-			expect: expectResult{
-				err:          nil,
-				matchedCount: 2,
-			},
-		},
-		{
 			name: "list tree with real repository but non-existing ref",
 			args: option{
 				repositoryUrl: privateGitRepoURL,
@@ -359,104 +327,4 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 			}
 		})
 	}
-}
-
-func Test_listRefs_Concurrently(t *testing.T) {
-	ensureIntegrationTest(t)
-
-	opt := option{
-		repositoryUrl: privateGitRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "GITHUB_PAT"),
-		username:      getRequiredValue(t, "GITHUB_USERNAME"),
-	}
-
-	client := NewGitClient(1)
-
-	go client.listRefs(context.TODO(), opt)
-	client.listRefs(context.TODO(), opt)
-
-	time.Sleep(2 * time.Second)
-}
-
-func Test_listFiles_Concurrently(t *testing.T) {
-	ensureIntegrationTest(t)
-
-	opt := option{
-		repositoryUrl: privateGitRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "GITHUB_PAT"),
-		username:      getRequiredValue(t, "GITHUB_USERNAME"),
-		extensions:    []string{},
-	}
-
-	client := NewGitClient(1)
-
-	go client.listFiles(context.TODO(), opt)
-	client.listFiles(context.TODO(), opt)
-
-	time.Sleep(2 * time.Second)
-}
-
-func Test_purgeCache(t *testing.T) {
-	ensureIntegrationTest(t)
-	opt := option{
-		repositoryUrl: privateGitRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "GITHUB_PAT"),
-		username:      getRequiredValue(t, "GITHUB_USERNAME"),
-		extensions:    []string{},
-	}
-
-	cacheSize := 2
-	client := &gitClient{
-		cacheEnabled: true,
-	}
-	client.repoRefCache, _ = lru.New(cacheSize)
-	client.repoFileCache, _ = lru.New(cacheSize)
-
-	client.listRefs(context.TODO(), opt)
-	client.listFiles(context.TODO(), opt)
-	assert.Equal(t, 1, client.repoRefCache.Len())
-	assert.Equal(t, 1, client.repoFileCache.Len())
-
-	client.purgeCache()
-	assert.Equal(t, 0, client.repoRefCache.Len())
-	assert.Equal(t, 0, client.repoFileCache.Len())
-}
-
-func Test_purgeCacheByTTL(t *testing.T) {
-	ensureIntegrationTest(t)
-	opt := option{
-		repositoryUrl: privateGitRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "GITHUB_PAT"),
-		username:      getRequiredValue(t, "GITHUB_USERNAME"),
-		extensions:    []string{},
-	}
-
-	timeout := 10 * time.Millisecond
-	cacheSize := 2
-	cacheTTL := 20 * timeout
-	client := &gitClient{
-		cacheEnabled: true,
-	}
-	client.repoRefCache, _ = lru.New(cacheSize)
-	client.repoFileCache, _ = lru.New(cacheSize)
-
-	service := Service{
-		shutdownCtx: context.TODO(),
-		git:         client,
-	}
-
-	client.listRefs(context.TODO(), opt)
-	client.listFiles(context.TODO(), opt)
-	assert.Equal(t, 1, client.repoRefCache.Len())
-	assert.Equal(t, 1, client.repoFileCache.Len())
-
-	go service.startCacheCleanTimer(cacheTTL)
-	time.Sleep(30 * timeout)
-
-	assert.Equal(t, 0, client.repoRefCache.Len())
-	assert.Equal(t, 0, client.repoFileCache.Len())
 }

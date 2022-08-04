@@ -6,14 +6,12 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
-	"time"
 
-	lru "github.com/hashicorp/golang-lru"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_buildDownloadUrl(t *testing.T) {
-	a := NewAzureClient(0)
+	a := NewAzureClient()
 	u, err := a.buildDownloadUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -31,7 +29,7 @@ func Test_buildDownloadUrl(t *testing.T) {
 }
 
 func Test_buildRootItemUrl(t *testing.T) {
-	a := NewAzureClient(0)
+	a := NewAzureClient()
 	u, err := a.buildRootItemUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -48,7 +46,7 @@ func Test_buildRootItemUrl(t *testing.T) {
 }
 
 func Test_buildRefsUrl(t *testing.T) {
-	a := NewAzureClient(0)
+	a := NewAzureClient()
 	u, err := a.buildRefsUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -65,7 +63,7 @@ func Test_buildRefsUrl(t *testing.T) {
 }
 
 func Test_buildTreeUrl(t *testing.T) {
-	a := NewAzureClient(0)
+	a := NewAzureClient()
 	u, err := a.buildTreeUrl(&azureOptions{
 		organisation: "organisation",
 		project:      "project",
@@ -376,7 +374,6 @@ func (t *testRepoManager) listRefs(_ context.Context, _ option) ([]string, error
 func (t *testRepoManager) listFiles(_ context.Context, _ option) ([]string, error) {
 	return nil, nil
 }
-func (t *testRepoManager) purgeCache() {}
 func Test_cloneRepository_azure(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -418,7 +415,7 @@ func Test_cloneRepository_azure(t *testing.T) {
 func Test_listRefs_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	client := NewAzureClient(0)
+	client := NewAzureClient()
 
 	type expectResult struct {
 		err       error
@@ -499,7 +496,7 @@ func Test_listRefs_azure(t *testing.T) {
 func Test_listFiles_azure(t *testing.T) {
 	ensureIntegrationTest(t)
 
-	client := NewAzureClient(0)
+	client := NewAzureClient()
 
 	type expectResult struct {
 		shouldFail   bool
@@ -557,34 +554,6 @@ func Test_listFiles_azure(t *testing.T) {
 			},
 		},
 		{
-			name: "list tree with real repository and head ref and existing file extension",
-			args: option{
-				repositoryUrl: privateAzureRepoURL,
-				referenceName: "refs/heads/main",
-				username:      username,
-				password:      accessToken,
-				extensions:    []string{"yml"},
-			},
-			expect: expectResult{
-				err:          nil,
-				matchedCount: 2,
-			},
-		},
-		{
-			name: "list tree with real repository and head ref and non-existing file extension",
-			args: option{
-				repositoryUrl: privateAzureRepoURL,
-				referenceName: "refs/heads/main",
-				username:      username,
-				password:      accessToken,
-				extensions:    []string{"hcl"},
-			},
-			expect: expectResult{
-				err:          nil,
-				matchedCount: 2,
-			},
-		},
-		{
 			name: "list tree with real repository but non-existing ref",
 			args: option{
 				repositoryUrl: privateAzureRepoURL,
@@ -629,107 +598,4 @@ func Test_listFiles_azure(t *testing.T) {
 			}
 		})
 	}
-}
-func Test_listRefs_Concurrently_azure(t *testing.T) {
-	ensureIntegrationTest(t)
-
-	opt := option{
-		repositoryUrl: privateAzureRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
-		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
-	}
-
-	client := NewAzureClient(1)
-
-	go client.listRefs(context.TODO(), opt)
-	client.listRefs(context.TODO(), opt)
-
-	time.Sleep(2 * time.Second)
-}
-
-func Test_listFiles_Concurrently_azure(t *testing.T) {
-	ensureIntegrationTest(t)
-
-	opt := option{
-		repositoryUrl: privateAzureRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
-		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
-		extensions:    []string{},
-	}
-
-	client := NewAzureClient(1)
-
-	go client.listFiles(context.TODO(), opt)
-	client.listFiles(context.TODO(), opt)
-
-	time.Sleep(2 * time.Second)
-}
-
-func Test_purgeCache_azure(t *testing.T) {
-	ensureIntegrationTest(t)
-	opt := option{
-		repositoryUrl: privateAzureRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
-		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
-		extensions:    []string{},
-	}
-
-	cacheSize := 2
-	client := &azureClient{
-		client:       newHttpClientForAzure(),
-		baseUrl:      "https://dev.azure.com",
-		cacheEnabled: true,
-	}
-	client.repoRefCache, _ = lru.New(cacheSize)
-	client.repoFileCache, _ = lru.New(cacheSize)
-
-	client.listRefs(context.TODO(), opt)
-	client.listFiles(context.TODO(), opt)
-	assert.Equal(t, 1, client.repoRefCache.Len())
-	assert.Equal(t, 1, client.repoFileCache.Len())
-
-	client.purgeCache()
-	assert.Equal(t, 0, client.repoRefCache.Len())
-	assert.Equal(t, 0, client.repoFileCache.Len())
-}
-
-func Test_purgeCacheByTTL_azure(t *testing.T) {
-	ensureIntegrationTest(t)
-	opt := option{
-		repositoryUrl: privateAzureRepoURL,
-		referenceName: "refs/heads/main",
-		password:      getRequiredValue(t, "AZURE_DEVOPS_PAT"),
-		username:      getRequiredValue(t, "AZURE_DEVOPS_USERNAME"),
-		extensions:    []string{},
-	}
-
-	timeout := 10 * time.Millisecond
-	cacheSize := 2
-	cacheTTL := 20 * timeout
-	client := &azureClient{
-		client:       newHttpClientForAzure(),
-		baseUrl:      "https://dev.azure.com",
-		cacheEnabled: true,
-	}
-	client.repoRefCache, _ = lru.New(cacheSize)
-	client.repoFileCache, _ = lru.New(cacheSize)
-
-	service := Service{
-		shutdownCtx: context.TODO(),
-		azure:       client,
-	}
-
-	client.listRefs(context.TODO(), opt)
-	client.listFiles(context.TODO(), opt)
-	assert.Equal(t, 1, client.repoRefCache.Len())
-	assert.Equal(t, 1, client.repoFileCache.Len())
-
-	go service.startCacheCleanTimer(cacheTTL)
-	time.Sleep(30 * timeout)
-
-	assert.Equal(t, 0, client.repoRefCache.Len())
-	assert.Equal(t, 0, client.repoFileCache.Len())
 }

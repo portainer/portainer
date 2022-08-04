@@ -2,12 +2,10 @@ package git
 
 import (
 	"context"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
-	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 
 	"github.com/go-git/go-git/v5"
@@ -20,31 +18,12 @@ import (
 
 type gitClient struct {
 	preserveGitDirectory bool
-	cacheEnabled         bool
-	// Cache the result of repository refs, key is repository URL
-	repoRefCache *lru.Cache
-	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
-	repoFileCache *lru.Cache
 }
 
-func NewGitClient(cacheSize int) *gitClient {
-	var err error
-	client := &gitClient{
-		cacheEnabled: cacheSize > 0,
+func NewGitClient(preserveGitDir bool) *gitClient {
+	return &gitClient{
+		preserveGitDirectory: preserveGitDir,
 	}
-	if client.cacheEnabled {
-		client.repoRefCache, err = lru.New(cacheSize)
-		if err != nil {
-			log.Printf("[DEBUG] [git] [message: failed to create ref cache: %v\n", err)
-		}
-
-		client.repoFileCache, err = lru.New(cacheSize)
-		if err != nil {
-			log.Printf("[DEBUG] [git] [message: failed to create file cache: %v\n", err)
-		}
-	}
-
-	return client
 }
 
 func (c *gitClient) download(ctx context.Context, dst string, opt option) error {
@@ -141,32 +120,11 @@ func (c *gitClient) listRefs(ctx context.Context, opt option) ([]string, error) 
 		ret = append(ret, ref.Name().String())
 	}
 
-	if c.cacheEnabled && c.repoRefCache != nil {
-		c.repoRefCache.Add(opt.repositoryUrl, ret)
-
-	}
 	return ret, nil
 }
 
+// listFiles list all filenames under the specific repository
 func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error) {
-	var filteredRet []string
-	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
-	if c.repoFileCache != nil {
-		cache, ok := c.repoFileCache.Get(repoKey)
-		if ok {
-			treeCache, success := cache.([]string)
-			if success {
-				for _, path := range treeCache {
-					if matchExtensions(path, opt.extensions) {
-						filteredRet = append(filteredRet, path)
-					}
-				}
-
-				return filteredRet, nil
-			}
-		}
-	}
-
 	cloneOption := &git.CloneOptions{
 		URL:           opt.repositoryUrl,
 		NoCheckout:    true,
@@ -199,43 +157,10 @@ func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error)
 	var allPaths []string
 	tree.Files().ForEach(func(f *object.File) error {
 		allPaths = append(allPaths, f.Name)
-		if matchExtensions(f.Name, opt.extensions) {
-			filteredRet = append(filteredRet, f.Name)
-		}
 		return nil
 	})
 
-	if c.cacheEnabled && c.repoFileCache != nil {
-		c.repoFileCache.Add(repoKey, allPaths)
-	}
-
-	return filteredRet, nil
-}
-
-func (c *gitClient) purgeCache() {
-	if c.repoRefCache != nil {
-		c.repoRefCache.Purge()
-	}
-	if c.repoFileCache != nil {
-		c.repoFileCache.Purge()
-	}
-}
-
-func generateCacheKey(names ...string) string {
-	return strings.Join(names, "-")
-}
-
-func matchExtensions(target string, exts []string) bool {
-	if len(exts) == 0 {
-		return true
-	}
-
-	for _, ext := range exts {
-		if strings.HasSuffix(target, ext) {
-			return true
-		}
-	}
-	return false
+	return allPaths, nil
 }
 
 func checkGitError(err error) error {

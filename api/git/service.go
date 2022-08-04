@@ -3,8 +3,12 @@ package git
 import (
 	"context"
 	"errors"
+	"log"
+	"strings"
 	"sync"
 	"time"
+
+	lru "github.com/hashicorp/golang-lru"
 )
 
 var (
@@ -12,7 +16,7 @@ var (
 	ErrAuthenticationFailure  = errors.New("Authentication failed, please ensure that the git credentials are correct.")
 
 	REPOSITORY_CACHE_SIZE = 4
-	REPOSITORY_CACHE_TTL  = 30 * time.Minute
+	REPOSITORY_CACHE_TTL  = 5 * time.Minute
 )
 
 type option struct {
@@ -29,7 +33,6 @@ type repoManager interface {
 	latestCommitID(ctx context.Context, opt option) (string, error)
 	listRefs(ctx context.Context, opt option) ([]string, error)
 	listFiles(ctx context.Context, opt option) ([]string, error)
-	purgeCache()
 }
 
 // Service represents a service for managing Git.
@@ -39,17 +42,45 @@ type Service struct {
 	git          repoManager
 	timerStopped bool
 	mut          sync.Mutex
+
+	cacheEnabled bool
+	// Cache the result of repository refs, key is repository URL
+	repoRefCache *lru.Cache
+	// Cache the result of repository file tree, key is the concatenated string of repository URL and ref value
+	repoFileCache *lru.Cache
 }
 
 // NewService initializes a new service.
 func NewService(ctx context.Context) *Service {
+	return newService(ctx, REPOSITORY_CACHE_SIZE, REPOSITORY_CACHE_TTL)
+}
+
+func newService(ctx context.Context, cacheSize int, cacheTTL time.Duration) *Service {
 	service := &Service{
 		shutdownCtx:  ctx,
-		azure:        NewAzureClient(REPOSITORY_CACHE_SIZE),
-		git:          NewGitClient(REPOSITORY_CACHE_SIZE),
+		azure:        NewAzureClient(),
+		git:          NewGitClient(false),
 		timerStopped: false,
+		cacheEnabled: cacheSize > 0,
 	}
-	go service.startCacheCleanTimer(REPOSITORY_CACHE_TTL)
+
+	if service.cacheEnabled {
+		var err error
+		service.repoRefCache, err = lru.New(cacheSize)
+		if err != nil {
+			log.Printf("[DEBUG] [git] [message: failed to create ref cache: %v\n", err)
+		}
+
+		service.repoFileCache, err = lru.New(cacheSize)
+		if err != nil {
+			log.Printf("[DEBUG] [git] [message: failed to create file cache: %v\n", err)
+		}
+
+		if cacheTTL > 0 {
+			go service.startCacheCleanTimer(cacheTTL)
+		}
+	}
+
 	return service
 }
 
@@ -60,13 +91,8 @@ func (service *Service) startCacheCleanTimer(d time.Duration) {
 	for {
 		select {
 		case <-ticker.C:
-			if service.git != nil {
-				service.git.purgeCache()
-			}
+			service.purgeCache()
 
-			if service.azure != nil {
-				service.azure.purgeCache()
-			}
 		case <-service.shutdownCtx.Done():
 			ticker.Stop()
 			service.mut.Lock()
@@ -125,22 +151,60 @@ func (service *Service) LatestCommitID(repositoryURL, referenceName, username, p
 
 // ListRefs will list target repository's references without cloning the repository
 func (service *Service) ListRefs(repositoryURL, username, password string) ([]string, error) {
+	if service.repoRefCache != nil {
+		// Lookup the refs cache first
+		cache, ok := service.repoRefCache.Get(repositoryURL)
+		if ok {
+			refs, success := cache.([]string)
+			if success {
+				return refs, nil
+			}
+		}
+	}
+
 	options := option{
 		repositoryUrl: repositoryURL,
 		username:      username,
 		password:      password,
 	}
 
+	var (
+		refs []string
+		err  error
+	)
 	if isAzureUrl(options.repositoryUrl) {
-		return service.azure.listRefs(context.TODO(), options)
+		refs, err = service.azure.listRefs(context.TODO(), options)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		refs, err = service.git.listRefs(context.TODO(), options)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return service.git.listRefs(context.TODO(), options)
+	if service.cacheEnabled && service.repoRefCache != nil {
+		service.repoRefCache.Add(options.repositoryUrl, refs)
+	}
+	return refs, nil
 }
 
 // ListFiles will list all the files of the target repository with specific extensions.
 // If extension is not provided, it will list all the files under the target repository
 func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
+	repoKey := generateCacheKey(repositoryURL, referenceName)
+	if service.repoFileCache != nil {
+		// lookup the files cache first
+		cache, ok := service.repoFileCache.Get(repoKey)
+		if ok {
+			files, success := cache.([]string)
+			if success {
+				return files, nil
+			}
+		}
+	}
+
 	options := option{
 		repositoryUrl: repositoryURL,
 		username:      username,
@@ -149,9 +213,59 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 		extensions:    includedExts,
 	}
 
+	var (
+		files []string
+		err   error
+	)
 	if isAzureUrl(options.repositoryUrl) {
-		return service.azure.listFiles(context.TODO(), options)
+		files, err = service.azure.listFiles(context.TODO(), options)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		files, err = service.git.listFiles(context.TODO(), options)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return service.git.listFiles(context.TODO(), options)
+	var includedFiles []string
+	if service.cacheEnabled && service.repoFileCache != nil {
+		for _, filename := range files {
+			// filter out the filenames with non-included extension
+			if matchExtensions(filename, options.extensions) {
+				includedFiles = append(includedFiles, filename)
+			}
+		}
+		service.repoFileCache.Add(repoKey, includedFiles)
+		return includedFiles, nil
+	}
+	return files, nil
+}
+
+func (service *Service) purgeCache() {
+	if service.repoRefCache != nil {
+		service.repoRefCache.Purge()
+	}
+
+	if service.repoFileCache != nil {
+		service.repoFileCache.Purge()
+	}
+}
+
+func generateCacheKey(names ...string) string {
+	return strings.Join(names, "-")
+}
+
+func matchExtensions(target string, exts []string) bool {
+	if len(exts) == 0 {
+		return true
+	}
+
+	for _, ext := range exts {
+		if strings.HasSuffix(target, ext) {
+			return true
+		}
+	}
+	return false
 }
