@@ -7,7 +7,7 @@
         <pr-icon icon="'repeat'" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
         Port mappings
       </div>
-      <div class="searchBar vertical-center">
+      <div class="searchBar vertical-center !mr-0 min-w-[300px]">
         <pr-icon icon="'search'" feather="true" class-name="'icon !h-3'"></pr-icon>
         <input
           type="text"
@@ -75,8 +75,8 @@
     </div>
     <!-- info text -->
     <div class="flex flex-row w-full">
-      <span class="small text-muted mt-1" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-        <pr-icon icon="'info'" feather="true" class-name="'icon'"></pr-icon>
+      <span class="small text-muted mt-1 vertical-center" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+        <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
         System resources are hidden, this can be changed in the table settings.
       </span>
     </div>
