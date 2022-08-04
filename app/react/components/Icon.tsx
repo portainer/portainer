@@ -53,7 +53,12 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
 
   if (icon.indexOf('svg-') === 0) {
     const svgIcon = icon.replace('svg-', '');
-    return <Svg icon={svgIcon as keyof typeof SvgIcons} className={classes} />;
+    return (
+      <Svg
+        icon={svgIcon as keyof typeof SvgIcons}
+        className={clsx(classes, '!flex')}
+      />
+    );
   }
 
   if (feather) {

@@ -3,7 +3,10 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="'svg-clockrewind'" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          <div class="widget-icon space-right">
+            <pr-icon icon="'svg-clockrewind'"></pr-icon>
+          </div>
+
           Authentication Events
           <be-feature-indicator feature="{{::$ctrl.feature}}"></be-feature-indicator>
         </div>
