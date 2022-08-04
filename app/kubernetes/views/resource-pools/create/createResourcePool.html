@@ -76,19 +76,20 @@
             <div ng-if="$ctrl.formValues.HasQuota">
               <div class="col-sm-12 form-section-title"> Resource limits </div>
               <div>
-                <div class="form-group" ng-if="$ctrl.formValues.HasQuota && !$ctrl.isQuotaValid()">
-                  <span class="col-sm-12 small text-muted">
-                    <p class="vertical-center"
+                <div class="form-group">
+                  <span class="col-sm-12 small text-muted" ng-switch on="$ctrl.formValues.HasQuota && !$ctrl.isQuotaValid()">
+                    <p class="vertical-center mb-0" ng-switch-when="true"
                       ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> At least a single limit must be set for the quota to be
                       valid.
                     </p>
+                    <p class="vertical-center mb-0" ng-switch-default></p>
                   </span>
                 </div>
 
                 <!-- memory-limit-input -->
-                <div class="form-group">
+                <div class="form-group flex flex-row !mb-0">
                   <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left"> Memory </label>
-                  <div class="col-sm-3">
+                  <div class="col-xs-3">
                     <slider
                       model="$ctrl.formValues.MemoryLimit"
                       floor="$ctrl.defaults.MemoryLimit"
@@ -99,7 +100,7 @@
                     >
                     </slider>
                   </div>
-                  <div class="col-sm-2">
+                  <div class="col-sm-2 vertical-center">
                     <input
                       name="memory_limit"
                       type="number"
@@ -111,29 +112,32 @@
                       data-cy="k8sNamespaceCreate-memoryLimitInput"
                       required
                     />
-                    <span class="help-block">
-                      <div class="form-group" ng-show="resourcePoolCreationForm.memory_limit.$invalid">
-                        <div class="col-sm-12 small text-muted">
-                          <div ng-messages="resourcePoolCreationForm.pool_name.$error">
-                            <p class="vertical-center"
-                              ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between
-                              {{ $ctrl.defaults.MemoryLimit }} and
-                              {{ $ctrl.state.sliderMaxMemory }}
-                            </p>
-                          </div>
+                  </div>
+                  <div class="col-sm-4 vertical-center">
+                    <p class="small text-muted mb-0"> Maximum memory usage (MB) </p>
+                  </div>
+                </div>
+                <div class="flex flex-row w-full">
+                  <span class="col-sm-3 col-lg-2"></span>
+                  <span class="help-block col-sm-9 col-lg-10">
+                    <div ng-show="resourcePoolCreationForm.memory_limit.$invalid">
+                      <div class="small text-muted">
+                        <div ng-messages="resourcePoolCreationForm.pool_name.$error">
+                          <p class="vertical-center"
+                            ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between
+                            {{ $ctrl.defaults.MemoryLimit }} and
+                            {{ $ctrl.state.sliderMaxMemory }}
+                          </p>
                         </div>
                       </div>
-                    </span>
-                  </div>
-                  <div class="col-sm-4">
-                    <p class="small text-muted"> Maximum memory usage (MB) </p>
-                  </div>
+                    </div>
+                  </span>
                 </div>
                 <!-- !memory-limit-input -->
                 <!-- cpu-limit-input -->
-                <div class="form-group">
+                <div class="form-group flex flex-row">
                   <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left"> CPU </label>
-                  <div class="col-sm-5">
+                  <div class="col-xs-5">
                     <slider
                       model="$ctrl.formValues.CpuLimit"
                       floor="$ctrl.defaults.CpuLimit"
@@ -145,8 +149,8 @@
                     >
                     </slider>
                   </div>
-                  <div class="col-sm-4">
-                    <p class="small text-muted"> Maximum CPU usage </p>
+                  <div class="col-sm-4 vertical-center">
+                    <p class="small text-muted mb-0"> Maximum CPU usage </p>
                   </div>
                 </div>
                 <!-- !cpu-limit-input -->
@@ -159,7 +163,7 @@
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small vertical-center">
-                <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+                <pr-icon icon="'info'" feather="true" mode="'primary'" class="vertical-center"></pr-icon>
                 You can set a quota on the amount of external load balancers that can be created inside this namespace. Set this quota to 0 to effectively disable the use of load
                 balancers in this namespace.
               </span>
