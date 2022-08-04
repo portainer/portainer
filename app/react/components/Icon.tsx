@@ -71,6 +71,10 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
   }
 
   return (
-    <i className={clsx('fa', icon, classes)} aria-hidden="true" role="img" />
+    <i
+      className={clsx(icon.startsWith('fa-') ? `fa ${icon}` : icon, classes)}
+      aria-hidden="true"
+      role="img"
+    />
   );
 }
