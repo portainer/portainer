@@ -2,10 +2,25 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'"></pr-icon>
+          {{ $ctrl.titleText }}
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true" class="searchIcon"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for an ingress..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
+            <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader"> Table settings </div>
@@ -25,7 +40,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
+                        <pr-icon id="refreshRateChange" style="display: none" icon="'check'" mode="'success'" feather="true"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -38,31 +53,24 @@
           </span>
         </div>
       </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
-      </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
+              <th ng-if="$ctrl.hasExpandableItems()" class="datatable-wide dropdown">
+                <div class="cursor-pointer vertical-center" ng-click="$ctrl.expandAll()">
+                  <pr-icon ng-if="$ctrl.state.expandAll" icon="'chevron-down'" feather="true"></pr-icon>
+                  <pr-icon ng-if="!$ctrl.state.expandAll" icon="'chevron-right'" feather="true"></pr-icon>
+                </div>
+              </th>
               <th>
-                <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()" style="margin-right: 5px">
-                  <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
-                </a>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Ingress
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Name'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Name'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Name')"
+                ></table-column-header>
               </th>
             </tr>
           </thead>
@@ -73,11 +81,14 @@
               ng-click="$ctrl.expandItem(item, !item.Expanded)"
               pagination-id="$ctrl.tableKey"
             >
-              <td colspan="3">
-                <a ng-if="$ctrl.itemCanExpand(item)" style="margin-right: 5px">
-                  <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i> </a
-                >{{ item.Name }}
+              <td ng-if="$ctrl.hasExpandableItems()">
+                <div ng-if="$ctrl.itemCanExpand(item)" class="vertical-center">
+                  <pr-icon ng-if="item.Expanded" icon="'chevron-down'" feather="true"></pr-icon>
+                  <pr-icon ng-if="!item.Expanded" icon="'chevron-right'" feather="true"></pr-icon>
+                </div>
               </td>
+              <td>{{ item.Name }}</td>
+              <td>{{ item.Size }}</td>
             </tr>
             <tr
               dir-paginate-end
