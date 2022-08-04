@@ -75,7 +75,7 @@ func newHttpClientForAzure() *http.Client {
 	return httpsCli
 }
 
-func (a *azureClient) download(ctx context.Context, destination string, opt option) error {
+func (a *azureClient) download(ctx context.Context, destination string, opt cloneOption) error {
 	zipFilepath, err := a.downloadZipFromAzureDevOps(ctx, opt)
 	if err != nil {
 		return errors.Wrap(err, "failed to download a zip file from Azure DevOps")
@@ -90,7 +90,7 @@ func (a *azureClient) download(ctx context.Context, destination string, opt opti
 	return nil
 }
 
-func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt option) (string, error) {
+func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneOption) (string, error) {
 	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to parse url")
@@ -133,7 +133,7 @@ func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt option
 	return zipFile.Name(), nil
 }
 
-func (a *azureClient) latestCommitID(ctx context.Context, opt option) (string, error) {
+func (a *azureClient) latestCommitID(ctx context.Context, opt fetchOption) (string, error) {
 	rootItem, err := a.getRootItem(ctx, opt)
 	if err != nil {
 		return "", err
@@ -141,7 +141,7 @@ func (a *azureClient) latestCommitID(ctx context.Context, opt option) (string, e
 	return rootItem.CommitId, nil
 }
 
-func (a *azureClient) getRootItem(ctx context.Context, opt option) (*azureItem, error) {
+func (a *azureClient) getRootItem(ctx context.Context, opt fetchOption) (*azureItem, error) {
 	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to parse url")
@@ -374,7 +374,7 @@ func getVersionType(name string) string {
 	return "commit"
 }
 
-func (a *azureClient) listRefs(ctx context.Context, opt option) ([]string, error) {
+func (a *azureClient) listRefs(ctx context.Context, opt baseOption) ([]string, error) {
 	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to parse url")
@@ -426,7 +426,7 @@ func (a *azureClient) listRefs(ctx context.Context, opt option) ([]string, error
 }
 
 // listFiles list all filenames under the specific repository
-func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, error) {
+func (a *azureClient) listFiles(ctx context.Context, opt fetchOption) ([]string, error) {
 	rootItem, err := a.getRootItem(ctx, opt)
 	if err != nil {
 		return nil, err

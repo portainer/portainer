@@ -98,10 +98,14 @@ func Test_cloneRepository(t *testing.T) {
 	defer os.RemoveAll(dir)
 	t.Logf("Cloning into %s", dir)
 
-	err = service.cloneRepository(dir, option{
-		repositoryUrl: repositoryURL,
-		referenceName: referenceName,
-		depth:         10,
+	err = service.cloneRepository(dir, cloneOption{
+		fetchOption: fetchOption{
+			baseOption: baseOption{
+				repositoryUrl: repositoryURL,
+			},
+			referenceName: referenceName,
+		},
+		depth: 10,
 	})
 
 	assert.NoError(t, err)
@@ -155,12 +159,12 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		args   option
+		args   baseOption
 		expect expectResult
 	}{
 		{
 			name: "list refs of a real private repository",
-			args: option{
+			args: baseOption{
 				repositoryUrl: privateGitRepoURL,
 				username:      username,
 				password:      accessToken,
@@ -172,7 +176,7 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 		},
 		{
 			name: "list refs of a real private repository with incorrect credential",
-			args: option{
+			args: baseOption{
 				repositoryUrl: privateGitRepoURL,
 				username:      "test-username",
 				password:      "test-token",
@@ -183,7 +187,7 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 		},
 		{
 			name: "list refs of a fake repository without providing credential",
-			args: option{
+			args: baseOption{
 				repositoryUrl: privateGitRepoURL + "fake",
 				username:      "",
 				password:      "",
@@ -194,7 +198,7 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 		},
 		{
 			name: "list refs of a fake repository",
-			args: option{
+			args: baseOption{
 				repositoryUrl: privateGitRepoURL + "fake",
 				username:      username,
 				password:      accessToken,
@@ -237,17 +241,18 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		args   option
+		args   fetchOption
 		expect expectResult
 	}{
 		{
 			name: "list tree with real repository and head ref but incorrect credential",
-			args: option{
-				repositoryUrl: privateGitRepoURL,
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL,
+					username:      "test-username",
+					password:      "test-token",
+				},
 				referenceName: "refs/heads/main",
-				username:      "test-username",
-				password:      "test-token",
-				extensions:    []string{},
 			},
 			expect: expectResult{
 				shouldFail: true,
@@ -256,12 +261,13 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 		},
 		{
 			name: "list tree with real repository and head ref but no credential",
-			args: option{
-				repositoryUrl: privateGitRepoURL + "fake",
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL + "fake",
+					username:      "",
+					password:      "",
+				},
 				referenceName: "refs/heads/main",
-				username:      "",
-				password:      "",
-				extensions:    []string{},
 			},
 			expect: expectResult{
 				shouldFail: true,
@@ -270,12 +276,13 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 		},
 		{
 			name: "list tree with real repository and head ref",
-			args: option{
-				repositoryUrl: privateGitRepoURL,
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL,
+					username:      username,
+					password:      accessToken,
+				},
 				referenceName: "refs/heads/main",
-				username:      username,
-				password:      accessToken,
-				extensions:    []string{},
 			},
 			expect: expectResult{
 				err:          nil,
@@ -284,12 +291,13 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 		},
 		{
 			name: "list tree with real repository but non-existing ref",
-			args: option{
-				repositoryUrl: privateGitRepoURL,
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL,
+					username:      username,
+					password:      accessToken,
+				},
 				referenceName: "refs/fake/feature",
-				username:      username,
-				password:      accessToken,
-				extensions:    []string{},
 			},
 			expect: expectResult{
 				shouldFail: true,
@@ -297,12 +305,13 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 		},
 		{
 			name: "list tree with fake repository ",
-			args: option{
-				repositoryUrl: privateGitRepoURL + "fake",
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL + "fake",
+					username:      username,
+					password:      accessToken,
+				},
 				referenceName: "refs/fake/feature",
-				username:      username,
-				password:      accessToken,
-				extensions:    []string{},
 			},
 			expect: expectResult{
 				shouldFail: true,

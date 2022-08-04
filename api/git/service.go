@@ -19,20 +19,30 @@ var (
 	REPOSITORY_CACHE_TTL  = 5 * time.Minute
 )
 
-type option struct {
+// baseOption provides a minimum group of information to operate a git repository, like git-remote
+type baseOption struct {
 	repositoryUrl string
 	username      string
 	password      string
+}
+
+// fetchOption allows to specify the reference name of the target repository
+type fetchOption struct {
+	baseOption
 	referenceName string
-	depth         int
-	extensions    []string
+}
+
+// cloneOption allows to add a history truncated to the specified number of commits
+type cloneOption struct {
+	fetchOption
+	depth int
 }
 
 type repoManager interface {
-	download(ctx context.Context, dst string, opt option) error
-	latestCommitID(ctx context.Context, opt option) (string, error)
-	listRefs(ctx context.Context, opt option) ([]string, error)
-	listFiles(ctx context.Context, opt option) ([]string, error)
+	download(ctx context.Context, dst string, opt cloneOption) error
+	latestCommitID(ctx context.Context, opt fetchOption) (string, error)
+	listRefs(ctx context.Context, opt baseOption) ([]string, error)
+	listFiles(ctx context.Context, opt fetchOption) ([]string, error)
 }
 
 // Service represents a service for managing Git.
@@ -114,18 +124,22 @@ func (service *Service) timerHasStopped() bool {
 // CloneRepository clones a git repository using the specified URL in the specified
 // destination folder.
 func (service *Service) CloneRepository(destination, repositoryURL, referenceName, username, password string) error {
-	options := option{
-		repositoryUrl: repositoryURL,
-		username:      username,
-		password:      password,
-		referenceName: referenceName,
-		depth:         1,
+	options := cloneOption{
+		fetchOption: fetchOption{
+			baseOption: baseOption{
+				repositoryUrl: repositoryURL,
+				username:      username,
+				password:      password,
+			},
+			referenceName: referenceName,
+		},
+		depth: 1,
 	}
 
 	return service.cloneRepository(destination, options)
 }
 
-func (service *Service) cloneRepository(destination string, options option) error {
+func (service *Service) cloneRepository(destination string, options cloneOption) error {
 	if isAzureUrl(options.repositoryUrl) {
 		return service.azure.download(context.TODO(), destination, options)
 	}
@@ -135,10 +149,12 @@ func (service *Service) cloneRepository(destination string, options option) erro
 
 // LatestCommitID returns SHA1 of the latest commit of the specified reference
 func (service *Service) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
-	options := option{
-		repositoryUrl: repositoryURL,
-		username:      username,
-		password:      password,
+	options := fetchOption{
+		baseOption: baseOption{
+			repositoryUrl: repositoryURL,
+			username:      username,
+			password:      password,
+		},
 		referenceName: referenceName,
 	}
 
@@ -162,7 +178,7 @@ func (service *Service) ListRefs(repositoryURL, username, password string) ([]st
 		}
 	}
 
-	options := option{
+	options := baseOption{
 		repositoryUrl: repositoryURL,
 		username:      username,
 		password:      password,
@@ -205,12 +221,13 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 		}
 	}
 
-	options := option{
-		repositoryUrl: repositoryURL,
-		username:      username,
-		password:      password,
+	options := fetchOption{
+		baseOption: baseOption{
+			repositoryUrl: repositoryURL,
+			username:      username,
+			password:      password,
+		},
 		referenceName: referenceName,
-		extensions:    includedExts,
 	}
 
 	var (
@@ -233,7 +250,7 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 	if service.cacheEnabled && service.repoFileCache != nil {
 		for _, filename := range files {
 			// filter out the filenames with non-included extension
-			if matchExtensions(filename, options.extensions) {
+			if matchExtensions(filename, includedExts) {
 				includedFiles = append(includedFiles, filename)
 			}
 		}

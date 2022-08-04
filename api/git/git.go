@@ -26,7 +26,7 @@ func NewGitClient(preserveGitDir bool) *gitClient {
 	}
 }
 
-func (c *gitClient) download(ctx context.Context, dst string, opt option) error {
+func (c *gitClient) download(ctx context.Context, dst string, opt cloneOption) error {
 	gitOptions := git.CloneOptions{
 		URL:   opt.repositoryUrl,
 		Depth: opt.depth,
@@ -50,7 +50,7 @@ func (c *gitClient) download(ctx context.Context, dst string, opt option) error 
 	return nil
 }
 
-func (c *gitClient) latestCommitID(ctx context.Context, opt option) (string, error) {
+func (c *gitClient) latestCommitID(ctx context.Context, opt fetchOption) (string, error) {
 	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 		Name: "origin",
 		URLs: []string{opt.repositoryUrl},
@@ -97,7 +97,7 @@ func getAuth(username, password string) *githttp.BasicAuth {
 	return nil
 }
 
-func (c *gitClient) listRefs(ctx context.Context, opt option) ([]string, error) {
+func (c *gitClient) listRefs(ctx context.Context, opt baseOption) ([]string, error) {
 	rem := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 		Name: "origin",
 		URLs: []string{opt.repositoryUrl},
@@ -124,7 +124,7 @@ func (c *gitClient) listRefs(ctx context.Context, opt option) ([]string, error) 
 }
 
 // listFiles list all filenames under the specific repository
-func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error) {
+func (c *gitClient) listFiles(ctx context.Context, opt fetchOption) ([]string, error) {
 	cloneOption := &git.CloneOptions{
 		URL:           opt.repositoryUrl,
 		NoCheckout:    true,
