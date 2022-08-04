@@ -886,6 +886,10 @@ json-tree .branch-preview {
   text-decoration-line: underline;
 }
 
+reach-portal > div {
+  z-index: 10;
+}
+
 input[style*='background-image: url("data:image/png'] + [data-cy='auth-passwordInputToggle'] {
   right: 20px;
 }

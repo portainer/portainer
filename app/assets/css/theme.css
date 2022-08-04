@@ -86,7 +86,7 @@
 
   --orange-1: #e86925;
 
-  --BE-only: var(--orange-1);
+  --BE-only: var(--ui-warning-7);
 
   /* Default Theme */
   --bg-card-color: var(--white-color);
