@@ -5,7 +5,7 @@
     { label:'Environments', link:'portainer.endpoints' },
     {
       label:ctrl.endpoint.Name,
-      link: 'portainer.endpoints.endpoint', 
+      link: 'portainer.endpoints.endpoint',
       linkParams:{id: ctrl.endpoint.Id}
     },
      'Kubernetes configuration'
@@ -75,7 +75,7 @@
                     />
                   </div>
                   <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
-                    <span class="input-group-addon">Type</span>
+                    <span class="input-group-addon required">Type</span>
                     <select
                       class="form-control"
                       name="ingress_class_type_{{ $index }}"
@@ -341,7 +341,7 @@
               <div class="col-sm-12">
                 <button
                   type="submit"
-                  class="btn btn-primary btn-sm"
+                  class="btn btn-primary btn-sm !ml-0"
                   ng-click="ctrl.configure()"
                   ng-disabled="ctrl.state.actionInProgress || !kubernetesClusterSetupForm.$valid || !ctrl.hasValidStorageConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"

@@ -25,7 +25,7 @@
     <div ng-repeat="servicePort in $ctrl.servicePorts" class="mt-5 service-form row">
       <div class="form-group !mx-0 !pl-0 col-sm-3">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">container port</span>
+          <span class="input-group-addon required">container port</span>
           <input
             type="number"
             class="form-control"
@@ -59,7 +59,7 @@
 
       <div class="form-group !mx-0 !pl-0 col-sm-3">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">service port</span>
+          <span class="input-group-addon required">service port</span>
           <input
             type="number"
             class="form-control"
@@ -94,7 +94,7 @@
 
       <div class="form-group !mx-0 !pl-0 col-sm-3" ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.NODE_PORT">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">nodeport</span>
+          <span class="input-group-addon required">nodeport</span>
           <input
             type="number"
             class="form-control"
