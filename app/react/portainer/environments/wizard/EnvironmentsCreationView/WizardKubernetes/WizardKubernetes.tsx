@@ -25,16 +25,14 @@ interface Props {
 const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
   {
     id: 'agent_endpoint',
-    icon: 'zap',
-    featherIcon: true,
+    icon: 'svg-agent',
     label: 'Agent',
     value: EnvironmentCreationTypes.AgentEnvironment,
     description: '',
   },
   {
     id: 'edgeAgent',
-    icon: 'cloud',
-    featherIcon: true,
+    icon: 'svg-edgeagent',
     label: 'Edge Agent',
     description: '',
     value: EnvironmentCreationTypes.EdgeAgentEnvironment,
@@ -42,8 +40,7 @@ const defaultOptions: BoxSelectorOption<EnvironmentCreationTypes>[] = [
   },
   {
     id: 'kubeconfig_endpoint',
-    icon: 'upload-cloud',
-    featherIcon: true,
+    icon: 'svg-cloudimport',
     label: 'Import',
     value: EnvironmentCreationTypes.KubeConfigEnvironment,
     description: 'Import an existing Kubernetes config',

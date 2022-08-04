@@ -38,7 +38,7 @@ const initialValues: FormValues = {
   },
 };
 
-const options = [buildOption('api', 'svg-dataflow2', 'API', '', 'api')];
+const options = [buildOption('api', 'svg-api', 'API', '', 'api')];
 
 interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
