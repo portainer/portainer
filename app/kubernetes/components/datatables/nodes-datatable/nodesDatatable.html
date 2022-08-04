@@ -153,7 +153,7 @@
               <td>{{ item.Version }}</td>
               <td>{{ item.IPAddress }}</td>
               <td ng-if="$ctrl.useServerMetrics">
-                <a ui-sref="kubernetes.cluster.node.stats({ name: item.Name })" style="cursor: pointer"> <i class="fa fa-chart-area" aria-hidden="true"></i> Stats </a>
+                <a ui-sref="kubernetes.cluster.node.stats({ name: item.Name })" class="vertical-center"> <pr-icon icon="'bar-chart'" feather="true"></pr-icon> Stats </a>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
