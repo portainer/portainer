@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -5,6 +6,7 @@ import { EnvironmentId } from '@/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 
 import { Button } from '@@/buttons';
+import { Icon } from '@@/Icon';
 
 import { KubeCtlShell } from './KubectlShell';
 import styles from './KubectlShellButton.module.css';
@@ -19,13 +21,14 @@ export function KubectlShellButton({ environmentId }: Props) {
     <>
       <Button
         color="primary"
-        size="xsmall"
+        size="small"
         disabled={open}
         data-cy="k8sSidebar-shellButton"
         onClick={() => handleOpen()}
-        className={styles.root}
+        className={clsx(styles.root, '!flex')}
       >
-        <i className="fa fa-terminal space-right" /> kubectl shell
+        <Icon icon="terminal" feather className="vertical-center" size="md" />{' '}
+        kubectl shell
       </Button>
 
       {open &&
