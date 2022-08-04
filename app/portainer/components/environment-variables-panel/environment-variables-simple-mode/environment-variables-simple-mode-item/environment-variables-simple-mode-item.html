@@ -39,7 +39,7 @@
           ng-change="$ctrl.onChangeValue($ctrl.variable.value)"
         />
       </div>
-      <button class="btn btn-sm btn-primary" type="button" ng-click="$ctrl.removeValue()"> <i class="fa fa-minus" aria-hidden="true"></i> Remove value </button>
+      <button class="btn btn-sm btn-light" type="button" ng-click="$ctrl.removeValue()"> <i class="fa fa-minus" aria-hidden="true"></i> Remove value </button>
     </div>
     <div class="form-group" ng-show="$ctrl[$ctrl.formName].value.$invalid">
       <div class="col-sm-12 small text-warning">
@@ -51,11 +51,11 @@
     </div>
   </div>
   <div>
-    <button class="btn btn-sm btn-primary" type="button" ng-if="!$ctrl.hasValue()" ng-click="$ctrl.onChangeValue('')">
-      <i class="fa fa-plus" aria-hidden="true"></i> Add value
+    <button class="btn btn-sm btn-light" type="button" ng-if="!$ctrl.hasValue()" ng-click="$ctrl.onChangeValue('')">
+      <pr-icon icon="'plus'" feather="true"></pr-icon>
     </button>
-    <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.onRemove($ctrl.index)">
-      <i class="fa fa-trash" aria-hidden="true"></i>
+    <button class="btn btn-sm btn-light" type="button" ng-click="$ctrl.onRemove($ctrl.index)">
+      <pr-icon icon="'trash-2'" feather="true"></pr-icon>
     </button>
   </div>
 </ng-form>
