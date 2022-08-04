@@ -3,9 +3,9 @@
   title="'Application details'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
-    { 
+    {
       label:ctrl.application.ResourcePool,
-      link: 'kubernetes.resourcePools.resourcePool', 
+      link: 'kubernetes.resourcePools.resourcePool',
       linkParams:{ id: ctrl.application.ResourcePool }
     },
     { label:'Applications', link:'kubernetes.applications' },
@@ -270,14 +270,14 @@
           <div class="text-muted" style="margin-bottom: 15px"> <pr-icon icon="'external-link'" class="mr-1" feather="true"></pr-icon>Accessing the application </div>
 
           <div class="small text-muted" ng-if="ctrl.application.PublishedPorts.length === 0" style="margin-bottom: 15px">
-            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is not exposing any port.
+            <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is not exposing any port.
           </div>
 
           <div ng-if="ctrl.application.Services.length !== 0">
             <!-- Services notice -->
             <div>
               <div class="small text-muted">
-                <p> <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is exposed through service(s) as below: </p>
+                <p> <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is exposed through service(s) as below: </p>
               </div>
             </div>
 
@@ -298,7 +298,7 @@
           <div class="text-muted" style="margin-bottom: 15px"> <pr-icon icon="'move'" class="mr-1" feather="true"></pr-icon>Auto-scaling </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.AutoScaler" style="margin-bottom: 15px">
-            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
+            <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application does not have an autoscaling policy defined.
           </div>
 
@@ -333,7 +333,7 @@
           </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.Env.length > 0 && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px">
-            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
+            <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application is not using any environment variable or configuration.
           </div>
 
@@ -434,7 +434,7 @@
           </div>
 
           <div class="small text-muted" ng-if="!ctrl.hasPersistedFolders()">
-            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
+            <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application has no persisted folders.
           </div>
 
