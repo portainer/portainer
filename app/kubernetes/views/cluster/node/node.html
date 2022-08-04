@@ -51,19 +51,21 @@
                     <tr>
                       <td class="col-xs-3"> Availability </td>
                       <td class="col-xs-9">
-                        <select class="form-control" name="availability" style="display: inline-block; width: 16rem" ng-model="ctrl.formValues.Availability">
-                          <option>{{ ctrl.availabilities.ACTIVE }}</option>
-                          <option>{{ ctrl.availabilities.PAUSE }}</option>
-                          <option>{{ ctrl.availabilities.DRAIN }}</option>
-                        </select>
-                        <span class="small vertical-center" ng-if="ctrl.state.isDrainOperation && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
-                          <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
-                          Cannot use this action while another node is currently being drained.
-                        </span>
-                        <span class="small vertical-center" ng-if="ctrl.state.isContainPortainer && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
-                          <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
-                          Cannot drain a node where this Portainer instance is running.
-                        </span>
+                        <div class="flex flex-col">
+                          <select class="form-control" name="availability" style="display: inline-block; width: 16rem" ng-model="ctrl.formValues.Availability">
+                            <option>{{ ctrl.availabilities.ACTIVE }}</option>
+                            <option>{{ ctrl.availabilities.PAUSE }}</option>
+                            <option>{{ ctrl.availabilities.DRAIN }}</option>
+                          </select>
+                          <div class="small text-muted vertical-center" ng-if="ctrl.state.isDrainOperation && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
+                            <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                            Cannot use this action while another node is currently being drained.
+                          </div>
+                          <div class="small text-muted vertical-center" ng-if="ctrl.state.isContainPortainer && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
+                            <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                            Cannot drain a node where this Portainer instance is running.
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
