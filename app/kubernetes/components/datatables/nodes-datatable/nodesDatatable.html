@@ -4,25 +4,25 @@
       <div class="toolBar">
         <div class="toolBarTitle flex">
           <div class="flex justify-center content-center mr-2 icon-nested-blue vertical-center">
-            <i class="fa icon icon-primary icon-sm" ng-class="$ctrl.titleIcon" aria-hidden="true"></i>
+            <pr-icon icon="$ctrl.titleIcon" feather="true" mode="'primary'" className="icon-nested-blue"></pr-icon>
           </div>
           <span class="vertical-center">
             {{ $ctrl.titleText }}
           </span>
         </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for a node..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
         <div class="settings">
-          <div class="searchBar vertical-center">
-            <pr-icon icon="'search'" feather="true"></pr-icon>
-            <input
-              type="text"
-              class="searchInput"
-              ng-model="$ctrl.state.textFilter"
-              ng-change="$ctrl.onTextFilterChange()"
-              placeholder="Search..."
-              auto-focus
-              ng-model-options="{ debounce: 300 }"
-            />
-          </div>
           <span
             class="setting vertical-center"
             ng-class="{ 'setting-active': $ctrl.settings.open }"
