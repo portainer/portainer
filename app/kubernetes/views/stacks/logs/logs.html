@@ -2,8 +2,8 @@
   ng-if="ctrl.state.viewReady"
   title="'Stacks logs'"
   breadcrumbs="[
-{ label:'Namespaces', link:'kubernetes.resourcePools' }, 
-{ label:ctrl.state.transition.namespace, link:'kubernetes.resourcePools.resourcePool', linkParams:{ id: ctrl.state.transition.namespace } }, 
+{ label:'Namespaces', link:'kubernetes.resourcePools' },
+{ label:ctrl.state.transition.namespace, link:'kubernetes.resourcePools.resourcePool', linkParams:{ id: ctrl.state.transition.namespace } },
 { label:'Applications', link:'kubernetes.applications' },
 'Stacks',
 ctrl.state.transition.name,
@@ -51,7 +51,9 @@ ctrl.state.transition.name,
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">
-                <button class="btn btn-primary btn-sm" type="button" ng-click="ctrl.downloadLogs()" style="margin-left: 0"><i class="fa fa-download"></i> Download logs</button>
+                <button class="btn btn-primary btn-sm !ml-0" type="button" ng-click="ctrl.downloadLogs()" style="margin-left: 0"
+                  ><i class="fa fa-download"></i> Download logs</button
+                >
               </div>
             </div>
             <!-- !actions -->
