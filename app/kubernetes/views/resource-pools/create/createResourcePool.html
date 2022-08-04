@@ -88,8 +88,8 @@
 
                 <!-- memory-limit-input -->
                 <div class="form-group flex flex-row !mb-0">
-                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left"> Memory </label>
-                  <div class="col-xs-3">
+                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left"> Maximum memory usage (MB) </label>
+                  <div class="col-xs-6">
                     <slider
                       model="$ctrl.formValues.MemoryLimit"
                       floor="$ctrl.defaults.MemoryLimit"
@@ -113,9 +113,6 @@
                       required
                     />
                   </div>
-                  <div class="col-sm-4 vertical-center">
-                    <p class="small text-muted mb-0"> Maximum memory usage (MB) </p>
-                  </div>
                 </div>
                 <div class="flex flex-row w-full">
                   <span class="col-sm-3 col-lg-2"></span>
@@ -136,8 +133,8 @@
                 <!-- !memory-limit-input -->
                 <!-- cpu-limit-input -->
                 <div class="form-group flex flex-row">
-                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left"> CPU </label>
-                  <div class="col-xs-5">
+                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left"> Maximum CPU usage </label>
+                  <div class="col-xs-8">
                     <slider
                       model="$ctrl.formValues.CpuLimit"
                       floor="$ctrl.defaults.CpuLimit"
@@ -148,9 +145,6 @@
                       data-cy="k8sNamespaceCreate-cpuLimitSlider"
                     >
                     </slider>
-                  </div>
-                  <div class="col-sm-4 vertical-center">
-                    <p class="small text-muted mb-0"> Maximum CPU usage </p>
                   </div>
                 </div>
                 <!-- !cpu-limit-input -->

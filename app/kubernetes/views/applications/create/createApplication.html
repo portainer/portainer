@@ -829,13 +829,13 @@
                     "
                   >
                     <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left flex flex-row items-center">
-                      Memory
+                      Maximum memory usage (MB)
                       <portainer-tooltip
                         message="'An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM.'"
                       >
                       </portainer-tooltip>
                     </label>
-                    <div class="col-sm-3">
+                    <div class="col-sm-6">
                       <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.state.sliders.memory.min" ceil="ctrl.state.sliders.memory.max" step="128"></slider>
                     </div>
                     <div class="col-sm-2 vertical-center">
@@ -850,9 +850,6 @@
                         required
                         data-cy="k8sAppCreate-memoryLimit"
                       />
-                    </div>
-                    <div class="col-sm-4 vertical-center">
-                      <p class="small text-muted !mb-0"> Maximum memory usage (MB) </p>
                     </div>
                   </div>
                   <div class="form-group" ng-show="kubernetesApplicationCreationForm.memory_limit.$invalid">
@@ -875,17 +872,14 @@
                     "
                   >
                     <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left flex flex-row items-center">
-                      CPU
+                      Maximum CPU usage
                       <portainer-tooltip
                         message="'An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling.'"
                       >
                       </portainer-tooltip>
                     </label>
-                    <div class="col-sm-5">
+                    <div class="col-sm-8">
                       <slider model="ctrl.formValues.CpuLimit" floor="ctrl.state.sliders.cpu.min" ceil="ctrl.state.sliders.cpu.max" step="0.10" precision="2"></slider>
-                    </div>
-                    <div class="col-sm-4 vertical-center">
-                      <p class="small text-muted !mb-0"> Maximum CPU usage </p>
                     </div>
                   </div>
 

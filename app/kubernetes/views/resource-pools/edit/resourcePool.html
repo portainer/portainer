@@ -78,8 +78,8 @@
                   <div>
                     <!-- memory-limit-input -->
                     <div class="form-group flex">
-                      <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory limit </label>
-                      <div class="col-sm-3">
+                      <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Maximum memory usage (MB) </label>
+                      <div class="col-sm-6">
                         <slider
                           model="ctrl.formValues.MemoryLimit"
                           floor="ctrl.ResourceQuotaDefaults.MemoryLimit"
@@ -100,9 +100,6 @@
                           required
                         />
                       </div>
-                      <div class="col-sm-4 vertical-center">
-                        <p class="small text-muted !mb-0"> Memory limit (<b>MB</b>) </p>
-                      </div>
                     </div>
                     <div class="form-group" ng-show="resourcePoolEditForm.memory_limit.$invalid">
                       <div class="col-sm-3 col-lg-2"></div>
@@ -118,8 +115,8 @@
                     <!-- !memory-limit-input -->
                     <!-- cpu-limit-input -->
                     <div class="form-group">
-                      <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> CPU limit </label>
-                      <div class="col-sm-5">
+                      <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> Maximum CPU usage </label>
+                      <div class="col-sm-8">
                         <slider
                           model="ctrl.formValues.CpuLimit"
                           floor="ctrl.ResourceQuotaDefaults.CpuLimit"
@@ -128,9 +125,6 @@
                           precision="2"
                           ng-if="ctrl.state.sliderMaxCpu"
                         ></slider>
-                      </div>
-                      <div class="col-sm-4" style="margin-top: 20px">
-                        <p class="small text-muted"> Maximum CPU usage </p>
                       </div>
                     </div>
                     <!-- !cpu-limit-input -->
