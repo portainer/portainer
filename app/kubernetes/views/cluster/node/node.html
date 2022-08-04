@@ -128,7 +128,7 @@
                         >
                           <pr-icon icon="'x'" feather="true" mode="'error'" size="'sm'"></pr-icon>
                         </button>
-                        <button ng-if="!ctrl.isSystemLabel($index) && label.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreLabel($index)">
+                        <button ng-if="!ctrl.isSystemLabel($index) && label.NeedsDeletion" class="btn btn-sm btn-secondary" type="button" ng-click="ctrl.restoreLabel($index)">
                           Restore
                         </button>
                         <span class="label label-warning label-sm image-tag" ng-if="label.IsUsed && !ctrl.isSystemLabel($index)" style="margin-left: 5px">used</span>

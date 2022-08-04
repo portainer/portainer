@@ -124,8 +124,16 @@
     </div>
   </div>
 
-  <div class="form-group" ng-if="!$ctrl.formValues.IsSimple">
+  <div class="form-group !px-[15px]" ng-if="!$ctrl.formValues.IsSimple">
     <input type="text" ng-model="$ctrl.formValues.DataYaml" required style="display: none" />
-    <code-editor identifier="kubernetes-configuration-editor" value="$ctrl.formValues.DataYaml" read-only="false" yml="true" on-change="($ctrl.editorUpdate)"></code-editor>
+
+    <web-editor-form
+      identifier="kubernetes-configuration-editor"
+      value="$ctrl.formValues.DataYaml"
+      on-change="($ctrl.editorUpdate)"
+      yml="true"
+      placeholder="# Define or paste key-value pairs here, one per line"
+    >
+    </web-editor-form>
   </div>
 </ng-form>
