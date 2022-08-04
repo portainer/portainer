@@ -40,26 +40,33 @@
                 <div class="form-group">
                   <div class="col-sm-12">
                     <div class="col-sm-12 form-inline" class="mt-2.5">
-                      <div ng-repeat="item in formValues.ImageNames track by $index" class="mt-0.5">
+                      <div ng-repeat="item in formValues.ImageNames track by $index" class="mt-1">
                         <!-- name-input -->
                         <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">name</span>
-                          <input type="text" class="form-control" ng-model="item.Name" placeholder="e.g. my-image:my-tag" auto-focus />
-                          <span class="input-group-addon" ng-if="!checkName(item.Name)">
+                          <input type="text" class="form-control" ng-model="item.Name" ng-change="checkName($index)" placeholder="e.g. my-image:my-tag" auto-focus />
+                          <span class="input-group-addon" ng-if="!item.Valid">
                             <pr-icon icon="'x'" mode="'danger'" feather="true"></pr-icon>
                           </span>
-                          <span class="input-group-addon" ng-if="checkName(item.Name)">
+                          <span class="input-group-addon" ng-if="item.Valid">
                             <pr-icon icon="'check'" mode="'success'" feather="true"></pr-icon>
                           </span>
                         </div>
                         <!-- !name-input -->
                         <!-- actions -->
                         <div class="input-group col-sm-2 input-group-sm">
-                          <button class="btn btn-sm btn-danger" type="button" ng-click="removeImageName($index)">
-                            <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                          <button class="btn btn-dangerlight btn-only-icon" type="button" ng-click="removeImageName($index)">
+                            <pr-icon icon="'trash-2'" feather="true"></pr-icon>
                           </button>
                         </div>
                         <!-- !actions -->
+                        <div class="small text-warning" ng-if="!item.Valid">
+                          <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                          <span ng-if="!item.Unique">The image name must be unique</span>
+                          <span ng-if="item.Unique"
+                            >The image name must consist of between 2 and 255 lowercase alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span
+                          >
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -204,7 +211,8 @@
                     ng-disabled="state.actionInProgress
                     || (state.BuildType === 'upload' && (!formValues.UploadFile || !formValues.Path))
                     || (state.BuildType === 'url' && (!formValues.URL || !formValues.Path))
-                    || (formValues.ImageNames.length === 0 || !validImageNames())"
+                    || (formValues.ImageNames.length === 0 || !validImageNames())
+                    || (formValues.DockerFileContent === '')"
                     ng-click="buildImage()"
                     button-spinner="state.actionInProgress"
                   >
