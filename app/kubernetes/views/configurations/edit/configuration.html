@@ -60,13 +60,13 @@
                 <pr-icon icon="'svg-clockrewind'"></pr-icon>
                 Events
                 <div ng-if="ctrl.hasEventWarnings()">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
               <kubernetes-events-datatable
                 title-text="Events"
-                title-icon="fa-history"
+                title-icon="svg-clockrewind"
                 dataset="ctrl.events"
                 table-key="kubernetes.configuration.events"
                 order-by="Date"

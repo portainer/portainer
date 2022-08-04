@@ -16,8 +16,8 @@
         <td>{{ service.spec.clusterIP }}</td>
         <td ng-show="service.spec.type === 'LoadBalancer'">
           <div ng-show="service.status.loadBalancer.ingress">
-            <a target="_blank" ng-href="http://{{ service.status.loadBalancer.ingress[0].ip }}:{{ service.spec.ports[0].port }}">
-              <i class="fa fa-external-link-alt" aria-hidden="true"></i>
+            <a class="vertical-center hyperlink" target="_blank" ng-href="http://{{ service.status.loadBalancer.ingress[0].ip }}:{{ service.spec.ports[0].port }}">
+              <pr-icon icon="'external-link'" feather="true"></pr-icon>
               <span data-cy="k8sAppDetail-containerPort"> Access </span>
             </a>
           </div>
@@ -32,8 +32,14 @@
         </td>
         <td ng-if="!ctrl.portHasIngressRules(port)">
           <div ng-repeat="port in service.spec.ports">
-            <a ng-if="$ctrl.publicUrl && port.nodePort" ng-href="http://{{ $ctrl.publicUrl }}:{{ port.nodePort }}" target="_blank" style="margin-left: 5px">
-              <i class="fa fa-external-link-alt" aria-hidden="true"></i>
+            <a
+              class="vertical-center hyperlink"
+              ng-if="$ctrl.publicUrl && port.nodePort"
+              ng-href="http://{{ $ctrl.publicUrl }}:{{ port.nodePort }}"
+              target="_blank"
+              style="margin-left: 5px"
+            >
+              <pr-icon icon="'external-link'" feather="true"></pr-icon>
               <span data-cy="k8sAppDetail-containerPort">
                 {{ port.port }}
               </span>

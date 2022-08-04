@@ -180,7 +180,7 @@
 
             <uib-tab index="2" classes="btn-sm" select="ctrl.selectTab(2)">
               <uib-tab-heading>
-                <pr-icon icon="'fa-history'"></pr-icon> Events
+                <pr-icon icon="'svg-clockrewind'"></pr-icon> Events
                 <div ng-if="ctrl.hasEventWarnings()" class="vertical-center">
                   <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
@@ -188,7 +188,7 @@
               </uib-tab-heading>
               <kubernetes-events-datatable
                 title-text="Events"
-                title-icon="fa-history"
+                title-icon="svg-clockrewind"
                 dataset="ctrl.events"
                 table-key="kubernetes.application.events"
                 order-by="Date"
