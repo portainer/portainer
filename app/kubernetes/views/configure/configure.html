@@ -3,7 +3,7 @@
   title="'Kubernetes features configuration'"
   breadcrumbs="[
     { label:'Environments', link:'portainer.endpoints' },
-    { 
+    {
       label:ctrl.endpoint.Name,
       link: 'portainer.endpoints.endpoint', 
       linkParams:{id: ctrl.endpoint.Id}
@@ -291,7 +291,7 @@
                     </tr>
                     <tr ng-repeat="class in ctrl.StorageClasses">
                       <td>
-                        <div class="flex-center justify-start">
+                        <div class="flex-row vertical-center">
                           <label class="switch mr-2 mb-0">
                             <input type="checkbox" ng-model="class.selected" /><span class="slider round" data-cy="kubeSetup-storageToggle{{ class.Name }}"></span>
                           </label>
