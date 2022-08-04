@@ -149,18 +149,10 @@ func (c *gitClient) listRefs(ctx context.Context, opt option) ([]string, error) 
 }
 
 func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error) {
-	var (
-		allPaths    []string
-		filteredRet []string
-		err         error
-		sucess      bool
-		ok          bool
-		cache       interface{}
-	)
-
+	var filteredRet []string
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
 	if c.repoFileCache != nil {
-		cache, ok = c.repoFileCache.Get(repoKey)
+		cache, ok := c.repoFileCache.Get(repoKey)
 		if ok {
 			treeCache, success := cache.([]string)
 			if success {
@@ -175,81 +167,48 @@ func (c *gitClient) listFiles(ctx context.Context, opt option) ([]string, error)
 		}
 	}
 
-	listOptions := &git.ListOptions{
-		Auth: getAuth(opt.username, opt.password),
+	cloneOption := &git.CloneOptions{
+		URL:           opt.repositoryUrl,
+		NoCheckout:    true,
+		Depth:         1,
+		SingleBranch:  true,
+		ReferenceName: plumbing.ReferenceName(opt.referenceName),
+		Auth:          getAuth(opt.username, opt.password),
 	}
 
-	refs := make([]*plumbing.Reference, 0)
+	repo, err := git.Clone(memory.NewStorage(), nil, cloneOption)
+	if err != nil {
+		return nil, checkGitError(err)
+	}
 
-	if c.repoRefCache != nil {
-		cache, ok = c.repoRefCache.Get(opt.repositoryUrl)
-		if ok {
-			refs, sucess = cache.([]*plumbing.Reference)
+	head, err := repo.Head()
+	if err != nil {
+		return nil, err
+	}
+
+	commit, err := repo.CommitObject(head.Hash())
+	if err != nil {
+		return nil, err
+	}
+
+	tree, err := commit.Tree()
+	if err != nil {
+		return nil, err
+	}
+
+	var allPaths []string
+	tree.Files().ForEach(func(f *object.File) error {
+		allPaths = append(allPaths, f.Name)
+		if matchExtensions(f.Name, opt.extensions) {
+			filteredRet = append(filteredRet, f.Name)
 		}
-	}
-	if !ok || !sucess {
-		rem := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
-			Name: "origin",
-			URLs: []string{opt.repositoryUrl},
-		})
+		return nil
+	})
 
-		refs, err = rem.List(listOptions)
-		if err != nil {
-			return nil, checkGitError(err)
-		}
+	if c.cacheEnabled && c.repoFileCache != nil {
+		c.repoFileCache.Add(repoKey, allPaths)
 	}
 
-	matchedRef := false
-	for _, r := range refs {
-		if r.Name().String() == opt.referenceName {
-			matchedRef = true
-			cloneOption := &git.CloneOptions{
-				URL:           opt.repositoryUrl,
-				NoCheckout:    true,
-				Depth:         1,
-				SingleBranch:  true,
-				ReferenceName: r.Name(),
-				Auth:          getAuth(opt.username, opt.password),
-			}
-
-			repo, err := git.Clone(memory.NewStorage(), nil, cloneOption)
-			if err != nil {
-				return nil, checkGitError(err)
-			}
-
-			head, err := repo.Head()
-			if err != nil {
-				return nil, err
-			}
-
-			commit, err := repo.CommitObject(head.Hash())
-			if err != nil {
-				return nil, err
-			}
-
-			tree, err := commit.Tree()
-			if err != nil {
-				return nil, err
-			}
-
-			tree.Files().ForEach(func(f *object.File) error {
-				allPaths = append(allPaths, f.Name)
-				if matchExtensions(f.Name, opt.extensions) {
-					filteredRet = append(filteredRet, f.Name)
-				}
-				return nil
-			})
-
-			if c.cacheEnabled && c.repoFileCache != nil {
-				c.repoFileCache.Add(repoKey, allPaths)
-			}
-			break
-		}
-	}
-
-	if !matchedRef {
-		return nil, ErrRefNotFound
-	}
 	return filteredRet, nil
 }
 

@@ -502,6 +502,7 @@ func Test_listFiles_azure(t *testing.T) {
 	client := NewAzureClient(0)
 
 	type expectResult struct {
+		shouldFail   bool
 		err          error
 		matchedCount int
 	}
@@ -523,7 +524,8 @@ func Test_listFiles_azure(t *testing.T) {
 				extensions:    []string{},
 			},
 			expect: expectResult{
-				err: ErrAuthenticationFailure,
+				shouldFail: true,
+				err:        ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -536,7 +538,8 @@ func Test_listFiles_azure(t *testing.T) {
 				extensions:    []string{},
 			},
 			expect: expectResult{
-				err: ErrAuthenticationFailure,
+				shouldFail: true,
+				err:        ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -591,7 +594,7 @@ func Test_listFiles_azure(t *testing.T) {
 				extensions:    []string{},
 			},
 			expect: expectResult{
-				err: ErrRefNotFound,
+				shouldFail: true,
 			},
 		},
 		{
@@ -604,7 +607,8 @@ func Test_listFiles_azure(t *testing.T) {
 				extensions:    []string{},
 			},
 			expect: expectResult{
-				err: ErrIncorrectRepositoryURL,
+				shouldFail: true,
+				err:        ErrIncorrectRepositoryURL,
 			},
 		},
 	}
@@ -612,14 +616,16 @@ func Test_listFiles_azure(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			paths, err := client.listFiles(context.TODO(), tt.args)
-			if tt.expect.err == nil {
+			if tt.expect.shouldFail {
+				assert.Error(t, err)
+				if tt.expect.err != nil {
+					assert.Equal(t, tt.expect.err, err)
+				}
+			} else {
 				assert.NoError(t, err)
 				if tt.expect.matchedCount > 0 {
 					assert.Greater(t, len(paths), 0)
 				}
-			} else {
-				assert.Error(t, err)
-				assert.Equal(t, tt.expect.err, err)
 			}
 		})
 	}

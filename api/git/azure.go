@@ -193,7 +193,7 @@ func (a *azureClient) getRootItem(ctx context.Context, opt option) (*azureItem, 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get repository root item with a status \"%v\"", resp.Status)
+		return nil, checkAzureStatusCode(fmt.Errorf("failed to get repository root item with a status \"%v\"", resp.Status), resp.StatusCode)
 	}
 
 	var items struct {
@@ -426,12 +426,7 @@ func (a *azureClient) listRefs(ctx context.Context, opt option) ([]string, error
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		if resp.StatusCode == http.StatusNotFound {
-			return nil, ErrIncorrectRepositoryURL
-		} else if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusNonAuthoritativeInfo {
-			return nil, ErrAuthenticationFailure
-		}
-		return nil, fmt.Errorf("failed to list refs url with a status \"%v\"", resp.Status)
+		return nil, checkAzureStatusCode(fmt.Errorf("failed to list refs with a status \"%v\"", resp.Status), resp.StatusCode)
 	}
 
 	var refs struct {
@@ -457,19 +452,10 @@ func (a *azureClient) listRefs(ctx context.Context, opt option) ([]string, error
 }
 
 func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, error) {
-	var (
-		allPaths    []string
-		filteredRet []string
-		refs        []string
-		err         error
-		success     bool
-		ok          bool
-		cache       interface{}
-	)
-
+	var filteredRet []string
 	repoKey := generateCacheKey(opt.repositoryUrl, opt.referenceName)
 	if a.repoFileCache != nil {
-		cache, ok = a.repoFileCache.Get(repoKey)
+		cache, ok := a.repoFileCache.Get(repoKey)
 		if ok {
 			treeCache, success := cache.([]string)
 			if success {
@@ -483,37 +469,6 @@ func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, erro
 		}
 	}
 
-	// Check if the reference exists
-	if a.repoRefCache != nil {
-		cache, ok = a.repoRefCache.Get(opt.repositoryUrl)
-		if ok {
-			refs, success = cache.([]string)
-		}
-	}
-	if !ok || !success {
-		opt := option{
-			repositoryUrl: opt.repositoryUrl,
-			username:      opt.username,
-			password:      opt.password,
-		}
-		refs, err = a.listRefs(ctx, opt)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	matchedRef := false
-	for _, ref := range refs {
-		if ref == opt.referenceName {
-			matchedRef = true
-			break
-		}
-	}
-	if !matchedRef {
-		return nil, ErrRefNotFound
-	}
-
-	//
 	rootItem, err := a.getRootItem(ctx, opt)
 	if err != nil {
 		return nil, err
@@ -560,6 +515,7 @@ func (a *azureClient) listFiles(ctx context.Context, opt option) ([]string, erro
 		return nil, errors.Wrap(err, "could not parse Azure tree response")
 	}
 
+	var allPaths []string
 	for _, treeEntry := range tree.TreeEntries {
 		allPaths = append(allPaths, treeEntry.RelativePath)
 		if matchExtensions(treeEntry.RelativePath, opt.extensions) {
@@ -581,4 +537,13 @@ func (a *azureClient) purgeCache() {
 	if a.repoFileCache != nil {
 		a.repoFileCache.Purge()
 	}
+}
+
+func checkAzureStatusCode(err error, code int) error {
+	if code == http.StatusNotFound {
+		return ErrIncorrectRepositoryURL
+	} else if code == http.StatusUnauthorized || code == http.StatusNonAuthoritativeInfo {
+		return ErrAuthenticationFailure
+	}
+	return err
 }

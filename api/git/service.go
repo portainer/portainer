@@ -10,7 +10,6 @@ import (
 var (
 	ErrIncorrectRepositoryURL = errors.New("Git repository could not be found, please ensure that the URL is correct.")
 	ErrAuthenticationFailure  = errors.New("Authentication failed, please ensure that the git credentials are correct.")
-	ErrRefNotFound            = errors.New("The target ref is not found")
 
 	REPOSITORY_CACHE_SIZE = 4
 	REPOSITORY_CACHE_TTL  = 30 * time.Minute
@@ -124,6 +123,7 @@ func (service *Service) LatestCommitID(repositoryURL, referenceName, username, p
 	return service.git.latestCommitID(context.TODO(), options)
 }
 
+// ListRefs will list target repository's references without cloning the repository
 func (service *Service) ListRefs(repositoryURL, username, password string) ([]string, error) {
 	options := option{
 		repositoryUrl: repositoryURL,
@@ -138,6 +138,8 @@ func (service *Service) ListRefs(repositoryURL, username, password string) ([]st
 	return service.git.listRefs(context.TODO(), options)
 }
 
+// ListFiles will list all the files of the target repository with specific extensions.
+// If extension is not provided, it will list all the files under the target repository
 func (service *Service) ListFiles(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
 	options := option{
 		repositoryUrl: repositoryURL,
