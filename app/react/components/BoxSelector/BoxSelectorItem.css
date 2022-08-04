@@ -59,7 +59,7 @@
 }
 
 .boxselector_wrapper label.boxselector_disabled a {
-  cursor: auto;
+  cursor: pointer;
   pointer-events: auto;
 }
 
