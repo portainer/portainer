@@ -6,6 +6,7 @@
   border-radius: 8px;
 
   display: flex;
+  align-items: center;
   gap: 5px;
 }
 
