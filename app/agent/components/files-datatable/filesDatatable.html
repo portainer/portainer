@@ -76,9 +76,11 @@
                   ></a>
                 </span>
                 <span ng-if="!item.edit && item.Dir">
-                  <a ng-click="$ctrl.browse({name: item.Name})"><pr-icon icon="'folder'" feather="true" class-name="space-right"></pr-icon>{{ item.Name }}</a>
+                  <a class="vertical-center" ng-click="$ctrl.browse({name: item.Name})">
+                    <pr-icon icon="'folder'" feather="true" class-name="space-right"></pr-icon>{{ item.Name }}
+                  </a>
                 </span>
-                <span ng-if="!item.edit && !item.Dir"><pr-icon icon="'file'" feather="true" class-name="space-right"></pr-icon>{{ item.Name }} </span>
+                <span class="vertical-center" ng-if="!item.edit && !item.Dir"> <pr-icon icon="'file'" feather="true" class-name="space-right"></pr-icon>{{ item.Name }} </span>
               </td>
               <td>{{ item.Size | humansize }}</td>
               <td>
