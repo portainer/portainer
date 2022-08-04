@@ -1,3 +1,7 @@
+import clsx from 'clsx';
+
+import { Icon } from '@/react/components/Icon';
+
 import { DockerContainer } from '../containers/types';
 
 interface Props {
@@ -10,28 +14,44 @@ export function useContainerStatusComponent(containers: DockerContainer[]) {
 
 export function ContainerStatus({ containers }: Props) {
   return (
-    <>
-      <div className="pull-right pl-1">
-        <div>
-          <i className="fa fa-power-off space-right green-icon" />
+    <div className="pull-right">
+      <div>
+        <div className="vertical-center space-right pr-5">
+          <Icon
+            icon="power"
+            className={clsx('icon icon-sm icon-success')}
+            feather
+          />
           {runningContainersFilter(containers)} running
         </div>
-        <div>
-          <i className="fa fa-power-off space-right red-icon" />
+        <div className="vertical-center space-right">
+          <Icon
+            icon="power"
+            className={clsx('icon icon-sm icon-danger')}
+            feather
+          />
           {stoppedContainersFilter(containers)} stopped
         </div>
       </div>
-      <div className="pull-right pr-5">
-        <div>
-          <i className="fa fa-heartbeat space-right green-icon" />
+      <div>
+        <div className="vertical-center space-right pr-5">
+          <Icon
+            icon="heart"
+            className={clsx('icon icon-sm icon-success')}
+            feather
+          />
           {healthyContainersFilter(containers)} healthy
         </div>
-        <div>
-          <i className="fa fa-heartbeat space-right orange-icon" />
+        <div className="vertical-center space-right">
+          <Icon
+            icon="heart"
+            className={clsx('icon icon-sm icon-danger')}
+            feather
+          />
           {unhealthyContainersFilter(containers)} unhealthy
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
