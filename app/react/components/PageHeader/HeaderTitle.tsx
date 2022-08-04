@@ -36,7 +36,15 @@ export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
           data-cy="userMenu-button"
           aria-label="User menu toggle"
         >
-          <User className="icon-nested-gray" />
+          <div
+            className={clsx(
+              'icon-badge text-lg !p-2 mr-1',
+              'bg-gray-4 text-gray-8',
+              'th-dark:bg-gray-warm-10 th-dark:text-gray-warm-7'
+            )}
+          >
+            <User className="feather" />
+          </div>
           {user && <span>{user.Username}</span>}
           <ChevronDown className={styles.arrowDown} />
         </MenuButton>
