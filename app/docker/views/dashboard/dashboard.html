@@ -32,13 +32,8 @@
   <div class="row" ng-if="(!applicationState.endpoint.mode.agentProxy || applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE') && info && endpoint">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-body classes="no-padding">
-          <div class="toolBar vertical-center w-full">
-            <div class="toolBarTitle vertical-center p-5">
-              <pr-icon icon="'svg-tachometer'" class-name="'icon-nested-blue [&>svg]:!h-5 [&>svg]:!w-5'" mode="'primary'"></pr-icon>
-              Environment info
-            </div>
-          </div>
+        <rd-widget-header icon="svg-tachometer" title-text="Environment info"></rd-widget-header>
+        <rd-widget-body classes="!px-5 !py-0">
           <table class="table">
             <tbody>
               <tr>
