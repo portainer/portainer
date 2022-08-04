@@ -11,6 +11,7 @@ import checked from '@/assets/ico/checked.svg?c';
 import circlenotch from '@/assets/ico/circle-notch.svg?c';
 import clockrewind from '@/assets/ico/clock-rewind.svg?c';
 import compress from '@/assets/ico/compress.svg?c';
+import cubes from '@/assets/ico/cubes.svg?c';
 import custom from '@/assets/ico/custom.svg?c';
 import dataflow from '@/assets/ico/dataflow-1.svg?c';
 import dataflow2 from '@/assets/ico/dataflow-2.svg?c';
@@ -83,6 +84,7 @@ export const SvgIcons = {
   circlenotch,
   clockrewind,
   compress,
+  cubes,
   custom,
   expand,
   filecode,

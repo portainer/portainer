@@ -160,7 +160,7 @@
               </span>
             </span>
             <!-- Internal -->
-            <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP"> <i class="fa fa-list-alt mr-0.5" aria-hidden="true"></i> ClusterIP </span>
+            <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP"> <pr-icon icon="'list'" feather="true"></pr-icon> ClusterIP </span>
             <!-- Cluster -->
             <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.NODE_PORT"> <pr-icon icon="'list'" feather="true" class-name="'icon'"></pr-icon> NodePort </span>
           </td>

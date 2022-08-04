@@ -33,6 +33,16 @@
   box-shadow: none;
 }
 
+.boxselector_wrapper input[type='radio']:disabled + label,
+.box-selector-item input[type='radio']:disabled + label {
+  background: var(--ui-gray-3);
+  color: var(--black-color) !important;
+  border-radius: 8px;
+  border-color: var(--ui-gray-5);
+  padding: 15px;
+  box-shadow: none;
+}
+
 .row.header {
   background-color: var(--bg-body-color) !important;
   margin-bottom: 5px !important;

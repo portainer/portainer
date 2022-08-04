@@ -11,7 +11,7 @@
       ></select>
       <button
         type="button"
-        class="btn btn-sm btn-default vertical-center"
+        class="btn btn-sm btn-default vertical-center h-[34px]"
         style="margin-left: 0"
         ng-click="$ctrl.addEntry( $ctrl.state.selected )"
         data-cy="k8sAppCreate-createServiceButton"
@@ -25,8 +25,10 @@
 <div class="form-group">
   <div class="col-sm-12 form-inline" style="margin-top: 20px" ng-repeat="service in $ctrl.formValues.Services">
     <div ng-if="!$ctrl.formValues.Services[$index].Ingress">
-      <div class="text-muted">
-        <i class="{{ $ctrl.iconStyle(service.Type) }}" aria-hidden="true" style="margin-right: 2px"></i>
+      <div class="text-muted vertical-center">
+        <pr-icon ng-if="$ctrl.serviceType(service.Type) === 'ClusterIP'" icon="'list'" feather="true"></pr-icon>
+        <pr-icon ng-if="$ctrl.serviceType(service.Type) === 'LoadBalancer'" icon="'svg-dataflow'"></pr-icon>
+        <pr-icon ng-if="$ctrl.serviceType(service.Type) === 'NodePort'" icon="'list'" feather="true"></pr-icon>
         {{ $ctrl.serviceType(service.Type) }}
       </div>
       <kube-services-item-view
@@ -50,7 +52,7 @@
 
     <div ng-if="$ctrl.formValues.Services[$index].Ingress && $ctrl.formValues.OriginalIngresses.length === 0">
       <div class="text-muted">
-        <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px"></i>
+        <pr-icon icon="'svg-route'"></pr-icon>
         Ingress
       </div>
       <div ng-if="$ctrl.isAdmin()" class="small">
