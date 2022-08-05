@@ -4,11 +4,11 @@
 
 <!-- starttls -->
 <div class="form-group" ng-if="!$ctrl.settings.TLSConfig.TLS">
-  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0">
+  <label for="tls" class="control-label col-sm-3 col-lg-2 text-left" style="padding-top: 0">
     Use StartTLS
     <portainer-tooltip message="'Enable this option if want to use StartTLS to secure the connection to the server. Ignored if Use TLS is selected.'"></portainer-tooltip>
   </label>
-  <div class="col-sm-9">
+  <div class="col-sm-9 col-lg-10">
     <label class="switch">
       <input type="checkbox" ng-model="$ctrl.settings.StartTLS" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
       <span class="slider round"></span>
@@ -19,11 +19,11 @@
 
 <!-- tls-checkbox -->
 <div class="form-group" ng-if="!$ctrl.settings.StartTLS">
-  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0">
+  <label for="tls" class="control-label col-sm-3 col-lg-2 text-left" style="padding-top: 0">
     Use TLS
     <portainer-tooltip message="'Enable this option if you need to specify TLS certificates to connect to the LDAP server.'"></portainer-tooltip>
   </label>
-  <div class="col-sm-9">
+  <div class="col-sm-9 col-lg-10">
     <label class="switch">
       <input type="checkbox" ng-model="$ctrl.settings.TLSConfig.TLS" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
       <span class="slider round"></span>
@@ -34,11 +34,11 @@
 
 <!-- tls-skip-verify -->
 <div class="form-group">
-  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0">
+  <label for="tls" class="control-label col-sm-3 col-lg-2 text-left" style="padding-top: 0">
     Skip verification of server certificate
     <portainer-tooltip message="'Skip the verification of the server TLS certificate. Not recommended on unsecured networks.'"></portainer-tooltip>
   </label>
-  <div class="col-sm-9">
+  <div class="col-sm-9 col-lg-10">
     <label class="switch">
       <input type="checkbox" ng-model="$ctrl.settings.TLSConfig.TLSSkipVerify" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
       <span class="slider round"></span>
@@ -49,8 +49,8 @@
 
 <!-- ca-input -->
 <div class="form-group" ng-if="$ctrl.settings.TLSConfig.TLS || ($ctrl.settings.StartTLS && !$ctrl.settings.TLSConfig.TLSSkipVerify)">
-  <label class="col-sm-3 control-label text-left">TLS CA certificate</label>
-  <div class="col-sm-9 vertical-center">
+  <label class="col-sm-3 col-lg-2 control-label text-left">TLS CA certificate</label>
+  <div class="col-sm-9 col-lg-10 vertical-center">
     <button
       type="button"
       class="btn btn-sm btn-primary"
