@@ -3,9 +3,9 @@
   title="'Volume details'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
-    { 
+    {
       label:ctrl.volume.ResourcePool.Namespace.Name,
-      link: 'kubernetes.resourcePools.resourcePool', 
+      link: 'kubernetes.resourcePools.resourcePool',
       linkParams:{ id: ctrl.volume.ResourcePool.Namespace.Name }
     },
     { label:'Volumes', link:'kubernetes.volumes' },
@@ -181,7 +181,7 @@
         order-by="Name"
         refresh-callback="ctrl.getVolume"
         title-text="Applications using this volume"
-        title-icon="code"
+        title-icon="svg-laptopcode"
       >
       </kubernetes-integrated-applications-datatable>
     </div>

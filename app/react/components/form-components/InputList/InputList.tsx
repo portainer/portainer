@@ -94,7 +94,7 @@ export function InputList<T = DefaultType>({
       </div>
 
       {textTip && (
-        <div className="col-sm-12 my-5">
+        <div className="col-sm-12 mt-5">
           <TextTip color="blue">{textTip}</TextTip>
         </div>
       )}
@@ -107,7 +107,11 @@ export function InputList<T = DefaultType>({
           return (
             <div
               key={key}
-              className={clsx(styles.itemLine, { [styles.hasError]: !!error })}
+              className={clsx(
+                styles.itemLine,
+                { [styles.hasError]: !!error },
+                'vertical-center'
+              )}
             >
               {Item ? (
                 <Item
@@ -128,17 +132,19 @@ export function InputList<T = DefaultType>({
                 {!readOnly && movable && (
                   <>
                     <Button
-                      size="small"
+                      size="medium"
                       disabled={disabled || index === 0}
                       onClick={() => handleMoveUp(index)}
+                      className="vertical-center btn-only-icon"
                     >
                       <Icon icon="arrow-up" feather />
                     </Button>
                     <Button
-                      size="small"
+                      size="medium"
                       type="button"
                       disabled={disabled || index === value.length - 1}
                       onClick={() => handleMoveDown(index)}
+                      className="vertical-center btn-only-icon"
                     >
                       <Icon icon="arrow-down" feather />
                     </Button>
@@ -146,12 +152,12 @@ export function InputList<T = DefaultType>({
                 )}
                 {!readOnly && (
                   <Button
-                    color="danger"
+                    color="dangerlight"
                     size="medium"
                     onClick={() => handleRemoveItem(key, item)}
-                    disabled={disabled}
+                    className="vertical-center btn-only-icon"
                   >
-                    <Icon icon="trash-2" feather />
+                    <Icon icon="trash-2" feather size="md" />
                   </Button>
                 )}
               </div>

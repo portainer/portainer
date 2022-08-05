@@ -9,8 +9,8 @@ class KubeCreateCustomTemplateViewController {
     Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, ModalService, Notifications, ResourceControlService });
 
     this.methodOptions = [
-      buildOption('method_editor', 'fa fa-edit', 'Web editor', 'Use our Web editor', 'editor'),
-      buildOption('method_upload', 'fa fa-upload', 'Upload', 'Upload from your computer', 'upload'),
+      buildOption('method_editor', 'svg-custom', 'Web editor', 'Use our Web editor', 'editor'),
+      buildOption('method_upload', 'svg-upload', 'Upload', 'Upload from your computer', 'upload'),
     ];
 
     this.templates = null;
@@ -97,7 +97,12 @@ class KubeCreateCustomTemplateViewController {
 
       this.state.actionInProgress = true;
       try {
-        const customTemplate = await this.createCustomTemplateByMethod(method, this.formValues);
+        const formValues = { ...this.formValues, Variables: null };
+        if (this.formValues.Variables.length > 0) {
+          formValues.Variables = JSON.stringify(this.formValues.Variables);
+        }
+
+        const customTemplate = await this.createCustomTemplateByMethod(method, formValues);
 
         const accessControlData = this.formValues.AccessControlData;
         const userDetails = this.Authentication.getUserDetails();

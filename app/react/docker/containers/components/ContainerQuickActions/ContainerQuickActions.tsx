@@ -133,7 +133,7 @@ function TaskQuickActions({ taskId, state }: TaskProps) {
             params={{ id: taskId }}
             title="Logs"
           >
-            <i className="fa fa-file-alt space-right" aria-hidden="true" />
+            <Icon icon="file-text" feather className="space-right" />
           </Link>
         </Authorized>
       )}
@@ -141,7 +141,7 @@ function TaskQuickActions({ taskId, state }: TaskProps) {
       {state.showQuickActionInspect && (
         <Authorized authorizations="DockerTaskInspect">
           <Link to="docker.tasks.task" params={{ id: taskId }} title="Inspect">
-            <i className="fa fa-info-circle space-right" aria-hidden="true" />
+            <Icon icon="info" feather className="space-right" />
           </Link>
         </Authorized>
       )}

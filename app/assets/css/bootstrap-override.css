@@ -33,10 +33,6 @@
   justify-content: center;
 }
 
-.justify-left {
-  justify-content: left;
-}
-
 .blue {
   background: var(--bg-dashboard-item) !important;
 }
@@ -408,4 +404,8 @@ input:checked + .slider:before {
   text-decoration: none !important;
   cursor: pointer;
   color: var(--ui-gray-9) !important;
+}
+
+.widget-header {
+  font-size: 16px;
 }

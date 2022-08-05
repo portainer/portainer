@@ -1,13 +1,13 @@
 <div class="datatable">
   <rd-widget>
-    <rd-widget-body classes="no-padding">
+    <rd-widget-body classes="no-padding" ng-if="$ctrl.createEnabled">
       <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
         <div class="toolBarTitle vertical-center">
           <pr-icon icon="'layers'" feather="true" class-name="'icon-nested-blue vertical-center'" mode="'primary'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center !mr-0">
-          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -21,6 +21,7 @@
         </div>
         <div class="actionBar !gap-3" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
           <button
+            ng-disabled="!$ctrl.createEnabled"
             type="button"
             class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
             authorization="PortainerStackDelete"
@@ -178,7 +179,7 @@
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a
-                  ng-if="!$ctrl.offlineMode"
+                  ng-if="!$ctrl.offlineMode && $ctrl.createEnabled"
                   ui-sref="docker.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, regular: item.Regular, external: item.External, orphaned: item.Orphaned, orphanedRunning: item.OrphanedRunning })"
                   >{{ item.Name }}</a
                 >

@@ -58,6 +58,11 @@
   pointer-events: none;
 }
 
+.boxselector_wrapper label.boxselector_disabled a {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
 .boxselector_wrapper input[type='radio']:checked + label,
 .box-selector-item input[type='radio']:checked + label {
   color: white;

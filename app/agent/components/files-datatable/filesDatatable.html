@@ -25,25 +25,31 @@
           <thead>
             <tr>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Name
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Name'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Name'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Name')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Size')">
-                  Size
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'Size' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Size'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Size'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Size')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('ModTime')">
-                  Last modification
-                  <pr-icon icon="'arrow-down'" feather="true" ng-if="$ctrl.state.orderBy === 'ModTime' && !$ctrl.state.reverseOrder"></pr-icon>
-                  <pr-icon icon="'arrow-up'" feather="true" ng-if="$ctrl.state.orderBy === 'ModTime' && $ctrl.state.reverseOrder"></pr-icon>
-                </a>
+                <table-column-header
+                  col-title="'Last modification'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'ModTime'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'ModTime' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('ModTime')"
+                ></table-column-header>
               </th>
               <th> Actions </th>
             </tr>

@@ -48,7 +48,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
   return (
     <div className="row">
       <Widget>
-        <WidgetTitle icon="fa-laptop" title="FDO" />
+        <WidgetTitle icon="svg-laptop" title="FDO" />
         <WidgetBody>
           <Formik
             initialValues={initialValues}
@@ -71,7 +71,7 @@ export function SettingsFDO({ settings, onSubmit }: Props) {
                 <FormControl
                   inputId="edge_enableFDO"
                   label="Enable FDO Management Service"
-                  size="medium"
+                  size="small"
                   errors={errors.enabled}
                 >
                   <Switch

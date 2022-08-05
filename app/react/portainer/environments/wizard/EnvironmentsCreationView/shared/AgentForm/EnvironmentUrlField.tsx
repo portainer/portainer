@@ -8,10 +8,11 @@ export function EnvironmentUrlField() {
 
   return (
     <FormControl
-      label="Environment URL"
+      label="Environment address"
       errors={meta.error}
       required
       inputId="environment-url-field"
+      tooltip="A host:port combination. The host can be either an IP address or a host name."
     >
       <Field
         id="environment-url-field"
