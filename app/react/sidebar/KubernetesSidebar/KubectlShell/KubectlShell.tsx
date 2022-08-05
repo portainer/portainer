@@ -12,6 +12,7 @@ import { EnvironmentId } from '@/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
 
+import { Icon } from '@@/Icon';
 import { Button } from '@@/buttons';
 
 import styles from './KubectlShell.module.css';
@@ -125,8 +126,8 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
   return (
     <div className={clsx(styles.root, { [styles.minimized]: shell.minimized })}>
       <div className={styles.header}>
-        <div className={styles.title}>
-          <i className="fas fa-terminal space-right" />
+        <div className={clsx(styles.title, 'vertical-center')}>
+          <Icon icon="terminal" feather />
           kubectl shell
         </div>
         <div className={clsx(styles.actions, 'space-x-8')}>
