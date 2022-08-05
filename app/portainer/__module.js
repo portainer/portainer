@@ -22,6 +22,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   $rootScope.$on('unauthenticated', function (event, data) {
     if (!_.includes(data.config.url, '/v2/') && !_.includes(data.config.url, '/api/v4/') && isTransitionRequiresAuthentication($state.transition)) {
       $state.go('portainer.logout', { error: 'Your session has expired' });
+      window.location.reload();
     }
   });
 
