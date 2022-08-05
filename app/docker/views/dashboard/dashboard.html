@@ -32,8 +32,8 @@
   <div class="row" ng-if="(!applicationState.endpoint.mode.agentProxy || applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE') && info && endpoint">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="fa-tachometer-alt" title-text="Environment info"></rd-widget-header>
-        <rd-widget-body classes="no-padding">
+        <rd-widget-header icon="svg-tachometer" title-text="Environment info"></rd-widget-header>
+        <rd-widget-body classes="!px-5 !py-0">
           <table class="table">
             <tbody>
               <tr>
@@ -41,7 +41,8 @@
                 <td>
                   {{ endpoint.Name }}
                   <span class="small text-muted space-left">
-                    <i class="fa fa-microchip"></i> {{ endpoint.Snapshots[0].TotalCPU }} <i class="fa fa-memory space-left"></i> {{ endpoint.Snapshots[0].TotalMemory | humansize }}
+                    <pr-icon icon="'cpu'" feather="true"></pr-icon> {{ endpoint.Snapshots[0].TotalCPU }} <pr-icon icon="'svg-memory'"></pr-icon>
+                    {{ endpoint.Snapshots[0].TotalMemory | humansize }}
                   </span>
                   <span class="small text-muted">
                     - {{ info.Swarm && info.Swarm.NodeID !== '' ? 'Swarm' : 'Standalone' }} {{ info.ServerVersion }}
@@ -77,33 +78,33 @@
 
   <div class="dashboard-grid mx-4">
     <a ui-sref="docker.stacks" ng-if="showStacks">
-      <dashboard-item icon="'layers'" feather-icon="true" type="'Stack'" value="stackCount"></dashboard-item>
+      <dashboard-item feather-icon="true" icon="'layers'" feather-icon="true" type="'Stack'" value="stackCount"></dashboard-item>
     </a>
 
     <div ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="docker.services">
-        <dashboard-item icon="'fa-list-alt'" type="'Service'" value="serviceCount"></dashboard-item>
+        <dashboard-item feather-icon="true" icon="'shuffle'" type="'Service'" value="serviceCount"></dashboard-item>
       </a>
     </div>
 
     <a ng-if="containers" ui-sref="docker.containers">
-      <dashboard-item icon="'fa-cubes'" type="'Container'" value="containers.length" children="containerStatusComponent"></dashboard-item>
+      <dashboard-item feather-icon="true" icon="'box'" type="'Container'" value="containers.length" children="containerStatusComponent"></dashboard-item>
     </a>
 
     <a ng-if="images" ui-sref="docker.images">
-      <dashboard-item icon="'fa-clone'" type="'Image'" value="images.length" children="imagesTotalSizeComponent"></dashboard-item>
+      <dashboard-item feather-icon="true" icon="'list'" type="'Image'" value="images.length" children="imagesTotalSizeComponent"></dashboard-item>
     </a>
 
     <a ui-sref="docker.volumes">
-      <dashboard-item icon="'fa-hdd'" type="'Volume'" value="volumeCount"></dashboard-item>
+      <dashboard-item feather-icon="true" icon="'database'" type="'Volume'" value="volumeCount"></dashboard-item>
     </a>
 
     <a ui-sref="docker.networks">
-      <dashboard-item icon="'fa-sitemap'" type="'Network'" value="networkCount"></dashboard-item>
+      <dashboard-item feather-icon="true" icon="'share2'" type="'Network'" value="networkCount"></dashboard-item>
     </a>
 
     <div>
-      <dashboard-item icon="'fa-digital-tachograph'" type="'GPU'" value="endpoint.Gpus.length"></dashboard-item>
+      <dashboard-item feather-icon="true" icon="'cpu'" type="'GPU'" value="endpoint.Gpus.length"></dashboard-item>
     </div>
   </div>
 </div>
