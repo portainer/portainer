@@ -11,6 +11,7 @@ export const webEditorForm = {
     value: '<',
     readOnly: '<',
     onChange: '<',
+    hideTitle: '<',
   },
 
   transclude: {

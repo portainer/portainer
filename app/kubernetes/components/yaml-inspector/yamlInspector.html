@@ -1,5 +1,13 @@
 <div>
-  <code-editor identifier="application-details-yaml" read-only="true" value="$ctrl.data"></code-editor>
+  <web-editor-form
+    identifier="application-details-yaml"
+    value="$ctrl.data"
+    yml="true"
+    placeholder="# Define or paste the content of your manifest here"
+    read-only="true"
+    hide-title="true"
+  >
+  </web-editor-form>
   <div class="py-5">
     <span class="btn btn-light btn-sm" ng-click="$ctrl.copyYAML()">
       <pr-icon class="vertical-center" icon="'copy'" feather="true"></pr-icon>
