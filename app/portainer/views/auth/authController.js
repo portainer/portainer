@@ -41,6 +41,7 @@ class AuthenticationController {
       Password: '',
     };
     this.state = {
+      passwordInputType: 'password',
       showOAuthLogin: false,
       showStandardLogin: false,
       AuthenticationError: '',
@@ -64,6 +65,10 @@ class AuthenticationController {
   /**
    * UTILS FUNCTIONS SECTION
    */
+
+  toggleShowPassword() {
+    this.state.passwordInputType = this.state.passwordInputType === 'text' ? 'password' : 'text';
+  }
 
   logout(error) {
     this.Authentication.logout();

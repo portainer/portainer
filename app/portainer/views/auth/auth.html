@@ -68,20 +68,25 @@
             </div>
 
             <!-- password input -->
-            <div ng-if="ctrl.state.showStandardLogin">
+            <div ng-if="ctrl.state.showStandardLogin" class="!mb-3">
               <div class="pb-2">Password</div>
               <input
                 id="password"
-                type="password"
+                ng-attr-type="{{ ctrl.state.passwordInputType }}"
                 class="form-control"
                 name="password"
                 ng-model="ctrl.formValues.Password"
+                autocomplete="off"
                 data-cy="auth-passwordInput"
                 placeholder="Enter your password"
               />
             </div>
+            <div class="md-checkbox !my-0 !ml-1 text-muted">
+              <input class="!h-5 w-auto" id="show_hide_password" type="checkbox" ng-model="$ctrl.state.passwordInputType" ng-change="ctrl.toggleShowPassword()" />
+              <label for="show_hide_password" class="font-normal">Show password</label>
+            </div>
 
-            <div class="form-group" ng-if="ctrl.state.showStandardLogin">
+            <div class="form-group overflow-auto" ng-if="ctrl.state.showStandardLogin">
               <!-- login button -->
               <div class="col-sm-12 d-flex">
                 <button
