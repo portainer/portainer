@@ -402,6 +402,10 @@ input:-webkit-autofill {
   color: var(--text-button-hover-color);
 }
 
+.btn-link:hover {
+  color: var(--text-link-hover-color) !important;
+}
+
 .btn-default:hover {
   background-color: var(--bg-btn-default-hover-color);
 }
