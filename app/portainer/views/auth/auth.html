@@ -68,22 +68,30 @@
             </div>
 
             <!-- password input -->
-            <div ng-if="ctrl.state.showStandardLogin" class="!mb-3">
+            <div ng-if="ctrl.state.showStandardLogin">
               <div class="pb-2">Password</div>
-              <input
-                id="password"
-                ng-attr-type="{{ ctrl.state.passwordInputType }}"
-                class="form-control"
-                name="password"
-                ng-model="ctrl.formValues.Password"
-                autocomplete="off"
-                data-cy="auth-passwordInput"
-                placeholder="Enter your password"
-              />
-            </div>
-            <div class="md-checkbox !my-0 !ml-1 text-muted">
-              <input class="!h-5 w-auto" id="show_hide_password" type="checkbox" ng-model="$ctrl.state.passwordInputType" ng-change="ctrl.toggleShowPassword()" />
-              <label for="show_hide_password" class="font-normal">Show password</label>
+              <div class="relative">
+                <input
+                  id="password"
+                  ng-attr-type="{{ ctrl.state.passwordInputType }}"
+                  class="form-control"
+                  name="password"
+                  ng-model="ctrl.formValues.Password"
+                  autocomplete="off"
+                  data-cy="auth-passwordInput"
+                  placeholder="Enter your password"
+                />
+                <button
+                  ng-click="ctrl.toggleShowPassword()"
+                  class="absolute top-0 right-0 h-[34px] w-[50px] border-none flex justify-center items-center bg-transparent"
+                  tooltip-append-to-body="true"
+                  tooltip-placement="top"
+                  tooltip-class="portainer-tooltip"
+                  uib-tooltip="{{ ctrl.state.passwordInputType === 'password' ? 'Show password' : 'Hide password' }}"
+                >
+                  <pr-icon icon="ctrl.state.passwordInputType === 'password' ? 'eye' : 'eye-off'" feather="true" size="'md'"></pr-icon>
+                </button>
+              </div>
             </div>
 
             <div class="form-group overflow-auto" ng-if="ctrl.state.showStandardLogin">
