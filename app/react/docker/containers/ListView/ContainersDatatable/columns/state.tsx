@@ -1,10 +1,9 @@
-import { Column } from 'react-table';
+import { CellProps, Column } from 'react-table';
 import clsx from 'clsx';
-import _ from 'lodash';
 
-import type {
-  DockerContainer,
-  DockerContainerStatus,
+import {
+  type DockerContainer,
+  ContainerStatus,
 } from '@/react/docker/containers/types';
 
 import { DefaultFilter } from '@@/datatables/Filter';
@@ -20,11 +19,14 @@ export const state: Column<DockerContainer> = {
   canHide: true,
 };
 
-function StatusCell({ value: status }: { value: DockerContainerStatus }) {
-  const statusNormalized = _.toLower(status);
-  const hasHealthCheck = ['starting', 'healthy', 'unhealthy'].includes(
-    statusNormalized
-  );
+function StatusCell({
+  value: status,
+}: CellProps<DockerContainer, ContainerStatus>) {
+  const hasHealthCheck = [
+    ContainerStatus.Starting,
+    ContainerStatus.Healthy,
+    ContainerStatus.Unhealthy,
+  ].includes(status);
 
   const statusClassName = getClassName();
 
@@ -40,22 +42,21 @@ function StatusCell({ value: status }: { value: DockerContainerStatus }) {
   );
 
   function getClassName() {
-    if (includeString(['paused', 'starting', 'unhealthy'])) {
-      return 'warning';
-    }
-
-    if (includeString(['created'])) {
-      return 'info';
-    }
-
-    if (includeString(['stopped', 'dead', 'exited'])) {
-      return 'danger';
-    }
-
-    return 'success';
-
-    function includeString(values: DockerContainerStatus[]) {
-      return values.some((val) => statusNormalized.includes(val));
+    switch (status) {
+      case ContainerStatus.Paused:
+      case ContainerStatus.Starting:
+      case ContainerStatus.Unhealthy:
+        return 'warning';
+      case ContainerStatus.Created:
+        return 'info';
+      case ContainerStatus.Stopped:
+      case ContainerStatus.Dead:
+      case ContainerStatus.Exited:
+        return 'danger';
+      case ContainerStatus.Healthy:
+      case ContainerStatus.Running:
+      default:
+        return 'success';
     }
   }
 }

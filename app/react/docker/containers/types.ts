@@ -7,48 +7,54 @@ import {
   SortableTableSettings,
 } from '@@/datatables/types-old';
 
-export type DockerContainerStatus =
-  | 'paused'
-  | 'stopped'
-  | 'created'
-  | 'healthy'
-  | 'unhealthy'
-  | 'starting'
-  | 'running'
-  | 'dead'
-  | 'exited';
+import { DockerContainerResponse } from './types/response';
+
+export enum ContainerStatus {
+  Paused = 'paused',
+  Stopped = 'stopped',
+  Created = 'created',
+  Healthy = 'healthy',
+  Unhealthy = 'unhealthy',
+  Starting = 'starting',
+  Running = 'running',
+  Dead = 'dead',
+  Exited = 'exited',
+}
 
 export type QuickAction = 'attach' | 'exec' | 'inspect' | 'logs' | 'stats';
+
+interface SettableQuickActionsTableSettings {
+  hiddenQuickActions: QuickAction[];
+}
 
 export interface ContainersTableSettings
   extends SortableTableSettings,
     PaginationTableSettings,
     SettableColumnsTableSettings,
+    SettableQuickActionsTableSettings,
     RefreshableTableSettings {
   truncateContainerName: number;
-
-  hiddenQuickActions: QuickAction[];
 }
 
 export interface Port {
-  host: string;
-  public: string;
-  private: string;
+  host?: string;
+  public: number;
+  private: number;
 }
 
 export type ContainerId = string;
 
-export type DockerContainer = {
-  IsPortainer: boolean;
-  Status: DockerContainerStatus;
+type DecoratedDockerContainer = {
   NodeName: string;
-  Id: ContainerId;
+  ResourceControl?: ResourceControlViewModel;
   IP: string;
-  Names: string[];
-  Created: string;
-  ResourceControl: ResourceControlViewModel;
-  Ports: Port[];
   StackName?: string;
+  Status: ContainerStatus;
+  Ports: Port[];
+  StatusText: string;
   Image: string;
   Gpus: string;
 };
+
+export type DockerContainer = DecoratedDockerContainer &
+  Omit<DockerContainerResponse, keyof DecoratedDockerContainer>;
