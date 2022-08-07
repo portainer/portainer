@@ -31,7 +31,15 @@ export function Header({ logo: customLogo }: Props) {
       <button
         type="button"
         onClick={() => toggle()}
-        className="w-6 h-6 flex justify-center items-center text-gray-4 be:text-gray-5 border-0 rounded text-sm bg-blue-11 hover:bg-blue-10 be:bg-gray-10 be:hover:bg-gray-8 th-dark:bg-gray-warm-11 hover:th-dark:bg-gray-warm-9 transition-colors duration-200  hover:text-white be:hover:text-white"
+        className={clsx(
+          'w-6 h-6 flex justify-center items-center border-0 rounded',
+          'transition-all duration-200',
+          'text-sm text-gray-4 be:text-gray-5 hover:text-white be:hover:text-white',
+          'bg-blue-11 hover:bg-blue-10 be:bg-gray-10 be:hover:bg-gray-8',
+          'th-dark:bg-gray-warm-11 hover:th-dark:bg-gray-warm-9',
+          'absolute',
+          { '-right-[10px]': !isOpen, 'right-6': isOpen }
+        )}
         aria-label="Toggle Sidebar"
         title="Toggle Sidebar"
       >
@@ -61,6 +69,7 @@ function Logo({
   isOpen: boolean;
 }) {
   const logo = getLogo(isOpen, customLogo);
+
   return (
     <img
       src={logo}

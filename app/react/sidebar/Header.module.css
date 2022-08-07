@@ -1,5 +1,6 @@
 .logo {
   display: inline;
   max-height: 55px;
-  max-width: 230px;
+  max-width: min(100%, 230px);
+  /* 230px; */
 }
