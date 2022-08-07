@@ -8,12 +8,14 @@ import {
   getStatus,
   getVersionStatus,
 } from '@/portainer/services/api/status.service';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 
 import { Button } from '@@/buttons';
 
 import { UpdateNotification } from './UpdateNotifications';
-import styles from './Footer.module.css';
 import '@reach/dialog/styles.css';
+import styles from './Footer.module.css';
+import Logo from './portainer_logo.svg?c';
 
 export function Footer() {
   const [showBuildInfo, setShowBuildInfo] = useState(false);
@@ -109,10 +111,19 @@ export function Footer() {
       </DialogOverlay>
 
       <div className={clsx(styles.root, 'text-center')}>
-        {process.env.PORTAINER_EDITION === 'CE' && <UpdateNotification />}
-        <div className="text-xs space-x-1 text-gray-5 be:text-gray-6">
-          <span>&copy;</span>
-          <span>Portainer {Edition}</span>
+        {!isBE && <UpdateNotification />}
+        <div className="text-[10px] space-x-1 text-gray-5 be:text-gray-6 flex items-center mx-auto">
+          {isBE ? (
+            <>
+              <span>&copy;</span>
+              <span>Portainer Business Edition</span>
+            </>
+          ) : (
+            <>
+              <Logo width="90px" height="" />
+              <span>Community Edition</span>
+            </>
+          )}
 
           <span
             data-cy="portainerSidebar-versionNumber"
@@ -125,7 +136,7 @@ export function Footer() {
             {Version}
           </span>
 
-          {process.env.PORTAINER_EDITION === 'CE' && (
+          {!isBE && (
             <a
               href="https://www.portainer.io/install-BE-now"
               className="text-blue-6 font-medium"
