@@ -222,17 +222,11 @@
   </div>
 </div>
 
-<div class="row" ng-if="stackType !== STACK_TYPES.DockerSwarm && (!orphaned || orphanedRunning)">
-  <div class="col-sm-12">
-    <containers-datatable
-      filters="{
-        label: ['com.docker.compose.project=' + stackName],
-      }"
-      environment="endpoint"
-      table-key="stack-containers"
-    ></containers-datatable>
-  </div>
-</div>
+<stack-containers-datatable
+  ng-if="stackType !== STACK_TYPES.DockerSwarm && (!orphaned || orphanedRunning)"
+  stack-name="stackName"
+  environment="endpoint"
+></stack-containers-datatable>
 
 <div class="row" ng-if="services && (!orphaned || orphanedRunning)">
   <div class="col-sm-12">

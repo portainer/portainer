@@ -1,24 +1,23 @@
 import _ from 'lodash';
 
+import { DockerContainer } from '@/react/docker/containers/types';
 import { Environment } from '@/portainer/environments/types';
-import type { DockerContainer } from '@/react/docker/containers/types';
+import { createStore } from '@/react/docker/containers/ListView/ContainersDatatable/datatable-store';
+import { useColumns } from '@/react/docker/containers/ListView/ContainersDatatable/columns';
+import { ContainersDatatableActions } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableActions';
+import { ContainersDatatableSettings } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableSettings';
 
-import { TableSettingsMenu, Datatable } from '@@/datatables';
+import { Datatable, TableSettingsMenu } from '@@/datatables';
 import {
   buildAction,
   QuickActionsSettings,
 } from '@@/datatables/QuickActionsSettings';
 import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
 
-import { useContainers } from '../../queries';
+import { useContainers } from '../../containers/queries';
+import { RowProvider } from '../../containers/ListView/ContainersDatatable/RowContext';
 
-import { createStore } from './datatable-store';
-import { ContainersDatatableSettings } from './ContainersDatatableSettings';
-import { useColumns } from './columns';
-import { ContainersDatatableActions } from './ContainersDatatableActions';
-import { RowProvider } from './RowContext';
-
-const storageKey = 'containers';
+const storageKey = 'stack-containers';
 const useStore = createStore(storageKey);
 
 const actions = [
@@ -30,16 +29,13 @@ const actions = [
 ];
 
 export interface Props {
-  isHostColumnVisible: boolean;
   environment: Environment;
+  stackName: string;
 }
 
-export function ContainersDatatable({
-  isHostColumnVisible,
-  environment,
-}: Props) {
+export function StackContainersDatatable({ environment, stackName }: Props) {
   const settings = useStore();
-  const columns = useColumns(isHostColumnVisible);
+  const columns = useColumns(false);
   const hidableColumns = _.compact(
     columns.filter((col) => col.canHide).map((col) => col.id)
   );
@@ -47,7 +43,9 @@ export function ContainersDatatable({
   const containersQuery = useContainers(
     environment.Id,
     true,
-    undefined,
+    {
+      label: [`com.docker.compose.project=${stackName}`],
+    },
     settings.autoRefreshRate * 1000
   );
 
@@ -63,11 +61,10 @@ export function ContainersDatatable({
         renderTableActions={(selectedRows) => (
           <ContainersDatatableActions
             selectedItems={selectedRows}
-            isAddActionVisible
+            isAddActionVisible={false}
             endpointId={environment.Id}
           />
         )}
-        isLoading={containersQuery.isLoading}
         initialTableState={{ hiddenColumns: settings.hiddenColumns }}
         renderTableSettings={(tableInstance) => {
           const columnsToHide = tableInstance.allColumns.filter((colInstance) =>
@@ -87,16 +84,14 @@ export function ContainersDatatable({
               <TableSettingsMenu
                 quickActions={<QuickActionsSettings actions={actions} />}
               >
-                <ContainersDatatableSettings
-                  isRefreshVisible
-                  settings={settings}
-                />
+                <ContainersDatatableSettings settings={settings} />
               </TableSettingsMenu>
             </>
           );
         }}
         storageKey={storageKey}
         dataset={containersQuery.data || []}
+        isLoading={containersQuery.isLoading}
         emptyContentLabel="No containers found"
       />
     </RowProvider>

@@ -2,14 +2,13 @@ import { CellProps, Column, TableInstance } from 'react-table';
 import _ from 'lodash';
 import { useSref } from '@uirouter/react';
 
-import type {
-  ContainersTableSettings,
-  DockerContainer,
-} from '@/react/docker/containers/types';
+import type { DockerContainer } from '@/react/docker/containers/types';
 import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
 import { useCurrentEnvironment } from '@/portainer/hooks/useCurrentEnvironment';
 
 import { useTableSettings } from '@@/datatables/useTableSettings';
+
+import { TableSettings } from '../types';
 
 export const name: Column<DockerContainer> = {
   Header: 'Name',
@@ -34,7 +33,7 @@ export function NameCell({
     nodeName: container.NodeName,
   });
 
-  const { settings } = useTableSettings<ContainersTableSettings>();
+  const { settings } = useTableSettings<TableSettings>();
   const truncate = settings.truncateContainerName;
   const environmentQuery = useCurrentEnvironment();
 

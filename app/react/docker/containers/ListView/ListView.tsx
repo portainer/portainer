@@ -28,10 +28,8 @@ export function ListView({ endpoint: environment }: Props) {
       <div className="row">
         <div className="col-sm-12">
           <ContainersDatatable
-            environment={environment}
-            isAddActionVisible
-            isRefreshVisible
             isHostColumnVisible={isHostColumnVisible}
+            environment={environment}
           />
         </div>
       </div>

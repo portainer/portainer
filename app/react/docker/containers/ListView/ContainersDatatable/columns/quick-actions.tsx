@@ -1,15 +1,14 @@
 import { CellProps, Column } from 'react-table';
 
 import { useAuthorizations } from '@/portainer/hooks/useUser';
-import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions/ContainerQuickActions';
-import type {
-  ContainersTableSettings,
-  DockerContainer,
-} from '@/react/docker/containers/types';
-import { useCurrentEnvironment } from '@/portainer/hooks/useCurrentEnvironment';
 import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
+import { useCurrentEnvironment } from '@/portainer/hooks/useCurrentEnvironment';
+import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
+import { DockerContainer } from '@/react/docker/containers/types';
 
 import { useTableSettings } from '@@/datatables/useTableSettings';
+
+import { TableSettings } from '../types';
 
 export const quickActions: Column<DockerContainer> = {
   Header: 'Quick Actions',
@@ -30,7 +29,7 @@ function QuickActionsCell({
   const environment = environmentQuery.data;
   const offlineMode = !environment || isOfflineEndpoint(environment);
 
-  const { settings } = useTableSettings<ContainersTableSettings>();
+  const { settings } = useTableSettings<TableSettings>();
 
   const { hiddenQuickActions = [] } = settings;
 
