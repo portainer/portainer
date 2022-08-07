@@ -176,11 +176,7 @@ export function Gpu({
           <div className="form-group">
             <div className="col-sm-3 col-lg-2 control-label text-left">
               Capabilities
-              <Tooltip
-                message={
-                  "This is the generated equivalent of the '--gpus' docker CLI parameter based on your settings."
-                }
-              />
+              <Tooltip message="‘compute’ and ‘utility’ capalities are preselected by Portainer because they are used by default when you don’t explicitly specify capabilities with docker CLI ‘--gpus’ option." />
             </div>
             <div className="col-sm-9 col-lg-10 text-left">
               <Select<GpuOption, true>
