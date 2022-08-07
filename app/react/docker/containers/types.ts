@@ -4,9 +4,8 @@ import {
   PaginationTableSettings,
   RefreshableTableSettings,
   SettableColumnsTableSettings,
-  SettableQuickActionsTableSettings,
   SortableTableSettings,
-} from '@@/datatables/types';
+} from '@@/datatables/types-old';
 
 export type DockerContainerStatus =
   | 'paused'
@@ -25,9 +24,10 @@ export interface ContainersTableSettings
   extends SortableTableSettings,
     PaginationTableSettings,
     SettableColumnsTableSettings,
-    SettableQuickActionsTableSettings<QuickAction>,
     RefreshableTableSettings {
   truncateContainerName: number;
+
+  hiddenQuickActions: QuickAction[];
 }
 
 export interface Port {
