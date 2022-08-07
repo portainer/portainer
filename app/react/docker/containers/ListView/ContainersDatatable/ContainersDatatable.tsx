@@ -10,7 +10,7 @@ import {
 } from '@@/datatables/QuickActionsSettings';
 import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
 
-import { useContainers } from '../../queries';
+import { useContainers } from '../../queries/containers';
 
 import { createStore } from './datatable-store';
 import { ContainersDatatableSettings } from './ContainersDatatableSettings';

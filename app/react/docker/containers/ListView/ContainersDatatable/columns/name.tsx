@@ -1,4 +1,4 @@
-import { CellProps, Column, TableInstance } from 'react-table';
+import { CellProps, Column } from 'react-table';
 import _ from 'lodash';
 import { useSref } from '@uirouter/react';
 
@@ -27,7 +27,7 @@ export const name: Column<DockerContainer> = {
 export function NameCell({
   value: name,
   row: { original: container },
-}: CellProps<TableInstance>) {
+}: CellProps<DockerContainer>) {
   const linkProps = useSref('.container', {
     id: container.Id,
     nodeName: container.NodeName,

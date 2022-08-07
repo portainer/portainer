@@ -14,7 +14,7 @@ import {
 } from '@@/datatables/QuickActionsSettings';
 import { ColumnVisibilityMenu } from '@@/datatables/ColumnVisibilityMenu';
 
-import { useContainers } from '../../containers/queries';
+import { useContainers } from '../../containers/queries/containers';
 import { RowProvider } from '../../containers/ListView/ContainersDatatable/RowContext';
 
 const storageKey = 'stack-containers';

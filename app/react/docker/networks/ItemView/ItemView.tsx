@@ -9,7 +9,7 @@ import { AccessControlPanel } from '@/portainer/access-control/AccessControlPane
 import { ResourceControlType } from '@/portainer/access-control/types';
 import { DockerContainer } from '@/react/docker/containers/types';
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
-import { useContainers } from '@/react/docker/containers/queries';
+import { useContainers } from '@/react/docker/containers/queries/containers';
 
 import { PageHeader } from '@@/PageHeader';
 
