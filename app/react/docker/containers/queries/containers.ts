@@ -6,12 +6,9 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { urlBuilder } from '../containers.service';
 import { DockerContainerResponse } from '../types/response';
 import { parseViewModel } from '../utils';
-import { NetworkId } from '../../networks/types';
 
-export interface Filters {
-  label?: string[];
-  network?: NetworkId[];
-}
+import { Filters } from './types';
+import { queryKeys } from './query-keys';
 
 export function useContainers(
   environmentId: EnvironmentId,
@@ -20,7 +17,7 @@ export function useContainers(
   autoRefreshRate?: number
 ) {
   return useQuery(
-    ['environments', environmentId, 'docker', 'containers', { all, filters }],
+    queryKeys.filters(environmentId, all, filters),
     () => getContainers(environmentId, all, filters),
     {
       meta: {

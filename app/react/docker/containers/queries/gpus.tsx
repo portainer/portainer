@@ -3,6 +3,8 @@ import { useQuery } from 'react-query';
 import { EnvironmentId } from '@/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
+import { queryKeys } from './query-keys';
+
 async function getContainerGpus(
   environmentId: EnvironmentId,
   containerId: string
@@ -21,15 +23,7 @@ export function useContainerGpus(
   environmentId: EnvironmentId,
   containerId: string
 ) {
-  return useQuery(
-    [
-      'environments',
-      environmentId,
-      'docker',
-      'containers',
-      containerId,
-      'gpus',
-    ],
-    () => getContainerGpus(environmentId, containerId)
+  return useQuery(queryKeys.gpus(environmentId, containerId), () =>
+    getContainerGpus(environmentId, containerId)
   );
 }
