@@ -65,6 +65,10 @@ export async function getVersionStatus() {
   }
 }
 
+export function useVersionStatus() {
+  return useQuery(['version'], () => getVersionStatus());
+}
+
 function buildUrl(action?: string) {
   let url = '/status';
 
