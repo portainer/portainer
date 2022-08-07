@@ -44,11 +44,6 @@ body,
   white-space: normal !important;
 }
 
-.logo {
-  display: inline;
-  max-width: 155px;
-  max-height: 55px;
-}
 .legend .title {
   padding: 0 0.3em;
   margin: 0.5em;

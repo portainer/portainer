@@ -1,16 +1,21 @@
 import { ChevronsLeft, ChevronsRight } from 'react-feather';
+import clsx from 'clsx';
 
-import defaultLogo from '@/assets/images/logo_small_alt.png';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
+import smallLogo from '@/assets/ico/logomark.svg';
 
 import { Link } from '@@/Link';
 
+import fullLogoBE from './portainer_logo-BE.svg';
+import fullLogoCE from './portainer_logo-CE.svg';
 import { useSidebarState } from './useSidebarState';
+import styles from './Header.module.css';
 
 interface Props {
   logo?: string;
 }
 
-export function Header({ logo }: Props) {
+export function Header({ logo: customLogo }: Props) {
   const { toggle, isOpen } = useSidebarState();
 
   return (
@@ -20,12 +25,7 @@ export function Header({ logo }: Props) {
         data-cy="portainerSidebar-homeImage"
         className="text-2xl text-white no-underline hover:no-underline hover:text-white focus:no-underline focus:text-white focus:outline-none"
       >
-        <img
-          src={logo || defaultLogo}
-          className="img-responsive logo"
-          alt={!logo ? 'portainer.io' : 'Logo'}
-        />
-        {isOpen && 'portainer.io'}
+        <Logo customLogo={customLogo} isOpen={isOpen} />
       </Link>
 
       <button
@@ -38,5 +38,34 @@ export function Header({ logo }: Props) {
         {isOpen ? <ChevronsLeft /> : <ChevronsRight />}
       </button>
     </div>
+  );
+}
+
+function getLogo(isOpen: boolean, customLogo?: string) {
+  if (customLogo) {
+    return customLogo;
+  }
+
+  if (!isOpen) {
+    return smallLogo;
+  }
+
+  return isBE ? fullLogoBE : fullLogoCE;
+}
+
+function Logo({
+  customLogo,
+  isOpen,
+}: {
+  customLogo?: string;
+  isOpen: boolean;
+}) {
+  const logo = getLogo(isOpen, customLogo);
+  return (
+    <img
+      src={logo}
+      className={clsx('img-responsive', styles.logo)}
+      alt="Logo"
+    />
   );
 }
