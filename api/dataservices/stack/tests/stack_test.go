@@ -56,10 +56,11 @@ func (b *stackBuilder) createNewStack(webhookID string) portainer.Stack {
 	stack := portainer.Stack{
 		ID:           portainer.StackID(b.count),
 		Name:         "Name",
+		Logo:         "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png",
 		Type:         portainer.DockerComposeStack,
 		EndpointID:   2,
 		EntryPoint:   filesystem.ComposeFileDefaultName,
-		Env:          []portainer.Pair{{"Name1", "Value1"}},
+		Env:          []portainer.Pair{{Name: "Name1", Value: "Value1"}},
 		Status:       portainer.StackStatusActive,
 		CreationDate: time.Now().Unix(),
 		ProjectPath:  "/tmp/project",

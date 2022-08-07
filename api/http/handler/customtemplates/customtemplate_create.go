@@ -101,7 +101,7 @@ func (handler *Handler) createCustomTemplate(method string, r *http.Request) (*p
 
 type customTemplateFromFileContentPayload struct {
 	// URL of the template's logo
-	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	Logo string `example:"https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png"`
 	// Title of the template
 	Title string `example:"Nginx" validate:"required"`
 	// Description of the template
@@ -188,7 +188,7 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 
 type customTemplateFromGitRepositoryPayload struct {
 	// URL of the template's logo
-	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	Logo string `example:"https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png"`
 	// Title of the template
 	Title string `example:"Nginx" validate:"required"`
 	// Description of the template

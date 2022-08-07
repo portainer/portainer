@@ -158,7 +158,7 @@ type (
 		// Valid values are: 1 - 'linux', 2 - 'windows'
 		Platform CustomTemplatePlatform `json:"Platform" example:"1" enums:"1,2"`
 		// URL of the template's logo
-		Logo string `json:"Logo" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+		Logo string `json:"Logo" example:"https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png"`
 		// Type of created stack (1 - swarm, 2 - compose)
 		Type            StackType        `json:"Type" example:"1"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
@@ -269,6 +269,7 @@ type (
 		// EdgeStack Identifier
 		ID             EdgeStackID                    `json:"Id" example:"1"`
 		Name           string                         `json:"Name"`
+		Logo           string                         `json:"Logo"`
 		Status         map[EndpointID]EdgeStackStatus `json:"Status"`
 		CreationDate   int64                          `json:"CreationDate"`
 		EdgeGroups     []EdgeGroupID                  `json:"EdgeGroups"`
@@ -897,6 +898,8 @@ type (
 		ID StackID `json:"Id" example:"1"`
 		// Stack name
 		Name string `json:"Name" example:"myStack"`
+		// URL of the template's logo
+		Logo string `json:"Logo" example:"https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png"`
 		// Stack type. 1 for a Swarm stack, 2 for a Compose stack
 		Type StackType `json:"Type" example:"2"`
 		// Environment(Endpoint) identifier. Reference the environment(endpoint) that will be used for deployment
@@ -1050,7 +1053,7 @@ type (
 		// Default name for the stack/container to be used on deployment
 		Name string `json:"name,omitempty" example:"mystackname"`
 		// URL of the template's logo
-		Logo string `json:"logo,omitempty" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+		Logo string `json:"logo,omitempty" example:"https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png"`
 		// A list of environment(endpoint) variables used during the template deployment
 		Env []TemplateEnv `json:"env,omitempty"`
 		// A note that will be displayed in the UI. Supports HTML content
@@ -1398,7 +1401,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.15.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 60
+	DBVersion = 70
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server

@@ -95,6 +95,13 @@
                     <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                     <label for="select_all"></label>
                   </span>
+                </div>
+              </th>
+              <th ng-if="$ctrl.columnVisibility.columns.logo.display">
+                <table-column-header col-title="'Logo'" can-sort="false"></table-column-header>
+              </th>
+              <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
+                <div class="flex flex-row flex-no-wrap gap-1">
                   <table-column-header
                     col-title="'Name'"
                     can-sort="true"
@@ -178,6 +185,11 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
+              </td>
+              <td ng-if="$ctrl.columnVisibility.columns.logo.display">
+                <img ng-src="{{ item.Logo }}" alt="Stack logo" title="Stack logo" />
+              </td>
+              <td>
                 <a
                   ng-if="!$ctrl.offlineMode && $ctrl.createEnabled"
                   ui-sref="docker.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, regular: item.Regular, external: item.External, orphaned: item.Orphaned, orphanedRunning: item.OrphanedRunning })"

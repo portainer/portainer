@@ -2,6 +2,7 @@ import { ResourceControlViewModel } from '@/portainer/access-control/models/Reso
 
 export function StackViewModel(data) {
   this.Id = data.Id;
+  this.Logo = data.Logo;
   this.Type = data.Type;
   this.Name = data.Name;
   this.EndpointId = data.EndpointId;

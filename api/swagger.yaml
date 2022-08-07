@@ -38,7 +38,7 @@ definitions:
         type: string
       logo:
         description: URL of the template's logo
-        example: https://cloudinovasi.id/assets/img/logos/nginx.png
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
         type: string
       note:
         description: A note that will be displayed in the UI. Supports HTML content
@@ -84,7 +84,7 @@ definitions:
         type: string
       logo:
         description: URL of the template's logo
-        example: https://cloudinovasi.id/assets/img/logos/nginx.png
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
         type: string
       note:
         description: A note that will be displayed in the UI. Supports HTML content
@@ -150,7 +150,7 @@ definitions:
         type: string
       logo:
         description: URL of the template's logo
-        example: https://cloudinovasi.id/assets/img/logos/nginx.png
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
         type: string
       note:
         description: A note that will be displayed in the UI. Supports HTML content
@@ -217,6 +217,8 @@ definitions:
         type: array
       name:
         type: string
+      logo:
+        type: string
       partialMatch:
         type: boolean
       tagIDs:
@@ -235,6 +237,8 @@ definitions:
           type: integer
         type: array
       name:
+        type: string
+      logo:
         type: string
       partialMatch:
         type: boolean
@@ -257,6 +261,8 @@ definitions:
         type: string
       name:
         type: string
+      logo:
+        type: string
       recurring:
         type: boolean
     type: object
@@ -273,6 +279,8 @@ definitions:
           type: integer
         type: array
       name:
+        type: string
+      logo:
         type: string
       recurring:
         type: boolean
@@ -293,6 +301,8 @@ definitions:
       fileContent:
         type: string
       name:
+        type: string
+      logo:
         type: string
       recurring:
         type: boolean
@@ -642,7 +652,7 @@ definitions:
         type: integer
       Logo:
         description: URL of the template's logo
-        example: https://cloudinovasi.id/assets/img/logos/nginx.png
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
         type: string
       Note:
         description: A note that will be displayed in the UI. Supports HTML content
@@ -1409,6 +1419,10 @@ definitions:
         description: Stack name
         example: myStack
         type: string
+      Logo:
+        description: URL of the stack's logo
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
+        type: string
       ResourceControl:
         $ref: '#/definitions/portainer.ResourceControl'
       Status:
@@ -1591,7 +1605,7 @@ definitions:
         type: array
       logo:
         description: URL of the template's logo
-        example: https://cloudinovasi.id/assets/img/logos/nginx.png
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
         type: string
       name:
         description: |-
@@ -2139,6 +2153,10 @@ definitions:
         description: Name of the stack
         example: myStack
         type: string
+      logo:
+        description: Logo of the stack
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
+        type: string
       stackFileContent:
         description: Content of the Stack file
         example: |-
@@ -2166,6 +2184,10 @@ definitions:
       name:
         description: Name of the stack
         example: myStack
+        type: string
+      logo:
+        description: Logo of the stack
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
         type: string
       repositoryAuthentication:
         description: Use basic authentication to clone the Git repository
@@ -2234,6 +2256,10 @@ definitions:
         description: Name of the stack
         example: myStack
         type: string
+      logo:
+        description: Logo of the stack
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
+        type: string
       stackFileContent:
         description: Content of the Stack file
         example: |-
@@ -2266,6 +2292,10 @@ definitions:
       name:
         description: Name of the stack
         example: myStack
+        type: string
+      logo:
+        description: Logo of the stack
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png
         type: string
       repositoryAuthentication:
         description: Use basic authentication to clone the Git repository
@@ -4726,6 +4756,10 @@ paths:
           in: formData
           name: Name
           type: string
+        - description: Logo of the stack
+          in: formData
+          name: Logo
+          type: string
         - description: Swarm cluster identifier. Required when method equals file and
             type equals 1. required when method is file
           in: formData
@@ -4845,6 +4879,9 @@ paths:
           in: query
           name: endpointId
           type: integer
+        - description: Logo of the stack. Use this optional parameter to set the Logo of the stack.
+          in: query
+          type: string
         - description: Stack details
           in: body
           name: body

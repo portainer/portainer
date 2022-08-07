@@ -42,6 +42,7 @@ angular
 
       $scope.formValues = {
         Name: '',
+        Logo: '',
         StackFileContent: '',
         StackFile: null,
         RepositoryURL: '',
@@ -151,18 +152,18 @@ angular
         return true;
       }
 
-      function createSwarmStack(name, method) {
+      function createSwarmStack(name, logo, method) {
         var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
         const endpointId = +$state.params.endpointId;
 
         if (method === 'template' || method === 'editor') {
           var stackFileContent = $scope.formValues.StackFileContent;
-          return StackService.createSwarmStackFromFileContent(name, stackFileContent, env, endpointId);
+          return StackService.createSwarmStackFromFileContent(name, logo, stackFileContent, env, endpointId);
         }
 
         if (method === 'upload') {
           var stackFile = $scope.formValues.StackFile;
-          return StackService.createSwarmStackFromFileUpload(name, stackFile, env, endpointId);
+          return StackService.createSwarmStackFromFileUpload(name, logo, stackFile, env, endpointId);
         }
 
         if (method === 'repository') {
@@ -178,7 +179,7 @@ angular
 
           getAutoUpdatesProperty(repositoryOptions);
 
-          return StackService.createSwarmStackFromGitRepository(name, repositoryOptions, env, endpointId);
+          return StackService.createSwarmStackFromGitRepository(name, logo, repositoryOptions, env, endpointId);
         }
       }
 
@@ -193,16 +194,16 @@ angular
         }
       }
 
-      function createComposeStack(name, method) {
+      function createComposeStack(name, logo, method) {
         var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
         const endpointId = +$state.params.endpointId;
 
         if (method === 'editor' || method === 'template') {
           var stackFileContent = $scope.formValues.StackFileContent;
-          return StackService.createComposeStackFromFileContent(name, stackFileContent, env, endpointId);
+          return StackService.createComposeStackFromFileContent(name, logo, stackFileContent, env, endpointId);
         } else if (method === 'upload') {
           var stackFile = $scope.formValues.StackFile;
-          return StackService.createComposeStackFromFileUpload(name, stackFile, env, endpointId);
+          return StackService.createComposeStackFromFileUpload(name, logo, stackFile, env, endpointId);
         } else if (method === 'repository') {
           var repositoryOptions = {
             AdditionalFiles: $scope.formValues.AdditionalFiles,
@@ -216,7 +217,7 @@ angular
 
           getAutoUpdatesProperty(repositoryOptions);
 
-          return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);
+          return StackService.createComposeStackFromGitRepository(name, logo, repositoryOptions, env, endpointId);
         }
       }
 
@@ -233,6 +234,7 @@ angular
 
       $scope.deployStack = function () {
         var name = $scope.formValues.Name;
+        var logo = $scope.formValues.Logo;
         var method = $scope.state.Method;
 
         var accessControlData = $scope.formValues.AccessControlData;
@@ -254,7 +256,7 @@ angular
           action = createComposeStack;
         }
         $scope.state.actionInProgress = true;
-        action(name, method)
+        action(name, logo, method)
           .then(function success(data) {
             if (data.data) {
               data = data.data;
