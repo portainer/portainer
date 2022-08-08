@@ -86,11 +86,15 @@ body,
 }
 
 .form-section-title {
+  @apply text-gray-9;
+  @apply th-dark:text-gray-5;
+  @apply th-highcontrast:text-white;
+
   margin-top: 5px;
   margin-bottom: 10px;
-  color: var(--text-form-section-title-color);
   padding-left: 0;
   font-weight: 500;
+  font-size: 16px;
 }
 
 .form-horizontal .control-label.text-left {

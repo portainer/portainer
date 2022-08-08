@@ -16,11 +16,6 @@
   font-weight: 500;
 }
 
-.form-section-title {
-  color: var(--ui-gray-9);
-  font-size: 16px;
-}
-
 .vertical-center {
   display: inline-flex;
   align-items: center;

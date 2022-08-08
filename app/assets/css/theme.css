@@ -180,7 +180,6 @@
   --text-danger-color: var(--red-1);
   --text-code-color: var(--red-2);
   --text-navtabs-color: var(--grey-25);
-  --text-form-section-title-color: var(--grey-26);
   --text-cm-default-color: var(--blue-1);
   --text-cm-meta-color: var(--black-color);
   --text-cm-string-color: var(--red-3);
@@ -367,7 +366,6 @@
   --text-danger-color: var(--red-4);
   --text-code-color: var(--white-color);
   --text-navtabs-color: var(--white-color);
-  --text-form-section-title-color: var(--grey-8);
   --text-cm-default-color: var(--blue-10);
   --text-cm-meta-color: var(--white-color);
   --text-cm-string-color: var(--red-5);
@@ -550,7 +548,6 @@
   --text-blocklist-hover-color: var(--blue-11);
   --text-boxselector-wrapper-color: var(--white-color);
   --text-dashboard-item-color: var(--blue-12);
-  --text-form-section-title-color: var(--white-color);
   --text-muted-color: var(--white-color);
   --text-tooltip-color: var(--white-color);
   --text-blocklist-item-selected-color: var(--blue-9);
