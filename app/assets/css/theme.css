@@ -280,7 +280,7 @@
   --text-button-group: var(--ui-gray-9);
 }
 
-:root[theme='dark'] {
+[theme='dark'] {
   --bg-card-color: var(--grey-1);
   --bg-main-color: var(--grey-2);
   --bg-body-color: var(--grey-2);
@@ -466,7 +466,7 @@
   --text-button-group: var(--ui-gray-9);
 }
 
-:root[theme='highcontrast'] {
+[theme='highcontrast'] {
   --bg-card-color: var(--black-color);
   --bg-main-color: var(--black-color);
   --bg-body-color: var(--black-color);

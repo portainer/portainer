@@ -318,7 +318,6 @@ json-tree .branch-preview {
 }
 
 input,
-button,
 select,
 textarea {
   background: var(--text-input-textarea);

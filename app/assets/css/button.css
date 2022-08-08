@@ -1,4 +1,7 @@
 .btn {
+  @apply disabled:opacity-40;
+  @apply !outline-none;
+
   border-radius: 5px;
   display: inline-flex;
   justify-content: space-around;
@@ -15,25 +18,35 @@
 }
 
 .btn-primary {
-  background-color: var(--ui-blue-8);
+  @apply bg-blue-8;
+  @apply hover:bg-blue-9 th-dark:hover:bg-blue-7;
 }
 
-.btn-primary:hover,
 .btn-primary:focus,
-.btn-primary:active .active {
-  background-color: var(--ui-blue-9);
-}
-
 .btn-primary:active,
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
-  background-color: var(--ui-blue-9);
+  outline: none;
+  @apply bg-blue-9 border border-solid border-blue-5;
 }
 
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
   background-color: var(--ui-blue-8);
+}
+
+/* Button Secondary */
+.btn-secondary {
+  @apply border border-solid;
+  @apply disabled:border-transparent;
+
+  @apply text-blue-9 bg-blue-2 border-blue-8;
+  @apply hover:bg-blue-3 focus:bg-blue-3;
+
+  @apply th-dark:text-blue-3 th-dark:bg-gray-10 th-dark:border-blue-7;
+  @apply th-dark:hover:bg-blue-11;
+  @apply th-dark:focus:bg-gray-10 th-dark:focus:border-blue-5;
 }
 
 .btn-danger {
@@ -61,26 +74,6 @@
 .btn-light.active,
 .open > .dropdown-toggle.btn-light {
   background-color: var(--ui-gray-3);
-}
-
-/* Button Secondary */
-.btn-secondary {
-  background-color: var(--ui-blue-2) !important;
-  border: 1px solid var(--ui-blue-8) !important;
-  color: var(--ui-blue-9) !important;
-}
-
-.btn-secondary:hover,
-.btn-secondary:focus,
-.btn-secondary:active .active {
-  background-color: var(--ui-blue-3) !important;
-  color: var(--ui-blue-9) !important;
-}
-
-.btn-secondary:disabled {
-  background-color: var(--ui-blue-1);
-  border: 1px solid var(--ui-blue-1);
-  color: var(--ui-blue-5);
 }
 
 form a,
