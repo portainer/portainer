@@ -70,6 +70,12 @@ class AuthenticationController {
     this.state.passwordInputType = this.state.passwordInputType === 'text' ? 'password' : 'text';
   }
 
+  // set the password input type to password, so that browser autofills don't treat the input as text
+  setPasswordInputType(inputType) {
+    this.state.passwordInputType = inputType;
+    document.getElementById('password').setAttribute('type', inputType);
+  }
+
   logout(error) {
     this.Authentication.logout();
     this.state.loginInProgress = false;
@@ -190,6 +196,7 @@ class AuthenticationController {
   }
 
   authenticateUser() {
+    this.setPasswordInputType('password');
     return this.$async(this.authenticateUserAsync);
   }
 
