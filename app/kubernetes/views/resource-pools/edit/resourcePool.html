@@ -78,7 +78,7 @@
                   <div>
                     <!-- memory-limit-input -->
                     <div class="form-group flex">
-                      <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Maximum memory usage (MB) </label>
+                      <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory limit (MB) </label>
                       <div class="col-sm-6">
                         <slider
                           model="ctrl.formValues.MemoryLimit"
@@ -115,7 +115,7 @@
                     <!-- !memory-limit-input -->
                     <!-- cpu-limit-input -->
                     <div class="form-group">
-                      <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> Maximum CPU usage </label>
+                      <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> CPU limit </label>
                       <div class="col-sm-8">
                         <slider
                           model="ctrl.formValues.CpuLimit"
@@ -333,7 +333,7 @@
                           />
                         </div>
                         <div class="col-sm-1 input-group input-group-sm">
-                          <button class="btn btn-sm btn-dangerlight !h-[30px]" type="button" ng-click="ctrl.removeAnnotation(ic, $index)">
+                          <button class="btn btn-md btn-dangerlight btn-only-icon" type="button" ng-click="ctrl.removeAnnotation(ic, $index)">
                             <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
                           </button>
                         </div>
@@ -456,7 +456,7 @@
               <uib-tab-heading class="vertical-center">
                 <pr-icon icon="'svg-clockrewind'"></pr-icon> Events
                 <div ng-if="ctrl.hasEventWarnings()">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class-name="'mr-0.5'"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>

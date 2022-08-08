@@ -29,7 +29,7 @@
 <div ng-if="ctrl.state.viewReady">
   <information-panel ng-if="!ctrl.state.getMetrics" title-text="Unable to retrieve container metrics">
     <span class="small text-muted vertical-center">
-      <pr-icon icon="'alert-triangle'" feather="true" mode="'primary'"></pr-icon>
+      <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
       Portainer was unable to retrieve any metrics associated to that container. Please contact your administrator to ensure that the Kubernetes metrics feature is properly
       configured.
     </span>
@@ -62,12 +62,15 @@
                 </select>
               </div>
               <span>
-                <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
+                <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
               </span>
             </div>
             <div class="form-group" ng-if="ctrl.state.networkStatsUnavailable">
               <div class="col-sm-12">
-                <span class="small text-muted"> <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> Network stats are unavailable for this container. </span>
+                <span class="small text-muted">
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                  Network stats are unavailable for this container.
+                </span>
               </div>
             </div>
           </form>

@@ -88,7 +88,7 @@
 
                 <!-- memory-limit-input -->
                 <div class="form-group flex flex-row !mb-0">
-                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left"> Maximum memory usage (MB) </label>
+                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left"> Memory limit (MB) </label>
                   <div class="col-xs-6">
                     <slider
                       model="$ctrl.formValues.MemoryLimit"
@@ -133,7 +133,7 @@
                 <!-- !memory-limit-input -->
                 <!-- cpu-limit-input -->
                 <div class="form-group flex flex-row">
-                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left"> Maximum CPU usage </label>
+                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left"> CPU limit </label>
                   <div class="col-xs-8">
                     <slider
                       model="$ctrl.formValues.CpuLimit"
@@ -266,8 +266,8 @@
                             data-cy="namespaceCreate-hostnameInput{{ ic.IngressClass.Name }}_{{ $index }}"
                           />
                         </div>
-                        <div class="col-sm-1 input-group input-group-sm" ng-if="$index > 0">
-                          <button class="btn btn-md btn-dangerlight btn-only-icon !h-[30px]" type="button" ng-click="$ctrl.removeHostname(ic, $index)">
+                        <div class="col-sm-1 input-group input-group-sm !pt-2" ng-if="$index > 0">
+                          <button class="btn btn-md btn-dangerlight btn-only-icon" type="button" ng-click="$ctrl.removeHostname(ic, $index)">
                             <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
                           </button>
                         </div>
@@ -374,7 +374,7 @@
                     </div>
                     <div class="input-group input-group-sm col-sm-1">
                       <button
-                        class="btn btn-sm btn-dangerlight btn-only-icon !h-[30px]"
+                        class="btn btn-md btn-dangerlight btn-only-icon"
                         type="button"
                         ng-click="$ctrl.removeAnnotation(ic, $index)"
                         data-cy="namespaceCreate-deleteAnnotationButton{{ ic.IngressClass.Name }}"

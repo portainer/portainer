@@ -24,7 +24,7 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading> <pr-icon icon="'fa-laptop-code'" class-name="'mr-1'"></pr-icon> Application </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'svg-laptopcode'" class-name="'mr-1'"></pr-icon> Application </uib-tab-heading>
               <div style="padding: 20px">
                 <table class="table">
                   <tbody>
@@ -156,7 +156,7 @@
 
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading>
-                <pr-icon icon="'fa-compress-arrows-alt'"></pr-icon> Placement
+                <pr-icon icon="'svg-compress'"></pr-icon> Placement
                 <div ng-if="ctrl.state.placementWarning" class="vertical-center">
                   <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   warning
@@ -168,7 +168,7 @@
               </div>
               <kubernetes-application-placements-datatable
                 title-text="Placement constraints/preferences"
-                title-icon="fa-compress-arrows-alt"
+                title-icon="svg-compress"
                 dataset="ctrl.placements"
                 table-key="kubernetes.application.placements"
                 order-by="Name"
@@ -439,8 +439,9 @@
           </div>
 
           <div ng-if="ctrl.hasPersistedFolders()">
-            <div class="small text-muted" style="margin-bottom: 15px">
-              Data access policy: <i class="fa {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyIcon }}" aria-hidden="true"></i>
+            <div class="small text-muted vertical-center" style="margin-bottom: 15px">
+              Data access policy:
+              <pr-icon icon="ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyIcon" feather="true"></pr-icon>
               {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyText }}
               <portainer-tooltip position="'right'" message="ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyTooltip"> </portainer-tooltip>
             </div>

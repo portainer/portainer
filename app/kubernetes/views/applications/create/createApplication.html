@@ -354,7 +354,7 @@
                     </div>
                     <div class="col-sm-3">
                       <button
-                        class="btn btn-sm btn-light vertical-center h-[34px] !ml-0"
+                        class="btn btn-md btn-light vertical-center !ml-0"
                         type="button"
                         ng-if="!config.Overriden"
                         ng-click="ctrl.overrideConfiguration(index)"
@@ -364,7 +364,7 @@
                         <pr-icon icon="'list'" size="'md'" feather="true"></pr-icon> Override
                       </button>
                       <button
-                        class="btn btn-sm btn-light vertical-center h-[34px] !ml-0"
+                        class="btn btn-md btn-light vertical-center !ml-0"
                         type="button"
                         ng-if="config.Overriden"
                         ng-click="ctrl.resetConfiguration(index)"
@@ -374,7 +374,7 @@
                         <pr-icon icon="'rotate-cw'" size="'md'" feather="true"></pr-icon> Auto
                       </button>
                       <button
-                        class="btn btn-sm btn-dangerlight vertical-center h-[34px]"
+                        class="btn btn-md btn-dangerlight vertical-center btn-only-icon h-[34px]"
                         type="button"
                         ng-click="ctrl.removeConfiguration(index)"
                         ng-if="ctrl.formValues.Containers.length <= 1"
@@ -729,7 +729,7 @@
                           />
                           <label for="data_access_isolated">
                             <div class="boxselector_header">
-                              <pr-icon icon="'box'" feather="true"></pr-icon>
+                              <pr-icon icon="'svg-cubes'"></pr-icon>
                               Isolated
                             </div>
                             <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
@@ -751,7 +751,7 @@
                             style="cursor: pointer; border-color: #767676"
                           >
                             <div class="boxselector_header">
-                              <pr-icon icon="'box'" feather="true"></pr-icon>
+                              <pr-icon icon="'svg-cubes'"></pr-icon>
                               Isolated
                             </div>
                             <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
@@ -767,7 +767,7 @@
                           />
                           <label for="data_access_shared">
                             <div class="boxselector_header">
-                              <pr-icon icon="'sliders'" feather="true"></pr-icon>
+                              <pr-icon icon="'box'" feather="true"></pr-icon>
                               Shared
                             </div>
                             <p>Application will be deployed as a Deployment with a shared storage access</p>
@@ -829,7 +829,7 @@
                     "
                   >
                     <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left flex flex-row items-center">
-                      Maximum memory usage (MB)
+                      Memory limit (MB)
                       <portainer-tooltip
                         message="'An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM.'"
                       >
@@ -872,7 +872,7 @@
                     "
                   >
                     <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left flex flex-row items-center">
-                      Maximum CPU usage
+                      CPU limit
                       <portainer-tooltip
                         message="'An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling.'"
                       >
@@ -1194,7 +1194,7 @@
                           <div class="col-sm-1 input-group">
                             <button
                               ng-if="!placement.NeedsDeletion"
-                              class="btn btn-sm btn-dangerlight btn-only-icon !ml-0 !h-[34px]"
+                              class="btn btn-md btn-dangerlight btn-only-icon !ml-0"
                               type="button"
                               ng-click="ctrl.removePlacement($index)"
                               data-cy="k8sAppCreate-deletePlacementButton"

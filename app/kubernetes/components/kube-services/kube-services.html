@@ -9,13 +9,7 @@
         ng-options="item.typeValue as item.typeName for item in $ctrl.state.serviceType"
         data-cy="k8sAppCreate-publishingModeDropdown"
       ></select>
-      <button
-        type="button"
-        class="btn btn-sm btn-default vertical-center h-[34px]"
-        style="margin-left: 0"
-        ng-click="$ctrl.addEntry( $ctrl.state.selected )"
-        data-cy="k8sAppCreate-createServiceButton"
-      >
+      <button type="button" class="btn btn-md btn-default vertical-center !ml-0" ng-click="$ctrl.addEntry( $ctrl.state.selected )" data-cy="k8sAppCreate-createServiceButton">
         <pr-icon icon="'plus'" size="'sm'" feather="true"></pr-icon> Create service
       </button>
     </div>
@@ -52,7 +46,7 @@
 
     <div ng-if="$ctrl.formValues.Services[$index].Ingress && $ctrl.formValues.OriginalIngresses.length === 0">
       <div class="text-muted">
-        <pr-icon icon="'svg-route'"></pr-icon>
+        <pr-icon icon="'svg-route'" class-name="'mr-0.5'"></pr-icon>
         Ingress
       </div>
       <div ng-if="$ctrl.isAdmin()" class="small">
