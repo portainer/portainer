@@ -45,23 +45,16 @@
 }
 
 .btn-dangerlight {
-  border: 1px solid var(--text-button-dangerlight-color);
-  color: var(--ui-error-9);
-}
-
-.btn-dangerlight:hover {
-  color: var(--ui-error-9) !important;
-  background-color: var(--ui-error-2) !important;
+  @apply text-error-9 th-dark:text-error-7;
+  @apply hover:bg-error-2 th-dark:hover:bg-error-5;
+  @apply border border-solid border-error-5 th-dark:border-error-7 th-highcontrast:border-error-7;
 }
 
 .btn-light {
+  @apply hover:bg-gray-2 th-dark:hover:bg-gray-9;
   background-color: var(--bg-button-group-color);
   border: 1px solid var(--border-button-group);
   color: var(--text-button-group-color);
-}
-
-.btn-light:hover {
-  background-color: var(--ui-gray-2) !important;
 }
 
 .btn-light:active,
@@ -101,9 +94,4 @@ form a:hover,
 .hyperlink:hover {
   text-decoration: underline;
   color: var(--ui-blue-9);
-}
-
-.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
-  background: var(--bg-button-group-color) !important;
-  color: var(--text-button-group-color);
 }
