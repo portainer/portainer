@@ -71,7 +71,6 @@ export function EdgeScriptSettingsFieldset({
             }
             label="Allow self-signed certs"
             labelClass="col-sm-3 col-lg-2"
-            switchValues={{ on: 'Yes', off: 'No' }}
             tooltip="When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS"
           />
         </div>
