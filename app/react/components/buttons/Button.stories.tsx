@@ -9,6 +9,63 @@ export default {
   title: 'Components/Buttons/Button',
 } as Meta;
 
+export function DifferentTheme() {
+  const colors = [
+    'primary',
+    'secondary',
+    'success',
+    'danger',
+    'dangerlight',
+    'warning',
+    'light',
+    'link',
+  ] as const;
+
+  const themes = ['light', 'dark', 'highcontrast'] as const;
+  const states = ['', 'disabled'] as const;
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Color/Theme</th>
+          {themes.map((theme) => (
+            <th key={theme} className="text-center">
+              {theme}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {colors.map((color) => (
+          <tr key={color}>
+            <td>{color}</td>
+            {themes.map((theme) => (
+              <td
+                key={theme}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                theme={theme}
+                className="p-5"
+                style={{ background: 'var(--bg-body-color)' }}
+              >
+                {states.map((state) => (
+                  <Button
+                    color={color}
+                    key={state}
+                    disabled={state === 'disabled'}
+                  >
+                    {state} {color} button
+                  </Button>
+                ))}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 function Template({
   onClick,
   color,
