@@ -1,6 +1,7 @@
 .btn {
-  @apply disabled:opacity-40;
+  @apply disabled:opacity-60;
   @apply !outline-none;
+  @apply border border-solid border-transparent;
 
   border-radius: 5px;
   display: inline-flex;
@@ -18,22 +19,22 @@
 }
 
 .btn-primary {
-  @apply bg-blue-8;
-  @apply hover:bg-blue-9 th-dark:hover:bg-blue-7;
+  @apply bg-blue-8 border-blue-8;
+  @apply hover:bg-blue-9 hover:border-blue-9;
+  @apply th-dark:hover:bg-blue-7 th-dark:hover:border-blue-7;
 }
 
 .btn-primary:focus,
 .btn-primary:active,
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
-  outline: none;
-  @apply bg-blue-9 border border-solid border-blue-5;
+  @apply bg-blue-9 border-blue-5;
 }
 
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
-  background-color: var(--ui-blue-8);
+  @apply bg-blue-8;
 }
 
 /* Button Secondary */
@@ -50,17 +51,29 @@
 }
 
 .btn-danger {
-  background-color: var(--ui-error-8);
+  @apply bg-error-8 border-error-8;
+  @apply hover:bg-error-7 hover:border-error-7 hover:text-white;
+  @apply focus:bg-error-8 focus:text-white focus:border-blue-5;
+}
+
+.btn-danger:active,
+.btn-danger.active,
+.open > .dropdown-toggle.btn-danger {
+  @apply bg-error-8 text-white border-blue-5;
+}
+
+.btn-dangerlight {
+  @apply text-error-9 th-dark:text-white;
+  @apply bg-error-3 th-dark:bg-error-9;
+  @apply hover:bg-error-2 th-dark:hover:bg-error-11;
+  @apply border-error-5 th-dark:border-error-7 th-highcontrast:border-error-7;
+  @apply border border-solid;
+
+  @apply focus:border-blue-5;
 }
 
 .btn-success {
   background-color: var(--ui-success-7);
-}
-
-.btn-dangerlight {
-  @apply text-error-9 th-dark:text-error-7;
-  @apply hover:bg-error-2 th-dark:hover:bg-error-5;
-  @apply border border-solid border-error-5 th-dark:border-error-7 th-highcontrast:border-error-7;
 }
 
 .btn-light {
