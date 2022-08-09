@@ -10,7 +10,7 @@
           <div class="form-group"></div>
 
           <div class="form-group" style="margin-bottom: 0">
-            <box-selector radio-name="'registry'" value="$ctrl.model.Type" options="$ctrl.state.availableRegistry" on-change="($ctrl.setRegistry)"></box-selector>
+            <box-selector radio-name="'registry'" value="$ctrl.state.registryValue" options="$ctrl.state.availableRegistry" on-change="($ctrl.setRegistry)"></box-selector>
           </div>
 
           <registry-form-quay

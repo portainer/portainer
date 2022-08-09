@@ -165,6 +165,8 @@ class CreateRegistryController {
   }
 
   setRegistry(registry) {
+    this.state.registryValue = registry;
+    
     switch (registry) {
       case '6':
         this.selectDockerHub();
