@@ -13,6 +13,7 @@
 .btn.disabled,
 .btn[disabled],
 fieldset[disabled] .btn {
+  @apply opacity-40;
   pointer-events: none;
   touch-action: none;
 }
