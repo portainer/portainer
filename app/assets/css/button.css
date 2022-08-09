@@ -1,9 +1,8 @@
 .btn {
-  @apply disabled:opacity-60;
   @apply !outline-none;
   @apply border border-solid border-transparent;
 
-  border-radius: 5px;
+  border-radius: 8px;
   display: inline-flex;
   justify-content: space-around;
   align-items: center;
@@ -32,7 +31,6 @@ fieldset[disabled] .btn {
   @apply th-dark:hover:bg-blue-7 th-dark:hover:border-blue-7;
 }
 
-.btn-primary:focus,
 .btn-primary:active,
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
@@ -50,17 +48,15 @@ fieldset[disabled] .btn {
   @apply border border-solid;
 
   @apply text-blue-9 bg-blue-2 border-blue-8;
-  @apply hover:bg-blue-3 focus:bg-blue-3;
+  @apply hover:bg-blue-3;
 
   @apply th-dark:text-blue-3 th-dark:bg-gray-10 th-dark:border-blue-7;
   @apply th-dark:hover:bg-blue-11;
-  @apply th-dark:focus:bg-gray-10 th-dark:focus:border-blue-5;
 }
 
 .btn-danger {
   @apply bg-error-8 border-error-8;
   @apply hover:bg-error-7 hover:border-error-7 hover:text-white;
-  @apply focus:bg-error-8 focus:text-white focus:border-blue-5;
 }
 
 .btn-danger:active,
@@ -75,8 +71,6 @@ fieldset[disabled] .btn {
   @apply hover:bg-error-2 th-dark:hover:bg-error-11;
   @apply border-error-5 th-dark:border-error-7 th-highcontrast:border-error-7;
   @apply border border-solid;
-
-  @apply focus:border-blue-5;
 }
 
 .btn-success {
@@ -121,4 +115,34 @@ fieldset[disabled] .btn {
 .btn-group .btn.active {
   @apply bg-blue-2 text-blue-10 border-blue-5;
   @apply th-dark:bg-blue-11 th-dark:text-blue-2 th-dark:border-blue-9;
+}
+
+/* focus */
+
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-light:focus {
+  @apply border-blue-5;
+}
+
+.btn-danger:focus,
+.btn-dangerlight:focus {
+  @apply border-blue-6;
+}
+
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-light:focus,
+.btn-danger:focus,
+.btn-dangerlight:focus {
+  --btn-focus-color: var(--ui-blue-3);
+  box-shadow: 0px 0px 0px 4px var(--btn-focus-color);
+}
+
+[theme='dark'] .btn-primary:focus,
+[theme='dark'] .btn-secondary:focus,
+[theme='dark'] .btn-light:focus,
+[theme='dark'] .btn-danger:focus,
+[theme='dark'] .btn-dangerlight:focus {
+  --btn-focus-color: var(--ui-blue-11);
 }
