@@ -105,8 +105,7 @@
 
     <tag-selector ng-if="$ctrl.model.TagIds" value="$ctrl.model.TagIds" on-change="($ctrl.onChangeTags)"> </tag-selector>
 
-    <div class="col-sm-12 form-section-title"> Associated environments by tags </div>
-    <div class="col-sm-12 form-group">
+    <div class="table-in-row">
       <group-association-table
         loaded="$ctrl.loaded"
         page-type="$ctrl.pageType"
@@ -120,6 +119,7 @@
         groups="$ctrl.groups"
         show-groups="true"
         has-backend-pagination="true"
+        title="Associated environments by tags"
       ></group-association-table>
     </div>
   </div>

@@ -348,3 +348,16 @@
   border: none;
   background: none;
 }
+
+/* Multiple Tables in a row */
+.table-row-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+}
+.table-in-row {
+  border: 1px solid var(--border-widget);
+  border-radius: 8px;
+  flex-grow: 2;
+}
