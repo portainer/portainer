@@ -13,10 +13,8 @@ export function DifferentTheme() {
   const colors = [
     'primary',
     'secondary',
-    'success',
     'danger',
     'dangerlight',
-    'warning',
     'light',
     'link',
   ] as const;
@@ -93,22 +91,6 @@ export function Disabled() {
   return (
     <Button color="primary" onClick={() => {}} disabled>
       Disabled Button
-    </Button>
-  );
-}
-
-export function Warning() {
-  return (
-    <Button color="warning" onClick={() => {}}>
-      Warning Button
-    </Button>
-  );
-}
-
-export function Success() {
-  return (
-    <Button color="success" onClick={() => {}}>
-      Success Button
     </Button>
   );
 }

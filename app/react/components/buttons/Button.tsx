@@ -17,13 +17,10 @@ type Color =
   | 'default'
   | 'primary'
   | 'secondary'
-  | 'success'
-  | 'warning'
   | 'danger'
   | 'link'
   | 'light'
   | 'dangerlight'
-  | 'default'
   | 'none';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
