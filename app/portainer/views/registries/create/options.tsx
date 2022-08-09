@@ -1,5 +1,5 @@
 import Docker from '@/assets/ico/vendor/docker.svg?c';
-import Aws from '@/assets/ico/vendor/aws.svg?c';
+import Ecr from '@/assets/ico/vendor/ecr.svg?c';
 import Quay from '@/assets/ico/vendor/quay.svg?c';
 import Proget from '@/assets/ico/vendor/proget.svg?c';
 import Azure from '@/assets/ico/vendor/azure.svg?c';
@@ -16,7 +16,7 @@ export const options = [
   },
   {
     id: 'registry_aws_ecr',
-    icon: Aws,
+    icon: Ecr,
     label: 'AWS ECR',
     description: 'Amazon elastic container registry',
     value: '7',
