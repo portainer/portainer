@@ -51,7 +51,6 @@ fieldset[disabled] .btn {
 /* Button Secondary */
 .btn-secondary {
   @apply border border-solid;
-  @apply disabled:border-transparent;
 
   @apply text-blue-9 bg-blue-2 border-blue-8;
   @apply hover:bg-blue-3 focus:bg-blue-3;
