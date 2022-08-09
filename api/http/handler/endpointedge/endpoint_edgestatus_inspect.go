@@ -77,13 +77,13 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	if endpoint.EdgeID == "" {
 		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
 		endpoint.EdgeID = edgeIdentifier
-
-		agentPlatform, agentPlatformErr := parseAgentPlatform(r)
-		if agentPlatformErr != nil {
-			return httperror.BadRequest("agent platform header is not valid", err)
-		}
-		endpoint.Type = agentPlatform
 	}
+
+	agentPlatform, agentPlatformErr := parseAgentPlatform(r)
+	if agentPlatformErr != nil {
+		return httperror.BadRequest("agent platform header is not valid", err)
+	}
+	endpoint.Type = agentPlatform
 
 	endpoint.LastCheckInDate = time.Now().Unix()
 
