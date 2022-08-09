@@ -1,22 +1,22 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-      <div class="toolBar">
+      <div class="toolBar vertical-center">
         <div class="toolBarTitle vertical-center">
           <pr-icon icon="$ctrl.titleIcon" feather="true" class="vertical-center" class-name="'icon-white icon-primary icon-nested-blue'"></pr-icon>{{ $ctrl.titleText }}
         </div>
-      </div>
-      <div class="searchBar">
-        <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
-        <input
-          type="text"
-          class="searchInput ml-1"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput ml-1"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">

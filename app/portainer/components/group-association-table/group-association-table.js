@@ -65,5 +65,6 @@ angular.module('portainer.app').component('groupAssociationTable', {
     showGroups: '<',
     hasBackendPagination: '<',
     cyValue: '@',
+    title: '@',
   },
 });

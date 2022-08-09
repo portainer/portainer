@@ -1,14 +1,25 @@
-<div class="datatable">
-  <div class="searchBar">
-    <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
-    <input
-      type="text"
-      class="searchInput ml-1"
-      ng-model="$ctrl.state.textFilter"
-      ng-change="$ctrl.onTextFilterChange()"
-      placeholder="Search..."
-      ng-model-options="{ debounce: 300 }"
-    />
+<div class="datatable access-viewer-datatable">
+  <div class="toolBar vertical-center pl-0 pr-0">
+    <div class="toolBarTitle vertical-center">
+      <div>
+        <div class="form-section-title mb-1">Access</div>
+        <div class="vertical-center">
+          <pr-icon icon="'info'" mode="'primary'" feather="true" size="'sm'" class="vertical-center"></pr-icon>
+          <span class="small text-muted"> Effective role for each environment will be displayed for the selected user </span>
+        </div>
+      </div>
+    </div>
+    <div class="searchBar vertical-center">
+      <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
+      <input
+        type="text"
+        class="searchInput ml-1"
+        ng-model="$ctrl.state.textFilter"
+        ng-change="$ctrl.onTextFilterChange()"
+        placeholder="Search..."
+        ng-model-options="{ debounce: 300 }"
+      />
+    </div>
   </div>
   <div class="table-responsive">
     <table class="table table-hover nowrap-cells">

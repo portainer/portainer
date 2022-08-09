@@ -3,10 +3,9 @@
   to the other.
 </div>
 <div class="col-sm-12" style="margin-top: 20px">
-  <!-- available-endpoints -->
-  <div class="col-sm-6">
-    <div class="text-center small text-muted">Available environments</div>
-    <div style="margin-top: 10px">
+  <div class="table-row-container">
+    <!-- available-endpoints -->
+    <div class="datatable table-in-row">
       <group-association-table
         loaded="$ctrl.loaded"
         page-type="$ctrl.pageType"
@@ -21,15 +20,13 @@
         groups="$ctrl.groups"
         show-groups="true"
         has-backend-pagination="true"
+        title="Available environments"
         data-cy="edgeGroupCreate-availableEndpoints"
       ></group-association-table>
     </div>
-  </div>
-  <!-- !available-endpoints -->
-  <!-- associated-endpoints -->
-  <div class="col-sm-6">
-    <div class="text-center small text-muted">Associated environments</div>
-    <div style="margin-top: 10px">
+    <!-- !available-endpoints -->
+    <!-- associated-endpoints -->
+    <div class="datatable table-in-row">
       <group-association-table
         loaded="$ctrl.loaded"
         page-type="$ctrl.pageType"
@@ -44,9 +41,10 @@
         groups="$ctrl.groups"
         show-groups="true"
         has-backend-pagination="true"
+        title="Associated environments"
         data-cy="edgeGroupCreate-associatedEndpoints"
       ></group-association-table>
     </div>
+    <!-- !associated-endpoints -->
   </div>
-  <!-- !associated-endpoints -->
 </div>
