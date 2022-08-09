@@ -107,14 +107,10 @@ fieldset[disabled] .btn {
   background-color: var(--ui-gray-3);
 }
 
-form a,
-.form-group a,
 .hyperlink {
   color: var(--ui-blue-8);
 }
 
-form a:hover,
-.form-group a:hover,
 .hyperlink:hover {
   text-decoration: underline;
   color: var(--ui-blue-9);
