@@ -1,4 +1,13 @@
 import { useRouter } from '@uirouter/react';
+import {
+  Pause,
+  Play,
+  Plus,
+  RefreshCw,
+  Slash,
+  Square,
+  Trash2,
+} from 'react-feather';
 
 import * as notifications from '@/portainer/services/notifications';
 import { useAuthorizations, Authorized } from '@/portainer/hooks/useUser';
@@ -84,8 +93,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onStartClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasStoppedItemsSelected}
+            icon={Play}
           >
-            <i className="fa fa-play space-right" aria-hidden="true" />
             Start
           </Button>
         </Authorized>
@@ -95,8 +104,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onStopClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
+            icon={Square}
           >
-            <i className="fa fa-stop space-right" aria-hidden="true" />
             Stop
           </Button>
         </Authorized>
@@ -106,8 +115,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onKillClick(selectedItems)}
             disabled={selectedItemCount === 0 || hasStoppedItemsSelected}
+            icon={Slash}
           >
-            <i className="fa fa-bomb space-right" aria-hidden="true" />
             Kill
           </Button>
         </Authorized>
@@ -117,8 +126,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onRestartClick(selectedItems)}
             disabled={selectedItemCount === 0}
+            icon={RefreshCw}
           >
-            <i className="fa fa-sync space-right" aria-hidden="true" />
             Restart
           </Button>
         </Authorized>
@@ -128,8 +137,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onPauseClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
+            icon={Pause}
           >
-            <i className="fa fa-pause space-right" aria-hidden="true" />
             Pause
           </Button>
         </Authorized>
@@ -139,8 +148,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onResumeClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasPausedItemsSelected}
+            icon={Play}
           >
-            <i className="fa fa-play space-right" aria-hidden="true" />
             Resume
           </Button>
         </Authorized>
@@ -150,8 +159,8 @@ export function ContainersDatatableActions({
             color="dangerlight"
             onClick={() => onRemoveClick(selectedItems)}
             disabled={selectedItemCount === 0}
+            icon={Trash2}
           >
-            <i className="fa fa-trash-alt space-right" aria-hidden="true" />
             Remove
           </Button>
         </Authorized>
@@ -160,10 +169,7 @@ export function ContainersDatatableActions({
       {isAddActionVisible && (
         <Authorized authorizations="DockerContainerCreate">
           <Link to="docker.containers.new" className="space-left">
-            <Button>
-              <i className="fa fa-plus space-right" aria-hidden="true" />
-              Add container
-            </Button>
+            <Button icon={Plus}>Add container</Button>
           </Link>
         </Authorized>
       )}
