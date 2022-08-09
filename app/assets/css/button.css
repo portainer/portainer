@@ -10,6 +10,17 @@
   gap: 5px;
 }
 
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+  pointer-events: none;
+  touch-action: none;
+}
+
+.btn:hover {
+  color: var(--text-button-hover-color);
+}
+
 .btn-group {
   display: inline-flex;
 }
@@ -19,8 +30,8 @@
 }
 
 .btn-primary {
-  @apply bg-blue-8 border-blue-8;
-  @apply hover:bg-blue-9 hover:border-blue-9;
+  @apply text-white bg-blue-8 border-blue-8;
+  @apply hover:text-white hover:bg-blue-9 hover:border-blue-9;
   @apply th-dark:hover:bg-blue-7 th-dark:hover:border-blue-7;
 }
 
@@ -76,11 +87,19 @@
   background-color: var(--ui-success-7);
 }
 
+.btn-success:hover {
+  color: var(--white-color);
+}
+
+/* secondary-grey */
+.btn-default,
 .btn-light {
-  @apply hover:bg-gray-2 th-dark:hover:bg-gray-9;
-  background-color: var(--bg-button-group-color);
-  border: 1px solid var(--border-button-group);
-  color: var(--text-button-group-color);
+  @apply bg-white border-gray-5 text-gray-9;
+  @apply hover:bg-gray-3 hover:border-gray-5 hover:text-gray-10;
+
+  /* dark mode */
+  @apply th-dark:bg-gray-warm-10 th-dark:border-gray-warm-7 th-dark:text-gray-warm-4;
+  @apply th-dark:hover:bg-gray-warm-9 th-dark:hover:border-gray-6 th-dark:hover:text-gray-warm-4;
 }
 
 .btn-light:active,

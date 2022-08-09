@@ -23,6 +23,7 @@ type Color =
   | 'link'
   | 'light'
   | 'dangerlight'
+  | 'default'
   | 'none';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 
