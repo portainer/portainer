@@ -216,7 +216,10 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 		if ok {
 			files, success := cache.([]string)
 			if success {
-				return files, nil
+				// For the case while searching files in a repository without include extensions for the first time,
+				// but with include extensions for the second time
+				includedFiles := filterFiles(files, includedExts)
+				return includedFiles, nil
 			}
 		}
 	}
@@ -246,18 +249,12 @@ func (service *Service) ListFiles(repositoryURL, referenceName, username, passwo
 		}
 	}
 
-	var includedFiles []string
+	includedFiles := filterFiles(files, includedExts)
 	if service.cacheEnabled && service.repoFileCache != nil {
-		for _, filename := range files {
-			// filter out the filenames with non-included extension
-			if matchExtensions(filename, includedExts) {
-				includedFiles = append(includedFiles, filename)
-			}
-		}
 		service.repoFileCache.Add(repoKey, includedFiles)
 		return includedFiles, nil
 	}
-	return files, nil
+	return includedFiles, nil
 }
 
 func (service *Service) purgeCache() {
@@ -285,4 +282,19 @@ func matchExtensions(target string, exts []string) bool {
 		}
 	}
 	return false
+}
+
+func filterFiles(paths []string, includedExts []string) []string {
+	if len(includedExts) == 0 {
+		return paths
+	}
+
+	var includedFiles []string
+	for _, filename := range paths {
+		// filter out the filenames with non-included extension
+		if matchExtensions(filename, includedExts) {
+			includedFiles = append(includedFiles, filename)
+		}
+	}
+	return includedFiles
 }
