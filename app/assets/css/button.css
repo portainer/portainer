@@ -21,10 +21,6 @@ fieldset[disabled] .btn {
   color: var(--text-button-hover-color);
 }
 
-.btn-group {
-  display: inline-flex;
-}
-
 .btn.active {
   box-shadow: none;
 }
@@ -114,4 +110,14 @@ fieldset[disabled] .btn {
 .hyperlink:hover {
   text-decoration: underline;
   color: var(--ui-blue-9);
+}
+
+.btn-group {
+  display: inline-flex;
+}
+
+.input-group-btn .btn.active,
+.btn-group .btn.active {
+  @apply bg-blue-2 text-blue-10 border-blue-5;
+  @apply th-dark:bg-blue-11 th-dark:text-blue-2 th-dark:border-blue-9;
 }
