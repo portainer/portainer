@@ -198,6 +198,8 @@ class CreateRegistryController {
       this.model.Type = RegistryTypes.DOCKERHUB;
       this.selectDockerHub();
       this.state.availableRegistry = options;
+      // Default registryValue is DockerHub, which is 6
+      this.state.registryValue = '6';
 
       const from = this.$transition$.from();
       const params = this.$transition$.params('from');
