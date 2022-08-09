@@ -1,8 +1,0 @@
-.selected .mask-icon {
-  color: var(--selected-item-color);
-}
-
-.mask-icon {
-  color: var(--bg-boxselector-color);
-  transform: scale(1.2);
-}
