@@ -333,7 +333,7 @@
   --bg-calendar-table-color: var(--grey-3);
   --bg-daterangepicker-end-date: var(--grey-4);
   --bg-daterangepicker-hover: var(--grey-4);
-  --bg-daterangepicker-in-range: var(--grey-2);
+  --bg-daterangepicker-in-range: var(--ui-gray-warm-11);
   --bg-daterangepicker-active: var(--blue-14);
   --bg-tooltip-color: var(--grey-3);
   --bg-input-autofill-color: var(--grey-2);
@@ -564,7 +564,7 @@
   --text-rzslider-color: var(--white-color);
   --text-rzslider-limit-color: var(--white-color);
   --text-pagination-color: var(--white-color);
-  --text-daterangepicker-end-date: var(--grey-7);
+  --text-daterangepicker-end-date: var(--ui-white);
   --text-daterangepicker-in-range: var(--white-color);
   --text-daterangepicker-active: var(--white-color);
   --text-ui-select-color: var(--white-color);
