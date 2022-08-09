@@ -77,10 +77,10 @@
                 <span ng-show="!$ctrl.isAdmin">{{ item.Username }}</span>
               </td>
               <td>
-                <span>
-                  <i class="fa fa-user-circle" aria-hidden="true" style="margin-right: 5px" ng-if="item.Role === 1 && !item.isTeamLeader"></i>
-                  <i class="fa fa-user-plus" aria-hidden="true" style="margin-right: 5px" ng-if="item.Role !== 1 && item.isTeamLeader"></i>
-                  <i class="fa fa-user" aria-hidden="true" style="margin-right: 5px" ng-if="item.Role !== 1 && !item.isTeamLeader"></i>
+                <span class="vertical-center">
+                  <pr-icon icon="'svg-usercircle'" ng-if="item.Role === 1 && !item.isTeamLeader"></pr-icon>
+                  <pr-icon icon="'user'" ng-if="item.Role !== 1 && item.isTeamLeader" feather="true"></pr-icon>
+                  <pr-icon icon="'user-plus'" ng-if="item.Role !== 1 && !item.isTeamLeader" feather="true"></pr-icon>
                   {{ item.RoleName ? item.RoleName : '-' }}
                 </span>
               </td>
