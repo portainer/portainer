@@ -61,7 +61,7 @@ angular.module('portainer.app').controller('UserController', [
       }
       UserService.updateUser($scope.user.Id, { role, username })
         .then(function success() {
-          Notifications.success('User successfully updated');
+          Notifications.success('Success', 'User successfully updated');
           $state.reload();
         })
         .catch(function error(err) {
@@ -77,7 +77,7 @@ angular.module('portainer.app').controller('UserController', [
       }
       UserService.updateUser($scope.user.Id, { password: $scope.formValues.newPassword })
         .then(function success() {
-          Notifications.success('Password successfully updated');
+          Notifications.success('Success', 'Password successfully updated');
 
           if (isCurrentUser) {
             $state.go('portainer.logout');

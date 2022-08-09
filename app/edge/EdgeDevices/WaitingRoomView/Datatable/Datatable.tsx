@@ -204,7 +204,7 @@ export function DataTable({
       devices.map((d) => d.Id),
       {
         onSuccess() {
-          notifySuccess('Edge devices associated successfully');
+          notifySuccess('Success', 'Edge devices associated successfully');
         },
       }
     );

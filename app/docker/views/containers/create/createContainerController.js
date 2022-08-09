@@ -883,7 +883,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         } else {
           await ContainerService.updateLimits($transition$.params().from, config);
           $scope.config = config;
-          Notifications.success('Limits updated');
+          Notifications.success('Success', 'Limits updated');
         }
       } catch (err) {
         Notifications.error('Failure', err, 'Update Limits fail');
@@ -1090,7 +1090,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
 
       function onSuccess() {
-        Notifications.success('Container successfully created');
+        Notifications.success('Success', 'Container successfully created');
         $state.go('docker.containers', {}, { reload: true });
       }
     }

@@ -77,7 +77,7 @@ angular.module('portainer.app').controller('AccountController', [
         selectedTokens.forEach((token) => {
           UserService.deleteAccessToken($scope.userID, token.id)
             .then(() => {
-              Notifications.success('Token successfully removed');
+              Notifications.success('Success', 'Token successfully removed');
               var index = $scope.tokens.indexOf(token);
               $scope.tokens.splice(index, 1);
             })

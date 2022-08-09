@@ -54,7 +54,7 @@ class KubernetesAppGitFormController {
         }
         this.state.redeployInProgress = true;
         await this.StackService.updateKubeGit(this.stack.Id, this.stack.EndpointId, this.namespace, this.formValues);
-        this.Notifications.success('Pulled and redeployed stack successfully');
+        this.Notifications.success('Success', 'Pulled and redeployed stack successfully');
         await this.$state.reload(this.$state.current);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
@@ -69,7 +69,7 @@ class KubernetesAppGitFormController {
       try {
         this.state.saveGitSettingsInProgress = true;
         await this.StackService.updateKubeStack({ EndpointId: this.stack.EndpointId, Id: this.stack.Id }, null, this.formValues);
-        this.Notifications.success('Save stack settings successfully');
+        this.Notifications.success('Success', 'Save stack settings successfully');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to save application settings');
       } finally {

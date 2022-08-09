@@ -36,7 +36,7 @@ export class EditEdgeGroupController {
     this.state.actionInProgress = true;
     try {
       await this.EdgeGroupService.update(this.model);
-      this.Notifications.success('Edge group successfully updated');
+      this.Notifications.success('Success', 'Edge group successfully updated');
       this.$state.go('edge.groups');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update edge group');

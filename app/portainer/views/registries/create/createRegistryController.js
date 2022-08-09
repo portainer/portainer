@@ -108,7 +108,7 @@ class CreateRegistryController {
       try {
         this.state.actionInProgress = true;
         await this.RegistryService.createGitlabRegistries(this.model, this.state.gitlab.selectedItems);
-        this.Notifications.success('Registries successfully created');
+        this.Notifications.success('Success', 'Registries successfully created');
         this.$state.go(this.state.originViewReference, { endpointId: this.state.originalEndpointId });
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to create registries');
@@ -122,7 +122,7 @@ class CreateRegistryController {
       try {
         this.state.actionInProgress = true;
         await this.RegistryService.createRegistry(this.model);
-        this.Notifications.success('Registry successfully created');
+        this.Notifications.success('Success', 'Registry successfully created');
         this.$state.go(this.state.originViewReference, { endpointId: this.state.originalEndpointId });
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to create registry');

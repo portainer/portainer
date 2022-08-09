@@ -115,7 +115,7 @@ angular.module('portainer.app').controller('StackController', [
       return StackService.duplicateStack(name, $scope.stackFileContent, env, targetEndpointId, stack.Type).then(onDuplicationSuccess).catch(notifyOnError);
 
       function onDuplicationSuccess() {
-        Notifications.success('Stack successfully duplicated');
+        Notifications.success('Success', 'Stack successfully duplicated');
         $state.go('docker.stacks', {}, { reload: true });
         // sets back the original endpointID as global for interceptors
         EndpointProvider.setEndpointID(stack.EndpointId);
@@ -266,7 +266,7 @@ angular.module('portainer.app').controller('StackController', [
         $scope.state.actionInProgress = true;
         StackService.updateStack(stack, stackFile, env, prune)
           .then(function success() {
-            Notifications.success('Stack successfully deployed');
+            Notifications.success('Success', 'Stack successfully deployed');
             $scope.state.isEditorDirty = false;
             $state.reload();
           })

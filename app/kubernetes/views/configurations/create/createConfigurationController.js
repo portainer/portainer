@@ -48,7 +48,7 @@ class KubernetesCreateConfigurationController {
         this.formValues.Data = KubernetesConfigurationHelper.parseYaml(this.formValues);
       }
       await this.KubernetesConfigurationService.create(this.formValues);
-      this.Notifications.success('Configuration succesfully created');
+      this.Notifications.success('Success', 'Configuration succesfully created');
       this.state.isEditorDirty = false;
       this.$state.go('kubernetes.configurations');
     } catch (err) {

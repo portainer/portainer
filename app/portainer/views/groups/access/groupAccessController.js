@@ -13,7 +13,7 @@ angular.module('portainer.app').controller('GroupAccessController', [
       $scope.state.actionInProgress = true;
       GroupService.updateGroup($scope.group, $scope.group.AssociatedEndpoints)
         .then(() => {
-          Notifications.success('Access successfully updated');
+          Notifications.success('Success', 'Access successfully updated');
           $state.reload();
         })
         .catch((err) => {

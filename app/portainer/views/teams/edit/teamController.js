@@ -92,7 +92,7 @@ angular.module('portainer.app').controller('TeamController', [
           }
           $scope.teamMembers = $scope.teamMembers.concat(users);
           $scope.users = [];
-          Notifications.success('All users successfully added');
+          Notifications.success('Success', 'All users successfully added');
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update team members');
@@ -123,7 +123,7 @@ angular.module('portainer.app').controller('TeamController', [
           $scope.users = $scope.users.concat($scope.teamMembers);
           $scope.teamMembers = [];
           $scope.leaderCount = 0;
-          Notifications.success('All users successfully removed');
+          Notifications.success('Success', 'All users successfully removed');
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update team members');

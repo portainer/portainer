@@ -252,7 +252,7 @@ class KubernetesNodeController {
       if (this.formValues.Availability === 'Drain') {
         await this.drainNode();
       }
-      this.Notifications.success('Node updated successfully');
+      this.Notifications.success('Success', 'Node updated successfully');
       this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update node');

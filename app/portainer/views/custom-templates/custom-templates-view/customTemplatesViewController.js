@@ -107,7 +107,7 @@ class CustomTemplatesViewController {
     for (let template of templates) {
       try {
         await this.CustomTemplateService.remove(template.id);
-        this.Notifications.success('Removed template successfully');
+        this.Notifications.success('Success', 'Removed template successfully');
         _.remove(this.templates, template);
       } catch (err) {
         this.Notifications.error('Failed removing template', err, 'Unable to remove custom template');
@@ -169,7 +169,7 @@ class CustomTemplatesViewController {
       const createAction = this.state.selectedTemplate.Type === 1 ? this.StackService.createSwarmStackFromFileContent : this.StackService.createComposeStackFromFileContent;
       const { ResourceControl: resourceControl } = await createAction(stackName, file, [], endpointId);
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
-      this.Notifications.success('Stack successfully deployed');
+      this.Notifications.success('Success', 'Stack successfully deployed');
       this.$state.go('docker.stacks');
     } catch (err) {
       this.Notifications.error('Deployment error', err, 'Failed to deploy stack');
