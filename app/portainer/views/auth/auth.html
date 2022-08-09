@@ -82,6 +82,8 @@
                   placeholder="Enter your password"
                 />
                 <button
+                  data-cy="auth-passwordInputToggle"
+                  type="button"
                   ng-click="ctrl.toggleShowPassword()"
                   class="absolute top-0 right-0 h-[34px] w-[50px] border-none flex justify-center items-center bg-transparent"
                   tooltip-append-to-body="true"
@@ -89,7 +91,7 @@
                   tooltip-class="portainer-tooltip"
                   uib-tooltip="{{ ctrl.state.passwordInputType === 'password' ? 'Show password' : 'Hide password' }}"
                 >
-                  <pr-icon icon="ctrl.state.passwordInputType === 'password' ? 'eye' : 'eye-off'" feather="true" size="'md'"></pr-icon>
+                  <pr-icon icon="ctrl.state.passwordInputType === 'password' ? 'eye-off' : 'eye'" feather="true" size="'md'"></pr-icon>
                 </button>
               </div>
             </div>
