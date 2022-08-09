@@ -881,3 +881,7 @@ json-tree .branch-preview {
   color: var(--text-link-hover-color);
   text-decoration-line: underline;
 }
+
+.web-editor .trancluded-item:empty {
+  display: none;
+}

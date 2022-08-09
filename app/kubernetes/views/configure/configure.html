@@ -34,7 +34,7 @@
               </div>
 
               <div class="col-sm-12">
-                <label class="control-label text-left col-sm-3 col-lg-2 px-0"> Allow users to use external load balancer </label>
+                <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Allow users to use external load balancer </label>
                 <label class="switch mb-0 col-sm-8">
                   <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><span class="slider round" data-cy="kubeSetup-loadBalancerToggle"></span>
                 </label>
@@ -42,7 +42,7 @@
             </div>
 
             <div class="form-group">
-              <div class="col-sm-12 text-muted small">
+              <div class="col-sm-12 text-muted small mt-4">
                 <p> Configuring ingress controllers will allow users to expose application they deploy over a HTTP route. </p>
                 <p class="mt-1 vertical-center">
                   <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
@@ -165,7 +165,7 @@
                   feature-id="ctrl.limitedFeatureAutoWindow"
                   tooltip="'Specify a timeframe during which automatic updates can occur in this environment.'"
                   on-change="(ctrl.onToggleAutoUpdate)"
-                  label-class="'col-sm-3 col-lg-2 px-0 !m-0'"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
                   switch-class="'col-sm-8'"
                 >
                 </por-switch-field>
@@ -185,7 +185,7 @@
 
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left col-sm-3 col-lg-2 px-0"> Restrict access to the default namespace </label>
+                <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Restrict access to the default namespace </label>
                 <label class="switch col-sm-8">
                   <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><span class="slider round" data-cy="kubeSetup-restrictDefaultNsToggle"></span>
                 </label>
@@ -216,7 +216,7 @@
                   feature-id="ctrl.limitedFeature"
                   checked="ctrl.formValues.EnableResourceOverCommit"
                   on-change="(ctrl.onChangeEnableResourceOverCommit)"
-                  label-class="'col-sm-3 col-lg-2 px-0 !m-0'"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
                   switch-class="'col-sm-8'"
                 ></por-switch-field>
               </div>
@@ -234,7 +234,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left col-sm-3 col-lg-2 px-0"> Enable features using the metrics API </label>
+                <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Enable features using the metrics API </label>
                 <label class="switch col-sm-8">
                   <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" />
                   <span class="slider round" data-cy="kubeSetup-metricsToggle"></span>
