@@ -241,6 +241,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 		t.Fatal("request error:", err)
 	}
 	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, "edge-id")
+	req.Header.Set(portainer.HTTPResponseAgentPlatform, "1")
 
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
@@ -357,6 +358,7 @@ func TestEdgeStackStatus(t *testing.T) {
 		t.Fatal("request error:", err)
 	}
 	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, "edge-id")
+	req.Header.Set(portainer.HTTPResponseAgentPlatform, "1")
 
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
@@ -426,6 +428,7 @@ func TestEdgeJobsResponse(t *testing.T) {
 		t.Fatal("request error:", err)
 	}
 	req.Header.Set(portainer.PortainerAgentEdgeIDHeader, "edge-id")
+	req.Header.Set(portainer.HTTPResponseAgentPlatform, "1")
 
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
