@@ -3,15 +3,15 @@
   title="'Application logs'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
-    { 
+    {
       label:ctrl.application.ResourcePool,
-      link: 'kubernetes.resourcePools.resourcePool', 
+      link: 'kubernetes.resourcePools.resourcePool',
       linkParams:{ id: ctrl.application.ResourcePool }
     },
     { label:'Applications', link:'kubernetes.applications' },
-    { 
+    {
       label:ctrl.application.Name,
-      link: 'kubernetes.applications.application', 
+      link: 'kubernetes.applications.application',
       linkParams:{ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool }
     },
      'Pods',
@@ -26,7 +26,7 @@
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-<div ng-if="ctrl.state.viewReady" style="height: 100%">
+<div ng-if="ctrl.state.viewReady">
   <div class="row">
     <div class="col-sm-12">
       <rd-widget>
@@ -75,8 +75,8 @@
     </div>
   </div>
 
-  <div class="row" style="height: 54%">
-    <div class="col-sm-12" style="height: 100%">
+  <div class="row">
+    <div class="col-sm-12 h-[max(400px,calc(100vh-380px))]">
       <pre
         class="log_viewer widget"
       ><div ng-repeat="line in ctrl.state.filteredLogs = (ctrl.applicationLogs | filter:ctrl.state.search) track by $index" class="line" ng-if="line"><p class="inner_line">{{ line }}</p></div><div ng-if="ctrl.applicationLogs.length && !ctrl.state.filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ ctrl.state.search }}' filter</p></div><div ng-if="ctrl.applicationLogs.length === 0" class="line"><p class="inner_line">No logs available</p></div></pre>
