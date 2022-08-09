@@ -85,7 +85,9 @@
                 <td>
                   {{ user.Username }}
                   <span class="space-left">
-                    <a ng-click="addUser(user)" ng-class="{ 'btn disabled py-0': settings.TeamSync }"> <pr-icon icon="'plus-circle'" feather="true" size="'sm'"></pr-icon> Add </a>
+                    <a class="hyperlink" ng-click="addUser(user)" ng-class="{ 'btn disabled py-0': settings.TeamSync }">
+                      <pr-icon icon="'plus-circle'" feather="true" size="'sm'"></pr-icon> Add
+                    </a>
                   </span>
                 </td>
               </tr>
@@ -162,7 +164,7 @@
                 <td>
                   {{ user.Username }}
                   <span class="space-left" ng-if="isAdmin || user.TeamRole === 'Member'">
-                    <a ng-click="removeUser(user)" ng-class="{ 'btn disabled py-0': settings.TeamSync }">
+                    <a class="hyperlink" ng-click="removeUser(user)" ng-class="{ 'btn disabled py-0': settings.TeamSync }">
                       <pr-icon icon="'minus-circle'" feather="true" size="'sm'"></pr-icon> Remove
                     </a>
                   </span>
@@ -172,10 +174,15 @@
                   <pr-icon ng-if="user.TeamRole === 'Member'" icon="'user'" feather="true" class-name="'icon-secondary-alt'" size="'sm'"></pr-icon>
                   {{ user.TeamRole }}
                   <span class="space-left">
-                    <a class="space-left" ng-click="promoteToLeader(user)" ng-if="user.TeamRole === 'Member'" ng-class="{ 'btn disabled py-0': settings.TeamSync }">
+                    <a class="space-left hyperlink" ng-click="promoteToLeader(user)" ng-if="user.TeamRole === 'Member'" ng-class="{ 'btn disabled py-0': settings.TeamSync }">
                       <pr-icon icon="'user-plus'" feather="true" class-name="'icon-secondary-alt'" size="'sm'"></pr-icon> Leader
                     </a>
-                    <a class="space-left" ng-click="demoteToMember(user)" ng-if="isAdmin && user.TeamRole === 'Leader'" ng-class="{ 'btn disabled py-0': settings.TeamSync }">
+                    <a
+                      class="space-left hyperlink"
+                      ng-click="demoteToMember(user)"
+                      ng-if="isAdmin && user.TeamRole === 'Leader'"
+                      ng-class="{ 'btn disabled py-0': settings.TeamSync }"
+                    >
                       <pr-icon icon="'user-x'" feather="true" class-name="'icon-secondary-alt'" size="'sm'"></pr-icon> Member
                     </a>
                   </span>
