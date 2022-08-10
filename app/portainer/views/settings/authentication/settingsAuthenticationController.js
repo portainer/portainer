@@ -109,7 +109,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
       .then(function success() {
         $scope.state.failedConnectivityCheck = false;
         $scope.state.successfulConnectivityCheck = true;
-        Notifications.success('Connection to LDAP successful');
+        Notifications.success('Success', 'Connection to LDAP successful');
       })
       .catch(function error(err) {
         $scope.state.failedConnectivityCheck = true;
@@ -136,7 +136,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
         return SettingsService.update(settings);
       })
       .then(function success() {
-        Notifications.success('Authentication settings updated');
+        Notifications.success('Success', 'Authentication settings updated');
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to update authentication settings');

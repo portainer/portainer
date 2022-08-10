@@ -110,7 +110,7 @@ angular
             }
           }
 
-          Notifications.success('Device(s) successfully imported');
+          Notifications.success('Success', 'Device(s) successfully imported');
           $state.go('edge.devices');
         });
       };

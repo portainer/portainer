@@ -39,7 +39,7 @@ export class CreateEdgeJobViewController {
 
     try {
       await this.createEdgeJob(method, this.model);
-      this.Notifications.success('Edge job successfully created');
+      this.Notifications.success('Success', 'Edge job successfully created');
       this.state.isEditorDirty = false;
       this.$state.go('edge.jobs', {}, { reload: true });
     } catch (err) {

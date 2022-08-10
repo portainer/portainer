@@ -133,7 +133,7 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
           return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
         })
         .then(function success() {
-          Notifications.success('Volume successfully created');
+          Notifications.success('Success', 'Volume successfully created');
           $state.go('docker.volumes', {}, { reload: true });
         })
         .catch(function error(err) {

@@ -111,7 +111,7 @@ class CreateCustomTemplateViewController {
       const userId = userDetails.ID;
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, customTemplate.ResourceControl);
 
-      this.Notifications.success('Custom template successfully created');
+      this.Notifications.success('Success', 'Custom template successfully created');
       this.state.isEditorDirty = false;
       this.$state.go('docker.templates.custom');
     } catch (err) {

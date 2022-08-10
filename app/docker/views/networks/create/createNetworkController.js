@@ -239,7 +239,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
           return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
         })
         .then(function success() {
-          Notifications.success('Network successfully created');
+          Notifications.success('Success', 'Network successfully created');
           if (context.reload) {
             $state.go(
               'docker.networks',

@@ -117,7 +117,7 @@ export function AccessControlPanelForm({
 
     updateAccess.mutate(accessControl, {
       onSuccess() {
-        notifySuccess('Access control successfully updated');
+        notifySuccess('Success', 'Access control successfully updated');
       },
     });
   }

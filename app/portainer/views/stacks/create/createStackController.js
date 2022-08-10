@@ -264,7 +264,7 @@ angular
             return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
           })
           .then(function success() {
-            Notifications.success('Stack successfully deployed');
+            Notifications.success('Success', 'Stack successfully deployed');
             $scope.state.isEditorDirty = false;
             $state.go('docker.stacks');
           })

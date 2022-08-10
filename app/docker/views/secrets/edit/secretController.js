@@ -16,7 +16,7 @@ angular.module('portainer.docker').controller('SecretController', [
     $scope.removeSecret = function removeSecret(secretId) {
       SecretService.remove(secretId)
         .then(function success() {
-          Notifications.success('Secret successfully removed');
+          Notifications.success('Success', 'Secret successfully removed');
           $state.go('docker.secrets', {});
         })
         .catch(function error(err) {
