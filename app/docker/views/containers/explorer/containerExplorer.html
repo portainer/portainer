@@ -1,0 +1,163 @@
+<rd-header>
+  <rd-header-title title-text="Container Explorer"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a> &gt; Explorer
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <div class="datatable">
+      <rd-widget>
+        <rd-widget-header icon="fa-folder-open" title-text="{{ explorerService.currentPath }}">
+          <div class="settings">
+            <a class="btn btn-primary btn-sm" type="button" ui-sref="docker.containers.container.explorer.create({ id: container.Id})" ng-disabled="container.IsPortainer"
+              ><i class="fa fa-plus space-right" aria-hidden="true"></i> New folder</a
+            >
+            <a class="btn btn-primary btn-sm" type="button" ui-sref="docker.containers.container.explorer.upload({ id: container.Id})" ng-disabled="container.IsPortainer"
+              ><i class="fa fa-upload space-right" aria-hidden="true"></i> Upload files</a
+            >
+          </div>
+        </rd-widget-header>
+        <rd-widget-body classes="no-padding">
+          <div class="row">
+            <div class="col-sm-4 col-md-3 sidebar file-tree animated slow fadeIn">
+              <ul class="nav nav-sidebar file-tree-root">
+                <li ng-repeat="node in explorerService.history[0].nodes" ng-include="'folder-branch-item'" class="active"></li>
+              </ul>
+            </div>
+            <div class="col-sm-8 col-md-9" ngf-model-options="{updateOn: 'drop', allowInvalid: false, debounce: 0}">
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-xs-12">
+                  <div class="searchBar">
+                    <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+                    <input
+                      type="text"
+                      class="searchInput"
+                      ng-model="$ctrl.state.textFilter"
+                      ng-change="explorerService.onTextFilterChange()"
+                      placeholder="Search..."
+                      auto-focus
+                      ng-model-options="{ debounce: 300 }"
+                    />
+                  </div>
+                  <table class="table mb0 table-files noselect">
+                    <thead>
+                      <tr>
+                        <th>
+                          <a href="" ng-click="order('model.name')">
+                            Name
+                            <span class="sortorder" ng-show="predicate[1] === 'model.name'" ng-class="{ reverse: reverse }"></span>
+                          </a>
+                        </th>
+                        <th class="hidden-xs">
+                          <a href="" ng-click="order('model.size')">
+                            Size
+                            <span class="sortorder" ng-show="predicate[1] === 'model.size'" ng-class="{ reverse: reverse }"></span>
+                          </a>
+                        </th>
+                        <th class="hidden-sm hidden-xs">
+                          <a href="" ng-click="order('model.date')">
+                            Date
+                            <span class="sortorder" ng-show="predicate[1] === 'model.date'" ng-class="{ reverse: reverse }"></span>
+                          </a>
+                        </th>
+                        <th class="hidden-sm hidden-xs">
+                          <a href="" ng-click="order('model.permissions')">
+                            Permissions
+                            <span class="sortorder" ng-show="predicate[1] === 'model.permissions'" ng-class="{ reverse: reverse }"></span>
+                          </a>
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr ng-show="!explorerService.requesting &amp;&amp; explorerService.fileList.length < 1 &amp;&amp; !explorerService.error">
+                        <td colspan="4"> No files in this folder... </td>
+                      </tr>
+
+                      <tr
+                        class="item-list"
+                        ng-repeat="item in $parent.fileList = (explorerService.fileList | filter: {model:{name: query}} | orderBy:predicate:reverse)"
+                        ng-show="!explorerService.requesting"
+                        ng-click="selectOrUnselect(item, $event)"
+                        ng-dblclick="smartClick(item)"
+                        ng-right-click="selectOrUnselect(item, $event)"
+                        ng-class="{ selected: isSelected(item) }"
+                      >
+                        <td>
+                          <a href="">
+                            <i class="fa fa-archive" ng-show="item.model.type === 'dir'"></i>
+                            <i class="fa fa-file" ng-show="item.model.type === 'file'"></i>
+                            {{ item.model.name }}
+                          </a>
+                        </td>
+                        <td class="hidden-xs">{{ item.model.size | humansize }}</td>
+                        <td class="hidden-sm hidden-xs">{{ item.model.date | date: 'yyyy-MM-dd hh:mm:ss' }}</td>
+                        <td class="hidden-sm hidden-xs">{{ item.model.perms }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>
+
+<div id="context-menu" class="dropdown clearfix animated fast fadeIn">
+  <ul class="dropdown-menu dropdown-right-click" role="menu" aria-labelledby="dropdownMenu" ng-show="temps.length">
+    <li ng-show="singleSelection() && singleSelection().isFolder()">
+      <a href="" tabindex="-1" ng-click="smartClick(singleSelection())"> <i class="fal fa-folder-open"></i> open </a>
+    </li>
+    <li class="divider" ng-show="singleSelection() && singleSelection().isFolder()"></li>
+    <li>
+      <a href="" tabindex="-1" ng-click="modal('remove')"> <i class="fa fa-trash"></i> remove </a>
+    </li>
+  </ul>
+</div>
+
+<div id="remove" class="modal animated fadeIn" ng-show="temps.length">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form ng-submit="remove()">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">close</span>
+          </button>
+          <h4 class="modal-title">confirm</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure to delete?
+          <span ng-include data-src="'selected-files-msg'"></span>
+          <div ng-include data-src="'error-bar'" class="clearfix"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+          <button type="submit" class="btn btn-primary" autofocus="autofocus">remove</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="folder-branch-item">
+  <a href="" ng-click="explorerService.folderClick(node.item)" class="animated fast fadeInDown">
+
+      <span class="point">
+          <i class="fa fa-chevron-down" ng-show="isInThisPath(node.absPath)"></i>
+          <i class="fa fa-chevron-right" ng-show="!isInThisPath(node.absPath)"></i>
+      </span>
+
+      <i class="fa fa-archive" ng-show="!isInThisPath(node.absPath)"></i>
+      <i class="fal fa-folder-open" ng-show="isInThisPath(node.absPath)"></i>
+      {{node.name }}
+  </a>
+  <ul class="nav nav-sidebar">
+      <li ng-repeat="node in node.nodes" ng-include="'folder-branch-item'" ng-class="{'active': true }"></li>
+  </ul>
+</script>

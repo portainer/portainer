@@ -50,7 +50,6 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 	}
 
 	id := strconv.Itoa(endpointID)
-
 	prefix := "/" + id + "/agent/docker"
 	if !strings.HasPrefix(r.URL.Path, prefix) {
 		prefix = "/" + id + "/docker"

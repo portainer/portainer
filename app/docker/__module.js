@@ -39,7 +39,13 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
             await StateManager.updateEndpointState(endpoint);
           } catch (e) {
             Notifications.error('Failed loading environment', e);
-            $state.go('portainer.home', {}, { reload: true });
+            $state.go(
+              'portainer.home',
+              {},
+              {
+                reload: true,
+              }
+            );
           }
 
           async function checkEndpointStatus(endpoint) {
@@ -55,7 +61,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
             if (endpoint.Status === status) {
               return;
             }
-            await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
+            await EndpointService.updateEndpoint(endpoint.Id, {
+              Status: status,
+            });
           }
         });
       },
@@ -180,6 +188,39 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
         'content@': {
           templateUrl: './views/containers/stats/containerstats.html',
           controller: 'ContainerStatsController',
+        },
+      },
+    };
+
+    const containerExplorer = {
+      name: 'docker.containers.container.explorer',
+      url: '/explorer',
+      views: {
+        'content@': {
+          templateUrl: './views/containers/explorer/containerExplorer.html',
+          controller: 'ContainerExplorerController',
+        },
+      },
+    };
+
+    const containerExplorerCreate = {
+      name: 'docker.containers.container.explorer.create',
+      url: '/create',
+      views: {
+        'content@': {
+          templateUrl: './views/containers/explorer/create/index.html',
+          controller: 'ContainerExplorerCreateController',
+        },
+      },
+    };
+
+    const containerExplorerUpload = {
+      name: 'docker.containers.container.explorer.upload',
+      url: '/upload',
+      views: {
+        'content@': {
+          templateUrl: './views/containers/explorer/upload/index.html',
+          controller: 'ContainerExplorerUploadController',
         },
       },
     };
@@ -621,6 +662,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     $stateRegistryProvider.register(containerInspect);
     $stateRegistryProvider.register(containerLogs);
     $stateRegistryProvider.register(containerStats);
+    $stateRegistryProvider.register(containerExplorer);
+    $stateRegistryProvider.register(containerExplorerCreate);
+    $stateRegistryProvider.register(containerExplorerUpload);
     $stateRegistryProvider.register(customTemplates);
     $stateRegistryProvider.register(customTemplatesNew);
     $stateRegistryProvider.register(customTemplatesEdit);

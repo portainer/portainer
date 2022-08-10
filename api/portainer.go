@@ -1297,6 +1297,7 @@ type (
 		CopySSLCertPair(certPath, keyPath string) (string, string, error)
 		CopySSLCACert(caCertPath string) (string, error)
 		StoreFDOProfileFileFromBytes(fdoProfileIdentifier string, data []byte) (string, error)
+		StoreDockerContainerTempFile(fileName string, r io.Reader) error
 	}
 
 	// GitService represents a service for managing Git
@@ -1662,6 +1663,7 @@ const (
 	OperationDockerContainerExport              Authorization = "DockerContainerExport"
 	OperationDockerContainerChanges             Authorization = "DockerContainerChanges"
 	OperationDockerContainerInspect             Authorization = "DockerContainerInspect"
+	OperationDockerContainerExplorer            Authorization = "DockerContainerExplorer"
 	OperationDockerContainerTop                 Authorization = "DockerContainerTop"
 	OperationDockerContainerLogs                Authorization = "DockerContainerLogs"
 	OperationDockerContainerStats               Authorization = "DockerContainerStats"

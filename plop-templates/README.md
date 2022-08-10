@@ -10,7 +10,7 @@ yarn plop exampleComponent
 this will create the following files and folders:
 
 ```
-example-component/index.js - the component file
+example-component/index.ts - the component file
 example-component/exampleComponent.html - the template file
 example-component/exampleComponentController.js - the component controller file
 ```

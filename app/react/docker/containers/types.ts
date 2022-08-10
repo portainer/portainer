@@ -19,7 +19,13 @@ export type DockerContainerStatus =
   | 'dead'
   | 'exited';
 
-export type QuickAction = 'attach' | 'exec' | 'inspect' | 'logs' | 'stats';
+export type QuickAction =
+  | 'attach'
+  | 'exec'
+  | 'inspect'
+  | 'logs'
+  | 'stats'
+  | 'explorer';
 
 export interface ContainersTableSettings
   extends SortableTableSettings,

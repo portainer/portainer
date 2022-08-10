@@ -5,6 +5,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/demo"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
@@ -43,6 +44,7 @@ type Handler struct {
 	ReverseTunnelService portainer.ReverseTunnelService
 	SnapshotService      portainer.SnapshotService
 	K8sClientFactory     *cli.ClientFactory
+	DockerClientFactory  *docker.ClientFactory
 	ComposeStackManager  portainer.ComposeStackManager
 	AuthorizationService *authorization.Service
 	BindAddress          string
@@ -57,31 +59,22 @@ func NewHandler(bouncer requestBouncer, demoService *demo.Service) *Handler {
 		demoService:    demoService,
 	}
 
-	h.Handle("/endpoints",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointCreate))).Methods(http.MethodPost)
-	h.Handle("/endpoints/{id}/settings",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSettingsUpdate))).Methods(http.MethodPut)
-	h.Handle("/endpoints/{id}/association",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointAssociationDelete))).Methods(http.MethodDelete)
-	h.Handle("/endpoints/snapshot",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshots))).Methods(http.MethodPost)
-	h.Handle("/endpoints",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
-	h.Handle("/endpoints/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
-	h.Handle("/endpoints/{id}/dockerhub/{registryId}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}/snapshot",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
-	h.Handle("/endpoints/{id}/registries",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistriesList))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}/registries/{registryId}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryAccess))).Methods(http.MethodPut)
-
+	h.Handle("/endpoints", bouncer.AdminAccess(httperror.LoggerHandler(h.endpointCreate))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}/settings", bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSettingsUpdate))).Methods(http.MethodPut)
+	h.Handle("/endpoints/{id}/association", bouncer.AdminAccess(httperror.LoggerHandler(h.endpointAssociationDelete))).Methods(http.MethodDelete)
+	h.Handle("/endpoints/snapshot", bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshots))).Methods(http.MethodPost)
+	h.Handle("/endpoints", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/explorer/{containerId}/list", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExplorer))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}/explorer/{containerId}/create", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExplorerCreate))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}/explorer/{containerId}/remove", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExplorerRemove))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}/explorer/{containerId}/upload", bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExplorerUpload))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}", bouncer.AdminAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
+	h.Handle("/endpoints/{id}", bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
+	h.Handle("/endpoints/{id}/dockerhub/{registryId}", bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/snapshot", bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}/registries", bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistriesList))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/registries/{registryId}", bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryAccess))).Methods(http.MethodPut)
 	h.Handle("/endpoints/global-key", httperror.LoggerHandler(h.endpointCreateGlobalKey)).Methods(http.MethodPost)
 
 	// DEPRECATED

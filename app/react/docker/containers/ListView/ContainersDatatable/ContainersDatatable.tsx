@@ -133,6 +133,7 @@ export function ContainersDatatable({
     buildAction('stats', 'Stats'),
     buildAction('exec', 'Console'),
     buildAction('attach', 'Attach'),
+    buildAction('explorer', 'Explorer'),
   ];
 
   const tableProps = getTableProps();
