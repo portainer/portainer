@@ -165,12 +165,6 @@
   vertical-align: middle;
 }
 
-[data-reach-menu-list],
-[data-reach-menu-items] {
-  padding: 0px;
-  border: 1px var(--bg-dropdown-menu-color);
-}
-
 .datatable thead tr > th {
   white-space: nowrap;
   vertical-align: middle;
@@ -357,7 +351,8 @@
 
 [data-reach-menu-list],
 [data-reach-menu-items] {
-  background: none;
+  padding: 0px;
+  border: 1px var(--bg-dropdown-menu-color);
 }
 
 .dropdown-menu .tableMenu {
