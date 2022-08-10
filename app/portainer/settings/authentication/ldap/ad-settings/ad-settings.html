@@ -20,8 +20,8 @@
 
   <div class="form-group">
     <div class="col-sm-12 small text-muted">
-      <p>
-        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+      <p class="vertical-center">
+        <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
         You can configure multiple AD Controllers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all use
         the same certificates).
       </p>
@@ -33,13 +33,14 @@
       AD Controller
       <button
         type="button"
-        class="label label-default interactive"
+        class="label label-default interactive vertical-center"
         style="border: 0"
         ng-click="$ctrl.addLDAPUrl()"
         limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
         limited-feature-tabindex="-1"
       >
-        <i class="fa fa-plus-circle" aria-hidden="true"></i> Add additional server
+        <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+        Add additional server
       </button>
     </label>
     <div class="col-sm-9 col-lg-10">
@@ -61,7 +62,7 @@
           limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
           limited-feature-tabindex="-1"
         >
-          <i class="fa fa-trash" aria-hidden="true"></i>
+          <pr-icon icon="'trash-2'" feather="true"></pr-icon>
         </button>
       </div>
     </div>
