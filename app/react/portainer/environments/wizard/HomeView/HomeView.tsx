@@ -32,7 +32,7 @@ export function HomeView() {
                 <div className="text-muted small">
                   {localEnvironmentAdded.status === 'success' && (
                     <p>
-                      We have connected your local environment of
+                      We have connected your local environment of{' '}
                       {getTypeLabel(localEnvironmentAdded.type)} to Portainer.
                     </p>
                   )}
