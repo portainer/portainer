@@ -96,6 +96,10 @@ form a,
   color: var(--ui-blue-8);
 }
 
+.form-group a.hyperlink-alt {
+  color: var(--ui-white);
+}
+
 form a:hover,
 .form-group a:hover,
 .hyperlink:hover {
