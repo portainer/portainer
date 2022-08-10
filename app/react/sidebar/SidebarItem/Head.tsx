@@ -34,7 +34,7 @@ export function Head({
   const { isOpen } = useSidebarState();
   const anchorProps = useSrefActive(
     to,
-    'bg-blue-8 be:bg-gray-8',
+    'bg-blue-8 be:bg-gray-8 th-dark:bg-gray-9',
     params,
     options,
     ignorePaths

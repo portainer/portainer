@@ -318,7 +318,6 @@ json-tree .branch-preview {
 }
 
 input,
-button,
 select,
 textarea {
   background: var(--text-input-textarea);
@@ -408,10 +407,6 @@ input:-webkit-autofill {
 
 .btn-primary:hover {
   color: var(--white-color) !important;
-}
-
-.btn-danger:hover {
-  color: var(--white-color);
 }
 
 .btn-success:hover {

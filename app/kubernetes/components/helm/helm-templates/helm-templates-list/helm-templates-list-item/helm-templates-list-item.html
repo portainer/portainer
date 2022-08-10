@@ -12,9 +12,11 @@
         size="'xl'"
       ></fallback-image>
     </span>
-    <span class="blocklist-item-logo vertical-center" ng-if="!$ctrl.model.icon">
-      <pr-icon icon="'svg-helm'" mode="'primary'" class-name="'icon-nested-blue'"></pr-icon>
-    </span>
+
+    <div class="widget-icon space-right" ng-if="!$ctrl.model.icon">
+      <pr-icon icon="'svg-helm'"></pr-icon>
+    </div>
+
     <!-- !helmchart-image -->
     <!-- helmchart-details -->
     <div class="col-sm-12 helm-template-item-details">

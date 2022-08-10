@@ -3,7 +3,9 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar show-dropdown">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          <div class="widget-icon space-right">
+            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+          </div>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
@@ -29,7 +31,7 @@
               ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
               data-cy="image-removeImageButton"
             >
-              <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>Remove
+              <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
             </button>
             <button
               type="button"
@@ -58,24 +60,24 @@
           <div class="btn-group">
             <button
               type="button"
-              class="btn btn-sm btn-secondary h-fit vertical-center !ml-0"
+              class="btn btn-sm btn-secondary h-fit"
               ui-sref="docker.images.import"
               authorization="DockerImageLoad"
               ng-disabled="$ctrl.exportInProgress"
               data-cy="image-importImageButton"
             >
-              <pr-icon icon="'upload'" feather="true" mode="'secondary'"></pr-icon>Import
+              <pr-icon icon="'upload'" feather="true"></pr-icon>Import
             </button>
             <button
               type="button"
-              class="btn btn-sm btn-secondary h-fit vertical-center !ml-0"
+              class="btn btn-sm btn-secondary h-fit"
               ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.exportInProgress"
               ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)"
               button-spinner="$ctrl.exportInProgress"
               authorization="DockerImageGet"
               data-cy="image-exportImageButton"
             >
-              <pr-icon icon="'download'" feather="true" mode="'secondary'"></pr-icon>
+              <pr-icon icon="'download'" feather="true"></pr-icon>
               <span ng-hide="$ctrl.exportInProgress">Export</span>
               <span ng-show="$ctrl.exportInProgress">Export in progress...</span>
             </button>

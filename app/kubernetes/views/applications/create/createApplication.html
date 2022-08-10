@@ -199,7 +199,6 @@
                         ng-model="ctrl.formValues.StackName"
                         name="stack_name"
                         uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7"
-                        typeahead-show-hint="true"
                         typeahead-min-length="0"
                         data-cy="k8sAppCreate-stackName"
                       />

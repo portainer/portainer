@@ -47,7 +47,6 @@
                   ng-model="ctrl.state.command"
                   name="console_command"
                   uib-typeahead="command for command in ctrl.state.availableCommands | filter:$viewValue | limitTo:5"
-                  typeahead-show-hint="true"
                   typeahead-min-length="0"
                   auto-focus
                 />

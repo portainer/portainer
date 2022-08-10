@@ -33,7 +33,7 @@ export function Option({
   return (
     <button
       className={clsx(
-        styles.optionTile,
+        styles.root,
         isLimited ? styles.teaser : styles.feature,
         'border-0',
         {
