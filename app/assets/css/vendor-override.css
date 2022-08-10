@@ -215,6 +215,7 @@ code {
 
 pre {
   border: 1px solid var(--border-pre-color);
+  border-radius: 8px;
   background-color: var(--bg-pre-color);
   color: var(--text-pre-color);
 }

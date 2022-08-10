@@ -92,7 +92,8 @@
 
 form a,
 .form-group a,
-.hyperlink {
+.hyperlink,
+.hyperlink:focus {
   color: var(--ui-blue-8);
 }
 

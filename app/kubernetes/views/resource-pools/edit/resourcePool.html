@@ -473,7 +473,7 @@
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center"><pr-icon icon="'code'" feather="true"></pr-icon> YAML </uib-tab-heading>
-              <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
+              <div class="px-5" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="resource-pool-yaml" data="ctrl.pool.Yaml"></kubernetes-yaml-inspector>
               </div>
             </uib-tab>

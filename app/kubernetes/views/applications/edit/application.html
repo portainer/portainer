@@ -200,7 +200,7 @@
 
             <uib-tab index="3" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading> <pr-icon icon="'code'" feather="true"></pr-icon> YAML </uib-tab-heading>
-              <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
+              <div class="px-5" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="application-yaml" data="ctrl.application.Yaml"></kubernetes-yaml-inspector>
               </div>
             </uib-tab>
@@ -457,7 +457,10 @@
                     {{ volume.MountPath }}
                   </td>
                   <td ng-if="volume.PersistentVolumeClaimName">
-                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName, namespace: ctrl.application.ResourcePool })" data-cy="k8sAppDetail-volClaimName"
+                    <a
+                      class="hyperlink"
+                      ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName, namespace: ctrl.application.ResourcePool })"
+                      data-cy="k8sAppDetail-volClaimName"
                       ><pr-icon icon="'database'" class="mr-1" feather="true"></pr-icon>{{ volume.PersistentVolumeClaimName }}</a
                     >
                   </td>
@@ -492,7 +495,10 @@
                     {{ volume.MountPath }}
                   </td>
                   <td ng-if="volume.PersistentVolumeClaimName">
-                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + container.PodName, namespace: ctrl.application.ResourcePool })">
+                    <a
+                      class="hyperlink"
+                      ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + container.PodName, namespace: ctrl.application.ResourcePool })"
+                    >
                       <pr-icon icon="'database'" class="mr-1" feather="true"></pr-icon>{{ volume.PersistentVolumeClaimName + '-' + container.PodName }}</a
                     >
                   </td>
