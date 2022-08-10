@@ -119,7 +119,8 @@
               $ctrl.registry.Type !== $ctrl.RegistryTypes.DOCKERHUB &&
               $ctrl.registry.Type !== $ctrl.RegistryTypes.QUAY &&
               $ctrl.registry.Type !== $ctrl.RegistryTypes.PROGET &&
-              $ctrl.registry.Type !== $ctrl.RegistryTypes.AZURE
+              $ctrl.registry.Type !== $ctrl.RegistryTypes.AZURE &&
+              $ctrl.registry.Type !== $ctrl.RegistryTypes.GITLAB
             "
           >
             <label for="registry_auth" class="col-sm-3 col-lg-2 control-label text-left">
@@ -156,11 +157,19 @@
             <!-- !credentials-user -->
             <!-- credentials-password -->
             <div class="form-group">
-              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left required">
+              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">
                 {{ $ctrl.passwordLabel() }}
               </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="credentials_password" name="credentials_password" ng-model="$ctrl.Password" autocomplete="off" required />
+                <input
+                  type="password"
+                  class="form-control"
+                  id="credentials_password"
+                  name="credentials_password"
+                  placeholder="*******"
+                  ng-model="$ctrl.Password"
+                  autocomplete="off"
+                />
               </div>
             </div>
             <div class="form-group" ng-show="editRegistry.credentials_password.$invalid">
@@ -173,6 +182,26 @@
                 </div>
               </div>
             </div>
+            <!-- region -->
+            <div ng-if="$ctrl.registry.Type == $ctrl.RegistryTypes.ECR">
+              <div class="form-group">
+                <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left required">Region</label>
+                <div class="col-sm-9 col-lg-10">
+                  <input type="text" class="form-control" id="registry_region" name="registry_region" ng-model="$ctrl.registry.Ecr.Region" placeholder="us-west-1" required />
+                </div>
+              </div>
+              <div class="form-group" ng-show="editRegistry.registry_region.$invalid">
+                <div class="col-sm-12 small text-warning">
+                  <div ng-messages="editRegistry.registry_region.$error">
+                    <p ng-message="required" class="vertical-center">
+                      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                      This field is required.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- !region -->
             <!-- !credentials-password -->
           </div>
           <!-- !authentication-credentials -->
@@ -210,27 +239,6 @@
               </div>
               <!-- !organisation_name -->
             </div>
-          </div>
-
-          <div ng-if="$ctrl.registry.Type == $ctrl.RegistryTypes.ECR">
-            <!-- region -->
-            <div class="form-group">
-              <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left required">Region</label>
-              <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="registry_region" name="registry_region" ng-model="$ctrl.registry.Ecr.Region" placeholder="us-west-1" required />
-              </div>
-            </div>
-            <div class="form-group" ng-show="editRegistry.registry_region.$invalid">
-              <div class="col-sm-12 small text-warning">
-                <div ng-messages="editRegistry.registry_region.$error">
-                  <p ng-message="required" class="vertical-center">
-                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
-                    This field is required.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <!-- !region -->
           </div>
 
           <div class="form-group">
