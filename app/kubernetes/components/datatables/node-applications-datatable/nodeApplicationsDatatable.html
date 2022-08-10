@@ -10,19 +10,19 @@
             {{ $ctrl.titleText }}
           </span>
         </div>
+        <div class="searchBar min-w-[260px]">
+          <pr-icon icon="'search'" class="vertical-center" class-name="'searchIcon'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput ml-1"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for an application..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
         <div class="settings vertical-center">
-          <div class="searchBar min-w-[260px]">
-            <pr-icon icon="'search'" class="vertical-center" class-name="'searchIcon'" feather="true"></pr-icon>
-            <input
-              type="text"
-              class="searchInput ml-1"
-              ng-model="$ctrl.state.textFilter"
-              ng-change="$ctrl.onTextFilterChange()"
-              placeholder="Search for an application..."
-              auto-focus
-              ng-model-options="{ debounce: 300 }"
-            />
-          </div>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>

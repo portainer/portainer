@@ -27,11 +27,11 @@
   background: rgb(245, 245, 245);
   border-top: 1px solid rgb(190, 190, 190);
 
-  padding: 0 30px;
+  padding: 0 16px;
 }
 
 .title {
-  font-weight: bold;
+  font-weight: 500;
   font-size: 14px;
 }
 

@@ -526,7 +526,7 @@
                             "
                           >
                             <label
-                              class="btn btn-primary"
+                              class="btn btn-light"
                               ng-model="persistedFolder.UseNewVolume"
                               uib-btn-radio="true"
                               ng-change="ctrl.useNewVolume($index)"
@@ -534,7 +534,7 @@
                               >New volume</label
                             >
                             <label
-                              class="btn btn-primary"
+                              class="btn btn-light"
                               ng-model="persistedFolder.UseNewVolume"
                               uib-btn-radio="false"
                               ng-change="ctrl.useExistingVolume($index)"
@@ -548,7 +548,7 @@
                           <span class="input-group-addon required">requested size</span>
                           <input
                             type="number"
-                            class="form-control"
+                            class="form-control !rounded-none"
                             name="persisted_folder_size_{{ $index }}"
                             ng-model="persistedFolder.Size"
                             placeholder="20"
@@ -557,9 +557,9 @@
                             ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
                             ng-change="ctrl.onChangeVolumeRequestedSize()"
                           />
-                          <span class="input-group-addon" style="padding: 0">
+                          <span class="input-group-addon !p-0 !rounded-r-[5px]">
                             <select
-                              class="w-12"
+                              class="form-control w-12 !h-[28px] !border-none !rounded-r-[5px] text-xs"
                               ng-model="persistedFolder.SizeUnit"
                               ng-style="{ height: '100%', cursor: ctrl.isEditAndExistingPersistedFolder($index) ? 'not-allowed' : 'auto' }"
                               ng-options="unit for unit in ctrl.state.availableSizeUnits"
@@ -656,9 +656,7 @@
                           </div>
                         </div>
 
-                        <div class="w-[202px]"></div>
-
-                        <div class="input-group col-sm-5 input-group-sm">
+                        <div class="input-group col-sm-offset-2 col-sm-3 input-group-sm">
                           <div
                             class="small text-muted"
                             style="margin-top: 5px"

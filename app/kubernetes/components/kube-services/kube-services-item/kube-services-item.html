@@ -6,7 +6,7 @@
     </p>
   </div>
   <div ng-if="!$ctrl.isAdmin()" class="small" ng-show="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">
-    <p style="margin-top: 10px"> <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon> No Load balancer is available in this cluster, contract your administrator. </p>
+    <p style="margin-top: 10px"> <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon> No Load balancer is available in this cluster, contact your administrator. </p>
   </div>
 
   <div
@@ -103,6 +103,7 @@
             placeholder="30080"
             ng-min="30000"
             ng-max="32767"
+            required
             ng-change="$ctrl.onChangeNodePort()"
             data-cy="k8sAppCreate-nodeportPort_{{ $index }}"
           />
@@ -111,6 +112,7 @@
           <span>
             <div class="small mt-1 text-muted">
               <div ng-messages="serviceForm['node_port_'+$index].$error">
+                <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Node port is required.</p>
                 <p class="vertical-center" ng-message="min"
                   ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Node port number must be inside the range 30000-32767 or blank for system
                   allocated.</p

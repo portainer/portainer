@@ -131,7 +131,9 @@
                   ng-click="$ctrl.changeOrderBy('IPAddress')"
                 ></table-column-header>
               </th>
-              <th ng-if="$ctrl.useServerMetrics"> Actions </th>
+              <th ng-if="$ctrl.useServerMetrics">
+                <table-column-header col-title="'Actions'" can-sort="false"></table-column-header>
+              </th>
             </tr>
           </thead>
           <tbody>

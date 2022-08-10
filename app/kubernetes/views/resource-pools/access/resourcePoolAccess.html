@@ -44,6 +44,14 @@
         <rd-widget-body>
           <form class="form-horizontal">
             <div class="form-group">
+              <span class="col-sm-12 small text-muted">
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                  Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
+                </p>
+              </span>
+            </div>
+            <div class="form-group">
               <label class="col-sm-3 col-lg-2 control-label text-left"> Select user(s) and/or team(s) </label>
               <div class="col-sm-9 col-lg-4">
                 <span class="small text-muted" ng-if="ctrl.availableUsersAndTeams.length === 0">
