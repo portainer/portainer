@@ -18,18 +18,26 @@ type filterTest struct {
 
 func Test_Filter_AgentVersion(t *testing.T) {
 
-	version1Endpoint := portainer.Endpoint{ID: 1, GroupID: 1, Agent: struct {
-		Version string "example:\"1.0.0\""
-	}{Version: "1.0.0"}}
-	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1, Agent: struct {
-		Version string "example:\"1.0.0\""
-	}{Version: "2.0.0"}}
-	noVersionEndpoint := portainer.Endpoint{ID: 3, GroupID: 1}
+	version1Endpoint := portainer.Endpoint{ID: 1, GroupID: 1,
+		Type: portainer.AgentOnDockerEnvironment,
+		Agent: struct {
+			Version string "example:\"1.0.0\""
+		}{Version: "1.0.0"}}
+	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1,
+		Type: portainer.AgentOnDockerEnvironment,
+		Agent: struct {
+			Version string "example:\"1.0.0\""
+		}{Version: "2.0.0"}}
+	noVersionEndpoint := portainer.Endpoint{ID: 3, GroupID: 1,
+		Type: portainer.AgentOnDockerEnvironment,
+	}
+	notAgentEnvironments := portainer.Endpoint{ID: 4, Type: portainer.DockerEnvironment, GroupID: 1}
 
 	endpoints := []portainer.Endpoint{
 		version1Endpoint,
 		version2Endpoint,
 		noVersionEndpoint,
+		notAgentEnvironments,
 	}
 
 	handler, teardown := setupFilterTest(t, endpoints)
@@ -42,6 +50,7 @@ func Test_Filter_AgentVersion(t *testing.T) {
 			[]portainer.EndpointID{version1Endpoint.ID},
 			EnvironmentsQuery{
 				agentVersions: []string{version1Endpoint.Agent.Version},
+				types:         []portainer.EndpointType{portainer.AgentOnDockerEnvironment},
 			},
 		},
 		{
@@ -49,6 +58,7 @@ func Test_Filter_AgentVersion(t *testing.T) {
 			[]portainer.EndpointID{version2Endpoint.ID},
 			EnvironmentsQuery{
 				agentVersions: []string{version2Endpoint.Agent.Version},
+				types:         []portainer.EndpointType{portainer.AgentOnDockerEnvironment},
 			},
 		},
 		{
@@ -56,6 +66,7 @@ func Test_Filter_AgentVersion(t *testing.T) {
 			[]portainer.EndpointID{version2Endpoint.ID, version1Endpoint.ID},
 			EnvironmentsQuery{
 				agentVersions: []string{version2Endpoint.Agent.Version, version1Endpoint.Agent.Version},
+				types:         []portainer.EndpointType{portainer.AgentOnDockerEnvironment},
 			},
 		},
 	}

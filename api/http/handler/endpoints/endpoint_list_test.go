@@ -23,15 +23,24 @@ type endpointListTest struct {
 
 func Test_EndpointList_AgentVersion(t *testing.T) {
 
-	version1Endpoint := portainer.Endpoint{ID: 1, GroupID: 1, Agent: struct {
-		Version string "example:\"1.0.0\""
-	}{Version: "1.0.0"}}
-	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1, Agent: struct {
+	version1Endpoint := portainer.Endpoint{
+		ID:      1,
+		GroupID: 1,
+		Type:    portainer.AgentOnDockerEnvironment,
+		Agent: struct {
+			Version string "example:\"1.0.0\""
+		}{
+			Version: "1.0.0",
+		},
+	}
+	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1, Type: portainer.AgentOnDockerEnvironment, Agent: struct {
 		Version string "example:\"1.0.0\""
 	}{Version: "2.0.0"}}
-	noVersionEndpoint := portainer.Endpoint{ID: 3, GroupID: 1}
+	noVersionEndpoint := portainer.Endpoint{ID: 3, Type: portainer.AgentOnDockerEnvironment, GroupID: 1}
+	notAgentEnvironments := portainer.Endpoint{ID: 4, Type: portainer.DockerEnvironment, GroupID: 1}
 
 	handler, teardown := setup(t, []portainer.Endpoint{
+		notAgentEnvironments,
 		version1Endpoint,
 		version2Endpoint,
 		noVersionEndpoint,
@@ -47,22 +56,22 @@ func Test_EndpointList_AgentVersion(t *testing.T) {
 	tests := []endpointListAgentVersionTest{
 		{
 			endpointListTest{
-				"should show version 1 endpoints",
-				[]portainer.EndpointID{version1Endpoint.ID},
+				"should show version 1 agent endpoints and non-agent endpoints",
+				[]portainer.EndpointID{version1Endpoint.ID, notAgentEnvironments.ID},
 			},
 			[]string{version1Endpoint.Agent.Version},
 		},
 		{
 			endpointListTest{
-				"should show version 2 endpoints",
-				[]portainer.EndpointID{version2Endpoint.ID},
+				"should show version 2 endpoints and non-agent endpoints",
+				[]portainer.EndpointID{version2Endpoint.ID, notAgentEnvironments.ID},
 			},
 			[]string{version2Endpoint.Agent.Version},
 		},
 		{
 			endpointListTest{
-				"should show version 1 and 2 endpoints",
-				[]portainer.EndpointID{version2Endpoint.ID, version1Endpoint.ID},
+				"should show version 1 and 2 endpoints and non-agent endpoints",
+				[]portainer.EndpointID{version2Endpoint.ID, notAgentEnvironments.ID, version1Endpoint.ID},
 			},
 			[]string{version2Endpoint.Agent.Version, version1Endpoint.Agent.Version},
 		},

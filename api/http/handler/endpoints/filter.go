@@ -141,7 +141,7 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 
 	if len(query.agentVersions) > 0 {
 		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
-			return slices.Contains(query.agentVersions, endpoint.Agent.Version)
+			return !endpointutils.IsAgentEndpoint(&endpoint) || contains(query.agentVersions, endpoint.Agent.Version)
 		})
 	}
 
@@ -422,4 +422,14 @@ func getNumberArrayQueryParameter[T ~int](r *http.Request, parameter string) ([]
 	}
 
 	return result, nil
+}
+
+func contains(strings []string, param string) bool {
+	for _, str := range strings {
+		if str == param {
+			return true
+		}
+	}
+
+	return false
 }
