@@ -329,25 +329,6 @@ input:checked + .slider:before {
   border: 0px;
 }
 
-/* Databatle Setting Menu */
-
-.tableMenu {
-  border: 1px solid var(--border-bootbox);
-  border-radius: 8px;
-}
-
-[data-reach-menu-list],
-[data-reach-menu-items] {
-  background: none;
-}
-
-.dropdown-menu {
-  border-radius: 8px;
-}
-.dropdown-menu .tableMenu {
-  border: 0px;
-}
-
 /* Status Indicator Inside Table Section Label Style */
 .table .label {
   border-radius: 8px !important;

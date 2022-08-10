@@ -171,25 +171,6 @@
   border: 1px var(--bg-dropdown-menu-color);
 }
 
-.tableMenu {
-  color: #767676;
-  padding: 15px;
-  background-color: var(--bg-dropdown-menu-color) !important;
-}
-
-.tableMenu .menuHeader {
-  font-size: 16px;
-}
-
-.tableMenu .menuContent {
-  font-size: 12px;
-  margin: 10px 0;
-}
-
-.tableMenu .menuContent .md-radio:first-child {
-  margin: 0;
-}
-
 .datatable thead tr > th {
   white-space: nowrap;
   vertical-align: middle;
@@ -361,4 +342,37 @@
   border: 1px solid var(--border-widget);
   border-radius: 8px;
   flex-grow: 2;
+}
+
+/* Databatle Setting Menu */
+
+.tableMenu {
+  border: 1px solid var(--border-bootbox);
+  border-radius: 8px;
+
+  color: var(--text-dropdown-menu-color);
+  padding: 15px;
+  background-color: var(--bg-dropdown-menu-color) !important;
+}
+
+[data-reach-menu-list],
+[data-reach-menu-items] {
+  background: none;
+}
+
+.dropdown-menu .tableMenu {
+  border: 0px;
+}
+
+.tableMenu .menuHeader {
+  font-size: 16px;
+}
+
+.tableMenu .menuContent {
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+.tableMenu .menuContent .md-radio:first-child {
+  margin: 0;
 }
