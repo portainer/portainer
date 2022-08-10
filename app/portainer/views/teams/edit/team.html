@@ -69,11 +69,13 @@
             <thead>
               <tr>
                 <th>
-                  <a ng-click="orderUsers('Username')">
-                    Name
-                    <span ng-show="sortTypeUsers == 'Username' && !sortReverseUsers" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortTypeUsers == 'Username' && sortReverseUsers" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
+                  <table-column-header
+                  col-title="'Name'"
+                  can-sort="true"
+                  is-sorted="sortTypeUsers === 'Username'"
+                  is-sorted-desc="sortTypeUsers === 'Username' && sortReverseUsers"
+                  ng-click="orderUsers('Username')"
+                ></table-column-header>
                 </th>
               </tr>
             </thead>
@@ -143,18 +145,22 @@
             <thead>
               <tr>
                 <th>
-                  <a ng-click="orderGroupMembers('Username')">
-                    Name
-                    <span ng-show="sortTypeGroupMembers == 'Username' && !sortReverseGroupMembers" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortTypeGroupMembers == 'Username' && sortReverseGroupMembers" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
+                  <table-column-header
+                  col-title="'Name'"
+                  can-sort="true"
+                  is-sorted="sortTypeGroupMembers === 'Username'"
+                  is-sorted-desc="sortTypeGroupMembers === 'Username' && sortReverseGroupMembers"
+                  ng-click="orderGroupMembers('Username')"
+                ></table-column-header>
                 </th>
                 <th>
-                  <a ng-click="orderGroupMembers('TeamRole')">
-                    Team Role
-                    <span ng-show="sortTypeGroupMembers == 'TeamRole' && !sortReverseGroupMembers" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortTypeGroupMembers == 'TeamRole' && sortReverseGroupMembers" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
+                  <table-column-header
+                  col-title="'Team Role'"
+                  can-sort="true"
+                  is-sorted="sortTypeGroupMembers === 'TeamRole'"
+                  is-sorted-desc="sortTypeGroupMembers === 'TeamRole' && sortReverseGroupMembers"
+                  ng-click="orderGroupMembers('TeamRole')"
+                ></table-column-header>
                 </th>
               </tr>
             </thead>
