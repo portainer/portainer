@@ -43,31 +43,31 @@
                     <label for="select_all"></label>
                   </span>
                   <table-column-header
-                  col-title="'Name'"
+                    col-title="'Name'"
+                    can-sort="true"
+                    is-sorted="$ctrl.state.orderBy === 'Username'"
+                    is-sorted-desc="$ctrl.state.orderBy === 'Username' && $ctrl.state.reverseOrder"
+                    ng-click="$ctrl.changeOrderBy('Username')"
+                  ></table-column-header>
+                </div>
+              </th>
+              <th>
+                <table-column-header
+                  col-title="'Role'"
                   can-sort="true"
-                  is-sorted="$ctrl.state.orderBy === 'Username'"
-                  is-sorted-desc="$ctrl.state.orderBy === 'Username' && $ctrl.state.reverseOrder"
-                  ng-click="$ctrl.changeOrderBy('Username')"
+                  is-sorted="$ctrl.state.orderBy === 'RoleName'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'RoleName' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('RoleName')"
                 ></table-column-header>
-              </div>
               </th>
               <th>
                 <table-column-header
-                col-title="'Role'"
-                can-sort="true"
-                is-sorted="$ctrl.state.orderBy === 'RoleName'"
-                is-sorted-desc="$ctrl.state.orderBy === 'RoleName' && $ctrl.state.reverseOrder"
-                ng-click="$ctrl.changeOrderBy('RoleName')"
-              ></table-column-header>
-              </th>
-              <th>
-                <table-column-header
-                col-title="'Authentication'"
-                can-sort="true"
-                is-sorted="$ctrl.state.orderBy === 'AuthenticationMethod'"
-                is-sorted-desc="$ctrl.state.orderBy === 'AuthenticationMethod' && $ctrl.state.reverseOrder"
-                ng-click="$ctrl.changeOrderBy('AuthenticationMethod')"
-              ></table-column-header>
+                  col-title="'Authentication'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'AuthenticationMethod'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'AuthenticationMethod' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('AuthenticationMethod')"
+                ></table-column-header>
               </th>
             </tr>
           </thead>
