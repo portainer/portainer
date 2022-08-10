@@ -476,7 +476,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       if (!gpuOptions.enabled) {
         return;
       }
-      const deviceRequest = existingDeviceRequest || {
+      const deviceRequest = {
         Driver: driver,
         Count: -1,
         DeviceIDs: [], // must be empty if Count != 0 https://github.com/moby/moby/blob/master/daemon/nvidia_linux.go#L50
