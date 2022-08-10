@@ -17,7 +17,7 @@ angular.module('portainer.app').controller('CreateGroupController', function Cre
     $scope.state.actionInProgress = true;
     GroupService.createGroup(model, associatedEndpoints)
       .then(function success() {
-        Notifications.success('Group successfully created');
+        Notifications.success('Success', 'Group successfully created');
         $state.go('portainer.groups', {}, { reload: true });
       })
       .catch(function error(err) {

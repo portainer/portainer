@@ -4,7 +4,9 @@
     <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
       <!-- title -->
       <div class="toolBarTitle vertical-center">
-        <pr-icon icon="'list'" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+        <div class="widget-icon space-right">
+          <pr-icon icon="'list'" feather="true"></pr-icon>
+        </div>
         Stacks
       </div>
       <!-- actions -->
@@ -26,12 +28,12 @@
           class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
           ng-disabled="$ctrl.state.selectedItemCount === 0"
           ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-          data-cy="k8sApp-removeAppButton"
+          data-cy="k8sApp-removeStackButton"
         >
           <pr-icon icon="'trash-2'" feather="true"></pr-icon>
           Remove
         </button>
-        <div class="settings" data-cy="k8sApp-tableSettings">
+        <div class="settings" data-cy="k8sApp-StackTableSettings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle>
               <pr-icon icon="'more-vertical'" feather="true" class-name="'!mr-0 !h-4'"></pr-icon>
@@ -51,7 +53,7 @@
                         type="checkbox"
                         ng-model="$ctrl.settings.repeater.autoRefresh"
                         ng-change="$ctrl.onSettingsRepeaterChange()"
-                        data-cy="k8sApp-autoRefreshCheckbox"
+                        data-cy="k8sApp-autoRefreshCheckbox-stack"
                       />
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
@@ -62,7 +64,7 @@
                         ng-model="$ctrl.settings.repeater.refreshRate"
                         ng-change="$ctrl.onSettingsRepeaterChange()"
                         class="small-select"
-                        data-cy="k8sApp-refreshRateDropdown"
+                        data-cy="k8sApp-refreshRateDropdown-stack"
                       >
                         <option value="10">10s</option>
                         <option value="30">30s</option>
@@ -77,7 +79,7 @@
                   </div>
                 </div>
                 <div>
-                  <a type="button" class="btn btn-sm btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sApp-tableSettingsCloseButton">Close</a>
+                  <a type="button" class="btn btn-sm btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sApp-tableSettingsCloseButton-stack">Close</a>
                 </div>
               </div>
             </div>

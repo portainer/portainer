@@ -3,34 +3,34 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-user" title-text="User details"></rd-widget-header>
+      <rd-widget-header icon="user" feather-icon="true" title-text="User details"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" style="margin-top: 15px">
           <div class="form-group">
-            <label for="username_field" class="col-sm-2 control-label text-left">Username</label>
+            <label for="username_field" class="col-sm-2 control-label text-left required">Username</label>
             <div class="col-sm-8">
               <input class="form-control" ng-model="formValues.username" id="username_field" />
             </div>
           </div>
 
           <div class="form-group" ng-if="isAdmin">
-            <div class="col-sm-4">
-              <label for="permissions" class="control-label text-left">
-                Administrator
-                <portainer-tooltip
-                  message="'Administrators have access to Portainer settings management as well as full control over all defined environments and their resources.'"
-                ></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px"> <input type="checkbox" ng-model="formValues.Administrator" /><i></i> </label>
+            <div class="col-sm-12">
+              <por-switch-field
+                label-class="'col-sm-3 col-lg-2 control-label text-left'"
+                checked="formValues.Administrator"
+                label="'Administrator'"
+                tooltip="'Administrators have access to Portainer settings management as well as full control over all defined environments and their resources.'"
+                on-change="(handleAdministratorChange)"
+              ></por-switch-field>
             </div>
           </div>
 
           <div class="form-group">
             <div class="col-sm-4">
               <button class="btn btn-primary btn-sm" ng-disabled="!isSubmitEnabled()" ng-click="updateUser()">Save</button>
-              <button class="btn btn-danger btn-sm" ng-disabled="isDeleteDisabled()" ng-click="deleteUser()"
-                ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this user</button
-              >
+              <button class="btn btn-danger btn-sm vertical-center" ng-disabled="isDeleteDisabled()" ng-click="deleteUser()">
+                <pr-icon icon="'trash-2'" feather="true" size="'sm'" class="vertical-center"></pr-icon>Delete this user
+              </button>
             </div>
           </div>
         </form>
@@ -42,37 +42,37 @@
 <div class="row" ng-if="AuthenticationMethod === 1">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-lock" title-text="Change user password"></rd-widget-header>
+      <rd-widget-header icon="lock" feather-icon="true" title-text="Change user password"></rd-widget-header>
       <rd-widget-body>
         <form name="form" class="form-horizontal" style="margin-top: 15px">
           <!-- new-password-input -->
           <div class="form-group">
-            <label for="new_password" class="col-sm-2 control-label text-left">New password</label>
+            <label for="new_password" class="col-sm-2 control-label text-left required">New password</label>
             <div class="col-sm-8">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password" name="new_password" ng-minlength="requiredPasswordLength" />
-              </div>
+              <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password" name="new_password" ng-minlength="requiredPasswordLength" />
             </div>
           </div>
           <!-- !new-password-input -->
           <!-- confirm-password-input -->
           <div class="form-group">
-            <label for="confirm_password" class="col-sm-2 control-label text-left">Confirm password</label>
+            <label for="confirm_password" class="col-sm-2 control-label text-left required">Confirm password</label>
             <div class="col-sm-8">
               <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
                 <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password" />
-                <span class="input-group-addon"
-                  ><i
-                    ng-class="
-                      { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[
-                        form.new_password.$viewValue !== '' && form.new_password.$viewValue === formValues.confirmPassword
-                      ]
-                    "
-                    aria-hidden="true"
-                  ></i
-                ></span>
+                <span class="input-group-addon">
+                  <pr-icon
+                    icon="'check'"
+                    feather="true"
+                    class="icon-success"
+                    ng-if="form.new_password.$viewValue !== '' && form.new_password.$viewValue === formValues.confirmPassword"
+                  ></pr-icon>
+                  <pr-icon
+                    icon="'x'"
+                    feather="true"
+                    class="icon-danger"
+                    ng-if="!(form.new_password.$viewValue !== '' && form.new_password.$viewValue === formValues.confirmPassword)"
+                  ></pr-icon>
+                </span>
               </div>
             </div>
           </div>

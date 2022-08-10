@@ -28,12 +28,10 @@
         Group Filter
         <portainer-tooltip message="'The LDAP search filter used to select group elements, optional.'"></portainer-tooltip>
       </label>
-      <div ng-class="{ 'col-sm-7 col-md-9': $index, 'col-sm-8 col-md-10': !$index }">
+      <div class="col-sm-8 col-md-10 vertical-center">
         <input type="text" class="form-control" id="ldap_group_filter_{{ $index }}" ng-model="config.GroupFilter" placeholder="(objectClass=account)" />
-      </div>
-      <div class="col-sm-1" ng-if="$index > 0">
-        <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.onRemoveClick($index)">
-          <i class="fa fa-trash" aria-hidden="true"></i>
+        <button class="btn btn-md btn-danger" type="button" ng-click="$ctrl.onRemoveClick($index)" ng-if="$index > 0">
+          <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
         </button>
       </div>
     </div>
@@ -42,8 +40,9 @@
 
 <div class="form-group" style="margin-top: 10px">
   <div class="col-sm-12">
-    <button class="label label-default interactive" style="border: 0" ng-click="$ctrl.onAddClick()">
-      <i class="fa fa-plus-circle" aria-hidden="true"></i> add group search configuration
+    <button class="label label-default interactive vertical-center" style="border: 0" ng-click="$ctrl.onAddClick()">
+      <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+      add group search configuration
     </button>
   </div>
   <div class="col-sm-12" style="margin-top: 10px">
@@ -63,7 +62,7 @@
 </div>
 
 <div ng-if="$ctrl.showTable">
-  <div class="form-group">
-    <ldap-groups-datatable dataset="$ctrl.groups" title-text="Groups" title-icon="fa-users" table-key="ldapGroups"></ldap-groups-datatable>
+  <div class="form-group col-sm-12">
+    <ldap-groups-datatable dataset="$ctrl.groups" title-text="Groups" title-icon="users" table-key="ldapGroups"></ldap-groups-datatable>
   </div>
 </div>

@@ -101,19 +101,6 @@ pr-icon {
   padding: 1.5%;
 }
 
-.icon-nested-gray {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 30px;
-  width: 30px;
-  padding: 5px;
-  text-align: center;
-  border-radius: 50%;
-  background-color: var(--ui-gray-4);
-  margin-right: 5px;
-}
-
 .icon-nested-blue {
   display: flex;
   justify-content: center;

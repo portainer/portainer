@@ -16,7 +16,7 @@ import { SidebarProvider } from './useSidebarState';
 
 export function Sidebar() {
   const { isAdmin, user } = useUser();
-  const isTeamLeader = useIsTeamLeader(user);
+  const isTeamLeader = useIsTeamLeader(user) as boolean;
 
   const settingsQuery = usePublicSettings();
 
@@ -32,7 +32,7 @@ export function Sidebar() {
       <nav
         className={clsx(
           styles.root,
-          'p-5 flex flex-col be:bg-gray-11 bg-blue-10'
+          'p-5 flex flex-col be:bg-gray-11 bg-blue-10 th-dark:bg-gray-warm-10'
         )}
         aria-label="Main"
       >
@@ -52,7 +52,9 @@ export function Sidebar() {
 
             {isAdmin && EnableEdgeComputeFeatures && <EdgeComputeSidebar />}
 
-            {(isAdmin || isTeamLeader) && <SettingsSidebar isAdmin={isAdmin} />}
+            {(isAdmin || isTeamLeader) && (
+              <SettingsSidebar isAdmin={isAdmin} isTeamLeader={isTeamLeader} />
+            )}
           </ul>
         </div>
 

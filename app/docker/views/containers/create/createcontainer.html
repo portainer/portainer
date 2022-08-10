@@ -131,7 +131,7 @@
                     <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                   </div>
                   <button class="btn btn-light" type="button" ng-click="removePortBinding($index)">
-                    <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                    <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                   </button>
                 </div>
                 <!-- !protocol-actions -->
@@ -213,8 +213,8 @@
                 <div class="col-sm-9">
                   <div class="input-group">
                     <div class="input-group-btn">
-                      <button class="btn btn-light" ng-model="formValues.CmdMode" uib-btn-radio="'default'" style="margin-left: 0px"> Default</button>
-                      <button class="btn btn-light" ng-model="formValues.CmdMode" uib-btn-radio="'override'">Override</button>
+                      <label class="btn btn-light" ng-model="formValues.CmdMode" uib-btn-radio="'default'" style="margin-left: 0px"> Default</label>
+                      <label class="btn btn-light" ng-model="formValues.CmdMode" uib-btn-radio="'override'">Override</label>
                     </div>
                     <input
                       type="text"
@@ -388,7 +388,7 @@
                           <label class="btn btn-light" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
                         </div>
                         <button class="btn btn-light" type="button" ng-click="removeVolume($index)">
-                          <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                          <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                         </button>
                       </div>
                       <!-- !volume-type -->
@@ -536,7 +536,7 @@
                       <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP" />
                     </div>
                     <button class="btn btn-light" type="button" ng-click="removeExtraHost($index)">
-                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -569,7 +569,7 @@
                       <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                     </div>
                     <button class="btn btn-sm btn-light" type="button" ng-click="removeLabel($index)">
-                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -660,7 +660,7 @@
                       <input type="text" class="form-control" ng-model="device.pathInContainer" placeholder="e.g. /dev/tty0" />
                     </div>
                     <button class="btn btn-sm btn-light" type="button" ng-click="removeDevice($index)">
-                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>
@@ -687,7 +687,7 @@
                       <input type="text" class="form-control" ng-model="sysctl.value" placeholder="e.g. bar" />
                     </div>
                     <button class="btn btn-sm btn-light" type="button" ng-click="removeSysctl($index)">
-                      <pr-icon icon="'trash'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                     </button>
                   </div>
                 </div>

@@ -20,6 +20,12 @@ angular.module('portainer.app').controller('UserController', [
       Administrator: false,
     };
 
+    $scope.handleAdministratorChange = function (checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.Administrator = checked;
+      });
+    };
+
     $scope.deleteUser = function () {
       ModalService.confirmDeletion('Do you want to remove this user? This user will not be able to login into Portainer anymore.', function onConfirm(confirmed) {
         if (!confirmed) {
@@ -55,7 +61,7 @@ angular.module('portainer.app').controller('UserController', [
       }
       UserService.updateUser($scope.user.Id, { role, username })
         .then(function success() {
-          Notifications.success('User successfully updated');
+          Notifications.success('Success', 'User successfully updated');
           $state.reload();
         })
         .catch(function error(err) {
@@ -71,7 +77,7 @@ angular.module('portainer.app').controller('UserController', [
       }
       UserService.updateUser($scope.user.Id, { password: $scope.formValues.newPassword })
         .then(function success() {
-          Notifications.success('Password successfully updated');
+          Notifications.success('Success', 'Password successfully updated');
 
           if (isCurrentUser) {
             $state.go('portainer.logout');

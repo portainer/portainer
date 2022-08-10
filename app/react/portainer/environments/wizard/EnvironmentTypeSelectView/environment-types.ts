@@ -1,34 +1,29 @@
 import { FeatureId } from '@/portainer/feature-flags/enums';
 
-import { KaaSIcon, Props as KaaSIconProps } from './KaaSIcon';
+import KaaSIcon from './kaas-icon.svg?c';
 
-interface WizardEnvironmentOption {
-  id: string;
-  title: string;
-  icon: string | { ({ selected, className }: KaaSIconProps): JSX.Element };
-  description: string;
-  featureId?: FeatureId;
-}
-
-export const environmentTypes: WizardEnvironmentOption[] = [
+export const environmentTypes = [
   {
     id: 'docker',
     title: 'Docker',
     icon: 'fab fa-docker',
     description:
       'Connect to Docker Standalone / Swarm via URL/IP, API or Socket',
+    featureId: undefined,
   },
   {
     id: 'kubernetes',
     title: 'Kubernetes',
     icon: 'fas fa-dharmachakra',
     description: 'Connect to a kubernetes environment via URL/IP',
+    featureId: undefined,
   },
   {
     id: 'aci',
     title: 'ACI',
     description: 'Connect to ACI environment via API',
     icon: 'fab fa-microsoft',
+    featureId: undefined,
   },
   {
     id: 'nomad',
@@ -44,4 +39,4 @@ export const environmentTypes: WizardEnvironmentOption[] = [
     icon: KaaSIcon,
     featureId: FeatureId.KAAS_PROVISIONING,
   },
-];
+] as const;

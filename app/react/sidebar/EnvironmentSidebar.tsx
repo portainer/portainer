@@ -1,6 +1,7 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect } from 'react';
 import { X, Slash } from 'react-feather';
+import clsx from 'clsx';
 
 import {
   PlatformType,
@@ -31,7 +32,13 @@ export function EnvironmentSidebar() {
   }
 
   return (
-    <div className="rounded border border-dotted py-2 be:bg-gray-10 bg-blue-11 be:border-gray-8 border-blue-9">
+    <div
+      className={clsx(
+        'rounded border border-dotted py-2',
+        'bg-blue-11 be:bg-gray-10 th-dark:bg-gray-warm-11',
+        'border-blue-9 be:border-gray-8  th-dark:border-gray-warm-9'
+      )}
+    >
       {environment ? (
         <Content environment={environment} onClear={clearEnvironment} />
       ) : (
@@ -138,7 +145,7 @@ function Title({ environment, onClear }: TitleProps) {
         title="Clear environment"
         type="button"
         onClick={onClear}
-        className="flex items-center justify-center be:bg-gray-9 bg-blue-10 hover:bg-blue-9 be:hover:bg-gray-7 transition-colors duration-200 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white be:hover:text-white"
+        className="flex items-center justify-center be:bg-gray-9 bg-blue-10 th-dark:bg-gray-warm-10 hover:bg-blue-9 be:hover:bg-gray-7 th-dark:hover:bg-gray-8 transition-colors duration-200 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white be:hover:text-white"
       >
         <X />
       </button>

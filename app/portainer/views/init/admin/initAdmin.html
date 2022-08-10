@@ -12,16 +12,19 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <!-- toggle -->
-          <div style="padding-bottom: 12px">
-            <a ng-click="togglePanel()">
-              <i ng-class="{ true: 'glyphicon glyphicon-chevron-down', false: 'glyphicon glyphicon-chevron-right' }[state.showInitPassword]" aria-hidden="true"></i
-              ><span style="padding-left: 10px">New Portainer installation</span>
+          <div>
+            <a ng-click="togglePanel()" class="vertical-center">
+              <span>
+                <pr-icon icon="'chevron-down'" feather="true" ng-if="state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
+                <pr-icon icon="'chevron-right'" feather="true" ng-if="!state.showInitPassword" size="'lg'" class-name="'icon-primary'"></pr-icon>
+              </span>
+              <span class="form-section-title">New Portainer installation</span>
             </a>
           </div>
           <!-- !toggle -->
 
           <!-- init password form -->
-          <form name="form" class="simple-box-form form-horizontal" style="padding-left: 30px" ng-if="state.showInitPassword">
+          <form name="form" class="simple-box-form form-horizontal padding-top" ng-if="state.showInitPassword">
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
@@ -68,10 +71,10 @@
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12 text-muted">
-                <p>
-                  <i class="fa fa-exclamation-triangle orange-icon space-right" aria-hidden="true"></i>
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                   <span>The password must be at least {{ requiredPasswordLength }} characters long.</span>
-                  <i class="fa fa-check green-icon space-left" aria-hidden="true" ng-if="form.password.$valid && formValues.Password"></i>
+                  <pr-icon class="fa green-icon" icon="'check'" feather="true" ng-if="form.password.$valid && formValues.Password"></pr-icon>
                 </p>
               </div>
             </div>
@@ -86,7 +89,7 @@
                   ng-click="createAdminUser()"
                   button-spinner="state.actionInProgress"
                 >
-                  <span ng-hide="state.actionInProgress"><i class="fa fa-user-plus" aria-hidden="true"></i> Create user</span>
+                  <span ng-hide="state.actionInProgress">Create user</span>
                   <span ng-show="state.actionInProgress">Creating user...</span>
                 </button>
               </div>
@@ -94,11 +97,11 @@
             <!-- !actions -->
             <!-- enableTelemetry-->
             <div class="form-group">
-              <div class="col-sm-12">
+              <div class="col-sm-12 vertical-center">
                 <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" />
-                <span class="text-muted small" style="margin-left: 2px"
+                <span class="text-muted small"
                   >Allow collection of anonymous statistics. You can find more information about this in our
-                  <a href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.</span
+                  <a class="hyperlink" href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.</span
                 >
               </div>
             </div>
@@ -113,16 +116,19 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <!-- toggle -->
-          <div style="padding-bottom: 12px">
-            <a ng-click="togglePanel()" data-cy="init-installPortainerFromBackup">
-              <i ng-class="{ true: 'glyphicon glyphicon-chevron-down', false: 'glyphicon glyphicon-chevron-right' }[state.showRestorePortainer]" aria-hidden="true"></i
-              ><span style="padding-left: 10px">Restore Portainer from backup</span>
+          <div>
+            <a ng-click="togglePanel()" data-cy="init-installPortainerFromBackup" class="vertical-center">
+              <span
+                ><pr-icon icon="'chevron-down'" feather="true" ng-if="state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon>
+                <pr-icon icon="'chevron-right'" feather="true" ng-if="!state.showRestorePortainer" size="'lg'" class-name="'icon-primary'"></pr-icon
+              ></span>
+              <span class="form-section-title">Restore Portainer from backup</span>
             </a>
           </div>
           <!-- !toggle -->
 
           <!-- restore form -->
-          <form class="simple-box-form form-horizontal" style="padding-left: 30px" ng-if="state.showRestorePortainer">
+          <form class="simple-box-form form-horizontal padding-top" ng-if="state.showRestorePortainer">
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-9">
@@ -132,28 +138,29 @@
               </div>
             </div>
             <!-- !note -->
-            <div class="form-group">
-              <div class="boxselector_wrapper">
-                <div>
-                  <input type="radio" id="restore_file" checked="checked" />
-                  <label for="restore_file" style="padding-bottom: 20px" data-cy="init-selectLocalFile">
-                    <div class="boxselector_header">
-                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px"></i>
-                      Upload backup file
-                    </div>
-                    <p></p>
-                  </label>
-                </div>
-                <div>
-                  <input type="radio" id="restore_s3" disabled />
-                  <label for="restore_s3" class="boxselector_disabled" style="background-color: #ffffff">
-                    <div class="boxselector_header">
-                      <i class="fa fa-download" aria-hidden="true" style="margin-right: 2px"></i>
-                      Retrieve from S3
-                    </div>
-                    <p>This feature is available in <a href="https://www.portainer.io/business-upsell?from=restore-s3-form" target="_blank"> Portainer Business Edition</a></p>
-                  </label>
-                </div>
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="restore_file" checked="checked" />
+                <label for="restore_file" data-cy="init-selectLocalFile">
+                  <div class="boxselector_header">
+                    <pr-icon icon="'upload'" feather="true"></pr-icon>
+                    Upload backup file
+                  </div>
+                  <p></p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="restore_s3" disabled />
+                <label for="restore_s3" class="boxselector_disabled">
+                  <div class="boxselector_header">
+                    <pr-icon icon="'download'" feather="true"></pr-icon>
+                    Retrieve from S3
+                  </div>
+                  <p
+                    >This feature is available in
+                    <a class="hyperlink" href="https://www.portainer.io/business-upsell?from=restore-s3-form" target="_blank"> Portainer Business Edition</a></p
+                  >
+                </label>
               </div>
             </div>
             <!-- note -->
@@ -165,7 +172,7 @@
             <!-- !note -->
             <!-- select-file-input -->
             <div class="form-group">
-              <div class="col-sm-12">
+              <div class="col-sm-12 vertical-center">
                 <button
                   class="btn btn-sm btn-primary"
                   ngf-select
@@ -176,9 +183,9 @@
                   data-cy="init-selectBackupFileButton"
                   >Select file</button
                 >
-                <span style="margin-left: 5px">
+                <span class="space-left vertical-center">
                   {{ formValues.BackupFile.name }}
-                  <i class="fa fa-times red-icon" ng-if="!formValues.BackupFile" aria-hidden="true"></i>
+                  <pr-icon class="fa red-icon" icon="'x'" feather="true" ng-if="!formValues.BackupFile"></pr-icon>
                 </span>
               </div>
             </div>

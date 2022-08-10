@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
-import { components } from 'react-select';
-import { OnChangeValue } from 'react-select/dist/declarations/src/types';
+import { components, MultiValue } from 'react-select';
+import { MultiValueRemoveProps } from 'react-select/dist/declarations/src/components/MultiValue';
+import {
+  ActionMeta,
+  OnChangeValue,
+} from 'react-select/dist/declarations/src/types';
 import { OptionProps } from 'react-select/dist/declarations/src/components/Option';
 
 import { Select } from '@@/form-components/ReactSelect';
@@ -9,6 +13,7 @@ import { Tooltip } from '@@/Tip/Tooltip';
 
 interface Values {
   enabled: boolean;
+  useSpecific: boolean;
   selectedGPUs: string[];
   capabilities: string[];
 }
@@ -81,6 +86,17 @@ function Option(props: OptionProps<GpuOption, true>) {
   );
 }
 
+function MultiValueRemove(props: MultiValueRemoveProps<GpuOption, true>) {
+  const {
+    selectProps: { value },
+  } = props;
+  if (value && (value as MultiValue<GpuOption>).length === 1) {
+    return null;
+  }
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <components.MultiValueRemove {...props} />;
+}
+
 export function Gpu({
   values,
   onChange,
@@ -97,6 +113,11 @@ export function Gpu({
           : gpu.name,
     }));
 
+    options.unshift({
+      value: 'all',
+      label: 'Use All GPUs',
+    });
+
     return options;
   }, [gpus, usedGpus, usedAllGpus]);
 
@@ -112,11 +133,22 @@ export function Gpu({
     onChangeValues('enabled', !values.enabled);
   }
 
-  function onChangeSelectedGpus(newValue: OnChangeValue<GpuOption, true>) {
-    onChangeValues(
-      'selectedGPUs',
-      newValue.map((option) => option.value)
-    );
+  function onChangeSelectedGpus(
+    newValue: OnChangeValue<GpuOption, true>,
+    actionMeta: ActionMeta<GpuOption>
+  ) {
+    let { useSpecific } = values;
+    let selectedGPUs = newValue.map((option) => option.value);
+
+    if (actionMeta.action === 'select-option') {
+      useSpecific = actionMeta.option?.value !== 'all';
+      selectedGPUs = selectedGPUs.filter((value) =>
+        useSpecific ? value !== 'all' : value === 'all'
+      );
+    }
+
+    const newValues = { ...values, selectedGPUs, useSpecific };
+    onChange(newValues);
   }
 
   function onChangeSelectedCaps(newValue: OnChangeValue<GpuOption, true>) {
@@ -128,8 +160,9 @@ export function Gpu({
 
   const gpuCmd = useMemo(() => {
     const devices = values.selectedGPUs.join(',');
+    const deviceStr = devices === 'all' ? 'all,' : `device=${devices},`;
     const caps = values.capabilities.join(',');
-    return `--gpus 'device=${devices},"capabilities=${caps}"`;
+    return `--gpus '${deviceStr}"capabilities=${caps}"'`;
   }, [values.selectedGPUs, values.capabilities]);
 
   const gpuValue = useMemo(
@@ -164,9 +197,12 @@ export function Gpu({
             isMulti
             closeMenuOnSelect
             value={gpuValue}
+            isClearable={false}
+            backspaceRemovesValue={false}
             isDisabled={!values.enabled}
             onChange={onChangeSelectedGpus}
             options={options}
+            components={{ MultiValueRemove }}
           />
         </div>
       </div>
@@ -176,11 +212,7 @@ export function Gpu({
           <div className="form-group">
             <div className="col-sm-3 col-lg-2 control-label text-left">
               Capabilities
-              <Tooltip
-                message={
-                  "This is the generated equivalent of the '--gpus' docker CLI parameter based on your settings."
-                }
-              />
+              <Tooltip message="‘compute’ and ‘utility’ capabilities are preselected by Portainer because they are used by default when you don’t explicitly specify capabilities with docker CLI ‘--gpus’ option." />
             </div>
             <div className="col-sm-9 col-lg-10 text-left">
               <Select<GpuOption, true>

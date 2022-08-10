@@ -258,6 +258,9 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 
 	endpointType := portainer.DockerEnvironment
 	if payload.EndpointCreationType == agentEnvironment {
+
+		payload.URL = "tcp://" + normalizeAgentAddress(payload.URL)
+
 		agentPlatform, err := handler.pingAndCheckPlatform(payload)
 		if err != nil {
 			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to get environment type", err}

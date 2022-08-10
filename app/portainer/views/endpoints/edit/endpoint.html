@@ -107,7 +107,8 @@
           <!-- endpoint-url-input -->
           <div class="form-group" ng-if="!state.edgeEndpoint">
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
-              Environment URL
+              <span ng-if="!state.agentEndpoint">Environment URL</span>
+              <span ng-if="state.agentEndpoint">Environment address</span>
               <portainer-tooltip
                 message="'URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it.'"
               >

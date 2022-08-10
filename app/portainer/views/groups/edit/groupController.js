@@ -9,7 +9,7 @@ angular.module('portainer.app').controller('GroupController', function GroupCont
     $scope.state.actionInProgress = true;
     GroupService.updateGroup(model)
       .then(function success() {
-        Notifications.success('Group successfully updated');
+        Notifications.success('Success', 'Group successfully updated');
         $state.go('portainer.groups', {}, { reload: true });
       })
       .catch(function error(err) {

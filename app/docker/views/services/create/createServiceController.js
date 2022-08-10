@@ -537,7 +537,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
           return $q.all([rcPromise, webhookPromise]);
         })
         .then(function success() {
-          Notifications.success('Service successfully created');
+          Notifications.success('Success', 'Service successfully created');
           $state.go('docker.services', {}, { reload: true });
         })
         .catch(function error(err) {

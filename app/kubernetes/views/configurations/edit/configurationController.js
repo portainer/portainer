@@ -95,7 +95,7 @@ class KubernetesConfigurationController {
       ) {
         await this.KubernetesConfigurationService.create(this.formValues);
         await this.KubernetesConfigurationService.delete(this.configuration);
-        this.Notifications.success('Configuration succesfully updated');
+        this.Notifications.success('Success', 'Configuration succesfully updated');
         this.$state.go(
           'kubernetes.configurations.configuration',
           {
@@ -106,7 +106,7 @@ class KubernetesConfigurationController {
         );
       } else {
         await this.KubernetesConfigurationService.update(this.formValues, this.configuration);
-        this.Notifications.success('Configuration succesfully updated');
+        this.Notifications.success('Success', 'Configuration succesfully updated');
         this.$state.reload(this.$state.current);
       }
     } catch (err) {

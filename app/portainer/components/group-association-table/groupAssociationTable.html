@@ -1,6 +1,7 @@
 <div class="datatable">
-  <table class="table table-hover" data-cy="{{ $ctrl.cyValue }}">
-    <div class="col-sm-12 vertical-center">
+  <div class="toolBar">
+    <div class="toolBarTitle">{{ $ctrl.title }}</div>
+    <div class="searchBar vertical-center">
       <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
       <input
         type="text"
@@ -11,6 +12,8 @@
         placeholder="Search..."
       />
     </div>
+  </div>
+  <table class="table table-hover" data-cy="{{ $ctrl.cyValue }}">
     <thead>
       <tr>
         <th> Name </th>
@@ -67,7 +70,7 @@
     <div class="paginationControls">
       <form class="form-inline">
         <span class="limitSelector">
-          <span class="mr-1"> Items per page </span>
+          <span class="space-right"> Items per page </span>
           <select ng-model="$ctrl.paginationState.limit" ng-change="$ctrl.onPaginationLimitChanged()">
             <option value="10">10</option>
             <option value="25">25</option>

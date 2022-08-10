@@ -1,33 +1,70 @@
 <div class="datatable datatable-empty">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-      <datatable-titlebar title="Activity Logs" icon="fa-history" feature="{{::$ctrl.feature}}"></datatable-titlebar>
-      <datatable-searchbar on-change="($ctrl.onChangeKeyword)" value="$ctrl.keyword"></datatable-searchbar>
+      <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
+        <div class="toolBarTitle vertical-center">
+          <div class="widget-icon space-right">
+            <pr-icon icon="'svg-clockrewind'"></pr-icon>
+          </div>
+
+          Activity Logs
+          <be-feature-indicator feature="{{::$ctrl.feature}}"></be-feature-indicator>
+        </div>
+        <div class="vertical-center">
+          <datatable-searchbar on-change="($ctrl.onChangeKeyword)" value="$ctrl.keyword"></datatable-searchbar>
+        </div>
+      </div>
       <div class="table-responsive">
         <table class="table table-hover">
           <thead>
             <tr>
               <th class="small-column">
-                <a ng-click="$ctrl.changeSort('Timestamp')">
-                  Time
-                  <datatable-sort-icon key="Timestamp" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
-                </a>
+                <div class="vertical-center">
+                  <table-column-header
+                    col-title="'Time'"
+                    can-sort="true"
+                    is-sorted="$ctrl.sort.key === 'Timestamp'"
+                    is-sorted-desc="$ctrl.sort.key === 'Timestamp' && $ctrl.sort.desc"
+                    ng-click="$ctrl.changeSort('Timestamp')"
+                  >
+                  </table-column-header>
+                </div>
               </th>
               <th class="small-column">
-                <a ng-click="$ctrl.changeSort('Username')">
-                  User
-                  <datatable-sort-icon key="Username" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
-                </a>
+                <div class="vertical-center">
+                  <table-column-header
+                    col-title="'User'"
+                    can-sort="true"
+                    is-sorted="$ctrl.sort.key === 'Username'"
+                    is-sorted-desc="$ctrl.sort.key === 'Username' && $ctrl.sort.desc"
+                    ng-click="$ctrl.changeSort('Username')"
+                  >
+                  </table-column-header>
+                </div>
               </th>
               <th class="small-column">
-                <a ng-click="$ctrl.changeSort('Context')">
-                  Environment
-                  <datatable-sort-icon key="Context" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
-                </a>
+                <div class="vertical-center">
+                  <table-column-header
+                    col-title="'Environment'"
+                    can-sort="true"
+                    is-sorted="$ctrl.sort.key === 'Context'"
+                    is-sorted-desc="$ctrl.sort.key === 'Context' && $ctrl.sort.desc"
+                    ng-click="$ctrl.changeSort('Context')"
+                  >
+                  </table-column-header>
+                </div>
               </th>
 
-              <th> Action </th>
-              <th> Payload </th>
+              <th>
+                <div class="vertical-center">
+                  <table-column-header col-title="'Action'" can-sort="false"> </table-column-header>
+                </div>
+              </th>
+              <th>
+                <div class="vertical-center">
+                  <table-column-header col-title="'Payload'" can-sort="false"> </table-column-header>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>

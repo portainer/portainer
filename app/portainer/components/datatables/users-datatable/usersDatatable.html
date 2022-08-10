@@ -3,7 +3,9 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          <div class="widget-icon space-right">
+            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+          </div>
           {{ $ctrl.titleText }}
         </div>
 
@@ -27,7 +29,7 @@
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="user-removeUserButton"
           >
-            <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>Remove
+            <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
           </button>
         </div>
       </div>

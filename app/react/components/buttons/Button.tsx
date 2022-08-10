@@ -58,14 +58,7 @@ export function Button({
       /* eslint-disable-next-line react/button-has-type */
       type={type}
       disabled={disabled}
-      className={clsx(
-        {
-          'opacity-60': disabled,
-        },
-        `btn btn-${color}`,
-        sizeClass(size),
-        className
-      )}
+      className={clsx(`btn btn-${color}`, sizeClass(size), className)}
       onClick={onClick}
       title={title}
       // eslint-disable-next-line react/jsx-props-no-spreading

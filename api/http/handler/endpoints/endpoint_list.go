@@ -19,8 +19,6 @@ const (
 	EdgeDeviceIntervalAdd        = 20
 )
 
-var endpointGroupNames map[portainer.EndpointGroupID]string
-
 // @id EndpointList
 // @summary List environments(endpoints)
 // @description List all environments(endpoints) based on the current user authorizations. Will
@@ -141,7 +139,7 @@ func sortEndpointsByField(endpoints []portainer.Endpoint, endpointGroups []porta
 		}
 
 	case "Group":
-		endpointGroupNames = make(map[portainer.EndpointGroupID]string, 0)
+		endpointGroupNames := make(map[portainer.EndpointGroupID]string, 0)
 		for _, group := range endpointGroups {
 			endpointGroupNames[group.ID] = group.Name
 		}

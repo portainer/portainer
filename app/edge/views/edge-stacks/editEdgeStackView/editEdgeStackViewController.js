@@ -83,7 +83,7 @@ export class EditEdgeStackViewController {
         this.formValues.Version = this.stack.Version + 1;
       }
       await this.EdgeStackService.updateStack(this.stack.Id, this.formValues);
-      this.Notifications.success('Stack successfully deployed');
+      this.Notifications.success('Success', 'Stack successfully deployed');
       this.state.isEditorDirty = false;
       this.$state.go('edge.stacks');
     } catch (err) {

@@ -58,9 +58,9 @@ angular.module('portainer.docker').controller('ImportImageController', [
             await tagImage(imageIds[1]);
             $state.go('docker.images.image', { id: imageIds[1] }, { reload: true });
           }
-          Notifications.success('Images successfully uploaded');
+          Notifications.success('Success', 'Images successfully uploaded');
         } else {
-          Notifications.success('The uploaded tar file contained multiple images. The provided tag therefore has been ignored.');
+          Notifications.success('Success', 'The uploaded tar file contained multiple images. The provided tag therefore has been ignored.');
         }
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to upload image');

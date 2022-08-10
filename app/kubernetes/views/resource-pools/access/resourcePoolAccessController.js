@@ -93,7 +93,7 @@ class KubernetesResourcePoolAccessController {
       const newAccesses = _.concat(this.authorizedUsersAndTeams, this.formValues.multiselectOutput);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
       await this.KubernetesConfigMapService.updateAccess(accessConfigMap);
-      this.Notifications.success('Access successfully created');
+      this.Notifications.success('Success', 'Access successfully created');
       this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create accesses');
@@ -113,7 +113,7 @@ class KubernetesResourcePoolAccessController {
       const newAccesses = _.without(this.authorizedUsersAndTeams, ...selectedItems);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
       await this.KubernetesConfigMapService.updateAccess(accessConfigMap);
-      this.Notifications.success('Access successfully removed');
+      this.Notifications.success('Success', 'Access successfully removed');
       this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to remove accesses');

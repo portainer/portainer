@@ -30,25 +30,31 @@
         <th style="width: 22%">Task</th>
         <th>Actions</th>
         <th>
-          <a ng-click="$ctrl.changeOrderBy('Slot')">
-            Slot
-            <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Slot' && !$ctrl.state.reverseOrder"></i>
-            <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Slot' && $ctrl.state.reverseOrder"></i>
-          </a>
+          <table-column-header
+            col-title="'Slot'"
+            can-sort="true"
+            is-sorted="$ctrl.state.orderBy === 'Slot'"
+            is-sorted-desc="$ctrl.state.orderBy === 'Slot' && $ctrl.state.reverseOrder"
+            ng-click="$ctrl.changeOrderBy('Slot')"
+          ></table-column-header>
         </th>
         <th>
-          <a ng-click="$ctrl.changeOrderBy('NodeId')">
-            Node
-            <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeId' && !$ctrl.state.reverseOrder"></i>
-            <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeId' && $ctrl.state.reverseOrder"></i>
-          </a>
+          <table-column-header
+            col-title="'Node'"
+            can-sort="true"
+            is-sorted="$ctrl.state.orderBy === 'NodeId'"
+            is-sorted-desc="$ctrl.state.orderBy === 'NodeId' && $ctrl.state.reverseOrder"
+            ng-click="$ctrl.changeOrderBy('NodeId')"
+          ></table-column-header>
         </th>
         <th>
-          <a ng-click="$ctrl.changeOrderBy('Updated')">
-            Last Update
-            <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Updated' && !$ctrl.state.reverseOrder"></i>
-            <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Updated' && $ctrl.state.reverseOrder"></i>
-          </a>
+          <table-column-header
+            col-title="'Last Update'"
+            can-sort="true"
+            is-sorted="$ctrl.state.orderBy === 'Updated'"
+            is-sorted-desc="$ctrl.state.orderBy === 'Updated' && $ctrl.state.reverseOrder"
+            ng-click="$ctrl.changeOrderBy('Updated')"
+          ></table-column-header>
         </th>
       </tr>
     </thead>

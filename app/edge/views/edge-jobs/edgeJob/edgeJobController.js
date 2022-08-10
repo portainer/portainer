@@ -45,7 +45,7 @@ export class EdgeJobController {
 
     try {
       await this.EdgeJobService.updateEdgeJob(model);
-      this.Notifications.success('Edge job successfully updated');
+      this.Notifications.success('Success', 'Edge job successfully updated');
       this.state.isEditorDirty = false;
       this.$state.go('edge.jobs', {}, { reload: true });
     } catch (err) {
