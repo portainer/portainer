@@ -111,7 +111,7 @@
 <div id="context-menu" class="dropdown clearfix animated fast fadeIn">
   <ul class="dropdown-menu dropdown-right-click" role="menu" aria-labelledby="dropdownMenu" ng-show="temps.length">
     <li ng-show="singleSelection() && singleSelection().isFolder()">
-      <a href="" tabindex="-1" ng-click="smartClick(singleSelection())"> <i class="fa fa-folder-open"></i> open </a>
+      <a href="" tabindex="-1" ng-click="smartClick(singleSelection())"> <i class="fal fa-folder-open"></i> open </a>
     </li>
     <li class="divider" ng-show="singleSelection() && singleSelection().isFolder()"></li>
     <li>
@@ -154,7 +154,7 @@
       </span>
 
       <i class="fa fa-archive" ng-show="!isInThisPath(node.absPath)"></i>
-      <i class="fa fa-folder-open" ng-show="isInThisPath(node.absPath)"></i>
+      <i class="fal fa-folder-open" ng-show="isInThisPath(node.absPath)"></i>
       {{node.name }}
   </a>
   <ul class="nav nav-sidebar">

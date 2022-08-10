@@ -72,9 +72,9 @@
               <td>Name</td>
               <td ng-if="!container.edit">
                 {{ container.Name | trimcontainername }}
-                <a authorization="DockerContainerRename" href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;"
-                  ><pr-icon icon="'edit'" feather="true" className="'space-right'"></pr-icon
-                ></a>
+                <a authorization="DockerContainerRename" href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;">
+                  <pr-icon icon="'edit'" feather="true" className="'space-right'"></pr-icon>
+                </a>
               </td>
               <td ng-if="container.edit">
                 <form ng-submit="renameContainer()">
@@ -117,8 +117,8 @@
                       tooltip="'Webhook (or callback URI) used to automate the recreation of this container. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and recreate this container.'"
                       label-class="'col-sm-2'"
                       label="'Container webhook'"
-                      feature-id="'container-webhook'"
-                    ></por-switch-field>
+                    >
+                    </por-switch-field>
                   </div>
                 </div>
               </td>
@@ -126,24 +126,24 @@
             <tr authorization="DockerContainerLogs, DockerContainerInspect, DockerContainerStats, DockerExecStart">
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
-                  <a authorization="DockerContainerLogs" class="btn" type="button" ui-sref="docker.containers.container.logs({ id: container.Id })"
-                    ><pr-icon icon="'file-text'" feather="true" className="'space-right'"></pr-icon>Logs</a
-                  >
-                  <a authorization="DockerContainerInspect" class="btn" type="button" ui-sref="docker.containers.container.inspect({ id: container.Id })"
-                    ><pr-icon icon="'info'" feather="true" className="'space-right'"></pr-icon>Inspect</a
-                  >
-                  <a authorization="DockerContainerStats" class="btn" type="button" ui-sref="docker.containers.container.stats({ id: container.Id })"
-                    ><pr-icon icon="'bar-chart'" feather="true" className="'space-right'"></pr-icon>Stats</a
-                  >
-                  <a authorization="DockerExecStart" class="btn" type="button" ui-sref="docker.containers.container.exec({ id: container.Id })"
-                    ><pr-icon icon="'terminal'" feather="true" className="'space-right'"></pr-icon>Console</a
-                  >
-                  <a authorization="DockerContainerAttach" class="btn" type="button" ui-sref="docker.containers.container.attach({ id: container.Id })"
-                    ><pr-icon icon="'paperclip'" feather="true" className="'space-right'"></pr-icon>Attach</a
-                  >
-                  <a authorization="DockerContainerExplorer" class="btn" type="button" ui-sref="docker.containers.container.explorer({ id: container.Id })"
-                    ><i class="fa fa-folder-open space-right" aria-hidden="true"></i>explorer</a
-                  >
+                  <a authorization="DockerContainerLogs" class="btn" type="button" ui-sref="docker.containers.container.logs({ id: container.Id })">
+                    <pr-icon icon="'file-text'" feather="true" className="'space-right'"></pr-icon>Logs
+                  </a>
+                  <a authorization="DockerContainerInspect" class="btn" type="button" ui-sref="docker.containers.container.inspect({ id: container.Id })">
+                    <pr-icon icon="'info'" feather="true" className="'space-right'"></pr-icon>Inspect
+                  </a>
+                  <a authorization="DockerContainerStats" class="btn" type="button" ui-sref="docker.containers.container.stats({ id: container.Id })">
+                    <pr-icon icon="'bar-chart'" feather="true" className="'space-right'"></pr-icon>Stats
+                  </a>
+                  <a authorization="DockerExecStart" class="btn" type="button" ui-sref="docker.containers.container.exec({ id: container.Id })">
+                    <pr-icon icon="'terminal'" feather="true" className="'space-right'"></pr-icon>Console
+                  </a>
+                  <a authorization="DockerContainerAttach" class="btn" type="button" ui-sref="docker.containers.container.attach({ id: container.Id })">
+                    <pr-icon icon="'paperclip'" feather="true" className="'space-right'"></pr-icon>Attach
+                  </a>
+                  <a authorization="DockerContainerExplorer" class="btn" type="button" ui-sref="docker.containers.container.explorer({ id: container.Id })">
+                    <pr-icon icon="'folder'" feather="true" className="'space-right'"></pr-icon>explorer
+                  </a>
                 </div>
               </td>
             </tr>
@@ -381,6 +381,7 @@
       leave-network-action="containerLeaveNetwork"
       leave-network-action-in-progress="state.leaveNetworkInProgress"
       node-name="nodeName"
-    ></container-networks-datatable>
+    >
+    </container-networks-datatable>
   </div>
 </div>

@@ -110,7 +110,7 @@ export function ContainerQuickActions({
             params={{ id: containerId, nodeName }}
             title="explorer"
           >
-            <i className="fa fa-folder-open space-right" aria-hidden="true" />
+            <Icon icon="folder" feather className="space-right" />
           </Link>
         </Authorized>
       )}
