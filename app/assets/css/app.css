@@ -885,3 +885,7 @@ json-tree .branch-preview {
 input[style*='background-image: url("data:image/png'] + [data-cy='auth-passwordInputToggle'] {
   right: 20px;
 }
+
+input[style*='background-image: url("data:image/png'] {
+  padding-right: 60px;
+}
