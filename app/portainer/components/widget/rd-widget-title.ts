@@ -14,7 +14,9 @@ export const rdWidgetTitle = {
     <div class="widget-header" ng-class="$ctrl.parentClasses">
       <div class="row">
         <span ng-class="$ctrl.classes" class="pull-left vertical-center">
-          <pr-icon icon="$ctrl.icon" feather="$ctrl.featherIcon" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          <div class="widget-icon space-right">
+            <pr-icon icon="$ctrl.icon" feather="$ctrl.featherIcon"></pr-icon>
+          </div>
           <span ng-transclude="title">{{ $ctrl.titleText }}</span>
         </span>
         <span ng-class="$ctrl.classes" class="pull-right" ng-transclude></span>

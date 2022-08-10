@@ -39,6 +39,8 @@ export default class RegistryController {
         return 'AWS Secret Access Key';
       case RegistryTypes.DOCKERHUB:
         return 'Access token';
+      case RegistryTypes.GITLAB:
+        return 'Personal Access Token';
       default:
         return 'Password';
     }

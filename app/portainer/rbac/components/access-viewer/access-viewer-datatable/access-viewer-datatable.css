@@ -1,0 +1,15 @@
+.datatable.access-viewer-datatable .toolBar {
+  font-size: inherit;
+}
+
+.datatable.access-viewer-datatable .toolBar .small {
+  font-weight: normal;
+}
+
+.datatable.access-viewer-datatable .toolBar.pl-0 {
+  padding-left: 0;
+}
+
+.datatable.access-viewer-datatable .toolBar.pr-0 {
+  padding-right: 0;
+}

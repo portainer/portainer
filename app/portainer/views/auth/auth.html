@@ -70,18 +70,33 @@
             <!-- password input -->
             <div ng-if="ctrl.state.showStandardLogin">
               <div class="pb-2">Password</div>
-              <input
-                id="password"
-                type="password"
-                class="form-control"
-                name="password"
-                ng-model="ctrl.formValues.Password"
-                data-cy="auth-passwordInput"
-                placeholder="Enter your password"
-              />
+              <div class="relative">
+                <input
+                  id="password"
+                  ng-attr-type="{{ ctrl.state.passwordInputType }}"
+                  class="form-control pr-10"
+                  name="password"
+                  ng-model="ctrl.formValues.Password"
+                  autocomplete="off"
+                  data-cy="auth-passwordInput"
+                  placeholder="Enter your password"
+                />
+                <button
+                  data-cy="auth-passwordInputToggle"
+                  type="button"
+                  ng-click="ctrl.toggleShowPassword()"
+                  class="absolute top-0 right-0 h-[34px] w-[50px] border-none flex justify-center items-center bg-transparent"
+                  tooltip-append-to-body="true"
+                  tooltip-placement="top"
+                  tooltip-class="portainer-tooltip"
+                  uib-tooltip="{{ ctrl.state.passwordInputType === 'password' ? 'Show password' : 'Hide password' }}"
+                >
+                  <pr-icon icon="ctrl.state.passwordInputType === 'password' ? 'eye-off' : 'eye'" feather="true" size="'md'"></pr-icon>
+                </button>
+              </div>
             </div>
 
-            <div class="form-group" ng-if="ctrl.state.showStandardLogin">
+            <div class="form-group overflow-auto" ng-if="ctrl.state.showStandardLogin">
               <!-- login button -->
               <div class="col-sm-12 d-flex">
                 <button

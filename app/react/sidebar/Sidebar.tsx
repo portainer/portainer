@@ -32,7 +32,7 @@ export function Sidebar() {
       <nav
         className={clsx(
           styles.root,
-          'p-5 flex flex-col be:bg-gray-11 bg-blue-10'
+          'p-5 flex flex-col be:bg-gray-11 bg-blue-10 th-dark:bg-gray-warm-10'
         )}
         aria-label="Main"
       >

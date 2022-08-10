@@ -16,11 +16,6 @@
   font-weight: 500;
 }
 
-.form-section-title {
-  color: var(--ui-gray-9);
-  font-size: 16px;
-}
-
 .vertical-center {
   display: inline-flex;
   align-items: center;
@@ -178,8 +173,16 @@ input:checked + .slider:before {
 
 /* Widget */
 
-.widget .widget-icon i {
-  color: var(--ui-blue-8);
+.widget .widget-icon {
+  @apply text-lg !p-2 mr-1;
+  @apply bg-blue-3 text-blue-8;
+  @apply th-dark:bg-gray-9 th-dark:text-blue-3;
+
+  border-radius: 50%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5%;
 }
 
 .widget .widget-body table thead {
