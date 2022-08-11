@@ -427,12 +427,29 @@ fieldset[disabled] .btn {
 }
 
 .nav-tabs > li.active > a {
-  border-top: 0px;
-  border-left: 0px;
-  border-right: 0px;
-  border-bottom: 3px solid red;
+  border: 0px;
 }
 
 .label-default {
   line-height: 11px;
+}
+
+/* Code Script Style */
+.code-script {
+  background-color: var(--bg-code-script-color);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding: 5px;
+}
+
+.nav-container {
+  border: 1px solid var(--border-nav-container-color);
+  background-color: var(--bg-nav-container-color);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.nav-tabs > li {
+  background-color: var(--bg-nav-tabs-active-color);
+  border-top-right-radius: 8px;
 }

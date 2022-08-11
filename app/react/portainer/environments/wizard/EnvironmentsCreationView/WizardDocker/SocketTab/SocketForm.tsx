@@ -10,6 +10,7 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { SwitchField } from '@@/form-components/SwitchField';
+import { Icon } from '@@/Icon';
 
 import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
@@ -54,12 +55,16 @@ export function SocketForm({ onCreate }: Props) {
           <div className="form-group">
             <div className="col-sm-12">
               <LoadingButton
-                className="wizard-connect-button"
+                className="wizard-connect-button vertical-center"
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
               >
-                <i className="fa fa-plug" aria-hidden="true" /> Connect
+                <Icon
+                  icon="svg-plug"
+                  className="icon icon-sm vertical-center"
+                />{' '}
+                Connect
               </LoadingButton>
             </div>
           </div>

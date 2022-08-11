@@ -23,7 +23,7 @@ export function HomeView() {
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <WidgetTitle title="Environment Wizard" icon="fa-magic" />
+            <WidgetTitle title="Environment Wizard" icon="svg-magic" />
             <WidgetBody>
               <div className="row">
                 <div className="col-sm-12 form-section-title">
@@ -32,7 +32,7 @@ export function HomeView() {
                 <div className="text-muted small">
                   {localEnvironmentAdded.status === 'success' && (
                     <p>
-                      We have connected your local environment of
+                      We have connected your local environment of{' '}
                       {getTypeLabel(localEnvironmentAdded.type)} to Portainer.
                     </p>
                   )}

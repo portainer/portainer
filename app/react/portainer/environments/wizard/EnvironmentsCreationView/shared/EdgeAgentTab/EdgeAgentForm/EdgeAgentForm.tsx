@@ -8,6 +8,7 @@ import { useCreateEdgeDeviceParam } from '@/react/portainer/environments/wizard/
 
 import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons/LoadingButton';
+import { Icon } from '@@/Icon';
 
 import { MoreSettingsSection } from '../../MoreSettingsSection';
 import { Hardware } from '../../Hardware/Hardware';
@@ -55,11 +56,15 @@ export function EdgeAgentForm({ onCreate, readonly, showGpus = false }: Props) {
             <div className="row">
               <div className="col-sm-12">
                 <LoadingButton
+                  className="vertical-center"
                   isLoading={createMutation.isLoading}
                   loadingText="Creating environment..."
                   disabled={!isValid}
                 >
-                  <i className="fa fa-plug space-right" />
+                  <Icon
+                    icon="svg-plug"
+                    className="icon icon-sm vertical-center"
+                  />
                   Create
                 </LoadingButton>
               </div>
