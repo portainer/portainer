@@ -80,6 +80,7 @@ export function APIForm({ onCreate }: Props) {
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
+                data-cy="wizard_button-connect"
               >
                 <i className="fa fa-plug" aria-hidden="true" /> Connect
               </LoadingButton>

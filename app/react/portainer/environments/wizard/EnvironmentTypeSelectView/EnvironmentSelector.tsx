@@ -32,6 +32,7 @@ export function EnvironmentSelector({
               <Option
                 key={eType.id}
                 featureId={eType.featureId}
+                id={eType.id}
                 title={eType.title}
                 description={eType.description}
                 icon={eType.icon}

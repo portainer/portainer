@@ -58,6 +58,7 @@ export function SocketForm({ onCreate }: Props) {
                 loadingText="Connecting environment..."
                 isLoading={mutation.isLoading}
                 disabled={!dirty || !isValid}
+                data-cy="wizard_button-connect"
               >
                 <i className="fa fa-plug" aria-hidden="true" /> Connect
               </LoadingButton>
@@ -94,6 +95,8 @@ function OverrideSocketFieldset() {
       <div className="form-group">
         <div className="col-sm-12">
           <SwitchField
+            dataCy="switch-override-socket-path"
+            name="switch-override-socket-path"
             checked={values.overridePath}
             onChange={(checked) => setFieldValue('overridePath', checked)}
             label="Override default socket path"

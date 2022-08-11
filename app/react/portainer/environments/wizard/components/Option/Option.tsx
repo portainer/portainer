@@ -10,6 +10,7 @@ import styles from './Option.module.css';
 
 export interface SelectorItemType {
   icon: string | ComponentType<{ selected?: boolean; className?: string }>;
+  id: string;
   title: string;
   description: string;
 }
@@ -21,6 +22,7 @@ interface Props extends SelectorItemType {
 }
 
 export function Option({
+  id,
   icon,
   active,
   description,
@@ -32,6 +34,7 @@ export function Option({
   const isLimited = isLimitedToBE(featureId);
   return (
     <button
+      data-cy={`wizard_option-${id}`}
       className={clsx(
         styles.root,
         isLimited ? styles.teaser : styles.feature,

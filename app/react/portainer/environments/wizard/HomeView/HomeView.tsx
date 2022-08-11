@@ -59,6 +59,7 @@ export function HomeView() {
                   {localEnvironmentAdded.status === 'success' && (
                     <Link to="portainer.home" className={styles.link}>
                       <Option
+                        id="get-started"
                         icon={
                           localEnvironmentAdded.type === EnvironmentType.Docker
                             ? 'fab fa-docker'
@@ -72,6 +73,7 @@ export function HomeView() {
                   )}
                   <Link to="portainer.wizard.endpoints" className={styles.link}>
                     <Option
+                      id="add-environment"
                       title="Add Environments"
                       icon="fa fa-plug"
                       description="Connect to other environments"
