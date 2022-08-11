@@ -1,6 +1,6 @@
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
-import { render } from '@/react-tools/test-utils';
+import { renderWithQueryClient } from '@/react-tools/test-utils';
 
 import { TeamAssociationSelector } from './TeamAssociationSelector';
 
@@ -13,9 +13,9 @@ test('renders correctly', () => {
 function renderComponent() {
   const user = new UserViewModel({ Username: 'user' });
 
-  return render(
+  return renderWithQueryClient(
     <UserContext.Provider value={{ user }}>
-      <TeamAssociationSelector users={[]} memberships={[]} />
+      <TeamAssociationSelector users={[]} memberships={[]} teamId={3} />
     </UserContext.Provider>
   );
 }

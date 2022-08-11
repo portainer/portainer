@@ -8,18 +8,19 @@ import { useMemo, useState } from 'react';
 import { Users, UserX } from 'react-feather';
 
 import { User, UserId } from '@/portainer/users/types';
-import { TeamRole } from '@/react/portainer/users/teams/types';
+import { TeamId, TeamRole } from '@/react/portainer/users/teams/types';
 import { useUser } from '@/portainer/hooks/useUser';
 import { notifySuccess } from '@/portainer/services/notifications';
+import {
+  useRemoveMemberMutation,
+  useTeamMemberships,
+} from '@/react/portainer/users/teams/queries';
 
 import { Widget } from '@@/Widget';
 import { PageSelector } from '@@/PaginationControls/PageSelector';
 import { Button } from '@@/buttons';
 import { Table } from '@@/datatables';
 import { Input } from '@@/form-components/Input';
-
-import { useRemoveMemberMutation, useTeamMemberships } from '../../../queries';
-import { useTeamIdParam } from '../../useTeamIdParam';
 
 import { name } from './name-column';
 import { RowContext, RowProvider } from './RowContext';
@@ -31,10 +32,10 @@ interface Props {
   users: User[];
   roles: Record<UserId, TeamRole>;
   disabled?: boolean;
+  teamId: TeamId;
 }
 
-export function TeamMembersList({ users, roles, disabled }: Props) {
-  const teamId = useTeamIdParam();
+export function TeamMembersList({ users, roles, disabled, teamId }: Props) {
   const membershipsQuery = useTeamMemberships(teamId);
 
   const removeMemberMutation = useRemoveMemberMutation(
@@ -83,8 +84,9 @@ export function TeamMembersList({ users, roles, disabled }: Props) {
         return roles[userId];
       },
       disabled,
+      teamId,
     }),
-    [roles, disabled]
+    [roles, disabled, teamId]
   );
   return (
     <Widget>

@@ -42,6 +42,7 @@ function Example({ userRole }: Args) {
   return (
     <UserContext.Provider value={userProviderState}>
       <TeamAssociationSelector
+        teamId={3}
         users={users}
         memberships={memberships as TeamMembership[]}
       />

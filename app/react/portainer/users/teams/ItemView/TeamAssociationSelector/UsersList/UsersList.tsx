@@ -10,6 +10,8 @@ import { UserPlus, Users } from 'react-feather';
 import { User, UserId } from '@/portainer/users/types';
 import { useUser } from '@/portainer/hooks/useUser';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { useAddMemberMutation } from '@/react/portainer/users/teams/queries';
+import { TeamId } from '@/react/portainer/users/teams/types';
 
 import { Widget } from '@@/Widget';
 import { PageSelector } from '@@/PaginationControls/PageSelector';
@@ -17,9 +19,6 @@ import { Button } from '@@/buttons';
 import { Table } from '@@/datatables';
 import { TableFooter } from '@@/datatables/TableFooter';
 import { Input } from '@@/form-components/Input';
-
-import { useAddMemberMutation } from '../../../queries';
-import { useTeamIdParam } from '../../useTeamIdParam';
 
 import { name } from './name-column';
 import { RowProvider } from './RowContext';
@@ -29,10 +28,10 @@ const columns = [name];
 interface Props {
   users: User[];
   disabled?: boolean;
+  teamId: TeamId;
 }
 
-export function UsersList({ users, disabled }: Props) {
-  const teamId = useTeamIdParam();
+export function UsersList({ users, disabled, teamId }: Props) {
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const addMemberMutation = useAddMemberMutation(teamId);
@@ -69,7 +68,7 @@ export function UsersList({ users, disabled }: Props) {
 
   const tableProps = getTableProps();
   const tbodyProps = getTableBodyProps();
-  const rowContext = useMemo(() => ({ disabled }), [disabled]);
+  const rowContext = useMemo(() => ({ disabled, teamId }), [disabled, teamId]);
   return (
     <Widget>
       <Widget.Title icon={Users} title="Users">

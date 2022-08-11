@@ -40,7 +40,7 @@ function Example({ userRole }: Args) {
 
   return (
     <UserContext.Provider value={userProviderState}>
-      <TeamMembersList users={users} roles={roles} />
+      <TeamMembersList users={users} roles={roles} teamId={3} />
     </UserContext.Provider>
   );
 }

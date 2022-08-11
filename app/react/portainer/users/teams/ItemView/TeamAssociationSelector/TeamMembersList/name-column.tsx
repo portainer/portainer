@@ -3,11 +3,12 @@ import { MinusCircle } from 'react-feather';
 
 import { User, UserId } from '@/portainer/users/types';
 import { notifySuccess } from '@/portainer/services/notifications';
+import {
+  useRemoveMemberMutation,
+  useTeamMemberships,
+} from '@/react/portainer/users/teams/queries';
 
 import { Button } from '@@/buttons';
-
-import { useRemoveMemberMutation, useTeamMemberships } from '../../../queries';
-import { useTeamIdParam } from '../../useTeamIdParam';
 
 import { useRowContext } from './RowContext';
 
@@ -26,7 +27,8 @@ export function NameCell({
   value: name,
   row: { original: user },
 }: CellProps<User, string>) {
-  const teamId = useTeamIdParam();
+  const { disabled, teamId } = useRowContext();
+
   const membershipsQuery = useTeamMemberships(teamId);
 
   const removeMemberMutation = useRemoveMemberMutation(
@@ -34,7 +36,6 @@ export function NameCell({
     membershipsQuery.data
   );
 
-  const { disabled } = useRowContext();
   return (
     <>
       {name}

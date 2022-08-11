@@ -3,11 +3,9 @@ import { PlusCircle } from 'react-feather';
 
 import { User } from '@/portainer/users/types';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { useAddMemberMutation } from '@/react/portainer/users/teams/queries';
 
 import { Button } from '@@/buttons';
-
-import { useAddMemberMutation } from '../../../queries';
-import { useTeamIdParam } from '../../useTeamIdParam';
 
 import { useRowContext } from './RowContext';
 
@@ -26,11 +24,10 @@ export function NameCell({
   value: name,
   row: { original: user },
 }: CellProps<User, string>) {
-  const teamId = useTeamIdParam();
+  const { disabled, teamId } = useRowContext();
 
   const addMemberMutation = useAddMemberMutation(teamId);
 
-  const { disabled } = useRowContext();
   return (
     <>
       {name}

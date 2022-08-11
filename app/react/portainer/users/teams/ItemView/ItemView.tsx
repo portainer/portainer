@@ -61,6 +61,7 @@ export function ItemView() {
 
       {usersQuery.data && membershipsQuery.data && (
         <TeamAssociationSelector
+          teamId={teamId}
           memberships={membershipsQuery.data}
           users={usersQuery.data}
           disabled={teamSyncQuery.data}

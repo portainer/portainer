@@ -5,12 +5,13 @@ import { User } from '@/portainer/users/types';
 import { useUser as useCurrentUser } from '@/portainer/hooks/useUser';
 import { TeamRole } from '@/react/portainer/users/teams/types';
 import { notifySuccess } from '@/portainer/services/notifications';
+import {
+  useTeamMemberships,
+  useUpdateRoleMutation,
+} from '@/react/portainer/users/teams/queries';
 
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
-
-import { useTeamMemberships, useUpdateRoleMutation } from '../../../queries';
-import { useTeamIdParam } from '../../useTeamIdParam';
 
 import { useRowContext } from './RowContext';
 
@@ -26,14 +27,13 @@ export const teamRole: Column<User> = {
 };
 
 export function RoleCell({ row: { original: user } }: CellProps<User>) {
-  const teamId = useTeamIdParam();
+  const { getRole, disabled, teamId } = useRowContext();
   const membershipsQuery = useTeamMemberships(teamId);
   const updateRoleMutation = useUpdateRoleMutation(
     teamId,
     membershipsQuery.data
   );
 
-  const { getRole, disabled } = useRowContext();
   const role = getRole(user.Id);
 
   const { isAdmin } = useCurrentUser();

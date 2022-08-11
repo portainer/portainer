@@ -16,7 +16,7 @@ export { Example };
 function Example() {
   const users = createMockUsers(20);
 
-  return <UsersList users={users} />;
+  return <UsersList users={users} teamId={3} />;
 }
 
 Example.args = {};
