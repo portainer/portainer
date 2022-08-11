@@ -99,6 +99,10 @@ export class EditEdgeStackViewController {
 
   async getPaginatedEndpointsAsync(lastId, limit, search) {
     try {
+      if (this.stackEndpointIds.length === 0) {
+        return { endpoints: [], totalCount: 0 };
+      }
+
       const query = { search, endpointIds: this.stackEndpointIds };
       const { value, totalCount } = await getEnvironments({ start: lastId, limit, query });
 
