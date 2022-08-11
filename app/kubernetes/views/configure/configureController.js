@@ -154,8 +154,8 @@ class KubernetesConfigureController {
       return;
     }
     const promises = [];
-    const oldEndpointID = this.EndpointProvider.endpointID();
-    this.EndpointProvider.setEndpointID(this.endpoint.Id);
+    const oldEndpoint = this.EndpointProvider.currentEndpoint();
+    this.EndpointProvider.setCurrentEndpoint(this.endpoint);
 
     try {
       const allResourcePools = await this.KubernetesResourcePoolService.get();
@@ -170,7 +170,7 @@ class KubernetesConfigureController {
         });
       });
     } finally {
-      this.EndpointProvider.setEndpointID(oldEndpointID);
+      this.EndpointProvider.setCurrentEndpoint(oldEndpoint);
     }
 
     const responses = await Promise.allSettled(promises);
