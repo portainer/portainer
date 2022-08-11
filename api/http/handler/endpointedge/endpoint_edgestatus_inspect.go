@@ -85,6 +85,9 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		endpoint.Type = agentPlatform
 	}
 
+	version := r.Header.Get(portainer.PortainerAgentHeader)
+	endpoint.Agent.Version = version
+
 	endpoint.LastCheckInDate = time.Now().Unix()
 
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)

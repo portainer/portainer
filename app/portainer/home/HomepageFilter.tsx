@@ -5,14 +5,14 @@ import { Filter } from '@/portainer/home/types';
 
 import { Select } from '@@/form-components/ReactSelect';
 
-interface Props {
-  filterOptions: Filter[];
-  onChange: (filterOptions: Filter[]) => void;
+interface Props<TValue = number> {
+  filterOptions?: Filter<TValue>[];
+  onChange: (filterOptions: Filter<TValue>[]) => void;
   placeHolder: string;
-  value: Filter[];
+  value: Filter<TValue>[];
 }
 
-function Option(props: OptionProps<Filter, true>) {
+function Option<TValue = number>(props: OptionProps<Filter<TValue>, true>) {
   const { isSelected, label } = props;
   return (
     <div>
@@ -27,12 +27,12 @@ function Option(props: OptionProps<Filter, true>) {
   );
 }
 
-export function HomepageFilter({
-  filterOptions,
+export function HomepageFilter<TValue = number>({
+  filterOptions = [],
   onChange,
   placeHolder,
   value,
-}: Props) {
+}: Props<TValue>) {
   return (
     <Select
       closeMenuOnSelect={false}
@@ -41,7 +41,7 @@ export function HomepageFilter({
       value={value}
       isMulti
       components={{ Option }}
-      onChange={(option) => onChange(option as Filter[])}
+      onChange={(option) => onChange([...option])}
     />
   );
 }
@@ -51,27 +51,9 @@ export function useHomePageFilter<T>(
   defaultValue: T
 ): [T, (value: T) => void] {
   const filterKey = keyBuilder(key);
-  const [storageValue, setStorageValue] = useLocalStorage(
-    filterKey,
-    JSON.stringify(defaultValue),
-    sessionStorage
-  );
-  const value = jsonParse(storageValue, defaultValue);
-  return [value, setValue];
-
-  function setValue(value?: T) {
-    setStorageValue(JSON.stringify(value));
-  }
+  return useLocalStorage(filterKey, defaultValue, sessionStorage);
 }
 
 function keyBuilder(key: string) {
   return `datatable_home_filter_type_${key}`;
-}
-
-function jsonParse<T>(value: string, defaultValue: T): T {
-  try {
-    return JSON.parse(value);
-  } catch (e) {
-    return defaultValue;
-  }
 }

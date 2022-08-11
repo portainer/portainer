@@ -25,6 +25,7 @@ type EnvironmentsQuery struct {
 	edgeDevice          *bool
 	edgeDeviceUntrusted bool
 	name                string
+	agentVersions       []string
 }
 
 func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
@@ -60,6 +61,8 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		return EnvironmentsQuery{}, err
 	}
 
+	agentVersions := getArrayQueryParameter(r, "agentVersions")
+
 	name, _ := request.RetrieveQueryParameter(r, "name", true)
 
 	edgeDeviceParam, _ := request.RetrieveQueryParameter(r, "edgeDevice", true)
@@ -82,6 +85,7 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		edgeDevice:          edgeDevice,
 		edgeDeviceUntrusted: edgeDeviceUntrusted,
 		name:                name,
+		agentVersions:       agentVersions,
 	}, nil
 }
 
@@ -133,6 +137,12 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 
 	if len(query.tagIds) > 0 {
 		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, query.tagIds, groups, query.tagsPartialMatch)
+	}
+
+	if len(query.agentVersions) > 0 {
+		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
+			return !endpointutils.IsAgentEndpoint(&endpoint) || contains(query.agentVersions, endpoint.Agent.Version)
+		})
 	}
 
 	return filteredEndpoints, totalAvailableEndpoints, nil
@@ -412,4 +422,14 @@ func getNumberArrayQueryParameter[T ~int](r *http.Request, parameter string) ([]
 	}
 
 	return result, nil
+}
+
+func contains(strings []string, param string) bool {
+	for _, str := range strings {
+		if str == param {
+			return true
+		}
+	}
+
+	return false
 }
