@@ -46,10 +46,11 @@
 }
 
 .clear-button {
-  display: inline-block;
+  white-space: nowrap;
+
   border: 0px;
-  padding: 10px;
-  height: 60px;
+  padding: 5px 10px;
+
   background: transparent;
 }
 

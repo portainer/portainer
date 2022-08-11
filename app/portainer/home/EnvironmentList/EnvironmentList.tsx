@@ -454,6 +454,8 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     setTagFilter([]);
     setGroupState([]);
     setGroupFilter([]);
+    setAgentVersions([]);
+    setConnectionTypes([]);
   }
 
   function sortOnchange(filterOptions: Filter) {
