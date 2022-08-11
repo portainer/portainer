@@ -280,8 +280,8 @@
 [theme='dark'] {
   --bg-body-color: var(--grey-2);
   --bg-btn-default-color: var(--grey-3);
-  --bg-blocklist-hover-color: var(--grey-iron-10);
-  --bg-boxselector-color: var(--grey-iron-10);
+  --bg-blocklist-hover-color: var(--ui-gray-iron-10);
+  --bg-boxselector-color: var(--ui-gray-iron-10);
   --bg-blocklist-item-selected-color: var(--grey-3);
   --bg-card-color: var(--grey-1);
   --bg-checkbox-border-color: var(--grey-8);
