@@ -22,55 +22,55 @@
 
       <div class="col-sm-12 form-section-title"> AD configuration </div>
 
-  <div class="form-group">
-    <div class="col-sm-12 small text-muted">
-      <p class="vertical-center">
-        <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
-        You can configure multiple AD Controllers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all use
-        the same certificates).
-      </p>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap">
-      AD Controller
-      <button
-        type="button"
-        class="label label-default interactive vertical-center"
-        style="border: 0"
-        ng-click="$ctrl.addLDAPUrl()"
-        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
-        limited-feature-tabindex="-1"
-      >
-        <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
-        Add additional server
-      </button>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px">
-        <input
-          type="text"
-          class="form-control"
-          id="ldap_url"
-          ng-model="$ctrl.settings.URLs[$index]"
-          placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389"
-          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
-          limited-feature-tabindex="-1"
-        />
-        <button
-          ng-if="$index > 0"
-          class="btn btn-sm btn-danger"
-          type="button"
-          ng-click="$ctrl.removeLDAPUrl($index)"
-          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
-          limited-feature-tabindex="-1"
-        >
-          <pr-icon icon="'trash-2'" feather="true"></pr-icon>
-        </button>
+      <div class="form-group">
+        <div class="col-sm-12 small text-muted">
+          <p class="vertical-center">
+            <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+            You can configure multiple AD Controllers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all
+            use the same certificates).
+          </p>
+        </div>
       </div>
-    </div>
-  </div>
+
+      <div class="form-group">
+        <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap">
+          AD Controller
+          <button
+            type="button"
+            class="label label-default interactive vertical-center"
+            style="border: 0"
+            ng-click="$ctrl.addLDAPUrl()"
+            limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+            limited-feature-tabindex="-1"
+          >
+            <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+            Add additional server
+          </button>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px">
+            <input
+              type="text"
+              class="form-control"
+              id="ldap_url"
+              ng-model="$ctrl.settings.URLs[$index]"
+              placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+            />
+            <button
+              ng-if="$index > 0"
+              class="btn btn-sm btn-danger"
+              type="button"
+              ng-click="$ctrl.removeLDAPUrl($index)"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+            >
+              <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div class="form-group">
         <label for="ldap_username" class="col-sm-3 control-label text-left">
