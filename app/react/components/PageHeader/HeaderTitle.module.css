@@ -1,3 +1,10 @@
+.root {
+  white-space: normal !important;
+
+  font-size: 17px;
+  padding-top: 11px;
+}
+
 .menu-button {
   border: 0px;
   font-size: 17px;
@@ -5,6 +12,10 @@
   margin-right: 15px;
   display: flex;
   align-items: center;
+}
+
+.content {
+  margin-left: 5px;
 }
 
 .menu-list {

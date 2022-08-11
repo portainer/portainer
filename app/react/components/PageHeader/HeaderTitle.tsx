@@ -24,9 +24,9 @@ export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
   const { user } = useUser();
 
   return (
-    <div className="page white-space-normal">
+    <div className={styles.root}>
       {title}
-      <span className="header_title_content">{children}</span>
+      <span className={styles.content}>{children}</span>
       <Menu>
         <MenuButton
           className={clsx(

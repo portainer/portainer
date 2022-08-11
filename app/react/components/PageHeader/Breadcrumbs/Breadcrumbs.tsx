@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 
 import { Link } from '@@/Link';
 
-import './Breadcrumbs.css';
+import styles from './Breadcrumbs.module.css';
 
 export interface Crumb {
   label: string;
@@ -19,7 +19,7 @@ export function Breadcrumbs({ breadcrumbs }: Props) {
     : [breadcrumbs];
 
   return (
-    <div className="breadcrumb-links">
+    <div className={styles.breadcrumbLinks}>
       {breadcrumbsArray.map((crumb, index) => (
         <Fragment key={index}>
           {renderCrumb(crumb)}

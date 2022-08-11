@@ -1,6 +1,7 @@
 import { PropsWithChildren, createContext, useContext } from 'react';
+import clsx from 'clsx';
 
-import './HeaderContainer.css';
+import styles from './HeaderContainer.module.css';
 
 const Context = createContext<null | boolean>(null);
 
@@ -15,10 +16,10 @@ export function useHeaderContext() {
 export function HeaderContainer({ children }: PropsWithChildren<unknown>) {
   return (
     <Context.Provider value>
-      <div className="row header">
+      <div className={clsx('row', styles.header)}>
         <div id="loadingbar-placeholder" />
         <div className="col-xs-12">
-          <div className="meta">{children}</div>
+          <div className={styles.meta}>{children}</div>
         </div>
       </div>
     </Context.Provider>

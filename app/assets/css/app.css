@@ -40,10 +40,6 @@ body,
   position: relative;
 }
 
-.white-space-normal {
-  white-space: normal !important;
-}
-
 .logo {
   display: inline;
   max-width: 155px;
@@ -79,10 +75,6 @@ body,
 #network-legend span {
   display: inline;
   font-size: 18px;
-}
-
-.header_title_content {
-  margin-left: 5px;
 }
 
 .form-section-title {

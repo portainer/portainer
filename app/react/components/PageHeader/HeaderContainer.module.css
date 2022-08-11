@@ -1,33 +1,29 @@
-.row.header .meta .page {
-  padding-top: 7px;
+.header {
+  min-height: 60px;
+  margin-bottom: 15px;
+
+  background-color: var(--bg-body-color);
+  margin-bottom: 5px !important;
 }
 
-.row.header {
-  min-height: 60px;
-  background: var(--bg-header-color);
-  margin-bottom: 15px;
-}
-.row.header > div:last-child {
+.header > div:last-child {
   padding-right: 0;
 }
-.row.header .meta .page {
-  font-size: 17px;
-  padding-top: 11px;
-}
 
-.row.header .meta div {
+.header .meta div {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.row.header .login a {
+
+.header .login a {
   padding: 18px;
   display: block;
 }
-.row.header .user {
+.header .user {
   min-width: 130px;
 }
-.row.header .user > .item {
+.header .user > .item {
   width: 65px;
   height: 60px;
   float: right;
@@ -35,36 +31,36 @@
   text-align: center;
   vertical-align: middle;
 }
-.row.header .user > .item a {
+.header .user > .item a {
   color: #919191;
   display: block;
 }
-.row.header .user > .item i {
+.header .user > .item i {
   font-size: 20px;
   line-height: 55px;
 }
-.row.header .user > .item img {
+.header .user > .item img {
   width: 40px;
   height: 40px;
   margin-top: 10px;
   border-radius: 2px;
 }
-.row.header .user > .item ul.dropdown-menu {
+.header .user > .item ul.dropdown-menu {
   border-radius: 2px;
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
 }
-.row.header .user > .item ul.dropdown-menu .dropdown-header {
+.header .user > .item ul.dropdown-menu .dropdown-header {
   text-align: center;
 }
-.row.header .user > .item ul.dropdown-menu li.link {
+.header .user > .item ul.dropdown-menu li.link {
   text-align: left;
 }
-.row.header .user > .item ul.dropdown-menu li.link a {
+.header .user > .item ul.dropdown-menu li.link a {
   padding-left: 7px;
   padding-right: 7px;
 }
-.row.header .user > .item ul.dropdown-menu:before {
+.header .user > .item ul.dropdown-menu:before {
   position: absolute;
   top: -7px;
   right: 23px;
@@ -74,7 +70,7 @@
   border-left: 7px solid transparent;
   content: '';
 }
-.row.header .user > .item ul.dropdown-menu:after {
+.header .user > .item ul.dropdown-menu:after {
   position: absolute;
   top: -6px;
   right: 24px;
