@@ -17,6 +17,7 @@ export function TLSFieldset() {
         <div className="col-sm-12">
           <SwitchField
             label="TLS"
+            labelClass="col-sm-3 col-lg-2"
             checked={values.tls}
             onChange={(checked) => setFieldValue('tls', checked)}
           />

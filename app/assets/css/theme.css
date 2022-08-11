@@ -352,7 +352,7 @@
   --bg-calendar-table-color: var(--grey-3);
   --bg-daterangepicker-end-date: var(--grey-4);
   --bg-daterangepicker-hover: var(--grey-4);
-  --bg-daterangepicker-in-range: var(--grey-2);
+  --bg-daterangepicker-in-range: var(--ui-gray-warm-11);
   --bg-daterangepicker-active: var(--blue-14);
   --bg-tooltip-color: var(--grey-3);
   --bg-input-autofill-color: var(--grey-2);
@@ -366,7 +366,7 @@
   --bg-stepper-item-counter: var(--grey-7);
   --bg-sortbutton-color: var(--grey-1);
   --bg-dashboard-item: var(--grey-3);
-  --bg-searchbar: var(--grey-1);
+  --bg-searchbar: var(--grey-2);
   --bg-inputbox: var(--grey-2);
   --bg-dropdown-hover: var(--grey-3);
   --bg-webeditor-color: var(--ui-gray-warm-9);
@@ -489,7 +489,7 @@
   --sort-icon: var(--ui-gray-3);
   --border-checkbox: var(--ui-gray-5);
   --bg-checkbox: var(--white-color);
-  --border-searchbar: var(--ui-gray-5);
+  --border-searchbar: var(--grey-54);
   --bg-button-group: var(--white-color);
   --border-button-group: var(--ui-gray-5);
   --text-button-group: var(--ui-gray-9);
@@ -593,7 +593,7 @@
   --text-rzslider-color: var(--white-color);
   --text-rzslider-limit-color: var(--white-color);
   --text-pagination-color: var(--white-color);
-  --text-daterangepicker-end-date: var(--grey-7);
+  --text-daterangepicker-end-date: var(--ui-white);
   --text-daterangepicker-in-range: var(--white-color);
   --text-daterangepicker-active: var(--white-color);
   --text-ui-select-color: var(--white-color);
