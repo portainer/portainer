@@ -46,7 +46,7 @@ export function FileUploadField({
       </Button>
 
       <span className="vertical-center">
-        {value ? value.name : <Icon icon="x" feather mode="danger" />}
+        {value ? value.name : <Icon icon="x-circle" feather mode="danger" />}
       </span>
     </div>
   );
