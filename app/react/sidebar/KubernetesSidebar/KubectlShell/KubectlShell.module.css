@@ -42,5 +42,6 @@
 
 .terminal-container .loading-message {
   position: fixed;
+  padding: 10px 16px 0px 16px;
   color: #fff;
 }

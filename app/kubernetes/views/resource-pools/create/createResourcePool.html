@@ -401,9 +401,9 @@
 
             <div class="form-group">
               <label class="col-sm-3 col-lg-2 control-label text-left !pt-0"> Select registries </label>
-              <div class="col-sm-9 col-lg-4">
+              <div class="col-sm-8 col-lg-9">
                 <span class="small text-muted" ng-if="!$ctrl.registries.length && $ctrl.state.isAdmin">
-                  No registries available. Head over <a ui-sref="portainer.registries">registry view</a> to define container registry.
+                  No registries available. Head over to the <a ui-sref="portainer.registries">registry view</a> to define a container registry.
                 </span>
                 <span class="small text-muted" ng-if="!$ctrl.registries.length && !$ctrl.state.isAdmin">
                   No registries available. Contact your administrator to create a container registry.
