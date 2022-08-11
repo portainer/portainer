@@ -2,8 +2,6 @@ import { Fragment } from 'react';
 
 import { Link } from '@@/Link';
 
-import styles from './Breadcrumbs.module.css';
-
 export interface Crumb {
   label: string;
   link?: string;
@@ -19,7 +17,7 @@ export function Breadcrumbs({ breadcrumbs }: Props) {
     : [breadcrumbs];
 
   return (
-    <div className={styles.breadcrumbLinks}>
+    <div className="text-sm font-medium text-gray-7 th-dark:text-gray-5 th-highcontrast:text-white">
       {breadcrumbsArray.map((crumb, index) => (
         <Fragment key={index}>
           {renderCrumb(crumb)}
@@ -44,7 +42,7 @@ function renderCrumb(crumb: Crumb | string) {
       <Link
         to={crumb.link}
         params={crumb.linkParams}
-        className="text-blue-9 hover:underline"
+        className="text-blue-9 hover:underline hover:text-blue-11 th-dark:text-blue-7 th-dark:hover:text-blue-9 th-highcontrast:text-blue-5"
       >
         {crumb.label}
       </Link>
