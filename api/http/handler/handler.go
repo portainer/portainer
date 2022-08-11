@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
+	"github.com/portainer/portainer/api/http/handler/docker"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
@@ -45,6 +46,7 @@ type Handler struct {
 	AuthHandler            *auth.Handler
 	BackupHandler          *backup.Handler
 	CustomTemplatesHandler *customtemplates.Handler
+	DockerHandler          *docker.Handler
 	EdgeGroupsHandler      *edgegroups.Handler
 	EdgeJobsHandler        *edgejobs.Handler
 	EdgeStacksHandler      *edgestacks.Handler

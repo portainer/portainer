@@ -10,7 +10,7 @@ import {
 
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
 
-export interface TableSettingsContextInterface<T> {
+interface TableSettingsContextInterface<T> {
   settings: T;
   setTableSettings(partialSettings: Partial<T>): void;
   setTableSettings(mutation: (settings: T) => T): void;

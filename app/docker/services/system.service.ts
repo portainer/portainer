@@ -36,20 +36,6 @@ export async function getInfo(environmentId: EnvironmentId) {
   }
 }
 
-function buildUrl(
-  environmentId: EnvironmentId,
-  action: string,
-  subAction = ''
-) {
-  let url = `/endpoints/${environmentId}/docker/${action}`;
-
-  if (subAction) {
-    url += `/${subAction}`;
-  }
-
-  return url;
-}
-
 export function useInfo<TSelect = InfoResponse>(
   environmentId: EnvironmentId,
   select?: (info: InfoResponse) => TSelect
@@ -73,4 +59,18 @@ export function useVersion<TSelect = VersionResponse>(
       select,
     }
   );
+}
+
+function buildUrl(
+  environmentId: EnvironmentId,
+  action: string,
+  subAction = ''
+) {
+  let url = `/endpoints/${environmentId}/docker/${action}`;
+
+  if (subAction) {
+    url += `/${subAction}`;
+  }
+
+  return url;
 }

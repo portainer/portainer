@@ -1,15 +1,14 @@
 import { CellProps, Column } from 'react-table';
 
-import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import { useAuthorizations } from '@/portainer/hooks/useUser';
-import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions/ContainerQuickActions';
-import type {
-  ContainersTableSettings,
-  DockerContainer,
-} from '@/react/docker/containers/types';
-import { EnvironmentStatus } from '@/portainer/environments/types';
+import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
+import { useCurrentEnvironment } from '@/portainer/hooks/useCurrentEnvironment';
+import { ContainerQuickActions } from '@/react/docker/containers/components/ContainerQuickActions';
+import { DockerContainer } from '@/react/docker/containers/types';
 
-import { useTableSettings } from '@@/datatables/useTableSettings';
+import { useTableSettings } from '@@/datatables/useZustandTableSettings';
+
+import { TableSettings } from '../types';
 
 export const quickActions: Column<DockerContainer> = {
   Header: 'Quick Actions',
@@ -25,10 +24,12 @@ export const quickActions: Column<DockerContainer> = {
 function QuickActionsCell({
   row: { original: container },
 }: CellProps<DockerContainer>) {
-  const endpoint = useEnvironment();
-  const offlineMode = endpoint.Status !== EnvironmentStatus.Up;
+  const environmentQuery = useCurrentEnvironment();
 
-  const { settings } = useTableSettings<ContainersTableSettings>();
+  const environment = environmentQuery.data;
+  const offlineMode = !environment || isOfflineEndpoint(environment);
+
+  const { settings } = useTableSettings<TableSettings>();
 
   const { hiddenQuickActions = [] } = settings;
 

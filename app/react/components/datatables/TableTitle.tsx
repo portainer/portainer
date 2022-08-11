@@ -1,10 +1,12 @@
-import { PropsWithChildren } from 'react';
+import { ComponentType, PropsWithChildren, ReactNode } from 'react';
 
-import { Icon, IconProps } from '@@/Icon';
+import { Icon } from '@@/Icon';
 
 import { useTableContext } from './TableContainer';
 
-interface Props extends IconProps {
+interface Props {
+  icon?: ReactNode | ComponentType<unknown>;
+  featherIcon?: boolean;
   label: string;
 }
 
@@ -19,13 +21,15 @@ export function TableTitle({
   return (
     <div className="toolBar">
       <div className="toolBarTitle">
-        <div className="widget-icon">
-          <Icon
-            icon={icon}
-            feather={featherIcon}
-            className="space-right feather"
-          />
-        </div>
+        {icon && (
+          <div className="widget-icon">
+            <Icon
+              icon={icon}
+              feather={featherIcon}
+              className="space-right feather"
+            />
+          </div>
+        )}
 
         {label}
       </div>
