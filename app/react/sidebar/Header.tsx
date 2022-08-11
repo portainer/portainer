@@ -19,14 +19,43 @@ export function Header({ logo: customLogo }: Props) {
   const { toggle, isOpen } = useSidebarState();
 
   return (
-    <div className="flex justify-between items-center">
-      <Link
-        to="portainer.home"
-        data-cy="portainerSidebar-homeImage"
-        className="text-2xl text-white no-underline hover:no-underline hover:text-white focus:no-underline focus:text-white focus:outline-none"
-      >
-        <Logo customLogo={customLogo} isOpen={isOpen} />
-      </Link>
+    <div className="flex">
+      <div>
+        <Link
+          to="portainer.home"
+          data-cy="portainerSidebar-homeImage"
+          className="text-2xl text-white no-underline hover:no-underline hover:text-white focus:no-underline focus:text-white focus:outline-none"
+        >
+          <Logo customLogo={customLogo} isOpen={isOpen} />
+        </Link>
+        {isOpen && customLogo && (
+          <div
+            className={clsx(
+              'uppercase text-[9.4px] space-x-1 tracking-[.28em] pt-3',
+              'text-gray-3',
+              'th-dark:text-gray-warm-6'
+            )}
+          >
+            <span className="font-medium">Powered by</span>
+            <span className="font-semibold">
+              {isBE ? (
+                'portainer business'
+              ) : (
+                <a
+                  href="https://www.portainer.io/install-BE-now"
+                  className={clsx(
+                    'hover:underline',
+                    'text-blue-6 hover:text-blue-8',
+                    'th-dark:text-blue-7 th-dark:hover:text-blue-9'
+                  )}
+                >
+                  portainer community
+                </a>
+              )}
+            </span>
+          </div>
+        )}
+      </div>
 
       <button
         type="button"
