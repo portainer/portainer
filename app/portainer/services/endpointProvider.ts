@@ -1,11 +1,16 @@
 import { ping } from '@/docker/services/ping';
+
+import { Environment } from '../environments/types';
 import { PortainerEndpointTypes } from '../models/endpoint/models';
 
-angular.module('portainer.app').factory('EndpointProvider', EndpointProvider);
+interface State {
+  currentEndpoint: Environment | null;
+  pingInterval: NodeJS.Timer | null;
+}
 
 /* @ngInject */
-function EndpointProvider() {
-  const state = {
+export function EndpointProvider() {
+  const state: State = {
     currentEndpoint: null,
     pingInterval: null,
   };
@@ -13,10 +18,10 @@ function EndpointProvider() {
   return { endpointID, setCurrentEndpoint, currentEndpoint, clean };
 
   function endpointID() {
-    return state.currentEndpoint && state.currentEndpoint.Id;
+    return state.currentEndpoint?.Id;
   }
 
-  function setCurrentEndpoint(endpoint) {
+  function setCurrentEndpoint(endpoint: Environment | null) {
     state.currentEndpoint = endpoint;
 
     if (state.pingInterval) {
@@ -24,7 +29,10 @@ function EndpointProvider() {
       state.pingInterval = null;
     }
 
-    if (endpoint && endpoint.Type == PortainerEndpointTypes.EdgeAgentOnDockerEnvironment) {
+    if (
+      endpoint &&
+      endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment
+    ) {
       state.pingInterval = setInterval(() => ping(endpoint.Id), 60 * 1000);
     }
   }
