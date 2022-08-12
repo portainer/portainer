@@ -1,9 +1,10 @@
 import { Column } from 'react-table';
 import { useSref } from '@uirouter/react';
 
-import { useEnvironment } from '@/portainer/environments/useEnvironment';
-import { EnvironmentStatus } from '@/portainer/environments/types';
 import type { DockerContainer } from '@/react/docker/containers/types';
+import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
+
+import { useRowContext } from '../RowContext';
 
 export const image: Column<DockerContainer> = {
   Header: 'Image',
@@ -21,14 +22,13 @@ interface Props {
 }
 
 function ImageCell({ value: imageName }: Props) {
-  const endpoint = useEnvironment();
-  const offlineMode = endpoint.Status !== EnvironmentStatus.Up;
-
+  const linkProps = useSref('docker.images.image', { id: imageName });
   const shortImageName = trimSHASum(imageName);
 
-  const linkProps = useSref('docker.images.image', { id: imageName });
-  if (offlineMode) {
-    return shortImageName;
+  const { environment } = useRowContext();
+
+  if (isOfflineEndpoint(environment)) {
+    return <span>{shortImageName}</span>;
   }
 
   return (

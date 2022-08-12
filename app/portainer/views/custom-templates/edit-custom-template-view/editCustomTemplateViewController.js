@@ -110,7 +110,7 @@ class EditCustomTemplateViewController {
       const userId = userDetails.ID;
       await this.ResourceControlService.applyResourceControl(userId, this.formValues.AccessControlData, this.formValues.ResourceControl);
 
-      this.Notifications.success('Custom template successfully updated');
+      this.Notifications.success('Success', 'Custom template successfully updated');
       this.state.isEditorDirty = false;
       this.$state.go('docker.templates.custom');
     } catch (err) {

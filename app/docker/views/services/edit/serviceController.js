@@ -609,7 +609,7 @@ angular.module('portainer.docker').controller('ServiceController', [
           return $q.when($scope.webhookID && WebhookService.deleteWebhook($scope.webhookID));
         })
         .then(function success() {
-          Notifications.success('Service successfully deleted');
+          Notifications.success('Success', 'Service successfully deleted');
           $state.go('docker.services', {});
         })
         .catch(function error(err) {

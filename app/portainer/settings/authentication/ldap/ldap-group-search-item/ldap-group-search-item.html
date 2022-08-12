@@ -9,7 +9,7 @@
         limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
         limited-feature-tabindex="-1"
       >
-        <i class="fa fa-trash" aria-hidden="true"></i>
+        <pr-icon icon="'trash-2'" feather="true"></pr-icon>
       </button>
     </div>
 
@@ -29,10 +29,11 @@
     </div>
 
     <div class="form-group">
-      <div class="col-sm-12" style="margin-bottom: 5px">
-        <label class="control-label text-left">Groups</label>
-        <span class="label label-default interactive" style="margin-left: 10px" ng-click="$ctrl.addGroup()">
-          <i class="fa fa-plus-circle" aria-hidden="true"></i> add another group
+      <div class="col-sm-12 vertical-center" style="margin-bottom: 5px">
+        <label class="control-label text-left !pt-0">Groups</label>
+        <span class="label label-default interactive vertical-center" style="margin-left: 10px" ng-click="$ctrl.addGroup()">
+          <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+          add another group
         </span>
       </div>
       <div class="col-sm-12" ng-if="$ctrl.groups.length">
@@ -62,13 +63,13 @@
               </div>
               <div class="col-sm-3 text-right">
                 <button
-                  class="btn btn-sm btn-danger"
+                  class="btn btn-md btn-danger"
                   type="button"
                   ng-click="$ctrl.removeGroup($index)"
                   limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
                   limited-feature-tabindex="-1"
                 >
-                  <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                  <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
                 </button>
               </div>
             </div>

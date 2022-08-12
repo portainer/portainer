@@ -96,94 +96,6 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       },
     };
 
-    var containers = {
-      name: 'docker.containers',
-      url: '/containers',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/containers.html',
-          controller: 'ContainersController',
-        },
-      },
-    };
-
-    var container = {
-      name: 'docker.containers.container',
-      url: '/:id?nodeName',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/edit/container.html',
-          controller: 'ContainerController',
-        },
-      },
-    };
-
-    var containerAttachConsole = {
-      name: 'docker.containers.container.attach',
-      url: '/attach',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/console/attach.html',
-          controller: 'ContainerConsoleController',
-        },
-      },
-    };
-
-    var containerExecConsole = {
-      name: 'docker.containers.container.exec',
-      url: '/exec',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/console/exec.html',
-          controller: 'ContainerConsoleController',
-        },
-      },
-    };
-
-    var containerCreation = {
-      name: 'docker.containers.new',
-      url: '/new?nodeName&from',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/create/createcontainer.html',
-          controller: 'CreateContainerController',
-        },
-      },
-    };
-
-    var containerInspect = {
-      name: 'docker.containers.container.inspect',
-      url: '/inspect',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/inspect/containerinspect.html',
-          controller: 'ContainerInspectController',
-        },
-      },
-    };
-
-    var containerLogs = {
-      name: 'docker.containers.container.logs',
-      url: '/logs',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/logs/containerlogs.html',
-          controller: 'ContainerLogsController',
-        },
-      },
-    };
-
-    var containerStats = {
-      name: 'docker.containers.container.stats',
-      url: '/stats',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/stats/containerstats.html',
-          controller: 'ContainerStatsController',
-        },
-      },
-    };
-
     const customTemplates = {
       name: 'docker.templates.custom',
       url: '/custom',
@@ -613,14 +525,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     $stateRegistryProvider.register(configs);
     $stateRegistryProvider.register(config);
     $stateRegistryProvider.register(configCreation);
-    $stateRegistryProvider.register(containers);
-    $stateRegistryProvider.register(container);
-    $stateRegistryProvider.register(containerExecConsole);
-    $stateRegistryProvider.register(containerAttachConsole);
-    $stateRegistryProvider.register(containerCreation);
-    $stateRegistryProvider.register(containerInspect);
-    $stateRegistryProvider.register(containerLogs);
-    $stateRegistryProvider.register(containerStats);
+
     $stateRegistryProvider.register(customTemplates);
     $stateRegistryProvider.register(customTemplatesNew);
     $stateRegistryProvider.register(customTemplatesEdit);

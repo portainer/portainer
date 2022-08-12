@@ -6,9 +6,12 @@
 .boxselector_wrapper .boxselector_header,
 .box-selector-item .boxselector_header {
   font-size: 18px;
+  margin-right: 20px;
   margin-bottom: 5px;
   font-weight: bold;
   user-select: none;
+  color: var(--text-boxselector-header);
+  padding: 0px 10px;
 }
 
 .boxselector_header .fa,
@@ -112,6 +115,16 @@
 
 .boxselector_content {
   padding-left: 20px;
+}
+
+.boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
+.box-selector-item input[type='radio']:not(:disabled) ~ label {
+  background-color: var(--bg-boxselector-color);
+}
+
+.boxselector_img_container {
+  line-height: 90px;
+  margin-bottom: 0;
 }
 
 .box-selector-item p {

@@ -1,19 +1,23 @@
-import { Zap } from 'react-feather';
-
 import {
   DockerSnapshot,
   EnvironmentType,
 } from '@/portainer/environments/types';
 import { addPlural } from '@/portainer/helpers/strings';
 
+import { AgentVersionTag } from './AgentVersionTag';
 import { Stat } from './EnvironmentStatsItem';
 
 interface Props {
   snapshots: DockerSnapshot[];
   type: EnvironmentType;
+  agentVersion: string;
 }
 
-export function EnvironmentStatsDocker({ snapshots = [], type }: Props) {
+export function EnvironmentStatsDocker({
+  snapshots = [],
+  type,
+  agentVersion,
+}: Props) {
   if (snapshots.length === 0) {
     return (
       <div className="blocklist-item-line endpoint-item">
@@ -60,15 +64,9 @@ export function EnvironmentStatsDocker({ snapshots = [], type }: Props) {
       </span>
 
       <span className="small text-muted space-x-2 vertical-center">
-        <span>{snapshot.Swarm ? 'Swarm' : 'Standalone'}</span>
-        <span>{snapshot.DockerVersion}</span>
-        {type === EnvironmentType.AgentOnDocker && (
-          <span>
-            +{' '}
-            <Zap className="icon icon-xs vertical-center" aria-hidden="true" />{' '}
-            Agent
-          </span>
-        )}
+        <span>
+          {snapshot.Swarm ? 'Swarm' : 'Standalone'} {snapshot.DockerVersion}
+        </span>
         {snapshot.Swarm && (
           <Stat
             value={addPlural(snapshot.NodeCount, 'node')}
@@ -76,6 +74,7 @@ export function EnvironmentStatsDocker({ snapshots = [], type }: Props) {
             featherIcon
           />
         )}
+        <AgentVersionTag version={agentVersion} type={type} />
       </span>
     </div>
   );

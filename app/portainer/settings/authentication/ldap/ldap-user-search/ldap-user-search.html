@@ -15,13 +15,14 @@
 <div class="form-group" style="margin-top: 10px">
   <div class="col-sm-12">
     <button
-      class="label label-default interactive"
+      class="label label-default interactive vertical-center"
       style="border: 0"
       ng-click="$ctrl.onAddClick()"
       limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
       limited-feature-tabindex="-1"
     >
-      <i class="fa fa-plus-circle" aria-hidden="true"></i> add user search configuration
+      <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+      add user search configuration
     </button>
   </div>
   <div class="col-sm-12" style="margin-top: 10px">
@@ -32,7 +33,7 @@
 </div>
 
 <div ng-if="$ctrl.showTable">
-  <div class="form-group">
-    <ldap-users-datatable dataset="$ctrl.users" title-text="Users" title-icon="fa-users" table-key="ldapUsers" order-by="" reverse-order=""></ldap-users-datatable>
+  <div class="form-group col-sm-12">
+    <ldap-users-datatable dataset="$ctrl.users" title-text="Users" title-icon="users" table-key="ldapUsers" order-by="" reverse-order=""></ldap-users-datatable>
   </div>
 </div>

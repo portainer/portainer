@@ -67,6 +67,9 @@ func NewHandler(bouncer requestBouncer, demoService *demo.Service) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshots))).Methods(http.MethodPost)
 	h.Handle("/endpoints",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
+	h.Handle("/endpoints/agent_versions",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.agentVersions))).Methods(http.MethodGet)
+
 	h.Handle("/endpoints/{id}",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",

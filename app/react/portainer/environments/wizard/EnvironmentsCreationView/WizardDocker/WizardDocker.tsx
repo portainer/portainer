@@ -22,28 +22,28 @@ const defaultOptions: BoxSelectorOption<
 >[] = [
   {
     id: 'agent',
-    icon: 'fa fa-bolt',
+    icon: 'svg-agent',
     label: 'Agent',
     description: '',
     value: 'agent',
   },
   {
     id: 'api',
-    icon: 'fa fa-cloud',
+    icon: 'svg-api',
     label: 'API',
     description: '',
     value: 'api',
   },
   {
     id: 'socket',
-    icon: 'fab fa-docker',
+    icon: 'svg-socket',
     label: 'Socket',
     description: '',
     value: 'socket',
   },
   {
     id: 'edgeAgent',
-    icon: 'fa fa-cloud', // Todo cloud with docker
+    icon: 'svg-edgeagent',
     label: 'Edge Agent',
     description: '',
     value: 'edgeAgent',

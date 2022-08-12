@@ -132,10 +132,10 @@
             <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px" name="stackUpdateForm">
               <div class="form-group">
-                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion == 2">
+                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == STACK_TYPES.DockerCompose && composeSyntaxMaxVersion == 2">
                   This stack will be deployed using the equivalent of <code>docker compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
                 </span>
-                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == 2 && composeSyntaxMaxVersion > 2">
+                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px" ng-if="stackType == STACK_TYPES.DockerCompose && composeSyntaxMaxVersion > 2">
                   This stack will be deployed using <code>docker compose</code>.
                 </span>
                 <span class="col-sm-12 text-muted small">
@@ -222,11 +222,11 @@
   </div>
 </div>
 
-<div class="row" ng-if="containers && (!orphaned || orphanedRunning)">
-  <div class="col-sm-12">
-    <containers-datatable dataset="containers" endpoint="endpoint" table-key="stack-containers"></containers-datatable>
-  </div>
-</div>
+<stack-containers-datatable
+  ng-if="stackType !== STACK_TYPES.DockerSwarm && (!orphaned || orphanedRunning)"
+  stack-name="stackName"
+  environment="endpoint"
+></stack-containers-datatable>
 
 <div class="row" ng-if="services && (!orphaned || orphanedRunning)">
   <div class="col-sm-12">

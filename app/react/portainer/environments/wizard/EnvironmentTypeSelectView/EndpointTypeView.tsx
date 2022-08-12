@@ -33,7 +33,7 @@ export function EnvironmentTypeSelectView() {
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <WidgetTitle icon="fa-magic" title="Environment Wizard" />
+            <WidgetTitle icon="svg-magic" title="Environment Wizard" />
             <WidgetBody>
               <EnvironmentSelector
                 value={types}

@@ -166,6 +166,7 @@ interface CreateEdgeAgentEnvironment {
   meta?: EnvironmentMetadata;
   pollFrequency: number;
   gpus?: Gpu[];
+  isEdgeDevice?: boolean;
 }
 
 export function createEdgeAgentEnvironment({
@@ -173,18 +174,20 @@ export function createEdgeAgentEnvironment({
   portainerUrl,
   meta = { tagIds: [] },
   gpus = [],
+  isEdgeDevice,
 }: CreateEdgeAgentEnvironment) {
   return createEnvironment(
     name,
     EnvironmentCreationTypes.EdgeAgentEnvironment,
     {
       url: portainerUrl,
-      ...meta,
       tls: {
         skipVerify: true,
         skipClientVerify: true,
       },
       gpus,
+      isEdgeDevice,
+      ...meta,
     }
   );
 }

@@ -9,13 +9,13 @@ import { AccessControlPanel } from '@/portainer/access-control/AccessControlPane
 import { ResourceControlType } from '@/portainer/access-control/types';
 import { DockerContainer } from '@/react/docker/containers/types';
 import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+import { useContainers } from '@/react/docker/containers/queries/containers';
 
 import { PageHeader } from '@@/PageHeader';
 
 import { useNetwork, useDeleteNetwork } from '../queries';
 import { isSystemNetwork } from '../network.helper';
 import { DockerNetwork, NetworkContainer } from '../types';
-import { useContainers } from '../../containers/queries';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 import { NetworkOptionsTable } from './NetworkOptionsTable';
@@ -38,7 +38,7 @@ export function ItemView() {
   const filters = {
     network: [networkId],
   };
-  const containersQuery = useContainers(environmentId, filters);
+  const containersQuery = useContainers(environmentId, true, filters);
 
   useEffect(() => {
     if (networkQuery.data && containersQuery.data) {

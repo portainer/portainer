@@ -48,18 +48,12 @@ a:focus {
   border: 1px solid var(--border-input-group-addon-color);
 }
 
-.btn-default {
-  color: var(--text-btn-default-color);
-  background-color: var(--bg-btn-default-color);
-  border-color: var(--border-btn-default-color);
-}
-
 .text-danger {
   color: var(--ui-error-9);
 }
 
 .table .table {
-  background-color: var(--bg-table-color);
+  background-color: initial;
 }
 
 .table-bordered {
@@ -207,6 +201,7 @@ code {
 
 .dropdown-menu {
   background: var(--bg-dropdown-menu-color);
+  border-radius: 8px;
 }
 
 .dropdown-menu > li > a {
@@ -398,33 +393,10 @@ input:-webkit-autofill {
   -webkit-text-fill-color: var(--text-input-autofill-color) !important;
 }
 
-.btn:hover {
-  color: var(--text-button-hover-color);
-}
+/* Overide Vendor CSS */
 
 .btn-link:hover {
   color: var(--text-link-hover-color) !important;
-}
-
-.btn-default:hover {
-  background-color: var(--bg-btn-default-hover-color);
-}
-
-.btn-primary:hover {
-  color: var(--white-color) !important;
-}
-
-.btn-success:hover {
-  color: var(--white-color);
-}
-
-/* Overide Vendor CSS */
-
-.btn.disabled,
-.btn[disabled],
-fieldset[disabled] .btn {
-  pointer-events: none;
-  touch-action: none;
 }
 
 .multiSelect.inlineBlock button {
@@ -432,12 +404,49 @@ fieldset[disabled] .btn {
 }
 
 .nav-tabs > li.active > a {
-  border-top: 0px;
-  border-left: 0px;
-  border-right: 0px;
-  border-bottom: 3px solid red;
+  border: 0px;
 }
 
 .label-default {
   line-height: 11px;
+}
+
+/* Code Script Style */
+.code-script {
+  background-color: var(--bg-code-script-color);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding: 5px;
+}
+
+.nav-container {
+  border: 1px solid var(--border-nav-container-color);
+  background-color: var(--bg-nav-container-color);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.nav-tabs > li {
+  background-color: var(--bg-nav-tabs-active-color);
+  border-top-right-radius: 8px;
+}
+
+/* Code Script Style */
+.code-script {
+  background-color: var(--bg-code-script-color);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding: 5px;
+}
+
+.nav-container {
+  border: 1px solid var(--border-nav-container-color);
+  background-color: var(--bg-nav-container-color);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.nav-tabs > li {
+  background-color: var(--bg-nav-tabs-active-color);
+  border-top-right-radius: 8px;
 }

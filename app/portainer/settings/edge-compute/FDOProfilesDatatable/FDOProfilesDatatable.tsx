@@ -20,7 +20,7 @@ import {
 import {
   PaginationTableSettings,
   SortableTableSettings,
-} from '@@/datatables/types';
+} from '@@/datatables/types-old';
 
 import { useFDOProfiles } from './useFDOProfiles';
 import { useColumns } from './columns';

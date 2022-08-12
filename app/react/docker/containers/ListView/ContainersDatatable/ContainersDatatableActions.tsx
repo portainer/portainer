@@ -1,11 +1,21 @@
 import { useRouter } from '@uirouter/react';
+import {
+  Pause,
+  Play,
+  Plus,
+  RefreshCw,
+  Slash,
+  Square,
+  Trash2,
+} from 'react-feather';
 
 import * as notifications from '@/portainer/services/notifications';
 import { useAuthorizations, Authorized } from '@/portainer/hooks/useUser';
 import { confirmContainerDeletion } from '@/portainer/services/modal.service/prompt';
 import { setPortainerAgentTargetHeader } from '@/portainer/services/http-request.helper';
-import type {
+import {
   ContainerId,
+  ContainerStatus,
   DockerContainer,
 } from '@/react/docker/containers/types';
 import {
@@ -40,13 +50,22 @@ export function ContainersDatatableActions({
 }: Props) {
   const selectedItemCount = selectedItems.length;
   const hasPausedItemsSelected = selectedItems.some(
-    (item) => item.Status === 'paused'
+    (item) => item.State === ContainerStatus.Paused
   );
   const hasStoppedItemsSelected = selectedItems.some((item) =>
-    ['stopped', 'created'].includes(item.Status)
+    [
+      ContainerStatus.Stopped,
+      ContainerStatus.Created,
+      ContainerStatus.Exited,
+    ].includes(item.Status)
   );
   const hasRunningItemsSelected = selectedItems.some((item) =>
-    ['running', 'healthy', 'unhealthy', 'starting'].includes(item.Status)
+    [
+      ContainerStatus.Running,
+      ContainerStatus.Healthy,
+      ContainerStatus.Unhealthy,
+      ContainerStatus.Starting,
+    ].includes(item.Status)
   );
 
   const isAuthorized = useAuthorizations([
@@ -74,8 +93,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onStartClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasStoppedItemsSelected}
+            icon={Play}
           >
-            <i className="fa fa-play space-right" aria-hidden="true" />
             Start
           </Button>
         </Authorized>
@@ -85,8 +104,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onStopClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
+            icon={Square}
           >
-            <i className="fa fa-stop space-right" aria-hidden="true" />
             Stop
           </Button>
         </Authorized>
@@ -95,9 +114,9 @@ export function ContainersDatatableActions({
           <Button
             color="light"
             onClick={() => onKillClick(selectedItems)}
-            disabled={selectedItemCount === 0}
+            disabled={selectedItemCount === 0 || hasStoppedItemsSelected}
+            icon={Slash}
           >
-            <i className="fa fa-bomb space-right" aria-hidden="true" />
             Kill
           </Button>
         </Authorized>
@@ -107,8 +126,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onRestartClick(selectedItems)}
             disabled={selectedItemCount === 0}
+            icon={RefreshCw}
           >
-            <i className="fa fa-sync space-right" aria-hidden="true" />
             Restart
           </Button>
         </Authorized>
@@ -118,8 +137,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onPauseClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasRunningItemsSelected}
+            icon={Pause}
           >
-            <i className="fa fa-pause space-right" aria-hidden="true" />
             Pause
           </Button>
         </Authorized>
@@ -129,8 +148,8 @@ export function ContainersDatatableActions({
             color="light"
             onClick={() => onResumeClick(selectedItems)}
             disabled={selectedItemCount === 0 || !hasPausedItemsSelected}
+            icon={Play}
           >
-            <i className="fa fa-play space-right" aria-hidden="true" />
             Resume
           </Button>
         </Authorized>
@@ -140,8 +159,8 @@ export function ContainersDatatableActions({
             color="dangerlight"
             onClick={() => onRemoveClick(selectedItems)}
             disabled={selectedItemCount === 0}
+            icon={Trash2}
           >
-            <i className="fa fa-trash-alt space-right" aria-hidden="true" />
             Remove
           </Button>
         </Authorized>
@@ -150,10 +169,7 @@ export function ContainersDatatableActions({
       {isAddActionVisible && (
         <Authorized authorizations="DockerContainerCreate">
           <Link to="docker.containers.new" className="space-left">
-            <Button>
-              <i className="fa fa-plus space-right" aria-hidden="true" />
-              Add container
-            </Button>
+            <Button icon={Plus}>Add container</Button>
           </Link>
         </Authorized>
       )}
@@ -228,7 +244,7 @@ export function ContainersDatatableActions({
 
   function onRemoveClick(selectedItems: DockerContainer[]) {
     const isOneContainerRunning = selectedItems.some(
-      (container) => container.Status === 'running'
+      (container) => container.State === 'running'
     );
 
     const runningTitle = isOneContainerRunning ? 'running' : '';

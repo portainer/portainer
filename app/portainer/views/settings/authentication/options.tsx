@@ -6,8 +6,7 @@ import Oauth from '@/assets/ico/oauth.svg?c';
 export const options = [
   {
     id: 'auth_internal',
-    icon: 'user',
-    featherIcon: true,
+    icon: 'svg-internal',
     label: 'Internal',
     description: 'Internal authentication mechanism',
     value: 1,

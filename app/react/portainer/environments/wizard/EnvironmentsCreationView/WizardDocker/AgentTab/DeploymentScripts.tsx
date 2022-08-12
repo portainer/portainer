@@ -59,7 +59,9 @@ function DeployCode({ code }: DeployCodeProps) {
       <span className="text-muted small">
         CLI script for installing agent on your environment with Docker Swarm:
       </span>
-      <Code>{code}</Code>
+      <div className="code-script">
+        <Code>{code}</Code>
+      </div>
       <CopyButton copyText={code}>Copy command</CopyButton>
     </>
   );

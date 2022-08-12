@@ -7,7 +7,6 @@ import { UserViewModel } from '@/portainer/models/user';
 import { HeaderContainer } from './HeaderContainer';
 import { Breadcrumbs } from './Breadcrumbs';
 import { HeaderTitle } from './HeaderTitle';
-import { HeaderContent } from './HeaderContent';
 
 export default {
   component: HeaderContainer,
@@ -28,14 +27,13 @@ function Template({ title }: StoryProps) {
     <UserContext.Provider value={state}>
       <HeaderContainer>
         <HeaderTitle title={title} />
-        <HeaderContent>
-          <Breadcrumbs
-            breadcrumbs={[
-              { link: 'example', label: 'crumb1' },
-              { label: 'crumb2' },
-            ]}
-          />
-        </HeaderContent>
+
+        <Breadcrumbs
+          breadcrumbs={[
+            { link: 'example', label: 'crumb1' },
+            { label: 'crumb2' },
+          ]}
+        />
       </HeaderContainer>
     </UserContext.Provider>
   );

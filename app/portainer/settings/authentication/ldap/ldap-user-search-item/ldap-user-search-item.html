@@ -10,7 +10,7 @@
         limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
         limited-feature-tabindex="-1"
       >
-        <i class="fa fa-trash" aria-hidden="true"></i>
+        <pr-icon icon="'trash-2'" feather="true"></pr-icon>
       </button>
     </div>
 
@@ -63,13 +63,14 @@
         <label class="control-label text-left">Allowed Groups (optional)</label>
         <button
           type="button"
-          class="label label-default interactive"
+          class="label label-default interactive vertical-center"
           style="margin-left: 10px; border: 0"
           ng-click="$ctrl.addGroup()"
           limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
           limited-feature-tabindex="-1"
         >
-          <i class="fa fa-plus-circle" aria-hidden="true"></i> add another group
+          <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+          add another group
         </button>
       </div>
       <div class="col-sm-12">

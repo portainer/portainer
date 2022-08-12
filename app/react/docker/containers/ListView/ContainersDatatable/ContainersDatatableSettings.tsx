@@ -1,17 +1,18 @@
-import type { ContainersTableSettings } from '@/react/docker/containers/types';
-
-import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
-import { useTableSettings } from '@@/datatables/useTableSettings';
 import { Checkbox } from '@@/form-components/Checkbox';
+import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
+
+import { TableSettings } from './types';
+import { TRUNCATE_LENGTH } from './datatable-store';
 
 interface Props {
-  isRefreshVisible: boolean;
+  isRefreshVisible?: boolean;
+  settings: TableSettings;
 }
 
-export function ContainersDatatableSettings({ isRefreshVisible }: Props) {
-  const { settings, setTableSettings } =
-    useTableSettings<ContainersTableSettings>();
-
+export function ContainersDatatableSettings({
+  isRefreshVisible,
+  settings,
+}: Props) {
   return (
     <>
       <Checkbox
@@ -19,23 +20,18 @@ export function ContainersDatatableSettings({ isRefreshVisible }: Props) {
         label="Truncate container name"
         checked={settings.truncateContainerName > 0}
         onChange={() =>
-          setTableSettings((settings) => ({
-            ...settings,
-            truncateContainerName: settings.truncateContainerName > 0 ? 0 : 32,
-          }))
+          settings.setTruncateContainerName(
+            settings.truncateContainerName > 0 ? 0 : TRUNCATE_LENGTH
+          )
         }
       />
 
       {isRefreshVisible && (
         <TableSettingsMenuAutoRefresh
           value={settings.autoRefreshRate}
-          onChange={handleRefreshRateChange}
+          onChange={(value) => settings.setAutoRefreshRate(value)}
         />
       )}
     </>
   );
-
-  function handleRefreshRateChange(autoRefreshRate: number) {
-    setTableSettings({ autoRefreshRate });
-  }
 }

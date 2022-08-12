@@ -1,4 +1,1 @@
-export {
-  ContainerQuickActions,
-  ContainerQuickActionsAngular,
-} from './ContainerQuickActions';
+export { ContainerQuickActions } from './ContainerQuickActions';

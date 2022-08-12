@@ -3,7 +3,7 @@ import {
   RefreshableTableSettings,
   SettableColumnsTableSettings,
   SortableTableSettings,
-} from '@@/datatables/types';
+} from '@@/datatables/types-old';
 
 export interface Pagination {
   pageLimit: number;

@@ -84,7 +84,7 @@ class KubernetesVolumeController {
     try {
       this.volume.PersistentVolumeClaim.Storage = this.state.volumeSize + this.state.volumeSizeUnit.charAt(0);
       await this.KubernetesPersistentVolumeClaimService.patch(this.oldVolume.PersistentVolumeClaim, this.volume.PersistentVolumeClaim);
-      this.Notifications.success('Volume successfully updated');
+      this.Notifications.success('Success', 'Volume successfully updated');
 
       if (redeploy) {
         const promises = _.flatten(
@@ -93,7 +93,7 @@ class KubernetesVolumeController {
           })
         );
         await Promise.all(promises);
-        this.Notifications.success('Applications successfully redeployed');
+        this.Notifications.success('Success', 'Applications successfully redeployed');
       }
 
       this.$state.reload(this.$state.current);

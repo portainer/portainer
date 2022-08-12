@@ -12,6 +12,7 @@ import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';
 import { FormControl } from '@@/form-components/FormControl';
 import { BoxSelector } from '@@/BoxSelector';
+import { Icon } from '@@/Icon';
 
 import { NameField, nameValidation } from '../shared/NameField';
 import { AnalyticsStateKey } from '../types';
@@ -37,7 +38,7 @@ const initialValues: FormValues = {
   },
 };
 
-const options = [buildOption('api', 'fa fa-bolt', 'API', '', 'api')];
+const options = [buildOption('api', 'svg-api', 'API', '', 'api')];
 
 interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
@@ -116,11 +117,16 @@ export function WizardAzure({ onCreate }: Props) {
             <div className="row">
               <div className="col-sm-12">
                 <LoadingButton
+                  className="vertical-center"
                   loadingText="Connecting environment..."
                   isLoading={mutation.isLoading}
                   disabled={!dirty || !isValid}
                 >
-                  <i className="fa fa-plug" aria-hidden="true" /> Connect
+                  <Icon
+                    icon="svg-plug"
+                    className="icon icon-sm vertical-center"
+                  />{' '}
+                  Connect
                 </LoadingButton>
               </div>
             </div>

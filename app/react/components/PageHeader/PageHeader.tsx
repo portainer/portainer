@@ -6,7 +6,6 @@ import { Button } from '../buttons';
 import { Breadcrumbs } from './Breadcrumbs';
 import { Crumb } from './Breadcrumbs/Breadcrumbs';
 import { HeaderContainer } from './HeaderContainer';
-import { HeaderContent } from './HeaderContent';
 import { HeaderTitle } from './HeaderTitle';
 import styles from './PageHeader.module.css';
 
@@ -33,9 +32,8 @@ export function PageHeader({
 
   return (
     <HeaderContainer>
-      <HeaderContent>
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
-      </HeaderContent>
+      <Breadcrumbs breadcrumbs={breadcrumbs} />
+
       <HeaderTitle title={title}>
         {reload && (
           <Button

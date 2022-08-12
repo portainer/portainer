@@ -2,7 +2,7 @@
   padding: 0;
   margin: 0;
   background-color: transparent;
-  width: 1em;
+  border: 0;
 }
 
 .btn-none:focus {

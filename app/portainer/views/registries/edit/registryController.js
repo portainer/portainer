@@ -54,7 +54,7 @@ export default class RegistryController {
         registry.Password = this.Password;
 
         await this.RegistryService.updateRegistry(registry);
-        this.Notifications.success('Registry successfully updated');
+        this.Notifications.success('Success', 'Registry successfully updated');
         this.$state.go('portainer.registries');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to update registry');

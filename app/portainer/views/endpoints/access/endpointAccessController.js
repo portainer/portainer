@@ -36,7 +36,7 @@ class EndpointAccessController {
     try {
       this.state.actionInProgress = true;
       await this.EndpointService.updateEndpoint(this.$transition$.params().id, this.endpoint);
-      this.Notifications.success('Access successfully updated');
+      this.Notifications.success('Success', 'Access successfully updated');
       this.$state.reload(this.$state.current);
     } catch (err) {
       this.state.actionInProgress = false;

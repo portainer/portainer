@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 
 const localStoragePrefix = 'portainer';
 
-function keyBuilder(key: string) {
+export function keyBuilder(key: string) {
   return `${localStoragePrefix}.${key}`;
 }
 
