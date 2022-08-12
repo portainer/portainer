@@ -1,46 +1,61 @@
 <page-header title="'User Activity'" breadcrumbs="['Activity Logs']" reload="true"> </page-header>
 
-<div class="be-indicator-container">
-  <rd-widget>
-    <rd-widget-body>
-      <div class="form-horizontal">
-        <div class="form-group">
-          <label for="dateRangeInput" class="col-sm-2 control-label text-left">Date Range</label>
-          <div class="col-sm-6">
-            <input type="text" class="form-control" disabled />
+<div class="be-indicator-container limited-be">
+  <div class="overlay">
+    <div class="limited-be-link vertical-center"
+      ><be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator
+      ><portainer-tooltip message="'This feature is currently limited to Business Edition users only. '"></portainer-tooltip
+    ></div>
+    <div class="limited-be-content">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="dateRangeInput" class="col-sm-2 control-label text-left">Date Range</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" disabled />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <p class="text-muted small vertical-center">
-        <pr-icon icon="'info'" feather="true" class-name="'icon icon-sm icon-primary'"></pr-icon>
-        Portainer user activity logs have a maximum retention of 7 days.
-      </p>
-      <div>
-        <button type="button" class="btn btn-sm btn-primary" limited-feature-dir="{{::$ctrl.limitedFeature}}" limited-feature-class="limited-be" limited-feature-disabled>
-          <pr-icon icon="'download'" feather="true" icon-class="'icon icon-sm'"></pr-icon>
-          Export as CSV
-        </button>
-        <be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator>
-      </div>
-    </rd-widget-body>
-  </rd-widget>
+          <p class="text-muted small vertical-center">
+            <pr-icon icon="'info'" feather="true" class-name="'icon icon-sm icon-primary'"></pr-icon>
+            Portainer user activity logs have a maximum retention of 7 days.
+          </p>
+          <div>
+            <button type="button" class="btn btn-sm btn-primary" limited-feature-dir="{{::$ctrl.limitedFeature}}" limited-feature-class="limited-be" limited-feature-disabled>
+              <pr-icon icon="'download'" feather="true" icon-class="'icon icon-sm'"></pr-icon>
+              Export as CSV
+            </button>
+          </div>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
 </div>
 
-<div class="be-indicator-container">
-  <div class="row">
-    <activity-logs-datatable
-      logs="$ctrl.state.logs"
-      keyword="$ctrl.state.keyword"
-      sort="$ctrl.state.sort"
-      limit="$ctrl.state.limit"
-      context-filter="$ctrl.state.contextFilter"
-      total-items="$ctrl.state.totalItems"
-      current-page="$ctrl.state.currentPage"
-      feature="{{:: $ctrl.limitedFeature}}"
-      on-change-keyword="($ctrl.onChangeKeyword)"
-      on-change-sort="($ctrl.onChangeSort)"
-      on-change-limit="($ctrl.onChangeLimit)"
-      on-change-page="($ctrl.onChangePage)"
-    ></activity-logs-datatable>
+<div class="be-indicator-container limited-be">
+  <div class="overlay">
+    <div class="limited-be-link vertical-center"
+      ><be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator
+      ><portainer-tooltip message="'This feature is currently limited to Business Edition users only. '"></portainer-tooltip
+    ></div>
+    <div class="limited-be-content">
+      <div class="row">
+        <activity-logs-datatable
+          logs="$ctrl.state.logs"
+          keyword="$ctrl.state.keyword"
+          sort="$ctrl.state.sort"
+          limit="$ctrl.state.limit"
+          context-filter="$ctrl.state.contextFilter"
+          total-items="$ctrl.state.totalItems"
+          current-page="$ctrl.state.currentPage"
+          feature="{{:: $ctrl.limitedFeature}}"
+          on-change-keyword="($ctrl.onChangeKeyword)"
+          on-change-sort="($ctrl.onChangeSort)"
+          on-change-limit="($ctrl.onChangeLimit)"
+          on-change-page="($ctrl.onChangePage)"
+        ></activity-logs-datatable>
+      </div>
+    </div>
   </div>
 </div>
