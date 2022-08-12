@@ -53,7 +53,7 @@ a:focus {
 }
 
 .table .table {
-  background-color: var(--bg-table-color);
+  background-color: initial;
 }
 
 .table-bordered {
