@@ -9,7 +9,7 @@
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -64,7 +64,7 @@
             </tr>
             <tr ng-repeat="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder))">
               <td>
-                <span ng-if="item.edit">
+                <span ng-if="item.edit" class="vertical-center">
                   <input
                     class="input-sm"
                     type="text"
@@ -73,14 +73,12 @@
                     auto-focus
                   />
                   <a class="interactive" ng-click="item.edit = false;"><pr-icon icon="'x'" feather="true"></pr-icon></a>
-                  <a class="interactive" ng-click="$ctrl.rename({name: item.Name, newName: item.newName}); item.edit = false;"
-                    ><pr-icon icon="'check-square'" feather="true"></pr-icon
-                  ></a>
+                  <a class="interactive" ng-click="$ctrl.rename({name: item.Name, newName: item.newName}); item.edit = false;"><pr-icon icon="'check'" feather="true"></pr-icon></a>
                 </span>
                 <span ng-if="!item.edit && item.Dir">
-                  <a ng-click="$ctrl.browse({name: item.Name})"><pr-icon icon="'folder'" feather="true" class-name="space-right"></pr-icon>{{ item.Name }}</a>
+                  <a ng-click="$ctrl.browse({name: item.Name})" class="vertical-center"><pr-icon icon="'folder'" feather="true"></pr-icon>{{ item.Name }}</a>
                 </span>
-                <span ng-if="!item.edit && !item.Dir"><pr-icon icon="'file'" feather="true" class-name="space-right"></pr-icon>{{ item.Name }} </span>
+                <span ng-if="!item.edit && !item.Dir" class="vertical-center"><pr-icon icon="'file'" feather="true"></pr-icon>{{ item.Name }}</span>
               </td>
               <td>{{ item.Size | humansize }}</td>
               <td>

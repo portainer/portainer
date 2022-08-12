@@ -7,8 +7,8 @@
         <form class="form-horizontal" autocomplete="off">
           <!-- name-input -->
           <div class="form-group">
-            <label for="service_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11">
+            <label for="service_name" class="col-sm-2 control-label text-left">Name</label>
+            <div class="col-sm-10">
               <input type="text" class="form-control" ng-model="formValues.Name" id="service_name" placeholder="e.g. myService" />
             </div>
           </div>
@@ -266,7 +266,9 @@
                             <span class="input-group-addon">container</span>
                             <input type="text" class="form-control" ng-model="volume.Target" placeholder="e.g. /path/in/container" />
                           </div>
-                          <div class="small" ng-show="!volume.Target"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target is required. </div>
+                          <div class="small text-warning" ng-show="!volume.Target">
+                            <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target is required.
+                          </div>
                         </div>
                         <!-- !container-path -->
                         <!-- volume-type -->
@@ -299,7 +301,9 @@
                               <option selected disabled value="">Select a volume</option>
                             </select>
                           </div>
-                          <div class="small" ng-show="!volume.Source"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Source is required. </div>
+                          <div class="small text-warning" ng-show="!volume.Source">
+                            <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Source is required.
+                          </div>
                         </div>
                         <!-- !volume -->
                         <!-- bind -->
@@ -308,7 +312,9 @@
                             <span class="input-group-addon">host</span>
                             <input type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/on/host" />
                           </div>
-                          <div class="small" ng-show="!volume.Source"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Source is required. </div>
+                          <div class="small text-warning" ng-show="!volume.Source">
+                            <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Source is required.
+                          </div>
                         </div>
                         <!-- !bind -->
                         <!-- read-only -->

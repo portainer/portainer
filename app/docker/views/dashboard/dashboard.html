@@ -17,12 +17,12 @@
 >
   <span class="small">
     <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'MANAGER'">
-      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
       Portainer is connected to a node that is part of a Swarm cluster. Some resources located on other nodes in the cluster might not be available for management, have a look at
       <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">our agent setup</a> for more details.
     </p>
     <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'WORKER'">
-      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
       Portainer is connected to a worker node. Swarm management features will not be available.
     </p>
   </span>
