@@ -99,14 +99,14 @@ export class EditEdgeStackViewController {
 
   async getPaginatedEndpointsAsync(lastId, limit, search) {
     try {
+      if (this.stackEndpointIds.length === 0) {
+        return { endpoints: [], totalCount: 0 };
+      }
+
       const query = { search, endpointIds: this.stackEndpointIds };
       const { value, totalCount } = await getEnvironments({ start: lastId, limit, query });
-      const endpoints = _.map(value, (endpoint) => {
-        const status = this.stack.Status[endpoint.Id];
-        endpoint.Status = status;
-        return endpoint;
-      });
-      return { endpoints, totalCount };
+
+      return { endpoints: value, totalCount };
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
     }

@@ -2,7 +2,8 @@ import { Column } from 'react-table';
 import _ from 'lodash';
 
 import type { DockerContainer, Port } from '@/react/docker/containers/types';
-import { useCurrentEnvironment } from '@/portainer/hooks/useCurrentEnvironment';
+
+import { useRowContext } from '../RowContext';
 
 export const ports: Column<DockerContainer> = {
   Header: 'Published Ports',
@@ -20,10 +21,9 @@ interface Props {
 }
 
 function PortsCell({ value: ports }: Props) {
-  const environmentQuery = useCurrentEnvironment();
+  const { environment } = useRowContext();
 
-  const environment = environmentQuery.data;
-  if (!environment || ports.length === 0) {
+  if (ports.length === 0) {
     return '-';
   }
 

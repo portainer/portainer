@@ -3,7 +3,8 @@ import { useSref } from '@uirouter/react';
 
 import type { DockerContainer } from '@/react/docker/containers/types';
 import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
-import { useCurrentEnvironment } from '@/portainer/hooks/useCurrentEnvironment';
+
+import { useRowContext } from '../RowContext';
 
 export const image: Column<DockerContainer> = {
   Header: 'Image',
@@ -24,11 +25,9 @@ function ImageCell({ value: imageName }: Props) {
   const linkProps = useSref('docker.images.image', { id: imageName });
   const shortImageName = trimSHASum(imageName);
 
-  const environmentQuery = useCurrentEnvironment();
+  const { environment } = useRowContext();
 
-  const environment = environmentQuery.data;
-
-  if (!environment || isOfflineEndpoint(environment)) {
+  if (isOfflineEndpoint(environment)) {
     return <span>{shortImageName}</span>;
   }
 
