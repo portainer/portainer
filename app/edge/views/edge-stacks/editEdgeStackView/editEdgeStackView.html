@@ -33,6 +33,8 @@
                 table-key="edgeStackEndpoints"
                 order-by="Name"
                 retrieve-page="$ctrl.getPaginatedEndpoints"
+                edge-stack-id="$ctrl.stack.Id"
+                endpoints-status="$ctrl.stack.Status"
               >
               </edge-stack-endpoints-datatable>
             </div>

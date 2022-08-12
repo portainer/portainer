@@ -45,6 +45,11 @@ body,
   max-width: 155px;
   max-height: 55px;
 }
+
+.white-space-normal {
+  white-space: normal !important;
+}
+
 .legend .title {
   padding: 0 0.3em;
   margin: 0.5em;
@@ -876,6 +881,10 @@ json-tree .branch-preview {
 .web-editor a:hover {
   color: var(--text-link-hover-color);
   text-decoration-line: underline;
+}
+
+reach-portal > div {
+  z-index: 10;
 }
 
 input[style*='background-image: url("data:image/png'] + [data-cy='auth-passwordInputToggle'] {
