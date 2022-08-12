@@ -1,9 +1,9 @@
 .secondary-heading {
-  background-color: var(--bg-app-datatable-thead) !important;
+  background-color: transparent;
 }
 
 .secondary-body {
-  background-color: var(--bg-app-datatable-tbody);
+  background-color: transparent;
 }
 
 .datatable-wide {

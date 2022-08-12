@@ -149,19 +149,6 @@ a[ng-click] {
   background-color: var(--bg-item-highlighted-null-color);
 }
 
-.service-datatable {
-  background-color: var(--bg-item-highlighted-color);
-  padding: 2px;
-}
-
-.service-datatable thead {
-  background-color: var(--bg-service-datatable-thead) !important;
-}
-
-.service-datatable tbody {
-  background-color: var(--bg-service-datatable-tbody);
-}
-
 .fa.green-icon {
   color: #23ae89;
 }

@@ -1,28 +1,32 @@
-<div class="service-datatable">
+<div class="inner-datatable">
   <table class="table table-condensed table-hover nowrap-cells">
     <thead>
       <tr>
-        <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" style="width: 10%">
-          <a ng-click="$ctrl.changeOrderBy('Status.State')">
-            Status
-            <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status.State' && !$ctrl.state.reverseOrder"></i>
-            <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status.State' && $ctrl.state.reverseOrder"></i>
-          </a>
-          <span class="space-left">
-            <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
-            <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
-          </span>
-          <div class="dropdown-menu" uib-dropdown-menu>
-            <div class="tableMenu">
-              <div class="menuHeader"> Filter by state </div>
-              <div class="menuContent">
-                <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
-                  <input id="filter_state_{{ $ctrl.serviceId }}_{{ $index }}" type="checkbox" ng-model="filter.display" ng-change="$ctrl.onStateFilterChange()" />
-                  <label for="filter_state_{{ $ctrl.serviceId }}_{{ $index }}">{{ filter.label }}</label>
+        <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" class="w-[10%]">
+          <div class="flex">
+            <table-column-header
+              col-title="'Status'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'Status.State'"
+              is-sorted-desc="$ctrl.state.orderBy === 'Status.State' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('Status.State')"
+            ></table-column-header>
+            <span class="space-left">
+              <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
+              <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
+            </span>
+            <div class="dropdown-menu" uib-dropdown-menu>
+              <div class="tableMenu">
+                <div class="menuHeader"> Filter by state </div>
+                <div class="menuContent">
+                  <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
+                    <input id="filter_state_{{ $ctrl.serviceId }}_{{ $index }}" type="checkbox" ng-model="filter.display" ng-change="$ctrl.onStateFilterChange()" />
+                    <label for="filter_state_{{ $ctrl.serviceId }}_{{ $index }}">{{ filter.label }}</label>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.state.open = false;">Close</a>
+                <div>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.state.open = false;">Close</a>
+                </div>
               </div>
             </div>
           </div>
