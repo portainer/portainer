@@ -1028,8 +1028,10 @@
 
                   <div class="form-group" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL && ctrl.state.useServerMetrics">
                     <div class="col-sm-12">
-                      <label for="enable_auto_scaling" class="control-label text-left"> Enable auto scaling for this application </label>
-                      <label class="switch" style="margin-left: 20px">
+                      <div class="col-sm-3 col-lg-2 pl-0 pt-0">
+                        <label for="enable_auto_scaling" class="control-label text-left"> Enable auto scaling for this application </label>
+                      </div>
+                      <label class="switch ml-4 mt-1">
                         <input
                           type="checkbox"
                           class="form-control"
@@ -1037,7 +1039,7 @@
                           ng-model="ctrl.formValues.AutoScaler.IsUsed"
                           data-cy="k8sAppCreate-autoScaleCheckbox"
                         />
-                        <i></i>
+                        <span class="slider round"></span>
                       </label>
                     </div>
                   </div>
