@@ -98,7 +98,8 @@ fieldset[disabled] .btn {
   background-color: var(--ui-gray-3);
 }
 
-.hyperlink {
+.hyperlink,
+.hyperlink:focus {
   color: var(--ui-blue-8);
 }
 

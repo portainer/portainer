@@ -76,19 +76,20 @@
             <div ng-if="$ctrl.formValues.HasQuota">
               <div class="col-sm-12 form-section-title"> Resource limits </div>
               <div>
-                <div class="form-group" ng-if="$ctrl.formValues.HasQuota && !$ctrl.isQuotaValid()">
-                  <span class="col-sm-12 small text-muted">
-                    <p class="vertical-center"
+                <div class="form-group">
+                  <span class="col-sm-12 small text-muted" ng-switch on="$ctrl.formValues.HasQuota && !$ctrl.isQuotaValid()">
+                    <p class="vertical-center mb-0" ng-switch-when="true"
                       ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> At least a single limit must be set for the quota to be
                       valid.
                     </p>
+                    <p class="vertical-center mb-0" ng-switch-default></p>
                   </span>
                 </div>
 
                 <!-- memory-limit-input -->
-                <div class="form-group">
-                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left"> Memory </label>
-                  <div class="col-sm-3">
+                <div class="form-group flex flex-row !mb-0">
+                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left"> Memory limit (MB) </label>
+                  <div class="col-xs-6">
                     <slider
                       model="$ctrl.formValues.MemoryLimit"
                       floor="$ctrl.defaults.MemoryLimit"
@@ -99,7 +100,7 @@
                     >
                     </slider>
                   </div>
-                  <div class="col-sm-2">
+                  <div class="col-sm-2 vertical-center">
                     <input
                       name="memory_limit"
                       type="number"
@@ -111,29 +112,29 @@
                       data-cy="k8sNamespaceCreate-memoryLimitInput"
                       required
                     />
-                    <span class="help-block">
-                      <div class="form-group" ng-show="resourcePoolCreationForm.memory_limit.$invalid">
-                        <div class="col-sm-12 small text-muted">
-                          <div ng-messages="resourcePoolCreationForm.pool_name.$error">
-                            <p class="vertical-center"
-                              ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between
-                              {{ $ctrl.defaults.MemoryLimit }} and
-                              {{ $ctrl.state.sliderMaxMemory }}
-                            </p>
-                          </div>
+                  </div>
+                </div>
+                <div class="flex flex-row w-full">
+                  <span class="col-sm-3 col-lg-2"></span>
+                  <span class="help-block col-sm-9 col-lg-10">
+                    <div ng-show="resourcePoolCreationForm.memory_limit.$invalid">
+                      <div class="small text-muted">
+                        <div ng-messages="resourcePoolCreationForm.pool_name.$error">
+                          <p class="vertical-center"
+                            ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between
+                            {{ $ctrl.defaults.MemoryLimit }} and
+                            {{ $ctrl.state.sliderMaxMemory }}
+                          </p>
                         </div>
                       </div>
-                    </span>
-                  </div>
-                  <div class="col-sm-4">
-                    <p class="small text-muted"> Maximum memory usage (MB) </p>
-                  </div>
+                    </div>
+                  </span>
                 </div>
                 <!-- !memory-limit-input -->
                 <!-- cpu-limit-input -->
-                <div class="form-group">
-                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left"> CPU </label>
-                  <div class="col-sm-5">
+                <div class="form-group flex flex-row">
+                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left"> CPU limit </label>
+                  <div class="col-xs-8">
                     <slider
                       model="$ctrl.formValues.CpuLimit"
                       floor="$ctrl.defaults.CpuLimit"
@@ -144,9 +145,6 @@
                       data-cy="k8sNamespaceCreate-cpuLimitSlider"
                     >
                     </slider>
-                  </div>
-                  <div class="col-sm-4">
-                    <p class="small text-muted"> Maximum CPU usage </p>
                   </div>
                 </div>
                 <!-- !cpu-limit-input -->
@@ -159,7 +157,7 @@
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small vertical-center">
-                <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+                <pr-icon icon="'info'" feather="true" mode="'primary'" class="vertical-center"></pr-icon>
                 You can set a quota on the amount of external load balancers that can be created inside this namespace. Set this quota to 0 to effectively disable the use of load
                 balancers in this namespace.
               </span>
@@ -184,7 +182,7 @@
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small vertical-center">
-                <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+                <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                 Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to effectively
                 prevent the usage of a specific storage option inside this namespace.
               </span>
@@ -211,7 +209,7 @@
               <div class="form-group" ng-if="$ctrl.formValues.IngressClasses.length > 0">
                 <div class="col-sm-12 small text-muted">
                   <p class="vertical-center">
-                    <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                     Enable and configure ingresses available to users when deploying applications.
                   </p>
                 </div>
@@ -268,8 +266,8 @@
                             data-cy="namespaceCreate-hostnameInput{{ ic.IngressClass.Name }}_{{ $index }}"
                           />
                         </div>
-                        <div class="col-sm-1 input-group input-group-sm" ng-if="$index > 0">
-                          <button class="btn btn-md btn-dangerlight btn-only-icon !h-[30px]" type="button" ng-click="$ctrl.removeHostname(ic, $index)">
+                        <div class="col-sm-1 input-group input-group-sm !pt-2" ng-if="$index > 0">
+                          <button class="btn btn-md btn-dangerlight btn-only-icon" type="button" ng-click="$ctrl.removeHostname(ic, $index)">
                             <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
                           </button>
                         </div>
@@ -282,13 +280,13 @@
                         "
                       >
                         <ng-messages for="resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
-                          <p ng-message="required"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Hostname is required.</p>
-                          <p ng-message="pattern">
+                          <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Hostname is required.</p>
+                          <p class="vertical-center" ng-message="pattern">
                             <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                             This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com').
                           </p>
                         </ng-messages>
-                        <p ng-if="$ctrl.state.duplicates.ingressHosts.refs[ic.IngressClass.Name][$index] !== undefined">
+                        <p class="vertical-center" ng-if="$ctrl.state.duplicates.ingressHosts.refs[ic.IngressClass.Name][$index] !== undefined">
                           <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This hostname is already used.
                         </p>
                       </div>
@@ -299,7 +297,7 @@
               <div ng-repeat-end class="form-group" ng-if="ic.Selected">
                 <div class="col-sm-12 small text-muted">
                   <p class="vertical-center">
-                    <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                     You can specify a list of annotations that will be associated to the ingress.
                   </p>
                 </div>
@@ -376,7 +374,7 @@
                     </div>
                     <div class="input-group input-group-sm col-sm-1">
                       <button
-                        class="btn btn-sm btn-dangerlight btn-only-icon !h-[30px]"
+                        class="btn btn-md btn-dangerlight btn-only-icon"
                         type="button"
                         ng-click="$ctrl.removeAnnotation(ic, $index)"
                         data-cy="namespaceCreate-deleteAnnotationButton{{ ic.IngressClass.Name }}"
@@ -395,17 +393,17 @@
             <div class="form-group">
               <div class="col-sm-12 small text-muted">
                 <p class="vertical-center">
-                  <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
+                  <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                   Define which registries can be used by users who have access to this namespace.
                 </p>
               </div>
             </div>
 
             <div class="form-group">
-              <label class="col-sm-3 col-lg-2 control-label text-left"> Select registries </label>
-              <div class="col-sm-9 col-lg-4">
+              <label class="col-sm-3 col-lg-2 control-label text-left !pt-0"> Select registries </label>
+              <div class="col-sm-8 col-lg-9">
                 <span class="small text-muted" ng-if="!$ctrl.registries.length && $ctrl.state.isAdmin">
-                  No registries available. Head over <a ui-sref="portainer.registries">registry view</a> to define container registry.
+                  No registries available. Head over to the <a ui-sref="portainer.registries">registry view</a> to define a container registry.
                 </span>
                 <span class="small text-muted" ng-if="!$ctrl.registries.length && !$ctrl.state.isAdmin">
                   No registries available. Contact your administrator to create a container registry.

@@ -52,7 +52,7 @@
     </div>
     <div ng-if="ctrl.configurations" data-cy="k8sDashboard-configurations">
       <a ui-sref="kubernetes.configurations">
-        <dashboard-item feather-icon="true" icon="'lock'" type="'Configuration'" value="ctrl.configurations.length"></dashboard-item>
+        <dashboard-item feather-icon="true" icon="'lock'" type="'ConfigMaps & Secret'" value="ctrl.configurations.length"></dashboard-item>
       </a>
     </div>
     <div ng-if="ctrl.volumes" data-cy="k8sDashboard-volumes">

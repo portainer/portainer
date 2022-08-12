@@ -4,26 +4,25 @@
       <div class="toolBar">
         <div class="toolBarTitle flex">
           <div class="widget-icon space-right">
-            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+            <pr-icon icon="'svg-laptopcode'"></pr-icon>
           </div>
-
           <span class="vertical-center">
             {{ $ctrl.titleText }}
           </span>
         </div>
+        <div class="searchBar min-w-[260px]">
+          <pr-icon icon="'search'" class="vertical-center" class-name="'searchIcon'" feather="true"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for an application..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+          />
+        </div>
         <div class="settings vertical-center">
-          <div class="searchBar">
-            <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
-            <input
-              type="text"
-              class="searchInput ml-1"
-              ng-model="$ctrl.state.textFilter"
-              ng-change="$ctrl.onTextFilterChange()"
-              placeholder="Search for an application..."
-              auto-focus
-              ng-model-options="{ debounce: 300 }"
-            />
-          </div>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><pr-icon icon="'more-vertical'" feather="true"></pr-icon></span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>

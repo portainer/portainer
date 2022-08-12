@@ -1,7 +1,7 @@
 <ng-form name="commonCustomTemplateForm">
   <!-- title-input -->
   <div class="form-group mb-0">
-    <label for="template_title" class="col-sm-3 col-lg-2 control-label text-left"> Title </label>
+    <label for="template_title" class="col-sm-3 col-lg-2 control-label text-left required"> Title </label>
     <div class="col-sm-8">
       <input
         type="text"
@@ -33,7 +33,7 @@
 
   <!-- description-input -->
   <div class="form-group mb-0">
-    <label for="description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
+    <label for="description" class="col-sm-3 col-lg-2 control-label text-left required">Description</label>
     <div class="col-sm-8">
       <input type="text" class="form-control" id="description" ng-model="$ctrl.formValues.Description" name="description" required />
       <span class="help-block">

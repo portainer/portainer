@@ -60,13 +60,13 @@
                 <pr-icon icon="'svg-clockrewind'"></pr-icon>
                 Events
                 <div ng-if="ctrl.hasEventWarnings()">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
               <kubernetes-events-datatable
                 title-text="Events"
-                title-icon="fa-history"
+                title-icon="svg-clockrewind"
                 dataset="ctrl.events"
                 table-key="kubernetes.configuration.events"
                 order-by="Date"
@@ -143,9 +143,11 @@
                   <td>
                     <div style="white-space: pre-wrap">{{ item.Value }}</div>
                     <div style="margin-top: 2px">
-                      <span class="btn btn-primary btn-xs" ng-click="ctrl.copyConfigurationValue($index)"> <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy </span>
+                      <span class="btn btn-primary btn-xs" ng-click="ctrl.copyConfigurationValue($index)">
+                        <pr-icon icon="'copy'" feather="true" class-name="'mr-0.5'"></pr-icon>Copy
+                      </span>
                       <span id="copyValueNotification_{{ $index }}" style="display: none; color: #23ae89; margin-left: 5px" class="small">
-                        <i class="fa fa-check" aria-hidden="true"></i> copied
+                        <pr-icon icon="'check'" feather="true"></pr-icon> copied
                       </span>
                     </div>
                   </td>

@@ -3,7 +3,7 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+          <pr-icon icon="$ctrl.titleIcon" feather="true" mode="'primary'" class-name="'icon-nested-blue'"></pr-icon>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
@@ -13,7 +13,7 @@
             class="searchInput"
             ng-model="$ctrl.state.textFilter"
             ng-change="$ctrl.onTextFilterChange()"
-            placeholder="Search for an application"
+            placeholder="Search for an application..."
             auto-focus
             ng-model-options="{ debounce: 300 }"
           />

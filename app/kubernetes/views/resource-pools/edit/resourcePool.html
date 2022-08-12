@@ -77,9 +77,9 @@
                   <div class="col-sm-12 form-section-title"> Resource limits </div>
                   <div>
                     <!-- memory-limit-input -->
-                    <div class="form-group">
-                      <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> Memory limit </label>
-                      <div class="col-sm-3">
+                    <div class="form-group flex">
+                      <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory limit (MB) </label>
+                      <div class="col-sm-6">
                         <slider
                           model="ctrl.formValues.MemoryLimit"
                           floor="ctrl.ResourceQuotaDefaults.MemoryLimit"
@@ -88,7 +88,7 @@
                           ng-if="ctrl.state.sliderMaxMemory"
                         ></slider>
                       </div>
-                      <div class="col-sm-2">
+                      <div class="col-sm-2 vertical-center">
                         <input
                           name="memory_limit"
                           type="number"
@@ -100,12 +100,10 @@
                           required
                         />
                       </div>
-                      <div class="col-sm-4">
-                        <p class="small text-muted" style="margin-top: 7px"> Memory limit (<b>MB</b>) </p>
-                      </div>
                     </div>
                     <div class="form-group" ng-show="resourcePoolEditForm.memory_limit.$invalid">
-                      <div class="col-sm-12 small text-muted">
+                      <div class="col-sm-3 col-lg-2"></div>
+                      <div class="col-sm-8 small text-muted">
                         <div ng-messages="resourcePoolEditForm.pool_name.$error">
                           <p class="vertical-center">
                             <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between {{ ctrl.ResourceQuotaDefaults.MemoryLimit }} and
@@ -118,7 +116,7 @@
                     <!-- cpu-limit-input -->
                     <div class="form-group">
                       <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px"> CPU limit </label>
-                      <div class="col-sm-5">
+                      <div class="col-sm-8">
                         <slider
                           model="ctrl.formValues.CpuLimit"
                           floor="ctrl.ResourceQuotaDefaults.CpuLimit"
@@ -127,9 +125,6 @@
                           precision="2"
                           ng-if="ctrl.state.sliderMaxCpu"
                         ></slider>
-                      </div>
-                      <div class="col-sm-4" style="margin-top: 20px">
-                        <p class="small text-muted"> Maximum CPU usage </p>
                       </div>
                     </div>
                     <!-- !cpu-limit-input -->
@@ -141,7 +136,7 @@
                 <div class="form-group">
                   <div class="col-sm-12 small text-muted">
                     <p class="vertical-center">
-                      <pr-icon icon="'info'" feather="true"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                       You can set a quota on the amount of external load balancers that can be created inside this namespace. Set this quota to 0 to effectively disable the use of
                       load balancers in this namespace.
                     </p>
@@ -174,7 +169,7 @@
                   <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length > 0">
                     <div class="col-sm-12 small text-muted">
                       <p class="vertical-center">
-                        <pr-icon icon="'info'" feather="true"></pr-icon>
+                        <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                         Enable and configure ingresses available to users when deploying applications.
                       </p>
                     </div>
@@ -220,7 +215,7 @@
                         <div ng-repeat="item in ic.Hosts track by $index" style="margin-top: 2px">
                           <div class="form-inline">
                             <div class="col-sm-10 input-group input-group-sm" ng-class="{ striked: item.NeedsDeletion }">
-                              <span class="input-group-addon">Hostname</span>
+                              <span class="input-group-addon required">Hostname</span>
                               <input
                                 type="text"
                                 class="form-control"
@@ -257,7 +252,7 @@
                                 'example.com').
                               </p>
                             </ng-messages>
-                            <p ng-if="item.Duplicate">
+                            <p class="vertical-center" ng-if="item.Duplicate">
                               <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                               This hostname is already used.
                             </p>
@@ -269,7 +264,7 @@
                   <div ng-repeat-end class="form-group" ng-if="ic.Selected" style="margin-bottom: 20px">
                     <div class="col-sm-12 small text-muted" style="margin-top: 5px">
                       <p class="vertical-center">
-                        <pr-icon icon="'info'" feather="true"></pr-icon>
+                        <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                         You can specify a list of annotations that will be associated to the ingress.
                       </p>
                     </div>
@@ -338,8 +333,8 @@
                           />
                         </div>
                         <div class="col-sm-1 input-group input-group-sm">
-                          <button class="btn btn-sm btn-dangerlight" type="button" ng-click="ctrl.removeAnnotation(ic, $index)">
-                            <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+                          <button class="btn btn-md btn-dangerlight btn-only-icon" type="button" ng-click="ctrl.removeAnnotation(ic, $index)">
+                            <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
                           </button>
                         </div>
                       </div>
@@ -363,18 +358,18 @@
                     <div class="form-group">
                       <div class="col-sm-12 small text-muted">
                         <p class="vertical-center">
-                          <pr-icon icon="'info'" feather="true"></pr-icon>
+                          <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                           Define which registries can be used by users who have access to this namespace.
                         </p>
                       </div>
                     </div>
                     <div class="form-group">
-                      <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0"> Select registries </label>
-                      <div class="col-sm-9 col-lg-4">
-                        <span class="small text-muted" ng-if="!ctrl.registries.length && ctrl.state.isAdmin">
-                          No registries available. Head over <a ui-sref="portainer.registries">registry view</a> to define container registry.
+                      <label class="col-sm-3 col-lg-2 control-label text-left !pt-0"> Select registries </label>
+                      <div class="col-sm-8 col-lg-9">
+                        <span class="small text-muted" ng-if="!ctrl.registries.length && ctrl.isAdmin">
+                          No registries available. Head over to the <a ui-sref="portainer.registries">registry view</a> to define a container registry.
                         </span>
-                        <span class="small text-muted" ng-if="!ctrl.registries.length && !ctrl.state.isAdmin">
+                        <span class="small text-muted" ng-if="!ctrl.registries.length && !ctrl.isAdmin">
                           No registries available. Contact your administrator to create a container registry.
                         </span>
                         <span
@@ -402,7 +397,7 @@
                 <div class="form-group">
                   <span class="col-sm-12 text-muted small">
                     <p class="vertical-center">
-                      <pr-icon icon="'info'" feather="true" mode="primary"></pr-icon>
+                      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                       Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to
                       effectively prevent the usage of a specific storage option inside this namespace.
                     </p>
@@ -433,7 +428,7 @@
                     <button
                       type="button"
                       ng-if="!ctrl.isSystem"
-                      class="btn btn-primary btn-sm"
+                      class="btn btn-primary btn-sm !ml-0 !mr-1"
                       ng-disabled="!resourcePoolEditForm.$valid || ctrl.isUpdateButtonDisabled()"
                       ng-click="ctrl.updateResourcePool()"
                       button-spinner="ctrl.state.actionInProgress"
@@ -444,7 +439,7 @@
                     <button
                       ng-if="!ctrl.isDefaultNamespace"
                       type="button"
-                      class="btn btn-primary btn-sm"
+                      class="btn btn-light btn-sm !ml-0"
                       ng-click="ctrl.markUnmarkAsSystem()"
                       button-spinner="ctrl.state.actionInProgress"
                       data-cy="k8sNamespaceEdit-markSystem"
@@ -459,9 +454,9 @@
             </uib-tab>
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading class="vertical-center">
-                <pr-icon icon="'file-text'" feather="true"></pr-icon> Events
+                <pr-icon icon="'svg-clockrewind'"></pr-icon> Events
                 <div ng-if="ctrl.hasEventWarnings()">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class-name="'mr-0.5'"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
@@ -478,7 +473,7 @@
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading class="vertical-center"><pr-icon icon="'code'" feather="true"></pr-icon> YAML </uib-tab-heading>
-              <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
+              <div class="px-5" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="resource-pool-yaml" data="ctrl.pool.Yaml"></kubernetes-yaml-inspector>
               </div>
             </uib-tab>

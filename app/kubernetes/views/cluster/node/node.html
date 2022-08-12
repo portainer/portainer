@@ -51,19 +51,21 @@
                     <tr>
                       <td class="col-xs-3"> Availability </td>
                       <td class="col-xs-9">
-                        <select class="form-control" name="availability" style="display: inline-block; width: 16rem" ng-model="ctrl.formValues.Availability">
-                          <option>{{ ctrl.availabilities.ACTIVE }}</option>
-                          <option>{{ ctrl.availabilities.PAUSE }}</option>
-                          <option>{{ ctrl.availabilities.DRAIN }}</option>
-                        </select>
-                        <span class="small vertical-center" ng-if="ctrl.state.isDrainOperation && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
-                          <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
-                          Cannot use this action while another node is currently being drained.
-                        </span>
-                        <span class="small vertical-center" ng-if="ctrl.state.isContainPortainer && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
-                          <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
-                          Cannot drain a node where this Portainer instance is running.
-                        </span>
+                        <div class="flex flex-col">
+                          <select class="form-control" name="availability" style="display: inline-block; width: 16rem" ng-model="ctrl.formValues.Availability">
+                            <option>{{ ctrl.availabilities.ACTIVE }}</option>
+                            <option>{{ ctrl.availabilities.PAUSE }}</option>
+                            <option>{{ ctrl.availabilities.DRAIN }}</option>
+                          </select>
+                          <div class="small text-muted vertical-center" ng-if="ctrl.state.isDrainOperation && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
+                            <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                            Cannot use this action while another node is currently being drained.
+                          </div>
+                          <div class="small text-muted vertical-center" ng-if="ctrl.state.isContainPortainer && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
+                            <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                            Cannot drain a node where this Portainer instance is running.
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -126,14 +128,14 @@
                         >
                           <pr-icon icon="'x'" feather="true" mode="'error'" size="'sm'"></pr-icon>
                         </button>
-                        <button ng-if="!ctrl.isSystemLabel($index) && label.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreLabel($index)">
+                        <button ng-if="!ctrl.isSystemLabel($index) && label.NeedsDeletion" class="btn btn-sm btn-secondary" type="button" ng-click="ctrl.restoreLabel($index)">
                           Restore
                         </button>
                         <span class="label label-warning label-sm image-tag" ng-if="label.IsUsed && !ctrl.isSystemLabel($index)" style="margin-left: 5px">used</span>
                         <span class="label label-info image-tag" ng-if="ctrl.isSystemLabel($index)" style="margin-left: 5px">system</span>
                       </div>
                     </div>
-                    <div class="small mt-2" ng-show="kubernetesNodeUpdateForm['label_key_' + $index].$invalid || ctrl.state.duplicateLabelKeys[$index] !== undefined">
+                    <div class="small mt-2 text-muted" ng-show="kubernetesNodeUpdateForm['label_key_' + $index].$invalid || ctrl.state.duplicateLabelKeys[$index] !== undefined">
                       <ng-messages for="kubernetesNodeUpdateForm['label_key_' + $index].$error">
                         <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Label key is required. </p>
                       </ng-messages>
@@ -179,11 +181,11 @@
                         <button ng-if="!taint.NeedsDeletion" class="btn btn-sm btn-dangerlight btn-only-icon" type="button" ng-click="ctrl.removeTaint($index)">
                           <pr-icon icon="'x'" feather="true" mode="'error'" size="'sm'"></pr-icon>
                         </button>
-                        <button ng-if="taint.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreTaint($index)"> Restore </button>
+                        <button ng-if="taint.NeedsDeletion" class="btn btn-sm btn-secondary" type="button" ng-click="ctrl.restoreTaint($index)"> Restore </button>
                       </div>
                     </div>
                     <div
-                      class="small"
+                      class="small text-muted"
                       style="margin-top: 5px"
                       ng-show="kubernetesNodeUpdateForm['taint_key_' + $index].$invalid || ctrl.state.duplicateTaintKeys[$index] !== undefined"
                     >
@@ -223,7 +225,7 @@
             </uib-tab>
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading>
-                <div class="flex-center gap-1"> <pr-icon icon="'rotate-ccw'" size="'sm'" feather="true"></pr-icon> Events </div>
+                <div class="flex-center gap-1"> <pr-icon icon="'svg-clockrewind'" size="'sm'" feather="true"></pr-icon> Events </div>
                 <div class="flex-center gap-1" ng-if="ctrl.hasEventWarnings()">
                   <pr-icon icon="'alert-circle'" mode="'warning-alt'" size="'sm'" feather="true"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
@@ -231,7 +233,7 @@
               </uib-tab-heading>
               <kubernetes-events-datatable
                 title-text="Events"
-                title-icon="fa-history"
+                title-icon="icon-nested-blue"
                 dataset="ctrl.events"
                 table-key="kubernetes.node.events"
                 order-by="Date"
@@ -264,7 +266,6 @@
         refresh-callback="ctrl.getApplications"
         loading="ctrl.state.applicationsLoading"
         title-text="Applications running on this node"
-        title-icon="box"
       >
       </kubernetes-node-applications-datatable>
     </div>

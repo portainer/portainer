@@ -75,7 +75,7 @@
                           <option value="300">5min</option>
                         </select>
                         <span>
-                          <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
+                          <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
                         </span>
                       </div>
                     </div>
@@ -90,7 +90,7 @@
         </div>
         <div ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem" class="flex flex-row w-full">
           <span class="small text-muted mt-1 vertical-center">
-            <pr-icon icon="'info'" feather="true" class-name="'!mb-0.5'" mode="'primary'"></pr-icon>
+            <pr-icon icon="'info'" feather="true" mode="'primary'" class="vertical-center"></pr-icon>
             <div> System resources are hidden, this can be changed in the table settings. </div>
           </span>
         </div>

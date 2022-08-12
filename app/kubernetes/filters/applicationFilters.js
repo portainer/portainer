@@ -63,9 +63,9 @@ angular
     return function (value) {
       switch (value) {
         case KubernetesApplicationDataAccessPolicies.ISOLATED:
-          return 'fa-cubes';
+          return 'svg-cubes';
         case KubernetesApplicationDataAccessPolicies.SHARED:
-          return 'fa-cube';
+          return 'box';
       }
     };
   })

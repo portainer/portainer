@@ -1,10 +1,9 @@
 <div class="row">
   <div class="col-sm-12 form-section-title"> Resource reservation </div>
   <div class="form-group">
-    <span class="col-sm-12 text-muted small">
-      <p>
-        {{ $ctrl.description }}
-      </p>
+    <span class="col-sm-12 text-muted small vertical-center">
+      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+      {{ $ctrl.description }}
     </span>
   </div>
   <div class="form-group" ng-if="$ctrl.memoryLimit !== 0">

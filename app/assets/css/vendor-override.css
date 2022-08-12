@@ -210,6 +210,7 @@ code {
 
 pre {
   border: 1px solid var(--border-pre-color);
+  border-radius: 8px;
   background-color: var(--bg-pre-color);
   color: var(--text-pre-color);
 }
@@ -394,6 +395,10 @@ input:-webkit-autofill {
 
 /* Overide Vendor CSS */
 
+.btn-link:hover {
+  color: var(--text-link-hover-color) !important;
+}
+
 .multiSelect.inlineBlock button {
   margin: 0;
 }
@@ -404,6 +409,26 @@ input:-webkit-autofill {
 
 .label-default {
   line-height: 11px;
+}
+
+/* Code Script Style */
+.code-script {
+  background-color: var(--bg-code-script-color);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding: 5px;
+}
+
+.nav-container {
+  border: 1px solid var(--border-nav-container-color);
+  background-color: var(--bg-nav-container-color);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.nav-tabs > li {
+  background-color: var(--bg-nav-tabs-active-color);
+  border-top-right-radius: 8px;
 }
 
 /* Code Script Style */

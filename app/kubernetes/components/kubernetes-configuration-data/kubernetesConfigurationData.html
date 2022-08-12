@@ -13,11 +13,11 @@
       </p>
     </div>
     <div class="col-sm-12 small text-muted vertical-center" ng-if="$ctrl.formValues.IsSimple">
-      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true" class="vertical-center"></pr-icon>
+      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
       Switch to advanced mode to copy and paste multiple key/values
     </div>
     <div class="col-sm-12 small text-muted vertical-center" ng-if="!$ctrl.formValues.IsSimple">
-      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true" class="vertical-center"></pr-icon>
+      <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
       Generate a configuration entry per line, use YAML format
     </div>
   </div>
@@ -35,7 +35,7 @@
 
   <div ng-repeat="(index, entry) in $ctrl.formValues.Data" ng-if="$ctrl.formValues.IsSimple">
     <div class="form-group">
-      <label for="configuration_data_key_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left">Key</label>
+      <label for="configuration_data_key_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left required">Key</label>
       <div class="col-sm-8 col-lg-9">
         <input
           type="text"
@@ -76,7 +76,7 @@
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple && !entry.IsBinary">
-      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left">Value</label>
+      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left required">Value</label>
       <div class="col-sm-8 col-lg-9">
         <textarea
           class="form-control"
@@ -97,7 +97,7 @@
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple && entry.IsBinary">
-      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left">Value</label>
+      <label for="configuration_data_value_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left required">Value</label>
       <div class="col-sm-8 control-label small text-muted text-left"
         >Binary data <portainer-tooltip message="'This key holds binary data and cannot be displayed.'"></portainer-tooltip
       ></div>
@@ -117,15 +117,23 @@
           <pr-icon class="vertical-center" icon="'trash-2'" feather="true"></pr-icon> Remove entry
         </button>
         <span class="small text-muted" ng-if="entry.Used">
-          <pr-icon icon="'alert-circle'" feather="true" mode="'primary'"></pr-icon>
+          <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
           This key is currently used by one or more applications
         </span>
       </div>
     </div>
   </div>
 
-  <div class="form-group" ng-if="!$ctrl.formValues.IsSimple">
+  <div class="form-group !px-[15px]" ng-if="!$ctrl.formValues.IsSimple">
     <input type="text" ng-model="$ctrl.formValues.DataYaml" required style="display: none" />
-    <code-editor identifier="kubernetes-configuration-editor" value="$ctrl.formValues.DataYaml" read-only="false" yml="true" on-change="($ctrl.editorUpdate)"></code-editor>
+
+    <web-editor-form
+      identifier="kubernetes-configuration-editor"
+      value="$ctrl.formValues.DataYaml"
+      on-change="($ctrl.editorUpdate)"
+      yml="true"
+      placeholder="# Define or paste key-value pairs, one pair per line"
+    >
+    </web-editor-form>
   </div>
 </ng-form>

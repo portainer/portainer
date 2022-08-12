@@ -3,7 +3,8 @@
   overflow: auto;
   padding: 20px;
   font-size: 16px;
-  border-radius: 8px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 
   display: flex;
   align-items: center;

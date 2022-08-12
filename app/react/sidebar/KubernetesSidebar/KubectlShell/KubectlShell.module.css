@@ -6,14 +6,20 @@
   width: 100vw;
   z-index: 1000;
   height: 495px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .root.minimized {
   height: 35px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .header {
   height: 35px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,11 +27,11 @@
   background: rgb(245, 245, 245);
   border-top: 1px solid rgb(190, 190, 190);
 
-  padding: 0 30px;
+  padding: 0 16px;
 }
 
 .title {
-  font-weight: bold;
+  font-weight: 500;
   font-size: 14px;
 }
 
@@ -36,5 +42,6 @@
 
 .terminal-container .loading-message {
   position: fixed;
+  padding: 10px 16px 0px 16px;
   color: #fff;
 }

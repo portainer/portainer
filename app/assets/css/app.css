@@ -881,3 +881,7 @@ input[style*='background-image: url("data:image/png'] + [data-cy='auth-passwordI
 input[style*='background-image: url("data:image/png'] {
   padding-right: 60px;
 }
+
+.web-editor .trancluded-item:empty {
+  display: none;
+}

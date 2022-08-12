@@ -12,6 +12,7 @@ import { EnvironmentId } from '@/portainer/environments/types';
 import { error as notifyError } from '@/portainer/services/notifications';
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
 
+import { Icon } from '@@/Icon';
 import { Button } from '@@/buttons';
 
 import styles from './KubectlShell.module.css';
@@ -125,27 +126,26 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
   return (
     <div className={clsx(styles.root, { [styles.minimized]: shell.minimized })}>
       <div className={styles.header}>
-        <div className={styles.title}>
-          <i className="fas fa-terminal space-right" />
+        <div className={clsx(styles.title, 'vertical-center')}>
+          <Icon icon="terminal" feather />
           kubectl shell
         </div>
         <div className={clsx(styles.actions, 'space-x-8')}>
           <Button color="link" onClick={clearScreen}>
-            <i className="fas fa-redo-alt" data-cy="k8sShell-refreshButton" />
+            <Icon icon="rotate-cw" feather size="md" />
           </Button>
           <Button color="link" onClick={toggleMinimize}>
-            <i
-              className={clsx(
-                'fas',
-                shell.minimized ? 'fa-window-restore' : 'fa-window-minimize'
-              )}
+            <Icon
+              icon={shell.minimized ? 'maximize-2' : 'minimize-2'}
+              feather
+              size="md"
               data-cy={
                 shell.minimized ? 'k8sShell-restore' : 'k8sShell-minimise'
               }
             />
           </Button>
           <Button color="link" onClick={handleClose}>
-            <i className="fas fa-times" data-cy="k8sShell-closeButton" />
+            <Icon icon="x" feather size="md" />
           </Button>
         </div>
       </div>

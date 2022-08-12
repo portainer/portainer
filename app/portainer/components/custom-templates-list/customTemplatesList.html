@@ -2,7 +2,10 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
-        <rd-widget-header icon="{{ $ctrl.titleIcon }}" feather-icon="true" title-text="Custom Templates" class="!flex-auto !mr-0" parent-classes="!p-0"></rd-widget-header>
+        <div class="toolBarTitle vertical-center">
+          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          Custom Templates
+        </div>
         <div class="searchBar vertical-center !mr-0">
           <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
           <input

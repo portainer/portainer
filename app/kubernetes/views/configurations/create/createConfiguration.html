@@ -15,8 +15,8 @@
           <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
             <!-- name -->
             <div class="form-group">
-              <label for="configuration_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
-              <div class="col-sm-8">
+              <label for="configuration_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
+              <div class="col-sm-8 col-lg-9">
                 <input
                   type="text"
                   class="form-control"
@@ -32,7 +32,8 @@
               </div>
             </div>
             <div class="form-group" ng-show="kubernetesConfigurationCreationForm.configuration_name.$invalid || ctrl.state.alreadyExist">
-              <div class="col-sm-12 small text-muted">
+              <div class="col-sm-3 col-lg-2"></div>
+              <div class="col-sm-8 col-lg-9 small text-muted">
                 <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
                   <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.</p>
                   <p ng-message="pattern" class="vertical-center"
@@ -52,7 +53,7 @@
             <!-- resource-pool -->
             <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
               <label for="resource-pool-selector" class="col-sm-3 col-lg-2 control-label text-left">Namespace</label>
-              <div class="col-sm-8">
+              <div class="col-sm-8 col-lg-9">
                 <select
                   class="form-control"
                   id="resource-pool-selector"
@@ -86,13 +87,13 @@
               </div>
 
               <!-- type options -->
-              <div class="form-group" style="margin-bottom: 0">
+              <div class="form-group px-[15px]" style="margin-bottom: 0">
                 <div class="boxselector_wrapper">
                   <div>
                     <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
                     <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
                       <div class="boxselector_header">
-                        <pr-icon icon="'code'" feather="true"></pr-icon>
+                        <pr-icon icon="'svg-filecode'"></pr-icon>
                         ConfigMap
                       </div>
                       <p>This configuration holds non-sensitive information</p>
@@ -102,7 +103,7 @@
                     <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
                     <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
                       <div class="boxselector_header">
-                        <pr-icon icon="'shield'" feather="true"></pr-icon>
+                        <pr-icon icon="'lock'" feather="true"></pr-icon>
                         Secret
                       </div>
                       <p>This configuration holds sensitive information</p>

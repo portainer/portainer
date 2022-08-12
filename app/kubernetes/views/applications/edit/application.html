@@ -3,9 +3,9 @@
   title="'Application details'"
   breadcrumbs="[
     { label:'Namespaces', link:'kubernetes.resourcePools' },
-    { 
+    {
       label:ctrl.application.ResourcePool,
-      link: 'kubernetes.resourcePools.resourcePool', 
+      link: 'kubernetes.resourcePools.resourcePool',
       linkParams:{ id: ctrl.application.ResourcePool }
     },
     { label:'Applications', link:'kubernetes.applications' },
@@ -24,7 +24,7 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading> <pr-icon icon="'fa-laptop-code'" class-name="'mr-1'"></pr-icon> Application </uib-tab-heading>
+              <uib-tab-heading> <pr-icon icon="'svg-laptopcode'" class-name="'mr-1'"></pr-icon> Application </uib-tab-heading>
               <div style="padding: 20px">
                 <table class="table">
                   <tbody>
@@ -156,19 +156,19 @@
 
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading>
-                <pr-icon icon="'fa-compress-arrows-alt'"></pr-icon> Placement
+                <pr-icon icon="'svg-compress'"></pr-icon> Placement
                 <div ng-if="ctrl.state.placementWarning" class="vertical-center">
                   <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   warning
                 </div>
               </uib-tab-heading>
               <div class="small text-muted vertical-center" style="padding: 20px">
-                <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
+                <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                 The placement component helps you understand whether or not this application can be deployed on a specific node.
               </div>
               <kubernetes-application-placements-datatable
                 title-text="Placement constraints/preferences"
-                title-icon="fa-compress-arrows-alt"
+                title-icon="svg-compress"
                 dataset="ctrl.placements"
                 table-key="kubernetes.application.placements"
                 order-by="Name"
@@ -180,7 +180,7 @@
 
             <uib-tab index="2" classes="btn-sm" select="ctrl.selectTab(2)">
               <uib-tab-heading>
-                <pr-icon icon="'fa-history'"></pr-icon> Events
+                <pr-icon icon="'svg-clockrewind'"></pr-icon> Events
                 <div ng-if="ctrl.hasEventWarnings()" class="vertical-center">
                   <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
                   {{ ctrl.state.eventWarningCount }} warning(s)
@@ -188,7 +188,7 @@
               </uib-tab-heading>
               <kubernetes-events-datatable
                 title-text="Events"
-                title-icon="fa-history"
+                title-icon="svg-clockrewind"
                 dataset="ctrl.events"
                 table-key="kubernetes.application.events"
                 order-by="Date"
@@ -200,7 +200,7 @@
 
             <uib-tab index="3" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading> <pr-icon icon="'code'" feather="true"></pr-icon> YAML </uib-tab-heading>
-              <div style="padding-right: 25px" ng-if="ctrl.state.showEditorTab">
+              <div class="px-5" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="application-yaml" data="ctrl.application.Yaml"></kubernetes-yaml-inspector>
               </div>
             </uib-tab>
@@ -270,14 +270,14 @@
           <div class="text-muted" style="margin-bottom: 15px"> <pr-icon icon="'external-link'" class="mr-1" feather="true"></pr-icon>Accessing the application </div>
 
           <div class="small text-muted" ng-if="ctrl.application.PublishedPorts.length === 0" style="margin-bottom: 15px">
-            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is not exposing any port.
+            <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is not exposing any port.
           </div>
 
           <div ng-if="ctrl.application.Services.length !== 0">
             <!-- Services notice -->
             <div>
               <div class="small text-muted">
-                <p> <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is exposed through service(s) as below: </p>
+                <p> <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>This application is exposed through service(s) as below: </p>
               </div>
             </div>
 
@@ -298,7 +298,7 @@
           <div class="text-muted" style="margin-bottom: 15px"> <pr-icon icon="'move'" class="mr-1" feather="true"></pr-icon>Auto-scaling </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.AutoScaler" style="margin-bottom: 15px">
-            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
+            <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application does not have an autoscaling policy defined.
           </div>
 
@@ -333,7 +333,7 @@
           </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.Env.length > 0 && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px">
-            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
+            <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application is not using any environment variable or configuration.
           </div>
 
@@ -434,13 +434,14 @@
           </div>
 
           <div class="small text-muted" ng-if="!ctrl.hasPersistedFolders()">
-            <pr-icon icon="'alert-circle'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
+            <pr-icon icon="'info'" mode="'primary'" class="mr-1" feather="true"></pr-icon>
             This application has no persisted folders.
           </div>
 
           <div ng-if="ctrl.hasPersistedFolders()">
-            <div class="small text-muted" style="margin-bottom: 15px">
-              Data access policy: <i class="fa {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyIcon }}" aria-hidden="true"></i>
+            <div class="small text-muted vertical-center" style="margin-bottom: 15px">
+              Data access policy:
+              <pr-icon icon="ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyIcon" feather="true"></pr-icon>
               {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyText }}
               <portainer-tooltip position="'right'" message="ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyTooltip"> </portainer-tooltip>
             </div>
@@ -456,7 +457,10 @@
                     {{ volume.MountPath }}
                   </td>
                   <td ng-if="volume.PersistentVolumeClaimName">
-                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName, namespace: ctrl.application.ResourcePool })" data-cy="k8sAppDetail-volClaimName"
+                    <a
+                      class="hyperlink"
+                      ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName, namespace: ctrl.application.ResourcePool })"
+                      data-cy="k8sAppDetail-volClaimName"
                       ><pr-icon icon="'database'" class="mr-1" feather="true"></pr-icon>{{ volume.PersistentVolumeClaimName }}</a
                     >
                   </td>
@@ -491,7 +495,10 @@
                     {{ volume.MountPath }}
                   </td>
                   <td ng-if="volume.PersistentVolumeClaimName">
-                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + container.PodName, namespace: ctrl.application.ResourcePool })">
+                    <a
+                      class="hyperlink"
+                      ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + container.PodName, namespace: ctrl.application.ResourcePool })"
+                    >
                       <pr-icon icon="'database'" class="mr-1" feather="true"></pr-icon>{{ volume.PersistentVolumeClaimName + '-' + container.PodName }}</a
                     >
                   </td>

@@ -31,8 +31,7 @@ export default class HelmTemplatesController {
     };
   }
 
-  editorUpdate(content) {
-    const contentvalues = content.getValue();
+  editorUpdate(contentvalues) {
     if (this.state.originalvalues === contentvalues) {
       this.state.isEditorDirty = false;
     } else {
