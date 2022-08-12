@@ -66,8 +66,8 @@
                   button-spinner="$ctrl.leaveNetworkActionInProgress"
                   ng-click="$ctrl.leaveNetworkAction($ctrl.container, key)"
                 >
-                  <span ng-hide="$ctrl.leaveNetworkActionInProgress"> <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon> Leave network</span>
-                  <span ng-show="$ctrl.leaveNetworkActionInProgress">Leaving network...</span>
+                  <span ng-if="!$ctrl.leaveNetworkActionInProgress" class="vertical-center !ml-0"> <pr-icon icon="'trash-2'" feather="true"></pr-icon> Leave network</span>
+                  <span ng-if="$ctrl.leaveNetworkActionInProgress">Leaving network...</span>
                 </button>
               </td>
             </tr>
