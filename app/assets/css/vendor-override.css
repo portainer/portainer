@@ -48,12 +48,6 @@ a:focus {
   border: 1px solid var(--border-input-group-addon-color);
 }
 
-.btn-default {
-  color: var(--text-btn-default-color);
-  background-color: var(--bg-btn-default-color);
-  border-color: var(--border-btn-default-color);
-}
-
 .text-danger {
   color: var(--ui-error-9);
 }
@@ -207,6 +201,7 @@ code {
 
 .dropdown-menu {
   background: var(--bg-dropdown-menu-color);
+  border-radius: 8px;
 }
 
 .dropdown-menu > li > a {
@@ -397,30 +392,7 @@ input:-webkit-autofill {
   -webkit-text-fill-color: var(--text-input-autofill-color) !important;
 }
 
-.btn:hover {
-  color: var(--text-button-hover-color);
-}
-
-.btn-default:hover {
-  background-color: var(--bg-btn-default-hover-color);
-}
-
-.btn-primary:hover {
-  color: var(--white-color) !important;
-}
-
-.btn-success:hover {
-  color: var(--white-color);
-}
-
 /* Overide Vendor CSS */
-
-.btn.disabled,
-.btn[disabled],
-fieldset[disabled] .btn {
-  pointer-events: none;
-  touch-action: none;
-}
 
 .multiSelect.inlineBlock button {
   margin: 0;

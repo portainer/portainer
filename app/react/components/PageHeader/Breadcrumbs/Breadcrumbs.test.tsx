@@ -8,8 +8,9 @@ test('should display a Breadcrumbs, breadcrumbs should be separated by >', async
     { label: 'bread2' },
     { label: 'bread3' },
   ];
-  const { queryByText } = render(<Breadcrumbs breadcrumbs={breadcrumbs} />);
+  const { container } = render(<Breadcrumbs breadcrumbs={breadcrumbs} />);
 
-  const heading = queryByText(breadcrumbs.map((b) => b.label).join(' > '));
-  expect(heading).toBeVisible();
+  expect(container.firstChild?.textContent).toEqual(
+    breadcrumbs.map((b) => b.label).join('>')
+  );
 });

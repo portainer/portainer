@@ -12,8 +12,3 @@
     flex-direction: column;
   }
 }
-
-.row.header {
-  background-color: var(--bg-body-color) !important;
-  margin-bottom: 5px !important;
-}

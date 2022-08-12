@@ -14,7 +14,7 @@ function Template({
 }: JSX.IntrinsicAttributes & PropsWithChildren<Props>) {
   return (
     <ButtonGroup size={size}>
-      <Button color="success" onClick={() => {}}>
+      <Button color="primary" onClick={() => {}}>
         <i className="fa fa-play space-right" aria-hidden="true" />
         Start
       </Button>
@@ -50,7 +50,7 @@ Primary.args = {
 export function Xsmall() {
   return (
     <ButtonGroup size="xsmall">
-      <Button color="success" onClick={() => {}}>
+      <Button color="primary" onClick={() => {}}>
         <i className="fa fa-play space-right" aria-hidden="true" />
         Start
       </Button>
@@ -58,7 +58,7 @@ export function Xsmall() {
         <i className="fa fa-stop space-right" aria-hidden="true" />
         Stop
       </Button>
-      <Button color="success" onClick={() => {}}>
+      <Button color="primary" onClick={() => {}}>
         <i className="fa fa-play space-right" aria-hidden="true" />
         Start
       </Button>
@@ -73,7 +73,7 @@ export function Xsmall() {
 export function Small() {
   return (
     <ButtonGroup size="small">
-      <Button color="success" onClick={() => {}}>
+      <Button color="primary" onClick={() => {}}>
         <i className="fa fa-play space-right" aria-hidden="true" />
         Start
       </Button>
@@ -81,7 +81,7 @@ export function Small() {
         <i className="fa fa-stop space-right" aria-hidden="true" />
         Stop
       </Button>
-      <Button color="success" onClick={() => {}}>
+      <Button color="primary" onClick={() => {}}>
         <i className="fa fa-play space-right" aria-hidden="true" />
         Start
       </Button>
@@ -96,7 +96,7 @@ export function Small() {
 export function Large() {
   return (
     <ButtonGroup size="large">
-      <Button color="success" onClick={() => {}}>
+      <Button color="primary" onClick={() => {}}>
         <i className="fa fa-play space-right" aria-hidden="true" />
         Start
       </Button>
@@ -104,7 +104,7 @@ export function Large() {
         <i className="fa fa-stop space-right" aria-hidden="true" />
         Stop
       </Button>
-      <Button color="success" onClick={() => {}}>
+      <Button color="light" onClick={() => {}}>
         <i className="fa fa-play space-right" aria-hidden="true" />
         Start
       </Button>

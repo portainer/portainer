@@ -24,13 +24,17 @@ export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
   const { user } = useUser();
 
   return (
-    <div className="page white-space-normal">
-      {title}
-      <span className="header_title_content">{children}</span>
+    <div className="flex justify-between whitespace-normal pt-3">
+      <div className="flex items-center gap-2">
+        <div className="font-medium text-3xl text-gray-11 th-dark:text-white th-highcontrast:text-white">
+          {title}
+        </div>
+        {children && <span>{children}</span>}
+      </div>
       <Menu>
         <MenuButton
           className={clsx(
-            'pull-right flex items-center gap-1',
+            'ml-auto flex items-center gap-1 self-start',
             styles.menuButton
           )}
           data-cy="userMenu-button"

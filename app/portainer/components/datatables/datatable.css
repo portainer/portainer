@@ -39,12 +39,12 @@
   @apply text-blue-7;
 }
 
-.datatable tr > td a {
+.datatable tr > td a:not(.btn) {
   color: var(--ui-blue-8);
 }
 
-.datatable tr > td a:hover,
-.datatable tr > td a:focus {
+.datatable tr > td a:not(.btn):hover,
+.datatable tr > td a:not(.btn):focus {
   text-decoration: underline;
 }
 
@@ -84,10 +84,13 @@
 
 .datatable .searchBar input[type='text'] {
   border: 0px !important;
+  @apply placeholder:text-gray-7;
+  @apply th-dark:placeholder:text-gray-warm-7;
 }
 
 .datatable .searchIcon {
-  color: #767676;
+  @apply text-gray-7;
+  @apply th-dark:text-gray-warm-5;
   margin-right: 5px;
 }
 
@@ -163,31 +166,6 @@
 .table > tbody > tr {
   height: 50px;
   vertical-align: middle;
-}
-
-[data-reach-menu-list],
-[data-reach-menu-items] {
-  padding: 0px;
-  border: 1px var(--bg-dropdown-menu-color);
-}
-
-.tableMenu {
-  color: #767676;
-  padding: 15px;
-  background-color: var(--bg-dropdown-menu-color) !important;
-}
-
-.tableMenu .menuHeader {
-  font-size: 16px;
-}
-
-.tableMenu .menuContent {
-  font-size: 12px;
-  margin: 10px 0;
-}
-
-.tableMenu .menuContent .md-radio:first-child {
-  margin: 0;
 }
 
 .datatable thead tr > th {
@@ -361,4 +339,38 @@
   border: 1px solid var(--border-widget);
   border-radius: 8px;
   flex-grow: 2;
+}
+
+/* Databatle Setting Menu */
+
+.tableMenu {
+  border: 1px solid var(--border-bootbox);
+  border-radius: 8px;
+
+  color: var(--text-dropdown-menu-color);
+  padding: 15px;
+  background-color: var(--bg-dropdown-menu-color) !important;
+}
+
+[data-reach-menu-list],
+[data-reach-menu-items] {
+  padding: 0px;
+  border: 1px var(--bg-dropdown-menu-color);
+}
+
+.dropdown-menu .tableMenu {
+  border: 0px;
+}
+
+.tableMenu .menuHeader {
+  font-size: 16px;
+}
+
+.tableMenu .menuContent {
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+.tableMenu .menuContent .md-radio:first-child {
+  margin: 0;
 }

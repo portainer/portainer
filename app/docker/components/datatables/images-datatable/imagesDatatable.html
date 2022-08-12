@@ -48,19 +48,11 @@
               <li><a ng-click="$ctrl.forceRemoveAction($ctrl.state.selectedItems, true)" ng-disabled="$ctrl.state.selectedItemCount === 0">Force Remove</a></li>
             </ul>
           </div>
-          <button
-            type="button"
-            class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
-            ui-sref="docker.images.build"
-            authorization="DockerImageBuild"
-            data-cy="image-buildImageButton"
-          >
-            <pr-icon icon="'plus'" feather="true"></pr-icon>Build a new image
-          </button>
+
           <div class="btn-group">
             <button
               type="button"
-              class="btn btn-sm btn-secondary h-fit"
+              class="btn btn-sm btn-light h-fit"
               ui-sref="docker.images.import"
               authorization="DockerImageLoad"
               ng-disabled="$ctrl.exportInProgress"
@@ -70,7 +62,7 @@
             </button>
             <button
               type="button"
-              class="btn btn-sm btn-secondary h-fit"
+              class="btn btn-sm btn-light h-fit"
               ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.exportInProgress"
               ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)"
               button-spinner="$ctrl.exportInProgress"
@@ -82,6 +74,16 @@
               <span ng-show="$ctrl.exportInProgress">Export in progress...</span>
             </button>
           </div>
+
+          <button
+            type="button"
+            class="btn btn-sm btn-primary h-fit vertical-center !ml-0"
+            ui-sref="docker.images.build"
+            authorization="DockerImageBuild"
+            data-cy="image-buildImageButton"
+          >
+            <pr-icon icon="'plus'" feather="true"></pr-icon>Build a new image
+          </button>
         </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">

@@ -40,6 +40,12 @@ body,
   position: relative;
 }
 
+.logo {
+  display: inline;
+  max-width: 155px;
+  max-height: 55px;
+}
+
 .white-space-normal {
   white-space: normal !important;
 }
@@ -74,10 +80,6 @@ body,
 #network-legend span {
   display: inline;
   font-size: 18px;
-}
-
-.header_title_content {
-  margin-left: 5px;
 }
 
 .form-section-title {
