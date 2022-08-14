@@ -7,6 +7,7 @@ import (
 	"net/http"
 	netUrl "net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -24,6 +25,10 @@ func GetAgentVersionAndPlatform(url string, tlsConfig *tls.Config) (portainer.Ag
 		httpCli.Transport = &http.Transport{
 			TLSClientConfig: tlsConfig,
 		}
+	}
+
+	if !strings.Contains(url, "://") {
+		url = "https://" + url
 	}
 
 	parsedURL, err := netUrl.Parse(fmt.Sprintf("%s/ping", url))
