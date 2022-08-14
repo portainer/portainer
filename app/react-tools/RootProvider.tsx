@@ -3,7 +3,6 @@ import { UIRouterContextComponent } from '@uirouter/react-hybrid';
 import { PropsWithChildren, StrictMode } from 'react';
 
 import { UserProvider } from '@/portainer/hooks/useUser';
-import { UIStateProvider } from '@/portainer/hooks/UIStateProvider';
 
 import { createQueryClient } from './react-query';
 
@@ -13,11 +12,9 @@ export function RootProvider({ children }: PropsWithChildren<unknown>) {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <UIStateProvider>
-          <UIRouterContextComponent>
-            <UserProvider>{children}</UserProvider>
-          </UIRouterContextComponent>
-        </UIStateProvider>
+        <UIRouterContextComponent>
+          <UserProvider>{children}</UserProvider>
+        </UIRouterContextComponent>
       </QueryClientProvider>
     </StrictMode>
   );
