@@ -919,7 +919,7 @@
   ],
   "version": {
     "DB_UPDATING": "false",
-    "DB_VERSION": "60",
+    "DB_VERSION": "70",
     "INSTANCE_ID": "null"
   }
 }
