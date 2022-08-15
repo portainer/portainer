@@ -29,11 +29,8 @@
           </div>
 
           <div class="col-sm-12 form-section-title"> Authentication method </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <box-selector radio-name="'authOptions'" value="authMethod" options="authOptions" on-change="(onChangeAuthMethod)"></box-selector>
-            </div>
-          </div>
+
+          <box-selector radio-name="'authOptions'" value="authMethod" options="authOptions" on-change="(onChangeAuthMethod)"></box-selector>
 
           <internal-auth
             ng-if="authenticationMethodSelected(1)"

@@ -209,11 +209,8 @@
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="backupPortainer()" name="backupPortainerForm">
           <div class="col-sm-12 form-section-title"> Backup configuration </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <box-selector options="backupOptions" value="formValues.backupFormType" on-change="(onBackupOptionsChange)" radio-name="'backupOptions'"></box-selector>
-            </div>
-          </div>
+
+          <box-selector options="backupOptions" value="formValues.backupFormType" on-change="(onBackupOptionsChange)" radio-name="'backupOptions'"></box-selector>
 
           <div ng-if="formValues.backupFormType === BACKUP_FORM_TYPES.S3">
             <!-- Schedule automatic backups -->

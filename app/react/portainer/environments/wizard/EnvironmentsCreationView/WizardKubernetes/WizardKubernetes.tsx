@@ -60,16 +60,12 @@ export function WizardKubernetes({ onCreate }: Props) {
 
   return (
     <div className="form-horizontal">
-      <div className="form-group">
-        <div className="col-sm-12">
-          <BoxSelector
-            onChange={(v) => setCreationType(v)}
-            options={options}
-            value={creationType}
-            radioName="creation-type"
-          />
-        </div>
-      </div>
+      <BoxSelector
+        onChange={(v) => setCreationType(v)}
+        options={options}
+        value={creationType}
+        radioName="creation-type"
+      />
 
       {tab}
     </div>

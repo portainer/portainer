@@ -55,17 +55,13 @@
                 </div>
 
                 <div class="col-sm-12 form-section-title"> Build method </div>
-                <div class="form-group">
-                  <div class="col-sm-12">
-                    <box-selector
-                      radio-name="'method'"
-                      value="ctrl.state.BuildMethod"
-                      options="ctrl.methodOptions"
-                      data-cy="k8sAppDeploy-buildSelector"
-                      on-change="(ctrl.onChangeMethod)"
-                    ></box-selector>
-                  </div>
-                </div>
+                <box-selector
+                  radio-name="'method'"
+                  value="ctrl.state.BuildMethod"
+                  options="ctrl.methodOptions"
+                  data-cy="k8sAppDeploy-buildSelector"
+                  on-change="(ctrl.onChangeMethod)"
+                ></box-selector>
 
                 <div ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.CUSTOM_TEMPLATE">
                   <div class="col-sm-12 form-section-title"> Deployment type </div>

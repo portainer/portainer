@@ -52,16 +52,12 @@ export function WizardAzure({ onCreate }: Props) {
 
   return (
     <div className="form-horizontal">
-      <div className="form-group">
-        <div className="col-sm-12">
-          <BoxSelector
-            options={options}
-            radioName="creation-type"
-            onChange={(value) => setCreationType(value)}
-            value={creationType}
-          />
-        </div>
-      </div>
+      <BoxSelector
+        options={options}
+        radioName="creation-type"
+        onChange={(value) => setCreationType(value)}
+        value={creationType}
+      />
 
       <Formik<FormValues>
         initialValues={initialValues}
