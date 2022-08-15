@@ -1,4 +1,6 @@
-import { Edit, FileText, GitHub, Globe, Upload } from 'react-feather';
+import { Edit, FileText, Globe, Upload } from 'react-feather';
+
+import GitIcon from '@/assets/ico/git.svg?c';
 
 import { BadgeIcon } from '../BadgeIcon';
 import { BoxSelectorOption } from '../types';
@@ -19,7 +21,7 @@ export const upload: BoxSelectorOption<'upload'> = {
 };
 export const git: BoxSelectorOption<'repository'> = {
   id: 'method_repository',
-  icon: <BadgeIcon icon={GitHub} />,
+  icon: <GitIcon />,
   label: 'Repository',
   description: 'Use a git repository',
   value: 'repository',
