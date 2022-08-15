@@ -1,16 +1,11 @@
-import { Edit, FileText, GitHub, Upload } from 'react-feather';
+import { editor, git, template, upload } from '@@/BoxSelector/common-options/build-methods';
 
 class DockerComposeFormController {
   /* @ngInject */
   constructor($async, EdgeTemplateService, Notifications) {
     Object.assign(this, { $async, EdgeTemplateService, Notifications });
 
-    this.methodOptions = [
-      { id: 'method_editor', icon: Edit, featherIcon: true, label: 'Web editor', description: 'Use our Web editor', value: 'editor' },
-      { id: 'method_upload', icon: Upload, featherIcon: true, label: 'Upload', description: 'Upload from your computer', value: 'upload' },
-      { id: 'method_repository', icon: GitHub, featherIcon: true, label: 'Repository', description: 'Use a git repository', value: 'repository' },
-      { id: 'method_template', icon: FileText, featherIcon: true, label: 'Template', description: 'Use an Edge stack template', value: 'template' },
-    ];
+    this.methodOptions = [editor, upload, git, template];
 
     this.selectedTemplate = null;
 
