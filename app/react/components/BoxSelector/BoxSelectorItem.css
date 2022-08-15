@@ -46,6 +46,8 @@
 /* not disabled */
 .boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
 .box-selector-item input[type='radio']:not(:disabled) ~ label {
+  background-color: var(--bg-boxselector-color);
+
   box-shadow: none;
   cursor: pointer;
 }
@@ -70,7 +72,7 @@
 /* checked */
 .boxselector_wrapper input[type='radio']:checked + label,
 .box-selector-item input[type='radio']:checked + label {
-  @apply bg-blue-3 border-blue-6;
+  @apply bg-blue-2 border-blue-6;
   @apply th-dark:bg-blue-10 th-dark:border-blue-7;
 
   background-image: url(../../../assets/ico/checked.svg);
@@ -115,11 +117,6 @@
 
 .boxselector_content {
   padding-left: 20px;
-}
-
-.boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
-.box-selector-item input[type='radio']:not(:disabled) ~ label {
-  background-color: var(--bg-boxselector-color);
 }
 
 .boxselector_img_container {
