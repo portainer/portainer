@@ -87,27 +87,29 @@
               </div>
 
               <!-- type options -->
-              <div class="form-group px-[15px]" style="margin-bottom: 0">
-                <div class="boxselector_wrapper">
-                  <div>
-                    <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
-                    <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
-                      <div class="boxselector_header">
-                        <pr-icon icon="'svg-filecode'"></pr-icon>
-                        ConfigMap
-                      </div>
-                      <p>This configuration holds non-sensitive information</p>
-                    </label>
-                  </div>
-                  <div>
-                    <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
-                    <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
-                      <div class="boxselector_header">
-                        <pr-icon icon="'lock'" feather="true"></pr-icon>
-                        Secret
-                      </div>
-                      <p>This configuration holds sensitive information</p>
-                    </label>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <div class="boxselector_wrapper">
+                    <div>
+                      <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
+                      <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
+                        <div class="boxselector_header">
+                          <pr-icon icon="'svg-filecode'"></pr-icon>
+                          ConfigMap
+                        </div>
+                        <p>This configuration holds non-sensitive information</p>
+                      </label>
+                    </div>
+                    <div>
+                      <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
+                      <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
+                        <div class="boxselector_header">
+                          <pr-icon icon="'lock'" feather="true"></pr-icon>
+                          Secret
+                        </div>
+                        <p>This configuration holds sensitive information</p>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>

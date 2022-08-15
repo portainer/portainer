@@ -15,38 +15,39 @@
           <!-- build-method -->
           <div ng-if="!$ctrl.state.fromStack">
             <div class="col-sm-12 form-section-title"> Build method </div>
-            <div class="form-group"></div>
-            <div class="form-group mb-0">
-              <div class="boxselector_wrapper">
-                <div>
-                  <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor" ng-change="$ctrl.onChangeMethod()" />
-                  <label for="method_editor">
-                    <div class="boxselector_header">
-                      <pr-icon icon="'edit'" feather="true"></pr-icon>
-                      Web editor
-                    </div>
-                    <p>Use our Web editor</p>
-                  </label>
-                </div>
-                <div>
-                  <input type="radio" id="method_upload" ng-model="$ctrl.state.Method" value="upload" ng-change="$ctrl.onChangeMethod()" />
-                  <label for="method_upload">
-                    <div class="boxselector_header">
-                      <pr-icon icon="'upload'" feather="true"></pr-icon>
-                      Upload
-                    </div>
-                    <p>Upload from your computer</p>
-                  </label>
-                </div>
-                <div>
-                  <input type="radio" id="method_repository" ng-model="$ctrl.state.Method" value="repository" ng-change="$ctrl.onChangeMethod()" />
-                  <label for="method_repository">
-                    <div class="boxselector_header">
-                      <pr-icon icon="'git-pull-request'" feather="true"></pr-icon>
-                      Repository
-                    </div>
-                    <p>Use a git repository</p>
-                  </label>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <div class="boxselector_wrapper">
+                  <div>
+                    <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor" ng-change="$ctrl.onChangeMethod()" />
+                    <label for="method_editor">
+                      <div class="boxselector_header">
+                        <pr-icon icon="'edit'" feather="true"></pr-icon>
+                        Web editor
+                      </div>
+                      <p>Use our Web editor</p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="method_upload" ng-model="$ctrl.state.Method" value="upload" ng-change="$ctrl.onChangeMethod()" />
+                    <label for="method_upload">
+                      <div class="boxselector_header">
+                        <pr-icon icon="'upload'" feather="true"></pr-icon>
+                        Upload
+                      </div>
+                      <p>Upload from your computer</p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="method_repository" ng-model="$ctrl.state.Method" value="repository" ng-change="$ctrl.onChangeMethod()" />
+                    <label for="method_repository">
+                      <div class="boxselector_header">
+                        <pr-icon icon="'git-pull-request'" feather="true"></pr-icon>
+                        Repository
+                      </div>
+                      <p>Use a git repository</p>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
