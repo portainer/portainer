@@ -1,7 +1,11 @@
 <ng-form name="$ctrl.webEditorForm">
-  <div class="web-editor overflow-x-hidden">
-    <div ng-if="!$ctrl.hideTitle" class="col-sm-12 form-section-title">Web editor</div>
-    <div class="trancluded-item form-group col-sm-12 col-lg-12 text-muted small" ng-transclude="description"></div>
+  <div class="web-editor overflow-auto">
+    <div ng-if="!$ctrl.hideTitle" class="col-sm-12 form-section-title pr-0"
+      >Web editor
+      <span ng-if="$ctrl.BROWSER_OS_PLATFORM != 'mac'" class="text-muted small vertical-center float-right mt-0">CTRL+F for search</span>
+      <span ng-if="$ctrl.BROWSER_OS_PLATFORM === 'mac'" class="text-muted small vertical-center float-right mt-0">CMD+F for search</span>
+    </div>
+    <div class="trancluded-item form-group col-sm-9 col-lg-10 text-muted small" ng-transclude="description"></div>
     <div class="form-group">
       <div class="col-sm-12 col-lg-12">
         <code-editor
