@@ -1,6 +1,6 @@
-import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { Search } from 'react-feather';
 
-import styles from './FilterSearchBar.module.css';
+import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
 
 interface Props {
   value: string;
@@ -14,19 +14,16 @@ export function FilterSearchBar({
   onChange,
 }: Props) {
   return (
-    <div className={styles.searchBar}>
-      <span className={styles.iconSpan}>
-        <i className="fa fa-search" aria-hidden="true" />
-      </span>
-      <span className={styles.textSpan}>
-        <input
-          type="text"
-          className="searchInput"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-        />
-      </span>
+    <div className="searchBar items-center flex h-[34px]">
+      <Search className="searchIcon feather" />
+      <input
+        type="text"
+        className="searchInput"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        data-cy="home-environmentSearch"
+      />
     </div>
   );
 }
