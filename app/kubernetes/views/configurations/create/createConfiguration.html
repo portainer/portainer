@@ -202,7 +202,7 @@
                   button-spinner="ctrl.state.actionInProgress"
                   data-cy="k8sConfigCreate-CreateConfigButton"
                 >
-                  <span ng-hide="ctrl.state.actionInProgress">Create {{ ctrl.formValues.Type | kubernetesConfigurationTypeText }}</span>
+                  <span ng-hide="ctrl.state.actionInProgress">Create {{ ctrl.formValues.Kind | kubernetesConfigurationKindText }}</span>
                   <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>
                 </button>
               </div>

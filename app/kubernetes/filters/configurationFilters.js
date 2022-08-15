@@ -1,6 +1,6 @@
 import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 
-angular.module('portainer.kubernetes').filter('kubernetesConfigurationTypeText', function () {
+angular.module('portainer.kubernetes').filter('kubernetesConfigurationKindText', function () {
   'use strict';
   return function (type) {
     switch (type) {

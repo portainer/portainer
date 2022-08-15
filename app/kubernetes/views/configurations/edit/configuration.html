@@ -122,7 +122,7 @@
                   button-spinner="ctrl.state.actionInProgress"
                   data-cy="k8sConfigDetail-updateConfig"
                 >
-                  <span ng-hide="ctrl.state.actionInProgress">Update {{ ctrl.configuration.Type | kubernetesConfigurationTypeText }}</span>
+                  <span ng-hide="ctrl.state.actionInProgress">Update {{ ctrl.configuration.Kind | kubernetesConfigurationKindText }}</span>
                   <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
                 </button>
               </div>

@@ -1,4 +1,4 @@
-import { KubernetesConfigurationKinds } from './models';
+import { KubernetesConfigurationKinds, KubernetesSecretTypes } from './models';
 
 /**
  * KubernetesConfigurationFormValues Model
@@ -8,10 +8,11 @@ const _KubernetesConfigurationFormValues = Object.freeze({
   ResourcePool: '',
   Name: '',
   ConfigurationOwner: '',
-  Type: KubernetesConfigurationKinds.CONFIGMAP,
+  Kind: KubernetesConfigurationKinds.CONFIGMAP,
   Data: [],
   DataYaml: '',
   IsSimple: true,
+  Type: KubernetesSecretTypes.OPAQUE,
 });
 
 export class KubernetesConfigurationFormValues {
