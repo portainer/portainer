@@ -18,6 +18,3 @@ export const compose: BoxSelectorOption<'compose'> = {
   description: 'docker-compose format',
   value: 'compose',
 };
-
-// buildOption('method_kubernetes', 'svg-kubernetes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
-// buildOption('method_compose', 'svg-dockercompose', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),

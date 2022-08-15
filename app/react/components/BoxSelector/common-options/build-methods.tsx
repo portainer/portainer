@@ -1,4 +1,4 @@
-import { Edit, FileText, GitHub, Upload } from 'react-feather';
+import { Edit, FileText, GitHub, Globe, Upload } from 'react-feather';
 
 import { BadgeIcon } from '../BadgeIcon';
 import { BoxSelectorOption } from '../types';
@@ -31,4 +31,12 @@ export const template: BoxSelectorOption<'template'> = {
   label: 'Template',
   description: 'Use an Edge stack template',
   value: 'template',
+};
+
+export const url: BoxSelectorOption<'url'> = {
+  id: 'method_url',
+  icon: <BadgeIcon icon={Globe} />,
+  label: 'URL',
+  description: 'Specify a URL to a file',
+  value: 'url',
 };
