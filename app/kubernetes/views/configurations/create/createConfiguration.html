@@ -90,7 +90,7 @@
               <div class="form-group px-[15px]" style="margin-bottom: 0">
                 <div class="boxselector_wrapper">
                   <div>
-                    <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Kind" />
+                    <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationKinds.CONFIGMAP" ng-model="ctrl.formValues.Kind" />
                     <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
                       <div class="boxselector_header">
                         <pr-icon icon="'svg-filecode'"></pr-icon>
@@ -100,7 +100,7 @@
                     </label>
                   </div>
                   <div>
-                    <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Kind" />
+                    <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationKinds.SECRET" ng-model="ctrl.formValues.Kind" />
                     <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
                       <div class="boxselector_header">
                         <pr-icon icon="'lock'" feather="true"></pr-icon>
