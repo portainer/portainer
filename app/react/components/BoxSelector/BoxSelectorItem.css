@@ -109,6 +109,10 @@
   font-size: 90px;
 }
 
+.boxselector_icon > svg {
+  margin-left: -5px;
+}
+
 .boxselector_header pr-icon {
   margin-right: 5px;
 }
