@@ -29,21 +29,21 @@
                   required
                   data-cy="k8sConfigCreate-nameInput"
                 />
-              </div>
-            </div>
-            <div class="form-group" ng-show="kubernetesConfigurationCreationForm.configuration_name.$invalid || ctrl.state.alreadyExist">
-              <div class="col-sm-3 col-lg-2"></div>
-              <div class="col-sm-8 col-lg-9 small text-warning">
-                <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
-                  <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.</p>
-                  <p ng-message="pattern" class="vertical-center"
-                    ><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon> This field must consist of lower case alphanumeric
-                    characters, '-' or '.', and contain at most 63 characters, and must start and end with an alphanumeric character.</p
-                  >
+                <div ng-show="kubernetesConfigurationCreationForm.configuration_name.$invalid || ctrl.state.alreadyExist">
+                  <div class="help-block small text-muted">
+                    <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
+                      <p ng-message="required" class="vertical-center"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.</p>
+                      <p ng-message="pattern" class="vertical-center"
+                        ><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon> This field must consist of lower case alphanumeric
+                        characters, '-' or '.', and contain at most 63 characters, and must start and end with an alphanumeric character.</p
+                      >
+                    </div>
+                    <p ng-if="ctrl.state.alreadyExist" class="vertical-center"
+                      ><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> A configuration with the same name already exists inside the selected
+                      namespace.</p
+                    >
+                  </div>
                 </div>
-                <p ng-if="ctrl.state.alreadyExist" class="vertical-center"
-                  ><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> A configuration with the same name already exists inside the selected namespace.</p
-                >
               </div>
             </div>
             <!-- !name -->
@@ -87,39 +87,91 @@
               </div>
 
               <!-- type options -->
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <div class="boxselector_wrapper">
-                    <div>
-                      <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
-                      <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
-                        <div class="boxselector_header">
-                          <pr-icon icon="'svg-filecode'"></pr-icon>
-                          ConfigMap
-                        </div>
-                        <p>This configuration holds non-sensitive information</p>
-                      </label>
+              <div class="form-group px-[15px]" style="margin-bottom: 0">
+                <div class="boxselector_wrapper">
+                  <div>
+                    <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Kind" />
+                    <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
+                      <div class="boxselector_header">
+                        <pr-icon icon="'svg-filecode'"></pr-icon>
+                        ConfigMap
+                      </div>
+                      <p>This configuration holds non-sensitive information</p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Kind" />
+                    <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
+                      <div class="boxselector_header">
+                        <pr-icon icon="'lock'" feather="true"></pr-icon>
+                        Secret
+                      </div>
+                      <p>This configuration holds sensitive information</p>
+                    </label>
+                  </div>
+                  <label for="configuration_serviceaccount" class="col-sm-3 col-lg-2 control-label text-left required">Service Account</label>
+                  <div class="col-sm-8 col-lg-9">
+                    <input type="text" name="service_account" class="form-control" id="configuration_serviceaccount" ng-model="ctrl.formValues.serviceAccount" required />
+                    <div class="help-block small text-muted" ng-messages="kubernetesConfigurationCreationForm.service_account.$error">
+                      <p class="vertical-center" ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>This field is required.</p>
                     </div>
-                    <div>
-                      <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
-                      <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
-                        <div class="boxselector_header">
-                          <pr-icon icon="'lock'" feather="true"></pr-icon>
-                          Secret
-                        </div>
-                        <p>This configuration holds sensitive information</p>
-                      </label>
+                  </div>
+              <!-- !type options -->
+
+              <div ng-if="ctrl.formValues.Kind === ctrl.KubernetesConfigurationKinds.SECRET">
+                <div class="col-sm-12 form-section-title"> Information </div>
+                <div class="form-group">
+                  <div class="col-sm-12 small text-muted">
+                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                    More information about types of secret can be found in the official
+                    <a class="hyperlink" href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-types" target="_blank">kubernetes documentation</a>.
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="configuration_data_type" class="col-sm-3 col-lg-2 control-label text-left">Type</label>
+                  <div class="col-sm-8 col-lg-9">
+                    <select
+                      class="form-control"
+                      id="configuration_data_type"
+                      ng-model="ctrl.formValues.Type"
+                      ng-options="value.name for (name, value) in ctrl.KubernetesSecretTypes"
+                    ></select>
+                    <div class="col-sm-3 col-lg-2"></div>
+                  </div>
+                </div>
+                <div class="form-group" ng-if="ctrl.formValues.Type === ctrl.KubernetesSecretTypes.CUSTOM">
+                  <label for="configuration_data_customtype" class="col-sm-3 col-lg-2 control-label text-left required">Custom Type</label>
+                  <div class="col-sm-8 col-lg-9">
+                    <input type="text" name="custom_type" class="form-control" id="configuration_data_customtype" ng-model="ctrl.formValues.customType" required />
+                    <div class="help-block" ng-messages="kubernetesConfigurationCreationForm.custom_type.$error">
+                      <p class="small text-muted vertical-center" ng-message="required">
+                        <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>This field is required.</p
+                      >
                     </div>
                   </div>
                 </div>
-              </div>
-              <!-- !type options -->
-
-              <div class="col-sm-12 form-section-title" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET"> Information </div>
-              <div class="form-group" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET">
-                <div class="col-sm-12 small text-muted">
-                  Creating a sensitive configuration will create a Kubernetes Secret of type <code>Opaque</code>. You can find more information about this in the
-                  <a href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-types" target="_blank">official documentation</a>.
+                <div class="form-group" ng-if="ctrl.formValues.Type === ctrl.KubernetesSecretTypes.SERVICEACCOUNTTOKEN">
+                  <div class="col-sm-12 small text-muted vertical-center pt-5">
+                    <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                    <span
+                      >You should only create a service account token Secret object if you can't use the TokenRequest API to obtain a token, and the security exposure of persisting
+                      a non-expiring token credential in a readable API object is acceptable to you. <br />See
+                      <a href="https://kubernetes.io/docs/concepts/configuration/secret/#service-account-token-secrets" target="_blank">service account token secrets</a> in the
+                      kubernetes documentation.</span
+                    >
+                  </div>
+                  <div class="col-sm-12 small text-muted vertical-center pt-2 pb-3">
+                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                    <span>The service account name must already exist.</span>
+                  </div>
+                  <label for="configuration_serviceaccount" class="col-sm-3 col-lg-2 control-label text-left required">Service Account</label>
+                  <div class="col-sm-8 col-lg-9">
+                    <input type="text" name="service_account" class="form-control" id="configuration_serviceaccount" ng-model="ctrl.formValues.serviceAccount" required />
+                    <div class="help-block small text-muted" ng-messages="kubernetesConfigurationCreationForm.service_account.$error">
+                      <p class="vertical-center" ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>This field is required.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

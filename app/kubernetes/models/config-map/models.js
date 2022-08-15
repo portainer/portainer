@@ -25,6 +25,6 @@ const _KubernetesConfigMap = Object.freeze({
 
 export class KubernetesConfigMap {
   constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigMap)));
+    Object.assign(this, _KubernetesConfigMap);
   }
 }

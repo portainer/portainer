@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 
 angular.module('portainer.docker').controller('KubernetesApplicationsDatatableController', [
   '$scope',
@@ -112,7 +112,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     };
 
     this.hasConfigurationSecrets = function (item) {
-      return item.Configurations && item.Configurations.some((config) => config.Data && config.Type === KubernetesConfigurationTypes.SECRET);
+      return item.Configurations && item.Configurations.some((config) => config.Data && config.Type === KubernetesConfigurationKinds.SECRET);
     };
 
     /**

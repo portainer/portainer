@@ -2,7 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 
 import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configuration/formvalues';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesConfigurationConverter from 'Kubernetes/converters/configuration';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
@@ -36,7 +36,7 @@ class KubernetesConfigurationController {
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
-    this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
+    this.KubernetesConfigurationKinds = KubernetesConfigurationKinds;
     this.KubernetesConfigMapService = KubernetesConfigMapService;
     this.KubernetesSecretService = KubernetesSecretService;
 

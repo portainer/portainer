@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import YAML from 'yaml';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 
 class KubernetesConfigurationHelper {
@@ -8,7 +8,7 @@ class KubernetesConfigurationHelper {
     return _.filter(applications, (app) => {
       let envFind;
       let volumeFind;
-      if (config.Type === KubernetesConfigurationTypes.CONFIGMAP) {
+      if (config.Type === KubernetesConfigurationKinds.CONFIGMAP) {
         envFind = _.find(app.Env, { valueFrom: { configMapKeyRef: { name: config.Name } } });
         volumeFind = _.find(app.Volumes, { configMap: { name: config.Name } });
       } else {

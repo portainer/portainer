@@ -13,6 +13,6 @@ const _KubernetesApplicationSecret = Object.freeze({
 
 export class KubernetesApplicationSecret {
   constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationSecret)));
+    Object.assign(this, _KubernetesApplicationSecret);
   }
 }

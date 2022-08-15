@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds, KubernetesSecretTypes } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
@@ -16,7 +16,8 @@ class KubernetesCreateConfigurationController {
     this.Authentication = Authentication;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
-    this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
+    this.KubernetesConfigurationKinds = KubernetesConfigurationKinds;
+    this.KubernetesSecretTypes = KubernetesSecretTypes;
 
     this.onInit = this.onInit.bind(this);
     this.createConfigurationAsync = this.createConfigurationAsync.bind(this);

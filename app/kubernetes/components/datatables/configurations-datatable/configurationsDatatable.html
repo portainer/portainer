@@ -125,11 +125,11 @@
               </th>
               <th>
                 <table-column-header
-                  col-title="'Type'"
+                  col-title="'Kind'"
                   can-sort="true"
-                  is-sorted="$ctrl.state.orderBy === 'Type'"
-                  is-sorted-desc="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"
-                  ng-click="$ctrl.changeOrderBy('Type')"
+                  is-sorted="$ctrl.state.orderBy === 'Kind'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Kind' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Kind')"
                 ></table-column-header>
               </th>
               <th>
@@ -160,7 +160,7 @@
               <td>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.Namespace })">{{ item.Namespace }}</a>
               </td>
-              <td>{{ item.Type | kubernetesConfigurationTypeText }}</td>
+              <td>{{ item.Kind | kubernetesConfigurationKindText }}</td>
               <td>{{ item.CreationDate | getisodate }} {{ item.ConfigurationOwner ? 'by ' + item.ConfigurationOwner : '' }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

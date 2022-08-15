@@ -1,4 +1,4 @@
-import { KubernetesConfigurationTypes } from './models';
+import { KubernetesConfigurationKinds } from './models';
 
 /**
  * KubernetesConfigurationFormValues Model
@@ -8,7 +8,7 @@ const _KubernetesConfigurationFormValues = Object.freeze({
   ResourcePool: '',
   Name: '',
   ConfigurationOwner: '',
-  Type: KubernetesConfigurationTypes.CONFIGMAP,
+  Type: KubernetesConfigurationKinds.CONFIGMAP,
   Data: [],
   DataYaml: '',
   IsSimple: true,
@@ -16,7 +16,7 @@ const _KubernetesConfigurationFormValues = Object.freeze({
 
 export class KubernetesConfigurationFormValues {
   constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigurationFormValues)));
+    Object.assign(this, _KubernetesConfigurationFormValues);
   }
 }
 
@@ -28,6 +28,6 @@ const _KubernetesConfigurationFormValuesEntry = Object.freeze({
 
 export class KubernetesConfigurationFormValuesEntry {
   constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigurationFormValuesEntry)));
+    Object.assign(this, _KubernetesConfigurationFormValuesEntry);
   }
 }
