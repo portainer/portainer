@@ -12,10 +12,11 @@
 }
 
 .control-label {
-  color: var(--ui-gray-7);
+  @apply inline-flex items-center;
+  @apply font-medium;
+  @apply text-gray-7;
   @apply th-dark:text-gray-warm-3;
   @apply th-highcontrast:text-white;
-  font-weight: 500;
 }
 
 .vertical-center {
@@ -355,10 +356,6 @@ input:checked + .slider:before {
 .required:after {
   content: '*';
   color: var(--ui-error-9);
-}
-
-.control-label {
-  @apply inline-flex items-center;
 }
 
 .progress {
