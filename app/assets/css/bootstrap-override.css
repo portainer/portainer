@@ -13,12 +13,9 @@
 
 .control-label {
   color: var(--ui-gray-7);
+  @apply th-dark:text-gray-warm-3;
+  @apply th-highcontrast:text-white;
   font-weight: 500;
-}
-
-[theme='dark'] .control-label,
-[theme='highcontrast'] .control-label {
-  color: var(--ui-white);
 }
 
 .vertical-center {
