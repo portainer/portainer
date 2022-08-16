@@ -167,8 +167,6 @@ export function confirmStackUpdate(
   confirmButtonClassName: string | undefined,
   callback: PromptCallback
 ) {
-  const sanitizedMessage = sanitize(message);
-
   const box = prompt({
     title: buildTitle('Are you sure?'),
     inputType: 'checkbox',
@@ -186,7 +184,7 @@ export function confirmStackUpdate(
     },
     callback,
   });
-  box.find('.bootbox-body').prepend(sanitizedMessage);
+  box.find('.bootbox-body').prepend(message);
   const checkbox = box.find('.bootbox-input-checkbox');
   checkbox.prop('checked', defaultToggle);
   checkbox.prop('disabled', defaultDisabled);
@@ -197,7 +195,8 @@ export function confirmStackUpdate(
     'position: relative; display: block; margin-top: 10px; margin-bottom: 10px;'
   );
   const checkboxLabel = box.find('.form-check-label');
-  checkboxLabel.addClass('switch box-selector-item limited business');
+  checkboxLabel.addClass('switch box-selector-item limited business mt-4');
+  checkboxLabel.prop('style', 'width: 100%');
   const switchEle = checkboxLabel.find('i');
   switchEle.prop('style', 'margin-left:20px');
 }
