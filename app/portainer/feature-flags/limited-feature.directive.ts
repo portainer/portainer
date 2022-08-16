@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import _ from 'lodash';
 import { IAttributes, IDirective, IScope } from 'angular';
 
 import { FeatureState } from '@/portainer/feature-flags/enums';

@@ -1,118 +1,144 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-      <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
-        <span class="small text-muted" style="float: left; margin-top: 5px" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-          System resources are hidden, this can be changed in the table settings.
-        </span>
-        <div class="settings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
-            <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
-              <div class="tableMenu">
-                <div class="menuHeader"> Table settings </div>
-                <div class="menuContent">
-                  <div>
-                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
-                      <input id="setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
-                      <label for="setting_show_system">Show system resources</label>
-                    </div>
-                    <div class="md-checkbox">
-                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
-                      <label for="setting_auto_refresh">Auto refresh</label>
-                    </div>
-                    <div ng-if="$ctrl.settings.repeater.autoRefresh">
-                      <label for="settings_refresh_rate"> Refresh rate </label>
-                      <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
-                        <option value="10">10s</option>
-                        <option value="30">30s</option>
-                        <option value="60">1min</option>
-                        <option value="120">2min</option>
-                        <option value="300">5min</option>
-                      </select>
-                      <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
-                      </span>
+      <!-- toolbar header actions and settings -->
+      <div class="toolBar !flex-col gap-1">
+        <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
+          <div class="toolBarTitle vertical-center">
+            <div class="widget-icon space-right">
+              <pr-icon icon="'layers'" feather="true"></pr-icon>
+            </div>
+            Namespaces
+          </div>
+          <div class="searchBar vertical-center">
+            <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+            <input
+              type="text"
+              class="searchInput"
+              ng-model="$ctrl.state.textFilter"
+              ng-change="$ctrl.onTextFilterChange()"
+              placeholder="Search for a namespace..."
+              auto-focus
+              ng-model-options="{ debounce: 300 }"
+              data-cy="k8sNamespace-namespaceSearchInput"
+            />
+          </div>
+          <div class="actionBar !gap-3 !mr-0" ng-if="$ctrl.isAdmin">
+            <button
+              type="button"
+              class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+              ng-disabled="$ctrl.state.selectedItemCount === 0"
+              ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+              data-cy="k8sNamespace-removeNamespaceButton"
+            >
+              <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary !ml-0" ui-sref="kubernetes.resourcePools.new" data-cy="k8sNamespace-addNamespaceWithFormButton">
+              <pr-icon icon="'plus'" feather="true" class-name="'!h-3'"></pr-icon>Add with form
+            </button>
+            <button type="button" class="btn btn-sm btn-primary !ml-0" ui-sref="kubernetes.deploy" data-cy="k8sNamespace-deployFromManifestButton">
+              <pr-icon icon="'plus'" feather="true" class-name="'!h-3'"></pr-icon>Create from manifest
+            </button>
+          </div>
+          <div class="settings">
+            <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
+              <span uib-dropdown-toggle>
+                <pr-icon icon="'more-vertical'" feather="true" class-name="'!mr-0 !h-4'"></pr-icon>
+              </span>
+              <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+                <div class="tableMenu">
+                  <div class="menuHeader"> Table settings </div>
+                  <div class="menuContent">
+                    <div>
+                      <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                        <input id="setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
+                        <label for="setting_show_system">Show system resources</label>
+                      </div>
+                      <div class="md-checkbox">
+                        <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                        <label for="setting_auto_refresh">Auto refresh</label>
+                      </div>
+                      <div ng-if="$ctrl.settings.repeater.autoRefresh">
+                        <label for="settings_refresh_rate"> Refresh rate </label>
+                        <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                          <option value="10">10s</option>
+                          <option value="30">30s</option>
+                          <option value="60">1min</option>
+                          <option value="120">2min</option>
+                          <option value="300">5min</option>
+                        </select>
+                        <span>
+                          <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                  <div>
+                    <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                  </div>
                 </div>
               </div>
-            </div>
+            </span>
+          </div>
+        </div>
+
+        <div class="flex flex-row w-full" ng-if="!$ctrl.settings.showSystem && $ctrl.isAdmin">
+          <span class="small text-muted mt-1 vertical-center">
+            <pr-icon icon="'info'" feather="true" mode="'primary'" class="vertical-center"></pr-icon>
+            <div> System resources are hidden, this can be changed in the table settings. </div>
           </span>
         </div>
       </div>
-      <div ng-if="$ctrl.isAdmin" class="actionBar">
-        <button
-          type="button"
-          class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-          data-cy="k8sNamespace-removeNamespaceButton"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.resourcePools.new" data-cy="k8sNamespace-addNamespaceWithFormButton">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add namespace with form
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.deploy" data-cy="k8sNamespace-deployFromManifestButton">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Create from manifest
-        </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-          data-cy="k8sNamespace-namespaceSearchInput"
-        />
-      </div>
+
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
-              <th>
-                <span ng-if="$ctrl.isAdmin" class="md-checkbox">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
-                  <label for="select_all"></label>
-                </span>
-                <a ng-click="$ctrl.changeOrderBy('Namespace.Name')">
-                  Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Name' && $ctrl.state.reverseOrder"></i>
-                </a>
+              <th class="dropdown">
+                <div class="flex flex-nowrap min-w-max vertical-center">
+                  <span ng-if="$ctrl.isAdmin" class="md-checkbox vertical-center">
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                    <label for="select_all"></label>
+                  </span>
+                  <table-column-header
+                    col-title="'Name'"
+                    can-sort="true"
+                    is-sorted="$ctrl.state.orderBy === 'Namespace.Name'"
+                    is-sorted-desc="$ctrl.state.orderBy === 'Namespace.Name' && $ctrl.state.reverseOrder"
+                    ng-click="$ctrl.changeOrderBy('Namespace.Name')"
+                  ></table-column-header>
+                </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Namespace.Status')">
-                  Status
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Status' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Status' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Status'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Namespace.Status'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Namespace.Status' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Namespace.Status')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Quota')">
-                  Quota
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Quota' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Quota' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Quota'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Quota'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Quota' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Quota')"
+                ></table-column-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('CreationDate')">
-                  Created
-                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'Created'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'Namespace.CreationDate'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Namespace.CreationDate' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Namespace.CreationDate')"
+                ></table-column-header>
               </th>
-              <th ng-if="$ctrl.isAdmin"> Actions </th>
+              <th ng-if="$ctrl.isAdmin">
+                <table-column-header col-title="'Actions'" can-sort="false"></table-column-header>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -131,11 +157,15 @@
               <td>
                 <span class="label label-{{ $ctrl.namespaceStatusColor(item.Namespace.Status) }}">{{ item.Namespace.Status }}</span>
               </td>
-              <td> <i class="fa {{ item.Quota ? 'fa-toggle-on' : 'fa-toggle-off' }}" aria-hidden="true" style="margin-right: 2px"></i> {{ item.Quota ? 'Yes' : 'No' }} </td>
+              <td>
+                <span ng-if="item.Quota" class="label label-warning">Enabled</span>
+                <span ng-if="!item.Quota">-</span>
+              </td>
               <td>{{ item.Namespace.CreationDate | getisodate }} {{ item.Namespace.ResourcePoolOwner ? 'by ' + item.Namespace.ResourcePoolOwner : '' }}</td>
               <td ng-if="$ctrl.isAdmin">
-                <a ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
-                  <i class="fa fa-users" aria-hidden="true"></i> Manage access
+                <a class="vertical-center" ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
+                  <pr-icon icon="'users'" feather="true"></pr-icon>
+                  Manage access
                 </a>
                 <span ng-if="!$ctrl.canManageAccess(item)">-</span>
               </td>
@@ -149,8 +179,8 @@
           </tbody>
         </table>
       </div>
-      <div class="footer" ng-if="$ctrl.dataset">
-        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
+      <div class="footer pl-5" ng-if="$ctrl.dataset">
+        <div class="infoBar !ml-0" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">

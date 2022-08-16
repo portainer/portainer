@@ -1,14 +1,19 @@
-<rd-header>
-  <rd-header-title title-text="Container statistics"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a> &gt; Stats
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'Container statistics'"
+  breadcrumbs="[
+    { label:'Containers', link:'docker.containers' },
+    { 
+      label:(container.Name | trimcontainername),
+      link: 'docker.containers.container', 
+      linkParams:container.Id
+    }, 'Stats']"
+>
+</page-header>
 
 <div class="row">
   <div class="col-md-12">
     <rd-widget>
-      <rd-widget-header icon="fa-info-circle" title-text="About statistics"> </rd-widget-header>
+      <rd-widget-header icon="info" feather-icon="true" title-text="About statistics"> </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -54,7 +59,7 @@
 <div class="row">
   <div class="col-lg-6 col-md-6 col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-chart-area" title-text="Memory usage"></rd-widget-header>
+      <rd-widget-header icon="bar-chart" feather-icon="true" title-text="Memory usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative">
           <canvas id="memoryChart" width="770" height="300"></canvas>
@@ -65,7 +70,7 @@
 
   <div class="col-lg-6 col-md-6 col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-chart-area" title-text="CPU usage"></rd-widget-header>
+      <rd-widget-header icon="bar-chart" feather-icon="true" title-text="CPU usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative">
           <canvas id="cpuChart" width="770" height="300"></canvas>
@@ -76,7 +81,7 @@
 
   <div class="col-lg-6 col-md-6 col-sm-12" ng-if="!state.networkStatsUnavailable">
     <rd-widget>
-      <rd-widget-header icon="fa-chart-area" title-text="Network usage (aggregate)"></rd-widget-header>
+      <rd-widget-header icon="bar-chart" feather-icon="true" title-text="Network usage (aggregate)"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative">
           <canvas id="networkChart" width="770" height="300"></canvas>
@@ -87,7 +92,7 @@
 
   <div class="col-lg-6 col-md-6 col-sm-12" ng-if="!state.ioStatsUnavailable">
     <rd-widget>
-      <rd-widget-header icon="fa-chart-area" title-text="I/O usage (aggregate)"></rd-widget-header>
+      <rd-widget-header icon="bar-chart" feather-icon="true" title-text="I/O usage (aggregate)"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative">
           <canvas id="ioChart" width="770" height="300"></canvas>
@@ -101,7 +106,7 @@
   <div class="col-sm-12">
     <container-processes-datatable
       title-text="Processes"
-      title-icon="fa-tasks"
+      title-icon="list"
       dataset="processInfo.Processes"
       headerset="processInfo.Titles"
       table-key="container-processes"

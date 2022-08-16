@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter-VariableFont.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  select {
+    font-family: Inter, Arial, Helvetica, sans-serif;
+  }
+}
+
+html {
+  font-size: 16px;
+  overflow-y: scroll;
+}
+
+body {
+  background: var(--bg-body-color);
+  font-family: 'Inter';
+  color: var(--text-body-color) !important;
+}
+
 html,
 body,
 #page-wrapper,
@@ -17,15 +40,16 @@ body,
   position: relative;
 }
 
-.white-space-normal {
-  white-space: normal !important;
-}
-
 .logo {
   display: inline;
   max-width: 155px;
   max-height: 55px;
 }
+
+.white-space-normal {
+  white-space: normal !important;
+}
+
 .legend .title {
   padding: 0 0.3em;
   margin: 0.5em;
@@ -58,16 +82,16 @@ body,
   font-size: 18px;
 }
 
-.header_title_content {
-  margin-left: 5px;
-}
-
 .form-section-title {
-  border-bottom: 1px solid var(--border-form-section-title-color);
+  @apply text-gray-9;
+  @apply th-dark:text-gray-5;
+  @apply th-highcontrast:text-white;
+
   margin-top: 5px;
-  margin-bottom: 15px;
-  color: var(--text-form-section-title-color);
+  margin-bottom: 10px;
   padding-left: 0;
+  font-weight: 500;
+  font-size: 16px;
 }
 
 .form-horizontal .control-label.text-left {
@@ -127,25 +151,12 @@ a[ng-click] {
   background-color: var(--bg-item-highlighted-null-color);
 }
 
-.service-datatable {
-  background-color: var(--bg-item-highlighted-color);
-  padding: 2px;
-}
-
-.service-datatable thead {
-  background-color: var(--bg-service-datatable-thead) !important;
-}
-
-.service-datatable tbody {
-  background-color: var(--bg-service-datatable-tbody);
-}
-
 .fa.green-icon {
   color: #23ae89;
 }
 
 .fa.red-icon {
-  color: #ae2323;
+  color: #f04438;
 }
 
 .fa.orange-icon {
@@ -217,12 +228,12 @@ a[ng-click] {
 }
 
 .blocklist-item {
-  padding: 0.7rem;
-  margin-bottom: 0.7rem;
+  padding: 10px;
+  margin-bottom: 10px;
   cursor: pointer;
-  border: 1px solid var(--border-blocklist-color);
-  border-radius: 2px;
-  box-shadow: var(--shadow-box-color);
+  border: 1px solid var(--border-blocklist);
+  border-radius: 8px;
+  margin-right: 10px;
 }
 
 .blocklist-item--disabled {
@@ -237,6 +248,8 @@ a[ng-click] {
 }
 
 .blocklist-item:hover {
+  @apply border border-blue-7;
+
   background-color: var(--bg-blocklist-hover-color);
   color: var(--text-blocklist-hover-color);
 }
@@ -257,7 +270,6 @@ a[ng-click] {
 .blocklist-item-logo {
   width: 100%;
   max-width: 60px;
-  height: 100%;
   max-height: 60px;
 }
 
@@ -375,12 +387,13 @@ a[ng-click] {
 }
 
 .panel-body {
-  padding-top: 30px;
-  background-color: var(--white-color) fff;
+  padding: 20px 25px;
+  background-color: var(--white-color);
+  border-radius: 8px;
 }
 
 .user-box {
-  margin-right: 25px;
+  margin-right: 15px;
 }
 
 .select-endpoint {
@@ -810,12 +823,6 @@ json-tree .branch-preview {
 }
 /* !uib-typeahead override */
 
-.kubectl-shell {
-  display: block;
-  text-align: center;
-  padding-bottom: 5px;
-}
-
 .no-margin {
   margin: 0 !important;
 }
@@ -837,4 +844,44 @@ json-tree .branch-preview {
 /* used for bootbox prompt with inputType radio */
 .form-check.radio {
   margin-left: 15px;
+}
+
+.inline-text {
+  display: inline;
+  position: absolute;
+  font-family: 'Montserrat';
+  font-size: smaller;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.web-editor {
+  background-color: var(--bg-webeditor-color);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.web-editor a {
+  color: var(--text-link-color);
+}
+
+.web-editor a:hover {
+  color: var(--text-link-hover-color);
+  text-decoration-line: underline;
+}
+
+reach-portal > div {
+  z-index: 10;
+}
+
+input[style*='background-image: url("data:image/png'] + [data-cy='auth-passwordInputToggle'] {
+  right: 20px;
+}
+
+input[style*='background-image: url("data:image/png'] {
+  padding-right: 60px;
+}
+
+.web-editor .trancluded-item:empty {
+  display: none;
 }

@@ -1,3 +1,5 @@
+import './access-viewer-datatable.css';
+
 export const accessViewerDatatable = {
   templateUrl: './access-viewer-datatable.html',
   controller: 'GenericDatatableController',
@@ -7,5 +9,6 @@ export const accessViewerDatatable = {
     tableKey: '@',
     orderBy: '@',
     dataset: '<',
+    isAdmin: '<',
   },
 };

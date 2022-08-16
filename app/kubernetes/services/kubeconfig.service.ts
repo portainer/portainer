@@ -2,7 +2,6 @@ import { saveAs } from 'file-saver';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/portainer/environments/types';
-import { publicSettings } from '@/portainer/settings/settings.service';
 
 const baseUrl = 'kubernetes';
 
@@ -20,24 +19,5 @@ export async function downloadKubeconfigFile(environmentIds: EnvironmentId[]) {
     saveAs(data, filename);
   } catch (e) {
     throw parseAxiosError(e as Error, '');
-  }
-}
-
-export async function expiryMessage() {
-  const settings = await publicSettings();
-
-  const prefix = 'Kubeconfig file will';
-  switch (settings.KubeconfigExpiry) {
-    case '24h':
-      return `${prefix} expire in 1 day.`;
-    case '168h':
-      return `${prefix} expire in 7 days.`;
-    case '720h':
-      return `${prefix} expire in 30 days.`;
-    case '8640h':
-      return `${prefix} expire in 1 year.`;
-    case '0':
-    default:
-      return `${prefix} not expire.`;
   }
 }

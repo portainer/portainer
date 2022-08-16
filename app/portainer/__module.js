@@ -9,6 +9,9 @@ import servicesModule from './services';
 import teamsModule from './teams';
 import homeModule from './home';
 import { accessControlModule } from './access-control';
+import { reactModule } from './react';
+import { sidebarModule } from './react/views/sidebar';
+import environmentsModule from './environments';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -19,6 +22,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   $rootScope.$on('unauthenticated', function (event, data) {
     if (!_.includes(data.config.url, '/v2/') && !_.includes(data.config.url, '/api/v4/') && isTransitionRequiresAuthentication($state.transition)) {
       $state.go('portainer.logout', { error: 'Your session has expired' });
+      window.location.reload();
     }
   });
 
@@ -38,6 +42,9 @@ angular
     servicesModule,
     teamsModule,
     accessControlModule,
+    reactModule,
+    sidebarModule,
+    environmentsModule,
   ])
   .config([
     '$stateRegistryProvider',
@@ -66,8 +73,7 @@ angular
         },
         views: {
           'sidebar@': {
-            templateUrl: './views/sidebar/sidebar.html',
-            controller: 'SidebarController',
+            component: 'sidebar',
           },
         },
       };
@@ -179,48 +185,6 @@ angular
           'content@': {
             templateUrl: './views/endpoints/edit/endpoint.html',
             controller: 'EndpointController',
-          },
-        },
-      };
-
-      var k8sendpoint = {
-        name: 'portainer.k8sendpoint',
-        url: '/:id',
-      };
-
-      const endpointKubernetesConfiguration = {
-        name: 'portainer.k8sendpoint.kubernetesConfig',
-        url: '/configure',
-        views: {
-          'content@': {
-            templateUrl: '../kubernetes/views/configure/configure.html',
-            controller: 'KubernetesConfigureController',
-            controllerAs: 'ctrl',
-          },
-        },
-      };
-
-      var endpointCreation = {
-        name: 'portainer.endpoints.new',
-        url: '/new',
-        views: {
-          'content@': {
-            templateUrl: './views/endpoints/create/createendpoint.html',
-            controller: 'CreateEndpointController',
-          },
-        },
-      };
-
-      var edgeDeviceCreation = {
-        name: 'portainer.endpoints.newEdgeDevice',
-        url: '/newEdgeDevice',
-        params: {
-          isEdgeDevice: true,
-        },
-        views: {
-          'content@': {
-            templateUrl: './views/endpoints/create/createendpoint.html',
-            controller: 'CreateEndpointController',
           },
         },
       };
@@ -339,26 +303,6 @@ angular
         url: '/init',
         views: {
           'sidebar@': {},
-        },
-      };
-
-      const wizard = {
-        name: 'portainer.wizard',
-        url: '/wizard',
-        views: {
-          'content@': {
-            component: 'wizardView',
-          },
-        },
-      };
-
-      const wizardEndpoints = {
-        name: 'portainer.wizard.endpoints',
-        url: '/endpoints',
-        views: {
-          'content@': {
-            component: 'wizardEndpoints',
-          },
         },
       };
 
@@ -512,23 +456,17 @@ angular
       $stateRegistryProvider.register(logout);
       $stateRegistryProvider.register(endpoints);
       $stateRegistryProvider.register(endpoint);
-      $stateRegistryProvider.register(k8sendpoint);
       $stateRegistryProvider.register(endpointAccess);
       $stateRegistryProvider.register(endpointKVM);
-      $stateRegistryProvider.register(edgeDeviceCreation);
-      $stateRegistryProvider.register(endpointCreation);
       $stateRegistryProvider.register(deviceImport);
       $stateRegistryProvider.register(addFDOProfile);
       $stateRegistryProvider.register(editFDOProfile);
-      $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);
       $stateRegistryProvider.register(group);
       $stateRegistryProvider.register(groupAccess);
       $stateRegistryProvider.register(groupCreation);
       $stateRegistryProvider.register(home);
       $stateRegistryProvider.register(init);
-      $stateRegistryProvider.register(wizard);
-      $stateRegistryProvider.register(wizardEndpoints);
       $stateRegistryProvider.register(initEndpoint);
       $stateRegistryProvider.register(initAdmin);
       $stateRegistryProvider.register(registries);

@@ -1,4 +1,10 @@
 <span>
-  <button type="button" class="btn btn-link nopadding" ng-click="$ctrl.copyValueText()" title="Copy Value"> <i class="fa fa-copy"></i> Copy </button>
-  <span ng-class="{ 'copy-button-fadeout': $ctrl.state.isFading }" class="copy-button-copy-text"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+  <button type="button" class="btn btn-link nopadding" ng-click="$ctrl.copyValueText()" title="Copy Value">
+    <pr-icon icon="'clipboard'" feather="true"></pr-icon>
+    Copy
+  </button>
+  <span ng-class="{ 'copy-button-fadeout': $ctrl.state.isFading }" class="copy-button-copy-text">
+    <pr-icon icon="'check'" feather="true"></pr-icon>
+    copied
+  </span>
 </span>

@@ -8,17 +8,15 @@ import {
 } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 
-import { Button } from '@/portainer/components/Button';
-import { Table } from '@/portainer/components/datatables/components';
-import {
-  SearchBar,
-  useSearchBarState,
-} from '@/portainer/components/datatables/components/SearchBar';
-import { SelectedRowsCount } from '@/portainer/components/datatables/components/SelectedRowsCount';
-import { PaginationControls } from '@/portainer/components/pagination-controls';
 import { Environment } from '@/portainer/environments/types';
-import { useTableSettings } from '@/portainer/components/datatables/components/useTableSettings';
 import { notifySuccess } from '@/portainer/services/notifications';
+
+import { Button } from '@@/buttons';
+import { Table } from '@@/datatables';
+import { SearchBar, useSearchBarState } from '@@/datatables/SearchBar';
+import { SelectedRowsCount } from '@@/datatables/SelectedRowsCount';
+import { PaginationControls } from '@@/PaginationControls';
+import { useTableSettings } from '@@/datatables/useTableSettings';
 
 import { useAssociateDeviceMutation } from '../queries';
 
@@ -111,19 +109,22 @@ export function DataTable({
     <div className="row">
       <div className="col-sm-12">
         <Table.Container>
-          <Table.Title label="Edge Devices Waiting Room" icon="" />
-          <Table.Actions>
-            <Button
-              onClick={() =>
-                handleAssociateDevice(selectedFlatRows.map((r) => r.original))
-              }
-              disabled={selectedFlatRows.length === 0}
-            >
-              Associate Device
-            </Button>
-          </Table.Actions>
-
-          <SearchBar onChange={handleSearchBarChange} value={searchBarValue} />
+          <Table.Title label="Edge Devices Waiting Room" icon="">
+            <SearchBar
+              onChange={handleSearchBarChange}
+              value={searchBarValue}
+            />
+            <Table.Actions>
+              <Button
+                onClick={() =>
+                  handleAssociateDevice(selectedFlatRows.map((r) => r.original))
+                }
+                disabled={selectedFlatRows.length === 0}
+              >
+                Associate Device
+              </Button>
+            </Table.Actions>
+          </Table.Title>
 
           <Table
             className={tableProps.className}
@@ -206,7 +207,7 @@ export function DataTable({
       devices.map((d) => d.Id),
       {
         onSuccess() {
-          notifySuccess('Edge devices associated successfully');
+          notifySuccess('Success', 'Edge devices associated successfully');
         },
       }
     );

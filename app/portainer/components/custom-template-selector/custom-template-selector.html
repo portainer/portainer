@@ -1,7 +1,7 @@
 <div>
-  <div class="form-group">
-    <label for="stack_template" class="col-sm-1 control-label text-left"> Template </label>
-    <div class="col-sm-11">
+  <div class="form-group pt-3">
+    <label for="stack_template" class="col-sm-3 col-lg-2 control-label text-left"> Template </label>
+    <div class="col-sm-8 vertical-center">
       <select
         ng-if="$ctrl.templates.length"
         class="form-control"
@@ -11,7 +11,9 @@
       >
         <option value="" label="Select a Custom template" disabled selected="selected"> </option>
       </select>
-      <span ng-if="!$ctrl.templates.length"> No custom templates are available. Head over to the <a ui-state="$ctrl.newTemplatePath">custom template view</a> to create one. </span>
+      <span class="small text-muted pt-[7px]" ng-if="!$ctrl.templates.length">
+        No custom templates are available. Head over to the <a class="hyperlink" ui-state="$ctrl.newTemplatePath">custom template view</a> to create one.
+      </span>
     </div>
   </div>
 

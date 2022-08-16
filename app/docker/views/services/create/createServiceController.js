@@ -111,6 +111,14 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     $scope.allowBindMounts = false;
 
+    $scope.handleWebHookChange = handleWebHookChange;
+
+    function handleWebHookChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.Webhook = checked;
+      });
+    }
+
     $scope.handleEnvVarChange = handleEnvVarChange;
     function handleEnvVarChange(value) {
       $scope.formValues.Env = value;
@@ -529,7 +537,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
           return $q.all([rcPromise, webhookPromise]);
         })
         .then(function success() {
-          Notifications.success('Service successfully created');
+          Notifications.success('Success', 'Service successfully created');
           $state.go('docker.services', {}, { reload: true });
         })
         .catch(function error(err) {

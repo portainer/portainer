@@ -1,5 +1,6 @@
 import angular from 'angular';
 import uuidv4 from 'uuid/v4';
+import { getEnvironments } from '@/portainer/environments/environment.service';
 
 class AuthenticationController {
   /* @ngInject */
@@ -12,7 +13,6 @@ class AuthenticationController {
     $window,
     Authentication,
     UserService,
-    EndpointService,
     StateManager,
     Notifications,
     SettingsService,
@@ -28,7 +28,6 @@ class AuthenticationController {
     this.$window = $window;
     this.Authentication = Authentication;
     this.UserService = UserService;
-    this.EndpointService = EndpointService;
     this.StateManager = StateManager;
     this.Notifications = Notifications;
     this.SettingsService = SettingsService;
@@ -42,6 +41,7 @@ class AuthenticationController {
       Password: '',
     };
     this.state = {
+      passwordInputType: 'password',
       showOAuthLogin: false,
       showStandardLogin: false,
       AuthenticationError: '',
@@ -50,7 +50,6 @@ class AuthenticationController {
     };
 
     this.checkForEndpointsAsync = this.checkForEndpointsAsync.bind(this);
-    this.checkForLatestVersionAsync = this.checkForLatestVersionAsync.bind(this);
     this.postLoginSteps = this.postLoginSteps.bind(this);
 
     this.oAuthLoginAsync = this.oAuthLoginAsync.bind(this);
@@ -66,6 +65,16 @@ class AuthenticationController {
   /**
    * UTILS FUNCTIONS SECTION
    */
+
+  toggleShowPassword() {
+    this.state.passwordInputType = this.state.passwordInputType === 'text' ? 'password' : 'text';
+  }
+
+  // set the password input type to password, so that browser autofills don't treat the input as text
+  setPasswordInputType(inputType) {
+    this.state.passwordInputType = inputType;
+    document.getElementById('password').setAttribute('type', inputType);
+  }
 
   logout(error) {
     this.Authentication.logout();
@@ -120,8 +129,8 @@ class AuthenticationController {
 
   async checkForEndpointsAsync() {
     try {
-      const endpoints = await this.EndpointService.endpoints(0, 1);
       const isAdmin = this.Authentication.isAdmin();
+      const endpoints = await getEnvironments({ limit: 1 });
 
       if (this.Authentication.getUserDetails().forceChangePassword) {
         return this.$state.go('portainer.account');
@@ -137,23 +146,6 @@ class AuthenticationController {
     }
   }
 
-  async checkForLatestVersionAsync() {
-    let versionInfo = {
-      UpdateAvailable: false,
-      LatestVersion: '',
-    };
-
-    try {
-      const versionStatus = await this.StatusService.version();
-      if (versionStatus.UpdateAvailable) {
-        versionInfo.UpdateAvailable = true;
-        versionInfo.LatestVersion = versionStatus.LatestVersion;
-      }
-    } finally {
-      this.StateManager.setVersionInfo(versionInfo);
-    }
-  }
-
   async postLoginSteps() {
     await this.StateManager.initialize();
 
@@ -161,7 +153,6 @@ class AuthenticationController {
     this.$analytics.setUserRole(isAdmin ? 'admin' : 'standard-user');
 
     await this.checkForEndpointsAsync();
-    await this.checkForLatestVersionAsync();
   }
   /**
    * END POST LOGIN STEPS SECTION
@@ -205,6 +196,7 @@ class AuthenticationController {
   }
 
   authenticateUser() {
+    this.setPasswordInputType('password');
     return this.$async(this.authenticateUserAsync);
   }
 

@@ -31,8 +31,7 @@ export default class HelmTemplatesController {
     };
   }
 
-  editorUpdate(content) {
-    const contentvalues = content.getValue();
+  editorUpdate(contentvalues) {
     if (this.state.originalvalues === contentvalues) {
       this.state.isEditorDirty = false;
     } else {
@@ -58,7 +57,7 @@ export default class HelmTemplatesController {
         Namespace: this.state.resourcePool.Namespace.Name,
       };
       await this.HelmService.install(this.endpoint.Id, payload);
-      this.Notifications.success('Helm Chart successfully installed');
+      this.Notifications.success('Success', 'Helm Chart successfully installed');
       this.$analytics.eventTrack('kubernetes-helm-install', { category: 'kubernetes', metadata: { 'chart-name': this.state.chart.name } });
       this.state.isEditorDirty = false;
       this.$state.go('kubernetes.applications');
@@ -83,7 +82,7 @@ export default class HelmTemplatesController {
   }
 
   async selectHelmChart(chart) {
-    this.$anchorScroll('view-top');
+    window.scrollTo(0, 0);
     this.state.showCustomValues = false;
     this.state.chart = chart;
     await this.getHelmValues();

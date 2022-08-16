@@ -78,6 +78,19 @@ func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 	return h
 }
 
+// TeamLeaderAccess defines a security check for APIs require team leader privilege
+//
+// Bouncer operations are applied backwards:
+//  - Parse the JWT from the request and stored in context, user has to be authenticated
+//  - Upgrade to the restricted request
+//  - User is admin or team leader
+func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
+	h = bouncer.mwIsTeamLeader(h)
+	h = bouncer.mwUpgradeToRestrictedRequest(h)
+	h = bouncer.mwAuthenticatedUser(h)
+	return h
+}
+
 // AuthenticatedAccess defines a security check for restricted API environments(endpoints).
 // Authentication is required to access these environments(endpoints).
 // The request context will be enhanced with a RestrictedRequestContext object
@@ -216,6 +229,24 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 
 		ctx := StoreRestrictedRequestContext(r, requestContext)
 		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+// mwIsTeamLeader will verify that the user is an admin or a team leader
+func (bouncer *RequestBouncer) mwIsTeamLeader(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		securityContext, err := RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve restricted request context ", err)
+			return
+		}
+
+		if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }
 

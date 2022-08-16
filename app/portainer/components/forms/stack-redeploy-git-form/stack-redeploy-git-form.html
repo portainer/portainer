@@ -35,8 +35,9 @@
     ng-model="$ctrl.formValues.Env"
     explanation="These values will be used as substitutions in the stack file"
     on-change="($ctrl.onChangeEnvVar)"
+    show-help-message="true"
   ></environment-variables-panel>
-
+  <option-panel ng-if="$ctrl.stack.Type === 1 && $ctrl.endpoint.apiVersion >= 1.27" ng-model="$ctrl.formValues.Option" on-change="($ctrl.onChangeOption)"></option-panel>
   <button
     class="btn btn-sm btn-primary"
     ng-click="$ctrl.submit()"

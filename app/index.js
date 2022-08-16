@@ -9,7 +9,7 @@ import './matomo-setup';
 import analyticsModule from './angulartics.matomo';
 
 import './agent';
-import './azure/_module';
+import { azureModule } from './azure';
 import './docker/__module';
 import './edge/__module';
 import './portainer/__module';
@@ -19,6 +19,7 @@ import { configApp } from './config';
 
 import { init as initFeatureService } from './portainer/feature-flags/feature-flags.service';
 import { Edition } from './portainer/feature-flags/enums';
+import { nomadModule } from './nomad';
 
 initFeatureService(Edition[process.env.PORTAINER_EDITION]);
 
@@ -43,9 +44,10 @@ angular
     'luegg.directives',
     'portainer.app',
     'portainer.agent',
-    'portainer.azure',
+    azureModule,
     'portainer.docker',
     'portainer.kubernetes',
+    nomadModule,
     'portainer.edge',
     'rzModule',
     'moment-picker',

@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Create config"></rd-header-title>
-  <rd-header-content> <a ui-sref="docker.configs">Configs</a> &gt; Add config </rd-header-content>
-</rd-header>
+<page-header title="'Create config'" breadcrumbs="[{label:'Configs', link:'docker.configs'}, 'Add config']"> </page-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
@@ -19,13 +16,13 @@
           <!-- config-data -->
           <div class="form-group">
             <div class="col-sm-12" ng-if="ctrl.formValues.displayCodeEditor">
-              <code-editor
+              <web-editor-form
                 identifier="config-creation-editor"
                 placeholder="Define or paste the content of your config here"
                 yml="false"
                 on-change="(ctrl.editorUpdate)"
                 value="ctrl.formValues.Data"
-              ></code-editor>
+              ></web-editor-form>
             </div>
           </div>
           <!-- !config-data -->
@@ -34,7 +31,7 @@
             <div class="col-sm-12" style="margin-top: 5px">
               <label class="control-label text-left">Labels</label>
               <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addLabel()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
+                <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add label
               </span>
             </div>
             <!-- labels-input-list -->
@@ -48,8 +45,8 @@
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                 </div>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeLabel($index)">
-                  <i class="fa fa-trash" aria-hidden="true"></i>
+                <button class="btn btn-light" type="button" ng-click="ctrl.removeLabel($index)">
+                  <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
                 </button>
               </div>
             </div>

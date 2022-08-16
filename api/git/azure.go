@@ -108,12 +108,12 @@ func (a *azureDownloader) latestCommitID(ctx context.Context, options fetchOptio
 		return "", errors.WithMessage(err, "failed to parse url")
 	}
 
-	refsUrl, err := a.buildRefsUrl(config, options.referenceName)
+	rootItemUrl, err := a.buildRootItemUrl(config, options.referenceName)
 	if err != nil {
-		return "", errors.WithMessage(err, "failed to build azure refs url")
+		return "", errors.WithMessage(err, "failed to build azure root item url")
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "GET", refsUrl, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", rootItemUrl, nil)
 	if options.username != "" || options.password != "" {
 		req.SetBasicAuth(options.username, options.password)
 	} else if config.username != "" || config.password != "" {
@@ -131,26 +131,24 @@ func (a *azureDownloader) latestCommitID(ctx context.Context, options fetchOptio
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to get repository refs with a status \"%v\"", resp.Status)
+		return "", fmt.Errorf("failed to get repository root item with a status \"%v\"", resp.Status)
 	}
 
-	var refs struct {
+	var items struct {
 		Value []struct {
-			Name     string `json:"name"`
-			ObjectId string `json:"objectId"`
-		}
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&refs); err != nil {
-		return "", errors.Wrap(err, "could not parse Azure Refs response")
-	}
-
-	for _, ref := range refs.Value {
-		if strings.EqualFold(ref.Name, options.referenceName) {
-			return ref.ObjectId, nil
+			CommitId string `json:"commitId"`
 		}
 	}
 
-	return "", errors.Errorf("could not find ref %q in the repository", options.referenceName)
+	if err := json.NewDecoder(resp.Body).Decode(&items); err != nil {
+		return "", errors.Wrap(err, "could not parse Azure items response")
+	}
+
+	if len(items.Value) == 0 || items.Value[0].CommitId == "" {
+		return "", errors.Errorf("failed to get latest commitID in the repository")
+	}
+
+	return items.Value[0].CommitId, nil
 }
 
 func parseUrl(rawUrl string) (*azureOptions, error) {
@@ -236,8 +234,10 @@ func (a *azureDownloader) buildDownloadUrl(config *azureOptions, referenceName s
 	// scopePath=/&download=true&versionDescriptor.version=main&$format=zip&recursionLevel=full&api-version=6.0
 	q.Set("scopePath", "/")
 	q.Set("download", "true")
-	q.Set("versionDescriptor.versionType", getVersionType(referenceName))
-	q.Set("versionDescriptor.version", formatReferenceName(referenceName))
+	if referenceName != "" {
+		q.Set("versionDescriptor.versionType", getVersionType(referenceName))
+		q.Set("versionDescriptor.version", formatReferenceName(referenceName))
+	}
 	q.Set("$format", "zip")
 	q.Set("recursionLevel", "full")
 	q.Set("api-version", "6.0")
@@ -246,8 +246,8 @@ func (a *azureDownloader) buildDownloadUrl(config *azureOptions, referenceName s
 	return u.String(), nil
 }
 
-func (a *azureDownloader) buildRefsUrl(config *azureOptions, referenceName string) (string, error) {
-	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/refs",
+func (a *azureDownloader) buildRootItemUrl(config *azureOptions, referenceName string) (string, error) {
+	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/items",
 		a.baseUrl,
 		url.PathEscape(config.organisation),
 		url.PathEscape(config.project),
@@ -255,12 +255,15 @@ func (a *azureDownloader) buildRefsUrl(config *azureOptions, referenceName strin
 	u, err := url.Parse(rawUrl)
 
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to parse refs url path %s", rawUrl)
+		return "", errors.Wrapf(err, "failed to parse root item url path %s", rawUrl)
 	}
 
-	// filterContains=main&api-version=6.0
 	q := u.Query()
-	q.Set("filterContains", formatReferenceName(referenceName))
+	q.Set("scopePath", "/")
+	if referenceName != "" {
+		q.Set("versionDescriptor.versionType", getVersionType(referenceName))
+		q.Set("versionDescriptor.version", formatReferenceName(referenceName))
+	}
 	q.Set("api-version", "6.0")
 	u.RawQuery = q.Encode()
 

@@ -1,7 +1,9 @@
 import registriesModule from './registries';
 import customTemplateModule from './custom-templates';
+import { reactModule } from './react';
+import './views/kubernetes.css';
 
-angular.module('portainer.kubernetes', ['portainer.app', registriesModule, customTemplateModule]).config([
+angular.module('portainer.kubernetes', ['portainer.app', registriesModule, customTemplateModule, reactModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -320,6 +322,29 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const endpointKubernetesConfiguration = {
+      name: 'kubernetes.cluster.setup',
+      url: '/configure',
+      views: {
+        'content@': {
+          templateUrl: './views/configure/configure.html',
+          controller: 'KubernetesConfigureController',
+          controllerAs: 'ctrl',
+        },
+      },
+    };
+
+    const endpointKubernetesSecurityConstraint = {
+      name: 'kubernetes.cluster.securityConstraint',
+      url: '/securityConstraint',
+      views: {
+        'content@': {
+          templateUrl: '../kubernetes/views/security-constraint/constraint.html',
+          controller: 'KubernetesSecurityConstraintController',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(kubernetes);
     $stateRegistryProvider.register(helmApplication);
     $stateRegistryProvider.register(helmTemplates);
@@ -349,5 +374,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(volume);
     $stateRegistryProvider.register(registries);
     $stateRegistryProvider.register(registriesAccess);
+    $stateRegistryProvider.register(endpointKubernetesConfiguration);
+    $stateRegistryProvider.register(endpointKubernetesSecurityConstraint);
   },
 ]);

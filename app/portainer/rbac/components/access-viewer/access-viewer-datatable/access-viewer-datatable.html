@@ -1,25 +1,47 @@
-<div class="datatable">
-  <div class="searchBar">
-    <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-    <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." ng-model-options="{ debounce: 300 }" />
+<div class="datatable access-viewer-datatable">
+  <div class="toolBar vertical-center pl-0 pr-0">
+    <div class="toolBarTitle vertical-center">
+      <div>
+        <div class="form-section-title mb-1">Access</div>
+        <div class="vertical-center">
+          <pr-icon icon="'info'" mode="'primary'" feather="true" size="'sm'" class="vertical-center"></pr-icon>
+          <span class="small text-muted"> Effective role for each environment will be displayed for the selected user </span>
+        </div>
+      </div>
+    </div>
+    <div class="searchBar vertical-center">
+      <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
+      <input
+        type="text"
+        class="searchInput ml-1"
+        ng-model="$ctrl.state.textFilter"
+        ng-change="$ctrl.onTextFilterChange()"
+        placeholder="Search..."
+        ng-model-options="{ debounce: 300 }"
+      />
+    </div>
   </div>
   <div class="table-responsive">
     <table class="table table-hover nowrap-cells">
       <thead>
         <tr>
           <th>
-            <a ng-click="$ctrl.changeOrderBy('EndpointName')">
-              Environment
-              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'EndpointName' && !$ctrl.state.reverseOrder"></i>
-              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'EndpointName' && $ctrl.state.reverseOrder"></i>
-            </a>
+            <table-column-header
+              col-title="'Environment'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'EndpointName'"
+              is-sorted-desc="$ctrl.state.orderBy === 'EndpointName' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('EndpointName')"
+            ></table-column-header>
           </th>
           <th>
-            <a ng-click="$ctrl.changeOrderBy('RoleName')">
-              Role
-              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RoleName' && !$ctrl.state.reverseOrder"></i>
-              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RoleName' && $ctrl.state.reverseOrder"></i>
-            </a>
+            <table-column-header
+              col-title="'Role'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'RoleName'"
+              is-sorted-desc="$ctrl.state.orderBy === 'RoleName' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('RoleName')"
+            ></table-column-header>
           </th>
           <th>Access origin</th>
         </tr>
@@ -33,11 +55,11 @@
           <td
             >{{ item.TeamName ? 'Team' : 'User' }} <code ng-if="item.TeamName">{{ item.TeamName }}</code> access defined on {{ item.AccessLocation }}
             <code ng-if="item.GroupName">{{ item.GroupName }}</code>
-            <a ng-if="!item.GroupName" ui-sref="portainer.endpoints.endpoint.access({id: item.EndpointId})"
-              ><i style="margin-left: 5px" class="fa fa-users" aria-hidden="true"></i> Manage access
+            <a ng-if="!item.GroupName && $ctrl.isAdmin" ui-sref="portainer.endpoints.endpoint.access({id: item.EndpointId})"
+              ><pr-icon icon="'users'" feather="true"></pr-icon> Manage access
             </a>
-            <a ng-if="item.GroupName" ui-sref="portainer.groups.group.access({id: item.GroupId})"
-              ><i style="margin-left: 5px" class="fa fa-users" aria-hidden="true"></i> Manage access
+            <a ng-if="item.GroupName && $ctrl.isAdmin" ui-sref="portainer.groups.group.access({id: item.GroupId})"
+              ><pr-icon icon="'users'" feather="true"></pr-icon> Manage access
             </a>
           </td>
         </tr>

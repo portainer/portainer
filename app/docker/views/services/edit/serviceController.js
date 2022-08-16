@@ -331,6 +331,13 @@ angular.module('portainer.docker').controller('ServiceController', [
       updateServiceArray(service, 'Hosts', service.Hosts);
     };
 
+    $scope.onWebhookChange = function (enabled) {
+      $scope.$evalAsync(() => {
+        $scope.updateWebhook($scope.service);
+        $scope.WebhookExists = enabled;
+      });
+    };
+
     $scope.updateWebhook = function updateWebhook(service) {
       if ($scope.WebhookExists) {
         WebhookService.deleteWebhook($scope.webhookID)
@@ -543,7 +550,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     }
 
     $scope.rollbackService = function (service) {
-      ModalService.confirm({
+      ModalService.confirmWarn({
         title: 'Rollback service',
         message: 'Are you sure you want to rollback?',
         buttons: {
@@ -602,7 +609,7 @@ angular.module('portainer.docker').controller('ServiceController', [
           return $q.when($scope.webhookID && WebhookService.deleteWebhook($scope.webhookID));
         })
         .then(function success() {
-          Notifications.success('Service successfully deleted');
+          Notifications.success('Success', 'Service successfully deleted');
           $state.go('docker.services', {});
         })
         .catch(function error(err) {

@@ -1,0 +1,4 @@
+/* highlight the sort icons for columns that aren't actively sorting */
+.sortable:not(.sortingActive):hover path {
+  fill: var(--sort-icon-hover);
+}

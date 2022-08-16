@@ -1,11 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Edge job details">
-    <a data-toggle="tooltip" title-text="Refresh" ui-sref="edge.jobs.job({id: $ctrl.edgeJob.Id, tab: $ctrl.state.activeTab})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content> <a ui-sref="edge.jobs">Edge jobs</a> &gt; {{ ::$ctrl.edgeJob.Name }} </rd-header-content>
-</rd-header>
+<page-header title="'Edge job details'" breadcrumbs="[{label:'Edge jobs', link:'edge.jobs'}, $ctrl.edgeJob.Name]" reload="true"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -13,7 +6,9 @@
       <rd-widget-body>
         <uib-tabset active="$ctrl.state.activeTab">
           <uib-tab index="0" select="$ctrl.showEditor()">
-            <uib-tab-heading> <i class="fa fa-wrench" aria-hidden="true"></i> Configuration </uib-tab-heading>
+            <uib-tab-heading>
+              <span><pr-icon icon="'tool'" feather="true"></pr-icon></span> Configuration
+            </uib-tab-heading>
 
             <edge-job-form
               ng-if="$ctrl.edgeJob && $ctrl.state.showEditorTab"
@@ -29,13 +24,14 @@
           </uib-tab>
 
           <uib-tab index="1">
-            <uib-tab-heading> <i class="fa fa-tasks" aria-hidden="true"></i> Results </uib-tab-heading>
+            <uib-tab-heading>
+              <span><pr-icon icon="'list'" feather="true"></pr-icon></span> Results
+            </uib-tab-heading>
 
             <edge-job-results-datatable
-              style="display: block; margin-top: 10px"
               ng-if="$ctrl.results"
               title-text="Results"
-              title-icon="fa-tasks"
+              title-icon="list"
               dataset="$ctrl.results"
               table-key="edge-job-results"
               order-by="Status"

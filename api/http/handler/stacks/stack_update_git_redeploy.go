@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -25,12 +24,10 @@ type stackGitRedployPayload struct {
 	RepositoryUsername       string
 	RepositoryPassword       string
 	Env                      []portainer.Pair
+	Prune                    bool
 }
 
 func (payload *stackGitRedployPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.RepositoryReferenceName) {
-		payload.RepositoryReferenceName = defaultGitReferenceName
-	}
 	return nil
 }
 
@@ -114,6 +111,15 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
+	canManage, err := handler.userCanManageStacks(securityContext, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack deletion", Err: err}
+	}
+	if !canManage {
+		errMsg := "Stack management is disabled for non-admin users"
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: errors.New(errMsg)}
+	}
+
 	var payload stackGitRedployPayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -122,6 +128,11 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 	stack.Env = payload.Env
+	if stack.Type == portainer.DockerSwarmStack {
+		stack.Option = &portainer.StackOption{
+			Prune: payload.Prune,
+		}
+	}
 
 	backupProjectPath := fmt.Sprintf("%s-old", stack.ProjectPath)
 	err = filesystem.MoveDirectory(stack.ProjectPath, backupProjectPath)
@@ -191,7 +202,11 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	switch stack.Type {
 	case portainer.DockerSwarmStack:
-		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+		prune := false
+		if stack.Option != nil {
+			prune = stack.Option.Prune
+		}
+		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, prune)
 		if httpErr != nil {
 			return httpErr
 		}

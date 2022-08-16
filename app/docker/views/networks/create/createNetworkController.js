@@ -202,6 +202,18 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
       }
     }
 
+    $scope.onChangeInternal = function (enable) {
+      $scope.$evalAsync(() => {
+        $scope.config.Internal = enable;
+      });
+    };
+
+    $scope.onChangeAttachable = function (enable) {
+      $scope.$evalAsync(() => {
+        $scope.config.Attachable = enable;
+      });
+    };
+
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';
@@ -227,7 +239,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
           return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
         })
         .then(function success() {
-          Notifications.success('Network successfully created');
+          Notifications.success('Success', 'Network successfully created');
           if (context.reload) {
             $state.go(
               'docker.networks',

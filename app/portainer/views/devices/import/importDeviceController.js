@@ -28,6 +28,12 @@ angular
 
       $scope.profiles = [];
 
+      $scope.onChangeTags = function onChangeTags(value) {
+        return $scope.$evalAsync(() => {
+          $scope.formValues.TagIds = value;
+        });
+      };
+
       $scope.onVoucherFilesChange = function () {
         if ($scope.formValues.VoucherFiles.length < 1) {
           return;
@@ -52,20 +58,6 @@ angular
             }
           });
       };
-
-      $scope.onCreateTag = function onCreateTag(tagName) {
-        return $async(onCreateTagAsync, tagName);
-      };
-
-      async function onCreateTagAsync(tagName) {
-        try {
-          const tag = await TagService.createTag(tagName);
-          $scope.availableTags = $scope.availableTags.concat(tag);
-          $scope.formValues.TagIds = $scope.formValues.TagIds.concat(tag.Id);
-        } catch (err) {
-          Notifications.error('Failure', err, 'Unable to create tag');
-        }
-      }
 
       $scope.createEndpointAndConfigureDevice = function () {
         return $async(async () => {
@@ -118,7 +110,7 @@ angular
             }
           }
 
-          Notifications.success('Device(s) successfully imported');
+          Notifications.success('Success', 'Device(s) successfully imported');
           $state.go('edge.devices');
         });
       };
@@ -133,11 +125,9 @@ angular
 
         $q.all({
           groups: GroupService.groups(),
-          tags: TagService.tags(),
         })
           .then(function success(data) {
             $scope.groups = data.groups;
-            $scope.availableTags = data.tags;
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to load groups');

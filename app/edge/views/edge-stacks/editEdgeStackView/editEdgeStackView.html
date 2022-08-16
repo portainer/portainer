@@ -1,11 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Edit Edge stack">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.stacks.edit({stackId:$ctrl.stack.Id, tab: $ctrl.state.activeTab})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content> <a ui-sref="edge.stacks">Edge Stacks</a> &gt; {{ $ctrl.stack.Name }} </rd-header-content>
-</rd-header>
+<page-header title="'Edit Edge stack'" breadcrumbs="[{label:'Edge Stacks', link:'edge.stacks'}, $ctrl.stack.Name]" reload="true"> </page-header>
 
 <div class="row" ng-if="$ctrl.stack">
   <div class="col-sm-12">
@@ -13,7 +6,9 @@
       <rd-widget-body classes="no-padding">
         <uib-tabset active="$ctrl.state.activeTab" justified="true" type="pills">
           <uib-tab index="0" classes="btn-sm">
-            <uib-tab-heading> <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Stack</uib-tab-heading>
+            <uib-tab-heading>
+              <span><pr-icon icon="'layers'" feather="true"></pr-icon></span> Stack
+            </uib-tab-heading>
 
             <div style="padding: 20px">
               <edit-edge-stack-form
@@ -26,16 +21,20 @@
             </div>
           </uib-tab>
           <uib-tab index="1" classes="btn-sm">
-            <uib-tab-heading> <i class="fa fa-plug space-right" aria-hidden="true"></i> Environments</uib-tab-heading>
+            <uib-tab-heading>
+              <span><pr-icon icon="'hard-drive'" feather="true"></pr-icon></span> Environments
+            </uib-tab-heading>
 
             <div style="margin-top: 25px">
               <edge-stack-endpoints-datatable
                 title-text="Environments Status"
                 dataset="$ctrl.endpoints"
-                title-icon="fa-plug"
+                title-icon="hard-drive"
                 table-key="edgeStackEndpoints"
                 order-by="Name"
                 retrieve-page="$ctrl.getPaginatedEndpoints"
+                edge-stack-id="$ctrl.stack.Id"
+                endpoints-status="$ctrl.stack.Status"
               >
               </edge-stack-endpoints-datatable>
             </div>

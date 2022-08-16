@@ -1,0 +1,47 @@
+.root {
+  position: fixed;
+  background: #000;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 1000;
+  height: 495px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.root.minimized {
+  height: 35px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.header {
+  height: 35px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #424242;
+  background: rgb(245, 245, 245);
+  border-top: 1px solid rgb(190, 190, 190);
+
+  padding: 0 16px;
+}
+
+.title {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.actions button {
+  padding: 0;
+  border: 0;
+}
+
+.terminal-container .loading-message {
+  position: fixed;
+  padding: 10px 16px 0px 16px;
+  color: #fff;
+}

@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/testhelpers"
 )
 
 const composeFile = `version: "3.9"
@@ -40,6 +41,8 @@ func setup(t *testing.T) (*portainer.Stack, *portainer.Endpoint) {
 }
 
 func Test_UpAndDown(t *testing.T) {
+
+	testhelpers.IntegrationTest(t)
 
 	stack, endpoint := setup(t)
 

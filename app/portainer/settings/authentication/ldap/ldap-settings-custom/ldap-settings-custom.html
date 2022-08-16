@@ -9,8 +9,8 @@
 
 <div class="form-group">
   <div class="col-sm-12 small text-muted">
-    <p>
-      <i class="fa fa-info-circle blue-icon mr-1" aria-hidden="true"></i>
+    <p class="vertical-center">
+      <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
       You can configure multiple LDAP Servers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all use the
       same certificates).
     </p>
@@ -22,20 +22,21 @@
     LDAP Server
     <button
       type="button"
-      class="label label-default interactive no-border"
+      class="label label-default interactive no-border vertical-center"
       ng-click="$ctrl.addLDAPUrl()"
       limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
       limited-feature-disabled
       limited-feature-class="limited-be"
     >
-      <i class="fa fa-plus-circle" aria-hidden="true"></i> Add additional server
+      <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+      Add additional server
     </button>
   </label>
   <div class="col-sm-9 col-lg-10">
     <div class="mb-3 flex" ng-repeat="url in $ctrl.settings.URLs track by $index">
       <input type="text" class="form-control" id="ldap_url" ng-model="$ctrl.settings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" required />
       <button ng-if="$index > 0" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLDAPUrl($index)">
-        <i class="fa fa-trash" aria-hidden="true"></i>
+        <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
       </button>
     </div>
   </div>
@@ -44,11 +45,12 @@
 <div class="form-group">
   <label for="anonymous_mode" class="control-label text-left col-sm-3 col-lg-2">
     Anonymous mode
-    <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
+    <portainer-tooltip message="'Enable this option if the server is configured for Anonymous access.'"></portainer-tooltip>
   </label>
   <div class="col-sm-9 col-lg-10">
     <label class="switch">
-      <input type="checkbox" id="anonymous_mode" ng-model="$ctrl.settings.AnonymousMode" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" /><i></i>
+      <input type="checkbox" id="anonymous_mode" ng-model="$ctrl.settings.AnonymousMode" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
+      <span class="slider round"></span>
     </label>
   </div>
 </div>
@@ -58,17 +60,17 @@
   <div class="form-group">
     <label for="ldap_username" class="col-sm-3 col-lg-2 control-label text-left">
       Reader DN
-      <portainer-tooltip position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
+      <portainer-tooltip message="'Account that will be used to search for users.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="ldap_username" ng-model="$ctrl.settings.ReaderDN" placeholder="{{ $ctrl.clickToSetValues.readerDNPlaceholder }}" />
+      <input type="text" class="form-control" id="ldap_username" ng-model="$ctrl.settings.ReaderDN" placeholder="cn=user,dc=domain,dc=tld" />
     </div>
   </div>
 
   <div class="form-group">
     <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
       Password
-      <portainer-tooltip position="bottom" message="If you do not enter a password, Portainer will leave the current password unchanged."></portainer-tooltip>
+      <portainer-tooltip message="'If you do not enter a password, Portainer will leave the current password unchanged.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="password" class="form-control" id="ldap_password" ng-model="$ctrl.settings.Password" placeholder="password" autocomplete="new-password" />

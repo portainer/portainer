@@ -3,7 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesNodeApplicationsData
   controller: 'KubernetesNodeApplicationsDatatableController',
   bindings: {
     titleText: '@',
-    titleIcon: '@',
     dataset: '<',
     tableKey: '@',
     orderBy: '@',

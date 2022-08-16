@@ -2,10 +2,12 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import stripAnsi from 'strip-ansi';
 import uuidv4 from 'uuid/v4';
-import PortainerError from 'Portainer/error';
 
+import PortainerError from '@/portainer/error';
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { buildOption } from '@/portainer/components/BoxSelector';
+import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
+import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class KubernetesDeployController {
   /* @ngInject */
@@ -22,16 +24,18 @@ class KubernetesDeployController {
     this.CustomTemplateService = CustomTemplateService;
     this.DeployMethod = 'manifest';
 
+    this.isTemplateVariablesEnabled = isBE;
+
     this.deployOptions = [
-      buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
-      buildOption('method_compose', 'fab fa-docker', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),
+      buildOption('method_kubernetes', 'svg-kubernetes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
+      buildOption('method_compose', 'svg-dockercompose', 'Compose', 'Docker compose format', KubernetesDeployManifestTypes.COMPOSE),
     ];
 
     this.methodOptions = [
-      buildOption('method_repo', 'fab fa-github', 'Git Repository', 'Use a git repository', KubernetesDeployBuildMethods.GIT),
-      buildOption('method_editor', 'fa fa-edit', 'Web editor', 'Use our Web editor', KubernetesDeployBuildMethods.WEB_EDITOR),
-      buildOption('method_url', 'fa fa-globe', 'URL', 'Specify a URL to a file', KubernetesDeployBuildMethods.URL),
-      buildOption('method_template', 'fa fa-rocket', 'Custom Template', 'Use a custom template', KubernetesDeployBuildMethods.CUSTOM_TEMPLATE),
+      buildOption('method_repo', 'svg-git', 'Git Repository', 'Use a git repository', KubernetesDeployBuildMethods.GIT),
+      buildOption('method_editor', 'svg-custom', 'Web editor', 'Use our Web editor', KubernetesDeployBuildMethods.WEB_EDITOR),
+      buildOption('method_url', 'svg-url', 'URL', 'Specify a URL to a file', KubernetesDeployBuildMethods.URL),
+      buildOption('method_template', 'svg-template', 'Custom Template', 'Use a custom template', KubernetesDeployBuildMethods.CUSTOM_TEMPLATE),
     ];
 
     this.state = {
@@ -42,6 +46,7 @@ class KubernetesDeployController {
       viewReady: false,
       isEditorDirty: false,
       templateId: null,
+      template: null,
     };
 
     this.formValues = {
@@ -56,7 +61,8 @@ class KubernetesDeployController {
       RepositoryAutomaticUpdates: false,
       RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
       RepositoryFetchInterval: '5m',
-      RepositoryWebhookURL: this.WebhookHelper.returnStackWebhookUrl(uuidv4()),
+      RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
+      Variables: {},
     };
 
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
@@ -70,6 +76,22 @@ class KubernetesDeployController {
     this.buildAnalyticsProperties = this.buildAnalyticsProperties.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
     this.onChangeDeployType = this.onChangeDeployType.bind(this);
+    this.onChangeTemplateVariables = this.onChangeTemplateVariables.bind(this);
+  }
+
+  onChangeTemplateVariables(value) {
+    this.onChangeFormValues({ Variables: value });
+
+    this.renderTemplate();
+  }
+
+  renderTemplate() {
+    if (!this.isTemplateVariablesEnabled) {
+      return;
+    }
+
+    const rendered = renderTemplate(this.state.templateContent, this.formValues.Variables, this.state.template.Variables);
+    this.onChangeFormValues({ EditorContent: rendered });
   }
 
   buildAnalyticsProperties() {
@@ -157,17 +179,24 @@ class KubernetesDeployController {
     };
   }
 
-  onChangeTemplateId(templateId) {
+  onChangeTemplateId(templateId, template) {
     return this.$async(async () => {
-      if (this.state.templateId === templateId) {
+      if (!template || (this.state.templateId === templateId && this.state.template === template)) {
         return;
       }
 
       this.state.templateId = templateId;
+      this.state.template = template;
 
       try {
         const fileContent = await this.CustomTemplateService.customTemplateFile(templateId);
+        this.state.templateContent = fileContent;
         this.onChangeFileContent(fileContent);
+
+        if (template.Variables && template.Variables.length > 0) {
+          const variables = Object.fromEntries(template.Variables.map((variable) => [variable.name, '']));
+          this.onChangeTemplateVariables(variables);
+        }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load template file');
       }
@@ -251,7 +280,7 @@ class KubernetesDeployController {
 
       await this.StackService.kubernetesDeploy(this.endpoint.Id, method, payload);
 
-      this.Notifications.success('Manifest successfully deployed');
+      this.Notifications.success('Success', 'Manifest successfully deployed');
       this.state.isEditorDirty = false;
       this.$state.go('kubernetes.applications');
     } catch (err) {
@@ -307,7 +336,7 @@ class KubernetesDeployController {
         const templateId = parseInt(this.$state.params.templateId, 10);
         if (templateId && !Number.isNaN(templateId)) {
           this.state.BuildMethod = KubernetesDeployBuildMethods.CUSTOM_TEMPLATE;
-          this.onChangeTemplateId(templateId);
+          this.state.templateId = templateId;
         }
       }
 

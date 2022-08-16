@@ -3,37 +3,38 @@
   <!-- access-control-switch -->
   <div class="form-group">
     <div class="col-sm-12">
-      <label for="ownership" class="control-label text-left">
-        Enable access control
-        <portainer-tooltip position="bottom" message="When enabled, you can restrict the access and management of this resource."></portainer-tooltip>
-      </label>
-      <label class="switch" style="margin-left: 20px">
-        <input name="ownership" type="checkbox" ng-model="$ctrl.formData.AccessControlEnabled" /><i data-cy="portainer-accessMgmtToggle"></i>
-      </label>
+      <por-switch-field
+        label-class="'col-sm-2'"
+        checked="$ctrl.formData.AccessControlEnabled"
+        label="'Enable access control'"
+        tooltip="'When enabled, you can restrict the access and management of this resource.'"
+        on-change="($ctrl.onChangeEnablement)"
+        data-cy="portainer-accessMgmtToggle"
+      ></por-switch-field>
     </div>
   </div>
   <!-- !access-control-switch -->
   <!-- restricted-access -->
   <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled" style="margin-bottom: 0">
-    <div class="boxselector_wrapper">
+    <div class="boxselector_wrapper px-[15px]">
       <div ng-if="$ctrl.isAdmin">
         <input type="radio" id="access_administrators" ng-model="$ctrl.formData.Ownership" value="administrators" />
         <label for="access_administrators" data-cy="portainer-selectAdminAccess">
           <div class="boxselector_header">
-            <i ng-class="'administrators' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'eye-off'" feather="true"></pr-icon>
             Administrators
           </div>
-          <p>I want to restrict the management of this resource to administrators only</p>
+          <p class="boxselector_content">I want to restrict the management of this resource to administrators only</p>
         </label>
       </div>
       <div ng-if="$ctrl.isAdmin">
         <input type="radio" id="access_restricted" ng-model="$ctrl.formData.Ownership" value="restricted" />
         <label for="access_restricted" data-cy="portainer-selectRestrictedAccess">
           <div class="boxselector_header">
-            <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
+            <pr-icon icon="'users'" feather="true"></pr-icon>
             Restricted
           </div>
-          <p> I want to restrict the management of this resource to a set of users and/or teams </p>
+          <p class="boxselector_content"> I want to restrict the management of this resource to a set of users and/or teams </p>
         </label>
       </div>
       <div ng-if="!$ctrl.isAdmin">
@@ -65,29 +66,28 @@
   <!-- restricted-access -->
   <!-- authorized-teams -->
   <div
-    class="form-group"
+    class="form-group mt-4"
     ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && ($ctrl.isAdmin || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1))"
   >
-    <div class="col-sm-12">
-      <label for="group-access" class="control-label text-left">
+    <div class="col-sm-12 vertical-center">
+      <label for="group-access" class="control-label text-left col-sm-3 col-lg-2 !p-0">
         Authorized teams
         <portainer-tooltip
           ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length > 0"
-          position="bottom"
-          message="You can select which teams(s) will be able to manage this resource."
+          message="'You can select which teams(s) will be able to manage this resource.'"
         ></portainer-tooltip>
         <portainer-tooltip
           ng-if="!$ctrl.isAdmin && $ctrl.availableTeams.length > 1"
-          position="bottom"
-          message="As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource."
+          message="'As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource.'"
         ></portainer-tooltip>
       </label>
       <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted" style="margin-left: 20px">
         You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
       </span>
-      <span
+      <div
         isteven-multi-select
         ng-if="($ctrl.isAdmin && $ctrl.availableTeams.length > 0) || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1)"
+        class="col-sm-9 col-lg-10"
         input-model="$ctrl.availableTeams"
         output-model="$ctrl.formData.AuthorizedTeams"
         button-label="Name"
@@ -96,30 +96,29 @@
         helper-elements="filter"
         search-property="Name"
         translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
-        style="margin-left: 20px"
         data-cy="portainer-selectTeamAccess"
       >
-      </span>
+      </div>
     </div>
   </div>
   <!-- !authorized-teams -->
   <!-- authorized-users -->
   <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && $ctrl.isAdmin">
-    <div class="col-sm-12">
-      <label for="group-access" class="control-label text-left">
+    <div class="col-sm-12 vertical-center">
+      <label for="group-access" class="control-label text-left col-sm-3 col-lg-2 !p-0">
         Authorized users
         <portainer-tooltip
           ng-if="$ctrl.isAdmin && $ctrl.availableUsers.length > 0"
-          position="bottom"
-          message="You can select which user(s) will be able to manage this resource."
+          message="'You can select which user(s) will be able to manage this resource.'"
         ></portainer-tooltip>
       </label>
       <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted" style="margin-left: 20px">
         You have not yet created any users. Head over to the <a ui-sref="portainer.users">Users view</a> to manage users.
       </span>
-      <span
+      <div
         isteven-multi-select
         ng-if="$ctrl.availableUsers.length > 0"
+        class="col-sm-9 col-lg-10"
         input-model="$ctrl.availableUsers"
         output-model="$ctrl.formData.AuthorizedUsers"
         button-label="Username"
@@ -128,10 +127,9 @@
         helper-elements="filter"
         search-property="Username"
         translation="{nothingSelected: 'Select one or more users', search: 'Search...'}"
-        style="margin-left: 20px"
         data-cy="portainer-selectUserAccess"
       >
-      </span>
+      </div>
     </div>
   </div>
   <!-- !authorized-users -->

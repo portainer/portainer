@@ -1,0 +1,5 @@
+.logo {
+  display: inline;
+  max-height: 55px;
+  max-width: min(100%, 230px);
+}

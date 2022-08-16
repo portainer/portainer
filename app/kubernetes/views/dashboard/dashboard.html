@@ -1,4 +1,4 @@
-<kubernetes-view-header title="Dashboard" state="kubernetes.dashboard" view-ready="ctrl.state.viewReady"> Environment summary </kubernetes-view-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Dashboard'" breadcrumbs="['Environment summary']" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -6,22 +6,29 @@
   <div class="row" ng-if="ctrl.endpoint">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="fa-tachometer-alt" title-text="Environment info"></rd-widget-header>
-        <rd-widget-body classes="no-padding">
+        <div class="toolBar vertical-center w-full">
+          <div class="toolBarTitle vertical-center p-5">
+            <div class="widget-icon space-right">
+              <pr-icon icon="'svg-tachometer'"></pr-icon>
+            </div>
+            Environment info
+          </div>
+        </div>
+        <rd-widget-body classes="!px-5 !py-0">
           <table class="table">
             <tbody>
               <tr>
-                <td>Environment</td>
-                <td>
+                <td class="!pl-0 !border-none">Environment</td>
+                <td class="!border-none">
                   {{ ctrl.endpoint.Name }}
                 </td>
               </tr>
-              <tr>
-                <td>URL</td>
-                <td>{{ ctrl.endpoint.URL | stripprotocol }}</td>
+              <tr ng-if="ctrl.showEnvUrl">
+                <td class="!pl-0 !border-t">URL</td>
+                <td class="!border-t">{{ ctrl.endpoint.URL | stripprotocol }}</td>
               </tr>
               <tr>
-                <td>Tags</td>
+                <td class="!pl-0">Tags</td>
                 <td>{{ ctrl.endpointTags }}</td>
               </tr>
             </tbody>
@@ -31,57 +38,26 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.pools" data-cy="k8sDashboard-namespaces">
+  <div class="dashboard-grid mx-4">
+    <div ng-if="ctrl.pools" data-cy="k8sDashboard-namespaces">
       <a ui-sref="kubernetes.resourcePools">
-        <rd-widget>
-          <rd-widget-body>
-            <div class="widget-icon blue pull-left">
-              <i class="fa fa-layer-group"></i>
-            </div>
-            <div class="title">{{ ctrl.pools.length }}</div>
-            <div class="comment">{{ ctrl.pools.length === 1 ? 'Namespace' : 'Namespaces' }}</div>
-          </rd-widget-body>
-        </rd-widget>
+        <dashboard-item feather-icon="true" icon="'layers'" type="'Namespace'" value="ctrl.pools.length"></dashboard-item>
       </a>
     </div>
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.applications" data-cy="k8sDashboard-applications">
+
+    <div ng-if="ctrl.applications" data-cy="k8sDashboard-applications">
       <a ui-sref="kubernetes.applications">
-        <rd-widget>
-          <rd-widget-body>
-            <div class="widget-icon blue pull-left">
-              <i class="fa fa-laptop-code"></i>
-            </div>
-            <div class="title">{{ ctrl.applications.length }}</div>
-            <div class="comment">{{ ctrl.applications.length === 1 ? 'Application' : 'Applications' }}</div>
-          </rd-widget-body>
-        </rd-widget>
+        <dashboard-item feather-icon="true" icon="'box'" type="'Application'" value="ctrl.applications.length"></dashboard-item>
       </a>
     </div>
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.configurations" data-cy="k8sDashboard-configurations">
+    <div ng-if="ctrl.configurations" data-cy="k8sDashboard-configurations">
       <a ui-sref="kubernetes.configurations">
-        <rd-widget>
-          <rd-widget-body>
-            <div class="widget-icon blue pull-left">
-              <i class="fa fa-file-code"></i>
-            </div>
-            <div class="title">{{ ctrl.configurations.length }}</div>
-            <div class="comment">{{ ctrl.configurations.length === 1 ? 'Configuration' : 'Configurations' }}</div>
-          </rd-widget-body>
-        </rd-widget>
+        <dashboard-item feather-icon="true" icon="'lock'" type="'ConfigMaps & Secret'" value="ctrl.configurations.length"></dashboard-item>
       </a>
     </div>
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.volumes" data-cy="k8sDashboard-volumes">
+    <div ng-if="ctrl.volumes" data-cy="k8sDashboard-volumes">
       <a ui-sref="kubernetes.volumes">
-        <rd-widget>
-          <rd-widget-body>
-            <div class="widget-icon blue pull-left">
-              <i class="fa fa-database"></i>
-            </div>
-            <div class="title">{{ ctrl.volumes.length }}</div>
-            <div class="comment">{{ ctrl.volumes.length === 1 ? 'Volume' : 'Volumes' }}</div>
-          </rd-widget-body>
-        </rd-widget>
+        <dashboard-item feather-icon="true" icon="'database'" type="'Volume'" value="ctrl.volumes.length"></dashboard-item>
       </a>
     </div>
   </div>

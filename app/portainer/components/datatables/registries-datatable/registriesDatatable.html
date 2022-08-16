@@ -2,57 +2,72 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px"></i> {{ $ctrl.titleText }} </div>
-      </div>
-      <div class="actionBar" ng-if="$ctrl.isAdmin">
-        <button
-          ng-if="!$ctrl.endpointType"
-          type="button"
-          class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0"
-          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
-        >
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.registries.new" data-cy="add-registry">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add registry
-        </button>
-      </div>
-      <div class="searchBar">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input
-          type="text"
-          class="searchInput"
-          ng-model="$ctrl.state.textFilter"
-          ng-change="$ctrl.onTextFilterChange()"
-          placeholder="Search..."
-          auto-focus
-          ng-model-options="{ debounce: 300 }"
-        />
+        <div class="toolBarTitle vertical-center">
+          <div class="widget-icon space-right">
+            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+          </div>
+          {{ $ctrl.titleText }}
+        </div>
+        <div class="searchBar vertical-center">
+          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+          <input
+            type="text"
+            class="searchInput"
+            ng-model="$ctrl.state.textFilter"
+            ng-change="$ctrl.onTextFilterChange()"
+            placeholder="Search for a registry..."
+            auto-focus
+            ng-model-options="{ debounce: 300 }"
+            data-cy="registry-searchInput"
+          />
+        </div>
+        <div class="actionBar !gap-3" ng-if="$ctrl.isAdmin">
+          <button
+            ng-if="!$ctrl.endpointType"
+            type="button"
+            class="btn btn-sm btn-dangerlight h-fit vertical-center !ml-0"
+            ng-disabled="$ctrl.state.selectedItemCount === 0"
+            ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+            data-cy="registry-removeRegistryButton"
+          >
+            <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
+          </button>
+          <button type="button" class="btn btn-sm btn-primary h-fit vertical-center !ml-0" ui-sref="portainer.registries.new" data-cy="registry-addRegistryButton">
+            <pr-icon icon="'plus'" feather="true"></pr-icon>Add registry
+          </button>
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox" ng-if="$ctrl.isAdmin && !$ctrl.endpointType">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
-                  <label for="select_all"></label>
-                </span>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <div class="vertical-center">
+                  <span class="md-checkbox vertical-center" ng-if="$ctrl.isAdmin && !$ctrl.endpointType">
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                    <label for="select_all"></label>
+                  </span>
+                  <table-column-header
+                    col-title="'Name'"
+                    can-sort="true"
+                    is-sorted="$ctrl.state.orderBy === 'Name'"
+                    is-sorted-desc="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                    ng-click="$ctrl.changeOrderBy('Name')"
+                  ></table-column-header>
+                </div>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('URL')">
-                  URL
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && $ctrl.state.reverseOrder"></i>
-                </a>
+                <table-column-header
+                  col-title="'URL'"
+                  can-sort="true"
+                  is-sorted="$ctrl.state.orderBy === 'URL'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'URL' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('URL')"
+                ></table-column-header>
               </th>
-              <th>Actions</th>
+              <th>
+                <table-column-header col-title="'Actions'" can-sort="false"></table-column-header>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -84,9 +99,11 @@
                 {{ item.URL }}
               </td>
               <td>
-                <a ng-if="$ctrl.canManageAccess(item)" ng-click="$ctrl.redirectToManageAccess(item)"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
+                <a class="vertical-center" ng-if="$ctrl.canManageAccess(item)" ng-click="$ctrl.redirectToManageAccess(item)">
+                  <pr-icon icon="'users'" feather="true"></pr-icon> Manage access
+                </a>
                 <be-feature-indicator feature="$ctrl.limitedFeature" ng-if="$ctrl.canBrowse(item)">
-                  <span class="text-muted space-left" style="padding-right: 5px"> <i class="fa fa-search" aria-hidden="true"></i> Browse</span>
+                  <span class="text-muted space-left" style="padding-right: 5px"> <pr-icon icon="'search'" feather="true"></pr-icon> Browse </span>
                 </be-feature-indicator>
 
                 <span ng-if="!$ctrl.canBrowse(item) && !$ctrl.canManageAccess(item)"> - </span>
@@ -101,7 +118,7 @@
       <div class="footer" ng-if="$ctrl.dataset">
         <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
-          <form class="form-inline">
+          <form class="form-inline vertical-center">
             <span class="limitSelector">
               <span style="margin-right: 5px"> Items per page </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">

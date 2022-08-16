@@ -1,7 +1,18 @@
-<kubernetes-view-header title="Namespace access management" state="kubernetes.resourcePools.resourcePool.access" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({id: ctrl.pool.Namespace.Name})">{{ ctrl.pool.Namespace.Name }}</a> &gt; Access management
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Namespace access management'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    {
+      label:ctrl.pool.Namespace.Name,
+      link: 'kubernetes.resourcePools.resourcePool',
+      linkParams:{id: ctrl.pool.Namespace.Name}
+    },
+     'Access management'
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -9,12 +20,12 @@
   <div class="row" ng-if="ctrl.pool">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="fa-plug" title-text="Namespace"></rd-widget-header>
-        <rd-widget-body classes="no-padding">
+        <rd-widget-header icon="layers" feather-icon="true" title-text="Namespace"></rd-widget-header>
+        <rd-widget-body>
           <table class="table">
             <tbody>
               <tr>
-                <td>Name</td>
+                <td class="!pl-0">Name</td>
                 <td>
                   {{ ctrl.pool.Namespace.Name }}
                 </td>
@@ -29,23 +40,31 @@
   <div class="row">
     <div class="col-sm-12">
       <rd-widget ng-if="ctrl.availableUsersAndTeams">
-        <rd-widget-header icon="fa-user-lock" title-text="Create access"></rd-widget-header>
+        <rd-widget-header icon="svg-userlock" title-text="Create access"></rd-widget-header>
         <rd-widget-body>
           <form class="form-horizontal">
+            <div class="form-group">
+              <span class="col-sm-12 small text-muted">
+                <p class="vertical-center">
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                  Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
+                </p>
+              </span>
+            </div>
             <div class="form-group">
               <label class="col-sm-3 col-lg-2 control-label text-left"> Select user(s) and/or team(s) </label>
               <div class="col-sm-9 col-lg-4">
                 <span class="small text-muted" ng-if="ctrl.availableUsersAndTeams.length === 0">
                   No user nor team access has been set on the environment. Head over to the
-                  <a ui-sref="portainer.endpoints.endpoint.access({id: ctrl.endpointId})">environment access view</a> to manage them.
+                  <a ui-sref="portainer.endpoints">Environments view</a> to manage them.
                 </span>
                 <span
                   isteven-multi-select
                   ng-if="ctrl.availableUsersAndTeams.length > 0"
                   input-model="ctrl.availableUsersAndTeams"
                   output-model="ctrl.formValues.multiselectOutput"
-                  button-label="icon '-' Name"
-                  item-label="icon '-' Name"
+                  button-label="icon Name"
+                  item-label="icon Name"
                   tick-property="ticked"
                   helper-elements="filter"
                   search-property="Name"
@@ -60,12 +79,12 @@
               <div class="col-sm-12">
                 <button
                   type="submit"
-                  class="btn btn-primary btn-sm"
+                  class="btn btn-primary btn-sm !ml-0 vertical-center"
                   ng-disabled="(ctrl.availableUsersAndTeams | filter:{ticked:true}).length === 0 || ctrl.actionInProgress"
                   ng-click="ctrl.authorizeAccess()"
                   button-spinner="ctrl.actionInProgress"
                 >
-                  <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create access</span>
+                  <span class="vertical-center" ng-hide="ctrl.state.actionInProgress"><pr-icon icon="'plus'" feather="true" class="vertical-center"></pr-icon> Create access</span>
                   <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
                 </button>
               </div>
@@ -81,8 +100,8 @@
     <div class="col-sm-12">
       <access-datatable
         ng-if="ctrl.authorizedUsersAndTeams"
-        title-text="Access"
-        title-icon="fa-user-lock"
+        title-text="Namespace access"
+        title-icon="svg-userlock"
         table-key="kubernetes_resourcepool_access"
         order-by="Name"
         dataset="ctrl.authorizedUsersAndTeams"

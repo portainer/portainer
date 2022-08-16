@@ -1,20 +1,11 @@
-<rd-header>
-  <rd-header-title title-text="Environment details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.endpoints">Environments</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a>
-  </rd-header-content>
-</rd-header>
+<page-header ng-if="endpoint" title="'Environment details'" breadcrumbs="[{label:'Environments', link:'portainer.endpoints'}, endpoint.Name]" reload="true"> </page-header>
 
 <div class="row">
   <div ng-if="state.edgeEndpoint">
     <information-panel ng-if="state.edgeAssociated" title-text="Edge information">
       <span class="small text-muted">
-        <p>
-          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+        <p class="vertical-center">
+          <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
           This Edge environment is associated to an Edge environment {{ state.kubernetesEndpoint ? '(Kubernetes)' : '(Docker)' }}.
         </p>
         <p>
@@ -45,8 +36,8 @@
         <rd-widget-body>
           <div class="col-sm-12 form-section-title">Deploy an agent</div>
           <span class="small text-muted">
-            <p>
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+            <p class="vertical-center">
+              <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
               Refer to the platform related command below to deploy the Edge agent in your remote cluster.
             </p>
             <p>
@@ -54,22 +45,34 @@
             </p>
           </span>
 
-          <edge-script-form edge-key="endpoint.EdgeKey" edge-id="endpoint.EdgeID"></edge-script-form>
+          <div class="col-sm-12 form-section-title"> Edge agent deployment script </div>
+          <edge-script-form
+            edge-info="{ key: endpoint.EdgeKey, id: endpoint.EdgeID }"
+            commands="state.edgeScriptCommands"
+            is-nomad-token-visible="state.showNomad"
+            hide-async-mode="!endpoint.IsEdgeDevice"
+          ></edge-script-form>
 
           <span class="small text-muted">
             <div class="col-sm-12 form-section-title" style="margin-top: 25px"> Join token </div>
-            <p>
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-              For those prestaging the edge agent, use the following join token to associate the Edge agent with this environment.
+            <p class="vertical-center">
+              <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+              For those pre-staging the edge agent, use the following join token to associate the Edge agent with this environment.
             </p>
             <p> You can read more about pre-staging in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a> </p>
             <div style="margin-top: 10px; overflow-wrap: break-word">
               <code>
                 {{ endpoint.EdgeKey }}
               </code>
-              <div style="margin-top: 10px">
-                <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentKey()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy token</span>
-                <span id="copyNotificationEdgeKey" style="margin-left: 7px; display: none; color: #23ae89"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+              <div class="mt-2">
+                <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentKey()">
+                  <pr-icon icon="'copy'" feather="true"></pr-icon>
+                  Copy token
+                </span>
+                <span id="copyNotificationEdgeKey" class="vertical-center" style="margin-left: 7px; display: none; color: #23ae89">
+                  <pr-icon icon="'check'" feather="true"></pr-icon>
+                  copied
+                </span>
               </div>
             </div>
           </span>
@@ -79,15 +82,15 @@
   </div>
 
   <information-panel ng-if="state.kubernetesEndpoint && (!state.edgeEndpoint || state.edgeAssociated)" title-text="Kubernetes features configuration">
-    <span class="small text-muted">
-      <i class="fa fa-tools blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
+    <span class="small text-muted vertical-center">
+      <pr-icon icon="'tool'" mode="'primary'" feather="true"></pr-icon>
       You should configure the features available in this Kubernetes environment in the
-      <a ui-sref="portainer.k8sendpoint.kubernetesConfig({id: endpoint.Id})">Kubernetes configuration</a> view.
+      <a ui-sref="kubernetes.cluster.setup({endpointId: endpoint.Id})">Kubernetes configuration</a> view.
     </span>
   </information-panel>
 </div>
 
-<div class="row">
+<div class="row mt-4">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-body>
@@ -104,10 +107,10 @@
           <!-- endpoint-url-input -->
           <div class="form-group" ng-if="!state.edgeEndpoint">
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
-              Environment URL
+              <span ng-if="!state.agentEndpoint">Environment URL</span>
+              <span ng-if="state.agentEndpoint">Environment address</span>
               <portainer-tooltip
-                position="bottom"
-                message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
+                message="'URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it.'"
               >
               </portainer-tooltip>
             </label>
@@ -127,10 +130,7 @@
           <div class="form-group" ng-if="!state.azureEndpoint">
             <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
               Public IP
-              <portainer-tooltip
-                position="bottom"
-                message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the environment URL."
-              >
+              <portainer-tooltip message="'URL or IP address where exposed containers will be reachable. This field is optional and will default to the environment URL.'">
               </portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
@@ -159,11 +159,9 @@
             </div>
           </div>
           <!-- !group -->
-          <!-- tags -->
-          <div class="form-group">
-            <tag-selector ng-if="endpoint && availableTags" tags="availableTags" model="endpoint.TagIds" on-create="(onCreateTag)" allow-create="state.allowCreate"></tag-selector>
-          </div>
-          <!-- !tags -->
+
+          <tag-selector ng-if="endpoint" value="endpoint.TagIds" allow-create="state.allowCreate" on-change="(onChangeTags)"></tag-selector>
+
           <!-- endpoint-security -->
           <div ng-if="endpointType === 'remote' && !state.azureEndpoint && !state.kubernetesEndpoint && !state.edgeEndpoint && endpoint.Type !== 6">
             <div class="col-sm-12 form-section-title"> Security </div>
@@ -231,6 +229,10 @@
             </div>
           </div>
           <!-- !open-amt info -->
+          <!-- gpus info -->
+          <div class="col-sm-12 form-section-title">Hardware acceleration</div>
+          <gpus-list ng-if="endpoint && endpoint.Gpus" value="endpoint.Gpus" on-change="(onGpusChange)"></gpus-list>
+          <!-- gpus info -->
           <div class="form-group">
             <div class="col-sm-12">
               <button

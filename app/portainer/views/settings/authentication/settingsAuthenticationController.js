@@ -1,8 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
-import { FeatureId } from '@/portainer/feature-flags/enums';
 import { buildLdapSettingsModel, buildAdSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
+import { options } from './options';
 
 angular.module('portainer.app').controller('SettingsAuthenticationController', SettingsAuthenticationController);
 
@@ -46,12 +46,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     },
   };
 
-  $scope.authOptions = [
-    { id: 'auth_internal', icon: 'fa fa-users', label: 'Internal', description: 'Internal authentication mechanism', value: 1 },
-    { id: 'auth_ldap', icon: 'fa fa-users', label: 'LDAP', description: 'LDAP authentication', value: 2 },
-    { id: 'auth_ad', icon: 'fab fa-microsoft', label: 'Microsoft Active Directory', description: 'AD authentication', value: 4, feature: FeatureId.HIDE_INTERNAL_AUTH },
-    { id: 'auth_oauth', icon: 'fa fa-users', label: 'OAuth', description: 'OAuth authentication', value: 3 },
-  ];
+  $scope.authOptions = options;
 
   $scope.onChangeAuthMethod = function onChangeAuthMethod(value) {
     $scope.authMethod = value;
@@ -69,6 +64,12 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     }
 
     $scope.settings.AuthenticationMethod = value;
+  };
+
+  $scope.onChangePasswordLength = function onChangePasswordLength(value) {
+    $scope.$evalAsync(() => {
+      $scope.settings.InternalAuthSettings = { RequiredPasswordLength: value };
+    });
   };
 
   $scope.authenticationMethodSelected = function authenticationMethodSelected(value) {
@@ -108,7 +109,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
       .then(function success() {
         $scope.state.failedConnectivityCheck = false;
         $scope.state.successfulConnectivityCheck = true;
-        Notifications.success('Connection to LDAP successful');
+        Notifications.success('Success', 'Connection to LDAP successful');
       })
       .catch(function error(err) {
         $scope.state.failedConnectivityCheck = true;
@@ -135,7 +136,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
         return SettingsService.update(settings);
       })
       .then(function success() {
-        Notifications.success('Authentication settings updated');
+        Notifications.success('Success', 'Authentication settings updated');
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to update authentication settings');
@@ -186,7 +187,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     return (
       _.compact(ldapSettings.URLs).length &&
       (ldapSettings.AnonymousMode || (ldapSettings.ReaderDN && ldapSettings.Password)) &&
-      (!isTLSMode || $scope.formValues.TLSCACert || ldapSettings.TLSConfig.TLSSkipVerify) &&
+      (!isTLSMode || (isTLSMode && $scope.formValues.TLSCACert) || ldapSettings.TLSConfig.TLSSkipVerify) &&
       (!$scope.settings.LDAPSettings.AdminAutoPopulate || ($scope.settings.LDAPSettings.AdminAutoPopulate && $scope.formValues.selectedAdminGroups.length > 0))
     );
   }

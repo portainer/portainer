@@ -20,6 +20,12 @@ angular.module('portainer.app').controller('UserController', [
       Administrator: false,
     };
 
+    $scope.handleAdministratorChange = function (checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.Administrator = checked;
+      });
+    };
+
     $scope.deleteUser = function () {
       ModalService.confirmDeletion('Do you want to remove this user? This user will not be able to login into Portainer anymore.', function onConfirm(confirmed) {
         if (!confirmed) {
@@ -36,7 +42,7 @@ angular.module('portainer.app').controller('UserController', [
       let promise = Promise.resolve(true);
       if (username != oldUsername) {
         promise = new Promise((resolve) =>
-          ModalService.confirm({
+          ModalService.confirmWarn({
             title: 'Are you sure?',
             message: `Are you sure you want to rename the user ${oldUsername} to ${username}?`,
             buttons: {
@@ -55,7 +61,7 @@ angular.module('portainer.app').controller('UserController', [
       }
       UserService.updateUser($scope.user.Id, { role, username })
         .then(function success() {
-          Notifications.success('User successfully updated');
+          Notifications.success('Success', 'User successfully updated');
           $state.reload();
         })
         .catch(function error(err) {
@@ -71,7 +77,7 @@ angular.module('portainer.app').controller('UserController', [
       }
       UserService.updateUser($scope.user.Id, { password: $scope.formValues.newPassword })
         .then(function success() {
-          Notifications.success('Password successfully updated');
+          Notifications.success('Success', 'Password successfully updated');
 
           if (isCurrentUser) {
             $state.go('portainer.logout');
@@ -120,6 +126,7 @@ angular.module('portainer.app').controller('UserController', [
           $scope.formValues.Administrator = user.Role === 1;
           $scope.formValues.username = user.Username;
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
+          $scope.requiredPasswordLength = data.settings.RequiredPasswordLength;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve user information');

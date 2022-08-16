@@ -10,7 +10,8 @@ angular.module('portainer.app').controller('TeamController', [
   'Notifications',
   'PaginationService',
   'Authentication',
-  function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMembershipService, ModalService, Notifications, PaginationService, Authentication) {
+  'SettingsService',
+  function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMembershipService, ModalService, Notifications, PaginationService, Authentication, SettingsService) {
     $scope.state = {
       pagination_count_users: PaginationService.getPaginationLimit('team_available_users'),
       pagination_count_members: PaginationService.getPaginationLimit('team_members'),
@@ -91,7 +92,7 @@ angular.module('portainer.app').controller('TeamController', [
           }
           $scope.teamMembers = $scope.teamMembers.concat(users);
           $scope.users = [];
-          Notifications.success('All users successfully added');
+          Notifications.success('Success', 'All users successfully added');
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update team members');
@@ -122,7 +123,7 @@ angular.module('portainer.app').controller('TeamController', [
           $scope.users = $scope.users.concat($scope.teamMembers);
           $scope.teamMembers = [];
           $scope.leaderCount = 0;
-          Notifications.success('All users successfully removed');
+          Notifications.success('Success', 'All users successfully removed');
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update team members');
@@ -189,21 +190,23 @@ angular.module('portainer.app').controller('TeamController', [
       }
     }
 
-    function initView() {
+    async function initView() {
       $scope.isAdmin = Authentication.isAdmin();
-      $q.all({
-        team: TeamService.team($transition$.params().id),
-        users: UserService.users(false),
-        memberships: TeamService.userMemberships($transition$.params().id),
-      })
-        .then(function success(data) {
-          var users = data.users;
-          $scope.team = data.team;
-          assignUsersAndMembers(users, data.memberships);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve team details');
+
+      try {
+        $scope.settings = await SettingsService.publicSettings();
+
+        const data = await $q.all({
+          team: TeamService.team($transition$.params().id),
+          users: UserService.users($scope.isAdmin && $scope.settings.TeamSync),
+          memberships: TeamService.userMemberships($transition$.params().id),
         });
+
+        $scope.team = data.team;
+        assignUsersAndMembers(data.users, data.memberships);
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve team details');
+      }
     }
 
     initView();

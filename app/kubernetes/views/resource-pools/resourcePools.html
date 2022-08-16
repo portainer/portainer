@@ -1,4 +1,4 @@
-<kubernetes-view-header title="Namespace list" state="kubernetes.resourcePools" view-ready="ctrl.state.viewReady"> Namespaces </kubernetes-view-header>
+<page-header ng-if="ctrl.state.viewReady" title="'Namespace list'" breadcrumbs="['Namespaces']" reload="true"></page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
@@ -9,7 +9,7 @@
         endpoint="ctrl.endpoint"
         dataset="ctrl.resourcePools"
         table-key="kubernetes.resourcePools"
-        order-by="Namespace.Name"
+        order-by="Name"
         remove-action="ctrl.removeAction"
         refresh-callback="ctrl.getResourcePools"
         endpoint="ctrl.endpoint"

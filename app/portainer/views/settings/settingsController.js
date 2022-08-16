@@ -1,7 +1,7 @@
 import angular from 'angular';
 
-import { buildOption } from '@/portainer/components/BoxSelector';
 import { FeatureId } from '@/portainer/feature-flags/enums';
+import { options } from './options';
 
 angular.module('portainer.app').controller('SettingsController', [
   '$scope',
@@ -14,12 +14,11 @@ angular.module('portainer.app').controller('SettingsController', [
   'Blob',
   function ($scope, $state, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
     $scope.s3BackupFeatureId = FeatureId.S3_BACKUP_SETTING;
-    $scope.backupOptions = [
-      buildOption('backup_file', 'fa fa-download', 'Download backup file', '', 'file'),
-      buildOption('backup_s3', 'fa fa-upload', 'Store in S3', 'Define a cron schedule', 's3', FeatureId.S3_BACKUP_SETTING),
-    ];
+
+    $scope.backupOptions = options;
 
     $scope.state = {
+      isDemo: false,
       actionInProgress: false,
       availableKubeconfigExpiryOptions: [
         {
@@ -58,6 +57,18 @@ angular.module('portainer.app').controller('SettingsController', [
       passwordProtect: false,
       password: '',
       backupFormType: $scope.BACKUP_FORM_TYPES.FILE,
+    };
+
+    $scope.onToggleEnableTelemetry = function onToggleEnableTelemetry(checked) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.enableTelemetry = checked;
+      });
+    };
+
+    $scope.onToggleCustomLogo = function onToggleCustomLogo(checked) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.customLogo = checked;
+      });
     };
 
     $scope.onToggleAutoBackups = function onToggleAutoBackups(checked) {
@@ -101,7 +112,7 @@ angular.module('portainer.app').controller('SettingsController', [
         .then(function success(data) {
           const downloadData = new Blob([data.file], { type: 'application/gzip' });
           FileSaver.saveAs(downloadData, data.name);
-          Notifications.success('Backup successfully downloaded');
+          Notifications.success('Success', 'Backup successfully downloaded');
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to download backup');
@@ -127,7 +138,7 @@ angular.module('portainer.app').controller('SettingsController', [
     function updateSettings(settings) {
       SettingsService.update(settings)
         .then(function success() {
-          Notifications.success('Settings updated');
+          Notifications.success('Success', 'Settings updated');
           StateManager.updateLogo(settings.LogoURL);
           StateManager.updateSnapshotInterval(settings.SnapshotInterval);
           StateManager.updateEnableTelemetry(settings.EnableTelemetry);
@@ -142,6 +153,9 @@ angular.module('portainer.app').controller('SettingsController', [
     }
 
     function initView() {
+      const state = StateManager.getState();
+      $scope.state.isDemo = state.application.demoEnvironment.enabled;
+
       SettingsService.settings()
         .then(function success(data) {
           var settings = data;

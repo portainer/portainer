@@ -82,7 +82,7 @@ class KubernetesRedeployAppGitFormController {
       try {
         const confirmed = await this.ModalService.confirmAsync({
           title: 'Are you sure?',
-          message: 'Any changes to this application will be overriden by the definition in git and may cause a service interruption. Do you wish to continue?',
+          message: 'Any changes to this application will be overridden by the definition in git and may cause a service interruption. Do you wish to continue?',
           buttons: {
             confirm: {
               label: 'Update',
@@ -95,7 +95,7 @@ class KubernetesRedeployAppGitFormController {
         }
         this.state.redeployInProgress = true;
         await this.StackService.updateKubeGit(this.stack.Id, this.stack.EndpointId, this.namespace, this.formValues);
-        this.Notifications.success('Pulled and redeployed stack successfully');
+        this.Notifications.success('Success', 'Pulled and redeployed stack successfully');
         await this.$state.reload();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
@@ -112,7 +112,7 @@ class KubernetesRedeployAppGitFormController {
         await this.StackService.updateKubeStack({ EndpointId: this.stack.EndpointId, Id: this.stack.Id }, null, this.formValues);
         this.savedFormValues = angular.copy(this.formValues);
         this.state.hasUnsavedChanges = false;
-        this.Notifications.success('Save stack settings successfully');
+        this.Notifications.success('Success', 'Save stack settings successfully');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to save application settings');
       } finally {

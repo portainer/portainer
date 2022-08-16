@@ -3,13 +3,14 @@
     <label class="control-label text-left">{{ $ctrl.label || 'DN entries' }}</label>
     <button
       type="button"
-      class="label label-default interactive"
+      class="label label-default interactive vertical-center"
       style="margin-left: 10px; border: 0"
       ng-click="$ctrl.addEntry()"
       limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
       limited-feature-tabindex="-1"
     >
-      <i class="fa fa-plus-circle" aria-hidden="true"></i> add another entry
+      <pr-icon icon="'plus-circle'" feather="true"></pr-icon>
+      add another entry
     </button>
   </div>
   <div class="col-sm-12" ng-if="$ctrl.entries.length">
@@ -33,33 +34,33 @@
           </div>
           <div class="col-sm-3 text-right">
             <button
-              class="btn btn-sm btn-primary"
+              class="btn btn-md btn-primary"
               type="button"
               ng-disabled="$first"
               ng-click="$ctrl.moveUp($index)"
               limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
               limited-feature-tabindex="-1"
             >
-              <i class="fa fa-arrow-up" aria-hidden="true"></i>
+              <pr-icon icon="'arrow-up'" feather="true" size="'md'"></pr-icon>
             </button>
             <button
-              class="btn btn-sm btn-primary"
+              class="btn btn-md btn-primary"
               type="button"
               ng-disabled="$last"
               ng-click="$ctrl.moveDown($index)"
               limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
               limited-feature-tabindex="-1"
             >
-              <i class="fa fa-arrow-down" aria-hidden="true"></i>
+              <pr-icon icon="'arrow-down'" feather="true" size="'md'"></pr-icon>
             </button>
             <button
-              class="btn btn-sm btn-danger"
+              class="btn btn-md btn-danger"
               type="button"
               ng-click="$ctrl.removeEntry($index)"
               limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
               limited-feature-tabindex="-1"
             >
-              <i class="fa fa-trash" aria-hidden="true"></i>
+              <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
             </button>
           </div>
         </div>

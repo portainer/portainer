@@ -1,0 +1,42 @@
+:global(#page-wrapper:not(.open)) .root {
+  display: none;
+}
+
+.dialog {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.versionInfo {
+  margin: 5px 15px 10px;
+  font-size: 12px;
+}
+
+.versionInfo table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.versionInfo td {
+  padding-bottom: 10px;
+}
+
+.toolsList {
+  padding: 15px;
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  background-color: rgba(211, 211, 211, 0.2);
+  width: max-width;
+  font-family: Arial;
+  word-break: break-all;
+}
+
+.toolsList span {
+  margin-bottom: 10px;
+}
+
+.tools span {
+  margin-right: 10px;
+}

@@ -1,29 +1,38 @@
 <form class="form-horizontal" name="EdgeGroupForm" ng-submit="$ctrl.formAction()">
   <div class="form-group">
-    <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left"> Name </label>
+    <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left required"> Name </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="group_name" name="group_name" ng-model="$ctrl.model.Name" required auto-focus data-cy="edgeGroupCreate-groupNameInput" />
+      <input
+        type="text"
+        class="form-control"
+        id="group_name"
+        name="group_name"
+        ng-model="$ctrl.model.Name"
+        required
+        auto-focus
+        data-cy="edgeGroupCreate-groupNameInput"
+        placeholder="e.g. mystack"
+      />
     </div>
   </div>
   <div class="form-group" ng-show="EdgeGroupForm.group_name.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="EdgeGroupForm.group_name.$error">
-        <p ng-message="required">
-          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-          This field is required.
+        <p ng-message="required" class="vertical-center">
+          <pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon> This field is required.
         </p>
       </div>
     </div>
   </div>
 
   <div class="col-sm-12 form-section-title"> Group type </div>
-  <div class="form-group col-sm-12">
+  <div class="col-sm-12 !px-0">
     <div class="boxselector_wrapper">
       <div class="boxselector">
         <input type="radio" id="static-group" ng-model="$ctrl.model.Dynamic" ng-value="false" ng-checked="!$ctrl.model.Dynamic" />
         <label for="static-group">
-          <div class="boxselector_header">
-            <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px"></i>
+          <div class="boxselector_header vertical-center">
+            <pr-icon icon="'list'" feather="true"></pr-icon>
             Static
           </div>
           <p>Manually select Edge environments</p>
@@ -32,8 +41,8 @@
       <div class="boxselector">
         <input type="radio" id="dynamic-group" ng-model="$ctrl.model.Dynamic" ng-value="true" ng-checked="$ctrl.model.Dynamic" />
         <label for="dynamic-group">
-          <div class="boxselector_header">
-            <i class="fa fa-tags" aria-hidden="true" style="margin-right: 2px"></i>
+          <div class="boxselector_header vertical-center">
+            <pr-icon icon="'tag'" feather="true" className="'feather'"></pr-icon>
             Dynamic
           </div>
           <p>Automatically associate environments via tags</p>
@@ -74,8 +83,8 @@
         <div class="boxselector">
           <input type="radio" id="or-selector" ng-model="$ctrl.model.PartialMatch" ng-value="true" ng-checked="$ctrl.model.PartialMatch" />
           <label for="or-selector">
-            <div class="boxselector_header">
-              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px"></i>
+            <div class="boxselector_header vertical-center">
+              <pr-icon icon="'tag'" feather="true"></pr-icon>
               Partial match
             </div>
             <p>Associate any environment matching at least one of the selected tags</p>
@@ -84,8 +93,8 @@
         <div class="boxselector">
           <input type="radio" id="and-selector" ng-model="$ctrl.model.PartialMatch" ng-value="false" ng-checked="!$ctrl.model.PartialMatch" />
           <label for="and-selector">
-            <div class="boxselector_header">
-              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px"></i>
+            <div class="boxselector_header vertical-center">
+              <pr-icon icon="'tag'" feather="true" className="'feather'"></pr-icon>
               Full match
             </div>
             <p>Associate any environment matching all of the selected tags</p>
@@ -93,14 +102,10 @@
         </div>
       </div>
     </div>
-    <div class="form-group">
-      <tag-selector ng-if="$ctrl.tags.length" tags="$ctrl.tags" model="$ctrl.model.TagIds"></tag-selector>
-      <div ng-if="$ctrl.tags && !$ctrl.tags.length" class="col-sm-12 small text-muted">
-        No tags available. Head over to the <a ui-sref="portainer.tags">Tags view</a> to add tags
-      </div>
-    </div>
-    <div class="col-sm-12 form-section-title"> Associated environments by tags </div>
-    <div class="col-sm-12 form-group">
+
+    <tag-selector ng-if="$ctrl.model.TagIds" value="$ctrl.model.TagIds" on-change="($ctrl.onChangeTags)"> </tag-selector>
+
+    <div class="table-in-row">
       <group-association-table
         loaded="$ctrl.loaded"
         page-type="$ctrl.pageType"
@@ -114,6 +119,7 @@
         groups="$ctrl.groups"
         show-groups="true"
         has-backend-pagination="true"
+        title="Associated environments by tags"
       ></group-association-table>
     </div>
   </div>

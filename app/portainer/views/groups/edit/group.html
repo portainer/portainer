@@ -1,7 +1,4 @@
-<rd-header>
-  <rd-header-title title-text="Environment group details"></rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.groups">Groups</a> &gt; {{ ::group.Name }} </rd-header-content>
-</rd-header>
+<page-header title="'Environment group details'" breadcrumbs="[{label:'Groups', link:'portainer.groups'}, group.Name]"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
@@ -12,14 +9,12 @@
           page-type="edit"
           model="group"
           available-endpoints="availableEndpoints"
-          available-tags="availableTags"
           associated-endpoints="associatedEndpoints"
           add-label-action="addLabel"
           remove-label-action="removeLabel"
           form-action="update"
           form-action-label="Update the group"
           action-in-progress="state.actionInProgress"
-          on-create-tag="(onCreateTag)"
         ></group-form>
       </rd-widget-body>
     </rd-widget>

@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -19,6 +18,7 @@ import (
 type stackGitUpdatePayload struct {
 	AutoUpdate               *portainer.StackAutoUpdate
 	Env                      []portainer.Pair
+	Prune                    bool
 	RepositoryReferenceName  string
 	RepositoryAuthentication bool
 	RepositoryUsername       string
@@ -26,10 +26,6 @@ type stackGitUpdatePayload struct {
 }
 
 func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.RepositoryReferenceName) {
-		payload.RepositoryReferenceName = defaultGitReferenceName
-	}
-
 	if err := validateStackAutoUpdate(payload.AutoUpdate); err != nil {
 		return err
 	}
@@ -124,6 +120,15 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	canManage, err := handler.userCanManageStacks(securityContext, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack deletion", Err: err}
+	}
+	if !canManage {
+		errMsg := "Stack editing is disabled for non-admin users"
+		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: errors.New(errMsg)}
+	}
+
 	//stop the autoupdate job if there is any
 	if stack.AutoUpdate != nil {
 		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
@@ -135,6 +140,12 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	stack.Env = payload.Env
 	stack.UpdatedBy = user.Username
 	stack.UpdateDate = time.Now().Unix()
+
+	if stack.Type == portainer.DockerSwarmStack {
+		stack.Option = &portainer.StackOption{
+			Prune: payload.Prune,
+		}
+	}
 
 	if payload.RepositoryAuthentication {
 		password := payload.RepositoryPassword

@@ -33,11 +33,11 @@ export class ResourceControlViewModel {
     this.TeamAccesses = data.TeamAccesses;
     this.Public = data.Public;
     this.System = data.System;
-    this.Ownership = determineOwnership(this);
+    this.Ownership = determineOwnership(data);
   }
 }
 
-function determineOwnership(resourceControl: ResourceControlViewModel) {
+export function determineOwnership(resourceControl: ResourceControlResponse) {
   if (resourceControl.Public) {
     return ResourceControlOwnership.PUBLIC;
   }

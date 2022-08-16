@@ -15,11 +15,13 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
+	dockerhandler "github.com/portainer/portainer/api/http/handler/docker"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
@@ -98,6 +100,7 @@ type Server struct {
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
 	StackDeployer               stackdeployer.StackDeployer
+	DemoService                 *demo.Service
 }
 
 // Start starts the HTTP server
@@ -109,7 +112,9 @@ func (server *Server) Start() error {
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 	offlineGate := offlinegate.NewOfflineGate()
 
-	var authHandler = auth.NewHandler(requestBouncer, rateLimiter)
+	passwordStrengthChecker := security.NewPasswordStrengthChecker(server.DataStore.Settings())
+
+	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, passwordStrengthChecker)
 	authHandler.DataStore = server.DataStore
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
@@ -121,7 +126,15 @@ func (server *Server) Start() error {
 	adminMonitor := adminmonitor.New(5*time.Minute, server.DataStore, server.ShutdownCtx)
 	adminMonitor.Start()
 
-	var backupHandler = backup.NewHandler(requestBouncer, server.DataStore, offlineGate, server.FileService.GetDatastorePath(), server.ShutdownTrigger, adminMonitor)
+	var backupHandler = backup.NewHandler(
+		requestBouncer,
+		server.DataStore,
+		offlineGate,
+		server.FileService.GetDatastorePath(),
+		server.ShutdownTrigger,
+		adminMonitor,
+		server.DemoService,
+	)
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore
@@ -147,7 +160,7 @@ func (server *Server) Start() error {
 	var edgeTemplatesHandler = edgetemplates.NewHandler(requestBouncer)
 	edgeTemplatesHandler.DataStore = server.DataStore
 
-	var endpointHandler = endpoints.NewHandler(requestBouncer)
+	var endpointHandler = endpoints.NewHandler(requestBouncer, server.DemoService)
 	endpointHandler.DataStore = server.DataStore
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = server.ProxyManager
@@ -172,6 +185,8 @@ func (server *Server) Start() error {
 
 	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.JWTService, server.KubeClusterAccessService, server.KubernetesClientFactory)
 
+	var dockerHandler = dockerhandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.DockerClientFactory)
+
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"), adminMonitor.WasInstanceDisabled)
 
 	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeClusterAccessService)
@@ -194,7 +209,7 @@ func (server *Server) Start() error {
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.DataStore = server.DataStore
 
-	var settingsHandler = settings.NewHandler(requestBouncer)
+	var settingsHandler = settings.NewHandler(requestBouncer, server.DemoService)
 	settingsHandler.DataStore = server.DataStore
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JWTService = server.JWTService
@@ -234,7 +249,7 @@ func (server *Server) Start() error {
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
 
-	var statusHandler = status.NewHandler(requestBouncer, server.Status)
+	var statusHandler = status.NewHandler(requestBouncer, server.Status, server.DemoService)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.DataStore = server.DataStore
@@ -244,7 +259,7 @@ func (server *Server) Start() error {
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
-	var userHandler = users.NewHandler(requestBouncer, rateLimiter, server.APIKeyService)
+	var userHandler = users.NewHandler(requestBouncer, rateLimiter, server.APIKeyService, server.DemoService, passwordStrengthChecker)
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
 
@@ -263,6 +278,7 @@ func (server *Server) Start() error {
 		AuthHandler:            authHandler,
 		BackupHandler:          backupHandler,
 		CustomTemplatesHandler: customTemplatesHandler,
+		DockerHandler:          dockerHandler,
 		EdgeGroupsHandler:      edgeGroupsHandler,
 		EdgeJobsHandler:        edgeJobsHandler,
 		EdgeStacksHandler:      edgeStacksHandler,

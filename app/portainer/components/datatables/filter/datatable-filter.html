@@ -1,9 +1,10 @@
 <div uib-dropdown dropdown-append-to-body auto-close="outsideClick" is-open="$ctrl.isOpen">
   <span ng-transclude></span>
   <div class="filter-button">
-    <span uib-dropdown-toggle class="table-filter" ng-class="{ 'filter-active': $ctrl.isEnabled() }">
+    <span uib-dropdown-toggle class="table-filter vertical-center" ng-class="{ 'filter-active': $ctrl.isEnabled() }">
       Filter
-      <i class="fa" ng-class="[$ctrl.isEnabled() ? 'fa-check' : 'fa-filter']" aria-hidden="true"></i>
+      <pr-icon ng-if="$ctrl.isEnabled()" icon="'check'" feather="true"></pr-icon>
+      <pr-icon ng-if="!$ctrl.isEnabled()" icon="'filter'" feather="true"></pr-icon>
     </span>
   </div>
   <div class="dropdown-menu" style="min-width: 0" uib-dropdown-menu>

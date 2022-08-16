@@ -227,7 +227,7 @@ class KubernetesConfigureController {
         this.assignFormValuesToEndpoint(modifiedEndpoint, storageClasses, ingressClasses);
         this.EndpointProvider.setEndpoints(endpoints);
       }
-      this.Notifications.success('Configuration successfully applied');
+      this.Notifications.success('Success', 'Configuration successfully applied');
       this.$state.go('portainer.home');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to apply configuration');
@@ -269,7 +269,7 @@ class KubernetesConfigureController {
       actionInProgress: false,
       displayConfigureClassPanel: {},
       viewReady: false,
-      endpointId: this.$state.params.id,
+      endpointId: this.$state.params.endpointId,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
       },

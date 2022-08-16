@@ -139,7 +139,7 @@ class CreateConfigController {
       const resourceControl = data.Portainer.ResourceControl;
       const userId = userDetails.ID;
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
-      this.Notifications.success('Config successfully created');
+      this.Notifications.success('Success', 'Configuration successfully created');
       this.state.isEditorDirty = false;
       this.$state.go('docker.configs', {}, { reload: true });
     } catch (err) {
@@ -147,8 +147,8 @@ class CreateConfigController {
     }
   }
 
-  editorUpdate(cm) {
-    this.formValues.ConfigContent = cm.getValue();
+  editorUpdate(value) {
+    this.formValues.ConfigContent = value;
     this.state.isEditorDirty = true;
   }
 }

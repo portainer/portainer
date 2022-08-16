@@ -1,19 +1,35 @@
-<kubernetes-view-header title="Application stats" state="kubernetes.applications.application.stats" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
-  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.state.transition.namespace })">{{ ctrl.state.transition.namespace }}</a> &gt;
-  <a ui-sref="kubernetes.applications">Applications</a> &gt;
-  <a ui-sref="kubernetes.applications.application({ name: ctrl.state.transition.applicationName, namespace: ctrl.state.transition.namespace })">{{
-    ctrl.state.transition.applicationName
-  }}</a>
-  &gt; Pods &gt; {{ ctrl.state.transition.podName }} &gt; Containers &gt; {{ ctrl.state.transition.containerName }} &gt; Stats
-</kubernetes-view-header>
+<page-header
+  ng-if="ctrl.state.viewReady"
+  title="'Application stats'"
+  breadcrumbs="[
+    { label:'Namespaces', link:'kubernetes.resourcePools' },
+    {
+      label:ctrl.state.transition.namespace,
+      link: 'kubernetes.resourcePools.resourcePool',
+      linkParams:{ id: ctrl.state.transition.namespace }
+    },
+    { label:'Applications', link:'kubernetes.applications' },
+    {
+      label:ctrl.state.transition.applicationName,
+      link: 'kubernetes.applications.application',
+      linkParams:{ name: ctrl.state.transition.applicationName, namespace: ctrl.state.transition.namespace }
+    },
+     'Pods',
+     ctrl.state.transition.podName,
+     'Containers',
+     ctrl.state.transition.containerName,
+     'Stats'
+     ]"
+  reload="true"
+>
+</page-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
   <information-panel ng-if="!ctrl.state.getMetrics" title-text="Unable to retrieve container metrics">
-    <span class="small text-muted">
-      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px"></i>
+    <span class="small text-muted vertical-center">
+      <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
       Portainer was unable to retrieve any metrics associated to that container. Please contact your administrator to ensure that the Kubernetes metrics feature is properly
       configured.
     </span>
@@ -21,7 +37,12 @@
   <div class="row" ng-if="ctrl.state.getMetrics">
     <div class="col-md-12">
       <rd-widget>
-        <rd-widget-header icon="fa-info-circle" title-text="About statistics"> </rd-widget-header>
+        <div class="toolBar pt-5 px-5">
+          <div class="toolBarTitle flex">
+            <pr-icon icon="'info'" feather="true" mode="'primary'" class-name="'icon-nested-blue'"></pr-icon>
+            <span class="vertical-center"> About statistics </span>
+          </div>
+        </div>
         <rd-widget-body>
           <form class="form-horizontal">
             <div class="form-group">
@@ -41,12 +62,15 @@
                 </select>
               </div>
               <span>
-                <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
+                <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
               </span>
             </div>
             <div class="form-group" ng-if="ctrl.state.networkStatsUnavailable">
               <div class="col-sm-12">
-                <span class="small text-muted"> <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> Network stats are unavailable for this container. </span>
+                <span class="small text-muted">
+                  <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
+                  Network stats are unavailable for this container.
+                </span>
               </div>
             </div>
           </form>
@@ -58,7 +82,12 @@
   <div class="row" ng-if="ctrl.state.getMetrics">
     <div class="col-lg-6 col-md-12 col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="fa-chart-area" title-text="Memory usage"></rd-widget-header>
+        <div class="toolBar pt-5 px-5">
+          <div class="toolBarTitle flex">
+            <pr-icon icon="'svg-memory'" mode="'primary'" class-name="'icon-nested-blue'"></pr-icon>
+            <span class="vertical-center"> Memory usage </span>
+          </div>
+        </div>
         <rd-widget-body>
           <div class="chart-container" style="position: relative">
             <canvas id="memoryChart" width="770" height="300"></canvas>
@@ -68,7 +97,12 @@
     </div>
     <div class="col-lg-6 col-md-12 col-sm-12" ng-if="!ctrl.state.networkStatsUnavailable">
       <rd-widget>
-        <rd-widget-header icon="fa-chart-area" title-text="CPU usage"></rd-widget-header>
+        <div class="toolBar pt-5 px-5">
+          <div class="toolBarTitle flex">
+            <pr-icon icon="'cpu'" feather="true" mode="'primary'" class-name="'icon-nested-blue'"></pr-icon>
+            <span class="vertical-center"> CPU usage </span>
+          </div>
+        </div>
         <rd-widget-body>
           <div class="chart-container" style="position: relative">
             <canvas id="cpuChart" width="770" height="300"></canvas>

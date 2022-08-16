@@ -1,6 +1,6 @@
 <div class="col-sm-12" style="margin-bottom: 0px">
   <rd-widget>
-    <rd-widget-header icon="fa-user-lock">
+    <rd-widget-header icon="svg-userlock" feather-icon="true">
       <header-title>
         Effective access viewer
         <be-feature-indicator feature="$ctrl.limitedFeature" class="space-left"></be-feature-indicator>
@@ -22,15 +22,7 @@
             </ui-select>
           </div>
         </div>
-
-        <div class="col-sm-12 form-section-title"> Access </div>
-        <div>
-          <div class="small text-muted" style="margin-bottom: 15px">
-            <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
-            Effective role for each environment will be displayed for the selected user
-          </div>
-        </div>
-        <access-viewer-datatable table-key="access_viewer" dataset="$ctrl.userRoles" order-by="EndpointName"> </access-viewer-datatable>
+        <access-viewer-datatable table-key="access_viewer" dataset="$ctrl.userRoles" order-by="EndpointName" is-admin="$ctrl.isAdmin"> </access-viewer-datatable>
       </form>
     </rd-widget-body>
   </rd-widget>

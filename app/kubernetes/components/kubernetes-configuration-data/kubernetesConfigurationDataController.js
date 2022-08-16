@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import angular from 'angular';
 import _ from 'lodash-es';
 import chardet from 'chardet';
@@ -42,15 +43,15 @@ class KubernetesConfigurationDataController {
     this.onChangeKey();
   }
 
-  async editorUpdateAsync(cm) {
-    if (this.formValues.DataYaml !== cm.getValue()) {
-      this.formValues.DataYaml = cm.getValue();
+  async editorUpdateAsync(value) {
+    if (this.formValues.DataYaml !== value) {
+      this.formValues.DataYaml = value;
       this.isEditorDirty = true;
     }
   }
 
-  editorUpdate(cm) {
-    return this.$async(this.editorUpdateAsync, cm);
+  editorUpdate(value) {
+    return this.$async(this.editorUpdateAsync, value);
   }
 
   async onFileLoadAsync(event) {

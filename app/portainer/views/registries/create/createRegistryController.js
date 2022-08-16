@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { RegistryTypes } from 'Portainer/models/registryTypes';
 import { RegistryCreateFormValues } from 'Portainer/models/registry';
+import { options } from './options';
 
 class CreateRegistryController {
   /* @ngInject */
@@ -26,6 +27,16 @@ class CreateRegistryController {
     this.nameIsUsed = this.nameIsUsed.bind(this);
     this.retrieveGitlabRegistries = this.retrieveGitlabRegistries.bind(this);
     this.createGitlabRegistries = this.createGitlabRegistries.bind(this);
+
+    this.selectDockerHub = this.selectDockerHub.bind(this);
+    this.selectEcr = this.selectEcr.bind(this);
+    this.selectQuayRegistry = this.selectQuayRegistry.bind(this);
+    this.selectProGetRegistry = this.selectProGetRegistry.bind(this);
+    this.selectAzureRegistry = this.selectAzureRegistry.bind(this);
+    this.selectGitlabRegistry = this.selectGitlabRegistry.bind(this);
+    this.selectCustomRegistry = this.selectCustomRegistry.bind(this);
+
+    this.setRegistry = this.setRegistry.bind(this);
   }
 
   useDefaultQuayConfiguration() {
@@ -39,6 +50,7 @@ class CreateRegistryController {
     this.model.Authentication = true;
     this.model.Quay = {};
     this.useDefaultQuayConfiguration();
+    this.model.Type = RegistryTypes.QUAY;
   }
 
   useDefaultGitlabConfiguration() {
@@ -51,12 +63,14 @@ class CreateRegistryController {
     this.model.Authentication = true;
     this.model.Gitlab = {};
     this.useDefaultGitlabConfiguration();
+    this.model.Type = RegistryTypes.GITLAB;
   }
 
   selectAzureRegistry() {
     this.model.Name = '';
     this.model.URL = '';
     this.model.Authentication = true;
+    this.model.Type = RegistryTypes.AZURE;
   }
 
   selectProGetRegistry() {
@@ -64,18 +78,21 @@ class CreateRegistryController {
     this.model.URL = '';
     this.model.BaseURL = '';
     this.model.Authentication = true;
+    this.model.Type = RegistryTypes.PROGET;
   }
 
   selectCustomRegistry() {
     this.model.Name = '';
     this.model.URL = '';
     this.model.Authentication = false;
+    this.model.Type = RegistryTypes.CUSTOM;
   }
 
   selectDockerHub() {
     this.model.Name = '';
     this.model.URL = 'docker.io';
     this.model.Authentication = true;
+    this.model.Type = RegistryTypes.DOCKERHUB;
   }
 
   useDefaultEcrConfiguration() {
@@ -88,6 +105,7 @@ class CreateRegistryController {
     this.model.Authentication = false;
     this.model.Ecr = {};
     this.useDefaultEcrConfiguration();
+    this.model.Type = RegistryTypes.ECR;
   }
 
   retrieveGitlabRegistries() {
@@ -108,7 +126,7 @@ class CreateRegistryController {
       try {
         this.state.actionInProgress = true;
         await this.RegistryService.createGitlabRegistries(this.model, this.state.gitlab.selectedItems);
-        this.Notifications.success('Registries successfully created');
+        this.Notifications.success('Success', 'Registries successfully created');
         this.$state.go(this.state.originViewReference, { endpointId: this.state.originalEndpointId });
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to create registries');
@@ -122,7 +140,7 @@ class CreateRegistryController {
       try {
         this.state.actionInProgress = true;
         await this.RegistryService.createRegistry(this.model);
-        this.Notifications.success('Registry successfully created');
+        this.Notifications.success('Success', 'Registry successfully created');
         this.$state.go(this.state.originViewReference, { endpointId: this.state.originalEndpointId });
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to create registry');
@@ -146,9 +164,42 @@ class CreateRegistryController {
     });
   }
 
+  setRegistry(registry) {
+    this.state.registryValue = registry;
+
+    switch (registry) {
+      case '6':
+        this.selectDockerHub();
+        break;
+      case '7':
+        this.selectEcr();
+        break;
+      case '1':
+        this.selectQuayRegistry();
+        break;
+      case '5':
+        this.selectProGetRegistry();
+        break;
+      case '2':
+        this.selectAzureRegistry();
+        break;
+      case '4':
+        this.selectGitlabRegistry();
+        break;
+      case '3':
+        this.selectCustomRegistry();
+        break;
+    }
+  }
+
   $onInit() {
     return this.$async(async () => {
       this.model = new RegistryCreateFormValues();
+      this.model.Type = RegistryTypes.DOCKERHUB;
+      this.selectDockerHub();
+      this.state.availableRegistry = options;
+      // Default registryValue is DockerHub, which is 6
+      this.state.registryValue = '6';
 
       const from = this.$transition$.from();
       const params = this.$transition$.params('from');

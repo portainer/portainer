@@ -1,12 +1,14 @@
 import { Formik, Field, Form } from 'formik';
 
-import { FormControl } from '@/portainer/components/form-components/FormControl';
-import { Widget, WidgetBody, WidgetTitle } from '@/portainer/components/widget';
 import { UserViewModel } from '@/portainer/models/user';
+import { Icon } from '@/react/components/Icon';
 import { TeamViewModel } from '@/portainer/models/team';
-import { Input } from '@/portainer/components/form-components/Input';
-import { UsersSelector } from '@/portainer/components/UsersSelector';
-import { LoadingButton } from '@/portainer/components/Button/LoadingButton';
+
+import { FormControl } from '@@/form-components/FormControl';
+import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
+import { Input } from '@@/form-components/Input';
+import { UsersSelector } from '@@/UsersSelector';
+import { LoadingButton } from '@@/buttons/LoadingButton';
 
 import { validationSchema } from './CreateTeamForm.validation';
 
@@ -31,7 +33,12 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
     <div className="row">
       <div className="col-lg-12 col-md-12 col-xs-12">
         <Widget>
-          <WidgetTitle icon="fa-plus" title="Add a new team" />
+          <WidgetTitle
+            icon="plus"
+            title="Add a new team"
+            featherIcon
+            className="vertical-center"
+          />
           <WidgetBody>
             <Formik
               initialValues={initialValues}
@@ -56,6 +63,7 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
                     inputId="team_name"
                     label="Name"
                     errors={errors.name}
+                    required
                   >
                     <Field
                       as={Input}
@@ -91,14 +99,11 @@ export function CreateTeamForm({ users, teams, onSubmit }: Props) {
                     <div className="col-sm-12">
                       <LoadingButton
                         disabled={!isValid}
-                        dataCy="team-createTeamButton"
+                        data-cy="team-createTeamButton"
                         isLoading={isSubmitting}
                         loadingText="Creating team..."
                       >
-                        <i
-                          className="fa fa-plus space-right"
-                          aria-hidden="true"
-                        />
+                        <Icon icon="plus" feather size="md" />
                         Create team
                       </LoadingButton>
                     </div>

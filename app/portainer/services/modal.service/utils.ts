@@ -10,6 +10,11 @@ export interface ButtonsOptions {
   cancel?: Button;
 }
 
+export enum ModalTypeIcon {
+  Warn = 'warning',
+  Destructive = 'error',
+}
+
 export function confirmButtons(options: ButtonsOptions) {
   return {
     confirm: {
@@ -22,16 +27,24 @@ export function confirmButtons(options: ButtonsOptions) {
         options.cancel && options.cancel.label
           ? sanitize(options.cancel.label)
           : 'Cancel',
+      className: 'btn-default',
     },
   };
 }
 
+export function buildTitle(
+  title: string,
+  modalType: ModalTypeIcon = ModalTypeIcon.Warn
+) {
+  return `
+    <div class="background-${modalType}">
+      <h5 class="modal-title">${sanitize(title)}</h5>
+    </div>
+  `;
+}
+
 export function applyBoxCSS(box: JQuery<HTMLElement>) {
   box.css({
-    top: '50%',
-    'margin-top': function marginTop() {
-      const height = box.height() || 0;
-      return -(height / 2);
-    },
+    'vertical-align': 'middle',
   });
 }

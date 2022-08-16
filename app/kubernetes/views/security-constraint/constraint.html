@@ -1,0 +1,40 @@
+<page-header
+  ng-if="state.viewReady"
+  title="'Kubernetes security constraints'"
+  breadcrumbs="[
+{ label:'Environments', link:'portainer.endpoints' }, 
+{ label:endpoint.Name, link:'portainer.endpoints.endpoint', linkParams:{id: endpoint.Id} }, 
+'Security constraints'
+]"
+  reload="true"
+></page-header>
+
+<kubernetes-view-loading view-ready="state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="state.viewReady">
+  <div class="row">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-header icon="shield" feather-icon="true" title-text="Pod security constraints"></rd-widget-header>
+        <rd-widget-body>
+          <form class="form-horizontal" name="kubernetesSecurityConstraintForm">
+            <!--  main toggle  -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  checked="formValues.enabled"
+                  name="'disableSysctlSettingForRegularUsers'"
+                  label="'Enable pod security constraints'"
+                  feature-id="limitedFeaturePodSecurityPolicy"
+                  label-class="'col-sm-3 col-lg-2 px-0'"
+                  switch-class="'col-sm-8'"
+                >
+                </por-switch-field>
+              </div>
+            </div>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

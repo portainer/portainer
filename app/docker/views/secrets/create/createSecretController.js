@@ -23,6 +23,14 @@ angular.module('portainer.docker').controller('CreateSecretController', [
       actionInProgress: false,
     };
 
+    $scope.handleEncodeSecretChange = handleEncodeSecretChange;
+
+    function handleEncodeSecretChange(checked) {
+      return $scope.$evalAsync(() => {
+        $scope.formValues.encodeSecret = checked;
+      });
+    }
+
     $scope.addLabel = function () {
       $scope.formValues.Labels.push({ key: '', value: '' });
     };
@@ -81,7 +89,7 @@ angular.module('portainer.docker').controller('CreateSecretController', [
           return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
         })
         .then(function success() {
-          Notifications.success('Secret successfully created');
+          Notifications.success('Success', 'Secret successfully created');
           $state.go('docker.secrets', {}, { reload: true });
         })
         .catch(function error(err) {

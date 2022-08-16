@@ -16,6 +16,20 @@ angular.module('portainer.docker').controller('SwarmVisualizerController', [
       refreshRate: '5',
     };
 
+    $scope.handleChangeDisplayOnlyRunningTasks = function handleChangeDisplayOnlyRunningTasks(enabled) {
+      $scope.$evalAsync(() => {
+        $scope.state.DisplayOnlyRunningTasks = enabled;
+        $scope.changeDisplayOnlyRunningTasks();
+      });
+    };
+
+    $scope.handleChangeDisplayNodeLabels = function handleChangeDisplayNodeLabels(enabled) {
+      $scope.$evalAsync(() => {
+        $scope.state.DisplayNodeLabels = enabled;
+        $scope.changeDisplayNodeLabels();
+      });
+    };
+
     $scope.$on('$destroy', function () {
       stopRepeater();
     });
