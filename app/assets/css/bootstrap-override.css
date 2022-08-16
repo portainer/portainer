@@ -16,6 +16,11 @@
   font-weight: 500;
 }
 
+[theme='dark'] .control-label,
+[theme='highcontrast'] .control-label {
+  color: var(--ui-white);
+}
+
 .vertical-center {
   display: inline-flex;
   align-items: center;
