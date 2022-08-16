@@ -17,7 +17,7 @@ export function Breadcrumbs({ breadcrumbs }: Props) {
     : [breadcrumbs];
 
   return (
-    <div className="text-sm font-medium text-gray-7 th-dark:text-gray-5 th-highcontrast:text-white space-x-2">
+    <div className="text-xs font-medium text-gray-7 th-dark:text-gray-5 th-highcontrast:text-white space-x-2">
       {breadcrumbsArray.map((crumb, index) => (
         <Fragment key={index}>
           <span>{renderCrumb(crumb)}</span>
