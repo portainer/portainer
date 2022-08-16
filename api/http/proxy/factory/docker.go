@@ -38,6 +38,10 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 		rawURL = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}
 
+	if !strings.Contains(rawURL, "://") {
+		rawURL = "http://" + rawURL
+	}
+
 	endpointURL, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, err
