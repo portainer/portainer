@@ -117,10 +117,6 @@ input[type='checkbox'] {
   text-align: center;
 }
 
-a[ng-click] {
-  cursor: pointer;
-}
-
 .space-right {
   margin-right: 5px;
 }
