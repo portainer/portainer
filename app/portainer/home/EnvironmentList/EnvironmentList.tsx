@@ -192,8 +192,10 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                     <Button
                       onClick={onRefresh}
                       data-cy="home-refreshEndpointsButton"
+                      size="medium"
+                      color="secondary"
                       className={clsx(
-                        'vertical-center',
+                        'vertical-center !ml-0',
                         styles.refreshEnvironmentsButton
                       )}
                     >
@@ -215,7 +217,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                     }}
                   />
                 </div>
-                <div className={styles.filterSearchbar}>
+                <div className={clsx(styles.filterSearchbar, 'ml-3')}>
                   <FilterSearchBar
                     value={searchBarValue}
                     onChange={setSearchBarValue}
