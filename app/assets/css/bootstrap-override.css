@@ -68,6 +68,8 @@
 
 .switch input[type='checkbox']:disabled + .slider {
   background-color: var(--ui-gray-3);
+  @apply th-dark:bg-gray-warm-9;
+  @apply th-highcontrast:bg-gray-warm-9;
 }
 
 .switch-values {
