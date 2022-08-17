@@ -145,7 +145,7 @@
                 </div>
                 <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid || ctrl.state.alreadyExists">
                   <div class="small">
-                    <div class="col-sm-3 col-lg-2"></div>
+                    <div class="col-sm-3 col-lg-2">&nbsp;</div>
                     <div class="col-sm-8" ng-messages="kubernetesApplicationCreationForm.application_name.$error">
                       <p class="text-muted vertical-center" ng-message="required"
                         ><pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p
@@ -156,10 +156,12 @@
                         alphanumeric character (e.g. 'my-name', or 'abc-123').
                       </p>
                     </div>
-                    <p class="text-muted vertical-center" ng-if="ctrl.state.alreadyExists">
-                      <pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
-                      An application with the same name already exists inside the selected namespace.
-                    </p>
+                    <div class="col-sm-8" ng-if="ctrl.state.alreadyExists">
+                      <p class="text-muted vertical-center">
+                        <pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                        An application with the same name already exists inside the selected namespace.
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <!-- #endregion -->
