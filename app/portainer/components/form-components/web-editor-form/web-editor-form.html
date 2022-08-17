@@ -2,8 +2,38 @@
   <div class="web-editor overflow-auto">
     <div ng-if="!$ctrl.hideTitle" class="col-sm-12 form-section-title pr-0"
       >Web editor
-      <span ng-if="$ctrl.BROWSER_OS_PLATFORM != 'mac'" class="text-muted small vertical-center float-right mt-0">CTRL+F for search</span>
-      <span ng-if="$ctrl.BROWSER_OS_PLATFORM === 'mac'" class="text-muted small vertical-center float-right mt-0">CMD+F for search</span>
+      <div class="text-muted small vertical-center float-right mt-0">
+        <span ng-if="$ctrl.BROWSER_OS_PLATFORM !== 'mac'" class="vertical-center">Ctrl+F for search</span>
+        <span ng-if="$ctrl.BROWSER_OS_PLATFORM === 'mac'" class="vertical-center">Cmd+F for search</span>
+        <portainer-tooltip
+          ng-if="$ctrl.BROWSER_OS_PLATFORM !== 'mac'"
+          message="'Ctrl+F - Start searching <br />
+              Ctrl+G - Find next <br />
+              Ctrl+Shift+G - Find previous <br />
+              Ctrl+Shift+F - Replace <br />
+              Ctrl+Shift+R - Replace all <br />
+              Alt+G - Jump to line <br />
+              Alt+F - Persistent search: <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enter - Find next <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Shift+Enter - Find previous <br />'"
+          class-name="'[&>span]:!text-left'"
+        >
+        </portainer-tooltip>
+        <portainer-tooltip
+          ng-if="$ctrl.BROWSER_OS_PLATFORM === 'mac'"
+          message="'Cmd+F - Start searching <br />
+              Cmd+G - Find next <br />
+              Cmd+Shift+G - Find previous <br />
+              Cmd+Option+F - Replace <br />
+              Cmd+Option+R - Replace all <br />
+              Option+G - Jump to line <br />
+              Option+F - Persistent search: <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enter - Find next <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Shift+Enter - Find previous <br />'"
+          class-name="'[&>span]:!text-left'"
+        >
+        </portainer-tooltip>
+      </div>
     </div>
     <div class="trancluded-item form-group col-sm-9 col-lg-10 text-muted small" ng-transclude="description"></div>
     <div class="form-group">

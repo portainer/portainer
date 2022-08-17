@@ -29,7 +29,7 @@ export const componentsModule = angular
   )
   .component(
     'portainerTooltip',
-    react2angular(Tooltip, ['message', 'position'])
+    react2angular(Tooltip, ['message', 'position', 'className'])
   )
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
