@@ -28,6 +28,7 @@ type (
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService
 		EdgeStack() EdgeStackService
+		EdgeUpdateSchedule() EdgeUpdateScheduleService
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
 		EndpointRelation() EndpointRelationService
@@ -78,6 +79,15 @@ type (
 		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int
+		BucketName() string
+	}
+
+	EdgeUpdateScheduleService interface {
+		List() ([]portainer.EdgeUpdateSchedule, error)
+		Item(ID portainer.EdgeUpdateScheduleID) (*portainer.EdgeUpdateSchedule, error)
+		Create(edgeUpdateSchedule *portainer.EdgeUpdateSchedule) error
+		Update(ID portainer.EdgeUpdateScheduleID, edgeUpdateSchedule *portainer.EdgeUpdateSchedule) error
+		Delete(ID portainer.EdgeUpdateScheduleID) error
 		BucketName() string
 	}
 
