@@ -49,7 +49,14 @@ export const componentsModule = angular
   .component('viewLoading', r2a(ViewLoading, ['message']))
   .component(
     'pageHeader',
-    r2a(PageHeader, ['title', 'breadcrumbs', 'loading', 'onReload', 'reload'])
+    r2a(PageHeader, [
+      'id',
+      'title',
+      'breadcrumbs',
+      'loading',
+      'onReload',
+      'reload',
+    ])
   )
   .component(
     'fallbackImage',
