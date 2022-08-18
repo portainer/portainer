@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	portaineree "github.com/portainer/portainer/api"
 	"github.com/sirupsen/logrus"
 )
 
@@ -35,28 +34,28 @@ func NewService(connection portainer.Connection) (*Service, error) {
 }
 
 // List return an array containing all the items in the bucket.
-func (service *Service) List() ([]portaineree.EdgeUpdateSchedule, error) {
-	var list = make([]portaineree.EdgeUpdateSchedule, 0)
+func (service *Service) List() ([]portainer.EdgeUpdateSchedule, error) {
+	var list = make([]portainer.EdgeUpdateSchedule, 0)
 
 	err := service.connection.GetAll(
 		BucketName,
-		&portaineree.EdgeUpdateSchedule{},
+		&portainer.EdgeUpdateSchedule{},
 		func(obj interface{}) (interface{}, error) {
-			item, ok := obj.(*portaineree.EdgeUpdateSchedule)
+			item, ok := obj.(*portainer.EdgeUpdateSchedule)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeUpdateSchedule object")
 				return nil, fmt.Errorf("Failed to convert to EdgeUpdateSchedule object: %s", obj)
 			}
 			list = append(list, *item)
-			return &portaineree.EdgeUpdateSchedule{}, nil
+			return &portainer.EdgeUpdateSchedule{}, nil
 		})
 
 	return list, err
 }
 
 // Item returns a item by ID.
-func (service *Service) Item(ID portaineree.EdgeUpdateScheduleID) (*portaineree.EdgeUpdateSchedule, error) {
-	var item portaineree.EdgeUpdateSchedule
+func (service *Service) Item(ID portainer.EdgeUpdateScheduleID) (*portainer.EdgeUpdateSchedule, error) {
+	var item portainer.EdgeUpdateSchedule
 	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &item)
@@ -68,24 +67,24 @@ func (service *Service) Item(ID portaineree.EdgeUpdateScheduleID) (*portaineree.
 }
 
 // Create assign an ID to a new object and saves it.
-func (service *Service) Create(item *portaineree.EdgeUpdateSchedule) error {
+func (service *Service) Create(item *portainer.EdgeUpdateSchedule) error {
 	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
-			item.ID = portaineree.EdgeUpdateScheduleID(id)
+			item.ID = portainer.EdgeUpdateScheduleID(id)
 			return int(item.ID), item
 		},
 	)
 }
 
 // Update updates an item.
-func (service *Service) Update(ID portaineree.EdgeUpdateScheduleID, item *portaineree.EdgeUpdateSchedule) error {
+func (service *Service) Update(ID portainer.EdgeUpdateScheduleID, item *portainer.EdgeUpdateSchedule) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, item)
 }
 
 // Delete deletes an item.
-func (service *Service) Delete(ID portaineree.EdgeUpdateScheduleID) error {
+func (service *Service) Delete(ID portainer.EdgeUpdateScheduleID) error {
 	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
