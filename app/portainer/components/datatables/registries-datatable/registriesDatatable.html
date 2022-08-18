@@ -77,9 +77,9 @@
                   <input id="select_{{ $index }}" type="checkbox" disabled />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <span>DockerHub (anonymous)</span>
+                <span><default-registry-name></default-registry-name></span>
               </td>
-              <td> docker.io </td>
+              <td> <default-registry-domain></default-registry-domain> </td>
               <td>
                 <default-registry-action ng-if="$ctrl.isAdmin && !$ctrl.endpointType"></default-registry-action>
               </td>

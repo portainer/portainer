@@ -30,5 +30,5 @@ export enum FeatureId {
   STACK_WEBHOOK = 'stack-webhook',
   CONTAINER_WEBHOOK = 'container-webhook',
   POD_SECURITY_POLICY_CONSTRAINT = 'pod-security-policy-constraint',
-  HIDE_DEFAULT_REGISTRY = 'hide-default-registry',
+  HIDE_DOCKER_HUB_ANONYMOUS = 'hide-docker-hub-anonymous',
 }
