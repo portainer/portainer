@@ -131,10 +131,18 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
           kubectl shell
         </div>
         <div className={clsx(styles.actions, 'space-x-8')}>
-          <Button color="link" onClick={clearScreen}>
+          <Button
+            color="link"
+            onClick={clearScreen}
+            data-cy="k8sShell-refreshButton"
+          >
             <Icon icon="rotate-cw" feather size="md" />
           </Button>
-          <Button color="link" onClick={toggleMinimize}>
+          <Button
+            color="link"
+            onClick={toggleMinimize}
+            data-cy={shell.minimized ? 'k8sShell-restore' : 'k8sShell-minimise'}
+          >
             <Icon
               icon={shell.minimized ? 'maximize-2' : 'minimize-2'}
               feather
@@ -144,7 +152,11 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
               }
             />
           </Button>
-          <Button color="link" onClick={handleClose}>
+          <Button
+            color="link"
+            onClick={handleClose}
+            data-cy="k8sShell-closeButton"
+          >
             <Icon icon="x" feather size="md" />
           </Button>
         </div>
