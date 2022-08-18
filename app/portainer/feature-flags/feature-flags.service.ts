@@ -35,6 +35,7 @@ export async function init(edition: Edition) {
     [FeatureId.STACK_WEBHOOK]: Edition.BE,
     [FeatureId.CONTAINER_WEBHOOK]: Edition.BE,
     [FeatureId.POD_SECURITY_POLICY_CONSTRAINT]: Edition.BE,
+    [FeatureId.HIDE_DEFAULT_REGISTRY]: Edition.BE,
   };
 
   state.currentEdition = currentEdition;

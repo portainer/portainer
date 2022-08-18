@@ -2,6 +2,7 @@ import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
 import { CreateAccessToken } from '@/react/portainer/account/CreateAccessTokenView';
+import { DefaultRegistryAction } from '@/react/portainer/registries/ListView/DefaultRegistry';
 
 import { wizardModule } from './wizard';
 
@@ -10,4 +11,5 @@ export const viewsModule = angular
   .component(
     'createAccessToken',
     r2a(CreateAccessToken, ['onSubmit', 'onError'])
-  ).name;
+  )
+  .component('defaultRegistryAction', r2a(DefaultRegistryAction, [])).name;

@@ -80,7 +80,9 @@
                 <span>DockerHub (anonymous)</span>
               </td>
               <td> docker.io </td>
-              <td> - </td>
+              <td>
+                <default-registry-action ng-if="$ctrl.isAdmin && !$ctrl.endpointType"></default-registry-action>
+              </td>
             </tr>
             <tr
               dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"

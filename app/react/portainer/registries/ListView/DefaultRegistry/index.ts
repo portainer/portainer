@@ -1,0 +1,1 @@
+export { DefaultRegistryAction } from './DefaultRegistryAction';
