@@ -25,8 +25,15 @@ class KubernetesCreateConfigurationController {
   }
 
   onChangeName() {
-    const filteredConfigurations = _.filter(this.configurations, (config) => config.Namespace === this.formValues.ResourcePool.Namespace.Name);
+    const filteredConfigurations = _.filter(
+      this.configurations,
+      (config) => config.Namespace === this.formValues.ResourcePool.Namespace.Name && config.Kind === this.formValues.Kind
+    );
     this.state.alreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
+  }
+
+  onChangeKind() {
+    this.onChangeName();
   }
 
   onResourcePoolSelectionChange() {

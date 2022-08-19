@@ -29,6 +29,6 @@ const _KubernetesConfigurationFormValuesEntry = Object.freeze({
 
 export class KubernetesConfigurationFormValuesEntry {
   constructor() {
-    Object.assign(this, _KubernetesConfigurationFormValuesEntry);
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigurationFormValuesEntry)));
   }
 }

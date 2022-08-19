@@ -4,7 +4,7 @@ import { KubernetesConfiguration, KubernetesConfigurationKinds } from 'Kubernete
 class KubernetesConfigurationConverter {
   static secretToConfiguration(secret) {
     const res = new KubernetesConfiguration();
-    res.Type = KubernetesConfigurationKinds.SECRET;
+    res.Kind = KubernetesConfigurationKinds.SECRET;
     res.Id = secret.Id;
     res.Name = secret.Name;
     res.Namespace = secret.Namespace;
@@ -20,7 +20,7 @@ class KubernetesConfigurationConverter {
 
   static configMapToConfiguration(configMap) {
     const res = new KubernetesConfiguration();
-    res.Type = KubernetesConfigurationKinds.CONFIGMAP;
+    res.Kind = KubernetesConfigurationKinds.CONFIGMAP;
     res.Id = configMap.Id;
     res.Name = configMap.Name;
     res.Namespace = configMap.Namespace;

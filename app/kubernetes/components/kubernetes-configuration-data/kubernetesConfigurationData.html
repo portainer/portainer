@@ -46,8 +46,7 @@
           ng-change="$ctrl.onChangeKey(entry)"
         />
         <div
-          class="small text-warning"
-          style="margin-top: 5px"
+          class="small text-warning mt-1"
           ng-show="
             kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid ||
             (!entry.Used && $ctrl.state.duplicateKeys[index] !== undefined) ||
@@ -61,12 +60,12 @@
           </ng-messages>
           <div>
             <p ng-if="$ctrl.state.duplicateKeys[index] !== undefined" class="vertical-center">
-              <pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon>This key is already defined.
+              <pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>This key is already defined.
             </p>
           </div>
           <p ng-if="$ctrl.state.invalidKeys[index]" class="vertical-center">
-            <pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'" class="vertical-center"></pr-icon> This key is invalid. A valid key must
-            consist of alphanumeric characters, '-', '_' or '.'
+            <pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This key is invalid. A valid key must consist of alphanumeric
+            characters, '-', '_' or '.'
           </p>
         </div>
       </div>
