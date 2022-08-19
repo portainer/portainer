@@ -12,11 +12,14 @@ export function useHeaderContext() {
     throw new Error('Should be nested inside a HeaderContainer component');
   }
 }
+interface Props {
+  id?: string;
+}
 
-export function HeaderContainer({ children }: PropsWithChildren<unknown>) {
+export function HeaderContainer({ id, children }: PropsWithChildren<Props>) {
   return (
     <Context.Provider value>
-      <div className={clsx('row', styles.header)}>
+      <div id={id} className={clsx('row', styles.header)}>
         <div id="loadingbar-placeholder" />
         <div className="col-xs-12">
           <div className={styles.meta}>{children}</div>
