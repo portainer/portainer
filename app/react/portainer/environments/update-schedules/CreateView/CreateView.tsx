@@ -17,6 +17,7 @@ import { useCreateMutation } from '../queries/create';
 import { FormValues } from '../common/types';
 import { validation } from '../common/validation';
 import { FormFields } from '../common/FormFields';
+import { useGetList } from '../queries/list';
 
 const initialValues: FormValues = {
   name: '',
@@ -28,9 +29,17 @@ const initialValues: FormValues = {
 
 export function CreateView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
+  const schedulesQuery = useGetList();
 
   const createMutation = useCreateMutation();
   const router = useRouter();
+
+  if (!schedulesQuery.data) {
+    return null;
+  }
+
+  const schedules = schedulesQuery.data;
+
   return (
     <>
       <PageHeader
@@ -57,7 +66,7 @@ export function CreateView() {
                   });
                 }}
                 validateOnMount
-                validationSchema={validation}
+                validationSchema={() => validation(schedules)}
               >
                 {({ isValid }) => (
                   <FormikForm className="form-horizontal">

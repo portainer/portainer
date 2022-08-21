@@ -1,27 +1,19 @@
-import { useFormikContext, Field } from 'formik';
+import { useFormikContext } from 'formik';
 
-import { FormControl } from '@@/form-components/FormControl';
-import { Input } from '@@/form-components/Input';
 import { NavTabs } from '@@/NavTabs';
 
 import { ScheduleType } from '../types';
 
 import { EdgeGroupsField } from './EdgeGroupsField';
 import { FormValues } from './types';
+import { NameField } from './NameField';
 
 export function FormFields() {
-  const { setFieldValue, errors, values } = useFormikContext<FormValues>();
+  const { setFieldValue, values } = useFormikContext<FormValues>();
 
   return (
     <>
-      <FormControl
-        label="Name"
-        required
-        inputId="name-input"
-        errors={errors.name}
-      >
-        <Field as={Input} name="name" id="name-input" />
-      </FormControl>
+      <NameField />
 
       <EdgeGroupsField />
 

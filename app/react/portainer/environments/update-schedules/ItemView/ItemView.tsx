@@ -16,23 +16,32 @@ import { FormFields } from '../common/FormFields';
 import { useItem } from '../queries/useItem';
 import { validation } from '../common/validation';
 import { useUpdateMutation } from '../queries/useUpdateMutation';
+import { useGetList } from '../queries/list';
 
 export function ItemView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
 
   const {
-    params: { id },
+    params: { id: idParam },
   } = useCurrentStateAndParams();
+
+  const id = parseInt(idParam, 10);
+
+  if (!idParam || Number.isNaN(id)) {
+    throw new Error('id is a required path param');
+  }
 
   const updateMutation = useUpdateMutation();
   const router = useRouter();
   const itemQuery = useItem(id);
+  const schedulesQuery = useGetList();
 
-  if (!itemQuery.data) {
+  if (!itemQuery.data || !schedulesQuery.data) {
     return null;
   }
 
   const item = itemQuery.data;
+  const schedules = schedulesQuery.data;
 
   return (
     <>
@@ -66,7 +75,7 @@ export function ItemView() {
                   );
                 }}
                 validateOnMount
-                validationSchema={validation}
+                validationSchema={() => validation(schedules, id)}
               >
                 {({ isValid }) => (
                   <FormikForm className="form-horizontal">
