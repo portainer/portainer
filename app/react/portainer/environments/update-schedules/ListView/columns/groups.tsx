@@ -13,7 +13,7 @@ export const groups: Column<EdgeUpdateSchedule> = {
   disableFilters: true,
   Filter: () => null,
   canHide: false,
-  sortType: 'string',
+  disableSortBy: true,
 };
 
 export function GroupsCell({

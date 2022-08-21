@@ -8,5 +8,5 @@ export const scheduleType: Column<EdgeUpdateSchedule> = {
   disableFilters: true,
   Filter: () => null,
   canHide: false,
-  // sortType: 'string',
+  sortType: 'string',
 };

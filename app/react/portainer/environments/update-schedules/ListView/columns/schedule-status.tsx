@@ -9,6 +9,7 @@ export const scheduleStatus: Column<EdgeUpdateSchedule> = {
   Filter: () => null,
   canHide: false,
   Cell: StatusCell,
+  disableSortBy: true,
 };
 
 function StatusCell({
