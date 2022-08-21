@@ -1,4 +1,4 @@
-import { Download, Upload } from 'react-feather';
+import { DownloadCloud, UploadCloud } from 'react-feather';
 
 import { FeatureId } from '@/portainer/feature-flags/enums';
 
@@ -7,14 +7,14 @@ import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 export const options = [
   {
     id: 'backup_file',
-    icon: <BadgeIcon icon={Download} />,
+    icon: <BadgeIcon icon={DownloadCloud} />,
     featherIcon: true,
     label: 'Download backup file',
     value: 'file',
   },
   {
     id: 'backup_s3',
-    icon: <BadgeIcon icon={Upload} />,
+    icon: <BadgeIcon icon={UploadCloud} />,
     featherIcon: true,
     label: 'Store in S3',
     description: 'Define a cron schedule',
