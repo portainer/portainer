@@ -5,12 +5,11 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EdgeUpdateSchedule } from '../types';
 
 import { queryKeys } from './query-keys';
+import { buildUrl } from './urls';
 
 async function getList() {
   try {
-    const { data } = await axios.get<EdgeUpdateSchedule[]>(
-      '/edge_update_schedules'
-    );
+    const { data } = await axios.get<EdgeUpdateSchedule[]>(buildUrl());
     return data;
   } catch (err) {
     throw parseAxiosError(

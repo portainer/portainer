@@ -4,6 +4,8 @@ import {
   FeatureFlag,
   useRedirectFeatureFlag,
 } from '@/portainer/feature-flags/useRedirectFeatureFlag';
+import { notifySuccess } from '@/portainer/services/notifications';
+import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
 import { Datatable } from '@@/datatables';
 import { PageHeader } from '@@/PageHeader';
@@ -11,6 +13,8 @@ import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 
 import { useGetList } from '../queries/list';
+import { EdgeUpdateSchedule } from '../types';
+import { useRemoveMutation } from '../queries/useRemoveMutation';
 
 import { columns } from './columns';
 import { createStore } from './datatable-store';
@@ -20,7 +24,6 @@ const useStore = createStore(storageKey);
 
 export function ListView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
-
   const listQuery = useGetList();
   const store = useStore();
 
@@ -48,16 +51,28 @@ export function ListView() {
         emptyContentLabel="No schedules found"
         isLoading={listQuery.isLoading}
         totalCount={listQuery.data.length}
-        renderTableActions={() => <TableActions />}
+        renderTableActions={(selectedRows) => (
+          <TableActions selectedRows={selectedRows} />
+        )}
       />
     </>
   );
 }
 
-function TableActions() {
+function TableActions({
+  selectedRows,
+}: {
+  selectedRows: EdgeUpdateSchedule[];
+}) {
+  const removeMutation = useRemoveMutation();
   return (
     <>
-      <Button icon={Trash2} color="dangerlight" onClick={() => {}}>
+      <Button
+        icon={Trash2}
+        color="dangerlight"
+        onClick={() => handleRemove()}
+        disabled={selectedRows.length === 0}
+      >
         Remove
       </Button>
 
@@ -66,4 +81,19 @@ function TableActions() {
       </Link>
     </>
   );
+
+  async function handleRemove() {
+    const confirmed = await confirmDeletionAsync(
+      'Are you sure you want to remove these?'
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    removeMutation.mutate(selectedRows, {
+      onSuccess: () => {
+        notifySuccess('Success', 'Schedules successfully removed');
+      },
+    });
+  }
 }

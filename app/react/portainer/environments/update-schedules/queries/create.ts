@@ -7,13 +7,11 @@ import { EdgeUpdateSchedule } from '../types';
 import { FormValues } from '../CreateView/types';
 
 import { queryKeys } from './query-keys';
+import { buildUrl } from './urls';
 
 async function create(schedule: FormValues) {
   try {
-    const { data } = await axios.post<EdgeUpdateSchedule>(
-      '/edge_update_schedules',
-      schedule
-    );
+    const { data } = await axios.post<EdgeUpdateSchedule>(buildUrl(), schedule);
 
     return data;
   } catch (err) {
