@@ -1,5 +1,10 @@
 import { Clock, Trash2 } from 'react-feather';
 
+import {
+  FeatureFlag,
+  useRedirectFeatureFlag,
+} from '@/portainer/feature-flags/useRedirectFeatureFlag';
+
 import { Datatable } from '@@/datatables';
 import { PageHeader } from '@@/PageHeader';
 import { Button } from '@@/buttons';
@@ -14,6 +19,8 @@ const storageKey = 'update-schedules-list';
 const useStore = createStore(storageKey);
 
 export function ListView() {
+  useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
+
   const listQuery = useGetList();
   const store = useStore();
 

@@ -3,6 +3,10 @@ import { Field, Formik, Form as FormikForm, useFormikContext } from 'formik';
 import { useRouter } from '@uirouter/react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
+import {
+  useRedirectFeatureFlag,
+  FeatureFlag,
+} from '@/portainer/feature-flags/useRedirectFeatureFlag';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -27,6 +31,8 @@ const initialValues: FormValues = {
 };
 
 export function CreateView() {
+  useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
+
   const createMutation = useCreateMutation();
   const router = useRouter();
   return (
