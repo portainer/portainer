@@ -9,22 +9,27 @@ import { FormValues } from '../common/types';
 import { queryKeys } from './query-keys';
 import { buildUrl } from './urls';
 
-async function create(schedule: FormValues) {
+interface Update {
+  id: EdgeUpdateSchedule['id'];
+  values: FormValues;
+}
+
+async function update({ id, values }: Update) {
   try {
-    const { data } = await axios.post<EdgeUpdateSchedule>(buildUrl(), schedule);
+    const { data } = await axios.put<EdgeUpdateSchedule>(buildUrl(id), values);
 
     return data;
   } catch (err) {
     throw parseAxiosError(
       err as Error,
-      'Failed to create edge update schedule'
+      'Failed to update edge update schedule'
     );
   }
 }
 
-export function useCreateMutation() {
+export function useUpdateMutation() {
   const queryClient = useQueryClient();
-  return useMutation(create, {
+  return useMutation(update, {
     ...withInvalidate(queryClient, [queryKeys.list()]),
     ...withError(),
   });

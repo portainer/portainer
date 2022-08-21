@@ -79,6 +79,7 @@ func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperro
 
 	item.GroupIDs = payload.GroupIDs
 	item.Time = payload.Time
+	item.Type = payload.Type
 	item.Version = payload.Version
 
 	err = handler.dataStore.EdgeUpdateSchedule().Update(item.ID, item)

@@ -1,6 +1,5 @@
-import { useFormikContext, Field, Form as FormikForm } from 'formik';
+import { useFormikContext, Field } from 'formik';
 
-import { LoadingButton } from '@@/buttons';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 import { NavTabs } from '@@/NavTabs';
@@ -10,12 +9,11 @@ import { ScheduleType } from '../types';
 import { EdgeGroupsField } from './EdgeGroupsField';
 import { FormValues } from './types';
 
-export function Form({ isLoading }: { isLoading: boolean }) {
-  const { setFieldValue, errors, values, isValid } =
-    useFormikContext<FormValues>();
+export function FormFields() {
+  const { setFieldValue, errors, values } = useFormikContext<FormValues>();
 
   return (
-    <FormikForm className="form-horizontal">
+    <>
       <FormControl
         label="Name"
         required
@@ -47,19 +45,7 @@ export function Form({ isLoading }: { isLoading: boolean }) {
           />
         </div>
       </div>
-
-      <div className="form-group">
-        <div className="col-sm-12">
-          <LoadingButton
-            disabled={!isValid}
-            isLoading={isLoading}
-            loadingText="Creating..."
-          >
-            Create Schedule
-          </LoadingButton>
-        </div>
-      </div>
-    </FormikForm>
+    </>
   );
 }
 
