@@ -68,6 +68,11 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
               label="Tags"
               data-cy="portainerSidebar-environmentTags"
             />
+            <SidebarItem
+              to="portainer.endpoints.updateSchedules"
+              label="Update & Rollback"
+              data-cy="portainerSidebar-updateSchedules"
+            />
           </SidebarItem>
 
           <SidebarItem
