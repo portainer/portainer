@@ -277,7 +277,7 @@ type (
 		// Type of the schedule
 		Time int64 `json:"time" example:"1564897200"`
 		// EdgeGroups to be updated
-		Groups []EdgeGroupID `json:"groups" example:"1"`
+		GroupIDs []EdgeGroupID `json:"groupIds" example:"1"`
 		// Type of the update (1 - update, 2 - rollback)
 		Type EdgeUpdateScheduleType `json:"type" example:"1" enums:"1,2"`
 		// Status of the schedule, grouped by environment id

@@ -22,7 +22,7 @@ export type EdgeUpdateSchedule = {
   id: number;
   name: string;
   time: number;
-  groups: EdgeGroup['Id'][];
+  groupIds: EdgeGroup['Id'][];
   type: ScheduleType;
   status: { [key: EnvironmentId]: Status };
   created: number;

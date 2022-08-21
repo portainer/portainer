@@ -77,7 +77,7 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 	item := &portainer.EdgeUpdateSchedule{
 		Name:      payload.Name,
 		Time:      payload.Time,
-		Groups:    payload.GroupIDs,
+		GroupIDs:  payload.GroupIDs,
 		Status:    map[portainer.EndpointID]portainer.EdgeUpdateScheduleStatus{},
 		Created:   time.Now().Unix(),
 		CreatedBy: tokenData.ID,
