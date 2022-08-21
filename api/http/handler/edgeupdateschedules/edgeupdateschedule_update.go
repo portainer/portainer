@@ -10,10 +10,9 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/security"
 )
 
-type createPayload struct {
+type updatePayload struct {
 	Name     string
 	GroupIDs []portainer.EdgeGroupID
 	Type     portainer.EdgeUpdateScheduleType
@@ -21,7 +20,7 @@ type createPayload struct {
 	Time     int64
 }
 
-func (payload *createPayload) Validate(r *http.Request) error {
+func (payload *updatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return errors.New("Invalid tag name")
 	}
@@ -45,49 +44,44 @@ func (payload *createPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @id EdgeUpdateScheduleCreate
-// @summary Creates a new Edge Update Schedule
+// @id EdgeUpdateScheduleUpdate
+// @summary Updates an Edge Update Schedule
 // @description **Access policy**: administrator
 // @tags edge_update_schedules
 // @security ApiKeyAuth
 // @security jwt
 // @accept json
-// @param body body createPayload true "Schedule details"
+// @param body body updatePayload true "Schedule details"
 // @produce json
-// @success 200 {object} portainer.EdgeUpdateSchedule
+// @success 204
 // @failure 500
 // @router /edge_update_schedules [post]
-func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	item, err := FetchItem[portainer.EdgeUpdateSchedule](r)
+	if err != nil {
+		return httperror.InternalServerError(err.Error(), err)
+	}
 
-	var payload createPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	var payload updatePayload
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	err = handler.validateUniqueName(payload.Name, 0)
-	if err != nil {
-		return httperror.NewError(http.StatusConflict, "Edge update schedule name already in use", err)
+	if payload.Name != item.Name {
+		err = handler.validateUniqueName(payload.Name, item.ID)
+		if err != nil {
+			return httperror.NewError(http.StatusConflict, "Edge update schedule name already in use", err)
+		}
 
+		item.Name = payload.Name
 	}
 
-	tokenData, err := security.RetrieveTokenData(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve user information from token", err)
-	}
+	item.GroupIDs = payload.GroupIDs
+	item.Time = payload.Time
+	item.Version = payload.Version
 
-	item := &portainer.EdgeUpdateSchedule{
-		Name:      payload.Name,
-		Time:      payload.Time,
-		GroupIDs:  payload.GroupIDs,
-		Status:    map[portainer.EndpointID]portainer.EdgeUpdateScheduleStatus{},
-		Created:   time.Now().Unix(),
-		CreatedBy: tokenData.ID,
-		Type:      payload.Type,
-		Version:   payload.Version,
-	}
-
-	err = handler.dataStore.EdgeUpdateSchedule().Create(item)
+	err = handler.dataStore.EdgeUpdateSchedule().Update(item.ID, item)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist the edge update schedule", err)
 	}

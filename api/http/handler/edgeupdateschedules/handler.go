@@ -43,6 +43,9 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 		httperror.LoggerHandler(h.inspect)).Methods(http.MethodGet)
 
 	itemRouter.Handle("",
+		httperror.LoggerHandler(h.update)).Methods(http.MethodPut)
+
+	itemRouter.Handle("",
 		httperror.LoggerHandler(h.delete)).Methods(http.MethodDelete)
 
 	return h
