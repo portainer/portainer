@@ -5,6 +5,8 @@ import {
 import { notifySuccess } from 'Portainer/services/notifications';
 import { FeatureId } from 'Portainer/feature-flags/enums';
 
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+
 import { Tooltip } from '@@/Tip/Tooltip';
 import { Button } from '@@/buttons';
 import { Icon } from '@@/Icon';
@@ -21,6 +23,8 @@ export function DefaultRegistryAction() {
   }
   const hideDefaultRegistry = settingsQuery.data;
 
+  const isLimited = isLimitedToBE(FeatureId.HIDE_DOCKER_HUB_ANONYMOUS);
+
   return (
     <>
       {!hideDefaultRegistry ? (
@@ -28,13 +32,13 @@ export function DefaultRegistryAction() {
           <Button
             className="btn btn-xs btn-light vertical-center"
             onClick={() => handleShowOrHide(true)}
-            disabled
+            disabled={isLimited}
           >
             <Icon icon="eye-off" feather />
             Hide for all users
           </Button>
           <BEFeatureIndicator featureId={FeatureId.HIDE_DOCKER_HUB_ANONYMOUS} />
-          {hideDefaultRegistry === undefined ? null : (
+          {isLimited ? null : (
             <Tooltip
               message="This hides the option in any registry dropdown prompts but does not prevent a user from deploying anonymously from Docker Hub directly via YAML.
             Note: Docker Hub (anonymous) will continue to show as the ONLY option if there are NO other registries available to the user."
