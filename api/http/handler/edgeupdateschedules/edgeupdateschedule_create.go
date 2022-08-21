@@ -14,11 +14,11 @@ import (
 )
 
 type createPayload struct {
-	Name    string
-	Groups  []portainer.EdgeGroupID
-	Type    portainer.EdgeUpdateScheduleType
-	Version string
-	Time    int64
+	Name     string
+	GroupIDs []portainer.EdgeGroupID
+	Type     portainer.EdgeUpdateScheduleType
+	Version  string
+	Time     int64
 }
 
 func (payload *createPayload) Validate(r *http.Request) error {
@@ -26,7 +26,7 @@ func (payload *createPayload) Validate(r *http.Request) error {
 		return errors.New("Invalid tag name")
 	}
 
-	if len(payload.Groups) == 0 {
+	if len(payload.GroupIDs) == 0 {
 		return errors.New("Required to choose at least one group")
 	}
 
@@ -77,7 +77,7 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 	item := &portainer.EdgeUpdateSchedule{
 		Name:      payload.Name,
 		Time:      payload.Time,
-		Groups:    payload.Groups,
+		Groups:    payload.GroupIDs,
 		Status:    map[portainer.EndpointID]portainer.EdgeUpdateScheduleStatus{},
 		Created:   time.Now().Unix(),
 		CreatedBy: tokenData.ID,
