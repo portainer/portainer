@@ -1,0 +1,17 @@
+import { array, number, object, SchemaOf, string } from 'yup';
+
+import { ScheduleType } from '../types';
+
+import { FormValues } from './types';
+
+export function validation(): SchemaOf<FormValues> {
+  return object({
+    groupIds: array().min(1, 'At least one group is required'),
+    name: string().required('This field is required'),
+    type: number()
+      .oneOf([ScheduleType.Rollback, ScheduleType.Upgrade])
+      .default(ScheduleType.Upgrade),
+    time: number().default(0),
+    version: string().default(''),
+  });
+}

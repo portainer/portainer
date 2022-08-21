@@ -2,7 +2,7 @@ import { EnvironmentId } from '@/portainer/environments/types';
 import { UserId } from '@/portainer/users/types';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 
-export enum Type {
+export enum ScheduleType {
   Upgrade = 1,
   Rollback,
 }
@@ -23,7 +23,7 @@ export type EdgeUpdateSchedule = {
   name: string;
   time: number;
   groups: EdgeGroup['Id'][];
-  type: Type;
+  type: ScheduleType;
   status: { [key: EnvironmentId]: Status };
   created: number;
   createdBy: UserId;

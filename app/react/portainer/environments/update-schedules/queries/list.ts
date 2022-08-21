@@ -4,6 +4,8 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { EdgeUpdateSchedule } from '../types';
 
+import { queryKeys } from './query-keys';
+
 async function getList() {
   try {
     const { data } = await axios.get<EdgeUpdateSchedule[]>(
@@ -19,5 +21,5 @@ async function getList() {
 }
 
 export function useGetList() {
-  return useQuery(['edge', 'update_schedules'], getList);
+  return useQuery(queryKeys.list(), getList);
 }
