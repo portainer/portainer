@@ -91,6 +91,12 @@ func (store *Store) initServices() error {
 	}
 	store.DockerHubService = dockerhubService
 
+	edgeUpdateScheduleService, err := edgeupdateschedule.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.EdgeUpdateScheduleService = edgeUpdateScheduleService
+
 	edgeStackService, err := edgestack.NewService(store.connection)
 	if err != nil {
 		return err

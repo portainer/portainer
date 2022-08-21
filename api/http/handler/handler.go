@@ -169,6 +169,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/custom_templates"):
 		http.StripPrefix("/api", h.CustomTemplatesHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/edge_update_schedules"):
+		http.StripPrefix("/api", h.EdgeUpdateScheduleHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_stacks"):
 		http.StripPrefix("/api", h.EdgeStacksHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_groups"):
