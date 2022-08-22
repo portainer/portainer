@@ -6,6 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/middlewares"
 )
 
 // @id EdgeUpdateScheduleDelete
@@ -18,7 +19,7 @@ import (
 // @failure 500
 // @router /edge_update_schedules/{id} [delete]
 func (handler *Handler) delete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	item, err := FetchItem[portainer.EdgeUpdateSchedule](r)
+	item, err := middlewares.FetchItem[portainer.EdgeUpdateSchedule](r, contextKey)
 	if err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}

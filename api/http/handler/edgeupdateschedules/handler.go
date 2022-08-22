@@ -12,6 +12,8 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
+const contextKey = "edgeUpdateSchedule_item"
+
 // Handler is the HTTP handler used to handle edge environment(endpoint) operations.
 type Handler struct {
 	*mux.Router
@@ -38,7 +40,10 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 		httperror.LoggerHandler(h.create)).Methods(http.MethodPost)
 
 	itemRouter := router.PathPrefix("/{id}").Subrouter()
-	itemRouter.Use(withItem[portainer.EdgeUpdateScheduleID, portainer.EdgeUpdateSchedule](dataStore.EdgeUpdateSchedule(), "id", contextKey))
+	itemRouter.Use(middlewares.WithItem(func(id portainer.EdgeUpdateScheduleID) (*portainer.EdgeUpdateSchedule, error) {
+		return dataStore.EdgeUpdateSchedule().Item(id)
+	}, "id", contextKey))
+
 	itemRouter.Handle("",
 		httperror.LoggerHandler(h.inspect)).Methods(http.MethodGet)
 

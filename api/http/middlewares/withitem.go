@@ -1,4 +1,4 @@
-package edgeupdateschedules
+package middlewares
 
 import (
 	"context"
@@ -11,22 +11,22 @@ import (
 	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
-const contextKey = "edgeUpdateSchedule"
+type ItemGetter[TId ~int, TObject any] func(id TId) (*TObject, error)
 
-type ItemGetter[TId ~int, TObject any] interface {
-	Item(id TId) (*TObject, error)
-}
+func WithItem[TId ~int, TObject any](getter ItemGetter[TId, TObject], idParam string, contextKey string) mux.MiddlewareFunc {
+	if idParam == "" {
+		idParam = "id"
+	}
 
-func withItem[TId ~int, TObject any, TService ItemGetter[TId, TObject]](dataService TService, idParam string, contextKey string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-			itemId, err := request.RetrieveNumericRouteVariableValue(req, "id")
+			itemId, err := request.RetrieveNumericRouteVariableValue(req, idParam)
 			if err != nil {
 				httperror.WriteError(rw, http.StatusBadRequest, "Invalid  identifier route variable", err)
 				return
 			}
 
-			item, err := dataService.Item(TId(itemId))
+			item, err := getter(TId(itemId))
 			if err != nil {
 				statusCode := http.StatusInternalServerError
 				if err == bolterrors.ErrObjectNotFound {
@@ -42,11 +42,16 @@ func withItem[TId ~int, TObject any, TService ItemGetter[TId, TObject]](dataServ
 	}
 }
 
-func FetchItem[T any](request *http.Request) (*T, error) {
+func FetchItem[T any](request *http.Request, contextKey string) (*T, error) {
 	contextData := request.Context().Value(contextKey)
 	if contextData == nil {
 		return nil, errors.New("Unable to find environment data in request context")
 	}
 
-	return contextData.(*T), nil
+	item, ok := contextData.(*T)
+	if !ok {
+		return nil, errors.New("Unable to cast context item")
+	}
+
+	return item, nil
 }
