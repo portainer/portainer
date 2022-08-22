@@ -24,7 +24,7 @@ const initialValues: FormValues = {
   groupIds: [],
   type: ScheduleType.Upgrade,
   version: 'latest',
-  time: Date.now() + 60 * 60 * 1000,
+  time: Math.floor(Date.now() / 1000) + 60 * 60,
 };
 
 export function CreateView() {

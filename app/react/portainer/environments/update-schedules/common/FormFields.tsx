@@ -7,6 +7,7 @@ import { ScheduleType } from '../types';
 import { EdgeGroupsField } from './EdgeGroupsField';
 import { FormValues } from './types';
 import { NameField } from './NameField';
+import { ScheduledTimeField } from './ScheduledTimeField';
 
 export function FormFields() {
   const { setFieldValue, values } = useFormikContext<FormValues>();
@@ -42,9 +43,17 @@ export function FormFields() {
 }
 
 function UpgradeForm() {
-  return <div />;
+  return (
+    <div>
+      <ScheduledTimeField />
+    </div>
+  );
 }
 
 function RollbackForm() {
-  return <div />;
+  return (
+    <div>
+      <ScheduledTimeField />
+    </div>
+  );
 }

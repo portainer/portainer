@@ -18,7 +18,9 @@ export function validation(
     type: number()
       .oneOf([ScheduleType.Rollback, ScheduleType.Upgrade])
       .default(ScheduleType.Upgrade),
-    time: number().default(0),
-    version: string().default(''),
+    time: number()
+      .min(Date.now() / 1000)
+      .required(),
+    version: string().required(),
   });
 }
