@@ -16,7 +16,7 @@ import { ScheduleType } from '../types';
 import { useCreateMutation } from '../queries/create';
 import { FormValues } from '../common/types';
 import { validation } from '../common/validation';
-import { FormFields } from '../common/FormFields';
+import { UpdateTypeTabs } from '../common/UpdateTypeTabs';
 import { useGetList } from '../queries/list';
 
 const initialValues: FormValues = {
@@ -70,7 +70,7 @@ export function CreateView() {
               >
                 {({ isValid }) => (
                   <FormikForm className="form-horizontal">
-                    <FormFields />
+                    <UpdateTypeTabs />
                     <div className="form-group">
                       <div className="col-sm-12">
                         <LoadingButton

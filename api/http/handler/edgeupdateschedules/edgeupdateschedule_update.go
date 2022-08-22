@@ -37,10 +37,6 @@ func (payload *updatePayload) Validate(r *http.Request) error {
 		return errors.New("Invalid version")
 	}
 
-	if payload.Time < time.Now().Unix() {
-		return errors.New("Invalid time")
-	}
-
 	return nil
 }
 
@@ -77,10 +73,13 @@ func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperro
 		item.Name = payload.Name
 	}
 
-	item.GroupIDs = payload.GroupIDs
-	item.Time = payload.Time
-	item.Type = payload.Type
-	item.Version = payload.Version
+	// if scheduled time didn't passed, then can update the schedule
+	if item.Time > time.Now().Unix() {
+		item.GroupIDs = payload.GroupIDs
+		item.Time = payload.Time
+		item.Type = payload.Type
+		item.Version = payload.Version
+	}
 
 	err = handler.dataStore.EdgeUpdateSchedule().Update(item.ID, item)
 	if err != nil {

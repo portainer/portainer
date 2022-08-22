@@ -1,6 +1,8 @@
 import { Settings } from 'react-feather';
 import { Formik, Form as FormikForm } from 'formik';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { useMemo } from 'react';
+import { object, SchemaOf } from 'yup';
 
 import { notifySuccess } from '@/portainer/services/notifications';
 import {
@@ -12,11 +14,15 @@ import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
 
-import { FormFields } from '../common/FormFields';
+import { UpdateTypeTabs } from '../common/UpdateTypeTabs';
 import { useItem } from '../queries/useItem';
 import { validation } from '../common/validation';
 import { useUpdateMutation } from '../queries/useUpdateMutation';
 import { useGetList } from '../queries/list';
+import { NameField, nameValidation } from '../common/NameField';
+import { EdgeGroupsField } from '../common/EdgeGroupsField';
+import { EdgeUpdateSchedule } from '../types';
+import { FormValues } from '../common/types';
 
 export function ItemView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
@@ -36,13 +42,17 @@ export function ItemView() {
   const itemQuery = useItem(id);
   const schedulesQuery = useGetList();
 
+  const isDisabled = useMemo(
+    () => (itemQuery.data ? itemQuery.data.time < Date.now() / 1000 : false),
+    [itemQuery.data]
+  );
+
   if (!itemQuery.data || !schedulesQuery.data) {
     return null;
   }
 
   const item = itemQuery.data;
   const schedules = schedulesQuery.data;
-
   return (
     <>
       <PageHeader
@@ -75,11 +85,16 @@ export function ItemView() {
                   );
                 }}
                 validateOnMount
-                validationSchema={() => validation(schedules, id)}
+                validationSchema={() => updateValidation(item, schedules)}
               >
                 {({ isValid }) => (
                   <FormikForm className="form-horizontal">
-                    <FormFields />
+                    <NameField />
+
+                    <EdgeGroupsField disabled={isDisabled} />
+
+                    <UpdateTypeTabs disabled={isDisabled} />
+
                     <div className="form-group">
                       <div className="col-sm-12">
                         <LoadingButton
@@ -100,4 +115,13 @@ export function ItemView() {
       </div>
     </>
   );
+}
+
+function updateValidation(
+  item: EdgeUpdateSchedule,
+  schedules: EdgeUpdateSchedule[]
+): SchemaOf<{ name: string } | FormValues> {
+  return item.time > Date.now() / 1000
+    ? validation(schedules, item.id)
+    : object({ name: nameValidation(schedules, item.id) });
 }

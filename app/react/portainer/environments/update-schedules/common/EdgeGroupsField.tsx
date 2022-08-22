@@ -7,7 +7,11 @@ import { Select } from '@@/form-components/ReactSelect';
 
 import { FormValues } from './types';
 
-export function EdgeGroupsField() {
+interface Props {
+  disabled?: boolean;
+}
+
+export function EdgeGroupsField({ disabled }: Props) {
   const groupsQuery = useEdgeGroups();
 
   const [{ name, onBlur, value }, { error }, { setValue }] =
@@ -31,6 +35,7 @@ export function EdgeGroupsField() {
         getOptionLabel={(group) => group.Name}
         getOptionValue={(group) => group.Id.toString()}
         closeMenuOnSelect={false}
+        isDisabled={disabled}
       />
     </FormControl>
   );

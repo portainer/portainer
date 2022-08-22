@@ -6,7 +6,11 @@ import { FormControl } from '@@/form-components/FormControl';
 
 import { FormValues } from './types';
 
-export function ScheduledTimeField() {
+interface Props {
+  disabled?: boolean;
+}
+
+export function ScheduledTimeField({ disabled }: Props) {
   const [{ name, value }, { error }, { setValue }] =
     useField<FormValues['time']>('time');
 
@@ -21,6 +25,8 @@ export function ScheduledTimeField() {
         value={new Date(value * 1000)}
         calendarIcon={<Calendar className="feather" />}
         clearIcon={<X className="feather" />}
+        disabled={disabled}
+        disableClock
       />
     </FormControl>
   );
