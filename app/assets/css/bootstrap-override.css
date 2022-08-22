@@ -110,6 +110,8 @@
 
 input:checked + .slider {
   background-color: var(--ui-blue-8);
+  @apply th-dark:bg-blue-9;
+  @apply th-highcontrast:bg-blue-9;
 }
 
 input:focus + .slider {
