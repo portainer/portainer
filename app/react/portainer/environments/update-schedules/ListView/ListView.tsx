@@ -34,15 +34,15 @@ export function ListView() {
   return (
     <>
       <PageHeader
-        title="Upgrade & Rollback"
+        title="Update & Rollback"
         reload
-        breadcrumbs="Upgrade and rollback"
+        breadcrumbs="Update and rollback"
       />
 
       <Datatable
         columns={columns}
         titleOptions={{
-          title: 'Upgrade & rollback',
+          title: 'Update & rollback',
           icon: Clock,
         }}
         dataset={listQuery.data}
@@ -77,7 +77,7 @@ function TableActions({
       </Button>
 
       <Link to=".create">
-        <Button>Add upgrade & rollback schedule</Button>
+        <Button>Add update & rollback schedule</Button>
       </Link>
     </>
   );

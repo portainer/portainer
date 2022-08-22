@@ -56,17 +56,14 @@ export function ItemView() {
   return (
     <>
       <PageHeader
-        title="Upgrade & Rollback"
-        breadcrumbs={['Edge agent upgrade and rollback', item.name]}
+        title="Update & Rollback"
+        breadcrumbs={['Edge agent update and rollback', item.name]}
       />
 
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <Widget.Title
-              title="Upgrade & Rollback Scheduler"
-              icon={Settings}
-            />
+            <Widget.Title title="Update & Rollback Scheduler" icon={Settings} />
             <Widget.Body>
               <Formik
                 initialValues={item}

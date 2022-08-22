@@ -21,8 +21,8 @@ export function UpdateTypeTabs({ disabled }: Props) {
         <NavTabs
           options={[
             {
-              id: ScheduleType.Upgrade,
-              label: 'Upgrade',
+              id: ScheduleType.Update,
+              label: 'Update',
               children: <ScheduleDetails disabled={disabled} />,
             },
             {
@@ -50,6 +50,6 @@ function ScheduleDetails({ disabled }: Props) {
 
 export function typeValidation() {
   return number()
-    .oneOf([ScheduleType.Rollback, ScheduleType.Upgrade])
-    .default(ScheduleType.Upgrade);
+    .oneOf([ScheduleType.Rollback, ScheduleType.Update])
+    .default(ScheduleType.Update);
 }

@@ -22,7 +22,7 @@ import { useList } from '../queries/list';
 const initialValues: FormValues = {
   name: '',
   groupIds: [],
-  type: ScheduleType.Upgrade,
+  type: ScheduleType.Update,
   version: 'latest',
   time: Math.floor(Date.now() / 1000) + 60 * 60,
 };
@@ -43,17 +43,14 @@ export function CreateView() {
   return (
     <>
       <PageHeader
-        title="Upgrade & Rollback"
-        breadcrumbs="Edge agent upgrade and rollback"
+        title="Update & Rollback"
+        breadcrumbs="Edge agent update and rollback"
       />
 
       <div className="row">
         <div className="col-sm-12">
           <Widget>
-            <Widget.Title
-              title="Upgrade & Rollback Scheduler"
-              icon={Settings}
-            />
+            <Widget.Title title="Update & Rollback Scheduler" icon={Settings} />
             <Widget.Body>
               <Formik
                 initialValues={initialValues}

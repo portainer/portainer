@@ -1551,8 +1551,8 @@ const (
 
 const (
 	_ EdgeUpdateScheduleType = iota
-	// EdgeUpdateScheduleUpgrade represents an edge device scheduled for an upgrade
-	EdgeUpdateScheduleUpgrade
+	// EdgeUpdateScheduleUpdate represents an edge device scheduled for an update
+	EdgeUpdateScheduleUpdate
 	// EdgeUpdateScheduleRollback represents an edge device scheduled for a rollback
 	EdgeUpdateScheduleRollback
 )

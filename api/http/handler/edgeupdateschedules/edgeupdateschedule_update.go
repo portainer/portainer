@@ -29,7 +29,7 @@ func (payload *updatePayload) Validate(r *http.Request) error {
 		return errors.New("Required to choose at least one group")
 	}
 
-	if payload.Type != portainer.EdgeUpdateScheduleRollback && payload.Type != portainer.EdgeUpdateScheduleUpgrade {
+	if payload.Type != portainer.EdgeUpdateScheduleRollback && payload.Type != portainer.EdgeUpdateScheduleUpdate {
 		return errors.New("Invalid schedule type")
 	}
 

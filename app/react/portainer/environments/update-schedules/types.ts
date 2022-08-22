@@ -3,7 +3,7 @@ import { UserId } from '@/portainer/users/types';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 
 export enum ScheduleType {
-  Upgrade = 1,
+  Update = 1,
   Rollback,
 }
 
