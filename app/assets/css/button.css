@@ -101,6 +101,12 @@ fieldset[disabled] .btn {
   background-color: var(--ui-gray-3);
 }
 
+.btn-link {
+  @apply text-blue-8 hover:text-blue-9 disabled:text-gray-5;
+  @apply th-dark:text-blue-8 th-dark:hover:text-blue-7;
+  @apply th-highcontrast:text-blue-8 th-highcontrast:hover:text-blue-7;
+}
+
 .hyperlink,
 .hyperlink:focus {
   color: var(--ui-blue-8);
