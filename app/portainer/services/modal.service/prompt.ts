@@ -167,6 +167,8 @@ export function confirmStackUpdate(
   confirmButtonClassName: string | undefined,
   callback: PromptCallback
 ) {
+  const sanitizedMessage =
+    typeof message === 'string' ? sanitize(message) : message;
   const box = prompt({
     title: buildTitle('Are you sure?'),
     inputType: 'checkbox',
@@ -184,7 +186,7 @@ export function confirmStackUpdate(
     },
     callback,
   });
-  box.find('.bootbox-body').prepend(message);
+  box.find('.bootbox-body').prepend(sanitizedMessage);
   const checkbox = box.find('.bootbox-input-checkbox');
   checkbox.prop('checked', defaultToggle);
   checkbox.prop('disabled', defaultDisabled);
