@@ -498,7 +498,6 @@ angular.module('portainer.app').controller('StackController', [
       $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
 
       $scope.stackType = $transition$.params().type;
-      $scope.editorReadOnly = !Authentication.hasAuthorizations(['PortainerStackUpdate']);
     }
 
     initView();
