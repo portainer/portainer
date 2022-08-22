@@ -1,12 +1,16 @@
+import { ArrowDownCircle } from 'react-feather';
+
 import { FeatureId } from '@/portainer/feature-flags/enums';
 import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import Ldap from '@/assets/ico/ldap.svg?c';
-import Oauth from '@/assets/ico/oauth.svg?c';
+import OAuth from '@/assets/ico/oauth.svg?c';
+
+import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 
 export const options = [
   {
     id: 'auth_internal',
-    icon: 'svg-internal',
+    icon: <BadgeIcon icon={ArrowDownCircle} />,
     label: 'Internal',
     description: 'Internal authentication mechanism',
     value: 1,
@@ -28,7 +32,7 @@ export const options = [
   },
   {
     id: 'auth_oauth',
-    icon: Oauth,
+    icon: OAuth,
     label: 'OAuth',
     description: 'OAuth authentication',
     value: 3,

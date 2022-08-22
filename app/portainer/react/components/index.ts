@@ -15,6 +15,7 @@ import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
 import { DashboardItem } from '@@/DashboardItem';
 import { SearchBar } from '@@/datatables/SearchBar';
 import { FallbackImage } from '@@/FallbackImage';
+import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -83,4 +84,8 @@ export const componentsModule = angular
   .component(
     'datatableSearchbar',
     r2a(SearchBar, ['data-cy', 'onChange', 'value', 'placeholder'])
+  )
+  .component(
+    'boxSelectorBadgeIcon',
+    react2angular(BadgeIcon, ['featherIcon', 'icon'])
   ).name;

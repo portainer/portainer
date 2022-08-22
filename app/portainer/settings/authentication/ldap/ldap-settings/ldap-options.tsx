@@ -1,6 +1,9 @@
+import { Edit } from 'react-feather';
+
 import { FeatureId } from '@/portainer/feature-flags/enums';
 import Openldap from '@/assets/ico/vendor/openldap.svg?c';
-import Custom from '@/assets/ico/custom.svg?c';
+
+import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 
 const SERVER_TYPES = {
   CUSTOM: 0,
@@ -11,7 +14,7 @@ const SERVER_TYPES = {
 export const options = [
   {
     id: 'ldap_custom',
-    icon: Custom,
+    icon: <BadgeIcon icon={Edit} />,
     label: 'Custom',
     value: SERVER_TYPES.CUSTOM,
   },

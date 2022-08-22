@@ -709,83 +709,85 @@
                     </div>
 
                     <!-- access policy options -->
-                    <div class="form-group" style="margin-bottom: 0">
-                      <div class="boxselector_wrapper !px-[15px]">
-                        <div
-                          ng-if="
-                            (!ctrl.state.isEdit && !ctrl.state.persistedFoldersUseExistingVolumes) ||
-                            (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED)
-                          "
-                        >
-                          <input
-                            type="radio"
-                            id="data_access_isolated"
-                            ng-value="ctrl.ApplicationDataAccessPolicies.ISOLATED"
-                            ng-model="ctrl.formValues.DataAccessPolicy"
-                            ng-change="ctrl.resetDeploymentType()"
-                          />
-                          <label for="data_access_isolated">
-                            <div class="boxselector_header">
-                              <pr-icon icon="'svg-cubes'"></pr-icon>
-                              Isolated
-                            </div>
-                            <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
-                          </label>
-                        </div>
-                        <div
-                          style="color: #767676"
-                          ng-if="
-                            (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED) || ctrl.state.persistedFoldersUseExistingVolumes
-                          "
-                        >
-                          <input type="radio" id="data_access_isolated" disabled />
-                          <label
-                            for="data_access_isolated"
-                            tooltip-append-to-body="true"
-                            tooltip-placement="bottom"
-                            tooltip-class="portainer-tooltip"
-                            uib-tooltip="Changing the data access policy is not allowed"
-                            style="cursor: pointer; border-color: #767676"
+                    <div class="form-group">
+                      <div class="col-sm-12">
+                        <div class="boxselector_wrapper">
+                          <div
+                            ng-if="
+                              (!ctrl.state.isEdit && !ctrl.state.persistedFoldersUseExistingVolumes) ||
+                              (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED)
+                            "
                           >
-                            <div class="boxselector_header">
-                              <pr-icon icon="'svg-cubes'"></pr-icon>
-                              Isolated
-                            </div>
-                            <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
-                          </label>
-                        </div>
-                        <div ng-if="!ctrl.state.isEdit || (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED)">
-                          <input
-                            type="radio"
-                            id="data_access_shared"
-                            ng-value="ctrl.ApplicationDataAccessPolicies.SHARED"
-                            ng-model="ctrl.formValues.DataAccessPolicy"
-                            ng-change="ctrl.resetDeploymentType()"
-                          />
-                          <label for="data_access_shared">
-                            <div class="boxselector_header">
-                              <pr-icon icon="'box'" feather="true"></pr-icon>
-                              Shared
-                            </div>
-                            <p>Application will be deployed as a Deployment with a shared storage access</p>
-                          </label>
-                        </div>
-                        <div style="color: #767676" ng-if="ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
-                          <input type="radio" id="data_access_shared" disabled />
-                          <label
-                            for="data_access_shared"
-                            tooltip-append-to-body="true"
-                            tooltip-placement="bottom"
-                            tooltip-class="portainer-tooltip"
-                            uib-tooltip="Changing the data access policy is not allowed"
-                            style="cursor: pointer; border-color: #767676"
+                            <input
+                              type="radio"
+                              id="data_access_isolated"
+                              ng-value="ctrl.ApplicationDataAccessPolicies.ISOLATED"
+                              ng-model="ctrl.formValues.DataAccessPolicy"
+                              ng-change="ctrl.resetDeploymentType()"
+                            />
+                            <label for="data_access_isolated">
+                              <div class="boxselector_header">
+                                <pr-icon icon="'svg-cubes'"></pr-icon>
+                                Isolated
+                              </div>
+                              <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
+                            </label>
+                          </div>
+                          <div
+                            style="color: #767676"
+                            ng-if="
+                              (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED) || ctrl.state.persistedFoldersUseExistingVolumes
+                            "
                           >
-                            <div class="boxselector_header">
-                              <pr-icon icon="'sliders'" feather="true"></pr-icon>
-                              Shared
-                            </div>
-                            <p>Application will be deployed as a Deployment with a shared storage access</p>
-                          </label>
+                            <input type="radio" id="data_access_isolated" disabled />
+                            <label
+                              for="data_access_isolated"
+                              tooltip-append-to-body="true"
+                              tooltip-placement="bottom"
+                              tooltip-class="portainer-tooltip"
+                              uib-tooltip="Changing the data access policy is not allowed"
+                              style="cursor: pointer; border-color: #767676"
+                            >
+                              <div class="boxselector_header">
+                                <pr-icon icon="'svg-cubes'"></pr-icon>
+                                Isolated
+                              </div>
+                              <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
+                            </label>
+                          </div>
+                          <div ng-if="!ctrl.state.isEdit || (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED)">
+                            <input
+                              type="radio"
+                              id="data_access_shared"
+                              ng-value="ctrl.ApplicationDataAccessPolicies.SHARED"
+                              ng-model="ctrl.formValues.DataAccessPolicy"
+                              ng-change="ctrl.resetDeploymentType()"
+                            />
+                            <label for="data_access_shared">
+                              <div class="boxselector_header">
+                                <pr-icon icon="'box'" feather="true"></pr-icon>
+                                Shared
+                              </div>
+                              <p>Application will be deployed as a Deployment with a shared storage access</p>
+                            </label>
+                          </div>
+                          <div style="color: #767676" ng-if="ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
+                            <input type="radio" id="data_access_shared" disabled />
+                            <label
+                              for="data_access_shared"
+                              tooltip-append-to-body="true"
+                              tooltip-placement="bottom"
+                              tooltip-class="portainer-tooltip"
+                              uib-tooltip="Changing the data access policy is not allowed"
+                              style="cursor: pointer; border-color: #767676"
+                            >
+                              <div class="boxselector_header">
+                                <pr-icon icon="'sliders'" feather="true"></pr-icon>
+                                Shared
+                              </div>
+                              <p>Application will be deployed as a Deployment with a shared storage access</p>
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -897,56 +899,58 @@
                   </div>
 
                   <!-- deployment options -->
-                  <div class="form-group" style="margin-bottom: 0">
-                    <div class="boxselector_wrapper !px-[15px]">
-                      <div>
-                        <input
-                          type="radio"
-                          id="deployment_replicated"
-                          ng-value="ctrl.ApplicationDeploymentTypes.REPLICATED"
-                          ng-model="ctrl.formValues.DeploymentType"
-                          data-cy="k8sAppCreate-replicatedDeploymentButton"
-                        />
-                        <label for="deployment_replicated">
-                          <div class="boxselector_header">
-                            <pr-icon icon="'sliders'" feather="true"></pr-icon>
-                            Replicated
-                          </div>
-                          <p>Run one or multiple instances of this container</p>
-                        </label>
-                      </div>
-                      <div ng-if="!ctrl.supportGlobalDeployment()">
-                        <input type="radio" id="deployment_global" disabled />
-                        <label
-                          for="deployment_global"
-                          tooltip-append-to-body="true"
-                          tooltip-placement="bottom"
-                          tooltip-class="portainer-tooltip"
-                          uib-tooltip="The storage or access policy used for persisted folders cannot be used with this option"
-                        >
-                          <div class="boxselector_header">
-                            <pr-icon icon="'svg-cubes'"></pr-icon>
-                            Global
-                          </div>
-                          <p>Application will be deployed as a DaemonSet with an instance on each node of the cluster</p>
-                        </label>
-                      </div>
-                      <div ng-if="ctrl.supportGlobalDeployment()">
-                        <input
-                          type="radio"
-                          id="deployment_global"
-                          ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL"
-                          ng-model="ctrl.formValues.DeploymentType"
-                          ng-click="ctrl.unselectAutoScaler()"
-                          data-cy="k8sAppCreate-globalDeployButton"
-                        />
-                        <label for="deployment_global">
-                          <div class="boxselector_header">
-                            <pr-icon icon="'svg-cubes'"></pr-icon>
-                            Global
-                          </div>
-                          <p>Application will be deployed as a DaemonSet with an instance on each node of the sdfh</p>
-                        </label>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <div class="boxselector_wrapper">
+                        <div>
+                          <input
+                            type="radio"
+                            id="deployment_replicated"
+                            ng-value="ctrl.ApplicationDeploymentTypes.REPLICATED"
+                            ng-model="ctrl.formValues.DeploymentType"
+                            data-cy="k8sAppCreate-replicatedDeploymentButton"
+                          />
+                          <label for="deployment_replicated">
+                            <div class="boxselector_header">
+                              <pr-icon icon="'sliders'" feather="true"></pr-icon>
+                              Replicated
+                            </div>
+                            <p>Run one or multiple instances of this container</p>
+                          </label>
+                        </div>
+                        <div ng-if="!ctrl.supportGlobalDeployment()">
+                          <input type="radio" id="deployment_global" disabled />
+                          <label
+                            for="deployment_global"
+                            tooltip-append-to-body="true"
+                            tooltip-placement="bottom"
+                            tooltip-class="portainer-tooltip"
+                            uib-tooltip="The storage or access policy used for persisted folders cannot be used with this option"
+                          >
+                            <div class="boxselector_header">
+                              <pr-icon icon="'svg-cubes'"></pr-icon>
+                              Global
+                            </div>
+                            <p>Application will be deployed as a DaemonSet with an instance on each node of the cluster</p>
+                          </label>
+                        </div>
+                        <div ng-if="ctrl.supportGlobalDeployment()">
+                          <input
+                            type="radio"
+                            id="deployment_global"
+                            ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL"
+                            ng-model="ctrl.formValues.DeploymentType"
+                            ng-click="ctrl.unselectAutoScaler()"
+                            data-cy="k8sAppCreate-globalDeployButton"
+                          />
+                          <label for="deployment_global">
+                            <div class="boxselector_header">
+                              <pr-icon icon="'svg-cubes'"></pr-icon>
+                              Global
+                            </div>
+                            <p>Application will be deployed as a DaemonSet with an instance on each node of the sdfh</p>
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1234,39 +1238,41 @@
                       </div>
 
                       <!-- placement policy options -->
-                      <div class="form-group" style="margin-bottom: 0" ng-if="ctrl.formValues.Placements.length">
-                        <div class="boxselector_wrapper !px-[15px]">
-                          <div>
-                            <input
-                              type="radio"
-                              id="placement_hard"
-                              ng-value="ctrl.ApplicationPlacementTypes.MANDATORY"
-                              ng-model="ctrl.formValues.PlacementType"
-                              data-cy="k8sAppCreate-mandatoryPlacementButton"
-                            />
-                            <label for="placement_hard">
-                              <div class="boxselector_header">
-                                <pr-icon icon="'sliders'" feather="true"></pr-icon>
-                                Mandatory
-                              </div>
-                              <p>Schedule this application <b>ONLY</b> on nodes that match <b>ALL</b> Rules</p>
-                            </label>
-                          </div>
-                          <div>
-                            <input
-                              type="radio"
-                              id="placement_soft"
-                              ng-value="ctrl.ApplicationPlacementTypes.PREFERRED"
-                              ng-model="ctrl.formValues.PlacementType"
-                              data-cy="k8sAppCreate-prefferedPlacementButton"
-                            />
-                            <label for="placement_soft">
-                              <div class="boxselector_header">
-                                <pr-icon icon="'align-justify'" feather="true"></pr-icon>
-                                Preferred
-                              </div>
-                              <p>Schedule this application on nodes that match the rules if possible</p>
-                            </label>
+                      <div class="form-group" ng-if="ctrl.formValues.Placements.length">
+                        <div class="col-sm-12">
+                          <div class="boxselector_wrapper">
+                            <div>
+                              <input
+                                type="radio"
+                                id="placement_hard"
+                                ng-value="ctrl.ApplicationPlacementTypes.MANDATORY"
+                                ng-model="ctrl.formValues.PlacementType"
+                                data-cy="k8sAppCreate-mandatoryPlacementButton"
+                              />
+                              <label for="placement_hard">
+                                <div class="boxselector_header">
+                                  <pr-icon icon="'sliders'" feather="true"></pr-icon>
+                                  Mandatory
+                                </div>
+                                <p>Schedule this application <b>ONLY</b> on nodes that match <b>ALL</b> Rules</p>
+                              </label>
+                            </div>
+                            <div>
+                              <input
+                                type="radio"
+                                id="placement_soft"
+                                ng-value="ctrl.ApplicationPlacementTypes.PREFERRED"
+                                ng-model="ctrl.formValues.PlacementType"
+                                data-cy="k8sAppCreate-prefferedPlacementButton"
+                              />
+                              <label for="placement_soft">
+                                <div class="boxselector_header">
+                                  <pr-icon icon="'align-justify'" feather="true"></pr-icon>
+                                  Preferred
+                                </div>
+                                <p>Schedule this application on nodes that match the rules if possible</p>
+                              </label>
+                            </div>
                           </div>
                         </div>
                       </div>

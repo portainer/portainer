@@ -15,51 +15,54 @@
   </div>
   <!-- !access-control-switch -->
   <!-- restricted-access -->
-  <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled" style="margin-bottom: 0">
-    <div class="boxselector_wrapper px-[15px]">
-      <div ng-if="$ctrl.isAdmin">
-        <input type="radio" id="access_administrators" ng-model="$ctrl.formData.Ownership" value="administrators" />
-        <label for="access_administrators" data-cy="portainer-selectAdminAccess">
-          <div class="boxselector_header">
-            <pr-icon icon="'eye-off'" feather="true"></pr-icon>
-            Administrators
-          </div>
-          <p class="boxselector_content">I want to restrict the management of this resource to administrators only</p>
-        </label>
-      </div>
-      <div ng-if="$ctrl.isAdmin">
-        <input type="radio" id="access_restricted" ng-model="$ctrl.formData.Ownership" value="restricted" />
-        <label for="access_restricted" data-cy="portainer-selectRestrictedAccess">
-          <div class="boxselector_header">
-            <pr-icon icon="'users'" feather="true"></pr-icon>
-            Restricted
-          </div>
-          <p class="boxselector_content"> I want to restrict the management of this resource to a set of users and/or teams </p>
-        </label>
-      </div>
-      <div ng-if="!$ctrl.isAdmin">
-        <input type="radio" id="access_private" ng-model="$ctrl.formData.Ownership" value="private" />
-        <label for="access_private">
-          <div class="boxselector_header">
-            <i ng-class="'private' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
-            Private
-          </div>
-          <p> I want to this resource to be manageable by myself only </p>
-        </label>
-      </div>
-      <div ng-if="!$ctrl.isAdmin && $ctrl.availableTeams.length > 0">
-        <input type="radio" id="access_restricted" ng-model="$ctrl.formData.Ownership" value="restricted" />
-        <label for="access_restricted">
-          <div class="boxselector_header">
-            <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px"></i>
-            Restricted
-          </div>
-          <p ng-if="$ctrl.availableTeams.length === 1">
-            I want any member of my team (<b>{{ $ctrl.availableTeams[0].Name }}</b
-            >) to be able to manage this resource
-          </p>
-          <p ng-if="$ctrl.availableTeams.length > 1"> I want to restrict the management of this resource to one or more of my teams </p>
-        </label>
+  <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled">
+    <div class="col-sm-12">
+      <div class="boxselector_wrapper">
+        <div ng-if="$ctrl.isAdmin">
+          <input type="radio" id="access_administrators" ng-model="$ctrl.formData.Ownership" value="administrators" />
+          <label for="access_administrators" data-cy="portainer-selectAdminAccess">
+            <div class="boxselector_header">
+              <pr-icon icon="'eye-off'" feather="true"></pr-icon>
+              Administrators
+            </div>
+            <p class="boxselector_content">I want to restrict the management of this resource to administrators only</p>
+          </label>
+        </div>
+        <div ng-if="$ctrl.isAdmin">
+          <input type="radio" id="access_restricted" ng-model="$ctrl.formData.Ownership" value="restricted" />
+          <label for="access_restricted" data-cy="portainer-selectRestrictedAccess">
+            <div class="boxselector_header">
+              <pr-icon icon="'users'" feather="true"></pr-icon>
+              Restricted
+            </div>
+            <p class="boxselector_content"> I want to restrict the management of this resource to a set of users and/or teams </p>
+          </label>
+        </div>
+        <div ng-if="!$ctrl.isAdmin">
+          <input type="radio" id="access_private" ng-model="$ctrl.formData.Ownership" value="private" />
+          <label for="access_private">
+            <div class="boxselector_header">
+              <pr-icon icon="'eye-off'" feather="true"></pr-icon>
+              Private
+            </div>
+            <p> I want to this resource to be manageable by myself only </p>
+          </label>
+        </div>
+        <div ng-if="!$ctrl.isAdmin && $ctrl.availableTeams.length > 0">
+          <input type="radio" id="access_restricted" ng-model="$ctrl.formData.Ownership" value="restricted" />
+          <label for="access_restricted">
+            <div class="boxselector_header">
+              <pr-icon icon="'users'" feather="true"></pr-icon>
+
+              Restricted
+            </div>
+            <p ng-if="$ctrl.availableTeams.length === 1">
+              I want any member of my team (<b>{{ $ctrl.availableTeams[0].Name }}</b
+              >) to be able to manage this resource
+            </p>
+            <p ng-if="$ctrl.availableTeams.length > 1"> I want to restrict the management of this resource to one or more of my teams </p>
+          </label>
+        </div>
       </div>
     </div>
   </div>
