@@ -1,4 +1,4 @@
-import { Column } from 'react-table';
+import { CellProps, Column } from 'react-table';
 
 import { EdgeUpdateSchedule, StatusType } from '../../types';
 
@@ -14,9 +14,12 @@ export const scheduleStatus: Column<EdgeUpdateSchedule> = {
 
 function StatusCell({
   value: status,
-}: {
-  value: EdgeUpdateSchedule['status'];
-}) {
+  row: { original: schedule },
+}: CellProps<EdgeUpdateSchedule, EdgeUpdateSchedule['status']>) {
+  if (schedule.time > Date.now() / 1000) {
+    return 'Scheduled';
+  }
+
   const statusList = Object.entries(status).map(
     ([environmentId, envStatus]) => ({ ...envStatus, environmentId })
   );
