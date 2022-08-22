@@ -3,9 +3,11 @@ package docker
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
+	"mime"
 	"net/http"
-	"strings"
 
 	"github.com/portainer/portainer/api/archive"
 )
@@ -23,29 +25,66 @@ type postDockerfileRequest struct {
 // In any other case, it will leave the request unaltered.
 func buildOperation(request *http.Request) error {
 	contentTypeHeader := request.Header.Get("Content-Type")
-	if contentTypeHeader != "" && !strings.Contains(contentTypeHeader, "application/json") {
-		return nil
+
+	mediaType, _, err := mime.ParseMediaType(contentTypeHeader)
+	if err != nil {
+		return err
 	}
 
-	var dockerfileContent []byte
-
-	if contentTypeHeader == "" {
+	var buffer []byte
+	switch mediaType {
+	case "":
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			return err
 		}
-		dockerfileContent = body
-	} else {
+
+		buffer, err = archive.TarFileInBuffer(body, "Dockerfile", 0600)
+		if err != nil {
+			return err
+		}
+
+	case "application/json":
 		var req postDockerfileRequest
 		if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
 			return err
 		}
-		dockerfileContent = []byte(req.Content)
-	}
 
-	buffer, err := archive.TarFileInBuffer(dockerfileContent, "Dockerfile", 0600)
-	if err != nil {
-		return err
+		buffer, err = archive.TarFileInBuffer([]byte(req.Content), "Dockerfile", 0600)
+		if err != nil {
+			return err
+		}
+
+	case "multipart/form-data":
+		if request.MultipartForm.File == nil {
+			return errors.New("uploaded files not found")
+		}
+
+		tfb := archive.NewTarFileInBuffer()
+		defer tfb.Close()
+
+		for k, _ := range request.MultipartForm.File {
+			f, hdr, err := request.FormFile(k)
+			if err != nil {
+				return err
+			}
+
+			defer f.Close()
+
+			fmt.Printf("uploaded filename(%s), size[%d], header[%#v]\n", hdr.Filename, hdr.Size, hdr.Header)
+
+			data := make([]byte, 0)
+			if _, err := f.Read(data); err != nil {
+				return err
+			}
+
+			tfb.Put(data, hdr.Filename, 0600)
+		}
+
+		buffer = tfb.Bytes()
+
+	default:
+		return nil
 	}
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(buffer))
