@@ -17,7 +17,7 @@ import { useCreateMutation } from '../queries/create';
 import { FormValues } from '../common/types';
 import { validation } from '../common/validation';
 import { UpdateTypeTabs } from '../common/UpdateTypeTabs';
-import { useGetList } from '../queries/list';
+import { useList } from '../queries/list';
 
 const initialValues: FormValues = {
   name: '',
@@ -29,7 +29,7 @@ const initialValues: FormValues = {
 
 export function CreateView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
-  const schedulesQuery = useGetList();
+  const schedulesQuery = useList();
 
   const createMutation = useCreateMutation();
   const router = useRouter();

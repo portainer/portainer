@@ -12,7 +12,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 
-import { useGetList } from '../queries/list';
+import { useList } from '../queries/list';
 import { EdgeUpdateSchedule } from '../types';
 import { useRemoveMutation } from '../queries/useRemoveMutation';
 
@@ -24,7 +24,7 @@ const useStore = createStore(storageKey);
 
 export function ListView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
-  const listQuery = useGetList();
+  const listQuery = useList();
   const store = useStore();
 
   if (!listQuery.data) {

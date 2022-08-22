@@ -19,6 +19,6 @@ async function getList() {
   }
 }
 
-export function useGetList() {
+export function useList() {
   return useQuery(queryKeys.list(), getList);
 }

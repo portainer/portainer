@@ -18,7 +18,7 @@ import { UpdateTypeTabs } from '../common/UpdateTypeTabs';
 import { useItem } from '../queries/useItem';
 import { validation } from '../common/validation';
 import { useUpdateMutation } from '../queries/useUpdateMutation';
-import { useGetList } from '../queries/list';
+import { useList } from '../queries/list';
 import { NameField, nameValidation } from '../common/NameField';
 import { EdgeGroupsField } from '../common/EdgeGroupsField';
 import { EdgeUpdateSchedule } from '../types';
@@ -40,7 +40,7 @@ export function ItemView() {
   const updateMutation = useUpdateMutation();
   const router = useRouter();
   const itemQuery = useItem(id);
-  const schedulesQuery = useGetList();
+  const schedulesQuery = useList();
 
   const isDisabled = useMemo(
     () => (itemQuery.data ? itemQuery.data.time < Date.now() / 1000 : false),
