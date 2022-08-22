@@ -36,6 +36,7 @@ export function PublicSettingsViewModel(settings) {
   this.KubeconfigExpiry = settings.KubeconfigExpiry;
   this.Features = settings.Features;
   this.Edge = new EdgeSettingsViewModel(settings.Edge);
+  this.DefaultRegistry = settings.DefaultRegistry;
 }
 
 export function InternalAuthSettingsViewModel(data) {

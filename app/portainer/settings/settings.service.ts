@@ -2,7 +2,7 @@ import { PublicSettingsViewModel } from '@/portainer/models/settings';
 
 import axios, { parseAxiosError } from '../services/axios';
 
-import { PublicSettingsResponse, Settings } from './types';
+import { DefaultRegistry, PublicSettingsResponse, Settings } from './types';
 
 export async function getPublicSettings() {
   try {
@@ -35,6 +35,19 @@ export async function updateSettings(settings: Partial<Settings>) {
     await axios.put(buildUrl(), settings);
   } catch (e) {
     throw parseAxiosError(e as Error, 'Unable to update application settings');
+  }
+}
+
+export async function updateDefaultRegistry(
+  defaultRegistry: Partial<DefaultRegistry>
+) {
+  try {
+    await axios.put(buildUrl('default_registry'), defaultRegistry);
+  } catch (e) {
+    throw parseAxiosError(
+      e as Error,
+      'Unable to update default registry settings'
+    );
   }
 }
 
