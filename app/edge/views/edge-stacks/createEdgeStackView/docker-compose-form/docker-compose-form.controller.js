@@ -1,14 +1,11 @@
+import { editor, git, template, upload } from '@@/BoxSelector/common-options/build-methods';
+
 class DockerComposeFormController {
   /* @ngInject */
   constructor($async, EdgeTemplateService, Notifications) {
     Object.assign(this, { $async, EdgeTemplateService, Notifications });
 
-    this.methodOptions = [
-      { id: 'method_editor', icon: 'edit', featherIcon: true, label: 'Web editor', description: 'Use our Web editor', value: 'editor' },
-      { id: 'method_upload', icon: 'upload', featherIcon: true, label: 'Upload', description: 'Upload from your computer', value: 'upload' },
-      { id: 'method_repository', icon: 'github', featherIcon: true, label: 'Repository', description: 'Use a git repository', value: 'repository' },
-      { id: 'method_template', icon: 'file-text', featherIcon: true, label: 'Template', description: 'Use an Edge stack template', value: 'template' },
-    ];
+    this.methodOptions = [editor, upload, git, template];
 
     this.selectedTemplate = null;
 

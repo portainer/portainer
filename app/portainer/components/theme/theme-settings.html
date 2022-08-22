@@ -2,10 +2,8 @@
   <rd-widget>
     <rd-widget-header icon="sliders" feather-icon="true" title-text="User theme"></rd-widget-header>
     <rd-widget-body>
-      <form class="theme-panel">
-        <!-- Theme Selector-->
+      <form class="form-horizontal">
         <box-selector radio-name="'theme'" value="$ctrl.state.userTheme" options="$ctrl.state.availableThemes" on-change="($ctrl.setTheme)"></box-selector>
-        <!-- !Theme -->
       </form>
       <p class="mt-2 vertical-center">
         <pr-icon icon="'alert-circle'" class-name="'icon-primary'" feather="true"></pr-icon>
