@@ -431,7 +431,7 @@ angular.module('portainer.app').controller('StackController', [
     }
 
     function loadExternalStack(name) {
-      const stackType = parseInt($scope.stackType);
+      const stackType = $scope.stackType;
       if (!stackType || (stackType !== StackType.DockerSwarm && stackType !== StackType.DockerCompose)) {
         Notifications.error('Failure', null, 'Invalid type URL parameter.');
         return;
@@ -486,7 +486,7 @@ angular.module('portainer.app').controller('StackController', [
       const orphanedRunning = $transition$.params().orphanedRunning == 'true';
       $scope.orphanedRunning = orphanedRunning;
 
-      $scope.stackType = $transition$.params().type;
+      $scope.stackType = parseInt($transition$.params().type, 10);
 
       if (external || (orphaned && orphanedRunning)) {
         loadExternalStack(stackName);
