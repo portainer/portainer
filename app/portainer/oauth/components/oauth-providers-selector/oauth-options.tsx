@@ -1,8 +1,11 @@
+import { Edit } from 'react-feather';
+
 import { FeatureId } from '@/portainer/feature-flags/enums';
 import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import Google from '@/assets/ico/vendor/google.svg?c';
 import Github from '@/assets/ico/vendor/github.svg?c';
-import Custom from '@/assets/ico/custom.svg?c';
+
+import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 
 export const options = [
   {
@@ -32,7 +35,7 @@ export const options = [
   },
   {
     id: 'custom',
-    icon: Custom,
+    icon: <BadgeIcon icon={Edit} />,
     label: 'Custom',
     description: 'Custom OAuth provider',
     value: 'custom',

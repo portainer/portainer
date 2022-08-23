@@ -60,7 +60,7 @@ import azure from '@/assets/ico/vendor/azure.svg?c';
 import civo from '@/assets/ico/vendor/civo.svg?c';
 import digitalocean from '@/assets/ico/vendor/digitalocean.svg?c';
 import docker from '@/assets/ico/vendor/docker.svg?c';
-import dockercompose from '@/assets/ico/vendor/dockercompose.svg?c';
+import dockercompose from '@/assets/ico/vendor/docker-compose.svg?c';
 import ecr from '@/assets/ico/vendor/ecr.svg?c';
 import github from '@/assets/ico/vendor/github.svg?c';
 import gitlab from '@/assets/ico/vendor/gitlab.svg?c';

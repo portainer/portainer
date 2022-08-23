@@ -1,4 +1,4 @@
-<button ng-if="!$ctrl.state.uploadInProgress" type="button" ngf-select="$ctrl.onFileSelected($file)" class="btn ng-scope">
+<button ng-if="!$ctrl.state.uploadInProgress" type="button" ngf-select="$ctrl.onFileSelected($file)" class="btn btn-light ng-scope">
   <pr-icon icon="'upload'" feather="true"></pr-icon>
 </button>
-<button ng-if="$ctrl.state.uploadInProgress" type="button" class="btn ng-scope" button-spinner="$ctrl.state.uploadInProgress"> </button>
+<button ng-if="$ctrl.state.uploadInProgress" type="button" class="btn btn-sm btn-light" button-spinner="$ctrl.state.uploadInProgress"></button>

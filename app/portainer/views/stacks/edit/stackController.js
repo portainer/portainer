@@ -246,7 +246,7 @@ angular.module('portainer.app').controller('StackController', [
       const stack = $scope.stack;
       const tplCrop =
         '<div>Do you want to force an update of the stack?</div>' +
-        '<div  style="position: absolute; right: 110px; top: 48px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
+        '<div  style="position: absolute; right: 5px; top: 50px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
       const template = angular.element(tplCrop);
       const html = $compile(template)($scope);
       // 'Do you want to force an update of the stack?'
@@ -431,7 +431,7 @@ angular.module('portainer.app').controller('StackController', [
     }
 
     function loadExternalStack(name) {
-      const stackType = parseInt($scope.stackType);
+      const stackType = $scope.stackType;
       if (!stackType || (stackType !== StackType.DockerSwarm && stackType !== StackType.DockerCompose)) {
         Notifications.error('Failure', null, 'Invalid type URL parameter.');
         return;
@@ -486,7 +486,7 @@ angular.module('portainer.app').controller('StackController', [
       const orphanedRunning = $transition$.params().orphanedRunning == 'true';
       $scope.orphanedRunning = orphanedRunning;
 
-      $scope.stackType = $transition$.params().type;
+      $scope.stackType = parseInt($transition$.params().type, 10);
 
       if (external || (orphaned && orphanedRunning)) {
         loadExternalStack(stackName);

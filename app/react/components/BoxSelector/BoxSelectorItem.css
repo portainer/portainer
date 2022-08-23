@@ -11,7 +11,6 @@
   font-weight: bold;
   user-select: none;
   color: var(--text-boxselector-header);
-  padding: 0px 10px;
 }
 
 .boxselector_header .fa,
@@ -46,6 +45,8 @@
 /* not disabled */
 .boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
 .box-selector-item input[type='radio']:not(:disabled) ~ label {
+  background-color: var(--bg-boxselector-color);
+
   box-shadow: none;
   cursor: pointer;
 }
@@ -70,7 +71,7 @@
 /* checked */
 .boxselector_wrapper input[type='radio']:checked + label,
 .box-selector-item input[type='radio']:checked + label {
-  @apply bg-blue-3 border-blue-6;
+  @apply bg-blue-2 border-blue-6;
   @apply th-dark:bg-blue-10 th-dark:border-blue-7;
 
   background-image: url(../../../assets/ico/checked.svg);
@@ -106,7 +107,10 @@
 .boxselector_icon,
 .boxselector_icon img {
   font-size: 90px;
-  display: block;
+}
+
+.boxselector_icon > svg {
+  margin-left: -5px;
 }
 
 .boxselector_header pr-icon {
@@ -115,11 +119,6 @@
 
 .boxselector_content {
   padding-left: 20px;
-}
-
-.boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
-.box-selector-item input[type='radio']:not(:disabled) ~ label {
-  background-color: var(--bg-boxselector-color);
 }
 
 .boxselector_img_container {

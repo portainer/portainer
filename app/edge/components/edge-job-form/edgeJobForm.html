@@ -34,27 +34,29 @@
   <!-- edge-job-method-select -->
   <div class="col-sm-12 form-section-title"> Edge job configuration </div>
   <div class="form-group"></div>
-  <div class="form-group px-4">
-    <div class="boxselector_wrapper !mt-0">
-      <div>
-        <input type="radio" id="config_basic" ng-model="$ctrl.formValues.cronMethod" value="basic" />
-        <label for="config_basic">
-          <div class="boxselector_header vertical-center">
-            <pr-icon icon="'calendar'" feather="true"></pr-icon>
-            Basic configuration
-          </div>
-          <p>Select date from calendar</p>
-        </label>
-      </div>
-      <div>
-        <input type="radio" id="config_advanced" ng-model="$ctrl.formValues.cronMethod" value="advanced" />
-        <label for="config_advanced">
-          <div class="boxselector_header vertical-center">
-            <pr-icon icon="'edit'" feather="true"></pr-icon>
-            Advanced configuration
-          </div>
-          <p>Write your own cron rule</p>
-        </label>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <div class="boxselector_wrapper !mt-0">
+        <div>
+          <input type="radio" id="config_basic" ng-model="$ctrl.formValues.cronMethod" value="basic" />
+          <label for="config_basic">
+            <div class="boxselector_header vertical-center">
+              <pr-icon icon="'calendar'" feather="true"></pr-icon>
+              Basic configuration
+            </div>
+            <p>Select date from calendar</p>
+          </label>
+        </div>
+        <div>
+          <input type="radio" id="config_advanced" ng-model="$ctrl.formValues.cronMethod" value="advanced" />
+          <label for="config_advanced">
+            <div class="boxselector_header vertical-center">
+              <pr-icon icon="'edit'" feather="true"></pr-icon>
+              Advanced configuration
+            </div>
+            <p>Write your own cron rule</p>
+          </label>
+        </div>
       </div>
     </div>
   </div>
@@ -151,28 +153,29 @@
   <!-- execution-method -->
   <div ng-if="!$ctrl.model.Id">
     <div class="col-sm-12 form-section-title"> Job content </div>
-    <div class="form-group"></div>
-    <div class="form-group px-4">
-      <div class="boxselector_wrapper !mt-0">
-        <div>
-          <input type="radio" id="method_editor" ng-model="$ctrl.formValues.method" value="editor" />
-          <label for="method_editor">
-            <div class="boxselector_header vertical-center">
-              <pr-icon icon="'edit'" feather="true"></pr-icon>
-              Web editor
-            </div>
-            <p>Use our Web editor</p>
-          </label>
-        </div>
-        <div>
-          <input type="radio" id="method_upload" ng-model="$ctrl.formValues.method" value="upload" />
-          <label for="method_upload">
-            <div class="boxselector_header vertical-center">
-              <pr-icon icon="'upload'" feather="true"></pr-icon>
-              Upload
-            </div>
-            <p>Upload from your computer</p>
-          </label>
+    <div class="form-group">
+      <div class="col-sm-12">
+        <div class="boxselector_wrapper">
+          <div>
+            <input type="radio" id="method_editor" ng-model="$ctrl.formValues.method" value="editor" />
+            <label for="method_editor">
+              <div class="boxselector_header vertical-center">
+                <pr-icon icon="'edit'" feather="true"></pr-icon>
+                Web editor
+              </div>
+              <p>Use our Web editor</p>
+            </label>
+          </div>
+          <div>
+            <input type="radio" id="method_upload" ng-model="$ctrl.formValues.method" value="upload" />
+            <label for="method_upload">
+              <div class="boxselector_header vertical-center">
+                <pr-icon icon="'upload'" feather="true"></pr-icon>
+                Upload
+              </div>
+              <p>Upload from your computer</p>
+            </label>
+          </div>
         </div>
       </div>
     </div>

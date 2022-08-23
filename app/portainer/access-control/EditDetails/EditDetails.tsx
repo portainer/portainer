@@ -47,16 +47,12 @@ export function EditDetails({
 
   return (
     <>
-      <div className="form-group">
-        <div className="col-sm-12">
-          <BoxSelector
-            radioName={withNamespace('ownership')}
-            value={values.ownership}
-            options={options}
-            onChange={(ownership) => handleChangeOwnership(ownership)}
-          />
-        </div>
-      </div>
+      <BoxSelector
+        radioName={withNamespace('ownership')}
+        value={values.ownership}
+        options={options}
+        onChange={(ownership) => handleChangeOwnership(ownership)}
+      />
 
       {values.ownership === ResourceControlOwnership.RESTRICTED && (
         <div aria-label="extra-options">
