@@ -33,6 +33,12 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
+    service.buildImageOverride = function (names, files) {
+      var endpointID = EndpointProvider.endpointID();
+      var url = 'api/endpoints/' + endpointID + '/docker/build?t=' + names;
+      return Upload.upload({ url: url, data: { file: files } });
+    };
+
     service.loadImages = function (file) {
       var endpointID = EndpointProvider.endpointID();
       return Upload.http({

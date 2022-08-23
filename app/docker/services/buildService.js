@@ -66,6 +66,24 @@ angular.module('portainer.docker').factory('BuildService', [
       return deferred.promise;
     };
 
+    service.buildImageFromDockerfileContentAndFiles = function (names, content, files) {
+      var dockerfile = new Blob([content], { type: 'text/plain' });
+      var uploadFiles = [dockerfile].concat(files);
+
+      var deferred = $q.defer();
+
+      FileUploadService.buildImageOverride(names, uploadFiles)
+        .$promise.then(function success(data) {
+          var model = new ImageBuildModel(data);
+          deferred.resolve(model);
+        })
+        .catch(function error(err) {
+          deferred.reject(err);
+        });
+
+      return deferred.promise;
+    };
+
     return service;
   },
 ]);
