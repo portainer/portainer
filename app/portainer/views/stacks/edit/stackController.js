@@ -246,7 +246,7 @@ angular.module('portainer.app').controller('StackController', [
       const stack = $scope.stack;
       const tplCrop =
         '<div>Do you want to force an update of the stack?</div>' +
-        '<div  style="position: absolute; right: 110px; top: 48px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
+        '<div  style="position: absolute; right: 5px; top: 50px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
       const template = angular.element(tplCrop);
       const html = $compile(template)($scope);
       // 'Do you want to force an update of the stack?'
