@@ -63,7 +63,7 @@ func buildOperation(request *http.Request) error {
 		tfb := archive.NewTarFileInBuffer()
 		defer tfb.Close()
 
-		for k, _ := range request.MultipartForm.File {
+		for k := range request.MultipartForm.File {
 			f, hdr, err := request.FormFile(k)
 			if err != nil {
 				return err
