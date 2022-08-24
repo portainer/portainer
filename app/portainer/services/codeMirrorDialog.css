@@ -1,0 +1,49 @@
+/* styles from https://github.com/codemirror/codemirror5/blob/master/addon/dialog/dialog.css with the button styles updated */
+
+.CodeMirror-dialog {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: inherit;
+  z-index: 15;
+  padding: 0.1em 0.8em;
+  overflow: hidden;
+  color: inherit;
+}
+
+.CodeMirror-dialog-top {
+  border-bottom: 1px solid #eee;
+  top: 0;
+}
+
+.CodeMirror-dialog-bottom {
+  border-top: 1px solid #eee;
+  bottom: 0;
+}
+
+.CodeMirror-dialog input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 20em;
+  color: inherit;
+  font-family: monospace;
+}
+
+.CodeMirror-dialog button {
+  /* apply styles from btn-default */
+  @apply bg-white border-gray-5 text-gray-9;
+  @apply hover:bg-gray-3 hover:border-gray-5 hover:text-gray-10;
+  /* dark mode */
+  @apply th-dark:bg-gray-warm-10 th-dark:border-gray-warm-7 th-dark:text-gray-warm-4;
+  @apply th-dark:hover:bg-gray-warm-9 th-dark:hover:border-gray-6 th-dark:hover:text-gray-warm-4;
+  /* highcontrast mode */
+  @apply th-highcontrast:bg-gray-warm-10 th-highcontrast:border-gray-warm-7 th-highcontrast:text-white;
+  @apply th-highcontrast:hover:bg-gray-warm-9 th-highcontrast:hover:border-gray-6 th-highcontrast:hover:text-white;
+
+  @apply font-sans;
+  @apply border-solid	border;
+  font-size: 85%;
+  padding: 0px 8px;
+  border-radius: 8px;
+}
