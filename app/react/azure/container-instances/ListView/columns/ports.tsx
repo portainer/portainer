@@ -10,7 +10,6 @@ export const ports: Column<ContainerGroup> = {
   disableFilters: true,
   Filter: () => null,
   canHide: true,
-  sortType: 'string',
   Cell: PortsCell,
 };
 
