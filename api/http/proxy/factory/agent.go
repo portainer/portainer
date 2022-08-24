@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/portainer/portainer-ee/api/internal/url"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/agent"
@@ -34,7 +35,7 @@ func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*Proxy
 		urlString = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}
 
-	endpointURL, err := parseURL(urlString)
+	endpointURL, err := url.ParseURL(urlString)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed parsing url %s", endpoint.URL)
 	}
