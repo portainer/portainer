@@ -250,7 +250,7 @@ angular.module('portainer.app').controller('StackController', [
       const template = angular.element(tplCrop);
       const html = $compile(template)($scope);
       // 'Do you want to force an update of the stack?'
-      ModalService.confirmStackUpdate(html, true, true, null, function (result) {
+      ModalService.confirmStackUpdate(html, true, false, null, function (result) {
         if (!result) {
           return;
         }
