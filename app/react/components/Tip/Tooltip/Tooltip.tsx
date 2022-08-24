@@ -10,9 +10,10 @@ type Position = 'top' | 'right' | 'bottom' | 'left';
 export interface Props {
   position?: Position;
   message: string;
+  className?: string;
 }
 
-export function Tooltip({ message, position = 'bottom' }: Props) {
+export function Tooltip({ message, position = 'bottom', className }: Props) {
   const id = _.uniqueId('tooltip-');
 
   return (
@@ -28,7 +29,7 @@ export function Tooltip({ message, position = 'bottom' }: Props) {
         type="info"
         place={position}
         effect="solid"
-        className={styles.tooltip}
+        className={clsx(styles.tooltip, className)}
         arrowColor="transparent"
       />
     </span>

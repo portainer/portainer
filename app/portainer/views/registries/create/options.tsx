@@ -1,10 +1,13 @@
+import { Edit } from 'react-feather';
+
 import Docker from '@/assets/ico/vendor/docker.svg?c';
 import Ecr from '@/assets/ico/vendor/ecr.svg?c';
 import Quay from '@/assets/ico/vendor/quay.svg?c';
 import Proget from '@/assets/ico/vendor/proget.svg?c';
 import Azure from '@/assets/ico/vendor/azure.svg?c';
 import Gitlab from '@/assets/ico/vendor/gitlab.svg?c';
-import Custom from '@/assets/ico/custom.svg?c';
+
+import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 
 export const options = [
   {
@@ -51,7 +54,7 @@ export const options = [
   },
   {
     id: 'registry_custom',
-    icon: Custom,
+    icon: <BadgeIcon icon={Edit} />,
     label: 'Custom registry',
     description: 'Define your own registry',
     value: '3',

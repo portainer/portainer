@@ -48,14 +48,24 @@
 
   <div class="form-group">
     <div class="col-sm-12">
-      <a class="small interactive vertical-center" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
+      <button
+        type="button"
+        class="btn btn-link btn-sm hover:no-underline !ml-0 p-0"
+        ng-if="!$ctrl.state.overrideConfiguration"
+        ng-click="$ctrl.state.overrideConfiguration = true;"
+      >
         <pr-icon icon="'tool'" feather="true"></pr-icon>
         Override default configuration
-      </a>
-      <a class="small interactive vertical-center" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.resetDefaults()">
+      </button>
+      <button
+        type="button"
+        class="btn btn-link btn-sm hover:no-underline !ml-0 p-0"
+        ng-if="$ctrl.state.overrideConfiguration"
+        ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.resetDefaults()"
+      >
         <pr-icon icon="'settings'" feather="true"></pr-icon>
         Use default configuration
-      </a>
+      </button>
     </div>
   </div>
 

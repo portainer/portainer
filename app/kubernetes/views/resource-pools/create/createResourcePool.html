@@ -42,6 +42,9 @@
                       <p class="vertical-center" ng-if="$ctrl.state.hasPrefixKube"
                         ><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Prefix "kube-" is reserved for Kubernetes system namespaces.</p
                       >
+                      <p class="vertical-center" ng-if="$ctrl.state.isAlreadyExist">
+                        <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> A namespace with the same name already exists.
+                      </p>
                     </div>
                   </div>
                 </span>

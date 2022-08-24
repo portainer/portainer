@@ -105,11 +105,11 @@ export interface EnvironmentOptions {
   url?: string;
   publicUrl?: string;
   meta?: EnvironmentMetadata;
-  checkinInterval?: number;
   azure?: AzureSettings;
   tls?: TLSSettings;
   isEdgeDevice?: boolean;
   gpus?: Gpu[];
+  pollFrequency?: number;
 }
 
 interface CreateRemoteEnvironment {
@@ -175,6 +175,7 @@ export function createEdgeAgentEnvironment({
   meta = { tagIds: [] },
   gpus = [],
   isEdgeDevice,
+  pollFrequency,
 }: CreateEdgeAgentEnvironment) {
   return createEnvironment(
     name,
@@ -187,6 +188,7 @@ export function createEdgeAgentEnvironment({
       },
       gpus,
       isEdgeDevice,
+      pollFrequency,
       ...meta,
     }
   );
@@ -211,7 +213,7 @@ async function createEnvironment(
       PublicURL: options.publicUrl,
       GroupID: groupId,
       TagIds: arrayToJson(tagIds),
-      CheckinInterval: options.checkinInterval,
+      CheckinInterval: options.pollFrequency,
       IsEdgeDevice: options.isEdgeDevice,
       Gpus: arrayToJson(options.gpus),
     };

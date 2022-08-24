@@ -196,7 +196,7 @@
 
       <div class="form-group !mx-0 !pl-0 col-sm-3 clear-both" ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">Route</span>
+          <span class="input-group-addon required">Route</span>
           <input
             class="form-control"
             name="ingress_route_{{ $index }}"

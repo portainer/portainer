@@ -2,6 +2,7 @@ import moment from 'moment';
 import _ from 'lodash-es';
 import filesize from 'filesize';
 
+import { Eye, EyeOff, Users } from 'react-feather';
 import { ResourceControlOwnership as RCO } from '@/portainer/access-control/types';
 
 export function truncateLeftRight(text, max, left, right) {
@@ -106,13 +107,13 @@ export function environmentTypeIcon(type) {
 export function ownershipIcon(ownership) {
   switch (ownership) {
     case RCO.PRIVATE:
-      return 'eye-off';
+      return EyeOff;
     case RCO.ADMINISTRATORS:
-      return 'eye-off';
+      return EyeOff;
     case RCO.RESTRICTED:
-      return 'users';
+      return Users;
     default:
-      return 'eye';
+      return Eye;
   }
 }
 

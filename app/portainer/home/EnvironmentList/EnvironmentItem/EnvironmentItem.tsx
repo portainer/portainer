@@ -46,12 +46,11 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
     <div className={styles.root}>
       <button
         type="button"
-        color="link"
         onClick={() => onClick(environment)}
         className={styles.wrapperButton}
       >
         <Link
-          className={clsx('blocklist-item', styles.item)}
+          className={clsx('blocklist-item no-link', styles.item)}
           to={route}
           params={{
             endpointId: environment.Id,

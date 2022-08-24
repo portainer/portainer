@@ -89,6 +89,10 @@ enum AuthenticationMethod {
 
 type Feature = string;
 
+export interface DefaultRegistry {
+  Hide: boolean;
+}
+
 export interface Settings {
   LogoURL: string;
   BlackListedLabels: Pair[];
