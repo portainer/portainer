@@ -238,13 +238,18 @@
             </div>
           </td>
           <td>
-            <a ng-if="item.KubernetesApplications" ui-sref="kubernetes.helm({ name: item.Name, namespace: item.ResourcePool })" ng-click="$event.stopPropagation()"
+            <a
+              ng-if="item.KubernetesApplications"
+              ui-sref="kubernetes.helm({ name: item.Name, namespace: item.ResourcePool })"
+              ng-click="$event.stopPropagation()"
+              class="hyperlink"
               >{{ item.Name }}
             </a>
             <a
               ng-if="!item.KubernetesApplications"
               ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })"
               ng-click="$event.stopPropagation()"
+              class="hyperlink"
               >{{ item.Name }}
             </a>
             <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>

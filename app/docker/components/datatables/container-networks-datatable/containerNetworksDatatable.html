@@ -50,9 +50,9 @@
               ng-click="$ctrl.expandItem(value, !value.Expanded)"
             >
               <td>
-                <a ng-if="$ctrl.itemCanExpand(value)">
+                <button class="btn btn-none" ng-if="$ctrl.itemCanExpand(value)" type="button">
                   <i ng-class="{ 'fas fa-angle-down': value.Expanded, 'fas fa-angle-right': !value.Expanded }" class="space-right" aria-hidden="true"></i>
-                </a>
+                </button>
                 <a ui-sref="docker.networks.network({ id: key, nodeName: $ctrl.nodeName })">{{ key }}</a>
               </td>
               <td>{{ value.IPAddress || '-' }}</td>
