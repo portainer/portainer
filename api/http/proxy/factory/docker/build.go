@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"mime"
 	"net/http"
 
@@ -56,8 +56,13 @@ func buildOperation(request *http.Request) error {
 		}
 
 	case "multipart/form-data":
-		if request.MultipartForm.File == nil {
-			return errors.New("uploaded files not found")
+		err := request.ParseMultipartForm(32 << 20) // 32 MB
+		if err != nil {
+			return err
+		}
+
+		if request.MultipartForm == nil || request.MultipartForm.File == nil {
+			return errors.New("uploaded files not found to build image")
 		}
 
 		tfb := archive.NewTarFileInBuffer()
@@ -71,17 +76,27 @@ func buildOperation(request *http.Request) error {
 
 			defer f.Close()
 
-			fmt.Printf("uploaded filename(%s), size[%d], header[%#v]\n", hdr.Filename, hdr.Size, hdr.Header)
+			log.Printf("[INFO] [http,proxy,docker] [message: upload the file to build image] [filename: %s] [size: %d]", hdr.Filename, hdr.Size)
 
-			data := make([]byte, 0)
-			if _, err := f.Read(data); err != nil {
+			content, err := ioutil.ReadAll(f)
+			if err != nil {
 				return err
 			}
 
-			tfb.Put(data, hdr.Filename, 0600)
+			filename := hdr.Filename
+			if hdr.Filename == "blob" {
+				filename = "Dockerfile"
+			}
+
+			if err := tfb.Put(content, filename, 0600); err != nil {
+				return err
+			}
 		}
 
 		buffer = tfb.Bytes()
+		request.Form = nil
+		request.PostForm = nil
+		request.MultipartForm = nil
 
 	default:
 		return nil
