@@ -25,14 +25,14 @@ fieldset[disabled] .btn {
   box-shadow: none;
 }
 
-.btn-primary {
+.btn.btn-primary {
   @apply text-white bg-blue-8 border-blue-8;
   @apply hover:text-white hover:bg-blue-9 hover:border-blue-9;
   @apply th-dark:hover:bg-blue-7 th-dark:hover:border-blue-7;
 }
 
-.btn-primary:active,
-.btn-primary.active,
+.btn.btn-primary:active,
+.btn.btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
   @apply bg-blue-9 border-blue-5;
 }
@@ -44,7 +44,7 @@ fieldset[disabled] .btn {
 }
 
 /* Button Secondary */
-.btn-secondary {
+.btn.btn-secondary {
   @apply border border-solid;
 
   @apply text-blue-9 bg-blue-2 border-blue-8;
@@ -54,18 +54,18 @@ fieldset[disabled] .btn {
   @apply th-dark:hover:bg-blue-11;
 }
 
-.btn-danger {
+.btn.btn-danger {
   @apply bg-error-8 border-error-8;
   @apply hover:bg-error-7 hover:border-error-7 hover:text-white;
 }
 
-.btn-danger:active,
-.btn-danger.active,
+.btn.btn-danger:active,
+.btn.btn-danger.active,
 .open > .dropdown-toggle.btn-danger {
   @apply bg-error-8 text-white border-blue-5;
 }
 
-.btn-dangerlight {
+.btn.btn-dangerlight {
   @apply text-error-9 th-dark:text-white;
   @apply bg-error-3 th-dark:bg-error-9;
   @apply hover:bg-error-2 th-dark:hover:bg-error-11;
@@ -73,18 +73,18 @@ fieldset[disabled] .btn {
   @apply border border-solid;
 }
 
-.btn-success {
+.btn.btn-success {
   background-color: var(--ui-success-7);
 }
 
-.btn-success:hover {
+.btn.btn-success:hover {
   color: var(--white-color);
 }
 
 /* secondary-grey */
-.btn-default,
-.btn-light {
-  @apply bg-gray-2 border-gray-5 text-gray-9;
+.btn.btn-default,
+.btn.btn-light {
+  @apply bg-white border-gray-5 text-gray-9;
   @apply hover:bg-gray-3 hover:border-gray-5 hover:text-gray-10;
 
   /* dark mode */
@@ -95,26 +95,16 @@ fieldset[disabled] .btn {
   @apply th-highcontrast:hover:bg-gray-9 th-highcontrast:hover:border-gray-6 th-highcontrast:hover:text-gray-warm-4;
 }
 
-.btn-light:active,
-.btn-light.active,
+.btn.btn-light:active,
+.btn.btn-light.active,
 .open > .dropdown-toggle.btn-light {
   background-color: var(--ui-gray-3);
 }
 
-.btn-link {
+.btn.btn-link {
   @apply text-blue-8 hover:text-blue-9 disabled:text-gray-5;
   @apply th-dark:text-blue-8 th-dark:hover:text-blue-7;
   @apply th-highcontrast:text-blue-8 th-highcontrast:hover:text-blue-7;
-}
-
-.hyperlink,
-.hyperlink:focus {
-  color: var(--ui-blue-8);
-}
-
-.hyperlink:hover {
-  text-decoration: underline;
-  color: var(--ui-blue-9);
 }
 
 .btn-group {
@@ -129,30 +119,43 @@ fieldset[disabled] .btn {
 
 /* focus */
 
-.btn-primary:focus,
-.btn-secondary:focus,
-.btn-light:focus {
+.btn.btn-primary:focus,
+.btn.btn-secondary:focus,
+.btn.btn-light:focus {
   @apply border-blue-5;
 }
 
-.btn-danger:focus,
-.btn-dangerlight:focus {
+.btn.btn-danger:focus,
+.btn.btn-dangerlight:focus {
   @apply border-blue-6;
 }
 
-.btn-primary:focus,
-.btn-secondary:focus,
-.btn-light:focus,
-.btn-danger:focus,
-.btn-dangerlight:focus {
+.btn.btn-primary:focus,
+.btn.btn-secondary:focus,
+.btn.btn-light:focus,
+.btn.btn-danger:focus,
+.btn.btn-dangerlight:focus {
   --btn-focus-color: var(--ui-blue-3);
   box-shadow: 0px 0px 0px 4px var(--btn-focus-color);
 }
 
-[theme='dark'] .btn-primary:focus,
-[theme='dark'] .btn-secondary:focus,
-[theme='dark'] .btn-light:focus,
-[theme='dark'] .btn-danger:focus,
-[theme='dark'] .btn-dangerlight:focus {
+[theme='dark'] .btn.btn-primary:focus,
+[theme='dark'] .btn.btn-secondary:focus,
+[theme='dark'] .btn.btn-light:focus,
+[theme='dark'] .btn.btn-danger:focus,
+[theme='dark'] .btn.btn-dangerlight:focus {
   --btn-focus-color: var(--ui-blue-11);
+}
+
+a.no-link,
+a[ng-click] {
+  @apply text-current;
+  @apply hover:no-underline hover:text-current;
+  @apply focus:no-underline focus:text-current;
+}
+
+a,
+a.hyperlink {
+  @apply text-blue-8 hover:text-blue-9;
+  @apply hover:underline cursor-pointer;
 }

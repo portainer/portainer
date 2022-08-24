@@ -40,19 +40,6 @@
   @apply text-blue-7;
 }
 
-.datatable tr > td a:not(.btn) {
-  color: var(--ui-blue-8);
-}
-
-.datatable tr > td a:not(.btn):hover,
-.datatable tr > td a:not(.btn):focus {
-  text-decoration: underline;
-}
-
-.datatable tr > td a.actions {
-  color: currentColor;
-}
-
 .toolBar .actionBar {
   display: inline-flex;
 }
