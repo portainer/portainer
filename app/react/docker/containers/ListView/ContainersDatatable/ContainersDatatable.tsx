@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { Environment } from '@/portainer/environments/types';
 import type { DockerContainer } from '@/react/docker/containers/types';
+import { useShowGPUsColumn } from '@/react/docker/containers/utils';
 
 import { TableSettingsMenu, Datatable } from '@@/datatables';
 import {
@@ -39,7 +40,8 @@ export function ContainersDatatable({
   environment,
 }: Props) {
   const settings = useStore();
-  const columns = useColumns(isHostColumnVisible);
+  const isGPUsColumnVisible = useShowGPUsColumn(environment.Id);
+  const columns = useColumns(isHostColumnVisible, isGPUsColumnVisible);
   const hidableColumns = _.compact(
     columns.filter((col) => col.canHide).map((col) => col.id)
   );

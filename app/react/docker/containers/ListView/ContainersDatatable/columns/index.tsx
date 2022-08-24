@@ -13,7 +13,10 @@ import { stack } from './stack';
 import { state } from './state';
 import { gpus } from './gpus';
 
-export function useColumns(isHostColumnVisible: boolean) {
+export function useColumns(
+  isHostColumnVisible: boolean,
+  isGPUsColumnVisible: boolean
+) {
   return useMemo(
     () =>
       _.compact([
@@ -25,10 +28,10 @@ export function useColumns(isHostColumnVisible: boolean) {
         created,
         ip,
         isHostColumnVisible && host,
-        gpus,
+        isGPUsColumnVisible && gpus,
         ports,
         ownership,
       ]),
-    [isHostColumnVisible]
+    [isHostColumnVisible, isGPUsColumnVisible]
   );
 }
