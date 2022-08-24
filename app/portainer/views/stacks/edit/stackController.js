@@ -498,6 +498,8 @@ angular.module('portainer.app').controller('StackController', [
       }
 
       $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
+
+      $scope.stackType = parseInt($transition$.params().type, 10);
     }
 
     initView();
