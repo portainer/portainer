@@ -5,13 +5,13 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/docker"
+	"github.com/portainer/portainer/api/internal/url"
 )
 
 func (factory *ProxyFactory) newDockerProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
@@ -23,7 +23,7 @@ func (factory *ProxyFactory) newDockerProxy(endpoint *portainer.Endpoint) (http.
 }
 
 func (factory *ProxyFactory) newDockerLocalProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	endpointURL, err := url.Parse(endpoint.URL)
+	endpointURL, err := url.ParseURL(endpoint.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 		rawURL = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}
 
-	endpointURL, err := url.Parse(rawURL)
+	endpointURL, err := url.ParseURL(rawURL)
 	if err != nil {
 		return nil, err
 	}
