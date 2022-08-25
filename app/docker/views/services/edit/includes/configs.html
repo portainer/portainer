@@ -38,9 +38,9 @@
             <td>{{ config.Uid }}</td>
             <td>{{ config.Gid }}</td>
             <td>{{ config.Mode }}</td>
-            <td class="input-group-btn" authorization="DockerServiceUpdate">
+            <td authorization="DockerServiceUpdate">
               <button class="btn btn-dangerlight pull-right" type="button" ng-click="removeConfig(service, $index)" ng-disabled="isUpdating">
-                <pr-icon icon="'trash-2'" feather="true" class-name="'icon-md'"></pr-icon>
+                <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
               </button>
             </td>
           </tr>

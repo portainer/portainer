@@ -45,7 +45,7 @@
                   <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. true" />
                   <span class="input-group-btn">
                     <button class="btn btn-dangerlight" type="button" ng-click="removeDriverOption($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-md'"></pr-icon>
+                      <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
                     </button>
                   </span>
                 </div>
@@ -94,7 +94,7 @@
                 />
               </div>
               <button class="btn btn-dangerlight" type="button" ng-click="removeIPV4AuxAddress($index)">
-                <pr-icon icon="'trash-2'" feather="true" class-name="'icon-md'"></pr-icon>
+                <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
               </button>
               <div class="col-sm-12 small text-warning" ng-if="state.IPV4AuxiliaryAddressesError[$index]">
                 <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Exclude ip cannot be the same as gateway.</p>
@@ -141,7 +141,7 @@
                 />
               </div>
               <button class="btn btn-dangerlight" type="button" ng-click="removeIPV6AuxAddress($index)">
-                <pr-icon icon="'trash-2'" feather="true" class-name="'icon-md'"></pr-icon>
+                <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
               </button>
               <div class="col-sm-12 small text-warning" ng-show="state.IPV6AuxiliaryAddressesError[$index]">
                 <p class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Exclude ip cannot be the same as gateway.</p>
@@ -168,8 +168,7 @@
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                   <span class="input-group-btn">
-                    <button class="btn btn-dangerlight" type="button" ng-click="removeLabel($index)">
-                      <pr-icon icon="'trash-2'" feather="true" class-name="'icon-md'"></pr-icon> </button
+                    <button class="btn btn-dangerlight" type="button" ng-click="removeLabel($index)"> <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon> </button
                   ></span>
                 </div>
               </div>
