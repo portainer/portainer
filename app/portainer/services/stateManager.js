@@ -26,6 +26,7 @@ function StateManagerFactory(
       dismissedInfoPanels: {},
       dismissedInfoHash: '',
       timesPasswordChangeSkipped: {},
+      dismissedUpdateVersion: '',
     },
   };
 
