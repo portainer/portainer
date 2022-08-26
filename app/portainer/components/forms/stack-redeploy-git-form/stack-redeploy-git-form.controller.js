@@ -108,7 +108,7 @@ class StackRedeployGitFormController {
       '<be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div></div>';
     const template = angular.element(tplCrop);
     const html = this.$compile(template)(this.$scope);
-    this.ModalService.confirmStackUpdate(html, true, true, 'btn-warning', async (result) => {
+    this.ModalService.confirmStackUpdate(html, true, false, 'btn-warning', async (result) => {
       if (!result) {
         return;
       }
