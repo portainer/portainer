@@ -93,3 +93,5 @@ function handleError(error: unknown, errorMeta?: unknown) {
     notifyError(title, error as Error, message);
   }
 }
+
+export const queryClient = createQueryClient();

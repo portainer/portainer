@@ -1,5 +1,6 @@
 import { withCurrentUser } from '@/portainer/hooks/useUser';
 import { r2a } from '@/react-tools/react2angular';
+import { withReactQuery } from '@/react-tools/withReactQuery';
 
 import { Settings } from '../types';
 
@@ -22,6 +23,6 @@ export function EdgeComputeSettingsView({ settings, onSubmit }: Props) {
 }
 
 export const EdgeComputeSettingsViewAngular = r2a(
-  withCurrentUser(EdgeComputeSettingsView),
+  withReactQuery(withCurrentUser(EdgeComputeSettingsView)),
   ['settings', 'onSubmit']
 );
