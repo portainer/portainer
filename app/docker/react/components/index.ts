@@ -7,6 +7,7 @@ import { TemplateListDropdownAngular } from '@/react/docker/app-templates/Templa
 import { TemplateListSortAngular } from '@/react/docker/app-templates/TemplateListSort';
 import { Gpu } from '@/react/docker/containers/CreateView/Gpu';
 import { withCurrentUser } from '@/portainer/hooks/useUser';
+import { withReactQuery } from '@/react-tools/withReactQuery';
 
 export const componentsModule = angular
   .module('portainer.docker.react.components', [])
@@ -24,7 +25,10 @@ export const componentsModule = angular
   .component('templateListSort', TemplateListSortAngular)
   .component(
     'stackContainersDatatable',
-    r2a(StackContainersDatatable, ['environment', 'stackName'])
+    r2a(withReactQuery(withCurrentUser(StackContainersDatatable)), [
+      'environment',
+      'stackName',
+    ])
   )
   .component(
     'gpu',

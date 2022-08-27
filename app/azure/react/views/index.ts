@@ -6,13 +6,23 @@ import { ItemView } from '@/react/azure/container-instances/ItemView';
 import { ListView } from '@/react/azure/container-instances/ListView';
 import { DashboardView } from '@/react/azure/DashboardView';
 import { withCurrentUser } from '@/portainer/hooks/useUser';
+import { withReactQuery } from '@/react-tools/withReactQuery';
 
 export const viewsModule = angular
   .module('portainer.azure.react.views', [])
-  .component('containerInstanceView', r2a(withCurrentUser(ItemView), []))
+  .component(
+    'containerInstanceView',
+    r2a(withReactQuery(withCurrentUser(ItemView)), [])
+  )
   .component(
     'createContainerInstanceView',
-    r2a(withCurrentUser(CreateView), [])
+    r2a(withReactQuery(withCurrentUser(CreateView)), [])
   )
-  .component('containerInstancesView', r2a(withCurrentUser(ListView), []))
-  .component('dashboardView', r2a(withCurrentUser(DashboardView), [])).name;
+  .component(
+    'containerInstancesView',
+    r2a(withReactQuery(withCurrentUser(ListView)), [])
+  )
+  .component(
+    'dashboardView',
+    r2a(withReactQuery(withCurrentUser(DashboardView)), [])
+  ).name;

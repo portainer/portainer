@@ -1,10 +1,11 @@
 import { useReducer } from 'react';
 
-import { useUser } from '@/portainer/hooks/useUser';
+import { useUser, withCurrentUser } from '@/portainer/hooks/useUser';
 import { Icon } from '@/react/components/Icon';
 import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, Role } from '@/portainer/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
+import { withReactQuery } from '@/react-tools/withReactQuery';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -143,10 +144,13 @@ function isLeaderOfAnyRestrictedTeams(
   );
 }
 
-export const AccessControlPanelAngular = r2a(AccessControlPanel, [
-  'resourceControl',
-  'resourceType',
-  'disableOwnershipChange',
-  'resourceId',
-  'onUpdateSuccess',
-]);
+export const AccessControlPanelAngular = r2a(
+  withReactQuery(withCurrentUser(AccessControlPanel)),
+  [
+    'resourceControl',
+    'resourceType',
+    'disableOwnershipChange',
+    'resourceId',
+    'onUpdateSuccess',
+  ]
+);
