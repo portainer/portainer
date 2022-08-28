@@ -14,6 +14,7 @@ import { AccessControlPanel } from '@/react/portainer/access-control';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
+import { withI18nSuspense } from '@/react-tools/withI18nSuspense';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -126,5 +127,8 @@ export const componentsModule = angular
   )
   .component(
     'createAccessToken',
-    r2a(withUIRouter(CreateAccessToken), ['onSubmit', 'onError'])
+    r2a(withI18nSuspense(withUIRouter(CreateAccessToken)), [
+      'onSubmit',
+      'onError',
+    ])
   ).name;
