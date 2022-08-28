@@ -1,7 +1,7 @@
 import angular from 'angular';
 
 import { HomeView } from '@/portainer/home';
-import { withCurrentUser } from '@/portainer/hooks/useUser';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { r2a } from '@/react-tools/react2angular';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';

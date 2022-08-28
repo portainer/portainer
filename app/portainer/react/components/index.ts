@@ -11,7 +11,7 @@ import {
 import { Icon } from '@/react/components/Icon';
 import { ReactQueryDevtoolsWrapper } from '@/react/components/ReactQueryDevtoolsWrapper';
 import { AccessControlPanel } from '@/react/portainer/access-control';
-import { withCurrentUser } from '@/portainer/hooks/useUser';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 

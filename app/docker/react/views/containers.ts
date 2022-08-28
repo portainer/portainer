@@ -3,7 +3,7 @@ import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
 import { ListView } from '@/react/docker/containers/ListView';
-import { withCurrentUser } from '@/portainer/hooks/useUser';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 

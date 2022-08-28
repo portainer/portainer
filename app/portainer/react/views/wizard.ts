@@ -7,7 +7,7 @@ import {
   EnvironmentTypeSelectView,
   HomeView,
 } from '@/react/portainer/environments/wizard';
-import { withCurrentUser } from '@/portainer/hooks/useUser';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 
