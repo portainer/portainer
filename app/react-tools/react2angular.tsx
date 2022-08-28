@@ -52,19 +52,29 @@ export function react2angular<T, U extends PropNames<T>[]>(
     $element: HTMLElement[],
     $q: ng.IQService
   ) {
+    let isDestroyed = false;
     const el = $element[0];
-    this.$onChanges = () => {
-      const props = toProps(propNames, this, $q);
-      ReactDOM.render(
-        <StrictMode>
-          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-          <Component {...(props as T)} />
-        </StrictMode>,
 
-        el
-      );
+    this.$onChanges = () => {
+      if (!isDestroyed) {
+        const props = toProps(propNames, this, $q);
+        ReactDOM.render(
+          <StrictMode>
+            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+            <Component {...(props as T)} />
+          </StrictMode>,
+
+          el
+        );
+      }
     };
-    this.$onDestroy = () => ReactDOM.unmountComponentAtNode(el);
+
+    this.$onDestroy = () => {
+      if (!isDestroyed) {
+        isDestroyed = true;
+        ReactDOM.unmountComponentAtNode(el);
+      }
+    };
   }
 }
 
