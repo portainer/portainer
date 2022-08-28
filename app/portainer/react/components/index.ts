@@ -12,6 +12,7 @@ import { Icon } from '@/react/components/Icon';
 import { ReactQueryDevtoolsWrapper } from '@/react/components/ReactQueryDevtoolsWrapper';
 import { withCurrentUser } from '@/portainer/hooks/useUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withUIRouter } from '@/react-tools/withUIRouter';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -61,7 +62,7 @@ export const componentsModule = angular
   .component('viewLoading', r2a(ViewLoading, ['message']))
   .component(
     'pageHeader',
-    r2a(withReactQuery(withCurrentUser(PageHeader)), [
+    r2a(withUIRouter(withReactQuery(withCurrentUser(PageHeader))), [
       'title',
       'breadcrumbs',
       'loading',
@@ -114,5 +115,5 @@ export const componentsModule = angular
   )
   .component(
     'createAccessToken',
-    r2a(CreateAccessToken, ['onSubmit', 'onError'])
+    r2a(withUIRouter(CreateAccessToken), ['onSubmit', 'onError'])
   ).name;

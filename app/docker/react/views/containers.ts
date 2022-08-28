@@ -5,12 +5,13 @@ import { r2a } from '@/react-tools/react2angular';
 import { ListView } from '@/react/docker/containers/ListView';
 import { withCurrentUser } from '@/portainer/hooks/useUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withUIRouter } from '@/react-tools/withUIRouter';
 
 export const containersModule = angular
   .module('portainer.docker.containers', [])
   .component(
     'containersView',
-    r2a(withReactQuery(withCurrentUser(ListView)), ['endpoint'])
+    r2a(withUIRouter(withReactQuery(withCurrentUser(ListView))), ['endpoint'])
   )
 
   .config(config).name;
