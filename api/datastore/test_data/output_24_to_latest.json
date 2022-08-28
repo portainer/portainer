@@ -791,6 +791,7 @@
       "GitConfig": null,
       "Id": 2,
       "IsComposeFormat": false,
+      "Logo": "",
       "Name": "alpine",
       "Namespace": "",
       "Option": null,
@@ -814,6 +815,7 @@
       "GitConfig": null,
       "Id": 5,
       "IsComposeFormat": false,
+      "Logo": "",
       "Name": "redis",
       "Namespace": "",
       "Option": null,
@@ -837,6 +839,7 @@
       "GitConfig": null,
       "Id": 6,
       "IsComposeFormat": false,
+      "Logo": "",
       "Name": "nginx",
       "Namespace": "",
       "Option": null,
@@ -916,7 +919,7 @@
   ],
   "version": {
     "DB_UPDATING": "false",
-    "DB_VERSION": "60",
+    "DB_VERSION": "70",
     "INSTANCE_ID": "null"
   }
 }
