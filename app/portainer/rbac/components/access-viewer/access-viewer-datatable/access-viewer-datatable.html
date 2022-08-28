@@ -1,25 +1,36 @@
 <div class="datatable">
   <div class="searchBar">
-    <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-    <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." ng-model-options="{ debounce: 300 }" />
+    <pr-icon icon="'search'" class="vertical-center" feather="true"></pr-icon>
+    <input
+      type="text"
+      class="searchInput ml-1"
+      ng-model="$ctrl.state.textFilter"
+      ng-change="$ctrl.onTextFilterChange()"
+      placeholder="Search..."
+      ng-model-options="{ debounce: 300 }"
+    />
   </div>
   <div class="table-responsive">
     <table class="table table-hover nowrap-cells">
       <thead>
         <tr>
           <th>
-            <a ng-click="$ctrl.changeOrderBy('EndpointName')">
-              Environment
-              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'EndpointName' && !$ctrl.state.reverseOrder"></i>
-              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'EndpointName' && $ctrl.state.reverseOrder"></i>
-            </a>
+            <table-column-header
+              col-title="'Environment'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'EndpointName'"
+              is-sorted-desc="$ctrl.state.orderBy === 'EndpointName' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('EndpointName')"
+            ></table-column-header>
           </th>
           <th>
-            <a ng-click="$ctrl.changeOrderBy('RoleName')">
-              Role
-              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RoleName' && !$ctrl.state.reverseOrder"></i>
-              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RoleName' && $ctrl.state.reverseOrder"></i>
-            </a>
+            <table-column-header
+              col-title="'Role'"
+              can-sort="true"
+              is-sorted="$ctrl.state.orderBy === 'RoleName'"
+              is-sorted-desc="$ctrl.state.orderBy === 'RoleName' && $ctrl.state.reverseOrder"
+              ng-click="$ctrl.changeOrderBy('RoleName')"
+            ></table-column-header>
           </th>
           <th>Access origin</th>
         </tr>
