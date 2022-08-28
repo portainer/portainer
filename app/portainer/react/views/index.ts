@@ -4,6 +4,7 @@ import { HomeView } from '@/portainer/home';
 import { withCurrentUser } from '@/portainer/hooks/useUser';
 import { r2a } from '@/react-tools/react2angular';
 import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withUIRouter } from '@/react-tools/withUIRouter';
 
 import { wizardModule } from './wizard';
 import { teamsModule } from './teams';
@@ -17,5 +18,5 @@ export const viewsModule = angular
   ])
   .component(
     'homeView',
-    r2a(withReactQuery(withCurrentUser(HomeView)), [])
+    r2a(withUIRouter(withReactQuery(withCurrentUser(HomeView))), [])
   ).name;

@@ -9,20 +9,27 @@ import {
 } from '@/react/portainer/environments/wizard';
 import { withCurrentUser } from '@/portainer/hooks/useUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withUIRouter } from '@/react-tools/withUIRouter';
 
 export const wizardModule = angular
   .module('portainer.app.react.views.wizard', [])
   .component(
     'wizardEnvironmentCreationView',
-    r2a(withReactQuery(withCurrentUser(EnvironmentCreationView)), [])
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(EnvironmentCreationView))),
+      []
+    )
   )
   .component(
     'wizardEnvironmentTypeSelectView',
-    r2a(withReactQuery(withCurrentUser(EnvironmentTypeSelectView)), [])
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(EnvironmentTypeSelectView))),
+      []
+    )
   )
   .component(
     'wizardMainView',
-    r2a(withReactQuery(withCurrentUser(HomeView)), [])
+    r2a(withUIRouter(withReactQuery(withCurrentUser(HomeView))), [])
   )
   .config(config).name;
 
