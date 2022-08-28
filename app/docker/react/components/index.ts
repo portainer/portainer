@@ -8,12 +8,13 @@ import { TemplateListSortAngular } from '@/react/docker/app-templates/TemplateLi
 import { Gpu } from '@/react/docker/containers/CreateView/Gpu';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withUIRouter } from '@/react-tools/withUIRouter';
 
 export const componentsModule = angular
   .module('portainer.docker.react.components', [])
   .component(
     'containerQuickActions',
-    r2a(withCurrentUser(ContainerQuickActions), [
+    r2a(withUIRouter(withCurrentUser(ContainerQuickActions)), [
       'containerId',
       'nodeName',
       'state',
