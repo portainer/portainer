@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import { IComponentOptions, IController } from 'angular';
-import { Suspense } from 'react';
+import { ComponentType, Suspense } from 'react';
 import _ from 'lodash';
 
 import { RootProvider } from './RootProvider';
@@ -36,9 +36,9 @@ type PropNames<T> = Exclude<keyof T, number | symbol>;
  *
  * if the second parameter has any ts errors check that the component has the correct props
  */
-export function react2angular<T, U extends PropNames<T>[]>(
-  Component: React.ComponentType<T>,
-  propNames: U & ([PropNames<T>] extends [U[number]] ? unknown : PropNames<T>)
+export function react2angular<TProps>(
+  Component: ComponentType<TProps>,
+  propNames: PropNames<TProps>[] = []
 ): IComponentOptions & { name: string } {
   const bindings = Object.fromEntries(propNames.map((key) => [key, '<']));
 
@@ -61,7 +61,7 @@ export function react2angular<T, U extends PropNames<T>[]>(
         <Suspense fallback="loading translations">
           <RootProvider>
             {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-            <Component {...(props as T)} />
+            <Component {...(props as TProps)} />
           </RootProvider>
         </Suspense>,
         el

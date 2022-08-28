@@ -3,10 +3,11 @@ import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
 import { ListView } from '@/react/docker/containers/ListView';
+import { withCurrentUser } from '@/portainer/hooks/useUser';
 
 export const containersModule = angular
   .module('portainer.docker.containers', [])
-  .component('containersView', r2a(ListView, ['endpoint']))
+  .component('containersView', r2a(withCurrentUser(ListView), ['endpoint']))
 
   .config(config).name;
 

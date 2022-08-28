@@ -7,15 +7,19 @@ import {
   EnvironmentTypeSelectView,
   HomeView,
 } from '@/react/portainer/environments/wizard';
+import { withCurrentUser } from '@/portainer/hooks/useUser';
 
 export const wizardModule = angular
   .module('portainer.app.react.views.wizard', [])
-  .component('wizardEnvironmentCreationView', r2a(EnvironmentCreationView, []))
+  .component(
+    'wizardEnvironmentCreationView',
+    r2a(withCurrentUser(EnvironmentCreationView), [])
+  )
   .component(
     'wizardEnvironmentTypeSelectView',
-    r2a(EnvironmentTypeSelectView, [])
+    r2a(withCurrentUser(EnvironmentTypeSelectView), [])
   )
-  .component('wizardMainView', r2a(HomeView, []))
+  .component('wizardMainView', r2a(withCurrentUser(HomeView), []))
   .config(config).name;
 
 function config($stateRegistryProvider: StateRegistry) {

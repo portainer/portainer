@@ -1,3 +1,4 @@
+import { withCurrentUser } from '@/portainer/hooks/useUser';
 import { r2a } from '@/react-tools/react2angular';
 
 import { Settings } from '../types';
@@ -20,7 +21,7 @@ export function EdgeComputeSettingsView({ settings, onSubmit }: Props) {
   );
 }
 
-export const EdgeComputeSettingsViewAngular = r2a(EdgeComputeSettingsView, [
-  'settings',
-  'onSubmit',
-]);
+export const EdgeComputeSettingsViewAngular = r2a(
+  withCurrentUser(EdgeComputeSettingsView),
+  ['settings', 'onSubmit']
+);

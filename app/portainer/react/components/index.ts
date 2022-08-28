@@ -2,8 +2,15 @@ import angular from 'angular';
 import { react2angular } from 'react2angular';
 
 import { r2a } from '@/react-tools/react2angular';
+import { CreateAccessToken } from '@/react/portainer/account/CreateAccessTokenView';
+import {
+  DefaultRegistryAction,
+  DefaultRegistryDomain,
+  DefaultRegistryName,
+} from '@/react/portainer/registries/ListView/DefaultRegistry';
 import { Icon } from '@/react/components/Icon';
 import { ReactQueryDevtoolsWrapper } from '@/react/components/ReactQueryDevtoolsWrapper';
+import { withCurrentUser } from '@/portainer/hooks/useUser';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -29,7 +36,7 @@ export const componentsModule = angular
   )
   .component(
     'portainerTooltip',
-    react2angular(Tooltip, ['message', 'position', 'className'])
+    react2angular(Tooltip, ['message', 'position'])
   )
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
@@ -50,8 +57,7 @@ export const componentsModule = angular
   .component('viewLoading', r2a(ViewLoading, ['message']))
   .component(
     'pageHeader',
-    r2a(PageHeader, [
-      'id',
+    r2a(withCurrentUser(PageHeader), [
       'title',
       'breadcrumbs',
       'loading',
@@ -88,4 +94,12 @@ export const componentsModule = angular
   .component(
     'boxSelectorBadgeIcon',
     react2angular(BadgeIcon, ['featherIcon', 'icon'])
+  )
+
+  .component('defaultRegistryName', r2a(DefaultRegistryName, []))
+  .component('defaultRegistryAction', r2a(DefaultRegistryAction, []))
+  .component('defaultRegistryDomain', r2a(DefaultRegistryDomain, []))
+  .component(
+    'createAccessToken',
+    r2a(CreateAccessToken, ['onSubmit', 'onError'])
   ).name;
