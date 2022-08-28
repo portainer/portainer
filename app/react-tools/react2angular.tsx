@@ -1,9 +1,7 @@
 import ReactDOM from 'react-dom';
 import { IComponentOptions, IController } from 'angular';
-import { ComponentType, Suspense } from 'react';
+import { ComponentType, StrictMode } from 'react';
 import _ from 'lodash';
-
-import { RootProvider } from './RootProvider';
 
 function toProps(
   propNames: string[],
@@ -58,12 +56,11 @@ export function react2angular<TProps>(
     this.$onChanges = () => {
       const props = toProps(propNames, this, $q);
       ReactDOM.render(
-        <Suspense fallback="loading translations">
-          <RootProvider>
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-            <Component {...(props as TProps)} />
-          </RootProvider>
-        </Suspense>,
+        <StrictMode>
+          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+          <Component {...(props as TProps)} />
+        </StrictMode>,
+
         el
       );
     };
