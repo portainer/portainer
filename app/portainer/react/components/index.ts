@@ -1,5 +1,4 @@
 import angular from 'angular';
-import { react2angular } from 'react2angular';
 
 import { r2a } from '@/react-tools/react2angular';
 import { CreateAccessToken } from '@/react/portainer/account/CreateAccessTokenView';
@@ -37,10 +36,7 @@ export const componentsModule = angular
     'tagSelector',
     r2a(withReactQuery(TagSelector), ['allowCreate', 'onChange', 'value'])
   )
-  .component(
-    'portainerTooltip',
-    react2angular(Tooltip, ['message', 'position'])
-  )
+  .component('portainerTooltip', r2a(Tooltip, ['message', 'position']))
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
   .component(
@@ -53,7 +49,7 @@ export const componentsModule = angular
   .component('rdLoading', r2a(Loading, []))
   .component(
     'tableColumnHeader',
-    react2angular(TableColumnHeaderAngular, [
+    r2a(TableColumnHeaderAngular, [
       'colTitle',
       'canSort',
       'isSorted',
@@ -86,7 +82,7 @@ export const componentsModule = angular
   )
   .component(
     'prIcon',
-    react2angular(Icon, ['className', 'feather', 'icon', 'mode', 'size'])
+    r2a(Icon, ['className', 'feather', 'icon', 'mode', 'size'])
   )
   .component('reactQueryDevTools', r2a(ReactQueryDevtoolsWrapper, []))
   .component(
@@ -97,10 +93,7 @@ export const componentsModule = angular
     'datatableSearchbar',
     r2a(SearchBar, ['data-cy', 'onChange', 'value', 'placeholder'])
   )
-  .component(
-    'boxSelectorBadgeIcon',
-    react2angular(BadgeIcon, ['featherIcon', 'icon'])
-  )
+  .component('boxSelectorBadgeIcon', r2a(BadgeIcon, ['featherIcon', 'icon']))
 
   .component(
     'defaultRegistryName',
