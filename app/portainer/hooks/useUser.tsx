@@ -179,7 +179,9 @@ export function UserProvider({ children }: UserProviderProps) {
   }
 }
 
-export function withCurrentUser<T>(WrappedComponent: ComponentType<T>) {
+export function withCurrentUser<T>(
+  WrappedComponent: ComponentType<T>
+): ComponentType<T> {
   // Try to create a nice displayName for React Dev Tools.
   const displayName =
     WrappedComponent.displayName || WrappedComponent.name || 'Component';
