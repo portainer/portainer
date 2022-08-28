@@ -1,6 +1,7 @@
 import { useReducer } from 'react';
 
-import { useUser, withCurrentUser } from '@/portainer/hooks/useUser';
+import { useUser } from '@/portainer/hooks/useUser';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { Icon } from '@/react/components/Icon';
 import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, Role } from '@/portainer/teams/types';

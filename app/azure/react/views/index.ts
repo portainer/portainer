@@ -5,7 +5,7 @@ import { CreateView } from '@/react/azure/container-instances/CreateView';
 import { ItemView } from '@/react/azure/container-instances/ItemView';
 import { ListView } from '@/react/azure/container-instances/ListView';
 import { DashboardView } from '@/react/azure/DashboardView';
-import { withCurrentUser } from '@/portainer/hooks/useUser';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 

@@ -6,7 +6,7 @@ import { ContainerQuickActions } from '@/react/docker/containers/components/Cont
 import { TemplateListDropdownAngular } from '@/react/docker/app-templates/TemplateListDropdown';
 import { TemplateListSortAngular } from '@/react/docker/app-templates/TemplateListSort';
 import { Gpu } from '@/react/docker/containers/CreateView/Gpu';
-import { withCurrentUser } from '@/portainer/hooks/useUser';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 
 export const componentsModule = angular
