@@ -266,8 +266,8 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.updateStack = function (stack, stackFile, env, prune) {
-      return Stack.update({ endpointId: stack.EndpointId }, { id: stack.Id, StackFileContent: stackFile, Env: env, Prune: prune }).$promise;
+    service.updateStack = function (stack, stackFile, env, prune, logo) {
+      return Stack.update({ endpointId: stack.EndpointId }, { id: stack.Id, StackFileContent: stackFile, Env: env, Prune: prune, Logo: logo }).$promise;
     };
 
     service.updateKubeStack = function (stack, stackFile, gitConfig) {
