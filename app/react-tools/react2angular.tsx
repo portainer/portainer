@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import { IComponentOptions, IController } from 'angular';
-import { ComponentType, StrictMode } from 'react';
+import { StrictMode } from 'react';
 import _ from 'lodash';
 
 function toProps(
@@ -34,9 +34,9 @@ type PropNames<T> = Exclude<keyof T, number | symbol>;
  *
  * if the second parameter has any ts errors check that the component has the correct props
  */
-export function react2angular<TProps>(
-  Component: ComponentType<TProps>,
-  propNames: PropNames<TProps>[] = []
+export function react2angular<T, U extends PropNames<T>[]>(
+  Component: React.ComponentType<T>,
+  propNames: U & ([PropNames<T>] extends [U[number]] ? unknown : PropNames<T>)
 ): IComponentOptions & { name: string } {
   const bindings = Object.fromEntries(propNames.map((key) => [key, '<']));
 
@@ -58,7 +58,7 @@ export function react2angular<TProps>(
       ReactDOM.render(
         <StrictMode>
           {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-          <Component {...(props as TProps)} />
+          <Component {...(props as T)} />
         </StrictMode>,
 
         el

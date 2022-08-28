@@ -36,7 +36,10 @@ export const componentsModule = angular
     'tagSelector',
     r2a(withReactQuery(TagSelector), ['allowCreate', 'onChange', 'value'])
   )
-  .component('portainerTooltip', r2a(Tooltip, ['message', 'position']))
+  .component(
+    'portainerTooltip',
+    r2a(Tooltip, ['message', 'position', 'className'])
+  )
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
   .component(
@@ -65,6 +68,7 @@ export const componentsModule = angular
       'loading',
       'onReload',
       'reload',
+      'id',
     ])
   )
   .component(
