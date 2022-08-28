@@ -44,7 +44,7 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 	settings, err := store.SettingsService.Settings()
 	if store.IsErrObjectNotFound(err) {
 		defaultSettings := &portainer.Settings{
-			EnableTelemetry:      true,
+			EnableTelemetry:      false,
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			BlackListedLabels:    make([]portainer.Pair, 0),
 			InternalAuthSettings: portainer.InternalAuthSettings{
