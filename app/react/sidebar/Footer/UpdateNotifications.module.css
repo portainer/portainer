@@ -1,7 +1,19 @@
-.update-notification {
-  font-size: 14px;
+.root {
   padding: 12px;
-  border-radius: 2px;
-  background-color: #ff851b;
-  margin-bottom: 5px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.dismissTitle {
+  color: var(--white-color);
+}
+
+.dismissBtn {
+  border: none;
+  background: none;
+  color: var(--text-muted-color);
+}
+
+.actions {
+  padding-left: 26px;
 }
