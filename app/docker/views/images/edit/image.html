@@ -10,7 +10,9 @@
             <div class="row">
               <div class="pull-left" ng-repeat="tag in image.RepoTags" style="display: table">
                 <div class="input-group col-md-1 !pr-3.5 !pl-3.5">
-                  <span class="input-group-addon" style="border-right: 1px solid var(--border-input-group-addon-color); border-radius: 4px">{{ tag }}</span>
+                  <span class="input-group-addon" style="border-right: 1px solid var(--border-input-group-addon-color); border-radius: 4px" data-cy="image-tag-{{ tag }}">{{
+                    tag
+                  }}</span>
                   <span class="input-group-btn" style="padding: 0px 5px">
                     <span style="margin: 0px 5px" authorization="DockerImagePush">
                       <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushTag(tag)">
