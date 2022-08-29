@@ -695,6 +695,17 @@
                 <!-- !sysctls-input-list -->
               </div>
               <!-- !sysctls -->
+              <!-- shm-size-input -->
+              <div class="form-group">
+                <label for="shm-size" class="col-sm-2 control-label text-left"> Shared memory size </label>
+                <div class="col-sm-2">
+                  <input type="number" min="1" class="form-control" ng-model="formValues.ShmSize" id="shm-size" />
+                </div>
+                <div class="col-sm-2">
+                  <p class="small text-muted mt-2"> Size of /dev/shm (<b>MB</b>) </p>
+                </div>
+              </div>
+              <!-- !shm-size-input -->
               <!-- #region GPU -->
               <div class="col-sm-12 form-section-title"> GPU </div>
 

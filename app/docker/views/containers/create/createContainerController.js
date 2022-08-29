@@ -89,6 +89,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       CpuLimit: 0,
       MemoryLimit: 0,
       MemoryReservation: 0,
+      ShmSize: 64,
       CmdMode: 'default',
       EntrypointMode: 'default',
       Env: [],
@@ -414,6 +415,13 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function prepareResources(config) {
+      // Shared Memory Size - Round to 0.125
+      if ($scope.formValues.ShmSize >= 0) {
+        var shmSize = (Math.round($scope.formValues.ShmSize * 8) / 8).toFixed(3);
+        shmSize *= 1024 * 1024;
+        config.HostConfig.ShmSize = shmSize;
+      }
+
       // Memory Limit - Round to 0.125
       if ($scope.formValues.MemoryLimit >= 0) {
         var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
@@ -694,6 +702,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
       if (d.HostConfig.MemoryReservation) {
         $scope.formValues.MemoryReservation = d.HostConfig.MemoryReservation / 1024 / 1024;
+      }
+      if (d.HostConfig.ShmSize) {
+        $scope.formValues.ShmSize = d.HostConfig.ShmSize / 1024 / 1024;
       }
     }
 
