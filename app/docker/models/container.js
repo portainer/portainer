@@ -52,7 +52,7 @@ export function ContainerViewModel(data) {
     for (var i = 0; i < data.Ports.length; ++i) {
       var p = data.Ports[i];
       if (p.PublicPort) {
-        this.Ports.push({ host: p.IP, private: p.PrivatePort, public: p.PublicPort });
+        this.Ports.push({ host: p.IP, private: p.PrivatePort, public: p.PublicPort, type: p.Type });
       }
     }
   }

@@ -51,9 +51,6 @@
               <td>{{ item.Name }}</td>
               <td>{{ item.Description }}</td>
               <td class="be-visual-indicator-col" ng-switch on="$ctrl.isDefaultItem(item)">
-                <span ng-switch-when="false">
-                  <be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator>
-                </span>
                 <b ng-switch-when="true">Default</b>
               </td>
             </tr>

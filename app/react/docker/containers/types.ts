@@ -40,6 +40,7 @@ export interface Port {
   host: string;
   public: string;
   private: string;
+  type: string;
 }
 
 export type ContainerId = string;

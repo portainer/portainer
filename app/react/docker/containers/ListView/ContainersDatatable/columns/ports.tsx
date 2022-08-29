@@ -36,6 +36,7 @@ function PortsCell({ value: ports }: Props) {
     >
       <i className="fa fa-external-link-alt" aria-hidden="true" />
       {port.public}:{port.private}
+      {port.type === 'tcp' ? '' : `|${port.type}`}
     </a>
   ));
 }
