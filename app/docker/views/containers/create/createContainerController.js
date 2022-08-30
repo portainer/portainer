@@ -812,8 +812,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         function (d) {
           var containers = d;
           $scope.runningContainers = containers;
-          $scope.gpuUseAll = $scope.endpoint.Snapshots[0].GpuUseAll;
-          $scope.gpuUseList = $scope.endpoint.Snapshots[0].GpuUseList;
+          $scope.gpuUseAll = _.get($scope, 'endpoint.Snapshots[0].GpuUseAll', false);
+          $scope.gpuUseList = _.get($scope, 'endpoint.Snapshots[0].GpuUseList', []);
           if ($transition$.params().from) {
             loadFromContainerSpec();
           } else {
