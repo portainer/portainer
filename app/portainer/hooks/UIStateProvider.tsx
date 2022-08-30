@@ -11,6 +11,7 @@ interface UIState {
 type UIStateService = [UIState, (state: UIState) => void];
 
 const Context = createContext<null | UIStateService>(null);
+Context.displayName = 'UIStateContext';
 
 export function useUIState() {
   const context = useContext(Context);
