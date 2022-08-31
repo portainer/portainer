@@ -15,14 +15,14 @@ import (
 
 const contextKey = "edgeUpdateSchedule_item"
 
-// Handler is the HTTP handler used to handle edge environment(endpoint) operations.
+// Handler is the HTTP handler used to handle edge environment update operations.
 type Handler struct {
 	*mux.Router
 	requestBouncer *security.RequestBouncer
 	dataStore      dataservices.DataStore
 }
 
-// NewHandler creates a handler to manage environment(endpoint) operations.
+// NewHandler creates a handler to manage environment update operations.
 func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
@@ -39,6 +39,15 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 
 	router.Handle("",
 		httperror.LoggerHandler(h.create)).Methods(http.MethodPost)
+
+	router.Handle("/active",
+		httperror.LoggerHandler(h.activeSchedules)).Methods(http.MethodPost)
+
+	router.Handle("/agent_versions",
+		httperror.LoggerHandler(h.agentVersions)).Methods(http.MethodGet)
+
+	router.Handle("/previous_versions",
+		httperror.LoggerHandler(h.previousVersions)).Methods(http.MethodGet)
 
 	itemRouter := router.PathPrefix("/{id}").Subrouter()
 	itemRouter.Use(middlewares.WithItem(func(id edgetypes.UpdateScheduleID) (*edgetypes.UpdateSchedule, error) {

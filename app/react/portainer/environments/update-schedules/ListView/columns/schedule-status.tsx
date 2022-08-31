@@ -28,13 +28,13 @@ function StatusCell({
     return 'No related environments';
   }
 
-  const error = statusList.find((s) => s.Type === StatusType.Failed);
+  const error = statusList.find((s) => s.status === StatusType.Failed);
 
   if (error) {
-    return `Failed: (ID: ${error.environmentId}) ${error.Error}`;
+    return `Failed: (ID: ${error.environmentId}) ${error.error}`;
   }
 
-  const pending = statusList.find((s) => s.Type === StatusType.Pending);
+  const pending = statusList.find((s) => s.status === StatusType.Pending);
 
   if (pending) {
     return 'Pending';

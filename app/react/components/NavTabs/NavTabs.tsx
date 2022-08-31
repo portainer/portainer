@@ -32,6 +32,7 @@ export function NavTabs<T extends string | number = string>({
             className={clsx({
               active: option.id === selectedId,
               [styles.parent]: !option.children,
+              disabled,
             })}
             key={option.id}
           >
@@ -53,7 +54,7 @@ export function NavTabs<T extends string | number = string>({
         ))}
       </ul>
       {selected && selected.children && (
-        <div className="tab-content">{selected.children}</div>
+        <div className="tab-content mt-3">{selected.children}</div>
       )}
     </div>
   );

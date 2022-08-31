@@ -16,7 +16,7 @@ import { ScheduleType } from '../types';
 import { useCreateMutation } from '../queries/create';
 import { FormValues } from '../common/types';
 import { validation } from '../common/validation';
-import { UpdateTypeTabs } from '../common/UpdateTypeTabs';
+import { ScheduleTypeSelector } from '../common/ScheduleTypeSelector';
 import { useList } from '../queries/list';
 import { EdgeGroupsField } from '../common/EdgeGroupsField';
 import { NameField } from '../common/NameField';
@@ -25,8 +25,8 @@ const initialValues: FormValues = {
   name: '',
   groupIds: [],
   type: ScheduleType.Update,
-  version: 'latest',
   time: Math.floor(Date.now() / 1000) + 60 * 60,
+  environments: {},
 };
 
 export function CreateView() {
@@ -56,23 +56,15 @@ export function CreateView() {
             <Widget.Body>
               <Formik
                 initialValues={initialValues}
-                onSubmit={(values) => {
-                  createMutation.mutate(values, {
-                    onSuccess() {
-                      notifySuccess('Success', 'Created schedule successfully');
-                      router.stateService.go('^');
-                    },
-                  });
-                }}
+                onSubmit={handleSubmit}
                 validateOnMount
                 validationSchema={() => validation(schedules)}
               >
                 {({ isValid }) => (
                   <FormikForm className="form-horizontal">
                     <NameField />
-
                     <EdgeGroupsField />
-                    <UpdateTypeTabs />
+                    <ScheduleTypeSelector />
                     <div className="form-group">
                       <div className="col-sm-12">
                         <LoadingButton
@@ -93,4 +85,13 @@ export function CreateView() {
       </div>
     </>
   );
+
+  function handleSubmit(values: FormValues) {
+    createMutation.mutate(values, {
+      onSuccess() {
+        notifySuccess('Success', 'Created schedule successfully');
+        router.stateService.go('^');
+      },
+    });
+  }
 }
