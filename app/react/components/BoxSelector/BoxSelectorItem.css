@@ -90,16 +90,11 @@
   }
 }
 
-.box-selector-item.limited.business label {
+.box-selector-item.limited.business label,
+.box-selector-item.limited.business input[type='radio']:checked + label {
   @apply border-warning-7 bg-warning-1 text-black;
   @apply th-dark:bg-warning-8 th-dark:bg-opacity-10;
   @apply th-highcontrast:bg-warning-8 th-highcontrast:bg-opacity-10;
-}
-
-.box-selector-item.limited.business input[type='radio']:checked + label {
-  @apply border-warning-7 bg-warning-1 text-black;
-  @apply th-dark:bg-warning-8 th-dark:bg-opacity-20;
-  @apply th-highcontrast:bg-warning-8 th-highcontrast:bg-opacity-20;
 }
 
 .boxselector_img_container {
