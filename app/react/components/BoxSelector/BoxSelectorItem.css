@@ -73,6 +73,7 @@
 .box-selector-item input[type='radio']:checked + label {
   @apply bg-blue-2 border-blue-6;
   @apply th-dark:bg-blue-10 th-dark:border-blue-7;
+  @apply th-highcontrast:bg-blue-10 th-highcontrast:border-blue-7;
 
   background-image: url(../../../assets/ico/checked.svg);
   background-repeat: no-repeat;
@@ -89,10 +90,16 @@
   }
 }
 
-.box-selector-item.limited.business label,
+.box-selector-item.limited.business label {
+  @apply border-warning-7 bg-warning-1 text-black;
+  @apply th-dark:bg-warning-8 th-dark:bg-opacity-10;
+  @apply th-highcontrast:bg-warning-8 th-highcontrast:bg-opacity-10;
+}
+
 .box-selector-item.limited.business input[type='radio']:checked + label {
   @apply border-warning-7 bg-warning-1 text-black;
-  @apply th-dark:bg-warning-3;
+  @apply th-dark:bg-warning-8 th-dark:bg-opacity-20;
+  @apply th-highcontrast:bg-warning-8 th-highcontrast:bg-opacity-20;
 }
 
 .boxselector_img_container {
@@ -128,4 +135,5 @@
 
 .box-selector-item p {
   margin-bottom: 0;
+  color: var(--text-boxselector-header);
 }
