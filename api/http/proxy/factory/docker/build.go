@@ -12,6 +12,8 @@ import (
 	"github.com/portainer/portainer/api/archive"
 )
 
+const OneMegabyte = 1024768
+
 type postDockerfileRequest struct {
 	Content string
 }
@@ -56,7 +58,7 @@ func buildOperation(request *http.Request) error {
 		}
 
 	case "multipart/form-data":
-		err := request.ParseMultipartForm(32 << 20) // 32 MB
+		err := request.ParseMultipartForm(32 * OneMegabyte) // limit parser memory to 32MB
 		if err != nil {
 			return err
 		}
