@@ -22,7 +22,7 @@ Please note that the public demo cluster is **reset every 15min**.
 
 Portainer CE is updated regularly. We aim to do an update release every couple of months.
 
-**The latest version of Portainer is 2.13.x**.
+<a href="https://github.com/portainer/portainer/releases/latest"><img alt="latest version" src="https://img.shields.io/github/v/release/portainer/portainer?color=%2344cc11&label=Latest%20release&style=for-the-badge"></img></a>
 
 ## Getting started
 
