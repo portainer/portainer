@@ -8,9 +8,9 @@ angular.module('portainer.app').factory('TeamService', [
     'use strict';
     var service = {};
 
-    service.teams = function () {
+    service.teams = function (endpointId) {
       var deferred = $q.defer();
-      Teams.query()
+      Teams.query({ endpointId: endpointId })
         .$promise.then(function success(data) {
           var teams = data.map(function (item) {
             return new TeamViewModel(item);
