@@ -28,26 +28,28 @@
           <!-- !config-data -->
           <!-- labels -->
           <div class="form-group">
-            <div class="col-sm-12" style="margin-top: 5px">
-              <label class="control-label text-left">Labels</label>
-              <span class="label label-default interactive" style="margin-left: 10px" ng-click="ctrl.addLabel()">
+            <div class="col-sm-12 mt-1">
+              <label class="control-label text-left space-right">Labels</label>
+              <span class="label label-default interactive vertical-center space-left" ng-click="ctrl.addLabel()">
                 <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> add label
               </span>
             </div>
             <!-- labels-input-list -->
-            <div class="col-sm-12 form-inline" style="margin-top: 10px">
-              <div ng-repeat="label in ctrl.formValues.Labels" style="margin-top: 2px">
+            <div class="col-sm-12 form-inline mt-2">
+              <div ng-repeat="label in ctrl.formValues.Labels" class="mt-1">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
                   <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
                 </div>
-                <div class="input-group col-sm-5 input-group-sm">
+                <div class="input-group col-sm-6 input-group-sm">
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
+                  <span class="input-group-btn">
+                    <button class="btn btn-dangerlight" type="button" ng-click="ctrl.removeLabel($index)">
+                      <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
+                    </button>
+                  </span>
                 </div>
-                <button class="btn btn-light" type="button" ng-click="ctrl.removeLabel($index)">
-                  <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
-                </button>
               </div>
             </div>
             <!-- !labels-input-list -->

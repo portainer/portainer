@@ -54,8 +54,8 @@
     <button class="btn btn-sm btn-light" type="button" ng-if="!$ctrl.hasValue()" ng-click="$ctrl.onChangeValue('')">
       <pr-icon icon="'plus'" feather="true"></pr-icon> Add value
     </button>
-    <button class="btn btn-light" type="button" ng-click="$ctrl.onRemove($ctrl.index)">
-      <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+    <button class="btn btn-dangerlight" type="button" ng-click="$ctrl.onRemove($ctrl.index)">
+      <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
     </button>
   </div>
 </ng-form>
