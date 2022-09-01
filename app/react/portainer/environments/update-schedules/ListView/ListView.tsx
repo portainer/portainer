@@ -1,4 +1,5 @@
 import { Clock, Trash2 } from 'react-feather';
+import { useStore } from 'zustand';
 
 import {
   FeatureFlag,
@@ -11,6 +12,7 @@ import { Datatable } from '@@/datatables';
 import { PageHeader } from '@@/PageHeader';
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
+import { useSearchBarState } from '@@/datatables/SearchBar';
 
 import { useList } from '../queries/list';
 import { EdgeUpdateSchedule } from '../types';
@@ -20,12 +22,15 @@ import { columns } from './columns';
 import { createStore } from './datatable-store';
 
 const storageKey = 'update-schedules-list';
-const useStore = createStore(storageKey);
+const settingsStore = createStore(storageKey);
 
 export function ListView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
+
+  const settings = useStore(settingsStore);
+  const [search, setSearch] = useSearchBarState(storageKey);
+
   const listQuery = useList();
-  const store = useStore();
 
   if (!listQuery.data) {
     return null;
@@ -40,20 +45,22 @@ export function ListView() {
       />
 
       <Datatable
-        columns={columns}
-        titleOptions={{
-          title: 'Update & rollback',
-          icon: Clock,
-        }}
         dataset={listQuery.data}
-        settingsStore={store}
-        storageKey={storageKey}
+        columns={columns}
+        title="Update & rollback"
+        titleIcon={Clock}
         emptyContentLabel="No schedules found"
         isLoading={listQuery.isLoading}
         totalCount={listQuery.data.length}
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}
+        initialPageSize={settings.pageSize}
+        onPageSizeChange={settings.setPageSize}
+        initialSortBy={settings.sortBy}
+        onSortByChange={settings.setSortBy}
+        searchValue={search}
+        onSearchChange={setSearch}
       />
     </>
   );

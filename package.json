@@ -143,7 +143,7 @@
     "xterm": "^3.8.0",
     "yaml": "^1.10.2",
     "yup": "^0.32.11",
-    "zustand": "^4.0.0"
+    "zustand": "^4.1.1"
   },
   "devDependencies": {
     "@apidevtools/swagger-cli": "^4.0.4",

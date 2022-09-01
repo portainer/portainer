@@ -1,6 +1,6 @@
 import { PageHeader } from '@@/PageHeader';
 
-import { IngressDataTable } from './IngressDataTable';
+import { IngressDatatable } from './IngressDatatable';
 
 export function IngressesDatatableView() {
   return (
@@ -14,7 +14,7 @@ export function IngressesDatatableView() {
         ]}
         reload
       />
-      <IngressDataTable />
+      <IngressDatatable />
     </>
   );
 }

@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 
-import './InnerDatatable.css';
+import './NestedTable.css';
 
-export function InnerDatatable({ children }: PropsWithChildren<unknown>) {
+export function NestedTable({ children }: PropsWithChildren<unknown>) {
   return <div className="inner-datatable">{children}</div>;
 }

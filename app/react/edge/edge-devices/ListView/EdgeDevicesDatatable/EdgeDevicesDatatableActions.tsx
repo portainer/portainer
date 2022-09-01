@@ -7,8 +7,8 @@ import {
 } from '@/portainer/services/modal.service/confirm';
 import { promptAsync } from '@/portainer/services/modal.service/prompt';
 import * as notifications from '@/portainer/services/notifications';
-import { activateDevice } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 import { deleteEndpoint } from '@/react/portainer/environments/environment.service';
+import { useActivateDeviceMutation } from '@/portainer/hostmanagement/open-amt/queries';
 
 import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
@@ -17,7 +17,6 @@ interface Props {
   selectedItems: Environment[];
   isFDOEnabled: boolean;
   isOpenAMTEnabled: boolean;
-  setLoadingMessage(message: string): void;
   showWaitingRoomLink: boolean;
 }
 
@@ -30,10 +29,10 @@ export function EdgeDevicesDatatableActions({
   selectedItems,
   isOpenAMTEnabled,
   isFDOEnabled,
-  setLoadingMessage,
   showWaitingRoomLink,
 }: Props) {
   const router = useRouter();
+  const activateDeviceMutation = useActivateDeviceMutation();
 
   return (
     <div className="actionBar">
@@ -169,23 +168,13 @@ export function EdgeDevicesDatatableActions({
       return;
     }
 
-    try {
-      setLoadingMessage(
-        'Activating Active Management Technology on selected device...'
-      );
-      await activateDevice(selectedEnvironment.Id);
-      notifications.success(
-        'Successfully associated with OpenAMT',
-        selectedEnvironment.Name
-      );
-    } catch (err) {
-      notifications.error(
-        'Failure',
-        err as Error,
-        'Unable to associate with OpenAMT'
-      );
-    } finally {
-      setLoadingMessage('');
-    }
+    activateDeviceMutation.mutate(selectedEnvironment.Id, {
+      onSuccess() {
+        notifications.notifySuccess(
+          'Successfully associated with OpenAMT',
+          selectedEnvironment.Name
+        );
+      },
+    });
   }
 }

@@ -1,6 +1,7 @@
 import { Column } from 'react-table';
 
 import { Environment } from '@/react/portainer/environments/types';
+import { EnvironmentGroupId } from '@/react/portainer/environments/environment-groups/types';
 
 import { DefaultFilter } from '@@/datatables/Filter';
 
@@ -15,8 +16,9 @@ export const group: Column<Environment> = {
   canHide: true,
 };
 
-function GroupCell() {
-  const { groupName } = useRowContext();
+function GroupCell({ value }: { value: EnvironmentGroupId }) {
+  const { groups } = useRowContext();
+  const group = groups.find((g) => g.Id === value);
 
-  return groupName;
+  return group?.Name || '';
 }

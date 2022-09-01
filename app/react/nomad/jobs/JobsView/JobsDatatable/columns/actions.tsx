@@ -1,4 +1,5 @@
 import { CellProps, Column } from 'react-table';
+import { Clock } from 'react-feather';
 
 import { Job } from '@/react/nomad/types';
 
@@ -18,7 +19,7 @@ export function ActionsCell({ row }: CellProps<Job>) {
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <div className="text-center" {...row.getToggleRowExpandedProps()}>
-      <i className="fa fa-history space-right" aria-hidden="true" />
+      <Clock className="feather" />
     </div>
   );
 }

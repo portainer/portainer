@@ -3,6 +3,7 @@ import { CellProps, Column } from 'react-table';
 import { Task } from '@/react/nomad/types';
 
 import { Link } from '@@/Link';
+import { Icon } from '@@/Icon';
 
 export const actions: Column<Task> = {
   Header: 'Task Actions',
@@ -25,7 +26,7 @@ export function ActionsCell({ row }: CellProps<Task>) {
   };
 
   return (
-    <div className="text-center">
+    <div className="text-center vertical-center">
       {/* events */}
       <Link
         to="nomad.events"
@@ -33,12 +34,12 @@ export function ActionsCell({ row }: CellProps<Task>) {
         title="Events"
         className="space-right"
       >
-        <i className="fa fa-history space-right" aria-hidden="true" />
+        <Icon icon="clock" feather className="space-right icon" />
       </Link>
 
       {/* logs */}
       <Link to="nomad.logs" params={params} title="Logs">
-        <i className="fa fa-file-alt space-right" aria-hidden="true" />
+        <Icon icon="file-text" feather className="space-right icon" />
       </Link>
     </div>
   );

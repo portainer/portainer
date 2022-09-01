@@ -1,11 +1,12 @@
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
-import { useTableSettings } from '@@/datatables/useTableSettings';
 
-import { JobsTableSettings } from './types';
+import { TableSettings } from './types';
 
-export function JobsDatatableSettings() {
-  const { settings, setTableSettings } = useTableSettings<JobsTableSettings>();
+interface Props {
+  settings: TableSettings;
+}
 
+export function JobsDatatableSettings({ settings }: Props) {
   return (
     <TableSettingsMenuAutoRefresh
       value={settings.autoRefreshRate}
@@ -14,6 +15,6 @@ export function JobsDatatableSettings() {
   );
 
   function handleRefreshRateChange(autoRefreshRate: number) {
-    setTableSettings({ autoRefreshRate });
+    settings.setAutoRefreshRate(autoRefreshRate);
   }
 }

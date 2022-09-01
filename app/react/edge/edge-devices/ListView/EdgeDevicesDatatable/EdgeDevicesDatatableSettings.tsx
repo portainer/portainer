@@ -1,12 +1,11 @@
 import { TableSettingsMenuAutoRefresh } from '@@/datatables/TableSettingsMenuAutoRefresh';
-import { useTableSettings } from '@@/datatables/useTableSettings';
+import { RefreshableTableSettings } from '@@/datatables/types';
 
-import { EdgeDeviceTableSettings } from './types';
+interface Props {
+  settings: RefreshableTableSettings;
+}
 
-export function EdgeDevicesDatatableSettings() {
-  const { settings, setTableSettings } =
-    useTableSettings<EdgeDeviceTableSettings>();
-
+export function EdgeDevicesDatatableSettings({ settings }: Props) {
   return (
     <TableSettingsMenuAutoRefresh
       value={settings.autoRefreshRate}
@@ -15,6 +14,6 @@ export function EdgeDevicesDatatableSettings() {
   );
 
   function handleRefreshRateChange(autoRefreshRate: number) {
-    setTableSettings({ autoRefreshRate });
+    settings.setAutoRefreshRate(autoRefreshRate);
   }
 }
