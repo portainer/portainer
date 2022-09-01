@@ -52,7 +52,11 @@ func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *por
 	d.swarmStackManager.Login(registries, endpoint)
 	defer d.swarmStackManager.Logout(endpoint)
 
-	return d.composeStackManager.Up(context.TODO(), stack, endpoint, forceRereate)
+	err := d.composeStackManager.Up(context.TODO(), stack, endpoint, forceRereate)
+	if err != nil {
+		d.composeStackManager.Down(context.TODO(), stack, endpoint)
+	}
+	return err
 }
 
 func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error {
