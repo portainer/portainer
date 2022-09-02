@@ -5,7 +5,6 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$controller',
   'DatatableService',
   'PaginationService',
-  'Notifications',
   function ($scope, $controller, DatatableService, PaginationService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
@@ -17,19 +16,18 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       pageNumber: 1,
     });
 
-    this.paginationChanged = function () {
-      this.state.loading = true;
-      this.state.filteredDataSet = [];
-      const start = (this.state.pageNumber - 1) * this.state.paginatedItemLimit + 1;
-      this.retrievePage(start, this.state.paginatedItemLimit, this.state.textFilter)
-        .then((data) => {
-          this.state.filteredDataSet = data.endpoints;
-          this.state.totalFilteredDataSet = data.totalCount;
-          this.refreshSelectedItems();
-        })
-        .finally(() => {
-          this.state.loading = false;
-        });
+    this.paginationChanged = async function () {
+      try {
+        this.state.loading = true;
+        this.state.filteredDataSet = [];
+        const start = (this.state.pageNumber - 1) * this.state.paginatedItemLimit + 1;
+        const { endpoints, totalCount } = await this.retrievePage(start, this.state.paginatedItemLimit, this.state.textFilter);
+        this.state.filteredDataSet = endpoints;
+        this.state.totalFilteredDataSet = totalCount;
+        this.refreshSelectedItems();
+      } finally {
+        this.state.loading = false;
+      }
     };
 
     this.onPageChange = function (newPageNumber) {
@@ -47,7 +45,15 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
     this.onTextFilterChange = function () {
       var filterValue = this.state.textFilter;
       DatatableService.setDataTableTextFilters(this.tableKey, filterValue);
+      this.resetSelectionState();
       this.paginationChanged();
+    };
+
+    /**
+     * Overriden
+     */
+    this.uniq = function () {
+      return _.uniqBy(_.concat(this.state.filteredDataSet, this.state.selectedItems), 'Id');
     };
 
     /**
@@ -59,14 +65,11 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
     };
 
     this.refreshSelectedItems = function () {
-      let selected = [];
       _.forEach(this.state.filteredDataSet, (item) => {
         if (_.filter(this.state.selectedItems, (i) => i.Id == item.Id).length > 0) {
           item.Checked = true;
-          selected.push(item);
         }
       });
-      this.state.selectedItems = selected;
     };
 
     /**
