@@ -1,17 +1,17 @@
 <page-header title="'Environments'" breadcrumbs="['Environment management']" reload="true"> </page-header>
 
-<view-loading ng-if="state.loadingMessage" message="state.loadingMessage"></view-loading>
+<view-loading ng-if="$ctrl.state.loadingMessage" message="$ctrl.state.loadingMessage"></view-loading>
 
-<div class="row" ng-if="!state.loadingMessage">
+<div class="row" ng-if="!$ctrl.state.loadingMessage">
   <div class="col-sm-12">
     <endpoints-datatable
       title-text="Environments"
       title-icon="hard-drive"
-      table-key="endpoints"
+      table-key="$ctrl.endpoints"
       order-by="Name"
-      remove-action="removeAction"
-      retrieve-page="getPaginatedEndpoints"
-      set-loading-message="setLoadingMessage"
+      remove-action="$ctrl.removeAction"
+      retrieve-page="$ctrl.getPaginatedEndpoints"
+      set-loading-message="$ctr.setLoadingMessage"
     ></endpoints-datatable>
   </div>
 </div>
