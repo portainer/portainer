@@ -27,17 +27,22 @@ func FilterUserTeams(teams []portainer.Team, context *RestrictedRequestContext) 
 // FilterLeaderTeams filters teams based on user role.
 // Team leaders only have access to team they lead.
 func FilterLeaderTeams(teams []portainer.Team, context *RestrictedRequestContext) []portainer.Team {
-	filteredTeams := teams
+	filteredTeams := []portainer.Team{}
 
-	if context.IsTeamLeader {
-		filteredTeams = make([]portainer.Team, 0)
-		for _, membership := range context.UserMemberships {
-			for _, team := range teams {
-				if team.ID == membership.TeamID && membership.Role == portainer.TeamLeader {
-					filteredTeams = append(filteredTeams, team)
-					break
-				}
-			}
+	if !context.IsTeamLeader {
+		return filteredTeams
+	}
+
+	leaderSet := map[portainer.TeamID]bool{}
+	for _, membership := range context.UserMemberships {
+		if membership.Role == portainer.TeamLeader && membership.UserID == context.UserID {
+			leaderSet[membership.TeamID] = true
+		}
+	}
+
+	for _, team := range teams {
+		if leaderSet[team.ID] {
+			filteredTeams = append(filteredTeams, team)
 		}
 	}
 

@@ -9,9 +9,10 @@ import {
 } from '@/react/portainer/registries/ListView/DefaultRegistry';
 
 import { wizardModule } from './wizard';
+import { teamsModule } from './teams';
 
 export const viewsModule = angular
-  .module('portainer.app.react.views', [wizardModule])
+  .module('portainer.app.react.views', [wizardModule, teamsModule])
   .component('defaultRegistryName', r2a(DefaultRegistryName, []))
   .component('defaultRegistryAction', r2a(DefaultRegistryAction, []))
   .component('defaultRegistryDomain', r2a(DefaultRegistryDomain, []))

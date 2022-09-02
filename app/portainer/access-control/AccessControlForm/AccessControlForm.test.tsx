@@ -2,7 +2,7 @@ import { server, rest } from '@/setup-tests/server';
 import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 import { renderWithQueryClient, within } from '@/react-tools/test-utils';
-import { Team, TeamId } from '@/portainer/teams/types';
+import { Team, TeamId } from '@/react/portainer/users/teams/types';
 import { createMockTeams } from '@/react-tools/test-mocks';
 import { UserId } from '@/portainer/users/types';
 

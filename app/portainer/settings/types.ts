@@ -1,4 +1,4 @@
-import { TeamId } from '../teams/types';
+import { TeamId } from '@/react/portainer/users/teams/types';
 
 export interface FDOConfiguration {
   enabled: boolean;

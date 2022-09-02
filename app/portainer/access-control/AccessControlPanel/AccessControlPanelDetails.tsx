@@ -4,8 +4,8 @@ import _ from 'lodash';
 
 import { ownershipIcon, truncate } from '@/portainer/filters/filters';
 import { UserId } from '@/portainer/users/types';
-import { TeamId } from '@/portainer/teams/types';
-import { useTeams } from '@/portainer/teams/queries';
+import { TeamId } from '@/react/portainer/users/teams/types';
+import { useTeams } from '@/react/portainer/users/teams/queries';
 import { useUsers } from '@/portainer/users/queries';
 
 import { Link } from '@@/Link';
@@ -178,17 +178,20 @@ function InheritanceMessage({
 }
 
 function useAuthorizedTeams(authorizedTeamIds: TeamId[]) {
-  return useTeams(authorizedTeamIds.length > 0, (teams) => {
-    if (authorizedTeamIds.length === 0) {
-      return [];
-    }
+  return useTeams(false, {
+    enabled: authorizedTeamIds.length > 0,
+    select: (teams) => {
+      if (authorizedTeamIds.length === 0) {
+        return [];
+      }
 
-    return _.compact(
-      authorizedTeamIds.map((id) => {
-        const team = teams.find((u) => u.Id === id);
-        return team?.Name;
-      })
-    );
+      return _.compact(
+        authorizedTeamIds.map((id) => {
+          const team = teams.find((u) => u.Id === id);
+          return team?.Name;
+        })
+      );
+    },
   });
 }
 

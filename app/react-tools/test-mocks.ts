@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { Team } from '@/portainer/teams/types';
+import { Team } from '@/react/portainer/users/teams/types';
 import { Role, User, UserId } from '@/portainer/users/types';
 import { Environment } from '@/portainer/environments/types';
 
