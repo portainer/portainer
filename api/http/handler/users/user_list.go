@@ -51,13 +51,12 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 			return httperror.InternalServerError("Unable to retrieve endpoint from the database", err)
 		}
 
+		endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
+		}
 		for _, user := range filteredUsers {
-			// if the user inherits the endpoint access from team or group
-			endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
-			if err != nil {
-				return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
-			}
-
+			// the user inherits the endpoint access from team or environment group
 			teamMemberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
 			if err != nil {
 				return httperror.InternalServerError("Unable to retrieve team membership from the database", err)
@@ -66,13 +65,6 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 			if security.AuthorizedEndpointAccess(endpoint, endpointGroup, user.ID, teamMemberships) {
 				ret = append(ret, user)
 				continue
-			}
-
-			for userID := range endpoint.UserAccessPolicies {
-				if user.ID == userID {
-					ret = append(ret, user)
-					break
-				}
 			}
 		}
 		return response.JSON(w, ret)

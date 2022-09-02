@@ -58,8 +58,8 @@ func (handler *Handler) teamList(w http.ResponseWriter, r *http.Request) *httper
 			return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 		}
 		for _, team := range filteredTeams {
-			// if the team is given access to the endpoint or inherited from group
 			found := false
+			// the team inherits the endpoint access from environment group
 			for teamID := range endpointGroup.TeamAccessPolicies {
 				if team.ID == teamID {
 					ret = append(ret, team)
@@ -72,6 +72,7 @@ func (handler *Handler) teamList(w http.ResponseWriter, r *http.Request) *httper
 				continue
 			}
 
+			// the team is given access to the endpoint directly
 			for teamID := range endpoint.TeamAccessPolicies {
 				if team.ID == teamID {
 					ret = append(ret, team)
