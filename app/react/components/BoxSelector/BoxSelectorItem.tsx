@@ -44,7 +44,10 @@ export function BoxSelectorItem<T extends number | string>({
     >
       <>
         {limitedToBE && (
-          <LimitedToBeIndicator tooltipId={beIndicatorTooltipId} />
+          <LimitedToBeIndicator
+            tooltipId={beIndicatorTooltipId}
+            featureId={option.feature}
+          />
         )}
         <div className={clsx({ 'opacity-30': limitedToBE })}>
           <div className="boxselector_img_container">
