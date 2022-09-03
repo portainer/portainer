@@ -2,6 +2,7 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect } from 'react';
 import { X, Slash } from 'react-feather';
 import clsx from 'clsx';
+import angular from 'angular';
 
 import {
   PlatformType,
@@ -11,6 +12,7 @@ import {
 import { getPlatformType } from '@/portainer/environments/utils';
 import { useEnvironment } from '@/portainer/environments/queries/useEnvironment';
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { EndpointProvider } from '@/portainer/services/types';
 
 import { getPlatformIcon } from '../portainer/environments/utils/get-platform-icon';
 
@@ -108,6 +110,13 @@ function useCurrentEnvironment() {
   return { query: useEnvironment(environmentId), clearEnvironment };
 
   function clearEnvironment() {
+    const $injector = angular.element(document).injector();
+    $injector.invoke(
+      /* @ngInject */ (EndpointProvider: EndpointProvider) => {
+        EndpointProvider.setCurrentEndpoint(undefined);
+      }
+    );
+
     if (params.endpointId) {
       router.stateService.go('portainer.home');
     }
