@@ -36,10 +36,7 @@ func (handler *Handler) activeSchedules(w http.ResponseWriter, r *http.Request) 
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	list, err := handler.dataStore.EdgeUpdateSchedule().ActiveSchedules(payload.EnvironmentIDs)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve the edge update schedules list", err)
-	}
+	list := handler.dataStore.EdgeUpdateSchedule().ActiveSchedules(payload.EnvironmentIDs)
 
 	return response.JSON(w, list)
 }
