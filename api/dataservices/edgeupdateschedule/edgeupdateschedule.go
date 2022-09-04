@@ -12,7 +12,7 @@ const (
 	BucketName = "edge_update_schedule"
 )
 
-// Service represents a service for managingFDO Profiles data.
+// Service represents a service for managing Edge Update Schedule data.
 type Service struct {
 	connection portainer.Connection
 }
