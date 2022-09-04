@@ -2,7 +2,6 @@ package stacks
 
 import (
 	"errors"
-	"io/ioutil"
 	"strings"
 	"testing"
 
@@ -68,7 +67,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 	_, store, teardown := datastore.MustNewTestStore(true, true)
 	defer teardown()
 
-	tmpDir, _ := ioutil.TempDir("", "stack")
+	tmpDir := t.TempDir()
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
 	err := store.User().Create(admin)
@@ -117,7 +116,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 	_, store, teardown := datastore.MustNewTestStore(true, true)
 	defer teardown()
 
-	tmpDir, _ := ioutil.TempDir("", "stack")
+	tmpDir := t.TempDir()
 
 	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})
 	assert.NoError(t, err, "error creating environment")
