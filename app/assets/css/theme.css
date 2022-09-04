@@ -286,7 +286,7 @@
   --bg-codemirror-color: var(--ui-gray-warm-11);
   --bg-codemirror-gutters-color: var(--ui-gray-warm-8);
   --bg-codemirror-selected-color: var(--ui-gray-warm-7);
-  --bg-dropdown-menu-color: var(--ui-gray-7);
+  --bg-dropdown-menu-color: var(--ui-gray-warm-8);
   --bg-main-color: var(--grey-2);
   --bg-widget-color: var(--ui-gray-warm-10);
   --bg-widget-header-color: var(--grey-1);
@@ -475,7 +475,7 @@
   --bg-hover-table-color: var(--grey-3);
   --bg-switch-box-color: var(--grey-53);
   --bg-panel-body-color: var(--black-color);
-  --bg-dropdown-menu-color: var(--black-color);
+  --bg-dropdown-menu-color: var(--ui-gray-warm-8);
   --bg-codemirror-selected-color: var(--grey-3);
   --bg-motd-body-color: var(--black-color);
   --bg-blocklist-hover-color: var(--black-color);
