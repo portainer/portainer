@@ -47,6 +47,8 @@ type endpointEdgeStatusInspectResponse struct {
 	Credentials string `json:"credentials"`
 	// List of stacks to be deployed on the environments(endpoints)
 	Stacks []stackStatusResponse `json:"stacks"`
+
+	VersionUpdate versionUpdateResponse `json:"versionUpdate"`
 }
 
 // @id EndpointEdgeStatusInspect
@@ -128,6 +130,8 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		return handlerErr
 	}
 	statusResponse.Stacks = edgeStacksStatus
+
+	statusResponse.VersionUpdate = handler.getVersionUpdateSchedule(endpoint)
 
 	return response.JSON(w, statusResponse)
 }

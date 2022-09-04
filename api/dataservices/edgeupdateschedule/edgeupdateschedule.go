@@ -178,6 +178,7 @@ func (service *Service) setRelation(schedule *edgetypes.UpdateSchedule) error {
 			Status:        environmentStatus.Status,
 			Error:         environmentStatus.Error,
 			Type:          schedule.Type,
+			ScheduledTime: schedule.Time,
 		}
 	}
 
