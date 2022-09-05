@@ -1,3 +1,5 @@
+import './pagination-controls.css';
+
 import { generatePagesArray } from './generatePagesArray';
 import { PageButton } from './PageButton';
 import { PageInput } from './PageInput';

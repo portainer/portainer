@@ -82,6 +82,7 @@
           id="configuration_data_value_{{ index }}"
           name="configuration_data_value_{{ index }}"
           ng-model="$ctrl.formValues.Data[index].Value"
+          ng-trim="false"
           required
         ></textarea>
         <div class="small text-muted" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">

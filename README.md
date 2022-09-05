@@ -12,17 +12,11 @@ Portainer consists of a single container that can run on any cluster. It can be 
 - [Take5 – get 5 free nodes of Portainer Business for as long as you want them](https://portainer.io/pricing/take5)
 - [Portainer BE install guide](https://install.portainer.io)
 
-## Demo
-
-You can try out the public demo instance: http://demo.portainer.io/ (login with the username **admin** and the password **tryportainer**).
-
-Please note that the public demo cluster is **reset every 15min**.
-
 ## Latest Version
 
 Portainer CE is updated regularly. We aim to do an update release every couple of months.
 
-**The latest version of Portainer is 2.13.x**.
+[![latest version](https://img.shields.io/github/v/release/portainer/portainer?color=%2344cc11&label=Latest%20release&style=for-the-badge)](https://github.com/portainer/portainer/releases/latest)
 
 ## Getting started
 

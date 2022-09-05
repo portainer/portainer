@@ -24,7 +24,7 @@ export function WidgetTitle({
   return (
     <div className="widget-header">
       <div className="row">
-        <span className={clsx('pull-left', className)}>
+        <span className={clsx('pull-left vertical-center', className)}>
           <div className="widget-icon">
             <Icon
               icon={icon}

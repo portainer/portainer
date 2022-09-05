@@ -2,8 +2,6 @@ import { ComponentType, PropsWithChildren, ReactNode } from 'react';
 
 import { Icon } from '@@/Icon';
 
-import { useTableContext } from './TableContainer';
-
 interface Props {
   icon?: ReactNode | ComponentType<unknown>;
   featherIcon?: boolean;
@@ -16,8 +14,6 @@ export function TableTitle({
   label,
   children,
 }: PropsWithChildren<Props>) {
-  useTableContext();
-
   return (
     <div className="toolBar">
       <div className="toolBarTitle">

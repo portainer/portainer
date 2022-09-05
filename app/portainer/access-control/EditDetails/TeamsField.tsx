@@ -1,4 +1,4 @@
-import { Team } from '@/portainer/teams/types';
+import { Team } from '@/react/portainer/users/teams/types';
 
 import { TeamsSelector } from '@@/TeamsSelector';
 import { FormControl } from '@@/form-components/FormControl';
