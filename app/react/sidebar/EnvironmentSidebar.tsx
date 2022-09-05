@@ -114,6 +114,9 @@ function useCurrentEnvironment() {
     $injector.invoke(
       /* @ngInject */ (EndpointProvider: EndpointProvider) => {
         EndpointProvider.setCurrentEndpoint(undefined);
+        if (!params.endpointId) {
+          document.title = 'Portainer';
+        }
       }
     );
 
