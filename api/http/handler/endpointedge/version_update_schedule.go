@@ -13,6 +13,8 @@ type versionUpdateResponse struct {
 	ScheduledTime int64 `json:"scheduledTime" example:"1523232323"`
 	// If need to update
 	Active bool
+	// Update schedule ID
+	ScheduleID portaineree.EdgeUpdateScheduleID `json:"scheduleId"`
 }
 
 func (handler *Handler) getVersionUpdateSchedule(endpoint *portaineree.Endpoint) versionUpdateResponse {
@@ -27,5 +29,6 @@ func (handler *Handler) getVersionUpdateSchedule(endpoint *portaineree.Endpoint)
 		Active:        true,
 		Version:       updateSchedule.TargetVersion,
 		ScheduledTime: updateSchedule.ScheduledTime,
+		ScheduleID:    updateSchedule.ScheduleID,
 	}
 }
