@@ -207,17 +207,22 @@ angular.module('portainer.docker').controller('ContainerController', [
 
     $scope.renameContainer = function () {
       var container = $scope.container;
+      if (container.newContainerName === $filter('trimcontainername')(container.Name)) {
+        $scope.container.edit = false;
+        return;
+      }
       ContainerService.renameContainer($transition$.params().id, container.newContainerName)
         .then(function success() {
           container.Name = container.newContainerName;
           Notifications.success('Container successfully renamed', container.Name);
         })
         .catch(function error(err) {
-          container.newContainerName = container.Name;
+          container.newContainerName = $filter('trimcontainername')(container.Name);
           Notifications.error('Failure', err, 'Unable to rename container');
         })
         .finally(function final() {
           $scope.container.edit = false;
+          $scope.$apply();
         });
     };
 
