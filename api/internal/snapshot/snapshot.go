@@ -118,27 +118,59 @@ func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
 	return service.snapshotDockerEndpoint(endpoint)
 }
 
-func (service *Service) snapshotKubernetesEndpoint(endpoint *portainer.Endpoint) error {
-	snapshot, err := service.kubernetesSnapshotter.CreateSnapshot(endpoint)
+func (service *Service) Create(snapshot portainer.Snapshot) error {
+	return service.dataStore.Snapshot().Create(&snapshot)
+}
+
+func (service *Service) FillSnapshotData(endpoint *portainer.Endpoint) error {
+	snapshot, err := service.dataStore.Snapshot().Snapshot(endpoint.ID)
+	if service.dataStore.IsErrObjectNotFound(err) {
+		endpoint.Snapshots = []portainer.DockerSnapshot{}
+		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
+
+		return nil
+	}
+
 	if err != nil {
 		return err
 	}
 
-	if snapshot != nil {
-		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{*snapshot}
+	if snapshot.Docker != nil {
+		endpoint.Snapshots = []portainer.DockerSnapshot{*snapshot.Docker}
+	}
+
+	if snapshot.Kubernetes != nil {
+		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{*snapshot.Kubernetes}
+	}
+
+	return nil
+}
+
+func (service *Service) snapshotKubernetesEndpoint(endpoint *portainer.Endpoint) error {
+	kubernetesSnapshot, err := service.kubernetesSnapshotter.CreateSnapshot(endpoint)
+	if err != nil {
+		return err
+	}
+
+	if kubernetesSnapshot != nil {
+		snapshot := &portainer.Snapshot{EndpointID: endpoint.ID, Kubernetes: kubernetesSnapshot}
+
+		return service.dataStore.Snapshot().Create(snapshot)
 	}
 
 	return nil
 }
 
 func (service *Service) snapshotDockerEndpoint(endpoint *portainer.Endpoint) error {
-	snapshot, err := service.dockerSnapshotter.CreateSnapshot(endpoint)
+	dockerSnapshot, err := service.dockerSnapshotter.CreateSnapshot(endpoint)
 	if err != nil {
 		return err
 	}
 
-	if snapshot != nil {
-		endpoint.Snapshots = []portainer.DockerSnapshot{*snapshot}
+	if dockerSnapshot != nil {
+		snapshot := &portainer.Snapshot{EndpointID: endpoint.ID, Docker: dockerSnapshot}
+
+		return service.dataStore.Snapshot().Create(snapshot)
 	}
 
 	return nil
@@ -194,8 +226,6 @@ func (service *Service) snapshotEndpoints() error {
 			latestEndpointReference.Status = portainer.EndpointStatusDown
 		}
 
-		latestEndpointReference.Snapshots = endpoint.Snapshots
-		latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
 		latestEndpointReference.Agent.Version = endpoint.Agent.Version
 
 		err = service.dataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)

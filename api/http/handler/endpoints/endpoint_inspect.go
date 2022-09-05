@@ -44,5 +44,18 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 	hideFields(endpoint)
 	endpoint.ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
 
+	if !excludeSnapshot(r) {
+		err = handler.SnapshotService.FillSnapshotData(endpoint)
+		if err != nil {
+			return httperror.InternalServerError("Unable to add snapshot data", err)
+		}
+	}
+
 	return response.JSON(w, endpoint)
+}
+
+func excludeSnapshot(r *http.Request) bool {
+	excludeSnapshot, _ := request.RetrieveBooleanQueryParameter(r, "excludeSnapshot", true)
+
+	return excludeSnapshot
 }

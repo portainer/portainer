@@ -56,6 +56,12 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 		endpointURL.Scheme = "https"
 	}
 
+	snapshot, err := factory.dataStore.Snapshot().Snapshot(endpoint.ID)
+	if err != nil {
+		return nil, err
+	}
+	endpoint.Snapshots = []portainer.DockerSnapshot{*snapshot.Docker}
+
 	transportParameters := &docker.TransportParameters{
 		Endpoint:             endpoint,
 		DataStore:            factory.dataStore,

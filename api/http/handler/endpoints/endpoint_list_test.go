@@ -11,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
@@ -202,6 +203,9 @@ func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, tear
 	handler = NewHandler(bouncer, nil)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
+
+	snapshotService, _ := snapshot.NewService("1s", store, nil, nil, nil)
+	handler.SnapshotService = snapshotService
 
 	return handler, teardown
 }

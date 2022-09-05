@@ -24,6 +24,7 @@ type EnvironmentsQuery struct {
 	status              []portainer.EndpointStatus
 	edgeDevice          *bool
 	edgeDeviceUntrusted bool
+	excludeSnapshots    bool
 	name                string
 	agentVersions       []string
 }
@@ -74,6 +75,8 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 
 	edgeDeviceUntrusted, _ := request.RetrieveBooleanQueryParameter(r, "edgeDeviceUntrusted", true)
 
+	excludeSnapshots, _ := request.RetrieveBooleanQueryParameter(r, "excludeSnapshots", true)
+
 	return EnvironmentsQuery{
 		search:              search,
 		types:               endpointTypes,
@@ -84,6 +87,7 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		status:              status,
 		edgeDevice:          edgeDevice,
 		edgeDeviceUntrusted: edgeDeviceUntrusted,
+		excludeSnapshots:    excludeSnapshots,
 		name:                name,
 		agentVersions:       agentVersions,
 	}, nil

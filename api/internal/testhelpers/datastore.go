@@ -24,6 +24,7 @@ type testDatastore struct {
 	role                    dataservices.RoleService
 	sslSettings             dataservices.SSLSettingsService
 	settings                dataservices.SettingsService
+	snapshot                dataservices.SnapshotService
 	stack                   dataservices.StackService
 	tag                     dataservices.TagService
 	teamMembership          dataservices.TeamMembershipService
@@ -65,6 +66,7 @@ func (d *testDatastore) APIKeyRepository() dataservices.APIKeyRepository {
 	return d.apiKeyRepositoryService
 }
 func (d *testDatastore) Settings() dataservices.SettingsService             { return d.settings }
+func (d *testDatastore) Snapshot() dataservices.SnapshotService             { return d.snapshot }
 func (d *testDatastore) SSLSettings() dataservices.SSLSettingsService       { return d.sslSettings }
 func (d *testDatastore) Stack() dataservices.StackService                   { return d.stack }
 func (d *testDatastore) Tag() dataservices.TagService                       { return d.tag }

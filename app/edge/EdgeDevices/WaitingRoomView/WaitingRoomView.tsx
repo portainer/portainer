@@ -18,6 +18,7 @@ export function WaitingRoomView() {
   const { environments, isLoading, totalCount } = useEnvironmentList({
     edgeDevice: true,
     edgeDeviceUntrusted: true,
+    excludeSnapshots: true,
     types: EdgeTypes,
   });
 

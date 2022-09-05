@@ -38,6 +38,7 @@ type (
 		Role() RoleService
 		APIKeyRepository() APIKeyRepository
 		Settings() SettingsService
+		Snapshot() SnapshotService
 		SSLSettings() SSLSettingsService
 		Stack() StackService
 		Tag() TagService
@@ -198,6 +199,15 @@ type (
 		Settings() (*portainer.Settings, error)
 		UpdateSettings(settings *portainer.Settings) error
 		IsFeatureFlagEnabled(feature portainer.Feature) bool
+		BucketName() string
+	}
+
+	SnapshotService interface {
+		Snapshot(endpointID portainer.EndpointID) (*portainer.Snapshot, error)
+		Snapshots() ([]portainer.Snapshot, error)
+		UpdateSnapshot(snapshot *portainer.Snapshot) error
+		DeleteSnapshot(endpointID portainer.EndpointID) error
+		Create(snapshot *portainer.Snapshot) error
 		BucketName() string
 	}
 

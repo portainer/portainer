@@ -60,6 +60,12 @@ func initDemoLocalEndpoint(store dataservices.DataStore) (portainer.EndpointID, 
 	}
 
 	err := store.Endpoint().Create(localEndpoint)
+	if err != nil {
+		return id, errors.WithMessage(err, "failed creating local endpoint")
+	}
+
+	_, err = store.Snapshot().Snapshot(id)
+
 	return id, errors.WithMessage(err, "failed creating local endpoint")
 }
 

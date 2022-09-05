@@ -43,6 +43,7 @@ func (store *Store) MigrateData() error {
 		RoleService:             store.RoleService,
 		ScheduleService:         store.ScheduleService,
 		SettingsService:         store.SettingsService,
+		SnapshotService:         store.SnapshotService,
 		StackService:            store.StackService,
 		TagService:              store.TagService,
 		TeamMembershipService:   store.TeamMembershipService,
