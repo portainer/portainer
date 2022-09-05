@@ -189,7 +189,7 @@ export function createEdgeAgentEnvironment({
       gpus,
       isEdgeDevice,
       pollFrequency,
-      ...meta,
+      meta,
     }
   );
 }

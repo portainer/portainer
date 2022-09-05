@@ -79,6 +79,7 @@ export function SocketForm({ onCreate }: Props) {
         name: values.name,
         socketPath: values.overridePath ? values.socketPath : '',
         gpus: values.gpus,
+        meta: values.meta,
       },
       {
         onSuccess(environment) {
