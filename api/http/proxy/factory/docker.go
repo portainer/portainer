@@ -60,7 +60,10 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 	if err != nil {
 		return nil, err
 	}
-	endpoint.Snapshots = []portainer.DockerSnapshot{*snapshot.Docker}
+
+	if snapshot.Docker != nil {
+		endpoint.Snapshots = []portainer.DockerSnapshot{*snapshot.Docker}
+	}
 
 	transportParameters := &docker.TransportParameters{
 		Endpoint:             endpoint,

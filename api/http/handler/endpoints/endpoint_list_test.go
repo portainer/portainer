@@ -204,8 +204,7 @@ func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, tear
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
 
-	snapshotService, _ := snapshot.NewService("1s", store, nil, nil, nil)
-	handler.SnapshotService = snapshotService
+	handler.SnapshotService, _ = snapshot.NewService("1s", store, nil, nil, nil)
 
 	return handler, teardown
 }
