@@ -124,7 +124,6 @@ function winStandaloneCommand(agentVersion: string, agentSecret: string) {
 
   return `docker run -d \\
   -p 9001:9001 ${secret}\\
-  -e CAP_HOST_MANAGEMENT=1 \\
   --name portainer_agent \\
   --restart=always \\
   -v C:\\:C:\\host \\
