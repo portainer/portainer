@@ -53,7 +53,7 @@ func TestService_ListRefs_GitHub(t *testing.T) {
 	service := newService(context.TODO(), 0, 0)
 
 	repositoryUrl := privateGitRepoURL
-	refs, err := service.ListRefs(repositoryUrl, username, accessToken)
+	refs, err := service.ListRefs(repositoryUrl, username, accessToken, false)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(refs), 1)
 }
@@ -66,8 +66,8 @@ func TestService_ListRefs_Github_Concurrently(t *testing.T) {
 	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
 
 	repositoryUrl := privateGitRepoURL
-	go service.ListRefs(repositoryUrl, username, accessToken)
-	service.ListRefs(repositoryUrl, username, accessToken)
+	go service.ListRefs(repositoryUrl, username, accessToken, false)
+	service.ListRefs(repositoryUrl, username, accessToken, false)
 
 	time.Sleep(2 * time.Second)
 }
@@ -205,7 +205,7 @@ func TestService_ListFiles_GitHub(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			paths, err := service.ListFiles(tt.args.repositoryUrl, tt.args.referenceName, tt.args.username, tt.args.password, tt.extensions)
+			paths, err := service.ListFiles(tt.args.repositoryUrl, tt.args.referenceName, tt.args.username, tt.args.password, false, tt.extensions)
 			if tt.expect.shouldFail {
 				assert.Error(t, err)
 				if tt.expect.err != nil {
@@ -229,8 +229,8 @@ func TestService_ListFiles_Github_Concurrently(t *testing.T) {
 	username := getRequiredValue(t, "GITHUB_USERNAME")
 	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
 
-	go service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
-	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
+	go service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{})
+	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{})
 
 	time.Sleep(2 * time.Second)
 }
@@ -243,8 +243,8 @@ func TestService_purgeCache_Github(t *testing.T) {
 	username := getRequiredValue(t, "GITHUB_USERNAME")
 	service := NewService(context.TODO())
 
-	service.ListRefs(repositoryUrl, username, accessToken)
-	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
+	service.ListRefs(repositoryUrl, username, accessToken, false)
+	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{})
 
 	assert.Equal(t, 1, service.repoRefCache.Len())
 	assert.Equal(t, 1, service.repoFileCache.Len())
@@ -264,8 +264,8 @@ func TestService_purgeCacheByTTL_Github(t *testing.T) {
 	// 40*timeout is designed for giving enough time for ListRefs and ListFiles to cache the result
 	service := newService(context.TODO(), 2, 40*timeout)
 
-	service.ListRefs(repositoryUrl, username, accessToken)
-	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, []string{})
+	service.ListRefs(repositoryUrl, username, accessToken, false)
+	service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{})
 	assert.Equal(t, 1, service.repoRefCache.Len())
 	assert.Equal(t, 1, service.repoFileCache.Len())
 
@@ -285,4 +285,39 @@ func TestService_canStopCacheCleanTimer_whenContextDone(t *testing.T) {
 	<-time.After(20 * timeout)
 
 	assert.True(t, service.timerHasStopped(), "timer should be stopped")
+}
+
+func TestService_HardRefresh_ListRefs_GitHub(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	accessToken := getRequiredValue(t, "GITHUB_PAT")
+	username := getRequiredValue(t, "GITHUB_USERNAME")
+	service := newService(context.TODO(), 2, 0)
+
+	repositoryUrl := privateGitRepoURL
+	refs, err := service.ListRefs(repositoryUrl, username, accessToken, false)
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, len(refs), 1)
+	assert.Equal(t, 1, service.repoRefCache.Len())
+
+	refs, err = service.ListRefs(repositoryUrl, username, "fake-token", true)
+	assert.Error(t, err)
+	assert.Equal(t, 0, service.repoRefCache.Len())
+}
+
+func TestService_HardRefresh_ListFiles_GitHub(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	service := newService(context.TODO(), 2, 0)
+	accessToken := getRequiredValue(t, "GITHUB_PAT")
+	username := getRequiredValue(t, "GITHUB_USERNAME")
+	repositoryUrl := privateGitRepoURL
+	files, err := service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{})
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, len(files), 1)
+	assert.Equal(t, 1, service.repoFileCache.Len())
+
+	files, err = service.ListFiles(repositoryUrl, "refs/heads/main", username, "fake-token", true, []string{})
+	assert.Error(t, err)
+	assert.Equal(t, 0, service.repoFileCache.Len())
 }

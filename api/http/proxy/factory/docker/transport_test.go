@@ -17,10 +17,10 @@ func (s *noopGitService) CloneRepository(destination string, repositoryURL, refe
 func (s *noopGitService) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
 	return "my-latest-commit-id", nil
 }
-func (g *noopGitService) ListRefs(repositoryURL, username, password string) ([]string, error) {
+func (g *noopGitService) ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error) {
 	return nil, nil
 }
-func (g *noopGitService) ListFiles(repositoryURL, referenceName, username, password string, includedExts []string) ([]string, error) {
+func (g *noopGitService) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string) ([]string, error) {
 	return nil, nil
 }
 

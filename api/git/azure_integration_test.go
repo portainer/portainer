@@ -101,7 +101,7 @@ func TestService_ListRefs_Azure(t *testing.T) {
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	service := NewService(context.TODO())
 
-	refs, err := service.ListRefs(privateAzureRepoURL, username, accessToken)
+	refs, err := service.ListRefs(privateAzureRepoURL, username, accessToken, false)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(refs), 1)
 }
@@ -113,8 +113,8 @@ func TestService_ListRefs_Azure_Concurrently(t *testing.T) {
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
 
-	go service.ListRefs(privateAzureRepoURL, username, accessToken)
-	service.ListRefs(privateAzureRepoURL, username, accessToken)
+	go service.ListRefs(privateAzureRepoURL, username, accessToken, false)
+	service.ListRefs(privateAzureRepoURL, username, accessToken, false)
 
 	time.Sleep(2 * time.Second)
 }
@@ -252,7 +252,7 @@ func TestService_ListFiles_Azure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			paths, err := service.ListFiles(tt.args.repositoryUrl, tt.args.referenceName, tt.args.username, tt.args.password, tt.extensions)
+			paths, err := service.ListFiles(tt.args.repositoryUrl, tt.args.referenceName, tt.args.username, tt.args.password, false, tt.extensions)
 			if tt.expect.shouldFail {
 				assert.Error(t, err)
 				if tt.expect.err != nil {
@@ -275,8 +275,8 @@ func TestService_ListFiles_Azure_Concurrently(t *testing.T) {
 	username := getRequiredValue(t, "AZURE_DEVOPS_USERNAME")
 	service := newService(context.TODO(), REPOSITORY_CACHE_SIZE, 200*time.Millisecond)
 
-	go service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, []string{})
-	service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, []string{})
+	go service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, false, []string{})
+	service.ListFiles(privateAzureRepoURL, "refs/heads/main", username, accessToken, false, []string{})
 
 	time.Sleep(2 * time.Second)
 }
