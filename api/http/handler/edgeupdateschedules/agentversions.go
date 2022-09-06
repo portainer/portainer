@@ -28,5 +28,7 @@ func (h *Handler) agentVersions(w http.ResponseWriter, r *http.Request) *httperr
 		"2.14.2",
 		"2.15",    // for develop only
 		"develop", // for develop only
+		"update1",
+		"update2",
 	})
 }

@@ -1,8 +1,8 @@
 package endpointedge
 
 import (
-	portaineree "github.com/portainer/portainer-ee/api"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/edgetypes"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,11 +14,21 @@ type versionUpdateResponse struct {
 	// If need to update
 	Active bool
 	// Update schedule ID
-	ScheduleID portaineree.EdgeUpdateScheduleID `json:"scheduleId"`
+	ScheduleID edgetypes.UpdateScheduleID `json:"scheduleId"`
 }
 
-func (handler *Handler) getVersionUpdateSchedule(endpoint *portaineree.Endpoint) versionUpdateResponse {
+func (handler *Handler) getVersionUpdateSchedule(endpoint *portainer.Endpoint, updateScheduleID int) versionUpdateResponse {
 	updateSchedule := handler.DataStore.EdgeUpdateSchedule().ActiveSchedule(portainer.EndpointID(endpoint.ID))
+
+	// update is successful
+	if updateSchedule != nil && updateScheduleID != 0 && updateSchedule.ScheduleID == edgetypes.UpdateScheduleID(updateScheduleID) {
+		err := handler.DataStore.EdgeUpdateSchedule().UpdateStatus(edgetypes.UpdateScheduleID(updateScheduleID), portainer.EndpointID(endpoint.ID), edgetypes.UpdateScheduleStatusSuccess, "")
+		if err != nil {
+			logrus.WithError(err).Warn("Unable to update active schedule")
+		}
+
+		return versionUpdateResponse{Active: false}
+	}
 
 	if updateSchedule == nil {
 		logrus.WithField("endpointId", endpoint.ID).Debug("No update schedule found")

@@ -91,6 +91,7 @@ type (
 		Create(edgeUpdateSchedule *edgetypes.UpdateSchedule) error
 		Update(ID edgetypes.UpdateScheduleID, edgeUpdateSchedule *edgetypes.UpdateSchedule) error
 		Delete(ID edgetypes.UpdateScheduleID) error
+		UpdateStatus(scheduleID edgetypes.UpdateScheduleID, environmentID portainer.EndpointID, status edgetypes.UpdateScheduleStatusType, errMsg string) error
 		BucketName() string
 	}
 

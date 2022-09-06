@@ -131,9 +131,17 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	}
 	statusResponse.Stacks = edgeStacksStatus
 
-	statusResponse.VersionUpdate = handler.getVersionUpdateSchedule(endpoint)
+	statusResponse.VersionUpdate = handler.getVersionUpdateSchedule(endpoint, getInt(r.Header.Get(portainer.PortainerAgentUpdateScheduleIDHeader)))
 
 	return response.JSON(w, statusResponse)
+}
+
+func getInt(str string) int {
+	i, err := strconv.Atoi(str)
+	if err != nil {
+		return 0
+	}
+	return i
 }
 
 func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {

@@ -184,3 +184,22 @@ func (service *Service) setRelation(schedule *edgetypes.UpdateSchedule) error {
 
 	return nil
 }
+
+func (service *Service) UpdateStatus(scheduleID edgetypes.UpdateScheduleID, environmentID portainer.EndpointID, status edgetypes.UpdateScheduleStatusType, errMsg string) error {
+	item, err := service.Item(scheduleID)
+	if err != nil {
+		return err
+	}
+
+	statusObj, ok := item.Status[environmentID]
+	if !ok {
+		return errors.Errorf("environment %s is not related to schedule", environmentID)
+	}
+
+	statusObj.Status = status
+	statusObj.Error = errMsg
+
+	item.Status[environmentID] = statusObj
+
+	return service.Update(item.ID, item)
+}
