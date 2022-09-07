@@ -45,3 +45,5 @@ export function EndpointProvider() {
     setCurrentEndpoint(null);
   }
 }
+
+export type EndpointProviderInterface = ReturnType<typeof EndpointProvider>;
