@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import { Trash2, Users } from 'react-feather';
 
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 import {
   mutationOptions,
   withError,

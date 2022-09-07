@@ -4,10 +4,6 @@ import { useReducer } from 'react';
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
 import { EdgeAsyncIntervalsForm } from '@/edge/components/EdgeAsyncIntervalsForm';
 import { notifySuccess } from '@/portainer/services/notifications';
-import {
-  useSettings,
-  useUpdateSettingsMutation,
-} from '@/portainer/settings/queries';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Switch } from '@@/form-components/SwitchField/Switch';
@@ -15,6 +11,8 @@ import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { TextTip } from '@@/Tip/TextTip';
+
+import { useSettings, useUpdateSettingsMutation } from '../../queries';
 
 import { FormValues } from './types';
 

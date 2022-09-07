@@ -1,4 +1,4 @@
-import { Settings } from '@/portainer/settings/types';
+import { Settings } from '@/react/portainer/settings/types';
 
 import { EdgeComputeSettings } from './EdgeComputeSettings';
 import { AutomaticEdgeEnvCreation } from './AutomaticEdgeEnvCreation';

@@ -5,8 +5,7 @@ import {
   withError,
   withInvalidate,
 } from '@/react-tools/react-query';
-
-import { PublicSettingsViewModel } from '../models/settings';
+import { PublicSettingsViewModel } from '@/portainer/models/settings';
 
 import {
   getSettings,

@@ -1,5 +1,5 @@
 import { confirmDestructive } from '@/portainer/services/modal.service/confirm';
-import { Settings } from '@/portainer/settings/types';
+import { Settings } from '@/react/portainer/settings/types';
 
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 

@@ -1,11 +1,11 @@
-import {
-  usePublicSettings,
-  useUpdateDefaultRegistrySettingsMutation,
-} from 'Portainer/settings/queries';
 import { notifySuccess } from 'Portainer/services/notifications';
 import { FeatureId } from 'Portainer/feature-flags/enums';
 
 import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+import {
+  usePublicSettings,
+  useUpdateDefaultRegistrySettingsMutation,
+} from '@/react/portainer/settings/queries';
 
 import { Tooltip } from '@@/Tip/Tooltip';
 import { Button } from '@@/buttons';
