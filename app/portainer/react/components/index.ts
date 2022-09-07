@@ -14,6 +14,8 @@ import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
 import { withI18nSuspense } from '@/react-tools/withI18nSuspense';
+import { SettingsFDO } from '@/react/portainer/settings/EdgeComputeView/SettingsFDO';
+import { SettingsOpenAMT } from '@/react/portainer/settings/EdgeComputeView/SettingsOpenAMT';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -128,4 +130,12 @@ export const componentsModule = angular
       'onSubmit',
       'onError',
     ])
+  )
+  .component(
+    'settingsFdo',
+    r2a(withUIRouter(withReactQuery(SettingsFDO)), ['onSubmit', 'settings'])
+  )
+  .component(
+    'settingsOpenAmt',
+    r2a(SettingsOpenAMT, ['onSubmit', 'settings'])
   ).name;

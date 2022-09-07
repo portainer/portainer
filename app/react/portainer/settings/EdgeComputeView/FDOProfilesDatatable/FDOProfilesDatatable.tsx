@@ -1,6 +1,5 @@
 import { useTable, usePagination, useSortBy } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
-import { FDOProfilesDatatableActions } from 'Portainer/settings/edge-compute/FDOProfilesDatatable/FDOProfilesDatatableActions';
 
 import { Profile } from '@/portainer/hostmanagement/fdo/model';
 import PortainerError from '@/portainer/error';
@@ -24,6 +23,7 @@ import {
 
 import { useFDOProfiles } from './useFDOProfiles';
 import { useColumns } from './columns';
+import { FDOProfilesDatatableActions } from './FDOProfilesDatatableActions';
 
 export interface FDOProfilesTableSettings
   extends SortableTableSettings,
