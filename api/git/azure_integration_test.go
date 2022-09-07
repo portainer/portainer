@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/docker/docker/pkg/ioutils"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/stretchr/testify/assert"
 )
@@ -53,7 +52,7 @@ func TestService_ClonePublicRepository_Azure(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dst := t.TempDir()
 			repositoryUrl := fmt.Sprintf(tt.args.repositoryURLFormat, tt.args.password)
-			err = service.CloneRepository(dst, repositoryUrl, tt.args.referenceName, "", "")
+			err := service.CloneRepository(dst, repositoryUrl, tt.args.referenceName, "", "")
 			assert.NoError(t, err)
 			assert.FileExists(t, filepath.Join(dst, "README.md"))
 		})
@@ -69,7 +68,7 @@ func TestService_ClonePrivateRepository_Azure(t *testing.T) {
 	dst := t.TempDir()
 
 	repositoryUrl := "https://portainer.visualstudio.com/Playground/_git/dev_integration"
-	err = service.CloneRepository(dst, repositoryUrl, "refs/heads/main", "", pat)
+	err := service.CloneRepository(dst, repositoryUrl, "refs/heads/main", "", pat)
 	assert.NoError(t, err)
 	assert.FileExists(t, filepath.Join(dst, "README.md"))
 }
