@@ -16,10 +16,10 @@ import (
 // @description **Access policy**: restricted
 // @tags teams
 // @param onlyLedTeams query boolean false "Only list teams that the user is leader of"
+// @param endpointId query int false "Identifier of the environment(endpoint) that will be used to filter the authorized teams"
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param endpointId query int false "Identifier of the environment(endpoint) that will be used to filter the authorized teams"
 // @success 200 {array} portainer.Team "Success"
 // @failure 500 "Server error"
 // @router /teams [get]
@@ -36,51 +36,42 @@ func (handler *Handler) teamList(w http.ResponseWriter, r *http.Request) *httper
 
 	onlyLedTeams, _ := request.RetrieveBooleanQueryParameter(r, "onlyLedTeams", true)
 
-	filteredTeams := teams
-
+	var userTeams []portainer.Team
 	if onlyLedTeams {
-		filteredTeams = security.FilterLeaderTeams(filteredTeams, securityContext)
+		userTeams = security.FilterLeaderTeams(teams, securityContext)
+	} else {
+		userTeams = security.FilterUserTeams(teams, securityContext)
 	}
 
-	filteredTeams = security.FilterUserTeams(filteredTeams, securityContext)
-
-	ret := make([]portainer.Team, 0)
 	endpointID, _ := request.RetrieveNumericQueryParameter(r, "endpointId", true)
-	if endpointID != 0 {
-		// filter out teams who do not have access to the specific endpoint
-		endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve endpoint from the database", err)
-		}
-
-		endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
-		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
-		}
-		for _, team := range filteredTeams {
-			found := false
-			// the team inherits the endpoint access from environment group
-			for teamID := range endpointGroup.TeamAccessPolicies {
-				if team.ID == teamID {
-					ret = append(ret, team)
-					found = true
-					break
-				}
-			}
-
-			if found {
-				continue
-			}
-
-			// the team is given access to the endpoint directly
-			for teamID := range endpoint.TeamAccessPolicies {
-				if team.ID == teamID {
-					ret = append(ret, team)
-					break
-				}
-			}
-		}
-		return response.JSON(w, ret)
+	if endpointID == 0 {
+		return response.JSON(w, userTeams)
 	}
-	return response.JSON(w, filteredTeams)
+
+	// filter out teams who do not have access to the specific endpoint
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve endpoint from the database", err)
+	}
+
+	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
+	}
+
+	allowedTeams := make(map[portainer.TeamID]struct{})
+	for teamID := range endpointGroup.TeamAccessPolicies {
+		allowedTeams[teamID] = struct{}{}
+	}
+	for teamID := range endpoint.TeamAccessPolicies {
+		allowedTeams[teamID] = struct{}{}
+	}
+
+	listableTeams := make([]portainer.Team, 0)
+	for _, team := range userTeams {
+		if _, ok := allowedTeams[team.ID]; ok {
+			listableTeams = append(listableTeams, team)
+		}
+	}
+	return response.JSON(w, listableTeams)
 }

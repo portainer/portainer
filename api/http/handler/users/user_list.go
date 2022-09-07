@@ -36,38 +36,45 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	filteredUsers := security.FilterUsers(users, securityContext)
-
-	for idx := range filteredUsers {
-		hideFields(&filteredUsers[idx])
+	availableUsers := security.FilterUsers(users, securityContext)
+	for i := range availableUsers {
+		hideFields(&availableUsers[i])
 	}
 
-	ret := make([]portainer.User, 0)
 	endpointID, _ := request.RetrieveNumericQueryParameter(r, "endpointId", true)
-	if endpointID != 0 {
-		// filter out users who do not have access to the specific endpoint
-		endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve endpoint from the database", err)
-		}
-
-		endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
-		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
-		}
-		for _, user := range filteredUsers {
-			// the user inherits the endpoint access from team or environment group
-			teamMemberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
-			if err != nil {
-				return httperror.InternalServerError("Unable to retrieve team membership from the database", err)
-			}
-
-			if security.AuthorizedEndpointAccess(endpoint, endpointGroup, user.ID, teamMemberships) {
-				ret = append(ret, user)
-				continue
-			}
-		}
-		return response.JSON(w, ret)
+	if endpointID == 0 {
+		return response.JSON(w, availableUsers)
 	}
-	return response.JSON(w, filteredUsers)
+
+	// filter out users who do not have access to the specific endpoint
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve endpoint from the database", err)
+	}
+
+	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
+	}
+
+	canAccessEndpoint := make([]portainer.User, 0)
+	for _, user := range availableUsers {
+		// the users who have the endpoint authorization
+		if _, ok := user.EndpointAuthorizations[endpoint.ID]; ok {
+			canAccessEndpoint = append(canAccessEndpoint, user)
+			continue
+		}
+
+		// the user inherits the endpoint access from team or environment group
+		teamMemberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve team membership from the database", err)
+		}
+
+		if security.AuthorizedEndpointAccess(endpoint, endpointGroup, user.ID, teamMemberships) {
+			canAccessEndpoint = append(canAccessEndpoint, user)
+		}
+	}
+
+	return response.JSON(w, canAccessEndpoint)
 }
