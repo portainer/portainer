@@ -1,5 +1,4 @@
-import axios, { parseAxiosError } from 'Portainer/services/axios';
-
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { EnvironmentId } from '@/portainer/environments/types';
 
 import {

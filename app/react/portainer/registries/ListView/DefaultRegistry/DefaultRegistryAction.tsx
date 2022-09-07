@@ -1,6 +1,5 @@
-import { notifySuccess } from 'Portainer/services/notifications';
-import { FeatureId } from 'Portainer/feature-flags/enums';
-
+import { notifySuccess } from '@/portainer/services/notifications';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 import {
   usePublicSettings,
