@@ -66,11 +66,7 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 		store,
 	)
 
-	tmpDir, err := os.MkdirTemp(os.TempDir(), "portainer-test")
-	if err != nil {
-		storeTeardown()
-		t.Fatal(err)
-	}
+	tmpDir := t.TempDir()
 
 	fs, err := filesystem.NewService(tmpDir, "")
 	if err != nil {

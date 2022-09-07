@@ -16,9 +16,7 @@ func TestService_ClonePrivateRepository_GitHub(t *testing.T) {
 	username := getRequiredValue(t, "GITHUB_USERNAME")
 	service := NewService()
 
-	dst, err := ioutils.TempDir("", "clone")
-	assert.NoError(t, err)
-	defer os.RemoveAll(dst)
+	dst := t.TempDir()
 
 	repositoryUrl := "https://github.com/portainer/private-test-repository.git"
 	err = service.CloneRepository(dst, repositoryUrl, "refs/heads/main", username, accessToken)

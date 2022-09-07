@@ -51,9 +51,7 @@ func TestService_ClonePublicRepository_Azure(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dst, err := ioutils.TempDir("", "clone")
-			assert.NoError(t, err)
-			defer os.RemoveAll(dst)
+			dst := t.TempDir()
 			repositoryUrl := fmt.Sprintf(tt.args.repositoryURLFormat, tt.args.password)
 			err = service.CloneRepository(dst, repositoryUrl, tt.args.referenceName, "", "")
 			assert.NoError(t, err)
@@ -68,9 +66,7 @@ func TestService_ClonePrivateRepository_Azure(t *testing.T) {
 	pat := getRequiredValue(t, "AZURE_DEVOPS_PAT")
 	service := NewService()
 
-	dst, err := ioutils.TempDir("", "clone")
-	assert.NoError(t, err)
-	defer os.RemoveAll(dst)
+	dst := t.TempDir()
 
 	repositoryUrl := "https://portainer.visualstudio.com/Playground/_git/dev_integration"
 	err = service.CloneRepository(dst, repositoryUrl, "refs/heads/main", "", pat)
