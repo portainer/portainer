@@ -132,6 +132,11 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
+                    <div class="form-group">
+                      <span class="col-sm-12 text-muted small">
+                        You can upload files from your local computer for referencing in your Dockerfile (using ADD filename) so they are included in your built image.
+                      </span>
+                    </div>
                     <button class="btn btn-sm btn-primary" ngf-select="selectAdditionalFiles($files)" ngf-multiple="true" ngf-min-size="10">Select files</button>
                     <span ng-repeat="item in formValues.AdditionalFiles track by $index" class="mx-2">
                       {{ item.name }}
