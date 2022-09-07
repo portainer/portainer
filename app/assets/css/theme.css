@@ -391,7 +391,7 @@
   --text-daterangepicker-active: var(--white-color);
   --text-input-autofill-color: var(--grey-8);
   --text-button-hover-color: var(--white-color);
-  --text-small-select-color: var(--grey-7);
+  --text-small-select-color: var(--white-color);
   --text-bootbox: var(--white-color);
   --text-button-group-color: var(--ui-white);
   --text-button-dangerlight-color: var(--ui-error-7);
