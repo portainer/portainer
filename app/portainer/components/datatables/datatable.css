@@ -72,8 +72,6 @@
 
 .datatable .searchBar input[type='text'] {
   border: 0px !important;
-  @apply placeholder:text-gray-7;
-  @apply th-dark:placeholder:text-gray-warm-7;
 }
 
 .datatable .searchIcon {
