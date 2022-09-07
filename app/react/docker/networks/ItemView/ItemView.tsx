@@ -5,10 +5,10 @@ import _ from 'lodash';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
-import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
-import { ResourceControlType } from '@/portainer/access-control/types';
+import { AccessControlPanel } from '@/react/portainer/access-control/AccessControlPanel/AccessControlPanel';
+import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { DockerContainer } from '@/react/docker/containers/types';
-import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 import { useContainers } from '@/react/docker/containers/queries/containers';
 
 import { PageHeader } from '@@/PageHeader';

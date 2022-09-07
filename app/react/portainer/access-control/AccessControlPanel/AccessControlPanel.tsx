@@ -2,7 +2,6 @@ import { useReducer } from 'react';
 
 import { useUser } from '@/portainer/hooks/useUser';
 import { Icon } from '@/react/components/Icon';
-import { r2a } from '@/react-tools/react2angular';
 import { TeamMembership, TeamRole } from '@/react/portainer/users/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
 
@@ -142,11 +141,3 @@ function isLeaderOfAnyRestrictedTeams(
       resourceControl.TeamAccesses.some((ta) => ta.TeamId === membership.TeamID)
   );
 }
-
-export const AccessControlPanelAngular = r2a(AccessControlPanel, [
-  'resourceControl',
-  'resourceType',
-  'disableOwnershipChange',
-  'resourceId',
-  'onUpdateSuccess',
-]);
