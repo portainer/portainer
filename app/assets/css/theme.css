@@ -93,6 +93,7 @@
   --bg-main-color: var(--white-color);
   --bg-body-color: var(--grey-9);
   --bg-checkbox-border-color: var(--grey-49);
+  --bg-sidebar-color: var(--ui-blue-10);
   --bg-widget-color: var(--white-color);
   --bg-widget-header-color: var(--grey-10);
   --bg-widget-table-color: var(--ui-gray-3);
@@ -267,7 +268,7 @@
   --sort-icon: var(--ui-gray-9);
   --border-checkbox: var(--ui-gray-5);
   --bg-checkbox: var(--white-color);
-  --border-searchbar: var(--ui-gray-5);
+  --border-searchbar: var(--grey-44);
   --bg-button-group: var(--white-color);
   --border-button-group: var(--ui-gray-5);
   --text-button-group: var(--ui-gray-9);
@@ -284,13 +285,14 @@
   --bg-checkbox-border-color: var(--grey-8);
   --bg-code-color: var(--ui-gray-warm-11);
   --bg-codemirror-color: var(--ui-gray-warm-11);
-  --bg-codemirror-gutters-color: var(--ui-gray-warm-8);
-  --bg-codemirror-selected-color: var(--ui-gray-warm-7);
+  --bg-codemirror-gutters-color: var(--grey-3);
+  --bg-codemirror-selected-color: var(--grey-3);
   --bg-dropdown-menu-color: var(--ui-gray-7);
   --bg-main-color: var(--grey-2);
-  --bg-widget-color: var(--ui-gray-warm-10);
-  --bg-widget-header-color: var(--grey-1);
-  --bg-widget-table-color: var(--ui-gray-warm-9);
+  --bg-sidebar-color: var(--grey-1);
+  --bg-widget-color: var(--grey-1);
+  --bg-widget-header-color: var(--grey-3);
+  --bg-widget-table-color: var(--grey-3);
   --bg-header-color: var(--grey-2);
   --bg-hover-table-color: var(--grey-3);
   --bg-switch-box-color: var(--grey-53);
@@ -341,7 +343,7 @@
   --bg-searchbar: var(--ui-grey-warm-11);
   --bg-inputbox: var(--grey-2);
   --bg-dropdown-hover: var(--grey-3);
-  --bg-webeditor-color: var(--ui-gray-warm-9);
+  --bg-webeditor-color: var(--ui-gray-iron-10);
   --bg-button-group-color: var(--ui-black);
   --bg-pagination-disabled-color: var(--grey-1);
   --bg-nav-container-color: var(--ui-gray-iron-10);
@@ -456,7 +458,7 @@
   --sort-icon: var(--ui-gray-3);
   --border-checkbox: var(--ui-gray-5);
   --bg-checkbox: var(--white-color);
-  --border-searchbar: var(--ui-gray-warm-9);
+  --border-searchbar: var(--grey-54);
   --bg-button-group: var(--white-color);
   --border-button-group: var(--ui-gray-5);
   --text-button-group: var(--ui-gray-9);
@@ -468,6 +470,7 @@
   --bg-main-color: var(--black-color);
   --bg-body-color: var(--black-color);
   --bg-checkbox-border-color: var(--grey-8);
+  --bg-sidebar-color: var(--black-color);
   --bg-widget-color: var(--black-color);
   --bg-widget-header-color: var(--black-color);
   --bg-widget-table-color: var(--black-color);
