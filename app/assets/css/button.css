@@ -88,8 +88,8 @@ fieldset[disabled] .btn {
   @apply hover:bg-gray-3 hover:border-gray-5 hover:text-gray-10;
 
   /* dark mode */
-  @apply th-dark:bg-gray-warm-10 th-dark:border-gray-warm-7 th-dark:text-gray-warm-4;
-  @apply th-dark:hover:bg-gray-warm-9 th-dark:hover:border-gray-6 th-dark:hover:text-gray-warm-4;
+  @apply th-dark:bg-gray-iron-10 th-dark:border-gray-warm-7 th-dark:text-gray-warm-4;
+  @apply th-dark:hover:bg-gray-iron-9 th-dark:hover:border-gray-6 th-dark:hover:text-gray-warm-4;
 
   @apply th-highcontrast:bg-black th-highcontrast:border-gray-2 th-highcontrast:text-white;
   @apply th-highcontrast:hover:bg-gray-9 th-highcontrast:hover:border-gray-6 th-highcontrast:hover:text-gray-warm-4;
