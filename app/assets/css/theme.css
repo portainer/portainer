@@ -433,7 +433,7 @@
   --border-sortbutton: var(--grey-3);
   --border-bootbox: var(--ui-gray-9);
   --border-blocklist: var(--ui-gray-9);
-  --border-widget: var(--ui-gray-9);
+  --border-widget: var(--grey-3);
   --border-pagination-color: var(--grey-1);
   --border-nav-container-color: var(--ui-gray-neutral-8);
   --border-stepper-color: var(--ui-gray-warm-9);
