@@ -28,9 +28,10 @@ export function UserMenu() {
       >
         <div
           className={clsx(
+            styles.menuIcon,
             'icon-badge text-lg !p-2 mr-1',
-            'bg-gray-4 text-gray-8',
-            'th-dark:bg-gray-warm-10 th-dark:text-gray-warm-7'
+            'text-gray-8',
+            'th-dark:text-gray-warm-7'
           )}
         >
           <User className="feather" />

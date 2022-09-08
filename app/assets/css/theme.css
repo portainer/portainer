@@ -214,7 +214,6 @@
   --border-color: var(--grey-42);
   --border-widget-color: var(--grey-43);
   --border-sidebar-color: var(--ui-blue-9);
-  --border-sidebar-nav-color: var(--ui-blue-9);
   --border-form-control-color: var(--grey-44);
   --border-table-color: var(--grey-19);
   --border-table-top-color: var(--grey-19);
@@ -265,6 +264,7 @@
   --bg-multiselect-helpercontainer: var(--white-color);
   --text-input-textarea: var(--white-color);
 
+  --user-menu-icon-color: var(--ui-gray-4);
   --sort-icon-muted: var(--ui-gray-5);
   --sort-icon-hover: var(--ui-gray-6);
   --sort-icon: var(--ui-gray-9);
@@ -406,7 +406,6 @@
   --border-color: var(--grey-3);
   --border-widget-color: var(--grey-1);
   --border-sidebar-color: var(--ui-gray-8);
-  --border-sidebar-nav-color: var(--grey-3);
   --border-form-control-color: var(--grey-54);
   --border-table-color: var(--grey-3);
   --border-table-top-color: var(--grey-3);
@@ -457,6 +456,7 @@
   --bg-multiselect-helpercontainer: var(--grey-1);
   --text-input-textarea: var(--grey-1);
 
+  --user-menu-icon-color: var(--grey-3);
   --sort-icon-muted: var(--ui-gray-7);
   --sort-icon-hover: var(--ui-gray-6);
   --sort-icon: var(--ui-gray-3);
@@ -587,7 +587,6 @@
   --border-color: var(--grey-55);
   --border-widget-color: var(--white-color);
   --border-sidebar-color: var(--white-color);
-  --border-sidebar-nav-color: var(--white-color);
   --border-form-control-color: var(--grey-54);
   --border-table-color: var(--grey-55);
   --border-table-top-color: var(--grey-55);
@@ -635,6 +634,7 @@
   --text-cm-string-color: var(--red-7);
   --text-progress-bar-color: var(--black-color);
 
+  --user-menu-icon-color: var(--white-color);
   --sort-icon-muted: var(--ui-gray-7);
   --sort-icon-hover: var(--ui-gray-6);
   --sort-icon: var(--ui-gray-3);
