@@ -67,11 +67,11 @@ pr-icon {
 
 .icon-warning,
 .icon-orange {
-  color: var(--ui-warning-7);
+  color: var(--ui-warning-9);
 }
 
 .icon.icon-warning-alt {
-  fill: var(--ui-warning-7);
+  fill: var(--ui-warning-9);
   stroke: var(--white-color);
 }
 
