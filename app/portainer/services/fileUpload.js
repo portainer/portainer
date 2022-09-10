@@ -37,6 +37,9 @@ angular.module('portainer.app').factory('FileUploadService', [
       var endpointID = EndpointProvider.endpointID();
       return Upload.upload({
         url: 'api/endpoints/' + endpointID + '/docker/build',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
         data: { file: files },
         params: {
           t: names,
