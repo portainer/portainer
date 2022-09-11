@@ -10,7 +10,7 @@ import (
 )
 
 func TestMigrateStackEntryPoint(t *testing.T) {
-	_, store, teardown := MustNewTestStore(false, true)
+	_, store, teardown := MustNewTestStore(t, false, true)
 	defer teardown()
 
 	stackService := store.Stack()
