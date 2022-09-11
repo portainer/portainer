@@ -5,7 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/edgetypes"
 	"github.com/portainer/portainer/api/http/middlewares"
 )
 
@@ -16,11 +16,11 @@ import (
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @success 200 {object} portainer.EdgeUpdateSchedule
+// @success 200 {object} edgetypes.EdgeUpdateSchedule
 // @failure 500
 // @router /edge_update_schedules/{id} [get]
 func (handler *Handler) inspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	item, err := middlewares.FetchItem[portainer.EdgeUpdateSchedule](r, contextKey)
+	item, err := middlewares.FetchItem[edgetypes.UpdateSchedule](r, contextKey)
 	if err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}

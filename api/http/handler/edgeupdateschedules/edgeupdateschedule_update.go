@@ -10,13 +10,14 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/edgetypes"
 	"github.com/portainer/portainer/api/http/middlewares"
 )
 
 type updatePayload struct {
 	Name     string
 	GroupIDs []portainer.EdgeGroupID
-	Type     portainer.EdgeUpdateScheduleType
+	Type     edgetypes.UpdateScheduleType
 	Version  string
 	Time     int64
 }
@@ -30,7 +31,7 @@ func (payload *updatePayload) Validate(r *http.Request) error {
 		return errors.New("Required to choose at least one group")
 	}
 
-	if payload.Type != portainer.EdgeUpdateScheduleRollback && payload.Type != portainer.EdgeUpdateScheduleUpdate {
+	if payload.Type != edgetypes.UpdateScheduleRollback && payload.Type != edgetypes.UpdateScheduleUpdate {
 		return errors.New("Invalid schedule type")
 	}
 
@@ -54,7 +55,7 @@ func (payload *updatePayload) Validate(r *http.Request) error {
 // @failure 500
 // @router /edge_update_schedules [post]
 func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	item, err := middlewares.FetchItem[portainer.EdgeUpdateSchedule](r, contextKey)
+	item, err := middlewares.FetchItem[edgetypes.UpdateSchedule](r, contextKey)
 	if err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}

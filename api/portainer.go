@@ -265,45 +265,6 @@ type (
 		Endpoints      []EndpointID `json:"Endpoints"`
 	}
 
-	// EdgeScheduleID represents an Edge schedule identifier
-	EdgeUpdateScheduleID int
-
-	// EdgeUpdateSchedule represents a schedule for update/rollback of edge devices
-	EdgeUpdateSchedule struct {
-		// EdgeUpdateSchedule Identifier
-		ID EdgeUpdateScheduleID `json:"id" example:"1"`
-		// Name of the schedule
-		Name string `json:"name" example:"Update Schedule"`
-		// Type of the schedule
-		Time int64 `json:"time" example:"1564897200"`
-		// EdgeGroups to be updated
-		GroupIDs []EdgeGroupID `json:"groupIds" example:"1"`
-		// Type of the update (1 - update, 2 - rollback)
-		Type EdgeUpdateScheduleType `json:"type" example:"1" enums:"1,2"`
-		// Status of the schedule, grouped by environment id
-		Status map[EndpointID]EdgeUpdateScheduleStatus `json:"status" example:"{1: {status: 1, error: \"\"}, 2: {status: 2, error: \"failed\"}}"`
-		// Created timestamp
-		Created int64 `json:"created" example:"1564897200"`
-		// Created by user id
-		CreatedBy UserID `json:"createdBy" example:"1"`
-		// Version of the edge agent
-		Version string `json:"version" example:"1"`
-	}
-
-	// EdgeUpdateScheduleType represents type of an Edge update schedule
-	EdgeUpdateScheduleType int
-
-	// EdgeUpdateScheduleStatus represents status of an Edge update schedule
-	EdgeUpdateScheduleStatus struct {
-		// Status of the schedule (0 - pending, 1 - failed, 2 - success)
-		Status EdgeUpdateScheduleStatusType `json:"status" example:"1" enums:"1,2,3"`
-		// Error message if status is failed
-		Error string `json:"error" example:""`
-	}
-
-	// EdgeUpdateScheduleStatusType represents status type of an Edge update schedule
-	EdgeUpdateScheduleStatusType int
-
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
 		// EdgeStack Identifier
@@ -1547,23 +1508,6 @@ const (
 	StatusError
 	//StatusAcknowledged represents an acknowledged edge stack
 	StatusAcknowledged
-)
-
-const (
-	_ EdgeUpdateScheduleType = iota
-	// EdgeUpdateScheduleUpdate represents an edge device scheduled for an update
-	EdgeUpdateScheduleUpdate
-	// EdgeUpdateScheduleRollback represents an edge device scheduled for a rollback
-	EdgeUpdateScheduleRollback
-)
-
-const (
-	// EdgeUpdateScheduleStatusPending represents a pending edge update schedule
-	EdgeUpdateScheduleStatusPending EdgeUpdateScheduleStatusType = iota
-	// EdgeUpdateScheduleStatusError represents a failed edge update schedule
-	EdgeUpdateScheduleStatusError
-	// EdgeUpdateScheduleStatusSuccess represents a successful edge update schedule
-	EdgeUpdateScheduleStatusSuccess
 )
 
 const (

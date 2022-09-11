@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/edgetypes"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -83,11 +84,11 @@ type (
 	}
 
 	EdgeUpdateScheduleService interface {
-		List() ([]portainer.EdgeUpdateSchedule, error)
-		Item(ID portainer.EdgeUpdateScheduleID) (*portainer.EdgeUpdateSchedule, error)
-		Create(edgeUpdateSchedule *portainer.EdgeUpdateSchedule) error
-		Update(ID portainer.EdgeUpdateScheduleID, edgeUpdateSchedule *portainer.EdgeUpdateSchedule) error
-		Delete(ID portainer.EdgeUpdateScheduleID) error
+		List() ([]edgetypes.UpdateSchedule, error)
+		Item(ID edgetypes.UpdateScheduleID) (*edgetypes.UpdateSchedule, error)
+		Create(edgeUpdateSchedule *edgetypes.UpdateSchedule) error
+		Update(ID edgetypes.UpdateScheduleID, edgeUpdateSchedule *edgetypes.UpdateSchedule) error
+		Delete(ID edgetypes.UpdateScheduleID) error
 		BucketName() string
 	}
 

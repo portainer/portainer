@@ -10,13 +10,14 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/edgetypes"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 type createPayload struct {
 	Name     string
 	GroupIDs []portainer.EdgeGroupID
-	Type     portainer.EdgeUpdateScheduleType
+	Type     edgetypes.UpdateScheduleType
 	Version  string
 	Time     int64
 }
@@ -30,7 +31,7 @@ func (payload *createPayload) Validate(r *http.Request) error {
 		return errors.New("Required to choose at least one group")
 	}
 
-	if payload.Type != portainer.EdgeUpdateScheduleRollback && payload.Type != portainer.EdgeUpdateScheduleUpdate {
+	if payload.Type != edgetypes.UpdateScheduleRollback && payload.Type != edgetypes.UpdateScheduleUpdate {
 		return errors.New("Invalid schedule type")
 	}
 
@@ -54,7 +55,7 @@ func (payload *createPayload) Validate(r *http.Request) error {
 // @accept json
 // @param body body createPayload true "Schedule details"
 // @produce json
-// @success 200 {object} portainer.EdgeUpdateSchedule
+// @success 200 {object} edgetypes.EdgeUpdateSchedule
 // @failure 500
 // @router /edge_update_schedules [post]
 func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -76,11 +77,11 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 		return httperror.InternalServerError("Unable to retrieve user information from token", err)
 	}
 
-	item := &portainer.EdgeUpdateSchedule{
+	item := &edgetypes.UpdateSchedule{
 		Name:      payload.Name,
 		Time:      payload.Time,
 		GroupIDs:  payload.GroupIDs,
-		Status:    map[portainer.EndpointID]portainer.EdgeUpdateScheduleStatus{},
+		Status:    map[portainer.EndpointID]edgetypes.UpdateScheduleStatus{},
 		Created:   time.Now().Unix(),
 		CreatedBy: tokenData.ID,
 		Type:      payload.Type,

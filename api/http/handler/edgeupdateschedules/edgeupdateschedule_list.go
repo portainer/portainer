@@ -14,7 +14,7 @@ import (
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @success 200 {array} portainer.EdgeUpdateSchedule
+// @success 200 {array} edgetypes.EdgeUpdateSchedule
 // @failure 500
 // @router /edge_update_schedules [get]
 func (handler *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
