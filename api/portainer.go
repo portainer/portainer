@@ -1429,8 +1429,6 @@ const (
 	PortainerAgentSignatureHeader = "X-PortainerAgent-Signature"
 	// PortainerAgentPublicKeyHeader represent the name of the header containing the public key
 	PortainerAgentPublicKeyHeader = "X-PortainerAgent-PublicKey"
-	// PortainerAgentUpdateScheduleIDHeader represents the name of the header containing the update schedule id
-	PortainerAgentUpdateScheduleIDHeader = "X-Portainer-Update-Schedule-ID"
 	// PortainerAgentKubernetesSATokenHeader represent the name of the header containing a Kubernetes SA token
 	PortainerAgentKubernetesSATokenHeader = "X-PortainerAgent-SA-Token"
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature

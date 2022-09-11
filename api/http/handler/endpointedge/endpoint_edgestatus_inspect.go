@@ -11,6 +11,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/edgetypes"
 	"github.com/portainer/portainer/api/http/middlewares"
 )
 
@@ -131,17 +132,29 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	}
 	statusResponse.Stacks = edgeStacksStatus
 
-	statusResponse.VersionUpdate = handler.getVersionUpdateSchedule(endpoint, getInt(r.Header.Get(portainer.PortainerAgentUpdateScheduleIDHeader)))
+	updateScheduleId := getInt[edgetypes.UpdateScheduleID](r.Header.Get(edgetypes.PortainerAgentUpdateScheduleIDHeader))
+	updateScheduleStatus := getInt[edgetypes.UpdateScheduleStatusType](r.Header.Get(edgetypes.PortainerAgentUpdateStatusHeader))
+	updateScheduleError := r.Header.Get(edgetypes.PortainerAgentUpdateErrorHeader)
+
+	edgeUpdateStatus := edgetypes.VersionUpdateStatus{
+		ScheduleID: updateScheduleId,
+		Status:     updateScheduleStatus,
+		Error:      updateScheduleError,
+	}
+
+	handler.setUpdateScheduleStatus(portainer.EndpointID(endpoint.ID), edgeUpdateStatus)
+
+	statusResponse.VersionUpdate = handler.getVersionUpdateSchedule(portainer.EndpointID(endpoint.ID), edgeUpdateStatus)
 
 	return response.JSON(w, statusResponse)
 }
 
-func getInt(str string) int {
+func getInt[T ~int](str string) T {
 	i, err := strconv.Atoi(str)
 	if err != nil {
 		return 0
 	}
-	return i
+	return T(i)
 }
 
 func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {

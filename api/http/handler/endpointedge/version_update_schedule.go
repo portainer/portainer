@@ -17,28 +17,30 @@ type versionUpdateResponse struct {
 	ScheduleID edgetypes.UpdateScheduleID `json:"scheduleId"`
 }
 
-func (handler *Handler) getVersionUpdateSchedule(endpoint *portainer.Endpoint, updateScheduleID int) versionUpdateResponse {
-	updateSchedule := handler.DataStore.EdgeUpdateSchedule().ActiveSchedule(portainer.EndpointID(endpoint.ID))
+func (handler *Handler) setUpdateScheduleStatus(endpointID portainer.EndpointID, updateStatus edgetypes.VersionUpdateStatus) {
+	activeSchedule := handler.DataStore.EdgeUpdateSchedule().ActiveSchedule(endpointID)
 
-	// update is successful
-	if updateSchedule != nil && updateScheduleID != 0 && updateSchedule.ScheduleID == edgetypes.UpdateScheduleID(updateScheduleID) {
-		err := handler.DataStore.EdgeUpdateSchedule().UpdateStatus(edgetypes.UpdateScheduleID(updateScheduleID), portainer.EndpointID(endpoint.ID), edgetypes.UpdateScheduleStatusSuccess, "")
+	// update is successful or failed
+	if activeSchedule != nil && updateStatus.ScheduleID != 0 && activeSchedule.ScheduleID == updateStatus.ScheduleID && updateStatus.Status != edgetypes.UpdateScheduleStatusPending {
+		err := handler.DataStore.EdgeUpdateSchedule().UpdateStatus(activeSchedule.ScheduleID, portainer.EndpointID(endpointID), updateStatus.Status, updateStatus.Error)
 		if err != nil {
 			logrus.WithError(err).Warn("Unable to update active schedule")
 		}
-
-		return versionUpdateResponse{Active: false}
 	}
+}
 
-	if updateSchedule == nil {
-		logrus.WithField("endpointId", endpoint.ID).Debug("No update schedule found")
+func (handler *Handler) getVersionUpdateSchedule(endpointID portainer.EndpointID, updateStatus edgetypes.VersionUpdateStatus) versionUpdateResponse {
+	activeSchedule := handler.DataStore.EdgeUpdateSchedule().ActiveSchedule(endpointID)
+
+	if activeSchedule == nil {
+		logrus.WithField("endpointId", endpointID).Debug("No update schedule found")
 		return versionUpdateResponse{Active: false}
 	}
 
 	return versionUpdateResponse{
 		Active:        true,
-		Version:       updateSchedule.TargetVersion,
-		ScheduledTime: updateSchedule.ScheduledTime,
-		ScheduleID:    updateSchedule.ScheduleID,
+		Version:       activeSchedule.TargetVersion,
+		ScheduledTime: activeSchedule.ScheduledTime,
+		ScheduleID:    activeSchedule.ScheduleID,
 	}
 }
