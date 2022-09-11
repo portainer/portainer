@@ -80,6 +80,7 @@ type (
 		Status        UpdateScheduleStatusType `json:"status"`
 		Error         string                   `json:"error"`
 		Type          UpdateScheduleType       `json:"type"`
+		ScheduledTime int64                    `json:"scheduledTime"`
 	}
 )
 
