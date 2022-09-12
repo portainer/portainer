@@ -18,11 +18,9 @@ type versionUpdateResponse struct {
 }
 
 func (handler *Handler) setUpdateScheduleStatus(endpointID portainer.EndpointID, updateStatus edgetypes.VersionUpdateStatus) {
-	activeSchedule := handler.DataStore.EdgeUpdateSchedule().ActiveSchedule(endpointID)
-
 	// update is successful or failed
-	if activeSchedule != nil && updateStatus.ScheduleID != 0 && activeSchedule.ScheduleID == updateStatus.ScheduleID && updateStatus.Status != edgetypes.UpdateScheduleStatusPending {
-		err := handler.DataStore.EdgeUpdateSchedule().UpdateStatus(activeSchedule.ScheduleID, portainer.EndpointID(endpointID), updateStatus.Status, updateStatus.Error)
+	if updateStatus.ScheduleID != 0 && updateStatus.Status != edgetypes.UpdateScheduleStatusPending {
+		err := handler.DataStore.EdgeUpdateSchedule().UpdateStatus(updateStatus.ScheduleID, portainer.EndpointID(endpointID), updateStatus.Status, updateStatus.Error)
 		if err != nil {
 			logrus.WithError(err).Warn("Unable to update active schedule")
 		}
