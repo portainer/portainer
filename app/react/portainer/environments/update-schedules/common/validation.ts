@@ -14,7 +14,7 @@ export function validation(
     name: nameValidation(schedules, currentId),
     type: typeValidation(),
     time: number()
-      .min(Date.now() / 1000)
+      .min(Math.floor(Date.now() / 1000), 'Time must be in the future')
       .required(),
     environments: object().default({}),
   });
