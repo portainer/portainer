@@ -36,7 +36,7 @@ type (
 		// Type of the update (1 - update, 2 - rollback)
 		Type UpdateScheduleType `json:"type" example:"1" enums:"1,2"`
 		// Status of the schedule, grouped by environment id
-		Status map[portainer.EndpointID]UpdateScheduleStatus `json:"status" example:"{1: {status: 1, error: \"\"}, 2: {status: 2, error: \"failed\"}}"`
+		Status map[portainer.EndpointID]UpdateScheduleStatus `json:"status"`
 		// Created timestamp
 		Created int64 `json:"created" example:"1564897200"`
 		// Created by user id

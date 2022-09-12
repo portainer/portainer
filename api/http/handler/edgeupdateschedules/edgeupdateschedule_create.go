@@ -55,7 +55,7 @@ func (payload *createPayload) Validate(r *http.Request) error {
 // @accept json
 // @param body body createPayload true "Schedule details"
 // @produce json
-// @success 200 {object} edgetypes.EdgeUpdateSchedule
+// @success 200 {object} edgetypes.UpdateSchedule
 // @failure 500
 // @router /edge_update_schedules [post]
 func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
