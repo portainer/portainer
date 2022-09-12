@@ -60,7 +60,7 @@
       />
       <div class="help-group">
         <div class="form-group col-md-12 pt-1" ng-show="autoUpdateForm.repository_fetch_interval.$touched && autoUpdateForm.repository_fetch_interval.$invalid">
-          <div class="small text-muted">
+          <div class="small text-warning">
             <div ng-messages="autoUpdateForm.repository_fetch_interval.$error">
               <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p>
               <p ng-message="invalidIntervalFormat"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Please enter a valid time interval.</p>
