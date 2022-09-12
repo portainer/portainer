@@ -143,7 +143,7 @@
   --bg-daterangepicker-hover: var(--grey-16);
   --bg-daterangepicker-in-range: var(--grey-58);
   --bg-daterangepicker-active: var(--blue-14);
-  --bg-input-autofill-color: var(--white-color);
+  --bg-input-autofill-color: var(--bg-inputbox);
   --bg-btn-default-hover-color: var(--ui-blue-9);
   --bg-btn-focus: var(--grey-59);
   --bg-boxselector-disabled-color: var(--white-color);
@@ -203,7 +203,7 @@
   --text-daterangepicker-end-date: var(--grey-57);
   --text-daterangepicker-in-range: var(--black-color);
   --text-daterangepicker-active: var(--white-color);
-  --text-input-autofill-color: var(--black-color);
+  --text-input-autofill-color: var(--text-form-control-color);
   --text-button-hover-color: var(--grey-6);
   --text-small-select-color: var(--grey-25);
   --text-bootbox: var(--ui-gray-7);
@@ -336,7 +336,7 @@
   --bg-daterangepicker-hover: var(--grey-4);
   --bg-daterangepicker-in-range: var(--ui-gray-warm-11);
   --bg-daterangepicker-active: var(--blue-14);
-  --bg-input-autofill-color: var(--grey-2);
+  --bg-input-autofill-color: var(--bg-inputbox);
   --bg-btn-default-hover-color: var(--grey-4);
   --bg-btn-focus: var(--grey-3);
   --bg-boxselector-disabled-color: var(--grey-54);
@@ -396,7 +396,7 @@
   --text-daterangepicker-end-date: var(--grey-7);
   --text-daterangepicker-in-range: var(--white-color);
   --text-daterangepicker-active: var(--white-color);
-  --text-input-autofill-color: var(--grey-8);
+  --text-input-autofill-color: var(--text-form-control-color);
   --text-button-hover-color: var(--white-color);
   --text-small-select-color: var(--grey-7);
   --text-bootbox: var(--white-color);
@@ -523,7 +523,7 @@
   --bg-navtabs-hover-color: var(--grey-3);
   --bg-nav-tab-active-color: var(--ui-black);
   --bg-btn-default-color: var(--black-color);
-  --bg-input-autofill-color: var(--black-color);
+  --bg-input-autofill-color: var(--bg-inputbox);
   --bg-code-color: var(--ui-black);
   --bg-btn-default-hover-color: var(--grey-4);
   --bg-btn-focus: var(--black-color);
@@ -576,7 +576,7 @@
   --text-navtabs-color: var(--white-color);
   --text-navtabs-hover-color: var(--white-color);
   --text-nav-tab-active-color: var(--white-color);
-  --text-input-autofill-color: var(--white-color);
+  --text-input-autofill-color: var(--text-form-control-color);
   --text-button-hover-color: var(--white-color);
   --text-small-select-color: var(--white-color);
   --text-pagination-span-color: var(--ui-white);
