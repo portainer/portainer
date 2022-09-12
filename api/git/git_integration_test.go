@@ -305,6 +305,37 @@ func TestService_HardRefresh_ListRefs_GitHub(t *testing.T) {
 	assert.Equal(t, 0, service.repoRefCache.Len())
 }
 
+func TestService_HardRefresh_ListRefs_And_RemoveAllCaches_GitHub(t *testing.T) {
+	ensureIntegrationTest(t)
+
+	accessToken := getRequiredValue(t, "GITHUB_PAT")
+	username := getRequiredValue(t, "GITHUB_USERNAME")
+	service := newService(context.TODO(), 2, 0)
+
+	repositoryUrl := privateGitRepoURL
+	refs, err := service.ListRefs(repositoryUrl, username, accessToken, false)
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, len(refs), 1)
+	assert.Equal(t, 1, service.repoRefCache.Len())
+
+	files, err := service.ListFiles(repositoryUrl, "refs/heads/main", username, accessToken, false, []string{})
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, len(files), 1)
+	assert.Equal(t, 1, service.repoFileCache.Len())
+
+	files, err = service.ListFiles(repositoryUrl, "refs/heads/test", username, accessToken, false, []string{})
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, len(files), 1)
+	assert.Equal(t, 2, service.repoFileCache.Len())
+
+	refs, err = service.ListRefs(repositoryUrl, username, "fake-token", true)
+	assert.Error(t, err)
+	assert.Equal(t, 0, service.repoRefCache.Len())
+
+	// The relevant file caches should be removed too
+	assert.Equal(t, 0, service.repoFileCache.Len())
+}
+
 func TestService_HardRefresh_ListFiles_GitHub(t *testing.T) {
 	ensureIntegrationTest(t)
 

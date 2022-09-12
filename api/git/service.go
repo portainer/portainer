@@ -170,6 +170,15 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 	if service.cacheEnabled && hardRefresh {
 		// Should remove the cache explicitly, so that the following normal list can show the correct result
 		service.repoRefCache.Remove(repositoryURL)
+		// Remove file caches pointed to the same repository
+		for _, fileCacheKey := range service.repoFileCache.Keys() {
+			key, ok := fileCacheKey.(string)
+			if ok {
+				if strings.HasPrefix(key, repositoryURL) {
+					service.repoFileCache.Remove(key)
+				}
+			}
+		}
 	}
 
 	if service.repoRefCache != nil {
