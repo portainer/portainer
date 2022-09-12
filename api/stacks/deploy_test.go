@@ -40,7 +40,7 @@ func (s *noopDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *p
 }
 
 func Test_redeployWhenChanged_FailsWhenCannotFindStack(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	err := RedeployWhenChanged(1, nil, store, nil)
@@ -49,7 +49,7 @@ func Test_redeployWhenChanged_FailsWhenCannotFindStack(t *testing.T) {
 }
 
 func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
@@ -64,7 +64,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
 }
 
 func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	tmpDir := t.TempDir()
@@ -90,7 +90,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 
 func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	cloneErr := errors.New("failed to clone")
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
@@ -113,7 +113,7 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 }
 
 func Test_redeployWhenChanged(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	tmpDir := t.TempDir()
@@ -164,7 +164,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 }
 
 func Test_getUserRegistries(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	endpointID := 123

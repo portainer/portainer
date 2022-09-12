@@ -80,7 +80,7 @@ func setupHandler(t *testing.T) (*Handler, func(), error) {
 		return nil, nil, fmt.Errorf("could not start a new filesystem service: %w", err)
 	}
 
-	_, store, storeTeardown := datastore.MustNewTestStore(true, true)
+	_, store, storeTeardown := datastore.MustNewTestStore(t, true, true)
 
 	ctx := context.Background()
 	shutdownCtx, cancelFn := context.WithCancel(ctx)
