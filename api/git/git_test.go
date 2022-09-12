@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setup(t *testing.T) (bareRepoDir string) {
+func setup(t *testing.T) string {
 	dir := t.TempDir()
-	bareRepoDir = filepath.Join(dir, "test-clone.git")
+	bareRepoDir := filepath.Join(dir, "test-clone.git")
 
 	file, err := os.OpenFile("./testdata/test-clone-git-repo.tar.gz", os.O_RDONLY, 0755)
 	if err != nil {
@@ -27,7 +27,7 @@ func setup(t *testing.T) (bareRepoDir string) {
 		t.Fatal(errors.Wrapf(err, "failed to extract file from the archive to a folder %s", dir))
 	}
 
-	return
+	return bareRepoDir
 }
 
 func Test_ClonePublicRepository_Shallow(t *testing.T) {
