@@ -30,26 +30,27 @@ export function FormControl({
 }: PropsWithChildren<Props>) {
   return (
     <div className={clsx('form-group', styles.container)}>
-        <label
-          htmlFor={inputId}
-          className={clsx(sizeClassLabel(size), 'control-label', 'text-left')}
-        >
-          {label}
+      <label
+        htmlFor={inputId}
+        className={clsx(sizeClassLabel(size), 'control-label', 'text-left')}
+      >
+        {label}
 
-          {required && <span className="text-danger">*</span>}
+        {required && <span className="text-danger">*</span>}
 
-          {tooltip && <Tooltip message={tooltip} />}
-        </label>
+        {tooltip && <Tooltip message={tooltip} />}
+      </label>
 
-        <div className={sizeClassChildren(size)}>
-          {children}
-          {errors && (
-            <span className="help-block">
-              <FormError>{errors}</FormError>
-            </span>
-          )}
-        </div>
+      <div className={sizeClassChildren(size)}>
+        {children}
+
+        {errors && (
+          <span className="help-block">
+            <FormError>{errors}</FormError>
+          </span>
+        )}
       </div>
+    </div>
   );
 }
 
