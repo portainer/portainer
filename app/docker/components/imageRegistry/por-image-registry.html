@@ -74,7 +74,12 @@
       <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0 vertical-center" ng-if="!$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = true;">
         <pr-icon icon="'database'" feather="true"> </pr-icon> Simple mode
       </button>
-      <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0 vertical-center" ng-if="$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = false;">
+      <button
+        type="button"
+        class="btn btn-link btn-sm hover:no-underline !ml-0 p-0 vertical-center"
+        ng-if="$ctrl.model.UseRegistry && $ctrl.showAdvancedMode"
+        ng-click="$ctrl.model.UseRegistry = false;"
+      >
         <pr-icon icon="'globe'" feather="true"> </pr-icon> Advanced mode
       </button>
     </div>
