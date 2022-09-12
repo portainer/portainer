@@ -101,9 +101,15 @@
                 {{ item.URL }}
               </td>
               <td>
-                <a class="vertical-center" ng-if="$ctrl.canManageAccess(item)" ng-click="$ctrl.redirectToManageAccess(item)">
-                  <pr-icon icon="'users'" feather="true"></pr-icon> Manage access
-                </a>
+                <button
+                  type="button"
+                  class="btn btn-link hover:no-underline !ml-0 px-0 vertical-center"
+                  authorization="PortainerRegistryUpdateAccess"
+                  ng-if="$ctrl.canManageAccess(item)"
+                  ng-click="$ctrl.redirectToManageAccess(item)"
+                >
+                  <pr-icon icon="'users'" feather="true"></pr-icon>Manage access
+                </button>
                 <be-feature-indicator feature="$ctrl.limitedFeature" ng-if="$ctrl.canBrowse(item)">
                   <span class="text-muted space-left" style="padding-right: 5px"> <pr-icon icon="'search'" feather="true"></pr-icon> Browse </span>
                 </be-feature-indicator>
