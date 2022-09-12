@@ -12,7 +12,6 @@ import {
   EdgeTypes,
 } from '@/portainer/environments/types';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
-import { useIsAdmin } from '@/portainer/hooks/useUser';
 import {
   HomepageFilter,
   useHomePageFilter,
@@ -27,6 +26,7 @@ import { useTags } from '@/portainer/tags/queries';
 import { Filter } from '@/portainer/home/types';
 import { useAgentVersionsList } from '@/portainer/environments/queries/useAgentVersionsList';
 import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service';
+import { useUser } from '@/portainer/hooks/useUser';
 
 import { TableFooter } from '@@/datatables/TableFooter';
 import { TableActions, TableContainer, TableTitle } from '@@/datatables';
@@ -69,7 +69,7 @@ enum ConnectionType {
 const storageKey = 'home_endpoints';
 
 export function EnvironmentList({ onClickItem, onRefresh }: Props) {
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useUser();
 
   const [platformTypes, setPlatformTypes] = useHomePageFilter<
     Filter<PlatformType>[]
@@ -130,7 +130,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     status: statusFilter,
     tagIds: tagFilter?.length ? tagFilter : undefined,
     groupIds: groupFilter,
-    edgeDevice: getEdgeDeviceFilter(connectionTypes.map((p) => p.value)),
+    edgeDevice: false,
     tagsPartialMatch: true,
     agentVersions: agentVersions.map((a) => a.value),
   };
@@ -192,8 +192,10 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                     <Button
                       onClick={onRefresh}
                       data-cy="home-refreshEndpointsButton"
+                      size="medium"
+                      color="secondary"
                       className={clsx(
-                        'vertical-center',
+                        'vertical-center !ml-0',
                         styles.refreshEnvironmentsButton
                       )}
                     >
@@ -215,7 +217,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
                     }}
                   />
                 </div>
-                <div className={styles.filterSearchbar}>
+                <div className={clsx(styles.filterSearchbar, 'ml-3')}>
                   <FilterSearchBar
                     value={searchBarValue}
                     onChange={setSearchBarValue}
@@ -330,19 +332,6 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
       </div>
     </>
   );
-
-  function getEdgeDeviceFilter(connectionTypes: ConnectionType[]) {
-    // show both types of edge agent if both are selected or  if no connection type is selected
-    if (
-      connectionTypes.length === 0 ||
-      (connectionTypes.includes(ConnectionType.EdgeAgent) &&
-        connectionTypes.includes(ConnectionType.EdgeDevice))
-    ) {
-      return undefined;
-    }
-
-    return connectionTypes.includes(ConnectionType.EdgeDevice);
-  }
 
   function getTypes(
     platformTypes: PlatformType[],
@@ -495,7 +484,6 @@ function getConnectionTypeOptions(platformTypes: Filter<PlatformType>[]) {
     { value: ConnectionType.API, label: 'API' },
     { value: ConnectionType.Agent, label: 'Agent' },
     { value: ConnectionType.EdgeAgent, label: 'Edge Agent' },
-    { value: ConnectionType.EdgeDevice, label: 'Edge Device' },
   ];
 
   if (platformTypes.length === 0) {

@@ -6,6 +6,7 @@ import { createStore } from '@/react/docker/containers/ListView/ContainersDatata
 import { useColumns } from '@/react/docker/containers/ListView/ContainersDatatable/columns';
 import { ContainersDatatableActions } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableActions';
 import { ContainersDatatableSettings } from '@/react/docker/containers/ListView/ContainersDatatable/ContainersDatatableSettings';
+import { useShowGPUsColumn } from '@/react/docker/containers/utils';
 
 import { Datatable, TableSettingsMenu } from '@@/datatables';
 import {
@@ -35,7 +36,8 @@ export interface Props {
 
 export function StackContainersDatatable({ environment, stackName }: Props) {
   const settings = useStore();
-  const columns = useColumns(false);
+  const isGPUsColumnVisible = useShowGPUsColumn(environment.Id);
+  const columns = useColumns(false, isGPUsColumnVisible);
   const hidableColumns = _.compact(
     columns.filter((col) => col.canHide).map((col) => col.id)
   );

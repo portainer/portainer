@@ -5,14 +5,13 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"net/url"
-	"strings"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/agent"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/url"
 )
 
 // ProxyServer provide an extended proxy with a local server to forward requests
@@ -34,7 +33,7 @@ func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*Proxy
 		urlString = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}
 
-	endpointURL, err := parseURL(urlString)
+	endpointURL, err := url.ParseURL(urlString)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed parsing url %s", endpoint.URL)
 	}
@@ -98,16 +97,4 @@ func (proxy *ProxyServer) Close() {
 	if proxy.server != nil {
 		proxy.server.Close()
 	}
-}
-
-// parseURL parses the endpointURL using url.Parse.
-//
-// to prevent an error when url has port but no protocol prefix
-// we add `//` prefix if needed
-func parseURL(endpointURL string) (*url.URL, error) {
-	if !strings.HasPrefix(endpointURL, "http") && !strings.HasPrefix(endpointURL, "tcp") && !strings.HasPrefix(endpointURL, "//") {
-		endpointURL = fmt.Sprintf("//%s", endpointURL)
-	}
-
-	return url.Parse(endpointURL)
 }

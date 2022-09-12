@@ -105,12 +105,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.URL != nil {
-		if endpoint.Type == portainer.AgentOnDockerEnvironment ||
-			endpoint.Type == portainer.AgentOnKubernetesEnvironment {
-			endpoint.URL = normalizeAgentAddress(*payload.URL)
-		} else {
-			endpoint.URL = *payload.URL
-		}
+		endpoint.URL = *payload.URL
 	}
 
 	if payload.PublicURL != nil {

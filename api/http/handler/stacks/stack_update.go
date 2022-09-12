@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -189,20 +190,34 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 	stack.Env = payload.Env
 
 	stackFolder := strconv.Itoa(int(stack.ID))
-	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	_, err = handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
+		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
+			log.Printf("[WARN] [stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+		}
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist updated Compose file on disk", Err: err}
 	}
 
 	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
 	if configErr != nil {
+		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
+			log.Printf("[WARN] [stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+		}
+
 		return configErr
 	}
 
 	err = handler.deployComposeStack(config, false)
 	if err != nil {
+		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
+			log.Printf("[WARN] [stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+		}
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 	}
+
+	handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint)
 
 	return nil
 }
@@ -226,20 +241,34 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	stack.Env = payload.Env
 
 	stackFolder := strconv.Itoa(int(stack.ID))
-	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	_, err = handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
+		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
+			log.Printf("[WARN] [swarm,stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+		}
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist updated Compose file on disk", Err: err}
 	}
 
 	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, payload.Prune)
 	if configErr != nil {
+		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
+			log.Printf("[WARN] [swarm,stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+		}
+
 		return configErr
 	}
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
+		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
+			log.Printf("[WARN] [swarm,stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+		}
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 	}
+
+	handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint)
 
 	return nil
 }

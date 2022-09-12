@@ -200,7 +200,7 @@
           <li class="interactive"><a data-target="#env" data-toggle="tab">Env</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#restart-policy" data-toggle="tab">Restart policy</a></li>
-          <li class="interactive"><a data-target="#runtime-resources" ng-click="refreshSlider()" data-toggle="tab">Runtime & Resources</a></li>
+          <li class="interactive"><a data-target="#runtime-resources" ng-mouseup="refreshSlider()" data-toggle="tab">Runtime & Resources</a></li>
           <li ng-if="areContainerCapabilitiesEnabled" class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
         </ul>
         <!-- tab-content -->
@@ -640,7 +640,7 @@
               </div>
               <!-- !runtimes -->
             </form>
-            <form class="form-horizontal" style="margin-top: 15px">
+            <form class="form-horizontal" style="margin-top: 15px" name="resourceForm">
               <!-- devices -->
               <div ng-if="showDeviceMapping" class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px">
@@ -695,6 +695,17 @@
                 <!-- !sysctls-input-list -->
               </div>
               <!-- !sysctls -->
+              <!-- shm-size-input -->
+              <div class="form-group">
+                <label for="shm-size" class="col-sm-2 control-label text-left"> Shared memory size </label>
+                <div class="col-sm-2">
+                  <input type="number" min="1" class="form-control" ng-model="formValues.ShmSize" id="shm-size" />
+                </div>
+                <div class="col-sm-2">
+                  <p class="small text-muted mt-2"> Size of /dev/shm (<b>MB</b>) </p>
+                </div>
+              </div>
+              <!-- !shm-size-input -->
               <!-- #region GPU -->
               <div class="col-sm-12 form-section-title"> GPU </div>
 
@@ -712,9 +723,9 @@
               <div ng-class="{ 'edit-resources': state.mode == 'duplicate' }">
                 <div class="col-sm-12 form-section-title"> Resources </div>
                 <!-- memory-reservation-input -->
-                <div class="form-group">
-                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left mt-8"> Memory reservation </label>
-                  <div class="col-sm-3">
+                <div class="form-group flex">
+                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory reservation (MB) </label>
+                  <div class="col-sm-6">
                     <slider
                       on-change="(handleResourceChange)"
                       model="formValues.MemoryReservation"
@@ -724,18 +735,34 @@
                       ng-if="state.sliderMaxMemory"
                     ></slider>
                   </div>
-                  <div class="col-sm-2">
-                    <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation" />
+                  <div class="col-sm-2 vertical-center">
+                    <input
+                      name="memory_reservation"
+                      type="number"
+                      min="0"
+                      max="{{ state.sliderMaxMemory }}"
+                      class="form-control"
+                      ng-model="formValues.MemoryReservation"
+                      id="memory-reservation"
+                      required
+                    />
                   </div>
-                  <div class="col-sm-4">
-                    <p class="small text-muted mt-2"> Memory soft limit (<b>MB</b>) </p>
+                </div>
+                <div class="form-group" ng-show="resourceForm.memory_reservation.$invalid">
+                  <div class="col-sm-3 col-lg-2"></div>
+                  <div class="col-sm-8 small text-muted">
+                    <div ng-messages="resourceForm.memory-reservation.$error">
+                      <p class="vertical-center text-warning">
+                        <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <!-- !memory-reservation-input -->
                 <!-- memory-limit-input -->
-                <div class="form-group">
-                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left mt-8"> Memory limit </label>
-                  <div class="col-sm-3">
+                <div class="form-group flex">
+                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Memory limit (MB) </label>
+                  <div class="col-sm-6">
                     <slider
                       on-change="(handleResourceChange)"
                       model="formValues.MemoryLimit"
@@ -745,30 +772,43 @@
                       ng-if="state.sliderMaxMemory"
                     ></slider>
                   </div>
-                  <div class="col-sm-2">
-                    <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit" />
+                  <div class="col-sm-2 vertical-center">
+                    <input
+                      name="memory_Limit"
+                      type="number"
+                      min="0"
+                      max="{{ state.sliderMaxMemory }}"
+                      class="form-control"
+                      ng-model="formValues.MemoryLimit"
+                      id="memory-limit"
+                      required
+                    />
                   </div>
-                  <div class="col-sm-4">
-                    <p class="small text-muted mt-7"> Memory limit (<b>MB</b>) </p>
+                </div>
+                <div class="form-group" ng-show="resourceForm.memory_Limit.$invalid">
+                  <div class="col-sm-3 col-lg-2"></div>
+                  <div class="col-sm-8 small text-muted">
+                    <div ng-messages="resourceForm.memory-limit.$error">
+                      <p class="vertical-center text-warning">
+                        <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between 0 and {{ state.sliderMaxMemory }}.
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <!-- !memory-limit-input -->
                 <!-- cpu-limit-input -->
-                <div class="form-group">
-                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left mt-8"> CPU limit </label>
-                  <div class="col-sm-5">
+                <div class="form-group flex">
+                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left vertical-center"> Maximum CPU usage </label>
+                  <div class="col-sm-8">
                     <slider
                       on-change="(handleResourceChange)"
                       model="formValues.CpuLimit"
                       floor="0"
                       ceil="state.sliderMaxCpu"
-                      step="0.25"
+                      step="0.1"
                       precision="2"
                       ng-if="state.sliderMaxCpu"
                     ></slider>
-                  </div>
-                  <div class="col-sm-4 mt-8">
-                    <p class="small text-muted"> Maximum CPU usage </p>
                   </div>
                 </div>
                 <!-- !cpu-limit-input -->

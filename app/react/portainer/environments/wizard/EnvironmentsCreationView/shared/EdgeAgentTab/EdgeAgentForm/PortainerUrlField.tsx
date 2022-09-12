@@ -45,7 +45,7 @@ export function PortainerUrlField({ fieldName, readonly }: Props) {
         id={id}
         name={fieldName}
         as={Input}
-        placeholder="e.g. 10.0.0.10:9443 or portainer.mydomain.com"
+        placeholder="e.g. https://10.0.0.10:9443 or https://portainer.mydomain.com"
         required
         data-cy="endpointCreate-portainerServerUrlInput"
         readOnly={readonly}

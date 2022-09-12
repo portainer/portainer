@@ -259,9 +259,6 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 	endpointType := portainer.DockerEnvironment
 	var agentVersion string
 	if payload.EndpointCreationType == agentEnvironment {
-
-		payload.URL = "tcp://" + normalizeAgentAddress(payload.URL)
-
 		var tlsConfig *tls.Config
 		if payload.TLS {
 			tlsConfig, err = crypto.CreateTLSConfigurationFromBytes(payload.TLSCACertFile, payload.TLSCertFile, payload.TLSKeyFile, payload.TLSSkipVerify, payload.TLSSkipClientVerify)

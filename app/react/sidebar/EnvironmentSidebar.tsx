@@ -2,6 +2,7 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect } from 'react';
 import { X, Slash } from 'react-feather';
 import clsx from 'clsx';
+import angular from 'angular';
 
 import {
   PlatformType,
@@ -11,9 +12,11 @@ import {
 import { getPlatformType } from '@/portainer/environments/utils';
 import { useEnvironment } from '@/portainer/environments/queries/useEnvironment';
 import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
+import { EndpointProvider } from '@/portainer/services/types';
 
 import { getPlatformIcon } from '../portainer/environments/utils/get-platform-icon';
 
+import styles from './EnvironmentSidebar.module.css';
 import { AzureSidebar } from './AzureSidebar';
 import { DockerSidebar } from './DockerSidebar';
 import { KubernetesSidebar } from './KubernetesSidebar';
@@ -32,13 +35,7 @@ export function EnvironmentSidebar() {
   }
 
   return (
-    <div
-      className={clsx(
-        'rounded border border-dotted py-2',
-        'bg-blue-11 be:bg-gray-10 th-dark:bg-gray-warm-11',
-        'border-blue-9 be:border-gray-8  th-dark:border-gray-warm-9'
-      )}
-    >
+    <div className={clsx(styles.root, 'rounded border border-dotted py-2')}>
       {environment ? (
         <Content environment={environment} onClear={clearEnvironment} />
       ) : (
@@ -108,6 +105,16 @@ function useCurrentEnvironment() {
   return { query: useEnvironment(environmentId), clearEnvironment };
 
   function clearEnvironment() {
+    const $injector = angular.element(document).injector();
+    $injector.invoke(
+      /* @ngInject */ (EndpointProvider: EndpointProvider) => {
+        EndpointProvider.setCurrentEndpoint(undefined);
+        if (!params.endpointId) {
+          document.title = 'Portainer';
+        }
+      }
+    );
+
     if (params.endpointId) {
       router.stateService.go('portainer.home');
     }
@@ -145,7 +152,10 @@ function Title({ environment, onClear }: TitleProps) {
         title="Clear environment"
         type="button"
         onClick={onClear}
-        className="flex items-center justify-center be:bg-gray-9 bg-blue-10 th-dark:bg-gray-warm-10 hover:bg-blue-9 be:hover:bg-gray-7 th-dark:hover:bg-gray-8 transition-colors duration-200 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white be:hover:text-white"
+        className={clsx(
+          styles.closeBtn,
+          'flex items-center justify-center transition-colors duration-200 rounded border-0 text-sm h-5 w-5 p-1 ml-auto mr-2 text-gray-5 be:text-gray-6 hover:text-white be:hover:text-white'
+        )}
       >
         <X />
       </button>

@@ -2,9 +2,9 @@ import { Column } from 'react-table';
 import clsx from 'clsx';
 
 import { ownershipIcon } from '@/portainer/filters/filters';
-import { ResourceControlOwnership } from '@/portainer/access-control/types';
+import { ResourceControlOwnership } from '@/react/portainer/access-control/types';
 import { ContainerGroup } from '@/react/azure/types';
-import { determineOwnership } from '@/portainer/access-control/models/ResourceControlViewModel';
+import { determineOwnership } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
 export const ownership: Column<ContainerGroup> = {
   Header: 'Ownership',

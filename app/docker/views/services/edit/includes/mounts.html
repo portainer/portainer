@@ -3,7 +3,7 @@
     <rd-widget-header icon="list" feather-icon="true" title-text="Mounts">
       <div class="nopadding" authorization="DockerServiceUpdate">
         <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating ||addMount(service)" ng-disabled="isUpdating">
-          <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> mount
+          <pr-icon icon="'plus'" feather="true"></pr-icon> mount
         </a>
       </div>
     </rd-widget-header>
@@ -80,8 +80,8 @@
             </td>
             <td authorization="DockerServiceUpdate">
               <span class="input-group-btn">
-                <button class="btn btn-sm btn-light" type="button" ng-click="removeMount(service, $index)" ng-disabled="isUpdating">
-                  <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                <button class="btn btn-dangerlight" type="button" ng-click="removeMount(service, $index)" ng-disabled="isUpdating">
+                  <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
                 </button>
               </span>
             </td>

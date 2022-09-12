@@ -40,19 +40,6 @@
   @apply text-blue-7;
 }
 
-.datatable tr > td a:not(.btn) {
-  color: var(--ui-blue-8);
-}
-
-.datatable tr > td a:not(.btn):hover,
-.datatable tr > td a:not(.btn):focus {
-  text-decoration: underline;
-}
-
-.datatable tr > td a.actions {
-  color: currentColor;
-}
-
 .toolBar .actionBar {
   display: inline-flex;
 }
@@ -85,8 +72,6 @@
 
 .datatable .searchBar input[type='text'] {
   border: 0px !important;
-  @apply placeholder:text-gray-7;
-  @apply th-dark:placeholder:text-gray-warm-7;
 }
 
 .datatable .searchIcon {

@@ -77,29 +77,29 @@
   </div>
 
   <div class="dashboard-grid mx-4">
-    <a ui-sref="docker.stacks" ng-if="showStacks">
-      <dashboard-item feather-icon="true" icon="'layers'" feather-icon="true" type="'Stack'" value="stackCount"></dashboard-item>
+    <a class="no-link" ui-sref="docker.stacks" ng-if="showStacks">
+      <dashboard-item feather-icon="true" icon="'layers'" type="'Stack'" value="stackCount"></dashboard-item>
     </a>
 
     <div ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
-      <a ui-sref="docker.services">
+      <a class="no-link" ui-sref="docker.services">
         <dashboard-item feather-icon="true" icon="'shuffle'" type="'Service'" value="serviceCount"></dashboard-item>
       </a>
     </div>
 
-    <a ng-if="containers" ui-sref="docker.containers">
+    <a class="no-link" ng-if="containers" ui-sref="docker.containers">
       <dashboard-item feather-icon="true" icon="'box'" type="'Container'" value="containers.length" children="containerStatusComponent"></dashboard-item>
     </a>
 
-    <a ng-if="images" ui-sref="docker.images">
+    <a class="no-link" ng-if="images" ui-sref="docker.images">
       <dashboard-item feather-icon="true" icon="'list'" type="'Image'" value="images.length" children="imagesTotalSizeComponent"></dashboard-item>
     </a>
 
-    <a ui-sref="docker.volumes">
+    <a class="no-link" ui-sref="docker.volumes">
       <dashboard-item feather-icon="true" icon="'database'" type="'Volume'" value="volumeCount"></dashboard-item>
     </a>
 
-    <a ui-sref="docker.networks">
+    <a class="no-link" ui-sref="docker.networks">
       <dashboard-item feather-icon="true" icon="'share2'" type="'Network'" value="networkCount"></dashboard-item>
     </a>
 

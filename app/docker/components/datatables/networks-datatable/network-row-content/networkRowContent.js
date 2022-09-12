@@ -1,4 +1,4 @@
-import { ResourceControlOwnership as RCO } from '@/portainer/access-control/types';
+import { ResourceControlOwnership as RCO } from '@/react/portainer/access-control/types';
 
 angular.module('portainer.docker').directive('networkRowContent', [
   function networkRowContent() {

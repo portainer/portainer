@@ -1,4 +1,4 @@
-import { AccessControlFormData } from '@/portainer/access-control/types';
+import { AccessControlFormData } from '@/react/portainer/access-control/types';
 import { PortainerMetadata } from '@/react/docker/types';
 
 import { PortMapping } from './container-instances/CreateView/PortsMappingField';

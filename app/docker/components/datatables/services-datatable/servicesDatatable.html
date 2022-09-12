@@ -156,7 +156,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event); $event.stopPropagation()" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i></a>
+                <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
               </td>
               <td>
                 <a ui-sref="docker.services.service({id: item.Id})" ng-click="$event.stopPropagation()">{{ item.Name }}</a>

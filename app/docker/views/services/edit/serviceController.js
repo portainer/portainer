@@ -21,7 +21,7 @@ import _ from 'lodash-es';
 
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import * as envVarsUtils from '@/portainer/helpers/env-vars';
-import { ResourceControlType } from '@/portainer/access-control/types';
+import { ResourceControlType } from '@/react/portainer/access-control/types';
 
 angular.module('portainer.docker').controller('ServiceController', [
   '$q',

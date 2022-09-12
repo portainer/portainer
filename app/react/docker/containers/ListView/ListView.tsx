@@ -25,14 +25,10 @@ export function ListView({ endpoint: environment }: Props) {
         reload
       />
 
-      <div className="row">
-        <div className="col-sm-12">
-          <ContainersDatatable
-            isHostColumnVisible={isHostColumnVisible}
-            environment={environment}
-          />
-        </div>
-      </div>
+      <ContainersDatatable
+        isHostColumnVisible={isHostColumnVisible}
+        environment={environment}
+      />
     </>
   );
 }

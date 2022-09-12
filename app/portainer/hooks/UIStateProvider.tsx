@@ -5,6 +5,7 @@ import { useLocalStorage } from '@/portainer/hooks/useLocalStorage';
 interface UIState {
   dismissedInfoPanels: Record<string, string>;
   dismissedInfoHash: string;
+  dismissedUpdateVersion: string;
 }
 
 type UIStateService = [UIState, (state: UIState) => void];

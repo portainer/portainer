@@ -376,6 +376,17 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       },
     };
 
+    var stackContainer = {
+      name: 'docker.stacks.stack.container',
+      url: '/:id?nodeName',
+      views: {
+        'content@': {
+          templateUrl: '~@/docker/views/containers/edit/container.html',
+          controller: 'ContainerController',
+        },
+      },
+    };
+
     var stackCreation = {
       name: 'docker.stacks.newstack',
       url: '/newstack',
@@ -553,6 +564,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     $stateRegistryProvider.register(serviceLogs);
     $stateRegistryProvider.register(stacks);
     $stateRegistryProvider.register(stack);
+    $stateRegistryProvider.register(stackContainer);
     $stateRegistryProvider.register(stackCreation);
     $stateRegistryProvider.register(swarm);
     $stateRegistryProvider.register(swarmVisualizer);

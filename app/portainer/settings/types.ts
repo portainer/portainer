@@ -1,4 +1,4 @@
-import { TeamId } from '../teams/types';
+import { TeamId } from '@/react/portainer/users/teams/types';
 
 export interface FDOConfiguration {
   enabled: boolean;
@@ -88,6 +88,10 @@ enum AuthenticationMethod {
 }
 
 type Feature = string;
+
+export interface DefaultRegistry {
+  Hide: boolean;
+}
 
 export interface Settings {
   LogoURL: string;

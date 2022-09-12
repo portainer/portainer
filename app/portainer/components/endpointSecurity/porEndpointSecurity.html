@@ -24,47 +24,49 @@
   </div>
   <div class="form-group"></div>
   <!-- endpoint-tls-mode -->
-  <div class="form-group" style="margin-bottom: 0" ng-if="$ctrl.formData.TLS">
-    <div class="boxselector_wrapper">
-      <div>
-        <input type="radio" id="tls_client_ca" ng-model="$ctrl.formData.TLSMode" value="tls_client_ca" />
-        <label for="tls_client_ca">
-          <div class="boxselector_header">
-            <pr-icon icon="'shield'" feather="true"></pr-icon>
-            TLS with server and client verification
-          </div>
-          <p>Use client certificates and server verification</p>
-        </label>
-      </div>
-      <div>
-        <input type="radio" id="tls_client_noca" ng-model="$ctrl.formData.TLSMode" value="tls_client_noca" />
-        <label for="tls_client_noca">
-          <div class="boxselector_header">
-            <pr-icon icon="'shield'" feather="true"></pr-icon>
-            TLS with client verification only
-          </div>
-          <p>Use client certificates without server verification</p>
-        </label>
-      </div>
-      <div>
-        <input type="radio" id="tls_ca" ng-model="$ctrl.formData.TLSMode" value="tls_ca" />
-        <label for="tls_ca">
-          <div class="boxselector_header">
-            <pr-icon icon="'shield'" feather="true"></pr-icon>
-            TLS with server verification only
-          </div>
-          <p>Only verify the server certificate</p>
-        </label>
-      </div>
-      <div>
-        <input type="radio" id="tls_only" ng-model="$ctrl.formData.TLSMode" value="tls_only" />
-        <label for="tls_only">
-          <div class="boxselector_header">
-            <pr-icon icon="'shield'" feather="true"></pr-icon>
-            TLS only
-          </div>
-          <p>No server/client verification</p>
-        </label>
+  <div class="form-group" ng-if="$ctrl.formData.TLS">
+    <div class="col-sm-12">
+      <div class="boxselector_wrapper">
+        <div>
+          <input type="radio" id="tls_client_ca" ng-model="$ctrl.formData.TLSMode" value="tls_client_ca" />
+          <label for="tls_client_ca">
+            <div class="boxselector_header">
+              <pr-icon icon="'shield'" feather="true"></pr-icon>
+              TLS with server and client verification
+            </div>
+            <p>Use client certificates and server verification</p>
+          </label>
+        </div>
+        <div>
+          <input type="radio" id="tls_client_noca" ng-model="$ctrl.formData.TLSMode" value="tls_client_noca" />
+          <label for="tls_client_noca">
+            <div class="boxselector_header">
+              <pr-icon icon="'shield'" feather="true"></pr-icon>
+              TLS with client verification only
+            </div>
+            <p>Use client certificates without server verification</p>
+          </label>
+        </div>
+        <div>
+          <input type="radio" id="tls_ca" ng-model="$ctrl.formData.TLSMode" value="tls_ca" />
+          <label for="tls_ca">
+            <div class="boxselector_header">
+              <pr-icon icon="'shield'" feather="true"></pr-icon>
+              TLS with server verification only
+            </div>
+            <p>Only verify the server certificate</p>
+          </label>
+        </div>
+        <div>
+          <input type="radio" id="tls_only" ng-model="$ctrl.formData.TLSMode" value="tls_only" />
+          <label for="tls_only">
+            <div class="boxselector_header">
+              <pr-icon icon="'shield'" feather="true"></pr-icon>
+              TLS only
+            </div>
+            <p>No server/client verification</p>
+          </label>
+        </div>
       </div>
     </div>
   </div>

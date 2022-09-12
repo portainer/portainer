@@ -103,12 +103,12 @@ class StackRedeployGitFormController {
 
   async submit() {
     const tplCrop =
-      '<div>Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption.</div>' +
-      '<div"><div style="position: absolute; right: 110px; top: 68px; z-index: 999">' +
+      '<div>Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption. Do you wish to continue?</div>' +
+      '<div"><div style="position: absolute; right: 5px; top: 84px; z-index: 999">' +
       '<be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div></div>';
     const template = angular.element(tplCrop);
     const html = this.$compile(template)(this.$scope);
-    this.ModalService.confirmStackUpdate(html, true, true, 'btn-warning', async (result) => {
+    this.ModalService.confirmStackUpdate(html, true, false, 'btn-warning', async (result) => {
       if (!result) {
         return;
       }

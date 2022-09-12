@@ -1,6 +1,8 @@
 import _ from 'lodash';
+import { useInfo } from 'Docker/services/system.service';
+import { EnvironmentId } from 'Portainer/environments/types';
 
-import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
 import { DockerContainer, ContainerStatus } from './types';
 import { DockerContainerResponse } from './types/response';
@@ -84,4 +86,13 @@ function createStatus(statusText = ''): ContainerStatus {
   }
 
   return ContainerStatus.Running;
+}
+
+export function useShowGPUsColumn(environmentID: EnvironmentId) {
+  const envInfoQuery = useInfo(
+    environmentID,
+    (info) => !!info.Swarm?.NodeID && !!info.Swarm?.ControlAvailable
+  );
+
+  return envInfoQuery.data !== true && !envInfoQuery.isLoading;
 }

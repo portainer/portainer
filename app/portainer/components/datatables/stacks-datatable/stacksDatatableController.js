@@ -37,7 +37,7 @@ angular.module('portainer.app').controller('StacksDatatableController', [
      * Do not allow external items
      */
     this.allowSelection = function (item) {
-      if (item.External && item.Type === 2) {
+      if (item.External) {
         return false;
       }
 

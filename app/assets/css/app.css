@@ -117,10 +117,6 @@ input[type='checkbox'] {
   text-align: center;
 }
 
-a[ng-click] {
-  cursor: pointer;
-}
-
 .space-right {
   margin-right: 5px;
 }
@@ -481,7 +477,7 @@ a[ng-click] {
 
 :root[theme='dark'] .bootbox-checkbox-list,
 :root[theme='highcontrast'] .bootbox-checkbox-list {
-  background-color: var(--black-color);
+  background-color: var(--bg-modal-content-color);
 }
 
 .small-select {

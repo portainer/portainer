@@ -4,6 +4,7 @@ import { react2angular } from 'react2angular';
 import { r2a } from '@/react-tools/react2angular';
 import { Icon } from '@/react/components/Icon';
 import { ReactQueryDevtoolsWrapper } from '@/react/components/ReactQueryDevtoolsWrapper';
+import { AccessControlPanel } from '@/react/portainer/access-control';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -15,6 +16,7 @@ import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
 import { DashboardItem } from '@@/DashboardItem';
 import { SearchBar } from '@@/datatables/SearchBar';
 import { FallbackImage } from '@@/FallbackImage';
+import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -28,7 +30,7 @@ export const componentsModule = angular
   )
   .component(
     'portainerTooltip',
-    react2angular(Tooltip, ['message', 'position'])
+    react2angular(Tooltip, ['message', 'position', 'className'])
   )
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
@@ -49,7 +51,14 @@ export const componentsModule = angular
   .component('viewLoading', r2a(ViewLoading, ['message']))
   .component(
     'pageHeader',
-    r2a(PageHeader, ['title', 'breadcrumbs', 'loading', 'onReload', 'reload'])
+    r2a(PageHeader, [
+      'id',
+      'title',
+      'breadcrumbs',
+      'loading',
+      'onReload',
+      'reload',
+    ])
   )
   .component(
     'fallbackImage',
@@ -76,4 +85,18 @@ export const componentsModule = angular
   .component(
     'datatableSearchbar',
     r2a(SearchBar, ['data-cy', 'onChange', 'value', 'placeholder'])
+  )
+  .component(
+    'boxSelectorBadgeIcon',
+    react2angular(BadgeIcon, ['featherIcon', 'icon'])
+  )
+  .component(
+    'accessControlPanel',
+    r2a(AccessControlPanel, [
+      'disableOwnershipChange',
+      'onUpdateSuccess',
+      'resourceControl',
+      'resourceId',
+      'resourceType',
+    ])
   ).name;

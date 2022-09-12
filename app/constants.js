@@ -31,7 +31,7 @@ export const KUBERNETES_SYSTEM_NAMESPACES = ['kube-system', 'kube-public', 'kube
 export const PORTAINER_FADEOUT = 1500;
 export const STACK_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
 export const TEMPLATE_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
-export const BROWSER_OS_PLATFORM = navigator.userAgent.indexOf('Windows NT') > -1 ? 'win' : 'lin';
+export const BROWSER_OS_PLATFORM = navigator.userAgent.indexOf('Windows') > -1 ? 'win' : navigator.userAgent.indexOf('Mac') > -1 ? 'mac' : 'lin';
 export const NEW_LINE_BREAKER = BROWSER_OS_PLATFORM === 'win' ? '\r\n' : '\n';
 
 // don't declare new constants, either:
@@ -66,4 +66,5 @@ angular
   .constant('PAGINATION_MAX_ITEMS', PAGINATION_MAX_ITEMS)
   .constant('APPLICATION_CACHE_VALIDITY', APPLICATION_CACHE_VALIDITY)
   .constant('CONSOLE_COMMANDS_LABEL_PREFIX', CONSOLE_COMMANDS_LABEL_PREFIX)
-  .constant('PREDEFINED_NETWORKS', PREDEFINED_NETWORKS);
+  .constant('PREDEFINED_NETWORKS', PREDEFINED_NETWORKS)
+  .constant('BROWSER_OS_PLATFORM', BROWSER_OS_PLATFORM);

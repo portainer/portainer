@@ -40,23 +40,23 @@
 
   <div class="dashboard-grid mx-4">
     <div ng-if="ctrl.pools" data-cy="k8sDashboard-namespaces">
-      <a ui-sref="kubernetes.resourcePools">
+      <a class="no-link" ui-sref="kubernetes.resourcePools">
         <dashboard-item feather-icon="true" icon="'layers'" type="'Namespace'" value="ctrl.pools.length"></dashboard-item>
       </a>
     </div>
 
     <div ng-if="ctrl.applications" data-cy="k8sDashboard-applications">
-      <a ui-sref="kubernetes.applications">
+      <a class="no-link" ui-sref="kubernetes.applications">
         <dashboard-item feather-icon="true" icon="'box'" type="'Application'" value="ctrl.applications.length"></dashboard-item>
       </a>
     </div>
     <div ng-if="ctrl.configurations" data-cy="k8sDashboard-configurations">
-      <a ui-sref="kubernetes.configurations">
+      <a class="no-link" ui-sref="kubernetes.configurations">
         <dashboard-item feather-icon="true" icon="'lock'" type="'ConfigMaps & Secret'" value="ctrl.configurations.length"></dashboard-item>
       </a>
     </div>
     <div ng-if="ctrl.volumes" data-cy="k8sDashboard-volumes">
-      <a ui-sref="kubernetes.volumes">
+      <a class="no-link" ui-sref="kubernetes.volumes">
         <dashboard-item feather-icon="true" icon="'database'" type="'Volume'" value="ctrl.volumes.length"></dashboard-item>
       </a>
     </div>

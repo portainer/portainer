@@ -67,6 +67,9 @@ export function Icon({ icon, feather, className, mode, size }: Props) {
       .map((s) => s.slice(0, 1).toUpperCase() + s.slice(1))
       .join('') as keyof typeof featherIcons;
     const IconComponent = featherIcons[iconName];
+    if (!IconComponent) {
+      throw new Error(`Feather icon not found: ${iconName}`);
+    }
     return <IconComponent className={classes} />;
   }
 

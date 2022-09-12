@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "2.15.0",
+  "version": "2.16.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -100,7 +100,7 @@
     "bootstrap": "^3.4.0",
     "buffer": "^6.0.3",
     "chardet": "^1.4.0",
-    "chart.js": "~2.7.0",
+    "chart.js": "^2.7.0",
     "clsx": "^1.1.1",
     "codemirror": "~5.64.0",
     "core-js": "^3.19.3",

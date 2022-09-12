@@ -65,7 +65,7 @@
         <table class="table">
           <tbody>
             <tr>
-              <td>ID</td>
+              <td class="col-xs-6 col-sm-4 col-md-3 col-lg-3">ID</td>
               <td>{{ container.Id }}</td>
             </tr>
             <tr>
@@ -80,7 +80,7 @@
                 <form ng-submit="renameContainer()">
                   <input type="text" class="containerNameInput" ng-model="container.newContainerName" />
                   <a href="" ng-click="container.edit = false;"><i class="fa fa-times"></i></a>
-                  <a href="" ng-click="renameContainer()"><i class="fa fa-check-square"></i></a>
+                  <a href="" ng-click="renameContainer()"><i class="fa fa-check"></i></a>
                 </form>
               </td>
             </tr>

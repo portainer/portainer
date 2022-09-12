@@ -10,6 +10,7 @@ import { Tag } from '@/portainer/tags/types';
 import { StatusResponse } from '@/portainer/services/api/status.service';
 import { createMockTeams } from '@/react-tools/test-mocks';
 import { PublicSettingsResponse } from '@/portainer/settings/types';
+import { UserId } from '@/portainer/users/types';
 
 import { azureHandlers } from './setup-handlers/azure';
 import { dockerHandlers } from './setup-handlers/docker';
@@ -36,6 +37,12 @@ export const handlers = [
     res(ctx.json(createMockTeams(10)))
   ),
 
+  rest.post<{ name: string }>('/api/teams', (req, res, ctx) =>
+    res(ctx.status(204))
+  ),
+  rest.post<{ userId: UserId }>('/api/team_memberships', (req, res, ctx) =>
+    res(ctx.status(204))
+  ),
   ...azureHandlers,
   ...dockerHandlers,
   ...userHandlers,
