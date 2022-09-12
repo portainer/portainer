@@ -173,7 +173,7 @@ export function confirmStackUpdate(
     inputType: 'checkbox',
     inputOptions: [
       {
-        text: 'Pull latest image version<i></i>',
+        text: 'Re-pull image and redeploy<i></i>',
         value: '1',
       },
     ],
