@@ -266,8 +266,17 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.updateStack = function (stack, stackFile, env, prune) {
-      return Stack.update({ endpointId: stack.EndpointId }, { id: stack.Id, StackFileContent: stackFile, Env: env, Prune: prune }).$promise;
+    service.updateStack = function (stack, stackFile, env, prune, pullImage) {
+      return Stack.update(
+        { endpointId: stack.EndpointId },
+        {
+          id: stack.Id,
+          StackFileContent: stackFile,
+          Env: env,
+          Prune: prune,
+          PullImage: pullImage,
+        }
+      ).$promise;
     };
 
     service.updateKubeStack = function (stack, stackFile, gitConfig) {
@@ -436,7 +445,7 @@ angular.module('portainer.app').factory('StackService', [
       return Stack.stop({ id }).$promise;
     }
 
-    function updateGit(id, endpointId, env, prune, gitConfig) {
+    function updateGit(id, endpointId, env, prune, gitConfig, pullImage) {
       return Stack.updateGit(
         { endpointId, id },
         {
@@ -446,6 +455,7 @@ angular.module('portainer.app').factory('StackService', [
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
           RepositoryPassword: gitConfig.RepositoryPassword,
+          PullImage: pullImage,
         }
       ).$promise;
     }
