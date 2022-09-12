@@ -2,8 +2,6 @@ package git
 
 import (
 	"context"
-	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -15,42 +13,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var bareRepoDir string
-
-func TestMain(m *testing.M) {
-	if err := testMain(m); err != nil {
-		log.Fatal(err)
-	}
-}
-
-// testMain does extra setup/teardown before/after testing.
-// The function is separated from TestMain due to necessity to call os.Exit/log.Fatal in the latter.
-func testMain(m *testing.M) error {
-	dir, err := ioutil.TempDir("", "git-repo-")
-	if err != nil {
-		return errors.Wrap(err, "failed to create a temp dir")
-	}
-	defer os.RemoveAll(dir)
-
+func setup(t *testing.T) (bareRepoDir string) {
+	dir := t.TempDir()
 	bareRepoDir = filepath.Join(dir, "test-clone.git")
 
 	file, err := os.OpenFile("./testdata/test-clone-git-repo.tar.gz", os.O_RDONLY, 0755)
 	if err != nil {
-		return errors.Wrap(err, "failed to open an archive")
+		t.Fatal(errors.Wrap(err, "failed to open an archive"))
 	}
+
 	err = archive.ExtractTarGz(file, dir)
 	if err != nil {
-		return errors.Wrapf(err, "failed to extract file from the archive to a folder %s\n", dir)
+		t.Fatal(errors.Wrapf(err, "failed to extract file from the archive to a folder %s", dir))
 	}
 
-	m.Run()
-
-	return nil
+	return
 }
 
 func Test_ClonePublicRepository_Shallow(t *testing.T) {
 	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
-	repositoryURL := bareRepoDir
+	repositoryURL := setup(t)
 	referenceName := "refs/heads/main"
 
 	dir := t.TempDir()
@@ -62,7 +44,7 @@ func Test_ClonePublicRepository_Shallow(t *testing.T) {
 
 func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 	service := Service{git: gitClient{preserveGitDirectory: false}} // no need for http client since the test access the repo via file system.
-	repositoryURL := bareRepoDir
+	repositoryURL := setup(t)
 	referenceName := "refs/heads/main"
 
 	dir := t.TempDir()
@@ -75,7 +57,7 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 func Test_cloneRepository(t *testing.T) {
 	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
 
-	repositoryURL := bareRepoDir
+	repositoryURL := setup(t)
 	referenceName := "refs/heads/main"
 
 	dir := t.TempDir()
@@ -94,7 +76,7 @@ func Test_cloneRepository(t *testing.T) {
 func Test_latestCommitID(t *testing.T) {
 	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
 
-	repositoryURL := bareRepoDir
+	repositoryURL := setup(t)
 	referenceName := "refs/heads/main"
 
 	id, err := service.LatestCommitID(repositoryURL, referenceName, "", "")
