@@ -20,6 +20,7 @@ interface SharedProps extends AutomationTestingProps {
   placeholder?: string;
   disabled?: boolean;
   isClearable?: boolean;
+  bindToBody?: boolean;
 }
 
 interface MultiProps<TValue> extends SharedProps {
@@ -64,6 +65,7 @@ export function SingleSelect<TValue = string>({
   inputId,
   placeholder,
   isClearable,
+  bindToBody,
 }: SingleProps<TValue>) {
   const selectedValue = _.first(findSelectedOptions<TValue>(options, value));
 
@@ -80,6 +82,7 @@ export function SingleSelect<TValue = string>({
       inputId={inputId}
       placeholder={placeholder}
       isDisabled={disabled}
+      menuPortalTarget={bindToBody ? document.body : undefined}
     />
   );
 }
@@ -114,6 +117,7 @@ export function MultiSelect<TValue = string>({
   placeholder,
   disabled,
   isClearable,
+  bindToBody,
 }: Omit<MultiProps<TValue>, 'isMulti'>) {
   const selectedOptions = findSelectedOptions(options, value);
   return (
@@ -131,6 +135,7 @@ export function MultiSelect<TValue = string>({
       inputId={inputId}
       placeholder={placeholder}
       isDisabled={disabled}
+      menuPortalTarget={bindToBody ? document.body : undefined}
     />
   );
 }

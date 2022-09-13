@@ -184,7 +184,7 @@ export const componentsModule = angular
       'placeholder',
       'disabled',
       'data-cy',
-
+      'bindToBody',
       'value',
       'onChange',
       'options',
