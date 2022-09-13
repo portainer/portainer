@@ -102,33 +102,35 @@ class StackRedeployGitFormController {
   }
 
   async submit() {
-    const tplCrop =
-      '<div>Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption. Do you wish to continue?</div>' +
-      '<div"><div style="position: absolute; right: 5px; top: 84px; z-index: 999">' +
-      '<be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div></div>';
-    const template = angular.element(tplCrop);
-    const html = this.$compile(template)(this.$scope);
-    this.ModalService.confirmStackUpdate(html, true, false, 'btn-warning', async (result) => {
-      if (!result) {
-        return;
+    const isSwarmStack = this.stack.Type === 1;
+    const that = this;
+    this.ModalService.confirmStackUpdate(
+      'Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption. Do you wish to continue?',
+      isSwarmStack,
+      'btn-warning',
+      async function (result) {
+        if (!result) {
+          return;
+        }
+        try {
+          that.state.redeployInProgress = true;
+          await that.StackService.updateGit(
+            that.stack.Id,
+            that.stack.EndpointId,
+            that.FormHelper.removeInvalidEnvVars(that.formValues.Env),
+            that.formValues.Option.Prune,
+            that.formValues,
+            !!result[0]
+          );
+          that.Notifications.success('Success', 'Pulled and redeployed stack successfully');
+          that.$state.reload();
+        } catch (err) {
+          that.Notifications.error('Failure', err, 'Failed redeploying stack');
+        } finally {
+          that.state.redeployInProgress = false;
+        }
       }
-      try {
-        this.state.redeployInProgress = true;
-        await this.StackService.updateGit(
-          this.stack.Id,
-          this.stack.EndpointId,
-          this.FormHelper.removeInvalidEnvVars(this.formValues.Env),
-          this.formValues.Option.Prune,
-          this.formValues
-        );
-        this.Notifications.success('Success', 'Pulled and redeployed stack successfully');
-        this.$state.reload();
-      } catch (err) {
-        this.Notifications.error('Failure', err, 'Failed redeploying stack');
-      } finally {
-        this.state.redeployInProgress = false;
-      }
-    });
+    );
   }
 
   async saveGitSettings() {
