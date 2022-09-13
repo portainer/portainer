@@ -1,5 +1,4 @@
 import { useRouter } from '@uirouter/react';
-import { useEffect } from 'react';
 
 import { usePublicSettings } from '../settings/queries';
 
@@ -7,9 +6,13 @@ export enum FeatureFlag {
   EdgeRemoteUpdate = 'edgeRemoteUpdate',
 }
 
-export function useFeatureFlag(flag: FeatureFlag) {
-  return usePublicSettings({
+export function useFeatureFlag(
+  flag: FeatureFlag,
+  { onSuccess }: { onSuccess?: (isEnabled: boolean) => void } = {}
+) {
+  return usePublicSettings<boolean>({
     select: (settings) => settings.Features[flag],
+    onSuccess,
   });
 }
 
@@ -19,11 +22,11 @@ export function useRedirectFeatureFlag(
 ) {
   const router = useRouter();
 
-  const query = useFeatureFlag(flag);
-
-  useEffect(() => {
-    if (query.isSuccess && !query.data) {
-      router.stateService.go(to);
-    }
-  }, [query.data, query.isSuccess, router.stateService, to]);
+  useFeatureFlag(flag, {
+    onSuccess(isEnabled) {
+      if (!isEnabled) {
+        router.stateService.go(to);
+      }
+    },
+  });
 }
