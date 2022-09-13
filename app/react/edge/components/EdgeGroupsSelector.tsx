@@ -28,6 +28,7 @@ export function EdgeGroupsSelector({ items, value, onChange }: Props) {
         onChange(value.map((item) => item.Id));
       }}
       placeholder="Select one or multiple group(s)"
+      closeMenuOnSelect={false}
     />
   );
 }
