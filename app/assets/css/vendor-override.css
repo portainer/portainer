@@ -430,9 +430,6 @@ input:-webkit-autofill {
   padding: 10px;
 }
 
-
-
-
 /* Code Script Style */
 .code-script {
   background-color: var(--bg-code-script-color);
