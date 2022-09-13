@@ -14,7 +14,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     };
 
     ctrl.formValues = {
-      endpoint: null,
+      endpointId: null,
       newName: '',
     };
 
@@ -30,16 +30,16 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     ctrl.$onChanges = $onChanges;
 
     function isFormValidForMigration() {
-      return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
+      return ctrl.formValues.endpointId;
     }
 
     function isFormValidForDuplication() {
       return isFormValidForMigration() && ctrl.formValues.newName && !ctrl.yamlError;
     }
 
-    function onChangeEnvironment(value) {
+    function onChangeEnvironment(endpointId) {
       return $scope.$evalAsync(() => {
-        ctrl.formValues.endpoint = value;
+        ctrl.formValues.endpointId = endpointId;
       });
     }
 
@@ -51,7 +51,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
       ctrl.state.duplicationInProgress = true;
       ctrl
         .onDuplicate({
-          endpointId: ctrl.formValues.endpoint.Id,
+          endpointId: ctrl.formValues.endpointId,
           name: ctrl.formValues.newName ? ctrl.formValues.newName : undefined,
         })
         .finally(function () {
@@ -63,7 +63,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
       ctrl.state.migrationInProgress = true;
       ctrl
         .onMigrate({
-          endpointId: ctrl.formValues.endpoint.Id,
+          endpointId: ctrl.formValues.endpointId,
           name: ctrl.formValues.newName ? ctrl.formValues.newName : undefined,
         })
         .finally(function () {
@@ -76,11 +76,11 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     }
 
     function isTargetEndpointAndCurrentEquals() {
-      return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id === ctrl.currentEndpointId;
+      return ctrl.formValues.endpointId === ctrl.currentEndpointId;
     }
 
     function isEndpointSelected() {
-      return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
+      return ctrl.formValues.endpointId;
     }
 
     function $onChanges() {
