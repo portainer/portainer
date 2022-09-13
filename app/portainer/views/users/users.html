@@ -112,11 +112,11 @@
               </span>
               <teams-selector
                 ng-if="teams.length > 0"
-                value="formValues.Teams"
+                value="formValues.TeamIds"
                 teams="teams"
                 placeholder="'Select one or more teams'"
                 data-cy="'user-teamSelect'"
-                on-change="(onChangeTeams)"
+                on-change="(onChangeTeamIds)"
                 input-id="'teams-selector'"
               ></teams-selector>
             </div>

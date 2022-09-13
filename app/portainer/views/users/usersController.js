@@ -23,7 +23,7 @@ angular.module('portainer.app').controller('UsersController', [
       Password: '',
       ConfirmPassword: '',
       Administrator: false,
-      Teams: [],
+      TeamIds: [],
     };
 
     $scope.handleAdministratorChange = function (checked) {
@@ -32,9 +32,9 @@ angular.module('portainer.app').controller('UsersController', [
       });
     };
 
-    $scope.onChangeTeams = function (teams) {
+    $scope.onChangeTeamIds = function (teamIds) {
       return $scope.$evalAsync(() => {
-        $scope.formValues.Teams = teams;
+        $scope.formValues.TeamIds = teamIds;
       });
     };
 
@@ -56,11 +56,7 @@ angular.module('portainer.app').controller('UsersController', [
       var username = $scope.formValues.Username;
       var password = $scope.formValues.Password;
       var role = $scope.formValues.Administrator ? 1 : 2;
-      var teamIds = [];
-      angular.forEach($scope.formValues.Teams, function (team) {
-        teamIds.push(team.Id);
-      });
-      UserService.createUser(username, password, role, teamIds)
+      UserService.createUser(username, password, role, $scope.formValues.TeamIds)
         .then(function success() {
           Notifications.success('User successfully created', username);
           $state.reload();
