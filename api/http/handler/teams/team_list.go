@@ -16,7 +16,7 @@ import (
 // @description **Access policy**: restricted
 // @tags teams
 // @param onlyLedTeams query boolean false "Only list teams that the user is leader of"
-// @param endpointId query int false "Identifier of the environment(endpoint) that will be used to filter the authorized teams"
+// @param environmentId query int false "Identifier of the environment(endpoint) that will be used to filter the authorized teams"
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
@@ -43,7 +43,7 @@ func (handler *Handler) teamList(w http.ResponseWriter, r *http.Request) *httper
 		userTeams = security.FilterUserTeams(teams, securityContext)
 	}
 
-	endpointID, _ := request.RetrieveNumericQueryParameter(r, "endpointId", true)
+	endpointID, _ := request.RetrieveNumericQueryParameter(r, "environmentId", true)
 	if endpointID == 0 {
 		return response.JSON(w, userTeams)
 	}

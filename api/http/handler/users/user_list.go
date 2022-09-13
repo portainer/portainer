@@ -20,7 +20,7 @@ import (
 // @security ApiKeyAuth
 // @security jwt
 // @produce json
-// @param endpointId query int false "Identifier of the environment(endpoint) that will be used to filter the authorized users"
+// @param environmentId query int false "Identifier of the environment(endpoint) that will be used to filter the authorized users"
 // @success 200 {array} portainer.User "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
@@ -41,7 +41,7 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 		hideFields(&availableUsers[i])
 	}
 
-	endpointID, _ := request.RetrieveNumericQueryParameter(r, "endpointId", true)
+	endpointID, _ := request.RetrieveNumericQueryParameter(r, "environmentId", true)
 	if endpointID == 0 {
 		return response.JSON(w, availableUsers)
 	}

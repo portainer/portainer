@@ -55,10 +55,10 @@ angular.module('portainer.app').controller('porAccessControlFormController', [
         ctrl.formData.Ownership = ctrl.RCO.ADMINISTRATORS;
       }
 
-      const endpointId = $state.params.endpointId;
+      const environmentId = $state.params.endpointId;
       $q.all({
-        availableTeams: TeamService.teams(endpointId),
-        availableUsers: isAdmin ? UserService.users(false, endpointId) : [],
+        availableTeams: TeamService.teams(environmentId),
+        availableUsers: isAdmin ? UserService.users(false, environmentId) : [],
       })
         .then(function success(data) {
           ctrl.availableUsers = _.orderBy(data.availableUsers, 'Username', 'asc');
