@@ -33,9 +33,7 @@ export function EditDetails({
 }: Props) {
   const { user, isAdmin } = useUser();
 
-  const { users, teams, isLoading } = useLoadState(
-    environmentId as EnvironmentId
-  );
+  const { users, teams, isLoading } = useLoadState(environmentId);
   const options = useOptions(isAdmin, teams, isPublicVisible);
 
   const handleChange = useCallback(
