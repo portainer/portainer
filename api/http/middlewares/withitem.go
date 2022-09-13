@@ -11,9 +11,11 @@ import (
 	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 )
 
+type ItemContextKey string
+
 type ItemGetter[TId ~int, TObject any] func(id TId) (*TObject, error)
 
-func WithItem[TId ~int, TObject any](getter ItemGetter[TId, TObject], idParam string, contextKey string) mux.MiddlewareFunc {
+func WithItem[TId ~int, TObject any](getter ItemGetter[TId, TObject], idParam string, contextKey ItemContextKey) mux.MiddlewareFunc {
 	if idParam == "" {
 		idParam = "id"
 	}
@@ -45,12 +47,12 @@ func WithItem[TId ~int, TObject any](getter ItemGetter[TId, TObject], idParam st
 func FetchItem[T any](request *http.Request, contextKey string) (*T, error) {
 	contextData := request.Context().Value(contextKey)
 	if contextData == nil {
-		return nil, errors.New("Unable to find environment data in request context")
+		return nil, errors.New("unable to find item in request context")
 	}
 
 	item, ok := contextData.(*T)
 	if !ok {
-		return nil, errors.New("Unable to cast context item")
+		return nil, errors.New("unable to cast context item")
 	}
 
 	return item, nil
