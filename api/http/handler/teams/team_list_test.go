@@ -100,7 +100,7 @@ func Test_teamList(t *testing.T) {
 
 	t.Run("admin user can list team who is given access to the specific endpoint", func(t *testing.T) {
 		params := url.Values{}
-		params.Add("endpointId", fmt.Sprintf("%d", endpointWithTeamAccessPolicy.ID))
+		params.Add("environmentId", fmt.Sprintf("%d", endpointWithTeamAccessPolicy.ID))
 		req := httptest.NewRequest(http.MethodGet, "/teams?"+params.Encode(), nil)
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", adminJWT))
 
@@ -166,7 +166,7 @@ func Test_teamList(t *testing.T) {
 
 	t.Run("admin user can list teams who inherit endpoint access from an environment group", func(t *testing.T) {
 		params := url.Values{}
-		params.Add("endpointId", fmt.Sprintf("%d", endpointUnderGroupWithTeam.ID))
+		params.Add("environmentId", fmt.Sprintf("%d", endpointUnderGroupWithTeam.ID))
 		req := httptest.NewRequest(http.MethodGet, "/teams?"+params.Encode(), nil)
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", adminJWT))
 

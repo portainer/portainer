@@ -90,7 +90,7 @@ func Test_userList(t *testing.T) {
 
 	t.Run("admin user can list users who are given the endpoint access directly", func(t *testing.T) {
 		params := url.Values{}
-		params.Add("endpointId", fmt.Sprintf("%d", endpointWithUserAccessPolicy.ID))
+		params.Add("environmentId", fmt.Sprintf("%d", endpointWithUserAccessPolicy.ID))
 		req := httptest.NewRequest(http.MethodGet, "/users?"+params.Encode(), nil)
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", adminJWT))
 
@@ -158,7 +158,7 @@ func Test_userList(t *testing.T) {
 
 	t.Run("admin user can list users who inherit endpoint access from an environment group", func(t *testing.T) {
 		params := url.Values{}
-		params.Add("endpointId", fmt.Sprintf("%d", endpointUnderGroupWithUser.ID))
+		params.Add("environmentId", fmt.Sprintf("%d", endpointUnderGroupWithUser.ID))
 		req := httptest.NewRequest(http.MethodGet, "/users?"+params.Encode(), nil)
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", adminJWT))
 
@@ -210,7 +210,7 @@ func Test_userList(t *testing.T) {
 	is.NoError(err, "error creating endpoint")
 	t.Run("admin user can list users who inherit endpoint access from a team that inherit from an environment group", func(t *testing.T) {
 		params := url.Values{}
-		params.Add("endpointId", fmt.Sprintf("%d", endpointUnderGroupWithTeam.ID))
+		params.Add("environmentId", fmt.Sprintf("%d", endpointUnderGroupWithTeam.ID))
 		req := httptest.NewRequest(http.MethodGet, "/users?"+params.Encode(), nil)
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", adminJWT))
 
@@ -261,7 +261,7 @@ func Test_userList(t *testing.T) {
 	is.NoError(err, "error creating endpoint")
 	t.Run("admin user can list users who inherit endpoint access from a team", func(t *testing.T) {
 		params := url.Values{}
-		params.Add("endpointId", fmt.Sprintf("%d", endpointWithTeamAccessPolicy.ID))
+		params.Add("environmentId", fmt.Sprintf("%d", endpointWithTeamAccessPolicy.ID))
 		req := httptest.NewRequest(http.MethodGet, "/users?"+params.Encode(), nil)
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", adminJWT))
 
