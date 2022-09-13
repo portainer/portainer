@@ -18,7 +18,11 @@ function Template({ options = [] }: Args) {
   );
 
   return (
-    <NavTabs options={options} selectedId={selected} onSelect={setSelected} />
+    <NavTabs
+      options={options}
+      selectedId={selected}
+      onSelect={(value) => setSelected(value)}
+    />
   );
 }
 
