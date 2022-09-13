@@ -9,6 +9,7 @@ import {
   useRedirectFeatureFlag,
   FeatureFlag,
 } from '@/portainer/feature-flags/useRedirectFeatureFlag';
+import { parseIsoDate } from '@/portainer/filters/filters';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -44,8 +45,11 @@ export function ItemView() {
   const itemQuery = useItem(id);
   const schedulesQuery = useList();
 
-  const isDisabled = useMemo(
-    () => (itemQuery.data ? itemQuery.data.time < Date.now() / 1000 : false),
+  const isScheduleActive = useMemo(
+    () =>
+      itemQuery.data
+        ? parseIsoDate(itemQuery.data.time).valueOf() >= Date.now()
+        : true,
     [itemQuery.data]
   );
 
@@ -102,16 +106,16 @@ export function ItemView() {
                 }}
                 validateOnMount
                 validationSchema={() =>
-                  updateValidation(item.id, item.time, schedules)
+                  updateValidation(item.id, schedules, isScheduleActive)
                 }
               >
                 {({ isValid }) => (
                   <FormikForm className="form-horizontal">
                     <NameField />
 
-                    <EdgeGroupsField disabled={isDisabled} />
+                    <EdgeGroupsField disabled={isScheduleActive} />
 
-                    {isDisabled ? (
+                    {isScheduleActive ? (
                       <ScheduleDetails schedule={item} />
                     ) : (
                       <ScheduleTypeSelector />
@@ -141,10 +145,10 @@ export function ItemView() {
 
 function updateValidation(
   itemId: EdgeUpdateSchedule['id'],
-  scheduledTime: number,
-  schedules: EdgeUpdateSchedule[]
+  schedules: EdgeUpdateSchedule[],
+  isScheduleActive: boolean
 ): SchemaOf<{ name: string } | FormValues> {
-  return scheduledTime > Date.now() / 1000
+  return !isScheduleActive
     ? validation(schedules, itemId)
     : object({ name: nameValidation(schedules, itemId) });
 }

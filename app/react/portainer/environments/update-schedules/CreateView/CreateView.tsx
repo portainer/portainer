@@ -7,6 +7,7 @@ import {
   useRedirectFeatureFlag,
   FeatureFlag,
 } from '@/portainer/feature-flags/useRedirectFeatureFlag';
+import { isoDate } from '@/portainer/filters/filters';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -25,7 +26,7 @@ const initialValues: FormValues = {
   name: '',
   groupIds: [],
   type: ScheduleType.Update,
-  time: Math.floor(Date.now() / 1000) + 60 * 60,
+  time: isoDate(Date.now() + 1000 * 60 * 60),
   environments: {},
 };
 

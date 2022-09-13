@@ -1,5 +1,7 @@
 import { CellProps, Column } from 'react-table';
 
+import { parseIsoDate } from '@/portainer/filters/filters';
+
 import { EdgeUpdateSchedule, StatusType } from '../../types';
 
 export const scheduleStatus: Column<EdgeUpdateSchedule> = {
@@ -16,7 +18,7 @@ function StatusCell({
   value: status,
   row: { original: schedule },
 }: CellProps<EdgeUpdateSchedule, EdgeUpdateSchedule['status']>) {
-  if (schedule.time > Date.now() / 1000) {
+  if (parseIsoDate(schedule.time).valueOf() < Date.now()) {
     return 'Scheduled';
   }
 

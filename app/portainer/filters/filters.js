@@ -33,12 +33,18 @@ export function humanize(bytes, round, base) {
   }
 }
 
+const TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+
 export function isoDateFromTimestamp(timestamp) {
-  return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+  return moment.unix(timestamp).format(TIME_FORMAT);
 }
 
 export function isoDate(date) {
-  return moment(date).format('YYYY-MM-DD HH:mm:ss');
+  return moment(date).format(TIME_FORMAT);
+}
+
+export function parseIsoDate(date) {
+  return moment(date, TIME_FORMAT).toDate();
 }
 
 export function getPairKey(pair, separator) {

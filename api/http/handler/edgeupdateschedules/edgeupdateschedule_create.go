@@ -1,11 +1,11 @@
 package edgeupdateschedules
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -19,7 +19,7 @@ type createPayload struct {
 	GroupIDs     []portainer.EdgeGroupID
 	Type         edgetypes.UpdateScheduleType
 	Environments map[portainer.EndpointID]string
-	Time         int64
+	Time         edgetypes.UpdateScheduleTime
 }
 
 func (payload *createPayload) Validate(r *http.Request) error {
@@ -35,12 +35,17 @@ func (payload *createPayload) Validate(r *http.Request) error {
 		return errors.New("Invalid schedule type")
 	}
 
-	if len(payload.Environments) == 0 {
-		return errors.New("No Environment is scheduled for update")
+	if payload.Time == "" {
+		return errors.New("Scheduled time is required")
 	}
 
-	if payload.Time < time.Now().Unix() {
-		return errors.New("Invalid time")
+	scheduledTime, err := time.Parse(edgetypes.UpdateScheduleTimeFormat, string(payload.Time))
+	if err != nil {
+		return errors.WithMessage(err, "Invalid scheduled time")
+	}
+
+	if scheduledTime.Before(time.Now()) {
+		return errors.New("Scheduled time must be in the future")
 	}
 
 	return nil

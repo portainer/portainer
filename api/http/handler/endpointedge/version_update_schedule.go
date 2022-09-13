@@ -10,7 +10,7 @@ type versionUpdateResponse struct {
 	// Target version
 	Version string `json:"version" example:"2.14.3"`
 	// Scheduled time
-	ScheduledTime int64 `json:"scheduledTime" example:"1523232323"`
+	ScheduledTime edgetypes.UpdateScheduleTime `json:"scheduledTime" example:"1523232323"`
 	// If need to update
 	Active bool
 	// Update schedule ID

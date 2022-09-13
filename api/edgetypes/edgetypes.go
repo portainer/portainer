@@ -11,6 +11,10 @@ const (
 	PortainerAgentUpdateErrorHeader = "X-Portainer-Update-Error"
 )
 
+const (
+	UpdateScheduleTimeFormat = "2006-01-02 15:04:05"
+)
+
 type (
 
 	// UpdateScheduleID represents an Edge schedule identifier
@@ -22,8 +26,8 @@ type (
 		ID UpdateScheduleID `json:"id" example:"1"`
 		// Name of the schedule
 		Name string `json:"name" example:"Update Schedule"`
-		// Type of the schedule
-		Time int64 `json:"time" example:"1564897200"`
+		// Time of the schedule
+		Time UpdateScheduleTime `json:"time" example:"2022-09-12 13:12:50"`
 		// EdgeGroups to be updated
 		GroupIDs []portainer.EdgeGroupID `json:"groupIds" example:"1"`
 		// Type of the update (1 - update, 2 - rollback)
@@ -35,6 +39,8 @@ type (
 		// Created by user id
 		CreatedBy portainer.UserID `json:"createdBy" example:"1"`
 	}
+
+	UpdateScheduleTime string
 
 	// UpdateScheduleType represents type of an Edge update schedule
 	UpdateScheduleType int
@@ -58,7 +64,7 @@ type (
 		// Target version
 		Version string
 		// Scheduled time
-		ScheduledTime int64
+		ScheduledTime UpdateScheduleTime
 		// If need to update
 		Active bool
 		// Update schedule ID
@@ -80,7 +86,7 @@ type (
 		Status        UpdateScheduleStatusType `json:"status"`
 		Error         string                   `json:"error"`
 		Type          UpdateScheduleType       `json:"type"`
-		ScheduledTime int64                    `json:"scheduledTime"`
+		ScheduledTime UpdateScheduleTime       `json:"scheduledTime"`
 	}
 )
 

@@ -1,11 +1,11 @@
 package edgeupdateschedules
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -19,7 +19,7 @@ type updatePayload struct {
 	GroupIDs     []portainer.EdgeGroupID
 	Environments map[portainer.EndpointID]string
 	Type         edgetypes.UpdateScheduleType
-	Time         int64
+	Time         edgetypes.UpdateScheduleTime
 }
 
 func (payload *updatePayload) Validate(r *http.Request) error {
@@ -37,6 +37,17 @@ func (payload *updatePayload) Validate(r *http.Request) error {
 
 	if len(payload.Environments) == 0 {
 		return errors.New("No Environment is scheduled for update")
+	}
+
+	if payload.Time != "" {
+		scheduledTime, err := time.Parse(edgetypes.UpdateScheduleTimeFormat, string(payload.Time))
+		if err != nil {
+			return errors.WithMessage(err, "Invalid scheduled time")
+		}
+
+		if scheduledTime.Before(time.Now()) {
+			return errors.New("Scheduled time must be in the future")
+		}
 	}
 
 	return nil
@@ -75,8 +86,13 @@ func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperro
 		item.Name = payload.Name
 	}
 
+	scheduledTime, err := time.Parse(edgetypes.UpdateScheduleTimeFormat, string(item.Time))
+	if err != nil {
+		return httperror.NewError(http.StatusInternalServerError, "Unable to parse scheduled time", err)
+	}
+
 	// if scheduled time didn't passed, then can update the schedule
-	if item.Time > time.Now().Unix() {
+	if scheduledTime.After(time.Now()) {
 		item.GroupIDs = payload.GroupIDs
 		item.Time = payload.Time
 		item.Type = payload.Type

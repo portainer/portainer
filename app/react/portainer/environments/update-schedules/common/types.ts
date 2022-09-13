@@ -7,6 +7,6 @@ export interface FormValues {
   name: string;
   groupIds: EdgeGroup['Id'][];
   type: ScheduleType;
-  time: number;
+  time: string;
   environments: Record<EnvironmentId, string>;
 }

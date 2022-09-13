@@ -23,7 +23,7 @@ interface Status {
 export type EdgeUpdateSchedule = {
   id: number;
   name: string;
-  time: number;
+  time: string;
   groupIds: EdgeGroup['Id'][];
   type: ScheduleType;
   status: { [key: EnvironmentId]: Status };
