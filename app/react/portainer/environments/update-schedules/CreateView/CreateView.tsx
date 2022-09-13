@@ -18,6 +18,8 @@ import { FormValues } from '../common/types';
 import { validation } from '../common/validation';
 import { UpdateTypeTabs } from '../common/UpdateTypeTabs';
 import { useList } from '../queries/list';
+import { EdgeGroupsField } from '../common/EdgeGroupsField';
+import { NameField } from '../common/NameField';
 
 const initialValues: FormValues = {
   name: '',
@@ -67,6 +69,9 @@ export function CreateView() {
               >
                 {({ isValid }) => (
                   <FormikForm className="form-horizontal">
+                    <NameField />
+
+                    <EdgeGroupsField />
                     <UpdateTypeTabs />
                     <div className="form-group">
                       <div className="col-sm-12">
