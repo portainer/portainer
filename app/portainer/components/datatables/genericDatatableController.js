@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import './datatable.css';
-import { ResourceControlOwnership as RCO } from '@/portainer/access-control/types';
+import { ResourceControlOwnership as RCO } from '@/react/portainer/access-control/types';
 
 function isBetween(value, a, b) {
   return (value >= a && value <= b) || (value >= b && value <= a);

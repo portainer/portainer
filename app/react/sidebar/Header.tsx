@@ -61,11 +61,12 @@ export function Header({ logo: customLogo }: Props) {
         type="button"
         onClick={() => toggle()}
         className={clsx(
+          styles.collapseBtn,
           'w-6 h-6 flex justify-center items-center border-0 rounded',
           'transition-all duration-200',
           'text-sm text-gray-4 be:text-gray-5 hover:text-white be:hover:text-white',
-          'bg-blue-11 hover:bg-blue-10 be:bg-gray-10 be:hover:bg-gray-8',
-          'th-dark:bg-gray-warm-11 hover:th-dark:bg-gray-warm-9',
+          'bg-blue-11 be:bg-gray-10',
+          'th-dark:bg-gray-warm-11',
           'absolute',
           { '-right-[10px]': !isOpen, 'right-6': isOpen }
         )}

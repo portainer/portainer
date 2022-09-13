@@ -1,4 +1,4 @@
-import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
 
 import { DockerContainerResponse } from './types/response';
 

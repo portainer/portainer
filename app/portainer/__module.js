@@ -6,9 +6,7 @@ import settingsModule from './settings';
 import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
 import servicesModule from './services';
-import teamsModule from './teams';
 import homeModule from './home';
-import { accessControlModule } from './access-control';
 import { reactModule } from './react';
 import { sidebarModule } from './react/views/sidebar';
 import environmentsModule from './environments';
@@ -40,8 +38,6 @@ angular
     userActivityModule,
     'portainer.shared.datatable',
     servicesModule,
-    teamsModule,
-    accessControlModule,
     reactModule,
     sidebarModule,
     environmentsModule,
@@ -425,28 +421,6 @@ angular
         },
       };
 
-      var teams = {
-        name: 'portainer.teams',
-        url: '/teams',
-        views: {
-          'content@': {
-            templateUrl: './views/teams/teams.html',
-            controller: 'TeamsController',
-          },
-        },
-      };
-
-      var team = {
-        name: 'portainer.teams.team',
-        url: '/:id',
-        views: {
-          'content@': {
-            templateUrl: './views/teams/edit/team.html',
-            controller: 'TeamController',
-          },
-        },
-      };
-
       $stateRegistryProvider.register(root);
       $stateRegistryProvider.register(endpointRoot);
       $stateRegistryProvider.register(portainer);
@@ -478,8 +452,6 @@ angular
       $stateRegistryProvider.register(tags);
       $stateRegistryProvider.register(users);
       $stateRegistryProvider.register(user);
-      $stateRegistryProvider.register(teams);
-      $stateRegistryProvider.register(team);
     },
   ]);
 

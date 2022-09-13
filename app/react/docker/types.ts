@@ -1,4 +1,4 @@
-import { ResourceControlResponse } from '@/portainer/access-control/types';
+import { ResourceControlResponse } from '@/react/portainer/access-control/types';
 
 interface AgentMetadata {
   NodeName: string;

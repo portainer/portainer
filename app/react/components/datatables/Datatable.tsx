@@ -13,6 +13,7 @@ import { ReactNode } from 'react';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 
 import { PaginationControls } from '@@/PaginationControls';
+import { IconProps } from '@@/Icon';
 
 import { Table } from './Table';
 import { multiple } from './filter-types';
@@ -28,7 +29,8 @@ interface DefaultTableSettings
 
 interface TitleOptionsVisible {
   title: string;
-  icon?: string;
+  icon?: IconProps['icon'];
+  featherIcon?: IconProps['featherIcon'];
   hide?: never;
 }
 

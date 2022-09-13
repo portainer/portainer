@@ -1,6 +1,5 @@
 import axios, { parseAxiosError } from '@/portainer/services/axios';
-
-import { TeamMembership } from '../teams/types';
+import { TeamMembership } from '@/react/portainer/users/teams/types';
 
 import { User, UserId } from './types';
 import { filterNonAdministratorUsers } from './user.helpers';

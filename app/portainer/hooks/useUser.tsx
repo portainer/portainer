@@ -176,8 +176,3 @@ export function UserProvider({ children }: UserProviderProps) {
     setUser(user);
   }
 }
-
-export function useIsAdmin() {
-  const { user } = useUser();
-  return !!user && isAdmin(user);
-}

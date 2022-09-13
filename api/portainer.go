@@ -254,7 +254,8 @@ type (
 	EdgeJobLogsStatus int
 
 	// EdgeSchedule represents a scheduled job that can run on Edge environments(endpoints).
-	// Deprecated in favor of EdgeJob
+	//
+	// Deprecated: in favor of EdgeJob
 	EdgeSchedule struct {
 		// EdgeSchedule Identifier
 		ID             ScheduleID   `json:"Id" example:"1"`
@@ -1278,6 +1279,9 @@ type (
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		RemoveStackFileBackup(stackIdentifier, fileName string) error
+		RollbackStackFile(stackIdentifier, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
@@ -1446,8 +1450,12 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
+const FeatureFlagEdgeRemoteUpdate Feature = "edgeRemoteUpdate"
+
 // List of supported features
-var SupportedFeatureFlags = []Feature{}
+var SupportedFeatureFlags = []Feature{
+	FeatureFlagEdgeRemoteUpdate,
+}
 
 const (
 	_ AuthenticationMethod = iota

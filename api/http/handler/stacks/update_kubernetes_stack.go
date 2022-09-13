@@ -3,6 +3,7 @@ package stacks
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -124,8 +125,12 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	projectPath, err := handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
+		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
+			log.Printf("[WARN] [kubernetes,stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+		}
+
 		fileType := "Manifest"
 		if stack.IsComposeFormat {
 			fileType = "Compose"
@@ -134,6 +139,8 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: errMsg, Err: err}
 	}
 	stack.ProjectPath = projectPath
+
+	handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint)
 
 	return nil
 }

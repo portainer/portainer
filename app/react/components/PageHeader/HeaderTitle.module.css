@@ -7,6 +7,10 @@
   align-items: center;
 }
 
+.menu-icon {
+  background: var(--user-menu-icon-color);
+}
+
 .menu-list {
   background: var(--bg-dropdown-menu-color);
   border-radius: 8px;

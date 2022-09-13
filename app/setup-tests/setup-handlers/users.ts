@@ -1,6 +1,6 @@
 import { DefaultRequestBody, PathParams, rest } from 'msw';
 
-import { TeamMembership } from '@/portainer/teams/types';
+import { TeamMembership } from '@/react/portainer/users/teams/types';
 import { createMockUsers } from '@/react-tools/test-mocks';
 
 export const userHandlers = [

@@ -211,10 +211,10 @@
                     type="button"
                     class="btn btn-primary btn-sm"
                     ng-disabled="state.actionInProgress
+                    || (state.BuildType === 'editor' && formValues.DockerFileContent === '')
                     || (state.BuildType === 'upload' && (!formValues.UploadFile || !formValues.Path))
                     || (state.BuildType === 'url' && (!formValues.URL || !formValues.Path))
-                    || (formValues.ImageNames.length === 0 || !validImageNames())
-                    || (formValues.DockerFileContent === '')"
+                    || (formValues.ImageNames.length === 0 || !validImageNames())"
                     ng-click="buildImage()"
                     button-spinner="state.actionInProgress"
                   >

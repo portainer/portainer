@@ -104,8 +104,8 @@ code {
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-  color: var(--text-navtabs-color);
-  background-color: var(--bg-navtabs-color);
+  color: var(--text-nav-tab-active-color);
+  background-color: var(--bg-nav-tab-active-color);
   border: 1px solid var(--border-navtabs-color);
 }
 
@@ -117,8 +117,13 @@ code {
   border-color: var(--border-navtabs-color);
 }
 
+.nav > li > a {
+  color: var(--text-navtabs-color);
+}
+
 .nav > li > a:hover,
 .nav > li > a:focus {
+  color: var(--text-navtabs-hover-color);
   background-color: var(--bg-navtabs-hover-color);
 }
 
@@ -436,6 +441,5 @@ input:-webkit-autofill {
 }
 
 .nav-tabs > li {
-  background-color: var(--bg-nav-tabs-active-color);
   border-top-right-radius: 8px;
 }
