@@ -20,6 +20,10 @@ angular.module('portainer.app').controller('StacksDatatableController', [
         open: false,
       },
       columns: {
+        logo: {
+          label: 'Logo',
+          display: true,
+        },
         updated: {
           label: 'Updated',
           display: false,

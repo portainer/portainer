@@ -21,6 +21,8 @@ import (
 type composeStackFromFileContentPayload struct {
 	// Name of the stack
 	Name string `example:"myStack" validate:"required"`
+	// URL of the stack's logo
+	Logo string `json:"Logo" example:"https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png"`
 	// Content of the Stack file
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
 	// A list of environment(endpoint) variables used during stack deployment
@@ -105,6 +107,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	stack := &portainer.Stack{
 		ID:              portainer.StackID(stackID),
 		Name:            payload.Name,
+		Logo:            payload.Logo,
 		Type:            portainer.DockerComposeStack,
 		EndpointID:      endpoint.ID,
 		EntryPoint:      filesystem.ComposeFileDefaultName,
@@ -148,6 +151,8 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 type composeStackFromGitRepositoryPayload struct {
 	// Name of the stack
 	Name string `example:"myStack" validate:"required"`
+	// URL of the stack's logo
+	Logo string `json:"Logo" example:"https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png"`
 	// URL of a Git repository hosting the Stack file
 	RepositoryURL string `example:"https://github.com/openfaas/faas" validate:"required"`
 	// Reference name of a Git repository hosting the Stack file
@@ -235,6 +240,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	stack := &portainer.Stack{
 		ID:              portainer.StackID(stackID),
 		Name:            payload.Name,
+		Logo:            payload.Logo,
 		Type:            portainer.DockerComposeStack,
 		EndpointID:      endpoint.ID,
 		EntryPoint:      payload.ComposeFile,
@@ -307,6 +313,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 type composeStackFromFileUploadPayload struct {
 	Name             string
+	Logo             string
 	StackFileContent []byte
 	Env              []portainer.Pair
 }
@@ -318,6 +325,11 @@ func decodeRequestForm(r *http.Request) (*composeStackFromFileUploadPayload, err
 		return nil, errors.New("Invalid stack name")
 	}
 	payload.Name = name
+	logo, err := request.RetrieveMultiPartFormValue(r, "Logo", true)
+	if err != nil {
+		return nil, errors.New("Invalid stack logo")
+	}
+	payload.Logo = logo
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
@@ -368,6 +380,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	stack := &portainer.Stack{
 		ID:           portainer.StackID(stackID),
 		Name:         payload.Name,
+		Logo:         payload.Logo,
 		Type:         portainer.DockerComposeStack,
 		EndpointID:   endpoint.ID,
 		EntryPoint:   filesystem.ComposeFileDefaultName,

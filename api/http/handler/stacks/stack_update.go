@@ -23,6 +23,8 @@ type updateComposeStackPayload struct {
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx"`
 	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
+	// An Icon URL, might be empty
+	Logo string `example:"https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/portainer.png"`
 }
 
 func (payload *updateComposeStackPayload) Validate(r *http.Request) error {
@@ -188,6 +190,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 	}
 
 	stack.Env = payload.Env
+	stack.Logo = payload.Logo
 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	_, err = handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))

@@ -266,8 +266,8 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.updateStack = function (stack, stackFile, env, prune) {
-      return Stack.update({ endpointId: stack.EndpointId }, { id: stack.Id, StackFileContent: stackFile, Env: env, Prune: prune }).$promise;
+    service.updateStack = function (stack, stackFile, env, prune, logo) {
+      return Stack.update({ endpointId: stack.EndpointId }, { id: stack.Id, StackFileContent: stackFile, Env: env, Prune: prune, Logo: logo }).$promise;
     };
 
     service.updateKubeStack = function (stack, stackFile, gitConfig) {
@@ -299,17 +299,17 @@ angular.module('portainer.app').factory('StackService', [
       return Stack.update({ id: stack.Id, endpointId: stack.EndpointId }, payload).$promise;
     };
 
-    service.createComposeStackFromFileUpload = function (name, stackFile, env, endpointId) {
-      return FileUploadService.createComposeStack(name, stackFile, env, endpointId);
+    service.createComposeStackFromFileUpload = function (name, logo, stackFile, env, endpointId) {
+      return FileUploadService.createComposeStack(name, logo, stackFile, env, endpointId);
     };
 
-    service.createSwarmStackFromFileUpload = function (name, stackFile, env, endpointId) {
+    service.createSwarmStackFromFileUpload = function (name, logo, stackFile, env, endpointId) {
       var deferred = $q.defer();
 
       SwarmService.swarm()
         .then(function success(data) {
           var swarm = data;
-          return FileUploadService.createSwarmStack(name, swarm.Id, stackFile, env, endpointId);
+          return FileUploadService.createSwarmStack(name, logo, swarm.Id, stackFile, env, endpointId);
         })
         .then(function success(data) {
           deferred.resolve(data.data);
@@ -320,22 +320,24 @@ angular.module('portainer.app').factory('StackService', [
 
       return deferred.promise;
     };
-    service.createComposeStackFromFileContent = function (name, stackFileContent, env, endpointId) {
+    service.createComposeStackFromFileContent = function (name, logo, stackFileContent, env, endpointId) {
       var payload = {
         Name: name,
+        Logo: logo,
         StackFileContent: stackFileContent,
         Env: env,
       };
       return Stack.create({ method: 'string', type: 2, endpointId: endpointId }, payload).$promise;
     };
 
-    service.createSwarmStackFromFileContent = function (name, stackFileContent, env, endpointId) {
+    service.createSwarmStackFromFileContent = function (name, logo, stackFileContent, env, endpointId) {
       var deferred = $q.defer();
 
       SwarmService.swarm()
         .then(function success(swarm) {
           var payload = {
             Name: name,
+            Logo: logo,
             SwarmID: swarm.Id,
             StackFileContent: stackFileContent,
             Env: env,
@@ -352,9 +354,10 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.createComposeStackFromGitRepository = function (name, repositoryOptions, env, endpointId) {
+    service.createComposeStackFromGitRepository = function (name, logo, repositoryOptions, env, endpointId) {
       var payload = {
         Name: name,
+        Logo: logo,
         RepositoryURL: repositoryOptions.RepositoryURL,
         RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
         ComposeFile: repositoryOptions.ComposeFilePathInRepository,
@@ -373,7 +376,7 @@ angular.module('portainer.app').factory('StackService', [
       return Stack.create({ method: 'repository', type: 2, endpointId: endpointId }, payload).$promise;
     };
 
-    service.createSwarmStackFromGitRepository = function (name, repositoryOptions, env, endpointId) {
+    service.createSwarmStackFromGitRepository = function (name, logo, repositoryOptions, env, endpointId) {
       var deferred = $q.defer();
 
       SwarmService.swarm()
@@ -381,6 +384,7 @@ angular.module('portainer.app').factory('StackService', [
           var swarm = data;
           var payload = {
             Name: name,
+            Logo: name,
             SwarmID: swarm.Id,
             RepositoryURL: repositoryOptions.RepositoryURL,
             RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,

@@ -2,6 +2,7 @@ import { ResourceControlViewModel } from '@/react/portainer/access-control/model
 
 export function StackViewModel(data) {
   this.Id = data.Id;
+  this.Logo = data.Logo;
   this.Type = data.Type;
   this.Name = data.Name;
   this.EndpointId = data.EndpointId;

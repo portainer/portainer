@@ -169,6 +169,15 @@
                 </div>
               </div>
 
+              <div ng-if="isAdmin">
+                <div class="col-sm-12 form-section-title">
+                  Icon URL
+                  <!-- icon-url-input -->
+                  <input type="text" class="form-control" id="icon-url" ng-model="formValues.Logo" on-change="(onUpdateIconUrl)" />
+                  <!-- !icon-url-input -->
+                </div>
+              </div>
+
               <!-- environment-variables -->
               <div ng-if="stack">
                 <environment-variables-panel

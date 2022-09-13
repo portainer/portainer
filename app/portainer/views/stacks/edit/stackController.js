@@ -80,6 +80,7 @@ angular.module('portainer.app').controller('StackController', [
       Endpoint: null,
       AccessControlData: new AccessControlFormData(),
       Env: [],
+      Logo: '',
     };
 
     $window.onbeforeunload = () => {
@@ -106,6 +107,12 @@ angular.module('portainer.app').controller('StackController', [
     $scope.onPruneChange = function (enable) {
       $scope.$evalAsync(() => {
         $scope.formValues.Prune = enable;
+      });
+    };
+
+    $scope.onUpdateIconUrl = function (newIconUrl) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.Logo = newIconUrl;
       });
     };
 
@@ -257,6 +264,7 @@ angular.module('portainer.app').controller('StackController', [
         var stackFile = $scope.stackFileContent;
         var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
         var prune = $scope.formValues.Prune;
+        var logo = $scope.formValues.Logo;
 
         // TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
         // The EndpointID property is not available for these stacks, we can pass
@@ -267,7 +275,7 @@ angular.module('portainer.app').controller('StackController', [
         }
 
         $scope.state.actionInProgress = true;
-        StackService.updateStack(stack, stackFile, env, prune)
+        StackService.updateStack(stack, stackFile, env, prune, logo)
           .then(function success() {
             Notifications.success('Success', 'Stack successfully deployed');
             $scope.state.isEditorDirty = false;
@@ -354,6 +362,7 @@ angular.module('portainer.app').controller('StackController', [
             $scope.containerNames = ContainerHelper.getContainerNames(data.containers);
 
             $scope.formValues.Env = $scope.stack.Env;
+            $scope.formValues.Logo = $scope.stack.Logo;
 
             let resourcesPromise = Promise.resolve({});
             if (!stack.Status || stack.Status === 1) {

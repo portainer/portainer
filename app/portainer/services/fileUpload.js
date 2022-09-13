@@ -71,12 +71,13 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.createSwarmStack = function (stackName, swarmId, file, env, endpointId) {
+    service.createSwarmStack = function (stackName, stackLogo, swarmId, file, env, endpointId) {
       return Upload.upload({
         url: 'api/stacks?method=file&type=1&endpointId=' + endpointId,
         data: {
           file: file,
           Name: stackName,
+          Logo: stackLogo,
           SwarmID: swarmId,
           Env: Upload.json(env),
         },
@@ -84,12 +85,13 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.createComposeStack = function (stackName, file, env, endpointId) {
+    service.createComposeStack = function (stackName, stackLogo, file, env, endpointId) {
       return Upload.upload({
         url: 'api/stacks?method=file&type=2&endpointId=' + endpointId,
         data: {
           file: file,
           Name: stackName,
+          Logo: stackLogo,
           Env: Upload.json(env),
         },
         ignoreLoadingBar: true,
