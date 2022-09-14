@@ -29,7 +29,7 @@ func TestService_StackByWebhookID(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	b := stackBuilder{t: t, store: store}
@@ -87,7 +87,7 @@ func Test_RefreshableStacks(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	staticStack := portainer.Stack{ID: 1}

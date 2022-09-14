@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,9 +26,7 @@ func listFiles(dir string) []string {
 }
 
 func Test_shouldCreateArhive(t *testing.T) {
-	tmpdir, _ := ioutils.TempDir("", "backup")
-	defer os.RemoveAll(tmpdir)
-
+	tmpdir := t.TempDir()
 	content := []byte("content")
 	ioutil.WriteFile(path.Join(tmpdir, "outer"), content, 0600)
 	os.MkdirAll(path.Join(tmpdir, "dir"), 0700)
@@ -40,9 +37,7 @@ func Test_shouldCreateArhive(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, filepath.Join(tmpdir, fmt.Sprintf("%s.tar.gz", filepath.Base(tmpdir))), gzPath)
 
-	extractionDir, _ := ioutils.TempDir("", "extract")
-	defer os.RemoveAll(extractionDir)
-
+	extractionDir := t.TempDir()
 	cmd := exec.Command("tar", "-xzf", gzPath, "-C", extractionDir)
 	err = cmd.Run()
 	if err != nil {
@@ -63,9 +58,7 @@ func Test_shouldCreateArhive(t *testing.T) {
 }
 
 func Test_shouldCreateArhiveXXXXX(t *testing.T) {
-	tmpdir, _ := ioutils.TempDir("", "backup")
-	defer os.RemoveAll(tmpdir)
-
+	tmpdir := t.TempDir()
 	content := []byte("content")
 	ioutil.WriteFile(path.Join(tmpdir, "outer"), content, 0600)
 	os.MkdirAll(path.Join(tmpdir, "dir"), 0700)
@@ -76,9 +69,7 @@ func Test_shouldCreateArhiveXXXXX(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, filepath.Join(tmpdir, fmt.Sprintf("%s.tar.gz", filepath.Base(tmpdir))), gzPath)
 
-	extractionDir, _ := ioutils.TempDir("", "extract")
-	defer os.RemoveAll(extractionDir)
-
+	extractionDir := t.TempDir()
 	r, _ := os.Open(gzPath)
 	ExtractTarGz(r, extractionDir)
 	if err != nil {
