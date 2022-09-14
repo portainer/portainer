@@ -20,6 +20,13 @@
                 required
                 data-cy="edgeStackCreate-nameInput"
               />
+              <div class="help-block" ng-show="$ctrl.form.$invalid">
+                <div class="small text-warning">
+                  <div ng-messages="$ctrl.form.$error">
+                    <p ng-message="required" class="vertical-center"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Name is required. </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <!-- !name-input -->

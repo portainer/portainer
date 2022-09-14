@@ -20,19 +20,19 @@
                 required
                 auto-focus
               />
-            </div>
-          </div>
-          <div class="form-group" ng-show="tagCreationForm.name.$invalid">
-            <div class="col-sm-12 small text-warning">
-              <div ng-messages="tagCreationForm.name.$error">
-                <p ng-message="required" class="vertical-center">
-                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
-                  This field is required.
-                </p>
-                <p ng-message="validName" class="vertical-center">
-                  <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
-                  This tag already exists.
-                </p>
+              <div class="help-block" ng-show="tagCreationForm.name.$invalid">
+                <div class="small text-warning">
+                  <div ng-messages="tagCreationForm.name.$error">
+                    <p ng-message="required" class="vertical-center">
+                      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                      This field is required.
+                    </p>
+                    <p ng-message="validName" class="vertical-center">
+                      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                      This tag already exists.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

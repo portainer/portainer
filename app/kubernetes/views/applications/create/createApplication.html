@@ -959,9 +959,9 @@
                   <!-- !deployment options -->
 
                   <!-- replica count -->
-                  <div class="form-group form-inline" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
-                    <div class="col-sm-12 vertical-center">
-                      <label class="control-label text-left !pt-0"> Instance count </label>
+                  <div class="form-group" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
+                    <label for="replica_count" class="col-sm-1 control-label text-left">Instance count</label>
+                    <div class="col-sm-2">
                       <input
                         type="number"
                         name="replica_count"
@@ -969,23 +969,24 @@
                         min="1"
                         max="9999"
                         placeholder="1"
-                        style="margin-left: 20px"
                         ng-model="ctrl.formValues.ReplicaCount"
                         ng-disabled="!ctrl.supportScalableReplicaDeployment()"
                         ng-change="ctrl.enforceReplicaCountMinimum()"
                         required
                         data-cy="k8sAppCreate-replicaCountInput"
                       />
-                    </div>
-                  </div>
-                  <div class="form-group" ng-if="kubernetesApplicationCreationForm['replica_count'].$invalid">
-                    <div class="col-sm-12 small text-warning">
-                      <ng-messages for="kubernetesApplicationCreationForm['replica_count'].$error">
-                        <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count is required.</p>
-                        <p class="vertical-center" ng-message="min"
-                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count must be greater than 0.</p
-                        >
-                      </ng-messages>
+                      <div class="help-block" ng-if="kubernetesApplicationCreationForm['replica_count'].$invalid">
+                        <div class="small text-warning whitespace-nowrap">
+                          <ng-messages for="kubernetesApplicationCreationForm['replica_count'].$error">
+                            <p class="vertical-center" ng-message="required"
+                              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count is required.</p
+                            >
+                            <p class="vertical-center" ng-message="min"
+                              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count must be greater than 0.</p
+                            >
+                          </ng-messages>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!-- !replica count -->
