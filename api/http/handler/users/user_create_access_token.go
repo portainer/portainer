@@ -56,37 +56,37 @@ type accessTokenResponse struct {
 func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	// specifically require JWT auth for this endpoint since API-Key based auth is not supported
 	if jwt := handler.bouncer.JWTAuthLookup(r); jwt == nil {
-		return &httperror.HandlerError{http.StatusUnauthorized, "Auth not supported", errors.New("JWT Authentication required")}
+		return httperror.Unauthorized("Auth not supported", errors.New("JWT Authentication required"))
 	}
 
 	var payload userAccessTokenCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid user identifier route variable", err}
+		return httperror.BadRequest("Invalid user identifier route variable", err)
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
 	}
 
 	if tokenData.ID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user access token", httperrors.ErrUnauthorized}
+		return httperror.Forbidden("Permission denied to create user access token", httperrors.ErrUnauthorized)
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Unable to find a user", err}
+		return httperror.BadRequest("Unable to find a user", err)
 	}
 
 	rawAPIKey, apiKey, err := handler.apiKeyService.GenerateApiKey(*user, payload.Description)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Internal Server Error", err}
+		return httperror.InternalServerError("Internal Server Error", err)
 	}
 
 	w.WriteHeader(http.StatusCreated)

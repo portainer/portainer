@@ -28,21 +28,21 @@ import (
 func (handler *Handler) teamMemberships(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	teamID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid team identifier route variable", err}
+		return httperror.BadRequest("Invalid team identifier route variable", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	if !security.AuthorizedTeamManagement(portainer.TeamID(teamID), securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to team", errors.ErrResourceAccessDenied}
+		return httperror.Forbidden("Access denied to team", errors.ErrResourceAccessDenied)
 	}
 
 	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByTeamID(portainer.TeamID(teamID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve associated team memberships from the database", err}
+		return httperror.InternalServerError("Unable to retrieve associated team memberships from the database", err)
 	}
 
 	return response.JSON(w, memberships)

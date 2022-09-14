@@ -27,7 +27,7 @@ import (
 func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	webhookID, err := retrieveUUIDRouteVariableValue(r, "webhookID")
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid webhook identifier route variable", Err: err}
+		return httperror.BadRequest("Invalid webhook identifier route variable", err)
 	}
 
 	stack, err := handler.DataStore.Stack().StackByWebhookID(webhookID.String())
@@ -44,7 +44,7 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Autoupdate for the stack isn't available", Err: err}
 		}
 		logrus.WithError(err).Error("failed to update the stack")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to update the stack", Err: err}
+		return httperror.InternalServerError("Failed to update the stack", err)
 	}
 
 	return response.Empty(w)

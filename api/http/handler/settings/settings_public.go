@@ -57,7 +57,7 @@ type publicSettingsResponse struct {
 func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve the settings from the database", Err: err}
+		return httperror.InternalServerError("Unable to retrieve the settings from the database", err)
 	}
 
 	publicSettings := generatePublicSettings(settings)

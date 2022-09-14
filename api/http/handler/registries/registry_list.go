@@ -25,15 +25,15 @@ import (
 func (handler *Handler) registryList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 	if !securityContext.IsAdmin {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to list registries, use /endpoints/:endpointId/registries route instead", httperrors.ErrResourceAccessDenied}
+		return httperror.Forbidden("Permission denied to list registries, use /endpoints/:endpointId/registries route instead", httperrors.ErrResourceAccessDenied)
 	}
 
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
+		return httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}
 
 	return response.JSON(w, registries)

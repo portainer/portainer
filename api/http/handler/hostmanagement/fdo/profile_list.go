@@ -24,7 +24,7 @@ func (handler *Handler) fdoProfileList(w http.ResponseWriter, r *http.Request) *
 
 	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	return response.JSON(w, profiles)

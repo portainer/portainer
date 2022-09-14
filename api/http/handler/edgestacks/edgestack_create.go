@@ -36,12 +36,12 @@ import (
 func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
+		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
 	edgeStack, err := handler.createSwarmStack(method, r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Edge stack", err}
+		return httperror.InternalServerError("Unable to create Edge stack", err)
 	}
 
 	return response.JSON(w, edgeStack)
