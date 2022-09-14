@@ -44,7 +44,7 @@ func WithItem[TId ~int, TObject any](getter ItemGetter[TId, TObject], idParam st
 	}
 }
 
-func FetchItem[T any](request *http.Request, contextKey string) (*T, error) {
+func FetchItem[T any](request *http.Request, contextKey ItemContextKey) (*T, error) {
 	contextData := request.Context().Value(contextKey)
 	if contextData == nil {
 		return nil, errors.New("unable to find item in request context")

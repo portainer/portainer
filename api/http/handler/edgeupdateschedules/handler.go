@@ -13,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-const contextKey = "edgeUpdateSchedule_item"
+const contextKey = middlewares.ItemContextKey("edgeUpdateSchedule_item")
 
 // Handler is the HTTP handler used to handle edge environment update operations.
 type Handler struct {

@@ -9,7 +9,6 @@ import {
   useRedirectFeatureFlag,
   FeatureFlag,
 } from '@/portainer/feature-flags/useRedirectFeatureFlag';
-import { parseIsoDate } from '@/portainer/filters/filters';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -22,8 +21,9 @@ import { useUpdateMutation } from '../queries/useUpdateMutation';
 import { useList } from '../queries/list';
 import { NameField, nameValidation } from '../common/NameField';
 import { EdgeGroupsField } from '../common/EdgeGroupsField';
-import { EdgeUpdateSchedule } from '../types';
+import { EdgeUpdateSchedule, StatusType } from '../types';
 import { FormValues } from '../common/types';
+import { getAggregatedStatus } from '../utils';
 
 import { ScheduleDetails } from './ScheduleDetails';
 
@@ -48,7 +48,8 @@ export function ItemView() {
   const isScheduleActive = useMemo(
     () =>
       itemQuery.data
-        ? parseIsoDate(itemQuery.data.time).valueOf() >= Date.now()
+        ? getAggregatedStatus(itemQuery.data.status).status !==
+          StatusType.Pending
         : true,
     [itemQuery.data]
   );

@@ -1,12 +1,11 @@
 import { CellProps, Column } from 'react-table';
 
-import { parseIsoDate } from '@/portainer/filters/filters';
-
 import { EdgeUpdateSchedule, StatusType } from '../../types';
+import { getAggregatedStatus } from '../../utils';
 
 export const scheduleStatus: Column<EdgeUpdateSchedule> = {
   Header: 'Status',
-  accessor: (row) => row.status,
+  accessor: (schedule) => getAggregatedStatus(schedule.status),
   disableFilters: true,
   Filter: () => null,
   canHide: false,
@@ -15,32 +14,17 @@ export const scheduleStatus: Column<EdgeUpdateSchedule> = {
 };
 
 function StatusCell({
-  value: status,
-  row: { original: schedule },
-}: CellProps<EdgeUpdateSchedule, EdgeUpdateSchedule['status']>) {
-  if (parseIsoDate(schedule.time).valueOf() < Date.now()) {
-    return 'Scheduled';
+  value,
+}: CellProps<EdgeUpdateSchedule, ReturnType<typeof getAggregatedStatus>>) {
+  switch (value.status) {
+    case StatusType.Failed:
+      return `Failed: ${value.error}`;
+    case StatusType.Pending:
+      return 'Pending';
+    case StatusType.Sent:
+      return 'Sent';
+    case StatusType.Success:
+    default:
+      return 'Success';
   }
-
-  const statusList = Object.entries(status).map(
-    ([environmentId, envStatus]) => ({ ...envStatus, environmentId })
-  );
-
-  if (statusList.length === 0) {
-    return 'No related environments';
-  }
-
-  const error = statusList.find((s) => s.status === StatusType.Failed);
-
-  if (error) {
-    return `Failed: (ID: ${error.environmentId}) ${error.error}`;
-  }
-
-  const pending = statusList.find((s) => s.status === StatusType.Pending);
-
-  if (pending) {
-    return 'Pending';
-  }
-
-  return 'Success';
 }

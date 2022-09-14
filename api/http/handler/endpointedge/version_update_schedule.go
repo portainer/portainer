@@ -27,7 +27,7 @@ func (handler *Handler) setUpdateScheduleStatus(endpointID portainer.EndpointID,
 	}
 }
 
-func (handler *Handler) getVersionUpdateSchedule(endpointID portainer.EndpointID, updateStatus edgetypes.VersionUpdateStatus) versionUpdateResponse {
+func (handler *Handler) getVersionUpdateSchedule(endpointID portainer.EndpointID) versionUpdateResponse {
 	activeSchedule := handler.DataStore.EdgeUpdateSchedule().ActiveSchedule(endpointID)
 
 	if activeSchedule == nil {
@@ -35,10 +35,15 @@ func (handler *Handler) getVersionUpdateSchedule(endpointID portainer.EndpointID
 		return versionUpdateResponse{Active: false}
 	}
 
-	return versionUpdateResponse{
+	response := versionUpdateResponse{
 		Active:        true,
 		Version:       activeSchedule.TargetVersion,
 		ScheduledTime: activeSchedule.ScheduledTime,
 		ScheduleID:    activeSchedule.ScheduleID,
 	}
+
+	// check update as sent to edge-device
+	go handler.DataStore.EdgeUpdateSchedule().UpdateStatus(activeSchedule.ScheduleID, endpointID, edgetypes.UpdateScheduleStatusSent, "")
+
+	return response
 }

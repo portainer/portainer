@@ -24,6 +24,12 @@ func (handler *Handler) delete(w http.ResponseWriter, r *http.Request) *httperro
 		return httperror.InternalServerError(err.Error(), err)
 	}
 
+	status := edgetypes.AggregatedStatus(item.Status)
+
+	if status != edgetypes.UpdateScheduleStatusPending {
+		return httperror.BadRequest("Cannot delete a schedule that is not pending", err)
+	}
+
 	err = handler.dataStore.EdgeUpdateSchedule().Delete(item.ID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to delete the edge update schedule", err)

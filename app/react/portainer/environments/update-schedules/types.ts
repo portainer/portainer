@@ -9,11 +9,12 @@ export enum ScheduleType {
 
 export enum StatusType {
   Pending,
-  Failed,
+  Sent,
   Success,
+  Failed,
 }
 
-interface Status {
+export interface ScheduleStatus {
   status: StatusType;
   error: string;
   targetVersion: string;
@@ -26,7 +27,7 @@ export type EdgeUpdateSchedule = {
   time: string;
   groupIds: EdgeGroup['Id'][];
   type: ScheduleType;
-  status: { [key: EnvironmentId]: Status };
+  status: { [key: EnvironmentId]: ScheduleStatus };
   created: number;
   createdBy: UserId;
 };

@@ -101,8 +101,25 @@ const (
 const (
 	// UpdateScheduleStatusPending represents a pending edge update schedule
 	UpdateScheduleStatusPending UpdateScheduleStatusType = iota
-	// UpdateScheduleStatusError represents a failed edge update schedule
-	UpdateScheduleStatusError
+	// UpdateScheduleStatusSent represents a sent edge update schedule
+	UpdateScheduleStatusSent
 	// UpdateScheduleStatusSuccess represents a successful edge update schedule
 	UpdateScheduleStatusSuccess
+	// UpdateScheduleStatusError represents a failed edge update schedule
+	UpdateScheduleStatusError
 )
+
+// AggregatedStatus aggregates the status of all environments in a schedule
+func AggregatedStatus(statuses map[portainer.EndpointID]UpdateScheduleStatus) UpdateScheduleStatusType {
+	if len(statuses) == 0 {
+		return UpdateScheduleStatusPending
+	}
+
+	for _, status := range statuses {
+		if status.Status != UpdateScheduleStatusSuccess {
+			return status.Status
+		}
+	}
+
+	return UpdateScheduleStatusSuccess
+}

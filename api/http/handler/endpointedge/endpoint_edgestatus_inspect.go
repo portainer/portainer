@@ -144,7 +144,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	handler.setUpdateScheduleStatus(portainer.EndpointID(endpoint.ID), edgeUpdateStatus)
 
-	statusResponse.VersionUpdate = handler.getVersionUpdateSchedule(portainer.EndpointID(endpoint.ID), edgeUpdateStatus)
+	statusResponse.VersionUpdate = handler.getVersionUpdateSchedule(portainer.EndpointID(endpoint.ID))
 
 	return response.JSON(w, statusResponse)
 }

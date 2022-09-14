@@ -13,8 +13,9 @@ import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 
 import { useList } from '../queries/list';
-import { EdgeUpdateSchedule } from '../types';
+import { EdgeUpdateSchedule, StatusType } from '../types';
 import { useRemoveMutation } from '../queries/useRemoveMutation';
+import { getAggregatedStatus } from '../utils';
 
 import { columns } from './columns';
 import { createStore } from './datatable-store';
@@ -54,6 +55,9 @@ export function ListView() {
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}
+        isRowSelectable={(row) =>
+          getAggregatedStatus(row.original.status).status === StatusType.Pending
+        }
       />
     </>
   );

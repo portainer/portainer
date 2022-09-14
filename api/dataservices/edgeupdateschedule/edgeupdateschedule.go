@@ -162,7 +162,7 @@ func (service *Service) setRelation(schedule *edgetypes.UpdateSchedule) error {
 	defer service.mu.Unlock()
 
 	for environmentID, environmentStatus := range schedule.Status {
-		if environmentStatus.Status != edgetypes.UpdateScheduleStatusPending {
+		if environmentStatus.Status == edgetypes.UpdateScheduleStatusSuccess {
 			continue
 		}
 

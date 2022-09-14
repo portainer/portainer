@@ -86,13 +86,9 @@ func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperro
 		item.Name = payload.Name
 	}
 
-	scheduledTime, err := time.Parse(edgetypes.UpdateScheduleTimeFormat, string(item.Time))
-	if err != nil {
-		return httperror.NewError(http.StatusInternalServerError, "Unable to parse scheduled time", err)
-	}
+	status := edgetypes.AggregatedStatus(item.Status)
 
-	// if scheduled time didn't passed, then can update the schedule
-	if scheduledTime.After(time.Now()) {
+	if status == edgetypes.UpdateScheduleStatusPending {
 		item.GroupIDs = payload.GroupIDs
 		item.Time = payload.Time
 		item.Type = payload.Type
