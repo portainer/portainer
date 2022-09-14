@@ -43,7 +43,7 @@ func testHelperFileExists_fileExists(t *testing.T, checker func(path string) (bo
 }
 
 func testHelperFileExists_fileNotExists(t *testing.T, checker func(path string) (bool, error)) {
-	filePath := path.Join(os.TempDir(), fmt.Sprintf("%s%d", t.Name(), rand.Int()))
+	filePath := path.Join(t.TempDir(), fmt.Sprintf("%s%d", t.Name(), rand.Int()))
 
 	err := os.RemoveAll(filePath)
 	assert.NoError(t, err, "RemoveAll should not fail")
