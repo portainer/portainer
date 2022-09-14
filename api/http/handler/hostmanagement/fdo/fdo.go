@@ -65,7 +65,7 @@ func (handler *Handler) newFDOClient() (fdo.FDOOwnerClient, error) {
 		OwnerURL: settings.FDOConfiguration.OwnerURL,
 		Username: settings.FDOConfiguration.OwnerUsername,
 		Password: settings.FDOConfiguration.OwnerPassword,
-		Timeout:  5 * time.Second,
+		Timeout:  10 * time.Second,
 	}, nil
 }
 

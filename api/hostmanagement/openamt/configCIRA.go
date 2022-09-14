@@ -8,9 +8,16 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+)
+
+const (
+	addrFormatFQDN = 201
+	addrFormatIpv4 = 3
+	addrFormatIpv6 = 4
 )
 
 type CIRAConfig struct {
@@ -70,15 +77,15 @@ func (service *Service) saveCIRAConfig(method string, configuration portainer.Op
 		return nil, err
 	}
 
-	addressFormat, err := addressFormat(configuration.MPSServer)
+	addressFormat, serverAddress, err := addressFormat(configuration.MPSServer)
 	if err != nil {
 		return nil, err
 	}
 
 	config := CIRAConfig{
 		ConfigName:          configName,
-		MPSServerAddress:    configuration.MPSServer,
-		CommonName:          configuration.MPSServer,
+		MPSServerAddress:    serverAddress,
+		CommonName:          serverAddress,
 		ServerAddressFormat: addressFormat,
 		MPSPort:             4433,
 		Username:            "admin",
@@ -101,18 +108,33 @@ func (service *Service) saveCIRAConfig(method string, configuration portainer.Op
 	return &result, nil
 }
 
-func addressFormat(url string) (int, error) {
-	ip := net.ParseIP(url)
-	if ip == nil {
-		return 201, nil // FQDN
+// addressFormat returns the address format and the address for the given server address.
+// when using a IP:PORT format, only the IP is returned.
+// see https://github.com/open-amt-cloud-toolkit/rps/blob/b63e0112f8a6323764742165a2cd5b465d9a9a24/src/routes/admin/ciraconfig/ciraValidator.ts#L20-L25
+func addressFormat(u string) (int, string, error) {
+	ip2 := net.ParseIP(u)
+	if ip2 != nil {
+		if ip2.To4() != nil {
+			return addrFormatIpv4, u, nil
+		}
+
+		return addrFormatIpv6, u, nil
 	}
-	if strings.Contains(url, ".") {
-		return 3, nil // IPV4
+
+	_, err := url.Parse(u)
+	if err == nil {
+		return addrFormatFQDN, u, nil
 	}
-	if strings.Contains(url, ":") {
-		return 4, nil // IPV6
+
+	host, _, err := net.SplitHostPort(u)
+	if err == nil {
+		if strings.Count(u, ":") >= 2 {
+			return addrFormatIpv6, host, nil
+		}
+		return addrFormatIpv4, host, nil
 	}
-	return 0, fmt.Errorf("could not determine server address format for %s", url)
+
+	return 0, "", fmt.Errorf("could not determine server address format for %s", u)
 }
 
 func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfiguration) (string, error) {

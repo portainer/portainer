@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/portainer/portainer/api/hostmanagement/openamt"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -25,19 +26,18 @@ import (
 )
 
 type HostInfo struct {
-	EndpointID     portainer.EndpointID `json:"EndpointID"`
-	RawOutput      string               `json:"RawOutput"`
-	AMT            string               `json:"AMT"`
-	UUID           string               `json:"UUID"`
-	DNSSuffix      string               `json:"DNS Suffix"`
-	BuildNumber    string               `json:"Build Number"`
-	ControlMode    string               `json:"Control Mode"`
-	ControlModeRaw int                  `json:"Control Mode (Raw)"`
+	EndpointID  portainer.EndpointID `json:"EndpointID"`
+	RawOutput   string               `json:"RawOutput"`
+	AMT         string               `json:"AMT"`
+	UUID        string               `json:"UUID"`
+	DNSSuffix   string               `json:"DNS Suffix"`
+	BuildNumber string               `json:"Build Number"`
+	ControlMode string               `json:"Control Mode"`
 }
 
 const (
 	// TODO: this should get extracted to some configurable - don't assume Docker Hub is everyone's global namespace, or that they're allowed to pull images from the internet
-	rpcGoImageName      = "ptrrd/openamt:rpc-go-json"
+	rpcGoImageName      = "intel/oact-rpc-go:v2.1.0"
 	rpcGoContainerName  = "openamt-rpc-go"
 	dockerClientTimeout = 5 * time.Minute
 )
