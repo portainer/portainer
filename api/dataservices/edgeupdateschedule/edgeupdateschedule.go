@@ -193,7 +193,7 @@ func (service *Service) UpdateStatus(scheduleID edgetypes.UpdateScheduleID, envi
 
 	statusObj, ok := item.Status[environmentID]
 	if !ok {
-		return errors.Errorf("environment %s is not related to schedule", environmentID)
+		return errors.Errorf("environment %d is not related to schedule", environmentID)
 	}
 
 	statusObj.Status = status
