@@ -50,13 +50,13 @@
         Ingress
       </div>
       <div ng-if="$ctrl.isAdmin()" class="small">
-        <p class="text-muted pt-2 vertical-center">
+        <p class="text-warning pt-2 vertical-center">
           <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress is not configured in this namespace, select another namespace or click
           <a ui-sref="kubernetes.cluster.setup">here</a> to configure ingress.
         </p>
       </div>
       <div ng-if="!$ctrl.isAdmin()" class="small">
-        <p class="text-muted pt-2 vertical-center">
+        <p class="text-warning pt-2 vertical-center">
           <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress is not configured in this namespace, select another namespace or contact your
           administrator.
         </p>

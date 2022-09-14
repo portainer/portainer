@@ -15,20 +15,21 @@
         required
         auto-focus
       />
-    </div>
-  </div>
-  <div class="form-group" ng-show="edgeJobForm.edgejob_name.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="edgeJobForm.edgejob_name.$error">
-        <p ng-message="required" class="vertical-center">
-          <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
-        </p>
-        <p ng-message="pattern" class="vertical-center">
-          <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> Allowed characters are: [a-zA-Z0-9_.-]
-        </p>
+      <div class="help-block" ng-show="edgeJobForm.edgejob_name.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="edgeJobForm.edgejob_name.$error">
+            <p ng-message="required" class="vertical-center">
+              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+            </p>
+            <p ng-message="pattern" class="vertical-center">
+              <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> Allowed characters are: [a-zA-Z0-9_.-]
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
   <!-- !name-input -->
   <!-- cron-input -->
   <!-- edge-job-method-select -->
@@ -132,20 +133,20 @@
           required
           ng-pattern="$ctrl.cronRegex"
         />
-      </div>
-      <div class="col-sm-12 small text-muted mt-2.5"> Time should be set according to the chosen environments' timezone. </div>
-    </div>
-    <div class="form-group" ng-show="edgeJobForm.edgejob_cron.$invalid && edgeJobForm.edgejob_cron.$dirty">
-      <div class="col-sm-12 small text-warning">
-        <div ng-messages="edgeJobForm.edgejob_cron.$error">
-          <p ng-message="required" class="vertical-center">
-            <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
-          </p>
-          <p ng-message="pattern" class="vertical-center">
-            <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field format is invalid.
-          </p>
+        <div class="help-block" ng-show="edgeJobForm.edgejob_cron.$invalid && edgeJobForm.edgejob_cron.$dirty">
+          <div class="small text-warning">
+            <div ng-messages="edgeJobForm.edgejob_cron.$error">
+              <p ng-message="required" class="vertical-center">
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field is required.
+              </p>
+              <p ng-message="pattern" class="vertical-center">
+                <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span> This field format is invalid.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="col-sm-12 small text-muted mt-2.5"> Time should be set according to the chosen environments' timezone. </div>
     </div>
   </div>
   <!-- !advanced-schedule -->

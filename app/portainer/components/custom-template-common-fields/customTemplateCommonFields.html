@@ -16,7 +16,7 @@
       />
       <span class="help-block">
         <div ng-show="commonCustomTemplateForm.template_title.$invalid">
-          <div class="mt-2 small text-muted">
+          <div class="mt-2 small text-warning">
             <div ng-messages="commonCustomTemplateForm.template_title.$error">
               <p class="vertical-center" ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Title is required. </p>
               <p class="vertical-center" ng-message="pattern">
@@ -37,7 +37,7 @@
     <div class="col-sm-8">
       <input type="text" class="form-control" id="description" ng-model="$ctrl.formValues.Description" name="description" required />
       <span class="help-block">
-        <div class="mt-2 small text-muted">
+        <div class="mt-2 small text-warning">
           <div ng-show="commonCustomTemplateForm.description.$invalid">
             <div ng-messages="commonCustomTemplateForm.description.$error">
               <p class="vertical-center" ng-message="required"> <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Description is required.</p>

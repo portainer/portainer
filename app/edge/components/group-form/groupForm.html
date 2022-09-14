@@ -13,14 +13,14 @@
         data-cy="edgeGroupCreate-groupNameInput"
         placeholder="e.g. mygroup"
       />
-    </div>
-  </div>
-  <div class="form-group" ng-show="EdgeGroupForm.group_name.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="EdgeGroupForm.group_name.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon> This field is required.
-        </p>
+      <div class="help-block" ng-show="EdgeGroupForm.group_name.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="EdgeGroupForm.group_name.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon> This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
