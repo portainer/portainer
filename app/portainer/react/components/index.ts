@@ -33,7 +33,7 @@ import { SearchBar } from '@@/datatables/SearchBar';
 import { FallbackImage } from '@@/FallbackImage';
 import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
 import { TeamsSelector } from '@@/TeamsSelector';
-import { Select } from '@@/form-components/PortainerSelect';
+import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -178,7 +178,7 @@ export const componentsModule = angular
   )
   .component(
     'porSelect',
-    r2a(Select, [
+    r2a(PortainerSelect, [
       'name',
       'inputId',
       'placeholder',

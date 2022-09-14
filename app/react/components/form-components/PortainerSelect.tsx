@@ -39,7 +39,7 @@ interface SingleProps<TValue> extends SharedProps {
 
 type Props<TValue> = MultiProps<TValue> | SingleProps<TValue>;
 
-export function Select<TValue = string>(props: Props<TValue>) {
+export function PortainerSelect<TValue = string>(props: Props<TValue>) {
   return isMultiProps(props) ? (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <MultiSelect {...props} />

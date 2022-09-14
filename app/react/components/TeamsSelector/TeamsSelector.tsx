@@ -1,6 +1,6 @@
 import { Team, TeamId } from '@/react/portainer/users/teams/types';
 
-import { Select } from '@@/form-components/PortainerSelect';
+import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
 interface Props {
   name?: string;
@@ -24,7 +24,7 @@ export function TeamsSelector({
   const options = teams.map((team) => ({ label: team.Name, value: team.Id }));
 
   return (
-    <Select<number>
+    <PortainerSelect<number>
       name={name}
       isMulti
       options={options}

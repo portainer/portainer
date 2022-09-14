@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { RefAttributes } from 'react';
 import ReactSelectType from 'react-select/dist/declarations/src/Select';
 
-import styles from './ReactSelect.module.css';
+import './ReactSelect.css';
 
 interface DefaultOption {
   value: string;
@@ -46,8 +46,8 @@ export function Select<
 
   return (
     <Component
-      className={clsx(styles.root, className)}
-      classNamePrefix="selector"
+      className={clsx(className, 'portainer-selector-root')}
+      classNamePrefix="portainer-selector"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     />
@@ -61,8 +61,8 @@ export function Creatable<
 >({ className, ...props }: ReactSelectCreatableProps<Option, IsMulti, Group>) {
   return (
     <ReactSelectCreatable
-      className={clsx(styles.root, className)}
-      classNamePrefix="selector"
+      className={clsx(className, 'portainer-selector-root')}
+      classNamePrefix="portainer-selector"
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     />
