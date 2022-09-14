@@ -1,11 +1,10 @@
-import { array, string, object } from 'yup';
-
-import { parseIsoDate } from '@/portainer/filters/filters';
+import { array, object } from 'yup';
 
 import { EdgeUpdateSchedule } from '../types';
 
 import { nameValidation } from './NameField';
 import { typeValidation } from './ScheduleTypeSelector';
+import { timeValidation } from './ScheduledTimeField';
 
 export function validation(
   schedules: EdgeUpdateSchedule[],
@@ -15,13 +14,7 @@ export function validation(
     groupIds: array().min(1, 'At least one group is required'),
     name: nameValidation(schedules, currentId),
     type: typeValidation(),
-    time: string()
-      .required('Scheduled time is required')
-      .test(
-        'validDate',
-        'Scheduled time must be in the future',
-        (value) => parseIsoDate(value).valueOf() > Date.now()
-      ),
+    time: timeValidation(),
     environments: object().default({}),
   });
 }

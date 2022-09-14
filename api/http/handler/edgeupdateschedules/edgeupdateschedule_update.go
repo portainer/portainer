@@ -45,7 +45,7 @@ func (payload *updatePayload) Validate(r *http.Request) error {
 			return errors.WithMessage(err, "Invalid scheduled time")
 		}
 
-		if scheduledTime.Before(time.Now()) {
+		if scheduledTime.Before(time.Now().Add(-24 * time.Hour)) {
 			return errors.New("Scheduled time must be in the future")
 		}
 	}

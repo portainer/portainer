@@ -2,8 +2,13 @@ import { useField } from 'formik';
 import DateTimePicker from 'react-datetime-picker';
 import { Calendar, X } from 'react-feather';
 import { useMemo } from 'react';
+import { string } from 'yup';
 
-import { isoDate, parseIsoDate } from '@/portainer/filters/filters';
+import {
+  isoDate,
+  parseIsoDate,
+  TIME_FORMAT,
+} from '@/portainer/filters/filters';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
@@ -25,7 +30,6 @@ export function ScheduledTimeField({ disabled }: Props) {
       {!disabled ? (
         <DateTimePicker
           format="y-MM-dd HH:mm:ss"
-          minDate={new Date()}
           className="form-control [&>div]:border-0"
           onChange={(date) => setValue(isoDate(date.valueOf()))}
           name={name}
@@ -33,10 +37,33 @@ export function ScheduledTimeField({ disabled }: Props) {
           calendarIcon={<Calendar className="feather" />}
           clearIcon={<X className="feather" />}
           disableClock
+          minDate={new Date(Date.now() - 24 * 60 * 60 * 1000)}
         />
       ) : (
         <Input defaultValue={value} disabled />
       )}
     </FormControl>
   );
+}
+
+export function timeValidation() {
+  return string()
+    .required('Scheduled time is required')
+    .test(
+      'validFormat',
+      `Scheduled time must be in the format ${TIME_FORMAT}`,
+      (value) => isValidDate(parseIsoDate(value))
+    )
+    .test(
+      'validDate',
+      `Scheduled time must be bigger then ${isoDate(
+        Date.now() - 24 * 60 * 60 * 1000
+      )}`,
+      (value) =>
+        parseIsoDate(value).valueOf() > Date.now() - 24 * 60 * 60 * 1000
+    );
+}
+
+function isValidDate(date: Date) {
+  return date instanceof Date && !Number.isNaN(date.valueOf());
 }

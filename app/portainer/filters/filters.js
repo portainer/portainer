@@ -33,7 +33,7 @@ export function humanize(bytes, round, base) {
   }
 }
 
-const TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+export const TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 export function isoDateFromTimestamp(timestamp) {
   return moment.unix(timestamp).format(TIME_FORMAT);
