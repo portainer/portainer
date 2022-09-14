@@ -34,19 +34,19 @@ func (handler *Handler) ldapCheck(w http.ResponseWriter, r *http.Request) *httpe
 	var payload checkPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	settings := &payload.LDAPSettings
 
 	err = handler.prefillSettings(settings)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to fetch default settings", err}
+		return httperror.InternalServerError("Unable to fetch default settings", err)
 	}
 
 	err = handler.LDAPService.TestConnectivity(settings)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to connect to LDAP server", err}
+		return httperror.InternalServerError("Unable to connect to LDAP server", err)
 	}
 
 	return response.Empty(w)

@@ -54,31 +54,31 @@ func (payload *teamMembershipUpdatePayload) Validate(r *http.Request) error {
 func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	membershipID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid membership identifier route variable", err}
+		return httperror.BadRequest("Invalid membership identifier route variable", err)
 	}
 
 	var payload teamMembershipUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	membership, err := handler.DataStore.TeamMembership().TeamMembership(portainer.TeamMembershipID(membershipID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team membership with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a team membership with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a team membership with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a team membership with the specified identifier inside the database", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	isLeadingBothTeam := security.AuthorizedTeamManagement(portainer.TeamID(payload.TeamID), securityContext) &&
 		security.AuthorizedTeamManagement(membership.TeamID, securityContext)
 	if !(securityContext.IsAdmin || isLeadingBothTeam) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the membership", httperrors.ErrResourceAccessDenied}
+		return httperror.Forbidden("Permission denied to update the membership", httperrors.ErrResourceAccessDenied)
 	}
 
 	membership.UserID = portainer.UserID(payload.UserID)
@@ -87,7 +87,7 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 
 	err = handler.DataStore.TeamMembership().UpdateTeamMembership(membership.ID, membership)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist membership changes inside the database", err}
+		return httperror.InternalServerError("Unable to persist membership changes inside the database", err)
 	}
 
 	return response.JSON(w, membership)

@@ -24,21 +24,21 @@ import (
 func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid webhook id", err}
+		return httperror.BadRequest("Invalid webhook id", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
+		return httperror.InternalServerError("Unable to retrieve user info from request context", err)
 	}
 
 	if !securityContext.IsAdmin {
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Not authorized to delete a webhook", Err: errors.New("not authorized to delete a webhook")}
+		return httperror.Forbidden("Not authorized to delete a webhook", errors.New("not authorized to delete a webhook"))
 	}
 
 	err = handler.DataStore.Webhook().DeleteWebhook(portainer.WebhookID(id))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the webhook from the database", err}
+		return httperror.InternalServerError("Unable to remove the webhook from the database", err)
 	}
 
 	return response.Empty(w)
