@@ -2,16 +2,12 @@ package archive
 
 import (
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"testing"
 )
 
 func TestUnzipFile(t *testing.T) {
-	dir, err := ioutil.TempDir("", "unzip-test-")
-	assert.NoError(t, err)
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	/*
 		Archive structure.
 		├── 0
@@ -21,7 +17,7 @@ func TestUnzipFile(t *testing.T) {
 		└── 0.txt
 	*/
 
-	err = UnzipFile("./testdata/sample_archive.zip", dir)
+	err := UnzipFile("./testdata/sample_archive.zip", dir)
 
 	assert.NoError(t, err)
 	archiveDir := dir + "/sample_archive"

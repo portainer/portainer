@@ -1,8 +1,7 @@
 package datastore
 
 import (
-	"io/ioutil"
-	"os"
+	"testing"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database"
@@ -18,8 +17,8 @@ func (store *Store) GetConnection() portainer.Connection {
 	return store.connection
 }
 
-func MustNewTestStore(init, secure bool) (bool, *Store, func()) {
-	newStore, store, teardown, err := NewTestStore(init, secure)
+func MustNewTestStore(t *testing.T, init, secure bool) (bool, *Store, func()) {
+	newStore, store, teardown, err := NewTestStore(t, init, secure)
 	if err != nil {
 		if !errors.Is(err, errTempDir) {
 			teardown()
@@ -31,13 +30,9 @@ func MustNewTestStore(init, secure bool) (bool, *Store, func()) {
 	return newStore, store, teardown
 }
 
-func NewTestStore(init, secure bool) (bool, *Store, func(), error) {
+func NewTestStore(t *testing.T, init, secure bool) (bool, *Store, func(), error) {
 	// Creates unique temp directory in a concurrency friendly manner.
-	storePath, err := ioutil.TempDir("", "test-store")
-	if err != nil {
-		return false, nil, nil, errors.Wrap(errTempDir, err.Error())
-	}
-
+	storePath := t.TempDir()
 	fileService, err := filesystem.NewService(storePath, "")
 	if err != nil {
 		return false, nil, nil, err
@@ -79,19 +74,14 @@ func NewTestStore(init, secure bool) (bool, *Store, func(), error) {
 	}
 
 	teardown := func() {
-		teardown(store, storePath)
+		teardown(store)
 	}
 
 	return newStore, store, teardown, nil
 }
 
-func teardown(store *Store, storePath string) {
+func teardown(store *Store) {
 	err := store.Close()
-	if err != nil {
-		log.Fatal().Err(err).Msg("")
-	}
-
-	err = os.RemoveAll(storePath)
 	if err != nil {
 		log.Fatal().Err(err).Msg("")
 	}

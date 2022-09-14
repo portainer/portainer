@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"golang.org/x/exp/slices"
 )
@@ -43,7 +43,7 @@ func (handler *Handler) containerGpusInspect(w http.ResponseWriter, r *http.Requ
 		return httperror.NotFound("Unable to find an environment on request context", err)
 	}
 
-	agentTargetHeader := r.Header.Get(portaineree.PortainerAgentTargetHeader)
+	agentTargetHeader := r.Header.Get(portainer.PortainerAgentTargetHeader)
 
 	cli, err := handler.dockerClientFactory.CreateClient(endpoint, agentTargetHeader, nil)
 	if err != nil {

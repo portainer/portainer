@@ -21,7 +21,7 @@ func Test_SatisfiesAPIKeyServiceInterface(t *testing.T) {
 func Test_GenerateApiKey(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -75,7 +75,7 @@ func Test_GenerateApiKey(t *testing.T) {
 func Test_GetAPIKey(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -95,7 +95,7 @@ func Test_GetAPIKey(t *testing.T) {
 func Test_GetAPIKeys(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -116,7 +116,7 @@ func Test_GetAPIKeys(t *testing.T) {
 func Test_GetDigestUserAndKey(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -152,7 +152,7 @@ func Test_GetDigestUserAndKey(t *testing.T) {
 func Test_UpdateAPIKey(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -200,7 +200,7 @@ func Test_UpdateAPIKey(t *testing.T) {
 func Test_DeleteAPIKey(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
@@ -241,7 +241,7 @@ func Test_DeleteAPIKey(t *testing.T) {
 func Test_InvalidateUserKeyCache(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	service := NewAPIKeyService(store.APIKeyRepository(), store.User())

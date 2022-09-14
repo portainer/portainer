@@ -11,17 +11,13 @@ import (
 )
 
 func Test_copyFile_returnsError_whenSourceDoesNotExist(t *testing.T) {
-	tmpdir, _ := ioutil.TempDir("", "backup")
-	defer os.RemoveAll(tmpdir)
-
+	tmpdir := t.TempDir()
 	err := copyFile("does-not-exist", tmpdir)
 	assert.Error(t, err)
 }
 
 func Test_copyFile_shouldMakeAbackup(t *testing.T) {
-	tmpdir, _ := ioutil.TempDir("", "backup")
-	defer os.RemoveAll(tmpdir)
-
+	tmpdir := t.TempDir()
 	content := []byte("content")
 	ioutil.WriteFile(path.Join(tmpdir, "origin"), content, 0600)
 
@@ -33,8 +29,7 @@ func Test_copyFile_shouldMakeAbackup(t *testing.T) {
 }
 
 func Test_CopyDir_shouldCopyAllFilesAndDirectories(t *testing.T) {
-	destination, _ := ioutil.TempDir("", "destination")
-	defer os.RemoveAll(destination)
+	destination := t.TempDir()
 	err := CopyDir("./testdata/copy_test", destination, true)
 	assert.NoError(t, err)
 
@@ -44,8 +39,7 @@ func Test_CopyDir_shouldCopyAllFilesAndDirectories(t *testing.T) {
 }
 
 func Test_CopyDir_shouldCopyOnlyDirContents(t *testing.T) {
-	destination, _ := ioutil.TempDir("", "destination")
-	defer os.RemoveAll(destination)
+	destination := t.TempDir()
 	err := CopyDir("./testdata/copy_test", destination, false)
 	assert.NoError(t, err)
 
@@ -55,9 +49,7 @@ func Test_CopyDir_shouldCopyOnlyDirContents(t *testing.T) {
 }
 
 func Test_CopyPath_shouldSkipWhenNotExist(t *testing.T) {
-	tmpdir, _ := ioutil.TempDir("", "backup")
-	defer os.RemoveAll(tmpdir)
-
+	tmpdir := t.TempDir()
 	err := CopyPath("does-not-exists", tmpdir)
 	assert.NoError(t, err)
 
@@ -65,9 +57,7 @@ func Test_CopyPath_shouldSkipWhenNotExist(t *testing.T) {
 }
 
 func Test_CopyPath_shouldCopyFile(t *testing.T) {
-	tmpdir, _ := ioutil.TempDir("", "backup")
-	defer os.RemoveAll(tmpdir)
-
+	tmpdir := t.TempDir()
 	content := []byte("content")
 	ioutil.WriteFile(path.Join(tmpdir, "file"), content, 0600)
 
@@ -81,8 +71,7 @@ func Test_CopyPath_shouldCopyFile(t *testing.T) {
 }
 
 func Test_CopyPath_shouldCopyDir(t *testing.T) {
-	destination, _ := ioutil.TempDir("", "destination")
-	defer os.RemoveAll(destination)
+	destination := t.TempDir()
 	err := CopyPath("./testdata/copy_test", destination)
 	assert.NoError(t, err)
 

@@ -290,7 +290,7 @@
   --bg-codemirror-color: var(--grey-2);
   --bg-codemirror-gutters-color: var(--grey-3);
   --bg-codemirror-selected-color: var(--grey-3);
-  --bg-dropdown-menu-color: var(--ui-gray-7);
+  --bg-dropdown-menu-color: var(--ui-gray-warm-8);
   --bg-main-color: var(--grey-2);
   --bg-sidebar-color: var(--grey-1);
   --bg-sidebar-nav-color: var(--grey-2);
@@ -398,7 +398,7 @@
   --text-daterangepicker-active: var(--white-color);
   --text-input-autofill-color: var(--text-form-control-color);
   --text-button-hover-color: var(--white-color);
-  --text-small-select-color: var(--grey-7);
+  --text-small-select-color: var(--white-color);
   --text-bootbox: var(--white-color);
   --text-button-group-color: var(--ui-white);
   --text-button-dangerlight-color: var(--ui-error-7);
@@ -485,7 +485,7 @@
   --bg-hover-table-color: var(--grey-3);
   --bg-switch-box-color: var(--grey-53);
   --bg-panel-body-color: var(--black-color);
-  --bg-dropdown-menu-color: var(--black-color);
+  --bg-dropdown-menu-color: var(--ui-gray-warm-8);
   --bg-codemirror-selected-color: var(--grey-3);
   --bg-motd-body-color: var(--black-color);
   --bg-blocklist-hover-color: var(--black-color);

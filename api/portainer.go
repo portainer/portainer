@@ -255,7 +255,8 @@ type (
 	EdgeJobLogsStatus int
 
 	// EdgeSchedule represents a scheduled job that can run on Edge environments(endpoints).
-	// Deprecated in favor of EdgeJob
+	//
+	// Deprecated: in favor of EdgeJob
 	EdgeSchedule struct {
 		// EdgeSchedule Identifier
 		ID             ScheduleID   `json:"Id" example:"1"`
@@ -1450,8 +1451,12 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
+const FeatureFlagEdgeRemoteUpdate Feature = "edgeRemoteUpdate"
+
 // List of supported features
-var SupportedFeatureFlags = []Feature{}
+var SupportedFeatureFlags = []Feature{
+	FeatureFlagEdgeRemoteUpdate,
+}
 
 const (
 	_ AuthenticationMethod = iota

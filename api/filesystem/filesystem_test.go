@@ -9,7 +9,7 @@ import (
 )
 
 func createService(t *testing.T) *Service {
-	dataStorePath := path.Join(os.TempDir(), t.Name())
+	dataStorePath := path.Join(t.TempDir(), t.Name())
 
 	service, err := NewService(dataStorePath, "")
 	assert.NoError(t, err, "NewService should not fail")

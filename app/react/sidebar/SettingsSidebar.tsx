@@ -8,6 +8,10 @@ import {
 } from 'react-feather';
 
 import { usePublicSettings } from '@/portainer/settings/queries';
+import {
+  FeatureFlag,
+  useFeatureFlag,
+} from '@/portainer/feature-flags/useRedirectFeatureFlag';
 
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';
@@ -21,6 +25,10 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
   const teamSyncQuery = usePublicSettings<boolean>({
     select: (settings) => settings.TeamSync,
   });
+
+  const isEdgeRemoteUpgradeEnabledQuery = useFeatureFlag(
+    FeatureFlag.EdgeRemoteUpdate
+  );
 
   const showUsersSection =
     !window.ddExtension && (isAdmin || (isTeamLeader && !teamSyncQuery.data));
@@ -68,6 +76,13 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
               label="Tags"
               data-cy="portainerSidebar-environmentTags"
             />
+            {isEdgeRemoteUpgradeEnabledQuery.data && (
+              <SidebarItem
+                to="portainer.endpoints.updateSchedules"
+                label="Update & Rollback"
+                data-cy="portainerSidebar-updateSchedules"
+              />
+            )}
           </SidebarItem>
 
           <SidebarItem
