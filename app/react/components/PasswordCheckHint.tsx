@@ -16,7 +16,7 @@ export function PasswordCheckHint({
 
   return (
     <div>
-      <p className="text-muted vertical-center">
+      <p className="text-warning vertical-center">
         <Icon icon="alert-triangle" className="icon-warning" feather />
         {forceChangePassword &&
           'An administrator has changed your password requirements, '}

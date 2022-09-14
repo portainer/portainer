@@ -10,7 +10,7 @@
       </button>
     </div>
     <div ng-show="$ctrl[$ctrl.formName].name.$invalid">
-      <div class="small text-muted">
+      <div class="small text-warning">
         <div ng-messages="$ctrl[$ctrl.formName].name.$error" class="mt-1">
           <p class="vertical-center" ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Path is required. </p>
         </div>

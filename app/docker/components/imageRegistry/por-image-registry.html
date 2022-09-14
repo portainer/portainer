@@ -61,7 +61,7 @@
     <div class="small">
       <div class="col-sm-3 col-lg-2"></div>
       <div class="col-sm-8" ng-messages="$ctrl.form.image_name.$error">
-        <p class="text-muted vertical-center" ng-message="required">
+        <p class="text-warning vertical-center" ng-message="required">
           <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true" class="vertical-center"></pr-icon> Image name is required.
           <span ng-if="$ctrl.canPull">Tag must be specified otherwise Portainer will pull all tags associated to the image.</span>
         </p>

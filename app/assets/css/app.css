@@ -169,7 +169,7 @@ input[type='checkbox'] {
 }
 
 .text-warning {
-  color: #f0ad4e;
+  @apply text-warning-9 th-dark:text-warning-7 th-highcontrast:text-warning-1;
 }
 
 .widget .widget-body table tbody .image-tag {
