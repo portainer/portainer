@@ -89,22 +89,22 @@ func (handler *Handler) fdoConfigure(w http.ResponseWriter, r *http.Request) *ht
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		logrus.WithError(err).Error("Invalid request payload")
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	settings := portainer.FDOConfiguration(payload)
 	if err = handler.saveSettings(settings); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error saving FDO settings", Err: err}
+		return httperror.BadRequest("Error saving FDO settings", err)
 	}
 
 	profiles, err := handler.DataStore.FDOProfile().FDOProfiles()
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Error saving FDO settings", Err: err}
+		return httperror.InternalServerError("Error saving FDO settings", err)
 	}
 	if len(profiles) == 0 {
 		err = handler.addDefaultProfile()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+			return httperror.InternalServerError(err.Error(), err)
 		}
 	}
 

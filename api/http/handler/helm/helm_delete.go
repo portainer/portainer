@@ -28,7 +28,7 @@ import (
 func (handler *Handler) helmDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	release, err := request.RetrieveRouteVariableValue(r, "release")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "No release specified", err}
+		return httperror.BadRequest("No release specified", err)
 	}
 
 	clusterAccess, httperr := handler.getHelmClusterAccess(r)
@@ -48,7 +48,7 @@ func (handler *Handler) helmDelete(w http.ResponseWriter, r *http.Request) *http
 
 	err = handler.helmPackageManager.Uninstall(uninstallOpts)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Helm returned an error", err}
+		return httperror.InternalServerError("Helm returned an error", err)
 	}
 
 	return response.Empty(w)

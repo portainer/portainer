@@ -11,7 +11,7 @@ import (
 )
 
 func (handler *Handler) handlerDBErr(err error, msg string) *httperror.HandlerError {
-	httpErr := &httperror.HandlerError{http.StatusInternalServerError, msg, err}
+	httpErr := httperror.InternalServerError(msg, err)
 
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		httpErr.StatusCode = http.StatusNotFound
@@ -35,17 +35,17 @@ func (handler *Handler) handlerDBErr(err error, msg string) *httperror.HandlerEr
 func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
+		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a valid endpoint from the handler context", err}
+		return httperror.InternalServerError("Unable to retrieve a valid endpoint from the handler context", err)
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
@@ -57,7 +57,7 @@ func (handler *Handler) edgeStackStatusDelete(w http.ResponseWriter, r *http.Req
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
+		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
 	}
 
 	return response.JSON(w, stack)

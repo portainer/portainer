@@ -74,14 +74,14 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	var payload composeStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
 
 	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 
 	if !isUnique {
@@ -93,7 +93,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
 				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
 				if err != nil {
-					return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+					return httperror.BadRequest("Invalid request payload", err)
 				}
 			} else {
 				return stackExistsError(payload.Name)
@@ -117,7 +117,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	stackFolder := strconv.Itoa(int(stack.ID))
 	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Compose file on disk", Err: err}
+		return httperror.InternalServerError("Unable to persist Compose file on disk", err)
 	}
 	stack.ProjectPath = projectPath
 
@@ -131,14 +131,14 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 	err = handler.deployComposeStack(config, false)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	stack.CreatedBy = config.user.Username
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
+		return httperror.InternalServerError("Unable to persist the stack inside the database", err)
 	}
 
 	doCleanUp = false
@@ -190,7 +190,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	var payload composeStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
@@ -200,7 +200,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 
 	if !isUnique {
@@ -212,7 +212,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
 				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
 				if err != nil {
-					return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+					return httperror.BadRequest("Invalid request payload", err)
 				}
 			} else {
 				return stackExistsError(payload.Name)
@@ -224,7 +224,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" {
 		isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook)
 		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for webhook ID collision", Err: err}
+			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
 		}
 		if !isUnique {
 			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), Err: errWebhookIDAlreadyExists}
@@ -266,12 +266,12 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	err = handler.clone(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryAuthentication, payload.RepositoryUsername, payload.RepositoryPassword)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to clone git repository", Err: err}
+		return httperror.InternalServerError("Unable to clone git repository", err)
 	}
 
 	commitID, err := handler.latestCommitID(payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryAuthentication, payload.RepositoryUsername, payload.RepositoryPassword)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to fetch git repository id", Err: err}
+		return httperror.InternalServerError("Unable to fetch git repository id", err)
 	}
 	stack.GitConfig.ConfigHash = commitID
 
@@ -282,7 +282,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	err = handler.deployComposeStack(config, false)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
@@ -298,7 +298,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
+		return httperror.InternalServerError("Unable to persist the stack inside the database", err)
 	}
 
 	doCleanUp = false
@@ -337,14 +337,14 @@ func decodeRequestForm(r *http.Request) (*composeStackFromFileUploadPayload, err
 func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	payload, err := decodeRequestForm(r)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
 
 	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 
 	if !isUnique {
@@ -356,7 +356,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
 				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
 				if err != nil {
-					return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+					return httperror.BadRequest("Invalid request payload", err)
 				}
 			} else {
 				return stackExistsError(payload.Name)
@@ -379,7 +379,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, payload.StackFileContent)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Compose file on disk", Err: err}
+		return httperror.InternalServerError("Unable to persist Compose file on disk", err)
 	}
 	stack.ProjectPath = projectPath
 
@@ -393,14 +393,14 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 
 	err = handler.deployComposeStack(config, false)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	stack.CreatedBy = config.user.Username
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
+		return httperror.InternalServerError("Unable to persist the stack inside the database", err)
 	}
 
 	doCleanUp = false
@@ -418,17 +418,17 @@ type composeStackDeploymentConfig struct {
 func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
+		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	user, err := handler.DataStore.User().User(securityContext.UserID)
 	if err != nil {
-		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
+		return nil, httperror.InternalServerError("Unable to load user information from the database", err)
 	}
 
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
-		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve registries from the database", Err: err}
+		return nil, httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 

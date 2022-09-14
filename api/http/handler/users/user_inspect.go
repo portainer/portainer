@@ -30,23 +30,23 @@ import (
 func (handler *Handler) userInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid user identifier route variable", err}
+		return httperror.BadRequest("Invalid user identifier route variable", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	if !securityContext.IsAdmin && securityContext.UserID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied inspect user", errors.ErrResourceAccessDenied}
+		return httperror.Forbidden("Permission denied inspect user", errors.ErrResourceAccessDenied)
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a user with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a user with the specified identifier inside the database", err)
 	}
 
 	hideFields(user)

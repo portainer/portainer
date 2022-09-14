@@ -101,28 +101,28 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 	if !securityContext.IsAdmin {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to configure registry", httperrors.ErrResourceAccessDenied}
+		return httperror.Forbidden("Permission denied to configure registry", httperrors.ErrResourceAccessDenied)
 	}
 
 	payload := &registryConfigurePayload{}
 	err = payload.Validate(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
+		return httperror.BadRequest("Invalid registry identifier route variable", err)
 	}
 
 	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a registry with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a registry with the specified identifier inside the database", err)
 	}
 
 	registry.ManagementConfiguration = &portainer.RegistryManagementConfiguration{
@@ -154,19 +154,19 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 
 			certPath, err := handler.FileService.StoreRegistryManagementFileFromBytes(folder, "cert.pem", payload.TLSCertFile)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS certificate file on disk", err}
+				return httperror.InternalServerError("Unable to persist TLS certificate file on disk", err)
 			}
 			registry.ManagementConfiguration.TLSConfig.TLSCertPath = certPath
 
 			keyPath, err := handler.FileService.StoreRegistryManagementFileFromBytes(folder, "key.pem", payload.TLSKeyFile)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS key file on disk", err}
+				return httperror.InternalServerError("Unable to persist TLS key file on disk", err)
 			}
 			registry.ManagementConfiguration.TLSConfig.TLSKeyPath = keyPath
 
 			cacertPath, err := handler.FileService.StoreRegistryManagementFileFromBytes(folder, "ca.pem", payload.TLSCACertFile)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS CA certificate file on disk", err}
+				return httperror.InternalServerError("Unable to persist TLS CA certificate file on disk", err)
 			}
 			registry.ManagementConfiguration.TLSConfig.TLSCACertPath = cacertPath
 		}
@@ -174,7 +174,7 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 
 	err = handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist registry changes inside the database", err}
+		return httperror.InternalServerError("Unable to persist registry changes inside the database", err)
 	}
 
 	return response.Empty(w)

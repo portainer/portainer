@@ -31,10 +31,10 @@ type restorePayload struct {
 func (h *Handler) restore(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	initialized, err := h.adminMonitor.WasInitialized()
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to check system initialization", Err: err}
+		return httperror.InternalServerError("Failed to check system initialization", err)
 	}
 	if initialized {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Cannot restore already initialized instance", Err: errors.New("system already initialized")}
+		return httperror.BadRequest("Cannot restore already initialized instance", errors.New("system already initialized"))
 	}
 	h.adminMonitor.Stop()
 	defer h.adminMonitor.Start()
@@ -42,13 +42,13 @@ func (h *Handler) restore(w http.ResponseWriter, r *http.Request) *httperror.Han
 	var payload restorePayload
 	err = decodeForm(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	var archiveReader io.Reader = bytes.NewReader(payload.FileContent)
 	err = operations.RestoreArchive(archiveReader, payload.Password, h.filestorePath, h.gate, h.dataStore, h.shutdownTrigger)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to restore the backup", Err: err}
+		return httperror.InternalServerError("Failed to restore the backup", err)
 	}
 
 	return nil
