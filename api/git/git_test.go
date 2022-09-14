@@ -3,15 +3,16 @@ package git
 import (
 	"context"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/portainer/portainer/api/archive"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/archive"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +20,7 @@ var bareRepoDir string
 
 func TestMain(m *testing.M) {
 	if err := testMain(m); err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("")
 	}
 }
 

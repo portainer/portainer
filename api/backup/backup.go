@@ -7,13 +7,14 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
-	"github.com/sirupsen/logrus"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 const rwxr__r__ os.FileMode = 0744
@@ -47,9 +48,9 @@ func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datasto
 
 		err := datastore.Export(exportFilename)
 		if err != nil {
-			logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
+			log.Error().Err(err).Str("filename", exportFilename).Msg("failed to export")
 		} else {
-			logrus.Debugf("exported to %s", exportFilename)
+			log.Debug().Str("filename", exportFilename).Msg("file exported")
 		}
 	}
 

@@ -3,7 +3,6 @@ package templates
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -11,6 +10,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/rs/zerolog/log"
 )
 
 type filePayload struct {
@@ -114,7 +115,8 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 func (handler *Handler) cleanUp(projectPath string) error {
 	err := handler.FileService.RemoveDirectory(projectPath)
 	if err != nil {
-		log.Printf("http error: Unable to cleanup stack creation (err=%s)\n", err)
+		log.Debug().Err(err).Msg("HTTP error: unable to cleanup stack creation")
 	}
+
 	return nil
 }

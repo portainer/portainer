@@ -3,15 +3,15 @@ package ssl
 import (
 	"context"
 	"crypto/tls"
-	"log"
 	"os"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/portainer/libcrypto"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // Service represents a service to manage SSL certificates
@@ -45,7 +45,7 @@ func (service *Service) Init(host, certPath, keyPath string) error {
 
 	settings, err := service.GetSSLSettings()
 	if err != nil {
-		return errors.Wrap(err, "failed fetching ssl settings")
+		return errors.Wrap(err, "failed fetching SSL settings")
 	}
 
 	// certificates already exist
@@ -77,7 +77,8 @@ func generateSelfSignedCertificates(ip, certPath, keyPath string) error {
 		return errors.New("host can't be empty")
 	}
 
-	log.Printf("[INFO] [internal,ssl] [message: no cert files found, generating self signed ssl certificates]")
+	log.Info().Msg("no cert files found, generating self signed SSL certificates")
+
 	return libcrypto.GenerateCertsForHost("localhost", ip, certPath, keyPath, time.Now().AddDate(5, 0, 0))
 }
 

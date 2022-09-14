@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -10,6 +9,8 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks"
+
+	"github.com/rs/zerolog/log"
 )
 
 func startAutoupdate(stackID portainer.StackID, interval string, scheduler *scheduler.Scheduler, stackDeployer stacks.StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) (jobID string, e *httperror.HandlerError) {
@@ -31,7 +32,6 @@ func stopAutoupdate(stackID portainer.StackID, jobID string, scheduler scheduler
 	}
 
 	if err := scheduler.StopJob(jobID); err != nil {
-		log.Printf("[WARN] could not stop the job for the stack %v", stackID)
+		log.Warn().Int("stack_id", int(stackID)).Msg("could not stop the job for the stack")
 	}
-
 }

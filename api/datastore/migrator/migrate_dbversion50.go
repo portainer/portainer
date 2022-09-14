@@ -2,6 +2,7 @@ package migrator
 
 import (
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 func (m *Migrator) migrateDBVersionToDB50() error {
@@ -9,7 +10,8 @@ func (m *Migrator) migrateDBVersionToDB50() error {
 }
 
 func (m *Migrator) migratePasswordLengthSettings() error {
-	migrateLog.Info("Updating required password length")
+	log.Info().Msg("updating required password length")
+
 	s, err := m.settingsService.Settings()
 	if err != nil {
 		return errors.Wrap(err, "unable to retrieve settings")

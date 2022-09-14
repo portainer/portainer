@@ -5,14 +5,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/coreos/go-semver/semver"
-
+	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/build"
 	"github.com/portainer/portainer/api/http/client"
 
-	"github.com/portainer/libhttp/response"
-	log "github.com/sirupsen/logrus"
+	"github.com/coreos/go-semver/semver"
+	"github.com/rs/zerolog/log"
 )
 
 type versionResponse struct {
@@ -71,7 +70,8 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
 func getLatestVersion() string {
 	motd, err := client.Get(portainer.VersionCheckURL, 5)
 	if err != nil {
-		log.WithError(err).Debug("couldn't fetch latest Portainer release version")
+		log.Debug().Err(err).Msg("couldn't fetch latest Portainer release version")
+
 		return ""
 	}
 
@@ -81,7 +81,8 @@ func getLatestVersion() string {
 
 	err = json.Unmarshal(motd, &data)
 	if err != nil {
-		log.WithError(err).Debug("couldn't parse latest Portainer version")
+		log.Debug().Err(err).Msg("couldn't parse latest Portainer version")
+
 		return ""
 	}
 
@@ -91,13 +92,15 @@ func getLatestVersion() string {
 func hasNewerVersion(currentVersion, latestVersion string) bool {
 	currentVersionSemver, err := semver.NewVersion(currentVersion)
 	if err != nil {
-		log.WithField("version", currentVersion).Debug("current Portainer version isn't a semver")
+		log.Debug().Str("version", currentVersion).Msg("current Portainer version isn't a semver")
+
 		return false
 	}
 
 	latestVersionSemver, err := semver.NewVersion(latestVersion)
 	if err != nil {
-		log.WithField("version", latestVersion).Debug("latest Portainer version isn't a semver")
+		log.Debug().Str("version", latestVersion).Msg("latest Portainer version isn't a semver")
+
 		return false
 	}
 

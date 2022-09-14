@@ -3,15 +3,13 @@ package stacks
 import (
 	"net/http"
 
-	"github.com/gofrs/uuid"
-	"github.com/sirupsen/logrus"
-
-	"github.com/portainer/libhttp/response"
-
-	"github.com/portainer/portainer/api/stacks"
-
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
+	"github.com/portainer/portainer/api/stacks"
+
+	"github.com/gofrs/uuid"
+	"github.com/rs/zerolog/log"
 )
 
 // @id WebhookInvoke
@@ -36,6 +34,7 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 		if handler.DataStore.IsErrObjectNotFound(err) {
 			statusCode = http.StatusNotFound
 		}
+
 		return &httperror.HandlerError{StatusCode: statusCode, Message: "Unable to find the stack by webhook ID", Err: err}
 	}
 
@@ -43,7 +42,9 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 		if _, ok := err.(*stacks.StackAuthorMissingErr); ok {
 			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Autoupdate for the stack isn't available", Err: err}
 		}
-		logrus.WithError(err).Error("failed to update the stack")
+
+		log.Error().Err(err).Msg("failed to update the stack")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to update the stack", Err: err}
 	}
 
@@ -57,7 +58,6 @@ func retrieveUUIDRouteVariableValue(r *http.Request, name string) (uuid.UUID, er
 	}
 
 	uid, err := uuid.FromString(webhookID)
-
 	if err != nil {
 		return uuid.Nil, err
 	}

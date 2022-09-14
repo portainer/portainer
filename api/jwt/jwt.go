@@ -6,11 +6,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang-jwt/jwt"
-	"github.com/gorilla/securecookie"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	log "github.com/sirupsen/logrus"
+
+	"github.com/golang-jwt/jwt"
+	"github.com/gorilla/securecookie"
+	"github.com/rs/zerolog/log"
 )
 
 // scope represents JWT scopes that are supported in JWT claims.
@@ -132,6 +133,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 			if user.TokenIssueAt > cl.StandardClaims.IssuedAt {
 				return nil, errInvalidJWTToken
 			}
+
 			return &portainer.TokenData{
 				ID:       portainer.UserID(cl.UserID),
 				Username: cl.Username,
@@ -152,6 +154,7 @@ func parseScope(token string) scope {
 			}
 		}
 	}
+
 	return defaultScope
 }
 
@@ -168,7 +171,7 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt
 
 	if _, ok := os.LookupEnv("DOCKER_EXTENSION"); ok {
 		// Set expiration to 99 years for docker desktop extension.
-		log.Infof("[message: detected docker desktop extension mode]")
+		log.Info().Msg("detected docker desktop extension mode")
 		expiresAt = time.Now().Add(time.Hour * 8760 * 99).Unix()
 	}
 

@@ -3,17 +3,17 @@ package websocket
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
-	"github.com/portainer/portainer/api/http/security"
-
-	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+	"github.com/portainer/portainer/api/http/security"
+
+	"github.com/gorilla/websocket"
+	"github.com/rs/zerolog/log"
 )
 
 // @summary Execute a websocket on pod
@@ -149,7 +149,8 @@ func (handler *Handler) hijackPodExecStartOperation(
 
 	// websocket client successfully disconnected
 	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
-		log.Printf("websocket error: %s \n", err.Error())
+		log.Debug().Err(err).Msg("websocket error")
+
 		return nil
 	}
 

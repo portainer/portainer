@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/sirupsen/logrus"
-
 	"github.com/portainer/libhttp/response"
+
+	"github.com/rs/zerolog/log"
 )
 
 // @id fdoListAll
@@ -24,14 +24,14 @@ import (
 func (handler *Handler) fdoListAll(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	fdoClient, err := handler.newFDOClient()
 	if err != nil {
-		logrus.WithError(err).Info("fdoListAll: newFDOClient()")
+		log.Error().Err(err).Msg("fdoListAll: newFDOClient()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: newFDOClient()", Err: err}
 	}
 
 	// Get all vouchers
 	guids, err := fdoClient.GetVouchers()
 	if err != nil {
-		logrus.WithError(err).Info("fdoListAll: GetVouchers()")
+		log.Error().Err(err).Msg("fdoListAll: GetVouchers()")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoListAll: GetVouchers()", Err: err}
 	}
 

@@ -7,13 +7,13 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/fxamacker/cbor/v2"
-
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/fxamacker/cbor/v2"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -63,7 +63,8 @@ func (payload *deviceConfigurePayload) Validate(r *http.Request) error {
 func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	guid, err := request.RetrieveRouteVariableValue(r, "guid")
 	if err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: request.RetrieveRouteVariableValue()")
+		log.Error().Err(err).Msg("fdoConfigureDevice: request.RetrieveRouteVariableValue()")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: guid not found", Err: err}
 	}
 
@@ -71,7 +72,8 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		logrus.WithError(err).Error("Invalid request payload")
+		log.Error().Err(err).Msg("invalid request payload")
+
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
@@ -84,13 +86,15 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 
 	fileContent, err := handler.FileService.GetFileContent(profile.FilePath, "")
 	if err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: GetFileContent")
+		log.Error().Err(err).Msg("fdoConfigureDevice: GetFileContent")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: GetFileContent", Err: err}
 	}
 
 	fdoClient, err := handler.newFDOClient()
 	if err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: newFDOClient()")
+		log.Error().Err(err).Msg("fdoConfigureDevice: newFDOClient()")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: newFDOClient()", Err: err}
 	}
 
@@ -102,7 +106,8 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"var":      []string{"active"},
 		"bytes":    []string{"F5"}, // this is "true" in CBOR
 	}, []byte("")); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
+		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw()")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
 	}
 
@@ -113,7 +118,8 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"var":      []string{"filedesc"},
 		"filename": []string{"DEVICE_edgeid.txt"},
 	}, []byte(payload.EdgeID)); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(edgeid)")
+		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw(edgeid)")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(edgeid)", Err: err}
 	}
 
@@ -125,7 +131,8 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"var":      []string{"filedesc"},
 		"filename": []string{"DEVICE_edgekey.txt"},
 	}, []byte(payload.EdgeKey)); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(edgekey)")
+		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw(edgekey)")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(edgekey)", Err: err}
 	}
 
@@ -137,7 +144,8 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"var":      []string{"filedesc"},
 		"filename": []string{"DEVICE_name.txt"},
 	}, []byte(payload.Name)); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw(name)")
+		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw(name)")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(name)", Err: err}
 	}
 
@@ -149,7 +157,8 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"var":      []string{"filedesc"},
 		"filename": []string{"DEVICE_GUID.txt"},
 	}, []byte(guid)); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
+		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw()")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
 	}
 
@@ -160,18 +169,20 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"var":      []string{"filedesc"},
 		"filename": []string{deploymentScriptName},
 	}, fileContent); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
+		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw()")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
 	}
 
 	b, err := cbor.Marshal([]string{"/bin/sh", deploymentScriptName})
 	if err != nil {
-		logrus.WithError(err).Error("failed to marshal string to CBOR")
+		log.Error().Err(err).Msg("failed to marshal string to CBOR")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw() failed to encode", Err: err}
 	}
 
 	cborBytes := strings.ToUpper(hex.EncodeToString(b))
-	logrus.WithField("cbor", cborBytes).WithField("string", deploymentScriptName).Info("converted to CBOR")
+	log.Debug().Str("cbor", cborBytes).Str("string", deploymentScriptName).Msg("converted to CBOR")
 
 	if err = fdoClient.PutDeviceSVIRaw(url.Values{
 		"guid":     []string{guid},
@@ -180,7 +191,8 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 		"var":      []string{"exec"},
 		"bytes":    []string{cborBytes},
 	}, []byte("")); err != nil {
-		logrus.WithError(err).Info("fdoConfigureDevice: PutDeviceSVIRaw()")
+		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw()")
+
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
 	}
 

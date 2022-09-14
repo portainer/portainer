@@ -2,14 +2,13 @@ package scheduler
 
 import (
 	"context"
-	"log"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 type Scheduler struct {
@@ -43,7 +42,7 @@ func (s *Scheduler) Shutdown() error {
 		return nil
 	}
 
-	log.Println("[DEBUG] Stopping scheduler")
+	log.Debug().Msg("stopping scheduler")
 	ctx := s.crontab.Stop()
 	<-ctx.Done()
 
@@ -87,7 +86,7 @@ func (s *Scheduler) StartJobEvery(duration time.Duration, job func() error) stri
 
 	j := cron.FuncJob(func() {
 		if err := job(); err != nil {
-			logrus.Debug("job returned an error")
+			log.Debug().Msg("job returned an error")
 			cancel()
 		}
 	})
@@ -100,7 +99,7 @@ func (s *Scheduler) StartJobEvery(duration time.Duration, job func() error) stri
 
 	go func(entryID cron.EntryID) {
 		<-ctx.Done()
-		logrus.Debug("job cancelled, stopping")
+		log.Debug().Msg("job cancelled, stopping")
 		s.crontab.Remove(entryID)
 	}(entryID)
 

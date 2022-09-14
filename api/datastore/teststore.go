@@ -2,14 +2,14 @@ package datastore
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/filesystem"
 
 	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/filesystem"
+	"github.com/rs/zerolog/log"
 )
 
 var errTempDir = errors.New("can't create a temp dir")
@@ -24,7 +24,8 @@ func MustNewTestStore(init, secure bool) (bool, *Store, func()) {
 		if !errors.Is(err, errTempDir) {
 			teardown()
 		}
-		log.Fatal(err)
+
+		log.Fatal().Err(err).Msg("")
 	}
 
 	return newStore, store, teardown
@@ -51,11 +52,14 @@ func NewTestStore(init, secure bool) (bool, *Store, func(), error) {
 	if err != nil {
 		panic(err)
 	}
+
 	store := NewStore(storePath, fileService, connection)
 	newStore, err := store.Open()
 	if err != nil {
 		return newStore, nil, nil, err
 	}
+
+	log.Debug().Msg("opened")
 
 	if init {
 		err = store.Init()
@@ -63,6 +67,8 @@ func NewTestStore(init, secure bool) (bool, *Store, func(), error) {
 			return newStore, nil, nil, err
 		}
 	}
+
+	log.Debug().Msg("initialised")
 
 	if newStore {
 		// from MigrateData
@@ -82,11 +88,11 @@ func NewTestStore(init, secure bool) (bool, *Store, func(), error) {
 func teardown(store *Store, storePath string) {
 	err := store.Close()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Err(err).Msg("")
 	}
 
 	err = os.RemoveAll(storePath)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Err(err).Msg("")
 	}
 }
