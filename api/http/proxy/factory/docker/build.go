@@ -3,12 +3,16 @@ package docker
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
+	"log"
+	"mime"
 	"net/http"
-	"strings"
 
 	"github.com/portainer/portainer/api/archive"
 )
+
+const OneMegabyte = 1024768
 
 type postDockerfileRequest struct {
 	Content string
@@ -23,29 +27,81 @@ type postDockerfileRequest struct {
 // In any other case, it will leave the request unaltered.
 func buildOperation(request *http.Request) error {
 	contentTypeHeader := request.Header.Get("Content-Type")
-	if contentTypeHeader != "" && !strings.Contains(contentTypeHeader, "application/json") {
-		return nil
+
+	mediaType, _, err := mime.ParseMediaType(contentTypeHeader)
+	if err != nil {
+		return err
 	}
 
-	var dockerfileContent []byte
-
-	if contentTypeHeader == "" {
+	var buffer []byte
+	switch mediaType {
+	case "":
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			return err
 		}
-		dockerfileContent = body
-	} else {
+
+		buffer, err = archive.TarFileInBuffer(body, "Dockerfile", 0600)
+		if err != nil {
+			return err
+		}
+
+	case "application/json":
 		var req postDockerfileRequest
 		if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
 			return err
 		}
-		dockerfileContent = []byte(req.Content)
-	}
 
-	buffer, err := archive.TarFileInBuffer(dockerfileContent, "Dockerfile", 0600)
-	if err != nil {
-		return err
+		buffer, err = archive.TarFileInBuffer([]byte(req.Content), "Dockerfile", 0600)
+		if err != nil {
+			return err
+		}
+
+	case "multipart/form-data":
+		err := request.ParseMultipartForm(32 * OneMegabyte) // limit parser memory to 32MB
+		if err != nil {
+			return err
+		}
+
+		if request.MultipartForm == nil || request.MultipartForm.File == nil {
+			return errors.New("uploaded files not found to build image")
+		}
+
+		tfb := archive.NewTarFileInBuffer()
+		defer tfb.Close()
+
+		for k := range request.MultipartForm.File {
+			f, hdr, err := request.FormFile(k)
+			if err != nil {
+				return err
+			}
+
+			defer f.Close()
+
+			log.Printf("[INFO] [http,proxy,docker] [message: upload the file to build image] [filename: %s] [size: %d]", hdr.Filename, hdr.Size)
+
+			content, err := ioutil.ReadAll(f)
+			if err != nil {
+				return err
+			}
+
+			filename := hdr.Filename
+			if hdr.Filename == "blob" {
+				filename = "Dockerfile"
+			}
+
+			if err := tfb.Put(content, filename, 0600); err != nil {
+				return err
+			}
+		}
+
+		buffer = tfb.Bytes()
+		request.Form = nil
+		request.PostForm = nil
+		request.MultipartForm = nil
+
+	default:
+		return nil
 	}
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(buffer))
