@@ -107,6 +107,8 @@ const (
 	UpdateScheduleStatusSuccess
 	// UpdateScheduleStatusError represents a failed edge update schedule
 	UpdateScheduleStatusError
+	// UpdateScheduleStatusSkip represents a skipped edge update schedule
+	UpdateScheduleStatusSkip
 )
 
 // AggregatedStatus aggregates the status of all environments in a schedule
