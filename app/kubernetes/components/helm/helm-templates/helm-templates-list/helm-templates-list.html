@@ -36,7 +36,7 @@
 
       <div class="blocklist">
         <helm-templates-list-item
-          ng-repeat="chart in $ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory "
+          ng-repeat="chart in $ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory"
           model="chart"
           type-label="helm"
           on-select="($ctrl.selectAction)"

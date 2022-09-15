@@ -32,7 +32,7 @@ export default class HelmTemplatesListController {
 
   onCategoryChange(value) {
     return this.$scope.$evalAsync(() => {
-      this.state.selectedCategory = value;
+      this.state.selectedCategory = value || '';
     });
   }
 
