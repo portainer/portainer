@@ -12,7 +12,6 @@ import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
 import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
-import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import KubernetesPodConverter from 'Kubernetes/pod/converter';
 
 class KubernetesApplicationService {
@@ -297,20 +296,10 @@ class KubernetesApplicationService {
       newServices.forEach(async (service) => {
         await this.KubernetesServiceService.create(service);
       });
-
-      // Create multiple ingress
-      const ingresses = KubernetesIngressConverter.generateNewIngresses(oldFormValues.OriginalIngresses, newServices);
-      if (ingresses) {
-        await Promise.all(this._generateIngressPatchPromises(oldFormValues.OriginalIngresses, ingresses));
-      }
     }
 
     // Delete services ( only called when all services been deleted )
     if (oldServices.length !== 0 && newServices.length === 0) {
-      const ingresses = KubernetesIngressConverter.removeIngressesPaths(oldFormValues.OriginalIngresses, oldServices);
-      if (ingresses) {
-        await Promise.all(this._generateIngressPatchPromises(oldFormValues.OriginalIngresses, ingresses));
-      }
       await this.KubernetesServiceService.deleteAll(oldServices);
     }
 
@@ -331,15 +320,6 @@ class KubernetesApplicationService {
           await this.KubernetesServiceService.create(newService);
         }
       });
-
-      // Clear all ingress which is related to services in this application
-      const clearIngress = KubernetesIngressConverter.removeIngressesPaths(oldFormValues.OriginalIngresses, oldServices);
-
-      // Generate all ingress from services in this application
-      const newIngress = KubernetesIngressConverter.generateNewIngresses(clearIngress, newServices);
-
-      // Compare new ingress with old ingress to get api patch
-      await Promise.all(this._generateIngressPatchPromises(oldFormValues.OriginalIngresses, newIngress));
     }
 
     const newKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(newApp);
@@ -413,17 +393,6 @@ class KubernetesApplicationService {
     if (application.ServiceType) {
       // delete headless service && non-headless service
       await this.KubernetesServiceService.delete(application.Services);
-
-      if (application.Ingresses.length) {
-        const originalIngresses = await this.KubernetesIngressService.get(payload.Namespace);
-        const formValues = {
-          OriginalIngresses: originalIngresses,
-          PublishedPorts: KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(application.ServiceType, application.PublishedPorts),
-        };
-        const ingresses = KubernetesIngressConverter.applicationFormValuesToDeleteIngresses(formValues, application);
-
-        await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
-      }
     }
     if (!_.isEmpty(application.AutoScaler)) {
       await this.KubernetesHorizontalPodAutoScalerService.delete(application.AutoScaler);
