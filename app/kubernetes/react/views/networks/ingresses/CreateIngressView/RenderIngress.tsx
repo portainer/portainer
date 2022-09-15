@@ -108,7 +108,7 @@ export function RenderIngress({
           <div className="form-horizontal">
             <div className="form-group">
               <label
-                className="control-label text-muted col-sm-3 col-lg-2"
+                className="control-label text-muted col-sm-3 col-lg-2 required"
                 htmlFor="namespace"
               >
                 Namespace
@@ -135,7 +135,7 @@ export function RenderIngress({
             <div className="form-horizontal">
               <div className="form-group">
                 <label
-                  className="control-label text-muted col-sm-3 col-lg-2"
+                  className="control-label text-muted col-sm-3 col-lg-2 required"
                   htmlFor="ingress_name"
                 >
                   Ingress name
@@ -166,7 +166,7 @@ export function RenderIngress({
 
               <div className="form-group" key={rule.IngressClassName}>
                 <label
-                  className="control-label text-muted col-sm-3 col-lg-2"
+                  className="control-label text-muted col-sm-3 col-lg-2 required"
                   htmlFor="ingress_class"
                 >
                   Ingress class
@@ -295,7 +295,9 @@ export function RenderIngress({
                   <div className="row">
                     <div className="form-group !pl-0 col-sm-6 col-lg-4 !pr-2">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon">Hostname</span>
+                        <span className="input-group-addon required">
+                          Hostname
+                        </span>
                         <input
                           name={`ingress_host_${hostIndex}`}
                           type="text"
@@ -367,7 +369,9 @@ export function RenderIngress({
                   >
                     <div className="form-group !pl-0 col-sm-3 col-xl-2 !m-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon">Service</span>
+                        <span className="input-group-addon required">
+                          Service
+                        </span>
                         <Select
                           key={serviceOptions.toString() + path.ServiceName}
                           name={`ingress_service_${hostIndex}_${pathIndex}`}
@@ -400,7 +404,7 @@ export function RenderIngress({
                       {servicePorts && (
                         <>
                           <div className="input-group input-group-sm">
-                            <span className="input-group-addon">
+                            <span className="input-group-addon required">
                               Service port
                             </span>
                             <Select
@@ -445,7 +449,9 @@ export function RenderIngress({
 
                     <div className="form-group !pl-0 col-sm-3 col-xl-2 !m-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon">Path type</span>
+                        <span className="input-group-addon required">
+                          Path type
+                        </span>
                         <Select
                           key={servicePorts.toString() + path.PathType}
                           name={`ingress_pathType_${hostIndex}_${pathIndex}`}
@@ -483,7 +489,7 @@ export function RenderIngress({
 
                     <div className="form-group !pl-0 col-sm-3 col-xl-3 !m-0">
                       <div className="input-group input-group-sm">
-                        <span className="input-group-addon">Path</span>
+                        <span className="input-group-addon required">Path</span>
                         <input
                           className="form-control"
                           name={`ingress_route_${hostIndex}-${pathIndex}`}

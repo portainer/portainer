@@ -30,7 +30,7 @@ export function Annotations({
         <div className="row" key={i}>
           <div className="form-group !pl-0 col-sm-4 !m-0">
             <div className="input-group input-group-sm">
-              <span className="input-group-addon">Key</span>
+              <span className="input-group-addon required">Key</span>
               <input
                 name={`annotation_key_${i}`}
                 type="text"
@@ -50,7 +50,7 @@ export function Annotations({
           </div>
           <div className="form-group !pl-0 col-sm-4 !m-0">
             <div className="input-group input-group-sm">
-              <span className="input-group-addon">Value</span>
+              <span className="input-group-addon required">Value</span>
               <input
                 name={`annotation_value_${i}`}
                 type="text"

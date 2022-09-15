@@ -299,7 +299,7 @@ export function CreateIngressView() {
     rule.Hosts?.forEach((host, hi) => {
       if (!host.NoHost) {
         if (!host.Host) {
-          errors[`hosts[${hi}].host`] = 'Host cannot be empty';
+          errors[`hosts[${hi}].host`] = 'Host is required';
         } else if (duplicatedHosts.includes(host.Host)) {
           errors[`hosts[${hi}].host`] = 'Host cannot be duplicated';
         }
