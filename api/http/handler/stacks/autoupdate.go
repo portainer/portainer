@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"net/http"
 	"time"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -16,7 +15,7 @@ import (
 func startAutoupdate(stackID portainer.StackID, interval string, scheduler *scheduler.Scheduler, stackDeployer stacks.StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) (jobID string, e *httperror.HandlerError) {
 	d, err := time.ParseDuration(interval)
 	if err != nil {
-		return "", &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Unable to parse stack's auto update interval", Err: err}
+		return "", httperror.BadRequest("Unable to parse stack's auto update interval", err)
 	}
 
 	jobID = scheduler.StartJobEvery(d, func() error {

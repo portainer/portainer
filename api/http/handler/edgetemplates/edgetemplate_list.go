@@ -29,7 +29,7 @@ type templateFileFormat struct {
 func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
 	url := portainer.DefaultTemplatesURL
@@ -40,14 +40,14 @@ func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request)
 	var templateData []byte
 	templateData, err = client.Get(url, 10)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve external templates", err}
+		return httperror.InternalServerError("Unable to retrieve external templates", err)
 	}
 
 	var templateFile templateFileFormat
 
 	err = json.Unmarshal(templateData, &templateFile)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse template file", err}
+		return httperror.InternalServerError("Unable to parse template file", err)
 	}
 
 	filteredTemplates := make([]portainer.Template, 0)

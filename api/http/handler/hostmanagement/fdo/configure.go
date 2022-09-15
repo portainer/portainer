@@ -65,7 +65,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: request.RetrieveRouteVariableValue()")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: guid not found", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: guid not found", err)
 	}
 
 	var payload deviceConfigurePayload
@@ -74,28 +74,28 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		log.Error().Err(err).Msg("invalid request payload")
 
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	profile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(payload.ProfileID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a FDO Profile with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a FDO Profile with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a FDO Profile with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a FDO Profile with the specified identifier inside the database", err)
 	}
 
 	fileContent, err := handler.FileService.GetFileContent(profile.FilePath, "")
 	if err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: GetFileContent")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: GetFileContent", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: GetFileContent", err)
 	}
 
 	fdoClient, err := handler.newFDOClient()
 	if err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: newFDOClient()")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: newFDOClient()", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: newFDOClient()", err)
 	}
 
 	// enable fdo_sys
@@ -108,7 +108,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}, []byte("")); err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw()")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: PutDeviceSVIRaw()", err)
 	}
 
 	if err = fdoClient.PutDeviceSVIRaw(url.Values{
@@ -120,7 +120,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}, []byte(payload.EdgeID)); err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw(edgeid)")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(edgeid)", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: PutDeviceSVIRaw(edgeid)", err)
 	}
 
 	// write down the edgekey
@@ -133,7 +133,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}, []byte(payload.EdgeKey)); err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw(edgekey)")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(edgekey)", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: PutDeviceSVIRaw(edgekey)", err)
 	}
 
 	// write down the device name
@@ -146,7 +146,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}, []byte(payload.Name)); err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw(name)")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw(name)", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: PutDeviceSVIRaw(name)", err)
 	}
 
 	// write down the device GUID - used as the EDGE_DEVICE_GUID too
@@ -159,7 +159,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}, []byte(guid)); err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw()")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: PutDeviceSVIRaw()", err)
 	}
 
 	if err = fdoClient.PutDeviceSVIRaw(url.Values{
@@ -171,14 +171,14 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}, fileContent); err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw()")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: PutDeviceSVIRaw()", err)
 	}
 
 	b, err := cbor.Marshal([]string{"/bin/sh", deploymentScriptName})
 	if err != nil {
 		log.Error().Err(err).Msg("failed to marshal string to CBOR")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw() failed to encode", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: PutDeviceSVIRaw() failed to encode", err)
 	}
 
 	cborBytes := strings.ToUpper(hex.EncodeToString(b))
@@ -193,7 +193,7 @@ func (handler *Handler) fdoConfigureDevice(w http.ResponseWriter, r *http.Reques
 	}, []byte("")); err != nil {
 		log.Error().Err(err).Msg("fdoConfigureDevice: PutDeviceSVIRaw()")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoConfigureDevice: PutDeviceSVIRaw()", Err: err}
+		return httperror.InternalServerError("fdoConfigureDevice: PutDeviceSVIRaw()", err)
 	}
 
 	return response.Empty(w)

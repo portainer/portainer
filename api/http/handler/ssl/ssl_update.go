@@ -42,20 +42,20 @@ func (handler *Handler) sslUpdate(w http.ResponseWriter, r *http.Request) *httpe
 	var payload sslUpdatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	if payload.Cert != nil {
 		err = handler.SSLService.SetCertificates([]byte(*payload.Cert), []byte(*payload.Key))
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Failed to save certificate", err}
+			return httperror.InternalServerError("Failed to save certificate", err)
 		}
 	}
 
 	if payload.HTTPEnabled != nil {
 		err = handler.SSLService.SetHTTPEnabled(*payload.HTTPEnabled)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Failed to force https", err}
+			return httperror.InternalServerError("Failed to force https", err)
 		}
 	}
 

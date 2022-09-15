@@ -46,7 +46,7 @@
           ng-change="$ctrl.onChangeKey(entry)"
         />
         <div
-          class="small text-muted"
+          class="small text-warning"
           style="margin-top: 5px"
           ng-show="
             kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid ||
@@ -85,7 +85,7 @@
           ng-trim="false"
           required
         ></textarea>
-        <div class="small text-muted" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
+        <div class="small text-warning" style="margin-top: 5px" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
           <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$error">
             <p ng-message="required" class="vertical-center"
               ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This field is required.</p

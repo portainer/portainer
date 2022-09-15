@@ -45,29 +45,29 @@ func (payload *createProfileFromFileContentPayload) Validate(r *http.Request) er
 func (handler *Handler) createProfile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
+		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
 	switch method {
 	case "editor":
 		return handler.createFDOProfileFromFileContent(w, r)
 	}
-	return &httperror.HandlerError{http.StatusBadRequest, "Invalid method. Value must be one of: editor", errors.New("invalid method")}
+	return httperror.BadRequest("Invalid method. Value must be one of: editor", errors.New("invalid method"))
 }
 
 func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload createProfileFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	isUnique, err := handler.checkUniqueProfileName(payload.Name, -1)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+		return httperror.InternalServerError(err.Error(), err)
 	}
 	if !isUnique {
-		return &httperror.HandlerError{http.StatusConflict, fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), errors.New("a profile already exists with this name")}
+		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A profile with the name '%s' already exists", payload.Name), Err: errors.New("a profile already exists with this name")}
 	}
 
 	profileID := handler.DataStore.FDOProfile().GetNextIdentifier()
@@ -78,14 +78,14 @@ func (handler *Handler) createFDOProfileFromFileContent(w http.ResponseWriter, r
 
 	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(profile.ID)), []byte(payload.ProfileFileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist profile file on disk", err}
+		return httperror.InternalServerError("Unable to persist profile file on disk", err)
 	}
 	profile.FilePath = filePath
 	profile.DateCreated = time.Now().Unix()
 
 	err = handler.DataStore.FDOProfile().Create(profile)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the profile inside the database", err}
+		return httperror.InternalServerError("Unable to persist the profile inside the database", err)
 	}
 
 	return response.JSON(w, profile)

@@ -25,12 +25,12 @@ import (
 func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	users, err := handler.DataStore.User().Users()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
+		return httperror.InternalServerError("Unable to retrieve users from the database", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	filteredUsers := security.FilterUsers(users, securityContext)

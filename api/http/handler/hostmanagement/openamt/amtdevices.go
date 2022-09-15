@@ -29,14 +29,14 @@ import (
 func (handler *Handler) openAMTDevices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
+		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
+		return httperror.NotFound("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
+		return httperror.InternalServerError("Unable to find an endpoint with the specified identifier inside the database", err)
 	}
 
 	if endpoint.AMTDeviceGUID == "" {
@@ -45,12 +45,12 @@ func (handler *Handler) openAMTDevices(w http.ResponseWriter, r *http.Request) *
 
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
 	device, err := handler.OpenAMTService.DeviceInformation(settings.OpenAMTConfiguration, endpoint.AMTDeviceGUID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve device information", err}
+		return httperror.InternalServerError("Unable to retrieve device information", err)
 	}
 
 	devices := []portainer.OpenAMTDeviceInformation{
@@ -89,7 +89,7 @@ func (payload *deviceActionPayload) Validate(r *http.Request) error {
 func (handler *Handler) deviceAction(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	deviceID, err := request.RetrieveRouteVariableValue(r, "deviceId")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid device identifier route variable", err}
+		return httperror.BadRequest("Invalid device identifier route variable", err)
 	}
 
 	var payload deviceActionPayload
@@ -97,19 +97,19 @@ func (handler *Handler) deviceAction(w http.ResponseWriter, r *http.Request) *ht
 	if err != nil {
 		log.Error().Err(err).Msg("invalid request payload")
 
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
 	err = handler.OpenAMTService.ExecuteDeviceAction(settings.OpenAMTConfiguration, deviceID, payload.Action)
 	if err != nil {
 		log.Error().Err(err).Msg("error executing device action")
 
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error executing device action", Err: err}
+		return httperror.BadRequest("Error executing device action", err)
 	}
 
 	return response.Empty(w)
@@ -149,7 +149,7 @@ type AuthorizationResponse struct {
 func (handler *Handler) deviceFeatures(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	deviceID, err := request.RetrieveRouteVariableValue(r, "deviceId")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid device identifier route variable", err}
+		return httperror.BadRequest("Invalid device identifier route variable", err)
 	}
 
 	var payload deviceFeaturesPayload
@@ -157,24 +157,24 @@ func (handler *Handler) deviceFeatures(w http.ResponseWriter, r *http.Request) *
 	if err != nil {
 		log.Error().Err(err).Msg("invalid request payload")
 
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
 	_, err = handler.OpenAMTService.DeviceInformation(settings.OpenAMTConfiguration, deviceID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve device information", err}
+		return httperror.InternalServerError("Unable to retrieve device information", err)
 	}
 
 	token, err := handler.OpenAMTService.EnableDeviceFeatures(settings.OpenAMTConfiguration, deviceID, payload.Features)
 	if err != nil {
 		log.Error().Err(err).Msg("error executing device action")
 
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error executing device action", Err: err}
+		return httperror.BadRequest("Error executing device action", err)
 	}
 
 	authorizationResponse := AuthorizationResponse{

@@ -59,7 +59,9 @@
           <tbody>
             <tr ng-if="!$ctrl.isRoot">
               <td colspan="4">
-                <a ng-click="$ctrl.goToParent()"><pr-icon icon="'corner-left-up'" feather="true"></pr-icon>Go to parent</a>
+                <button type="button" class="btn btn-link hover:no-underline !ml-0 p-0" ng-click="$ctrl.goToParent()"
+                  ><pr-icon icon="'corner-left-up'" feather="true"></pr-icon>Go to parent</button
+                >
               </td>
             </tr>
             <tr ng-repeat="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder))">
@@ -76,7 +78,9 @@
                   <a class="interactive" ng-click="$ctrl.rename({name: item.Name, newName: item.newName}); item.edit = false;"><pr-icon icon="'check'" feather="true"></pr-icon></a>
                 </span>
                 <span ng-if="!item.edit && item.Dir">
-                  <a ng-click="$ctrl.browse({name: item.Name})" class="vertical-center"><pr-icon icon="'folder'" feather="true"></pr-icon>{{ item.Name }}</a>
+                  <button type="button" class="btn btn-link hover:no-underline !ml-0 p-0" ng-click="$ctrl.browse({name: item.Name})" class="vertical-center"
+                    ><pr-icon icon="'folder'" feather="true"></pr-icon>{{ item.Name }}</button
+                  >
                 </span>
                 <span ng-if="!item.edit && !item.Dir" class="vertical-center"><pr-icon icon="'file'" feather="true"></pr-icon>{{ item.Name }}</span>
               </td>

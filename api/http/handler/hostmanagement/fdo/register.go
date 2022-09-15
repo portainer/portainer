@@ -32,21 +32,21 @@ func (handler *Handler) fdoRegisterDevice(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		log.Info().Str("filename", filename).Err(err).Msg("fdoRegisterDevice: readVoucher()")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: read Voucher()", Err: err}
+		return httperror.InternalServerError("fdoRegisterDevice: read Voucher()", err)
 	}
 
 	fdoClient, err := handler.newFDOClient()
 	if err != nil {
 		log.Info().Err(err).Msg("fdoRegisterDevice: newFDOClient()")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: newFDOClient()", Err: err}
+		return httperror.InternalServerError("fdoRegisterDevice: newFDOClient()", err)
 	}
 
 	guid, err := fdoClient.PostVoucher(ov)
 	if err != nil {
 		log.Info().Err(err).Msg("fdoRegisterDevice: PostVoucher()")
 
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: PostVoucher()", Err: err}
+		return httperror.InternalServerError("fdoRegisterDevice: PostVoucher()", err)
 	}
 
 	return response.JSON(w, registerDeviceResponse{guid})

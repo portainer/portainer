@@ -58,7 +58,7 @@ func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httper
 
 	releases, err := handler.helmPackageManager.List(listOpts)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Helm returned an error", err}
+		return httperror.InternalServerError("Helm returned an error", err)
 	}
 
 	return response.JSON(w, releases)

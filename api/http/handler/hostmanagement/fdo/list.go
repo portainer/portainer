@@ -25,14 +25,16 @@ func (handler *Handler) fdoListAll(w http.ResponseWriter, r *http.Request) *http
 	fdoClient, err := handler.newFDOClient()
 	if err != nil {
 		log.Error().Err(err).Msg("fdoListAll: newFDOClient()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoRegisterDevice: newFDOClient()", Err: err}
+
+		return httperror.InternalServerError("fdoRegisterDevice: newFDOClient()", err)
 	}
 
 	// Get all vouchers
 	guids, err := fdoClient.GetVouchers()
 	if err != nil {
 		log.Error().Err(err).Msg("fdoListAll: GetVouchers()")
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "fdoListAll: GetVouchers()", Err: err}
+
+		return httperror.InternalServerError("fdoListAll: GetVouchers()", err)
 	}
 
 	return response.JSON(w, guids)

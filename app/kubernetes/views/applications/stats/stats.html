@@ -28,7 +28,7 @@
 
 <div ng-if="ctrl.state.viewReady">
   <information-panel ng-if="!ctrl.state.getMetrics" title-text="Unable to retrieve container metrics">
-    <span class="small text-muted vertical-center">
+    <span class="small text-warning vertical-center">
       <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
       Portainer was unable to retrieve any metrics associated to that container. Please contact your administrator to ensure that the Kubernetes metrics feature is properly
       configured.
@@ -47,7 +47,7 @@
           <form class="form-horizontal">
             <div class="form-group">
               <div class="col-sm-12">
-                <span class="small text-muted">
+                <span class="small text-warning">
                   This view displays real-time statistics about the container <b>{{ ctrl.state.transition.containerName | trimcontainername }}</b
                   >.
                 </span>

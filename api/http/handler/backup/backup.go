@@ -39,12 +39,12 @@ func (h *Handler) backup(w http.ResponseWriter, r *http.Request) *httperror.Hand
 	var payload backupPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	archivePath, err := operations.CreateBackupArchive(payload.Password, h.gate, h.dataStore, h.filestorePath)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to create backup", Err: err}
+		return httperror.InternalServerError("Failed to create backup", err)
 	}
 	defer os.RemoveAll(filepath.Dir(archivePath))
 

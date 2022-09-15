@@ -27,21 +27,21 @@ import (
 func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid tag identifier route variable", err}
+		return httperror.BadRequest("Invalid tag identifier route variable", err)
 	}
 	tagID := portainer.TagID(id)
 
 	tag, err := handler.DataStore.Tag().Tag(tagID)
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a tag with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a tag with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a tag with the specified identifier inside the database", err)
 	}
 
 	for endpointID := range tag.Endpoints {
 		endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment from the database", err}
+			return httperror.InternalServerError("Unable to retrieve environment from the database", err)
 		}
 
 		tagIdx := findTagIndex(endpoint.TagIDs, tagID)
@@ -49,7 +49,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 			endpoint.TagIDs = removeElement(endpoint.TagIDs, tagIdx)
 			err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update environment", err}
+				return httperror.InternalServerError("Unable to update environment", err)
 			}
 		}
 	}
@@ -57,7 +57,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	for endpointGroupID := range tag.EndpointGroups {
 		endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpointGroupID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment group from the database", err}
+			return httperror.InternalServerError("Unable to retrieve environment group from the database", err)
 		}
 
 		tagIdx := findTagIndex(endpointGroup.TagIDs, tagID)
@@ -65,31 +65,31 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 			endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagIdx)
 			err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update environment group", err}
+				return httperror.InternalServerError("Unable to update environment group", err)
 			}
 		}
 	}
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
+		return httperror.InternalServerError("Unable to retrieve environments from the database", err)
 	}
 
 	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+		return httperror.InternalServerError("Unable to retrieve edge groups from the database", err)
 	}
 
 	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
+		return httperror.InternalServerError("Unable to retrieve edge stacks from the database", err)
 	}
 
 	for _, endpoint := range endpoints {
 		if (tag.Endpoints[endpoint.ID] || tag.EndpointGroups[endpoint.GroupID]) && (endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment) {
 			err = handler.updateEndpointRelations(endpoint, edgeGroups, edgeStacks)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update environment relations in the database", err}
+				return httperror.InternalServerError("Unable to update environment relations in the database", err)
 			}
 		}
 	}
@@ -101,14 +101,14 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 			edgeGroup.TagIDs = removeElement(edgeGroup.TagIDs, tagIdx)
 			err = handler.DataStore.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update environment group", err}
+				return httperror.InternalServerError("Unable to update environment group", err)
 			}
 		}
 	}
 
 	err = handler.DataStore.Tag().DeleteTag(tagID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the tag from the database", err}
+		return httperror.InternalServerError("Unable to remove the tag from the database", err)
 	}
 
 	return response.Empty(w)
