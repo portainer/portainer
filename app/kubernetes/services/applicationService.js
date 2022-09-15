@@ -2,12 +2,7 @@ import _ from 'lodash-es';
 import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
-import {
-  KubernetesApplication,
-  KubernetesApplicationDeploymentTypes,
-  KubernetesApplicationPublishingTypes,
-  KubernetesApplicationTypes,
-} from 'Kubernetes/models/application/models';
+import { KubernetesApplication, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesApplicationRollbackHelper from 'Kubernetes/helpers/application/rollback';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
@@ -79,12 +74,6 @@ class KubernetesApplicationService {
     return apiService;
   }
 
-  _generateIngressPatchPromises(oldIngresses, newIngresses) {
-    return _.map(newIngresses, (newIng) => {
-      const oldIng = _.find(oldIngresses, { Name: newIng.Name });
-      return this.KubernetesIngressService.patch(oldIng, newIng);
-    });
-  }
   /* #endregion */
 
   /* #region  GET */
@@ -221,26 +210,12 @@ class KubernetesApplicationService {
    */
   async createAsync(formValues) {
     // formValues -> Application
-    let [app, headlessService, services, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
+    let [app, headlessService, services, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
 
     if (services) {
       services.forEach(async (service) => {
         await this.KubernetesServiceService.create(service);
       });
-
-      //Generate all ingresses from current form by passing services object
-      const ingresses = KubernetesIngressConverter.generateNewIngresses(formValues.OriginalIngresses, services);
-      if (ingresses) {
-        //Update original ingress with current ingress
-        await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
-      }
-    }
-
-    if (service) {
-      if (formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
-        const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(formValues, service.Name);
-        await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
-      }
     }
 
     const apiService = this._getApplicationApiService(app);
