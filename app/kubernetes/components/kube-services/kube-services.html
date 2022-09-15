@@ -16,17 +16,19 @@
         ng-options="item.typeValue as item.typeName for item in $ctrl.state.serviceType"
         data-cy="k8sAppCreate-publishingModeDropdown"
       ></select>
-      <button
-        title="Different service types expose the deployment in alternate ways.
-      - ClusterIP exposes it within the cluster (for internal access only).
-      - NodePort exposes it (on a high port) across all nodes.
-      - LoadBalancer exposes it via an external load balancer."
-        type="button"
-        class="btn btn-md btn-default vertical-center !ml-0"
-        ng-click="$ctrl.addEntry( $ctrl.state.selected )"
-        data-cy="k8sAppCreate-createServiceButton"
-      >
-        <pr-icon icon="'plus'" size="'sm'" feather="true"></pr-icon> Create service
+      <button type="button" class="btn btn-md btn-default vertical-center !ml-0" ng-click="$ctrl.addEntry( $ctrl.state.selected )" data-cy="k8sAppCreate-createServiceButton">
+        <span
+          class="interactive vertical-center"
+          tooltip-append-to-body="true"
+          tooltip-placement="top"
+          tooltip-class="portainer-tooltip"
+          uib-tooltip="Different service types expose the deployment in alternate ways.
+          ClusterIP exposes it within the cluster (for internal access only).
+          NodePort exposes it (on a high port) across all nodes.
+          LoadBalancer exposes it via an external load balancer."
+        >
+          <pr-icon icon="'plus'" size="'sm'" feather="true"></pr-icon> Create service
+        </span>
       </button>
     </div>
   </div>
