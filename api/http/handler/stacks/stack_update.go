@@ -22,6 +22,8 @@ type updateComposeStackPayload struct {
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx"`
 	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
+	// Force a pulling to current image with the original tag though the image is already the latest
+	PullImage bool `example:"false"`
 }
 
 func (payload *updateComposeStackPayload) Validate(r *http.Request) error {
@@ -38,6 +40,8 @@ type updateSwarmStackPayload struct {
 	Env []portainer.Pair
 	// Prune services that are no longer referenced (only available for Swarm stacks)
 	Prune bool `example:"true"`
+	// Force a pulling to current image with the original tag though the image is already the latest
+	PullImage bool `example:"false"`
 }
 
 func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
@@ -194,7 +198,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist updated Compose file on disk", Err: err}
 	}
 
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
+	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint, payload.PullImage)
 	if configErr != nil {
 		return configErr
 	}
@@ -231,7 +235,7 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist updated Compose file on disk", Err: err}
 	}
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, payload.Prune)
+	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, payload.Prune, payload.PullImage)
 	if configErr != nil {
 		return configErr
 	}

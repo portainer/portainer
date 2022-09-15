@@ -89,7 +89,7 @@ func (manager *SwarmStackManager) Logout(endpoint *portainer.Endpoint) error {
 }
 
 // Deploy executes the docker stack deploy command.
-func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
+func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, pullImage bool, endpoint *portainer.Endpoint) error {
 	filePaths := stackutils.GetStackFilePaths(stack)
 	command, args, err := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
 	if err != nil {
@@ -100,6 +100,9 @@ func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, end
 		args = append(args, "stack", "deploy", "--prune", "--with-registry-auth")
 	} else {
 		args = append(args, "stack", "deploy", "--with-registry-auth")
+	}
+	if !pullImage {
+		args = append(args, "--resolve-image=never")
 	}
 
 	args = configureFilePaths(args, filePaths)
