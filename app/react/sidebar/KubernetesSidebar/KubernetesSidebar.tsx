@@ -72,7 +72,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
 
       <SidebarItem
         to="kubernetes.ingresses"
-        params={{ id: environmentId }}
+        params={{ endpointId: environmentId }}
         label="Ingresses"
         data-cy="k8sSidebar-ingresses"
         icon={Route}
@@ -106,7 +106,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         >
           <SidebarItem
             to="kubernetes.cluster.setup"
-            params={{ id: environmentId }}
+            params={{ endpointId: environmentId }}
             label="Setup"
             data-cy="k8sSidebar-setup"
           />
@@ -119,7 +119,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         >
           <SidebarItem
             to="kubernetes.cluster.securityConstraint"
-            params={{ id: environmentId }}
+            params={{ endpointId: environmentId }}
             label="Security constraints"
             data-cy="k8sSidebar-securityConstraints"
           />
