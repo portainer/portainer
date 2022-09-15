@@ -14,8 +14,10 @@
     ></environment-variables-simple-mode>
 
     <div ng-if="$ctrl.mode == 'advanced'" class="environment-variables-panel--advanced">
-      <div class="col-sm-12">
-        <a class="small interactive" ng-click="$ctrl.switchEnvMode()"> <pr-icon icon="'list'" feather="true"></pr-icon> Simple mode </a>
+      <div class="col-sm-12 text-clickable">
+        <button type="button" class="btn btn-link btn-sm hover:no-underline !ml-0 p-0 vertical-center" ng-click="$ctrl.switchEnvMode()">
+          <pr-icon icon="'list'" feather="true"></pr-icon> Simple mode
+        </button>
       </div>
       <div class="col-sm-12 small text-muted">
         <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
