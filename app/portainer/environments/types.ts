@@ -57,8 +57,24 @@ export interface KubernetesSnapshot {
   NodeCount: number;
 }
 
+export type IngressClass = {
+  Name: string;
+  Type: string;
+};
+
+export interface KubernetesConfiguration {
+  UseLoadBalancer?: boolean;
+  UseServerMetrics?: boolean;
+  EnableResourceOverCommit?: boolean;
+  ResourceOverCommitPercentage?: number;
+  RestrictDefaultNamespace?: boolean;
+  IngressClasses: IngressClass[];
+  IngressAvailabilityPerNamespace: boolean;
+}
+
 export interface KubernetesSettings {
   Snapshots?: KubernetesSnapshot[] | null;
+  Configuration: KubernetesConfiguration;
 }
 
 export type EnvironmentEdge = {

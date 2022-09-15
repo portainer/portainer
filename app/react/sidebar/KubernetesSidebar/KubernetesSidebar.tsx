@@ -3,6 +3,7 @@ import { Box, Edit, Layers, Lock, Server } from 'react-feather';
 import { EnvironmentId } from '@/portainer/environments/types';
 import { Authorized } from '@/portainer/hooks/useUser';
 import Helm from '@/assets/ico/vendor/helm.svg?c';
+import Route from '@/assets/ico/route.svg?c';
 
 import { DashboardLink } from '../items/DashboardLink';
 import { SidebarItem } from '../SidebarItem';
@@ -67,6 +68,14 @@ export function KubernetesSidebar({ environmentId }: Props) {
         icon={Box}
         label="Applications"
         data-cy="k8sSidebar-applications"
+      />
+
+      <SidebarItem
+        to="kubernetes.ingresses"
+        params={{ id: environmentId }}
+        label="Ingresses"
+        data-cy="k8sSidebar-ingresses"
+        icon={Route}
       />
 
       <SidebarItem

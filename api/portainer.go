@@ -7,6 +7,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/volume"
+	"github.com/portainer/portainer/api/database/models"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	v1 "k8s.io/api/core/v1"
 )
@@ -510,6 +511,11 @@ type (
 	// JobType represents a job type
 	JobType int
 
+	K8sNamespaceInfo struct {
+		IsSystem  bool `json:"IsSystem"`
+		IsDefault bool `json:"IsDefault"`
+	}
+
 	K8sNodeLimits struct {
 		CPU    int64 `json:"CPU"`
 		Memory int64 `json:"Memory"`
@@ -539,11 +545,13 @@ type (
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes environment(endpoint)
 	KubernetesConfiguration struct {
-		UseLoadBalancer          bool                           `json:"UseLoadBalancer"`
-		UseServerMetrics         bool                           `json:"UseServerMetrics"`
-		StorageClasses           []KubernetesStorageClassConfig `json:"StorageClasses"`
-		IngressClasses           []KubernetesIngressClassConfig `json:"IngressClasses"`
-		RestrictDefaultNamespace bool                           `json:"RestrictDefaultNamespace"`
+		UseLoadBalancer              bool                           `json:"UseLoadBalancer"`
+		UseServerMetrics             bool                           `json:"UseServerMetrics"`
+		EnableResourceOverCommit     bool                           `json:"EnableResourceOverCommit"`
+		ResourceOverCommitPercentage int                            `json:"ResourceOverCommitPercentage"`
+		StorageClasses               []KubernetesStorageClassConfig `json:"StorageClasses"`
+		IngressClasses               []KubernetesIngressClassConfig `json:"IngressClasses"`
+		RestrictDefaultNamespace     bool                           `json:"RestrictDefaultNamespace"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
@@ -556,8 +564,10 @@ type (
 
 	// KubernetesIngressClassConfig represents a Kubernetes Ingress Class configuration
 	KubernetesIngressClassConfig struct {
-		Name string `json:"Name"`
-		Type string `json:"Type"`
+		Name              string   `json:"Name"`
+		Type              string   `json:"Type"`
+		Blocked           bool     `json:"Blocked"`
+		BlockedNamespaces []string `json:"BlockedNamespaces"`
 	}
 
 	// KubernetesShellPod represents a Kubectl Shell details to facilitate pod exec functionality
@@ -1328,6 +1338,22 @@ type (
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
+
+		CreateNamespace(info models.K8sNamespaceInfo) error
+		UpdateNamespace(info models.K8sNamespaceInfo) error
+		GetNamespaces() (map[string]K8sNamespaceInfo, error)
+		DeleteNamespace(namespace string) error
+		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
+		CreateIngress(namespace string, info models.K8sIngressInfo) error
+		UpdateIngress(namespace string, info models.K8sIngressInfo) error
+		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
+		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
+		CreateService(namespace string, service models.K8sServiceInfo) error
+		UpdateService(namespace string, service models.K8sServiceInfo) error
+		GetServices(namespace string) ([]models.K8sServiceInfo, error)
+		DeleteServices(reqs models.K8sServiceDeleteRequests) error
+		GetIngressControllers() models.K8sIngressControllers
+
 		HasStackName(namespace string, stackName string) (bool, error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
 		GetNodesLimits() (K8sNodesLimits, error)
