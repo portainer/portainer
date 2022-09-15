@@ -21,7 +21,7 @@ import {
 } from '../queries';
 
 import { Rule, Path, Host } from './types';
-import { RenderIngress } from './RenderIngress';
+import { IngressForm } from './IngressForm';
 import {
   prepareTLS,
   preparePaths,
@@ -219,7 +219,7 @@ export function CreateIngressView() {
       />
       <div className="row ingress-rules">
         <div className="col-sm-12">
-          <RenderIngress
+          <IngressForm
             environmentID={environmentId}
             isLoading={isLoading}
             isEdit={isEdit}

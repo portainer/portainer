@@ -65,9 +65,6 @@ export function useIngresses(
       'ingress',
     ],
     async () => {
-      if (!namespaces.length) {
-        return [];
-      }
       const ingresses: Ingress[] = [];
       for (let i = 0; i < namespaces.length; i += 1) {
         const ings = await getIngresses(environmentId, namespaces[i]);
@@ -78,6 +75,7 @@ export function useIngresses(
       return ingresses;
     },
     {
+      enabled: namespaces.length > 0,
       ...withError('Unable to get ingresses'),
     }
   );

@@ -67,7 +67,7 @@ interface Props {
   reloadTLSCerts: () => void;
 }
 
-export function RenderIngress({
+export function IngressForm({
   environmentID,
   rule,
   isLoading,
