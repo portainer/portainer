@@ -28,6 +28,7 @@ class StackRedeployGitFormController {
       RepositoryUsername: '',
       RepositoryPassword: '',
       Env: [],
+      PullImage: false,
       Option: {
         Prune: false,
       },
