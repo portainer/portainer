@@ -67,7 +67,9 @@ export function SingleSelect<TValue = string>({
   isClearable,
   bindToBody,
 }: SingleProps<TValue>) {
-  const selectedValue = _.first(findSelectedOptions<TValue>(options, value));
+  const selectedValue = value
+    ? _.first(findSelectedOptions<TValue>(options, value))
+    : null;
 
   return (
     <ReactSelect<Option<TValue>>
