@@ -297,10 +297,14 @@ export function CreateIngressView() {
     const duplicatedHosts: string[] = [];
     // Check if the paths are duplicates
     rule.Hosts?.forEach((host, hi) => {
-      if (duplicatedHosts.includes(host.Host)) {
-        errors[`hosts[${hi}].host`] = 'Host cannot be duplicated';
+      if (!host.NoHost) {
+        if (!host.Host) {
+          errors[`hosts[${hi}].host`] = 'Host cannot be empty';
+        } else if (duplicatedHosts.includes(host.Host)) {
+          errors[`hosts[${hi}].host`] = 'Host cannot be duplicated';
+        }
+        duplicatedHosts.push(host.Host);
       }
-      duplicatedHosts.push(host.Host);
 
       // Validate service
       host.Paths?.forEach((path, pi) => {
