@@ -25,6 +25,8 @@ type stackGitRedployPayload struct {
 	RepositoryPassword       string
 	Env                      []portainer.Pair
 	Prune                    bool
+	// Force a pulling to current image with the original tag though the image is already the latest
+	PullImage bool `example:"false"`
 }
 
 func (payload *stackGitRedployPayload) Validate(r *http.Request) error {
@@ -167,7 +169,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		}
 	}()
 
-	httpErr := handler.deployStack(r, stack, endpoint)
+	httpErr := handler.deployStack(r, stack, payload.PullImage, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}
@@ -199,14 +201,14 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 	return response.JSON(w, stack)
 }
 
-func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pullImage bool, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	switch stack.Type {
 	case portainer.DockerSwarmStack:
 		prune := false
 		if stack.Option != nil {
 			prune = stack.Option.Prune
 		}
-		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, prune)
+		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, prune, pullImage)
 		if httpErr != nil {
 			return httpErr
 		}
@@ -216,7 +218,7 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, end
 		}
 
 	case portainer.DockerComposeStack:
-		config, httpErr := handler.createComposeDeployConfig(r, stack, endpoint)
+		config, httpErr := handler.createComposeDeployConfig(r, stack, endpoint, pullImage)
 		if httpErr != nil {
 			return httpErr
 		}

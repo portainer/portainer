@@ -124,7 +124,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
+	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -275,7 +275,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 	stack.GitConfig.ConfigHash = commitID
 
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
+	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -386,7 +386,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
+	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -408,14 +408,15 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 }
 
 type composeStackDeploymentConfig struct {
-	stack      *portainer.Stack
-	endpoint   *portainer.Endpoint
-	registries []portainer.Registry
-	isAdmin    bool
-	user       *portainer.User
+	stack          *portainer.Stack
+	endpoint       *portainer.Endpoint
+	registries     []portainer.Registry
+	isAdmin        bool
+	user           *portainer.User
+	forcePullImage bool
 }
 
-func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
+func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, forcePullImage bool) (*composeStackDeploymentConfig, *httperror.HandlerError) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
@@ -433,11 +434,12 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
 	config := &composeStackDeploymentConfig{
-		stack:      stack,
-		endpoint:   endpoint,
-		registries: filteredRegistries,
-		isAdmin:    securityContext.IsAdmin,
-		user:       user,
+		stack:          stack,
+		endpoint:       endpoint,
+		registries:     filteredRegistries,
+		isAdmin:        securityContext.IsAdmin,
+		user:           user,
+		forcePullImage: forcePullImage,
 	}
 
 	return config, nil
@@ -477,5 +479,5 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig,
 		}
 	}
 
-	return handler.StackDeployer.DeployComposeStack(config.stack, config.endpoint, config.registries, forceCreate)
+	return handler.StackDeployer.DeployComposeStack(config.stack, config.endpoint, config.registries, config.forcePullImage, forceCreate)
 }

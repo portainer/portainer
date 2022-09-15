@@ -85,7 +85,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false, true)
 	if configErr != nil {
 		return configErr
 	}
@@ -226,7 +226,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 	}
 	stack.GitConfig.ConfigHash = commitID
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false, true)
 	if configErr != nil {
 		return configErr
 	}
@@ -332,7 +332,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false, true)
 	if configErr != nil {
 		return configErr
 	}
@@ -360,9 +360,10 @@ type swarmStackDeploymentConfig struct {
 	prune      bool
 	isAdmin    bool
 	user       *portainer.User
+	pullImage  bool
 }
 
-func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool) (*swarmStackDeploymentConfig, *httperror.HandlerError) {
+func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool, pullImage bool) (*swarmStackDeploymentConfig, *httperror.HandlerError) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
@@ -386,6 +387,7 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 		prune:      prune,
 		isAdmin:    securityContext.IsAdmin,
 		user:       user,
+		pullImage:  pullImage,
 	}
 
 	return config, nil
@@ -413,5 +415,5 @@ func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) err
 		}
 	}
 
-	return handler.StackDeployer.DeploySwarmStack(config.stack, config.endpoint, config.registries, config.prune)
+	return handler.StackDeployer.DeploySwarmStack(config.stack, config.endpoint, config.registries, config.prune, config.pullImage)
 }
