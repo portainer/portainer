@@ -4,6 +4,7 @@ import { useUser } from '@/portainer/hooks/useUser';
 import { Icon } from '@/react/components/Icon';
 import { TeamMembership, TeamRole } from '@/react/portainer/users/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
+import { EnvironmentId } from '@/portainer/environments/types';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { Button } from '@@/buttons';
@@ -18,6 +19,7 @@ interface Props {
   resourceControl?: ResourceControlViewModel;
   resourceType: ResourceControlType;
   resourceId: ResourceId;
+  environmentId: EnvironmentId;
   disableOwnershipChange?: boolean;
   onUpdateSuccess(): Promise<void>;
 }
@@ -27,6 +29,7 @@ export function AccessControlPanel({
   resourceType,
   disableOwnershipChange,
   resourceId,
+  environmentId,
   onUpdateSuccess,
 }: Props) {
   const [isEditMode, toggleEditMode] = useReducer((state) => !state, false);
@@ -69,6 +72,7 @@ export function AccessControlPanel({
               onCancelClick={() => toggleEditMode()}
               resourceId={resourceId}
               resourceType={resourceType}
+              environmentId={environmentId}
               onUpdateSuccess={handleUpdateSuccess}
             />
           )}

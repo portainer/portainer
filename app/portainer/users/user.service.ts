@@ -4,9 +4,14 @@ import { TeamMembership } from '@/react/portainer/users/teams/types';
 import { User, UserId } from './types';
 import { filterNonAdministratorUsers } from './user.helpers';
 
-export async function getUsers(includeAdministrators = false) {
+export async function getUsers(
+  includeAdministrators = false,
+  environmentId = 0
+) {
   try {
-    const { data } = await axios.get<User[]>(buildUrl());
+    const { data } = await axios.get<User[]>(buildUrl(), {
+      params: { environmentId },
+    });
 
     return includeAdministrators ? data : filterNonAdministratorUsers(data);
   } catch (e) {
