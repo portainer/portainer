@@ -203,7 +203,7 @@
                     <button
                       type="button"
                       class="btn btn-sm btn-primary"
-                      ng-disabled="state.actionInProgress || !stackUpdateForm.$valid || !stackFileContent || orphaned"
+                      ng-disabled="state.actionInProgress || state.yamlError || !stackUpdateForm.$valid || !stackFileContent || orphaned"
                       ng-click="deployStack()"
                       button-spinner="state.actionInProgress"
                     >

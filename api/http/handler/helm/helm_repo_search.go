@@ -28,12 +28,12 @@ import (
 func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	repo := r.URL.Query().Get("repo")
 	if repo == "" {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.New("missing `repo` query parameter")}
+		return httperror.BadRequest("Bad request", errors.New("missing `repo` query parameter"))
 	}
 
 	_, err := url.ParseRequestURI(repo)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.Wrap(err, fmt.Sprintf("provided URL %q is not valid", repo))}
+		return httperror.BadRequest("Bad request", errors.Wrap(err, fmt.Sprintf("provided URL %q is not valid", repo)))
 	}
 
 	searchOpts := options.SearchRepoOptions{
@@ -42,11 +42,7 @@ func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *
 
 	result, err := handler.helmPackageManager.SearchRepo(searchOpts)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Search failed",
-			Err:        err,
-		}
+		return httperror.InternalServerError("Search failed", err)
 	}
 
 	w.Header().Set("Content-Type", "text/plain")

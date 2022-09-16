@@ -23,7 +23,7 @@ import (
 func (handler *Handler) teamMembershipList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	memberships, err := handler.DataStore.TeamMembership().TeamMemberships()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve team memberships from the database", err}
+		return httperror.InternalServerError("Unable to retrieve team memberships from the database", err)
 	}
 
 	return response.JSON(w, memberships)

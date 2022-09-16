@@ -31,12 +31,12 @@ func (handler *Handler) webhookList(w http.ResponseWriter, r *http.Request) *htt
 	var filters webhookListOperationFilters
 	err := request.RetrieveJSONQueryParameter(r, "filters", &filters, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: filters", err}
+		return httperror.BadRequest("Invalid query parameter: filters", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
+		return httperror.InternalServerError("Unable to retrieve user info from request context", err)
 	}
 	if !securityContext.IsAdmin {
 		return response.JSON(w, []portainer.Webhook{})
@@ -45,7 +45,7 @@ func (handler *Handler) webhookList(w http.ResponseWriter, r *http.Request) *htt
 	webhooks, err := handler.DataStore.Webhook().Webhooks()
 	webhooks = filterWebhooks(webhooks, &filters)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhooks from the database", err}
+		return httperror.InternalServerError("Unable to retrieve webhooks from the database", err)
 	}
 
 	return response.JSON(w, webhooks)

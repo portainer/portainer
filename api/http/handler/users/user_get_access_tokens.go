@@ -30,29 +30,29 @@ import (
 func (handler *Handler) userGetAccessTokens(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid user identifier route variable", err}
+		return httperror.BadRequest("Invalid user identifier route variable", err)
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to get user access tokens", httperrors.ErrUnauthorized}
+		return httperror.Forbidden("Permission denied to get user access tokens", httperrors.ErrUnauthorized)
 	}
 
 	_, err = handler.DataStore.User().User(portainer.UserID(userID))
 	if err != nil {
 		if handler.DataStore.IsErrObjectNotFound(err) {
-			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
+			return httperror.NotFound("Unable to find a user with the specified identifier inside the database", err)
 		}
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a user with the specified identifier inside the database", err)
 	}
 
 	apiKeys, err := handler.apiKeyService.GetAPIKeys(portainer.UserID(userID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Internal Server Error", err}
+		return httperror.InternalServerError("Internal Server Error", err)
 	}
 
 	for idx := range apiKeys {

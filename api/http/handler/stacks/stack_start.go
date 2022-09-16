@@ -33,49 +33,49 @@ import (
 func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid stack identifier route variable", Err: err}
+		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find a stack with the specified identifier inside the database", Err: err}
+		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find a stack with the specified identifier inside the database", Err: err}
+		return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
 	}
 
 	if stack.Type == portainer.KubernetesStack {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Starting a kubernetes stack is not supported", Err: err}
+		return httperror.BadRequest("Starting a kubernetes stack is not supported", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
+		return httperror.NotFound("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
+		return httperror.InternalServerError("Unable to find an endpoint with the specified identifier inside the database", err)
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access endpoint", Err: err}
+		return httperror.Forbidden("Permission denied to access endpoint", err)
 	}
 
 	canManage, err := handler.userCanManageStacks(securityContext, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack deletion", Err: err}
+		return httperror.InternalServerError("Unable to verify user authorizations to validate stack deletion", err)
 	}
 	if !canManage {
 		errMsg := "Stack management is disabled for non-admin users"
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: errMsg, Err: errors.New(errMsg)}
+		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
 	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, stack.Name, stack.ID, stack.SwarmID != "")
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 	if !isUnique {
 		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", stack.Name)
@@ -84,19 +84,19 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 
 	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the stack", Err: err}
+		return httperror.InternalServerError("Unable to retrieve a resource control associated to the stack", err)
 	}
 
 	access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack access", Err: err}
+		return httperror.InternalServerError("Unable to verify user authorizations to validate stack access", err)
 	}
 	if !access {
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied to resource", Err: httperrors.ErrResourceAccessDenied}
+		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 	}
 
 	if stack.Status == portainer.StackStatusActive {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Stack is already active", Err: errors.New("Stack is already active")}
+		return httperror.BadRequest("Stack is already active", errors.New("Stack is already active"))
 	}
 
 	if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
@@ -112,13 +112,13 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 
 	err = handler.startStack(stack, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to start stack", Err: err}
+		return httperror.InternalServerError("Unable to start stack", err)
 	}
 
 	stack.Status = portainer.StackStatusActive
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to update stack status", Err: err}
+		return httperror.InternalServerError("Unable to update stack status", err)
 	}
 
 	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
@@ -134,7 +134,7 @@ func (handler *Handler) startStack(stack *portainer.Stack, endpoint *portainer.E
 	case portainer.DockerComposeStack:
 		return handler.ComposeStackManager.Up(context.TODO(), stack, endpoint, false)
 	case portainer.DockerSwarmStack:
-		return handler.SwarmStackManager.Deploy(stack, true, endpoint)
+		return handler.SwarmStackManager.Deploy(stack, true, true, endpoint)
 	}
 	return nil
 }

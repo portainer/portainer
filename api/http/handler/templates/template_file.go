@@ -40,12 +40,12 @@ func (payload *filePayload) Validate(r *http.Request) error {
 func (handler *Handler) ifRequestedTemplateExists(payload *filePayload) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
 	resp, err := http.Get(settings.TemplatesURL)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve templates via the network", err}
+		return httperror.InternalServerError("Unable to retrieve templates via the network", err)
 	}
 	defer resp.Body.Close()
 
@@ -54,7 +54,7 @@ func (handler *Handler) ifRequestedTemplateExists(payload *filePayload) *httperr
 	}
 	err = json.NewDecoder(resp.Body).Decode(&templates)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse template file", err}
+		return httperror.InternalServerError("Unable to parse template file", err)
 	}
 
 	for _, t := range templates.Templates {
@@ -62,7 +62,7 @@ func (handler *Handler) ifRequestedTemplateExists(payload *filePayload) *httperr
 			return nil
 		}
 	}
-	return &httperror.HandlerError{http.StatusInternalServerError, "Invalid template", errors.New("requested template does not exist")}
+	return httperror.InternalServerError("Invalid template", errors.New("requested template does not exist"))
 }
 
 // @id TemplateFile
@@ -83,7 +83,7 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 	var payload filePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	if err := handler.ifRequestedTemplateExists(&payload); err != nil {
@@ -92,19 +92,19 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 
 	projectPath, err := handler.FileService.GetTemporaryPath()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create temporary folder", err}
+		return httperror.InternalServerError("Unable to create temporary folder", err)
 	}
 
 	defer handler.cleanUp(projectPath)
 
 	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, "", "", "")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
+		return httperror.InternalServerError("Unable to clone git repository", err)
 	}
 
 	fileContent, err := handler.FileService.GetFileContent(projectPath, payload.ComposeFilePathInRepository)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Failed loading file content", err}
+		return httperror.InternalServerError("Failed loading file content", err)
 	}
 
 	return response.JSON(w, fileResponse{FileContent: string(fileContent)})

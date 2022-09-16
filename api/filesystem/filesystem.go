@@ -234,6 +234,58 @@ func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string
 	return service.wrapFileStore(stackStorePath), nil
 }
 
+// UpdateStoreStackFileFromBytes makes stack file backup and updates a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error) {
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	err := service.createBackupFileInStore(composeFilePath)
+	if err != nil {
+		return "", err
+	}
+
+	r := bytes.NewReader(data)
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return service.wrapFileStore(stackStorePath), nil
+}
+
+// RemoveStackFileBackup removes the stack file backup in the ComposeStorePath.
+func (service *Service) RemoveStackFileBackup(stackIdentifier, fileName string) error {
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+
+	return service.removeBackupFileInStore(composeFilePath)
+}
+
+// RollbackStackFile rollbacks the stack file backup in the ComposeStorePath.
+func (service *Service) RollbackStackFile(stackIdentifier, fileName string) error {
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
+	path := service.wrapFileStore(composeFilePath)
+	backupPath := fmt.Sprintf("%s.bak", path)
+
+	exists, err := service.FileExists(backupPath)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		// keep the updated/failed stack file
+		return nil
+	}
+
+	err = service.Copy(backupPath, path, true)
+	if err != nil {
+		return err
+	}
+
+	return os.Remove(backupPath)
+}
+
 // GetEdgeStackProjectPath returns the absolute path on the FS for a edge stack based
 // on its identifier.
 func (service *Service) GetEdgeStackProjectPath(edgeStackIdentifier string) string {
@@ -445,6 +497,31 @@ func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 
 	_, err = io.Copy(out, r)
 	return err
+}
+
+// createBackupFileInStore makes a copy in the file store.
+func (service *Service) createBackupFileInStore(filePath string) error {
+	path := service.wrapFileStore(filePath)
+	backupPath := fmt.Sprintf("%s.bak", path)
+
+	return service.Copy(path, backupPath, true)
+}
+
+// removeBackupFileInStore removes the copy in the file store.
+func (service *Service) removeBackupFileInStore(filePath string) error {
+	path := service.wrapFileStore(filePath)
+	backupPath := fmt.Sprintf("%s.bak", path)
+
+	exists, err := service.FileExists(backupPath)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return os.Remove(backupPath)
+	}
+
+	return nil
 }
 
 func (service *Service) createPEMFileInStore(content []byte, fileType, filePath string) error {

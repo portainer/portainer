@@ -29,24 +29,24 @@ import (
 func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
+		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
 	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.dataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
 	cli, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
+		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}
 
 	nodesLimits, err := cli.GetNodesLimits()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve nodes limits", err}
+		return httperror.InternalServerError("Unable to retrieve nodes limits", err)
 	}
 
 	return response.JSON(w, nodesLimits)

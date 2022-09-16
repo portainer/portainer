@@ -28,31 +28,31 @@ import (
 func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	user, err := handler.DataStore.User().User(securityContext.UserID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user from the database", err}
+		return httperror.InternalServerError("Unable to retrieve user from the database", err)
 	}
 
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment identifier route variable", Err: err}
+		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
 	isAdmin := securityContext.IsAdmin
 
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
+		return httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}
 
 	registries, handleError := handler.filterRegistriesByAccess(r, registries, endpoint, user, securityContext.UserMemberships)
@@ -79,16 +79,16 @@ func (handler *Handler) filterKubernetesEndpointRegistries(r *http.Request, regi
 	namespaceParam, _ := request.RetrieveQueryParameter(r, "namespace", true)
 	isAdmin, err := security.IsAdmin(r)
 	if err != nil {
-		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check user role", Err: err}
+		return nil, httperror.InternalServerError("Unable to check user role", err)
 	}
 
 	if namespaceParam != "" {
 		authorized, err := handler.isNamespaceAuthorized(endpoint, namespaceParam, user.ID, memberships, isAdmin)
 		if err != nil {
-			return nil, &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to check for namespace authorization", Err: err}
+			return nil, httperror.NotFound("Unable to check for namespace authorization", err)
 		}
 		if !authorized {
-			return nil, &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized to use namespace", Err: errors.New("user is not authorized to use namespace")}
+			return nil, httperror.Forbidden("User is not authorized to use namespace", errors.New("user is not authorized to use namespace"))
 		}
 
 		return filterRegistriesByNamespaces(registries, endpoint.ID, []string{namespaceParam}), nil
@@ -154,15 +154,15 @@ func registryAccessPoliciesContainsNamespace(registryAccess portainer.RegistryAc
 func (handler *Handler) filterKubernetesRegistriesByUserRole(r *http.Request, registries []portainer.Registry, endpoint *portainer.Endpoint, user *portainer.User) ([]portainer.Registry, *httperror.HandlerError) {
 	err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err == security.ErrAuthorizationRequired {
-		return nil, &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized", Err: errors.New("missing namespace query parameter")}
+		return nil, httperror.Forbidden("User is not authorized", errors.New("missing namespace query parameter"))
 	}
 	if err != nil {
-		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
+		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	userNamespaces, err := handler.userNamespaces(endpoint, user)
 	if err != nil {
-		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "unable to retrieve user namespaces", Err: err}
+		return nil, httperror.InternalServerError("unable to retrieve user namespaces", err)
 	}
 
 	return filterRegistriesByNamespaces(registries, endpoint.ID, userNamespaces), nil

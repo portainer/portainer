@@ -85,6 +85,27 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 	return errors.Wrap(err, "failed to remove a stack")
 }
 
+// Pull an image associated with a service defined in a docker-compose.yml or docker-stack.yml file,
+// but does not start containers based on those images.
+func (manager *ComposeStackManager) Pull(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	url, proxy, err := manager.fetchEndpointProxy(endpoint)
+	if err != nil {
+		return err
+	}
+	if proxy != nil {
+		defer proxy.Close()
+	}
+
+	envFile, err := createEnvFile(stack)
+	if err != nil {
+		return errors.Wrap(err, "failed to create env file")
+	}
+
+	filePaths := stackutils.GetStackFilePaths(stack)
+	err = manager.deployer.Pull(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFile)
+	return errors.Wrap(err, "failed to pull images of the stack")
+}
+
 // NormalizeStackName returns a new stack name with unsupported characters replaced
 func (manager *ComposeStackManager) NormalizeStackName(name string) string {
 	return stackNameNormalizeRegex.ReplaceAllString(strings.ToLower(name), "")

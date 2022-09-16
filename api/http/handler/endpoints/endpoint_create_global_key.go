@@ -30,7 +30,7 @@ func (handler *Handler) endpointCreateGlobalKey(w http.ResponseWriter, r *http.R
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the endpoints from the database", err}
+		return httperror.InternalServerError("Unable to retrieve the endpoints from the database", err)
 	}
 
 	for _, endpoint := range endpoints {
@@ -39,5 +39,5 @@ func (handler *Handler) endpointCreateGlobalKey(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint in the database", err}
+	return httperror.NotFound("Unable to find the endpoint in the database", err)
 }

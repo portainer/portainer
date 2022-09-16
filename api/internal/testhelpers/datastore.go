@@ -12,6 +12,7 @@ type testDatastore struct {
 	customTemplate          dataservices.CustomTemplateService
 	edgeGroup               dataservices.EdgeGroupService
 	edgeJob                 dataservices.EdgeJobService
+	edgeUpdateSchedule      dataservices.EdgeUpdateScheduleService
 	edgeStack               dataservices.EdgeStackService
 	endpoint                dataservices.EndpointService
 	endpointGroup           dataservices.EndpointGroupService
@@ -47,6 +48,9 @@ func (d *testDatastore) EdgeJob() dataservices.EdgeJobService               { re
 func (d *testDatastore) EdgeStack() dataservices.EdgeStackService           { return d.edgeStack }
 func (d *testDatastore) Endpoint() dataservices.EndpointService             { return d.endpoint }
 func (d *testDatastore) EndpointGroup() dataservices.EndpointGroupService   { return d.endpointGroup }
+func (d *testDatastore) EdgeUpdateSchedule() dataservices.EdgeUpdateScheduleService {
+	return d.edgeUpdateSchedule
+}
 func (d *testDatastore) FDOProfile() dataservices.FDOProfileService {
 	return d.fdoProfile
 }

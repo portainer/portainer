@@ -6,9 +6,9 @@
 }
 
 .parent a {
-  background-color: initial !important;
-  border: 1px solid transparent !important;
-  cursor: inherit !important;
+  background-color: initial;
+  border: 1px solid transparent;
+  cursor: inherit;
 }
 
 .parent {
@@ -22,11 +22,11 @@
 }
 
 .parent a {
-  color: var(--white-color) !important;
+  color: var(--white-color);
 }
 :global([theme='dark']) .parent a {
-  color: var(--black-color) !important;
+  color: var(--black-color);
 }
 :global([theme='highcontrast']) .parent a {
-  color: var(--black-color) !important;
+  color: var(--black-color);
 }

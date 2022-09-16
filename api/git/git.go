@@ -19,6 +19,10 @@ import (
 	"github.com/go-git/go-git/v5/storage/memory"
 )
 
+var (
+	ErrAuthenticationFailure = errors.New("Authentication failed, please ensure that the git credentials are correct.")
+)
+
 type fetchOptions struct {
 	repositoryUrl string
 	username      string
@@ -57,6 +61,9 @@ func (c gitClient) download(ctx context.Context, dst string, opt cloneOptions) e
 	_, err := git.PlainCloneContext(ctx, dst, false, &gitOptions)
 
 	if err != nil {
+		if err.Error() == "authentication required" {
+			return ErrAuthenticationFailure
+		}
 		return errors.Wrap(err, "failed to clone git repository")
 	}
 
@@ -79,6 +86,9 @@ func (c gitClient) latestCommitID(ctx context.Context, opt fetchOptions) (string
 
 	refs, err := remote.List(listOptions)
 	if err != nil {
+		if err.Error() == "authentication required" {
+			return "", ErrAuthenticationFailure
+		}
 		return "", errors.Wrap(err, "failed to list repository refs")
 	}
 

@@ -3,6 +3,7 @@ package stacks
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -55,7 +56,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		var payload kubernetesGitStackUpdatePayload
 
 		if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+			return httperror.BadRequest("Invalid request payload", err)
 		}
 
 		stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
@@ -72,7 +73,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 			}
 			_, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password)
 			if err != nil {
-				return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to fetch git repository", Err: err}
+				return httperror.InternalServerError("Unable to fetch git repository", err)
 			}
 		} else {
 			stack.GitConfig.Authentication = nil
@@ -93,19 +94,19 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Failed to retrieve user token data", Err: err}
+		return httperror.BadRequest("Failed to retrieve user token data", err)
 	}
 
 	tempFileDir, _ := ioutil.TempDir("", "kub_file_content")
 	defer os.RemoveAll(tempFileDir)
 
 	if err := filesystem.WriteToFile(filesystem.JoinPaths(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to persist deployment file in a temp directory", Err: err}
+		return httperror.InternalServerError("Failed to persist deployment file in a temp directory", err)
 	}
 
 	//use temp dir as the stack project path for deployment
@@ -120,20 +121,26 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	})
 
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack via file content", Err: err}
+		return httperror.InternalServerError("Unable to deploy Kubernetes stack via file content", err)
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	projectPath, err := handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
+		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
+			log.Printf("[WARN] [kubernetes,stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+		}
+
 		fileType := "Manifest"
 		if stack.IsComposeFormat {
 			fileType = "Compose"
 		}
 		errMsg := fmt.Sprintf("Unable to persist Kubernetes %s file on disk", fileType)
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: errMsg, Err: err}
+		return httperror.InternalServerError(errMsg, err)
 	}
 	stack.ProjectPath = projectPath
+
+	handler.FileService.RemoveStackFileBackup(stackFolder, stack.EntryPoint)
 
 	return nil
 }

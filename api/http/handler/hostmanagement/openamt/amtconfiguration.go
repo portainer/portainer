@@ -74,25 +74,25 @@ func (handler *Handler) openAMTConfigure(w http.ResponseWriter, r *http.Request)
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		logrus.WithError(err).Error("Invalid request payload")
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	if payload.Enabled {
 		certificateErr := validateCertificate(payload.CertFileContent, payload.CertFilePassword)
 		if certificateErr != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error validating certificate", Err: certificateErr}
+			return httperror.BadRequest("Error validating certificate", certificateErr)
 		}
 
 		err = handler.enableOpenAMT(payload)
 		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error enabling OpenAMT", Err: err}
+			return httperror.BadRequest("Error enabling OpenAMT", err)
 		}
 		return response.Empty(w)
 	}
 
 	err = handler.disableOpenAMT()
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error disabling OpenAMT", Err: err}
+		return httperror.BadRequest("Error disabling OpenAMT", err)
 	}
 	return response.Empty(w)
 }

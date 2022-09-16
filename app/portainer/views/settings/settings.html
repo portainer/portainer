@@ -61,6 +61,21 @@
               <a href="https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/" target="_blank">privacy policy</a>.
             </div>
           </div>
+
+          <!-- login screen banner -->
+          <div class="form-group">
+            <por-switch-field
+              label="'Login screen banner'"
+              name="'toggle_login_banner'"
+              feature-id="customBannerFeatureId"
+              checked="$formValues.customLoginBanner"
+              on-change="(onToggleCustomLoginBanner)"
+              field-class="'col-sm-12'"
+              label-class="'col-sm-2'"
+            ></por-switch-field>
+          </div>
+          <!-- !login screen banner -->
+
           <!-- templates -->
           <div class="col-sm-12 form-section-title"> App Templates </div>
           <div>

@@ -3,19 +3,25 @@ import { ReactNode } from 'react';
 
 import styles from './NavTabs.module.css';
 
-export interface Option {
+export interface Option<T extends string | number = string> {
   label: string | ReactNode;
   children?: ReactNode;
-  id: string | number;
+  id: T;
 }
 
-interface Props {
-  options: Option[];
-  selectedId?: string | number;
-  onSelect?(id: string | number): void;
+interface Props<T extends string | number> {
+  options: Option<T>[];
+  selectedId?: T;
+  onSelect?(id: T): void;
+  disabled?: boolean;
 }
 
-export function NavTabs({ options, selectedId, onSelect = () => {} }: Props) {
+export function NavTabs<T extends string | number = string>({
+  options,
+  selectedId,
+  onSelect = () => {},
+  disabled,
+}: Props<T>) {
   const selected = options.find((option) => option.id === selectedId);
 
   return (
@@ -52,7 +58,11 @@ export function NavTabs({ options, selectedId, onSelect = () => {} }: Props) {
     </div>
   );
 
-  function handleSelect(option: Option) {
+  function handleSelect(option: Option<T>) {
+    if (disabled) {
+      return;
+    }
+
     if (option.children) {
       onSelect(option.id);
     }

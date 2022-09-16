@@ -254,7 +254,8 @@ type (
 	EdgeJobLogsStatus int
 
 	// EdgeSchedule represents a scheduled job that can run on Edge environments(endpoints).
-	// Deprecated in favor of EdgeJob
+	//
+	// Deprecated: in favor of EdgeJob
 	EdgeSchedule struct {
 		// EdgeSchedule Identifier
 		ID             ScheduleID   `json:"Id" example:"1"`
@@ -1243,6 +1244,7 @@ type (
 		NormalizeStackName(name string) string
 		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRereate bool) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
+		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data
@@ -1278,6 +1280,9 @@ type (
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		RemoveStackFileBackup(stackIdentifier, fileName string) error
+		RollbackStackFile(stackIdentifier, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
@@ -1392,7 +1397,7 @@ type (
 	SwarmStackManager interface {
 		Login(registries []Registry, endpoint *Endpoint) error
 		Logout(endpoint *Endpoint) error
-		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
+		Deploy(stack *Stack, prune bool, pullImage bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
 		NormalizeStackName(name string) string
 	}
@@ -1446,8 +1451,12 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
+const FeatureFlagEdgeRemoteUpdate Feature = "edgeRemoteUpdate"
+
 // List of supported features
-var SupportedFeatureFlags = []Feature{}
+var SupportedFeatureFlags = []Feature{
+	FeatureFlagEdgeRemoteUpdate,
+}
 
 const (
 	_ AuthenticationMethod = iota

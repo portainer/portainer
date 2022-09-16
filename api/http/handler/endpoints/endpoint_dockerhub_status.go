@@ -42,23 +42,23 @@ type dockerhubStatusResponse struct {
 func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
+		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
 	if !endpointutils.IsLocalEndpoint(endpoint) {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment type", errors.New("Invalid environment type")}
+		return httperror.BadRequest("Invalid environment type", errors.New("Invalid environment type"))
 	}
 
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "registryId")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
+		return httperror.BadRequest("Invalid registry identifier route variable", err)
 	}
 
 	var registry *portainer.Registry
@@ -68,25 +68,25 @@ func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.R
 	} else {
 		registry, err = handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
 		if handler.DataStore.IsErrObjectNotFound(err) {
-			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
+			return httperror.NotFound("Unable to find a registry with the specified identifier inside the database", err)
 		} else if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
+			return httperror.InternalServerError("Unable to find a registry with the specified identifier inside the database", err)
 		}
 
 		if registry.Type != portainer.DockerHubRegistry {
-			return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry type", errors.New("Invalid registry type")}
+			return httperror.BadRequest("Invalid registry type", errors.New("Invalid registry type"))
 		}
 	}
 
 	httpClient := client.NewHTTPClient()
 	token, err := getDockerHubToken(httpClient, registry)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub token from DockerHub", err}
+		return httperror.InternalServerError("Unable to retrieve DockerHub token from DockerHub", err)
 	}
 
 	resp, err := getDockerHubLimits(httpClient, token)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub rate limits from DockerHub", err}
+		return httperror.InternalServerError("Unable to retrieve DockerHub rate limits from DockerHub", err)
 	}
 
 	return response.JSON(w, resp)

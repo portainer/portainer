@@ -27,30 +27,30 @@ import (
 func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	templateTypes, err := parseTemplateTypes(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Custom template type", err}
+		return httperror.BadRequest("Invalid Custom template type", err)
 	}
 
 	customTemplates, err := handler.DataStore.CustomTemplate().CustomTemplates()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve custom templates from the database", err}
+		return httperror.InternalServerError("Unable to retrieve custom templates from the database", err)
 	}
 
 	resourceControls, err := handler.DataStore.ResourceControl().ResourceControls()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
+		return httperror.InternalServerError("Unable to retrieve resource controls from the database", err)
 	}
 
 	customTemplates = authorization.DecorateCustomTemplates(customTemplates, resourceControls)
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	if !securityContext.IsAdmin {
 		user, err := handler.DataStore.User().User(securityContext.UserID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user information from the database", err}
+			return httperror.InternalServerError("Unable to retrieve user information from the database", err)
 		}
 
 		userTeamIDs := make([]portainer.TeamID, 0)

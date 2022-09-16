@@ -1,0 +1,12 @@
+.root {
+  background-color: var(--bg-sidebar-nav-color);
+  border-color: var(--border-sidebar-color);
+}
+
+.closeBtn {
+  background-color: var(--bg-btn-default-color);
+}
+
+.closeBtn:hover {
+  background-color: var(--bg-btn-default-hover-color);
+}

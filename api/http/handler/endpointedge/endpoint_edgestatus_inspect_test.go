@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 	"time"
 
@@ -74,18 +73,14 @@ var endpointTestCases = []endpointTestCase{
 	},
 }
 
-func setupHandler() (*Handler, func(), error) {
-	tmpDir, err := os.MkdirTemp(os.TempDir(), "portainer-test")
-	if err != nil {
-		return nil, nil, fmt.Errorf("could not create a tmp dir: %w", err)
-	}
-
+func setupHandler(t *testing.T) (*Handler, func(), error) {
+	tmpDir := t.TempDir()
 	fs, err := filesystem.NewService(tmpDir, "")
 	if err != nil {
 		return nil, nil, fmt.Errorf("could not start a new filesystem service: %w", err)
 	}
 
-	_, store, storeTeardown := datastore.MustNewTestStore(true, true)
+	_, store, storeTeardown := datastore.MustNewTestStore(t, true, true)
 
 	ctx := context.Background()
 	shutdownCtx, cancelFn := context.WithCancel(ctx)
@@ -143,7 +138,7 @@ func createEndpoint(handler *Handler, endpoint portainer.Endpoint, endpointRelat
 }
 
 func TestMissingEdgeIdentifier(t *testing.T) {
-	handler, teardown, err := setupHandler()
+	handler, teardown, err := setupHandler(t)
 	defer teardown()
 
 	if err != nil {
@@ -177,7 +172,7 @@ func TestMissingEdgeIdentifier(t *testing.T) {
 }
 
 func TestWithEndpoints(t *testing.T) {
-	handler, teardown, err := setupHandler()
+	handler, teardown, err := setupHandler(t)
 	defer teardown()
 
 	if err != nil {
@@ -208,7 +203,7 @@ func TestWithEndpoints(t *testing.T) {
 }
 
 func TestLastCheckInDateIncreases(t *testing.T) {
-	handler, teardown, err := setupHandler()
+	handler, teardown, err := setupHandler(t)
 	defer teardown()
 
 	if err != nil {
@@ -259,7 +254,7 @@ func TestLastCheckInDateIncreases(t *testing.T) {
 }
 
 func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
-	handler, teardown, err := setupHandler()
+	handler, teardown, err := setupHandler(t)
 	defer teardown()
 
 	if err != nil {
@@ -307,7 +302,7 @@ func TestEmptyEdgeIdWithAgentPlatformHeader(t *testing.T) {
 }
 
 func TestEdgeStackStatus(t *testing.T) {
-	handler, teardown, err := setupHandler()
+	handler, teardown, err := setupHandler(t)
 	defer teardown()
 
 	if err != nil {
@@ -379,7 +374,7 @@ func TestEdgeStackStatus(t *testing.T) {
 }
 
 func TestEdgeJobsResponse(t *testing.T) {
-	handler, teardown, err := setupHandler()
+	handler, teardown, err := setupHandler(t)
 	defer teardown()
 
 	if err != nil {
