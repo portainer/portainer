@@ -23,7 +23,7 @@ import (
 func Test_userList(t *testing.T) {
 	is := assert.New(t)
 
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	// create admin and standard user(s)
