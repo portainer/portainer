@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"log"
 	"mime"
 	"net/http"
 
 	"github.com/portainer/portainer/api/archive"
+
+	"github.com/rs/zerolog/log"
 )
 
 const OneMegabyte = 1024768
@@ -78,7 +79,7 @@ func buildOperation(request *http.Request) error {
 
 			defer f.Close()
 
-			log.Printf("[INFO] [http,proxy,docker] [message: upload the file to build image] [filename: %s] [size: %d]", hdr.Filename, hdr.Size)
+			log.Info().Str("filename", hdr.Filename).Int64("size", hdr.Size).Msg("upload the file to build image")
 
 			content, err := ioutil.ReadAll(f)
 			if err != nil {
