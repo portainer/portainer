@@ -159,7 +159,7 @@ function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointPro
 
     Container.logs(parameters)
       .$promise.then(function success(data) {
-        var logs = LogHelper.formatLogs(data.logs, stripHeaders);
+        var logs = LogHelper.formatLogs(data.logs, { stripHeaders, withTimestamps: !!timestamps });
         deferred.resolve(logs);
       })
       .catch(function error(err) {
