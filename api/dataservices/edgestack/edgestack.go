@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -44,10 +45,12 @@ func (service *Service) EdgeStacks() ([]portainer.EdgeStack, error) {
 			//var tag portainer.Tag
 			stack, ok := obj.(*portainer.EdgeStack)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeStack object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EdgeStack object")
 				return nil, fmt.Errorf("Failed to convert to EdgeStack object: %s", obj)
 			}
+
 			stacks = append(stacks, *stack)
+
 			return &portainer.EdgeStack{}, nil
 		})
 

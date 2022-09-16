@@ -2,16 +2,17 @@ package factory
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/agent"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/url"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // ProxyServer provide an extended proxy with a local server to forward requests
@@ -24,7 +25,7 @@ type ProxyServer struct {
 func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*ProxyServer, error) {
 	urlString := endpoint.URL
 
-	if endpointutils.IsEdgeEndpoint((endpoint)) {
+	if endpointutils.IsEdgeEndpoint(endpoint) {
 		tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed starting tunnel")
@@ -77,15 +78,16 @@ func (proxy *ProxyServer) start() error {
 	}
 
 	proxy.Port = listener.Addr().(*net.TCPAddr).Port
+
 	go func() {
 		proxyHost := fmt.Sprintf("127.0.0.1:%d", proxy.Port)
-		log.Printf("Starting Proxy server on %s...\n", proxyHost)
+		log.Debug().Str("host", proxyHost).Msg("starting proxy server")
 
 		err := proxy.server.Serve(listener)
-		log.Printf("Exiting Proxy server %s\n", proxyHost)
+		log.Debug().Str("host", proxyHost).Msg("exiting proxy server")
 
 		if err != nil && err != http.ErrServerClosed {
-			log.Printf("Proxy server %s exited with an error: %s\n", proxyHost, err)
+			log.Debug().Str("host", proxyHost).Err(err).Msg("proxy server exited with an error")
 		}
 	}()
 

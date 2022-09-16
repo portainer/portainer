@@ -1,12 +1,8 @@
 package stacks
 
 import (
-	"log"
 	"net/http"
 
-	"github.com/docker/cli/cli/compose/loader"
-	"github.com/docker/cli/cli/compose/types"
-	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -14,6 +10,11 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/stackutils"
+
+	"github.com/docker/cli/cli/compose/loader"
+	"github.com/docker/cli/cli/compose/types"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
@@ -23,8 +24,9 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 
 	err := handler.FileService.RemoveDirectory(stack.ProjectPath)
 	if err != nil {
-		log.Printf("http error: Unable to cleanup stack creation (err=%s)\n", err)
+		log.Error().Err(err).Msg("unable to cleanup stack creation")
 	}
+
 	return nil
 }
 

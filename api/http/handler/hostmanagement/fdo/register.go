@@ -6,7 +6,8 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 type registerDeviceResponse struct {
@@ -29,19 +30,22 @@ func (handler *Handler) fdoRegisterDevice(w http.ResponseWriter, r *http.Request
 	// Post a voucher
 	ov, filename, err := request.RetrieveMultiPartFormFile(r, "voucher")
 	if err != nil {
-		logrus.WithField("filename", filename).WithError(err).Info("fdoRegisterDevice: readVoucher()")
+		log.Info().Str("filename", filename).Err(err).Msg("fdoRegisterDevice: readVoucher()")
+
 		return httperror.InternalServerError("fdoRegisterDevice: read Voucher()", err)
 	}
 
 	fdoClient, err := handler.newFDOClient()
 	if err != nil {
-		logrus.WithError(err).Info("fdoRegisterDevice: newFDOClient()")
+		log.Info().Err(err).Msg("fdoRegisterDevice: newFDOClient()")
+
 		return httperror.InternalServerError("fdoRegisterDevice: newFDOClient()", err)
 	}
 
 	guid, err := fdoClient.PostVoucher(ov)
 	if err != nil {
-		logrus.WithError(err).Info("fdoRegisterDevice: PostVoucher()")
+		log.Info().Err(err).Msg("fdoRegisterDevice: PostVoucher()")
+
 		return httperror.InternalServerError("fdoRegisterDevice: PostVoucher()", err)
 	}
 

@@ -2,7 +2,6 @@ package helm
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 
@@ -10,6 +9,8 @@ import (
 	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
+
+	"github.com/rs/zerolog/log"
 )
 
 // @id HelmShow
@@ -47,7 +48,7 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 	cmd, err := request.RetrieveRouteVariableValue(r, "command")
 	if err != nil {
 		cmd = "all"
-		log.Printf("[DEBUG] [internal,helm] [message: command not provided, defaulting to %s]", cmd)
+		log.Debug().Str("default_command", cmd).Msg("command not provided, using default")
 	}
 
 	showOptions := options.ShowOptions{

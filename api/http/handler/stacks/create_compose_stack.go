@@ -2,7 +2,6 @@ package stacks
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,6 +15,8 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
+
+	"github.com/rs/zerolog/log"
 )
 
 type composeStackFromFileContentPayload struct {
@@ -44,6 +45,7 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 	if err != nil {
 		return err
 	}
+
 	// stop scheduler updates of the stack before removal
 	if stack.AutoUpdate != nil {
 		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
@@ -57,16 +59,21 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 	if resourceControl != nil {
 		err = handler.DataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
 		if err != nil {
-			log.Printf("[ERROR] [Stack] Unable to remove the associated resource control from the database for stack: [%+v].", stack)
+			log.Error().
+				Str("stack", fmt.Sprintf("%+v", stack)).
+				Msg("unable to remove the associated resource control from the database for stack")
 		}
 	}
 
 	if exists, _ := handler.FileService.FileExists(stack.ProjectPath); exists {
 		err = handler.FileService.RemoveDirectory(stack.ProjectPath)
 		if err != nil {
-			log.Printf("Unable to remove stack files from disk for stack: [%+v].", stack)
+			log.Warn().
+				Str("stack", fmt.Sprintf("%+v", stack)).
+				Msg("unable to remove stack files from disk for stack")
 		}
 	}
+
 	return nil
 }
 

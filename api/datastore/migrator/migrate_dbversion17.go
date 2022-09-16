@@ -2,10 +2,13 @@ package migrator
 
 import (
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (m *Migrator) updateUsersToDBVersion18() error {
-	migrateLog.Info("- updating users")
+	log.Info().Msg("updating users")
+
 	legacyUsers, err := m.userService.Users()
 	if err != nil {
 		return err
@@ -40,7 +43,8 @@ func (m *Migrator) updateUsersToDBVersion18() error {
 }
 
 func (m *Migrator) updateEndpointsToDBVersion18() error {
-	migrateLog.Info("- updating endpoints")
+	log.Info().Msg("updating endpoints")
+
 	legacyEndpoints, err := m.endpointService.Endpoints()
 	if err != nil {
 		return err
@@ -71,7 +75,8 @@ func (m *Migrator) updateEndpointsToDBVersion18() error {
 }
 
 func (m *Migrator) updateEndpointGroupsToDBVersion18() error {
-	migrateLog.Info("- updating endpoint groups")
+	log.Info().Msg("updating endpoint groups")
+
 	legacyEndpointGroups, err := m.endpointGroupService.EndpointGroups()
 	if err != nil {
 		return err
@@ -102,7 +107,8 @@ func (m *Migrator) updateEndpointGroupsToDBVersion18() error {
 }
 
 func (m *Migrator) updateRegistriesToDBVersion18() error {
-	migrateLog.Info("- updating registries")
+	log.Info().Msg("updating registries")
+
 	legacyRegistries, err := m.registryService.Registries()
 	if err != nil {
 		return err

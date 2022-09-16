@@ -35,7 +35,7 @@ require (
 	github.com/portainer/docker-compose-wrapper v0.0.0-20220708023447-a69a4ebaa021
 	github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a
 	github.com/portainer/libhelm v0.0.0-20210929000907-825e93d62108
-	github.com/portainer/libhttp v0.0.0-20211208103139-07a5f798eb3f
+	github.com/portainer/libhttp v0.0.0-20220916153711-5d61e12f4b0a
 	github.com/rkl-/digest v0.0.0-20180419075440-8316caa4a777
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.8.1
@@ -89,6 +89,8 @@ require (
 	github.com/jpillora/sizestr v1.0.0 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/moby/spdystream v0.2.0 // indirect
@@ -101,6 +103,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rs/zerolog v1.28.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce // indirect
