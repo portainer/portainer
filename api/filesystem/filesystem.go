@@ -154,6 +154,13 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier)
 }
 
+// GetStackProjectGitRepositoryPath returns the absolute path on the FS for a git repository of a stack based
+// on its identifier and normalized repository name.
+func (service *Service) GetStackProjectGitRepositoryPath(stackIdentifier, repoName string) string {
+	stackPath := service.GetStackProjectPath(stackIdentifier)
+	return JoinPaths(service.wrapFileStore(stackPath), repoName)
+}
+
 // Copy copies the file on fromFilePath to toFilePath
 // if toFilePath exists func will fail unless deleteIfExists is true
 func (service *Service) Copy(fromFilePath string, toFilePath string, deleteIfExists bool) error {
