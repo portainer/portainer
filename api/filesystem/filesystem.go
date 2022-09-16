@@ -157,8 +157,7 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 // GetStackProjectGitRepositoryPath returns the absolute path on the FS for a git repository of a stack based
 // on its identifier and normalized repository name.
 func (service *Service) GetStackProjectGitRepositoryPath(stackIdentifier, repoName string) string {
-	stackPath := service.GetStackProjectPath(stackIdentifier)
-	return JoinPaths(service.wrapFileStore(stackPath), repoName)
+	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier, repoName)
 }
 
 // Copy copies the file on fromFilePath to toFilePath
