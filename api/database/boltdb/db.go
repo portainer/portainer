@@ -11,7 +11,8 @@ import (
 	"time"
 
 	dserrors "github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -120,7 +121,7 @@ func (connection *DbConnection) NeedsEncryptionMigration() (bool, error) {
 // Open opens and initializes the BoltDB database.
 func (connection *DbConnection) Open() error {
 
-	logrus.Infof("Loading PortainerDB: %s", connection.GetDatabaseFileName())
+	log.Info().Str("filename", connection.GetDatabaseFileName()).Msg("loading PortainerDB")
 
 	// Now we open the db
 	databasePath := connection.GetDatabaseFilePath()
@@ -348,6 +349,7 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 func (connection *DbConnection) GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
+
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			err := connection.UnmarshalObject(v, obj)
@@ -362,6 +364,7 @@ func (connection *DbConnection) GetAll(bucketName string, obj interface{}, appen
 
 		return nil
 	})
+
 	return err
 }
 
@@ -411,7 +414,7 @@ func (connection *DbConnection) RestoreMetadata(s map[string]interface{}) error 
 	for bucketName, v := range s {
 		id, ok := v.(float64) // JSON ints are unmarshalled to interface as float64. See: https://pkg.go.dev/encoding/json#Decoder.Decode
 		if !ok {
-			logrus.Errorf("Failed to restore metadata to bucket %s, skipped", bucketName)
+			log.Error().Str("bucket", bucketName).Msg("failed to restore metadata to bucket, skipped")
 			continue
 		}
 
@@ -420,6 +423,7 @@ func (connection *DbConnection) RestoreMetadata(s map[string]interface{}) error 
 			if err != nil {
 				return err
 			}
+
 			return bucket.SetSequence(uint64(id))
 		})
 	}

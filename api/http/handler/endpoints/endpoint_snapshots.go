@@ -1,13 +1,14 @@
 package endpoints
 
 import (
-	"log"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/snapshot"
+
+	"github.com/rs/zerolog/log"
 )
 
 // @id EndpointSnapshots
@@ -35,13 +36,23 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 
 		latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
 		if latestEndpointReference == nil {
-			log.Printf("background schedule error (environment snapshot). Environment not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			log.Debug().
+				Str("endpoint", endpoint.Name).
+				Str("URL", endpoint.URL).
+				Err(err).
+				Msg("background schedule error (environment snapshot), environment not found inside the database anymore")
+
 			continue
 		}
 
 		endpoint.Status = portainer.EndpointStatusUp
 		if snapshotError != nil {
-			log.Printf("background schedule error (environment snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
+			log.Debug().
+				Str("endpoint", endpoint.Name).
+				Str("URL", endpoint.URL).
+				Err(snapshotError).
+				Msg("background schedule error (environment snapshot), unable to create snapshot")
+
 			endpoint.Status = portainer.EndpointStatusDown
 		}
 

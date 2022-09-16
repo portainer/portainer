@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -66,13 +67,14 @@ func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 		BucketName,
 		&portainer.EndpointGroup{},
 		func(obj interface{}) (interface{}, error) {
-			//var tag portainer.Tag
 			endpointGroup, ok := obj.(*portainer.EndpointGroup)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to EndpointGroup object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointGroup object")
 				return nil, fmt.Errorf("Failed to convert to EndpointGroup object: %s", obj)
 			}
+
 			endpointGroups = append(endpointGroups, *endpointGroup)
+
 			return &portainer.EndpointGroup{}, nil
 		})
 

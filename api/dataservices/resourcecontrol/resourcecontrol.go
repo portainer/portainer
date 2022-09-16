@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -58,7 +59,7 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 		func(obj interface{}) (interface{}, error) {
 			rc, ok := obj.(*portainer.ResourceControl)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to ResourceControl object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to ResourceControl object")
 				return nil, fmt.Errorf("Failed to convert to ResourceControl object: %s", obj)
 			}
 
@@ -73,6 +74,7 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 					return nil, stop
 				}
 			}
+
 			return &portainer.ResourceControl{}, nil
 		})
 	if err == stop {
@@ -92,10 +94,12 @@ func (service *Service) ResourceControls() ([]portainer.ResourceControl, error) 
 		func(obj interface{}) (interface{}, error) {
 			rc, ok := obj.(*portainer.ResourceControl)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to ResourceControl object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to ResourceControl object")
 				return nil, fmt.Errorf("Failed to convert to ResourceControl object: %s", obj)
 			}
+
 			rcs = append(rcs, *rc)
+
 			return &portainer.ResourceControl{}, nil
 		})
 

@@ -1,11 +1,10 @@
 package main
 
 import (
-	"log"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 func importFromJson(fileService portainer.FileService, store *datastore.Store) {
@@ -13,17 +12,17 @@ func importFromJson(fileService portainer.FileService, store *datastore.Store) {
 	importFile := "/data/import.json"
 	if exists, _ := fileService.FileExists(importFile); exists {
 		if err := store.Import(importFile); err != nil {
-			logrus.WithError(err).Debugf("Import %s failed", importFile)
-
+			log.Error().Str("filename", importFile).Err(err).Msg("import failed")
 			// TODO: should really rollback on failure, but then we have nothing.
 		} else {
-			logrus.Printf("Successfully imported %s to new portainer database", importFile)
+			log.Info().Str("filename", importFile).Msg("successfully imported the file to a new portainer database")
 		}
+
 		// TODO: this is bad - its to ensure that any defaults that were broken in import, or migrations get set back to what we want
 		// I also suspect that everything from "Init to Init" is potentially a migration
 		err := store.Init()
 		if err != nil {
-			log.Fatalf("Failed initializing data store: %v", err)
+			log.Fatal().Err(err).Msg("failed initializing data store")
 		}
 	}
 }
