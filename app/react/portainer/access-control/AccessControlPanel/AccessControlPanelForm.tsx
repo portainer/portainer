@@ -6,6 +6,7 @@ import { object } from 'yup';
 import { useUser } from '@/portainer/hooks/useUser';
 import { confirmAsync } from '@/portainer/services/modal.service/confirm';
 import { notifySuccess } from '@/portainer/services/notifications';
+import { EnvironmentId } from '@/portainer/environments/types';
 
 import { Button } from '@@/buttons';
 import { LoadingButton } from '@@/buttons/LoadingButton';
@@ -27,6 +28,7 @@ interface Props {
   resourceType: ResourceControlType;
   resourceId: ResourceId;
   resourceControl?: ResourceControlViewModel;
+  environmentId?: EnvironmentId;
   onCancelClick(): void;
   onUpdateSuccess(): Promise<void>;
 }
@@ -35,6 +37,7 @@ export function AccessControlPanelForm({
   resourceId,
   resourceType,
   resourceControl,
+  environmentId,
   onCancelClick,
   onUpdateSuccess,
 }: Props) {
@@ -81,6 +84,7 @@ export function AccessControlPanelForm({
             values={values.accessControl}
             isPublicVisible
             errors={errors.accessControl}
+            environmentId={environmentId}
           />
 
           <div className="form-group">

@@ -178,7 +178,7 @@ function InheritanceMessage({
 }
 
 function useAuthorizedTeams(authorizedTeamIds: TeamId[]) {
-  return useTeams(false, {
+  return useTeams(false, 0, {
     enabled: authorizedTeamIds.length > 0,
     select: (teams) => {
       if (authorizedTeamIds.length === 0) {
@@ -196,7 +196,7 @@ function useAuthorizedTeams(authorizedTeamIds: TeamId[]) {
 }
 
 function useAuthorizedUsers(authorizedUserIds: UserId[]) {
-  return useUsers(false, authorizedUserIds.length > 0, (users) => {
+  return useUsers(false, 0, authorizedUserIds.length > 0, (users) => {
     if (authorizedUserIds.length === 0) {
       return [];
     }

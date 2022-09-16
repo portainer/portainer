@@ -7,21 +7,21 @@ import (
 // FilterUserTeams filters teams based on user role.
 // non-administrator users only have access to team they are member of.
 func FilterUserTeams(teams []portainer.Team, context *RestrictedRequestContext) []portainer.Team {
-	filteredTeams := teams
+	if context.IsAdmin {
+		return teams
+	}
 
-	if !context.IsAdmin {
-		filteredTeams = make([]portainer.Team, 0)
-		for _, membership := range context.UserMemberships {
-			for _, team := range teams {
-				if team.ID == membership.TeamID {
-					filteredTeams = append(filteredTeams, team)
-					break
-				}
+	teamsAccessableToUser := make([]portainer.Team, 0)
+	for _, membership := range context.UserMemberships {
+		for _, team := range teams {
+			if team.ID == membership.TeamID {
+				teamsAccessableToUser = append(teamsAccessableToUser, team)
+				break
 			}
 		}
 	}
 
-	return filteredTeams
+	return teamsAccessableToUser
 }
 
 // FilterLeaderTeams filters teams based on user role.
@@ -52,19 +52,18 @@ func FilterLeaderTeams(teams []portainer.Team, context *RestrictedRequestContext
 // FilterUsers filters users based on user role.
 // Non-administrator users only have access to non-administrator users.
 func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []portainer.User {
-	filteredUsers := users
+	if context.IsAdmin {
+		return users
+	}
 
-	if !context.IsAdmin {
-		filteredUsers = make([]portainer.User, 0)
-
-		for _, user := range users {
-			if user.Role != portainer.AdministratorRole {
-				filteredUsers = append(filteredUsers, user)
-			}
+	nonAdmins := make([]portainer.User, 0)
+	for _, user := range users {
+		if user.Role != portainer.AdministratorRole {
+			nonAdmins = append(nonAdmins, user)
 		}
 	}
 
-	return filteredUsers
+	return nonAdmins
 }
 
 // FilterRegistries filters registries based on user role and team memberships.
@@ -96,7 +95,7 @@ func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.Endpoint
 		for _, endpoint := range endpoints {
 			endpointGroup := getAssociatedGroup(&endpoint, groups)
 
-			if authorizedEndpointAccess(&endpoint, endpointGroup, context.UserID, context.UserMemberships) {
+			if AuthorizedEndpointAccess(&endpoint, endpointGroup, context.UserID, context.UserMemberships) {
 				filteredEndpoints = append(filteredEndpoints, endpoint)
 			}
 		}
