@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { FormikErrors } from 'formik';
 
 import { useUser } from '@/portainer/hooks/useUser';
+import { EnvironmentId } from '@/portainer/environments/types';
 
 import { BoxSelector } from '@@/BoxSelector';
 import { FormError } from '@@/form-components/FormError';
@@ -19,6 +20,7 @@ interface Props {
   isPublicVisible?: boolean;
   errors?: FormikErrors<AccessControlFormData>;
   formNamespace?: string;
+  environmentId?: EnvironmentId;
 }
 
 export function EditDetails({
@@ -27,10 +29,11 @@ export function EditDetails({
   isPublicVisible = false,
   errors,
   formNamespace,
+  environmentId,
 }: Props) {
   const { user, isAdmin } = useUser();
 
-  const { users, teams, isLoading } = useLoadState();
+  const { users, teams, isLoading } = useLoadState(environmentId);
   const options = useOptions(isAdmin, teams, isPublicVisible);
 
   const handleChange = useCallback(

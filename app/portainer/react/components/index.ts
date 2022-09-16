@@ -98,5 +98,6 @@ export const componentsModule = angular
       'resourceControl',
       'resourceId',
       'resourceType',
+      'environmentId',
     ])
   ).name;

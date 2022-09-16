@@ -14,6 +14,7 @@ import { Team, TeamId, TeamMembership, TeamRole } from './types';
 
 export function useTeams<T = Team[]>(
   onlyLedTeams = false,
+  environmentId = 0,
   {
     enabled = true,
     select = (data) => data as unknown as T,
@@ -23,8 +24,8 @@ export function useTeams<T = Team[]>(
   } = {}
 ) {
   const teams = useQuery(
-    ['teams', { onlyLedTeams }],
-    () => getTeams(onlyLedTeams),
+    ['teams', { onlyLedTeams, environmentId }],
+    () => getTeams(onlyLedTeams, environmentId),
     {
       meta: {
         error: { title: 'Failure', message: 'Unable to load teams' },

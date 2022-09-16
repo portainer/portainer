@@ -4,12 +4,13 @@ import { ResourceControlOwnership as RCO } from '@/react/portainer/access-contro
 angular.module('portainer.app').controller('porAccessControlFormController', [
   '$q',
   '$scope',
+  '$state',
   'UserService',
   'TeamService',
   'Notifications',
   'Authentication',
   'ResourceControlService',
-  function ($q, $scope, UserService, TeamService, Notifications, Authentication, ResourceControlService) {
+  function ($q, $scope, $state, UserService, TeamService, Notifications, Authentication, ResourceControlService) {
     var ctrl = this;
 
     ctrl.RCO = RCO;
@@ -54,9 +55,10 @@ angular.module('portainer.app').controller('porAccessControlFormController', [
         ctrl.formData.Ownership = ctrl.RCO.ADMINISTRATORS;
       }
 
+      const environmentId = $state.params.endpointId;
       $q.all({
-        availableTeams: TeamService.teams(),
-        availableUsers: isAdmin ? UserService.users(false) : [],
+        availableTeams: TeamService.teams(environmentId),
+        availableUsers: isAdmin ? UserService.users(false, environmentId) : [],
       })
         .then(function success(data) {
           ctrl.availableUsers = _.orderBy(data.availableUsers, 'Username', 'asc');

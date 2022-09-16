@@ -4,10 +4,10 @@ import { type UserId } from '@/portainer/users/types';
 import { createTeamMembership } from './team-membership.service';
 import { Team, TeamId, TeamMembership, TeamRole } from './types';
 
-export async function getTeams(onlyLedTeams = false) {
+export async function getTeams(onlyLedTeams = false, environmentId = 0) {
   try {
     const { data } = await axios.get<Team[]>(buildUrl(), {
-      params: { onlyLedTeams },
+      params: { onlyLedTeams, environmentId },
     });
     return data;
   } catch (error) {
