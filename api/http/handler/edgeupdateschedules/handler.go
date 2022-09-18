@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/edgetypes"
+	"github.com/portainer/portainer/api/edge/updateschedule"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -50,7 +50,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 		httperror.LoggerHandler(h.previousVersions)).Methods(http.MethodGet)
 
 	itemRouter := router.PathPrefix("/{id}").Subrouter()
-	itemRouter.Use(middlewares.WithItem(func(id edgetypes.UpdateScheduleID) (*edgetypes.UpdateSchedule, error) {
+	itemRouter.Use(middlewares.WithItem(func(id updateschedule.UpdateScheduleID) (*updateschedule.UpdateSchedule, error) {
 		return dataStore.EdgeUpdateSchedule().Item(id)
 	}, "id", contextKey))
 

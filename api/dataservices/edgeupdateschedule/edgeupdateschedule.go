@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/edgetypes"
+	"github.com/portainer/portainer/api/edge/updateschedule"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,7 +20,7 @@ type Service struct {
 	connection portainer.Connection
 
 	mu                 sync.Mutex
-	idxActiveSchedules map[portainer.EndpointID]*edgetypes.EndpointUpdateScheduleRelation
+	idxActiveSchedules map[portainer.EndpointID]*updateschedule.EndpointUpdateScheduleRelation
 }
 
 func (service *Service) BucketName() string {
@@ -38,7 +38,7 @@ func NewService(connection portainer.Connection) (*Service, error) {
 		connection: connection,
 	}
 
-	service.idxActiveSchedules = map[portainer.EndpointID]*edgetypes.EndpointUpdateScheduleRelation{}
+	service.idxActiveSchedules = map[portainer.EndpointID]*updateschedule.EndpointUpdateScheduleRelation{}
 
 	schedules, err := service.List()
 	if err != nil {
@@ -52,18 +52,18 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	return service, nil
 }
 
-func (service *Service) ActiveSchedule(environmentID portainer.EndpointID) *edgetypes.EndpointUpdateScheduleRelation {
+func (service *Service) ActiveSchedule(environmentID portainer.EndpointID) *updateschedule.EndpointUpdateScheduleRelation {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
 	return service.idxActiveSchedules[environmentID]
 }
 
-func (service *Service) ActiveSchedules(environmentsIDs []portainer.EndpointID) []edgetypes.EndpointUpdateScheduleRelation {
+func (service *Service) ActiveSchedules(environmentsIDs []portainer.EndpointID) []updateschedule.EndpointUpdateScheduleRelation {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	schedules := []edgetypes.EndpointUpdateScheduleRelation{}
+	schedules := []updateschedule.EndpointUpdateScheduleRelation{}
 
 	for _, environmentID := range environmentsIDs {
 		if s, ok := service.idxActiveSchedules[environmentID]; ok {
@@ -75,28 +75,28 @@ func (service *Service) ActiveSchedules(environmentsIDs []portainer.EndpointID) 
 }
 
 // List return an array containing all the items in the bucket.
-func (service *Service) List() ([]edgetypes.UpdateSchedule, error) {
-	var list = make([]edgetypes.UpdateSchedule, 0)
+func (service *Service) List() ([]updateschedule.UpdateSchedule, error) {
+	var list = make([]updateschedule.UpdateSchedule, 0)
 
 	err := service.connection.GetAll(
 		BucketName,
-		&edgetypes.UpdateSchedule{},
+		&updateschedule.UpdateSchedule{},
 		func(obj interface{}) (interface{}, error) {
-			item, ok := obj.(*edgetypes.UpdateSchedule)
+			item, ok := obj.(*updateschedule.UpdateSchedule)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeUpdateSchedule object")
 				return nil, fmt.Errorf("failed to convert to EdgeUpdateSchedule object: %s", obj)
 			}
 			list = append(list, *item)
-			return &edgetypes.UpdateSchedule{}, nil
+			return &updateschedule.UpdateSchedule{}, nil
 		})
 
 	return list, err
 }
 
 // Item returns a item by ID.
-func (service *Service) Item(ID edgetypes.UpdateScheduleID) (*edgetypes.UpdateSchedule, error) {
-	var item edgetypes.UpdateSchedule
+func (service *Service) Item(ID updateschedule.UpdateScheduleID) (*updateschedule.UpdateSchedule, error) {
+	var item updateschedule.UpdateSchedule
 	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &item)
@@ -108,11 +108,11 @@ func (service *Service) Item(ID edgetypes.UpdateScheduleID) (*edgetypes.UpdateSc
 }
 
 // Create assign an ID to a new object and saves it.
-func (service *Service) Create(item *edgetypes.UpdateSchedule) error {
+func (service *Service) Create(item *updateschedule.UpdateSchedule) error {
 	err := service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
-			item.ID = edgetypes.UpdateScheduleID(id)
+			item.ID = updateschedule.UpdateScheduleID(id)
 			return int(item.ID), item
 		},
 	)
@@ -125,7 +125,7 @@ func (service *Service) Create(item *edgetypes.UpdateSchedule) error {
 }
 
 // Update updates an item.
-func (service *Service) Update(id edgetypes.UpdateScheduleID, item *edgetypes.UpdateSchedule) error {
+func (service *Service) Update(id updateschedule.UpdateScheduleID, item *updateschedule.UpdateSchedule) error {
 	identifier := service.connection.ConvertToKey(int(id))
 	err := service.connection.UpdateObject(BucketName, identifier, item)
 	if err != nil {
@@ -138,7 +138,7 @@ func (service *Service) Update(id edgetypes.UpdateScheduleID, item *edgetypes.Up
 }
 
 // Delete deletes an item.
-func (service *Service) Delete(id edgetypes.UpdateScheduleID) error {
+func (service *Service) Delete(id updateschedule.UpdateScheduleID) error {
 
 	service.cleanRelation(id)
 
@@ -146,7 +146,7 @@ func (service *Service) Delete(id edgetypes.UpdateScheduleID) error {
 	return service.connection.DeleteObject(BucketName, identifier)
 }
 
-func (service *Service) cleanRelation(id edgetypes.UpdateScheduleID) {
+func (service *Service) cleanRelation(id updateschedule.UpdateScheduleID) {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
@@ -157,12 +157,12 @@ func (service *Service) cleanRelation(id edgetypes.UpdateScheduleID) {
 	}
 }
 
-func (service *Service) setRelation(schedule *edgetypes.UpdateSchedule) error {
+func (service *Service) setRelation(schedule *updateschedule.UpdateSchedule) error {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
 	for environmentID, environmentStatus := range schedule.Status {
-		if environmentStatus.Status != edgetypes.UpdateScheduleStatusPending {
+		if environmentStatus.Status != updateschedule.UpdateScheduleStatusPending {
 			continue
 		}
 
@@ -171,7 +171,7 @@ func (service *Service) setRelation(schedule *edgetypes.UpdateSchedule) error {
 			return errors.New("Multiple schedules are pending for the same environment")
 		}
 
-		service.idxActiveSchedules[environmentID] = &edgetypes.EndpointUpdateScheduleRelation{
+		service.idxActiveSchedules[environmentID] = &updateschedule.EndpointUpdateScheduleRelation{
 			EnvironmentID: environmentID,
 			ScheduleID:    schedule.ID,
 			TargetVersion: environmentStatus.TargetVersion,

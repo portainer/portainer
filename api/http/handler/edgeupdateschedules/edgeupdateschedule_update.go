@@ -10,7 +10,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/edgetypes"
+	"github.com/portainer/portainer/api/edge/updateschedule"
 	"github.com/portainer/portainer/api/http/middlewares"
 )
 
@@ -18,7 +18,7 @@ type updatePayload struct {
 	Name         string
 	GroupIDs     []portainer.EdgeGroupID
 	Environments map[portainer.EndpointID]string
-	Type         edgetypes.UpdateScheduleType
+	Type         updateschedule.UpdateScheduleType
 	Time         int64
 }
 
@@ -31,7 +31,7 @@ func (payload *updatePayload) Validate(r *http.Request) error {
 		return errors.New("Required to choose at least one group")
 	}
 
-	if payload.Type != edgetypes.UpdateScheduleRollback && payload.Type != edgetypes.UpdateScheduleUpdate {
+	if payload.Type != updateschedule.UpdateScheduleRollback && payload.Type != updateschedule.UpdateScheduleUpdate {
 		return errors.New("Invalid schedule type")
 	}
 
@@ -55,7 +55,7 @@ func (payload *updatePayload) Validate(r *http.Request) error {
 // @failure 500
 // @router /edge_update_schedules [post]
 func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	item, err := middlewares.FetchItem[edgetypes.UpdateSchedule](r, contextKey)
+	item, err := middlewares.FetchItem[updateschedule.UpdateSchedule](r, contextKey)
 	if err != nil {
 		return httperror.InternalServerError(err.Error(), err)
 	}
@@ -81,7 +81,7 @@ func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperro
 		item.Time = payload.Time
 		item.Type = payload.Type
 
-		item.Status = map[portainer.EndpointID]edgetypes.UpdateScheduleStatus{}
+		item.Status = map[portainer.EndpointID]updateschedule.UpdateScheduleStatus{}
 		for environmentID, version := range payload.Environments {
 			environment, err := handler.dataStore.Endpoint().Endpoint(environmentID)
 			if err != nil {
@@ -92,7 +92,7 @@ func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperro
 				return httperror.BadRequest("Only standalone docker Environments are supported for remote update", nil)
 			}
 
-			item.Status[environmentID] = edgetypes.UpdateScheduleStatus{
+			item.Status[environmentID] = updateschedule.UpdateScheduleStatus{
 				TargetVersion:  version,
 				CurrentVersion: environment.Agent.Version,
 			}

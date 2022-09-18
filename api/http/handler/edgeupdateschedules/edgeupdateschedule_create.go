@@ -10,14 +10,14 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/edgetypes"
+	"github.com/portainer/portainer/api/edge/updateschedule"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 type createPayload struct {
 	Name         string
 	GroupIDs     []portainer.EdgeGroupID
-	Type         edgetypes.UpdateScheduleType
+	Type         updateschedule.UpdateScheduleType
 	Environments map[portainer.EndpointID]string
 	Time         int64
 }
@@ -31,7 +31,7 @@ func (payload *createPayload) Validate(r *http.Request) error {
 		return errors.New("Required to choose at least one group")
 	}
 
-	if payload.Type != edgetypes.UpdateScheduleRollback && payload.Type != edgetypes.UpdateScheduleUpdate {
+	if payload.Type != updateschedule.UpdateScheduleRollback && payload.Type != updateschedule.UpdateScheduleUpdate {
 		return errors.New("Invalid schedule type")
 	}
 
@@ -55,7 +55,7 @@ func (payload *createPayload) Validate(r *http.Request) error {
 // @accept json
 // @param body body createPayload true "Schedule details"
 // @produce json
-// @success 200 {object} edgetypes.UpdateSchedule
+// @success 200 {object} updateschedule.UpdateSchedule
 // @failure 500
 // @router /edge_update_schedules [post]
 func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -77,11 +77,11 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 		return httperror.InternalServerError("Unable to retrieve user information from token", err)
 	}
 
-	item := &edgetypes.UpdateSchedule{
+	item := &updateschedule.UpdateSchedule{
 		Name:      payload.Name,
 		Time:      payload.Time,
 		GroupIDs:  payload.GroupIDs,
-		Status:    map[portainer.EndpointID]edgetypes.UpdateScheduleStatus{},
+		Status:    map[portainer.EndpointID]updateschedule.UpdateScheduleStatus{},
 		Created:   time.Now().Unix(),
 		CreatedBy: tokenData.ID,
 		Type:      payload.Type,
@@ -93,7 +93,7 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 	}
 
 	prevVersions := map[portainer.EndpointID]string{}
-	if item.Type == edgetypes.UpdateScheduleRollback {
+	if item.Type == updateschedule.UpdateScheduleRollback {
 		prevVersions = previousVersions(schedules)
 	}
 
@@ -109,7 +109,7 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 		}
 
 		// validate version id is valid for rollback
-		if item.Type == edgetypes.UpdateScheduleRollback {
+		if item.Type == updateschedule.UpdateScheduleRollback {
 			if prevVersions[environmentID] == "" {
 				return httperror.BadRequest("No previous version found for environment", nil)
 			}
@@ -119,7 +119,7 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 			}
 		}
 
-		item.Status[environmentID] = edgetypes.UpdateScheduleStatus{
+		item.Status[environmentID] = updateschedule.UpdateScheduleStatus{
 			TargetVersion:  version,
 			CurrentVersion: environment.Agent.Version,
 		}

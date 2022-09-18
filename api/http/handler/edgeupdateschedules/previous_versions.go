@@ -6,7 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/edgetypes"
+	"github.com/portainer/portainer/api/edge/updateschedule"
 	"golang.org/x/exp/slices"
 )
 
@@ -39,9 +39,9 @@ type EnvironmentVersionDetails struct {
 	skipReason string
 }
 
-func previousVersions(schedules []edgetypes.UpdateSchedule) map[portainer.EndpointID]string {
+func previousVersions(schedules []updateschedule.UpdateSchedule) map[portainer.EndpointID]string {
 
-	slices.SortFunc(schedules, func(a edgetypes.UpdateSchedule, b edgetypes.UpdateSchedule) bool {
+	slices.SortFunc(schedules, func(a updateschedule.UpdateSchedule, b updateschedule.UpdateSchedule) bool {
 		return a.Created > b.Created
 	})
 
@@ -59,13 +59,13 @@ func previousVersions(schedules []edgetypes.UpdateSchedule) map[portainer.Endpoi
 				continue
 			}
 
-			if schedule.Type == edgetypes.UpdateScheduleRollback {
+			if schedule.Type == updateschedule.UpdateScheduleRollback {
 				props.skip = true
 				props.skipReason = "has rollback"
 				continue
 			}
 
-			if status.Status == edgetypes.UpdateScheduleStatusPending || status.Status == edgetypes.UpdateScheduleStatusError {
+			if status.Status == updateschedule.UpdateScheduleStatusPending || status.Status == updateschedule.UpdateScheduleStatusError {
 				props.skip = true
 				props.skipReason = "has active schedule"
 				continue

@@ -1,4 +1,4 @@
-package edgetypes
+package updateschedule
 
 import portainer "github.com/portainer/portainer/api"
 

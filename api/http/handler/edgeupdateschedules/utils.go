@@ -2,10 +2,10 @@ package edgeupdateschedules
 
 import (
 	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/edgetypes"
+	"github.com/portainer/portainer/api/edge/updateschedule"
 )
 
-func (handler *Handler) validateUniqueName(name string, id edgetypes.UpdateScheduleID) error {
+func (handler *Handler) validateUniqueName(name string, id updateschedule.UpdateScheduleID) error {
 	list, err := handler.dataStore.EdgeUpdateSchedule().List()
 	if err != nil {
 		return errors.WithMessage(err, "Unable to list edge update schedules")
