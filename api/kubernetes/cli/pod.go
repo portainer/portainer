@@ -3,11 +3,12 @@ package cli
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -78,11 +79,11 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 	go func() {
 		select {
 		case <-time.After(portainer.WebSocketKeepAlive):
-			log.Println("[DEBUG] [internal,kubernetes/pod] [message: pod removal schedule duration exceeded]")
+			log.Debug().Msg("pod removal schedule duration exceeded")
 			kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{})
 		case <-ctx.Done():
 			err := ctx.Err()
-			log.Printf("[DEBUG] [internal,kubernetes/pod] [message: context error: err=%s ]\n", err)
+			log.Debug().Err(err).Msg("context error")
 			kcl.cli.CoreV1().Pods(portainerNamespace).Delete(context.TODO(), shellPod.Name, metav1.DeleteOptions{})
 		}
 	}()
@@ -93,7 +94,7 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 // waitForPodStatus will wait until duration d (from now) for a pod to reach defined phase/status.
 // The pod status will be polled at specified delay until the pod reaches ready state.
 func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase v1.PodPhase, pod *v1.Pod) error {
-	log.Printf("[DEBUG] [internal,kubernetes/pod] [message: waiting for pod ready: pod=%s... ]\n", pod.Name)
+	log.Debug().Str("pod", pod.Name).Msg("waiting for pod ready")
 
 	pollDelay := 500 * time.Millisecond
 	for {

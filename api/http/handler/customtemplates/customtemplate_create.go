@@ -3,13 +3,11 @@ package customtemplates
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
 
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -17,6 +15,9 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/rs/zerolog/log"
 )
 
 // @id CustomTemplateCreate
@@ -44,42 +45,42 @@ import (
 func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
+		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user details from authentication token", err}
+		return httperror.InternalServerError("Unable to retrieve user details from authentication token", err)
 	}
 
 	customTemplate, err := handler.createCustomTemplate(method, r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create custom template", err}
+		return httperror.InternalServerError("Unable to create custom template", err)
 	}
 
 	customTemplate.CreatedByUserID = tokenData.ID
 
 	customTemplates, err := handler.DataStore.CustomTemplate().CustomTemplates()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve custom templates from the database", err}
+		return httperror.InternalServerError("Unable to retrieve custom templates from the database", err)
 	}
 
 	for _, existingTemplate := range customTemplates {
 		if existingTemplate.Title == customTemplate.Title {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Template name must be unique", errors.New("Template name must be unique")}
+			return httperror.InternalServerError("Template name must be unique", errors.New("Template name must be unique"))
 		}
 	}
 
 	err = handler.DataStore.CustomTemplate().Create(customTemplate)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create custom template", err}
+		return httperror.InternalServerError("Unable to create custom template", err)
 	}
 
 	resourceControl := authorization.NewPrivateResourceControl(strconv.Itoa(int(customTemplate.ID)), portainer.CustomTemplateResourceControl, tokenData.ID)
 
 	err = handler.DataStore.ResourceControl().Create(resourceControl)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
+		return httperror.InternalServerError("Unable to persist resource control inside the database", err)
 	}
 
 	customTemplate.ResourceControl = resourceControl
@@ -291,16 +292,18 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	if err != nil {
 		return nil, err
 	}
+
 	isValidProject := true
 	defer func() {
 		if !isValidProject {
 			if err := handler.FileService.RemoveDirectory(projectPath); err != nil {
-				log.Printf("[WARN] [http,customtemplate,git] [error: %s] [message: unable to remove git repository directory]", err)
+				log.Warn().Err(err).Msg("unable to remove git repository directory")
 			}
 		}
 	}()
 
 	entryPath := filesystem.JoinPaths(projectPath, customTemplate.EntryPoint)
+
 	exists, err := handler.FileService.FileExists(entryPath)
 	if err != nil || !exists {
 		isValidProject = false

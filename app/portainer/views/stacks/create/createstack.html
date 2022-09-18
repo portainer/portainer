@@ -19,15 +19,15 @@
                 auto-focus
                 ng-pattern="STACK_NAME_VALIDATION_REGEX"
               />
-            </div>
-          </div>
-          <div class="form-group" ng-show="createStackForm.stack_name.$invalid">
-            <div class="col-sm-12 small text-warning">
-              <div ng-messages="createStackForm.stack_name.$error">
-                <p ng-message="pattern">
-                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                  <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
-                </p>
+              <div class="help-block" ng-show="createStackForm.stack_name.$invalid">
+                <div class="small text-warning">
+                  <div ng-messages="createStackForm.stack_name.$error">
+                    <p ng-message="pattern">
+                      <span><pr-icon icon="'alert-triangle'" class-name="'icon-sm icon-warning'" feather="true"></pr-icon></span>
+                      This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

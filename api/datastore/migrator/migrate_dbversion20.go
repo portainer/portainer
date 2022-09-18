@@ -3,10 +3,13 @@ package migrator
 import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/authorization"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (m *Migrator) updateResourceControlsToDBVersion22() error {
-	migrateLog.Info("- updating resource controls")
+	log.Info().Msg("updating resource controls")
+
 	legacyResourceControls, err := m.resourceControlService.ResourceControls()
 	if err != nil {
 		return err
@@ -25,7 +28,8 @@ func (m *Migrator) updateResourceControlsToDBVersion22() error {
 }
 
 func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
-	migrateLog.Info("- updating users and roles")
+	log.Info().Msg("updating users and roles")
+
 	legacyUsers, err := m.userService.Users()
 	if err != nil {
 		return err

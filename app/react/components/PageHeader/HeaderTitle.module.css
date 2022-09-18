@@ -18,6 +18,8 @@
   width: 180px;
   padding: 5px !important;
   box-shadow: 0 6px 12px rgb(0 0 0 / 18%);
+  @apply th-dark:!border-none;
+  @apply th-highcontrast:!border-none;
 }
 
 .menu-link {

@@ -14,15 +14,15 @@
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left required">Username</label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.registry_username.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.registry_username.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
+      <div class="help-block" ng-show="registryFormGitlab.registry_username.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="registryFormGitlab.registry_username.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -32,15 +32,15 @@
     <label for="registry_perso_acc_token" class="col-sm-3 col-lg-2 control-label text-left required">Personal Access Token </label>
     <div class="col-sm-9 col-lg-10">
       <input type="password" class="form-control" id="registry_perso_acc_token" name="registry_perso_acc_token" ng-model="$ctrl.model.Token" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.registry_perso_acc_token.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.registry_perso_acc_token.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
+      <div class="help-block" ng-show="registryFormGitlab.registry_perso_acc_token.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="registryFormGitlab.registry_perso_acc_token.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -77,15 +77,15 @@
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="instance_url" name="instance_url" ng-model="$ctrl.model.Gitlab.InstanceURL" placeholder="https://gitlab.com" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.instance_url.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.instance_url.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
+      <div class="help-block" ng-show="registryFormGitlab.instance_url.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="registryFormGitlab.instance_url.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -98,15 +98,15 @@
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="https://registry.gitlab.com" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.registry_url.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.registry_url.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
+      <div class="help-block" ng-show="registryFormGitlab.registry_url.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="registryFormGitlab.registry_url.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

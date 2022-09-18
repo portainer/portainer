@@ -1,15 +1,14 @@
-import { array, number, object, SchemaOf, string } from 'yup';
+import { array, number, object } from 'yup';
 
 import { EdgeUpdateSchedule } from '../types';
 
 import { nameValidation } from './NameField';
-import { FormValues } from './types';
-import { typeValidation } from './UpdateTypeTabs';
+import { typeValidation } from './ScheduleTypeSelector';
 
 export function validation(
   schedules: EdgeUpdateSchedule[],
   currentId?: EdgeUpdateSchedule['id']
-): SchemaOf<FormValues> {
+) {
   return object({
     groupIds: array().min(1, 'At least one group is required'),
     name: nameValidation(schedules, currentId),
@@ -17,6 +16,6 @@ export function validation(
     time: number()
       .min(Date.now() / 1000)
       .required(),
-    version: string().required(),
+    environments: object().default({}),
   });
 }

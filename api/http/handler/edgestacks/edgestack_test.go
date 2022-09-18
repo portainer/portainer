@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -47,7 +46,7 @@ func (g *gitService) ListFiles(repositoryURL, referenceName, username, password 
 func setupHandler(t *testing.T) (*Handler, string, func()) {
 	t.Helper()
 
-	_, store, storeTeardown := datastore.MustNewTestStore(true, true)
+	_, store, storeTeardown := datastore.MustNewTestStore(t, true, true)
 
 	jwtService, err := jwt.NewService("1h", store)
 	if err != nil {
@@ -74,11 +73,7 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 		store,
 	)
 
-	tmpDir, err := os.MkdirTemp(os.TempDir(), "portainer-test")
-	if err != nil {
-		storeTeardown()
-		t.Fatal(err)
-	}
+	tmpDir := t.TempDir()
 
 	fs, err := filesystem.NewService(tmpDir, "")
 	if err != nil {

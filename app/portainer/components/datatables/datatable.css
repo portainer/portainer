@@ -341,7 +341,9 @@
 [data-reach-menu-list],
 [data-reach-menu-items] {
   padding: 0px;
+  border-radius: 8px;
   border: 1px var(--bg-dropdown-menu-color);
+  background-color: var(--bg-dropdown-menu-color);
 }
 
 .dropdown-menu .tableMenu {

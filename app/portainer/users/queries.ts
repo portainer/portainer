@@ -34,16 +34,21 @@ export function useIsTeamLeader(user: User) {
 
 export function useUsers<T = User[]>(
   includeAdministrator = false,
+  environmentId = 0,
   enabled = true,
   select: (data: User[]) => T = (data) => data as unknown as T
 ) {
-  const users = useQuery(['users'], () => getUsers(includeAdministrator), {
-    meta: {
-      error: { title: 'Failure', message: 'Unable to load users' },
-    },
-    enabled,
-    select,
-  });
+  const users = useQuery(
+    ['users'],
+    () => getUsers(includeAdministrator, environmentId),
+    {
+      meta: {
+        error: { title: 'Failure', message: 'Unable to load users' },
+      },
+      enabled,
+      select,
+    }
+  );
 
   return users;
 }

@@ -6,12 +6,12 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"strings"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // KubeClusterAccessService represents a service that is responsible for centralizing kube cluster access data
@@ -45,7 +45,7 @@ var (
 func NewKubeClusterAccessService(baseURL, httpsBindAddr, tlsCertPath string) KubeClusterAccessService {
 	certificateAuthorityData, err := getCertificateAuthorityData(tlsCertPath)
 	if err != nil {
-		log.Printf("[DEBUG] [internal,kubeconfig] [message: %s, generated KubeConfig will be insecure]", err.Error())
+		log.Debug().Err(err).Msg("generated KubeConfig will be insecure")
 	}
 
 	return &kubeClusterAccessService{
@@ -106,7 +106,11 @@ func (service *kubeClusterAccessService) GetData(hostURL string, endpointID port
 		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
 	}
 
-	logrus.Infof("[kubeconfig] [hostURL: %s, httpsBindAddr: %s, baseURL: %s]", hostURL, service.httpsBindAddr, baseURL)
+	log.Info().
+		Str("host_URL", hostURL).
+		Str("HTTPS_bind_address", service.httpsBindAddr).
+		Str("base_URL", baseURL).
+		Msg("kubeconfig")
 
 	clusterURL := hostURL + baseURL
 

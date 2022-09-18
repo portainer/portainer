@@ -158,7 +158,7 @@ func runTest(t *testing.T, test filterTest, handler *Handler, endpoints []portai
 
 func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, teardown func()) {
 	is := assert.New(t)
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 
 	for _, endpoint := range endpoints {
 		err := store.Endpoint().Create(&endpoint)

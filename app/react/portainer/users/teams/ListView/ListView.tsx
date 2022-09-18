@@ -12,7 +12,7 @@ export function ListView() {
   const { isAdmin } = useUser();
 
   const usersQuery = useUsers(false);
-  const teamsQuery = useTeams(!isAdmin, { enabled: !!usersQuery.data });
+  const teamsQuery = useTeams(!isAdmin, 0, { enabled: !!usersQuery.data });
 
   return (
     <>

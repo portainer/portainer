@@ -2,12 +2,10 @@ package git
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,12 +20,10 @@ func TestService_ClonePrivateRepository_GitHub(t *testing.T) {
 	username := getRequiredValue(t, "GITHUB_USERNAME")
 	service := newService(context.TODO(), 0, 0)
 
-	dst, err := ioutils.TempDir("", "clone")
-	assert.NoError(t, err)
-	defer os.RemoveAll(dst)
+	dst := t.TempDir()
 
 	repositoryUrl := privateGitRepoURL
-	err = service.CloneRepository(dst, repositoryUrl, "refs/heads/main", username, accessToken)
+	err := service.CloneRepository(dst, repositoryUrl, "refs/heads/main", username, accessToken)
 	assert.NoError(t, err)
 	assert.FileExists(t, filepath.Join(dst, "README.md"))
 }

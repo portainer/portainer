@@ -128,6 +128,7 @@ type (
 		MaxBatchSize              *int
 		MaxBatchDelay             *time.Duration
 		SecretKeyName             *string
+		LogLevel                  *string
 	}
 
 	// CustomTemplateVariableDefinition
@@ -1244,6 +1245,7 @@ type (
 		NormalizeStackName(name string) string
 		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRereate bool) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
+		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data
@@ -1398,7 +1400,7 @@ type (
 	SwarmStackManager interface {
 		Login(registries []Registry, endpoint *Endpoint) error
 		Logout(endpoint *Endpoint) error
-		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
+		Deploy(stack *Stack, prune bool, pullImage bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
 		NormalizeStackName(name string) string
 	}

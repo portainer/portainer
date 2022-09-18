@@ -27,57 +27,57 @@ import (
 func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
+		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
 	if handler.demoService.IsDemoEnvironment(portainer.EndpointID(endpointID)) {
-		return &httperror.HandlerError{http.StatusForbidden, httperrors.ErrNotAvailableInDemo.Error(), httperrors.ErrNotAvailableInDemo}
+		return httperror.Forbidden(httperrors.ErrNotAvailableInDemo.Error(), httperrors.ErrNotAvailableInDemo)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
 	if endpoint.TLSConfig.TLS {
 		folder := strconv.Itoa(endpointID)
 		err = handler.FileService.DeleteTLSFiles(folder)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove TLS files from disk", err}
+			return httperror.InternalServerError("Unable to remove TLS files from disk", err)
 		}
 	}
 
 	err = handler.DataStore.Endpoint().DeleteEndpoint(portainer.EndpointID(endpointID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove environment from the database", err}
+		return httperror.InternalServerError("Unable to remove environment from the database", err)
 	}
 
 	handler.ProxyManager.DeleteEndpointProxy(endpoint.ID)
 
 	err = handler.DataStore.EndpointRelation().DeleteEndpointRelation(endpoint.ID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove environment relation from the database", err}
+		return httperror.InternalServerError("Unable to remove environment relation from the database", err)
 	}
 
 	for _, tagID := range endpoint.TagIDs {
 		tag, err := handler.DataStore.Tag().Tag(tagID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusNotFound, "Unable to find tag inside the database", err}
+			return httperror.NotFound("Unable to find tag inside the database", err)
 		}
 
 		delete(tag.Endpoints, endpoint.ID)
 
 		err = handler.DataStore.Tag().UpdateTag(tagID, tag)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag relation inside the database", err}
+			return httperror.InternalServerError("Unable to persist tag relation inside the database", err)
 		}
 	}
 
 	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+		return httperror.InternalServerError("Unable to retrieve edge groups from the database", err)
 	}
 
 	for idx := range edgeGroups {
@@ -87,14 +87,14 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 			edgeGroup.Endpoints = removeElement(edgeGroup.Endpoints, endpointIdx)
 			err = handler.DataStore.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update edge group", err}
+				return httperror.InternalServerError("Unable to update edge group", err)
 			}
 		}
 	}
 
 	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
+		return httperror.InternalServerError("Unable to retrieve edge stacks from the database", err)
 	}
 
 	for idx := range edgeStacks {
@@ -103,14 +103,14 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 			delete(edgeStack.Status, endpoint.ID)
 			err = handler.DataStore.EdgeStack().UpdateEdgeStack(edgeStack.ID, edgeStack)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update edge stack", err}
+				return httperror.InternalServerError("Unable to update edge stack", err)
 			}
 		}
 	}
 
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
+		return httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}
 
 	for idx := range registries {
@@ -119,7 +119,7 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 			delete(registry.RegistryAccesses, endpoint.ID)
 			err = handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)
 			if err != nil {
-				return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to update registry accesses", Err: err}
+				return httperror.InternalServerError("Unable to update registry accesses", err)
 			}
 		}
 	}

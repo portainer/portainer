@@ -40,6 +40,9 @@ func (c *gitClient) download(ctx context.Context, dst string, opt cloneOption) e
 	_, err := git.PlainCloneContext(ctx, dst, false, &gitOptions)
 
 	if err != nil {
+		if err.Error() == "authentication required" {
+			return ErrAuthenticationFailure
+		}
 		return errors.Wrap(err, "failed to clone git repository")
 	}
 
@@ -62,6 +65,9 @@ func (c *gitClient) latestCommitID(ctx context.Context, opt fetchOption) (string
 
 	refs, err := remote.List(listOptions)
 	if err != nil {
+		if err.Error() == "authentication required" {
+			return "", ErrAuthenticationFailure
+		}
 		return "", errors.Wrap(err, "failed to list repository refs")
 	}
 

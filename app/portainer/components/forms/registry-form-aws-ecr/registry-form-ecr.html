@@ -14,19 +14,19 @@
     <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left required">Name</label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="registry_name" name="registry_name" ng-model="$ctrl.model.Name" placeholder="my-ecr-registry" required auto-focus />
-    </div>
-  </div>
-  <div class="form-group" ng-show="$ctrl.registryFormEcr.registry_name.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="$ctrl.registryFormEcr.registry_name.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
-        <p ng-message="used" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          A registry with the same name already exists.
-        </p>
+      <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_name.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="$ctrl.registryFormEcr.registry_name.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+            <p ng-message="used" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              A registry with the same name already exists.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -48,15 +48,15 @@
         placeholder="aws-account-id.dkr.ecr.us-east-1.amazonaws.com/"
         required
       />
-    </div>
-  </div>
-  <div class="form-group" ng-show="$ctrl.registryFormEcr.registry_url.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="$ctrl.registryFormEcr.registry_url.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
+      <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_url.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="$ctrl.registryFormEcr.registry_url.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -84,15 +84,15 @@
       <label for="registry_access_key" class="col-sm-3 col-lg-2 control-label text-left required">AWS Access Key</label>
       <div class="col-sm-9 col-lg-10">
         <input type="text" class="form-control" id="registry_access_key" name="registry_access_key" ng-model="$ctrl.model.Username" required />
-      </div>
-    </div>
-    <div class="form-group" ng-show="$ctrl.registryFormEcr.registry_access_key.$invalid">
-      <div class="col-sm-12 small text-warning">
-        <div ng-messages="$ctrl.registryFormEcr.registry_access_key.$error">
-          <p ng-message="required" class="vertical-center">
-            <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-            This field is required.
-          </p>
+        <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_access_key.$invalid">
+          <div class="small text-warning">
+            <div ng-messages="$ctrl.registryFormEcr.registry_access_key.$error">
+              <p ng-message="required" class="vertical-center">
+                <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+                This field is required.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -103,15 +103,15 @@
       <label for="registry_secret_access_key" class="col-sm-3 col-lg-2 control-label text-left required">AWS Secret Access Key</label>
       <div class="col-sm-9 col-lg-10">
         <input type="password" class="form-control" id="registry_secret_access_key" name="registry_secret_access_key" ng-model="$ctrl.model.Password" required />
-      </div>
-    </div>
-    <div class="form-group" ng-show="$ctrl.registryFormEcr.registry_secret_access_key.$invalid">
-      <div class="col-sm-12 small text-warning">
-        <div ng-messages="$ctrl.registryFormEcr.registry_secret_access_key.$error">
-          <p ng-message="required" class="vertical-center">
-            <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-            This field is required.
-          </p>
+        <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_secret_access_key.$invalid">
+          <div class="small text-warning">
+            <div ng-messages="$ctrl.registryFormEcr.registry_secret_access_key.$error">
+              <p ng-message="required" class="vertical-center">
+                <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+                This field is required.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -122,19 +122,19 @@
       <label for="registry_region" class="col-sm-3 col-lg-2 control-label text-left required">Region</label>
       <div class="col-sm-9 col-lg-10">
         <input type="text" class="form-control" id="registry_region" name="registry_region" placeholder="us-west-1" ng-model="$ctrl.model.Ecr.Region" required />
-      </div>
-    </div>
-    <div class="form-group" ng-show="$ctrl.registryFormEcr.registry_region.$invalid">
-      <div class="col-sm-12 small text-warning">
-        <div ng-messages="$ctrl.registryFormEcr.registry_region.$error">
-          <p ng-message="required" class="vertical-center">
-            <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-            This field is required.
-          </p>
-          <p ng-message="used" class="vertical-center">
-            <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-            A registry with the same name already exists.
-          </p>
+        <div class="help-block" ng-show="$ctrl.registryFormEcr.registry_region.$invalid">
+          <div class="small text-warning">
+            <div ng-messages="$ctrl.registryFormEcr.registry_region.$error">
+              <p ng-message="required" class="vertical-center">
+                <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+                This field is required.
+              </p>
+              <p ng-message="used" class="vertical-center">
+                <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+                A registry with the same name already exists.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

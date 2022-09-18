@@ -36,11 +36,11 @@ import (
 func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 	bearerToken, err := handler.jwtService.GenerateTokenForKubeconfig(tokenData)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}
+		return httperror.InternalServerError("Unable to generate JWT token", err)
 	}
 
 	endpoints, handlerErr := handler.filterUserKubeEndpoints(r)
@@ -48,7 +48,7 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 		return handlerErr
 	}
 	if len(endpoints) == 0 {
-		return &httperror.HandlerError{http.StatusBadRequest, "empty endpoints list", errors.New("empty endpoints list")}
+		return httperror.BadRequest("empty endpoints list", errors.New("empty endpoints list"))
 	}
 
 	config, handlerErr := handler.buildConfig(r, tokenData, bearerToken, endpoints)
@@ -67,17 +67,17 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 	_ = request.RetrieveJSONQueryParameter(r, "excludeIds", &excludeEndpointIDs, true)
 
 	if len(endpointIDs) > 0 && len(excludeEndpointIDs) > 0 {
-		return nil, &httperror.HandlerError{http.StatusBadRequest, "Can't provide both 'ids' and 'excludeIds' parameters", errors.New("invalid parameters")}
+		return nil, httperror.BadRequest("Can't provide both 'ids' and 'excludeIds' parameters", errors.New("invalid parameters"))
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	endpointGroups, err := handler.dataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from the database", err}
+		return nil, httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}
 
 	if len(endpointIDs) > 0 {
@@ -85,7 +85,7 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 		for _, endpointID := range endpointIDs {
 			endpoint, err := handler.dataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
-				return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment from the database", err}
+				return nil, httperror.InternalServerError("Unable to retrieve environment from the database", err)
 			}
 			if !endpointutils.IsKubernetesEndpoint(endpoint) {
 				continue
@@ -99,7 +99,7 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 	var kubeEndpoints []portainer.Endpoint
 	endpoints, err := handler.dataStore.Endpoint().Endpoints()
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
+		return nil, httperror.InternalServerError("Unable to retrieve environments from the database", err)
 	}
 	for _, endpoint := range endpoints {
 		if !endpointutils.IsKubernetesEndpoint(&endpoint) {
@@ -188,7 +188,7 @@ func writeFileContent(w http.ResponseWriter, r *http.Request, endpoints []portai
 	if r.Header.Get("Accept") == "text/yaml" {
 		yaml, err := kcli.GenerateYAML(config)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Failed to generate Kubeconfig", err}
+			return httperror.InternalServerError("Failed to generate Kubeconfig", err)
 		}
 
 		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; %s.yaml", filenameBase))

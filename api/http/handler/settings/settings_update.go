@@ -106,12 +106,12 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	var payload settingsUpdatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
+		return httperror.InternalServerError("Unable to retrieve the settings from the database", err)
 	}
 
 	if handler.demoService.IsDemo() {
@@ -139,7 +139,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 			if newHelmRepo != settings.HelmRepositoryURL && newHelmRepo != portainer.DefaultHelmRepositoryURL {
 				err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
 				if err != nil {
-					return &httperror.HandlerError{http.StatusBadRequest, "Invalid Helm repository URL. Must correspond to a valid URL format", err}
+					return httperror.BadRequest("Invalid Helm repository URL. Must correspond to a valid URL format", err)
 				}
 
 			}
@@ -205,7 +205,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
 		err := handler.updateSnapshotInterval(settings, *payload.SnapshotInterval)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update snapshot interval", err}
+			return httperror.InternalServerError("Unable to update snapshot interval", err)
 		}
 	}
 
@@ -240,7 +240,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	err = handler.DataStore.Settings().UpdateSettings(settings)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist settings changes inside the database", err}
+		return httperror.InternalServerError("Unable to persist settings changes inside the database", err)
 	}
 
 	return response.JSON(w, settings)
@@ -265,7 +265,7 @@ func (handler *Handler) updateTLS(settings *portainer.Settings) *httperror.Handl
 		settings.LDAPSettings.TLSConfig.TLSCACertPath = ""
 		err := handler.FileService.DeleteTLSFiles(filesystem.LDAPStorePath)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove TLS files from disk", err}
+			return httperror.InternalServerError("Unable to remove TLS files from disk", err)
 		}
 	}
 	return nil

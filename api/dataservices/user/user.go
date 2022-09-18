@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/sirupsen/logrus"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices/errors"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -59,18 +59,23 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 		func(obj interface{}) (interface{}, error) {
 			user, ok := obj.(*portainer.User)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to User object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to User object")
+
 				return nil, fmt.Errorf("Failed to convert to User object: %s", obj)
 			}
+
 			if strings.EqualFold(user.Username, username) {
 				u = user
 				return nil, stop
 			}
+
 			return &portainer.User{}, nil
 		})
+
 	if err == stop {
 		return u, nil
 	}
+
 	if err == nil {
 		return nil, errors.ErrObjectNotFound
 	}
@@ -88,10 +93,13 @@ func (service *Service) Users() ([]portainer.User, error) {
 		func(obj interface{}) (interface{}, error) {
 			user, ok := obj.(*portainer.User)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to User object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to User object")
+
 				return nil, fmt.Errorf("Failed to convert to User object: %s", obj)
 			}
+
 			users = append(users, *user)
+
 			return &portainer.User{}, nil
 		})
 
@@ -108,12 +116,15 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 		func(obj interface{}) (interface{}, error) {
 			user, ok := obj.(*portainer.User)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to User object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to User object")
+
 				return nil, fmt.Errorf("Failed to convert to User object: %s", obj)
 			}
+
 			if user.Role == role {
 				users = append(users, *user)
 			}
+
 			return &portainer.User{}, nil
 		})
 

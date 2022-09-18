@@ -13,7 +13,7 @@
   </div>
   <div class="small vertical-center" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
     <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
-    <span class="text-muted"
+    <span class="text-warning"
       >Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption. Do you wish to continue?</span
     >
   </div>
@@ -60,7 +60,7 @@
       />
       <div class="help-group">
         <div class="form-group col-md-12 pt-1" ng-show="autoUpdateForm.repository_fetch_interval.$touched && autoUpdateForm.repository_fetch_interval.$invalid">
-          <div class="small text-muted">
+          <div class="small text-warning">
             <div ng-messages="autoUpdateForm.repository_fetch_interval.$error">
               <p ng-message="required"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p>
               <p ng-message="invalidIntervalFormat"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Please enter a valid time interval.</p>

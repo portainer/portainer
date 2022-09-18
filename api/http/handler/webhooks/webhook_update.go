@@ -37,41 +37,41 @@ func (payload *webhookUpdatePayload) Validate(r *http.Request) error {
 func (handler *Handler) webhookUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid webhook id", err}
+		return httperror.BadRequest("Invalid webhook id", err)
 	}
 	webhookID := portainer.WebhookID(id)
 
 	var payload webhookUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	webhook, err := handler.DataStore.Webhook().Webhook(webhookID)
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a webhooks with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a webhooks with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a webhooks with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a webhooks with the specified identifier inside the database", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
+		return httperror.InternalServerError("Unable to retrieve user info from request context", err)
 	}
 
 	if !securityContext.IsAdmin {
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Not authorized to update a webhook", Err: errors.New("not authorized to update a webhook")}
+		return httperror.Forbidden("Not authorized to update a webhook", errors.New("not authorized to update a webhook"))
 	}
 
 	if payload.RegistryID != 0 {
 		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+			return httperror.InternalServerError("Unable to retrieve user authentication token", err)
 		}
 
 		_, err = access.GetAccessibleRegistry(handler.DataStore, tokenData.ID, webhook.EndpointID, payload.RegistryID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusForbidden, "Permission deny to access registry", err}
+			return httperror.Forbidden("Permission deny to access registry", err)
 		}
 	}
 
@@ -79,7 +79,7 @@ func (handler *Handler) webhookUpdate(w http.ResponseWriter, r *http.Request) *h
 
 	err = handler.DataStore.Webhook().UpdateWebhook(portainer.WebhookID(id), webhook)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the webhook inside the database", err}
+		return httperror.InternalServerError("Unable to persist the webhook inside the database", err)
 	}
 
 	return response.JSON(w, webhook)

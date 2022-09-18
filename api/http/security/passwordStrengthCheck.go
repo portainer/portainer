@@ -2,7 +2,8 @@ package security
 
 import (
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 type PasswordStrengthChecker interface {
@@ -23,7 +24,8 @@ func NewPasswordStrengthChecker(settings settingsService) *passwordStrengthCheck
 func (c *passwordStrengthChecker) Check(password string) bool {
 	s, err := c.settings.Settings()
 	if err != nil {
-		logrus.WithError(err).Warn("failed to fetch Portainer settings to validate user password")
+		log.Warn().Err(err).Msg("failed to fetch Portainer settings to validate user password")
+
 		return true
 	}
 

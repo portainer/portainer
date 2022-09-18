@@ -24,12 +24,12 @@ import (
 func (handler *Handler) deleteProfile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Bad request", errors.New("missing 'id' query parameter")}
+		return httperror.BadRequest("Bad request", errors.New("missing 'id' query parameter"))
 	}
 
 	err = handler.DataStore.FDOProfile().Delete(portainer.FDOProfileID(id))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete Profile", err}
+		return httperror.InternalServerError("Unable to delete Profile", err)
 	}
 
 	return response.Empty(w)

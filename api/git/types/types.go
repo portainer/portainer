@@ -17,4 +17,8 @@ type RepoConfig struct {
 type GitAuthentication struct {
 	Username string
 	Password string
+	// Git credentials identifier when the value is not 0
+	// When the value is 0, Username and Password are set without using saved credential
+	// This is introduced since 2.15.0
+	GitCredentialID int `example:"0"`
 }

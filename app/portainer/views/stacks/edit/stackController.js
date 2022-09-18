@@ -244,13 +244,8 @@ angular.module('portainer.app').controller('StackController', [
 
     $scope.deployStack = function () {
       const stack = $scope.stack;
-      const tplCrop =
-        '<div>Do you want to force an update of the stack?</div>' +
-        '<div  style="position: absolute; right: 5px; top: 50px; z-index: 999"><be-feature-indicator feature="stackPullImageFeature"></be-feature-indicator></div>';
-      const template = angular.element(tplCrop);
-      const html = $compile(template)($scope);
-      // 'Do you want to force an update of the stack?'
-      ModalService.confirmStackUpdate(html, true, false, null, function (result) {
+      const isSwarmStack = stack.Type === 1;
+      ModalService.confirmStackUpdate('Do you want to force an update of the stack?', isSwarmStack, null, function (result) {
         if (!result) {
           return;
         }
@@ -267,7 +262,7 @@ angular.module('portainer.app').controller('StackController', [
         }
 
         $scope.state.actionInProgress = true;
-        StackService.updateStack(stack, stackFile, env, prune)
+        StackService.updateStack(stack, stackFile, env, prune, !!result[0])
           .then(function success() {
             Notifications.success('Success', 'Stack successfully deployed');
             $scope.state.isEditorDirty = false;

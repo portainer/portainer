@@ -2,10 +2,13 @@ package migrator
 
 import (
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (m *Migrator) updateEndpointSettingsToDB25() error {
-	migrateLog.Info("- updating endpoint settings")
+	log.Info().Msg("updating endpoint settings")
+
 	settings, err := m.settingsService.Settings()
 	if err != nil {
 		return err

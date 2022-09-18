@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -33,7 +34,7 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	}, nil
 }
 
-//EndpointRelations returns an array of all EndpointRelations
+// EndpointRelations returns an array of all EndpointRelations
 func (service *Service) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	var all = make([]portainer.EndpointRelation, 0)
 
@@ -43,10 +44,12 @@ func (service *Service) EndpointRelations() ([]portainer.EndpointRelation, error
 		func(obj interface{}) (interface{}, error) {
 			r, ok := obj.(*portainer.EndpointRelation)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to EndpointRelation object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointRelation object")
 				return nil, fmt.Errorf("Failed to convert to EndpointRelation object: %s", obj)
 			}
+
 			all = append(all, *r)
+
 			return &portainer.EndpointRelation{}, nil
 		})
 

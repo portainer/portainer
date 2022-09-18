@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 
@@ -34,7 +35,8 @@ import (
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/portainer/portainer/api/dataservices/webhook"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 // Store defines the implementation of portainer.DataStore using
@@ -391,7 +393,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if c, err := store.CustomTemplate().CustomTemplates(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Custom Templates")
+			log.Error().Err(err).Msg("exporting Custom Templates")
 		}
 	} else {
 		backup.CustomTemplate = c
@@ -399,7 +401,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if e, err := store.EdgeGroup().EdgeGroups(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Edge Groups")
+			log.Error().Err(err).Msg("exporting Edge Groups")
 		}
 	} else {
 		backup.EdgeGroup = e
@@ -407,7 +409,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if e, err := store.EdgeJob().EdgeJobs(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Edge Jobs")
+			log.Error().Err(err).Msg("exporting Edge Jobs")
 		}
 	} else {
 		backup.EdgeJob = e
@@ -415,7 +417,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if e, err := store.EdgeStack().EdgeStacks(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Edge Stacks")
+			log.Error().Err(err).Msg("exporting Edge Stacks")
 		}
 	} else {
 		backup.EdgeStack = e
@@ -423,7 +425,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if e, err := store.Endpoint().Endpoints(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Endpoints")
+			log.Error().Err(err).Msg("exporting Endpoints")
 		}
 	} else {
 		backup.Endpoint = e
@@ -431,7 +433,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if e, err := store.EndpointGroup().EndpointGroups(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Endpoint Groups")
+			log.Error().Err(err).Msg("exporting Endpoint Groups")
 		}
 	} else {
 		backup.EndpointGroup = e
@@ -439,7 +441,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if r, err := store.EndpointRelation().EndpointRelations(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Endpoint Relations")
+			log.Error().Err(err).Msg("exporting Endpoint Relations")
 		}
 	} else {
 		backup.EndpointRelation = r
@@ -447,7 +449,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if r, err := store.ExtensionService.Extensions(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Extensions")
+			log.Error().Err(err).Msg("exporting Extensions")
 		}
 	} else {
 		backup.Extensions = r
@@ -455,7 +457,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if r, err := store.HelmUserRepository().HelmUserRepositories(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Helm User Repositories")
+			log.Error().Err(err).Msg("exporting Helm User Repositories")
 		}
 	} else {
 		backup.HelmUserRepository = r
@@ -463,7 +465,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if r, err := store.Registry().Registries(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Registries")
+			log.Error().Err(err).Msg("exporting Registries")
 		}
 	} else {
 		backup.Registry = r
@@ -471,7 +473,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if c, err := store.ResourceControl().ResourceControls(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Resource Controls")
+			log.Error().Err(err).Msg("exporting Resource Controls")
 		}
 	} else {
 		backup.ResourceControl = c
@@ -479,7 +481,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if role, err := store.Role().Roles(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Roles")
+			log.Error().Err(err).Msg("exporting Roles")
 		}
 	} else {
 		backup.Role = role
@@ -487,7 +489,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if r, err := store.ScheduleService.Schedules(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Schedules")
+			log.Error().Err(err).Msg("exporting Schedules")
 		}
 	} else {
 		backup.Schedules = r
@@ -495,7 +497,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if settings, err := store.Settings().Settings(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Settings")
+			log.Error().Err(err).Msg("exporting Settings")
 		}
 	} else {
 		backup.Settings = *settings
@@ -503,7 +505,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if settings, err := store.SSLSettings().Settings(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting SSL Settings")
+			log.Error().Err(err).Msg("exporting SSL Settings")
 		}
 	} else {
 		backup.SSLSettings = *settings
@@ -511,7 +513,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if t, err := store.Stack().Stacks(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Stacks")
+			log.Error().Err(err).Msg("exporting Stacks")
 		}
 	} else {
 		backup.Stack = t
@@ -519,7 +521,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if t, err := store.Tag().Tags(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Tags")
+			log.Error().Err(err).Msg("exporting Tags")
 		}
 	} else {
 		backup.Tag = t
@@ -527,7 +529,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if t, err := store.TeamMembership().TeamMemberships(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Team Memberships")
+			log.Error().Err(err).Msg("exporting Team Memberships")
 		}
 	} else {
 		backup.TeamMembership = t
@@ -535,7 +537,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if t, err := store.Team().Teams(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Teams")
+			log.Error().Err(err).Msg("exporting Teams")
 		}
 	} else {
 		backup.Team = t
@@ -543,7 +545,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if info, err := store.TunnelServer().Info(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Tunnel Server")
+			log.Error().Err(err).Msg("exporting Tunnel Server")
 		}
 	} else {
 		backup.TunnelServer = *info
@@ -551,7 +553,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if users, err := store.User().Users(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Users")
+			log.Error().Err(err).Msg("exporting Users")
 		}
 	} else {
 		backup.User = users
@@ -559,7 +561,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if webhooks, err := store.Webhook().Webhooks(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Webhooks")
+			log.Error().Err(err).Msg("exporting Webhooks")
 		}
 	} else {
 		backup.Webhook = webhooks
@@ -567,7 +569,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	v, err := store.Version().DBVersion()
 	if err != nil && !store.IsErrObjectNotFound(err) {
-		logrus.WithError(err).Errorf("Exporting DB version")
+		log.Error().Err(err).Msg("exporting DB version")
 	}
 	instance, _ := store.Version().InstanceID()
 	backup.Version = map[string]string{
@@ -577,7 +579,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	backup.Metadata, err = store.connection.BackupMetadata()
 	if err != nil {
-		logrus.WithError(err).Errorf("Exporting Metadata")
+		log.Error().Err(err).Msg("exporting Metadata")
 	}
 
 	b, err := json.MarshalIndent(backup, "", "  ")
@@ -588,7 +590,6 @@ func (store *Store) Export(filename string) (err error) {
 }
 
 func (store *Store) Import(filename string) (err error) {
-
 	backup := storeExport{}
 
 	s, err := ioutil.ReadFile(filename)
@@ -604,13 +605,13 @@ func (store *Store) Import(filename string) (err error) {
 	if dbversion, ok := backup.Version["DB_VERSION"]; ok {
 		if v, err := strconv.Atoi(dbversion); err == nil {
 			if err := store.Version().StoreDBVersion(v); err != nil {
-				logrus.WithError(err).Errorf("DB_VERSION import issue")
+				log.Error().Err(err).Msg("DB_VERSION import issue")
 			}
 		}
 	}
 	if instanceID, ok := backup.Version["INSTANCE_ID"]; ok {
 		if err := store.Version().StoreInstanceID(instanceID); err != nil {
-			logrus.WithError(err).Errorf("INSTANCE_ID import issue")
+			log.Error().Err(err).Msg("INSTANCE_ID import issue")
 		}
 	}
 
@@ -681,7 +682,7 @@ func (store *Store) Import(filename string) (err error) {
 
 	for _, user := range backup.User {
 		if err := store.User().UpdateUser(user.ID, &user); err != nil {
-			logrus.WithField("user", user).WithError(err).Errorf("User: Failed to Update Database")
+			log.Debug().Str("user", fmt.Sprintf("%+v", user)).Err(err).Msg("user: failed to Update Database")
 		}
 	}
 

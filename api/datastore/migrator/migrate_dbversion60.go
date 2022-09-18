@@ -1,17 +1,18 @@
 package migrator
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+
+	"github.com/rs/zerolog/log"
+)
 
 func (m *Migrator) migrateDBVersionToDB60() error {
-	if err := m.addGpuInputFieldDB60(); err != nil {
-		return err
-	}
-
-	return nil
+	return m.addGpuInputFieldDB60()
 }
 
 func (m *Migrator) addGpuInputFieldDB60() error {
-	migrateLog.Info("- add gpu input field")
+	log.Info().Msg("add gpu input field")
+
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
 		return err
