@@ -1,10 +1,12 @@
 package datastore
 
 import (
+	"io/ioutil"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/filesystem"
 
 	"github.com/pkg/errors"
@@ -21,7 +23,9 @@ func MustNewTestStore(t *testing.T, init, secure bool) (bool, *Store, func()) {
 	newStore, store, teardown, err := NewTestStore(t, init, secure)
 	if err != nil {
 		if !errors.Is(err, errTempDir) {
-			teardown()
+			if teardown != nil {
+				teardown()
+			}
 		}
 
 		log.Fatal().Err(err).Msg("")
@@ -32,7 +36,12 @@ func MustNewTestStore(t *testing.T, init, secure bool) (bool, *Store, func()) {
 
 func NewTestStore(t *testing.T, init, secure bool) (bool, *Store, func(), error) {
 	// Creates unique temp directory in a concurrency friendly manner.
-	storePath := t.TempDir()
+	//storePath := t.TempDir()
+	storePath, err := ioutil.TempDir("", "test-store")
+	if err != nil {
+		return false, nil, nil, errors.Wrap(errTempDir, err.Error())
+	}
+
 	fileService, err := filesystem.NewService(storePath, "")
 	if err != nil {
 		return false, nil, nil, err
@@ -67,7 +76,11 @@ func NewTestStore(t *testing.T, init, secure bool) (bool, *Store, func(), error)
 
 	if newStore {
 		// from MigrateData
-		store.VersionService.StoreDBVersion(portainer.DBVersion)
+		v := models.Version{
+			SchemaVersion: portainer.APIVersion,
+			Edition:       int(portainer.PortainerCE),
+		}
+		err = store.VersionService.UpdateVersion(&v)
 		if err != nil {
 			return newStore, nil, nil, err
 		}

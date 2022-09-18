@@ -25,7 +25,6 @@ import (
 type (
 	// Migrator defines a service to migrate data after a Portainer version update.
 	Migrator struct {
-		currentDBVersion        int
 		endpointGroupService    *endpointgroup.Service
 		endpointService         *endpoint.Service
 		endpointRelationService *endpointrelation.Service
@@ -49,7 +48,6 @@ type (
 
 	// MigratorParameters represents the required parameters to create a new Migrator instance.
 	MigratorParameters struct {
-		DatabaseVersion         int
 		EndpointGroupService    *endpointgroup.Service
 		EndpointService         *endpoint.Service
 		EndpointRelationService *endpointrelation.Service
@@ -75,7 +73,6 @@ type (
 // NewMigrator creates a new Migrator.
 func NewMigrator(parameters *MigratorParameters) *Migrator {
 	return &Migrator{
-		currentDBVersion:        parameters.DatabaseVersion,
 		endpointGroupService:    parameters.EndpointGroupService,
 		endpointService:         parameters.EndpointService,
 		endpointRelationService: parameters.EndpointRelationService,
@@ -96,9 +93,4 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		authorizationService:    parameters.AuthorizationService,
 		dockerhubService:        parameters.DockerhubService,
 	}
-}
-
-// Version exposes version of database
-func (migrator *Migrator) Version() int {
-	return migrator.currentDBVersion
 }

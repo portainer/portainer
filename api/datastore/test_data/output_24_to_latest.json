@@ -930,8 +930,6 @@
     }
   ],
   "version": {
-    "DB_UPDATING": "false",
-    "DB_VERSION": "80",
-    "INSTANCE_ID": "null"
+    "VERSION": "{\"SchemaVersion\":\"2.16.0\",\"MigratorCount\":0,\"Edition\":1,\"InstanceID\":\"463d5c47-0ea5-4aca-85b1-405ceefee254\"}"
   }
 }

@@ -13,14 +13,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (store *Store) version() (int, error) {
-	version, err := store.VersionService.DBVersion()
-	if store.IsErrObjectNotFound(err) {
-		version = 0
-	}
-	return version, err
-}
-
 func (store *Store) edition() portainer.SoftwareEdition {
 	edition, err := store.VersionService.Edition()
 	if store.IsErrObjectNotFound(err) {
@@ -39,8 +31,6 @@ func NewStore(storePath string, fileService portainer.FileService, connection po
 
 // Open opens and initializes the BoltDB database.
 func (store *Store) Open() (newStore bool, err error) {
-	newStore = true
-
 	encryptionReq, err := store.connection.NeedsEncryptionMigration()
 	if err != nil {
 		return false, err
@@ -55,31 +45,26 @@ func (store *Store) Open() (newStore bool, err error) {
 
 	err = store.connection.Open()
 	if err != nil {
-		return newStore, err
+		return false, err
 	}
 
 	err = store.initServices()
 	if err != nil {
-		return newStore, err
+		return false, err
 	}
 
-	// if we have DBVersion in the database then ensure we flag this as NOT a new store
-	version, err := store.VersionService.DBVersion()
+	store.VersionService.Migrate()
+
+	// If no settings object exists then assume we have a new store
+	_, err = store.SettingsService.Settings()
 	if err != nil {
 		if store.IsErrObjectNotFound(err) {
-			return newStore, nil
+			return true, nil
 		}
-
-		return newStore, err
+		return false, err
 	}
 
-	if version > 0 {
-		log.Debug().Int("version", version).Msg("opened existing store")
-
-		return false, nil
-	}
-
-	return newStore, nil
+	return false, nil
 }
 
 func (store *Store) Close() error {

@@ -6,6 +6,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/portainer/portainer/api/database/models"
 	"github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/portainer/portainer/api/edgetypes"
 
@@ -303,11 +304,12 @@ type (
 
 	// VersionService represents a service for managing version data
 	VersionService interface {
-		DBVersion() (int, error)
 		Edition() (portainer.SoftwareEdition, error)
 		InstanceID() (string, error)
-		StoreDBVersion(version int) error
-		StoreInstanceID(ID string) error
+		UpdateInstanceID(ID string) error
+		Version() (*models.Version, error)
+		UpdateVersion(*models.Version) error
+		Migrate() (bool, error)
 		BucketName() string
 	}
 

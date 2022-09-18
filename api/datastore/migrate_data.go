@@ -17,11 +17,6 @@ import (
 const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
 
 func (store *Store) MigrateData() error {
-	version, err := store.version()
-	if err != nil {
-		return err
-	}
-
 	// Backup Database
 	backupPath, err := store.Backup()
 	if err != nil {
@@ -29,7 +24,6 @@ func (store *Store) MigrateData() error {
 	}
 
 	migratorParams := &migrator.MigratorParameters{
-		DatabaseVersion:         version,
 		EndpointGroupService:    store.EndpointGroupService,
 		EndpointService:         store.EndpointService,
 		EndpointRelationService: store.EndpointRelationService,
@@ -88,11 +82,16 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) (err error) {
 	return migrator.Migrate()
 }
 
-// MigrateData automatically migrate the data based on the DBVersion.
+// MigrateData automatically migrate the data based on the Version.
 // This process is only triggered on an existing database, not if the database was just created.
 // if force is true, then migrate regardless.
 func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParameters) error {
 	migrator := migrator.NewMigrator(migratorParams)
+
+	v, err := migratorParams.VersionService.Version()
+	if err != nil {
+		return err
+	}
 
 	// backup db file before upgrading DB to support rollback
 	isUpdating, err := migratorParams.VersionService.IsUpdating()
@@ -100,25 +99,19 @@ func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParam
 		return err
 	}
 
-	if !isUpdating && migrator.Version() != portainer.DBVersion {
+	if !isUpdating && v.SchemaVersion != portainer.APIVersion {
 		err = store.backupVersion(migrator)
 		if err != nil {
 			return werrors.Wrapf(err, "failed to backup database")
 		}
 	}
 
-	if migrator.Version() < portainer.DBVersion {
-		log.Info().
-			Int("migrator_version", migrator.Version()).
-			Int("db_version", portainer.DBVersion).
-			Msg("migrating database")
+	log.Info().Msgf("migrating database from version %s to %s ", v.SchemaVersion, portainer.APIVersion)
 
-		err = store.FailSafeMigrate(migrator)
-		if err != nil {
-			log.Error().Err(err).Msg("an error occurred during database migration")
-
-			return err
-		}
+	err = store.FailSafeMigrate(migrator)
+	if err != nil {
+		log.Error().Err(err).Msg("an error occurred during database migration")
+		return err
 	}
 
 	return nil
