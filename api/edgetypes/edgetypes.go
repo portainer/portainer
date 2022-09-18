@@ -13,13 +13,6 @@ const (
 
 type (
 
-	// VersionUpdateStatus represents the status of an agent version update
-	VersionUpdateStatus struct {
-		Status     UpdateScheduleStatusType
-		ScheduleID UpdateScheduleID
-		Error      string
-	}
-
 	// UpdateScheduleID represents an Edge schedule identifier
 	UpdateScheduleID int
 
@@ -41,8 +34,6 @@ type (
 		Created int64 `json:"created" example:"1564897200"`
 		// Created by user id
 		CreatedBy portainer.UserID `json:"createdBy" example:"1"`
-		// Version of the edge agent
-		Version string `json:"version" example:"1"`
 	}
 
 	// UpdateScheduleType represents type of an Edge update schedule
@@ -72,6 +63,24 @@ type (
 		Active bool
 		// Update schedule ID
 		ScheduleID UpdateScheduleID
+	}
+
+	// VersionUpdateStatus represents the status of an agent version update
+	VersionUpdateStatus struct {
+		Status     UpdateScheduleStatusType
+		ScheduleID UpdateScheduleID
+		Error      string
+	}
+
+	// EndpointUpdateScheduleRelation represents the relation between an environment(endpoint) and an update schedule
+	EndpointUpdateScheduleRelation struct {
+		EnvironmentID portainer.EndpointID     `json:"environmentId"`
+		ScheduleID    UpdateScheduleID         `json:"scheduleId"`
+		TargetVersion string                   `json:"targetVersion"`
+		Status        UpdateScheduleStatusType `json:"status"`
+		Error         string                   `json:"error"`
+		Type          UpdateScheduleType       `json:"type"`
+		ScheduledTime int64                    `json:"scheduledTime"`
 	}
 )
 

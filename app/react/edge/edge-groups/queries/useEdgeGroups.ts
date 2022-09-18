@@ -13,6 +13,10 @@ async function getEdgeGroups() {
   }
 }
 
-export function useEdgeGroups() {
-  return useQuery(['edge', 'groups'], getEdgeGroups);
+export function useEdgeGroups<T = EdgeGroup[]>({
+  select,
+}: {
+  select?: (groups: EdgeGroup[]) => T;
+} = {}) {
+  return useQuery(['edge', 'groups'], getEdgeGroups, { select });
 }
