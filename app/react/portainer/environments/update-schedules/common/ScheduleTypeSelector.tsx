@@ -6,13 +6,10 @@ import { NavTabs } from '@@/NavTabs';
 import { ScheduleType } from '../types';
 
 import { FormValues } from './types';
-import { ScheduledTimeField } from './ScheduledTimeField';
+import { UpdateScheduleDetailsFieldset } from './UpdateScheduleDetailsFieldset';
+import { RollbackScheduleDetailsFieldset } from './RollbackScheduleDetailsFieldset';
 
-interface Props {
-  disabled?: boolean;
-}
-
-export function UpdateTypeTabs({ disabled }: Props) {
+export function ScheduleTypeSelector() {
   const [{ value }, , { setValue }] = useField<FormValues['type']>('type');
 
   return (
@@ -23,27 +20,18 @@ export function UpdateTypeTabs({ disabled }: Props) {
             {
               id: ScheduleType.Update,
               label: 'Update',
-              children: <ScheduleDetails disabled={disabled} />,
+              children: <UpdateScheduleDetailsFieldset />,
             },
             {
               id: ScheduleType.Rollback,
               label: 'Rollback',
-              children: <ScheduleDetails disabled={disabled} />,
+              children: <RollbackScheduleDetailsFieldset />,
             },
           ]}
           selectedId={value}
           onSelect={(value) => setValue(value)}
-          disabled={disabled}
         />
       </div>
-    </div>
-  );
-}
-
-function ScheduleDetails({ disabled }: Props) {
-  return (
-    <div>
-      <ScheduledTimeField disabled={disabled} />
     </div>
   );
 }

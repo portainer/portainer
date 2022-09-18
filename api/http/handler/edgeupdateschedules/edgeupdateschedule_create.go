@@ -15,11 +15,11 @@ import (
 )
 
 type createPayload struct {
-	Name     string
-	GroupIDs []portainer.EdgeGroupID
-	Type     edgetypes.UpdateScheduleType
-	Version  string
-	Time     int64
+	Name         string
+	GroupIDs     []portainer.EdgeGroupID
+	Type         edgetypes.UpdateScheduleType
+	Environments map[portainer.EndpointID]string
+	Time         int64
 }
 
 func (payload *createPayload) Validate(r *http.Request) error {
@@ -35,8 +35,8 @@ func (payload *createPayload) Validate(r *http.Request) error {
 		return errors.New("Invalid schedule type")
 	}
 
-	if payload.Version == "" {
-		return errors.New("Invalid version")
+	if len(payload.Environments) == 0 {
+		return errors.New("No Environment is scheduled for update")
 	}
 
 	if payload.Time < time.Now().Unix() {
@@ -85,7 +85,44 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 		Created:   time.Now().Unix(),
 		CreatedBy: tokenData.ID,
 		Type:      payload.Type,
-		Version:   payload.Version,
+	}
+
+	schedules, err := handler.dataStore.EdgeUpdateSchedule().List()
+	if err != nil {
+		return httperror.InternalServerError("Unable to list edge update schedules", err)
+	}
+
+	prevVersions := map[portainer.EndpointID]string{}
+	if item.Type == edgetypes.UpdateScheduleRollback {
+		prevVersions = previousVersions(schedules)
+	}
+
+	for environmentID, version := range payload.Environments {
+		environment, err := handler.dataStore.Endpoint().Endpoint(environmentID)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve environment from the database", err)
+		}
+
+		// TODO check that env is standalone (snapshots)
+		if environment.Type != portainer.EdgeAgentOnDockerEnvironment {
+			return httperror.BadRequest("Only standalone docker Environments are supported for remote update", nil)
+		}
+
+		// validate version id is valid for rollback
+		if item.Type == edgetypes.UpdateScheduleRollback {
+			if prevVersions[environmentID] == "" {
+				return httperror.BadRequest("No previous version found for environment", nil)
+			}
+
+			if version != prevVersions[environmentID] {
+				return httperror.BadRequest("Rollback version must match previous version", nil)
+			}
+		}
+
+		item.Status[environmentID] = edgetypes.UpdateScheduleStatus{
+			TargetVersion:  version,
+			CurrentVersion: environment.Agent.Version,
+		}
 	}
 
 	err = handler.dataStore.EdgeUpdateSchedule().Create(item)
