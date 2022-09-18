@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/edge/stacks"
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
@@ -40,12 +41,12 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 		return httperror.InternalServerError("Unable to remove the edge stack from the database", err)
 	}
 
-	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
+	relationConfig, err := stacks.FetchEndpointRelationsConfig(handler.DataStore)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environments relations config from database", err)
 	}
 
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 	}

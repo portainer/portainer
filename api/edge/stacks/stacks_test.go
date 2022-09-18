@@ -1,4 +1,4 @@
-package edgestacks
+package stacks
 
 import (
 	"testing"

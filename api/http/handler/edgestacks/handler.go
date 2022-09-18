@@ -3,7 +3,6 @@ package edgestacks
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
@@ -54,7 +53,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 	return h
 }
 
-func (handler *Handler) convertAndStoreKubeManifestIfNeeded(edgeStackID portainer.EdgeStackID, projectPath, composePath string, relatedEndpointIds []portainer.EndpointID) (manifestPath string, err error) {
+func (handler *Handler) convertAndStoreKubeManifestIfNeeded(stackFolder string, projectPath, composePath string, relatedEndpointIds []portainer.EndpointID) (manifestPath string, err error) {
 	hasKubeEndpoint, err := hasKubeEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
 	if err != nil {
 		return "", fmt.Errorf("unable to check if edge stack has kube environments: %w", err)
@@ -75,7 +74,7 @@ func (handler *Handler) convertAndStoreKubeManifestIfNeeded(edgeStackID portaine
 	}
 
 	komposeFileName := filesystem.ManifestFileDefaultName
-	_, err = handler.FileService.StoreEdgeStackFileFromBytes(strconv.Itoa(int(edgeStackID)), komposeFileName, kompose)
+	_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, komposeFileName, kompose)
 	if err != nil {
 		return "", fmt.Errorf("failed to store kube manifest file: %w", err)
 	}

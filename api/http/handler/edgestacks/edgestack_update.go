@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/portainer/portainer/api/edge/stacks"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -66,18 +67,18 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
+	relationConfig, err := stacks.FetchEndpointRelationsConfig(handler.DataStore)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environments relations config from database", err)
 	}
 
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 	}
 
 	if payload.EdgeGroups != nil {
-		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 		}
@@ -154,7 +155,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 		}
 
-		manifestPath, err := handler.convertAndStoreKubeManifestIfNeeded(stack.ID, stack.ProjectPath, stack.EntryPoint, relatedEndpointIds)
+		manifestPath, err := handler.convertAndStoreKubeManifestIfNeeded(stackFolder, stack.ProjectPath, stack.EntryPoint, relatedEndpointIds)
 		if err != nil {
 			return httperror.InternalServerError("Unable to convert and persist updated Kubernetes manifest file on disk", err)
 		}
