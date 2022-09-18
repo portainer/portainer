@@ -29,3 +29,5 @@ if [ "${PLATFORM}" == 'windows' ]; then
 else
   mv "$BUILD_SOURCESDIRECTORY/api/cmd/portainer/$binary" "$BUILD_SOURCESDIRECTORY/dist/portainer"
 fi
+
+cp "$BUILD_SOURCESDIRECTORY/mustache-templates/edge-update.yml.mustache" "$BUILD_SOURCESDIRECTORY/dist"

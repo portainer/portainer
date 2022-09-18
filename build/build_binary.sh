@@ -29,3 +29,5 @@ GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build \
 	--X 'github.com/portainer/portainer/api/build.GoVersion=${GO_VERSION}'" \
 	-o "../dist/portainer" \
 	./cmd/portainer/
+
+cp ../mustache-templates/edge-update.yml.mustache ../dist

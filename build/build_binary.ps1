@@ -15,3 +15,4 @@ C:\go\bin\go.exe get -t -d -v ./...
 C:\go\bin\go.exe build -v
 
 Move-Item -Path "$($binary)" -Destination "..\..\..\dist"
+Copy-Item -Path "$($project_path)\mustache-templates\edge-update.yml.mustache" -Destination "..\..\..\dist"

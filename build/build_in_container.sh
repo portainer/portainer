@@ -8,3 +8,4 @@ docker run --rm -tv "$(pwd)/api:/src" -e BUILD_GOOS="$1" -e BUILD_GOARCH="$2" po
 
 mv "api/cmd/portainer/$binary" dist/
 #sha256sum "dist/$binary" > portainer-checksum.txt
+cp ./mustache-templates/edge-update.yml.mustache ./dist
