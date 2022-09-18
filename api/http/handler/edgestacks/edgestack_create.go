@@ -15,6 +15,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
@@ -93,78 +94,56 @@ func (handler *Handler) createSwarmStackFromFileContent(r *http.Request) (*porta
 		return nil, err
 	}
 
-	err = handler.validateUniqueName(payload.Name)
-	if err != nil {
-		return nil, err
-	}
+	stack, err := createEdgeStackObject(handler.DataStore, payload.Name, payload.DeploymentType, payload.EdgeGroups, func(stackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
+		return handler.storeFileContent(stackID, payload.DeploymentType, relatedEndpointIds, []byte(payload.StackFileContent))
+	})
 
-	stackID := handler.DataStore.EdgeStack().GetNextIdentifier()
-	stack := &portainer.EdgeStack{
-		ID:             portainer.EdgeStackID(stackID),
-		Name:           payload.Name,
-		DeploymentType: payload.DeploymentType,
-		CreationDate:   time.Now().Unix(),
-		EdgeGroups:     payload.EdgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
-		Version:        1,
-	}
-
-	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
-	if err != nil {
-		return nil, fmt.Errorf("unable to find environment relations in database: %w", err)
-	}
-
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
-	if err != nil {
-		return nil, fmt.Errorf("unable to persist environment relation in database: %w", err)
-	}
-
-	stackFolder := strconv.Itoa(int(stack.ID))
-	if stack.DeploymentType == portainer.EdgeStackDeploymentCompose {
-		stack.EntryPoint = filesystem.ComposeFileDefaultName
-
-		projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
-		if err != nil {
-			return nil, err
-		}
-		stack.ProjectPath = projectPath
-
-		err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
-		if err != nil {
-			return nil, fmt.Errorf("Failed creating and storing kube manifest: %w", err)
-		}
-
-	} else {
-		hasDockerEndpoint, err := hasDockerEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
-		if err != nil {
-			return nil, fmt.Errorf("unable to check for existence of docker endpoint: %w", err)
-		}
-
-		if hasDockerEndpoint {
-			return nil, fmt.Errorf("edge stack with docker endpoint cannot be deployed with kubernetes config")
-		}
-
-		stack.ManifestPath = filesystem.ManifestFileDefaultName
-
-		projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.ManifestPath, []byte(payload.StackFileContent))
-		if err != nil {
-			return nil, err
-		}
-
-		stack.ProjectPath = projectPath
-	}
-
-	err = updateEndpointRelations(handler.DataStore.EndpointRelation(), stack.ID, relatedEndpointIds)
-	if err != nil {
-		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
-	}
-
-	err = handler.DataStore.EdgeStack().Create(stack.ID, stack)
 	if err != nil {
 		return nil, err
 	}
 
 	return stack, nil
+}
+
+func (handler *Handler) storeFileContent(stackID portainer.EdgeStackID, deploymentType portainer.EdgeStackDeploymentType, relatedEndpointIds []portainer.EndpointID, fileContent []byte) (composePath, manifestPath, projectPath string, err error) {
+	stackFolder := strconv.Itoa(int(stackID))
+	if deploymentType == portainer.EdgeStackDeploymentCompose {
+		composePath = filesystem.ComposeFileDefaultName
+
+		projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, composePath, fileContent)
+		if err != nil {
+			return "", "", "", err
+		}
+
+		manifestPath, err = handler.convertAndStoreKubeManifestIfNeeded(stackID, projectPath, composePath, relatedEndpointIds)
+		if err != nil {
+			return "", "", "", fmt.Errorf("Failed creating and storing kube manifest: %w", err)
+		}
+
+		return composePath, manifestPath, projectPath, nil
+
+	}
+
+	// non docker stacks
+
+	hasDockerEndpoint, err := hasDockerEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
+	if err != nil {
+		return "", "", "", fmt.Errorf("unable to check for existence of docker endpoint: %w", err)
+	}
+
+	if hasDockerEndpoint {
+		return "", "", "", fmt.Errorf("edge stack with docker endpoint cannot be deployed with kubernetes config")
+	}
+
+	manifestPath = filesystem.ManifestFileDefaultName
+
+	projectPath, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, manifestPath, []byte(fileContent))
+	if err != nil {
+		return "", "", "", err
+	}
+
+	return "", manifestPath, projectPath, nil
+
 }
 
 type swarmStackFromGitRepositoryPayload struct {
@@ -187,7 +166,7 @@ type swarmStackFromGitRepositoryPayload struct {
 	// Deployment type to deploy this stack
 	// Valid values are: 0 - 'compose', 1 - 'kubernetes'
 	// for compose stacks will use kompose to convert to kubernetes manifest for kubernetes environments(endpoints)
-	// kubernetes deploytype is enabled only for kubernetes environments(endpoints)
+	// kubernetes deploy type is enabled only for kubernetes environments(endpoints)
 	DeploymentType portainer.EdgeStackDeploymentType `example:"0" enums:"0,1"`
 }
 
@@ -217,69 +196,21 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 		return nil, err
 	}
 
-	err = handler.validateUniqueName(payload.Name)
-	if err != nil {
-		return nil, err
+	repoConfig := gittypes.RepoConfig{
+		URL:           payload.RepositoryURL,
+		ReferenceName: payload.RepositoryReferenceName,
 	}
 
-	stackID := handler.DataStore.EdgeStack().GetNextIdentifier()
-	stack := &portainer.EdgeStack{
-		ID:             portainer.EdgeStackID(stackID),
-		Name:           payload.Name,
-		CreationDate:   time.Now().Unix(),
-		EdgeGroups:     payload.EdgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
-		DeploymentType: payload.DeploymentType,
-		Version:        1,
-	}
-
-	projectPath := handler.FileService.GetEdgeStackProjectPath(strconv.Itoa(int(stack.ID)))
-	stack.ProjectPath = projectPath
-
-	repositoryUsername := payload.RepositoryUsername
-	repositoryPassword := payload.RepositoryPassword
-	if !payload.RepositoryAuthentication {
-		repositoryUsername = ""
-		repositoryPassword = ""
-	}
-
-	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
-	if err != nil {
-		return nil, fmt.Errorf("failed fetching relations config: %w", err)
-	}
-
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
-	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve related endpoints: %w", err)
-	}
-
-	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
-	if err != nil {
-		return nil, err
-	}
-
-	if stack.DeploymentType == portainer.EdgeStackDeploymentCompose {
-		stack.EntryPoint = payload.FilePathInRepository
-
-		err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
-		if err != nil {
-			return nil, fmt.Errorf("Failed creating and storing kube manifest: %w", err)
+	if payload.RepositoryAuthentication {
+		repoConfig.Authentication = &gittypes.GitAuthentication{
+			Username: payload.RepositoryUsername,
+			Password: payload.RepositoryPassword,
 		}
-	} else {
-		stack.ManifestPath = payload.FilePathInRepository
 	}
 
-	err = updateEndpointRelations(handler.DataStore.EndpointRelation(), stack.ID, relatedEndpointIds)
-	if err != nil {
-		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
-	}
-
-	err = handler.DataStore.EdgeStack().Create(stack.ID, stack)
-	if err != nil {
-		return nil, err
-	}
-
-	return stack, nil
+	return createEdgeStackObject(handler.DataStore, payload.Name, payload.DeploymentType, payload.EdgeGroups, func(stackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
+		return handler.storeManifestFromGitRepository(stackID, relatedEndpointIds, payload.DeploymentType, repoConfig)
+	})
 }
 
 type swarmStackFromFileUploadPayload struct {
@@ -325,72 +256,13 @@ func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request) (*portai
 		return nil, err
 	}
 
-	err = handler.validateUniqueName(payload.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	stackID := handler.DataStore.EdgeStack().GetNextIdentifier()
-	stack := &portainer.EdgeStack{
-		ID:             portainer.EdgeStackID(stackID),
-		Name:           payload.Name,
-		DeploymentType: payload.DeploymentType,
-		CreationDate:   time.Now().Unix(),
-		EdgeGroups:     payload.EdgeGroups,
-		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
-		Version:        1,
-	}
-
-	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
-	if err != nil {
-		return nil, fmt.Errorf("failed fetching relations config: %w", err)
-	}
-
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
-	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve related endpoints: %w", err)
-	}
-
-	stackFolder := strconv.Itoa(int(stack.ID))
-	if stack.DeploymentType == portainer.EdgeStackDeploymentCompose {
-		stack.EntryPoint = filesystem.ComposeFileDefaultName
-
-		projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
-		if err != nil {
-			return nil, err
-		}
-		stack.ProjectPath = projectPath
-
-		err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
-		if err != nil {
-			return nil, fmt.Errorf("Failed creating and storing kube manifest: %w", err)
-		}
-
-	} else {
-		stack.ManifestPath = filesystem.ManifestFileDefaultName
-
-		projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.ManifestPath, []byte(payload.StackFileContent))
-		if err != nil {
-			return nil, err
-		}
-		stack.ProjectPath = projectPath
-	}
-
-	err = updateEndpointRelations(handler.DataStore.EndpointRelation(), stack.ID, relatedEndpointIds)
-	if err != nil {
-		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
-	}
-
-	err = handler.DataStore.EdgeStack().Create(stack.ID, stack)
-	if err != nil {
-		return nil, err
-	}
-
-	return stack, nil
+	return createEdgeStackObject(handler.DataStore, payload.Name, payload.DeploymentType, payload.EdgeGroups, func(stackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
+		return handler.storeFileContent(stackID, payload.DeploymentType, relatedEndpointIds, payload.StackFileContent)
+	})
 }
 
-func (handler *Handler) validateUniqueName(name string) error {
-	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
+func validateUniqueName(edgeStackService dataservices.EdgeStackService, name string) error {
+	edgeStacks, err := edgeStackService.EdgeStacks()
 	if err != nil {
 		return err
 	}
@@ -420,4 +292,83 @@ func updateEndpointRelations(endpointRelationService dataservices.EndpointRelati
 	}
 
 	return nil
+}
+
+type storeManifestFunc func(stackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID) (composePath, manifestPath, projectPath string, err error)
+
+func createEdgeStackObject(dataStore dataservices.DataStore, name string, deploymentType portainer.EdgeStackDeploymentType, edgeGroups []portainer.EdgeGroupID, storeManifest storeManifestFunc) (*portainer.EdgeStack, error) {
+	err := validateUniqueName(dataStore.EdgeStack(), name)
+	if err != nil {
+		return nil, err
+	}
+
+	stackID := dataStore.EdgeStack().GetNextIdentifier()
+	stack := &portainer.EdgeStack{
+		ID:             portainer.EdgeStackID(stackID),
+		Name:           name,
+		DeploymentType: deploymentType,
+		CreationDate:   time.Now().Unix(),
+		EdgeGroups:     edgeGroups,
+		Status:         make(map[portainer.EndpointID]portainer.EdgeStackStatus),
+		Version:        1,
+	}
+
+	relationConfig, err := fetchEndpointRelationsConfig(dataStore)
+	if err != nil {
+		return nil, fmt.Errorf("unable to find environment relations in database: %w", err)
+	}
+
+	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+	if err != nil {
+		return nil, fmt.Errorf("unable to persist environment relation in database: %w", err)
+	}
+
+	composePath, manifestPath, projectPath, err := storeManifest(stack.ID, relatedEndpointIds)
+	if err != nil {
+		return nil, fmt.Errorf("unable to store manifest: %w", err)
+	}
+
+	stack.ManifestPath = manifestPath
+	stack.ProjectPath = projectPath
+	stack.EntryPoint = composePath
+
+	err = updateEndpointRelations(dataStore.EndpointRelation(), stack.ID, relatedEndpointIds)
+	if err != nil {
+		return nil, fmt.Errorf("unable to update endpoint relations: %w", err)
+	}
+
+	err = dataStore.EdgeStack().Create(stack.ID, stack)
+	if err != nil {
+		return nil, err
+	}
+
+	return stack, nil
+}
+
+func (handler *Handler) storeManifestFromGitRepository(stackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID, deploymentType portainer.EdgeStackDeploymentType, repositoryConfig gittypes.RepoConfig) (composePath, manifestPath, projectPath string, err error) {
+	projectPath = handler.FileService.GetEdgeStackProjectPath(strconv.Itoa(int(stackID)))
+	repositoryUsername := ""
+	repositoryPassword := ""
+	if repositoryConfig.Authentication != nil {
+		repositoryUsername = repositoryConfig.Authentication.Username
+		repositoryPassword = repositoryConfig.Authentication.Password
+	}
+
+	err = handler.GitService.CloneRepository(projectPath, repositoryConfig.URL, repositoryConfig.ReferenceName, repositoryUsername, repositoryPassword)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	if deploymentType == portainer.EdgeStackDeploymentCompose {
+		composePath := repositoryConfig.ConfigFilePath
+
+		manifestPath, err := handler.convertAndStoreKubeManifestIfNeeded(stackID, projectPath, composePath, relatedEndpointIds)
+		if err != nil {
+			return "", "", "", fmt.Errorf("Failed creating and storing kube manifest: %w", err)
+		}
+
+		return composePath, manifestPath, projectPath, nil
+	}
+
+	return "", repositoryConfig.ConfigFilePath, projectPath, nil
 }

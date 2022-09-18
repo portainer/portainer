@@ -2,9 +2,10 @@ package edgestacks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 	"strconv"
+
+	"github.com/portainer/portainer/api/internal/endpointutils"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -23,10 +24,10 @@ type updateEdgeStackPayload struct {
 
 func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 	if payload.StackFileContent == "" {
-		return errors.New("Invalid stack file content")
+		return errors.New("invalid stack file content")
 	}
 	if payload.EdgeGroups != nil && len(payload.EdgeGroups) == 0 {
-		return errors.New("Edge Groups are mandatory for an Edge stack")
+		return errors.New("edge groups are mandatory for an Edge stack")
 	}
 	return nil
 }
@@ -153,10 +154,12 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 		}
 
-		err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
+		manifestPath, err := handler.convertAndStoreKubeManifestIfNeeded(stack.ID, stack.ProjectPath, stack.EntryPoint, relatedEndpointIds)
 		if err != nil {
 			return httperror.InternalServerError("Unable to convert and persist updated Kubernetes manifest file on disk", err)
 		}
+
+		stack.ManifestPath = manifestPath
 
 	} else {
 		if stack.ManifestPath == "" {
