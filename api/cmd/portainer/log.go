@@ -1,6 +1,8 @@
 package main
 
 import (
+	stdlog "log"
+
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
@@ -10,6 +12,9 @@ func configureLogger() {
 	zerolog.ErrorStackFieldName = "stack_trace"
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	stdlog.SetFlags(0)
+	stdlog.SetOutput(log.Logger)
 
 	log.Logger = log.Logger.With().Caller().Stack().Logger()
 }
