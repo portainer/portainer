@@ -8,7 +8,7 @@ import { EdgeUpdateSchedule } from '../../types';
 
 export const groups: Column<EdgeUpdateSchedule> = {
   Header: 'Groups',
-  accessor: 'groupIds',
+  accessor: 'edgeGroupIds',
   Cell: GroupsCell,
   disableFilters: true,
   Filter: () => null,

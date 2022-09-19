@@ -153,7 +153,7 @@ func (server *Server) Start() error {
 	edgeJobsHandler.FileService = server.FileService
 	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
 
-	edgeUpdateScheduleHandler := edgeupdateschedules.NewHandler(requestBouncer, server.DataStore)
+	edgeUpdateScheduleHandler := edgeupdateschedules.NewHandler(requestBouncer, server.DataStore, server.FileService, server.AssetsPath)
 
 	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer, server.DataStore)
 	edgeStacksHandler.FileService = server.FileService

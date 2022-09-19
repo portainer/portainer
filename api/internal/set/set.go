@@ -38,3 +38,11 @@ func (s Set[T]) Keys() []T {
 
 	return keys
 }
+
+func ToSet[T SetKey](keys []T) Set[T] {
+	set := make(Set[T])
+	for _, key := range keys {
+		set.Add(key)
+	}
+	return set
+}

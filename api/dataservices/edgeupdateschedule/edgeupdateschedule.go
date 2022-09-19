@@ -161,11 +161,7 @@ func (service *Service) setRelation(schedule *updateschedule.UpdateSchedule) err
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	for environmentID, environmentStatus := range schedule.Status {
-		if environmentStatus.Status != updateschedule.UpdateScheduleStatusPending {
-			continue
-		}
-
+	for environmentID := range schedule.EnvironmentsPreviousVersions {
 		// this should never happen
 		if service.idxActiveSchedules[environmentID] != nil && service.idxActiveSchedules[environmentID].ScheduleID != schedule.ID {
 			return errors.New("Multiple schedules are pending for the same environment")
@@ -174,10 +170,7 @@ func (service *Service) setRelation(schedule *updateschedule.UpdateSchedule) err
 		service.idxActiveSchedules[environmentID] = &updateschedule.EndpointUpdateScheduleRelation{
 			EnvironmentID: environmentID,
 			ScheduleID:    schedule.ID,
-			TargetVersion: environmentStatus.TargetVersion,
-			Status:        environmentStatus.Status,
-			Error:         environmentStatus.Error,
-			Type:          schedule.Type,
+			TargetVersion: schedule.Version,
 		}
 	}
 

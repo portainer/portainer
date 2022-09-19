@@ -22,18 +22,17 @@ type (
 		ID UpdateScheduleID `json:"id" example:"1"`
 		// Name of the schedule
 		Name string `json:"name" example:"Update Schedule"`
-		// Type of the schedule
-		Time int64 `json:"time" example:"1564897200"`
-		// EdgeGroups to be updated
-		GroupIDs []portainer.EdgeGroupID `json:"groupIds" example:"1"`
+
+		EdgeStackID portainer.EdgeStackID `json:"edgeStackId" example:"1"`
 		// Type of the update (1 - update, 2 - rollback)
-		Type UpdateScheduleType `json:"type" example:"1" enums:"1,2"`
-		// Status of the schedule, grouped by environment id
-		Status map[portainer.EndpointID]UpdateScheduleStatus `json:"status"`
+		Type    UpdateScheduleType `json:"type" example:"1" enums:"1,2"`
+		Version string             `json:"version" example:"1.0.0"`
 		// Created timestamp
 		Created int64 `json:"created" example:"1564897200"`
 		// Created by user id
 		CreatedBy portainer.UserID `json:"createdBy" example:"1"`
+
+		EnvironmentsPreviousVersions map[portainer.EndpointID]string `json:"environmentsPreviousVersions"`
 	}
 
 	// UpdateScheduleType represents type of an Edge update schedule
@@ -74,13 +73,10 @@ type (
 
 	// EndpointUpdateScheduleRelation represents the relation between an environment(endpoint) and an update schedule
 	EndpointUpdateScheduleRelation struct {
-		EnvironmentID portainer.EndpointID     `json:"environmentId"`
-		ScheduleID    UpdateScheduleID         `json:"scheduleId"`
-		TargetVersion string                   `json:"targetVersion"`
-		Status        UpdateScheduleStatusType `json:"status"`
-		Error         string                   `json:"error"`
-		Type          UpdateScheduleType       `json:"type"`
-		ScheduledTime int64                    `json:"scheduledTime"`
+		EnvironmentID portainer.EndpointID  `json:"environmentId"`
+		ScheduleID    UpdateScheduleID      `json:"scheduleId"`
+		TargetVersion string                `json:"targetVersion"`
+		EdgeStackID   portainer.EdgeStackID `json:"edgeStackId"`
 	}
 )
 
@@ -99,4 +95,6 @@ const (
 	UpdateScheduleStatusError
 	// UpdateScheduleStatusSuccess represents a successful edge update schedule
 	UpdateScheduleStatusSuccess
+	// UpdateScheduleStatusSent represents a sent edge update schedule
+	UpdateScheduleStatusSent
 )

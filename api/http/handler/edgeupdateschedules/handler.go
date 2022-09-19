@@ -20,14 +20,18 @@ type Handler struct {
 	*mux.Router
 	requestBouncer *security.RequestBouncer
 	dataStore      dataservices.DataStore
+	fileService    portainer.FileService
+	assetsPath     string
 }
 
 // NewHandler creates a handler to manage environment update operations.
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, fileService portainer.FileService, assetsPath string) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
 		dataStore:      dataStore,
+		fileService:    fileService,
+		assetsPath:     assetsPath,
 	}
 
 	router := h.PathPrefix("/edge_update_schedules").Subrouter()

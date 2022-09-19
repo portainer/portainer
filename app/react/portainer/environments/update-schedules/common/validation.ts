@@ -1,4 +1,4 @@
-import { array, number, object } from 'yup';
+import { array, number, object, string } from 'yup';
 
 import { EdgeUpdateSchedule } from '../types';
 
@@ -16,6 +16,6 @@ export function validation(
     time: number()
       .min(Date.now() / 1000)
       .required(),
-    environments: object().default({}),
+    version: string().required('Version is required'),
   });
 }

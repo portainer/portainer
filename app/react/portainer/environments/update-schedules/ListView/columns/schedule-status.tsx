@@ -14,31 +14,14 @@ export const scheduleStatus: Column<EdgeUpdateSchedule> = {
 
 function StatusCell({
   value: status,
-  row: { original: schedule },
+  row: {
+    original: { statusMessage },
+  },
 }: CellProps<EdgeUpdateSchedule, EdgeUpdateSchedule['status']>) {
-  if (schedule.time > Date.now() / 1000) {
-    return 'Scheduled';
+  switch (status) {
+    case StatusType.Failed:
+      return statusMessage;
+    default:
+      return StatusType[status];
   }
-
-  const statusList = Object.entries(status).map(
-    ([environmentId, envStatus]) => ({ ...envStatus, environmentId })
-  );
-
-  if (statusList.length === 0) {
-    return 'No related environments';
-  }
-
-  const error = statusList.find((s) => s.status === StatusType.Failed);
-
-  if (error) {
-    return `Failed: (ID: ${error.environmentId}) ${error.error}`;
-  }
-
-  const pending = statusList.find((s) => s.status === StatusType.Pending);
-
-  if (pending) {
-    return 'Pending';
-  }
-
-  return 'Success';
 }

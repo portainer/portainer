@@ -42,11 +42,7 @@ export function RollbackScheduleDetailsFieldset() {
 }
 
 function useSelectedEnvironmentsCount() {
-  const {
-    values: { environments },
-  } = useFormikContext<FormValues>();
-
-  return Object.keys(environments).length;
+  return 0;
 }
 
 function useSelectEnvironmentsOnMount() {

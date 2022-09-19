@@ -1,17 +1,23 @@
 import { useQuery } from 'react-query';
 
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { withError } from '@/react-tools/react-query';
 
 import { queryKeys } from './query-keys';
 import { buildUrl } from './urls';
 
 export function useSupportedAgentVersions<T = string[]>({
   select,
-}: { select?: (data: string[]) => T } = {}) {
+  onSuccess,
+}: { select?: (data: string[]) => T; onSuccess?(data: T): void } = {}) {
   return useQuery(
     queryKeys.supportedAgentVersions(),
     getSupportedAgentVersions,
-    { select }
+    {
+      select,
+      onSuccess,
+      ...withError('failed fetching available agent versions'),
+    }
   );
 }
 

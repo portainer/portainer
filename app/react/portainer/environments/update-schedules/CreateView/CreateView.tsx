@@ -25,8 +25,7 @@ const initialValues: FormValues = {
   name: '',
   groupIds: [],
   type: ScheduleType.Update,
-  time: Math.floor(Date.now() / 1000) + 60 * 60,
-  environments: {},
+  version: '',
 };
 
 export function CreateView() {
@@ -65,6 +64,7 @@ export function CreateView() {
                     <NameField />
                     <EdgeGroupsField />
                     <ScheduleTypeSelector />
+
                     <div className="form-group">
                       <div className="col-sm-12">
                         <LoadingButton

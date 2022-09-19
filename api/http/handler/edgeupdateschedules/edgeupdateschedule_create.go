@@ -1,25 +1,31 @@
 package edgeupdateschedules
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/edge/stacks"
 	"github.com/portainer/portainer/api/edge/updateschedule"
+	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/set"
+	"github.com/sirupsen/logrus"
+
 	"github.com/portainer/portainer/api/http/security"
 )
 
 type createPayload struct {
-	Name         string
-	GroupIDs     []portainer.EdgeGroupID
-	Type         updateschedule.UpdateScheduleType
-	Environments map[portainer.EndpointID]string
-	Time         int64
+	Name     string
+	GroupIDs []portainer.EdgeGroupID
+	Type     updateschedule.UpdateScheduleType
+	Version  string
+	Time     int64
 }
 
 func (payload *createPayload) Validate(r *http.Request) error {
@@ -33,10 +39,6 @@ func (payload *createPayload) Validate(r *http.Request) error {
 
 	if payload.Type != updateschedule.UpdateScheduleRollback && payload.Type != updateschedule.UpdateScheduleUpdate {
 		return errors.New("Invalid schedule type")
-	}
-
-	if len(payload.Environments) == 0 {
-		return errors.New("No Environment is scheduled for update")
 	}
 
 	if payload.Time < time.Now().Unix() {
@@ -77,52 +79,36 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 		return httperror.InternalServerError("Unable to retrieve user information from token", err)
 	}
 
+	var edgeStackID portainer.EdgeStackID
+	var scheduleID updateschedule.UpdateScheduleID
+	needCleanup := true
+	defer func() {
+		if !needCleanup {
+			return
+		}
+
+		if scheduleID != 0 {
+			err := handler.dataStore.EdgeUpdateSchedule().Delete(scheduleID)
+			if err != nil {
+				logrus.WithError(err).Error("Unable to cleanup edge update schedule")
+			}
+		}
+
+		if edgeStackID != 0 {
+			err := handler.dataStore.EdgeStack().DeleteEdgeStack(edgeStackID)
+			if err != nil {
+				logrus.WithError(err).Error("Unable to cleanup edge stack")
+			}
+		}
+	}()
+
 	item := &updateschedule.UpdateSchedule{
-		Name:      payload.Name,
-		Time:      payload.Time,
-		GroupIDs:  payload.GroupIDs,
-		Status:    map[portainer.EndpointID]updateschedule.UpdateScheduleStatus{},
+		Name:    payload.Name,
+		Version: payload.Version,
+
 		Created:   time.Now().Unix(),
 		CreatedBy: tokenData.ID,
 		Type:      payload.Type,
-	}
-
-	schedules, err := handler.dataStore.EdgeUpdateSchedule().List()
-	if err != nil {
-		return httperror.InternalServerError("Unable to list edge update schedules", err)
-	}
-
-	prevVersions := map[portainer.EndpointID]string{}
-	if item.Type == updateschedule.UpdateScheduleRollback {
-		prevVersions = previousVersions(schedules)
-	}
-
-	for environmentID, version := range payload.Environments {
-		environment, err := handler.dataStore.Endpoint().Endpoint(environmentID)
-		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve environment from the database", err)
-		}
-
-		// TODO check that env is standalone (snapshots)
-		if environment.Type != portainer.EdgeAgentOnDockerEnvironment {
-			return httperror.BadRequest("Only standalone docker Environments are supported for remote update", nil)
-		}
-
-		// validate version id is valid for rollback
-		if item.Type == updateschedule.UpdateScheduleRollback {
-			if prevVersions[environmentID] == "" {
-				return httperror.BadRequest("No previous version found for environment", nil)
-			}
-
-			if version != prevVersions[environmentID] {
-				return httperror.BadRequest("Rollback version must match previous version", nil)
-			}
-		}
-
-		item.Status[environmentID] = updateschedule.UpdateScheduleStatus{
-			TargetVersion:  version,
-			CurrentVersion: environment.Agent.Version,
-		}
 	}
 
 	err = handler.dataStore.EdgeUpdateSchedule().Create(item)
@@ -130,5 +116,61 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 		return httperror.InternalServerError("Unable to persist the edge update schedule", err)
 	}
 
+	scheduleID = item.ID
+
+	previousVersions, err := handler.GetPreviousVersions(payload.GroupIDs)
+	if err != nil {
+		return httperror.InternalServerError("Unable to fetch previous versions for related endpoints", err)
+	}
+
+	item.EnvironmentsPreviousVersions = previousVersions
+
+	edgeStackID, err = handler.createUpdateEdgeStack(item.ID, payload.Name, payload.GroupIDs, payload.Version)
+	if err != nil {
+		return httperror.InternalServerError("Unable to create edge stack", err)
+	}
+
+	item.EdgeStackID = edgeStackID
+	err = handler.dataStore.EdgeUpdateSchedule().Update(item.ID, item)
+	if err != nil {
+		return httperror.InternalServerError("Unable to persist the edge update schedule", err)
+	}
+
+	needCleanup = false
 	return response.JSON(w, item)
+}
+
+func buildEdgeStackName(scheduleId updateschedule.UpdateScheduleID, name string) string {
+	return fmt.Sprintf("edge-update-schedule-%s-%d", name, scheduleId)
+}
+
+func (handler *Handler) GetPreviousVersions(edgeGroupIds []portainer.EdgeGroupID) (map[portainer.EndpointID]string, error) {
+	relationConfig, err := stacks.FetchEndpointRelationsConfig(handler.dataStore)
+	if err != nil {
+		return nil, errors.WithMessage(err, "unable to fetch endpoint relations config")
+	}
+
+	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(edgeGroupIds, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
+	if err != nil {
+		return nil, errors.WithMessage(err, "unable to fetch related endpoints")
+	}
+
+	relatedEndpointIdsSet := set.ToSet(relatedEndpointIds)
+
+	prevVersions := map[portainer.EndpointID]string{}
+
+	environments, err := handler.dataStore.Endpoint().Endpoints()
+	if err != nil {
+		return nil, errors.WithMessage(err, "unable to fetch environments")
+	}
+
+	for _, environment := range environments {
+		if !relatedEndpointIdsSet.Contains(environment.ID) {
+			continue
+		}
+
+		prevVersions[environment.ID] = environment.Agent.Version
+	}
+
+	return prevVersions, nil
 }

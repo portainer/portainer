@@ -1,7 +1,6 @@
 import { Settings } from 'react-feather';
 import { Formik, Form as FormikForm } from 'formik';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { useMemo } from 'react';
 import { object, SchemaOf } from 'yup';
 
 import { notifySuccess } from '@/portainer/services/notifications';
@@ -14,7 +13,6 @@ import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
 
-import { ScheduleTypeSelector } from '../common/ScheduleTypeSelector';
 import { useItem } from '../queries/useItem';
 import { validation } from '../common/validation';
 import { useUpdateMutation } from '../queries/useUpdateMutation';
@@ -23,8 +21,6 @@ import { NameField, nameValidation } from '../common/NameField';
 import { EdgeGroupsField } from '../common/EdgeGroupsField';
 import { EdgeUpdateSchedule } from '../types';
 import { FormValues } from '../common/types';
-
-import { ScheduleDetails } from './ScheduleDetails';
 
 export function ItemView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
@@ -44,10 +40,7 @@ export function ItemView() {
   const itemQuery = useItem(id);
   const schedulesQuery = useList();
 
-  const isDisabled = useMemo(
-    () => (itemQuery.data ? itemQuery.data.time < Date.now() / 1000 : false),
-    [itemQuery.data]
-  );
+  const isScheduleActive = true;
 
   if (!itemQuery.data || !schedulesQuery.data) {
     return null;
@@ -58,15 +51,9 @@ export function ItemView() {
 
   const initialValues: FormValues = {
     name: item.name,
-    groupIds: item.groupIds,
+    groupIds: item.edgeGroupIds,
     type: item.type,
-    time: item.time,
-    environments: Object.fromEntries(
-      Object.entries(item.status).map(([envId, status]) => [
-        parseInt(envId, 10),
-        status.targetVersion,
-      ])
-    ),
+    version: item.version,
   };
 
   return (
@@ -102,20 +89,14 @@ export function ItemView() {
                 }}
                 validateOnMount
                 validationSchema={() =>
-                  updateValidation(item.id, item.time, schedules)
+                  updateValidation(item.id, schedules, isScheduleActive)
                 }
               >
                 {({ isValid }) => (
                   <FormikForm className="form-horizontal">
                     <NameField />
 
-                    <EdgeGroupsField disabled={isDisabled} />
-
-                    {isDisabled ? (
-                      <ScheduleDetails schedule={item} />
-                    ) : (
-                      <ScheduleTypeSelector />
-                    )}
+                    <EdgeGroupsField disabled={isScheduleActive} />
 
                     <div className="form-group">
                       <div className="col-sm-12">
@@ -141,10 +122,10 @@ export function ItemView() {
 
 function updateValidation(
   itemId: EdgeUpdateSchedule['id'],
-  scheduledTime: number,
-  schedules: EdgeUpdateSchedule[]
+  schedules: EdgeUpdateSchedule[],
+  isScheduleActive: boolean
 ): SchemaOf<{ name: string } | FormValues> {
-  return scheduledTime > Date.now() / 1000
+  return !isScheduleActive
     ? validation(schedules, itemId)
     : object({ name: nameValidation(schedules, itemId) });
 }
