@@ -12,7 +12,11 @@ interface Props {
   createEdgeDevice?: boolean;
 }
 
-const hasEdge: EnvironmentSelectorValue[] = ['docker', 'kubernetes'];
+const hasEdge: EnvironmentSelectorValue[] = [
+  'dockerStandalone',
+  'dockerSwarm',
+  'kubernetes',
+];
 
 export function EnvironmentSelector({
   value,
