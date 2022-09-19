@@ -66,7 +66,7 @@ export function Button({
         <Icon
           icon={icon}
           size={getIconSize(size)}
-          className="inline-flex"
+          className="!inline-flex"
           feather={featherIcon}
         />
       )}
