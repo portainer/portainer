@@ -1,4 +1,5 @@
 import { Terminal } from 'xterm';
+import { FitAddon } from 'xterm-addon-fit';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 
 angular.module('portainer.docker').controller('ContainerConsoleController', [
@@ -28,7 +29,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     CONSOLE_COMMANDS_LABEL_PREFIX,
     SidebarService
   ) {
-    var socket, term;
+    var socket, term, fitAddon;
 
     let states = Object.freeze({
       disconnected: 0,
@@ -138,6 +139,9 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           term.write('\n\r(connection closed)');
           term.dispose();
         }
+        if (fitAddon) {
+          fitAddon.dispose();
+        }
       }
     };
 
@@ -152,7 +156,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     function resize(restcall, add) {
       add = add || 0;
 
-      term.fit();
+      fitAddon.fit();
       var termWidth = term.cols;
       var termHeight = 30;
       term.resize(termWidth, termHeight);
@@ -161,7 +165,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     }
 
     function initTerm(url, resizeRestCall) {
-      let resizefun = resize.bind(this, resizeRestCall);
+      let resizeFunc = resize.bind(this, resizeRestCall);
 
       if ($transition$.params().nodeName) {
         url += '&nodeName=' + $transition$.params().nodeName;
@@ -176,23 +180,24 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
 
       socket.onopen = function () {
         $scope.state = states.connected;
-        term = new Terminal();
+        term = new Terminal({ cursorBlink: true });
+        fitAddon = new FitAddon();
+        term.loadAddon(fitAddon);
 
-        term.on('data', function (data) {
+        term.onData(function (data) {
           socket.send(data);
         });
         var terminal_container = document.getElementById('terminal-container');
         term.open(terminal_container);
         term.focus();
-        term.setOption('cursorBlink', true);
 
         window.onresize = function () {
-          resizefun();
+          resizeFunc();
           $scope.$apply();
         };
 
         $scope.$watch(SidebarService.isSidebarOpen, function () {
-          setTimeout(resizefun, 400);
+          setTimeout(resizeFunc, 400);
         });
 
         socket.onmessage = function (e) {
@@ -208,7 +213,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           $scope.$apply();
         };
 
-        resizefun(1);
+        resizeFunc(1);
         $scope.$apply();
       };
     }

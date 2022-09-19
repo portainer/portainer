@@ -1,5 +1,5 @@
 import { Terminal } from 'xterm';
-import { fit } from 'xterm/lib/addons/fit/fit';
+import { FitAddon } from 'xterm-addon-fit';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { RotateCw, X, Terminal as TerminalIcon } from 'lucide-react';
@@ -29,7 +29,8 @@ interface Props {
 }
 
 export function KubeCtlShell({ environmentId, onClose }: Props) {
-  const [terminal] = useState(new Terminal());
+  const [terminal] = useState(new Terminal({ cursorBlink: true }));
+  const [fitAddon] = useState(new FitAddon());
 
   const [shell, setShell] = useState<ShellState>({
     socket: null,
@@ -46,22 +47,23 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
     terminalClose(); // only css trick
     socket?.close();
     terminal.dispose();
+    fitAddon.dispose();
     onClose();
-  }, [onClose, terminal, socket]);
+  }, [onClose, socket, terminal, fitAddon]);
 
   const openTerminal = useCallback(() => {
     if (!terminalElem.current) {
       return;
     }
 
+    terminal.loadAddon(fitAddon);
     terminal.open(terminalElem.current);
-    terminal.setOption('cursorBlink', true);
     terminal.focus();
-    fit(terminal);
+    fitAddon.fit();
     terminal.writeln('#Run kubectl commands inside here');
     terminal.writeln('#e.g. kubectl get all');
     terminal.writeln('');
-  }, [terminal]);
+  }, [terminal, fitAddon]);
 
   // refresh socket listeners on socket updates
   useEffect(() => {
@@ -106,7 +108,17 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
     const socket = new WebSocket(buildUrl(jwt, environmentId));
     setShell((shell) => ({ ...shell, socket }));
 
-    terminal.onData((data) => socket.send(data));
+    terminal.onData((data) => {
+      if (
+        terminal.modes.bracketedPasteMode &&
+        data.slice(0, 6) === '\x1b[200~' &&
+        data.slice(-6) === '\x1b[201~'
+      ) {
+        socket.send(data.slice(6, -6));
+      } else {
+        socket.send(data);
+      }
+    });
     terminal.onKey(({ domEvent }) => {
       if (domEvent.ctrlKey && domEvent.code === 'KeyD') {
         close();
@@ -118,11 +130,12 @@ export function KubeCtlShell({ environmentId, onClose }: Props) {
     function close() {
       socket.close();
       terminal.dispose();
+      fitAddon.dispose();
       window.removeEventListener('resize', terminalResize);
     }
 
     return close;
-  }, [environmentId, jwt, terminal]);
+  }, [environmentId, jwt, terminal, fitAddon]);
 
   return (
     <div className={clsx(styles.root, { [styles.minimized]: shell.minimized })}>

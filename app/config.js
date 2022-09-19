@@ -1,5 +1,3 @@
-import { Terminal } from 'xterm';
-import * as fit from 'xterm/lib/addons/fit/fit';
 import { agentInterceptor } from './portainer/services/axios';
 
 /* @ngInject */
@@ -26,8 +24,6 @@ export function configApp($urlRouterProvider, $httpProvider, localStorageService
   $httpProvider.interceptors.push(() => ({
     request: agentInterceptor,
   }));
-
-  Terminal.applyAddon(fit);
 
   $uibTooltipProvider.setTriggers({
     mouseenter: 'mouseleave',
