@@ -1,6 +1,6 @@
 import tokenize from '@nxmix/tokenize-ansi';
 import x256 from 'x256';
-import { without } from 'lodash';
+import { takeRight, without } from 'lodash';
 import { format } from 'date-fns';
 
 const FOREGROUND_COLORS_BY_ANSI = {
@@ -194,9 +194,10 @@ function JSONToFormattedLine(rawText, spans, withTimestamps) {
     line += `${levelSpan.text} `;
   }
   if (caller) {
-    spans.push({ foregroundColor: JSONColors.Magenta, text: caller, fontWeight: 'bold' }, spaceSpan);
+    const trimmedCaller = takeRight(caller.split('/'), 2).join('/');
+    spans.push({ foregroundColor: JSONColors.Magenta, text: trimmedCaller, fontWeight: 'bold' }, spaceSpan);
     spans.push({ foregroundColor: JSONColors.Blue, text: '>' }, spaceSpan);
-    line += `${caller} > `;
+    line += `${trimmedCaller} > `;
   }
 
   const keys = without(Object.keys(json), 'time', 'level', 'caller', 'message');
