@@ -14,26 +14,6 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 )
 
-const (
-	// mustacheUpdateEdgeStackTemplateFile represents the name of the edge stack template file for edge updates
-	mustacheUpdateEdgeStackTemplateFile = "edge-update.yml.mustache"
-)
-
-func (handler *Handler) validateUniqueName(name string, id updateschedule.UpdateScheduleID) error {
-	list, err := handler.dataStore.EdgeUpdateSchedule().List()
-	if err != nil {
-		return errors.WithMessage(err, "Unable to list edge update schedules")
-	}
-
-	for _, schedule := range list {
-		if id != schedule.ID && schedule.Name == name {
-			return errors.New("Edge update schedule name already in use")
-		}
-	}
-
-	return nil
-}
-
 func (handler *Handler) createUpdateEdgeStack(scheduleID updateschedule.UpdateScheduleID, name string, groupIDs []portainer.EdgeGroupID, version string) (portainer.EdgeStackID, error) {
 	agentImagePrefix := os.Getenv("AGENT_IMAGE_PREFIX")
 	if agentImagePrefix == "" {
