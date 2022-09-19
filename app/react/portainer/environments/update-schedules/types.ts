@@ -1,3 +1,4 @@
+import { EnvironmentId } from '@/portainer/environments/types';
 import { UserId } from '@/portainer/users/types';
 import { EdgeGroup } from '@/react/edge/edge-groups/types';
 
@@ -22,6 +23,7 @@ export type EdgeUpdateSchedule = {
   created: number;
   createdBy: UserId;
   version: string;
+  environmentsPreviousVersions: Record<EnvironmentId, string>;
 
   // from edge stack:
   edgeGroupIds: EdgeGroup['Id'][];

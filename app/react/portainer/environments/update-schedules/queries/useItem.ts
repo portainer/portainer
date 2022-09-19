@@ -13,7 +13,9 @@ export function useItem(id: EdgeUpdateSchedule['id']) {
 
 async function getItem(id: EdgeUpdateSchedule['id']) {
   try {
-    const { data } = await axios.get<EdgeUpdateSchedule>(buildUrl(id));
+    const { data } = await axios.get<EdgeUpdateSchedule>(buildUrl(id), {
+      params: { includeEdgeStack: true },
+    });
     return data;
   } catch (err) {
     throw parseAxiosError(

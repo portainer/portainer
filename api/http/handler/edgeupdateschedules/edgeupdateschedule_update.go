@@ -3,7 +3,6 @@ package edgeupdateschedules
 import (
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -15,11 +14,11 @@ import (
 )
 
 type updatePayload struct {
-	Name         string
-	GroupIDs     []portainer.EdgeGroupID
-	Environments map[portainer.EndpointID]string
-	Type         updateschedule.UpdateScheduleType
-	Time         int64
+	Name     string
+	GroupIDs []portainer.EdgeGroupID
+	Type     updateschedule.UpdateScheduleType
+	Version  string
+	Time     int64
 }
 
 func (payload *updatePayload) Validate(r *http.Request) error {
@@ -33,10 +32,6 @@ func (payload *updatePayload) Validate(r *http.Request) error {
 
 	if payload.Type != updateschedule.UpdateScheduleRollback && payload.Type != updateschedule.UpdateScheduleUpdate {
 		return errors.New("Invalid schedule type")
-	}
-
-	if len(payload.Environments) == 0 {
-		return errors.New("No Environment is scheduled for update")
 	}
 
 	return nil
@@ -75,28 +70,30 @@ func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperro
 		item.Name = payload.Name
 	}
 
-	// if scheduled time didn't passed, then can update the schedule
-	if item.Time > time.Now().Unix() {
-		item.GroupIDs = payload.GroupIDs
-		item.Time = payload.Time
-		item.Type = payload.Type
+	stack, err := handler.dataStore.EdgeStack().EdgeStack(item.EdgeStackID)
+	if err != nil {
+		return httperror.NewError(http.StatusInternalServerError, "Unable to retrieve Edge stack", err)
+	}
 
-		item.Status = map[portainer.EndpointID]updateschedule.UpdateScheduleStatus{}
-		for environmentID, version := range payload.Environments {
-			environment, err := handler.dataStore.Endpoint().Endpoint(environmentID)
-			if err != nil {
-				return httperror.InternalServerError("Unable to retrieve environment from the database", err)
-			}
-
-			if environment.Type != portainer.EdgeAgentOnDockerEnvironment {
-				return httperror.BadRequest("Only standalone docker Environments are supported for remote update", nil)
-			}
-
-			item.Status[environmentID] = updateschedule.UpdateScheduleStatus{
-				TargetVersion:  version,
-				CurrentVersion: environment.Agent.Version,
-			}
+	canUpdate := true
+	for _, environmentStatus := range stack.Status {
+		if environmentStatus.Type != portainer.EdgeStackStatusPending {
+			canUpdate = false
 		}
+	}
+
+	if canUpdate {
+		err := handler.dataStore.EdgeStack().DeleteEdgeStack(item.EdgeStackID)
+		if err != nil {
+			return httperror.NewError(http.StatusInternalServerError, "Unable to delete Edge stack", err)
+		}
+
+		stackID, err := handler.createUpdateEdgeStack(item.ID, item.Name, payload.GroupIDs, payload.Version)
+		if err != nil {
+			return httperror.NewError(http.StatusInternalServerError, "Unable to create Edge stack", err)
+		}
+
+		item.EdgeStackID = stackID
 	}
 
 	err = handler.dataStore.EdgeUpdateSchedule().Update(item.ID, item)

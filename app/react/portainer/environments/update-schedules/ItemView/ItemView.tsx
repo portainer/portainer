@@ -12,6 +12,7 @@ import {
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { useItem } from '../queries/useItem';
 import { validation } from '../common/validation';
@@ -19,8 +20,9 @@ import { useUpdateMutation } from '../queries/useUpdateMutation';
 import { useList } from '../queries/list';
 import { NameField, nameValidation } from '../common/NameField';
 import { EdgeGroupsField } from '../common/EdgeGroupsField';
-import { EdgeUpdateSchedule } from '../types';
+import { EdgeUpdateSchedule, StatusType } from '../types';
 import { FormValues } from '../common/types';
+import { ScheduleTypeSelector } from '../common/ScheduleTypeSelector';
 
 export function ItemView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
@@ -40,13 +42,13 @@ export function ItemView() {
   const itemQuery = useItem(id);
   const schedulesQuery = useList();
 
-  const isScheduleActive = true;
-
   if (!itemQuery.data || !schedulesQuery.data) {
     return null;
   }
 
   const item = itemQuery.data;
+  const isScheduleActive = item.status !== StatusType.Pending;
+
   const schedules = schedulesQuery.data;
 
   const initialValues: FormValues = {
@@ -55,6 +57,10 @@ export function ItemView() {
     type: item.type,
     version: item.version,
   };
+
+  const environmentsCount = Object.keys(
+    item.environmentsPreviousVersions
+  ).length;
 
   return (
     <>
@@ -97,6 +103,15 @@ export function ItemView() {
                     <NameField />
 
                     <EdgeGroupsField disabled={isScheduleActive} />
+
+                    {isScheduleActive ? (
+                      <TextTip color="blue">
+                        {environmentsCount} environment(s) will be updated to
+                        version {item.version}
+                      </TextTip>
+                    ) : (
+                      <ScheduleTypeSelector />
+                    )}
 
                     <div className="form-group">
                       <div className="col-sm-12">
