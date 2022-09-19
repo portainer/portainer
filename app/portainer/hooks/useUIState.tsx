@@ -32,6 +32,6 @@ export const useUIState = create<UIState>()(
         set({ dismissedUpdateVersion: version });
       },
     }),
-    { name: keyBuilder('UI_STATE') }
+    { name: keyBuilder('NEW_UI_STATE') }
   )
 );
