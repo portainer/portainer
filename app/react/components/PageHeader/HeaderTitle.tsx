@@ -1,5 +1,7 @@
 import { PropsWithChildren } from 'react';
 
+import { ContextHelp } from '@@/PageHeader/ContextHelp';
+
 import { useHeaderContext } from './HeaderContainer';
 import { UserMenu } from './UserMenu';
 
@@ -18,7 +20,10 @@ export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
         </div>
         {children && <span>{children}</span>}
       </div>
-      {!window.ddExtension && <UserMenu />}
+      <div className="flex items-center gap-4">
+        <ContextHelp />
+        {!window.ddExtension && <UserMenu />}
+      </div>
     </div>
   );
 }
