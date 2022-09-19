@@ -16,6 +16,15 @@
   gap: 5px;
 }
 
+.ingress-name-error {
+  display: block;
+}
+
 .ingress-name-error svg {
-  width: 28px;
+  margin-right: 5px;
+}
+
+.ingress-name-error svg,
+.ingress-name-error span {
+  display: inline;
 }

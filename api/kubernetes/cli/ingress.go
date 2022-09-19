@@ -62,11 +62,15 @@ func (kcl *KubeClient) GetIngresses(namespace string) ([]models.K8sIngressInfo, 
 
 	var infos []models.K8sIngressInfo
 	for _, ingress := range ingressList.Items {
+		ingressClass := ingress.Spec.IngressClassName
 		var info models.K8sIngressInfo
 		info.Name = ingress.Name
 		info.UID = string(ingress.UID)
 		info.Namespace = namespace
-		info.ClassName = *ingress.Spec.IngressClassName
+		info.ClassName = ""
+		if ingressClass != nil {
+			info.ClassName = *ingressClass
+		}
 		info.Type = classes[info.ClassName]
 		info.Annotations = ingress.Annotations
 

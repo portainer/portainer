@@ -15,10 +15,14 @@ import { Rule, ServicePorts } from './types';
 
 import '../style.css';
 
-const pathTypes = ['ImplementationSpecific', 'Prefix', 'Exact'];
-const placeholderAnnotations: Record<string, string[]> = {
+const PathTypes: Record<string, string[]> = {
+  nginx: ['ImplementationSpecific', 'Prefix', 'Exact'],
+  traefik: ['Prefix', 'Exact'],
+  other: ['Prefix', 'Exact'],
+};
+const PlaceholderAnnotations: Record<string, string[]> = {
   nginx: ['e.g. nginx.ingress.kubernetes.io/rewrite-target', '/$1'],
-  traefik: ['e.g. traefik.ingress.kubernetes.io/rewrite-target', '/$1'],
+  traefik: ['e.g. traefik.ingress.kubernetes.io/router.tls', 'true'],
   other: ['e.g. app.kubernetes.io/name', 'examplename'],
 };
 
@@ -98,7 +102,8 @@ export function IngressForm({
   }
   const hasNoHostRule = rule.Hosts?.some((host) => host.NoHost);
   const placeholderAnnotation =
-    placeholderAnnotations[rule.IngressType || 'other'];
+    PlaceholderAnnotations[rule.IngressType || 'other'];
+  const pathTypes = PathTypes[rule.IngressType || 'other'];
 
   return (
     <Widget>
