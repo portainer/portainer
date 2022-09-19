@@ -9,7 +9,6 @@ import { snapshotEndpoints } from '../environments/environment.service';
 import { isEdgeEnvironment } from '../environments/utils';
 import { confirmAsync } from '../services/modal.service/confirm';
 import { buildTitle } from '../services/modal.service/utils';
-import { UIStateProvider } from '../hooks/UIStateProvider';
 
 import { EnvironmentList } from './EnvironmentList';
 import { EdgeLoadingSpinner } from './EdgeLoadingSpinner';
@@ -23,7 +22,7 @@ export function HomeView() {
 
   const router = useRouter();
   return (
-    <UIStateProvider>
+    <>
       <PageHeader
         reload
         title="Home"
@@ -44,7 +43,7 @@ export function HomeView() {
           onRefresh={confirmTriggerSnapshot}
         />
       )}
-    </UIStateProvider>
+    </>
   );
 
   async function confirmTriggerSnapshot() {
