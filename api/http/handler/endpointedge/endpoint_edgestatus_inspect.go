@@ -4,6 +4,9 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+
+	"github.com/rs/zerolog/log"
+
 	"net/http"
 	"strconv"
 	"time"
@@ -11,7 +14,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/edge/updateschedule"
 	"github.com/portainer/portainer/api/http/middlewares"
+	"golang.org/x/exp/slices"
 )
 
 type stackStatusResponse struct {
@@ -113,6 +118,14 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		Credentials:     tunnel.Credentials,
 	}
 
+	// check endpoint version, if it has the same version as the active schedule, then we can mark the edge stack as successfully deployed
+	successFullUpdateEdgeStackID := portainer.EdgeStackID(0)
+	activeUpdateSchedule := handler.DataStore.EdgeUpdateSchedule().ActiveSchedule(endpoint.ID)
+	if activeUpdateSchedule != nil && activeUpdateSchedule.TargetVersion == version {
+		successFullUpdateEdgeStackID = activeUpdateSchedule.EdgeStackID
+		go handler.handleSuccessfulUpdate(activeUpdateSchedule)
+	}
+
 	schedules, handlerErr := handler.buildSchedules(endpoint.ID, tunnel)
 	if handlerErr != nil {
 		return handlerErr
@@ -123,7 +136,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
 	}
 
-	edgeStacksStatus, handlerErr := handler.buildEdgeStacks(endpoint.ID)
+	edgeStacksStatus, handlerErr := handler.buildEdgeStacks(endpoint.ID, successFullUpdateEdgeStackID)
 	if handlerErr != nil {
 		return handlerErr
 	}
@@ -155,6 +168,35 @@ func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {
 	}
 }
 
+func (handler *Handler) handleSuccessfulUpdate(activeUpdateSchedule *updateschedule.EndpointUpdateScheduleRelation) {
+	handler.DataStore.EdgeUpdateSchedule().RemoveActiveSchedule(activeUpdateSchedule.EnvironmentID, activeUpdateSchedule.ScheduleID)
+	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(activeUpdateSchedule.EdgeStackID)
+	if err != nil {
+		log.Warn().
+			Err(err).
+			Msgf("Unable to find edge stack %d", activeUpdateSchedule.EdgeStackID)
+		return
+	}
+
+	status, ok := edgeStack.Status[activeUpdateSchedule.EnvironmentID]
+	if !ok {
+		status = portainer.EdgeStackStatus{
+			EndpointID: activeUpdateSchedule.EnvironmentID,
+		}
+	}
+
+	status.Type = portainer.StatusOk
+
+	edgeStack.Status[activeUpdateSchedule.EnvironmentID] = status
+	err = handler.DataStore.EdgeStack().UpdateEdgeStack(edgeStack.ID, edgeStack)
+	if err != nil {
+		log.Warn().
+			Err(err).
+			Msgf("Unable to update edge stack %d", edgeStack.ID)
+		return
+	}
+}
+
 func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel portainer.TunnelDetails) ([]edgeJobResponse, *httperror.HandlerError) {
 	schedules := []edgeJobResponse{}
 	for _, job := range tunnel.Jobs {
@@ -176,7 +218,7 @@ func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel p
 	return schedules, nil
 }
 
-func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID) ([]stackStatusResponse, *httperror.HandlerError) {
+func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID, skipEdgeStackID portainer.EdgeStackID) ([]stackStatusResponse, *httperror.HandlerError) {
 	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve relation object from the database", err)
@@ -184,9 +226,17 @@ func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID) ([]stac
 
 	edgeStacksStatus := []stackStatusResponse{}
 	for stackID := range relation.EdgeStacks {
+		if stackID == skipEdgeStackID {
+			continue
+		}
+
 		stack, err := handler.DataStore.EdgeStack().EdgeStack(stackID)
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to retrieve edge stack from the database", err)
+		}
+
+		if slices.Contains([]portainer.EdgeStackStatusType{portainer.StatusError, portainer.StatusOk}, stack.Status[endpointID].Type) {
+			continue
 		}
 
 		stackStatus := stackStatusResponse{

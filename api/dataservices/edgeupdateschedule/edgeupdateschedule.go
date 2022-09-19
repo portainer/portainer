@@ -8,6 +8,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/edge/updateschedule"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/exp/slices"
 )
 
 const (
@@ -45,6 +46,26 @@ func NewService(connection portainer.Connection) (*Service, error) {
 		return nil, errors.WithMessage(err, "Unable to list schedules")
 	}
 
+	slices.SortFunc(schedules, func(a updateschedule.UpdateSchedule, b updateschedule.UpdateSchedule) bool {
+		return a.Created > b.Created
+	})
+
+	for _, schedule := range schedules {
+		for endpointId := range schedule.EnvironmentsPreviousVersions {
+			if service.idxActiveSchedules[endpointId] != nil {
+				continue
+			}
+
+			service.idxActiveSchedules[endpointId] = &updateschedule.EndpointUpdateScheduleRelation{
+				EnvironmentID: endpointId,
+				ScheduleID:    schedule.ID,
+				TargetVersion: schedule.Version,
+				EdgeStackID:   schedule.EdgeStackID,
+			}
+		}
+
+	}
+
 	for _, schedule := range schedules {
 		service.setRelation(&schedule)
 	}
@@ -74,6 +95,24 @@ func (service *Service) ActiveSchedules(environmentsIDs []portainer.EndpointID) 
 	return schedules
 }
 
+func (service *Service) RemoveActiveSchedule(environmentID portainer.EndpointID, scheduleID updateschedule.UpdateScheduleID) error {
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
+	activeSchedule := service.idxActiveSchedules[environmentID]
+	if activeSchedule == nil {
+		return nil
+	}
+
+	if activeSchedule.ScheduleID != scheduleID {
+		return errors.New("cannot remove active schedule for environment: schedule ID mismatch")
+	}
+
+	delete(service.idxActiveSchedules, environmentID)
+
+	return nil
+}
+
 // List return an array containing all the items in the bucket.
 func (service *Service) List() ([]updateschedule.UpdateSchedule, error) {
 	var list = make([]updateschedule.UpdateSchedule, 0)
@@ -94,7 +133,7 @@ func (service *Service) List() ([]updateschedule.UpdateSchedule, error) {
 	return list, err
 }
 
-// Item returns a item by ID.
+// Item returns an item by ID.
 func (service *Service) Item(ID updateschedule.UpdateScheduleID) (*updateschedule.UpdateSchedule, error) {
 	var item updateschedule.UpdateSchedule
 	identifier := service.connection.ConvertToKey(int(ID))
@@ -109,6 +148,11 @@ func (service *Service) Item(ID updateschedule.UpdateScheduleID) (*updateschedul
 
 // Create assign an ID to a new object and saves it.
 func (service *Service) Create(item *updateschedule.UpdateSchedule) error {
+
+	if service.hasActiveSchedule(item) {
+		return errors.New("Cannot create a new schedule while another schedule is active")
+	}
+
 	err := service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
@@ -121,11 +165,31 @@ func (service *Service) Create(item *updateschedule.UpdateSchedule) error {
 		return err
 	}
 
-	return service.setRelation(item)
+	service.setRelation(item)
+
+	return nil
+}
+
+func (service *Service) setRelation(item *updateschedule.UpdateSchedule) {
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
+	for endpointId := range item.EnvironmentsPreviousVersions {
+		service.idxActiveSchedules[endpointId] = &updateschedule.EndpointUpdateScheduleRelation{
+			EnvironmentID: endpointId,
+			ScheduleID:    item.ID,
+			TargetVersion: item.Version,
+			EdgeStackID:   item.EdgeStackID,
+		}
+	}
 }
 
 // Update updates an item.
 func (service *Service) Update(id updateschedule.UpdateScheduleID, item *updateschedule.UpdateSchedule) error {
+	if service.hasActiveSchedule(item) {
+		return errors.New("Cannot update a schedule while another schedule is active")
+	}
+
 	identifier := service.connection.ConvertToKey(int(id))
 	err := service.connection.UpdateObject(BucketName, identifier, item)
 	if err != nil {
@@ -134,7 +198,9 @@ func (service *Service) Update(id updateschedule.UpdateScheduleID, item *updates
 
 	service.cleanRelation(id)
 
-	return service.setRelation(item)
+	service.setRelation(item)
+
+	return nil
 }
 
 // Delete deletes an item.
@@ -157,22 +223,14 @@ func (service *Service) cleanRelation(id updateschedule.UpdateScheduleID) {
 	}
 }
 
-func (service *Service) setRelation(schedule *updateschedule.UpdateSchedule) error {
+func (service *Service) hasActiveSchedule(item *updateschedule.UpdateSchedule) bool {
 	service.mu.Lock()
 	defer service.mu.Unlock()
-
-	for environmentID := range schedule.EnvironmentsPreviousVersions {
-		// this should never happen
-		if service.idxActiveSchedules[environmentID] != nil && service.idxActiveSchedules[environmentID].ScheduleID != schedule.ID {
-			return errors.New("Multiple schedules are pending for the same environment")
-		}
-
-		service.idxActiveSchedules[environmentID] = &updateschedule.EndpointUpdateScheduleRelation{
-			EnvironmentID: environmentID,
-			ScheduleID:    schedule.ID,
-			TargetVersion: schedule.Version,
+	for endpointId := range item.EnvironmentsPreviousVersions {
+		if service.idxActiveSchedules[endpointId] != nil && service.idxActiveSchedules[endpointId].ScheduleID != item.ID {
+			return true
 		}
 	}
 
-	return nil
+	return false
 }
