@@ -7,12 +7,24 @@ import {
   CreateView,
   ItemView,
 } from '@/react/portainer/environments/update-schedules';
+import { withUIRouter } from '@/react-tools/withUIRouter';
+import { withReactQuery } from '@/react-tools/withReactQuery';
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
 
 export const updateSchedulesModule = angular
   .module('portainer.edge.updateSchedules', [])
-  .component('updateSchedulesListView', r2a(ListView, []))
-  .component('updateSchedulesCreateView', r2a(CreateView, []))
-  .component('updateSchedulesItemView', r2a(ItemView, []))
+  .component(
+    'updateSchedulesListView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(ListView))), [])
+  )
+  .component(
+    'updateSchedulesCreateView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(CreateView))), [])
+  )
+  .component(
+    'updateSchedulesItemView',
+    r2a(withUIRouter(withReactQuery(withCurrentUser(ItemView))), [])
+  )
   .config(config).name;
 
 function config($stateRegistryProvider: StateRegistry) {
