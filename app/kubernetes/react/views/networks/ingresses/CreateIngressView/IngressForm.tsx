@@ -377,9 +377,17 @@ export function IngressForm({
                       !serviceOptions.find(
                         (s) => s.value === path.ServiceName
                       ) && (
-                        <div className="col-sm-12 !pl-0 text-muted !m-0 !mb-2">
-                          Currently set to <b>{path.ServiceName}</b>, which does
-                          not exist.
+                        <div className="col-sm-12 !pl-0 vertical-center text-warning small whitespace-nowrap !m-0 !mb-2">
+                          <Icon
+                            icon="alert-triangle"
+                            mode="warning"
+                            size="sm"
+                            feather
+                          />
+                          <span>
+                            Currently set to <b>{path.ServiceName}</b>, which
+                            does not exist.
+                          </span>
                         </div>
                       )}
                     <div className="form-group !pl-0 col-sm-3 col-xl-2 !m-0">

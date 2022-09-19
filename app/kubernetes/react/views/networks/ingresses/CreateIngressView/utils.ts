@@ -76,7 +76,7 @@ export function prepareRuleHostsFromIngress(ing: Ingress) {
     if (!host) {
       h.NoHost = true;
     }
-    h.Key = getRandomKey();
+    h.Key = uuidv4();
     return h;
   });
 
@@ -92,6 +92,7 @@ export function getAnnotationsForEdit(
       result.push({
         Key: k,
         Value: annotations[k],
+        ID: uuidv4(),
       });
     }
   });
@@ -100,7 +101,7 @@ export function getAnnotationsForEdit(
 
 export function prepareRuleFromIngress(ing: Ingress): Rule {
   return {
-    Key: getRandomKey(),
+    Key: uuidv4(),
     IngressName: ing.Name,
     Namespace: ing.Namespace,
     IngressClassName: ing.ClassName,
@@ -108,10 +109,6 @@ export function prepareRuleFromIngress(ing: Ingress): Rule {
     Annotations: ing.Annotations ? getAnnotationsForEdit(ing.Annotations) : [],
     IngressType: ing.Type,
   };
-}
-
-export function getRandomKey() {
-  return uuidv4();
 }
 
 export function checkIfPathExistsWithHost(

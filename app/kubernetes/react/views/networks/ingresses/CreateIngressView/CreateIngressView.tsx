@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { useConfigurations } from '@/react/kubernetes/configs/queries';
@@ -27,7 +28,6 @@ import {
   preparePaths,
   prepareAnnotations,
   prepareRuleFromIngress,
-  getRandomKey,
   checkIfPathExistsWithHost,
 } from './utils';
 
@@ -285,13 +285,17 @@ export function CreateIngressView() {
       errors.className = 'Ingress class is required';
     }
 
+    const duplicatedAnnotations: string[] = [];
     rule.Annotations?.forEach((a, i) => {
       if (!a.Key) {
         errors[`annotations.key[${i}]`] = 'Annotation key is required';
+      } else if (duplicatedAnnotations.includes(a.Key)) {
+        errors[`annotations.key[${i}]`] = 'Annotation cannot be duplicated';
       }
       if (!a.Value) {
         errors[`annotations.value[${i}]`] = 'Annotation value is required';
       }
+      duplicatedAnnotations.push(a.Key);
     });
 
     const duplicatedHosts: string[] = [];
@@ -437,7 +441,7 @@ export function CreateIngressView() {
       (ruleCounterByNamespace[namespace] || 0) + 1
     }`;
     const path: Path = {
-      Key: getRandomKey(),
+      Key: uuidv4(),
       ServiceName: '',
       ServicePort: 0,
       Route: '',
@@ -448,11 +452,11 @@ export function CreateIngressView() {
       Host: '',
       Secret: '',
       Paths: [path],
-      Key: getRandomKey(),
+      Key: uuidv4(),
     };
 
     const rule: Rule = {
-      Key: getRandomKey(),
+      Key: uuidv4(),
       Namespace: namespace,
       IngressName: newKey,
       IngressClassName: '',
@@ -470,7 +474,7 @@ export function CreateIngressView() {
       ServicePort: 0,
       Route: '',
       PathType: 'Prefix',
-      Key: getRandomKey(),
+      Key: uuidv4(),
     };
 
     const host: Host = {
@@ -478,7 +482,7 @@ export function CreateIngressView() {
       Secret: '',
       Paths: [path],
       NoHost: noHost,
-      Key: getRandomKey(),
+      Key: uuidv4(),
     };
 
     rule.Hosts.push(host);
@@ -493,7 +497,7 @@ export function CreateIngressView() {
       ServicePort: 0,
       Route: '',
       PathType: 'Prefix',
-      Key: getRandomKey(),
+      Key: uuidv4(),
     };
 
     rule.Hosts[hostIndex].Paths.push(path);
@@ -506,6 +510,7 @@ export function CreateIngressView() {
     const annotation: Annotation = {
       Key: '',
       Value: '',
+      ID: uuidv4(),
     };
     if (type === 'rewrite') {
       annotation.Key = 'nginx.ingress.kubernetes.io/rewrite-target';
