@@ -196,6 +196,10 @@ input:checked + .slider:before {
   padding: 1.5%;
 }
 
+.widget .widget-icon .icon {
+  display: flex !important;
+}
+
 .widget .widget-body table thead {
   border-top: 1px solid var(--border-table-color);
 }

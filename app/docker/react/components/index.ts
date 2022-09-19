@@ -26,10 +26,10 @@ export const componentsModule = angular
   .component('templateListSort', TemplateListSortAngular)
   .component(
     'stackContainersDatatable',
-    r2a(withReactQuery(withCurrentUser(StackContainersDatatable)), [
-      'environment',
-      'stackName',
-    ])
+    r2a(
+      withUIRouter(withReactQuery(withCurrentUser(StackContainersDatatable))),
+      ['environment', 'stackName']
+    )
   )
   .component(
     'gpu',
