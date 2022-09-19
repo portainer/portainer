@@ -279,10 +279,10 @@ export function CreateIngressView() {
       } else if (ingressNames.includes(rule.IngressName)) {
         errors.ingressName = 'Ingress name already exists';
       }
+    }
 
-      if (!rule.IngressClassName) {
-        errors.className = 'Ingress class is required';
-      }
+    if (!rule.IngressClassName) {
+      errors.className = 'Ingress class is required';
     }
 
     rule.Annotations?.forEach((a, i) => {

@@ -187,7 +187,7 @@ export function IngressForm({
                     }
                     options={ingressClassOptions}
                   />
-                  {errors.className && !isEdit && (
+                  {errors.className && (
                     <FormError className="mt-1">{errors.className}</FormError>
                   )}
                 </div>
@@ -372,6 +372,16 @@ export function IngressForm({
                     className="mt-5 !mb-5 row path"
                     key={`path_${path.Key}}`}
                   >
+                    {isEdit &&
+                      path.ServiceName &&
+                      !serviceOptions.find(
+                        (s) => s.value === path.ServiceName
+                      ) && (
+                        <div className="col-sm-12 !pl-0 text-muted !m-0 !mb-2">
+                          Currently set to <b>{path.ServiceName}</b>, which does
+                          not exist.
+                        </div>
+                      )}
                     <div className="form-group !pl-0 col-sm-3 col-xl-2 !m-0">
                       <div className="input-group input-group-sm">
                         <span className="input-group-addon required">
