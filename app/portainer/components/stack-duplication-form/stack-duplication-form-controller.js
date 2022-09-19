@@ -38,6 +38,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     }
 
     function onChangeEnvironment(endpointId) {
+      console.log({ endpointId });
       return $scope.$evalAsync(() => {
         ctrl.formValues.endpointId = endpointId;
       });
