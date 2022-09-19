@@ -1531,7 +1531,8 @@ const (
 )
 
 const (
-	_ EdgeStackStatusType = iota
+	// EdgeStackStatusPending represents a pending edge stack
+	EdgeStackStatusPending EdgeStackStatusType = iota
 	//StatusOk represents a successfully deployed edge stack
 	StatusOk
 	//StatusError represents an edge environment(endpoint) which failed to deploy its edge stack

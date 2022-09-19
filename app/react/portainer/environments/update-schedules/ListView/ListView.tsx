@@ -24,7 +24,7 @@ const useStore = createStore(storageKey);
 
 export function ListView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
-  const listQuery = useList();
+  const listQuery = useList(true);
   const store = useStore();
 
   if (!listQuery.data) {
