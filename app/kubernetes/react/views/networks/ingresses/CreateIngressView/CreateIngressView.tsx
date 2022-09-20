@@ -120,13 +120,18 @@ export function CreateIngressView() {
     }
   });
 
-  const clusterIpServices = servicesResults.data?.filter(
-    (s) => s.Type === 'ClusterIP'
+  const clusterIpServices = useMemo(
+    () => servicesResults.data?.filter((s) => s.Type === 'ClusterIP'),
+    [servicesResults.data]
   );
-  const servicesOptions = clusterIpServices?.map((service) => ({
-    label: service.Name,
-    value: service.Name,
-  }));
+  const servicesOptions = useMemo(
+    () =>
+      clusterIpServices?.map((service) => ({
+        label: service.Name,
+        value: service.Name,
+      })),
+    [clusterIpServices]
+  );
 
   const serviceOptions = [
     { label: 'Select a service', value: '' },
@@ -144,8 +149,12 @@ export function CreateIngressView() {
       )
     : {};
 
-  const existingIngressClass = ingressControllersResults.data?.find(
-    (i) => i.ClassName === ingressRule.IngressClassName
+  const existingIngressClass = useMemo(
+    () =>
+      ingressControllersResults.data?.find(
+        (i) => i.ClassName === ingressRule.IngressClassName
+      ),
+    [ingressControllersResults.data, ingressRule.IngressClassName]
   );
   const ingressClassOptions: Option<string>[] = [
     { label: 'Select an ingress class', value: '' },
@@ -202,9 +211,20 @@ export function CreateIngressView() {
 
   useEffect(() => {
     if (namespace.length > 0) {
-      validate(ingressRule, ingressNames || []);
+      validate(
+        ingressRule,
+        ingressNames || [],
+        servicesOptions || [],
+        !!existingIngressClass
+      );
     }
-  }, [ingressRule, namespace, ingressNames]);
+  }, [
+    ingressRule,
+    namespace,
+    ingressNames,
+    servicesOptions,
+    existingIngressClass,
+  ]);
 
   return (
     <>
@@ -263,7 +283,12 @@ export function CreateIngressView() {
     </>
   );
 
-  function validate(ingressRule: Rule, ingressNames: string[]) {
+  function validate(
+    ingressRule: Rule,
+    ingressNames: string[],
+    serviceOptions: Option<string>[],
+    existingIngressClass: boolean
+  ) {
     const errors: Record<string, ReactNode> = {};
     const rule = { ...ingressRule };
 
@@ -286,6 +311,11 @@ export function CreateIngressView() {
       if (!rule.IngressClassName) {
         errors.className = 'Ingress class is required';
       }
+    }
+
+    if (isEdit && !ingressRule.IngressClassName) {
+      errors.className =
+        'No ingress class is currently set for this ingress - use of the Portainer UI requires one to be set.';
     }
 
     if (isEdit && !existingIngressClass && ingressRule.IngressClassName) {
