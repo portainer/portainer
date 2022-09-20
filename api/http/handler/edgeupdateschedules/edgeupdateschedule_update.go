@@ -18,20 +18,20 @@ type updatePayload struct {
 	GroupIDs []portainer.EdgeGroupID
 	Type     updateschedule.UpdateScheduleType
 	Version  string
-	Time     int64
+	// Time     int64
 }
 
 func (payload *updatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return errors.New("Invalid tag name")
+		return errors.New("invalid tag name")
 	}
 
 	if len(payload.GroupIDs) == 0 {
-		return errors.New("Required to choose at least one group")
+		return errors.New("required to choose at least one group")
 	}
 
 	if payload.Type != updateschedule.UpdateScheduleRollback && payload.Type != updateschedule.UpdateScheduleUpdate {
-		return errors.New("Invalid schedule type")
+		return errors.New("invalid schedule type")
 	}
 
 	return nil

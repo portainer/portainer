@@ -1,4 +1,4 @@
-import { array, number, object, string } from 'yup';
+import { array, object, string } from 'yup';
 
 import { EdgeUpdateSchedule } from '../types';
 
@@ -13,9 +13,9 @@ export function validation(
     groupIds: array().min(1, 'At least one group is required'),
     name: nameValidation(schedules, currentId),
     type: typeValidation(),
-    time: number()
-      .min(Date.now() / 1000)
-      .required(),
+    // time: number()
+    //   .min(Date.now() / 1000)
+    //   .required(),
     version: string().required('Version is required'),
   });
 }

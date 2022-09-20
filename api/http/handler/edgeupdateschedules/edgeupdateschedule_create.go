@@ -25,7 +25,7 @@ type createPayload struct {
 	GroupIDs []portainer.EdgeGroupID
 	Type     updateschedule.UpdateScheduleType
 	Version  string
-	Time     int64
+	// Time     int64
 }
 
 func (payload *createPayload) Validate(r *http.Request) error {
@@ -41,9 +41,9 @@ func (payload *createPayload) Validate(r *http.Request) error {
 		return errors.New("Invalid schedule type")
 	}
 
-	if payload.Time < time.Now().Unix() {
-		return errors.New("Invalid time")
-	}
+	// if payload.Time < time.Now().Unix() {
+	// 	return errors.New("Invalid time")
+	// }
 
 	return nil
 }
