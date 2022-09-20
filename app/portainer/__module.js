@@ -6,7 +6,6 @@ import settingsModule from './settings';
 import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
 import servicesModule from './services';
-import homeModule from './home';
 import { reactModule } from './react';
 import { sidebarModule } from './react/views/sidebar';
 import environmentsModule from './environments';
@@ -29,7 +28,6 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
 
 angular
   .module('portainer.app', [
-    homeModule,
     'portainer.oauth',
     'portainer.rbac',
     componentsModule,

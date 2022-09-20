@@ -2,14 +2,14 @@ import { useQuery } from 'react-query';
 import clsx from 'clsx';
 
 import { getVersionStatus } from '@/portainer/services/api/status.service';
-import { useUIState } from '@/portainer/hooks/UIStateProvider';
+import { useUIState } from '@/portainer/hooks/useUIState';
 
 import { Icon } from '@@/Icon';
 
 import styles from './UpdateNotifications.module.css';
 
 export function UpdateNotification() {
-  const [uiState, setUIState] = useUIState();
+  const uiStateStore = useUIState();
   const query = useUpdateNotification();
 
   if (!query.data || !query.data.UpdateAvailable) {
@@ -19,9 +19,9 @@ export function UpdateNotification() {
   const { LatestVersion } = query.data;
 
   if (
-    uiState?.dismissedUpdateVersion?.length > 0 &&
+    !!uiStateStore.dismissedUpdateVersion &&
     LatestVersion?.length > 0 &&
-    uiState?.dismissedUpdateVersion === LatestVersion
+    uiStateStore.dismissedUpdateVersion === LatestVersion
   ) {
     return null;
   }
@@ -63,10 +63,7 @@ export function UpdateNotification() {
   );
 
   function onDismiss(version: string) {
-    setUIState({
-      ...uiState,
-      dismissedUpdateVersion: version,
-    });
+    uiStateStore.dismissUpdateVersion(version);
   }
 }
 

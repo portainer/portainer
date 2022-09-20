@@ -1,8 +1,6 @@
 import { useRouter } from '@uirouter/react';
 import { useState } from 'react';
 
-import { r2a } from '@/react-tools/react2angular';
-
 import { PageHeader } from '@@/PageHeader';
 
 import * as notifications from '../services/notifications';
@@ -72,8 +70,6 @@ export function HomeView() {
     }
   }
 }
-
-export const HomeViewAngular = r2a(HomeView, []);
 
 async function confirmEndpointSnapshot() {
   return confirmAsync({
