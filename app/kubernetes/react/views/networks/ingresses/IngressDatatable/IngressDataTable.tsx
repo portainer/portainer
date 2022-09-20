@@ -79,14 +79,18 @@ export function IngressDataTable() {
 
         <Authorized authorizations="K8sIngressesAdd">
           <Link to="kubernetes.ingresses.create" className="space-left">
-            <Button icon={Plus} className="btn-wrapper vertical-center">
+            <Button
+              icon={Plus}
+              className="btn-wrapper vertical-center"
+              color="secondary"
+            >
               Add with form
             </Button>
           </Link>
         </Authorized>
         <Authorized authorizations="K8sApplicationsW">
           <Link to="kubernetes.deploy" className="space-left">
-            <Button icon={Plus} className="btn-wrapper" color="secondary">
+            <Button icon={Plus} className="btn-wrapper">
               Create from manifest
             </Button>
           </Link>
