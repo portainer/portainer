@@ -1,4 +1,5 @@
 import { Field, useField } from 'formik';
+import _ from 'lodash';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';
@@ -18,7 +19,7 @@ export function VersionSelect() {
       versions.map((version) => ({ label: version, value: version })),
     onSuccess(versions) {
       if (versions.length > 0) {
-        setValue(versions[0].value);
+        setValue(_.last(versions)?.value || '');
       }
     },
   });
