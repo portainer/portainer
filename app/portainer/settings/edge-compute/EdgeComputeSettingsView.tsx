@@ -1,4 +1,6 @@
+import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { r2a } from '@/react-tools/react2angular';
+import { withReactQuery } from '@/react-tools/withReactQuery';
 
 import { Settings } from '../types';
 
@@ -20,7 +22,7 @@ export function EdgeComputeSettingsView({ settings, onSubmit }: Props) {
   );
 }
 
-export const EdgeComputeSettingsViewAngular = r2a(EdgeComputeSettingsView, [
-  'settings',
-  'onSubmit',
-]);
+export const EdgeComputeSettingsViewAngular = r2a(
+  withReactQuery(withCurrentUser(EdgeComputeSettingsView)),
+  ['settings', 'onSubmit']
+);

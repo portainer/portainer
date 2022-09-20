@@ -2,6 +2,7 @@ import { createContext, PropsWithChildren, useContext } from 'react';
 
 export function createRowContext<TContext>() {
   const Context = createContext<TContext | null>(null);
+  Context.displayName = 'RowContext';
 
   return { RowProvider, useRowContext };
 
