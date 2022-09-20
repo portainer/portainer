@@ -279,10 +279,14 @@ export function CreateIngressView() {
       } else if (ingressNames.includes(rule.IngressName)) {
         errors.ingressName = 'Ingress name already exists';
       }
+      if (!rule.IngressClassName) {
+        errors.className = 'Ingress class is required';
+      }
     }
 
-    if (!rule.IngressClassName) {
-      errors.className = 'Ingress class is required';
+    if (isEdit && !rule.IngressClassName) {
+      errors.className =
+        'No ingress class is currently set for this ingress - use of the Portainer UI requires one to be set.';
     }
 
     const duplicatedAnnotations: string[] = [];

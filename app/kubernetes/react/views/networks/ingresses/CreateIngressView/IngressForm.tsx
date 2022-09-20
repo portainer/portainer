@@ -162,7 +162,7 @@ export function IngressForm({
                     />
                   )}
                   {errors.ingressName && !isEdit && (
-                    <FormError className="mt-1 ingress-name-error">
+                    <FormError className="mt-1 error-inline">
                       {errors.ingressName}
                     </FormError>
                   )}
@@ -188,7 +188,9 @@ export function IngressForm({
                     options={ingressClassOptions}
                   />
                   {errors.className && (
-                    <FormError className="mt-1">{errors.className}</FormError>
+                    <FormError className="mt-1 error-inline">
+                      {errors.className}
+                    </FormError>
                   )}
                 </div>
               </div>
