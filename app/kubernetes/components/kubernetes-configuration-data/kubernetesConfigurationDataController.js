@@ -147,16 +147,21 @@ class KubernetesConfigurationDataController {
     }
 
     const entry = new KubernetesConfigurationFormValuesEntry();
-    const encoding = chardet.detect(Buffer.from(event.target.result));
-    const decoder = new TextDecoder(encoding);
+    try {
+      const encoding = chardet.detect(Buffer.from(event.target.result));
+      const decoder = new TextDecoder(encoding);
 
-    entry.IsBinary = KubernetesConfigurationHelper.isBinary(encoding);
+      entry.IsBinary = KubernetesConfigurationHelper.isBinary(encoding);
 
-    if (!entry.IsBinary) {
-      entry.Value = decoder.decode(event.target.result);
-    } else {
-      const stringValue = decoder.decode(event.target.result);
-      entry.Value = Base64.encode(stringValue);
+      if (!entry.IsBinary) {
+        entry.Value = decoder.decode(event.target.result);
+      } else {
+        const stringValue = decoder.decode(event.target.result);
+        entry.Value = Base64.encode(stringValue);
+      }
+    } catch (error) {
+      this.Notifications.error('Failed to upload file', error, 'Failed to upload file');
+      return;
     }
 
     entry.Key = event.target.fileName;
@@ -194,10 +199,12 @@ class KubernetesConfigurationDataController {
   }
 
   isEntryRequired() {
-    const typeValue = typeof this.formValues.Type === 'string' ? this.formValues.Type : this.formValues.Type.value;
-    if (this.formValues.Data.length === 1) {
-      if (typeValue !== this.KubernetesSecretTypes.SERVICEACCOUNTTOKEN.value) {
-        return true;
+    if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
+      const typeValue = typeof this.formValues.Type === 'string' ? this.formValues.Type : this.formValues.Type.value;
+      if (this.formValues.Data.length === 1) {
+        if (typeValue !== this.KubernetesSecretTypes.SERVICEACCOUNTTOKEN.value) {
+          return true;
+        }
       }
     }
     return false;
