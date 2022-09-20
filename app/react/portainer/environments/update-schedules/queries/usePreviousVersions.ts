@@ -6,11 +6,21 @@ import { EnvironmentId } from '@/portainer/environments/types';
 import { queryKeys } from './query-keys';
 import { buildUrl } from './urls';
 
+interface Options<T> {
+  select?: (data: Record<EnvironmentId, string>) => T;
+  onSuccess?(data: T): void;
+  enabled?: boolean;
+}
+
 export function usePreviousVersions<T = Record<EnvironmentId, string>>({
   select,
-}: { select?: (data: Record<EnvironmentId, string>) => T } = {}) {
+  onSuccess,
+  enabled,
+}: Options<T> = {}) {
   return useQuery(queryKeys.previousVersions(), getPreviousVersions, {
     select,
+    onSuccess,
+    enabled,
   });
 }
 

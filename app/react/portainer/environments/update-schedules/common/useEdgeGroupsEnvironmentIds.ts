@@ -12,7 +12,7 @@ export function useEdgeGroupsEnvironmentIds(
       Object.fromEntries(groups.map((g) => [g.Id, g.Endpoints])),
   });
 
-  return useMemo(
+  const envIds = useMemo(
     () =>
       _.uniq(
         _.compact(
@@ -22,5 +22,13 @@ export function useEdgeGroupsEnvironmentIds(
         )
       ),
     [edgeGroupsIds, groupsQuery.data]
+  );
+
+  return useMemo(
+    () => ({
+      data: groupsQuery.data ? envIds : null,
+      isLoading: groupsQuery.isLoading,
+    }),
+    [envIds, groupsQuery.data, groupsQuery.isLoading]
   );
 }

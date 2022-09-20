@@ -1,6 +1,6 @@
 import { array, object, string } from 'yup';
 
-import { EdgeUpdateSchedule } from '../types';
+import { EdgeUpdateSchedule, ScheduleType } from '../types';
 
 import { nameValidation } from './NameField';
 import { typeValidation } from './ScheduleTypeSelector';
@@ -16,6 +16,12 @@ export function validation(
     // time: number()
     //   .min(Date.now() / 1000)
     //   .required(),
-    version: string().required('Version is required'),
+    version: string().when('type', {
+      is: ScheduleType.Update,
+      // update type
+      then: (schema) => schema.required('Version is required'),
+      // rollback
+      otherwise: (schema) => schema.required('No rollback options available'),
+    }),
   });
 }
