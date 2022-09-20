@@ -1,1 +1,1 @@
-export { WaitingRoomView, WaitingRoomViewAngular } from './WaitingRoomView';
+export { WaitingRoomView } from './WaitingRoomView';

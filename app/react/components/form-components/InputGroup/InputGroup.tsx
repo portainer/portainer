@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { createContext, PropsWithChildren, useContext } from 'react';
 
 const Context = createContext<null | boolean>(null);
+Context.displayName = 'InputGroupContext';
 
 type Size = 'small' | 'large';
 

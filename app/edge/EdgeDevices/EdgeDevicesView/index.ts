@@ -1,1 +1,1 @@
-export { EdgeDevicesView, EdgeDevicesViewAngular } from './EdgeDevicesView';
+export { EdgeDevicesView } from './EdgeDevicesView';
