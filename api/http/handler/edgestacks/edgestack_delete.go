@@ -36,6 +36,11 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", err)
 	}
 
+	err = handler.protectUpdateSchedule(portainer.EdgeStackID(edgeStackID))
+	if err != nil {
+		return httperror.BadRequest("Unable to delete edge stack that is used by an edge update schedule", err)
+	}
+
 	err = handler.DataStore.EdgeStack().DeleteEdgeStack(portainer.EdgeStackID(edgeStackID))
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove the edge stack from the database", err)

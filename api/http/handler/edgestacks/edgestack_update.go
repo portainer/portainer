@@ -61,6 +61,11 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
 	}
 
+	err = handler.protectUpdateSchedule(portainer.EdgeStackID(stackID))
+	if err != nil {
+		return httperror.BadRequest("Unable to delete edge stack that is used by an edge update schedule", err)
+	}
+
 	var payload updateEdgeStackPayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
