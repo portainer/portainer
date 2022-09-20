@@ -12,6 +12,7 @@ export function IngressesDatatableView() {
             label: 'Ingresses',
           },
         ]}
+        reload
       />
       <IngressDataTable />
     </>

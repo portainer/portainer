@@ -86,7 +86,7 @@ export function IngressDataTable() {
         </Authorized>
         <Authorized authorizations="K8sApplicationsW">
           <Link to="kubernetes.deploy" className="space-left">
-            <Button icon={Plus} className="btn-wrapper">
+            <Button icon={Plus} className="btn-wrapper" color="secondary">
               Create from manifest
             </Button>
           </Link>
