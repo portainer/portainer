@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 import KubernetesConfigurationConverter from 'Kubernetes/converters/configuration';
 import KubernetesConfigMapConverter from 'Kubernetes/converters/configMap';
 import KubernetesSecretConverter from 'Kubernetes/converters/secret';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 
 class KubernetesConfigurationService {
@@ -62,7 +62,7 @@ class KubernetesConfigurationService {
   async createAsync(formValues) {
     formValues.ConfigurationOwner = KubernetesCommonHelper.ownerToLabel(formValues.ConfigurationOwner);
 
-    if (formValues.Type === KubernetesConfigurationTypes.CONFIGMAP) {
+    if (formValues.Kind === KubernetesConfigurationKinds.CONFIGMAP) {
       const configMap = KubernetesConfigMapConverter.configurationFormValuesToConfigMap(formValues);
       await this.KubernetesConfigMapService.create(configMap);
     } else {
@@ -79,7 +79,7 @@ class KubernetesConfigurationService {
    * UPDATE
    */
   async updateAsync(formValues, configuration) {
-    if (formValues.Type === KubernetesConfigurationTypes.CONFIGMAP) {
+    if (formValues.Kind === KubernetesConfigurationKinds.CONFIGMAP) {
       const configMap = KubernetesConfigMapConverter.configurationFormValuesToConfigMap(formValues);
       configMap.ConfigurationOwner = configuration.ConfigurationOwner;
       await this.KubernetesConfigMapService.update(configMap);
@@ -98,7 +98,7 @@ class KubernetesConfigurationService {
    * DELETE
    */
   async deleteAsync(config) {
-    if (config.Type === KubernetesConfigurationTypes.CONFIGMAP) {
+    if (config.Kind == KubernetesConfigurationKinds.CONFIGMAP) {
       await this.KubernetesConfigMapService.delete(config);
     } else {
       await this.KubernetesSecretService.delete(config);
