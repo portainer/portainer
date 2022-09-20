@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -93,6 +94,12 @@ type createKubernetesStackResponse struct {
 	Output string `json:"Output"`
 }
 
+// convert string to valid kubernetes label by replacing invalid characters with periods
+func sanitizeLabel(value string) string {
+	re := regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
+	return re.ReplaceAllString(value, ".")
+}
+
 func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload kubernetesStringDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
@@ -121,7 +128,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		Namespace:       payload.Namespace,
 		Status:          portainer.StackStatusActive,
 		CreationDate:    time.Now().Unix(),
-		CreatedBy:       user.Username,
+		CreatedBy:       sanitizeLabel(user.Username),
 		IsComposeFormat: payload.ComposeFormat,
 	}
 
@@ -143,7 +150,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
 		StackID:   stackID,
 		StackName: stack.Name,
-		Owner:     stack.CreatedBy,
+		Owner:     sanitizeLabel(stack.CreatedBy),
 		Kind:      "content",
 	})
 
@@ -248,7 +255,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
 		StackID:   stackID,
 		StackName: stack.Name,
-		Owner:     stack.CreatedBy,
+		Owner:     sanitizeLabel(stack.CreatedBy),
 		Kind:      "git",
 	})
 
