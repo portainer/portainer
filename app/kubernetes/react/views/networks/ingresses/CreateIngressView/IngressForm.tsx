@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, ReactNode } from 'react';
 import { Plus, RefreshCw, Trash2 } from 'react-feather';
 
 import { Annotations } from '@/kubernetes/react/views/networks/ingresses/components/annotations';
@@ -30,7 +30,7 @@ interface Props {
   environmentID: number;
   rule: Rule;
 
-  errors: Record<string, string>;
+  errors: Record<string, ReactNode>;
   isLoading: boolean;
   isEdit: boolean;
   namespace: string;
@@ -200,21 +200,23 @@ export function IngressForm({
               <div className="mb-2">Annotations</div>
               <p className="vertical-center text-muted small">
                 <Icon icon="info" mode="primary" feather />
-                You can specify{' '}
-                <a
-                  href="https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/"
-                  target="_black"
-                >
-                  annotations
-                </a>{' '}
-                for the object. See further Kubernetes documentation on
-                <a
-                  href="https://kubernetes.io/docs/reference/labels-annotations-taints/"
-                  target="_black"
-                >
-                  well-known annotations
-                </a>
-                .
+                <span>
+                  You can specify{' '}
+                  <a
+                    href="https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/"
+                    target="_black"
+                  >
+                    annotations
+                  </a>{' '}
+                  for the object. See further Kubernetes documentation on{' '}
+                  <a
+                    href="https://kubernetes.io/docs/reference/labels-annotations-taints/"
+                    target="_black"
+                  >
+                    well-known annotations
+                  </a>
+                  .
+                </span>
               </p>
             </div>
 
@@ -340,18 +342,20 @@ export function IngressForm({
 
                     <p className="vertical-center text-muted small whitespace-nowrap col-sm-12 !p-0">
                       <Icon icon="info" mode="primary" size="md" feather />
-                      Add a secret via
-                      <Link
-                        to="kubernetes.configurations"
-                        params={{ id: environmentID }}
-                        className="text-primary"
-                        target="_blank"
-                      >
-                        ConfigMaps &amp; Secrets
-                      </Link>
-                      {', '}
-                      then select &apos;Reload TLS secrets&apos; above to
-                      populate the dropdown with your changes.
+                      <span>
+                        Add a secret via{' '}
+                        <Link
+                          to="kubernetes.configurations"
+                          params={{ id: environmentID }}
+                          className="text-primary"
+                          target="_blank"
+                        >
+                          ConfigMaps &amp; Secrets
+                        </Link>
+                        {', '}
+                        then select &apos;Reload TLS secrets&apos; above to
+                        populate the dropdown with your changes.
+                      </span>
                     </p>
                   </div>
                 )}
@@ -374,24 +378,6 @@ export function IngressForm({
                     className="mt-5 !mb-5 row path"
                     key={`path_${path.Key}}`}
                   >
-                    {isEdit &&
-                      path.ServiceName &&
-                      !serviceOptions.find(
-                        (s) => s.value === path.ServiceName
-                      ) && (
-                        <div className="col-sm-12 !pl-0 vertical-center text-warning small whitespace-nowrap !m-0 !mb-2">
-                          <Icon
-                            icon="alert-triangle"
-                            mode="warning"
-                            size="sm"
-                            feather
-                          />
-                          <span>
-                            Currently set to <b>{path.ServiceName}</b>, which
-                            does not exist.
-                          </span>
-                        </div>
-                      )}
                     <div className="form-group !pl-0 col-sm-3 col-xl-2 !m-0">
                       <div className="input-group input-group-sm">
                         <span className="input-group-addon required">
@@ -415,7 +401,7 @@ export function IngressForm({
                       {errors[
                         `hosts[${hostIndex}].paths[${pathIndex}].servicename`
                       ] && (
-                        <FormError className="mt-1 !mb-0">
+                        <FormError className="mt-1 !mb-0 error-inline">
                           {
                             errors[
                               `hosts[${hostIndex}].paths[${pathIndex}].servicename`

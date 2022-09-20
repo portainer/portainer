@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, ReactNode } from 'react';
 
 import { Icon } from '@@/Icon';
 import { FormError } from '@@/form-components/FormError';
@@ -13,7 +13,7 @@ interface Props {
     val: string
   ) => void;
   removeAnnotation: (index: number) => void;
-  errors: Record<string, string>;
+  errors: Record<string, ReactNode>;
   placeholder: string[];
 }
 

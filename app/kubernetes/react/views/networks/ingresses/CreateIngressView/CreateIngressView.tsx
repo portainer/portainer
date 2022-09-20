@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,6 +9,7 @@ import { Annotation } from '@/kubernetes/react/views/networks/ingresses/componen
 import { useServices } from '@/kubernetes/react/views/networks/services/queries';
 import { notifySuccess } from '@/portainer/services/notifications';
 
+import { Link } from '@@/Link';
 import { PageHeader } from '@@/PageHeader';
 import { Option } from '@@/form-components/Input/Select';
 import { Button } from '@@/buttons';
@@ -41,7 +42,7 @@ export function CreateIngressView() {
   const [namespace, setNamespace] = useState<string>(params.namespace || '');
   const [ingressRule, setIngressRule] = useState<Rule>({} as Rule);
 
-  const [errors, setErrors] = useState<Record<string, string>>(
+  const [errors, setErrors] = useState<Record<string, ReactNode>>(
     {} as Record<string, string>
   );
 
@@ -153,6 +154,7 @@ export function CreateIngressView() {
       value: cls.ClassName,
     })) || []),
   ];
+
   if (!existingIngressClass && ingressRule.IngressClassName) {
     ingressClassOptions.push({
       label: !ingressRule.IngressType
@@ -179,7 +181,7 @@ export function CreateIngressView() {
     if (!!params.name && ingressesResults.data && !ingressRule.IngressName) {
       // if it is an edit screen, prepare the rule from the ingress
       const ing = ingressesResults.data?.find(
-        (ing) => ing.Name === params.name
+        (ing) => ing.Name === params.name && ing.Namespace === params.namespace
       );
       if (ing) {
         const type = ingressControllersResults.data?.find(
@@ -195,6 +197,7 @@ export function CreateIngressView() {
     ingressesResults.data,
     ingressControllersResults.data,
     ingressRule.IngressName,
+    params.namespace,
   ]);
 
   useEffect(() => {
@@ -261,7 +264,7 @@ export function CreateIngressView() {
   );
 
   function validate(ingressRule: Rule, ingressNames: string[]) {
-    const errors: Record<string, string> = {};
+    const errors: Record<string, ReactNode> = {};
     const rule = { ...ingressRule };
 
     // User cannot edit the namespace and the ingress name
@@ -279,14 +282,20 @@ export function CreateIngressView() {
       } else if (ingressNames.includes(rule.IngressName)) {
         errors.ingressName = 'Ingress name already exists';
       }
+
       if (!rule.IngressClassName) {
         errors.className = 'Ingress class is required';
       }
     }
 
-    if (isEdit && !rule.IngressClassName) {
-      errors.className =
-        'No ingress class is currently set for this ingress - use of the Portainer UI requires one to be set.';
+    if (isEdit && !existingIngressClass && ingressRule.IngressClassName) {
+      if (!rule.IngressType) {
+        errors.className =
+          'Currently set to an ingress class that cannot be found in the cluster - you must select a valid class.';
+      } else {
+        errors.className =
+          'Currently set to an ingress class that you do not have access to - you must select a valid class.';
+      }
     }
 
     const duplicatedAnnotations: string[] = [];
@@ -320,7 +329,30 @@ export function CreateIngressView() {
           errors[`hosts[${hi}].paths[${pi}].servicename`] =
             'Service name is required';
         }
-        if (!path.ServiceName) {
+
+        if (
+          isEdit &&
+          path.ServiceName &&
+          !serviceOptions.find((s) => s.value === path.ServiceName)
+        ) {
+          errors[`hosts[${hi}].paths[${pi}].servicename`] = (
+            <span>
+              Currently set to {path.ServiceName}, which does not exist. You can
+              create a service with this name for a particular deployment via{' '}
+              <Link
+                to="kubernetes.applications"
+                params={{ id: environmentId }}
+                className="text-primary"
+                target="_blank"
+              >
+                Applications
+              </Link>
+              , and on returning here it will be picked up.
+            </span>
+          );
+        }
+
+        if (!path.ServicePort) {
           errors[`hosts[${hi}].paths[${pi}].serviceport`] =
             'Service port is required';
         }
