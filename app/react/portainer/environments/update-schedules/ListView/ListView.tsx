@@ -13,7 +13,7 @@ import { Button } from '@@/buttons';
 import { Link } from '@@/Link';
 
 import { useList } from '../queries/list';
-import { EdgeUpdateSchedule } from '../types';
+import { EdgeUpdateSchedule, StatusType } from '../types';
 import { useRemoveMutation } from '../queries/useRemoveMutation';
 
 import { columns } from './columns';
@@ -54,6 +54,7 @@ export function ListView() {
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}
+        isRowSelectable={(row) => row.original.status === StatusType.Pending}
       />
     </>
   );
