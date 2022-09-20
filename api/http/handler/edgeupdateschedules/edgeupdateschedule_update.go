@@ -94,6 +94,13 @@ func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperro
 		}
 
 		item.EdgeStackID = stackID
+
+		previousVersions, err := handler.GetPreviousVersions(payload.GroupIDs)
+		if err != nil {
+			return httperror.InternalServerError("Unable to fetch previous versions for related endpoints", err)
+		}
+
+		item.EnvironmentsPreviousVersions = previousVersions
 	}
 
 	err = handler.dataStore.EdgeUpdateSchedule().Update(item.ID, item)
