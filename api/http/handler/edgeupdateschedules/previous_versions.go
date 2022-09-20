@@ -28,7 +28,7 @@ func (handler *Handler) previousVersions(w http.ResponseWriter, r *http.Request)
 		return httperror.InternalServerError("Unable to retrieve the edge update schedules list", err)
 	}
 
-	versionMap := previousVersions(schedules)
+	versionMap := previousVersions(schedules, handler.dataStore.EdgeUpdateSchedule().ActiveSchedule)
 
 	return response.JSON(w, versionMap)
 }
@@ -39,7 +39,7 @@ type EnvironmentVersionDetails struct {
 	skipReason string
 }
 
-func previousVersions(schedules []updateschedule.UpdateSchedule) map[portainer.EndpointID]string {
+func previousVersions(schedules []updateschedule.UpdateSchedule, activeScheduleGetter func(environmentID portainer.EndpointID) *updateschedule.EndpointUpdateScheduleRelation) map[portainer.EndpointID]string {
 
 	slices.SortFunc(schedules, func(a updateschedule.UpdateSchedule, b updateschedule.UpdateSchedule) bool {
 		return a.Created > b.Created
@@ -48,7 +48,7 @@ func previousVersions(schedules []updateschedule.UpdateSchedule) map[portainer.E
 	environmentMap := map[portainer.EndpointID]*EnvironmentVersionDetails{}
 	// to all schedules[:schedule index -1].Created > schedule.Created
 	for _, schedule := range schedules {
-		for environmentId, status := range schedule.Status {
+		for environmentId, version := range schedule.EnvironmentsPreviousVersions {
 			props, ok := environmentMap[environmentId]
 			if !ok {
 				environmentMap[environmentId] = &EnvironmentVersionDetails{}
@@ -65,13 +65,15 @@ func previousVersions(schedules []updateschedule.UpdateSchedule) map[portainer.E
 				continue
 			}
 
-			if status.Status == updateschedule.UpdateScheduleStatusPending || status.Status == updateschedule.UpdateScheduleStatusError {
+			activeSchedule := activeScheduleGetter(environmentId)
+
+			if activeSchedule != nil {
 				props.skip = true
 				props.skipReason = "has active schedule"
 				continue
 			}
 
-			props.version = status.CurrentVersion
+			props.version = version
 		}
 	}
 
