@@ -2,8 +2,10 @@ package kubernetes
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/kubernetes"
 	"net/http"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/kubernetes"
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
@@ -20,6 +22,8 @@ type Handler struct {
 	*mux.Router
 	authorizationService     *authorization.Service
 	dataStore                dataservices.DataStore
+	KubernetesClientFactory  *cli.ClientFactory
+	KubernetesClient         portainer.KubeClient
 	jwtService               dataservices.JWTService
 	kubernetesClientFactory  *cli.ClientFactory
 	kubeClusterAccessService kubernetes.KubeClusterAccessService
