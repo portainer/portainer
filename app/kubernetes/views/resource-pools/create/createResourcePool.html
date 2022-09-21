@@ -180,214 +180,17 @@
             </div>
             <!-- #endregion -->
 
-            <!-- #region STORAGES -->
-            <div class="col-sm-12 form-section-title"> Storage </div>
-
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small vertical-center">
-                <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
-                Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to effectively
-                prevent the usage of a specific storage option inside this namespace.
-              </span>
-            </div>
-            <div class="col-sm-12 form-section-title vertical-center">
-              <pr-icon icon="'svg-route'"></pr-icon>
-              standard
-            </div>
-
-            <storage-class-switch value="sc.Selected" name="sc.Name" on-change="(ctrl.onToggleStorageQuota)" authorization="K8sResourcePoolDetailsW"></storage-class-switch>
-
-            <!-- #endregion -->
-
-            <div ng-if="$ctrl.state.canUseIngress">
-              <div class="col-sm-12 form-section-title"> Ingresses </div>
+            <div ng-if="$ctrl.state.ingressAvailabilityPerNamespace">
               <!-- #region INGRESSES -->
-              <div class="form-group" ng-if="$ctrl.formValues.IngressClasses.length === 0">
-                <div class="col-sm-12 small text-muted">
-                  The ingress feature must be enabled in the
-                  <a ui-sref="kubernetes.cluster.setup">environment configuration view</a> to be able to register ingresses inside this namespace.
-                </div>
-              </div>
-
-              <div class="form-group" ng-if="$ctrl.formValues.IngressClasses.length > 0">
-                <div class="col-sm-12 small text-muted">
-                  <p class="vertical-center">
-                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
-                    Enable and configure ingresses available to users when deploying applications.
-                  </p>
-                </div>
-              </div>
-
-              <div class="form-group" ng-repeat-start="ic in $ctrl.formValues.IngressClasses track by ic.IngressClass.Name">
-                <div class="row">
-                  <div class="col-sm-12">
-                    <span class="text-muted vertical-center"><pr-icon icon="'svg-route'"></pr-icon> {{ ic.IngressClass.Name }}</span>
-                    <hr class="mt-2 mb-0" />
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-sm-3 col-lg-2">
-                    <label class="control-label text-left"> Allow users to use this ingress </label>
-                  </div>
-                  <div class="col-sm-8 pt-2">
-                    <label class="switch">
-                      <input type="checkbox" ng-model="ic.Selected" /><span class="slider round" data-cy="namespaceCreate-ingressToggle{{ ic.IngressClass.Name }}"></span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div ng-if="ic.Selected">
-                <div class="form-group">
-                  <div class="col-sm-12">
-                    <label class="control-label text-left">
-                      Hostnames
-                      <portainer-tooltip
-                        message="'Hostnames associated to the ingress inside this namespace. Users will be able to expose and access their applications over the ingress via one of these hostname.'"
-                      >
-                      </portainer-tooltip>
-                    </label>
-                    <span class="label label-default interactive" ng-click="$ctrl.addHostname(ic)" data-cy="namespaceCreate-addHostButton{{ ic.IngressClass.Name }}">
-                      <pr-icon icon="'plus'" feather="true"></pr-icon> add hostname
-                    </span>
-                  </div>
-                  <div class="col-sm-12 pt-4">
-                    <div ng-repeat="item in ic.Hosts track by $index">
-                      <div class="form-inline">
-                        <div class="col-sm-8 input-group input-group-sm pt-2">
-                          <span class="input-group-addon required">Hostname</span>
-                          <input
-                            type="text"
-                            class="form-control"
-                            name="hostname_{{ ic.IngressClass.Name }}_{{ $index }}"
-                            ng-model="item.Host"
-                            ng-change="$ctrl.onChangeIngressHostname()"
-                            placeholder="foo"
-                            pattern="[\*a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
-                            required
-                            data-cy="namespaceCreate-hostnameInput{{ ic.IngressClass.Name }}_{{ $index }}"
-                          />
-                        </div>
-                        <div class="col-sm-1 input-group input-group-sm !pt-2" ng-if="$index > 0">
-                          <button class="btn btn-md btn-dangerlight btn-only-icon" type="button" ng-click="$ctrl.removeHostname(ic, $index)">
-                            <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
-                          </button>
-                        </div>
-                      </div>
-                      <div
-                        class="small text-warning pt-1"
-                        ng-show="
-                          resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$invalid ||
-                          $ctrl.state.duplicates.ingressHosts.refs[ic.IngressClass.Name][$index] !== undefined
-                        "
-                      >
-                        <ng-messages for="resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
-                          <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Hostname is required.</p>
-                          <p class="vertical-center" ng-message="pattern">
-                            <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
-                            This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com').
-                          </p>
-                        </ng-messages>
-                        <p class="vertical-center" ng-if="$ctrl.state.duplicates.ingressHosts.refs[ic.IngressClass.Name][$index] !== undefined">
-                          <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> This hostname is already used.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div ng-repeat-end class="form-group" ng-if="ic.Selected">
-                <div class="col-sm-12 small text-muted">
-                  <p class="vertical-center">
-                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
-                    You can specify a list of annotations that will be associated to the ingress.
-                  </p>
-                </div>
-
-                <div class="col-sm-12">
-                  <label class="control-label text-left">Annotations </label>
-                  <label class="control-label text-left">
-                    <span class="label label-default interactive" ng-click="$ctrl.addAnnotation(ic)" data-cy="namespaceCreate-addAnnotation{{ ic.IngressClass.Name }}">
-                      <pr-icon icon="'plus'" feather="true"></pr-icon> add annotation
-                    </span>
-                    <portainer-tooltip
-                      message="'Use annotations to configure options for an ingress. Review Nginx or Traefik documentation to find the annotations supported by your choice of ingress type.'"
-                    >
-                    </portainer-tooltip>
-                  </label>
-                  <label class="control-label text-left">
-                    <span
-                      class="label label-default interactive"
-                      ng-if="ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX"
-                      ng-click="$ctrl.addRewriteAnnotation(ic)"
-                      data-cy="namespaceCreate-addAnnotation{{ ic.IngressClass.Name }}"
-                    >
-                      <pr-icon icon="'plus'" feather="true"></pr-icon> add rewrite annotation
-                    </span>
-                    <portainer-tooltip
-                      ng-if="ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX"
-                      message="'When the exposed URLs for your applications differ from the specified paths in the ingress, use the rewrite target annotation to denote the path to redirect to.'"
-                    >
-                    </portainer-tooltip>
-                  </label>
-                  <label class="control-label text-left">
-                    <span
-                      class="label label-default interactive"
-                      ng-if="ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX"
-                      ng-click="$ctrl.addUseregexAnnotation(ic)"
-                      data-cy="namespaceCreate-addAnnotation{{ ic.IngressClass.Name }}"
-                    >
-                      <pr-icon icon="'plus'" feather="true"></pr-icon> add regular expression annotation
-                    </span>
-                    <portainer-tooltip
-                      ng-if="ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX"
-                      message="'Enable use of regular expressions in ingress paths (set in the ingress details of an application). Use this along with rewrite-target to specify the regex capturing group to be replaced, e.g. path regex of ^/foo/(,*) and rewrite-target of /bar/$1 rewrites example.com/foo/account to example.com/bar/account.'"
-                    >
-                    </portainer-tooltip>
-                  </label>
-                </div>
-                <div class="col-sm-12 form-inline pt-4">
-                  <div class="pt-2" ng-repeat="annotation in ic.Annotations track by $index">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">Key</span>
-                      <input
-                        type="text"
-                        class="form-control"
-                        ng-model="annotation.Key"
-                        placeholder="{{
-                          ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX
-                            ? 'e.g. nginx.ingress.kubernetes.io/enable-rewrite-log'
-                            : 'e.g. traefik.ingress.kubernetes.io/router.priority'
-                        }}"
-                        required
-                        data-cy="namespaceCreate-annotationKey{{ ic.IngressClass.Name }}"
-                      />
-                    </div>
-                    <div class="input-group input-group-sm col-sm-5">
-                      <span class="input-group-addon">Value</span>
-                      <input
-                        type="text"
-                        class="form-control"
-                        ng-model="annotation.Value"
-                        placeholder="{{ ic.IngressClass.Type === $ctrl.IngressClassTypes.NGINX ? 'e.g. true or false' : 'e.g. 42' }}"
-                        required
-                        data-cy="namespaceCreate-annotationValue{{ ic.IngressClass.Name }}"
-                      />
-                    </div>
-                    <div class="input-group input-group-sm col-sm-1">
-                      <button
-                        class="btn btn-md btn-dangerlight btn-only-icon"
-                        type="button"
-                        ng-click="$ctrl.removeAnnotation(ic, $index)"
-                        data-cy="namespaceCreate-deleteAnnotationButton{{ ic.IngressClass.Name }}"
-                      >
-                        <pr-icon icon="'trash-2'" size="'md'" feather="true"></pr-icon>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div class="col-sm-12 form-section-title"> Networking </div>
+              <ingress-class-datatable
+                ng-if="$ctrl.state.ingressAvailabilityPerNamespace"
+                on-change-availability="($ctrl.onChangeIngressControllerAvailability)"
+                ingress-controllers="$ctrl.ingressControllers"
+                description="'Enable the ingress controllers that users can select when publishing applications in this namespace.'"
+                no-ingress-controller-label="'No ingress controllers found in the cluster. Go to the cluster setup view to configure and allow the use of ingress controllers in the cluster.'"
+                view="'namespace'"
+              ></ingress-class-datatable>
               <!-- #endregion -->
             </div>
 
@@ -427,6 +230,25 @@
                 </span>
               </div>
             </div>
+            <!-- #endregion -->
+
+            <!-- #region STORAGES -->
+            <div class="col-sm-12 form-section-title"> Storage </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small vertical-center">
+                <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to effectively
+                prevent the usage of a specific storage option inside this namespace.
+              </span>
+            </div>
+            <div class="col-sm-12 form-section-title vertical-center">
+              <pr-icon icon="'svg-route'"></pr-icon>
+              standard
+            </div>
+
+            <storage-class-switch value="sc.Selected" name="sc.Name" on-change="(ctrl.onToggleStorageQuota)" authorization="K8sResourcePoolDetailsW"></storage-class-switch>
+
             <!-- #endregion -->
 
             <!-- summary -->

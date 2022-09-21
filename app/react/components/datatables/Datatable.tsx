@@ -54,6 +54,7 @@ interface Props<
   initialTableState?: Partial<TableState<D>>;
   isLoading?: boolean;
   totalCount?: number;
+  description?: JSX.Element;
 }
 
 export function Datatable<
@@ -74,6 +75,7 @@ export function Datatable<
   initialTableState = {},
   isLoading,
   totalCount = dataset.length,
+  description,
 }: Props<D, TSettings>) {
   const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
 
@@ -141,7 +143,12 @@ export function Datatable<
         <TableSettingsProvider settings={settingsStore}>
           <Table.Container>
             {isTitleVisible(titleOptions) && (
-              <Table.Title label={titleOptions.title} icon={titleOptions.icon}>
+              <Table.Title
+                label={titleOptions.title}
+                icon={titleOptions.icon}
+                featherIcon={titleOptions.featherIcon}
+                description={description}
+              >
                 <SearchBar value={searchBarValue} onChange={setGlobalFilter} />
                 {renderTableActions && (
                   <Table.Actions>

@@ -70,7 +70,13 @@ export function createMockEnvironment(): Environment {
     Status: 1,
     URL: 'url',
     Snapshots: [],
-    Kubernetes: { Snapshots: [] },
+    Kubernetes: {
+      Snapshots: [],
+      Configuration: {
+        IngressClasses: [],
+        IngressAvailabilityPerNamespace: false,
+      },
+    },
     EdgeKey: '',
     Id: 3,
     UserTrusted: false,

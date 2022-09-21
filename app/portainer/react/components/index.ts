@@ -21,6 +21,7 @@ import { Loading } from '@@/Widget/Loading';
 import { PasswordCheckHint } from '@@/PasswordCheckHint';
 import { ViewLoading } from '@@/ViewLoading';
 import { Tooltip } from '@@/Tip/Tooltip';
+import { Badge } from '@@/Badge';
 import { TableColumnHeaderAngular } from '@@/datatables/TableHeaderCell';
 import { DashboardItem } from '@@/DashboardItem';
 import { SearchBar } from '@@/datatables/SearchBar';
@@ -41,6 +42,7 @@ export const componentsModule = angular
     'portainerTooltip',
     r2a(Tooltip, ['message', 'position', 'className'])
   )
+  .component('badge', r2a(Badge, ['type', 'className']))
   .component('fileUploadField', fileUploadField)
   .component('porSwitchField', switchField)
   .component(
