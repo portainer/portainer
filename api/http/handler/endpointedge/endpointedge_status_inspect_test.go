@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/edge/updateservice"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
@@ -111,11 +112,18 @@ func setupHandler(t *testing.T) (*Handler, func(), error) {
 		return nil, nil, fmt.Errorf("could not update settings: %w", err)
 	}
 
+	updateService, err := updateservice.NewService(store)
+	if err != nil {
+		teardown()
+		return nil, nil, fmt.Errorf("could not create update service: %w", err)
+	}
+
 	handler := NewHandler(
 		security.NewRequestBouncer(store, jwtService, apiKeyService),
 		store,
 		fs,
 		chisel.NewService(store, shutdownCtx),
+		updateService,
 	)
 
 	handler.ReverseTunnelService = chisel.NewService(store, shutdownCtx)

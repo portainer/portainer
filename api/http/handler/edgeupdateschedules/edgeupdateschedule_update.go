@@ -103,7 +103,7 @@ func (handler *Handler) update(w http.ResponseWriter, r *http.Request) *httperro
 		item.EnvironmentsPreviousVersions = previousVersions
 	}
 
-	err = handler.dataStore.EdgeUpdateSchedule().Update(item.ID, item)
+	err = handler.updateService.UpdateSchedule(item.ID, item)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist the edge update schedule", err)
 	}

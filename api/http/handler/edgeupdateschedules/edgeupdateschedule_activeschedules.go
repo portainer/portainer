@@ -36,7 +36,7 @@ func (handler *Handler) activeSchedules(w http.ResponseWriter, r *http.Request) 
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	list := handler.dataStore.EdgeUpdateSchedule().ActiveSchedules(payload.EnvironmentIDs)
+	list := handler.updateService.ActiveSchedules(payload.EnvironmentIDs)
 
 	return response.JSON(w, list)
 }

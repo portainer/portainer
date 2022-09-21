@@ -3,6 +3,7 @@ package endpointedge
 import (
 	"net/http"
 
+	"github.com/portainer/portainer/api/edge/updateservice"
 	"github.com/portainer/portainer/api/http/middlewares"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -20,16 +21,18 @@ type Handler struct {
 	DataStore            dataservices.DataStore
 	FileService          portainer.FileService
 	ReverseTunnelService portainer.ReverseTunnelService
+	edgeUpdateService    *updateservice.Service
 }
 
 // NewHandler creates a handler to manage environment(endpoint) operations.
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService, edgeUpdateService *updateservice.Service) *Handler {
 	h := &Handler{
 		Router:               mux.NewRouter(),
 		requestBouncer:       bouncer,
 		DataStore:            dataStore,
 		FileService:          fileService,
 		ReverseTunnelService: reverseTunnelService,
+		edgeUpdateService:    edgeUpdateService,
 	}
 
 	endpointRouter := h.PathPrefix("/{id}").Subrouter()

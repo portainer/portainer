@@ -120,10 +120,10 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	// check endpoint version, if it has the same version as the active schedule, then we can mark the edge stack as successfully deployed
 	successFullUpdateEdgeStackID := portainer.EdgeStackID(0)
-	activeUpdateSchedule := handler.DataStore.EdgeUpdateSchedule().ActiveSchedule(endpoint.ID)
+	activeUpdateSchedule := handler.edgeUpdateService.ActiveSchedule(endpoint.ID)
 	if activeUpdateSchedule != nil && activeUpdateSchedule.TargetVersion == version {
 		successFullUpdateEdgeStackID = activeUpdateSchedule.EdgeStackID
-		go handler.handleSuccessfulUpdate(activeUpdateSchedule)
+		handler.handleSuccessfulUpdate(activeUpdateSchedule)
 	}
 
 	schedules, handlerErr := handler.buildSchedules(endpoint.ID, tunnel)
@@ -169,7 +169,7 @@ func parseAgentPlatform(r *http.Request) (portainer.EndpointType, error) {
 }
 
 func (handler *Handler) handleSuccessfulUpdate(activeUpdateSchedule *updateschedule.EndpointUpdateScheduleRelation) {
-	handler.DataStore.EdgeUpdateSchedule().RemoveActiveSchedule(activeUpdateSchedule.EnvironmentID, activeUpdateSchedule.ScheduleID)
+	handler.edgeUpdateService.RemoveActiveSchedule(activeUpdateSchedule.EnvironmentID, activeUpdateSchedule.ScheduleID)
 	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(activeUpdateSchedule.EdgeStackID)
 	if err != nil {
 		log.Warn().

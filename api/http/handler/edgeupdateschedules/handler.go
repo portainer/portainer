@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-	"github.com/portainer/portainer/api/edge/updateschedule"
+	"github.com/portainer/portainer/api/edge/updateservice"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -21,17 +21,19 @@ type Handler struct {
 	requestBouncer *security.RequestBouncer
 	dataStore      dataservices.DataStore
 	fileService    portainer.FileService
+	updateService  *updateservice.Service
 	assetsPath     string
 }
 
 // NewHandler creates a handler to manage environment update operations.
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, fileService portainer.FileService, assetsPath string) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, fileService portainer.FileService, assetsPath string, updateService *updateservice.Service) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
 		dataStore:      dataStore,
 		fileService:    fileService,
 		assetsPath:     assetsPath,
+		updateService:  updateService,
 	}
 
 	router := h.PathPrefix("/edge_update_schedules").Subrouter()
@@ -54,9 +56,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 		httperror.LoggerHandler(h.previousVersions)).Methods(http.MethodGet)
 
 	itemRouter := router.PathPrefix("/{id}").Subrouter()
-	itemRouter.Use(middlewares.WithItem(func(id updateschedule.UpdateScheduleID) (*updateschedule.UpdateSchedule, error) {
-		return dataStore.EdgeUpdateSchedule().Item(id)
-	}, "id", contextKey))
+	itemRouter.Use(middlewares.WithItem(updateService.Schedule, "id", contextKey))
 
 	itemRouter.Handle("",
 		httperror.LoggerHandler(h.inspect)).Methods(http.MethodGet)

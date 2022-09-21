@@ -19,7 +19,7 @@ import (
 // @failure 500
 // @router /edge_update_schedules [get]
 func (handler *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	list, err := handler.dataStore.EdgeUpdateSchedule().List()
+	list, err := handler.updateService.Schedules()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve the edge update schedules list", err)
 	}

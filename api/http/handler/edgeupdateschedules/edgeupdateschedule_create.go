@@ -88,7 +88,7 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 		}
 
 		if scheduleID != 0 {
-			err := handler.dataStore.EdgeUpdateSchedule().Delete(scheduleID)
+			err := handler.updateService.DeleteSchedule(scheduleID)
 			if err != nil {
 				logrus.WithError(err).Error("Unable to cleanup edge update schedule")
 			}
@@ -111,13 +111,6 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 		Type:      payload.Type,
 	}
 
-	err = handler.dataStore.EdgeUpdateSchedule().Create(item)
-	if err != nil {
-		return httperror.InternalServerError("Unable to persist the edge update schedule", err)
-	}
-
-	scheduleID = item.ID
-
 	previousVersions, err := handler.GetPreviousVersions(payload.GroupIDs)
 	if err != nil {
 		return httperror.InternalServerError("Unable to fetch previous versions for related endpoints", err)
@@ -125,13 +118,20 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 
 	item.EnvironmentsPreviousVersions = previousVersions
 
+	err = handler.updateService.CreateSchedule(item)
+	if err != nil {
+		return httperror.InternalServerError("Unable to persist the edge update schedule", err)
+	}
+
+	scheduleID = item.ID
+
 	edgeStackID, err = handler.createUpdateEdgeStack(item.ID, payload.Name, payload.GroupIDs, payload.Version)
 	if err != nil {
 		return httperror.InternalServerError("Unable to create edge stack", err)
 	}
 
 	item.EdgeStackID = edgeStackID
-	err = handler.dataStore.EdgeUpdateSchedule().Update(item.ID, item)
+	err = handler.updateService.UpdateSchedule(item.ID, item)
 	if err != nil {
 		return httperror.InternalServerError("Unable to persist the edge update schedule", err)
 	}

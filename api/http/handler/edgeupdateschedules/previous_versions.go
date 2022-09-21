@@ -23,12 +23,12 @@ import (
 // @failure 500 "Server error"
 // @router /edge_update_schedules/agent_versions [get]
 func (handler *Handler) previousVersions(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	schedules, err := handler.dataStore.EdgeUpdateSchedule().List()
+	schedules, err := handler.updateService.Schedules()
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve the edge update schedules list", err)
 	}
 
-	versionMap := previousVersions(schedules, handler.dataStore.EdgeUpdateSchedule().ActiveSchedule)
+	versionMap := previousVersions(schedules, handler.updateService.ActiveSchedule)
 
 	return response.JSON(w, versionMap)
 }

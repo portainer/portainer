@@ -11,7 +11,7 @@ const (
 )
 
 func (handler *Handler) validateUniqueName(name string, id updateschedule.UpdateScheduleID) error {
-	list, err := handler.dataStore.EdgeUpdateSchedule().List()
+	list, err := handler.updateService.Schedules()
 	if err != nil {
 		return errors.WithMessage(err, "Unable to list edge update schedules")
 	}

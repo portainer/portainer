@@ -24,7 +24,7 @@ func (handler *Handler) delete(w http.ResponseWriter, r *http.Request) *httperro
 		return httperror.InternalServerError(err.Error(), err)
 	}
 
-	err = handler.dataStore.EdgeUpdateSchedule().Delete(item.ID)
+	err = handler.updateService.DeleteSchedule(item.ID)
 	if err != nil {
 		return httperror.InternalServerError("Unable to delete the edge update schedule", err)
 	}
