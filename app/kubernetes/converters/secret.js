@@ -61,6 +61,8 @@ class KubernetesSecretConverter {
 
     res.Yaml = yaml ? yaml.data : '';
 
+    res.SecretType = payload.type;
+
     res.Data = _.map(payload.data, (value, key) => {
       const annotations = payload.metadata.annotations ? payload.metadata.annotations[KubernetesPortainerConfigurationDataAnnotation] : '';
       const entry = new KubernetesConfigurationFormValuesEntry();

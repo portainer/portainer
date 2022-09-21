@@ -141,7 +141,11 @@ export function Datatable<
         <TableSettingsProvider settings={settingsStore}>
           <Table.Container>
             {isTitleVisible(titleOptions) && (
-              <Table.Title label={titleOptions.title} icon={titleOptions.icon}>
+              <Table.Title
+                label={titleOptions.title}
+                icon={titleOptions.icon}
+                featherIcon={titleOptions.featherIcon}
+              >
                 <SearchBar value={searchBarValue} onChange={setGlobalFilter} />
                 {renderTableActions && (
                   <Table.Actions>
