@@ -6,7 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portaineree "github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
 )
@@ -20,7 +20,7 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 		)
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portaineree.EndpointID(endpointID))
+	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainerDsErrors.ErrObjectNotFound {
 		return httperror.NotFound(
 			"Unable to find an environment with the specified identifier inside the database",
@@ -76,9 +76,9 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 
 	// Update the database to match the list of found + modified controllers.
 	// This includes pruning out controllers which no longer exist.
-	var newClasses []portaineree.KubernetesIngressClassConfig
+	var newClasses []portainer.KubernetesIngressClassConfig
 	for _, controller := range controllers {
-		var class portaineree.KubernetesIngressClassConfig
+		var class portainer.KubernetesIngressClassConfig
 		class.Name = controller.ClassName
 		class.Type = controller.Type
 		class.GloballyBlocked = !controller.Availability
@@ -87,7 +87,7 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 	}
 	endpoint.Kubernetes.Configuration.IngressClasses = newClasses
 	err = handler.dataStore.Endpoint().UpdateEndpoint(
-		portaineree.EndpointID(endpointID),
+		portainer.EndpointID(endpointID),
 		endpoint,
 	)
 	if err != nil {
@@ -120,7 +120,7 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 		)
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portaineree.EndpointID(endpointID))
+	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainerDsErrors.ErrObjectNotFound {
 		return httperror.NotFound(
 			"Unable to find an environment with the specified identifier inside the database",
@@ -144,14 +144,14 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 	cli := handler.KubernetesClient
 	currentControllers := cli.GetIngressControllers()
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
-	var updatedClasses []portaineree.KubernetesIngressClassConfig
+	var updatedClasses []portainer.KubernetesIngressClassConfig
 	var controllers models.K8sIngressControllers
 	for i := range currentControllers {
 		var globallyblocked bool
 		currentControllers[i].Availability = true
 		currentControllers[i].New = true
 
-		var updatedClass portaineree.KubernetesIngressClassConfig
+		var updatedClass portainer.KubernetesIngressClassConfig
 		updatedClass.Name = currentControllers[i].ClassName
 		updatedClass.Type = currentControllers[i].Type
 
@@ -184,7 +184,7 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 	// This includes pruning out controllers which no longer exist.
 	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
 	err = handler.dataStore.Endpoint().UpdateEndpoint(
-		portaineree.EndpointID(endpointID),
+		portainer.EndpointID(endpointID),
 		endpoint,
 	)
 	if err != nil {
@@ -205,7 +205,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		)
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portaineree.EndpointID(endpointID))
+	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainerDsErrors.ErrObjectNotFound {
 		return httperror.NotFound(
 			"Unable to find an environment with the specified identifier inside the database",
@@ -258,9 +258,9 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 
 	// Update the database to match the list of found + modified controllers.
 	// This includes pruning out controllers which no longer exist.
-	var newClasses []portaineree.KubernetesIngressClassConfig
+	var newClasses []portainer.KubernetesIngressClassConfig
 	for _, controller := range controllers {
-		var class portaineree.KubernetesIngressClassConfig
+		var class portainer.KubernetesIngressClassConfig
 		class.Name = controller.ClassName
 		class.Type = controller.Type
 		class.GloballyBlocked = !controller.Availability
@@ -270,7 +270,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 
 	endpoint.Kubernetes.Configuration.IngressClasses = newClasses
 	err = handler.dataStore.Endpoint().UpdateEndpoint(
-		portaineree.EndpointID(endpointID),
+		portainer.EndpointID(endpointID),
 		endpoint,
 	)
 	if err != nil {
@@ -291,7 +291,7 @@ func (handler *Handler) updateKubernetesIngressControllersByNamespace(w http.Res
 		)
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portaineree.EndpointID(endpointID))
+	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainerDsErrors.ErrObjectNotFound {
 		return httperror.NotFound(
 			"Unable to find an environment with the specified identifier inside the database",
@@ -322,14 +322,14 @@ func (handler *Handler) updateKubernetesIngressControllersByNamespace(w http.Res
 	}
 
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
-	var updatedClasses []portaineree.KubernetesIngressClassConfig
+	var updatedClasses []portainer.KubernetesIngressClassConfig
 PayloadLoop:
 	for _, p := range payload {
 		for _, existingClass := range existingClasses {
 			if p.ClassName != existingClass.Name {
 				continue
 			}
-			var updatedClass portaineree.KubernetesIngressClassConfig
+			var updatedClass portainer.KubernetesIngressClassConfig
 			updatedClass.Name = existingClass.Name
 			updatedClass.Type = existingClass.Type
 			updatedClass.GloballyBlocked = existingClass.GloballyBlocked
@@ -367,7 +367,7 @@ PayloadLoop:
 
 	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
 	err = handler.dataStore.Endpoint().UpdateEndpoint(
-		portaineree.EndpointID(endpointID),
+		portainer.EndpointID(endpointID),
 		endpoint,
 	)
 	if err != nil {

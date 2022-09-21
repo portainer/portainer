@@ -66,3 +66,27 @@ func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *htt
 
 	return nil
 }
+
+func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	cli := handler.KubernetesClient
+
+	var payload models.K8sNamespaceDetails
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return &httperror.HandlerError{
+			StatusCode: http.StatusBadRequest,
+			Message:    "Invalid request payload",
+			Err:        err,
+		}
+	}
+
+	err = cli.UpdateNamespace(payload)
+	if err != nil {
+		return &httperror.HandlerError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to retrieve nodes limits",
+			Err:        err,
+		}
+	}
+	return nil
+}

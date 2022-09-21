@@ -105,25 +105,20 @@
           <!-- !admin-checkbox -->
           <!-- teams -->
           <div class="form-group" ng-if="!formValues.Administrator">
-            <label class="col-sm-3 col-lg-2 control-label text-left">Add to team(s)</label>
+            <label class="col-sm-3 col-lg-2 control-label text-left" for="teams-selector">Add to team(s)</label>
             <div class="col-sm-8">
               <span class="small text-muted" ng-if="teams.length === 0">
                 You don't seem to have any teams to add users into. Head over to the <a ui-sref="portainer.teams">Teams view</a> to create some.
               </span>
-              <span
-                isteven-multi-select
+              <teams-selector
                 ng-if="teams.length > 0"
-                input-model="teams"
-                output-model="formValues.Teams"
-                button-label="Name"
-                item-label="Name"
-                tick-property="ticked"
-                helper-elements="filter"
-                search-property="Name"
-                translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
-                data-cy="user-teamSelect"
-              >
-              </span>
+                value="formValues.TeamIds"
+                teams="teams"
+                placeholder="'Select one or more teams'"
+                data-cy="'user-teamSelect'"
+                on-change="(onChangeTeamIds)"
+                input-id="'teams-selector'"
+              ></teams-selector>
             </div>
           </div>
           <!-- !teams -->

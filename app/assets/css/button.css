@@ -159,3 +159,7 @@ a.hyperlink {
   @apply text-blue-8 hover:text-blue-9;
   @apply hover:underline cursor-pointer;
 }
+
+a.no-decoration {
+  text-decoration: none;
+}

@@ -12,19 +12,14 @@
             <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0"> Select namespaces </label>
             <div class="col-sm-9 col-lg-4" style="margin-bottom: 15px">
               <span class="small text-muted" ng-if="!$ctrl.resourcePools.length"> No namespaces available. </span>
-              <span
-                isteven-multi-select
+
+              <namespaces-selector
                 ng-if="$ctrl.resourcePools.length"
-                input-model="$ctrl.resourcePools"
-                output-model="$ctrl.selectedResourcePools"
-                button-label="name"
-                item-label="name"
-                tick-property="ticked"
-                helper-elements="filter"
-                search-property="name"
-                translation="{nothingSelected: 'Select one or more namespaces', search: 'Search...'}"
-              >
-              </span>
+                value="$ctrl.selectedResourcePools"
+                namespaces="$ctrl.resourcePools"
+                placeholder="'Select one or more namespaces'"
+                on-change="($ctrl.onChangeResourcePools)"
+              ></namespaces-selector>
             </div>
             <div class="col-sm-12 small text-muted vertical-center">
               <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>

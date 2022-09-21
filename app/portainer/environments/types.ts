@@ -63,6 +63,11 @@ export type IngressClass = {
 };
 
 export interface KubernetesConfiguration {
+  UseLoadBalancer?: boolean;
+  UseServerMetrics?: boolean;
+  EnableResourceOverCommit?: boolean;
+  ResourceOverCommitPercentage?: number;
+  RestrictDefaultNamespace?: boolean;
   IngressClasses: IngressClass[];
   IngressAvailabilityPerNamespace: boolean;
 }

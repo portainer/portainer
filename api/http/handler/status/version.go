@@ -58,8 +58,8 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	latestVersion := getLatestVersion()
-	if hasNewerVersion(portainer.APIVersion, latestVersion) {
+	latestVersion := GetLatestVersion()
+	if HasNewerVersion(portainer.APIVersion, latestVersion) {
 		result.UpdateAvailable = true
 		result.LatestVersion = latestVersion
 	}
@@ -67,7 +67,7 @@ func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, &result)
 }
 
-func getLatestVersion() string {
+func GetLatestVersion() string {
 	motd, err := client.Get(portainer.VersionCheckURL, 5)
 	if err != nil {
 		log.Debug().Err(err).Msg("couldn't fetch latest Portainer release version")
@@ -89,7 +89,7 @@ func getLatestVersion() string {
 	return data.TagName
 }
 
-func hasNewerVersion(currentVersion, latestVersion string) bool {
+func HasNewerVersion(currentVersion, latestVersion string) bool {
 	currentVersionSemver, err := semver.NewVersion(currentVersion)
 	if err != nil {
 		log.Debug().Str("version", currentVersion).Msg("current Portainer version isn't a semver")

@@ -548,6 +548,8 @@ type (
 	KubernetesConfiguration struct {
 		UseLoadBalancer                 bool                           `json:"UseLoadBalancer"`
 		UseServerMetrics                bool                           `json:"UseServerMetrics"`
+		EnableResourceOverCommit        bool                           `json:"EnableResourceOverCommit"`
+		ResourceOverCommitPercentage    int                            `json:"ResourceOverCommitPercentage"`
 		StorageClasses                  []KubernetesStorageClassConfig `json:"StorageClasses"`
 		IngressClasses                  []KubernetesIngressClassConfig `json:"IngressClasses"`
 		RestrictDefaultNamespace        bool                           `json:"RestrictDefaultNamespace"`
@@ -1322,6 +1324,8 @@ type (
 	GitService interface {
 		CloneRepository(destination string, repositoryURL, referenceName, username, password string) error
 		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
+		ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error)
+		ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includeExts []string) ([]string, error)
 	}
 
 	// OpenAMTService represents a service for managing OpenAMT
@@ -1339,6 +1343,22 @@ type (
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
+
+		CreateNamespace(info models.K8sNamespaceInfo) error
+		UpdateNamespace(info models.K8sNamespaceInfo) error
+		GetNamespaces() (map[string]K8sNamespaceInfo, error)
+		DeleteNamespace(namespace string) error
+		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
+		CreateIngress(namespace string, info models.K8sIngressInfo) error
+		UpdateIngress(namespace string, info models.K8sIngressInfo) error
+		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
+		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
+		CreateService(namespace string, service models.K8sServiceInfo) error
+		UpdateService(namespace string, service models.K8sServiceInfo) error
+		GetServices(namespace string) ([]models.K8sServiceInfo, error)
+		DeleteServices(reqs models.K8sServiceDeleteRequests) error
+		GetIngressControllers() models.K8sIngressControllers
+
 		HasStackName(namespace string, stackName string) (bool, error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
 		CreateNamespace(info models.K8sNamespaceDetails) error

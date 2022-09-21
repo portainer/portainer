@@ -7,7 +7,7 @@ import * as kcService from '@/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
 import { EnvironmentType } from '@/portainer/environments/types';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 import {
   Query,
   useEnvironmentList,

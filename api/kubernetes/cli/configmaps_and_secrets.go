@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/portainer/portainer/api/database/models"
@@ -41,7 +40,6 @@ func (kcl *KubeClient) GetConfigMapsAndSecrets(namespace string) ([]models.K8sCo
 	}
 
 	for _, s := range secretList.Items {
-		fmt.Printf("%#v\n", s)
 		var secret models.K8sConfigMapOrSecret
 		secret.UID = string(s.UID)
 		secret.Name = s.Name

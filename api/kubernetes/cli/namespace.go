@@ -107,6 +107,18 @@ func (kcl *KubeClient) ToggleSystemState(namespaceName string, isSystem bool) er
 
 }
 
+// UpdateIngress updates an ingress in a given namespace in a k8s endpoint.
+func (kcl *KubeClient) UpdateNamespace(info models.K8sNamespaceDetails) error {
+	client := kcl.cli.CoreV1().Namespaces()
+
+	var ns v1.Namespace
+	ns.Name = info.Name
+	ns.Annotations = info.Annotations
+
+	_, err := client.Update(context.Background(), &ns, metav1.UpdateOptions{})
+	return err
+}
+
 func (kcl *KubeClient) DeleteNamespace(namespace string) error {
 	client := kcl.cli.CoreV1().Namespaces()
 	namespaces, err := client.List(context.Background(), metav1.ListOptions{})

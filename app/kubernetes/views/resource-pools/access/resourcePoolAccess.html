@@ -52,25 +52,19 @@
               </span>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 col-lg-2 control-label text-left"> Select user(s) and/or team(s) </label>
+              <label class="col-sm-3 col-lg-2 control-label text-left" for="users-selector"> Select user(s) and/or team(s) </label>
               <div class="col-sm-9 col-lg-4">
                 <span class="small text-muted" ng-if="ctrl.availableUsersAndTeams.length === 0">
                   No user nor team access has been set on the environment. Head over to the
                   <a ui-sref="portainer.endpoints">Environments view</a> to manage them.
                 </span>
-                <span
-                  isteven-multi-select
+                <namespace-access-users-selector
                   ng-if="ctrl.availableUsersAndTeams.length > 0"
-                  input-model="ctrl.availableUsersAndTeams"
-                  output-model="ctrl.formValues.multiselectOutput"
-                  button-label="icon Name"
-                  item-label="icon Name"
-                  tick-property="ticked"
-                  helper-elements="filter"
-                  search-property="Name"
-                  translation="{nothingSelected: 'Select one or more users and/or teams', search: 'Search...'}"
-                >
-                </span>
+                  input-id="users-selector"
+                  value="ctrl.formValues.multiselectOutput"
+                  options="ctrl.availableUsersAndTeams"
+                  on-change="(ctrl.onUsersAndTeamsChange)"
+                ></namespace-access-users-selector>
               </div>
             </div>
 
@@ -80,7 +74,7 @@
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm !ml-0 vertical-center"
-                  ng-disabled="(ctrl.availableUsersAndTeams | filter:{ticked:true}).length === 0 || ctrl.actionInProgress"
+                  ng-disabled="ctrl.formValues.multiselectOutput.length === 0 || ctrl.actionInProgress"
                   ng-click="ctrl.authorizeAccess()"
                   button-spinner="ctrl.actionInProgress"
                 >

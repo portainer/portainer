@@ -245,37 +245,6 @@ json-tree .branch-preview {
   background-color: var(--bg-progress-color);
 }
 
-.ui-select-search,
-.ui-select-toggle {
-  height: 30px;
-  min-width: 260px;
-  padding: 4px 12px;
-}
-
-.ui-select-toggle {
-  justify-content: flex-start !important;
-}
-
-.ui-select-match-text {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-}
-
-.ui-select-match-text > a {
-  verical-align: middle;
-}
-
-.ui-select-bootstrap .ui-select-choices-row > span {
-  color: var(--text-ui-select-color);
-}
-
-.ui-select-bootstrap .ui-select-choices-row > span:hover,
-.ui-select-bootstrap .ui-select-choices-row > span:focus {
-  background-color: var(--bg-ui-select-hover-color);
-  color: var(--text-ui-select-hover-color);
-}
-
 .motd-body {
   background-color: var(--bg-motd-body-color) !important;
 }

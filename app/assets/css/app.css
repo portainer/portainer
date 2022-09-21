@@ -692,60 +692,6 @@ input[type='checkbox'] {
 
 /*!bootbox override*/
 
-/*angular-multi-select override*/
-.multiSelect > button {
-  min-height: 30px !important;
-  background-image: var(--bg-image-multiselect-button);
-  border-color: var(--border-multiselect);
-  color: var(--text-multiselect);
-  background-color: var(--bg-multiselect-color);
-}
-
-.multiSelect > button:hover {
-  background-image: var(--bg-image-multiselect-hover);
-}
-
-.multiSelect .checkboxLayer {
-  border-color: var(--border-multiselect-checkboxlayer);
-}
-
-.multiSelect .checkBoxContainer {
-  background-color: var(--bg-multiselect-checkboxcontainer);
-}
-
-.multiSelect .multiSelectItem {
-  color: var(--text-multiselect-item);
-}
-
-.multiSelect .helperContainer {
-  background-color: var(--bg-multiselect-helpercontainer);
-}
-
-.multiSelect .multiSelectFocus {
-  background-image: var(--bg-image-multiselect);
-}
-
-.multiSelect .multiSelectItem:not(.multiSelectGroup).selected {
-  background-image: var(--bg-image-multiselect);
-  color: var(--white-color);
-  border: none;
-}
-
-.multiSelect .multiSelectItem:hover,
-.multiSelect .multiSelectGroup:hover {
-  border-color: var(--grey-3);
-  background-image: var(--bg-image-multiselect) !important;
-  color: var(--white-color) !important;
-}
-
-.multiSelect .tickMark,
-.widget .widget-body table tbody .multiSelect .tickMark {
-  top: 2px;
-  right: 12px;
-  font-size: 20px !important;
-}
-/*!angular-multi-select override*/
-
 /*toaster override*/
 #toast-container > div {
   opacity: 0.9;

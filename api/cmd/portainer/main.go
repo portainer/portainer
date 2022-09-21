@@ -210,8 +210,8 @@ func initOAuthService() portainer.OAuthService {
 	return oauth.NewService()
 }
 
-func initGitService() portainer.GitService {
-	return git.NewService()
+func initGitService(ctx context.Context) portainer.GitService {
+	return git.NewService(ctx)
 }
 
 func initSSLService(addr, certPath, keyPath string, fileService portainer.FileService, dataStore dataservices.DataStore, shutdownTrigger context.CancelFunc) (*ssl.Service, error) {
@@ -580,8 +580,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	ldapService := initLDAPService()
 
 	oauthService := initOAuthService()
-
-	gitService := initGitService()
+	gitService := initGitService(shutdownCtx)
 
 	openAMTService := openamt.NewService()
 

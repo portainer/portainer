@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { useSettings } from '@/portainer/settings/queries';
 import { r2a } from '@/react-tools/react2angular';
+import { useSettings } from '@/react/portainer/settings/queries';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 
 import { FormControl } from '@@/form-components/FormControl';

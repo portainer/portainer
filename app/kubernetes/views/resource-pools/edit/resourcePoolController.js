@@ -68,8 +68,15 @@ class KubernetesResourcePoolController {
     this.onToggleLoadBalancersQuota = this.onToggleLoadBalancersQuota.bind(this);
     this.onToggleStorageQuota = this.onToggleStorageQuota.bind(this);
     this.onChangeIngressControllerAvailability = this.onChangeIngressControllerAvailability.bind(this);
+    this.onRegistriesChange = this.onRegistriesChange.bind(this);
   }
   /* #endregion */
+
+  onRegistriesChange(registries) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.Registries = registries;
+    });
+  }
 
   onToggleLoadBalancersQuota(checked) {
     return this.$scope.$evalAsync(() => {

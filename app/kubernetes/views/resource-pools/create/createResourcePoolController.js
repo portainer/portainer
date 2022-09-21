@@ -32,6 +32,7 @@ class KubernetesCreateResourcePoolController {
     this.onToggleLoadBalancerQuota = this.onToggleLoadBalancerQuota.bind(this);
     this.onToggleResourceQuota = this.onToggleResourceQuota.bind(this);
     this.onChangeIngressControllerAvailability = this.onChangeIngressControllerAvailability.bind(this);
+    this.onRegistriesChange = this.onRegistriesChange.bind(this);
   }
   /* #endregion */
 

@@ -1,0 +1,30 @@
+.ingress-rules .bordered {
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+}
+
+.ingress-rules .rule {
+  background-color: var(--bg-body-color);
+}
+
+.ingressDatatable-actions button > span,
+.anntation-actions button > span,
+.rules-action button > span,
+.rule button > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.error-inline {
+  display: block;
+}
+
+.error-inline svg {
+  margin-right: 5px;
+}
+
+.error-inline svg,
+.error-inline span {
+  display: inline;
+}

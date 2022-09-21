@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { Environment } from '@/portainer/environments/types';
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 import { PublicSettingsViewModel } from '@/portainer/models/settings';
 
 interface Props {

@@ -34,7 +34,7 @@
           <div class="col-sm-12 form-section-title"> Edge Groups </div>
           <div class="form-group" ng-if="$ctrl.edgeGroups">
             <div class="col-sm-12">
-              <edge-groups-selector ng-if="!$ctrl.noGroups" model="$ctrl.formValues.Groups" on-change="($ctrl.onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
+              <edge-groups-selector ng-if="!$ctrl.noGroups" value="$ctrl.formValues.Groups" on-change="($ctrl.onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
             </div>
             <div ng-if="$ctrl.noGroups" class="col-sm-12 small text-muted">
               No Edge groups are available. Head over to the <a ui-sref="edge.groups">Edge groups view</a> to create one.
