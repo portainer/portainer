@@ -16,7 +16,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/edge/updateschedule"
 	"github.com/portainer/portainer/api/http/middlewares"
-	"golang.org/x/exp/slices"
 )
 
 type stackStatusResponse struct {
@@ -119,10 +118,8 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 	}
 
 	// check endpoint version, if it has the same version as the active schedule, then we can mark the edge stack as successfully deployed
-	successFullUpdateEdgeStackID := portainer.EdgeStackID(0)
 	activeUpdateSchedule := handler.edgeUpdateService.ActiveSchedule(endpoint.ID)
 	if activeUpdateSchedule != nil && activeUpdateSchedule.TargetVersion == version {
-		successFullUpdateEdgeStackID = activeUpdateSchedule.EdgeStackID
 		handler.handleSuccessfulUpdate(activeUpdateSchedule)
 	}
 
@@ -136,7 +133,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
 	}
 
-	edgeStacksStatus, handlerErr := handler.buildEdgeStacks(endpoint.ID, successFullUpdateEdgeStackID)
+	edgeStacksStatus, handlerErr := handler.buildEdgeStacks(endpoint.ID)
 	if handlerErr != nil {
 		return handlerErr
 	}
@@ -185,7 +182,7 @@ func (handler *Handler) handleSuccessfulUpdate(activeUpdateSchedule *updatesched
 		}
 	}
 
-	status.Type = portainer.StatusOk
+	status.Type = portainer.EdgeStackStatusRemoteUpdateSuccess
 
 	edgeStack.Status[activeUpdateSchedule.EnvironmentID] = status
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(edgeStack.ID, edgeStack)
@@ -218,7 +215,7 @@ func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel p
 	return schedules, nil
 }
 
-func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID, skipEdgeStackID portainer.EdgeStackID) ([]stackStatusResponse, *httperror.HandlerError) {
+func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID) ([]stackStatusResponse, *httperror.HandlerError) {
 	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve relation object from the database", err)
@@ -226,16 +223,13 @@ func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID, skipEdg
 
 	edgeStacksStatus := []stackStatusResponse{}
 	for stackID := range relation.EdgeStacks {
-		if stackID == skipEdgeStackID {
-			continue
-		}
-
 		stack, err := handler.DataStore.EdgeStack().EdgeStack(stackID)
 		if err != nil {
 			return nil, httperror.InternalServerError("Unable to retrieve edge stack from the database", err)
 		}
 
-		if slices.Contains([]portainer.EdgeStackStatusType{portainer.StatusError, portainer.StatusOk}, stack.Status[endpointID].Type) {
+		// if the stack represents a successful remote update - skip it
+		if stack.Status[endpointID].Type == portainer.EdgeStackStatusRemoteUpdateSuccess {
 			continue
 		}
 

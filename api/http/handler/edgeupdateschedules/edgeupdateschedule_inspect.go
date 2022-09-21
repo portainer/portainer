@@ -31,7 +31,8 @@ func (handler *Handler) inspect(w http.ResponseWriter, r *http.Request) *httperr
 		return response.JSON(w, item)
 	}
 
-	decoratedItem, err := decorateSchedule(handler.dataStore.EdgeStack().EdgeStack, *item)
+	decoratedItem, err := decorateSchedule(*item, handler.dataStore.EdgeStack().EdgeStack, handler.dataStore.Endpoint().Endpoint)
+
 	if err != nil {
 		return httperror.InternalServerError("Unable to decorate the edge update schedule", err)
 	}

@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/edge/updateschedule"
-	"golang.org/x/exp/maps"
+	"github.com/portainer/portainer/api/http/middlewares"
 )
 
 type decoratedUpdateSchedule struct {
@@ -16,15 +16,13 @@ type decoratedUpdateSchedule struct {
 	StatusMessage string                                  `json:"statusMessage"`
 }
 
-func decorateSchedule(edgeStackGetter func(portainer.EdgeStackID) (*portainer.EdgeStack, error), schedule updateschedule.UpdateSchedule) (*decoratedUpdateSchedule, error) {
+func decorateSchedule(schedule updateschedule.UpdateSchedule, edgeStackGetter middlewares.ItemGetter[portainer.EdgeStackID, portainer.EdgeStack], environmentGetter middlewares.ItemGetter[portainer.EndpointID, portainer.Endpoint]) (*decoratedUpdateSchedule, error) {
 	edgeStack, err := edgeStackGetter(schedule.EdgeStackID)
 	if err != nil {
 		return nil, errors.WithMessage(err, "unable to get edge stack")
 	}
 
-	relatedEndpointIds := maps.Keys(schedule.EnvironmentsPreviousVersions)
-
-	status, statusMessage := aggregateStatus(relatedEndpointIds, edgeStack)
+	status, statusMessage := aggregateStatus(schedule.EnvironmentsPreviousVersions, edgeStack, environmentGetter)
 
 	decoratedItem := &decoratedUpdateSchedule{
 		UpdateSchedule: schedule,
@@ -36,13 +34,13 @@ func decorateSchedule(edgeStackGetter func(portainer.EdgeStackID) (*portainer.Ed
 	return decoratedItem, nil
 }
 
-func aggregateStatus(relatedEndpointIds []portainer.EndpointID, edgeStack *portainer.EdgeStack) (updateschedule.UpdateScheduleStatusType, string) {
+func aggregateStatus(previousVersions map[portainer.EndpointID]string, edgeStack *portainer.EdgeStack, environmentGetter middlewares.ItemGetter[portainer.EndpointID, portainer.Endpoint]) (updateschedule.UpdateScheduleStatusType, string) {
 	aggregatedStatus := struct {
 		hasPending bool
 		hasSent    bool
 	}{}
 
-	for _, endpointID := range relatedEndpointIds {
+	for endpointID, previousVersion := range previousVersions {
 		envStatus, ok := edgeStack.Status[endpointID]
 
 		if !ok || envStatus.Type == portainer.EdgeStackStatusPending {
@@ -58,6 +56,22 @@ func aggregateStatus(relatedEndpointIds []portainer.EndpointID, edgeStack *porta
 			aggregatedStatus.hasSent = true
 			break
 		}
+
+		// TODO some times when edge stacks fail, they will report ok, but the version will not be updated
+		if envStatus.Type == portainer.StatusOk {
+
+			// check if environment was updated
+			environment, err := environmentGetter(endpointID)
+			if err != nil {
+				return updateschedule.UpdateScheduleStatusError, fmt.Sprintf("Error on environment %d: %s", endpointID, err)
+			}
+
+			if environment.Agent.Version == previousVersion {
+				return updateschedule.UpdateScheduleStatusError, fmt.Sprintf("environment %d did not update", endpointID)
+			}
+		}
+
+		// status is "success update"
 
 	}
 

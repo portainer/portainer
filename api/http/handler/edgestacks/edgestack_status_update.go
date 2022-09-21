@@ -62,6 +62,11 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
+	// skip if it's a successful remote update
+	if stack.Status[*payload.EndpointID].Type == portainer.EdgeStackStatusRemoteUpdateSuccess {
+		return response.JSON(w, stack)
+	}
+
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(*payload.EndpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)

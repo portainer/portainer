@@ -33,7 +33,7 @@ func (handler *Handler) list(w http.ResponseWriter, r *http.Request) *httperror.
 
 	decoratedList := make([]decoratedUpdateSchedule, len(list))
 	for idx, item := range list {
-		decoratedItem, err := decorateSchedule(handler.dataStore.EdgeStack().EdgeStack, item)
+		decoratedItem, err := decorateSchedule(item, handler.dataStore.EdgeStack().EdgeStack, handler.dataStore.Endpoint().Endpoint)
 		if err != nil {
 			return httperror.InternalServerError("Unable to decorate the edge update schedule", err)
 		}

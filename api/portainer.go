@@ -1539,6 +1539,8 @@ const (
 	StatusError
 	//StatusAcknowledged represents an acknowledged edge stack
 	StatusAcknowledged
+	// StatusRemoteUpdateSuccess represents a successfully updated edge stack
+	EdgeStackStatusRemoteUpdateSuccess
 )
 
 const (
