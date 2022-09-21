@@ -3,24 +3,18 @@ import _ from 'lodash';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';
-import { Option } from '@@/form-components/Input/Select';
+import { TextTip } from '@@/Tip/TextTip';
 
 import { useSupportedAgentVersions } from '../queries/useSupportedAgentVersions';
 
 import { FormValues } from './types';
 
-export function VersionSelect() {
+export function VersionSelect({ minVersion }: { minVersion?: string }) {
   const [, { error }, { setValue }] =
     useField<FormValues['version']>('version');
-  const supportedAgentVersionsQuery = useSupportedAgentVersions<
-    Option<string>[]
-  >({
-    select: (versions) =>
-      versions.map((version) => ({ label: version, value: version })),
+  const supportedAgentVersionsQuery = useSupportedAgentVersions(minVersion, {
     onSuccess(versions) {
-      if (versions.length > 0) {
-        setValue(_.last(versions)?.value || '');
-      }
+      setValue(_.last(versions) || '');
     },
   });
 
@@ -28,7 +22,18 @@ export function VersionSelect() {
     return null;
   }
 
-  const supportedVersions = supportedAgentVersionsQuery.data;
+  if (!supportedAgentVersionsQuery.data.length) {
+    return (
+      <FormControl label="Version">
+        <TextTip>No supported versions available</TextTip>
+      </FormControl>
+    );
+  }
+
+  const supportedVersions = supportedAgentVersionsQuery.data.map((version) => ({
+    label: version,
+    value: version,
+  }));
 
   return (
     <FormControl label="Version" errors={error} inputId="version-input">

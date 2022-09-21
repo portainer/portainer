@@ -1,61 +1,49 @@
-// import { useFormikContext } from 'formik';
-// import { useCurrentStateAndParams } from '@uirouter/react';
+import { useFormikContext } from 'formik';
+import semverCompare from 'semver-compare';
+import _ from 'lodash';
 
-// import { EdgeTypes, EnvironmentId } from '@/portainer/environments/types';
-// import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
+import { EdgeTypes, EnvironmentId } from '@/portainer/environments/types';
+import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
 
-// import { useActiveSchedules } from '../queries/useActiveSchedules';
+import { TextTip } from '@@/Tip/TextTip';
 
-// import { ScheduledTimeField } from './ScheduledTimeField';
-// import { FormValues } from './types';
-// import { ActiveSchedulesNotice } from './ActiveSchedulesNotice';
-// import { useEdgeGroupsEnvironmentIds } from './useEdgeGroupsEnvironmentIds';
+import { FormValues } from './types';
+import { useEdgeGroupsEnvironmentIds } from './useEdgeGroupsEnvironmentIds';
 import { VersionSelect } from './VersionSelect';
 
 export function UpdateScheduleDetailsFieldset() {
-  // const { values } = useFormikContext<FormValues>();
+  const { values } = useFormikContext<FormValues>();
 
-  // const edgeGroupsEnvironmentIds = useEdgeGroupsEnvironmentIds(values.groupIds);
+  const environmentIdsQuery = useEdgeGroupsEnvironmentIds(values.groupIds);
 
-  // const environments = useEnvironments(edgeGroupsEnvironmentIds);
-  // const activeSchedules = useRelevantActiveSchedules(edgeGroupsEnvironmentIds);
+  const edgeGroupsEnvironmentIds = environmentIdsQuery.data || [];
+  const environments = useEnvironments(edgeGroupsEnvironmentIds);
+  const minVersion = _.first(
+    _.compact<string>(environments.map((env) => env.Agent.Version)).sort(
+      (a, b) => semverCompare(a, b)
+    )
+  );
 
   return (
     <>
-      {/* <ActiveSchedulesNotice
-        selectedEdgeGroupIds={values.groupIds}
-        activeSchedules={activeSchedules}
-        environments={environments}
-      /> */}
+      {!!(edgeGroupsEnvironmentIds.length && values.version) && (
+        <TextTip color="blue">
+          {edgeGroupsEnvironmentIds.length} will be updated to {values.version}
+        </TextTip>
+      )}
 
-      <VersionSelect />
-
-      {/* <ScheduledTimeField /> */}
+      <VersionSelect minVersion={minVersion} />
     </>
   );
 }
 
-// function useEnvironments(environmentsIds: Array<EnvironmentId>) {
-//   const environmentsQuery = useEnvironmentList(
-//     { endpointIds: environmentsIds, types: EdgeTypes },
-//     undefined,
-//     undefined,
-//     environmentsIds.length > 0
-//   );
+function useEnvironments(environmentsIds: Array<EnvironmentId>) {
+  const environmentsQuery = useEnvironmentList(
+    { endpointIds: environmentsIds, types: EdgeTypes },
+    undefined,
+    undefined,
+    environmentsIds.length > 0
+  );
 
-//   return environmentsQuery.environments;
-// }
-
-// function useRelevantActiveSchedules(environmentIds: EnvironmentId[]) {
-//   const { params } = useCurrentStateAndParams();
-
-//   const scheduleId = params.id ? parseInt(params.id, 10) : 0;
-
-//   const activeSchedulesQuery = useActiveSchedules(environmentIds);
-
-//   return (
-//     activeSchedulesQuery.data?.filter(
-//       (schedule) => schedule.scheduleId !== scheduleId
-//     ) || []
-//   );
-// }
+  return environmentsQuery.environments;
+}
