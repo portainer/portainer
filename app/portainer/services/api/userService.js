@@ -9,8 +9,8 @@ export function UserService($q, Users, TeamService, TeamMembershipService) {
   'use strict';
   var service = {};
 
-  service.users = async function (includeAdministrators) {
-    const users = await getUsers(includeAdministrators);
+  service.users = async function (includeAdministrators, environmentId) {
+    const users = await getUsers(includeAdministrators, environmentId);
 
     return users.map((u) => new UserViewModel(u));
   };

@@ -186,6 +186,7 @@ export function ItemView() {
         resourceId={id}
         resourceControl={container.resourceControl}
         resourceType={ResourceControlType.ContainerGroup}
+        environmentId={environmentId}
       />
     </>
   );

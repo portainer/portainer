@@ -14,7 +14,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
 import { LoadingButton } from '@@/buttons';
 
-import { UpdateTypeTabs } from '../common/UpdateTypeTabs';
+import { ScheduleTypeSelector } from '../common/ScheduleTypeSelector';
 import { useItem } from '../queries/useItem';
 import { validation } from '../common/validation';
 import { useUpdateMutation } from '../queries/useUpdateMutation';
@@ -23,6 +23,8 @@ import { NameField, nameValidation } from '../common/NameField';
 import { EdgeGroupsField } from '../common/EdgeGroupsField';
 import { EdgeUpdateSchedule } from '../types';
 import { FormValues } from '../common/types';
+
+import { ScheduleDetails } from './ScheduleDetails';
 
 export function ItemView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
@@ -53,11 +55,28 @@ export function ItemView() {
 
   const item = itemQuery.data;
   const schedules = schedulesQuery.data;
+
+  const initialValues: FormValues = {
+    name: item.name,
+    groupIds: item.groupIds,
+    type: item.type,
+    time: item.time,
+    environments: Object.fromEntries(
+      Object.entries(item.status).map(([envId, status]) => [
+        parseInt(envId, 10),
+        status.targetVersion,
+      ])
+    ),
+  };
+
   return (
     <>
       <PageHeader
         title="Update & Rollback"
-        breadcrumbs={['Edge agent update and rollback', item.name]}
+        breadcrumbs={[
+          { label: 'Edge agent update and rollback', link: '^' },
+          item.name,
+        ]}
       />
 
       <div className="row">
@@ -66,7 +85,7 @@ export function ItemView() {
             <Widget.Title title="Update & Rollback Scheduler" icon={Settings} />
             <Widget.Body>
               <Formik
-                initialValues={item}
+                initialValues={initialValues}
                 onSubmit={(values) => {
                   updateMutation.mutate(
                     { id, values },
@@ -82,7 +101,9 @@ export function ItemView() {
                   );
                 }}
                 validateOnMount
-                validationSchema={() => updateValidation(item, schedules)}
+                validationSchema={() =>
+                  updateValidation(item.id, item.time, schedules)
+                }
               >
                 {({ isValid }) => (
                   <FormikForm className="form-horizontal">
@@ -90,7 +111,11 @@ export function ItemView() {
 
                     <EdgeGroupsField disabled={isDisabled} />
 
-                    <UpdateTypeTabs disabled={isDisabled} />
+                    {isDisabled ? (
+                      <ScheduleDetails schedule={item} />
+                    ) : (
+                      <ScheduleTypeSelector />
+                    )}
 
                     <div className="form-group">
                       <div className="col-sm-12">
@@ -115,10 +140,11 @@ export function ItemView() {
 }
 
 function updateValidation(
-  item: EdgeUpdateSchedule,
+  itemId: EdgeUpdateSchedule['id'],
+  scheduledTime: number,
   schedules: EdgeUpdateSchedule[]
 ): SchemaOf<{ name: string } | FormValues> {
-  return item.time > Date.now() / 1000
-    ? validation(schedules, item.id)
-    : object({ name: nameValidation(schedules, item.id) });
+  return scheduledTime > Date.now() / 1000
+    ? validation(schedules, itemId)
+    : object({ name: nameValidation(schedules, itemId) });
 }

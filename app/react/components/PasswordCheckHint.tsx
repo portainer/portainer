@@ -1,4 +1,4 @@
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import { Icon } from '@@/Icon';
 

@@ -14,8 +14,10 @@ export enum StatusType {
 }
 
 interface Status {
-  Type: StatusType;
-  Error: string;
+  status: StatusType;
+  error: string;
+  targetVersion: string;
+  currentVersion: string;
 }
 
 export type EdgeUpdateSchedule = {
@@ -27,5 +29,4 @@ export type EdgeUpdateSchedule = {
   status: { [key: EnvironmentId]: Status };
   created: number;
   createdBy: UserId;
-  version: string;
 };

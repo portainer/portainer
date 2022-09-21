@@ -57,6 +57,7 @@ const _KubernetesIngressServiceRoute = Object.freeze({
   IngressName: '',
   Path: '',
   ServiceName: '',
+  TLSCert: '',
 });
 
 export class KubernetesIngressServiceRoute {

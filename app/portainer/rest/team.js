@@ -8,7 +8,7 @@ angular.module('portainer.app').factory('Teams', [
       {},
       {
         create: { method: 'POST', ignoreLoadingBar: true },
-        query: { method: 'GET', isArray: true },
+        query: { method: 'GET', isArray: true, params: { environmentId: '@environmentId' } },
         get: { method: 'GET', params: { id: '@id' } },
         remove: { method: 'DELETE', params: { id: '@id' } },
         queryMemberships: { method: 'GET', isArray: true, params: { id: '@id', entity: 'memberships' } },

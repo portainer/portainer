@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 const categories = [
   'docker',

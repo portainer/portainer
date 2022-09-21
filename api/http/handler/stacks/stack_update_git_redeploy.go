@@ -2,7 +2,6 @@ package stacks
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -16,6 +15,8 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
 	k "github.com/portainer/portainer/api/kubernetes"
+
+	"github.com/rs/zerolog/log"
 )
 
 type stackGitRedployPayload struct {
@@ -156,7 +157,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		restoreError := filesystem.MoveDirectory(backupProjectPath, stack.ProjectPath)
 		if restoreError != nil {
-			log.Printf("[WARN] [http,stacks,git] [error: %s] [message: failed restoring backup folder]", restoreError)
+			log.Warn().Err(restoreError).Msg("failed restoring backup folder")
 		}
 
 		return httperror.InternalServerError("Unable to clone git repository", err)
@@ -165,7 +166,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 	defer func() {
 		err = handler.FileService.RemoveDirectory(backupProjectPath)
 		if err != nil {
-			log.Printf("[WARN] [http,stacks,git] [error: %s] [message: unable to remove git repository directory]", err)
+			log.Warn().Err(err).Msg("unable to remove git repository directory")
 		}
 	}()
 

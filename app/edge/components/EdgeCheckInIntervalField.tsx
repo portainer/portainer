@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { useSettings } from '@/portainer/settings/queries';
 import { r2a } from '@/react-tools/react2angular';
+import { useSettings } from '@/react/portainer/settings/queries';
+import { withReactQuery } from '@/react-tools/withReactQuery';
 
 import { FormControl } from '@@/form-components/FormControl';
 import { Select } from '@@/form-components/Input';
@@ -58,14 +59,10 @@ export function EdgeCheckinIntervalField({
   );
 }
 
-export const EdgeCheckinIntervalFieldAngular = r2a(EdgeCheckinIntervalField, [
-  'value',
-  'onChange',
-  'isDefaultHidden',
-  'tooltip',
-  'label',
-  'readonly',
-]);
+export const EdgeCheckinIntervalFieldAngular = r2a(
+  withReactQuery(EdgeCheckinIntervalField),
+  ['value', 'onChange', 'isDefaultHidden', 'tooltip', 'label', 'readonly']
+);
 
 function useOptions(isDefaultHidden: boolean) {
   const [options, setOptions] = useState(checkinIntervalOptions);

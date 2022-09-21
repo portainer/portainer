@@ -1,14 +1,10 @@
 package stacks
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -16,6 +12,10 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 type updateComposeStackPayload struct {
@@ -197,7 +197,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 	_, err = handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
-			log.Printf("[WARN] [stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
 		return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
@@ -206,7 +206,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint, payload.PullImage)
 	if configErr != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
-			log.Printf("[WARN] [stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
 		return configErr
@@ -215,7 +215,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 	err = handler.deployComposeStack(config, false)
 	if err != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
-			log.Printf("[WARN] [stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
 		return httperror.InternalServerError(err.Error(), err)
@@ -248,7 +248,7 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	_, err = handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
-			log.Printf("[WARN] [swarm,stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
 		return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
@@ -257,7 +257,7 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, payload.Prune, payload.PullImage)
 	if configErr != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
-			log.Printf("[WARN] [swarm,stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
 		return configErr
@@ -266,7 +266,7 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	err = handler.deploySwarmStack(config)
 	if err != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
-			log.Printf("[WARN] [swarm,stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
 		return httperror.InternalServerError(err.Error(), err)

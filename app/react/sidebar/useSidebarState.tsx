@@ -24,6 +24,7 @@ interface State {
 }
 
 export const Context = createContext<State | null>(null);
+Context.displayName = 'SidebarContext';
 
 export function useSidebarState() {
   const context = useContext(Context);

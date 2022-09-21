@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -56,10 +57,12 @@ func (service *Service) Roles() ([]portainer.Role, error) {
 		func(obj interface{}) (interface{}, error) {
 			set, ok := obj.(*portainer.Role)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Role object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Role object")
 				return nil, fmt.Errorf("Failed to convert to Role object: %s", obj)
 			}
+
 			sets = append(sets, *set)
+
 			return &portainer.Role{}, nil
 		})
 

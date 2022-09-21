@@ -1,16 +1,15 @@
 package docker
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
-	"github.com/portainer/portainer/api/internal/stackutils"
-
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/stackutils"
 
-	portainer "github.com/portainer/portainer/api"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -79,7 +78,11 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 		for _, name := range teamNames {
 			team, err := transport.dataStore.Team().TeamByName(name)
 			if err != nil {
-				log.Printf("[WARN] [http,proxy,docker] [message: unknown team name in access control label, ignoring access control rule for this team] [name: %s] [resource_id: %s]", name, resourceID)
+				log.Warn().
+					Str("name", name).
+					Str("resource_id", resourceID).
+					Msg("unknown team name in access control label, ignoring access control rule for this team")
+
 				continue
 			}
 
@@ -89,7 +92,11 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 		for _, name := range userNames {
 			user, err := transport.dataStore.User().UserByUsername(name)
 			if err != nil {
-				log.Printf("[WARN] [http,proxy,docker] [message: unknown user name in access control label, ignoring access control rule for this user] [name: %s] [resource_id: %s]", name, resourceID)
+				log.Warn().
+					Str("name", name).
+					Str("resource_id", resourceID).
+					Msg("unknown user name in access control label, ignoring access control rule for this user")
+
 				continue
 			}
 
@@ -114,7 +121,11 @@ func (transport *Transport) createPrivateResourceControl(resourceIdentifier stri
 
 	err := transport.dataStore.ResourceControl().Create(resourceControl)
 	if err != nil {
-		log.Printf("[ERROR] [http,proxy,docker,transport] [message: unable to persist resource control] [resource: %s] [err: %s]", resourceIdentifier, err)
+		log.Error().
+			Str("resource", resourceIdentifier).
+			Err(err).
+			Msg("unable to persist resource control")
+
 		return nil, err
 	}
 
@@ -148,7 +159,10 @@ func (transport *Transport) getInheritedResourceControlFromServiceOrStack(resour
 
 func (transport *Transport) applyAccessControlOnResource(parameters *resourceOperationParameters, responseObject map[string]interface{}, response *http.Response, executor *operationExecutor) error {
 	if responseObject[parameters.resourceIdentifierAttribute] == nil {
-		log.Printf("[WARN] [message: unable to find resource identifier property in resource object] [identifier_attribute: %s]", parameters.resourceIdentifierAttribute)
+		log.Warn().
+			Str("identifier_attribute", parameters.resourceIdentifierAttribute).
+			Msg("unable to find resource identifier property in resource object")
+
 		return nil
 	}
 
@@ -195,7 +209,10 @@ func (transport *Transport) decorateResourceList(parameters *resourceOperationPa
 		resourceObject := resource.(map[string]interface{})
 
 		if resourceObject[parameters.resourceIdentifierAttribute] == nil {
-			log.Printf("[WARN] [http,proxy,docker,decorate] [message: unable to find resource identifier property in resource list element] [identifier_attribute: %s]", parameters.resourceIdentifierAttribute)
+			log.Warn().
+				Str("identifier_attribute", parameters.resourceIdentifierAttribute).
+				Msg("unable to find resource identifier property in resource list element")
+
 			continue
 		}
 
@@ -232,7 +249,10 @@ func (transport *Transport) filterResourceList(parameters *resourceOperationPara
 	for _, resource := range resourceData {
 		resourceObject := resource.(map[string]interface{})
 		if resourceObject[parameters.resourceIdentifierAttribute] == nil {
-			log.Printf("[WARN] [http,proxy,docker,filter] [message: unable to find resource identifier property in resource list element] [identifier_attribute: %s]", parameters.resourceIdentifierAttribute)
+			log.Warn().
+				Str("identifier_attribute", parameters.resourceIdentifierAttribute).
+				Msg("unable to find resource identifier property in resource list element")
+
 			continue
 		}
 

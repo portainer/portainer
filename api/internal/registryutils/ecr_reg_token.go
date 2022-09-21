@@ -3,11 +3,11 @@ package registryutils
 import (
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/aws/ecr"
 	"github.com/portainer/portainer/api/dataservices"
+
+	"github.com/rs/zerolog/log"
 )
 
 func isRegTokenValid(registry *portainer.Registry) (valid bool) {
@@ -37,11 +37,11 @@ func parseRegToken(registry *portainer.Registry) (username, password string, err
 func EnsureRegTokenValid(dataStore dataservices.DataStore, registry *portainer.Registry) (err error) {
 	if registry.Type == portainer.EcrRegistry {
 		if isRegTokenValid(registry) {
-			log.Println("[DEBUG] [registry, GetEcrAccessToken] [message: current ECR token is still valid]")
+			log.Debug().Msg("current ECR token is still valid")
 		} else {
 			err = doGetRegToken(dataStore, registry)
 			if err != nil {
-				log.Println("[DEBUG] [registry, GetEcrAccessToken] [message: refresh ECR token]")
+				log.Debug().Msg("refresh ECR token")
 			}
 		}
 	}

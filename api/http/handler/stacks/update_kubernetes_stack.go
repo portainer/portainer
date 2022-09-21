@@ -3,13 +3,10 @@ package stacks
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
@@ -17,6 +14,10 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	k "github.com/portainer/portainer/api/kubernetes"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 type kubernetesFileStackUpdatePayload struct {
@@ -128,7 +129,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	projectPath, err := handler.FileService.UpdateStoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
-			log.Printf("[WARN] [kubernetes,stack,update] [message: rollback stack file error] [err: %s]", rollbackErr)
+			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
 		fileType := "Manifest"

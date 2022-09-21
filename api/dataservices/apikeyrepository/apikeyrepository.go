@@ -6,7 +6,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -41,12 +42,14 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 		func(obj interface{}) (interface{}, error) {
 			record, ok := obj.(*portainer.APIKey)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to APIKey object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
 				return nil, fmt.Errorf("Failed to convert to APIKey object: %s", obj)
 			}
+
 			if record.UserID == userID {
 				result = append(result, *record)
 			}
+
 			return &portainer.APIKey{}, nil
 		})
 
@@ -64,18 +67,21 @@ func (service *Service) GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, err
 		func(obj interface{}) (interface{}, error) {
 			key, ok := obj.(*portainer.APIKey)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to APIKey object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to APIKey object")
 				return nil, fmt.Errorf("Failed to convert to APIKey object: %s", obj)
 			}
 			if bytes.Equal(key.Digest, digest) {
 				k = key
 				return nil, stop
 			}
+
 			return &portainer.APIKey{}, nil
 		})
+
 	if err == stop {
 		return k, nil
 	}
+
 	if err == nil {
 		return nil, errors.ErrObjectNotFound
 	}

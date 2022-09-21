@@ -2,7 +2,6 @@ package adminmonitor
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -11,9 +10,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-)
 
-var logFatalf = log.Fatalf
+	"github.com/rs/zerolog/log"
+)
 
 const RedirectReasonAdminInitTimeout string = "AdminInitTimeout"
 
@@ -49,24 +48,28 @@ func (m *Monitor) Start() {
 	m.cancellationFunc = cancellationFunc
 
 	go func() {
-		log.Println("[DEBUG] [internal,init] [message: start initialization monitor ]")
+		log.Debug().Msg("start initialization monitor")
+
 		select {
 		case <-time.After(m.timeout):
 			initialized, err := m.WasInitialized()
 			if err != nil {
-				logFatalf("%s", err)
+				log.Fatal().Err(err).Msg("")
 			}
+
 			if !initialized {
-				log.Println("[INFO] [internal,init] The Portainer instance timed out for security purposes. To re-enable your Portainer instance, you will need to restart Portainer")
+				log.Info().Msg("the Portainer instance timed out for security purposes, to re-enable your Portainer instance, you will need to restart Portainer")
+
 				m.mu.Lock()
 				defer m.mu.Unlock()
+
 				m.adminInitDisabled = true
 				return
 			}
 		case <-cancellationCtx.Done():
-			log.Println("[DEBUG] [internal,init] [message: canceling initialization monitor]")
+			log.Debug().Msg("canceling initialization monitor")
 		case <-m.shutdownCtx.Done():
-			log.Println("[DEBUG] [internal,init] [message: shutting down initialization monitor]")
+			log.Debug().Msg("shutting down initialization monitor")
 		}
 	}()
 }

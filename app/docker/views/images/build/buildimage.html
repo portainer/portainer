@@ -183,9 +183,10 @@
               <div ng-show="state.BuildType === 'url'">
                 <div class="col-sm-12 form-section-title"> URL </div>
                 <div class="form-group">
-                  <span class="col-sm-12 text-muted small">
-                    Specify the URL to a Dockerfile, a tarball or a public Git repository (suffixed by <b>.git</b>). When using a tarball or a Git repository URL, the root folder
-                    will be used as the build context.
+                  <span class="col-sm-12 text-muted small vertical-center">
+                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                    Specify the URL to a Dockerfile, a tarball or a public Git repository (suffixed by <b>.git</b>). When using a Git repository URL, build contexts can be
+                    specified as in the <a href="https://docs.docker.com/engine/reference/commandline/build/#git-repositories">Docker documentation.</a>
                   </span>
                 </div>
                 <div class="form-group">
@@ -201,7 +202,10 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <span class="col-sm-12 text-muted small"> Indicate the path to the Dockerfile within the tarball/repository (ignored when using a Dockerfile). </span>
+                  <span class="col-sm-12 text-muted small vertical-center">
+                    <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
+                    Indicate the path to the Dockerfile within the tarball/repository (ignored when using a Dockerfile).
+                  </span>
                 </div>
                 <div class="form-group">
                   <label for="image_path" class="col-sm-2 control-label text-left">Dockerfile path</label>

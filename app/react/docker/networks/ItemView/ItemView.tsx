@@ -89,6 +89,7 @@ export function ItemView() {
         resourceType={ResourceControlType.Network}
         disableOwnershipChange={isSystemNetwork(networkQuery.data.Name)}
         resourceId={networkId}
+        environmentId={environmentId}
       />
       <NetworkOptionsTable options={networkQuery.data.Options} />
       <NetworkContainersTable
