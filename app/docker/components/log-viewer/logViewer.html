@@ -86,7 +86,7 @@
 <div class="row" style="height: 54%">
   <div class="col-sm-12" style="height: 100%">
     <pre ng-class="{ wrap_lines: $ctrl.state.wrapLines }" class="log_viewer" scroll-glue="$ctrl.state.autoScroll" force-glue>
-      <div ng-repeat="log in $ctrl.state.filteredLogs = ($ctrl.data | filter:{ 'line': $ctrl.state.search }) track by $index" class="line" ng-if="log.line"><p class="inner_line" ng-click="$ctrl.selectLine(log.line)" ng-class="{ 'line_selected': $ctrl.state.selectedLines.indexOf(log.line) > -1 }"><span ng-repeat="span in log.spans" ng-style="{ 'color': span.foregroundColor, 'background-color': span.backgroundColor }">{{ span.text }}</span></p></div>
+      <div ng-repeat="log in $ctrl.state.filteredLogs = ($ctrl.data | filter:{ 'line': $ctrl.state.search }) track by $index" class="line" ng-if="log.line"><p class="inner_line" ng-click="$ctrl.selectLine(log.line)" ng-class="{ 'line_selected': $ctrl.state.selectedLines.indexOf(log.line) > -1 }"><span ng-repeat="span in log.spans track by $index" ng-style="{ 'color': span.foregroundColor, 'background-color': span.backgroundColor, 'font-weight': span.fontWeight }">{{ span.text }}</span></p></div>
       <div ng-if="!$ctrl.state.filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ $ctrl.state.search }}' filter</p></div>
       <div ng-if="$ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line" class="line"><p class="inner_line">No logs available</p></div>
     </pre>
