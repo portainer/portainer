@@ -1,12 +1,10 @@
-import { react2angular } from '@/react-tools/react2angular';
 import { confirmDestructive } from '@/portainer/services/modal.service/confirm';
+import { Settings } from '@/react/portainer/settings/types';
 
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 
-import { SaveAuthSettingsButton } from '../components/SaveAuthSettingsButton';
-import { Settings } from '../../types';
-
-import { PasswordLengthSlider } from './components/PasswordLengthSlider/PasswordLengthSlider';
+import { PasswordLengthSlider } from './PasswordLengthSlider/PasswordLengthSlider';
+import { SaveAuthSettingsButton } from './SaveAuthSettingsButton';
 
 export interface Props {
   onSaveSettings(): void;
@@ -69,10 +67,3 @@ export function InternalAuth({
     </>
   );
 }
-
-export const InternalAuthAngular = react2angular(InternalAuth, [
-  'onSaveSettings',
-  'isLoading',
-  'value',
-  'onChange',
-]);

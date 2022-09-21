@@ -2,9 +2,9 @@ import RcSlider from 'rc-slider';
 import clsx from 'clsx';
 import { Lock, XCircle, CheckCircle } from 'react-feather';
 
-import { Badge } from '@/portainer/settings/authentication/internal-auth/components/Badge';
-
 import 'rc-slider/assets/index.css';
+
+import { Badge } from '../Badge';
 
 import styles from './PasswordLengthSlider.module.css';
 

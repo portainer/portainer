@@ -1,6 +1,6 @@
 import { useRouter } from '@uirouter/react';
 
-import { usePublicSettings } from '../settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 export enum FeatureFlag {
   EdgeRemoteUpdate = 'edgeRemoteUpdate',

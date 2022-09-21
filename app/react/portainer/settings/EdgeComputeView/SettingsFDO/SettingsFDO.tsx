@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Formik, Field, Form } from 'formik';
 
 import { FDOConfiguration } from '@/portainer/hostmanagement/fdo/model';
-import { FDOProfilesDatatableContainer } from '@/portainer/settings/edge-compute/FDOProfilesDatatable/FDOProfilesDatatableContainer';
 
 import { Switch } from '@@/form-components/SwitchField/Switch';
 import { FormControl } from '@@/form-components/FormControl';
@@ -11,6 +10,8 @@ import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { TextTip } from '@@/Tip/TextTip';
 import { Input } from '@@/form-components/Input';
+
+import { FDOProfilesDatatableContainer } from '../FDOProfilesDatatable/FDOProfilesDatatableContainer';
 
 import styles from './SettingsFDO.module.css';
 import { validationSchema } from './SettingsFDO.validation';

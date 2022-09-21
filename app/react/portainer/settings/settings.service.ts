@@ -1,6 +1,5 @@
 import { PublicSettingsViewModel } from '@/portainer/models/settings';
-
-import axios, { parseAxiosError } from '../services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { DefaultRegistry, PublicSettingsResponse, Settings } from './types';
 

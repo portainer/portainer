@@ -1,8 +1,4 @@
-import { withCurrentUser } from '@/react-tools/withCurrentUser';
-import { r2a } from '@/react-tools/react2angular';
-import { withReactQuery } from '@/react-tools/withReactQuery';
-
-import { Settings } from '../types';
+import { Settings } from '@/react/portainer/settings/types';
 
 import { EdgeComputeSettings } from './EdgeComputeSettings';
 import { AutomaticEdgeEnvCreation } from './AutomaticEdgeEnvCreation';
@@ -21,8 +17,3 @@ export function EdgeComputeSettingsView({ settings, onSubmit }: Props) {
     </div>
   );
 }
-
-export const EdgeComputeSettingsViewAngular = r2a(
-  withReactQuery(withCurrentUser(EdgeComputeSettingsView)),
-  ['settings', 'onSubmit']
-);

@@ -4,7 +4,7 @@ import { useCallback, useEffect } from 'react';
 
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { useUpdateSettingsMutation } from '@/portainer/settings/queries';
+import { useUpdateSettingsMutation } from '@/react/portainer/settings/queries';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { FormControl } from '@@/form-components/FormControl';

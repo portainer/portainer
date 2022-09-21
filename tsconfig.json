@@ -30,12 +30,7 @@
     "paths": {
       // paths relative to the baseUrl
       "@@/*": ["react/components/*"],
-      "@/*": ["./*", "../app/*"],
-      "Agent/*": ["agent/*"],
-      "Azure/*": ["azure/*"],
-      "Docker/*": ["docker/*"],
-      "Kubernetes/*": ["kubernetes/*"],
-      "Portainer/*": ["portainer/*"]
+      "@/*": ["./*", "../app/*"]
     }
   },
   "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack"],
