@@ -31,7 +31,7 @@
         <div class="form-group nomargin" ng-show="addUserHelmRepoForm.repo.$invalid">
           <div class="small">
             <div ng-messages="addUserHelmRepoForm.repo.$error">
-              <p class="vertical-center text-muted" ng-message="pattern"
+              <p class="vertical-center text-warning" ng-message="pattern"
                 ><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> A valid URL beginning with http(s) is required.</p
               >
             </div>
@@ -41,7 +41,7 @@
         <div class="form-group nomargin" ng-show="$ctrl.doesRepoExist()">
           <div class="small">
             <div ng-messages="addUserHelmRepoForm.repo.$error">
-              <p class="vertical-center text-muted"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Helm repository already exists.</p>
+              <p class="vertical-center text-warning"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Helm repository already exists.</p>
             </div>
           </div>
         </div>

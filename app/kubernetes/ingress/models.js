@@ -8,6 +8,7 @@ export function KubernetesIngress() {
     // PreviousHost: undefined, // only use for RP ingress host edit
     Paths: [],
     IngressClassName: '',
+    TLS: [],
   };
 }
 

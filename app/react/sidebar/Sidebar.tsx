@@ -3,7 +3,7 @@ import { Home } from 'react-feather';
 
 import { useUser } from '@/portainer/hooks/useUser';
 import { useIsTeamLeader } from '@/portainer/users/queries';
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import styles from './Sidebar.module.css';
 import { EdgeComputeSidebar } from './EdgeComputeSidebar';
@@ -29,13 +29,7 @@ export function Sidebar() {
   return (
     /* in the future (when we remove r2a) this should wrap the whole app - to change root styles */
     <SidebarProvider>
-      <nav
-        className={clsx(
-          styles.root,
-          'p-5 flex flex-col be:bg-gray-11 bg-blue-10 th-dark:bg-gray-warm-10'
-        )}
-        aria-label="Main"
-      >
+      <nav className={clsx(styles.root, 'p-5 flex flex-col')} aria-label="Main">
         <Header logo={LogoURL} />
 
         {/* negative margin + padding -> scrollbar won't hide the content */}

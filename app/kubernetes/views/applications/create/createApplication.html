@@ -71,7 +71,7 @@
                 </div>
               </div>
               <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
-                <div class="col-sm-12 small text-muted">
+                <div class="col-sm-12 small text-warning">
                   <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
                   You do not have access to any namespace. Contact your administrator to get access to a namespace.
                 </div>
@@ -147,17 +147,17 @@
                   <div class="small">
                     <div class="col-sm-3 col-lg-2">&nbsp;</div>
                     <div class="col-sm-8" ng-messages="kubernetesApplicationCreationForm.application_name.$error">
-                      <p class="text-muted vertical-center" ng-message="required"
+                      <p class="text-warning vertical-center" ng-message="required"
                         ><pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field is required.</p
                       >
-                      <p class="text-muted vertical-center" ng-message="pattern">
+                      <p class="text-warning vertical-center" ng-message="pattern">
                         <pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                         This field must consist of lower case alphanumeric characters or '-', contain at most 63 characters, start with an alphabetic character, and end with an
                         alphanumeric character (e.g. 'my-name', or 'abc-123').
                       </p>
                     </div>
                     <div class="col-sm-8" ng-if="ctrl.state.alreadyExists">
-                      <p class="text-muted vertical-center">
+                      <p class="text-warning vertical-center">
                         <pr-icon class="vertical-center" icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
                         An application with the same name already exists inside the selected namespace.
                       </p>
@@ -299,15 +299,15 @@
                               "
                             >
                               <ng-messages for="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$error">
-                                <p ng-message="required" class="text-muted vertical-center"
+                                <p ng-message="required" class="text-warning vertical-center"
                                   ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true" class-="vertical-center"></pr-icon> Environment variable name is required.</p
                                 >
-                                <p ng-message="pattern" class="text-muted vertical-center"
+                                <p ng-message="pattern" class="text-warning vertical-center"
                                   ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field must consist of alphabetic characters, digits, '_', '-',
                                   or '.', and must not start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.</p
                                 >
                               </ng-messages>
-                              <p class="text-muted vertical-center" ng-if="ctrl.state.duplicates.environmentVariables.refs[$index] !== undefined"
+                              <p class="text-warning vertical-center" ng-if="ctrl.state.duplicates.environmentVariables.refs[$index] !== undefined"
                                 ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This environment variable is already defined.</p
                               >
                             </div>
@@ -430,7 +430,7 @@
                                 ctrl.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] !== undefined
                               "
                             >
-                              <div class="input-group input-group-sm text-muted" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                              <div class="input-group input-group-sm text-warning" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
                                 <div
                                   class="small"
                                   style="margin-top: 5px"
@@ -643,7 +643,7 @@
                       >
                         <div class="input-group col-sm-3 input-group-sm">
                           <div
-                            class="small text-muted"
+                            class="small text-warning"
                             style="margin-top: 5px"
                             ng-show="
                               kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid || ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined
@@ -660,7 +660,7 @@
 
                         <div class="input-group col-sm-offset-2 col-sm-3 input-group-sm">
                           <div
-                            class="small text-muted"
+                            class="small text-warning"
                             style="margin-top: 5px"
                             ng-show="
                               kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid || ctrl.state.exceeded.persistedFolders.refs[$index] !== undefined
@@ -855,7 +855,7 @@
                   </div>
                   <div class="form-group" ng-show="kubernetesApplicationCreationForm.memory_limit.$invalid">
                     <div class="col-sm-3 col-lg-2"></div>
-                    <div class="col-sm-8 small text-muted">
+                    <div class="col-sm-8 small text-warning">
                       <div ng-messages="kubernetesApplicationCreationForm.memory_limit.$error">
                         <p class="vertical-center"
                           ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Value must be between {{ ctrl.state.sliders.memory.min }} and
@@ -959,9 +959,9 @@
                   <!-- !deployment options -->
 
                   <!-- replica count -->
-                  <div class="form-group form-inline" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
-                    <div class="col-sm-12 vertical-center">
-                      <label class="control-label text-left !pt-0"> Instance count </label>
+                  <div class="form-group" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
+                    <label for="replica_count" class="col-sm-1 control-label text-left">Instance count</label>
+                    <div class="col-sm-2">
                       <input
                         type="number"
                         name="replica_count"
@@ -969,23 +969,24 @@
                         min="1"
                         max="9999"
                         placeholder="1"
-                        style="margin-left: 20px"
                         ng-model="ctrl.formValues.ReplicaCount"
                         ng-disabled="!ctrl.supportScalableReplicaDeployment()"
                         ng-change="ctrl.enforceReplicaCountMinimum()"
                         required
                         data-cy="k8sAppCreate-replicaCountInput"
                       />
-                    </div>
-                  </div>
-                  <div class="form-group" ng-if="kubernetesApplicationCreationForm['replica_count'].$invalid">
-                    <div class="col-sm-12 small text-muted">
-                      <ng-messages for="kubernetesApplicationCreationForm['replica_count'].$error">
-                        <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count is required.</p>
-                        <p class="vertical-center" ng-message="min"
-                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count must be greater than 0.</p
-                        >
-                      </ng-messages>
+                      <div class="help-block" ng-if="kubernetesApplicationCreationForm['replica_count'].$invalid">
+                        <div class="small text-warning whitespace-nowrap">
+                          <ng-messages for="kubernetesApplicationCreationForm['replica_count'].$error">
+                            <p class="vertical-center" ng-message="required"
+                              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count is required.</p
+                            >
+                            <p class="vertical-center" ng-message="min"
+                              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Instance count must be greater than 0.</p
+                            >
+                          </ng-messages>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!-- !replica count -->
@@ -1077,7 +1078,7 @@
                           />
                         </div>
                         <span ng-show="kubernetesApplicationCreationForm['auto_scaler_min'].$invalid">
-                          <div class="small text-muted" style="margin-top: 5px">
+                          <div class="small text-warning" style="margin-top: 5px">
                             <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_min'].$error">
                               <p ng-message="required" class="vertical-center">
                                 <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Minimum instances is required.
@@ -1104,7 +1105,7 @@
                           />
                         </div>
                         <span ng-show="kubernetesApplicationCreationForm['auto_scaler_max'].$invalid || ctrl.autoScalerOverflow()">
-                          <div class="small text-muted" style="margin-top: 5px">
+                          <div class="small text-warning" style="margin-top: 5px">
                             <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_max'].$error">
                               <p ng-message="required" class="vertical-center">
                                 <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Maximum instances is required.
@@ -1135,7 +1136,7 @@
                           />
                         </div>
                         <span ng-show="kubernetesApplicationCreationForm['auto_scaler_cpu'].$invalid">
-                          <div class="small text-muted" style="margin-top: 5px">
+                          <div class="small text-warning" style="margin-top: 5px">
                             <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_cpu'].$error">
                               <p ng-message="required" class="vertical-center">
                                 <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target CPU usage is required.
@@ -1225,7 +1226,7 @@
                         </div>
                         <div ng-repeat-end ng-show="ctrl.state.duplicates.placements.refs[$index] !== undefined">
                           <div class="col-sm-5 input-group">
-                            <div class="small text-muted" style="margin-top: 5px" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
+                            <div class="small text-warning" style="margin-top: 5px" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
                               <p class="vertical-center" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
                                 <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This label is already defined.
                               </p>

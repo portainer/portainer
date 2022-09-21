@@ -2,106 +2,76 @@ package git
 
 import (
 	"context"
-	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/portainer/portainer/api/archive"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/archive"
 	"github.com/stretchr/testify/assert"
 )
 
-var bareRepoDir string
-
-func TestMain(m *testing.M) {
-	if err := testMain(m); err != nil {
-		log.Fatal(err)
-	}
-}
-
-// testMain does extra setup/teardown before/after testing.
-// The function is separated from TestMain due to necessity to call os.Exit/log.Fatal in the latter.
-func testMain(m *testing.M) error {
-	dir, err := ioutil.TempDir("", "git-repo-")
-	if err != nil {
-		return errors.Wrap(err, "failed to create a temp dir")
-	}
-	defer os.RemoveAll(dir)
-
-	bareRepoDir = filepath.Join(dir, "test-clone.git")
+func setup(t *testing.T) string {
+	dir := t.TempDir()
+	bareRepoDir := filepath.Join(dir, "test-clone.git")
 
 	file, err := os.OpenFile("./testdata/test-clone-git-repo.tar.gz", os.O_RDONLY, 0755)
 	if err != nil {
-		return errors.Wrap(err, "failed to open an archive")
+		t.Fatal(errors.Wrap(err, "failed to open an archive"))
 	}
+
 	err = archive.ExtractTarGz(file, dir)
 	if err != nil {
-		return errors.Wrapf(err, "failed to extract file from the archive to a folder %s\n", dir)
+		t.Fatal(errors.Wrapf(err, "failed to extract file from the archive to a folder %s", dir))
 	}
 
-	m.Run()
-
-	return nil
+	return bareRepoDir
 }
 
 func Test_ClonePublicRepository_Shallow(t *testing.T) {
-	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
-	repositoryURL := bareRepoDir
+	service := Service{git: NewGitClient(true)} // no need for http client since the test access the repo via file system.
+	repositoryURL := setup(t)
 	referenceName := "refs/heads/main"
-	destination := "shallow"
 
-	dir, err := ioutil.TempDir("", destination)
-	if err != nil {
-		t.Fatalf("failed to create a temp dir")
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	t.Logf("Cloning into %s", dir)
-	err = service.CloneRepository(dir, repositoryURL, referenceName, "", "")
+	err := service.CloneRepository(dir, repositoryURL, referenceName, "", "")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, getCommitHistoryLength(t, err, dir), "cloned repo has incorrect depth")
 }
 
 func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
-	service := Service{git: gitClient{preserveGitDirectory: false}} // no need for http client since the test access the repo via file system.
-	repositoryURL := bareRepoDir
+	service := Service{git: NewGitClient(false)} // no need for http client since the test access the repo via file system.
+	repositoryURL := setup(t)
 	referenceName := "refs/heads/main"
-	destination := "shallow"
 
-	dir, err := ioutil.TempDir("", destination)
-	if err != nil {
-		t.Fatalf("failed to create a temp dir")
-	}
-
-	defer os.RemoveAll(dir)
-
+	dir := t.TempDir()
 	t.Logf("Cloning into %s", dir)
-	err = service.CloneRepository(dir, repositoryURL, referenceName, "", "")
+	err := service.CloneRepository(dir, repositoryURL, referenceName, "", "")
 	assert.NoError(t, err)
 	assert.NoDirExists(t, filepath.Join(dir, ".git"))
 }
 
 func Test_cloneRepository(t *testing.T) {
-	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
+	service := Service{git: NewGitClient(true)} // no need for http client since the test access the repo via file system.
 
-	repositoryURL := bareRepoDir
+	repositoryURL := setup(t)
 	referenceName := "refs/heads/main"
-	destination := "shallow"
 
-	dir, err := ioutil.TempDir("", destination)
-	if err != nil {
-		t.Fatalf("failed to create a temp dir")
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	t.Logf("Cloning into %s", dir)
 
-	err = service.cloneRepository(dir, cloneOptions{
-		repositoryUrl: repositoryURL,
-		referenceName: referenceName,
-		depth:         10,
+	err := service.cloneRepository(dir, cloneOption{
+		fetchOption: fetchOption{
+			baseOption: baseOption{
+				repositoryUrl: repositoryURL,
+			},
+			referenceName: referenceName,
+		},
+		depth: 10,
 	})
 
 	assert.NoError(t, err)
@@ -109,9 +79,9 @@ func Test_cloneRepository(t *testing.T) {
 }
 
 func Test_latestCommitID(t *testing.T) {
-	service := Service{git: gitClient{preserveGitDirectory: true}} // no need for http client since the test access the repo via file system.
+	service := Service{git: NewGitClient(true)} // no need for http client since the test access the repo via file system.
 
-	repositoryURL := bareRepoDir
+	repositoryURL := setup(t)
 	referenceName := "refs/heads/main"
 
 	id, err := service.LatestCommitID(repositoryURL, referenceName, "", "")
@@ -140,53 +110,196 @@ func getCommitHistoryLength(t *testing.T, err error, dir string) int {
 	return count
 }
 
-type testDownloader struct {
-	called bool
-}
+func Test_listRefsPrivateRepository(t *testing.T) {
+	ensureIntegrationTest(t)
 
-func (t *testDownloader) download(_ context.Context, _ string, _ cloneOptions) error {
-	t.called = true
-	return nil
-}
+	accessToken := getRequiredValue(t, "GITHUB_PAT")
+	username := getRequiredValue(t, "GITHUB_USERNAME")
 
-func (t *testDownloader) latestCommitID(_ context.Context, _ fetchOptions) (string, error) {
-	return "", nil
-}
+	client := NewGitClient(false)
 
-func Test_cloneRepository_azure(t *testing.T) {
+	type expectResult struct {
+		err       error
+		refsCount int
+	}
+
 	tests := []struct {
 		name   string
-		url    string
-		called bool
+		args   baseOption
+		expect expectResult
 	}{
 		{
-			name:   "Azure HTTP URL",
-			url:    "https://Organisation@dev.azure.com/Organisation/Project/_git/Repository",
-			called: true,
+			name: "list refs of a real private repository",
+			args: baseOption{
+				repositoryUrl: privateGitRepoURL,
+				username:      username,
+				password:      accessToken,
+			},
+			expect: expectResult{
+				err:       nil,
+				refsCount: 2,
+			},
 		},
 		{
-			name:   "Azure SSH URL",
-			url:    "git@ssh.dev.azure.com:v3/Organisation/Project/Repository",
-			called: true,
+			name: "list refs of a real private repository with incorrect credential",
+			args: baseOption{
+				repositoryUrl: privateGitRepoURL,
+				username:      "test-username",
+				password:      "test-token",
+			},
+			expect: expectResult{
+				err: ErrAuthenticationFailure,
+			},
 		},
 		{
-			name:   "Something else",
-			url:    "https://example.com",
-			called: false,
+			name: "list refs of a fake repository without providing credential",
+			args: baseOption{
+				repositoryUrl: privateGitRepoURL + "fake",
+				username:      "",
+				password:      "",
+			},
+			expect: expectResult{
+				err: ErrAuthenticationFailure,
+			},
+		},
+		{
+			name: "list refs of a fake repository",
+			args: baseOption{
+				repositoryUrl: privateGitRepoURL + "fake",
+				username:      username,
+				password:      accessToken,
+			},
+			expect: expectResult{
+				err: ErrIncorrectRepositoryURL,
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			azure := &testDownloader{}
-			git := &testDownloader{}
+			refs, err := client.listRefs(context.TODO(), tt.args)
+			if tt.expect.err == nil {
+				assert.NoError(t, err)
+				if tt.expect.refsCount > 0 {
+					assert.Greater(t, len(refs), 0)
+				}
+			} else {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expect.err, err)
+			}
+		})
+	}
+}
 
-			s := &Service{azure: azure, git: git}
-			s.cloneRepository("", cloneOptions{repositoryUrl: tt.url, depth: 1})
+func Test_listFilesPrivateRepository(t *testing.T) {
+	ensureIntegrationTest(t)
 
-			// if azure API is called, git isn't and vice versa
-			assert.Equal(t, tt.called, azure.called)
-			assert.Equal(t, tt.called, !git.called)
+	client := NewGitClient(false)
+
+	type expectResult struct {
+		shouldFail   bool
+		err          error
+		matchedCount int
+	}
+
+	accessToken := getRequiredValue(t, "GITHUB_PAT")
+	username := getRequiredValue(t, "GITHUB_USERNAME")
+
+	tests := []struct {
+		name   string
+		args   fetchOption
+		expect expectResult
+	}{
+		{
+			name: "list tree with real repository and head ref but incorrect credential",
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL,
+					username:      "test-username",
+					password:      "test-token",
+				},
+				referenceName: "refs/heads/main",
+			},
+			expect: expectResult{
+				shouldFail: true,
+				err:        ErrAuthenticationFailure,
+			},
+		},
+		{
+			name: "list tree with real repository and head ref but no credential",
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL + "fake",
+					username:      "",
+					password:      "",
+				},
+				referenceName: "refs/heads/main",
+			},
+			expect: expectResult{
+				shouldFail: true,
+				err:        ErrAuthenticationFailure,
+			},
+		},
+		{
+			name: "list tree with real repository and head ref",
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL,
+					username:      username,
+					password:      accessToken,
+				},
+				referenceName: "refs/heads/main",
+			},
+			expect: expectResult{
+				err:          nil,
+				matchedCount: 15,
+			},
+		},
+		{
+			name: "list tree with real repository but non-existing ref",
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL,
+					username:      username,
+					password:      accessToken,
+				},
+				referenceName: "refs/fake/feature",
+			},
+			expect: expectResult{
+				shouldFail: true,
+			},
+		},
+		{
+			name: "list tree with fake repository ",
+			args: fetchOption{
+				baseOption: baseOption{
+					repositoryUrl: privateGitRepoURL + "fake",
+					username:      username,
+					password:      accessToken,
+				},
+				referenceName: "refs/fake/feature",
+			},
+			expect: expectResult{
+				shouldFail: true,
+				err:        ErrIncorrectRepositoryURL,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			paths, err := client.listFiles(context.TODO(), tt.args)
+			if tt.expect.shouldFail {
+				assert.Error(t, err)
+				if tt.expect.err != nil {
+					assert.Equal(t, tt.expect.err, err)
+				}
+			} else {
+				assert.NoError(t, err)
+				if tt.expect.matchedCount > 0 {
+					assert.Greater(t, len(paths), 0)
+				}
+			}
 		})
 	}
 }

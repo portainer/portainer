@@ -40,7 +40,7 @@ export const Checkbox = forwardRef<HTMLInputElement, Props>(
     }, [resolvedRef, indeterminate]);
 
     return (
-      <div className="md-checkbox" title={title || label}>
+      <div className="md-checkbox flex" title={title || label}>
         <input
           id={id}
           type="checkbox"

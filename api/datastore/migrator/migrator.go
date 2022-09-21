@@ -18,11 +18,8 @@ import (
 	"github.com/portainer/portainer/api/dataservices/teammembership"
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
-	plog "github.com/portainer/portainer/api/datastore/log"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
-
-var migrateLog = plog.NewScopedLog("database, migrate")
 
 type (
 	// Migrator defines a service to migrate data after a Portainer version update.

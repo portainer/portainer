@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -93,19 +94,25 @@ type createKubernetesStackResponse struct {
 	Output string `json:"Output"`
 }
 
+// convert string to valid kubernetes label by replacing invalid characters with periods
+func sanitizeLabel(value string) string {
+	re := regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
+	return re.ReplaceAllString(value, ".")
+}
+
 func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload kubernetesStringDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	user, err := handler.DataStore.User().User(userID)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
+		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
 	isUnique, err := handler.checkUniqueStackNameInKubernetes(endpoint, payload.StackName, 0, payload.Namespace)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 	if !isUnique {
 		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), Err: errStackAlreadyExists}
@@ -121,7 +128,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		Namespace:       payload.Namespace,
 		Status:          portainer.StackStatusActive,
 		CreationDate:    time.Now().Unix(),
-		CreatedBy:       user.Username,
+		CreatedBy:       sanitizeLabel(user.Username),
 		IsComposeFormat: payload.ComposeFormat,
 	}
 
@@ -133,7 +140,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 			fileType = "Compose"
 		}
 		errMsg := fmt.Sprintf("Unable to persist Kubernetes %s file on disk", fileType)
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: errMsg, Err: err}
+		return httperror.InternalServerError(errMsg, err)
 	}
 	stack.ProjectPath = projectPath
 
@@ -143,17 +150,17 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
 		StackID:   stackID,
 		StackName: stack.Name,
-		Owner:     stack.CreatedBy,
+		Owner:     sanitizeLabel(stack.CreatedBy),
 		Kind:      "content",
 	})
 
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack", Err: err}
+		return httperror.InternalServerError("Unable to deploy Kubernetes stack", err)
 	}
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the Kubernetes stack inside the database", Err: err}
+		return httperror.InternalServerError("Unable to persist the Kubernetes stack inside the database", err)
 	}
 
 	resp := &createKubernetesStackResponse{
@@ -167,16 +174,16 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload kubernetesGitDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	user, err := handler.DataStore.User().User(userID)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
+		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
 	isUnique, err := handler.checkUniqueStackNameInKubernetes(endpoint, payload.StackName, 0, payload.Namespace)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 	if !isUnique {
 		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), Err: errStackAlreadyExists}
@@ -186,7 +193,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" {
 		isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook)
 		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for webhook ID collision", Err: err}
+			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
 		}
 		if !isUnique {
 			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), Err: errWebhookIDAlreadyExists}
@@ -229,7 +236,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 
 	commitID, err := handler.latestCommitID(payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryAuthentication, payload.RepositoryUsername, payload.RepositoryPassword)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to fetch git repository id", Err: err}
+		return httperror.InternalServerError("Unable to fetch git repository id", err)
 	}
 	stack.GitConfig.ConfigHash = commitID
 
@@ -242,18 +249,18 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 
 	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to clone git repository", Err: err}
+		return httperror.InternalServerError("Failed to clone git repository", err)
 	}
 
 	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
 		StackID:   stackID,
 		StackName: stack.Name,
-		Owner:     stack.CreatedBy,
+		Owner:     sanitizeLabel(stack.CreatedBy),
 		Kind:      "git",
 	})
 
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack", Err: err}
+		return httperror.InternalServerError("Unable to deploy Kubernetes stack", err)
 	}
 
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
@@ -267,7 +274,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
+		return httperror.InternalServerError("Unable to persist the stack inside the database", err)
 	}
 
 	resp := &createKubernetesStackResponse{
@@ -281,16 +288,16 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload kubernetesManifestURLDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	user, err := handler.DataStore.User().User(userID)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
+		return httperror.InternalServerError("Unable to load user information from the database", err)
 	}
 	isUnique, err := handler.checkUniqueStackNameInKubernetes(endpoint, payload.StackName, 0, payload.Namespace)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 	if !isUnique {
 		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), Err: errStackAlreadyExists}
@@ -313,13 +320,13 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 	var manifestContent []byte
 	manifestContent, err = client.Get(payload.ManifestURL, 30)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve manifest from URL", Err: err}
+		return httperror.InternalServerError("Unable to retrieve manifest from URL", err)
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, manifestContent)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Kubernetes manifest file on disk", Err: err}
+		return httperror.InternalServerError("Unable to persist Kubernetes manifest file on disk", err)
 	}
 	stack.ProjectPath = projectPath
 
@@ -333,12 +340,12 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 		Kind:      "url",
 	})
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack", Err: err}
+		return httperror.InternalServerError("Unable to deploy Kubernetes stack", err)
 	}
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the Kubernetes stack inside the database", Err: err}
+		return httperror.InternalServerError("Unable to persist the Kubernetes stack inside the database", err)
 	}
 
 	doCleanUp = false

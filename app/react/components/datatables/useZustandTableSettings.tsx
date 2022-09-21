@@ -7,6 +7,7 @@ interface TableSettingsContextInterface<T> {
 const TableSettingsContext = createContext<TableSettingsContextInterface<
   Record<string, unknown>
 > | null>(null);
+TableSettingsContext.displayName = 'TableSettingsContext';
 
 export function useTableSettings<T>() {
   const Context = getContextType<T>();

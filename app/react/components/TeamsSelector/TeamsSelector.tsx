@@ -1,11 +1,11 @@
 import { Team, TeamId } from '@/react/portainer/users/teams/types';
 
-import { Select } from '@@/form-components/ReactSelect';
+import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
 interface Props {
   name?: string;
-  value: TeamId[];
-  onChange(value: TeamId[]): void;
+  value: TeamId[] | readonly TeamId[];
+  onChange(value: readonly TeamId[]): void;
   teams: Team[];
   dataCy?: string;
   inputId?: string;
@@ -21,18 +21,15 @@ export function TeamsSelector({
   inputId,
   placeholder,
 }: Props) {
+  const options = teams.map((team) => ({ label: team.Name, value: team.Id }));
+
   return (
-    <Select
+    <PortainerSelect<number>
       name={name}
       isMulti
-      getOptionLabel={(team) => team.Name}
-      getOptionValue={(team) => String(team.Id)}
-      options={teams}
-      value={teams.filter((team) => value.includes(team.Id))}
-      closeMenuOnSelect={false}
-      onChange={(selectedTeams) =>
-        onChange(selectedTeams.map((team) => team.Id))
-      }
+      options={options}
+      value={value}
+      onChange={(value) => onChange(value)}
       data-cy={dataCy}
       inputId={inputId}
       placeholder={placeholder}

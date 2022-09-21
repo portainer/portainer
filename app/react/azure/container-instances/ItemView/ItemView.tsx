@@ -2,9 +2,9 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { useQueryClient } from 'react-query';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
-import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
-import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
-import { ResourceControlType } from '@/portainer/access-control/types';
+import { AccessControlPanel } from '@/react/portainer/access-control/AccessControlPanel/AccessControlPanel';
+import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
+import { ResourceControlType } from '@/react/portainer/access-control/types';
 import {
   ContainerGroup,
   ResourceGroup,
@@ -186,6 +186,7 @@ export function ItemView() {
         resourceId={id}
         resourceControl={container.resourceControl}
         resourceType={ResourceControlType.ContainerGroup}
+        environmentId={environmentId}
       />
     </>
   );

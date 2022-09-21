@@ -31,7 +31,7 @@
                 />
                 <span class="help-block">
                   <div class="form-group" ng-show="resourcePoolCreationForm.pool_name.$invalid || $ctrl.state.isAlreadyExist || $ctrl.state.hasPrefixKube">
-                    <div class="col-sm-12 small text-muted">
+                    <div class="col-sm-12 small text-warning">
                       <div ng-messages="resourcePoolCreationForm.pool_name.$error">
                         <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>This field is required.</p>
                         <p class="vertical-center" ng-message="pattern"
@@ -80,7 +80,7 @@
               <div class="col-sm-12 form-section-title"> Resource limits </div>
               <div>
                 <div class="form-group">
-                  <span class="col-sm-12 small text-muted" ng-switch on="$ctrl.formValues.HasQuota && !$ctrl.isQuotaValid()">
+                  <span class="col-sm-12 small text-warning" ng-switch on="$ctrl.formValues.HasQuota && !$ctrl.isQuotaValid()">
                     <p class="vertical-center mb-0" ng-switch-when="true"
                       ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> At least a single limit must be set for the quota to be
                       valid.
@@ -121,7 +121,7 @@
                   <span class="col-sm-3 col-lg-2"></span>
                   <span class="help-block col-sm-9 col-lg-10">
                     <div ng-show="resourcePoolCreationForm.memory_limit.$invalid">
-                      <div class="small text-muted">
+                      <div class="small text-warning">
                         <div ng-messages="resourcePoolCreationForm.pool_name.$error">
                           <p class="vertical-center"
                             ><pr-icon class="vertical-center" icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon> Value must be between
@@ -276,7 +276,7 @@
                         </div>
                       </div>
                       <div
-                        class="small text-muted pt-1"
+                        class="small text-warning pt-1"
                         ng-show="
                           resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$invalid ||
                           $ctrl.state.duplicates.ingressHosts.refs[ic.IngressClass.Name][$index] !== undefined
@@ -403,7 +403,7 @@
             </div>
 
             <div class="form-group">
-              <label class="col-sm-3 col-lg-2 control-label text-left !pt-0"> Select registries </label>
+              <label class="col-sm-3 col-lg-2 control-label text-left !pt-0" for="registries-selector"> Select registries </label>
               <div class="col-sm-8 col-lg-9">
                 <span class="small text-muted" ng-if="!$ctrl.registries.length && $ctrl.state.isAdmin">
                   No registries available. Head over to the <a ui-sref="portainer.registries">registry view</a> to define a container registry.
@@ -411,20 +411,13 @@
                 <span class="small text-muted" ng-if="!$ctrl.registries.length && !$ctrl.state.isAdmin">
                   No registries available. Contact your administrator to create a container registry.
                 </span>
-                <span
-                  isteven-multi-select
-                  ng-if="$ctrl.registries.length"
-                  input-model="$ctrl.registries"
-                  output-model="$ctrl.formValues.Registries"
-                  button-label="Name"
-                  item-label="Name"
-                  tick-property="Checked"
-                  helper-elements="filter"
-                  search-property="Name"
-                  translation="{nothingSelected: 'Select one or more registries', search: 'Search...'}"
-                  data-cy="namespaceCreate-registrySelect"
+                <create-namespace-registries-selector
+                  input-id="'registries-selector'"
+                  value="$ctrl.formValues.Registries"
+                  on-change="($ctrl.onRegistriesChange)"
+                  options="$ctrl.registries"
                 >
-                </span>
+                </create-namespace-registries-selector>
               </div>
             </div>
             <!-- #endregion -->

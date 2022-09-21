@@ -118,15 +118,15 @@
                       ng-if="kubernetesClusterSetupForm['ingress_class_name_' + $index].$invalid || ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined"
                     >
                       <div ng-messages="kubernetesClusterSetupForm['ingress_class_name_'+$index].$error">
-                        <p ng-message="required" class="vertical-center text-muted"
+                        <p ng-message="required" class="vertical-center text-warning"
                           ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress class name is required.</p
                         >
-                        <p ng-message="pattern" class="vertical-center text-muted"
+                        <p ng-message="pattern" class="vertical-center text-warning"
                           ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field must consist of lower case alphanumeric characters or '-', start
                           with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p
                         >
                       </div>
-                      <p ng-if="ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined" class="vertical-center text-muted">
+                      <p ng-if="ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined" class="vertical-center text-warning">
                         <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This ingress class is already defined.
                       </p>
                     </div>
@@ -134,7 +134,7 @@
                   <div class="col-sm-3 input-group">
                     <div class="small" style="margin-top: 5px" ng-if="kubernetesClusterSetupForm['ingress_class_type_' + $index].$invalid">
                       <div ng-messages="kubernetesClusterSetupForm['ingress_class_type_'+$index].$error">
-                        <p ng-message="required" class="vertical-center text-muted"
+                        <p ng-message="required" class="vertical-center text-warning"
                           ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress class type is required.</p
                         >
                       </div>
@@ -166,7 +166,7 @@
                   tooltip="'Specify a timeframe during which automatic updates can occur in this environment.'"
                   on-change="(ctrl.onToggleAutoUpdate)"
                   label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
-                  switch-class="'col-sm-8'"
+                  switch-class="'col-sm-8 text-muted'"
                 >
                 </por-switch-field>
               </div>
@@ -299,19 +299,12 @@
                         </div>
                       </td>
                       <td>
-                        <span
-                          isteven-multi-select
-                          input-model="class.availableAccessModes"
-                          output-model="class.AccessModes"
-                          button-label="Name"
-                          item-label="Description"
-                          tick-property="selected"
-                          directive-id="{{ class.Name }}"
-                          helper-elements=""
-                          translation="{nothingSelected: 'Not configured'}"
-                          data-cy="kubeSetup-storageAccessSelect{{ class.Name }}"
-                        >
-                        </span>
+                        <storage-access-mode-selector
+                          options="ctrl.availableAccessModes"
+                          value="class.AccessModes"
+                          on-change="(ctrl.onChangeStorageClassAccessMode)"
+                          storage-class-name="class.Name"
+                        ></storage-access-mode-selector>
                       </td>
                       <td>
                         <div style="margin: 5px">

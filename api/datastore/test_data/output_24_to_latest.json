@@ -52,7 +52,9 @@
       "IsEdgeDevice": false,
       "Kubernetes": {
         "Configuration": {
+          "EnableResourceOverCommit": false,
           "IngressClasses": null,
+          "ResourceOverCommitPercentage": 0,
           "RestrictDefaultNamespace": false,
           "StorageClasses": null,
           "UseLoadBalancer": false,

@@ -43,6 +43,7 @@ export class KubernetesIngressConverter {
     if (idx >= 0) {
       res.Hosts.splice(idx, 1, '');
     }
+    res.TLS = data.spec.tls;
     return res;
   }
 

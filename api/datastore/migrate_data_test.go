@@ -5,15 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/boltdb"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/rs/zerolog/log"
 )
 
 // testVersion is a helper which tests current store version against wanted version
@@ -53,7 +54,7 @@ func TestMigrateData(t *testing.T) {
 	}
 
 	t.Run("MigrateData for New Store & Re-Open Check", func(t *testing.T) {
-		newStore, store, teardown := MustNewTestStore(false, true)
+		newStore, store, teardown := MustNewTestStore(t, false, true)
 		defer teardown()
 
 		if !newStore {
@@ -80,7 +81,7 @@ func TestMigrateData(t *testing.T) {
 		{version: 21, expectedVersion: portainer.DBVersion},
 	}
 	for _, tc := range tests {
-		_, store, teardown := MustNewTestStore(true, true)
+		_, store, teardown := MustNewTestStore(t, true, true)
 		defer teardown()
 
 		// Setup data
@@ -105,7 +106,7 @@ func TestMigrateData(t *testing.T) {
 	}
 
 	t.Run("Error in MigrateData should restore backup before MigrateData", func(t *testing.T) {
-		_, store, teardown := MustNewTestStore(false, true)
+		_, store, teardown := MustNewTestStore(t, false, true)
 		defer teardown()
 
 		version := 17
@@ -117,7 +118,7 @@ func TestMigrateData(t *testing.T) {
 	})
 
 	t.Run("MigrateData should create backup file upon update", func(t *testing.T) {
-		_, store, teardown := MustNewTestStore(false, true)
+		_, store, teardown := MustNewTestStore(t, false, true)
 		defer teardown()
 		store.VersionService.StoreDBVersion(0)
 
@@ -131,7 +132,7 @@ func TestMigrateData(t *testing.T) {
 	})
 
 	t.Run("MigrateData should fail to create backup if database file is set to updating", func(t *testing.T) {
-		_, store, teardown := MustNewTestStore(false, true)
+		_, store, teardown := MustNewTestStore(t, false, true)
 		defer teardown()
 
 		store.VersionService.StoreIsUpdating(true)
@@ -146,7 +147,7 @@ func TestMigrateData(t *testing.T) {
 	})
 
 	t.Run("MigrateData should not create backup on startup if portainer version matches db", func(t *testing.T) {
-		_, store, teardown := MustNewTestStore(false, true)
+		_, store, teardown := MustNewTestStore(t, false, true)
 		defer teardown()
 
 		store.MigrateData()
@@ -157,48 +158,48 @@ func TestMigrateData(t *testing.T) {
 			t.Errorf("Backup file should not exist for dirty database; file=%s", options.BackupPath)
 		}
 	})
-
 }
 
 func Test_getBackupRestoreOptions(t *testing.T) {
-	_, store, teardown := MustNewTestStore(false, true)
+	_, store, teardown := MustNewTestStore(t, false, true)
 	defer teardown()
 
 	options := getBackupRestoreOptions(store.commonBackupDir())
 
 	wantDir := store.commonBackupDir()
 	if !strings.HasSuffix(options.BackupDir, wantDir) {
-		log.Fatalf("incorrect backup dir; got=%s, want=%s", options.BackupDir, wantDir)
+		log.Fatal().Str("got", options.BackupDir).Str("want", wantDir).Msg("incorrect backup dir")
 	}
 
 	wantFilename := "portainer.db.bak"
 	if options.BackupFileName != wantFilename {
-		log.Fatalf("incorrect backup file; got=%s, want=%s", options.BackupFileName, wantFilename)
+		log.Fatal().Str("got", options.BackupFileName).Str("want", wantFilename).Msg("incorrect backup file")
 	}
 }
 
 func TestRollback(t *testing.T) {
 	t.Run("Rollback should restore upgrade after backup", func(t *testing.T) {
 		version := 21
-		_, store, teardown := MustNewTestStore(false, true)
+		_, store, teardown := MustNewTestStore(t, false, true)
 		defer teardown()
 		store.VersionService.StoreDBVersion(version)
 
 		_, err := store.backupWithOptions(getBackupRestoreOptions(store.commonBackupDir()))
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal().Err(err).Msg("")
 		}
 
 		// Change the current edition
 		err = store.VersionService.StoreDBVersion(version + 10)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal().Err(err).Msg("")
 		}
 
 		err = store.Rollback(true)
 		if err != nil {
 			t.Logf("Rollback failed: %s", err)
 			t.Fail()
+
 			return
 		}
 
@@ -226,7 +227,7 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string) error {
 	}
 
 	// Parse source json to db.
-	_, store, teardown := MustNewTestStore(true, false)
+	_, store, teardown := MustNewTestStore(t, true, false)
 	defer teardown()
 	err = importJSON(t, bytes.NewReader(srcJSON), store)
 	if err != nil {
@@ -274,7 +275,7 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string) error {
 
 	// Compare the result we got with the one we wanted.
 	if diff := cmp.Diff(wantJSON, gotJSON); diff != "" {
-		gotPath := filepath.Join(os.TempDir(), "portainer-migrator-test-fail.json")
+		gotPath := filepath.Join(t.TempDir(), "portainer-migrator-test-fail.json")
 		os.WriteFile(
 			gotPath,
 			gotJSON,

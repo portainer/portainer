@@ -3,6 +3,7 @@ import { Box, Edit, Layers, Lock, Server } from 'react-feather';
 import { EnvironmentId } from '@/portainer/environments/types';
 import { Authorized } from '@/portainer/hooks/useUser';
 import Helm from '@/assets/ico/vendor/helm.svg?c';
+import Route from '@/assets/ico/route.svg?c';
 
 import { DashboardLink } from '../items/DashboardLink';
 import { SidebarItem } from '../SidebarItem';
@@ -70,6 +71,14 @@ export function KubernetesSidebar({ environmentId }: Props) {
       />
 
       <SidebarItem
+        to="kubernetes.ingresses"
+        params={{ endpointId: environmentId }}
+        label="Ingresses"
+        data-cy="k8sSidebar-ingresses"
+        icon={Route}
+      />
+
+      <SidebarItem
         to="kubernetes.configurations"
         params={{ endpointId: environmentId }}
         icon={Lock}
@@ -97,7 +106,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         >
           <SidebarItem
             to="kubernetes.cluster.setup"
-            params={{ id: environmentId }}
+            params={{ endpointId: environmentId }}
             label="Setup"
             data-cy="k8sSidebar-setup"
           />
@@ -110,7 +119,7 @@ export function KubernetesSidebar({ environmentId }: Props) {
         >
           <SidebarItem
             to="kubernetes.cluster.securityConstraint"
-            params={{ id: environmentId }}
+            params={{ endpointId: environmentId }}
             label="Security constraints"
             data-cy="k8sSidebar-securityConstraints"
           />

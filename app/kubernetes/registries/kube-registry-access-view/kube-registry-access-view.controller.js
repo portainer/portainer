@@ -2,8 +2,9 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 export default class KubernetesRegistryAccessController {
   /* @ngInject */
-  constructor($async, $state, ModalService, EndpointService, Notifications, RegistryService, KubernetesResourcePoolService) {
+  constructor($async, $scope, $state, ModalService, EndpointService, Notifications, RegistryService, KubernetesResourcePoolService) {
     this.$async = $async;
+    this.$scope = $scope;
     this.$state = $state;
     this.ModalService = ModalService;
     this.Notifications = Notifications;
@@ -20,10 +21,11 @@ export default class KubernetesRegistryAccessController {
     this.savedResourcePools = [];
 
     this.handleRemove = this.handleRemove.bind(this);
+    this.onChangeResourcePools = this.onChangeResourcePools.bind(this);
   }
 
   async submit() {
-    return this.updateNamespaces([...this.savedResourcePools.map(({ value }) => value), ...this.selectedResourcePools.map((pool) => pool.name)]);
+    return this.updateNamespaces([...this.savedResourcePools.map(({ value }) => value), ...this.selectedResourcePools]);
   }
 
   handleRemove(namespaces) {
@@ -49,6 +51,12 @@ export default class KubernetesRegistryAccessController {
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed saving registry access');
       }
+    });
+  }
+
+  onChangeResourcePools(resourcePools) {
+    return this.$scope.$evalAsync(() => {
+      this.selectedResourcePools = resourcePools;
     });
   }
 

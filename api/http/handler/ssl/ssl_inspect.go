@@ -23,7 +23,7 @@ import (
 func (handler *Handler) sslInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.SSLService.GetSSLSettings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Failed to fetch certificate info", err}
+		return httperror.InternalServerError("Failed to fetch certificate info", err)
 	}
 
 	return response.JSON(w, settings)
