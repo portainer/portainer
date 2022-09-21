@@ -24,16 +24,16 @@ func (handler *Handler) createUpdateEdgeStack(scheduleID updateschedule.UpdateSc
 
 	stack, err := stacks.CreateEdgeStack(handler.dataStore, buildEdgeStackName(scheduleID, name), portainer.EdgeStackDeploymentCompose, groupIDs, func(stackFolder string, relatedEndpointIds []portainer.EndpointID) (composePath string, manifestPath string, projectPath string, err error) {
 		templateName := path.Join(handler.assetsPath, mustacheUpdateEdgeStackTemplateFile)
-		skipPullAgentImage := false
+		skipPullAgentImage := ""
 		env := os.Getenv("EDGE_UPDATE_SKIP_PULL_AGENT_IMAGE")
 		if env != "" {
-			skipPullAgentImage = true
+			skipPullAgentImage = "1"
 		}
 
 		composeFile, err := mustache.RenderFile(templateName, map[string]string{
 			"image_name":            agentImage,
 			"schedule_id":           strconv.Itoa(int(scheduleID)),
-			"skip_pull_agent_image": strconv.FormatBool(skipPullAgentImage),
+			"skip_pull_agent_image": skipPullAgentImage,
 		})
 
 		if err != nil {
