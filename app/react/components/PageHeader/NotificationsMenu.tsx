@@ -1,0 +1,208 @@
+import clsx from 'clsx';
+import {
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuLink as ReachMenuLink,
+} from '@reach/menu-button';
+import { UISrefProps, useSref } from '@uirouter/react';
+import Moment from 'moment';
+import { useEffect, useState } from 'react';
+
+import { AutomationTestingProps } from '@/types';
+import { useUser } from '@/portainer/hooks/useUser';
+import { ToastNotification } from '@/react/portainer/notifications/types';
+
+import { Icon } from '@@/Icon';
+import { Link } from '@@/Link';
+import { Button } from '@@/buttons';
+
+import { notificationsStore } from '../../portainer/notifications/notifications-store';
+
+import styles from './HeaderTitle.module.css';
+
+export function NotificationsMenu() {
+  const { user } = useUser();
+  const [badge, setBadge] = useState(false);
+
+  const [userNotifications, setUserNotifications] = useState<
+    ToastNotification[]
+  >(notificationsStore.getState().userNotifications[user.Id] || []);
+
+  useEffect(
+    () =>
+      notificationsStore.subscribe((state) =>
+        setUserNotifications(state.userNotifications[user.Id])
+      ),
+    [user.Id]
+  );
+
+  useEffect(() => {
+    if (userNotifications.length > 0) {
+      setBadge(true);
+    } else {
+      setBadge(false);
+    }
+  }, [userNotifications]);
+
+  const { removeNotification } = notificationsStore.getState();
+  const { clearUserNotifications } = notificationsStore.getState();
+
+  return (
+    <Menu>
+      <MenuButton
+        className={clsx(
+          'ml-auto flex items-center gap-1 self-start',
+          styles.menuButton
+        )}
+        data-cy="notificationsMenu-button"
+        aria-label="Notifications menu toggle"
+      >
+        <div
+          className={clsx(
+            styles.menuIcon,
+            'icon-badge text-lg !p-2 mr-1',
+            'text-gray-8',
+            'th-dark:text-gray-warm-7'
+          )}
+        >
+          <Icon className={clsx(styles.icon)} icon="bell" feather />
+          <span className={badge ? clsx(styles.badge) : ''} />
+        </div>
+      </MenuButton>
+
+      <MenuList
+        className={styles.menuList}
+        aria-label="Notifications Menu"
+        data-cy="notificationsMenu"
+      >
+        <div>
+          <div className={clsx(styles.notificationContainer)}>
+            <div>
+              <h4>Notifications</h4>
+            </div>
+            <div className={clsx(styles.itemLast)}>
+              {userNotifications.length > 0 && (
+                <Button
+                  color="clear"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onClear();
+                  }}
+                  data-cy="notification-deleteButton"
+                >
+                  Clear all
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+        {userNotifications.length > 0 ? (
+          <>
+            {userNotifications.map((notification) => (
+              <MenuLink
+                to="portainer.notifications"
+                params={{ notificationFrom: notification.timeStamp }}
+                notification={notification}
+                key={notification.id}
+                onDelete={() => onDelete(notification.id)}
+              />
+            ))}
+
+            <div className={clsx(styles.notificationLink)}>
+              <Link to="portainer.notifications">View all notifications</Link>
+            </div>
+          </>
+        ) : (
+          <div>
+            <Icon icon="bell" feather size="xl" />
+            <div>
+              <p>You have no notifications yet.</p>
+            </div>
+          </div>
+        )}
+      </MenuList>
+    </Menu>
+  );
+
+  function onDelete(notificationId: string) {
+    removeNotification(user.Id, notificationId);
+  }
+
+  function onClear() {
+    clearUserNotifications(user.Id);
+  }
+}
+
+interface MenuLinkProps extends AutomationTestingProps, UISrefProps {
+  notification: ToastNotification;
+  onDelete: () => void;
+}
+
+function MenuLink({
+  to,
+  params,
+  options,
+  notification,
+  onDelete,
+}: MenuLinkProps) {
+  const anchorProps = useSref(to, params, options);
+
+  return (
+    <ReachMenuLink href={anchorProps.href} className={styles.menuLink}>
+      <div className={clsx(styles.container)}>
+        <div className={clsx(styles.notificationIcon)}>
+          {notification.type === 'success' ? (
+            <Icon icon="check-circle" feather size="lg" mode="success" />
+          ) : (
+            <Icon icon="alert-circle" feather size="lg" mode="danger" />
+          )}
+        </div>
+        <div className={clsx(styles.notificationBody)}>
+          <p className={clsx(styles.notificationTitle)}>{notification.title}</p>
+          <p>{notification.details}</p>
+          <p className="small text-muted">
+            {formatTime(notification.timeStamp)}
+          </p>
+        </div>
+        <div className={clsx(styles.deleteButton)}>
+          <Button
+            color="clear"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onDelete();
+            }}
+            data-cy="notification-deleteButton"
+            size="large"
+          >
+            <Icon icon="trash-2" feather />
+          </Button>
+        </div>
+      </div>
+    </ReachMenuLink>
+  );
+}
+
+function formatTime(timeCreated: Date) {
+  const timeStamp = new Date(timeCreated).valueOf().toString();
+
+  const diff = Math.floor((Date.now() - parseInt(timeStamp, 10)) / 1000);
+
+  if (diff <= 86400) {
+    let interval = Math.floor(diff / 3600);
+    if (interval >= 1) {
+      return `${interval} hours ago`;
+    }
+    interval = Math.floor(diff / 60);
+    if (interval >= 1) {
+      return `${interval} min ago`;
+    }
+  }
+  if (diff > 86400) {
+    const formatDate = Moment(timeCreated).format('YYYY-MM-DD h:mm:ss');
+    return formatDate;
+  }
+  return 'Just now';
+}

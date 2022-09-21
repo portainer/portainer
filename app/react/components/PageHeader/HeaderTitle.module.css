@@ -2,20 +2,21 @@
   border: 0px;
   font-size: 17px;
   background: none;
-  margin-right: 15px;
+  margin-right: 8px;
   display: flex;
   align-items: center;
 }
 
 .menu-icon {
   background: var(--user-menu-icon-color);
+  position: relative;
 }
 
 .menu-list {
   background: var(--bg-dropdown-menu-color);
   border-radius: 8px;
   border: 1px solid var(--ui-gray-5) !important;
-  width: 180px;
+  min-width: 180px;
   padding: 5px !important;
   box-shadow: 0 6px 12px rgb(0 0 0 / 18%);
   @apply th-dark:!border-none;
@@ -43,4 +44,58 @@
 .menu-link:hover {
   background: var(--bg-dropdown-hover);
   color: var(--text-dropdown-menu-color);
+}
+
+.badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 6px;
+  height: 6px;
+  background: red;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.notification-container {
+  display: flex;
+  border-bottom: 1px solid var(--ui-gray-4);
+  padding: 5px 10px;
+  margin-bottom: 15px;
+}
+
+.item-last {
+  margin-left: auto;
+}
+
+.container {
+  display: flex;
+}
+.notificationIcon {
+  flex-basis: 5rem;
+  width: 5rem;
+}
+.notificationBody {
+  flex-basis: 30rem;
+}
+.deleteButton {
+  flex-basis: 5rem;
+}
+
+.container > div {
+  padding: 0px 10px;
+  margin: auto;
+}
+
+.notification-title {
+  font-weight: 700;
+}
+
+.notification-link {
+  border-top: 1px solid var(--ui-gray-4);
+  padding: 10px;
+  text-align: center;
 }

@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react';
 
 import { useHeaderContext } from './HeaderContainer';
+import { NotificationsMenu } from './NotificationsMenu';
 import { UserMenu } from './UserMenu';
 
 interface Props {
@@ -18,7 +19,10 @@ export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
         </div>
         {children && <span>{children}</span>}
       </div>
-      {!window.ddExtension && <UserMenu />}
+      <div className="flex items-end">
+        <NotificationsMenu />
+        {!window.ddExtension && <UserMenu />}
+      </div>
     </div>
   );
 }

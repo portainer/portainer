@@ -5,6 +5,7 @@ import {
   HardDrive,
   Radio,
   FileText,
+  Bell,
 } from 'react-feather';
 
 import { usePublicSettings } from '@/portainer/settings/queries';
@@ -113,49 +114,56 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
               data-cy="portainerSidebar-activityLogs"
             />
           </SidebarItem>
-
-          <SidebarItem
-            to="portainer.settings"
-            label="Settings"
-            icon={Settings}
-            data-cy="portainerSidebar-settings"
-          >
-            {!window.ddExtension && (
-              <SidebarItem
-                to="portainer.settings.authentication"
-                label="Authentication"
-                data-cy="portainerSidebar-authentication"
-              />
-            )}
-            {process.env.PORTAINER_EDITION !== 'CE' && (
-              <SidebarItem
-                to="portainer.settings.cloud"
-                label="Cloud"
-                data-cy="portainerSidebar-cloud"
-              />
-            )}
-            <SidebarItem
-              to="portainer.settings.edgeCompute"
-              label="Edge Compute"
-              data-cy="portainerSidebar-edgeCompute"
-            />
-
-            <SidebarItem.Wrapper label="Help / About">
-              <a
-                href={
-                  process.env.PORTAINER_EDITION === 'CE'
-                    ? 'https://www.portainer.io/community_help'
-                    : 'https://documentation.portainer.io/r/business-support'
-                }
-                target="_blank"
-                rel="noreferrer"
-                className="px-3 rounded flex h-8 items-center"
-              >
-                Help / About
-              </a>
-            </SidebarItem.Wrapper>
-          </SidebarItem>
         </>
+      )}
+      <SidebarItem
+        to="portainer.notifications"
+        icon={Bell}
+        label="Notifications"
+        data-cy="portainerSidebar-notifications"
+      />
+      {isAdmin && (
+        <SidebarItem
+          to="portainer.settings"
+          label="Settings"
+          icon={Settings}
+          data-cy="portainerSidebar-settings"
+        >
+          {!window.ddExtension && (
+            <SidebarItem
+              to="portainer.settings.authentication"
+              label="Authentication"
+              data-cy="portainerSidebar-authentication"
+            />
+          )}
+          {process.env.PORTAINER_EDITION !== 'CE' && (
+            <SidebarItem
+              to="portainer.settings.cloud"
+              label="Cloud"
+              data-cy="portainerSidebar-cloud"
+            />
+          )}
+          <SidebarItem
+            to="portainer.settings.edgeCompute"
+            label="Edge Compute"
+            data-cy="portainerSidebar-edgeCompute"
+          />
+
+          <SidebarItem.Wrapper label="Help / About">
+            <a
+              href={
+                process.env.PORTAINER_EDITION === 'CE'
+                  ? 'https://www.portainer.io/community_help'
+                  : 'https://documentation.portainer.io/r/business-support'
+              }
+              target="_blank"
+              rel="noreferrer"
+              className="px-3 rounded flex h-8 items-center"
+            >
+              Help / About
+            </a>
+          </SidebarItem.Wrapper>
+        </SidebarItem>
       )}
     </SidebarSection>
   );
