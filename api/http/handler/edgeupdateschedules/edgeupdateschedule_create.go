@@ -95,7 +95,8 @@ func (handler *Handler) create(w http.ResponseWriter, r *http.Request) *httperro
 		}
 
 		if edgeStackID != 0 {
-			err := handler.dataStore.EdgeStack().DeleteEdgeStack(edgeStackID)
+			err = stacks.DeleteEdgeStack(edgeStackID, payload.GroupIDs, handler.dataStore)
+
 			if err != nil {
 				logrus.WithError(err).Error("Unable to cleanup edge stack")
 			}

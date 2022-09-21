@@ -127,3 +127,36 @@ func FetchEndpointRelationsConfig(dataStore dataservices.DataStore) (*EndpointRe
 		EdgeGroups:     edgeGroups,
 	}, nil
 }
+
+func DeleteEdgeStack(edgeStackID portainer.EdgeStackID, relatedEdgeGroupsIds []portainer.EdgeGroupID, dataStore dataservices.DataStore) error {
+	err := dataStore.EdgeStack().DeleteEdgeStack(portainer.EdgeStackID(edgeStackID))
+	if err != nil {
+		return errors.WithMessage(err, "Unable to remove the edge stack from the database")
+	}
+
+	relationConfig, err := FetchEndpointRelationsConfig(dataStore)
+	if err != nil {
+		return errors.WithMessage(err, "Unable to retrieve environments relations config from database")
+	}
+
+	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(relatedEdgeGroupsIds, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
+	if err != nil {
+		return errors.WithMessage(err, "Unable to retrieve edge stack related environments from database")
+	}
+
+	for _, endpointID := range relatedEndpointIds {
+		relation, err := dataStore.EndpointRelation().EndpointRelation(endpointID)
+		if err != nil {
+			return errors.WithMessage(err, "Unable to find environment relation in database")
+		}
+
+		delete(relation.EdgeStacks, edgeStackID)
+
+		err = dataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
+		if err != nil {
+			return errors.WithMessage(err, "Unable to persist environment relation in database")
+		}
+	}
+
+	return nil
+}

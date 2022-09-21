@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
+	"github.com/portainer/portainer/api/edge/stacks"
 	"github.com/portainer/portainer/api/edge/updateschedule"
 	"github.com/portainer/portainer/api/http/middlewares"
 )
@@ -22,6 +23,16 @@ func (handler *Handler) delete(w http.ResponseWriter, r *http.Request) *httperro
 	item, err := middlewares.FetchItem[updateschedule.UpdateSchedule](r, contextKey)
 	if err != nil {
 		return httperror.InternalServerError(err.Error(), err)
+	}
+
+	edgeStack, err := handler.dataStore.EdgeStack().EdgeStack(item.EdgeStackID)
+	if err != nil {
+		return httperror.InternalServerError("failed fetching edge stack", err)
+	}
+
+	err = stacks.DeleteEdgeStack(edgeStack.ID, edgeStack.EdgeGroups, handler.dataStore)
+	if err != nil {
+		return httperror.InternalServerError("failed deleting schedule edge stack", err)
 	}
 
 	err = handler.updateService.DeleteSchedule(item.ID)
