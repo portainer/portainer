@@ -72,8 +72,8 @@
     class="form-group mt-4"
     ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && ($ctrl.isAdmin || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1))"
   >
-    <div class="col-sm-12 vertical-center">
-      <label for="group-access" class="control-label text-left col-sm-3 col-lg-2 !p-0">
+    <div class="w-full vertical-center">
+      <label for="group-access" class="control-label text-left col-sm-3 col-lg-2 !pt-0">
         Authorized teams
         <portainer-tooltip
           ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length > 0"
@@ -84,54 +84,45 @@
           message="'As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource.'"
         ></portainer-tooltip>
       </label>
-      <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted" style="margin-left: 20px">
-        You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
-      </span>
-      <div
-        isteven-multi-select
-        ng-if="($ctrl.isAdmin && $ctrl.availableTeams.length > 0) || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1)"
-        class="col-sm-9 col-lg-10"
-        input-model="$ctrl.availableTeams"
-        output-model="$ctrl.formData.AuthorizedTeams"
-        button-label="Name"
-        item-label="Name"
-        tick-property="selected"
-        helper-elements="filter"
-        search-property="Name"
-        translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
-        data-cy="portainer-selectTeamAccess"
-      >
+      <div class="col-sm-9 col-lg-10">
+        <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted">
+          You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
+        </span>
+
+        <por-access-control-form-team-selector
+          ng-if="($ctrl.isAdmin && $ctrl.availableTeams.length > 0) || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1)"
+          options="$ctrl.availableTeams"
+          value="$ctrl.formData.AuthorizedTeams"
+          input-id="'teams-selector'"
+          on-change="($ctrl.onAuthorizedTeamsChange)"
+        ></por-access-control-form-team-selector>
       </div>
     </div>
   </div>
+
   <!-- !authorized-teams -->
   <!-- authorized-users -->
   <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && $ctrl.isAdmin">
-    <div class="col-sm-12 vertical-center">
-      <label for="group-access" class="control-label text-left col-sm-3 col-lg-2 !p-0">
+    <div class="w-full vertical-center">
+      <label for="group-access" class="control-label text-left col-sm-3 col-lg-2 !pt-0">
         Authorized users
         <portainer-tooltip
           ng-if="$ctrl.isAdmin && $ctrl.availableUsers.length > 0"
           message="'You can select which user(s) will be able to manage this resource.'"
         ></portainer-tooltip>
       </label>
-      <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted" style="margin-left: 20px">
-        You have not yet created any users. Head over to the <a ui-sref="portainer.users">Users view</a> to manage users.
-      </span>
-      <div
-        isteven-multi-select
-        ng-if="$ctrl.availableUsers.length > 0"
-        class="col-sm-9 col-lg-10"
-        input-model="$ctrl.availableUsers"
-        output-model="$ctrl.formData.AuthorizedUsers"
-        button-label="Username"
-        item-label="Username"
-        tick-property="selected"
-        helper-elements="filter"
-        search-property="Username"
-        translation="{nothingSelected: 'Select one or more users', search: 'Search...'}"
-        data-cy="portainer-selectUserAccess"
-      >
+      <div class="col-sm-9 col-lg-10">
+        <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted">
+          You have not yet created any users. Head over to the <a ui-sref="portainer.users">Users view</a> to manage users.
+        </span>
+
+        <por-access-control-form-user-selector
+          ng-if="$ctrl.availableUsers.length > 0"
+          options="$ctrl.availableUsers"
+          value="$ctrl.formData.AuthorizedUsers"
+          input-id="'users-selector'"
+          on-change="($ctrl.onAuthorizedUsersChange)"
+        ></por-access-control-form-user-selector>
       </div>
     </div>
   </div>

@@ -13,7 +13,11 @@
             </span>
           </div>
 
-          <por-access-management-users-selector options="ctrl.availableUsersAndTeams" value="ctrl.formValues.multiselectOutput"></por-access-management-users-selector>
+          <por-access-management-users-selector
+            options="ctrl.availableUsersAndTeams"
+            value="ctrl.formValues.multiselectOutput"
+            on-change="(ctrl.onChangeUsersAndTeams)"
+          ></por-access-management-users-selector>
 
           <div class="form-group" ng-if="ctrl.entityType !== 'registry'">
             <label class="col-sm-3 col-lg-2 control-label text-left"> Role </label>
@@ -38,7 +42,7 @@
               <button
                 type="submit"
                 class="btn btn-primary btn-sm vertical-center"
-                ng-disabled="(ctrl.availableUsersAndTeams | filter:{ticked:true}).length === 0 || ctrl.actionInProgress"
+                ng-disabled="ctrl.formValues.multiselectOutput.length === 0 || ctrl.actionInProgress"
                 ng-click="ctrl.authorizeAccess()"
                 button-spinner="ctrl.actionInProgress"
                 data-cy="access-createAccess"

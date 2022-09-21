@@ -17,6 +17,9 @@ import { withI18nSuspense } from '@/react-tools/withI18nSuspense';
 import { SettingsFDO } from '@/react/portainer/settings/EdgeComputeView/SettingsFDO';
 import { SettingsOpenAMT } from '@/react/portainer/settings/EdgeComputeView/SettingsOpenAMT';
 import { InternalAuth } from '@/react/portainer/settings/AuthenticationView/InternalAuth';
+import { PorAccessControlFormTeamSelector } from '@/react/portainer/access-control/PorAccessControlForm/TeamsSelector';
+import { PorAccessControlFormUserSelector } from '@/react/portainer/access-control/PorAccessControlForm/UsersSelector';
+import { PorAccessManagementUsersSelector } from '@/react/portainer/access-control/AccessManagement/PorAccessManagementUsersSelector';
 
 import { PageHeader } from '@@/PageHeader';
 import { TagSelector } from '@@/TagSelector';
@@ -29,6 +32,8 @@ import { DashboardItem } from '@@/DashboardItem';
 import { SearchBar } from '@@/datatables/SearchBar';
 import { FallbackImage } from '@@/FallbackImage';
 import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
+import { TeamsSelector } from '@@/TeamsSelector';
+import { PortainerSelect } from '@@/form-components/PortainerSelect';
 
 import { fileUploadField } from './file-upload-field';
 import { switchField } from './switch-field';
@@ -140,4 +145,54 @@ export const componentsModule = angular
   .component(
     'internalAuth',
     r2a(InternalAuth, ['onSaveSettings', 'isLoading', 'value', 'onChange'])
+  )
+  .component(
+    'teamsSelector',
+    r2a(TeamsSelector, [
+      'onChange',
+      'value',
+      'dataCy',
+      'inputId',
+      'name',
+      'placeholder',
+      'teams',
+    ])
+  )
+  .component(
+    'porAccessControlFormTeamSelector',
+    r2a(PorAccessControlFormTeamSelector, [
+      'inputId',
+      'onChange',
+      'options',
+      'value',
+    ])
+  )
+  .component(
+    'porAccessControlFormUserSelector',
+    r2a(PorAccessControlFormUserSelector, [
+      'inputId',
+      'onChange',
+      'options',
+      'value',
+    ])
+  )
+  .component(
+    'porSelect',
+    r2a(PortainerSelect, [
+      'name',
+      'inputId',
+      'placeholder',
+      'disabled',
+      'data-cy',
+      'bindToBody',
+      'value',
+      'onChange',
+      'options',
+      'isMulti',
+      'isClearable',
+    ])
+  )
+  .component(
+    'porAccessManagementUsersSelector',
+    r2a(PorAccessManagementUsersSelector, ['onChange', 'options', 'value'])
   ).name;

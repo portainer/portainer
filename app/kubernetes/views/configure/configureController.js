@@ -45,6 +45,7 @@ class KubernetesConfigureController {
     this.limitedFeatureAutoWindow = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
     this.onToggleAutoUpdate = this.onToggleAutoUpdate.bind(this);
     this.onChangeEnableResourceOverCommit = this.onChangeEnableResourceOverCommit.bind(this);
+    this.onChangeStorageClassAccessMode = this.onChangeStorageClassAccessMode.bind(this);
   }
   /* #endregion */
 
@@ -263,6 +264,18 @@ class KubernetesConfigureController {
     });
   }
 
+  onChangeStorageClassAccessMode(storageClassName, accessModes) {
+    return this.$scope.$evalAsync(() => {
+      const storageClass = this.StorageClasses.find((item) => item.Name === storageClassName);
+
+      if (!storageClass) {
+        throw new Error('Storage class not found');
+      }
+
+      storageClass.AccessModes = accessModes;
+    });
+  }
+
   /* #region  ON INIT */
   async onInit() {
     this.state = {
@@ -288,18 +301,14 @@ class KubernetesConfigureController {
     };
 
     try {
+      this.availableAccessModes = new KubernetesStorageClassAccessPolicies();
+
       [this.StorageClasses, this.endpoint] = await Promise.all([this.KubernetesStorageService.get(this.state.endpointId), this.EndpointService.endpoint(this.state.endpointId)]);
       _.forEach(this.StorageClasses, (item) => {
-        item.availableAccessModes = new KubernetesStorageClassAccessPolicies();
         const storage = _.find(this.endpoint.Kubernetes.Configuration.StorageClasses, (sc) => sc.Name === item.Name);
         if (storage) {
           item.selected = true;
-          _.forEach(storage.AccessModes, (access) => {
-            const mode = _.find(item.availableAccessModes, { Name: access });
-            if (mode) {
-              mode.selected = true;
-            }
-          });
+          item.AccessModes = storage.AccessModes.map((name) => this.availableAccessModes.find((accessMode) => accessMode.Name === name));
         }
       });
 

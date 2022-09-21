@@ -1,6 +1,5 @@
 import angular from 'angular';
 import 'moment';
-import 'ui-select';
 import 'angular-sanitize';
 import 'ng-file-upload';
 import 'angular-messages';
@@ -18,7 +17,6 @@ import 'bootstrap/dist/js/bootstrap.js';
 import 'js-yaml/dist/js-yaml.js';
 import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
-import 'angular-multiselect/isteven-multi-select.js';
 import 'angulartics/dist/angulartics.min.js';
 
 window.angular = angular;
