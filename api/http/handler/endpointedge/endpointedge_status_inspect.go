@@ -170,8 +170,9 @@ func (handler *Handler) handleSuccessfulUpdate(activeUpdateSchedule *updatesched
 	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(activeUpdateSchedule.EdgeStackID)
 	if err != nil {
 		log.Warn().
+			Int("edge_stack_id", int(activeUpdateSchedule.EdgeStackID)).
 			Err(err).
-			Msgf("Unable to find edge stack %d", activeUpdateSchedule.EdgeStackID)
+			Msg("Unable to find edge stack")
 		return
 	}
 
@@ -188,8 +189,9 @@ func (handler *Handler) handleSuccessfulUpdate(activeUpdateSchedule *updatesched
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(edgeStack.ID, edgeStack)
 	if err != nil {
 		log.Warn().
+			Int("edge_stack_id", int(activeUpdateSchedule.EdgeStackID)).
 			Err(err).
-			Msgf("Unable to update edge stack %d", edgeStack.ID)
+			Msg("Unable to update edge stack")
 		return
 	}
 }
