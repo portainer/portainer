@@ -101,14 +101,14 @@ export function IngressClassDatatable({
 
   function renderIngressClassDescription() {
     return (
-      <div className="flex flex-col w-full">
-        <div className="small text-muted mt-1">{description}</div>
+      <div className="flex flex-col !text-xs text-muted w-full">
+        <div className="mt-1">{description}</div>
         {ingressControllers &&
           ingControllerFormValues &&
           isUnsavedChanges(ingressControllers, ingControllerFormValues) && (
             <span className="flex items-center text-warning mt-1">
               <Icon icon="alert-triangle" feather className="!mr-1" />
-              <span className="small text-warning">Unsaved changes.</span>
+              <span className="text-warning">Unsaved changes.</span>
             </span>
           )}
       </div>

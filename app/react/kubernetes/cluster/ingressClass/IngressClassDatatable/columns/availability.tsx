@@ -12,6 +12,8 @@ export const availability: Column<IngressControllerClassMap> = {
   id: 'availability',
   disableFilters: true,
   canHide: true,
+  sortInverted: true,
+  sortType: 'basic',
   Filter: () => null,
 };
 

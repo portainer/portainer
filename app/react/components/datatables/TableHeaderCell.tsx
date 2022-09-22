@@ -22,7 +22,7 @@ export function TableHeaderCell({
   render,
   onSortClick,
   isSorted,
-  isSortedDesc,
+  isSortedDesc = true,
   canFilter,
   renderFilter,
 }: Props) {
@@ -55,7 +55,7 @@ function SortWrapper({
   children,
   onClick = () => {},
   isSorted,
-  isSortedDesc,
+  isSortedDesc = true,
 }: PropsWithChildren<SortWrapperProps>) {
   if (!canSort) {
     return <>{children}</>;
@@ -93,7 +93,7 @@ export function TableColumnHeaderAngular({
   canSort,
   isSorted,
   colTitle,
-  isSortedDesc,
+  isSortedDesc = true,
 }: TableColumnHeaderAngularProps) {
   return (
     <div className="flex flex-row flex-nowrap h-full">

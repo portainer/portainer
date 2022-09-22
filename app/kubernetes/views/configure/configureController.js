@@ -41,6 +41,9 @@ class KubernetesConfigureController {
 
     this.onInit = this.onInit.bind(this);
     this.configureAsync = this.configureAsync.bind(this);
+    this.areControllersChanged = this.areControllersChanged.bind(this);
+    this.areFormValuesChanged = this.areFormValuesChanged.bind(this);
+    this.onBeforeOnload = this.onBeforeOnload.bind(this);
     this.limitedFeature = FeatureId.K8S_SETUP_DEFAULT;
     this.limitedFeatureAutoWindow = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
     this.onToggleAutoUpdate = this.onToggleAutoUpdate.bind(this);
@@ -327,12 +330,49 @@ class KubernetesConfigureController {
     } finally {
       this.state.viewReady = true;
     }
+
+    window.addEventListener('beforeunload', this.onBeforeOnload);
   }
 
   $onInit() {
     return this.$async(this.onInit);
   }
   /* #endregion */
+
+  $onDestroy() {
+    window.removeEventListener('beforeunload', this.onBeforeOnload);
+  }
+
+  areControllersChanged() {
+    return !_.isEqual(this.ingressControllers, this.originalIngressControllers);
+  }
+
+  areFormValuesChanged() {
+    return !_.isEqual(this.formValues, this.oldFormValues);
+  }
+
+  onBeforeOnload(event) {
+    if (this.areControllersChanged() || this.areFormValuesChanged()) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+  }
+
+  uiCanExit() {
+    if (this.areControllersChanged() || this.areFormValuesChanged()) {
+      console.log('canExit called');
+      return this.ModalService.confirmAsync({
+        title: 'Are you sure?',
+        message: 'You currently have unsaved changes in the cluster setup view. Are you sure you want to leave?',
+        buttons: {
+          confirm: {
+            label: 'Yes',
+            className: 'btn-danger',
+          },
+        },
+      });
+    }
+  }
 }
 
 export default KubernetesConfigureController;
