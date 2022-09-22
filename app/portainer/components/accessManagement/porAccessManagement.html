@@ -20,7 +20,7 @@
             <div class="col-sm-9 col-lg-6">
               <div class="flex items-center">
                 <div>
-                  <select class="form-control" ng-model="ctrl.formValues.selectedRole" ng-options="role as ctrl.roleLabel(role) for role in ctrl.roles"> </select>
+                  <select class="form-control" ng-model="ctrl.formValues.selectedRole" ng-options="role as role.Name for role in ctrl.roles"> </select>
                 </div>
                 <be-feature-indicator class="space-left"></be-feature-indicator>
                 <!-- ng-options="role as ctrl.roleLabel(role) disable when ctrl.isRoleLimitedToBE(role) for role in ctrl.roles" -->
