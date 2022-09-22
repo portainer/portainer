@@ -174,7 +174,7 @@ class KubernetesCreateResourcePoolController {
           viewReady: false,
           isAlreadyExist: false,
           hasPrefixKube: false,
-          canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
+          canUseIngress: false,
           duplicates: {
             ingressHosts: new KubernetesFormValidationReferences(),
           },
@@ -184,6 +184,7 @@ class KubernetesCreateResourcePoolController {
 
         const nodes = await this.KubernetesNodeService.get();
 
+        this.ingressControllers = [];
         if (this.state.ingressAvailabilityPerNamespace) {
           this.ingressControllers = await getIngressControllerClassMap({ environmentId: this.endpoint.Id, allowedOnly: true });
         }

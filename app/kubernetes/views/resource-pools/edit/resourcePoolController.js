@@ -352,7 +352,7 @@ class KubernetesResourcePoolController {
           ingressesLoading: true,
           viewReady: false,
           eventWarningCount: 0,
-          canUseIngress: this.endpoint.Kubernetes.Configuration.IngressClasses.length,
+          canUseIngress: false,
           useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
           duplicates: {
             ingressHosts: new KubernetesFormValidationReferences(),
@@ -366,6 +366,7 @@ class KubernetesResourcePoolController {
 
         const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get()]);
 
+        this.ingressControllers = [];
         if (this.state.ingressAvailabilityPerNamespace) {
           this.ingressControllers = await getIngressControllerClassMap({ environmentId: this.endpoint.Id, namespace: name });
         }
