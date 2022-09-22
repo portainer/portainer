@@ -36,6 +36,12 @@ class KubernetesCreateResourcePoolController {
   }
   /* #endregion */
 
+  onRegistriesChange(registries) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.Registries = registries;
+    });
+  }
+
   onToggleStorageQuota(storageClassName, enabled) {
     this.$scope.$evalAsync(() => {
       this.formValues.StorageClasses = this.formValues.StorageClasses.map((sClass) => (sClass.Name !== storageClassName ? sClass : { ...sClass, Selected: enabled }));
