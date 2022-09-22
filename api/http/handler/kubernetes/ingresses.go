@@ -41,7 +41,7 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 		)
 	}
 
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError(
 			"Unable to create Kubernetes client",
@@ -227,7 +227,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		)
 	}
 
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError(
 			"Unable to create Kubernetes client",

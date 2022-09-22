@@ -24,10 +24,9 @@ type Handler struct {
 	*mux.Router
 	authorizationService     *authorization.Service
 	dataStore                dataservices.DataStore
-	KubernetesClientFactory  *cli.ClientFactory
 	KubernetesClient         portainer.KubeClient
-	jwtService               dataservices.JWTService
 	kubernetesClientFactory  *cli.ClientFactory
+	jwtService               dataservices.JWTService
 	kubeClusterAccessService kubernetes.KubeClusterAccessService
 }
 
