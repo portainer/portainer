@@ -1243,6 +1243,12 @@ type (
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
 
+	Snapshot struct {
+		EndpointID EndpointID          `json:"EndpointId"`
+		Docker     *DockerSnapshot     `json:"Docker"`
+		Kubernetes *KubernetesSnapshot `json:"Kubernetes"`
+	}
+
 	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)
@@ -1420,6 +1426,7 @@ type (
 		Start()
 		SetSnapshotInterval(snapshotInterval string) error
 		SnapshotEndpoint(endpoint *Endpoint) error
+		FillSnapshotData(endpoint *Endpoint) error
 	}
 
 	// SwarmStackManager represents a service to manage Swarm stacks

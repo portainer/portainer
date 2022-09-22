@@ -24,6 +24,7 @@ export interface EnvironmentsQueryParams {
   status?: EnvironmentStatus[];
   edgeDevice?: boolean;
   edgeDeviceUntrusted?: boolean;
+  excludeSnapshots?: boolean;
   provisioned?: boolean;
   name?: string;
   agentVersions?: string[];

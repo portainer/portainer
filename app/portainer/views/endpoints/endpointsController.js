@@ -50,7 +50,7 @@ function EndpointsController($q, $scope, $state, $async, EndpointService, GroupS
   function getPaginatedEndpoints(start, limit, search) {
     const deferred = $q.defer();
     $q.all({
-      endpoints: getEnvironments({ start, limit, query: { search } }),
+      endpoints: getEnvironments({ start, limit, query: { search, excludeSnapshots: true } }),
       groups: GroupService.groups(),
     })
       .then(function success(data) {

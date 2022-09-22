@@ -56,8 +56,6 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 			endpoint.Status = portainer.EndpointStatusDown
 		}
 
-		latestEndpointReference.Snapshots = endpoint.Snapshots
-		latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
 		latestEndpointReference.Agent.Version = endpoint.Agent.Version
 
 		err = handler.DataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
