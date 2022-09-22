@@ -29,3 +29,16 @@ type GitAuthentication struct {
 	// This is introduced since 2.15.0
 	GitCredentialID int `example:"0"`
 }
+
+// RepoConfigV2 binds the basic git repository information with extra paths information
+type RepoConfigV2 struct {
+	RepoConfig
+	// Path to the Stack file inside the Git repository
+	ConfigFilePath string `example:"docker-compose.yml" default:"docker-compose.yml"`
+	// Applicable when deploying with multiple stack files
+	AdditionalFiles []string `example:"[nz.compose.yml, uat.compose.yml]"`
+	// The name of directory where the repository is cloned to
+	DirectoryName string `example:"myStack_jpofkc0i9uo9wtx1zesuk649w"`
+	// First git repository if true
+	Main bool
+}
