@@ -161,7 +161,7 @@ export function IngressClassDatatable({
           title: 'Disallow in-use ingress controllers?',
           message: `
             <div>
-              <p>There are ingress constrollers you want to disallow that are in use:</p>
+              <p>There are ingress controllers you want to disallow that are in use:</p>
               ${usedControllerHtmlList}
               <p>No new ingress rules can be created for the disallowed controllers.</p>
             </div>`,
