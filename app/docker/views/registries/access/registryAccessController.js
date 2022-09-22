@@ -45,6 +45,10 @@ class DockerRegistryAccessController {
 
   $onInit() {
     return this.$async(async () => {
+      this.Authentication.redirectIfUnauthorized(['PortainerRegistryUpdateAccess']);
+
+      this.registryTo = window.location.hash.match(/#!\/\d+\/docker\/swarm\/registries/) ? 'docker.swarm.registries' : 'docker.host.registries';
+
       try {
         this.state = {
           viewReady: false,

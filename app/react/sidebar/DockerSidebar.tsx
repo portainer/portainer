@@ -67,6 +67,13 @@ export function DockerSidebar({ environmentId, environment }: Props) {
         dataCy: 'portainerSidebar-host',
       };
 
+  const featSubMenuTo = isSwarmManager
+    ? 'docker.swarm.featuresConfiguration'
+    : 'docker.host.featuresConfiguration';
+  const registrySubMenuTo = isSwarmManager
+    ? 'docker.swarm.registries'
+    : 'docker.host.registries';
+
   return (
     <>
       <DashboardLink
@@ -183,14 +190,14 @@ export function DockerSidebar({ environmentId, environment }: Props) {
           environmentId={environmentId}
         >
           <SidebarItem
-            to="docker.featuresConfiguration"
+            to={featSubMenuTo}
             params={{ endpointId: environmentId }}
             label="Setup"
           />
         </Authorized>
 
         <SidebarItem
-          to="docker.registries"
+          to={registrySubMenuTo}
           params={{ endpointId: environmentId }}
           label="Registries"
         />

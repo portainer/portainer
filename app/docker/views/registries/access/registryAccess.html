@@ -1,5 +1,5 @@
 <div ng-if="$ctrl.registry">
-  <page-header title="'Registry access'" breadcrumbs="[{label:'Registries', link:'docker.registries'}, $ctrl.registry.Name, 'Access management']"> </page-header>
+  <page-header title="'Registry access'" breadcrumbs="[{label:'Registries', link:$ctrl.registryTo,}, $ctrl.registry.Name, 'Access management']"> </page-header>
 
   <registry-details registry="$ctrl.registry"></registry-details>
 
