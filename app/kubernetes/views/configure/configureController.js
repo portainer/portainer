@@ -200,7 +200,7 @@ class KubernetesConfigureController {
       await this.EndpointService.updateEndpoint(this.endpoint.Id, this.endpoint);
       // updateIngressControllerClassMap must be done after updateEndpoint, as a hacky workaround. A better solution: saving ingresscontrollers somewhere else, is being discussed
       await updateIngressControllerClassMap(this.state.endpointId, this.ingressControllers);
-
+      this.state.isSaving = true;
       const storagePromises = _.map(storageClasses, (storageClass) => {
         const oldStorageClass = _.find(this.oldStorageClasses, { Name: storageClass.Name });
         if (oldStorageClass) {
@@ -279,6 +279,7 @@ class KubernetesConfigureController {
         userClick: false,
       },
       timeZone: '',
+      isSaving: false,
     };
 
     this.formValues = {
@@ -352,15 +353,14 @@ class KubernetesConfigureController {
   }
 
   onBeforeOnload(event) {
-    if (this.areControllersChanged() || this.areFormValuesChanged()) {
+    if (!this.state.isSaving && (this.areControllersChanged() || this.areFormValuesChanged())) {
       event.preventDefault();
       event.returnValue = '';
     }
   }
 
   uiCanExit() {
-    if (this.areControllersChanged() || this.areFormValuesChanged()) {
-      console.log('canExit called');
+    if (!this.state.isSaving && (this.areControllersChanged() || this.areFormValuesChanged())) {
       return this.ModalService.confirmAsync({
         title: 'Are you sure?',
         message: 'You currently have unsaved changes in the cluster setup view. Are you sure you want to leave?',
