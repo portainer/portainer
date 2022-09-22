@@ -2,7 +2,7 @@ import { Column } from 'react-table';
 
 import { isoDate } from '@/portainer/filters/filters';
 
-import { ToastNotification } from '../../types';
+import { ToastNotification } from '../types';
 
 export const time: Column<ToastNotification> = {
   Header: 'Time',

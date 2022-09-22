@@ -21,7 +21,6 @@ type Color =
   | 'link'
   | 'light'
   | 'dangerlight'
-  | 'clear'
   | 'none';
 type Size = 'xsmall' | 'small' | 'medium' | 'large';
 

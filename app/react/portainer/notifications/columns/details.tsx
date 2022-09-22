@@ -1,6 +1,6 @@
 import { Column } from 'react-table';
 
-import { ToastNotification } from '../../types';
+import { ToastNotification } from '../types';
 
 export const details: Column<ToastNotification> = {
   Header: 'Details',

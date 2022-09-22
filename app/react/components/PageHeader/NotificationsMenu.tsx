@@ -8,6 +8,7 @@ import {
 import { UISrefProps, useSref } from '@uirouter/react';
 import Moment from 'moment';
 import { useEffect, useState } from 'react';
+import { useStore } from 'zustand';
 
 import { AutomationTestingProps } from '@/types';
 import { useUser } from '@/portainer/hooks/useUser';
@@ -19,23 +20,20 @@ import { Button } from '@@/buttons';
 
 import { notificationsStore } from '../../portainer/notifications/notifications-store';
 
-import styles from './HeaderTitle.module.css';
+import styles from './NotificationsMenu.module.css';
 
 export function NotificationsMenu() {
+  const notificationsStoreState = useStore(notificationsStore);
+  const { removeNotification } = notificationsStoreState;
+  const { clearUserNotifications } = notificationsStoreState;
+
   const { user } = useUser();
-  const [badge, setBadge] = useState(false);
-
-  const [userNotifications, setUserNotifications] = useState<
-    ToastNotification[]
-  >(notificationsStore.getState().userNotifications[user.Id] || []);
-
-  useEffect(
-    () =>
-      notificationsStore.subscribe((state) =>
-        setUserNotifications(state.userNotifications[user.Id])
-      ),
-    [user.Id]
+  const userNotifications: ToastNotification[] = useStore(
+    notificationsStore,
+    (state) => state.userNotifications[user.Id]
   );
+
+  const [badge, setBadge] = useState(false);
 
   useEffect(() => {
     if (userNotifications.length > 0) {
@@ -44,9 +42,6 @@ export function NotificationsMenu() {
       setBadge(false);
     }
   }, [userNotifications]);
-
-  const { removeNotification } = notificationsStore.getState();
-  const { clearUserNotifications } = notificationsStore.getState();
 
   return (
     <Menu>
@@ -84,7 +79,7 @@ export function NotificationsMenu() {
             <div className={clsx(styles.itemLast)}>
               {userNotifications.length > 0 && (
                 <Button
-                  color="clear"
+                  color="none"
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
@@ -168,7 +163,7 @@ function MenuLink({
         </div>
         <div className={clsx(styles.deleteButton)}>
           <Button
-            color="clear"
+            color="none"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
