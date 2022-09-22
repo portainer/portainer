@@ -1,7 +1,6 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
-import { CreateAccessToken } from '@/react/portainer/account/CreateAccessTokenView';
 import {
   DefaultRegistryAction,
   DefaultRegistryDomain,
@@ -13,7 +12,6 @@ import { AccessControlPanel } from '@/react/portainer/access-control';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { withReactQuery } from '@/react-tools/withReactQuery';
 import { withUIRouter } from '@/react-tools/withUIRouter';
-import { withI18nSuspense } from '@/react-tools/withI18nSuspense';
 import { SettingsFDO } from '@/react/portainer/settings/EdgeComputeView/SettingsFDO';
 import { SettingsOpenAMT } from '@/react/portainer/settings/EdgeComputeView/SettingsOpenAMT';
 import { InternalAuth } from '@/react/portainer/settings/AuthenticationView/InternalAuth';
@@ -129,13 +127,6 @@ export const componentsModule = angular
   .component(
     'defaultRegistryDomain',
     r2a(withReactQuery(DefaultRegistryDomain), [])
-  )
-  .component(
-    'createAccessToken',
-    r2a(withI18nSuspense(withUIRouter(CreateAccessToken)), [
-      'onSubmit',
-      'onError',
-    ])
   )
   .component(
     'settingsFdo',
