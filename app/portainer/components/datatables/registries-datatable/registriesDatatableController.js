@@ -27,7 +27,7 @@ function RegistriesDatatableController($scope, $controller, $state, Authenticati
       this.endpointType === PortainerEndpointTypes.AgentOnDockerEnvironment ||
       this.endpointType === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment
     ) {
-      $state.go('docker.registries.registry', { id: item.Id });
+      $state.go('docker.host.registries.registry', { id: item.Id });
     } else {
       $state.go('portainer.registries.registry', { id: item.Id });
     }
@@ -41,7 +41,11 @@ function RegistriesDatatableController($scope, $controller, $state, Authenticati
     ) {
       $state.go('kubernetes.registries.access', { id: item.Id });
     } else {
-      $state.go('docker.registries.access', { id: item.Id });
+      if (window.location.hash.endsWith('/docker/swarm/registries')) {
+        $state.go('docker.swarm.registries.access', { id: item.Id });
+      } else {
+        $state.go('docker.host.registries.access', { id: item.Id });
+      }
     }
   };
 

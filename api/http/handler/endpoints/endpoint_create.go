@@ -495,7 +495,8 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint) *httperror.HandlerError {
 	err := handler.SnapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
-		if strings.Contains(err.Error(), "Invalid request signature") || strings.Contains(err.Error(), "unknown") {
+		if (endpoint.Type == portainer.AgentOnDockerEnvironment && strings.Contains(err.Error(), "Invalid request signature")) ||
+			(endpoint.Type == portainer.AgentOnKubernetesEnvironment && strings.Contains(err.Error(), "unknown")) {
 			err = errors.New("agent already paired with another Portainer instance")
 		}
 		return httperror.InternalServerError("Unable to initiate communications with environment", err)

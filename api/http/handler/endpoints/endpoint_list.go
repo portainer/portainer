@@ -103,6 +103,12 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 			paginatedEndpoints[idx].EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
 		}
 		paginatedEndpoints[idx].QueryDate = time.Now().Unix()
+		if !query.excludeSnapshots {
+			err = handler.SnapshotService.FillSnapshotData(&paginatedEndpoints[idx])
+			if err != nil {
+				return httperror.InternalServerError("Unable to add snapshot data", err)
+			}
+		}
 	}
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(filteredEndpointCount))

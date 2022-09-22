@@ -88,6 +88,13 @@
 
   --BE-only: var(--ui-warning-7);
 
+  --text-log-viewer-color-json-grey: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-magenta: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-yellow: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-green: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-red: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-blue: var(--text-log-viewer-color);
+
   /* Default Theme */
   --bg-card-color: var(--white-color);
   --bg-main-color: var(--white-color);
@@ -265,6 +272,13 @@
 
 /* Dark Theme */
 [theme='dark'] {
+  --text-log-viewer-color-json-grey: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-magenta: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-yellow: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-green: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-red: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-blue: var(--text-log-viewer-color);
+
   --bg-body-color: var(--grey-2);
   --bg-btn-default-color: var(--grey-3);
   --bg-blocklist-hover-color: var(--ui-gray-iron-10);
@@ -445,6 +459,13 @@
 
 /* High Contrast Theme */
 [theme='highcontrast'] {
+  --text-log-viewer-color-json-grey: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-magenta: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-yellow: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-green: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-red: var(--text-log-viewer-color);
+  --text-log-viewer-color-json-blue: var(--text-log-viewer-color);
+
   --bg-card-color: var(--black-color);
   --bg-main-color: var(--black-color);
   --bg-body-color: var(--black-color);
