@@ -36,7 +36,7 @@ export function NotificationsMenu() {
   const [badge, setBadge] = useState(false);
 
   useEffect(() => {
-    if (userNotifications.length > 0) {
+    if (userNotifications?.length > 0) {
       setBadge(true);
     } else {
       setBadge(false);
@@ -77,7 +77,7 @@ export function NotificationsMenu() {
               <h4>Notifications</h4>
             </div>
             <div className={clsx(styles.itemLast)}>
-              {userNotifications.length > 0 && (
+              {userNotifications?.length > 0 && (
                 <Button
                   color="none"
                   onClick={(e) => {
@@ -93,7 +93,7 @@ export function NotificationsMenu() {
             </div>
           </div>
         </div>
-        {userNotifications.length > 0 ? (
+        {userNotifications?.length > 0 ? (
           <>
             {userNotifications.map((notification) => (
               <MenuLink
