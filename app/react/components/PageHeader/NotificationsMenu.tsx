@@ -20,7 +20,8 @@ import { Button } from '@@/buttons';
 
 import { notificationsStore } from '../../portainer/notifications/notifications-store';
 
-import styles from './NotificationsMenu.module.css';
+import headerStyles from './HeaderTitle.module.css';
+import notificationStyles from './NotificationsMenu.module.css';
 
 export function NotificationsMenu() {
   const notificationsStoreState = useStore(notificationsStore);
@@ -48,35 +49,35 @@ export function NotificationsMenu() {
       <MenuButton
         className={clsx(
           'ml-auto flex items-center gap-1 self-start',
-          styles.menuButton
+          headerStyles.menuButton
         )}
         data-cy="notificationsMenu-button"
         aria-label="Notifications menu toggle"
       >
         <div
           className={clsx(
-            styles.menuIcon,
+            headerStyles.menuIcon,
             'icon-badge text-lg !p-2 mr-1',
             'text-gray-8',
             'th-dark:text-gray-warm-7'
           )}
         >
-          <Icon className={clsx(styles.icon)} icon="bell" feather />
-          <span className={badge ? clsx(styles.badge) : ''} />
+          <Icon icon="bell" feather />
+          <span className={badge ? clsx(notificationStyles.badge) : ''} />
         </div>
       </MenuButton>
 
       <MenuList
-        className={styles.menuList}
+        className={headerStyles.menuList}
         aria-label="Notifications Menu"
         data-cy="notificationsMenu"
       >
         <div>
-          <div className={clsx(styles.notificationContainer)}>
+          <div className={clsx(notificationStyles.notificationContainer)}>
             <div>
               <h4>Notifications</h4>
             </div>
-            <div className={clsx(styles.itemLast)}>
+            <div className={clsx(notificationStyles.itemLast)}>
               {userNotifications?.length > 0 && (
                 <Button
                   color="none"
@@ -105,7 +106,7 @@ export function NotificationsMenu() {
               />
             ))}
 
-            <div className={clsx(styles.notificationLink)}>
+            <div className={clsx(notificationStyles.notificationLink)}>
               <Link to="portainer.notifications">View all notifications</Link>
             </div>
           </>
@@ -145,23 +146,25 @@ function MenuLink({
   const anchorProps = useSref(to, params, options);
 
   return (
-    <ReachMenuLink href={anchorProps.href} className={styles.menuLink}>
-      <div className={clsx(styles.container)}>
-        <div className={clsx(styles.notificationIcon)}>
+    <ReachMenuLink href={anchorProps.href} className={headerStyles.menuLink}>
+      <div className={clsx(notificationStyles.container)}>
+        <div className={clsx(notificationStyles.notificationIcon)}>
           {notification.type === 'success' ? (
             <Icon icon="check-circle" feather size="lg" mode="success" />
           ) : (
             <Icon icon="alert-circle" feather size="lg" mode="danger" />
           )}
         </div>
-        <div className={clsx(styles.notificationBody)}>
-          <p className={clsx(styles.notificationTitle)}>{notification.title}</p>
+        <div className={clsx(notificationStyles.notificationBody)}>
+          <p className={clsx(notificationStyles.notificationTitle)}>
+            {notification.title}
+          </p>
           <p>{notification.details}</p>
           <p className="small text-muted">
             {formatTime(notification.timeStamp)}
           </p>
         </div>
-        <div className={clsx(styles.deleteButton)}>
+        <div className={clsx(notificationStyles.deleteButton)}>
           <Button
             color="none"
             onClick={(e) => {
