@@ -67,11 +67,15 @@
 
   <div ng-repeat="(index, entry) in $ctrl.formValues.Data" ng-if="$ctrl.formValues.IsSimple">
     <div class="form-group">
-      <label for="configuration_data_key_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left required">Key</label>
+      <label for="configuration_data_key_{{ index }}" class="col-sm-3 col-lg-2 control-label text-left required"
+        >Key
+        <portainer-tooltip message="'The key must consist of alphanumeric characters, \'-\', \'_\' or \'.\' and be up to 253 characters in length.'"></portainer-tooltip>
+      </label>
       <div class="col-sm-8 col-lg-9">
         <input
           type="text"
           class="form-control"
+          maxlength="253"
           id="configuration_data_key_{{ index }}"
           name="configuration_data_key_{{ index }}"
           ng-model="$ctrl.formValues.Data[index].Key"
