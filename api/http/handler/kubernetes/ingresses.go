@@ -436,7 +436,12 @@ func (handler *Handler) deleteKubernetesIngresses(w http.ResponseWriter, r *http
 	cli := handler.KubernetesClient
 
 	var payload models.K8sIngressDeleteRequests
-	err := cli.DeleteIngresses(payload)
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return httperror.BadRequest("Invalid request payload", err)
+	}
+
+	err = cli.DeleteIngresses(payload)
 	if err != nil {
 		return httperror.InternalServerError(
 			"Unable to retrieve nodes limits",
