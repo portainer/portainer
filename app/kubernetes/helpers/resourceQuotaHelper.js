@@ -1,4 +1,4 @@
-import { KubernetesPortainerResourceQuotaPrefix } from 'Kubernetes/models/resource-quota/models';
+import { KubernetesPortainerResourceQuotaPrefix } from 'kubernetes/models/resource-quota/models';
 
 class KubernetesResourceQuotaHelper {
   static generateResourceQuotaName(name) {

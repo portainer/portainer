@@ -1,13 +1,13 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
-import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import KubernetesNodeConverter from 'Kubernetes/node/converter';
-import { KubernetesNodeLabelFormValues, KubernetesNodeTaintFormValues } from 'Kubernetes/node/formValues';
-import { KubernetesNodeTaintEffects, KubernetesNodeAvailabilities } from 'Kubernetes/node/models';
-import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
-import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
+import KubernetesResourceReservationHelper from 'kubernetes/helpers/resourceReservationHelper';
+import { KubernetesResourceReservation } from 'kubernetes/models/resource-reservation/models';
+import KubernetesEventHelper from 'kubernetes/helpers/eventHelper';
+import KubernetesNodeConverter from 'kubernetes/node/converter';
+import { KubernetesNodeLabelFormValues, KubernetesNodeTaintFormValues } from 'kubernetes/node/formValues';
+import { KubernetesNodeTaintEffects, KubernetesNodeAvailabilities } from 'kubernetes/node/models';
+import KubernetesFormValidationHelper from 'kubernetes/helpers/formValidationHelper';
+import { KubernetesNodeHelper } from 'kubernetes/node/helper';
 
 class KubernetesNodeController {
   /* @ngInject */

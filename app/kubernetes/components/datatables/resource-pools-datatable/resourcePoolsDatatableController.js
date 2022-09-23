@@ -1,4 +1,4 @@
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableController', [
   '$scope',

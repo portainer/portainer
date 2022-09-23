@@ -1,4 +1,4 @@
-import PortainerError from 'Portainer/error';
+import PortainerError from 'portainer/error';
 
 export default class KubernetesHelmApplicationController {
   /* @ngInject */

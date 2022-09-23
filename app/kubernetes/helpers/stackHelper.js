@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesStack } from 'Kubernetes/models/stack/models';
+import { KubernetesStack } from '@/kubernetes/models/stack/models';
 
 class KubernetesStackHelper {
   static stacksFromApplications(applications) {

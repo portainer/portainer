@@ -4,7 +4,7 @@ import stripAnsi from 'strip-ansi';
 import uuidv4 from 'uuid/v4';
 
 import PortainerError from '@/portainer/error';
-import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
+import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 import { compose, kubernetes } from '@@/BoxSelector/common-options/deployment-methods';

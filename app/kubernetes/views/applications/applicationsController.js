@@ -1,10 +1,10 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
-import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
-import { KubernetesPortainerApplicationStackNameLabel } from 'Kubernetes/models/application/models';
+import KubernetesStackHelper from 'kubernetes/helpers/stackHelper';
+import KubernetesApplicationHelper from 'kubernetes/helpers/application';
+import KubernetesConfigurationHelper from 'kubernetes/helpers/configurationHelper';
+import { KubernetesApplicationTypes } from 'kubernetes/models/application/models';
+import { KubernetesPortainerApplicationStackNameLabel } from 'kubernetes/models/application/models';
 class KubernetesApplicationsController {
   /* @ngInject */
   constructor($async, $state, Notifications, KubernetesApplicationService, HelmService, KubernetesConfigurationService, Authentication, ModalService, LocalStorage, StackService) {

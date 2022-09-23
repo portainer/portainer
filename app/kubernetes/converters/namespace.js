@@ -1,12 +1,12 @@
 import _ from 'lodash-es';
-import { KubernetesNamespace } from 'Kubernetes/models/namespace/models';
-import { KubernetesNamespaceCreatePayload } from 'Kubernetes/models/namespace/payloads';
+import { KubernetesNamespace } from 'kubernetes/models/namespace/models';
+import { KubernetesNamespaceCreatePayload } from 'kubernetes/models/namespace/payloads';
 import {
   KubernetesPortainerResourcePoolNameLabel,
   KubernetesPortainerResourcePoolOwnerLabel,
   KubernetesPortainerNamespaceSystemLabel,
-} from 'Kubernetes/models/resource-pool/models';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+} from 'kubernetes/models/resource-pool/models';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 export default class KubernetesNamespaceConverter {
   static apiToNamespace(data, yaml) {

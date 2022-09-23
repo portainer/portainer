@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointTypes } from 'portainer/models/endpoint/models';
 
 function findAssociatedGroup(endpoint, groups) {
   return _.find(groups, function (group) {

@@ -1,15 +1,15 @@
 import * as JsonPatch from 'fast-json-patch';
 import _ from 'lodash-es';
 
-import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
+import KubernetesCommonHelper from 'kubernetes/helpers/commonHelper';
 import {
   KubernetesPortainerApplicationStackNameLabel,
   KubernetesPortainerApplicationNameLabel,
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationNote,
-} from 'Kubernetes/models/application/models';
+} from 'kubernetes/models/application/models';
 
-import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes, KubernetesPodEviction } from 'Kubernetes/pod/models';
+import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes, KubernetesPodEviction } from 'kubernetes/pod/models';
 import { createPayloadFactory } from './payloads/create';
 
 function computeStatus(statuses) {

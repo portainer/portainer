@@ -1,9 +1,9 @@
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
-import { KubernetesPersistentVolumeClaim } from 'Kubernetes/models/volume/models';
-import { KubernetesPersistentVolumClaimCreatePayload } from 'Kubernetes/models/volume/payloads';
-import { KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNameLabel } from 'Kubernetes/models/application/models';
+import { KubernetesPersistentVolumeClaim } from 'kubernetes/models/volume/models';
+import { KubernetesPersistentVolumClaimCreatePayload } from 'kubernetes/models/volume/payloads';
+import { KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNameLabel } from 'kubernetes/models/application/models';
 
 class KubernetesPersistentVolumeClaimConverter {
   static apiToPersistentVolumeClaim(data, storageClasses, yaml) {

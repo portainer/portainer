@@ -1,4 +1,4 @@
-import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloads';
+import { KubernetesCommonMetadataPayload } from 'kubernetes/models/common/payloads';
 
 /**
  * KubernetesDaemonSetCreatePayload Model

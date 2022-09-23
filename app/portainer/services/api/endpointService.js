@@ -1,4 +1,4 @@
-import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointCreationTypes } from 'portainer/models/endpoint/models';
 
 angular.module('portainer.app').factory('EndpointService', [
   '$q',

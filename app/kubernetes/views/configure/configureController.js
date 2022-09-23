@@ -1,11 +1,11 @@
 import _ from 'lodash-es';
 import angular from 'angular';
-import { KubernetesStorageClass, KubernetesStorageClassAccessPolicies } from 'Kubernetes/models/storage-class/models';
-import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
-import { KubernetesIngressClass } from 'Kubernetes/ingress/models';
-import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
-import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { KubernetesStorageClass, KubernetesStorageClassAccessPolicies } from 'kubernetes/models/storage-class/models';
+import { KubernetesFormValidationReferences } from 'kubernetes/models/application/formValues';
+import { KubernetesIngressClass } from 'kubernetes/ingress/models';
+import KubernetesFormValidationHelper from 'kubernetes/helpers/formValidationHelper';
+import { KubernetesIngressClassTypes } from 'kubernetes/ingress/constants';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 import { FeatureId } from '@/portainer/feature-flags/enums';
 
 class KubernetesConfigureController {

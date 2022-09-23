@@ -1,12 +1,12 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
-import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configuration/formvalues';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
-import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
-import KubernetesConfigurationConverter from 'Kubernetes/converters/configuration';
-import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { KubernetesConfigurationFormValues } from 'kubernetes/models/configuration/formvalues';
+import { KubernetesConfigurationTypes } from 'kubernetes/models/configuration/models';
+import KubernetesConfigurationHelper from 'kubernetes/helpers/configurationHelper';
+import KubernetesConfigurationConverter from 'kubernetes/converters/configuration';
+import KubernetesEventHelper from 'kubernetes/helpers/eventHelper';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 class KubernetesConfigurationController {
   /* @ngInject */

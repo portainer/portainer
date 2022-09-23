@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
 
 import angular from 'angular';
-import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool';
-import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
+import KubernetesResourcePoolConverter from 'kubernetes/converters/resourcePool';
+import KubernetesResourceQuotaHelper from 'kubernetes/helpers/resourceQuotaHelper';
 
 /* @ngInject */
 export function KubernetesResourcePoolService(

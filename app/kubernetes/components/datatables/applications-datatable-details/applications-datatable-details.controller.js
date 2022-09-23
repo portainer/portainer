@@ -1,4 +1,4 @@
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationTypes } from 'kubernetes/models/configuration/models';
 
 export default class {
   $onInit() {

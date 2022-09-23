@@ -1,6 +1,6 @@
-import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { KubernetesApplicationDeploymentTypes } from 'kubernetes/models/application/models';
+import KubernetesApplicationHelper from 'kubernetes/helpers/application';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 angular.module('portainer.docker').controller('KubernetesNodeApplicationsDatatableController', [
   '$scope',

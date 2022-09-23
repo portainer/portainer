@@ -1,4 +1,4 @@
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 export default class KubernetesRegistryAccessController {
   /* @ngInject */

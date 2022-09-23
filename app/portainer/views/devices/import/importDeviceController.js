@@ -1,7 +1,7 @@
 import uuidv4 from 'uuid/v4';
 
-import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
-import { configureDevice, getProfiles } from 'Portainer/hostmanagement/fdo/fdo.service';
+import { PortainerEndpointCreationTypes } from 'portainer/models/endpoint/models';
+import { configureDevice, getProfiles } from 'portainer/hostmanagement/fdo/fdo.service';
 
 angular
   .module('portainer.app')

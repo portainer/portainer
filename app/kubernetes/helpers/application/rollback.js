@@ -1,9 +1,9 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import PortainerError from 'Portainer/error';
+import PortainerError from 'portainer/error';
 
-import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
-import { KubernetesSystem_DefaultDeploymentUniqueLabelKey, KubernetesSystem_AnnotationsToSkip } from 'Kubernetes/models/history/models';
+import { KubernetesApplicationTypes } from 'kubernetes/models/application/models';
+import { KubernetesSystem_DefaultDeploymentUniqueLabelKey, KubernetesSystem_AnnotationsToSkip } from 'kubernetes/models/history/models';
 
 class KubernetesApplicationRollbackHelper {
   static getPatchPayload(application, targetRevision) {

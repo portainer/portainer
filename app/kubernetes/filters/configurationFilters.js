@@ -1,4 +1,4 @@
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationTypes } from 'kubernetes/models/configuration/models';
 
 angular.module('portainer.kubernetes').filter('kubernetesConfigurationTypeText', function () {
   'use strict';

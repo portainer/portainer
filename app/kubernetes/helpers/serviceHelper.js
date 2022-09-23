@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesServiceHeadlessPrefix } from 'Kubernetes/models/service/models';
+import { KubernetesServiceHeadlessPrefix } from 'kubernetes/models/service/models';
 
 class KubernetesServiceHelper {
   static generateHeadlessServiceName(name) {

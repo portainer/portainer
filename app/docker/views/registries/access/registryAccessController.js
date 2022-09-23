@@ -1,4 +1,4 @@
-import { TeamAccessViewModel, UserAccessViewModel } from 'Portainer/models/access';
+import { TeamAccessViewModel, UserAccessViewModel } from 'portainer/models/access';
 
 class DockerRegistryAccessController {
   /* @ngInject */

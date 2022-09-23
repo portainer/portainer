@@ -1,8 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import PortainerError from 'Portainer/error';
-import KubernetesStorageClassConverter from 'Kubernetes/converters/storageClass';
-import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import PortainerError from 'portainer/error';
+import KubernetesStorageClassConverter from 'kubernetes/converters/storageClass';
+import { KubernetesCommonParams } from 'kubernetes/models/common/params';
 
 class KubernetesStorageService {
   /* @ngInject */

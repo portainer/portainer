@@ -1,10 +1,10 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
-import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
+import { KubernetesResourceQuotaDefaults } from 'kubernetes/models/resource-quota/models';
+import KubernetesResourceReservationHelper from 'kubernetes/helpers/resourceReservationHelper';
+import { KubernetesResourceReservation } from 'kubernetes/models/resource-reservation/models';
+import KubernetesEventHelper from 'kubernetes/helpers/eventHelper';
 import {
   KubernetesResourcePoolFormValues,
   KubernetesResourcePoolIngressClassAnnotationFormValue,
@@ -12,13 +12,13 @@ import {
   KubernetesResourcePoolNginxRewriteAnnotationFormValue,
   KubernetesResourcePoolNginxUseregexAnnotationFormValue,
   KubernetesResourcePoolTraefikRewriteAnnotationFormValue,
-} from 'Kubernetes/models/resource-pool/formValues';
-import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
-import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
-import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
-import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
-import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuota';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+} from 'kubernetes/models/resource-pool/formValues';
+import { KubernetesIngressConverter } from 'kubernetes/ingress/converter';
+import { KubernetesFormValidationReferences } from 'kubernetes/models/application/formValues';
+import KubernetesFormValidationHelper from 'kubernetes/helpers/formValidationHelper';
+import { KubernetesIngressClassTypes } from 'kubernetes/ingress/constants';
+import KubernetesResourceQuotaConverter from 'kubernetes/converters/resourceQuota';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 import { FeatureId } from '@/portainer/feature-flags/enums';
 
 class KubernetesResourcePoolController {

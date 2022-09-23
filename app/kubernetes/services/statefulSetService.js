@@ -1,7 +1,7 @@
 import angular from 'angular';
-import PortainerError from 'Portainer/error';
-import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
-import KubernetesStatefulSetConverter from 'Kubernetes/converters/statefulSet';
+import PortainerError from 'portainer/error';
+import { KubernetesCommonParams } from 'kubernetes/models/common/params';
+import KubernetesStatefulSetConverter from 'kubernetes/converters/statefulSet';
 
 class KubernetesStatefulSetService {
   /* @ngInject */

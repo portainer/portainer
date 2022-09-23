@@ -1,5 +1,5 @@
-import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import KubernetesConfigurationHelper from 'kubernetes/helpers/configurationHelper';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 angular.module('portainer.docker').controller('KubernetesConfigurationsDatatableController', [
   '$scope',

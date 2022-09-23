@@ -1,8 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import KubernetesConfigurationHelper from 'kubernetes/helpers/configurationHelper';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
+import { PortainerEndpointTypes } from 'portainer/models/endpoint/models';
 
 class KubernetesDashboardController {
   /* @ngInject */

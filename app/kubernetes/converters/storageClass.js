@@ -1,7 +1,7 @@
 import * as JsonPatch from 'fast-json-patch';
 
-import { KubernetesStorageClass } from 'Kubernetes/models/storage-class/models';
-import { KubernetesStorageClassCreatePayload } from 'Kubernetes/models/storage-class/payload';
+import { KubernetesStorageClass } from 'kubernetes/models/storage-class/models';
+import { KubernetesStorageClassCreatePayload } from 'kubernetes/models/storage-class/payload';
 
 class KubernetesStorageClassConverter {
   /**

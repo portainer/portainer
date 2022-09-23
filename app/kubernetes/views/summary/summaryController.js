@@ -1,8 +1,8 @@
 import angular from 'angular';
-import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configuration/formvalues';
-import { KubernetesResourcePoolFormValues } from 'Kubernetes/models/resource-pool/formValues';
-import { KubernetesApplicationFormValues } from 'Kubernetes/models/application/formValues';
-import { KubernetesResourceActions, KubernetesResourceTypes } from 'Kubernetes/models/resource-types/models';
+import { KubernetesConfigurationFormValues } from 'kubernetes/models/configuration/formvalues';
+import { KubernetesResourcePoolFormValues } from 'kubernetes/models/resource-pool/formValues';
+import { KubernetesApplicationFormValues } from 'kubernetes/models/application/formValues';
+import { KubernetesResourceActions, KubernetesResourceTypes } from 'kubernetes/models/resource-types/models';
 import getApplicationResources from './resources/applicationResources';
 import getNamespaceResources from './resources/namespaceResources';
 import getConfigurationResources from './resources/configurationResources';

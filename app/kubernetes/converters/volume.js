@@ -1,4 +1,4 @@
-import { KubernetesVolume } from 'Kubernetes/models/volume/models';
+import { KubernetesVolume } from 'kubernetes/models/volume/models';
 
 class KubernetesVolumeConverter {
   static pvcToVolume(claim, pool) {

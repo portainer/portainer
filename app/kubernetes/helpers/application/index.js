@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
-import { KubernetesPortMapping, KubernetesPortMappingPort } from 'Kubernetes/models/port/models';
-import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesPortMapping, KubernetesPortMappingPort } from 'kubernetes/models/port/models';
+import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'kubernetes/models/service/models';
+import { KubernetesConfigurationTypes } from 'kubernetes/models/configuration/models';
 import {
   KubernetesApplicationAutoScalerFormValue,
   KubernetesApplicationConfigurationFormValue,
@@ -11,7 +11,7 @@ import {
   KubernetesApplicationPersistedFolderFormValue,
   KubernetesApplicationPlacementFormValue,
   KubernetesApplicationPublishedPortFormValue,
-} from 'Kubernetes/models/application/formValues';
+} from 'kubernetes/models/application/formValues';
 import {
   KubernetesApplicationEnvConfigMapPayload,
   KubernetesApplicationEnvPayload,
@@ -21,16 +21,16 @@ import {
   KubernetesApplicationVolumeMountPayload,
   KubernetesApplicationVolumePersistentPayload,
   KubernetesApplicationVolumeSecretPayload,
-} from 'Kubernetes/models/application/payloads';
-import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes, KubernetesApplicationTypes, HelmApplication } from 'Kubernetes/models/application/models';
-import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
+} from 'kubernetes/models/application/payloads';
+import KubernetesVolumeHelper from 'kubernetes/helpers/volumeHelper';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes, KubernetesApplicationTypes, HelmApplication } from 'kubernetes/models/application/models';
+import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'kubernetes/pod/models';
 import {
   KubernetesNodeSelectorRequirementPayload,
   KubernetesNodeSelectorTermPayload,
   KubernetesPodNodeAffinityPayload,
   KubernetesPreferredSchedulingTermPayload,
-} from 'Kubernetes/pod/payloads/affinities';
+} from 'kubernetes/pod/payloads/affinities';
 
 export const PodKubernetesInstanceLabel = 'app.kubernetes.io/instance';
 export const PodManagedByLabel = 'app.kubernetes.io/managed-by';

@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesConfiguration, KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfiguration, KubernetesConfigurationTypes } from 'kubernetes/models/configuration/models';
 
 class KubernetesConfigurationConverter {
   static secretToConfiguration(secret) {

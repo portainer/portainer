@@ -1,24 +1,24 @@
 import _ from 'lodash-es';
 import angular from 'angular';
-import PortainerError from 'Portainer/error';
+import PortainerError from 'portainer/error';
 
 import {
   KubernetesApplication,
   KubernetesApplicationDeploymentTypes,
   KubernetesApplicationPublishingTypes,
   KubernetesApplicationTypes,
-} from 'Kubernetes/models/application/models';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import KubernetesApplicationRollbackHelper from 'Kubernetes/helpers/application/rollback';
-import KubernetesApplicationConverter from 'Kubernetes/converters/application';
-import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
-import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
-import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
-import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
-import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
-import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
-import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
-import KubernetesPodConverter from 'Kubernetes/pod/converter';
+} from 'kubernetes/models/application/models';
+import KubernetesApplicationHelper from 'kubernetes/helpers/application';
+import KubernetesApplicationRollbackHelper from 'kubernetes/helpers/application/rollback';
+import KubernetesApplicationConverter from 'kubernetes/converters/application';
+import { KubernetesDeployment } from 'kubernetes/models/deployment/models';
+import { KubernetesStatefulSet } from 'kubernetes/models/stateful-set/models';
+import { KubernetesDaemonSet } from 'kubernetes/models/daemon-set/models';
+import KubernetesServiceHelper from 'kubernetes/helpers/serviceHelper';
+import { KubernetesHorizontalPodAutoScalerHelper } from 'kubernetes/horizontal-pod-auto-scaler/helper';
+import { KubernetesHorizontalPodAutoScalerConverter } from 'kubernetes/horizontal-pod-auto-scaler/converter';
+import { KubernetesIngressConverter } from 'kubernetes/ingress/converter';
+import KubernetesPodConverter from 'kubernetes/pod/converter';
 
 class KubernetesApplicationService {
   /* #region  CONSTRUCTOR */

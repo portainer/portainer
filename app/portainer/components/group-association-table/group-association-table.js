@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { idsToTagNames } from 'Portainer/helpers/tagHelper';
+import { idsToTagNames } from 'portainer/helpers/tagHelper';
 
 angular.module('portainer.app').component('groupAssociationTable', {
   templateUrl: './groupAssociationTable.html',

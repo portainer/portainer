@@ -1,7 +1,7 @@
 import angular from 'angular';
 import moment from 'moment';
 import filesizeParser from 'filesize-parser';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
+import KubernetesResourceReservationHelper from 'kubernetes/helpers/resourceReservationHelper';
 import { PORTAINER_FADEOUT } from '@/constants';
 
 class KubernetesNodeStatsController {

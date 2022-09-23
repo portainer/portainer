@@ -1,4 +1,4 @@
-import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointCreationTypes } from 'portainer/models/endpoint/models';
 import { genericHandler, jsonObjectsToArrayHandler } from '../../docker/rest/response/handlers';
 
 angular.module('portainer.app').factory('FileUploadService', [

@@ -8,13 +8,13 @@ import {
   KubernetesPortainerResourceQuotaCPURequest,
   KubernetesPortainerResourceQuotaMemoryRequest,
   KubernetesResourceQuotaDefaults,
-} from 'Kubernetes/models/resource-quota/models';
-import { KubernetesResourceQuotaCreatePayload } from 'Kubernetes/models/resource-quota/payloads';
-import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
-import { KubernetesPortainerResourcePoolNameLabel, KubernetesPortainerResourcePoolOwnerLabel } from 'Kubernetes/models/resource-pool/models';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
-import { KubernetesResourcePoolFormValues } from 'Kubernetes/models/resource-pool/formValues';
+} from 'kubernetes/models/resource-quota/models';
+import { KubernetesResourceQuotaCreatePayload } from 'kubernetes/models/resource-quota/payloads';
+import KubernetesResourceQuotaHelper from 'kubernetes/helpers/resourceQuotaHelper';
+import { KubernetesPortainerResourcePoolNameLabel, KubernetesPortainerResourcePoolOwnerLabel } from 'kubernetes/models/resource-pool/models';
+import KubernetesResourceReservationHelper from 'kubernetes/helpers/resourceReservationHelper';
+import KubernetesCommonHelper from 'kubernetes/helpers/commonHelper';
+import { KubernetesResourcePoolFormValues } from 'kubernetes/models/resource-pool/formValues';
 
 class KubernetesResourceQuotaConverter {
   static apiToResourceQuota(data, yaml) {

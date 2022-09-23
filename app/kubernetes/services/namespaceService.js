@@ -1,11 +1,11 @@
 import _ from 'lodash-es';
 
 import angular from 'angular';
-import PortainerError from 'Portainer/error';
-import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
-import KubernetesNamespaceConverter from 'Kubernetes/converters/namespace';
-import { updateNamespaces } from 'Kubernetes/store/namespace';
-import $allSettled from 'Portainer/services/allSettled';
+import PortainerError from 'portainer/error';
+import { KubernetesCommonParams } from 'kubernetes/models/common/params';
+import KubernetesNamespaceConverter from 'kubernetes/converters/namespace';
+import { updateNamespaces } from 'kubernetes/store/namespace';
+import $allSettled from 'portainer/services/allSettled';
 
 class KubernetesNamespaceService {
   /* @ngInject */

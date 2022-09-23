@@ -1,17 +1,17 @@
 import * as JsonPatch from 'fast-json-patch';
-import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
-import { KubernetesDeploymentCreatePayload } from 'Kubernetes/models/deployment/payloads';
+import { KubernetesDeployment } from 'kubernetes/models/deployment/models';
+import { KubernetesDeploymentCreatePayload } from 'kubernetes/models/deployment/payloads';
 import {
   KubernetesPortainerApplicationStackNameLabel,
   KubernetesPortainerApplicationNameLabel,
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationNote,
-} from 'Kubernetes/models/application/models';
+} from 'kubernetes/models/application/models';
 
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
-import { buildImageFullURI } from 'Docker/helpers/imageHelper';
+import KubernetesApplicationHelper from 'kubernetes/helpers/application';
+import KubernetesResourceReservationHelper from 'kubernetes/helpers/resourceReservationHelper';
+import KubernetesCommonHelper from 'kubernetes/helpers/commonHelper';
+import { buildImageFullURI } from 'docker/helpers/imageHelper';
 
 class KubernetesDeploymentConverter {
   /**

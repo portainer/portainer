@@ -1,15 +1,15 @@
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
-import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloads';
+import { KubernetesServiceCreatePayload } from 'kubernetes/models/service/payloads';
 import {
   KubernetesApplicationPublishingTypes,
   KubernetesPortainerApplicationNameLabel,
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationStackNameLabel,
-} from 'Kubernetes/models/application/models';
-import { KubernetesService, KubernetesServiceHeadlessClusterIP, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
+} from 'kubernetes/models/application/models';
+import { KubernetesService, KubernetesServiceHeadlessClusterIP, KubernetesServicePort, KubernetesServiceTypes } from 'kubernetes/models/service/models';
+import KubernetesServiceHelper from 'kubernetes/helpers/serviceHelper';
 
 function _publishedPortToServicePort(formValues, publishedPort, type) {
   if (publishedPort.IsNew || !publishedPort.NeedsDeletion) {

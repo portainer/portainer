@@ -1,4 +1,4 @@
-import { PortainerEndpointConnectionTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointConnectionTypes } from 'portainer/models/endpoint/models';
 
 export class PortainerEndpointInitFormValues {
   constructor() {

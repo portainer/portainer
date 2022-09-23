@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
-import { KubernetesResourceActions } from 'Kubernetes/models/resource-types/models';
+import { KubernetesResourceActions } from 'kubernetes/models/resource-types/models';
 
 function findCreateResources(newResources, oldResources) {
   return _.differenceBy(newResources, oldResources, 'Name');

@@ -1,8 +1,8 @@
 import angular from 'angular';
-import PortainerError from 'Portainer/error';
+import PortainerError from 'portainer/error';
 
-import KubernetesHistoryHelper from 'Kubernetes/helpers/history';
-import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+import KubernetesHistoryHelper from 'kubernetes/helpers/history';
+import { KubernetesApplicationTypes } from 'kubernetes/models/application/models';
 
 class KubernetesHistoryService {
   /* @ngInject */

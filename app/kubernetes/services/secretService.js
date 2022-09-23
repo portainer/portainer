@@ -1,8 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import PortainerError from 'Portainer/error';
-import KubernetesSecretConverter from 'Kubernetes/converters/secret';
-import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import PortainerError from 'portainer/error';
+import KubernetesSecretConverter from 'kubernetes/converters/secret';
+import { KubernetesCommonParams } from 'kubernetes/models/common/params';
 
 class KubernetesSecretService {
   /* @ngInject */

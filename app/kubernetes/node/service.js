@@ -1,9 +1,9 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
-import PortainerError from 'Portainer/error';
-import KubernetesNodeConverter from 'Kubernetes/node/converter';
-import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import PortainerError from 'portainer/error';
+import KubernetesNodeConverter from 'kubernetes/node/converter';
+import { KubernetesCommonParams } from 'kubernetes/models/common/params';
 
 class KubernetesNodeService {
   /* @ngInject */

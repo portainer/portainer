@@ -19,7 +19,7 @@ require('./includes/updateconfig.html');
 
 import _ from 'lodash-es';
 
-import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { PorImageRegistryModel } from 'docker/models/porImageRegistry';
 import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
 

@@ -12,7 +12,7 @@ import {
   KubernetesApplicationTypes,
   KubernetesApplicationPlacementTypes,
   KubernetesDeploymentTypes,
-} from 'Kubernetes/models/application/models';
+} from '@/kubernetes/models/application/models';
 import {
   KubernetesApplicationConfigurationFormValue,
   KubernetesApplicationConfigurationFormValueOverridenKey,
@@ -23,15 +23,15 @@ import {
   KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationPlacementFormValue,
   KubernetesFormValidationReferences,
-} from 'Kubernetes/models/application/formValues';
-import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
-import KubernetesApplicationConverter from 'Kubernetes/converters/application';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
-import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
+} from '@/kubernetes/models/application/formValues';
+import KubernetesFormValidationHelper from '@/kubernetes/helpers/formValidationHelper';
+import KubernetesApplicationConverter from '@/kubernetes/converters/application';
+import KubernetesResourceReservationHelper from '@/kubernetes/helpers/resourceReservationHelper';
+import { KubernetesServiceTypes } from '@/kubernetes/models/service/models';
+import KubernetesApplicationHelper from '@/kubernetes/helpers/application/index';
+import KubernetesVolumeHelper from '@/kubernetes/helpers/volumeHelper';
+import KubernetesNamespaceHelper from '@/kubernetes/helpers/namespaceHelper';
+import { KubernetesNodeHelper } from '@/kubernetes/node/helper';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */

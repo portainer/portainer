@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import uuidv4 from 'uuid/v4';
-import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationTypes } from 'kubernetes/models/application/models';
 
 class KubernetesVolumeHelper {
   // TODO: review

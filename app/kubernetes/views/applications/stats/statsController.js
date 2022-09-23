@@ -2,8 +2,8 @@ import angular from 'angular';
 import moment from 'moment';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import KubernetesPodConverter from 'Kubernetes/pod/converter';
+import KubernetesResourceReservationHelper from 'kubernetes/helpers/resourceReservationHelper';
+import KubernetesPodConverter from 'kubernetes/pod/converter';
 
 class KubernetesApplicationStatsController {
   /* @ngInject */

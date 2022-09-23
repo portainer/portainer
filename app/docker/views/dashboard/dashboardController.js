@@ -2,7 +2,7 @@ import angular from 'angular';
 import _ from 'lodash';
 
 import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { useContainerStatusComponent } from '@/react/docker/DashboardView/ContainerStatus';
 import { useImagesTotalSizeComponent } from '@/react/docker/DashboardView/ImagesTotalSize';
 

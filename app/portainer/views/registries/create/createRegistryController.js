@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { RegistryTypes } from 'Portainer/models/registryTypes';
-import { RegistryCreateFormValues } from 'Portainer/models/registry';
+import { RegistryTypes } from 'portainer/models/registryTypes';
+import { RegistryCreateFormValues } from 'portainer/models/registry';
 import { options } from './options';
 
 class CreateRegistryController {

@@ -1,8 +1,8 @@
-import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool';
-import { KubernetesResourcePoolFormValues } from 'Kubernetes/models/resource-pool/formValues';
-import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
-import { KubernetesResourceTypes } from 'Kubernetes/models/resource-types/models';
-import { getResourcesSummary } from 'Kubernetes/views/summary/resources/helpers';
+import KubernetesResourcePoolConverter from 'kubernetes/converters/resourcePool';
+import { KubernetesResourcePoolFormValues } from 'kubernetes/models/resource-pool/formValues';
+import { KubernetesResourceQuotaDefaults } from 'kubernetes/models/resource-quota/models';
+import { KubernetesResourceTypes } from 'kubernetes/models/resource-types/models';
+import { getResourcesSummary } from 'kubernetes/views/summary/resources/helpers';
 
 export default function (newFormValues, oldFormValues) {
   const [newNamespace, newQuota, newIngresses] = KubernetesResourcePoolConverter.formValuesToResourcePool(newFormValues);

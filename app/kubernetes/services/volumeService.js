@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
-import KubernetesVolumeConverter from 'Kubernetes/converters/volume';
+import KubernetesVolumeConverter from 'kubernetes/converters/volume';
 
 class KubernetesVolumeService {
   /* @ngInject */

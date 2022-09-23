@@ -1,5 +1,5 @@
-import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models/constants';
+import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'kubernetes/models/service/models';
+import { KubernetesApplicationPublishingTypes } from 'kubernetes/models/application/models/constants';
 
 export default class KubeServicesViewController {
   /* @ngInject */

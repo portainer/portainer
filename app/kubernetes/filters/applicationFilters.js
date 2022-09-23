@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
-import { KubernetesApplicationDataAccessPolicies } from 'Kubernetes/models/application/models';
-import { KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'Kubernetes/models/application/models';
-import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
+import { KubernetesApplicationDataAccessPolicies } from 'kubernetes/models/application/models';
+import { KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'kubernetes/models/application/models';
+import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'kubernetes/pod/models';
 
 angular
   .module('portainer.kubernetes')

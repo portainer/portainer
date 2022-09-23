@@ -1,6 +1,6 @@
+import { AccessControlFormData } from 'portainer/components/accessControlForm/porAccessControlFormModel';
+import { FeatureId } from 'portainer/feature-flags/enums';
 import { ResourceControlType } from '@/react/portainer/access-control/types';
-import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-import { FeatureId } from 'Portainer/feature-flags/enums';
 import { getEnvironments } from '@/portainer/environments/environment.service';
 import { StackStatus, StackType } from '@/react/docker/stacks/types';
 

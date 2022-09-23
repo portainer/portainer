@@ -4,7 +4,7 @@ import uuidv4 from 'uuid/v4';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import EndpointHelper from '@/portainer/helpers/endpointHelper';
-import { getAMTInfo } from 'Portainer/hostmanagement/open-amt/open-amt.service';
+import { getAMTInfo } from '@/portainer/hostmanagement/open-amt/open-amt.service';
 import { confirmDestructiveAsync } from '@/portainer/services/modal.service/confirm';
 import { isEdgeEnvironment } from '@/portainer/environments/utils';
 

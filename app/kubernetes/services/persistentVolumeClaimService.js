@@ -1,8 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import PortainerError from 'Portainer/error';
-import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
-import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import PortainerError from 'portainer/error';
+import KubernetesPersistentVolumeClaimConverter from 'kubernetes/converters/persistentVolumeClaim';
+import { KubernetesCommonParams } from 'kubernetes/models/common/params';
 
 class KubernetesPersistentVolumeClaimService {
   /* @ngInject */

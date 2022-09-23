@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
+import { RepositoryMechanismTypes } from 'kubernetes/models/deploy';
 import { StackViewModel, OrphanedStackViewModel } from '../../models/stack';
 
 angular.module('portainer.app').factory('StackService', [

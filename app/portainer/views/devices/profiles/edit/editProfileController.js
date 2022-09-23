@@ -1,5 +1,5 @@
 import angular from 'angular';
-import { getProfile, updateProfile } from 'Portainer/hostmanagement/fdo/fdo.service';
+import { getProfile, updateProfile } from 'portainer/hostmanagement/fdo/fdo.service';
 
 angular.module('portainer.app').controller('EditProfileController', EditProfileController);
 

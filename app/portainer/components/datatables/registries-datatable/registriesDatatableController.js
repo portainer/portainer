@@ -1,5 +1,5 @@
 import { FeatureId } from '@/portainer/feature-flags/enums';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 
 angular.module('portainer.docker').controller('RegistriesDatatableController', RegistriesDatatableController);
 

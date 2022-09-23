@@ -1,5 +1,5 @@
 import angular from 'angular';
-import PortainerError from 'Portainer/error';
+import PortainerError from 'portainer/error';
 
 class KubernetesHealthService {
   /* @ngInject */

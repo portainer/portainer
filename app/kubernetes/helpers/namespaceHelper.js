@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 
-import { KUBERNETES_DEFAULT_NAMESPACE, KUBERNETES_DEFAULT_SYSTEM_NAMESPACES } from 'Kubernetes/models/namespace/models';
-import { isSystem } from 'Kubernetes/store/namespace';
+import { KUBERNETES_DEFAULT_NAMESPACE, KUBERNETES_DEFAULT_SYSTEM_NAMESPACES } from 'kubernetes/models/namespace/models';
+import { isSystem } from 'kubernetes/store/namespace';
 
 export default class KubernetesNamespaceHelper {
   /**

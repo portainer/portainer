@@ -1,5 +1,5 @@
-import EndpointHelper from 'Portainer/helpers/endpointHelper';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import EndpointHelper from 'portainer/helpers/endpointHelper';
+import { PortainerEndpointTypes } from 'portainer/models/endpoint/models';
 
 angular.module('portainer.app').factory('DockerHubService', DockerHubService);
 

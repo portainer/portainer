@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
 
-import { KubernetesResourcePool } from 'Kubernetes/models/resource-pool/models';
-import { KubernetesNamespace } from 'Kubernetes/models/namespace/models';
-import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
+import { KubernetesResourcePool } from 'kubernetes/models/resource-pool/models';
+import { KubernetesNamespace } from 'kubernetes/models/namespace/models';
+import { KubernetesIngressConverter } from 'kubernetes/ingress/converter';
 import KubernetesResourceQuotaConverter from './resourceQuota';
 
 class KubernetesResourcePoolConverter {

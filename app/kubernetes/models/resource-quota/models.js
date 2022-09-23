@@ -1,4 +1,4 @@
-import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
+import KubernetesResourceQuotaHelper from 'kubernetes/helpers/resourceQuotaHelper';
 
 export const KubernetesPortainerResourceQuotaPrefix = 'portainer-rq-';
 export const KubernetesPortainerResourceQuotaCPULimit = 'limits.cpu';

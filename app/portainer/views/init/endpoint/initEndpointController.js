@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import angular from 'angular';
-import { PortainerEndpointInitFormValueEndpointSections, PortainerEndpointInitFormValues } from 'Portainer/models/endpoint/formValues';
-import { PortainerEndpointConnectionTypes, PortainerEndpointCreationTypes, PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointInitFormValueEndpointSections, PortainerEndpointInitFormValues } from 'portainer/models/endpoint/formValues';
+import { PortainerEndpointConnectionTypes, PortainerEndpointCreationTypes, PortainerEndpointTypes } from 'portainer/models/endpoint/models';
 
 require('./includes/localDocker.html');
 require('./includes/localKubernetes.html');

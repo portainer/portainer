@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointTypes } from 'portainer/models/endpoint/models';
 
 /* @ngInject */
 export function onStartupAngular($rootScope, $state, $interval, LocalStorage, EndpointProvider, SystemService, cfpLoadingBar, $transitions, HttpRequestHelper) {

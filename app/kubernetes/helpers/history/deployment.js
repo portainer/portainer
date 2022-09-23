@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import angular from 'angular';
-import { KubernetesSystem_DefaultDeploymentUniqueLabelKey, KubernetesSystem_RevisionAnnotation } from 'Kubernetes/models/history/models';
+import { KubernetesSystem_DefaultDeploymentUniqueLabelKey, KubernetesSystem_RevisionAnnotation } from 'kubernetes/models/history/models';
 
 class KubernetesDeploymentHistoryHelper {
   static _isControlledBy(deployment) {

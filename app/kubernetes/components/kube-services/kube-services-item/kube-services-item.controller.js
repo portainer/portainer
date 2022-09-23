@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
-import { KubernetesServicePort, KubernetesIngressServiceRoute } from 'Kubernetes/models/service/models';
-import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
-import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
-import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models/constants';
+import { KubernetesServicePort, KubernetesIngressServiceRoute } from 'kubernetes/models/service/models';
+import { KubernetesFormValidationReferences } from 'kubernetes/models/application/formValues';
+import KubernetesFormValidationHelper from 'kubernetes/helpers/formValidationHelper';
+import { KubernetesApplicationPublishingTypes } from 'kubernetes/models/application/models/constants';
 
 export default class KubeServicesItemViewController {
   /* @ngInject */

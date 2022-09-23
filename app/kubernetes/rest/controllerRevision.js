@@ -1,4 +1,4 @@
-import { rawResponse } from 'Kubernetes/rest/response/transform';
+import { rawResponse } from 'kubernetes/rest/response/transform';
 
 angular.module('portainer.kubernetes').factory('KubernetesControllerRevisions', [
   '$resource',

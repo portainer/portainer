@@ -1,4 +1,4 @@
-import { KubernetesNginxRewriteTargetAnnotations, KubernetesNginxUseregexAnnotations, KubernetesTraefikRewriteTargetAnnotations } from 'Kubernetes/ingress/constants';
+import { KubernetesNginxRewriteTargetAnnotations, KubernetesNginxUseregexAnnotations, KubernetesTraefikRewriteTargetAnnotations } from 'kubernetes/ingress/constants';
 
 export function KubernetesResourcePoolFormValues(defaults) {
   this.Name = '';

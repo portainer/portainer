@@ -4,7 +4,7 @@ import uuidv4 from 'uuid/v4';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
 import { RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
-import { FeatureId } from 'Portainer/feature-flags/enums';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 import { isBE } from '@/portainer/feature-flags/feature-flags.service';
 import { renderTemplate } from '@/react/portainer/custom-templates/components/utils';
 

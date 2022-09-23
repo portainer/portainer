@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import angular from 'angular';
-import $allSettled from 'Portainer/services/allSettled';
+import $allSettled from 'portainer/services/allSettled';
 
 const colors = ['red', 'orange', 'lime', 'green', 'darkgreen', 'cyan', 'turquoise', 'teal', 'deepskyblue', 'blue', 'darkblue', 'slateblue', 'magenta', 'darkviolet'];
 

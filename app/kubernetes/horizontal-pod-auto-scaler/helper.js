@@ -1,9 +1,9 @@
 import _ from 'lodash-es';
-import PortainerError from 'Portainer/error';
-import { KubernetesApplication, KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'Kubernetes/models/application/models';
-import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
-import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
-import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
+import PortainerError from 'portainer/error';
+import { KubernetesApplication, KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'kubernetes/models/application/models';
+import { KubernetesDeployment } from 'kubernetes/models/deployment/models';
+import { KubernetesStatefulSet } from 'kubernetes/models/stateful-set/models';
+import { KubernetesDaemonSet } from 'kubernetes/models/daemon-set/models';
 
 export class KubernetesHorizontalPodAutoScalerHelper {
   static findApplicationBoundScaler(sList, app) {

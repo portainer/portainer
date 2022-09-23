@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 export default class HelmTemplatesController {
   /* @ngInject */

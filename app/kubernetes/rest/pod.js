@@ -1,5 +1,5 @@
-import { rawResponse } from 'Kubernetes/rest/response/transform';
-import { logsHandler } from 'Docker/rest/response/handlers';
+import { rawResponse } from 'kubernetes/rest/response/transform';
+import { logsHandler } from 'docker/rest/response/handlers';
 
 angular.module('portainer.kubernetes').factory('KubernetesPods', [
   '$resource',

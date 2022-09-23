@@ -1,9 +1,9 @@
 import _ from 'lodash-es';
 
 import angular from 'angular';
-import PortainerError from 'Portainer/error';
-import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
-import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuota';
+import PortainerError from 'portainer/error';
+import { KubernetesCommonParams } from 'kubernetes/models/common/params';
+import KubernetesResourceQuotaConverter from 'kubernetes/converters/resourceQuota';
 
 /* @ngInject */
 export function KubernetesResourceQuotaService($async, KubernetesResourceQuotas) {

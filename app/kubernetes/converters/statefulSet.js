@@ -1,18 +1,18 @@
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
-import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
-import { KubernetesStatefulSetCreatePayload } from 'Kubernetes/models/stateful-set/payloads';
+import { KubernetesStatefulSet } from 'kubernetes/models/stateful-set/models';
+import { KubernetesStatefulSetCreatePayload } from 'kubernetes/models/stateful-set/payloads';
 import {
   KubernetesPortainerApplicationStackNameLabel,
   KubernetesPortainerApplicationNameLabel,
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationNote,
-} from 'Kubernetes/models/application/models';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
-import { buildImageFullURI } from 'Docker/helpers/imageHelper';
+} from 'kubernetes/models/application/models';
+import KubernetesApplicationHelper from 'kubernetes/helpers/application';
+import KubernetesResourceReservationHelper from 'kubernetes/helpers/resourceReservationHelper';
+import KubernetesCommonHelper from 'kubernetes/helpers/commonHelper';
+import { buildImageFullURI } from 'docker/helpers/imageHelper';
 import KubernetesPersistentVolumeClaimConverter from './persistentVolumeClaim';
 
 class KubernetesStatefulSetConverter {

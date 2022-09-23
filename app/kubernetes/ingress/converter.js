@@ -1,12 +1,12 @@
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
-import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
+import KubernetesCommonHelper from 'kubernetes/helpers/commonHelper';
 import {
   KubernetesResourcePoolIngressClassAnnotationFormValue,
   KubernetesResourcePoolIngressClassFormValue,
   KubernetesResourcePoolIngressClassHostFormValue,
-} from 'Kubernetes/models/resource-pool/formValues';
+} from 'kubernetes/models/resource-pool/formValues';
 import { KubernetesApplicationPublishingTypes } from '../models/application/models';
 import { KubernetesIngress, KubernetesIngressRule } from './models';
 import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, KubernetesIngressRulePathCreatePayload } from './payloads';

@@ -1,4 +1,4 @@
-import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { PorImageRegistryModel } from 'docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('ImportImageController', [
   '$scope',

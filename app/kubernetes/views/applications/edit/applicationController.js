@@ -7,13 +7,13 @@ import {
   KubernetesApplicationDeploymentTypes,
   KubernetesApplicationTypes,
   KubernetesDeploymentTypes,
-} from 'Kubernetes/models/application/models';
-import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
-import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+} from 'kubernetes/models/application/models';
+import KubernetesEventHelper from 'kubernetes/helpers/eventHelper';
+import KubernetesApplicationHelper from 'kubernetes/helpers/application';
+import { KubernetesServiceTypes } from 'kubernetes/models/service/models';
+import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'kubernetes/pod/models';
+import { KubernetesPodContainerTypes } from 'kubernetes/pod/models/index';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 function computeTolerations(nodes, application) {
   const pod = application.Pods[0];

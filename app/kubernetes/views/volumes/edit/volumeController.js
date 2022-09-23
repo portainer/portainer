@@ -1,10 +1,10 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import { KubernetesStorageClassAccessPolicies } from 'Kubernetes/models/storage-class/models';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import KubernetesVolumeHelper from 'kubernetes/helpers/volumeHelper';
+import KubernetesEventHelper from 'kubernetes/helpers/eventHelper';
+import { KubernetesStorageClassAccessPolicies } from 'kubernetes/models/storage-class/models';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 class KubernetesVolumeController {
   /* @ngInject */

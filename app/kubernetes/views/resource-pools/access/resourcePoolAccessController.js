@@ -1,8 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import { KubernetesPortainerConfigMapConfigName, KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapAccessKey } from 'Kubernetes/models/config-map/models';
-import { UserAccessViewModel, TeamAccessViewModel } from 'Portainer/models/access';
-import KubernetesConfigMapHelper from 'Kubernetes/helpers/configMapHelper';
+import { KubernetesPortainerConfigMapConfigName, KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapAccessKey } from 'kubernetes/models/config-map/models';
+import { UserAccessViewModel, TeamAccessViewModel } from 'portainer/models/access';
+import KubernetesConfigMapHelper from 'kubernetes/helpers/configMapHelper';
 
 class KubernetesResourcePoolAccessController {
   /* @ngInject */

@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { createProfile } from 'Portainer/hostmanagement/fdo/fdo.service';
+import { createProfile } from 'portainer/hostmanagement/fdo/fdo.service';
 
 angular.module('portainer.app').controller('AddProfileController', AddProfileController);
 

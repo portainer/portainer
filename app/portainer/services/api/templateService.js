@@ -1,4 +1,4 @@
-import { DockerHubViewModel } from 'Portainer/models/dockerhub';
+import { DockerHubViewModel } from 'portainer/models/dockerhub';
 import { TemplateViewModel } from '../../models/template';
 
 angular.module('portainer.app').factory('TemplateService', TemplateServiceFactory);

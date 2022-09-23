@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
+import { KubernetesResourceQuotaDefaults } from 'kubernetes/models/resource-quota/models';
+import KubernetesResourceReservationHelper from 'kubernetes/helpers/resourceReservationHelper';
 import {
   KubernetesResourcePoolFormValues,
   KubernetesResourcePoolIngressClassAnnotationFormValue,
@@ -9,11 +9,11 @@ import {
   KubernetesResourcePoolNginxRewriteAnnotationFormValue,
   KubernetesResourcePoolNginxUseregexAnnotationFormValue,
   KubernetesResourcePoolTraefikRewriteAnnotationFormValue,
-} from 'Kubernetes/models/resource-pool/formValues';
-import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
-import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
-import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
-import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
+} from 'kubernetes/models/resource-pool/formValues';
+import { KubernetesIngressConverter } from 'kubernetes/ingress/converter';
+import KubernetesFormValidationHelper from 'kubernetes/helpers/formValidationHelper';
+import { KubernetesFormValidationReferences } from 'kubernetes/models/application/formValues';
+import { KubernetesIngressClassTypes } from 'kubernetes/ingress/constants';
 
 import { FeatureId } from '@/portainer/feature-flags/enums';
 

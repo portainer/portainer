@@ -1,5 +1,5 @@
 import uuidv4 from 'uuid/v4';
-import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
+import { RepositoryMechanismTypes } from 'kubernetes/models/deploy';
 class KubernetesRedeployAppGitFormController {
   /* @ngInject */
   constructor($async, $state, StackService, ModalService, Notifications, WebhookHelper) {

@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import DockerNetworkHelper from 'Docker/helpers/networkHelper';
+import DockerNetworkHelper from 'docker/helpers/networkHelper';
 import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
 
 angular.module('portainer.docker').controller('NetworksController', [

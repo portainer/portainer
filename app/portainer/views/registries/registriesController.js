@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { RegistryTypes } from 'Portainer/models/registryTypes';
+import { RegistryTypes } from 'portainer/models/registryTypes';
 
 angular.module('portainer.app').controller('RegistriesController', [
   '$q',

@@ -1,10 +1,10 @@
 import _ from 'lodash-es';
 
 import * as JsonPatch from 'fast-json-patch';
-import { KubernetesNode, KubernetesNodeDetails, KubernetesNodeTaint, KubernetesNodeAvailabilities, KubernetesPortainerNodeDrainLabel } from 'Kubernetes/node/models';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import { KubernetesNodeFormValues, KubernetesNodeTaintFormValues, KubernetesNodeLabelFormValues } from 'Kubernetes/node/formValues';
-import { KubernetesNodeCreatePayload, KubernetesNodeTaintPayload } from 'Kubernetes/node/payload';
+import { KubernetesNode, KubernetesNodeDetails, KubernetesNodeTaint, KubernetesNodeAvailabilities, KubernetesPortainerNodeDrainLabel } from 'kubernetes/node/models';
+import KubernetesResourceReservationHelper from 'kubernetes/helpers/resourceReservationHelper';
+import { KubernetesNodeFormValues, KubernetesNodeTaintFormValues, KubernetesNodeLabelFormValues } from 'kubernetes/node/formValues';
+import { KubernetesNodeCreatePayload, KubernetesNodeTaintPayload } from 'kubernetes/node/payload';
 
 class KubernetesNodeConverter {
   static apiToNode(data, res) {

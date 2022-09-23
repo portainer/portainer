@@ -1,6 +1,6 @@
 import angular from 'angular';
-import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import KubernetesVolumeHelper from 'kubernetes/helpers/volumeHelper';
+import KubernetesNamespaceHelper from 'kubernetes/helpers/namespaceHelper';
 
 // TODO: review - refactor to use `extends GenericDatatableController`
 class KubernetesVolumesDatatableController {

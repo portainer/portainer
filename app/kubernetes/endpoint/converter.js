@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesEndpoint, KubernetesEndpointAnnotationLeader, KubernetesEndpointSubset } from 'Kubernetes/endpoint/models';
+import { KubernetesEndpoint, KubernetesEndpointAnnotationLeader, KubernetesEndpointSubset } from 'kubernetes/endpoint/models';
 
 class KubernetesEndpointConverter {
   static apiToEndpoint(data) {

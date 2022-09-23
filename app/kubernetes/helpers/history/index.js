@@ -1,10 +1,10 @@
 import _ from 'lodash-es';
-import PortainerError from 'Portainer/error';
+import PortainerError from 'portainer/error';
 
-import KubernetesDeploymentHistoryHelper from 'Kubernetes/helpers/history/deployment';
-import KubernetesDaemonSetHistoryHelper from 'Kubernetes/helpers/history/daemonset';
-import KubernetesStatefulSetHistoryHelper from 'Kubernetes/helpers/history/statefulset';
-import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+import KubernetesDeploymentHistoryHelper from 'kubernetes/helpers/history/deployment';
+import KubernetesDaemonSetHistoryHelper from 'kubernetes/helpers/history/daemonset';
+import KubernetesStatefulSetHistoryHelper from 'kubernetes/helpers/history/statefulset';
+import { KubernetesApplicationTypes } from 'kubernetes/models/application/models';
 
 class KubernetesHistoryHelper {
   static getRevisions(rawRevisions, application) {

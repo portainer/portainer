@@ -1,4 +1,4 @@
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import KubernetesApplicationHelper from 'kubernetes/helpers/application';
 
 angular.module('portainer.docker').controller('KubernetesResourcePoolApplicationsDatatableController', [
   '$scope',

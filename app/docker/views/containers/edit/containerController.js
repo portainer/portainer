@@ -1,6 +1,6 @@
 import moment from 'moment';
 import _ from 'lodash-es';
-import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { PorImageRegistryModel } from 'docker/models/porImageRegistry';
 import { confirmContainerDeletion } from '@/portainer/services/modal.service/prompt';
 import { FeatureId } from '@/portainer/feature-flags/enums';
 import { ResourceControlType } from '@/react/portainer/access-control/types';

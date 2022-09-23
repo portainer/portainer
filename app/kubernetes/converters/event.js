@@ -1,4 +1,4 @@
-import { KubernetesEvent } from 'Kubernetes/models/event/models';
+import { KubernetesEvent } from 'kubernetes/models/event/models';
 
 class KubernetesEventConverter {
   static apiToEvent(data) {
