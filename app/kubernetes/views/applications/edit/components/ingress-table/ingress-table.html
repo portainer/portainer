@@ -10,13 +10,15 @@
         <td style="width: 15%">HTTP Route</td>
       </tr>
       <tr ng-repeat="ingress in $ctrl.applicationIngress">
-        <td>{{ ingress.IngressName }}</td>
+        <td
+          ><a ui-sref="kubernetes.ingresses.edit({ name: ingress.IngressName, namespace: $ctrl.application.ResourcePool })">{{ ingress.IngressName }}</a></td
+        >
         <td>{{ ingress.ServiceName }}</td>
         <td>{{ ingress.Host }}</td>
         <td>{{ ingress.Port }}</td>
         <td>{{ ingress.Path }}</td>
         <td
-          ><a target="_blank" href="http://{{ ingress.Host }}{{ ingress.Path }}">{{ ingress.Host }}{{ ingress.Path }}</a></td
+          ><a target="_blank" href="{{ ingress.Secure ? 'https' : 'http' }}://{{ ingress.Host }}{{ ingress.Path }}">{{ ingress.Host }}{{ ingress.Path }}</a></td
         >
       </tr>
     </tbody>

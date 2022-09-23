@@ -2,7 +2,7 @@ import { useRouter } from '@uirouter/react';
 
 import { useUsers } from '@/portainer/users/queries';
 import { useUser } from '@/portainer/hooks/useUser';
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import { TextTip } from '@@/Tip/TextTip';
 import { PageHeader } from '@@/PageHeader';

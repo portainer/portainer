@@ -67,6 +67,36 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const ingresses = {
+      name: 'kubernetes.ingresses',
+      url: '/ingresses',
+      views: {
+        'content@': {
+          component: 'kubernetesIngressesView',
+        },
+      },
+    };
+
+    const ingressesCreate = {
+      name: 'kubernetes.ingresses.create',
+      url: '/add',
+      views: {
+        'content@': {
+          component: 'kubernetesIngressesCreateView',
+        },
+      },
+    };
+
+    const ingressesEdit = {
+      name: 'kubernetes.ingresses.edit',
+      url: '/:namespace/:name/edit',
+      views: {
+        'content@': {
+          component: 'kubernetesIngressesCreateView',
+        },
+      },
+    };
+
     const applications = {
       name: 'kubernetes.applications',
       url: '/applications',
@@ -376,5 +406,9 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(registriesAccess);
     $stateRegistryProvider.register(endpointKubernetesConfiguration);
     $stateRegistryProvider.register(endpointKubernetesSecurityConstraint);
+
+    $stateRegistryProvider.register(ingresses);
+    $stateRegistryProvider.register(ingressesCreate);
+    $stateRegistryProvider.register(ingressesEdit);
   },
 ]);

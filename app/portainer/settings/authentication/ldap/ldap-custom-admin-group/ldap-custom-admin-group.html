@@ -114,22 +114,18 @@
   </div>
 </div>
 
-<div class="form-group" ng-if="$ctrl.settings.AdminAutoPopulate">
-  <div class="col-sm-12">
-    <label for="group-access" class="control-label text-left"> Select Group(s) </label>
-    <span
-      class="ml-7"
-      isteven-multi-select
-      ng-if="$ctrl.enableAssignAdminGroup"
-      input-model="$ctrl.groups"
-      output-model="$ctrl.selectedAdminGroups"
-      button-label="name"
-      item-label="name"
-      tick-property="selected"
-      helper-elements="filter"
-      search-property="name"
-      translation="{nothingSelected: 'Select one or more groups', search: 'Search...'}"
+<div class="form-group" ng-if="$ctrl.settings.AdminAutoPopulate && $ctrl.groups">
+  <label for="group-access" class="control-label text-left col-sm-2"> Select Group(s) </label>
+  <div class="col-sm-8">
+    <por-select
+      data-cy="'group-access-selector'"
+      input-id="'group-access'"
+      value="$ctrl.selectedAdminGroups"
+      on-change="($ctrl.onAdminGroupChange)"
+      options="$ctrl.groups"
+      placeholder="'Select one or more groups'"
+      is-multi="true"
     >
-    </span>
+    </por-select>
   </div>
 </div>

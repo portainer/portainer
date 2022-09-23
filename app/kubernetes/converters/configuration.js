@@ -15,6 +15,7 @@ class KubernetesConfigurationConverter {
     });
     res.ConfigurationOwner = secret.ConfigurationOwner;
     res.IsRegistrySecret = secret.IsRegistrySecret;
+    res.SecretType = secret.SecretType;
     return res;
   }
 

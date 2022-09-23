@@ -299,19 +299,12 @@
                         </div>
                       </td>
                       <td>
-                        <span
-                          isteven-multi-select
-                          input-model="class.availableAccessModes"
-                          output-model="class.AccessModes"
-                          button-label="Name"
-                          item-label="Description"
-                          tick-property="selected"
-                          directive-id="{{ class.Name }}"
-                          helper-elements=""
-                          translation="{nothingSelected: 'Not configured'}"
-                          data-cy="kubeSetup-storageAccessSelect{{ class.Name }}"
-                        >
-                        </span>
+                        <storage-access-mode-selector
+                          options="ctrl.availableAccessModes"
+                          value="class.AccessModes"
+                          on-change="(ctrl.onChangeStorageClassAccessMode)"
+                          storage-class-name="class.Name"
+                        ></storage-access-mode-selector>
                       </td>
                       <td>
                         <div style="margin: 5px">

@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/role"
 	"github.com/portainer/portainer/api/dataservices/schedule"
 	"github.com/portainer/portainer/api/dataservices/settings"
+	"github.com/portainer/portainer/api/dataservices/snapshot"
 	"github.com/portainer/portainer/api/dataservices/stack"
 	"github.com/portainer/portainer/api/dataservices/tag"
 	"github.com/portainer/portainer/api/dataservices/teammembership"
@@ -35,6 +36,7 @@ type (
 		roleService             *role.Service
 		scheduleService         *schedule.Service
 		settingsService         *settings.Service
+		snapshotService         *snapshot.Service
 		stackService            *stack.Service
 		tagService              *tag.Service
 		teamMembershipService   *teammembership.Service
@@ -58,6 +60,7 @@ type (
 		RoleService             *role.Service
 		ScheduleService         *schedule.Service
 		SettingsService         *settings.Service
+		SnapshotService         *snapshot.Service
 		StackService            *stack.Service
 		TagService              *tag.Service
 		TeamMembershipService   *teammembership.Service
@@ -83,6 +86,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		roleService:             parameters.RoleService,
 		scheduleService:         parameters.ScheduleService,
 		settingsService:         parameters.SettingsService,
+		snapshotService:         parameters.SnapshotService,
 		tagService:              parameters.TagService,
 		teamMembershipService:   parameters.TeamMembershipService,
 		stackService:            parameters.StackService,

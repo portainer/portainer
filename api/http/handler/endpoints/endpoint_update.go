@@ -329,5 +329,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	err = handler.SnapshotService.FillSnapshotData(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to add snapshot data", err}
+	}
+
 	return response.JSON(w, endpoint)
 }

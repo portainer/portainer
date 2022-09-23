@@ -1,5 +1,6 @@
-import { usePublicSettings } from 'Portainer/settings/queries';
 import clsx from 'clsx';
+
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 export function DefaultRegistryName() {
   const settingsQuery = usePublicSettings({

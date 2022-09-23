@@ -1,12 +1,20 @@
 export default class HelmTemplatesListController {
   /* @ngInject */
-  constructor($async, DatatableService, HelmService, Notifications) {
+  constructor($async, $scope, DatatableService, HelmService, Notifications) {
     this.$async = $async;
+    this.$scope = $scope;
     this.DatatableService = DatatableService;
     this.HelmService = HelmService;
     this.Notifications = Notifications;
 
+    this.state = {
+      textFilter: '',
+      selectedCategory: '',
+      categories: [],
+    };
+
     this.updateCategories = this.updateCategories.bind(this);
+    this.onCategoryChange = this.onCategoryChange.bind(this);
   }
 
   async updateCategories() {
@@ -16,18 +24,20 @@ export default class HelmTemplatesListController {
         .filter((a) => a) // filter out undefined/nulls
         .map((c) => c.category); // get annotation category
       const availableCategories = [...new Set(annotationCategories)].sort(); // unique and sort
-      this.state.categories = availableCategories;
+      this.state.categories = availableCategories.map((cat) => ({ label: cat, value: cat }));
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve helm charts categories');
     }
   }
 
-  onTextFilterChange() {
-    this.DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+  onCategoryChange(value) {
+    return this.$scope.$evalAsync(() => {
+      this.state.selectedCategory = value || '';
+    });
   }
 
-  clearCategory() {
-    this.state.selectedCategory = '';
+  onTextFilterChange() {
+    this.DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
   }
 
   $onChanges() {
@@ -38,12 +48,6 @@ export default class HelmTemplatesListController {
 
   $onInit() {
     return this.$async(async () => {
-      this.state = {
-        textFilter: '',
-        selectedCategory: '',
-        categories: [],
-      };
-
       const textFilter = this.DatatableService.getDataTableTextFilters(this.tableKey);
       if (textFilter !== null) {
         this.state.textFilter = textFilter;

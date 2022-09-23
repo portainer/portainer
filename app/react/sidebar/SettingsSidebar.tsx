@@ -8,7 +8,7 @@ import {
   Bell,
 } from 'react-feather';
 
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 import {
   FeatureFlag,
   useFeatureFlag,

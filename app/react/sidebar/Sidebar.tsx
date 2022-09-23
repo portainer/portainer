@@ -3,7 +3,7 @@ import { Home } from 'react-feather';
 
 import { useUser } from '@/portainer/hooks/useUser';
 import { useIsTeamLeader } from '@/portainer/users/queries';
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import styles from './Sidebar.module.css';
 import { EdgeComputeSidebar } from './EdgeComputeSidebar';
