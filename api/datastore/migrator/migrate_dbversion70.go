@@ -2,6 +2,7 @@ package migrator
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/rs/zerolog/log"
 )
 
 func (m *Migrator) migrateDBVersionToDB70() error {
@@ -13,7 +14,7 @@ func (m *Migrator) migrateDBVersionToDB70() error {
 
 	for _, endpoint := range endpoints {
 		// copy snapshots to new object
-		migrateLog.Info("- moving snapshots from endpoint to new object")
+		log.Info().Msg("moving snapshots from endpoint to new object")
 		snapshot := portainer.Snapshot{EndpointID: endpoint.ID}
 
 		if len(endpoint.Snapshots) > 0 {
@@ -31,7 +32,7 @@ func (m *Migrator) migrateDBVersionToDB70() error {
 		}
 
 		// set to nil old fields
-		migrateLog.Info("- deleting snapshot from endpoint")
+		log.Info().Msg("deleting snapshot from endpoint")
 		endpoint.Snapshots = []portainer.DockerSnapshot{}
 		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
 

@@ -518,7 +518,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if snapshot, err := store.Snapshot().Snapshots(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			logrus.WithError(err).Errorf("Exporting Snapshots")
+			log.Err(err).Msg("Exporting Snapshots")
 		}
 	} else {
 		backup.Snapshot = snapshot
