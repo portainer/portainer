@@ -25,6 +25,7 @@ export class KubernetesIngressConverter {
             ingRule.IP = data.status.loadBalancer.ingress ? data.status.loadBalancer.ingress[0].ip : undefined;
             ingRule.Port = path.backend.service.port.number;
             ingRule.Path = path.path;
+            ingRule.TLS = data.spec.tls;
             return ingRule;
           });
     });

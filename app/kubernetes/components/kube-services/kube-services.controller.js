@@ -11,12 +11,7 @@ export default class KubeServicesViewController {
 
   addEntry(service) {
     const p = new KubernetesService();
-    if (service === KubernetesApplicationPublishingTypes.INGRESS) {
-      p.Type = KubernetesApplicationPublishingTypes.CLUSTER_IP;
-      p.Ingress = true;
-    } else {
-      p.Type = service;
-    }
+    p.Type = service;
 
     p.Selector = this.formValues.Selector;
 
@@ -62,8 +57,6 @@ export default class KubeServicesViewController {
         return KubernetesServiceTypes.NODE_PORT;
       case KubernetesApplicationPublishingTypes.LOAD_BALANCER:
         return KubernetesServiceTypes.LOAD_BALANCER;
-      case KubernetesApplicationPublishingTypes.INGRESS:
-        return KubernetesServiceTypes.INGRESS;
     }
   }
 
@@ -79,8 +72,6 @@ export default class KubeServicesViewController {
         return 'fa fa-list';
       case KubernetesApplicationPublishingTypes.LOAD_BALANCER:
         return 'fa fa-project-diagram';
-      case KubernetesApplicationPublishingTypes.INGRESS:
-        return 'fa fa-route';
     }
   }
   $onInit() {
@@ -97,10 +88,6 @@ export default class KubeServicesViewController {
         {
           typeName: KubernetesServiceTypes.LOAD_BALANCER,
           typeValue: KubernetesApplicationPublishingTypes.LOAD_BALANCER,
-        },
-        {
-          typeName: KubernetesServiceTypes.INGRESS,
-          typeValue: KubernetesApplicationPublishingTypes.INGRESS,
         },
       ],
       selected: KubernetesApplicationPublishingTypes.CLUSTER_IP,
