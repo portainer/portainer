@@ -38,6 +38,7 @@ require (
 	github.com/portainer/libhttp v0.0.0-20220916153711-5d61e12f4b0a
 	github.com/rkl-/digest v0.0.0-20180419075440-8316caa4a777
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/rs/zerolog v1.28.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/viney-shih/go-lock v1.1.1
@@ -103,7 +104,6 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rs/zerolog v1.28.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce // indirect
