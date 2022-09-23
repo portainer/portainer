@@ -156,7 +156,7 @@
                   </div>
                 </div>
                 <!-- #endregion -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable && ctrl.state.canUseIngress">
+                <div ng-if="ctrl.isAdmin && ctrl.isEditable && ctrl.state.ingressAvailabilityPerNamespace">
                   <!-- #region INGRESSES -->
                   <div class="col-sm-12 form-section-title"> Networking </div>
                   <ingress-class-datatable

@@ -195,7 +195,6 @@ class KubernetesConfigureController {
 
       await this.removeIngressesAcrossNamespaces();
 
-      console.log(this.endpoint);
       this.assignFormValuesToEndpoint(this.endpoint, storageClasses, ingressClasses);
       await this.EndpointService.updateEndpoint(this.endpoint.Id, this.endpoint);
       // updateIngressControllerClassMap must be done after updateEndpoint, as a hacky workaround. A better solution: saving ingresscontrollers somewhere else, is being discussed
