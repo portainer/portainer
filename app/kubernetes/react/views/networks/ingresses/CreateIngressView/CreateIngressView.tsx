@@ -158,10 +158,12 @@ export function CreateIngressView() {
   );
   const ingressClassOptions: Option<string>[] = [
     { label: 'Select an ingress class', value: '' },
-    ...(ingressControllersResults.data?.map((cls) => ({
-      label: cls.ClassName,
-      value: cls.ClassName,
-    })) || []),
+    ...(ingressControllersResults.data
+      ?.filter((cls) => cls.Availability)
+      .map((cls) => ({
+        label: cls.ClassName,
+        value: cls.ClassName,
+      })) || []),
   ];
 
   if (!existingIngressClass && ingressRule.IngressClassName) {
