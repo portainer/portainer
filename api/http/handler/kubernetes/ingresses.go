@@ -327,6 +327,7 @@ PayloadLoop:
 	for _, p := range payload {
 		for _, existingClass := range existingClasses {
 			if p.ClassName != existingClass.Name {
+				updatedClasses = append(updatedClasses, existingClass)
 				continue
 			}
 			var updatedClass portainer.KubernetesIngressClassConfig
@@ -344,6 +345,7 @@ PayloadLoop:
 					}
 				}
 
+				updatedClasses = append(updatedClasses, existingClass)
 				continue PayloadLoop
 			}
 
@@ -354,6 +356,7 @@ PayloadLoop:
 			updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
 			for _, ns := range updatedClass.BlockedNamespaces {
 				if namespace == ns {
+					updatedClasses = append(updatedClasses, existingClass)
 					continue PayloadLoop
 				}
 			}
