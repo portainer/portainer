@@ -6,7 +6,7 @@ angular.module('portainer.app').factory('FormHelper', [
     helper.removeInvalidEnvVars = function (env) {
       for (var i = env.length - 1; i >= 0; i--) {
         var envvar = env[i];
-        if (!envvar.value || !envvar.name) {
+        if (!envvar.name) {
           env.splice(i, 1);
         }
       }
