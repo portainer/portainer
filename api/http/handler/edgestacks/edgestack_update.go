@@ -153,10 +153,12 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 		}
 
-		err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
+		manifestPath, err := handler.convertAndStoreKubeManifestIfNeeded(stackFolder, stack.ProjectPath, stack.EntryPoint, relatedEndpointIds)
 		if err != nil {
 			return httperror.InternalServerError("Unable to convert and persist updated Kubernetes manifest file on disk", err)
 		}
+
+		stack.ManifestPath = manifestPath
 
 	} else {
 		if stack.ManifestPath == "" {

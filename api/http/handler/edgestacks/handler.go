@@ -3,7 +3,6 @@ package edgestacks
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
@@ -54,33 +53,31 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataSto
 	return h
 }
 
-func (handler *Handler) convertAndStoreKubeManifestIfNeeded(edgeStack *portainer.EdgeStack, relatedEndpointIds []portainer.EndpointID) error {
+func (handler *Handler) convertAndStoreKubeManifestIfNeeded(stackFolder string, projectPath, composePath string, relatedEndpointIds []portainer.EndpointID) (manifestPath string, err error) {
 	hasKubeEndpoint, err := hasKubeEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
 	if err != nil {
-		return fmt.Errorf("unable to check if edge stack has kube environments: %w", err)
+		return "", fmt.Errorf("unable to check if edge stack has kube environments: %w", err)
 	}
 
 	if !hasKubeEndpoint {
-		return nil
+		return "", nil
 	}
 
-	composeConfig, err := handler.FileService.GetFileContent(edgeStack.ProjectPath, edgeStack.EntryPoint)
+	composeConfig, err := handler.FileService.GetFileContent(projectPath, composePath)
 	if err != nil {
-		return fmt.Errorf("unable to retrieve Compose file from disk: %w", err)
+		return "", fmt.Errorf("unable to retrieve Compose file from disk: %w", err)
 	}
 
 	kompose, err := handler.KubernetesDeployer.ConvertCompose(composeConfig)
 	if err != nil {
-		return fmt.Errorf("failed converting compose file to kubernetes manifest: %w", err)
+		return "", fmt.Errorf("failed converting compose file to kubernetes manifest: %w", err)
 	}
 
 	komposeFileName := filesystem.ManifestFileDefaultName
-	_, err = handler.FileService.StoreEdgeStackFileFromBytes(strconv.Itoa(int(edgeStack.ID)), komposeFileName, kompose)
+	_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, komposeFileName, kompose)
 	if err != nil {
-		return fmt.Errorf("failed to store kube manifest file: %w", err)
+		return "", fmt.Errorf("failed to store kube manifest file: %w", err)
 	}
 
-	edgeStack.ManifestPath = komposeFileName
-
-	return nil
+	return komposeFileName, nil
 }
