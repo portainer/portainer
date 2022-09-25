@@ -30,7 +30,7 @@ async function update({ id, values }: Update) {
 export function useUpdateMutation() {
   const queryClient = useQueryClient();
   return useMutation(update, {
-    ...withInvalidate(queryClient, [queryKeys.list()]),
+    ...withInvalidate(queryClient, [queryKeys.base()]),
     ...withError(),
   });
 }

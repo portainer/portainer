@@ -7,9 +7,11 @@ import { EdgeUpdateSchedule } from '../types';
 import { queryKeys } from './query-keys';
 import { buildUrl } from './urls';
 
-async function getList() {
+async function getList(includeEdgeStacks?: boolean) {
   try {
-    const { data } = await axios.get<EdgeUpdateSchedule[]>(buildUrl());
+    const { data } = await axios.get<EdgeUpdateSchedule[]>(buildUrl(), {
+      params: { includeEdgeStacks },
+    });
     return data;
   } catch (err) {
     throw parseAxiosError(
@@ -19,6 +21,8 @@ async function getList() {
   }
 }
 
-export function useList() {
-  return useQuery(queryKeys.list(), getList);
+export function useList(includeEdgeStacks?: boolean) {
+  return useQuery(queryKeys.list(includeEdgeStacks), () =>
+    getList(includeEdgeStacks)
+  );
 }

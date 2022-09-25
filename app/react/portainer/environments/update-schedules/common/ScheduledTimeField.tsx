@@ -8,15 +8,14 @@ import { isoDateFromTimestamp } from '@/portainer/filters/filters';
 import { FormControl } from '@@/form-components/FormControl';
 import { Input } from '@@/form-components/Input';
 
-import { FormValues } from './types';
+// import { FormValues } from './types';
 
 interface Props {
   disabled?: boolean;
 }
 
 export function ScheduledTimeField({ disabled }: Props) {
-  const [{ name, value }, { error }, { setValue }] =
-    useField<FormValues['time']>('time');
+  const [{ name, value }, { error }, { setValue }] = useField('time');
 
   const dateValue = useMemo(() => new Date(value * 1000), [value]);
 

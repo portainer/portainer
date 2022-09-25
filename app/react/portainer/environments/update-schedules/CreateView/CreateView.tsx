@@ -7,6 +7,7 @@ import {
   useRedirectFeatureFlag,
   FeatureFlag,
 } from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
+import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 
 import { PageHeader } from '@@/PageHeader';
 import { Widget } from '@@/Widget';
@@ -18,18 +19,20 @@ import { FormValues } from '../common/types';
 import { validation } from '../common/validation';
 import { ScheduleTypeSelector } from '../common/ScheduleTypeSelector';
 import { useList } from '../queries/list';
-import { EdgeGroupsField } from '../common/EdgeGroupsField';
 import { NameField } from '../common/NameField';
+import { EdgeGroupsField } from '../common/EdgeGroupsField';
+import { BetaAlert } from '../common/BetaAlert';
 
 const initialValues: FormValues = {
   name: '',
   groupIds: [],
   type: ScheduleType.Update,
-  time: Math.floor(Date.now() / 1000) + 60 * 60,
-  environments: {},
+  version: '',
 };
 
-export function CreateView() {
+export default withLimitToBE(CreateView);
+
+function CreateView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
   const schedulesQuery = useList();
 
@@ -49,6 +52,8 @@ export function CreateView() {
         breadcrumbs="Edge agent update and rollback"
       />
 
+      <BetaAlert />
+
       <div className="row">
         <div className="col-sm-12">
           <Widget>
@@ -65,6 +70,7 @@ export function CreateView() {
                     <NameField />
                     <EdgeGroupsField />
                     <ScheduleTypeSelector />
+
                     <div className="form-group">
                       <div className="col-sm-12">
                         <LoadingButton

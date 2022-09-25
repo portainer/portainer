@@ -7,6 +7,7 @@ import {
 } from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
+import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 
 import { Datatable } from '@@/datatables';
 import { PageHeader } from '@@/PageHeader';
@@ -15,7 +16,7 @@ import { Link } from '@@/Link';
 import { useSearchBarState } from '@@/datatables/SearchBar';
 
 import { useList } from '../queries/list';
-import { EdgeUpdateSchedule } from '../types';
+import { EdgeUpdateSchedule, StatusType } from '../types';
 import { useRemoveMutation } from '../queries/useRemoveMutation';
 
 import { columns } from './columns';
@@ -24,13 +25,15 @@ import { createStore } from './datatable-store';
 const storageKey = 'update-schedules-list';
 const settingsStore = createStore(storageKey);
 
+export default withLimitToBE(ListView);
+
 export function ListView() {
   useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
 
   const settings = useStore(settingsStore);
   const [search, setSearch] = useSearchBarState(storageKey);
 
-  const listQuery = useList();
+  const listQuery = useList(true);
 
   if (!listQuery.data) {
     return null;
@@ -61,6 +64,7 @@ export function ListView() {
         onSortByChange={settings.setSortBy}
         searchValue={search}
         onSearchChange={setSearch}
+        isRowSelectable={(row) => row.original.status === StatusType.Pending}
       />
     </>
   );

@@ -1,1 +1,1 @@
-export { WaitingRoomView } from './WaitingRoomView';
+export { default as WaitingRoomView } from './WaitingRoomView';
