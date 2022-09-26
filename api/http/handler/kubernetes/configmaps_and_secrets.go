@@ -13,20 +13,18 @@ func (handler *Handler) getKubernetesConfigMaps(w http.ResponseWriter, r *http.R
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusBadRequest,
-			Message:    "Invalid namespace identifier route variable",
-			Err:        err,
-		}
+		return httperror.BadRequest(
+			"Invalid namespace identifier route variable",
+			err,
+		)
 	}
 
 	configmaps, err := cli.GetConfigMapsAndSecrets(namespace)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to retrieve nodes limits",
-			Err:        err,
-		}
+		return httperror.InternalServerError(
+			"Unable to retrieve nodes limits",
+			err,
+		)
 	}
 
 	return response.JSON(w, configmaps)

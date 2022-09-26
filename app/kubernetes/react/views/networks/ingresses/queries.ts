@@ -65,14 +65,12 @@ export function useIngresses(
       'ingress',
     ],
     async () => {
-      const ingresses: Ingress[] = [];
-      for (let i = 0; i < namespaces.length; i += 1) {
-        const ings = await getIngresses(environmentId, namespaces[i]);
-        if (ings) {
-          ingresses.push(...ings);
-        }
-      }
-      return ingresses;
+      const ingresses = await Promise.all(
+        namespaces.map((namespace) => getIngresses(environmentId, namespace))
+      );
+      // flatten the array and remove empty ingresses
+      const filteredIngresses = ingresses.flat().filter((ing) => ing);
+      return filteredIngresses;
     },
     {
       enabled: namespaces.length > 0,

@@ -35,122 +35,33 @@
 
               <div class="col-sm-12">
                 <label class="control-label text-left col-sm-5 col-lg-4 px-0"> Allow users to use external load balancer </label>
-                <label class="switch mb-0 col-sm-8">
+                <label class="switch col-sm-8 mb-0">
                   <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><span class="slider round" data-cy="kubeSetup-loadBalancerToggle"></span>
                 </label>
               </div>
             </div>
 
-            <div class="form-group">
-              <div class="col-sm-12 text-muted small mt-4">
-                <p> Configuring ingress controllers will allow users to expose application they deploy over a HTTP route. </p>
-                <p class="mt-1 vertical-center">
-                  <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
-                  Ingress classes must be manually specified for each controller you want to use in the cluster. Make sure that each controller is running inside your cluster.
-                </p>
-              </div>
-            </div>
+            <ingress-class-datatable
+              on-change-availability="(ctrl.onChangeAvailability)"
+              ingress-controllers="ctrl.originalIngressControllers"
+              description="'Enabling ingress controllers in your cluster allows them to be available in the Portainer UI for users to publish applications over HTTP/HTTPS. A controller must have a class name for it to be included here.'"
+              no-ingress-controller-label="'No supported ingress controllers found.'"
+              view="'cluster'"
+            ></ingress-class-datatable>
+
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left">Ingress controller</label>
-                <span class="label label-default interactive vertical-center" style="margin-left: 10px" ng-click="ctrl.addIngressClass()" data-cy="kubeSetup-congifIngressButton">
-                  <pr-icon icon="'plus'" feather="true" size="'sm'" class="vertical-center"></pr-icon> configure ingress controller
-                </span>
-              </div>
-
-              <div class="col-sm-12 form-inline" style="margin-top: 10px">
-                <div ng-repeat-start="ingressClass in ctrl.formValues.IngressClasses" style="margin-top: 2px">
-                  <div class="col-sm-7 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
-                    <span class="input-group-addon">Ingress class</span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="ingress_class_name_{{ $index }}"
-                      ng-model="ingressClass.Name"
-                      placeholder="nginx"
-                      ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
-                      ng-change="ctrl.onChangeIngressClassName($index)"
-                      required
-                      data-cy="kubeSetup-ingressClassName"
-                    />
-                  </div>
-                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
-                    <span class="input-group-addon">Type</span>
-                    <select
-                      class="form-control"
-                      name="ingress_class_type_{{ $index }}"
-                      ng-model="ingressClass.Type"
-                      ng-options="value as value for (key, value) in ctrl.IngressClassTypes"
-                      required
-                      data-cy="kubeSetup-ingressType"
-                    >
-                      <option selected disabled hidden value="">Select a type</option>
-                    </select>
-                  </div>
-                  <div class="col-sm-1 input-group input-group-sm">
-                    <button
-                      ng-if="!ingressClass.NeedsDeletion"
-                      class="btn btn-dangerlight btn-only-icon"
-                      type="button"
-                      ng-click="ctrl.removeIngressClass($index)"
-                      data-cy="kubeSetup-deleteIngress"
-                    >
-                      <pr-icon icon="'trash-2'" feather="true"></pr-icon>
-                    </button>
-                    <button ng-if="ingressClass.NeedsDeletion" class="btn btn-only-icon btn-light" type="button" ng-click="ctrl.restoreIngressClass($index)">
-                      <pr-icon icon="'rotate-ccw'" feather="true"></pr-icon>
-                    </button>
-                  </div>
-                </div>
-
-                <div
-                  ng-repeat-end
-                  ng-show="
-                    kubernetesClusterSetupForm['ingress_class_name_' + $index].$invalid ||
-                    kubernetesClusterSetupForm['ingress_class_type_' + $index].$invalid ||
-                    ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined
-                  "
+                <por-switch-field
+                  checked="ctrl.formValues.IngressAvailabilityPerNamespace"
+                  name="'ingressAvailabilityPerNamespace'"
+                  label="'Configure ingress controller availability per namespace'"
+                  tooltip="'This allows an administrator to configure, in each namespace, which ingress controllers will be available for users to select when setting up ingresses for applications.'"
+                  on-change="(ctrl.onToggleIngressAvailabilityPerNamespace)"
+                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                  switch-class="'col-sm-8'"
                 >
-                  <div class="col-sm-7 input-group">
-                    <div
-                      class="small"
-                      style="margin-top: 5px"
-                      ng-if="kubernetesClusterSetupForm['ingress_class_name_' + $index].$invalid || ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined"
-                    >
-                      <div ng-messages="kubernetesClusterSetupForm['ingress_class_name_'+$index].$error">
-                        <p ng-message="required" class="vertical-center text-warning"
-                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress class name is required.</p
-                        >
-                        <p ng-message="pattern" class="vertical-center text-warning"
-                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field must consist of lower case alphanumeric characters or '-', start
-                          with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p
-                        >
-                      </div>
-                      <p ng-if="ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined" class="vertical-center text-warning">
-                        <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This ingress class is already defined.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="col-sm-3 input-group">
-                    <div class="small" style="margin-top: 5px" ng-if="kubernetesClusterSetupForm['ingress_class_type_' + $index].$invalid">
-                      <div ng-messages="kubernetesClusterSetupForm['ingress_class_type_'+$index].$error">
-                        <p ng-message="required" class="vertical-center text-warning"
-                          ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress class type is required.</p
-                        >
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                </por-switch-field>
               </div>
-            </div>
-
-            <div class="form-group" ng-if="ctrl.hasTraefikIngress()">
-              <span class="col-sm-12 text-muted small">
-                <p>
-                  <i class="fa fa-flask blue-icon" aria-hidden="true" style="margin-right: 2px"></i>
-                  Traefik support is experimental.
-                </p>
-              </span>
             </div>
 
             <!-- auto update window -->
@@ -163,7 +74,7 @@
                   name="'disableSysctlSettingForRegularUsers'"
                   label="'Enable Change Window'"
                   feature-id="ctrl.limitedFeatureAutoWindow"
-                  tooltip="'Specify a timeframe during which automatic updates can occur in this environment.'"
+                  tooltip="'Automatic updates to stacks or applications outside the defined change window will not occur.'"
                   on-change="(ctrl.onToggleAutoUpdate)"
                   label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
                   switch-class="'col-sm-8 text-muted'"

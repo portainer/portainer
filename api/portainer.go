@@ -546,13 +546,14 @@ type (
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes environment(endpoint)
 	KubernetesConfiguration struct {
-		UseLoadBalancer              bool                           `json:"UseLoadBalancer"`
-		UseServerMetrics             bool                           `json:"UseServerMetrics"`
-		EnableResourceOverCommit     bool                           `json:"EnableResourceOverCommit"`
-		ResourceOverCommitPercentage int                            `json:"ResourceOverCommitPercentage"`
-		StorageClasses               []KubernetesStorageClassConfig `json:"StorageClasses"`
-		IngressClasses               []KubernetesIngressClassConfig `json:"IngressClasses"`
-		RestrictDefaultNamespace     bool                           `json:"RestrictDefaultNamespace"`
+		UseLoadBalancer                 bool                           `json:"UseLoadBalancer"`
+		UseServerMetrics                bool                           `json:"UseServerMetrics"`
+		EnableResourceOverCommit        bool                           `json:"EnableResourceOverCommit"`
+		ResourceOverCommitPercentage    int                            `json:"ResourceOverCommitPercentage"`
+		StorageClasses                  []KubernetesStorageClassConfig `json:"StorageClasses"`
+		IngressClasses                  []KubernetesIngressClassConfig `json:"IngressClasses"`
+		RestrictDefaultNamespace        bool                           `json:"RestrictDefaultNamespace"`
+		IngressAvailabilityPerNamespace bool                           `json:"IngressAvailabilityPerNamespace"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
@@ -567,7 +568,7 @@ type (
 	KubernetesIngressClassConfig struct {
 		Name              string   `json:"Name"`
 		Type              string   `json:"Type"`
-		Blocked           bool     `json:"Blocked"`
+		GloballyBlocked   bool     `json:"Blocked"`
 		BlockedNamespaces []string `json:"BlockedNamespaces"`
 	}
 
@@ -1349,11 +1350,14 @@ type (
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
 
-		CreateNamespace(info models.K8sNamespaceInfo) error
-		UpdateNamespace(info models.K8sNamespaceInfo) error
+		HasStackName(namespace string, stackName string) (bool, error)
+		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
+		CreateNamespace(info models.K8sNamespaceDetails) error
+		UpdateNamespace(info models.K8sNamespaceDetails) error
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
 		DeleteNamespace(namespace string) error
 		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
+		GetIngressControllers() models.K8sIngressControllers
 		CreateIngress(namespace string, info models.K8sIngressInfo) error
 		UpdateIngress(namespace string, info models.K8sIngressInfo) error
 		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
@@ -1362,10 +1366,6 @@ type (
 		UpdateService(namespace string, service models.K8sServiceInfo) error
 		GetServices(namespace string) ([]models.K8sServiceInfo, error)
 		DeleteServices(reqs models.K8sServiceDeleteRequests) error
-		GetIngressControllers() models.K8sIngressControllers
-
-		HasStackName(namespace string, stackName string) (bool, error)
-		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error

@@ -24,10 +24,10 @@ type Handler struct {
 	*mux.Router
 	authorizationService     *authorization.Service
 	dataStore                dataservices.DataStore
-	jwtService               dataservices.JWTService
-	kubernetesClientFactory  *cli.ClientFactory
-	kubeClusterAccessService kubernetes.KubeClusterAccessService
 	KubernetesClient         portainer.KubeClient
+	kubernetesClientFactory  *cli.ClientFactory
+	jwtService               dataservices.JWTService
+	kubeClusterAccessService kubernetes.KubeClusterAccessService
 }
 
 // NewHandler creates a handler to process pre-proxied requests to external APIs.

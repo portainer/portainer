@@ -20,10 +20,34 @@ func (kcl *KubeClient) GetIngressControllers() models.K8sIngressControllers {
 		return nil
 	}
 
+	// We want to know which of these controllers is in use.
+	var ingresses []models.K8sIngressInfo
+	namespaces, err := kcl.GetNamespaces()
+	if err != nil {
+		return nil
+	}
+	for namespace := range namespaces {
+		t, err := kcl.GetIngresses(namespace)
+		if err != nil {
+			return nil
+		}
+		ingresses = append(ingresses, t...)
+	}
+	usedClasses := make(map[string]struct{})
+	for _, ingress := range ingresses {
+		usedClasses[ingress.ClassName] = struct{}{}
+	}
+
 	for _, class := range classList.Items {
 		var controller models.K8sIngressController
 		controller.Name = class.Spec.Controller
 		controller.ClassName = class.Name
+
+		// If the class is used mark it as such.
+		if _, ok := usedClasses[class.Name]; ok {
+			controller.Used = true
+		}
+
 		switch {
 		case strings.Contains(controller.Name, "nginx"):
 			controller.Type = "nginx"

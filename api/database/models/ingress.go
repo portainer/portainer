@@ -12,6 +12,7 @@ type (
 		Type         string `json:"Type"`
 		Availability bool   `json:"Availability"`
 		New          bool   `json:"New"`
+		Used         bool   `json:"Used"`
 	}
 
 	K8sIngressControllers []K8sIngressController

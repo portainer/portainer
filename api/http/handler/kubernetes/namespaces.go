@@ -14,11 +14,10 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 
 	namespaces, err := cli.GetNamespaces()
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to retrieve nodes limits",
-			Err:        err,
-		}
+		return httperror.InternalServerError(
+			"Unable to retrieve nodes limits",
+			err,
+		)
 	}
 
 	return response.JSON(w, namespaces)
@@ -27,23 +26,21 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli := handler.KubernetesClient
 
-	var payload models.K8sNamespaceInfo
+	var payload models.K8sNamespaceDetails
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusBadRequest,
-			Message:    "Invalid request payload",
-			Err:        err,
-		}
+		return httperror.BadRequest(
+			"Invalid request payload",
+			err,
+		)
 	}
 
 	err = cli.CreateNamespace(payload)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to retrieve nodes limits",
-			Err:        err,
-		}
+		return httperror.InternalServerError(
+			"Unable to retrieve nodes limits",
+			err,
+		)
 	}
 	return nil
 }
@@ -53,20 +50,18 @@ func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *htt
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusBadRequest,
-			Message:    "Invalid namespace identifier route variable",
-			Err:        err,
-		}
+		return httperror.BadRequest(
+			"Invalid namespace identifier route variable",
+			err,
+		)
 	}
 
 	err = cli.DeleteNamespace(namespace)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to retrieve nodes limits",
-			Err:        err,
-		}
+		return httperror.InternalServerError(
+			"Unable to retrieve nodes limits",
+			err,
+		)
 	}
 
 	return nil
@@ -75,7 +70,7 @@ func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *htt
 func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	cli := handler.KubernetesClient
 
-	var payload models.K8sNamespaceInfo
+	var payload models.K8sNamespaceDetails
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{

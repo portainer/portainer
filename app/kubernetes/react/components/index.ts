@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 import { r2a } from '@/react-tools/react2angular';
+import { IngressClassDatatable } from '@/react/kubernetes/cluster/ingressClass/IngressClassDatatable';
 import { NamespacesSelector } from '@/react/kubernetes/cluster/RegistryAccessView/NamespacesSelector';
 import { StorageAccessModeSelector } from '@/react/kubernetes/cluster/ConfigureView/StorageAccessModeSelector';
 import { NamespaceAccessUsersSelector } from '@/react/kubernetes/namespaces/AccessView/NamespaceAccessUsersSelector';
@@ -8,6 +9,16 @@ import { CreateNamespaceRegistriesSelector } from '@/react/kubernetes/namespaces
 
 export const componentsModule = angular
   .module('portainer.kubernetes.react.components', [])
+  .component(
+    'ingressClassDatatable',
+    r2a(IngressClassDatatable, [
+      'onChangeAvailability',
+      'description',
+      'ingressControllers',
+      'noIngressControllerLabel',
+      'view',
+    ])
+  )
   .component(
     'namespacesSelector',
     r2a(NamespacesSelector, [
