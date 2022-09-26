@@ -671,7 +671,9 @@ func (transport *Transport) executeRequestAndRewriteResponse(request *http.Reque
 		return response, err
 	}
 
-	err = operation(response, executor)
+	if response.StatusCode == http.StatusOK {
+		err = operation(response, executor)
+	}
 	return response, err
 }
 
