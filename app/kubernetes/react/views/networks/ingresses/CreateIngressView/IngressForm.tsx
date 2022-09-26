@@ -169,7 +169,7 @@ export function IngressForm({
                 </div>
               </div>
 
-              <div className="form-group" key={rule.IngressClassName}>
+              <div className="form-group" key={ingressClassOptions.toString()}>
                 <label
                   className="control-label text-muted col-sm-3 col-lg-2 required"
                   htmlFor="ingress_class"
