@@ -166,8 +166,7 @@ angular
         url: '/endpoints',
         views: {
           'content@': {
-            templateUrl: './views/endpoints/endpoints.html',
-            controller: 'EndpointsController',
+            component: 'endpointsView',
           },
         },
       };
