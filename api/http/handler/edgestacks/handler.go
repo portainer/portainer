@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
+	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
 )
 
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
@@ -20,16 +21,19 @@ type Handler struct {
 	DataStore          dataservices.DataStore
 	FileService        portainer.FileService
 	GitService         portainer.GitService
+	edgeStacksService  *edgestackservice.Service
 	KubernetesDeployer portainer.KubernetesDeployer
 }
 
 // NewHandler creates a handler to manage environment(endpoint) group operations.
-func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, edgeStacksService *edgestackservice.Service) *Handler {
 	h := &Handler{
-		Router:         mux.NewRouter(),
-		requestBouncer: bouncer,
-		DataStore:      dataStore,
+		Router:            mux.NewRouter(),
+		requestBouncer:    bouncer,
+		DataStore:         dataStore,
+		edgeStacksService: edgeStacksService,
 	}
+
 	h.Handle("/edge_stacks",
 		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_stacks",

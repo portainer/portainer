@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/jwt"
 
 	"github.com/pkg/errors"
@@ -69,9 +70,12 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 		t.Fatal(err)
 	}
 
+	edgeStacksService := edgestacks.NewService(store)
+
 	handler := NewHandler(
 		security.NewRequestBouncer(store, jwtService, apiKeyService),
 		store,
+		edgeStacksService,
 	)
 
 	tmpDir := t.TempDir()

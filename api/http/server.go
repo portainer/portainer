@@ -56,6 +56,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	edgestackservice "github.com/portainer/portainer/api/internal/edge/edgestacks"
 	"github.com/portainer/portainer/api/internal/ssl"
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
@@ -76,6 +77,7 @@ type Server struct {
 	ReverseTunnelService        portainer.ReverseTunnelService
 	ComposeStackManager         portainer.ComposeStackManager
 	CryptoService               portainer.CryptoService
+	EdgeStacksService           *edgestackservice.Service
 	SignatureService            portainer.DigitalSignatureService
 	SnapshotService             portainer.SnapshotService
 	FileService                 portainer.FileService
@@ -152,7 +154,7 @@ func (server *Server) Start() error {
 	edgeJobsHandler.FileService = server.FileService
 	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
 
-	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer, server.DataStore)
+	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer, server.DataStore, server.EdgeStacksService)
 	edgeStacksHandler.FileService = server.FileService
 	edgeStacksHandler.GitService = server.GitService
 	edgeStacksHandler.KubernetesDeployer = server.KubernetesDeployer

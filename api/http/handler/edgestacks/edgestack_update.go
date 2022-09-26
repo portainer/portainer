@@ -65,18 +65,18 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
+	relationConfig, err := edge.FetchEndpointRelationsConfig(handler.DataStore)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve environments relations config from database", err)
 	}
 
-	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 	if err != nil {
 		return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 	}
 
 	if payload.EdgeGroups != nil {
-		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
+		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.Endpoints, relationConfig.EndpointGroups, relationConfig.EdgeGroups)
 		if err != nil {
 			return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 		}

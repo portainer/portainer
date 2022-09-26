@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/edge/stacks"
 )
 
 // @id EdgeStackDelete
@@ -35,7 +34,7 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", err)
 	}
 
-	err = stacks.DeleteEdgeStack(edgeStack.ID, edgeStack.EdgeGroups, handler.DataStore)
+	err = handler.edgeStacksService.DeleteEdgeStack(edgeStack.ID, edgeStack.EdgeGroups)
 	if err != nil {
 		return httperror.InternalServerError("Unable to delete edge stack", err)
 	}

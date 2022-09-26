@@ -1,4 +1,4 @@
-package stacks
+package edgestacks
 
 import (
 	"testing"
@@ -23,7 +23,9 @@ func Test_updateEndpointRelation_successfulRuns(t *testing.T) {
 
 	dataStore := testhelpers.NewDatastore(testhelpers.WithEndpointRelations(endpointRelations))
 
-	err := updateEndpointRelations(dataStore.EndpointRelation(), edgeStackID, relatedIds)
+	service := NewService(dataStore)
+
+	err := service.updateEndpointRelations(edgeStackID, relatedIds)
 
 	assert.NoError(t, err, "updateEndpointRelations should not fail")
 
