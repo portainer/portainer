@@ -66,7 +66,8 @@ export function CreateIngressView() {
     (servicesResults.isLoading &&
       configResults.isLoading &&
       namespacesResults.isLoading &&
-      ingressesResults.isLoading) ||
+      ingressesResults.isLoading &&
+      ingressControllersResults.isLoading) ||
     (isEdit && !ingressRule.IngressName);
 
   const [ingressNames, ingresses, ruleCounterByNamespace, hostWithTLS] =
@@ -166,7 +167,11 @@ export function CreateIngressView() {
       })) || []),
   ];
 
-  if (!existingIngressClass && ingressRule.IngressClassName) {
+  if (
+    !existingIngressClass &&
+    ingressRule.IngressClassName &&
+    ingressControllersResults.data
+  ) {
     ingressClassOptions.push({
       label: !ingressRule.IngressType
         ? `${ingressRule.IngressClassName} - NOT FOUND`
@@ -195,11 +200,7 @@ export function CreateIngressView() {
         (ing) => ing.Name === params.name && ing.Namespace === params.namespace
       );
       if (ing) {
-        const type = ingressControllersResults.data?.find(
-          (c) => c.ClassName === ing.ClassName
-        )?.Type;
         const r = prepareRuleFromIngress(ing);
-        r.IngressType = type;
         setIngressRule(r);
       }
     }
