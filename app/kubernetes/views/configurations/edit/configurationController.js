@@ -2,11 +2,13 @@ import angular from 'angular';
 import _ from 'lodash-es';
 
 import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configuration/formvalues';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds, KubernetesSecretTypes } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesConfigurationConverter from 'Kubernetes/converters/configuration';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+
+import { isConfigurationFormValid } from '../validation';
 
 class KubernetesConfigurationController {
   /* @ngInject */
@@ -36,7 +38,8 @@ class KubernetesConfigurationController {
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
-    this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
+    this.KubernetesConfigurationKinds = KubernetesConfigurationKinds;
+    this.KubernetesSecretTypes = KubernetesSecretTypes;
     this.KubernetesConfigMapService = KubernetesConfigMapService;
     this.KubernetesSecretService = KubernetesSecretService;
 
@@ -76,10 +79,9 @@ class KubernetesConfigurationController {
   }
 
   isFormValid() {
-    if (this.formValues.IsSimple) {
-      return this.formValues.Data.length > 0 && this.state.isDataValid;
-    }
-    return this.state.isDataValid;
+    const [isValid, warningMessage] = isConfigurationFormValid(this.state.alreadyExist, this.state.isDataValid, this.formValues);
+    this.state.secretWarningMessage = warningMessage;
+    return isValid;
   }
 
   // TODO: refactor
@@ -89,7 +91,7 @@ class KubernetesConfigurationController {
     try {
       this.state.actionInProgress = true;
       if (
-        this.formValues.Type !== this.configuration.Type ||
+        this.formValues.Kind !== this.configuration.Kind ||
         this.formValues.ResourcePool.Namespace.Name !== this.configuration.Namespace ||
         this.formValues.Name !== this.configuration.Name
       ) {
@@ -153,6 +155,7 @@ class KubernetesConfigurationController {
       this.formValues.Id = this.configuration.Id;
       this.formValues.Name = this.configuration.Name;
       this.formValues.Type = this.configuration.Type;
+      this.formValues.Kind = this.configuration.Kind;
       this.oldDataYaml = this.formValues.DataYaml;
 
       return this.configuration;
@@ -254,6 +257,8 @@ class KubernetesConfigurationController {
         currentName: this.$state.$current.name,
         isDataValid: true,
         isEditorDirty: false,
+        isDockerConfig: false,
+        secretWarningMessage: '',
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('configuration');
@@ -267,6 +272,23 @@ class KubernetesConfigurationController {
         await this.getEvents(this.configuration.Namespace);
         await this.getConfigurations();
       }
+
+      // after loading the configuration, check if it is a docker config secret type
+      if (
+        this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET &&
+        (this.formValues.Type === this.KubernetesSecretTypes.DOCKERCONFIGJSON.value || this.formValues.Type === this.KubernetesSecretTypes.DOCKERCFG.value)
+      ) {
+        this.state.isDockerConfig = true;
+      }
+      // convert the secret type to a human readable value
+      if (this.formValues.Type) {
+        const secretTypeValues = Object.values(this.KubernetesSecretTypes);
+        const secretType = secretTypeValues.find((secretType) => secretType.value === this.formValues.Type);
+        this.secretTypeName = secretType ? secretType.name : this.formValues.Type;
+      } else {
+        this.secretTypeName = '';
+      }
+
       this.tagUsedDataKeys();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');

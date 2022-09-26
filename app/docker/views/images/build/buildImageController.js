@@ -13,6 +13,7 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     ImageNames: [{ Name: '', Valid: false, Unique: true }],
     UploadFile: null,
     DockerFileContent: '',
+    AdditionalFiles: [],
     URL: '',
     Path: 'Dockerfile',
     NodeName: null,
@@ -74,7 +75,12 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
       return BuildService.buildImageFromURL(names, URL, dockerfilePath);
     } else {
       var dockerfileContent = $scope.formValues.DockerFileContent;
-      return BuildService.buildImageFromDockerfileContent(names, dockerfileContent);
+      if ($scope.formValues.AdditionalFiles.length === 0) {
+        return BuildService.buildImageFromDockerfileContent(names, dockerfileContent);
+      } else {
+        var additionalFiles = $scope.formValues.AdditionalFiles;
+        return BuildService.buildImageFromDockerfileContentAndFiles(names, dockerfileContent, additionalFiles);
+      }
     }
   }
 
@@ -139,5 +145,9 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
     if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
       return ModalService.confirmWebEditorDiscard();
     }
+  };
+
+  $scope.selectAdditionalFiles = function (files) {
+    $scope.formValues.AdditionalFiles = files;
   };
 }

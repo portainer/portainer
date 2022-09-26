@@ -159,7 +159,9 @@
                 <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
               </td>
               <td>
-                <a ui-sref="docker.services.service({id: item.Id})" ng-click="$event.stopPropagation()">{{ item.Name }}</a>
+                <button type="button" class="btn btn-link hover:no-underline !ml-0 p-0" ui-sref="docker.services.service({id: item.Id})" ng-click="$event.stopPropagation()">{{
+                  item.Name
+                }}</button>
               </td>
               <td ng-if="$ctrl.showStackColumn">{{ item.StackName ? item.StackName : '-' }}</td>
               <td ng-show="$ctrl.columnVisibility.columns.image.display">{{ item.Image | hideshasum }}</td>

@@ -2,7 +2,8 @@ import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 
 export class EditEdgeStackFormController {
   /* @ngInject */
-  constructor() {
+  constructor($scope) {
+    this.$scope = $scope;
     this.state = {
       endpointTypes: [],
     };
@@ -32,9 +33,11 @@ export class EditEdgeStackFormController {
   }
 
   onChangeGroups(groups) {
-    this.model.EdgeGroups = groups;
+    return this.$scope.$evalAsync(() => {
+      this.model.EdgeGroups = groups;
 
-    this.checkEndpointTypes(groups);
+      this.checkEndpointTypes(groups);
+    });
   }
 
   isFormValid() {

@@ -2,15 +2,15 @@ import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 import { TableProps } from 'react-table';
 
-import { useTableContext, TableContainer } from './TableContainer';
+import { TableContainer } from './TableContainer';
 import { TableActions } from './TableActions';
 import { TableTitleActions } from './TableTitleActions';
+import { TableContent } from './TableContent';
 import { TableHeaderCell } from './TableHeaderCell';
 import { TableSettingsMenu } from './TableSettingsMenu';
 import { TableTitle } from './TableTitle';
 import { TableHeaderRow } from './TableHeaderRow';
 import { TableRow } from './TableRow';
-import { TableContent } from './TableContent';
 import { TableFooter } from './TableFooter';
 
 function MainComponent({
@@ -19,8 +19,6 @@ function MainComponent({
   role,
   style,
 }: PropsWithChildren<TableProps>) {
-  useTableContext();
-
   return (
     <div className="table-responsive">
       <table

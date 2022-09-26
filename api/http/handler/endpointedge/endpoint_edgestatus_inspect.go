@@ -71,7 +71,7 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	if endpoint.EdgeID == "" {
@@ -92,14 +92,14 @@ func (handler *Handler) endpointEdgeStatusInspect(w http.ResponseWriter, r *http
 
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist environment changes inside the database", err}
+		return httperror.InternalServerError("Unable to Unable to persist environment changes inside the database", err)
 	}
 
 	checkinInterval := endpoint.EdgeCheckinInterval
 	if endpoint.EdgeCheckinInterval == 0 {
 		settings, err := handler.DataStore.Settings().Settings()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+			return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 		}
 		checkinInterval = settings.EdgeAgentCheckinInterval
 	}
@@ -167,7 +167,7 @@ func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel p
 
 		file, err := handler.FileService.GetFileContent(job.ScriptPath, "")
 		if err != nil {
-			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge job script file", err}
+			return nil, httperror.InternalServerError("Unable to retrieve Edge job script file", err)
 		}
 		schedule.Script = base64.RawStdEncoding.EncodeToString(file)
 
@@ -179,14 +179,14 @@ func (handler *Handler) buildSchedules(endpointID portainer.EndpointID, tunnel p
 func (handler *Handler) buildEdgeStacks(endpointID portainer.EndpointID) ([]stackStatusResponse, *httperror.HandlerError) {
 	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve relation object from the database", err}
+		return nil, httperror.InternalServerError("Unable to retrieve relation object from the database", err)
 	}
 
 	edgeStacksStatus := []stackStatusResponse{}
 	for stackID := range relation.EdgeStacks {
 		stack, err := handler.DataStore.EdgeStack().EdgeStack(stackID)
 		if err != nil {
-			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack from the database", err}
+			return nil, httperror.InternalServerError("Unable to retrieve edge stack from the database", err)
 		}
 
 		stackStatus := stackStatusResponse{

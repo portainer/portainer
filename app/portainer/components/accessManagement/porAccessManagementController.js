@@ -6,13 +6,20 @@ import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 
 class PorAccessManagementController {
   /* @ngInject */
-  constructor(Notifications, AccessService, RoleService) {
-    Object.assign(this, { Notifications, AccessService, RoleService });
+  constructor($scope, Notifications, AccessService, RoleService) {
+    Object.assign(this, { $scope, Notifications, AccessService, RoleService });
 
     this.limitedToBE = false;
 
     this.unauthorizeAccess = this.unauthorizeAccess.bind(this);
     this.updateAction = this.updateAction.bind(this);
+    this.onChangeUsersAndTeams = this.onChangeUsersAndTeams.bind(this);
+  }
+
+  onChangeUsersAndTeams(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.multiselectOutput = value;
+    });
   }
 
   updateAction() {

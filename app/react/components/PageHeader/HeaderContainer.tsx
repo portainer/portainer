@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import styles from './HeaderContainer.module.css';
 
 const Context = createContext<null | boolean>(null);
+Context.displayName = 'PageHeaderContext';
 
 export function useHeaderContext() {
   const context = useContext(Context);

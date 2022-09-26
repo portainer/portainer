@@ -30,23 +30,23 @@ import (
 func (handler *Handler) teamInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	teamID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid team identifier route variable", err}
+		return httperror.BadRequest("Invalid team identifier route variable", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	if !security.AuthorizedTeamManagement(portainer.TeamID(teamID), securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to team", errors.ErrResourceAccessDenied}
+		return httperror.Forbidden("Access denied to team", errors.ErrResourceAccessDenied)
 	}
 
 	team, err := handler.DataStore.Team().Team(portainer.TeamID(teamID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a team with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a team with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a team with the specified identifier inside the database", err)
 	}
 
 	return response.JSON(w, team)

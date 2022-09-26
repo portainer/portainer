@@ -7,6 +7,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/volume"
+	"github.com/portainer/portainer/api/database/models"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	v1 "k8s.io/api/core/v1"
 )
@@ -128,6 +129,7 @@ type (
 		MaxBatchSize              *int
 		MaxBatchDelay             *time.Duration
 		SecretKeyName             *string
+		LogLevel                  *string
 	}
 
 	// CustomTemplateVariableDefinition
@@ -254,7 +256,8 @@ type (
 	EdgeJobLogsStatus int
 
 	// EdgeSchedule represents a scheduled job that can run on Edge environments(endpoints).
-	// Deprecated in favor of EdgeJob
+	//
+	// Deprecated: in favor of EdgeJob
 	EdgeSchedule struct {
 		// EdgeSchedule Identifier
 		ID             ScheduleID   `json:"Id" example:"1"`
@@ -509,6 +512,11 @@ type (
 	// JobType represents a job type
 	JobType int
 
+	K8sNamespaceInfo struct {
+		IsSystem  bool `json:"IsSystem"`
+		IsDefault bool `json:"IsDefault"`
+	}
+
 	K8sNodeLimits struct {
 		CPU    int64 `json:"CPU"`
 		Memory int64 `json:"Memory"`
@@ -538,11 +546,14 @@ type (
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes environment(endpoint)
 	KubernetesConfiguration struct {
-		UseLoadBalancer          bool                           `json:"UseLoadBalancer"`
-		UseServerMetrics         bool                           `json:"UseServerMetrics"`
-		StorageClasses           []KubernetesStorageClassConfig `json:"StorageClasses"`
-		IngressClasses           []KubernetesIngressClassConfig `json:"IngressClasses"`
-		RestrictDefaultNamespace bool                           `json:"RestrictDefaultNamespace"`
+		UseLoadBalancer                 bool                           `json:"UseLoadBalancer"`
+		UseServerMetrics                bool                           `json:"UseServerMetrics"`
+		EnableResourceOverCommit        bool                           `json:"EnableResourceOverCommit"`
+		ResourceOverCommitPercentage    int                            `json:"ResourceOverCommitPercentage"`
+		StorageClasses                  []KubernetesStorageClassConfig `json:"StorageClasses"`
+		IngressClasses                  []KubernetesIngressClassConfig `json:"IngressClasses"`
+		RestrictDefaultNamespace        bool                           `json:"RestrictDefaultNamespace"`
+		IngressAvailabilityPerNamespace bool                           `json:"IngressAvailabilityPerNamespace"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
@@ -555,8 +566,10 @@ type (
 
 	// KubernetesIngressClassConfig represents a Kubernetes Ingress Class configuration
 	KubernetesIngressClassConfig struct {
-		Name string `json:"Name"`
-		Type string `json:"Type"`
+		Name              string   `json:"Name"`
+		Type              string   `json:"Type"`
+		GloballyBlocked   bool     `json:"Blocked"`
+		BlockedNamespaces []string `json:"BlockedNamespaces"`
 	}
 
 	// KubernetesShellPod represents a Kubectl Shell details to facilitate pod exec functionality
@@ -1231,6 +1244,12 @@ type (
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
 
+	Snapshot struct {
+		EndpointID EndpointID          `json:"EndpointId"`
+		Docker     *DockerSnapshot     `json:"Docker"`
+		Kubernetes *KubernetesSnapshot `json:"Kubernetes"`
+	}
+
 	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)
@@ -1243,6 +1262,7 @@ type (
 		NormalizeStackName(name string) string
 		Up(ctx context.Context, stack *Stack, endpoint *Endpoint, forceRereate bool) error
 		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
+		Pull(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data
@@ -1278,6 +1298,9 @@ type (
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		UpdateStoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		RemoveStackFileBackup(stackIdentifier, fileName string) error
+		RollbackStackFile(stackIdentifier, fileName string) error
 		GetEdgeStackProjectPath(edgeStackIdentifier string) string
 		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
@@ -1307,6 +1330,8 @@ type (
 	GitService interface {
 		CloneRepository(destination string, repositoryURL, referenceName, username, password string) error
 		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
+		ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error)
+		ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includeExts []string) ([]string, error)
 	}
 
 	// OpenAMTService represents a service for managing OpenAMT
@@ -1324,8 +1349,23 @@ type (
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
+
 		HasStackName(namespace string, stackName string) (bool, error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
+		CreateNamespace(info models.K8sNamespaceDetails) error
+		UpdateNamespace(info models.K8sNamespaceDetails) error
+		GetNamespaces() (map[string]K8sNamespaceInfo, error)
+		DeleteNamespace(namespace string) error
+		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
+		GetIngressControllers() models.K8sIngressControllers
+		CreateIngress(namespace string, info models.K8sIngressInfo) error
+		UpdateIngress(namespace string, info models.K8sIngressInfo) error
+		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
+		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
+		CreateService(namespace string, service models.K8sServiceInfo) error
+		UpdateService(namespace string, service models.K8sServiceInfo) error
+		GetServices(namespace string) ([]models.K8sServiceInfo, error)
+		DeleteServices(reqs models.K8sServiceDeleteRequests) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
@@ -1386,13 +1426,14 @@ type (
 		Start()
 		SetSnapshotInterval(snapshotInterval string) error
 		SnapshotEndpoint(endpoint *Endpoint) error
+		FillSnapshotData(endpoint *Endpoint) error
 	}
 
 	// SwarmStackManager represents a service to manage Swarm stacks
 	SwarmStackManager interface {
 		Login(registries []Registry, endpoint *Endpoint) error
 		Logout(endpoint *Endpoint) error
-		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
+		Deploy(stack *Stack, prune bool, pullImage bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
 		NormalizeStackName(name string) string
 	}
@@ -1446,8 +1487,12 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
+const FeatureFlagEdgeRemoteUpdate Feature = "edgeRemoteUpdate"
+
 // List of supported features
-var SupportedFeatureFlags = []Feature{}
+var SupportedFeatureFlags = []Feature{
+	FeatureFlagEdgeRemoteUpdate,
+}
 
 const (
 	_ AuthenticationMethod = iota

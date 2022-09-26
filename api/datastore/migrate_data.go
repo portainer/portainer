@@ -4,20 +4,17 @@ import (
 	"fmt"
 	"runtime/debug"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/dataservices/errors"
-	plog "github.com/portainer/portainer/api/datastore/log"
 	"github.com/portainer/portainer/api/datastore/migrator"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/sirupsen/logrus"
 
 	werrors "github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/rs/zerolog/log"
 )
 
 const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
-
-var migrateLog = plog.NewScopedLog("database, migrate")
 
 func (store *Store) MigrateData() error {
 	version, err := store.version()
@@ -43,6 +40,7 @@ func (store *Store) MigrateData() error {
 		RoleService:             store.RoleService,
 		ScheduleService:         store.ScheduleService,
 		SettingsService:         store.SettingsService,
+		SnapshotService:         store.SnapshotService,
 		StackService:            store.StackService,
 		TagService:              store.TagService,
 		TeamMembershipService:   store.TeamMembershipService,
@@ -56,20 +54,19 @@ func (store *Store) MigrateData() error {
 	// restore on error
 	err = store.connectionMigrateData(migratorParams)
 	if err != nil {
-		logrus.Errorf("While DB migration %v. Restoring DB", err)
+		log.Error().Err(err).Msg("while DB migration, restoring DB")
+
 		// Restore options
 		options := BackupOptions{
 			BackupPath: backupPath,
 		}
+
 		err := store.restoreWithOptions(&options)
 		if err != nil {
-			logrus.Fatalf(
-				"Failed restoring the backup. portainer database file needs to restored manually by "+
-					"replacing %s database file with recent backup %s. Error %v",
-				store.databasePath(),
-				options.BackupPath,
-				err,
-			)
+			log.Fatal().
+				Str("database_file", store.databasePath()).
+				Str("backup", options.BackupPath).Err(err).
+				Msg("failed restoring the backup, Portainer database file needs to restored manually by replacing the database file with a recent backup")
 		}
 	}
 
@@ -111,10 +108,15 @@ func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParam
 	}
 
 	if migrator.Version() < portainer.DBVersion {
-		migrateLog.Info(fmt.Sprintf("Migrating database from version %v to %v.\n", migrator.Version(), portainer.DBVersion))
+		log.Info().
+			Int("migrator_version", migrator.Version()).
+			Int("db_version", portainer.DBVersion).
+			Msg("migrating database")
+
 		err = store.FailSafeMigrate(migrator)
 		if err != nil {
-			migrateLog.Error("An error occurred during database migration", err)
+			log.Error().Err(err).Msg("an error occurred during database migration")
+
 			return err
 		}
 	}
@@ -124,17 +126,19 @@ func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParam
 
 // backupVersion will backup the database or panic if any errors occur
 func (store *Store) backupVersion(migrator *migrator.Migrator) error {
-	migrateLog.Info("Backing up database prior to version upgrade...")
+	log.Info().Msg("backing up database prior to version upgrade")
 
 	options := getBackupRestoreOptions(store.commonBackupDir())
 
 	_, err := store.backupWithOptions(options)
 	if err != nil {
-		migrateLog.Error("An error occurred during database backup", err)
+		log.Error().Err(err).Msg("an error occurred during database backup")
+
 		removalErr := store.removeWithOptions(options)
 		if removalErr != nil {
-			migrateLog.Error("An error occurred during store removal prior to backup", err)
+			log.Error().Err(err).Msg("an error occurred during store removal prior to backup")
 		}
+
 		return err
 	}
 

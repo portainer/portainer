@@ -37,25 +37,25 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	edgeStackID, err := request.RetrieveNumericRouteVariableValue(r, "stackId")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid edge stack identifier route variable", err}
+		return httperror.BadRequest("Invalid edge stack identifier route variable", err)
 	}
 
 	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(edgeStackID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an edge stack with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find an edge stack with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an edge stack with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find an edge stack with the specified identifier inside the database", err)
 	}
 
 	fileName := edgeStack.EntryPoint
 	if endpointutils.IsDockerEndpoint(endpoint) {
 		if fileName == "" {
-			return &httperror.HandlerError{http.StatusBadRequest, "Docker is not supported by this stack", errors.New("Docker is not supported by this stack")}
+			return httperror.BadRequest("Docker is not supported by this stack", errors.New("Docker is not supported by this stack"))
 		}
 	}
 
@@ -63,13 +63,13 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 		fileName = edgeStack.ManifestPath
 
 		if fileName == "" {
-			return &httperror.HandlerError{http.StatusBadRequest, "Kubernetes is not supported by this stack", errors.New("Kubernetes is not supported by this stack")}
+			return httperror.BadRequest("Kubernetes is not supported by this stack", errors.New("Kubernetes is not supported by this stack"))
 		}
 	}
 
 	stackFileContent, err := handler.FileService.GetFileContent(edgeStack.ProjectPath, fileName)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Compose file from disk", err}
+		return httperror.InternalServerError("Unable to retrieve Compose file from disk", err)
 	}
 
 	return response.JSON(w, configResponse{

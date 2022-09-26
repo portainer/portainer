@@ -1,6 +1,5 @@
 import { HeaderGroup, TableHeaderProps } from 'react-table';
 
-import { useTableContext } from './TableContainer';
 import { TableHeaderCell } from './TableHeaderCell';
 
 interface Props<D extends Record<string, unknown> = Record<string, unknown>> {
@@ -17,8 +16,6 @@ export function TableHeaderRow<
   role,
   style,
 }: Props<D> & TableHeaderProps) {
-  useTableContext();
-
   return (
     <tr className={className} role={role} style={style}>
       {headers.map((column) => (

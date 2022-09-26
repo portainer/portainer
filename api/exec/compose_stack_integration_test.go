@@ -3,7 +3,6 @@ package exec
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -12,6 +11,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+
+	"github.com/rs/zerolog/log"
 )
 
 const composeFile = `version: "3.9"
@@ -77,7 +78,7 @@ func containerExists(containerName string) bool {
 
 	out, err := cmd.Output()
 	if err != nil {
-		log.Fatalf("failed to list containers: %s", err)
+		log.Fatal().Err(err).Msg("failed to list containers")
 	}
 
 	return strings.Contains(string(out), containerName)

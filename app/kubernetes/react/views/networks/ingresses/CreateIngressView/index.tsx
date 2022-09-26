@@ -1,0 +1,1 @@
+export { CreateIngressView } from './CreateIngressView';

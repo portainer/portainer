@@ -504,7 +504,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     };
 
     const dockerFeaturesConfiguration = {
-      name: 'docker.featuresConfiguration',
+      name: 'docker.host.featuresConfiguration',
       url: '/feat-config',
       views: {
         'content@': {
@@ -513,8 +513,18 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       },
     };
 
-    const registries = {
-      name: 'docker.registries',
+    const swarmFeaturesConfiguration = {
+      name: 'docker.swarm.featuresConfiguration',
+      url: '/feat-config',
+      views: {
+        'content@': {
+          component: 'dockerFeaturesConfigurationView',
+        },
+      },
+    };
+
+    const dockerRegistries = {
+      name: 'docker.host.registries',
       url: '/registries',
       views: {
         'content@': {
@@ -523,8 +533,28 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       },
     };
 
-    const registryAccess = {
-      name: 'docker.registries.access',
+    const swarmRegistries = {
+      name: 'docker.swarm.registries',
+      url: '/registries',
+      views: {
+        'content@': {
+          component: 'endpointRegistriesView',
+        },
+      },
+    };
+
+    const dockerRegistryAccess = {
+      name: 'docker.host.registries.access',
+      url: '/:id/access',
+      views: {
+        'content@': {
+          component: 'dockerRegistryAccessView',
+        },
+      },
+    };
+
+    const swarmRegistryAccess = {
+      name: 'docker.swarm.registries.access',
       url: '/:id/access',
       views: {
         'content@': {
@@ -577,7 +607,10 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     $stateRegistryProvider.register(volumeBrowse);
     $stateRegistryProvider.register(volumeCreation);
     $stateRegistryProvider.register(dockerFeaturesConfiguration);
-    $stateRegistryProvider.register(registries);
-    $stateRegistryProvider.register(registryAccess);
+    $stateRegistryProvider.register(swarmFeaturesConfiguration);
+    $stateRegistryProvider.register(dockerRegistries);
+    $stateRegistryProvider.register(swarmRegistries);
+    $stateRegistryProvider.register(dockerRegistryAccess);
+    $stateRegistryProvider.register(swarmRegistryAccess);
   },
 ]);

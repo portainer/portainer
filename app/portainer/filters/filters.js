@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 import filesize from 'filesize';
 
 import { Eye, EyeOff, Users } from 'react-feather';
-import { ResourceControlOwnership as RCO } from '@/portainer/access-control/types';
+import { ResourceControlOwnership as RCO } from '@/react/portainer/access-control/types';
 
 export function truncateLeftRight(text, max, left, right) {
   max = isNaN(max) ? 50 : max;

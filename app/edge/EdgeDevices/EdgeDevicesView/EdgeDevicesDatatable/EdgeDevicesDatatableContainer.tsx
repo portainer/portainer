@@ -92,6 +92,7 @@ function Loader({ children, storageKey }: LoaderProps) {
       edgeDevice: true,
       search: debouncedSearchValue,
       types: EdgeTypes,
+      excludeSnapshots: true,
       ...pagination,
     },
     settings.autoRefreshRate * 1000

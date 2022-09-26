@@ -1,6 +1,14 @@
 import _ from 'lodash';
 import toastr from 'toastr';
 import sanitize from 'sanitize-html';
+import jwtDecode from 'jwt-decode';
+import { v4 as uuid } from 'uuid';
+
+import { get as localStorageGet } from '@/portainer/hooks/useLocalStorage';
+import { notificationsStore } from '@/react/portainer/notifications/notifications-store';
+import { ToastNotification } from '@/react/portainer/notifications/types';
+
+const { addNotification } = notificationsStore.getState();
 
 toastr.options = {
   timeOut: 3000,
@@ -25,15 +33,18 @@ toastr.options = {
 };
 
 export function notifySuccess(title: string, text: string) {
+  saveNotification(title, text, 'success');
   toastr.success(sanitize(_.escape(text)), sanitize(_.escape(title)));
 }
 
 export function notifyWarning(title: string, text: string) {
+  saveNotification(title, text, 'warning');
   toastr.warning(sanitize(_.escape(text)), sanitize(title), { timeOut: 6000 });
 }
 
 export function notifyError(title: string, e?: Error, fallbackText = '') {
   const msg = pickErrorMsg(e) || fallbackText;
+  saveNotification(title, msg, 'error');
 
   // eslint-disable-next-line no-console
   console.error(e);
@@ -85,4 +96,21 @@ function pickErrorMsg(e?: Error) {
   });
 
   return msg;
+}
+
+function saveNotification(title: string, text: string, type: string) {
+  const notif: ToastNotification = {
+    id: uuid(),
+    title,
+    details: text,
+    type,
+    timeStamp: new Date(),
+  };
+  const jwt = localStorageGet('JWT', '');
+  if (jwt !== '') {
+    const { id } = jwtDecode(jwt) as { id: number };
+    if (id) {
+      addNotification(id, notif);
+    }
+  }
 }

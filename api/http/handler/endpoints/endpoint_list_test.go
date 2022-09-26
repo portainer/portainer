@@ -11,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
@@ -188,7 +189,7 @@ func Test_endpointList_edgeDeviceFilter(t *testing.T) {
 
 func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, teardown func()) {
 	is := assert.New(t)
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 
 	for _, endpoint := range endpoints {
 		err := store.Endpoint().Create(&endpoint)
@@ -202,6 +203,8 @@ func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, tear
 	handler = NewHandler(bouncer, nil)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
+
+	handler.SnapshotService, _ = snapshot.NewService("1s", store, nil, nil, nil)
 
 	return handler, teardown
 }

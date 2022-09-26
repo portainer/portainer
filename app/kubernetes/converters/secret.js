@@ -4,12 +4,13 @@ import { KubernetesApplicationSecret } from 'Kubernetes/models/secret/models';
 import { KubernetesPortainerConfigurationDataAnnotation } from 'Kubernetes/models/configuration/models';
 import { KubernetesPortainerConfigurationOwnerLabel } from 'Kubernetes/models/configuration/models';
 import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
-
+import { KubernetesSecretTypes } from 'Kubernetes/models/configuration/models';
 class KubernetesSecretConverter {
   static createPayload(secret) {
     const res = new KubernetesSecretCreatePayload();
     res.metadata.name = secret.Name;
     res.metadata.namespace = secret.Namespace;
+    res.type = secret.Type.value;
     const configurationOwner = _.truncate(secret.ConfigurationOwner, { length: 63, omission: '' });
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = configurationOwner;
 
@@ -25,6 +26,11 @@ class KubernetesSecretConverter {
     if (annotation !== '') {
       res.metadata.annotations[KubernetesPortainerConfigurationDataAnnotation] = annotation;
     }
+
+    _.forEach(secret.Annotations, (entry) => {
+      res.metadata.annotations[entry.name] = entry.value;
+    });
+
     return res;
   }
 
@@ -32,6 +38,7 @@ class KubernetesSecretConverter {
     const res = new KubernetesSecretUpdatePayload();
     res.metadata.name = secret.Name;
     res.metadata.namespace = secret.Namespace;
+    res.type = secret.Type;
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = secret.ConfigurationOwner;
 
     let annotation = '';
@@ -54,12 +61,15 @@ class KubernetesSecretConverter {
     res.Id = payload.metadata.uid;
     res.Name = payload.metadata.name;
     res.Namespace = payload.metadata.namespace;
+    res.Type = payload.type;
     res.ConfigurationOwner = payload.metadata.labels ? payload.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] : '';
     res.CreationDate = payload.metadata.creationTimestamp;
 
     res.IsRegistrySecret = payload.metadata.annotations && !!payload.metadata.annotations['portainer.io/registry.id'];
 
     res.Yaml = yaml ? yaml.data : '';
+
+    res.SecretType = payload.type;
 
     res.Data = _.map(payload.data, (value, key) => {
       const annotations = payload.metadata.annotations ? payload.metadata.annotations[KubernetesPortainerConfigurationDataAnnotation] : '';
@@ -82,8 +92,19 @@ class KubernetesSecretConverter {
     const res = new KubernetesApplicationSecret();
     res.Name = formValues.Name;
     res.Namespace = formValues.ResourcePool.Namespace.Name;
+    res.Type = formValues.Type;
     res.ConfigurationOwner = formValues.ConfigurationOwner;
     res.Data = formValues.Data;
+
+    switch (formValues.Type) {
+      case KubernetesSecretTypes.CUSTOM:
+        res.Type.value = formValues.customType;
+        break;
+
+      case KubernetesSecretTypes.SERVICEACCOUNTTOKEN:
+        res.Annotations = [{ name: 'kubernetes.io/service-account.name', value: formValues.ServiceAccountName }];
+        break;
+    }
     return res;
   }
 }

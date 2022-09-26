@@ -1,12 +1,12 @@
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 
-angular.module('portainer.kubernetes').filter('kubernetesConfigurationTypeText', function () {
+angular.module('portainer.kubernetes').filter('kubernetesConfigurationKindText', function () {
   'use strict';
   return function (type) {
     switch (type) {
-      case KubernetesConfigurationTypes.SECRET:
+      case KubernetesConfigurationKinds.SECRET:
         return 'Secret';
-      case KubernetesConfigurationTypes.CONFIGMAP:
+      case KubernetesConfigurationKinds.CONFIGMAP:
         return 'ConfigMap';
     }
   };

@@ -23,6 +23,7 @@ interface State {
 }
 
 export const UserContext = createContext<State | null>(null);
+UserContext.displayName = 'UserContext';
 
 export function useUser() {
   const context = useContext(UserContext);
@@ -175,9 +176,4 @@ export function UserProvider({ children }: UserProviderProps) {
     const user = await getUser(id);
     setUser(user);
   }
-}
-
-export function useIsAdmin() {
-  const { user } = useUser();
-  return !!user && isAdmin(user);
 }

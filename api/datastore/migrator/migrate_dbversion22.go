@@ -1,9 +1,14 @@
 package migrator
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+
+	"github.com/rs/zerolog/log"
+)
 
 func (m *Migrator) updateTagsToDBVersion23() error {
-	migrateLog.Info("- Updating tags")
+	log.Info().Msg("updating tags")
+
 	tags, err := m.tagService.Tags()
 	if err != nil {
 		return err
@@ -21,7 +26,8 @@ func (m *Migrator) updateTagsToDBVersion23() error {
 }
 
 func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
-	migrateLog.Info("- updating endpoints and endpoint groups")
+	log.Info().Msg("updating endpoints and endpoint groups")
+
 	tags, err := m.tagService.Tags()
 	if err != nil {
 		return err
@@ -90,5 +96,6 @@ func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
 			return err
 		}
 	}
+
 	return nil
 }

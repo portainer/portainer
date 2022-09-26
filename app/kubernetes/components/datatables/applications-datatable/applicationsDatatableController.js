@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 
 angular.module('portainer.docker').controller('KubernetesApplicationsDatatableController', [
   '$scope',
@@ -93,8 +93,8 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       // Map all ingress rules in published ports to their respective URLs
       const ingressUrls = item.PublishedPorts.flatMap((pp) => pp.IngressRules)
         .filter(({ Host, IP }) => Host || IP)
-        .map(({ Host, IP, Port, Path }) => {
-          let scheme = Port === 443 ? 'https' : 'http';
+        .map(({ Host, IP, Path, TLS }) => {
+          let scheme = TLS && TLS.filter((tls) => tls.hosts && tls.hosts.includes(Host)).length > 0 ? 'https' : 'http';
           return `${scheme}://${Host || IP}${Path}`;
         });
 
@@ -112,7 +112,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     };
 
     this.hasConfigurationSecrets = function (item) {
-      return item.Configurations && item.Configurations.some((config) => config.Data && config.Type === KubernetesConfigurationTypes.SECRET);
+      return item.Configurations && item.Configurations.some((config) => config.Data && config.Type === KubernetesConfigurationKinds.SECRET);
     };
 
     /**

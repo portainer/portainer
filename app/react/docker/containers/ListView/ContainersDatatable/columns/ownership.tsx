@@ -3,7 +3,7 @@ import clsx from 'clsx';
 
 import { ownershipIcon } from '@/portainer/filters/filters';
 import type { DockerContainer } from '@/react/docker/containers/types';
-import { ResourceControlOwnership } from '@/portainer/access-control/types';
+import { ResourceControlOwnership } from '@/react/portainer/access-control/types';
 
 export const ownership: Column<DockerContainer> = {
   Header: 'Ownership',

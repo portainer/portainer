@@ -2,20 +2,12 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import {
-  KubernetesResourcePoolFormValues,
-  KubernetesResourcePoolIngressClassAnnotationFormValue,
-  KubernetesResourcePoolIngressClassHostFormValue,
-  KubernetesResourcePoolNginxRewriteAnnotationFormValue,
-  KubernetesResourcePoolNginxUseregexAnnotationFormValue,
-  KubernetesResourcePoolTraefikRewriteAnnotationFormValue,
-} from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassHostFormValue } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
-import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
-
 import { FeatureId } from '@/portainer/feature-flags/enums';
+import { getIngressControllerClassMap, updateIngressControllerClassMap } from '@/react/kubernetes/cluster/ingressClass/utils';
 
 class KubernetesCreateResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -39,8 +31,16 @@ class KubernetesCreateResourcePoolController {
     this.onToggleStorageQuota = this.onToggleStorageQuota.bind(this);
     this.onToggleLoadBalancerQuota = this.onToggleLoadBalancerQuota.bind(this);
     this.onToggleResourceQuota = this.onToggleResourceQuota.bind(this);
+    this.onChangeIngressControllerAvailability = this.onChangeIngressControllerAvailability.bind(this);
+    this.onRegistriesChange = this.onRegistriesChange.bind(this);
   }
   /* #endregion */
+
+  onRegistriesChange(registries) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues.Registries = registries;
+    });
+  }
 
   onToggleStorageQuota(storageClassName, enabled) {
     this.$scope.$evalAsync(() => {
@@ -60,68 +60,9 @@ class KubernetesCreateResourcePoolController {
     });
   }
 
-  onChangeIngressHostname() {
-    const state = this.state.duplicates.ingressHosts;
-    const hosts = _.flatMap(this.formValues.IngressClasses, 'Hosts');
-    const hostnames = _.compact(hosts.map((h) => h.Host));
-    const hostnamesWithoutRemoved = _.filter(hostnames, (h) => !h.NeedsDeletion);
-    const allHosts = _.flatMap(this.allIngresses, 'Hosts');
-    const formDuplicates = KubernetesFormValidationHelper.getDuplicates(hostnamesWithoutRemoved);
-    _.forEach(hostnames, (host, idx) => {
-      if (host !== undefined && _.includes(allHosts, host)) {
-        formDuplicates[idx] = host;
-      }
-    });
-    const duplicates = {};
-    let count = 0;
-    _.forEach(this.formValues.IngressClasses, (ic) => {
-      duplicates[ic.IngressClass.Name] = {};
-      _.forEach(ic.Hosts, (hostFV, hostIdx) => {
-        if (hostFV.Host === formDuplicates[count]) {
-          duplicates[ic.IngressClass.Name][hostIdx] = hostFV.Host;
-        }
-        count++;
-      });
-    });
-    state.refs = duplicates;
-    state.hasRefs = false;
-    _.forIn(duplicates, (value) => {
-      if (Object.keys(value).length > 0) {
-        state.hasRefs = true;
-      }
-    });
-  }
-
-  addHostname(ingressClass) {
-    ingressClass.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
-  }
-
-  removeHostname(ingressClass, index) {
-    ingressClass.Hosts.splice(index, 1);
-    this.onChangeIngressHostname();
-  }
-
-  /* #region  ANNOTATIONS MANAGEMENT */
-  addAnnotation(ingressClass) {
-    ingressClass.Annotations.push(new KubernetesResourcePoolIngressClassAnnotationFormValue());
-  }
-
-  addRewriteAnnotation(ingressClass) {
-    if (ingressClass.IngressClass.Type === this.IngressClassTypes.NGINX) {
-      ingressClass.Annotations.push(new KubernetesResourcePoolNginxRewriteAnnotationFormValue());
-    }
-
-    if (ingressClass.IngressClass.Type === this.IngressClassTypes.TRAEFIK) {
-      ingressClass.Annotations.push(new KubernetesResourcePoolTraefikRewriteAnnotationFormValue());
-    }
-  }
-
-  addUseregexAnnotation(ingressClass) {
-    ingressClass.Annotations.push(new KubernetesResourcePoolNginxUseregexAnnotationFormValue());
-  }
-
-  removeAnnotation(ingressClass, index) {
-    ingressClass.Annotations.splice(index, 1);
+  /* #region  INGRESS MANAGEMENT */
+  onChangeIngressControllerAvailability(controllerClassMap) {
+    this.ingressControllers = controllerClassMap;
   }
   /* #endregion */
 
@@ -168,6 +109,7 @@ class KubernetesCreateResourcePoolController {
         this.checkDefaults();
         this.formValues.Owner = this.Authentication.getUserDetails().username;
         await this.KubernetesResourcePoolService.create(this.formValues);
+        await updateIngressControllerClassMap(this.endpoint.Id, this.ingressControllers, this.formValues.Name);
         this.Notifications.success('Namespace successfully created', this.formValues.Name);
         this.$state.go('kubernetes.resourcePools');
       } catch (err) {
@@ -232,14 +174,20 @@ class KubernetesCreateResourcePoolController {
           viewReady: false,
           isAlreadyExist: false,
           hasPrefixKube: false,
-          canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
+          canUseIngress: false,
           duplicates: {
             ingressHosts: new KubernetesFormValidationReferences(),
           },
           isAdmin: this.Authentication.isAdmin(),
+          ingressAvailabilityPerNamespace: endpoint.Kubernetes.Configuration.IngressAvailabilityPerNamespace,
         };
 
         const nodes = await this.KubernetesNodeService.get();
+
+        this.ingressControllers = [];
+        if (this.state.ingressAvailabilityPerNamespace) {
+          this.ingressControllers = await getIngressControllerClassMap({ environmentId: this.endpoint.Id, allowedOnly: true });
+        }
 
         _.forEach(nodes, (item) => {
           this.state.sliderMaxMemory += filesizeParser(item.Memory);

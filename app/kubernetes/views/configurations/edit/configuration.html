@@ -46,9 +46,15 @@
                       </td>
                     </tr>
                     <tr>
-                      <td class="!pl-0">Configuration type</td>
+                      <td class="!pl-0">Configuration kind</td>
                       <td>
-                        {{ ctrl.configuration.Type | kubernetesConfigurationTypeText }}
+                        {{ ctrl.configuration.Kind | kubernetesConfigurationKindText }}
+                      </td>
+                    </tr>
+                    <tr ng-if="ctrl.secretTypeName">
+                      <td class="!pl-0">Secret Type</td>
+                      <td>
+                        {{ ctrl.secretTypeName }}
                       </td>
                     </tr>
                   </tbody>
@@ -99,10 +105,19 @@
             <kubernetes-configuration-data
               ng-if="ctrl.formValues"
               form-values="ctrl.formValues"
+              is-docker-config="ctrl.state.isDockerConfig"
               is-valid="ctrl.state.isDataValid"
+              on-change-validation="ctrl.isFormValid()"
               is-creation="false"
               is-editor-dirty="ctrl.state.isEditorDirty"
             ></kubernetes-configuration-data>
+
+            <div class="form-group" ng-if="ctrl.state.secretWarningMessage">
+              <div class="col-sm-12 small text-warning vertical-center pt-5">
+                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
+                <span>{{ ctrl.state.secretWarningMessage }}</span>
+              </div>
+            </div>
 
             <!-- summary -->
             <kubernetes-summary-view
@@ -122,7 +137,7 @@
                   button-spinner="ctrl.state.actionInProgress"
                   data-cy="k8sConfigDetail-updateConfig"
                 >
-                  <span ng-hide="ctrl.state.actionInProgress">Update {{ ctrl.configuration.Type | kubernetesConfigurationTypeText }}</span>
+                  <span ng-hide="ctrl.state.actionInProgress">Update {{ ctrl.configuration.Kind | kubernetesConfigurationKindText }}</span>
                   <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
                 </button>
               </div>

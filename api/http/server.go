@@ -3,8 +3,6 @@ package http
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
-	"log"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -26,6 +24,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
 	"github.com/portainer/portainer/api/http/handler/edgetemplates"
+	"github.com/portainer/portainer/api/http/handler/edgeupdateschedules"
 	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
@@ -63,6 +62,8 @@ import (
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
 	stackdeployer "github.com/portainer/portainer/api/stacks"
+
+	"github.com/rs/zerolog/log"
 )
 
 // Server implements the portainer.Server interface
@@ -152,6 +153,8 @@ func (server *Server) Start() error {
 	edgeJobsHandler.FileService = server.FileService
 	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
 
+	edgeUpdateScheduleHandler := edgeupdateschedules.NewHandler(requestBouncer, server.DataStore)
+
 	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer, server.DataStore)
 	edgeStacksHandler.FileService = server.FileService
 	edgeStacksHandler.GitService = server.GitService
@@ -183,7 +186,7 @@ func (server *Server) Start() error {
 	endpointProxyHandler.ProxyManager = server.ProxyManager
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
-	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.JWTService, server.KubeClusterAccessService, server.KubernetesClientFactory)
+	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.JWTService, server.KubeClusterAccessService, server.KubernetesClientFactory, nil)
 
 	var dockerHandler = dockerhandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.DockerClientFactory)
 
@@ -274,62 +277,64 @@ func (server *Server) Start() error {
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
 	server.Handler = &handler.Handler{
-		RoleHandler:            roleHandler,
-		AuthHandler:            authHandler,
-		BackupHandler:          backupHandler,
-		CustomTemplatesHandler: customTemplatesHandler,
-		DockerHandler:          dockerHandler,
-		EdgeGroupsHandler:      edgeGroupsHandler,
-		EdgeJobsHandler:        edgeJobsHandler,
-		EdgeStacksHandler:      edgeStacksHandler,
-		EdgeTemplatesHandler:   edgeTemplatesHandler,
-		EndpointGroupHandler:   endpointGroupHandler,
-		EndpointHandler:        endpointHandler,
-		EndpointHelmHandler:    endpointHelmHandler,
-		EndpointEdgeHandler:    endpointEdgeHandler,
-		EndpointProxyHandler:   endpointProxyHandler,
-		FileHandler:            fileHandler,
-		LDAPHandler:            ldapHandler,
-		HelmTemplatesHandler:   helmTemplatesHandler,
-		KubernetesHandler:      kubernetesHandler,
-		MOTDHandler:            motdHandler,
-		OpenAMTHandler:         openAMTHandler,
-		FDOHandler:             fdoHandler,
-		RegistryHandler:        registryHandler,
-		ResourceControlHandler: resourceControlHandler,
-		SettingsHandler:        settingsHandler,
-		SSLHandler:             sslHandler,
-		StatusHandler:          statusHandler,
-		StackHandler:           stackHandler,
-		StorybookHandler:       storybookHandler,
-		TagHandler:             tagHandler,
-		TeamHandler:            teamHandler,
-		TeamMembershipHandler:  teamMembershipHandler,
-		TemplatesHandler:       templatesHandler,
-		UploadHandler:          uploadHandler,
-		UserHandler:            userHandler,
-		WebSocketHandler:       websocketHandler,
-		WebhookHandler:         webhookHandler,
+		RoleHandler:               roleHandler,
+		AuthHandler:               authHandler,
+		BackupHandler:             backupHandler,
+		CustomTemplatesHandler:    customTemplatesHandler,
+		DockerHandler:             dockerHandler,
+		EdgeGroupsHandler:         edgeGroupsHandler,
+		EdgeJobsHandler:           edgeJobsHandler,
+		EdgeUpdateScheduleHandler: edgeUpdateScheduleHandler,
+		EdgeStacksHandler:         edgeStacksHandler,
+		EdgeTemplatesHandler:      edgeTemplatesHandler,
+		EndpointGroupHandler:      endpointGroupHandler,
+		EndpointHandler:           endpointHandler,
+		EndpointHelmHandler:       endpointHelmHandler,
+		EndpointEdgeHandler:       endpointEdgeHandler,
+		EndpointProxyHandler:      endpointProxyHandler,
+		FileHandler:               fileHandler,
+		LDAPHandler:               ldapHandler,
+		HelmTemplatesHandler:      helmTemplatesHandler,
+		KubernetesHandler:         kubernetesHandler,
+		MOTDHandler:               motdHandler,
+		OpenAMTHandler:            openAMTHandler,
+		FDOHandler:                fdoHandler,
+		RegistryHandler:           registryHandler,
+		ResourceControlHandler:    resourceControlHandler,
+		SettingsHandler:           settingsHandler,
+		SSLHandler:                sslHandler,
+		StatusHandler:             statusHandler,
+		StackHandler:              stackHandler,
+		StorybookHandler:          storybookHandler,
+		TagHandler:                tagHandler,
+		TeamHandler:               teamHandler,
+		TeamMembershipHandler:     teamMembershipHandler,
+		TemplatesHandler:          templatesHandler,
+		UploadHandler:             uploadHandler,
+		UserHandler:               userHandler,
+		WebSocketHandler:          websocketHandler,
+		WebhookHandler:            webhookHandler,
 	}
 
 	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))
 	if server.HTTPEnabled {
 		go func() {
-			log.Printf("[INFO] [http,server] [message: starting HTTP server on port %s]", server.BindAddress)
+			log.Info().Str("bind_address", server.BindAddress).Msg("starting HTTP server")
 			httpServer := &http.Server{
 				Addr:    server.BindAddress,
 				Handler: handler,
 			}
 
 			go shutdown(server.ShutdownCtx, httpServer)
+
 			err := httpServer.ListenAndServe()
 			if err != nil && err != http.ErrServerClosed {
-				log.Printf("[ERROR] [message: http server failed] [error: %s]", err)
+				log.Error().Err(err).Msg("HTTP server failed to start")
 			}
 		}()
 	}
 
-	log.Printf("[INFO] [http,server] [message: starting HTTPS server on port %s]", server.BindAddressHTTPS)
+	log.Info().Str("bind_address", server.BindAddressHTTPS).Msg("starting HTTPS server")
 	httpsServer := &http.Server{
 		Addr:    server.BindAddressHTTPS,
 		Handler: handler,
@@ -341,18 +346,21 @@ func (server *Server) Start() error {
 	}
 
 	go shutdown(server.ShutdownCtx, httpsServer)
+
 	return httpsServer.ListenAndServeTLS("", "")
 }
 
 func shutdown(shutdownCtx context.Context, httpServer *http.Server) {
 	<-shutdownCtx.Done()
 
-	log.Println("[DEBUG] [http,server] [message: shutting down http server]")
+	log.Debug().Msg("shutting down the HTTP server")
 	shutdownTimeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	err := httpServer.Shutdown(shutdownTimeout)
 	if err != nil {
-		fmt.Printf("[ERROR] [http,server] [message: failed shutdown http server] [error: %s]", err)
+		log.Error().
+			Err(err).
+			Msg("failed to shut down the HTTP server")
 	}
 }

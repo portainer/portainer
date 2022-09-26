@@ -29,15 +29,15 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	webhookToken, err := request.RetrieveRouteVariableValue(r, "token")
 
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Invalid service id parameter", err}
+		return httperror.InternalServerError("Invalid service id parameter", err)
 	}
 
 	webhook, err := handler.DataStore.Webhook().WebhookByToken(webhookToken)
 
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a webhook with this token", err}
+		return httperror.NotFound("Unable to find a webhook with this token", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhook from the database", err}
+		return httperror.InternalServerError("Unable to retrieve webhook from the database", err)
 	}
 
 	resourceID := webhook.ResourceID
@@ -47,9 +47,9 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
 	imageTag, _ := request.RetrieveQueryParameter(r, "tag", true)
@@ -58,7 +58,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	case portainer.ServiceWebhook:
 		return handler.executeServiceWebhook(w, endpoint, resourceID, registryID, imageTag)
 	default:
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unsupported webhook type", errors.New("Webhooks for this resource are not currently supported")}
+		return httperror.InternalServerError("Unsupported webhook type", errors.New("Webhooks for this resource are not currently supported"))
 	}
 }
 
@@ -71,13 +71,13 @@ func (handler *Handler) executeServiceWebhook(
 ) *httperror.HandlerError {
 	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "", nil)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating docker client", err}
+		return httperror.InternalServerError("Error creating docker client", err)
 	}
 	defer dockerClient.Close()
 
 	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), resourceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Error looking up service", err}
+		return httperror.InternalServerError("Error looking up service", err)
 	}
 
 	service.Spec.TaskTemplate.ForceUpdate++
@@ -101,21 +101,21 @@ func (handler *Handler) executeServiceWebhook(
 	if registryID != 0 {
 		registry, err := handler.DataStore.Registry().Registry(registryID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Error getting registry", err}
+			return httperror.InternalServerError("Error getting registry", err)
 		}
 
 		if registry.Authentication {
 			registryutils.EnsureRegTokenValid(handler.DataStore, registry)
 			serviceUpdateOptions.EncodedRegistryAuth, err = registryutils.GetRegistryAuthHeader(registry)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Error getting registry auth header", err}
+				return httperror.InternalServerError("Error getting registry auth header", err)
 			}
 		}
 	}
 	if imageTag != "" {
 		rc, err := dockerClient.ImagePull(context.Background(), service.Spec.TaskTemplate.ContainerSpec.Image, dockertypes.ImagePullOptions{RegistryAuth: serviceUpdateOptions.EncodedRegistryAuth})
 		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Error pulling image with the specified tag", Err: err}
+			return httperror.NotFound("Error pulling image with the specified tag", err)
 		}
 		defer func(rc io.ReadCloser) {
 			_ = rc.Close()
@@ -124,7 +124,7 @@ func (handler *Handler) executeServiceWebhook(
 	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, serviceUpdateOptions)
 
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Error updating service", err}
+		return httperror.InternalServerError("Error updating service", err)
 	}
 	return response.Empty(w)
 }

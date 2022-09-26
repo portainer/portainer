@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -56,10 +57,12 @@ func (service *Service) Extensions() ([]portainer.Extension, error) {
 		func(obj interface{}) (interface{}, error) {
 			extension, ok := obj.(*portainer.Extension)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Extension object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Extension object")
 				return nil, fmt.Errorf("Failed to convert to Extension object: %s", obj)
 			}
+
 			extensions = append(extensions, *extension)
+
 			return &portainer.Extension{}, nil
 		})
 

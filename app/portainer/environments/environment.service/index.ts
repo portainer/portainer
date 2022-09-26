@@ -2,7 +2,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { type EnvironmentGroupId } from '@/portainer/environment-groups/types';
 import { type TagId } from '@/portainer/tags/types';
 import { UserId } from '@/portainer/users/types';
-import { TeamId } from '@/portainer/teams/types';
+import { TeamId } from '@/react/portainer/users/teams/types';
 
 import type {
   Environment,
@@ -24,6 +24,7 @@ export interface EnvironmentsQueryParams {
   status?: EnvironmentStatus[];
   edgeDevice?: boolean;
   edgeDeviceUntrusted?: boolean;
+  excludeSnapshots?: boolean;
   provisioned?: boolean;
   name?: string;
   agentVersions?: string[];

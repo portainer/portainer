@@ -80,6 +80,7 @@
                   autocomplete="off"
                   data-cy="auth-passwordInput"
                   placeholder="Enter your password"
+                  ng-trim="false"
                 />
                 <button
                   data-cy="auth-passwordInputToggle"
@@ -98,7 +99,7 @@
 
             <div class="form-group overflow-auto" ng-if="ctrl.state.showStandardLogin">
               <!-- login button -->
-              <div class="col-sm-12 d-flex">
+              <div class="col-sm-12 d-flex py-1">
                 <button
                   type="submit"
                   class="btn btn-primary btn-lg btn-block"

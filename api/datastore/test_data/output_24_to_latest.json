@@ -52,13 +52,16 @@
       "IsEdgeDevice": false,
       "Kubernetes": {
         "Configuration": {
+          "EnableResourceOverCommit": false,
+          "IngressAvailabilityPerNamespace": true,
           "IngressClasses": null,
+          "ResourceOverCommitPercentage": 0,
           "RestrictDefaultNamespace": false,
           "StorageClasses": null,
           "UseLoadBalancer": false,
           "UseServerMetrics": false
         },
-        "Snapshots": null
+        "Snapshots": []
       },
       "LastCheckInDate": 0,
       "Name": "local",
@@ -75,127 +78,7 @@
         "allowVolumeBrowserForRegularUsers": false,
         "enableHostManagementFeatures": false
       },
-      "Snapshots": [
-        {
-          "DockerSnapshotRaw": {
-            "Containers": null,
-            "Images": null,
-            "Info": {
-              "Architecture": "",
-              "BridgeNfIp6tables": false,
-              "BridgeNfIptables": false,
-              "CPUSet": false,
-              "CPUShares": false,
-              "CgroupDriver": "",
-              "ContainerdCommit": {
-                "Expected": "",
-                "ID": ""
-              },
-              "Containers": 0,
-              "ContainersPaused": 0,
-              "ContainersRunning": 0,
-              "ContainersStopped": 0,
-              "CpuCfsPeriod": false,
-              "CpuCfsQuota": false,
-              "Debug": false,
-              "DefaultRuntime": "",
-              "DockerRootDir": "",
-              "Driver": "",
-              "DriverStatus": null,
-              "ExperimentalBuild": false,
-              "GenericResources": null,
-              "HttpProxy": "",
-              "HttpsProxy": "",
-              "ID": "",
-              "IPv4Forwarding": false,
-              "Images": 0,
-              "IndexServerAddress": "",
-              "InitBinary": "",
-              "InitCommit": {
-                "Expected": "",
-                "ID": ""
-              },
-              "Isolation": "",
-              "KernelMemory": false,
-              "KernelMemoryTCP": false,
-              "KernelVersion": "",
-              "Labels": null,
-              "LiveRestoreEnabled": false,
-              "LoggingDriver": "",
-              "MemTotal": 0,
-              "MemoryLimit": false,
-              "NCPU": 0,
-              "NEventsListener": 0,
-              "NFd": 0,
-              "NGoroutines": 0,
-              "Name": "",
-              "NoProxy": "",
-              "OSType": "",
-              "OSVersion": "",
-              "OomKillDisable": false,
-              "OperatingSystem": "",
-              "PidsLimit": false,
-              "Plugins": {
-                "Authorization": null,
-                "Log": null,
-                "Network": null,
-                "Volume": null
-              },
-              "RegistryConfig": null,
-              "RuncCommit": {
-                "Expected": "",
-                "ID": ""
-              },
-              "Runtimes": null,
-              "SecurityOptions": null,
-              "ServerVersion": "",
-              "SwapLimit": false,
-              "Swarm": {
-                "ControlAvailable": false,
-                "Error": "",
-                "LocalNodeState": "",
-                "NodeAddr": "",
-                "NodeID": "",
-                "RemoteManagers": null
-              },
-              "SystemTime": "",
-              "Warnings": null
-            },
-            "Networks": null,
-            "Version": {
-              "ApiVersion": "",
-              "Arch": "",
-              "GitCommit": "",
-              "GoVersion": "",
-              "Os": "",
-              "Platform": {
-                "Name": ""
-              },
-              "Version": ""
-            },
-            "Volumes": {
-              "Volumes": null,
-              "Warnings": null
-            }
-          },
-          "DockerVersion": "20.10.13",
-          "GpuUseAll": false,
-          "GpuUseList": null,
-          "HealthyContainerCount": 0,
-          "ImageCount": 9,
-          "NodeCount": 0,
-          "RunningContainerCount": 5,
-          "ServiceCount": 0,
-          "StackCount": 2,
-          "StoppedContainerCount": 0,
-          "Swarm": false,
-          "Time": 1648610112,
-          "TotalCPU": 8,
-          "TotalMemory": 25098706944,
-          "UnhealthyContainerCount": 0,
-          "VolumeCount": 10
-        }
-      ],
+      "Snapshots": [],
       "Status": 1,
       "TLSConfig": {
         "TLS": false,
@@ -775,6 +658,131 @@
       "mpsUser": ""
     }
   },
+  "snapshots": [
+    {
+      "Docker": {
+        "DockerSnapshotRaw": {
+          "Containers": null,
+          "Images": null,
+          "Info": {
+            "Architecture": "",
+            "BridgeNfIp6tables": false,
+            "BridgeNfIptables": false,
+            "CPUSet": false,
+            "CPUShares": false,
+            "CgroupDriver": "",
+            "ContainerdCommit": {
+              "Expected": "",
+              "ID": ""
+            },
+            "Containers": 0,
+            "ContainersPaused": 0,
+            "ContainersRunning": 0,
+            "ContainersStopped": 0,
+            "CpuCfsPeriod": false,
+            "CpuCfsQuota": false,
+            "Debug": false,
+            "DefaultRuntime": "",
+            "DockerRootDir": "",
+            "Driver": "",
+            "DriverStatus": null,
+            "ExperimentalBuild": false,
+            "GenericResources": null,
+            "HttpProxy": "",
+            "HttpsProxy": "",
+            "ID": "",
+            "IPv4Forwarding": false,
+            "Images": 0,
+            "IndexServerAddress": "",
+            "InitBinary": "",
+            "InitCommit": {
+              "Expected": "",
+              "ID": ""
+            },
+            "Isolation": "",
+            "KernelMemory": false,
+            "KernelMemoryTCP": false,
+            "KernelVersion": "",
+            "Labels": null,
+            "LiveRestoreEnabled": false,
+            "LoggingDriver": "",
+            "MemTotal": 0,
+            "MemoryLimit": false,
+            "NCPU": 0,
+            "NEventsListener": 0,
+            "NFd": 0,
+            "NGoroutines": 0,
+            "Name": "",
+            "NoProxy": "",
+            "OSType": "",
+            "OSVersion": "",
+            "OomKillDisable": false,
+            "OperatingSystem": "",
+            "PidsLimit": false,
+            "Plugins": {
+              "Authorization": null,
+              "Log": null,
+              "Network": null,
+              "Volume": null
+            },
+            "RegistryConfig": null,
+            "RuncCommit": {
+              "Expected": "",
+              "ID": ""
+            },
+            "Runtimes": null,
+            "SecurityOptions": null,
+            "ServerVersion": "",
+            "SwapLimit": false,
+            "Swarm": {
+              "ControlAvailable": false,
+              "Error": "",
+              "LocalNodeState": "",
+              "NodeAddr": "",
+              "NodeID": "",
+              "RemoteManagers": null
+            },
+            "SystemTime": "",
+            "Warnings": null
+          },
+          "Networks": null,
+          "Version": {
+            "ApiVersion": "",
+            "Arch": "",
+            "GitCommit": "",
+            "GoVersion": "",
+            "Os": "",
+            "Platform": {
+              "Name": ""
+            },
+            "Version": ""
+          },
+          "Volumes": {
+            "Volumes": null,
+            "Warnings": null
+          }
+        },
+        "DockerVersion": "20.10.13",
+        "GpuUseAll": false,
+        "GpuUseList": null,
+        "HealthyContainerCount": 0,
+        "ImageCount": 9,
+        "NodeCount": 0,
+        "RunningContainerCount": 5,
+        "ServiceCount": 0,
+        "StackCount": 2,
+        "StoppedContainerCount": 0,
+        "Swarm": false,
+        "Time": 1648610112,
+        "TotalCPU": 8,
+        "TotalMemory": 25098706944,
+        "UnhealthyContainerCount": 0,
+        "VolumeCount": 10
+      },
+      "EndpointId": 1,
+      "Kubernetes": null
+    }
+  ],
   "ssl": {
     "certPath": "",
     "httpEnabled": true,

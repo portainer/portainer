@@ -17,14 +17,6 @@ class EnvironmentVariablesSimpleModeItemController {
     this.onChange(this.index, { ...this.variable, value });
   }
 
-  hasValue() {
-    return typeof this.variable.value !== 'undefined';
-  }
-
-  removeValue() {
-    this.onChange(this.index, { name: this.variable.name });
-  }
-
   $onInit() {
     this.formName = `variableForm${this.index}`;
   }

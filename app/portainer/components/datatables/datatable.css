@@ -72,8 +72,6 @@
 
 .datatable .searchBar input[type='text'] {
   border: 0px !important;
-  @apply placeholder:text-gray-7;
-  @apply th-dark:placeholder:text-gray-warm-7;
 }
 
 .datatable .searchIcon {
@@ -343,7 +341,9 @@
 [data-reach-menu-list],
 [data-reach-menu-items] {
   padding: 0px;
+  border-radius: 8px;
   border: 1px var(--bg-dropdown-menu-color);
+  background-color: var(--bg-dropdown-menu-color);
 }
 
 .dropdown-menu .tableMenu {

@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,7 +11,10 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/go-git/go-git/v5/plumbing/transport/client"
+	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 )
@@ -32,20 +36,47 @@ type azureOptions struct {
 	username, password string
 }
 
-type azureDownloader struct {
+// azureRef abstracts from the response of https://docs.microsoft.com/en-us/rest/api/azure/devops/git/refs/list?view=azure-devops-rest-6.0#refs
+type azureRef struct {
+	Name     string `json:"name"`
+	ObjectID string `json:"objectId"`
+}
+
+// azureItem abstracts from the response of https://docs.microsoft.com/en-us/rest/api/azure/devops/git/items/get?view=azure-devops-rest-6.0#download
+type azureItem struct {
+	ObjectID string `json:"objectId"`
+	CommitId string `json:"commitId"`
+	Path     string `json:"path"`
+}
+
+type azureClient struct {
 	client  *http.Client
 	baseUrl string
 }
 
-func NewAzureDownloader(client *http.Client) *azureDownloader {
-	return &azureDownloader{
-		client:  client,
+func NewAzureClient() *azureClient {
+	httpsCli := newHttpClientForAzure()
+	return &azureClient{
+		client:  httpsCli,
 		baseUrl: "https://dev.azure.com",
 	}
 }
 
-func (a *azureDownloader) download(ctx context.Context, destination string, options cloneOptions) error {
-	zipFilepath, err := a.downloadZipFromAzureDevOps(ctx, options)
+func newHttpClientForAzure() *http.Client {
+	httpsCli := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			Proxy:           http.ProxyFromEnvironment,
+		},
+		Timeout: 300 * time.Second,
+	}
+
+	client.InstallProtocol("https", githttp.NewClient(httpsCli))
+	return httpsCli
+}
+
+func (a *azureClient) download(ctx context.Context, destination string, opt cloneOption) error {
+	zipFilepath, err := a.downloadZipFromAzureDevOps(ctx, opt)
 	if err != nil {
 		return errors.Wrap(err, "failed to download a zip file from Azure DevOps")
 	}
@@ -59,12 +90,12 @@ func (a *azureDownloader) download(ctx context.Context, destination string, opti
 	return nil
 }
 
-func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, options cloneOptions) (string, error) {
-	config, err := parseUrl(options.repositoryUrl)
+func (a *azureClient) downloadZipFromAzureDevOps(ctx context.Context, opt cloneOption) (string, error) {
+	config, err := parseUrl(opt.repositoryUrl)
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to parse url")
 	}
-	downloadUrl, err := a.buildDownloadUrl(config, options.referenceName)
+	downloadUrl, err := a.buildDownloadUrl(config, opt.referenceName)
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to build download url")
 	}
@@ -75,8 +106,8 @@ func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, option
 	defer zipFile.Close()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", downloadUrl, nil)
-	if options.username != "" || options.password != "" {
-		req.SetBasicAuth(options.username, options.password)
+	if opt.username != "" || opt.password != "" {
+		req.SetBasicAuth(opt.username, opt.password)
 	} else if config.username != "" || config.password != "" {
 		req.SetBasicAuth(config.username, config.password)
 	}
@@ -102,53 +133,58 @@ func (a *azureDownloader) downloadZipFromAzureDevOps(ctx context.Context, option
 	return zipFile.Name(), nil
 }
 
-func (a *azureDownloader) latestCommitID(ctx context.Context, options fetchOptions) (string, error) {
-	config, err := parseUrl(options.repositoryUrl)
+func (a *azureClient) latestCommitID(ctx context.Context, opt fetchOption) (string, error) {
+	rootItem, err := a.getRootItem(ctx, opt)
 	if err != nil {
-		return "", errors.WithMessage(err, "failed to parse url")
+		return "", err
+	}
+	return rootItem.CommitId, nil
+}
+
+func (a *azureClient) getRootItem(ctx context.Context, opt fetchOption) (*azureItem, error) {
+	config, err := parseUrl(opt.repositoryUrl)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to parse url")
 	}
 
-	rootItemUrl, err := a.buildRootItemUrl(config, options.referenceName)
+	rootItemUrl, err := a.buildRootItemUrl(config, opt.referenceName)
 	if err != nil {
-		return "", errors.WithMessage(err, "failed to build azure root item url")
+		return nil, errors.WithMessage(err, "failed to build azure root item url")
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", rootItemUrl, nil)
-	if options.username != "" || options.password != "" {
-		req.SetBasicAuth(options.username, options.password)
+	if opt.username != "" || opt.password != "" {
+		req.SetBasicAuth(opt.username, opt.password)
 	} else if config.username != "" || config.password != "" {
 		req.SetBasicAuth(config.username, config.password)
 	}
 
 	if err != nil {
-		return "", errors.WithMessage(err, "failed to create a new HTTP request")
+		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
 	}
 
 	resp, err := a.client.Do(req)
 	if err != nil {
-		return "", errors.WithMessage(err, "failed to make an HTTP request")
+		return nil, errors.WithMessage(err, "failed to make an HTTP request")
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to get repository root item with a status \"%v\"", resp.Status)
+		return nil, checkAzureStatusCode(fmt.Errorf("failed to get repository root item with a status \"%v\"", resp.Status), resp.StatusCode)
 	}
 
 	var items struct {
-		Value []struct {
-			CommitId string `json:"commitId"`
-		}
+		Value []azureItem
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&items); err != nil {
-		return "", errors.Wrap(err, "could not parse Azure items response")
+		return nil, errors.Wrap(err, "could not parse Azure items response")
 	}
 
 	if len(items.Value) == 0 || items.Value[0].CommitId == "" {
-		return "", errors.Errorf("failed to get latest commitID in the repository")
+		return nil, errors.Errorf("failed to get latest commitID in the repository")
 	}
-
-	return items.Value[0].CommitId, nil
+	return &items.Value[0], nil
 }
 
 func parseUrl(rawUrl string) (*azureOptions, error) {
@@ -219,7 +255,7 @@ func parseHttpUrl(rawUrl string) (*azureOptions, error) {
 	return &opt, nil
 }
 
-func (a *azureDownloader) buildDownloadUrl(config *azureOptions, referenceName string) (string, error) {
+func (a *azureClient) buildDownloadUrl(config *azureOptions, referenceName string) (string, error) {
 	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/items",
 		a.baseUrl,
 		url.PathEscape(config.organisation),
@@ -246,7 +282,7 @@ func (a *azureDownloader) buildDownloadUrl(config *azureOptions, referenceName s
 	return u.String(), nil
 }
 
-func (a *azureDownloader) buildRootItemUrl(config *azureOptions, referenceName string) (string, error) {
+func (a *azureClient) buildRootItemUrl(config *azureOptions, referenceName string) (string, error) {
 	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/items",
 		a.baseUrl,
 		url.PathEscape(config.organisation),
@@ -264,6 +300,49 @@ func (a *azureDownloader) buildRootItemUrl(config *azureOptions, referenceName s
 		q.Set("versionDescriptor.versionType", getVersionType(referenceName))
 		q.Set("versionDescriptor.version", formatReferenceName(referenceName))
 	}
+	q.Set("api-version", "6.0")
+	u.RawQuery = q.Encode()
+
+	return u.String(), nil
+}
+
+func (a *azureClient) buildRefsUrl(config *azureOptions) (string, error) {
+	// ref@https://docs.microsoft.com/en-us/rest/api/azure/devops/git/refs/list?view=azure-devops-rest-6.0#gitref
+	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/refs",
+		a.baseUrl,
+		url.PathEscape(config.organisation),
+		url.PathEscape(config.project),
+		url.PathEscape(config.repository))
+	u, err := url.Parse(rawUrl)
+
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to parse list refs url path %s", rawUrl)
+	}
+
+	q := u.Query()
+	q.Set("api-version", "6.0")
+	u.RawQuery = q.Encode()
+
+	return u.String(), nil
+}
+
+func (a *azureClient) buildTreeUrl(config *azureOptions, rootObjectHash string) (string, error) {
+	// ref@https://docs.microsoft.com/en-us/rest/api/azure/devops/git/trees/get?view=azure-devops-rest-6.0
+	rawUrl := fmt.Sprintf("%s/%s/%s/_apis/git/repositories/%s/trees/%s",
+		a.baseUrl,
+		url.PathEscape(config.organisation),
+		url.PathEscape(config.project),
+		url.PathEscape(config.repository),
+		url.PathEscape(rootObjectHash),
+	)
+	u, err := url.Parse(rawUrl)
+
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to parse list tree url path %s", rawUrl)
+	}
+	q := u.Query()
+	// projectId={projectId}&recursive=true&fileName={fileName}&$format={$format}&api-version=6.0
+	q.Set("recursive", "true")
 	q.Set("api-version", "6.0")
 	u.RawQuery = q.Encode()
 
@@ -293,4 +372,120 @@ func getVersionType(name string) string {
 		return "tag"
 	}
 	return "commit"
+}
+
+func (a *azureClient) listRefs(ctx context.Context, opt baseOption) ([]string, error) {
+	config, err := parseUrl(opt.repositoryUrl)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to parse url")
+	}
+
+	listRefsUrl, err := a.buildRefsUrl(config)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to build list refs url")
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", listRefsUrl, nil)
+	if opt.username != "" || opt.password != "" {
+		req.SetBasicAuth(opt.username, opt.password)
+	} else if config.username != "" || config.password != "" {
+		req.SetBasicAuth(config.username, config.password)
+	}
+
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
+	}
+
+	resp, err := a.client.Do(req)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to make an HTTP request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, checkAzureStatusCode(fmt.Errorf("failed to list refs with a status \"%v\"", resp.Status), resp.StatusCode)
+	}
+
+	var refs struct {
+		Value []azureRef
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&refs); err != nil {
+		return nil, errors.Wrap(err, "could not parse Azure refs response")
+	}
+
+	var ret []string
+	for _, value := range refs.Value {
+		if value.Name == "HEAD" {
+			continue
+		}
+		ret = append(ret, value.Name)
+	}
+
+	return ret, nil
+}
+
+// listFiles list all filenames under the specific repository
+func (a *azureClient) listFiles(ctx context.Context, opt fetchOption) ([]string, error) {
+	rootItem, err := a.getRootItem(ctx, opt)
+	if err != nil {
+		return nil, err
+	}
+
+	config, err := parseUrl(opt.repositoryUrl)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to parse url")
+	}
+
+	listTreeUrl, err := a.buildTreeUrl(config, rootItem.ObjectID)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to build list tree url")
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", listTreeUrl, nil)
+	if opt.username != "" || opt.password != "" {
+		req.SetBasicAuth(opt.username, opt.password)
+	} else if config.username != "" || config.password != "" {
+		req.SetBasicAuth(config.username, config.password)
+	}
+
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to create a new HTTP request")
+	}
+
+	resp, err := a.client.Do(req)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to make an HTTP request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to list tree url with a status \"%v\"", resp.Status)
+	}
+
+	var tree struct {
+		TreeEntries []struct {
+			RelativePath string `json:"relativePath"`
+		} `json:"treeEntries"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&tree); err != nil {
+		return nil, errors.Wrap(err, "could not parse Azure tree response")
+	}
+
+	var allPaths []string
+	for _, treeEntry := range tree.TreeEntries {
+		allPaths = append(allPaths, treeEntry.RelativePath)
+	}
+
+	return allPaths, nil
+}
+
+func checkAzureStatusCode(err error, code int) error {
+	if code == http.StatusNotFound {
+		return ErrIncorrectRepositoryURL
+	} else if code == http.StatusUnauthorized || code == http.StatusNonAuthoritativeInfo {
+		return ErrAuthenticationFailure
+	}
+	return err
 }

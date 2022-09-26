@@ -58,7 +58,10 @@ export class EndpointsController {
   getPaginatedEndpoints(start, limit, search) {
     return this.$async(async () => {
       try {
-        const [{ value: endpoints, totalCount }, groups] = await Promise.all([getEnvironments({ start, limit, query: { search } }), this.GroupService.groups()]);
+        const [{ value: endpoints, totalCount }, groups] = await Promise.all([
+          getEnvironments({ start, limit, query: { search, excludeSnapshots: true } }),
+          this.GroupService.groups(),
+        ]);
         EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
         return { endpoints, totalCount };
       } catch (err) {

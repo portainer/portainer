@@ -31,4 +31,5 @@ export enum FeatureId {
   CONTAINER_WEBHOOK = 'container-webhook',
   POD_SECURITY_POLICY_CONSTRAINT = 'pod-security-policy-constraint',
   HIDE_DOCKER_HUB_ANONYMOUS = 'hide-docker-hub-anonymous',
+  CUSTOM_LOGIN_BANNER = 'custom-login-banner',
 }

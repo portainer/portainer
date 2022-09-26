@@ -22,24 +22,21 @@
             ng-model-options="{ debounce: 300 }"
           />
         </div>
-        <div>
-          <ui-select ng-model="$ctrl.state.selectedCategory" theme="bootstrap" append-to-body="true">
-            <ui-select-match placeholder="Select a category">
-              <a class="btn btn-xs btn-link pull-right vertical-center" ng-click="$ctrl.clearCategory()">
-                <pr-icon icon="'x'" feather="true"></pr-icon>
-              </a>
-              <span class="vertical-center">{{ $select.selected }}</span>
-            </ui-select-match>
-            <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
-              <span>{{ category }}</span>
-            </ui-select-choices>
-          </ui-select>
+        <div class="w-1/5">
+          <por-select
+            placeholder="'Select a category'"
+            value="$ctrl.state.selectedCategory"
+            options="$ctrl.state.categories"
+            on-change="($ctrl.onCategoryChange)"
+            is-clearable="true"
+            bind-to-body="true"
+          ></por-select>
         </div>
       </div>
 
       <div class="blocklist">
         <helm-templates-list-item
-          ng-repeat="chart in $ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory "
+          ng-repeat="chart in $ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory"
           model="chart"
           type-label="helm"
           on-select="($ctrl.selectAction)"

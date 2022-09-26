@@ -10,9 +10,7 @@ export function onStartupAngular($rootScope, $state, $interval, LocalStorage, En
 
   $transitions.onEnter({}, () => {
     const endpoint = EndpointProvider.currentEndpoint();
-    if (endpoint) {
-      document.title = `${defaultTitle} | ${endpoint.Name}`;
-    }
+    document.title = endpoint ? `${defaultTitle} | ${endpoint.Name}` : `${defaultTitle}`;
   });
 
   // Workaround to prevent the loading bar from going backward

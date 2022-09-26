@@ -4,24 +4,23 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
-
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/client"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/sirupsen/logrus"
+	"github.com/portainer/portainer/api/hostmanagement/openamt"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/client"
+	"github.com/rs/zerolog/log"
 )
 
 type HostInfo struct {
@@ -57,21 +56,21 @@ const (
 func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
+		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
-	logrus.WithField("endpointID", endpointID).Info("OpenAMTHostInfo")
+	log.Info().Int("endpointID", endpointID).Msg("OpenAMTHostInfo")
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
+		return httperror.NotFound("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
+		return httperror.InternalServerError("Unable to find an endpoint with the specified identifier inside the database", err)
 	}
 
 	amtInfo, output, err := handler.getEndpointAMTInfo(endpoint)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: output, Err: err}
+		return httperror.InternalServerError(output, err)
 	}
 
 	return response.JSON(w, amtInfo)
@@ -121,6 +120,7 @@ func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *porta
 	if err != nil {
 		return "Could not run container", err
 	}
+
 	return output, nil
 }
 
@@ -133,18 +133,20 @@ func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *porta
 func pullImage(ctx context.Context, docker *client.Client, imageName string) error {
 	out, err := docker.ImagePull(ctx, imageName, types.ImagePullOptions{})
 	if err != nil {
-		logrus.WithError(err).WithField("imageName", imageName).Error("Could not pull image from registry")
+		log.Error().Str("image_name", imageName).Err(err).Msg("could not pull image from registry")
+
 		return err
 	}
 
 	defer out.Close()
 	outputBytes, err := ioutil.ReadAll(out)
 	if err != nil {
-		logrus.WithError(err).WithField("imageName", imageName).Error("Could not read image pull output")
+		log.Error().Str("image_name", imageName).Err(err).Msg("could not read image pull output")
+
 		return err
 	}
 
-	log.Printf("%s imaged pulled with output:\n%s", imageName, string(outputBytes))
+	log.Debug().Str("image_name", imageName).Str("output", string(outputBytes)).Msg("image pulled")
 
 	return nil
 }
@@ -158,14 +160,24 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 	opts.Filters.Add("name", containerName)
 	existingContainers, err := docker.ContainerList(ctx, opts)
 	if err != nil {
-		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("listing existing container")
+		log.Error().
+			Str("image_name", imageName).
+			Str("container_name", containerName).
+			Err(err).
+			Msg("listing existing container")
+
 		return "", err
 	}
 
 	if len(existingContainers) > 0 {
 		err = docker.ContainerRemove(ctx, existingContainers[0].ID, types.ContainerRemoveOptions{Force: true})
 		if err != nil {
-			logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("removing existing container")
+			log.Error().
+				Str("image_name", imageName).
+				Str("container_name", containerName).
+				Err(err).
+				Msg("removing existing container")
+
 			return "", err
 		}
 	}
@@ -188,50 +200,82 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 		nil,
 		containerName,
 	)
+
 	if err != nil {
-		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("creating container")
-		return "", err
-	}
-	err = docker.ContainerStart(ctx, created.ID, types.ContainerStartOptions{})
-	if err != nil {
-		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("starting container")
+		log.Error().
+			Str("image_name", imageName).
+			Str("container_name", containerName).
+			Err(err).
+			Msg("creating container")
+
 		return "", err
 	}
 
-	log.Printf("%s container created and started\n", containerName)
+	err = docker.ContainerStart(ctx, created.ID, types.ContainerStartOptions{})
+	if err != nil {
+		log.Error().
+			Str("image_name", imageName).
+			Str("container_name", containerName).
+			Err(err).
+			Msg("starting container")
+
+		return "", err
+	}
+
+	log.Debug().Str("container_name", containerName).Msg("container created and started")
 
 	statusCh, errCh := docker.ContainerWait(ctx, created.ID, container.WaitConditionNotRunning)
 	var statusCode int64
 	select {
 	case err := <-errCh:
 		if err != nil {
-			logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("starting container")
+			log.Error().
+				Str("image_name", imageName).
+				Str("container_name", containerName).
+				Err(err).
+				Msg("starting container")
+
 			return "", err
 		}
 	case status := <-statusCh:
 		statusCode = status.StatusCode
 	}
-	logrus.WithField("status", statusCode).Debug("container wait status")
+
+	log.Debug().Int64("status", statusCode).Msg("container wait status")
 
 	out, err := docker.ContainerLogs(ctx, created.ID, types.ContainerLogsOptions{ShowStdout: true})
 	if err != nil {
-		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("getting container log")
+		log.Error().Err(err).Str("image_name", imageName).Str("container_name", containerName).Msg("getting container log")
+
 		return "", err
 	}
 
 	err = docker.ContainerRemove(ctx, created.ID, types.ContainerRemoveOptions{})
 	if err != nil {
-		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("removing container")
+		log.Error().
+			Str("image_name", imageName).
+			Str("container_name", containerName).
+			Err(err).
+			Msg("removing container")
+
 		return "", err
 	}
 
 	outputBytes, err := ioutil.ReadAll(out)
 	if err != nil {
-		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("read container output")
+		log.Error().
+			Str("image_name", imageName).
+			Str("container_name", containerName).
+			Err(err).
+			Msg("read container output")
+
 		return "", err
 	}
 
-	log.Printf("%s container finished with output:\n%s", containerName, string(outputBytes))
+	log.Debug().
+		Str("container_name", containerName).
+		Str("output", string(outputBytes)).
+		Msg("container finished with output")
 
 	return string(outputBytes), nil
 }
@@ -269,6 +313,7 @@ func (handler *Handler) deactivateDevice(endpoint *portainer.Endpoint, settings 
 		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
 		"-password", config.MPSPassword,
 	}
+
 	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
 		return err

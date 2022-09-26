@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/edgetypes"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -28,6 +29,7 @@ type (
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService
 		EdgeStack() EdgeStackService
+		EdgeUpdateSchedule() EdgeUpdateScheduleService
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
 		EndpointRelation() EndpointRelationService
@@ -38,6 +40,7 @@ type (
 		Role() RoleService
 		APIKeyRepository() APIKeyRepository
 		Settings() SettingsService
+		Snapshot() SnapshotService
 		SSLSettings() SSLSettingsService
 		Stack() StackService
 		Tag() TagService
@@ -78,6 +81,17 @@ type (
 		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int
+		BucketName() string
+	}
+
+	EdgeUpdateScheduleService interface {
+		ActiveSchedule(environmentID portainer.EndpointID) *edgetypes.EndpointUpdateScheduleRelation
+		ActiveSchedules(environmentIDs []portainer.EndpointID) []edgetypes.EndpointUpdateScheduleRelation
+		List() ([]edgetypes.UpdateSchedule, error)
+		Item(ID edgetypes.UpdateScheduleID) (*edgetypes.UpdateSchedule, error)
+		Create(edgeUpdateSchedule *edgetypes.UpdateSchedule) error
+		Update(ID edgetypes.UpdateScheduleID, edgeUpdateSchedule *edgetypes.UpdateSchedule) error
+		Delete(ID edgetypes.UpdateScheduleID) error
 		BucketName() string
 	}
 
@@ -198,6 +212,15 @@ type (
 		Settings() (*portainer.Settings, error)
 		UpdateSettings(settings *portainer.Settings) error
 		IsFeatureFlagEnabled(feature portainer.Feature) bool
+		BucketName() string
+	}
+
+	SnapshotService interface {
+		Snapshot(endpointID portainer.EndpointID) (*portainer.Snapshot, error)
+		Snapshots() ([]portainer.Snapshot, error)
+		UpdateSnapshot(snapshot *portainer.Snapshot) error
+		DeleteSnapshot(endpointID portainer.EndpointID) error
+		Create(snapshot *portainer.Snapshot) error
 		BucketName() string
 	}
 

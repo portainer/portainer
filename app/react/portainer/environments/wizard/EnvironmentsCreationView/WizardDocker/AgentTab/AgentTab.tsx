@@ -6,12 +6,13 @@ import { DeploymentScripts } from './DeploymentScripts';
 
 interface Props {
   onCreate(environment: Environment): void;
+  isDockerStandalone?: boolean;
 }
 
-export function AgentTab({ onCreate }: Props) {
+export function AgentTab({ onCreate, isDockerStandalone }: Props) {
   return (
     <>
-      <DeploymentScripts />
+      <DeploymentScripts isDockerStandalone={isDockerStandalone} />
 
       <div className="mt-5">
         <AgentForm onCreate={onCreate} />

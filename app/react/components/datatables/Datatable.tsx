@@ -13,6 +13,7 @@ import { ReactNode } from 'react';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 
 import { PaginationControls } from '@@/PaginationControls';
+import { IconProps } from '@@/Icon';
 
 import { Table } from './Table';
 import { multiple } from './filter-types';
@@ -28,7 +29,8 @@ interface DefaultTableSettings
 
 interface TitleOptionsVisible {
   title: string;
-  icon?: string;
+  icon?: IconProps['icon'];
+  featherIcon?: IconProps['featherIcon'];
   hide?: never;
 }
 
@@ -52,6 +54,7 @@ interface Props<
   initialTableState?: Partial<TableState<D>>;
   isLoading?: boolean;
   totalCount?: number;
+  description?: JSX.Element;
 }
 
 export function Datatable<
@@ -72,6 +75,7 @@ export function Datatable<
   initialTableState = {},
   isLoading,
   totalCount = dataset.length,
+  description,
 }: Props<D, TSettings>) {
   const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
 
@@ -139,7 +143,12 @@ export function Datatable<
         <TableSettingsProvider settings={settingsStore}>
           <Table.Container>
             {isTitleVisible(titleOptions) && (
-              <Table.Title label={titleOptions.title} icon={titleOptions.icon}>
+              <Table.Title
+                label={titleOptions.title}
+                icon={titleOptions.icon}
+                featherIcon={titleOptions.featherIcon}
+                description={description}
+              >
                 <SearchBar value={searchBarValue} onChange={setGlobalFilter} />
                 {renderTableActions && (
                   <Table.Actions>

@@ -126,7 +126,7 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 		return err
 	}
 
-	if !authorizedEndpointAccess(endpoint, group, tokenData.ID, memberships) {
+	if !AuthorizedEndpointAccess(endpoint, group, tokenData.ID, memberships) {
 		return httperrors.ErrEndpointAccessDenied
 	}
 
