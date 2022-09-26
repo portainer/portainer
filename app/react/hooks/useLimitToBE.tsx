@@ -7,10 +7,10 @@ export function useLimitToBE(defaultPath = 'portainer.home') {
   const router = useRouter();
   if (!isBE) {
     router.stateService.go(defaultPath);
-    return false;
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 export function withLimitToBE<T>(
