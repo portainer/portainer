@@ -28,7 +28,7 @@ export const KubernetesConfigurationKinds = Object.freeze({
   SECRET: 2,
 });
 
-export const KubernetesSecretTypes = Object.freeze({
+export const KubernetesSecretTypeOptions = Object.freeze({
   OPAQUE: { name: 'Opaque', value: 'Opaque' },
   SERVICEACCOUNTTOKEN: { name: 'Service account token', value: 'kubernetes.io/service-account-token' },
   DOCKERCFG: { name: 'Dockercfg', value: 'kubernetes.io/dockercfg' },

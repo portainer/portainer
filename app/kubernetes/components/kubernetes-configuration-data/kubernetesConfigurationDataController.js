@@ -6,7 +6,7 @@ import { Base64 } from 'js-base64';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
-import { KubernetesConfigurationKinds, KubernetesSecretTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds, KubernetesSecretTypeOptions } from 'Kubernetes/models/configuration/models';
 
 class KubernetesConfigurationDataController {
   /* @ngInject */
@@ -20,7 +20,7 @@ class KubernetesConfigurationDataController {
     this.showSimpleMode = this.showSimpleMode.bind(this);
     this.showAdvancedMode = this.showAdvancedMode.bind(this);
     this.KubernetesConfigurationKinds = KubernetesConfigurationKinds;
-    this.KubernetesSecretTypes = KubernetesSecretTypes;
+    this.KubernetesSecretTypeOptions = KubernetesSecretTypeOptions;
   }
 
   onChangeKey(entry) {
@@ -41,27 +41,26 @@ class KubernetesConfigurationDataController {
     // logic for setting required keys for new entries, based on the secret type
     if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
       const newDataIndex = this.formValues.Data.length - 1;
-      const typeValue = typeof this.formValues.Type === 'string' ? this.formValues.Type : this.formValues.Type.value;
-      switch (typeValue) {
-        case this.KubernetesSecretTypes.DOCKERCFG.value:
+      switch (this.formValues.Type) {
+        case this.KubernetesSecretTypeOptions.DOCKERCFG.value:
           this.addMissingKeys(['dockercfg'], newDataIndex);
           break;
-        case this.KubernetesSecretTypes.DOCKERCONFIGJSON.value:
+        case this.KubernetesSecretTypeOptions.DOCKERCONFIGJSON.value:
           this.addMissingKeys(['.dockerconfigjson'], newDataIndex);
           break;
-        case this.KubernetesSecretTypes.BASICAUTH.value:
+        case this.KubernetesSecretTypeOptions.BASICAUTH.value:
           // only add a required key if there is no required key out of username and password
           if (!this.formValues.Data.some((entry) => entry.Key === 'username' || entry.Key === 'password')) {
             this.addMissingKeys(['username', 'password'], newDataIndex);
           }
           break;
-        case this.KubernetesSecretTypes.SSHAUTH.value:
+        case this.KubernetesSecretTypeOptions.SSHAUTH.value:
           this.addMissingKeys(['ssh-privatekey'], newDataIndex);
           break;
-        case this.KubernetesSecretTypes.TLS.value:
+        case this.KubernetesSecretTypeOptions.TLS.value:
           this.addMissingKeys(['tls.crt', 'tls.key'], newDataIndex);
           break;
-        case this.KubernetesSecretTypes.BOOTSTRAPTOKEN.value:
+        case this.KubernetesSecretTypeOptions.BOOTSTRAPTOKEN.value:
           this.addMissingKeys(['token-id', 'token-secret'], newDataIndex);
           break;
         default:
@@ -84,29 +83,28 @@ class KubernetesConfigurationDataController {
 
   isRequiredKey(key) {
     if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
-      const secretTypeValue = typeof this.formValues.Type === 'string' ? this.formValues.Type : this.formValues.Type.value;
-      switch (secretTypeValue) {
-        case this.KubernetesSecretTypes.DOCKERCONFIGJSON.value:
+      switch (this.formValues.Type) {
+        case this.KubernetesSecretTypeOptions.DOCKERCONFIGJSON.value:
           if (key === '.dockerconfigjson') {
             return true;
           }
           break;
-        case this.KubernetesSecretTypes.DOCKERCFG.value:
+        case this.KubernetesSecretTypeOptions.DOCKERCFG.value:
           if (key === '.dockercfg') {
             return true;
           }
           break;
-        case this.KubernetesSecretTypes.SSHAUTH.value:
+        case this.KubernetesSecretTypeOptions.SSHAUTH.value:
           if (key === 'ssh-privatekey') {
             return true;
           }
           break;
-        case this.KubernetesSecretTypes.TLS.value:
+        case this.KubernetesSecretTypeOptions.TLS.value:
           if (key === 'tls.crt' || key === 'tls.key') {
             return true;
           }
           break;
-        case this.KubernetesSecretTypes.BOOTSTRAPTOKEN.value:
+        case this.KubernetesSecretTypeOptions.BOOTSTRAPTOKEN.value:
           if (key === 'token-id' || key === 'token-secret') {
             return true;
           }
@@ -168,14 +166,14 @@ class KubernetesConfigurationDataController {
 
     if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
       if (this.isDockerConfig) {
-        if (this.formValues.Type.name === this.KubernetesSecretTypes.DOCKERCFG.name) {
+        if (this.formValues.Type === this.KubernetesSecretTypeOptions.DOCKERCFG.value) {
           entry.Key = '.dockercfg';
         } else {
           entry.Key = '.dockerconfigjson';
         }
       }
 
-      if (this.formValues.Type.name === this.KubernetesSecretTypes.TLS.name) {
+      if (this.formValues.Type === this.KubernetesSecretTypeOptions.TLS.value) {
         const isCrt = entry.Value.indexOf('BEGIN CERTIFICATE') !== -1;
         if (isCrt) {
           entry.Key = 'tls.crt';
@@ -200,9 +198,8 @@ class KubernetesConfigurationDataController {
 
   isEntryRequired() {
     if (this.formValues.Kind === this.KubernetesConfigurationKinds.SECRET) {
-      const typeValue = typeof this.formValues.Type === 'string' ? this.formValues.Type : this.formValues.Type.value;
       if (this.formValues.Data.length === 1) {
-        if (typeValue !== this.KubernetesSecretTypes.SERVICEACCOUNTTOKEN.value) {
+        if (this.formValues.Type !== this.KubernetesSecretTypeOptions.SERVICEACCOUNTTOKEN.value) {
           return true;
         }
       }

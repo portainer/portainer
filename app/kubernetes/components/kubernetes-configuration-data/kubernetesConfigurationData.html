@@ -27,10 +27,7 @@
       </button>
       <button
         ng-if="
-          !(
-            ($ctrl.isDockerConfig || $ctrl.formValues.Type.name === $ctrl.KubernetesSecretTypes.TLS.name || $ctrl.formValues.Type === $ctrl.KubernetesSecretTypes.TLS.value) &&
-            $ctrl.formValues.Kind === $ctrl.KubernetesConfigurationKinds.SECRET
-          )
+          !(($ctrl.isDockerConfig || $ctrl.formValues.Type === $ctrl.KubernetesSecretTypeOptions.TLS.value) && $ctrl.formValues.Kind === $ctrl.KubernetesConfigurationKinds.SECRET)
         "
         type="button"
         class="btn btn-sm btn-default ml-0"
@@ -50,10 +47,7 @@
         <pr-icon icon="'upload'" feather="true" class="vertical-center"></pr-icon> Upload docker config file
       </button>
       <button
-        ng-if="
-          ($ctrl.formValues.Type.name === $ctrl.KubernetesSecretTypes.TLS.name || $ctrl.formValues.Type === $ctrl.KubernetesSecretTypes.TLS.value) &&
-          $ctrl.formValues.Kind === $ctrl.KubernetesConfigurationKinds.SECRET
-        "
+        ng-if="$ctrl.formValues.Type === $ctrl.KubernetesSecretTypeOptions.TLS.value && $ctrl.formValues.Kind === $ctrl.KubernetesConfigurationKinds.SECRET"
         type="button"
         class="btn btn-sm btn-default ml-0"
         ngf-select="$ctrl.addEntryFromFile($file)"
