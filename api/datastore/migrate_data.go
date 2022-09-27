@@ -106,7 +106,9 @@ func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParam
 		}
 	}
 
-	log.Info().Msgf("migrating database from version %s to %s ", v.SchemaVersion, portainer.APIVersion)
+	if v.SchemaVersion != portainer.APIVersion {
+		log.Info().Msgf("migrating database from version %s to %s ", v.SchemaVersion, portainer.APIVersion)
+	}
 
 	err = store.FailSafeMigrate(migrator)
 	if err != nil {

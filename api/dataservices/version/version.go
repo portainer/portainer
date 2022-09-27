@@ -117,7 +117,6 @@ func (service *Service) UpdateVersion(version *models.Version) error {
 }
 
 // Migrate version structure from legacy version.
-// Return true if version bucket was migrated with success
-func (service *Service) Migrate() (bool, error) {
+func (service *Service) Migrate() error {
 	return service.migrateLegacyVersion()
 }

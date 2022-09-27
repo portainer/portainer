@@ -67,39 +67,39 @@ func dbVersionToSemanticVersion(dbVersion int) string {
 }
 
 // migrateLegacyVersion to new Version struct
-func (service *Service) migrateLegacyVersion() (migrated bool, err error) {
+func (service *Service) migrateLegacyVersion() error {
 	dbVersion := 24
 	edition := int(portaineree.PortainerCE)
 	instanceId := ""
 
 	// If we already have a version key, we don't need to migrate
-	_, err = service.Version()
+	_, err := service.Version()
 	if err != nil {
 		if !dataservices.IsErrObjectNotFound(err) {
-			return false, err
+			return err
 		}
 	} else {
-		return false, nil
+		return nil
 	}
 
 	err = service.connection.GetObject(BucketName, []byte(legacyDBVersionKey), &dbVersion)
 	if err != nil && !dataservices.IsErrObjectNotFound(err) {
-		return false, err
+		return err
 	}
 
 	err = service.connection.GetObject(BucketName, []byte(legacyEditionKey), &edition)
 	if err != nil && !dataservices.IsErrObjectNotFound(err) {
-		return false, err
+		return err
 	}
 
 	err = service.connection.GetObject(BucketName, []byte(legacyInstanceKey), &instanceId)
 	if err != nil && !dataservices.IsErrObjectNotFound(err) {
-		return false, err
+		return err
 	}
 
 	err = service.StoreIsUpdating(true)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	v := &models.Version{
@@ -110,7 +110,7 @@ func (service *Service) migrateLegacyVersion() (migrated bool, err error) {
 
 	err = service.UpdateVersion(v)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	// Remove legacy keys if present
@@ -120,8 +120,8 @@ func (service *Service) migrateLegacyVersion() (migrated bool, err error) {
 
 	err = service.StoreIsUpdating(false)
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 }

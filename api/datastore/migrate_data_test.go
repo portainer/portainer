@@ -252,9 +252,15 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string, overrideInstanc
 		return err
 	}
 
-	store.VersionService.Migrate()
+	err = store.VersionService.Migrate()
+	if err != nil {
+		return err
+	}
 
-	store.Init()
+	err = store.Init()
+	if err != nil {
+		return err
+	}
 
 	// Run the actual migrations on our input database.
 	err = store.MigrateData()
