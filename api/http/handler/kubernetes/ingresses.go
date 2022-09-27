@@ -51,27 +51,26 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 
 	controllers := cli.GetIngressControllers()
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
+	var updatedClasses []portainer.KubernetesIngressClassConfig
 	for i := range controllers {
 		controllers[i].Availability = true
 		controllers[i].New = true
 
-		// Check if the controller is blocked globally.
-		for _, a := range existingClasses {
-			controllers[i].New = false
-			if controllers[i].ClassName != a.Name {
+		var updatedClass portainer.KubernetesIngressClassConfig
+		updatedClass.Name = controllers[i].ClassName
+		updatedClass.Type = controllers[i].Type
+
+		// Check if the controller is already known.
+		for _, existingClass := range existingClasses {
+			if controllers[i].ClassName != existingClass.Name {
 				continue
 			}
 			controllers[i].New = false
-
-			// Skip over non-global blocks.
-			if len(a.BlockedNamespaces) > 0 {
-				continue
-			}
-
-			if controllers[i].ClassName == a.Name {
-				controllers[i].Availability = !a.GloballyBlocked
-			}
+			controllers[i].Availability = !existingClass.GloballyBlocked
+			updatedClass.GloballyBlocked = existingClass.GloballyBlocked
+			updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
 		}
+		updatedClasses = append(updatedClasses, updatedClass)
 	}
 
 	// Update the database to match the list of found + modified controllers.
@@ -197,6 +196,7 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 }
 
 func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return httperror.BadRequest(
@@ -237,21 +237,33 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 
 	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
 	controllers := cli.GetIngressControllers()
+	var updatedClasses []portainer.KubernetesIngressClassConfig
 	for i := range controllers {
-		// Set existing class data. So that we don't accidentally overwrite it
-		// with blank data that isn't in the payload.
-		for ii := range existingClasses {
-			if controllers[i].ClassName == existingClasses[ii].Name {
-				controllers[i].Availability = !existingClasses[ii].GloballyBlocked
+		controllers[i].Availability = true
+		controllers[i].New = true
+
+		var updatedClass portainer.KubernetesIngressClassConfig
+		updatedClass.Name = controllers[i].ClassName
+		updatedClass.Type = controllers[i].Type
+
+		// Check if the controller is already known.
+		for _, existingClass := range existingClasses {
+			if controllers[i].ClassName != existingClass.Name {
+				continue
 			}
+			controllers[i].New = false
+			controllers[i].Availability = !existingClass.GloballyBlocked
+			updatedClass.GloballyBlocked = existingClass.GloballyBlocked
+			updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
 		}
+		updatedClasses = append(updatedClasses, updatedClass)
 	}
 
 	for _, p := range payload {
 		for i := range controllers {
 			// Now set new payload data
-			if p.ClassName == controllers[i].ClassName {
-				controllers[i].Availability = p.Availability
+			if updatedClasses[i].Name == p.ClassName {
+				updatedClasses[i].GloballyBlocked = !p.Availability
 			}
 		}
 	}
@@ -327,7 +339,6 @@ PayloadLoop:
 	for _, p := range payload {
 		for _, existingClass := range existingClasses {
 			if p.ClassName != existingClass.Name {
-				updatedClasses = append(updatedClasses, existingClass)
 				continue
 			}
 			var updatedClass portainer.KubernetesIngressClassConfig
@@ -345,7 +356,7 @@ PayloadLoop:
 					}
 				}
 
-				updatedClasses = append(updatedClasses, existingClass)
+				updatedClasses = append(updatedClasses, updatedClass)
 				continue PayloadLoop
 			}
 
@@ -356,7 +367,7 @@ PayloadLoop:
 			updatedClass.BlockedNamespaces = existingClass.BlockedNamespaces
 			for _, ns := range updatedClass.BlockedNamespaces {
 				if namespace == ns {
-					updatedClasses = append(updatedClasses, existingClass)
+					updatedClasses = append(updatedClasses, updatedClass)
 					continue PayloadLoop
 				}
 			}
@@ -365,6 +376,24 @@ PayloadLoop:
 				namespace,
 			)
 			updatedClasses = append(updatedClasses, updatedClass)
+		}
+	}
+
+	// At this point it's possible we had an existing class which was globally
+	// blocked and thus not included in the payload. As a result it is not yet
+	// part of updatedClasses, but we MUST include it or we would remove the
+	// global block.
+	for _, existingClass := range existingClasses {
+		var found bool
+
+		for _, updatedClass := range updatedClasses {
+			if existingClass.Name == updatedClass.Name {
+				found = true
+			}
+		}
+
+		if !found {
+			updatedClasses = append(updatedClasses, existingClass)
 		}
 	}
 
