@@ -102,8 +102,9 @@ export function IngressForm({
   }
   const hasNoHostRule = rule.Hosts?.some((host) => host.NoHost);
   const placeholderAnnotation =
-    PlaceholderAnnotations[rule.IngressType || 'other'];
-  const pathTypes = PathTypes[rule.IngressType || 'other'];
+    PlaceholderAnnotations[rule.IngressType || 'other'] ||
+    PlaceholderAnnotations.other;
+  const pathTypes = PathTypes[rule.IngressType || 'other'] || PathTypes.other;
 
   return (
     <Widget>
