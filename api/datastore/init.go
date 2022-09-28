@@ -36,6 +36,7 @@ func (store *Store) checkOrCreateInstanceID() error {
 		instanceID := uid.String()
 		return store.VersionService.StoreInstanceID(instanceID)
 	}
+
 	return err
 }
 
@@ -88,7 +89,6 @@ func (store *Store) checkOrCreateDefaultSettings() error {
 
 func (store *Store) checkOrCreateDefaultSSLSettings() error {
 	_, err := store.SSLSettings().Settings()
-
 	if store.IsErrObjectNotFound(err) {
 		defaultSSLSettings := &portainer.SSLSettings{
 			HTTPEnabled: true,
@@ -96,6 +96,7 @@ func (store *Store) checkOrCreateDefaultSSLSettings() error {
 
 		return store.SSLSettings().UpdateSettings(defaultSSLSettings)
 	}
+
 	return err
 }
 

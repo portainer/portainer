@@ -8,9 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -133,6 +132,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
+
 	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		fileType := "Manifest"
@@ -274,7 +274,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return httperror.InternalServerError("Unable to persist the stack inside the database", err)
+		return httperror.InternalServerError("Unable to persist the Kubernetes stack inside the database", err)
 	}
 
 	resp := &createKubernetesStackResponse{

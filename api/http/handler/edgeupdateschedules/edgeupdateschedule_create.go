@@ -31,12 +31,12 @@ func (payload *createPayload) Validate(r *http.Request) error {
 		return errors.New("Required to choose at least one group")
 	}
 
-	if payload.Type != edgetypes.UpdateScheduleRollback && payload.Type != edgetypes.UpdateScheduleUpdate {
-		return errors.New("Invalid schedule type")
-	}
-
 	if len(payload.Environments) == 0 {
 		return errors.New("No Environment is scheduled for update")
+	}
+
+	if payload.Type != edgetypes.UpdateScheduleRollback && payload.Type != edgetypes.UpdateScheduleUpdate {
+		return errors.New("Invalid schedule type")
 	}
 
 	if payload.Time < time.Now().Unix() {

@@ -23,10 +23,10 @@ import (
 type Handler struct {
 	*mux.Router
 	authorizationService     *authorization.Service
-	dataStore                dataservices.DataStore
+	DataStore                dataservices.DataStore
 	KubernetesClient         portainer.KubeClient
-	kubernetesClientFactory  *cli.ClientFactory
-	jwtService               dataservices.JWTService
+	KubernetesClientFactory  *cli.ClientFactory
+	JwtService               dataservices.JWTService
 	kubeClusterAccessService kubernetes.KubeClusterAccessService
 }
 
@@ -35,10 +35,10 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 	h := &Handler{
 		Router:                   mux.NewRouter(),
 		authorizationService:     authorizationService,
-		dataStore:                dataStore,
-		jwtService:               jwtService,
+		DataStore:                dataStore,
+		JwtService:               jwtService,
 		kubeClusterAccessService: kubeClusterAccessService,
-		kubernetesClientFactory:  kubernetesClientFactory,
+		KubernetesClientFactory:  kubernetesClientFactory,
 		KubernetesClient:         kubernetesClient,
 	}
 
@@ -90,7 +90,7 @@ func kubeOnlyMiddleware(next http.Handler) http.Handler {
 		}
 
 		if !endpointutils.IsKubernetesEndpoint(endpoint) {
-			errMessage := "Environment is not a kubernetes environment"
+			errMessage := "environment is not a Kubernetes environment"
 			httperror.WriteError(rw, http.StatusBadRequest, errMessage, errors.New(errMessage))
 			return
 		}
@@ -111,7 +111,7 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 			)
 		}
 
-		endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+		endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 		if err == portainerDsErrors.ErrObjectNotFound {
 			httperror.WriteError(
 				w,
@@ -128,11 +128,11 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 			)
 		}
 
-		if handler.kubernetesClientFactory == nil {
+		if handler.KubernetesClientFactory == nil {
 			next.ServeHTTP(w, r)
 			return
 		}
-		kubeCli, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
+		kubeCli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 		if err != nil {
 			httperror.WriteError(
 				w,

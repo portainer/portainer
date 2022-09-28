@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/orcaman/concurrent-map"
+	cmap "github.com/orcaman/concurrent-map"
 )
 
 type (

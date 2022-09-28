@@ -56,6 +56,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		return httperror.BadRequest("Invalid Helm repository URL", err)
 	}
+
 	// lowercase, remove trailing slash
 	p.URL = strings.TrimSuffix(strings.ToLower(p.URL), "/")
 

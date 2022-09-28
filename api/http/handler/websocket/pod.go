@@ -91,12 +91,14 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		if err != nil {
 			return httperror.InternalServerError("Unable to proxy websocket request to agent", err)
 		}
+
 		return nil
 	} else if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		err := handler.proxyEdgeAgentWebsocketRequest(w, r, params)
 		if err != nil {
 			return httperror.InternalServerError("Unable to proxy websocket request to Edge agent", err)
 		}
+
 		return nil
 	}
 

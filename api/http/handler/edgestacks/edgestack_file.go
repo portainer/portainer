@@ -46,7 +46,7 @@ func (handler *Handler) edgeStackFile(w http.ResponseWriter, r *http.Request) *h
 
 	stackFileContent, err := handler.FileService.GetFileContent(stack.ProjectPath, fileName)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve Compose file from disk", err)
+		return httperror.InternalServerError("Unable to retrieve stack file from disk", err)
 	}
 
 	return response.JSON(w, &stackFileResponse{StackFileContent: string(stackFileContent)})

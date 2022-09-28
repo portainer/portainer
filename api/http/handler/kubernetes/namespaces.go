@@ -73,20 +73,12 @@ func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http
 	var payload models.K8sNamespaceDetails
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusBadRequest,
-			Message:    "Invalid request payload",
-			Err:        err,
-		}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	err = cli.UpdateNamespace(payload)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to retrieve nodes limits",
-			Err:        err,
-		}
+		return httperror.InternalServerError("Unable to retrieve nodes limits", err)
 	}
 	return nil
 }

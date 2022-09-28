@@ -156,6 +156,7 @@ func (store *Store) encryptDB() error {
 	if err != nil {
 		// Remove the new encrypted file that we failed to import
 		os.Remove(store.connection.GetDatabaseFilePath())
+
 		log.Fatal().Err(portainerErrors.ErrDBImportFailed).Msg("")
 	}
 

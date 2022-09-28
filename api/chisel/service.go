@@ -246,9 +246,8 @@ func (service *Service) checkTunnels() {
 			err := service.snapshotEnvironment(endpointID, tunnel.Port)
 			if err != nil {
 				log.Error().
-					Int("endpoint_id", int(endpointID)).Err(
-
-					err).
+					Int("endpoint_id", int(endpointID)).
+					Err(err).
 					Msg("unable to snapshot Edge environment")
 			}
 		}

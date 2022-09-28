@@ -8,15 +8,14 @@ import (
 	"path"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	libstack "github.com/portainer/docker-compose-wrapper"
 	"github.com/portainer/docker-compose-wrapper/compose"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/internal/stackutils"
+
+	"github.com/pkg/errors"
 )
 
 // ComposeStackManager is a wrapper for docker-compose binary

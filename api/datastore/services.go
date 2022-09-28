@@ -518,7 +518,7 @@ func (store *Store) Export(filename string) (err error) {
 
 	if snapshot, err := store.Snapshot().Snapshots(); err != nil {
 		if !store.IsErrObjectNotFound(err) {
-			log.Err(err).Msg("Exporting Snapshots")
+			log.Error().Err(err).Msg("exporting Snapshots")
 		}
 	} else {
 		backup.Snapshot = snapshot
@@ -707,7 +707,7 @@ func (store *Store) Import(filename string) (err error) {
 
 	for _, user := range backup.User {
 		if err := store.User().UpdateUser(user.ID, &user); err != nil {
-			log.Debug().Str("user", fmt.Sprintf("%+v", user)).Err(err).Msg("user: failed to Update Database")
+			log.Debug().Str("user", fmt.Sprintf("%+v", user)).Err(err).Msg("failed to update the user in the database")
 		}
 	}
 

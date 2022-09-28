@@ -51,7 +51,7 @@ func (handler *Handler) namespacesToggleSystem(rw http.ResponseWriter, r *http.R
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
-	kubeClient, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
+	kubeClient, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError("Unable to create kubernetes client", err)
 	}

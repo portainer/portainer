@@ -2,6 +2,7 @@ package apikey
 
 import (
 	"crypto/sha256"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -170,11 +171,9 @@ func Test_UpdateAPIKey(t *testing.T) {
 		_, apiKeyGot, err := service.GetDigestUserAndKey(apiKey.Digest)
 		is.NoError(err)
 
-		log.Debug().Msgf("%+v", apiKey)
-		log.Debug().Msgf("%+v", apiKeyGot)
+		log.Debug().Str("wanted", fmt.Sprintf("%+v", apiKey)).Str("got", fmt.Sprintf("%+v", apiKeyGot)).Msg("")
 
 		is.Equal(apiKey.LastUsed, apiKeyGot.LastUsed)
-
 	})
 
 	t.Run("Successfully updates api-key in cache upon api-key update", func(t *testing.T) {

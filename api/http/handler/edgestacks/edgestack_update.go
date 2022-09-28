@@ -2,7 +2,6 @@ package edgestacks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 	"strconv"
 
@@ -12,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 type updateEdgeStackPayload struct {

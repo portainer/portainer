@@ -1,6 +1,7 @@
 package boltdb
 
 import (
+	"bytes"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -162,7 +163,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
-	b, err := connection.ExportJson(databasePath, true)
+	b, err := connection.ExportJSON(databasePath, true)
 	if err != nil {
 		return err
 	}
@@ -369,6 +370,27 @@ func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interf
 	return err
 }
 
+func (connection *DbConnection) GetAllWithKeyPrefix(bucketName string, keyPrefix []byte, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+	return connection.View(func(tx *bolt.Tx) error {
+		cursor := tx.Bucket([]byte(bucketName)).Cursor()
+
+		for k, v := cursor.Seek(keyPrefix); k != nil && bytes.HasPrefix(k, keyPrefix); k, v = cursor.Next() {
+			err := connection.UnmarshalObjectWithJsoniter(v, obj)
+			if err != nil {
+				return err
+			}
+
+			obj, err = append(obj)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+// BackupMetadata will return a copy of the boltdb sequence numbers for all buckets.
 func (connection *DbConnection) BackupMetadata() (map[string]interface{}, error) {
 	buckets := map[string]interface{}{}
 
@@ -387,6 +409,7 @@ func (connection *DbConnection) BackupMetadata() (map[string]interface{}, error)
 	return buckets, err
 }
 
+// RestoreMetadata will restore the boltdb sequence numbers for all buckets.
 func (connection *DbConnection) RestoreMetadata(s map[string]interface{}) error {
 	var err error
 

@@ -16,7 +16,7 @@ import (
 )
 
 type (
-	// Manager represents a service used to manage proxies to environments (endpoints).
+	// Manager represents a service used to manage proxies to environments (endpoints) and extensions.
 	Manager struct {
 		proxyFactory     *factory.ProxyFactory
 		endpointProxies  cmap.ConcurrentMap

@@ -2,6 +2,7 @@ package edge
 
 import (
 	"errors"
+
 	"github.com/portainer/portainer/api"
 )
 
