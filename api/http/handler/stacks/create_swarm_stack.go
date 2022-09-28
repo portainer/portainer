@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
@@ -378,6 +378,7 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}
+
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
 	config := &swarmStackDeploymentConfig{

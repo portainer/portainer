@@ -5,13 +5,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type userUpdatePayload struct {
@@ -122,5 +123,6 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	// remove all of the users persisted API keys
 	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
+
 	return response.JSON(w, user)
 }

@@ -38,7 +38,7 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
-	bearerToken, err := handler.jwtService.GenerateTokenForKubeconfig(tokenData)
+	bearerToken, err := handler.JwtService.GenerateTokenForKubeconfig(tokenData)
 	if err != nil {
 		return httperror.InternalServerError("Unable to generate JWT token", err)
 	}
@@ -75,7 +75,7 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	endpointGroups, err := handler.dataStore.EndpointGroup().EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
 	}
@@ -83,7 +83,7 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 	if len(endpointIDs) > 0 {
 		var endpoints []portainer.Endpoint
 		for _, endpointID := range endpointIDs {
-			endpoint, err := handler.dataStore.Endpoint().Endpoint(endpointID)
+			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
 				return nil, httperror.InternalServerError("Unable to retrieve environment from the database", err)
 			}
@@ -97,7 +97,7 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 	}
 
 	var kubeEndpoints []portainer.Endpoint
-	endpoints, err := handler.dataStore.Endpoint().Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve environments from the database", err)
 	}
@@ -122,7 +122,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 	authInfosSet := make(map[string]bool)
 
 	for idx, endpoint := range endpoints {
-		instanceID := handler.kubernetesClientFactory.GetInstanceID()
+		instanceID := handler.KubernetesClientFactory.GetInstanceID()
 		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instanceID)
 
 		configClusters[idx] = handler.buildCluster(r, endpoint)
@@ -145,6 +145,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 
 func (handler *Handler) buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
 	kubeConfigInternal := handler.kubeClusterAccessService.GetData(r.Host, endpoint.ID)
+
 	return clientV1.NamedCluster{
 		Name: buildClusterName(endpoint.Name),
 		Cluster: clientV1.Cluster{

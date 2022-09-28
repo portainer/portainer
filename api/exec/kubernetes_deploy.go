@@ -9,14 +9,14 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/pkg/errors"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
-	portainer "github.com/portainer/portainer/api"
+	"github.com/pkg/errors"
 )
 
 // KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment(endpoint).
@@ -73,6 +73,7 @@ func (deployer *KubernetesDeployer) getToken(userID portainer.UserID, endpoint *
 	if token == "" {
 		return "", fmt.Errorf("can not get a valid user service account token")
 	}
+
 	return token, nil
 }
 

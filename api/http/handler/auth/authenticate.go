@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"errors"
 	"net/http"
 	"strings"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 

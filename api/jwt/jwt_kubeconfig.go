@@ -1,8 +1,9 @@
 package jwt
 
 import (
-	portainer "github.com/portainer/portainer/api"
 	"time"
+
+	portainer "github.com/portainer/portainer/api"
 )
 
 // GenerateTokenForKubeconfig generates a new JWT token for Kubeconfig

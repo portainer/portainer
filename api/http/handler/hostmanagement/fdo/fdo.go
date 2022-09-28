@@ -89,7 +89,7 @@ func (handler *Handler) fdoConfigure(w http.ResponseWriter, r *http.Request) *ht
 
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		log.Error().Err(err).Msg("Invalid request payload")
+		log.Error().Err(err).Msg("invalid request payload")
 
 		return httperror.BadRequest("Invalid request payload", err)
 	}

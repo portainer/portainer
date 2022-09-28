@@ -74,7 +74,6 @@ func FilterRegistries(registries []portainer.Registry, user *portainer.User, tea
 	}
 
 	filteredRegistries := []portainer.Registry{}
-
 	for _, registry := range registries {
 		if AuthorizedRegistryAccess(&registry, user, teamMemberships, endpointID) {
 			filteredRegistries = append(filteredRegistries, registry)

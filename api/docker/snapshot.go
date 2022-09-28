@@ -194,7 +194,7 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 		}
 
 		for k, v := range container.Labels {
-			if k == "com.docker.compose.project" {
+			if k == ComposeStackNameLabel {
 				stacks[v] = struct{}{}
 			}
 		}

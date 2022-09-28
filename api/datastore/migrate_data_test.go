@@ -259,7 +259,7 @@ func migrateDBTestHelper(t *testing.T, srcPath, wantPath string) error {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
-	gotJSON, err := con.ExportJson(databasePath, false)
+	gotJSON, err := con.ExportJSON(databasePath, false)
 	if err != nil {
 		t.Logf(
 			"failed re-exporting database %s to JSON: %v",

@@ -32,14 +32,14 @@ func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.
 		return httperror.BadRequest("Invalid environment identifier route variable", err)
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if handler.dataStore.IsErrObjectNotFound(err) {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an environment with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an environment with the specified identifier inside the database", err)
 	}
 
-	cli, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}

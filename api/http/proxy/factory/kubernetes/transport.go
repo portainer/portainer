@@ -3,7 +3,6 @@ package kubernetes
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -17,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 

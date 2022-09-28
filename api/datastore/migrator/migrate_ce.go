@@ -1,13 +1,12 @@
 package migrator
 
 import (
-	"errors"
 	"reflect"
 	"runtime"
 
 	portainer "github.com/portainer/portainer/api"
 
-	werrors "github.com/pkg/errors"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -17,7 +16,7 @@ type migration struct {
 }
 
 func migrationError(err error, context string) error {
-	return werrors.Wrap(err, "failed in "+context)
+	return errors.Wrap(err, "failed in "+context)
 }
 
 func newMigration(dbversion int, migrate func() error) migration {

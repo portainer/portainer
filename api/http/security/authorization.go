@@ -42,7 +42,7 @@ func AuthorizedResourceControlAccess(resourceControl *portainer.ResourceControl,
 // AuthorizedResourceControlUpdate ensure that the user can update a resource control object.
 // A non-administrator user cannot create a resource control where:
 // * the Public flag is set false
-// * the AdministatorsOnly flag is set to true
+// * the AdministratorsOnly flag is set to true
 // * he wants to create a resource control without any user/team accesses
 // * he wants to add more than one user in the user accesses
 // * he wants to add a user in the user accesses that is not corresponding to its id

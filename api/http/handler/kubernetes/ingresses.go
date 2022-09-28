@@ -20,7 +20,7 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 		)
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainerDsErrors.ErrObjectNotFound {
 		return httperror.NotFound(
 			"Unable to find an environment with the specified identifier inside the database",
@@ -41,7 +41,7 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 		)
 	}
 
-	cli, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError(
 			"Unable to create Kubernetes client",
@@ -86,7 +86,7 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 		newClasses = append(newClasses, class)
 	}
 	endpoint.Kubernetes.Configuration.IngressClasses = newClasses
-	err = handler.dataStore.Endpoint().UpdateEndpoint(
+	err = handler.DataStore.Endpoint().UpdateEndpoint(
 		portainer.EndpointID(endpointID),
 		endpoint,
 	)
@@ -120,8 +120,8 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 		)
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == portainerDsErrors.ErrObjectNotFound {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound(
 			"Unable to find an environment with the specified identifier inside the database",
 			err,
@@ -183,7 +183,7 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 	// Update the database to match the list of found controllers.
 	// This includes pruning out controllers which no longer exist.
 	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
-	err = handler.dataStore.Endpoint().UpdateEndpoint(
+	err = handler.DataStore.Endpoint().UpdateEndpoint(
 		portainer.EndpointID(endpointID),
 		endpoint,
 	)
@@ -205,8 +205,8 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		)
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == portainerDsErrors.ErrObjectNotFound {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound(
 			"Unable to find an environment with the specified identifier inside the database",
 			err,
@@ -227,7 +227,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		)
 	}
 
-	cli, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return httperror.InternalServerError(
 			"Unable to create Kubernetes client",
@@ -269,7 +269,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 	}
 
 	endpoint.Kubernetes.Configuration.IngressClasses = newClasses
-	err = handler.dataStore.Endpoint().UpdateEndpoint(
+	err = handler.DataStore.Endpoint().UpdateEndpoint(
 		portainer.EndpointID(endpointID),
 		endpoint,
 	)
@@ -291,8 +291,8 @@ func (handler *Handler) updateKubernetesIngressControllersByNamespace(w http.Res
 		)
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == portainerDsErrors.ErrObjectNotFound {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound(
 			"Unable to find an environment with the specified identifier inside the database",
 			err,
@@ -369,7 +369,7 @@ PayloadLoop:
 	}
 
 	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
-	err = handler.dataStore.Endpoint().UpdateEndpoint(
+	err = handler.DataStore.Endpoint().UpdateEndpoint(
 		portainer.EndpointID(endpointID),
 		endpoint,
 	)

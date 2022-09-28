@@ -4,11 +4,13 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/endpointutils"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type edgeGroupCreatePayload struct {
@@ -81,7 +83,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 				return httperror.InternalServerError("Unable to retrieve environment from the database", err)
 			}
 
-			if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+			if endpointutils.IsEdgeEndpoint(endpoint) {
 				endpointIDs = append(endpointIDs, endpoint.ID)
 			}
 		}

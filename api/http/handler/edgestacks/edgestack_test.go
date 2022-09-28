@@ -3,7 +3,6 @@ package edgestacks
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -19,6 +18,8 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
+
+	"github.com/pkg/errors"
 )
 
 type gitService struct {

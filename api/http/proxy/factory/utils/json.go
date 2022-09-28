@@ -87,7 +87,7 @@ func marshal(contentType string, data interface{}) ([]byte, error) {
 }
 
 func unmarshal(contentType string, body []byte, returnBody interface{}) error {
-	// Note: contentType can look look like: "application/json" or "application/json; charset=utf-8"
+	// Note: contentType can look like: "application/json" or "application/json; charset=utf-8"
 	mediaType, _, err := mime.ParseMediaType(contentType)
 	if err != nil {
 		return err

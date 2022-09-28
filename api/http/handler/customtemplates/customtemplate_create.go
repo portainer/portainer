@@ -3,6 +3,7 @@ package customtemplates
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"regexp"
@@ -13,6 +14,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/git"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 
@@ -290,6 +292,9 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 
 	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
 	if err != nil {
+		if err == git.ErrAuthenticationFailure {
+			return nil, fmt.Errorf("invalid git credential")
+		}
 		return nil, err
 	}
 

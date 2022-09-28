@@ -23,7 +23,7 @@ func (transport *Transport) proxyContainerGroupRequest(request *http.Request) (*
 }
 
 func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request) (*http.Response, error) {
-	//add a lock before processing existense check
+	//add a lock before processing existence check
 	transport.mutex.Lock()
 	defer transport.mutex.Unlock()
 

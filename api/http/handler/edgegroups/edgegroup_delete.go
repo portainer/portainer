@@ -53,5 +53,4 @@ func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) 
 	}
 
 	return response.Empty(w)
-
 }

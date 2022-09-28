@@ -42,7 +42,7 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 
 	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve environments relations config from database", err)
+		return httperror.InternalServerError("Unable to find environment relations in database", err)
 	}
 
 	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)

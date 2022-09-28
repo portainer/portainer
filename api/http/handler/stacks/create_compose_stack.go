@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
@@ -16,6 +14,8 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
 
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -438,6 +438,7 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 	if err != nil {
 		return nil, httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}
+
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
 	config := &composeStackDeploymentConfig{

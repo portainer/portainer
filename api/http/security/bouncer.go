@@ -409,7 +409,7 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 	}, nil
 }
 
-// EdgeComputeOperation defines a restriced edge compute operation.
+// EdgeComputeOperation defines a restricted edge compute operation.
 // Use of this operation will only be authorized if edgeCompute is enabled in settings
 func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -3,6 +3,7 @@ package registryutils
 import (
 	"encoding/base64"
 	"encoding/json"
+
 	portainer "github.com/portainer/portainer/api"
 )
 

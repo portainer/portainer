@@ -213,6 +213,10 @@ func (service *Service) snapshotEndpoints() error {
 			continue
 		}
 
+		if endpoint.URL == "" {
+			continue
+		}
+
 		snapshotError := service.SnapshotEndpoint(&endpoint)
 
 		latestEndpointReference, err := service.dataStore.Endpoint().Endpoint(endpoint.ID)

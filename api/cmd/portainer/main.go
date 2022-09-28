@@ -186,6 +186,10 @@ func initAPIKeyService(datastore dataservices.DataStore) apikey.APIKeyService {
 }
 
 func initJWTService(userSessionTimeout string, dataStore dataservices.DataStore) (dataservices.JWTService, error) {
+	if userSessionTimeout == "" {
+		userSessionTimeout = portainer.DefaultUserSessionTimeout
+	}
+
 	jwtService, err := jwt.NewService(userSessionTimeout, dataStore)
 	if err != nil {
 		return nil, err
@@ -239,7 +243,13 @@ func initKubernetesClientFactory(signatureService portainer.DigitalSignatureServ
 	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID, dataStore)
 }
 
-func initSnapshotService(snapshotIntervalFromFlag string, dataStore dataservices.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (portainer.SnapshotService, error) {
+func initSnapshotService(
+	snapshotIntervalFromFlag string,
+	dataStore dataservices.DataStore,
+	dockerClientFactory *docker.ClientFactory,
+	kubernetesClientFactory *kubecli.ClientFactory,
+	shutdownCtx context.Context,
+) (portainer.SnapshotService, error) {
 	dockerSnapshotter := docker.NewSnapshotter(dockerClientFactory)
 	kubernetesSnapshotter := kubernetes.NewSnapshotter(kubernetesClientFactory)
 
@@ -580,6 +590,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	ldapService := initLDAPService()
 
 	oauthService := initOAuthService()
+
 	gitService := initGitService(shutdownCtx)
 
 	openAMTService := openamt.NewService()
@@ -704,14 +715,15 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Err(err).Msg("failed starting tunnel server")
 	}
 
-	sslDBSettings, err := dataStore.SSLSettings().Settings()
-	if err != nil {
-		log.Fatal().Msg("failed to fetch SSL settings from DB")
-	}
 
 	scheduler := scheduler.NewScheduler(shutdownCtx)
 	stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
 	stacks.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
+
+	sslDBSettings, err := dataStore.SSLSettings().Settings()
+	if err != nil {
+		log.Fatal().Msg("failed to fetch SSL settings from DB")
+	}
 
 	return &http.Server{
 		AuthorizationService:        authorizationService,
@@ -726,8 +738,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ComposeStackManager:         composeStackManager,
 		KubernetesDeployer:          kubernetesDeployer,
 		HelmPackageManager:          helmPackageManager,
-		CryptoService:               cryptoService,
 		APIKeyService:               apiKeyService,
+		CryptoService:               cryptoService,
 		JWTService:                  jwtService,
 		FileService:                 fileService,
 		LDAPService:                 ldapService,

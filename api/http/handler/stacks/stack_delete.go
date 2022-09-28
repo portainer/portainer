@@ -199,7 +199,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 		//then process the remove operation
 		if stack.IsComposeFormat {
 			fileNames := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
-			tmpDir, err := ioutil.TempDir("", "kub_delete")
+			tmpDir, err := ioutil.TempDir("", "kube_delete")
 			if err != nil {
 				return errors.Wrap(err, "failed to create temp directory for deleting kub stack")
 			}

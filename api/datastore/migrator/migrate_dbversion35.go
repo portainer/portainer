@@ -14,6 +14,8 @@ func (m *Migrator) migrateDBVersionToDB36() error {
 }
 
 func (m *Migrator) migrateUsersToDB36() error {
+	log.Info().Msg("updating user authorizations")
+
 	users, err := m.userService.Users()
 	if err != nil {
 		return err

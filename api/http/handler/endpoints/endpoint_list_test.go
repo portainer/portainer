@@ -102,7 +102,6 @@ func Test_EndpointList_AgentVersion(t *testing.T) {
 			is.ElementsMatch(test.expected, respIds)
 		})
 	}
-
 }
 
 func Test_endpointList_edgeDeviceFilter(t *testing.T) {

@@ -24,7 +24,6 @@ func (transport *Transport) applyPortainerContainers(resources []interface{}) ([
 			continue
 		}
 		responseObject, _ = transport.applyPortainerContainer(responseObject)
-
 		decoratedResourceData = append(decoratedResourceData, responseObject)
 	}
 	return decoratedResourceData, nil

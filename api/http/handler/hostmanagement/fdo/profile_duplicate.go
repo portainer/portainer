@@ -3,13 +3,14 @@ package fdo
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 // @id duplicate

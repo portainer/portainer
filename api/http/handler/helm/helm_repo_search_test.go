@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/portainer/libhelm/binary/test"
-
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
@@ -32,6 +31,7 @@ func Test_helmRepoSearch(t *testing.T) {
 			h.ServeHTTP(rr, req)
 
 			is.Equal(http.StatusOK, rr.Code, "Status should be 200 OK")
+
 			body, err := io.ReadAll(rr.Body)
 			is.NoError(err, "ReadAll should not return error")
 			is.NotEmpty(body, "Body should not be empty")

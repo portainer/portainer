@@ -15,6 +15,7 @@ func (m *Migrator) updateUsersToDBVersion20() error {
 }
 
 func (m *Migrator) updateSettingsToDBVersion20() error {
+	log.Info().Msg("updating settings")
 	legacySettings, err := m.settingsService.Settings()
 	if err != nil {
 		return err

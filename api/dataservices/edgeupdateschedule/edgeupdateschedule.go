@@ -85,7 +85,7 @@ func (service *Service) List() ([]edgetypes.UpdateSchedule, error) {
 			item, ok := obj.(*edgetypes.UpdateSchedule)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeUpdateSchedule object")
-				return nil, fmt.Errorf("failed to convert to EdgeUpdateSchedule object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to EdgeUpdateSchedule object: %s", obj)
 			}
 			list = append(list, *item)
 			return &edgetypes.UpdateSchedule{}, nil

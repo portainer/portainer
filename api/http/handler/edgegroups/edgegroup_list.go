@@ -81,7 +81,7 @@ func getEndpointTypes(endpointService dataservices.EndpointService, endpointIds 
 	for _, endpointID := range endpointIds {
 		endpoint, err := endpointService.Endpoint(endpointID)
 		if err != nil {
-			return nil, fmt.Errorf("failed fetching endpoint: %w", err)
+			return nil, fmt.Errorf("failed fetching environment: %w", err)
 		}
 
 		typeSet[endpoint.Type] = true

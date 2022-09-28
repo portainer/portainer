@@ -13,6 +13,7 @@ func (m *Migrator) migrateDBVersionToDB33() error {
 }
 
 func (m *Migrator) migrateSettingsToDB33() error {
+	log.Info().Msg("setting default kubctl shell")
 	settings, err := m.settingsService.Settings()
 	if err != nil {
 		return err
