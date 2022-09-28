@@ -202,7 +202,7 @@
                     </tr>
                     <tr ng-repeat="class in ctrl.StorageClasses">
                       <td>
-                        <div class="flex-row vertical-center">
+                        <div class="flex flex-row items-center h-full">
                           <label class="switch mr-2 mb-0">
                             <input type="checkbox" ng-model="class.selected" /><span class="slider round" data-cy="kubeSetup-storageToggle{{ class.Name }}"></span>
                           </label>
@@ -218,7 +218,7 @@
                         ></storage-access-mode-selector>
                       </td>
                       <td>
-                        <div style="margin: 5px">
+                        <div class="flex flex-row items-center h-full">
                           <label class="switch mr-2 mb-0"
                             ><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><span
                               class="slider round"
