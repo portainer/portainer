@@ -1,4 +1,4 @@
-import { KubernetesConfigurationKinds, KubernetesSecretTypes } from './models';
+import { KubernetesConfigurationKinds, KubernetesSecretTypeOptions } from './models';
 
 /**
  * KubernetesConfigurationFormValues Model
@@ -13,7 +13,7 @@ const _KubernetesConfigurationFormValues = Object.freeze({
   DataYaml: '',
   IsSimple: true,
   ServiceAccountName: '',
-  Type: KubernetesSecretTypes.OPAQUE,
+  Type: KubernetesSecretTypeOptions.OPAQUE.value,
 });
 
 export class KubernetesConfigurationFormValues {

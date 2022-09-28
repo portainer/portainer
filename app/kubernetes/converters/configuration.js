@@ -17,6 +17,9 @@ class KubernetesConfigurationConverter {
     res.ConfigurationOwner = secret.ConfigurationOwner;
     res.IsRegistrySecret = secret.IsRegistrySecret;
     res.SecretType = secret.SecretType;
+    if (secret.Annotations) {
+      res.ServiceAccountName = secret.Annotations['kubernetes.io/service-account.name'];
+    }
     return res;
   }
 
