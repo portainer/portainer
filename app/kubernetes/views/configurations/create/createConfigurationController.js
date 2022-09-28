@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
-import { KubernetesConfigurationKinds, KubernetesSecretTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds, KubernetesSecretTypeOptions } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { getServiceAccounts } from 'Kubernetes/rest/serviceAccount';
@@ -21,7 +21,7 @@ class KubernetesCreateConfigurationController {
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesConfigurationKinds = KubernetesConfigurationKinds;
-    this.KubernetesSecretTypes = KubernetesSecretTypes;
+    this.KubernetesSecretTypeOptions = KubernetesSecretTypeOptions;
 
     this.onInit = this.onInit.bind(this);
     this.createConfigurationAsync = this.createConfigurationAsync.bind(this);
@@ -66,41 +66,41 @@ class KubernetesCreateConfigurationController {
   }
 
   onSecretTypeChange() {
-    switch (this.formValues.Type.value) {
-      case KubernetesSecretTypes.OPAQUE.value:
-      case KubernetesSecretTypes.CUSTOM.value:
+    switch (this.formValues.Type) {
+      case KubernetesSecretTypeOptions.OPAQUE.value:
+      case KubernetesSecretTypeOptions.CUSTOM.value:
         this.formValues.Data = this.formValues.Data.filter((entry) => entry.Value !== '');
         if (this.formValues.Data.length === 0) {
           this.addRequiredKeysToForm(['']);
         }
         this.state.isDockerConfig = false;
         break;
-      case KubernetesSecretTypes.SERVICEACCOUNTTOKEN.value:
+      case KubernetesSecretTypeOptions.SERVICEACCOUNTTOKEN.value:
         // data isn't required for service account tokens, so remove the data fields if they are empty
         this.addRequiredKeysToForm([]);
         this.state.isDockerConfig = false;
         break;
-      case KubernetesSecretTypes.DOCKERCONFIGJSON.value:
+      case KubernetesSecretTypeOptions.DOCKERCONFIGJSON.value:
         this.addRequiredKeysToForm(['.dockerconfigjson']);
         this.state.isDockerConfig = true;
         break;
-      case KubernetesSecretTypes.DOCKERCFG.value:
+      case KubernetesSecretTypeOptions.DOCKERCFG.value:
         this.addRequiredKeysToForm(['.dockercfg']);
         this.state.isDockerConfig = true;
         break;
-      case KubernetesSecretTypes.BASICAUTH.value:
+      case KubernetesSecretTypeOptions.BASICAUTH.value:
         this.addRequiredKeysToForm(['username', 'password']);
         this.state.isDockerConfig = false;
         break;
-      case KubernetesSecretTypes.SSHAUTH.value:
+      case KubernetesSecretTypeOptions.SSHAUTH.value:
         this.addRequiredKeysToForm(['ssh-privatekey']);
         this.state.isDockerConfig = false;
         break;
-      case KubernetesSecretTypes.TLS.value:
+      case KubernetesSecretTypeOptions.TLS.value:
         this.addRequiredKeysToForm(['tls.crt', 'tls.key']);
         this.state.isDockerConfig = false;
         break;
-      case KubernetesSecretTypes.BOOTSTRAPTOKEN.value:
+      case KubernetesSecretTypeOptions.BOOTSTRAPTOKEN.value:
         this.addRequiredKeysToForm(['token-id', 'token-secret']);
         this.state.isDockerConfig = false;
         break;

@@ -4,13 +4,13 @@ import { KubernetesApplicationSecret } from 'Kubernetes/models/secret/models';
 import { KubernetesPortainerConfigurationDataAnnotation } from 'Kubernetes/models/configuration/models';
 import { KubernetesPortainerConfigurationOwnerLabel } from 'Kubernetes/models/configuration/models';
 import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
-import { KubernetesSecretTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesSecretTypeOptions } from 'Kubernetes/models/configuration/models';
 class KubernetesSecretConverter {
   static createPayload(secret) {
     const res = new KubernetesSecretCreatePayload();
     res.metadata.name = secret.Name;
     res.metadata.namespace = secret.Namespace;
-    res.type = secret.Type.value;
+    res.type = secret.Type;
     const configurationOwner = _.truncate(secret.ConfigurationOwner, { length: 63, omission: '' });
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = configurationOwner;
 
@@ -53,6 +53,11 @@ class KubernetesSecretConverter {
     if (annotation !== '') {
       res.metadata.annotations[KubernetesPortainerConfigurationDataAnnotation] = annotation;
     }
+
+    _.forEach(secret.Annotations, (entry) => {
+      res.metadata.annotations[entry.name] = entry.value;
+    });
+
     return res;
   }
 
@@ -64,6 +69,7 @@ class KubernetesSecretConverter {
     res.Type = payload.type;
     res.ConfigurationOwner = payload.metadata.labels ? payload.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] : '';
     res.CreationDate = payload.metadata.creationTimestamp;
+    res.Annotations = payload.metadata.annotations;
 
     res.IsRegistrySecret = payload.metadata.annotations && !!payload.metadata.annotations['portainer.io/registry.id'];
 
@@ -96,14 +102,11 @@ class KubernetesSecretConverter {
     res.ConfigurationOwner = formValues.ConfigurationOwner;
     res.Data = formValues.Data;
 
-    switch (formValues.Type) {
-      case KubernetesSecretTypes.CUSTOM:
-        res.Type.value = formValues.customType;
-        break;
-
-      case KubernetesSecretTypes.SERVICEACCOUNTTOKEN:
-        res.Annotations = [{ name: 'kubernetes.io/service-account.name', value: formValues.ServiceAccountName }];
-        break;
+    if (formValues.Type === KubernetesSecretTypeOptions.CUSTOM.value) {
+      res.Type = formValues.customType;
+    }
+    if (formValues.Type === KubernetesSecretTypeOptions.SERVICEACCOUNTTOKEN.value) {
+      res.Annotations = [{ name: 'kubernetes.io/service-account.name', value: formValues.ServiceAccountName }];
     }
     return res;
   }
