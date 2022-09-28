@@ -194,13 +194,22 @@ export function CreateIngressView() {
   ];
 
   useEffect(() => {
-    if (!!params.name && ingressesResults.data && !ingressRule.IngressName) {
+    if (
+      !!params.name &&
+      ingressesResults.data &&
+      !ingressRule.IngressName &&
+      ingressControllersResults.data
+    ) {
       // if it is an edit screen, prepare the rule from the ingress
       const ing = ingressesResults.data?.find(
         (ing) => ing.Name === params.name && ing.Namespace === params.namespace
       );
       if (ing) {
+        const type = ingressControllersResults.data?.find(
+          (c) => c.ClassName === ing.ClassName
+        )?.Type;
         const r = prepareRuleFromIngress(ing);
+        r.IngressType = type;
         setIngressRule(r);
       }
     }
