@@ -9,16 +9,15 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
-	"github.com/portainer/portainer/api/git"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
-
-	"github.com/asaskevich/govalidator"
 	"github.com/rs/zerolog/log"
 )
 
@@ -292,7 +291,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 
 	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
 	if err != nil {
-		if err == git.ErrAuthenticationFailure {
+		if err == gittypes.ErrAuthenticationFailure {
 			return nil, fmt.Errorf("invalid git credential")
 		}
 		return nil, err

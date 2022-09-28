@@ -9,6 +9,7 @@ import (
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -145,7 +146,7 @@ func TestService_ListFiles_Azure(t *testing.T) {
 			extensions: []string{},
 			expect: expectResult{
 				shouldFail: true,
-				err:        ErrAuthenticationFailure,
+				err:        gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -161,7 +162,7 @@ func TestService_ListFiles_Azure(t *testing.T) {
 			extensions: []string{},
 			expect: expectResult{
 				shouldFail: true,
-				err:        ErrAuthenticationFailure,
+				err:        gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -240,7 +241,7 @@ func TestService_ListFiles_Azure(t *testing.T) {
 			extensions: []string{},
 			expect: expectResult{
 				shouldFail: true,
-				err:        ErrIncorrectRepositoryURL,
+				err:        gittypes.ErrIncorrectRepositoryURL,
 			},
 		},
 	}

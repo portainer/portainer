@@ -6,14 +6,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/pkg/errors"
+	gittypes "github.com/portainer/portainer/api/git/types"
 )
 
 type gitClient struct {
@@ -41,7 +41,7 @@ func (c *gitClient) download(ctx context.Context, dst string, opt cloneOption) e
 
 	if err != nil {
 		if err.Error() == "authentication required" {
-			return ErrAuthenticationFailure
+			return gittypes.ErrAuthenticationFailure
 		}
 		return errors.Wrap(err, "failed to clone git repository")
 	}
@@ -66,7 +66,7 @@ func (c *gitClient) latestCommitID(ctx context.Context, opt fetchOption) (string
 	refs, err := remote.List(listOptions)
 	if err != nil {
 		if err.Error() == "authentication required" {
-			return "", ErrAuthenticationFailure
+			return "", gittypes.ErrAuthenticationFailure
 		}
 		return "", errors.Wrap(err, "failed to list repository refs")
 	}
@@ -172,9 +172,9 @@ func (c *gitClient) listFiles(ctx context.Context, opt fetchOption) ([]string, e
 func checkGitError(err error) error {
 	errMsg := err.Error()
 	if errMsg == "repository not found" {
-		return ErrIncorrectRepositoryURL
+		return gittypes.ErrIncorrectRepositoryURL
 	} else if errMsg == "authentication required" {
-		return ErrAuthenticationFailure
+		return gittypes.ErrAuthenticationFailure
 	}
 	return err
 }

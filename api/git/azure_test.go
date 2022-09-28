@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"testing"
 
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -466,7 +467,7 @@ func Test_listRefs_azure(t *testing.T) {
 				password:      "test-token",
 			},
 			expect: expectResult{
-				err: ErrAuthenticationFailure,
+				err: gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -477,7 +478,7 @@ func Test_listRefs_azure(t *testing.T) {
 				password:      "",
 			},
 			expect: expectResult{
-				err: ErrAuthenticationFailure,
+				err: gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -488,7 +489,7 @@ func Test_listRefs_azure(t *testing.T) {
 				password:      accessToken,
 			},
 			expect: expectResult{
-				err: ErrIncorrectRepositoryURL,
+				err: gittypes.ErrIncorrectRepositoryURL,
 			},
 		},
 	}
@@ -540,7 +541,7 @@ func Test_listFiles_azure(t *testing.T) {
 			},
 			expect: expectResult{
 				shouldFail: true,
-				err:        ErrAuthenticationFailure,
+				err:        gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -555,7 +556,7 @@ func Test_listFiles_azure(t *testing.T) {
 			},
 			expect: expectResult{
 				shouldFail: true,
-				err:        ErrAuthenticationFailure,
+				err:        gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -599,7 +600,7 @@ func Test_listFiles_azure(t *testing.T) {
 			},
 			expect: expectResult{
 				shouldFail: true,
-				err:        ErrIncorrectRepositoryURL,
+				err:        gittypes.ErrIncorrectRepositoryURL,
 			},
 		},
 	}
