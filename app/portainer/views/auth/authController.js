@@ -1,6 +1,6 @@
 import angular from 'angular';
 import uuidv4 from 'uuid/v4';
-import { getEnvironments } from '@/portainer/environments/environment.service';
+import { getEnvironments } from '@/react/portainer/environments/environment.service';
 
 class AuthenticationController {
   /* @ngInject */

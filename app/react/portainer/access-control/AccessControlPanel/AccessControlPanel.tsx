@@ -4,7 +4,7 @@ import { useUser } from '@/portainer/hooks/useUser';
 import { Icon } from '@/react/components/Icon';
 import { TeamMembership, TeamRole } from '@/react/portainer/users/teams/types';
 import { useUserMembership } from '@/portainer/users/queries';
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { TableContainer, TableTitle } from '@@/datatables';
 import { Button } from '@@/buttons';

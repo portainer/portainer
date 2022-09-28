@@ -4,7 +4,10 @@ import _ from 'lodash';
 import clsx from 'clsx';
 
 import { notifyError } from '@/portainer/services/notifications';
-import { Environment, EnvironmentId } from '@/portainer/environments/types';
+import {
+  Environment,
+  EnvironmentId,
+} from '@/react/portainer/environments/types';
 import { useAnalytics } from '@/angulartics.matomo/analytics-services';
 
 import { Stepper } from '@@/Stepper';

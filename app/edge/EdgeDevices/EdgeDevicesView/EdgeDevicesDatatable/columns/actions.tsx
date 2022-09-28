@@ -2,10 +2,10 @@ import { CellProps, Column } from 'react-table';
 import { MenuItem, MenuLink } from '@reach/menu-button';
 import { useRouter, useSref } from '@uirouter/react';
 
-import { Environment } from '@/portainer/environments/types';
-import { snapshotEndpoint } from '@/portainer/environments/environment.service';
+import { Environment } from '@/react/portainer/environments/types';
+import { snapshotEndpoint } from '@/react/portainer/environments/environment.service';
 import * as notifications from '@/portainer/services/notifications';
-import { getRoute } from '@/portainer/environments/utils';
+import { getRoute } from '@/react/portainer/environments/utils';
 
 import { ActionsMenu } from '@@/datatables/ActionsMenu';
 

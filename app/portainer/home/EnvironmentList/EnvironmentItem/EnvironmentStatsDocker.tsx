@@ -1,7 +1,7 @@
 import {
   DockerSnapshot,
   EnvironmentType,
-} from '@/portainer/environments/types';
+} from '@/react/portainer/environments/types';
 import { addPlural } from '@/portainer/helpers/strings';
 
 import { AgentVersionTag } from './AgentVersionTag';

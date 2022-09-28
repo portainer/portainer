@@ -1,6 +1,6 @@
 import { PropsWithChildren, useMemo, useReducer } from 'react';
 
-import { EnvironmentId } from '@/portainer/environments/types';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { createRowContext } from '@@/datatables/RowContext';
 

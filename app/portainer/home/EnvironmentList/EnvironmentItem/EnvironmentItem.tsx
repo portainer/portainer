@@ -7,12 +7,15 @@ import {
   humanize,
   stripProtocol,
 } from '@/portainer/filters/filters';
-import { type Environment, PlatformType } from '@/portainer/environments/types';
+import {
+  type Environment,
+  PlatformType,
+} from '@/react/portainer/environments/types';
 import {
   getPlatformType,
   isDockerEnvironment,
   isEdgeEnvironment,
-} from '@/portainer/environments/utils';
+} from '@/react/portainer/environments/utils';
 import type { TagId } from '@/portainer/tags/types';
 import { useTags } from '@/portainer/tags/queries';
 import { useUser } from '@/portainer/hooks/useUser';

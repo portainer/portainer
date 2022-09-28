@@ -10,7 +10,7 @@ import {
   EnvironmentStatus,
   PlatformType,
   EdgeTypes,
-} from '@/portainer/environments/types';
+} from '@/react/portainer/environments/types';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
 import {
   HomepageFilter,
@@ -20,12 +20,12 @@ import { useDebounce } from '@/portainer/hooks/useDebounce';
 import {
   refetchIfAnyOffline,
   useEnvironmentList,
-} from '@/portainer/environments/queries/useEnvironmentList';
+} from '@/react/portainer/environments/queries/useEnvironmentList';
 import { useGroups } from '@/portainer/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
 import { Filter } from '@/portainer/home/types';
-import { useAgentVersionsList } from '@/portainer/environments/queries/useAgentVersionsList';
-import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service';
+import { useAgentVersionsList } from '@/react/portainer/environments/queries/useAgentVersionsList';
+import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
 import { useUser } from '@/portainer/hooks/useUser';
 
 import { TableFooter } from '@@/datatables/TableFooter';

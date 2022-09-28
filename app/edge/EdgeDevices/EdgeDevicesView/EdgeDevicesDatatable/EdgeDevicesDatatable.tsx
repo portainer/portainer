@@ -2,7 +2,7 @@ import { useTable, useExpanded, useSortBy, useFilters } from 'react-table';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
 import _ from 'lodash';
 
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 import { AMTDevicesDatatable } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/AMTDevicesDatatable';
 import { EnvironmentGroup } from '@/portainer/environment-groups/types';
 

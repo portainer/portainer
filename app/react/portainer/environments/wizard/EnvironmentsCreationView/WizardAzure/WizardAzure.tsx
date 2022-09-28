@@ -3,10 +3,10 @@ import { useReducer, useState } from 'react';
 import { object, SchemaOf, string } from 'yup';
 
 import { buildOption } from '@/portainer/components/BoxSelector';
-import { useCreateAzureEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
+import { useCreateAzureEnvironmentMutation } from '@/react/portainer/environments/queries/useCreateEnvironmentMutation';
 import { notifySuccess } from '@/portainer/services/notifications';
-import { Environment } from '@/portainer/environments/types';
-import { EnvironmentMetadata } from '@/portainer/environments/environment.service/create';
+import { Environment } from '@/react/portainer/environments/types';
+import { EnvironmentMetadata } from '@/react/portainer/environments/environment.service/create';
 
 import { LoadingButton } from '@@/buttons/LoadingButton';
 import { Input } from '@@/form-components/Input';

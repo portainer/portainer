@@ -5,13 +5,13 @@ import { DialogOverlay } from '@reach/dialog';
 
 import * as kcService from '@/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
-import { EnvironmentType } from '@/portainer/environments/types';
+import { EnvironmentType } from '@/react/portainer/environments/types';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
 import { usePublicSettings } from '@/react/portainer/settings/queries';
 import {
   Query,
   useEnvironmentList,
-} from '@/portainer/environments/queries/useEnvironmentList';
+} from '@/react/portainer/environments/queries/useEnvironmentList';
 
 import { PaginationControls } from '@@/PaginationControls';
 import { Checkbox } from '@@/form-components/Checkbox';

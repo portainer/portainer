@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { Environment } from '@/portainer/environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 
 import { TextTip } from '@@/Tip/TextTip';
 

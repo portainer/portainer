@@ -1,4 +1,4 @@
-import { Environment } from '../environments/types';
+import { Environment } from '@/react/portainer/environments/types';
 
 export interface EndpointProvider {
   setEndpointID(id: Environment['Id']): void;

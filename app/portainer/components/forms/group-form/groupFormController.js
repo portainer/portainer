@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import angular from 'angular';
-import { endpointsByGroup } from '@/portainer/environments/environment.service';
+import { endpointsByGroup } from '@/react/portainer/environments/environment.service';
 import { notifyError } from '@/portainer/services/notifications';
 
 class GroupFormController {
