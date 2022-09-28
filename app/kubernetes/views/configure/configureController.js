@@ -307,6 +307,9 @@ class KubernetesConfigureController {
         if (storage) {
           item.selected = true;
           item.AccessModes = storage.AccessModes.map((name) => this.availableAccessModes.find((accessMode) => accessMode.Name === name));
+        } else if (this.availableAccessModes.length) {
+          // set a default access mode if the storage class is not enabled and there are available access modes
+          item.AccessModes = [this.availableAccessModes[0]];
         }
       });
 
