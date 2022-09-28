@@ -715,7 +715,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal().Err(err).Msg("failed starting tunnel server")
 	}
 
-
 	scheduler := scheduler.NewScheduler(shutdownCtx)
 	stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
 	stacks.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)

@@ -78,7 +78,7 @@ func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http
 
 	err = cli.UpdateNamespace(payload)
 	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve nodes limits",	err)
+		return httperror.InternalServerError("Unable to retrieve nodes limits", err)
 	}
 	return nil
 }
