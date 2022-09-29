@@ -209,7 +209,7 @@ export function CreateIngressView() {
           (c) => c.ClassName === ing.ClassName
         )?.Type;
         const r = prepareRuleFromIngress(ing);
-        r.IngressType = type;
+        r.IngressType = type || r.IngressType;
         setIngressRule(r);
       }
     }
@@ -230,6 +230,7 @@ export function CreateIngressView() {
         !!existingIngressClass
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     ingressRule,
     namespace,
