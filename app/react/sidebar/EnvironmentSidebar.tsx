@@ -13,6 +13,7 @@ import { getPlatformType } from '@/react/portainer/environments/utils';
 import { useEnvironment } from '@/react/portainer/environments/queries/useEnvironment';
 import { useLocalStorage } from '@/react/hooks/useLocalStorage';
 import { EndpointProviderInterface } from '@/portainer/services/endpointProvider';
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { getPlatformIcon } from '../portainer/environments/utils/get-platform-icon';
 
@@ -22,6 +23,7 @@ import { DockerSidebar } from './DockerSidebar';
 import { KubernetesSidebar } from './KubernetesSidebar';
 import { SidebarSection, SidebarSectionTitle } from './SidebarSection';
 import { useSidebarState } from './useSidebarState';
+import { NomadSidebar } from './NomadSidebar';
 
 export function EnvironmentSidebar() {
   const { query: currentEnvironmentQuery, clearEnvironment } =
@@ -67,7 +69,9 @@ function Content({ environment, onClear }: ContentProps) {
       showTitleWhenOpen
     >
       <div className="mt-2">
-        <Sidebar environmentId={environment.Id} environment={environment} />
+        {Sidebar && (
+          <Sidebar environmentId={environment.Id} environment={environment} />
+        )}
       </div>
     </SidebarSection>
   );
@@ -77,11 +81,12 @@ function Content({ environment, onClear }: ContentProps) {
       [key in PlatformType]: React.ComponentType<{
         environmentId: EnvironmentId;
         environment: Environment;
-      }>;
+      }> | null;
     } = {
       [PlatformType.Azure]: AzureSidebar,
       [PlatformType.Docker]: DockerSidebar,
       [PlatformType.Kubernetes]: KubernetesSidebar,
+      [PlatformType.Nomad]: isBE ? NomadSidebar : null,
     };
 
     return sidebar[platform];
