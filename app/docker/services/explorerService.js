@@ -39,7 +39,9 @@ angular.module('portainer.docker').factory('ExplorerService', [
       self.containerId = containerId;
       self.requesting = true;
       self.fileList = [];
-      return self.list(containerId, path).then(function (data) {
+      return self
+        .list(containerId, path)
+        .then(function (data) {
           self.fileList = (data || []).map(function (file) {
             return new ItemViewModel(file, path);
           });

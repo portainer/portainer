@@ -271,7 +271,7 @@ input[type='checkbox'] {
   display: flex;
 }
 
-.blocklist-item-box-column{
+.blocklist-item-box-column {
   flex-direction: column;
 }
 

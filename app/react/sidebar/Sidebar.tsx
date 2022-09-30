@@ -13,7 +13,7 @@ import { SidebarItem } from './SidebarItem';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { SidebarProvider } from './useSidebarState';
-import {SidebarSection } from './SidebarSection';
+import { SidebarSection } from './SidebarSection';
 
 export function Sidebar() {
   const { isAdmin, user } = useUser();
@@ -45,19 +45,18 @@ export function Sidebar() {
               />
 
               <SidebarItem
-                  to="portainer.scenes"
-                  icon={Box}
-                  label="Scenes"
-                  data-cy="portainerSidebar-scenes"
+                to="portainer.scenes"
+                icon={Box}
+                label="Scenes"
+                data-cy="portainerSidebar-scenes"
               />
 
               <SidebarItem
-                  to="portainer.namespaces"
-                  icon={Layers}
-                  label="Namespaces"
-                  data-cy="portainerSidebar-namespaces"
+                to="portainer.namespaces"
+                icon={Layers}
+                label="Namespaces"
+                data-cy="portainerSidebar-namespaces"
               />
-
             </SidebarSection>
 
             <EnvironmentSidebar />

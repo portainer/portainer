@@ -417,8 +417,8 @@ angular
           },
         },
       };
-	  
-	  var scenes = {
+
+      var scenes = {
         name: 'portainer.scenes',
         url: '/scenes',
         views: {
@@ -493,8 +493,8 @@ angular
       $stateRegistryProvider.register(tags);
       $stateRegistryProvider.register(users);
       $stateRegistryProvider.register(user);
-	  
-	  $stateRegistryProvider.register(scenes);
+
+      $stateRegistryProvider.register(scenes);
       $stateRegistryProvider.register(sceneCreate);
       $stateRegistryProvider.register(scene);
       $stateRegistryProvider.register(namespaces);

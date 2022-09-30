@@ -4,12 +4,12 @@ import _ from 'lodash';
 function ScenesController($scope, $state, $async, SceneService, Notifications) {
   $scope.state = {
     actionInProgress: false,
-    scenes: []
+    scenes: [],
   };
 
   $scope.handleClick = (item) => {
-    alert(item)
-  }
+    alert(item);
+  };
 
   $scope.removeAction = removeAction;
 
@@ -22,7 +22,7 @@ function ScenesController($scope, $state, $async, SceneService, Notifications) {
       await SceneService.deleteScene(item.Id).then(() => {
         Notifications.success('Scenes successfully removed', item.Name);
         _.remove($scope.scenes, item);
-      })
+      });
     } catch (err) {
       Notifications.error('Failure', err, 'Unable to remove scenes');
     }
@@ -31,16 +31,16 @@ function ScenesController($scope, $state, $async, SceneService, Notifications) {
   }
 
   function initView() {
-    SceneService.scenes().then((data) => {
-      $scope.state.scenes = data;
-      console.log('scenes: ', $scope.state.scenes)
-    })
-    .catch((err) => {
-      Notifications.error('Failure', err, 'Unable to retrieve scenes');
-      $scope.state.scenes = [];
-    });
+    SceneService.scenes()
+      .then((data) => {
+        $scope.state.scenes = data;
+        console.log('scenes: ', $scope.state.scenes);
+      })
+      .catch((err) => {
+        Notifications.error('Failure', err, 'Unable to retrieve scenes');
+        $scope.state.scenes = [];
+      });
   }
 
   initView();
 }
-
