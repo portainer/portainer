@@ -41,7 +41,7 @@ import (
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/oauth"
 	"github.com/portainer/portainer/api/scheduler"
-	"github.com/portainer/portainer/api/stacks"
+	"github.com/portainer/portainer/api/stacks/deployments"
 
 	"github.com/rs/zerolog/log"
 )
@@ -716,8 +716,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	scheduler := scheduler.NewScheduler(shutdownCtx)
-	stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
-	stacks.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
+	stackDeployer := deployments.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
+	deployments.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {

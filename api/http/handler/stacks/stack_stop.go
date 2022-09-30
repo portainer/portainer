@@ -11,7 +11,8 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/stackutils"
+	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
 // @id StackStop
@@ -90,7 +91,7 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 
 	// stop scheduler updates of the stack before stopping
 	if stack.AutoUpdate != nil && stack.AutoUpdate.JobID != "" {
-		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
 		stack.AutoUpdate.JobID = ""
 	}
 

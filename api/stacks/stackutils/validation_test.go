@@ -1,4 +1,4 @@
-package stacks
+package stackutils
 
 import (
 	"testing"
@@ -35,7 +35,7 @@ func Test_ValidateStackAutoUpdate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateStackAutoUpdate(tt.value)
+			err := ValidateStackAutoUpdate(tt.value)
 			assert.Equalf(t, tt.wantErr, err != nil, "received %+v", err)
 		})
 	}

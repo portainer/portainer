@@ -16,7 +16,8 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/stackutils"
+	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
 // @id StackDelete
@@ -114,7 +115,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 
 	// stop scheduler updates of the stack before removal
 	if stack.AutoUpdate != nil {
-		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
 	}
 
 	err = handler.deleteStack(securityContext.UserID, stack, endpoint)
@@ -198,7 +199,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 		//if it is a compose format kub stack, create a temp dir and convert the manifest files into it
 		//then process the remove operation
 		if stack.IsComposeFormat {
-			fileNames := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
+			fileNames := stackutils.GetStackFilePaths(stack, false)
 			tmpDir, err := ioutil.TempDir("", "kube_delete")
 			if err != nil {
 				return errors.Wrap(err, "failed to create temp directory for deleting kub stack")
@@ -224,7 +225,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 				manifestFiles = append(manifestFiles, manifestFilePath)
 			}
 		} else {
-			manifestFiles = stackutils.GetStackFilePaths(stack)
+			manifestFiles = stackutils.GetStackFilePaths(stack, true)
 		}
 		out, err := handler.KubernetesDeployer.Remove(userID, endpoint, manifestFiles, stack.Namespace)
 		return errors.WithMessagef(err, "failed to remove kubernetes resources: %q", out)

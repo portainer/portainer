@@ -13,8 +13,9 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/stackutils"
 	k "github.com/portainer/portainer/api/kubernetes"
+	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/rs/zerolog/log"
 )
@@ -209,30 +210,47 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pul
 		if stack.Option != nil {
 			prune = stack.Option.Prune
 		}
-		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, prune, pullImage)
-		if httpErr != nil {
-			return httpErr
+
+		// Create swarm deployment config
+		securityContext, err := security.RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve info from request context", err)
 		}
 
-		if err := handler.deploySwarmStack(config); err != nil {
+		deploymentConfiger, err := deployments.CreateSwarmStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, prune, pullImage)
+		if err != nil {
 			return httperror.InternalServerError(err.Error(), err)
 		}
 
+		err = deploymentConfiger.Deploy()
+		if err != nil {
+			return httperror.InternalServerError(err.Error(), err)
+		}
 	case portainer.DockerComposeStack:
-		config, httpErr := handler.createComposeDeployConfig(r, stack, endpoint, pullImage)
-		if httpErr != nil {
-			return httpErr
+		// Create compose deployment config
+		securityContext, err := security.RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve info from request context", err)
 		}
 
-		if err := handler.deployComposeStack(config, true); err != nil {
+		deploymentConfiger, err := deployments.CreateComposeStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, pullImage, true)
+		if err != nil {
 			return httperror.InternalServerError(err.Error(), err)
 		}
 
+		err = deploymentConfiger.Deploy()
+		if err != nil {
+			return httperror.InternalServerError(err.Error(), err)
+		}
 	case portainer.KubernetesStack:
+		handler.stackCreationMutex.Lock()
+		defer handler.stackCreationMutex.Unlock()
+
 		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
 			return httperror.BadRequest("Failed to retrieve user token data", err)
 		}
+
 		_, err = handler.deployKubernetesStack(tokenData.ID, endpoint, stack, k.KubeAppLabels{
 			StackID:   int(stack.ID),
 			StackName: stack.Name,

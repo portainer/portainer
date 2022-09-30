@@ -11,7 +11,8 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/stackutils"
+	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
@@ -178,7 +179,7 @@ func (handler *Handler) updateAndDeployStack(r *http.Request, stack *portainer.S
 func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
-		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
 		stack.AutoUpdate = nil
 	}
 	if stack.GitConfig != nil {
@@ -203,16 +204,30 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 	}
 
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint, payload.PullImage)
-	if configErr != nil {
+	// Create compose deployment config
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	composeDeploymentConfig, err := deployments.CreateComposeStackDeploymentConfig(securityContext,
+		stack,
+		endpoint,
+		handler.DataStore,
+		handler.FileService,
+		handler.StackDeployer,
+		payload.PullImage,
+		false)
+	if err != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
-		return configErr
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
-	err = handler.deployComposeStack(config, false)
+	// Deploy the stack
+	err = composeDeploymentConfig.Deploy()
 	if err != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
@@ -229,7 +244,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
-		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
 		stack.AutoUpdate = nil
 	}
 	if stack.GitConfig != nil {
@@ -254,16 +269,30 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 		return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 	}
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, payload.Prune, payload.PullImage)
-	if configErr != nil {
+	// Create swarm deployment config
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
+	}
+
+	swarmDeploymentConfig, err := deployments.CreateSwarmStackDeploymentConfig(securityContext,
+		stack,
+		endpoint,
+		handler.DataStore,
+		handler.FileService,
+		handler.StackDeployer,
+		payload.Prune,
+		payload.PullImage)
+	if err != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
 		}
 
-		return configErr
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
-	err = handler.deploySwarmStack(config)
+	// Deploy the stack
+	err = swarmDeploymentConfig.Deploy()
 	if err != nil {
 		if rollbackErr := handler.FileService.RollbackStackFile(stackFolder, stack.EntryPoint); rollbackErr != nil {
 			log.Warn().Err(rollbackErr).Msg("rollback stack file error")
