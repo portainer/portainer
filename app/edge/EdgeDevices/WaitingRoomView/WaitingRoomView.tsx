@@ -1,7 +1,6 @@
 import { useRouter } from '@uirouter/react';
 
 import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
-import { r2a } from '@/react-tools/react2angular';
 import { EdgeTypes } from '@/portainer/environments/types';
 
 import { InformationPanel } from '@@/InformationPanel';
@@ -18,6 +17,7 @@ export function WaitingRoomView() {
   const { environments, isLoading, totalCount } = useEnvironmentList({
     edgeDevice: true,
     edgeDeviceUntrusted: true,
+    excludeSnapshots: true,
     types: EdgeTypes,
   });
 
@@ -58,5 +58,3 @@ export function WaitingRoomView() {
     </>
   );
 }
-
-export const WaitingRoomViewAngular = r2a(WaitingRoomView, []);

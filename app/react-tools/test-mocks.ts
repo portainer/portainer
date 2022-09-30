@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { Team } from '@/portainer/teams/types';
+import { Team } from '@/react/portainer/users/teams/types';
 import { Role, User, UserId } from '@/portainer/users/types';
 import { Environment } from '@/portainer/environments/types';
 
@@ -70,7 +70,13 @@ export function createMockEnvironment(): Environment {
     Status: 1,
     URL: 'url',
     Snapshots: [],
-    Kubernetes: { Snapshots: [] },
+    Kubernetes: {
+      Snapshots: [],
+      Configuration: {
+        IngressClasses: [],
+        IngressAvailabilityPerNamespace: false,
+      },
+    },
     EdgeKey: '',
     Id: 3,
     UserTrusted: false,
@@ -92,5 +98,6 @@ export function createMockEnvironment(): Environment {
       enableHostManagementFeatures: false,
     },
     Gpus: [],
+    Agent: { Version: '1.0.0' },
   };
 }

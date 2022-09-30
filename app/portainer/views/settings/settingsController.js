@@ -13,6 +13,7 @@ angular.module('portainer.app').controller('SettingsController', [
   'FileSaver',
   'Blob',
   function ($scope, $state, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
+    $scope.customBannerFeatureId = FeatureId.CUSTOM_LOGIN_BANNER;
     $scope.s3BackupFeatureId = FeatureId.S3_BACKUP_SETTING;
 
     $scope.backupOptions = options;
@@ -112,7 +113,7 @@ angular.module('portainer.app').controller('SettingsController', [
         .then(function success(data) {
           const downloadData = new Blob([data.file], { type: 'application/gzip' });
           FileSaver.saveAs(downloadData, data.name);
-          Notifications.success('Backup successfully downloaded');
+          Notifications.success('Success', 'Backup successfully downloaded');
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to download backup');
@@ -138,7 +139,7 @@ angular.module('portainer.app').controller('SettingsController', [
     function updateSettings(settings) {
       SettingsService.update(settings)
         .then(function success() {
-          Notifications.success('Settings updated');
+          Notifications.success('Success', 'Settings updated');
           StateManager.updateLogo(settings.LogoURL);
           StateManager.updateSnapshotInterval(settings.SnapshotInterval);
           StateManager.updateEnableTelemetry(settings.EnableTelemetry);

@@ -5,17 +5,17 @@ import _ from 'lodash';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
-import { AccessControlPanel } from '@/portainer/access-control/AccessControlPanel/AccessControlPanel';
-import { ResourceControlType } from '@/portainer/access-control/types';
+import { AccessControlPanel } from '@/react/portainer/access-control/AccessControlPanel/AccessControlPanel';
+import { ResourceControlType } from '@/react/portainer/access-control/types';
 import { DockerContainer } from '@/react/docker/containers/types';
-import { ResourceControlViewModel } from '@/portainer/access-control/models/ResourceControlViewModel';
+import { ResourceControlViewModel } from '@/react/portainer/access-control/models/ResourceControlViewModel';
+import { useContainers } from '@/react/docker/containers/queries/containers';
 
 import { PageHeader } from '@@/PageHeader';
 
 import { useNetwork, useDeleteNetwork } from '../queries';
 import { isSystemNetwork } from '../network.helper';
 import { DockerNetwork, NetworkContainer } from '../types';
-import { useContainers } from '../../containers/queries';
 
 import { NetworkDetailsTable } from './NetworkDetailsTable';
 import { NetworkOptionsTable } from './NetworkOptionsTable';
@@ -38,7 +38,7 @@ export function ItemView() {
   const filters = {
     network: [networkId],
   };
-  const containersQuery = useContainers(environmentId, filters);
+  const containersQuery = useContainers(environmentId, true, filters);
 
   useEffect(() => {
     if (networkQuery.data && containersQuery.data) {
@@ -89,6 +89,7 @@ export function ItemView() {
         resourceType={ResourceControlType.Network}
         disableOwnershipChange={isSystemNetwork(networkQuery.data.Name)}
         resourceId={networkId}
+        environmentId={environmentId}
       />
       <NetworkOptionsTable options={networkQuery.data.Options} />
       <NetworkContainersTable

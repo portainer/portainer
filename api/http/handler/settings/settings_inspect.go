@@ -21,7 +21,7 @@ import (
 func (handler *Handler) settingsInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
+		return httperror.InternalServerError("Unable to retrieve the settings from the database", err)
 	}
 
 	hideFields(settings)

@@ -30,17 +30,17 @@ type fileResponse struct {
 func (handler *Handler) edgeJobTaskLogsInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge job identifier route variable", err}
+		return httperror.BadRequest("Invalid Edge job identifier route variable", err)
 	}
 
 	taskID, err := request.RetrieveNumericRouteVariableValue(r, "taskID")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Task identifier route variable", err}
+		return httperror.BadRequest("Invalid Task identifier route variable", err)
 	}
 
 	logFileContent, err := handler.FileService.GetEdgeJobTaskLogFileContent(strconv.Itoa(edgeJobID), strconv.Itoa(taskID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve log file from disk", err}
+		return httperror.InternalServerError("Unable to retrieve log file from disk", err)
 	}
 
 	return response.JSON(w, &fileResponse{FileContent: string(logFileContent)})

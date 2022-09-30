@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import { KubernetesPortMapping, KubernetesPortMappingPort } from 'Kubernetes/models/port/models';
 import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationKinds } from 'Kubernetes/models/configuration/models';
 import {
   KubernetesApplicationAutoScalerFormValue,
   KubernetesApplicationConfigurationFormValue,
@@ -147,7 +147,7 @@ class KubernetesApplicationHelper {
   /* #region  CONFIGURATIONS FV <> ENV & VOLUMES */
   static generateConfigurationFormValuesFromEnvAndVolumes(env, volumes, configurations) {
     const finalRes = _.flatMap(configurations, (cfg) => {
-      const filterCondition = cfg.Type === KubernetesConfigurationTypes.CONFIGMAP ? 'valueFrom.configMapKeyRef.name' : 'valueFrom.secretKeyRef.name';
+      const filterCondition = cfg.Type === KubernetesConfigurationKinds.CONFIGMAP ? 'valueFrom.configMapKeyRef.name' : 'valueFrom.secretKeyRef.name';
 
       const cfgEnv = _.filter(env, [filterCondition, cfg.Name]);
       const cfgVol = _.filter(volumes, { configurationName: cfg.Name });
@@ -207,7 +207,7 @@ class KubernetesApplicationHelper {
     let finalMounts = [];
 
     _.forEach(configurations, (config) => {
-      const isBasic = config.SelectedConfiguration.Type === KubernetesConfigurationTypes.CONFIGMAP;
+      const isBasic = config.SelectedConfiguration.Type === KubernetesConfigurationKinds.CONFIGMAP;
 
       if (!config.Overriden) {
         const envKeys = _.keys(config.SelectedConfiguration.Data);

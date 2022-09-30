@@ -2,12 +2,16 @@ package snapshot
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
-	"log"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/agent"
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/dataservices"
+
+	"github.com/rs/zerolog/log"
 )
 
 // Service repesents a service to manage environment(endpoint) snapshots.
@@ -87,6 +91,24 @@ func SupportDirectSnapshot(endpoint *portainer.Endpoint) bool {
 // SnapshotEndpoint will create a snapshot of the environment(endpoint) based on the environment(endpoint) type.
 // If the snapshot is a success, it will be associated to the environment(endpoint).
 func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
+	if endpoint.Type == portainer.AgentOnDockerEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment {
+		var err error
+		var tlsConfig *tls.Config
+		if endpoint.TLSConfig.TLS {
+			tlsConfig, err = crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
+			if err != nil {
+				return err
+			}
+		}
+
+		_, version, err := agent.GetAgentVersionAndPlatform(endpoint.URL, tlsConfig)
+		if err != nil {
+			return err
+		}
+
+		endpoint.Agent.Version = version
+	}
+
 	switch endpoint.Type {
 	case portainer.AzureEnvironment:
 		return nil
@@ -97,27 +119,59 @@ func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
 	return service.snapshotDockerEndpoint(endpoint)
 }
 
-func (service *Service) snapshotKubernetesEndpoint(endpoint *portainer.Endpoint) error {
-	snapshot, err := service.kubernetesSnapshotter.CreateSnapshot(endpoint)
+func (service *Service) Create(snapshot portainer.Snapshot) error {
+	return service.dataStore.Snapshot().Create(&snapshot)
+}
+
+func (service *Service) FillSnapshotData(endpoint *portainer.Endpoint) error {
+	snapshot, err := service.dataStore.Snapshot().Snapshot(endpoint.ID)
+	if service.dataStore.IsErrObjectNotFound(err) {
+		endpoint.Snapshots = []portainer.DockerSnapshot{}
+		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{}
+
+		return nil
+	}
+
 	if err != nil {
 		return err
 	}
 
-	if snapshot != nil {
-		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{*snapshot}
+	if snapshot.Docker != nil {
+		endpoint.Snapshots = []portainer.DockerSnapshot{*snapshot.Docker}
+	}
+
+	if snapshot.Kubernetes != nil {
+		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{*snapshot.Kubernetes}
+	}
+
+	return nil
+}
+
+func (service *Service) snapshotKubernetesEndpoint(endpoint *portainer.Endpoint) error {
+	kubernetesSnapshot, err := service.kubernetesSnapshotter.CreateSnapshot(endpoint)
+	if err != nil {
+		return err
+	}
+
+	if kubernetesSnapshot != nil {
+		snapshot := &portainer.Snapshot{EndpointID: endpoint.ID, Kubernetes: kubernetesSnapshot}
+
+		return service.dataStore.Snapshot().Create(snapshot)
 	}
 
 	return nil
 }
 
 func (service *Service) snapshotDockerEndpoint(endpoint *portainer.Endpoint) error {
-	snapshot, err := service.dockerSnapshotter.CreateSnapshot(endpoint)
+	dockerSnapshot, err := service.dockerSnapshotter.CreateSnapshot(endpoint)
 	if err != nil {
 		return err
 	}
 
-	if snapshot != nil {
-		endpoint.Snapshots = []portainer.DockerSnapshot{*snapshot}
+	if dockerSnapshot != nil {
+		snapshot := &portainer.Snapshot{EndpointID: endpoint.ID, Docker: dockerSnapshot}
+
+		return service.dataStore.Snapshot().Create(snapshot)
 	}
 
 	return nil
@@ -128,7 +182,7 @@ func (service *Service) startSnapshotLoop() {
 
 	err := service.snapshotEndpoints()
 	if err != nil {
-		log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
+		log.Error().Err(err).Msg("background schedule error (environment snapshot)")
 	}
 
 	for {
@@ -136,10 +190,10 @@ func (service *Service) startSnapshotLoop() {
 		case <-ticker.C:
 			err := service.snapshotEndpoints()
 			if err != nil {
-				log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
+				log.Error().Err(err).Msg("background schedule error (environment snapshot)")
 			}
 		case <-service.shutdownCtx.Done():
-			log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
+			log.Debug().Msg("shutting down snapshotting")
 			ticker.Stop()
 			return
 		case interval := <-service.snapshotIntervalCh:
@@ -159,26 +213,41 @@ func (service *Service) snapshotEndpoints() error {
 			continue
 		}
 
+		if endpoint.URL == "" {
+			continue
+		}
+
 		snapshotError := service.SnapshotEndpoint(&endpoint)
 
 		latestEndpointReference, err := service.dataStore.Endpoint().Endpoint(endpoint.ID)
 		if latestEndpointReference == nil {
-			log.Printf("background schedule error (environment snapshot). Environment not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			log.Debug().
+				Str("endpoint", endpoint.Name).
+				Str("URL", endpoint.URL).Err(err).
+				Msg("background schedule error (environment snapshot), environment not found inside the database anymore")
+
 			continue
 		}
 
 		latestEndpointReference.Status = portainer.EndpointStatusUp
 		if snapshotError != nil {
-			log.Printf("background schedule error (environment snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
+			log.Debug().
+				Str("endpoint", endpoint.Name).
+				Str("URL", endpoint.URL).Err(err).
+				Msg("background schedule error (environment snapshot), unable to create snapshot")
+
 			latestEndpointReference.Status = portainer.EndpointStatusDown
 		}
 
-		latestEndpointReference.Snapshots = endpoint.Snapshots
-		latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
+		latestEndpointReference.Agent.Version = endpoint.Agent.Version
 
 		err = service.dataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 		if err != nil {
-			log.Printf("background schedule error (environment snapshot). Unable to update environment (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			log.Debug().
+				Str("endpoint", endpoint.Name).
+				Str("URL", endpoint.URL).Err(err).
+				Msg("background schedule error (environment snapshot), unable to update environment")
+
 			continue
 		}
 	}

@@ -16,92 +16,57 @@ angular.module('portainer.docker').factory('Container', [
       {
         query: {
           method: 'GET',
-          params: {
-            all: 0,
-            action: 'json',
-            filters: '@filters',
-          },
+          params: { all: 0, action: 'json', filters: '@filters' },
           isArray: true,
           interceptor: ContainersInterceptor,
         },
         get: {
           method: 'GET',
-          params: {
-            action: 'json',
-          },
+          params: { action: 'json' },
         },
         logs: {
           method: 'GET',
-          params: {
-            id: '@id',
-            action: 'logs',
-          },
+          params: { id: '@id', action: 'logs' },
           ignoreLoadingBar: true,
           transformResponse: logsHandler,
         },
         stats: {
           method: 'GET',
-          params: {
-            id: '@id',
-            stream: false,
-            action: 'stats',
-          },
+          params: { id: '@id', stream: false, action: 'stats' },
           ignoreLoadingBar: true,
         },
         top: {
           method: 'GET',
-          params: {
-            id: '@id',
-            action: 'top',
-          },
+          params: { id: '@id', action: 'top' },
           ignoreLoadingBar: true,
         },
         create: {
           method: 'POST',
-          params: {
-            action: 'create',
-          },
+          params: { action: 'create' },
           transformResponse: genericHandler,
           ignoreLoadingBar: true,
         },
         exec: {
           method: 'POST',
-          params: {
-            id: '@id',
-            action: 'exec',
-          },
+          params: { id: '@id', action: 'exec' },
           transformResponse: genericHandler,
           ignoreLoadingBar: true,
         },
         inspect: {
           method: 'GET',
-          params: {
-            id: '@id',
-            action: 'json',
-          },
+          params: { id: '@id', action: 'json' },
         },
         update: {
           method: 'POST',
-          params: {
-            id: '@id',
-            action: 'update',
-          },
+          params: { id: '@id', action: 'update' },
         },
         prune: {
           method: 'POST',
-          params: {
-            action: 'prune',
-            filters: '@filters',
-          },
+          params: { action: 'prune', filters: '@filters' },
         },
         resize: {
           method: 'POST',
-          params: {
-            id: '@id',
-            action: 'resize',
-            h: '@height',
-            w: '@width',
-          },
+          params: { id: '@id', action: 'resize', h: '@height', w: '@width' },
           transformResponse: genericHandler,
           ignoreLoadingBar: true,
         },

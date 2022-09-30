@@ -1,15 +1,17 @@
 import { ReactNode, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { RefreshCcw } from 'react-feather';
+import _ from 'lodash';
 
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
 import {
   Environment,
   EnvironmentType,
   EnvironmentStatus,
+  PlatformType,
+  EdgeTypes,
 } from '@/portainer/environments/types';
 import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
-import { useIsAdmin } from '@/portainer/hooks/useUser';
 import {
   HomepageFilter,
   useHomePageFilter,
@@ -22,6 +24,9 @@ import {
 import { useGroups } from '@/portainer/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
 import { Filter } from '@/portainer/home/types';
+import { useAgentVersionsList } from '@/portainer/environments/queries/useAgentVersionsList';
+import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service';
+import { useUser } from '@/portainer/hooks/useUser';
 
 import { TableFooter } from '@@/datatables/TableFooter';
 import { TableActions, TableContainer, TableTitle } from '@@/datatables';
@@ -35,53 +40,48 @@ import { PaginationControls } from '@@/PaginationControls';
 
 import { EnvironmentItem } from './EnvironmentItem';
 import { KubeconfigButton } from './KubeconfigButton';
-import styles from './EnvironmentList.module.css';
 import { NoEnvironmentsInfoPanel } from './NoEnvironmentsInfoPanel';
+import styles from './EnvironmentList.module.css';
 
 interface Props {
   onClickItem(environment: Environment): void;
   onRefresh(): void;
 }
 
-const PlatformOptions = [
-  { value: EnvironmentType.Docker, label: 'Docker' },
-  { value: EnvironmentType.Azure, label: 'Azure' },
-  { value: EnvironmentType.KubernetesLocal, label: 'Kubernetes' },
-];
-
 const status = [
   { value: EnvironmentStatus.Up, label: 'Up' },
   { value: EnvironmentStatus.Down, label: 'Down' },
 ];
 
-const SortByOptions = [
+const sortByOptions = [
   { value: 1, label: 'Name' },
   { value: 2, label: 'Group' },
   { value: 3, label: 'Status' },
 ];
 
+enum ConnectionType {
+  API,
+  Agent,
+  EdgeAgent,
+  EdgeDevice,
+}
+
 const storageKey = 'home_endpoints';
-const allEnvironmentType = [
-  EnvironmentType.Docker,
-  EnvironmentType.AgentOnDocker,
-  EnvironmentType.Azure,
-  EnvironmentType.EdgeAgentOnDocker,
-  EnvironmentType.KubernetesLocal,
-  EnvironmentType.AgentOnKubernetes,
-  EnvironmentType.EdgeAgentOnKubernetes,
-];
 
 export function EnvironmentList({ onClickItem, onRefresh }: Props) {
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useUser();
 
-  const [platformType, setPlatformType] = useHomePageFilter(
-    'platformType',
-    allEnvironmentType
-  );
+  const [platformTypes, setPlatformTypes] = useHomePageFilter<
+    Filter<PlatformType>[]
+  >('platformType', []);
   const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
   const [pageLimit, setPageLimit] = usePaginationLimitState(storageKey);
   const [page, setPage] = useState(1);
   const debouncedTextFilter = useDebounce(searchBarValue);
+
+  const [connectionTypes, setConnectionTypes] = useHomePageFilter<
+    Filter<ConnectionType>[]
+  >('connectionTypes', []);
 
   const [statusFilter, setStatusFilter] = useHomePageFilter<
     EnvironmentStatus[]
@@ -101,10 +101,6 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     false
   );
 
-  const [platformState, setPlatformState] = useHomePageFilter<Filter[]>(
-    'type_state',
-    []
-  );
   const [statusState, setStatusState] = useHomePageFilter<Filter[]>(
     'status_state',
     []
@@ -115,30 +111,45 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     []
   );
   const [sortByState, setSortByState] = useHomePageFilter<Filter | undefined>(
-    'sortby_state',
+    'sort_by_state',
     undefined
+  );
+  const [agentVersions, setAgentVersions] = useHomePageFilter<Filter<string>[]>(
+    'agentVersions',
+    []
   );
 
   const groupsQuery = useGroups();
+
+  const environmentsQueryParams: EnvironmentsQueryParams = {
+    types: getTypes(
+      platformTypes.map((p) => p.value),
+      connectionTypes.map((p) => p.value)
+    ),
+    search: debouncedTextFilter,
+    status: statusFilter,
+    tagIds: tagFilter?.length ? tagFilter : undefined,
+    groupIds: groupFilter,
+    edgeDevice: false,
+    tagsPartialMatch: true,
+    agentVersions: agentVersions.map((a) => a.value),
+  };
+
+  const tagsQuery = useTags();
 
   const { isLoading, environments, totalCount, totalAvailable } =
     useEnvironmentList(
       {
         page,
         pageLimit,
-        types: platformType,
-        search: debouncedTextFilter,
-        status: statusFilter,
-        tagIds: tagFilter?.length ? tagFilter : undefined,
-        groupIds: groupFilter,
         sort: sortByFilter,
         order: sortByDescending ? 'desc' : 'asc',
-        provisioned: true,
-        edgeDevice: false,
-        tagsPartialMatch: true,
+        ...environmentsQueryParams,
       },
       refetchIfAnyOffline
     );
+
+  const agentVersionsQuery = useAgentVersionsList();
 
   useEffect(() => {
     setPage(1);
@@ -152,8 +163,7 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     label,
   }));
 
-  const alltags = useTags();
-  const tagOptions = [...(alltags.tags || [])];
+  const tagOptions = [...(tagsQuery.tags || [])];
   const uniqueTag = [
     ...new Map(tagOptions.map((item) => [item.ID, item])).values(),
   ].map(({ ID: value, Name: label }) => ({
@@ -161,39 +171,220 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     label,
   }));
 
-  function platformOnChange(filterOptions: Filter[]) {
-    setPlatformState(filterOptions);
-    const dockerBaseType = EnvironmentType.Docker;
-    const kubernetesBaseType = EnvironmentType.KubernetesLocal;
-    const dockerRelateType = [
-      EnvironmentType.AgentOnDocker,
-      EnvironmentType.EdgeAgentOnDocker,
-    ];
-    const kubernetesRelateType = [
-      EnvironmentType.AgentOnKubernetes,
-      EnvironmentType.EdgeAgentOnKubernetes,
-    ];
+  const connectionTypeOptions = getConnectionTypeOptions(platformTypes);
+  const platformTypeOptions = getPlatformTypeOptions(connectionTypes);
 
-    if (filterOptions.length === 0) {
-      setPlatformType(allEnvironmentType);
-    } else {
-      let finalFilterEnvironment = filterOptions.map(
-        (filterOption) => filterOption.value
-      );
-      if (finalFilterEnvironment.includes(dockerBaseType)) {
-        finalFilterEnvironment = [
-          ...finalFilterEnvironment,
-          ...dockerRelateType,
-        ];
-      }
-      if (finalFilterEnvironment.includes(kubernetesBaseType)) {
-        finalFilterEnvironment = [
-          ...finalFilterEnvironment,
-          ...kubernetesRelateType,
-        ];
-      }
-      setPlatformType(finalFilterEnvironment);
+  return (
+    <>
+      {totalAvailable === 0 && <NoEnvironmentsInfoPanel isAdmin={isAdmin} />}
+      <div className="row">
+        <div className="col-sm-12">
+          <TableContainer>
+            <TableTitle icon="hard-drive" featherIcon label="Environments" />
+
+            <TableActions className={styles.actionBar}>
+              <div className={styles.description}>
+                Click on an environment to manage
+              </div>
+              <div className={styles.actionButton}>
+                <div className={styles.refreshButton}>
+                  {isAdmin && (
+                    <Button
+                      onClick={onRefresh}
+                      data-cy="home-refreshEndpointsButton"
+                      size="medium"
+                      color="secondary"
+                      className={clsx(
+                        'vertical-center !ml-0',
+                        styles.refreshEnvironmentsButton
+                      )}
+                    >
+                      <RefreshCcw
+                        className="feather icon-sm icon-white"
+                        aria-hidden="true"
+                      />
+                      Refresh
+                    </Button>
+                  )}
+                </div>
+                <div className={styles.kubeconfigButton}>
+                  <KubeconfigButton
+                    environments={environments}
+                    envQueryParams={{
+                      ...environmentsQueryParams,
+                      sort: sortByFilter,
+                      order: sortByDescending ? 'desc' : 'asc',
+                    }}
+                  />
+                </div>
+                <div className={clsx(styles.filterSearchbar, 'ml-3')}>
+                  <FilterSearchBar
+                    value={searchBarValue}
+                    onChange={setSearchBarValue}
+                    placeholder="Search by name, group, tag, status, URL..."
+                    data-cy="home-endpointsSearchInput"
+                  />
+                </div>
+              </div>
+            </TableActions>
+            <div className={styles.filterContainer}>
+              <div className={styles.filterLeft}>
+                <HomepageFilter
+                  filterOptions={platformTypeOptions}
+                  onChange={setPlatformTypes}
+                  placeHolder="Platform"
+                  value={platformTypes}
+                />
+              </div>
+              <div className={styles.filterLeft}>
+                <HomepageFilter
+                  filterOptions={connectionTypeOptions}
+                  onChange={setConnectionTypes}
+                  placeHolder="Connection Type"
+                  value={connectionTypes}
+                />
+              </div>
+              <div className={styles.filterLeft}>
+                <HomepageFilter
+                  filterOptions={status}
+                  onChange={statusOnChange}
+                  placeHolder="Status"
+                  value={statusState}
+                />
+              </div>
+              <div className={styles.filterLeft}>
+                <HomepageFilter
+                  filterOptions={uniqueTag}
+                  onChange={tagOnChange}
+                  placeHolder="Tags"
+                  value={tagState}
+                />
+              </div>
+              <div className={styles.filterLeft}>
+                <HomepageFilter
+                  filterOptions={uniqueGroup}
+                  onChange={groupOnChange}
+                  placeHolder="Groups"
+                  value={groupState}
+                />
+              </div>
+              <div className={styles.filterLeft}>
+                <HomepageFilter<string>
+                  filterOptions={
+                    agentVersionsQuery.data?.map((v) => ({
+                      label: v,
+                      value: v,
+                    })) || []
+                  }
+                  onChange={setAgentVersions}
+                  placeHolder="Agent Version"
+                  value={agentVersions}
+                />
+              </div>
+              <button
+                type="button"
+                className={styles.clearButton}
+                onClick={clearFilter}
+              >
+                Clear all
+              </button>
+              <div className={styles.filterRight}>
+                <SortbySelector
+                  filterOptions={sortByOptions}
+                  onChange={sortOnchange}
+                  onDescending={sortOnDescending}
+                  placeHolder="Sort By"
+                  sortByDescending={sortByDescending}
+                  sortByButton={sortByButton}
+                  value={sortByState}
+                />
+              </div>
+            </div>
+            <div className="blocklist" data-cy="home-endpointList">
+              {renderItems(
+                isLoading,
+                totalCount,
+                environments.map((env) => (
+                  <EnvironmentItem
+                    key={env.Id}
+                    environment={env}
+                    groupName={
+                      groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
+                    }
+                    onClick={onClickItem}
+                  />
+                ))
+              )}
+            </div>
+
+            <TableFooter>
+              <PaginationControls
+                showAll={totalCount <= 100}
+                pageLimit={pageLimit}
+                page={page}
+                onPageChange={setPage}
+                totalCount={totalCount}
+                onPageLimitChange={setPageLimit}
+              />
+            </TableFooter>
+          </TableContainer>
+        </div>
+      </div>
+    </>
+  );
+
+  function getTypes(
+    platformTypes: PlatformType[],
+    connectionTypes: ConnectionType[]
+  ) {
+    if (platformTypes.length === 0 && connectionTypes.length === 0) {
+      return [];
     }
+
+    const typesByPlatform = {
+      [PlatformType.Docker]: [
+        EnvironmentType.Docker,
+        EnvironmentType.AgentOnDocker,
+        EnvironmentType.EdgeAgentOnDocker,
+      ],
+      [PlatformType.Azure]: [EnvironmentType.Azure],
+      [PlatformType.Kubernetes]: [
+        EnvironmentType.KubernetesLocal,
+        EnvironmentType.AgentOnKubernetes,
+        EnvironmentType.EdgeAgentOnKubernetes,
+      ],
+    };
+
+    const typesByConnection = {
+      [ConnectionType.API]: [
+        EnvironmentType.Azure,
+        EnvironmentType.KubernetesLocal,
+        EnvironmentType.Docker,
+      ],
+      [ConnectionType.Agent]: [
+        EnvironmentType.AgentOnDocker,
+        EnvironmentType.AgentOnKubernetes,
+      ],
+      [ConnectionType.EdgeAgent]: EdgeTypes,
+      [ConnectionType.EdgeDevice]: EdgeTypes,
+    };
+
+    const selectedTypesByPlatform = platformTypes.flatMap(
+      (platformType) => typesByPlatform[platformType]
+    );
+    const selectedTypesByConnection = connectionTypes.flatMap(
+      (connectionType) => typesByConnection[connectionType]
+    );
+
+    if (selectedTypesByPlatform.length === 0) {
+      return selectedTypesByConnection;
+    }
+
+    if (selectedTypesByConnection.length === 0) {
+      return selectedTypesByPlatform;
+    }
+
+    return _.intersection(selectedTypesByConnection, selectedTypesByPlatform);
   }
 
   function statusOnChange(filterOptions: Filter[]) {
@@ -245,14 +436,15 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
   }
 
   function clearFilter() {
-    setPlatformState([]);
-    setPlatformType(allEnvironmentType);
+    setPlatformTypes([]);
     setStatusState([]);
     setStatusFilter([]);
     setTagState([]);
     setTagFilter([]);
     setGroupState([]);
     setGroupFilter([]);
+    setAgentVersions([]);
+    setConnectionTypes([]);
   }
 
   function sortOnchange(filterOptions: Filter) {
@@ -267,149 +459,66 @@ export function EnvironmentList({ onClickItem, onRefresh }: Props) {
     }
   }
 
-  function sortOndescending() {
+  function sortOnDescending() {
     setSortByDescending(!sortByDescending);
   }
+}
 
-  return (
-    <>
-      {totalAvailable === 0 && <NoEnvironmentsInfoPanel isAdmin={isAdmin} />}
-      <div className="row">
-        <div className="col-sm-12">
-          <TableContainer>
-            <TableTitle icon="hard-drive" featherIcon label="Environments" />
+function getConnectionTypeOptions(platformTypes: Filter<PlatformType>[]) {
+  const platformTypeConnectionType = {
+    [PlatformType.Docker]: [
+      ConnectionType.API,
+      ConnectionType.Agent,
+      ConnectionType.EdgeAgent,
+      ConnectionType.EdgeDevice,
+    ],
+    [PlatformType.Azure]: [ConnectionType.API],
+    [PlatformType.Kubernetes]: [
+      ConnectionType.Agent,
+      ConnectionType.EdgeAgent,
+      ConnectionType.EdgeDevice,
+    ],
+  };
 
-            <TableActions className={styles.actionBar}>
-              <div className={styles.description}>
-                Click on an environment to manage
-              </div>
-              <div className={styles.actionButton}>
-                <div className={styles.refreshButton}>
-                  {isAdmin && (
-                    <Button
-                      onClick={onRefresh}
-                      data-cy="home-refreshEndpointsButton"
-                      className={clsx(
-                        'vertical-center',
-                        styles.refreshEnvironmentsButton
-                      )}
-                    >
-                      <RefreshCcw
-                        className="feather icon-sm icon-white"
-                        aria-hidden="true"
-                      />
-                      Refresh
-                    </Button>
-                  )}
-                </div>
-                <div className={styles.kubeconfigButton}>
-                  <KubeconfigButton
-                    environments={environments}
-                    envQueryParams={{
-                      types: platformType,
-                      search: debouncedTextFilter,
-                      status: statusFilter,
-                      tagIds: tagFilter?.length ? tagFilter : undefined,
-                      groupIds: groupFilter,
-                      sort: sortByFilter,
-                      order: sortByDescending ? 'desc' : 'asc',
-                      edgeDevice: false,
-                    }}
-                  />
-                </div>
-                <div className={styles.filterSearchbar}>
-                  <FilterSearchBar
-                    value={searchBarValue}
-                    onChange={setSearchBarValue}
-                    placeholder="Search by name, group, tag, status, URL..."
-                    data-cy="home-endpointsSearchInput"
-                  />
-                </div>
-              </div>
-            </TableActions>
-            <div className={styles.filterContainer}>
-              <div className={styles.filterLeft}>
-                <HomepageFilter
-                  filterOptions={PlatformOptions}
-                  onChange={platformOnChange}
-                  placeHolder="Platform"
-                  value={platformState}
-                />
-              </div>
-              <div className={styles.filterLeft}>
-                <HomepageFilter
-                  filterOptions={status}
-                  onChange={statusOnChange}
-                  placeHolder="Status"
-                  value={statusState}
-                />
-              </div>
-              <div className={styles.filterLeft}>
-                <HomepageFilter
-                  filterOptions={uniqueTag}
-                  onChange={tagOnChange}
-                  placeHolder="Tags"
-                  value={tagState}
-                />
-              </div>
-              <div className={styles.filterLeft}>
-                <HomepageFilter
-                  filterOptions={uniqueGroup}
-                  onChange={groupOnChange}
-                  placeHolder="Groups"
-                  value={groupState}
-                />
-              </div>
-              <button
-                type="button"
-                className={styles.clearButton}
-                onClick={clearFilter}
-              >
-                Clear all
-              </button>
-              <div className={styles.filterRight}>
-                <SortbySelector
-                  filterOptions={SortByOptions}
-                  onChange={sortOnchange}
-                  onDescending={sortOndescending}
-                  placeHolder="Sort By"
-                  sortByDescending={sortByDescending}
-                  sortByButton={sortByButton}
-                  value={sortByState}
-                />
-              </div>
-            </div>
-            <div className="blocklist" data-cy="home-endpointList">
-              {renderItems(
-                isLoading,
-                totalCount,
-                environments.map((env) => (
-                  <EnvironmentItem
-                    key={env.Id}
-                    environment={env}
-                    groupName={
-                      groupsQuery.data?.find((g) => g.Id === env.GroupId)?.Name
-                    }
-                    onClick={onClickItem}
-                  />
-                ))
-              )}
-            </div>
+  const connectionTypesDefaultOptions = [
+    { value: ConnectionType.API, label: 'API' },
+    { value: ConnectionType.Agent, label: 'Agent' },
+    { value: ConnectionType.EdgeAgent, label: 'Edge Agent' },
+  ];
 
-            <TableFooter>
-              <PaginationControls
-                showAll={totalCount <= 100}
-                pageLimit={pageLimit}
-                page={page}
-                onPageChange={setPage}
-                totalCount={totalCount}
-                onPageLimitChange={setPageLimit}
-              />
-            </TableFooter>
-          </TableContainer>
-        </div>
-      </div>
-    </>
+  if (platformTypes.length === 0) {
+    return connectionTypesDefaultOptions;
+  }
+
+  return _.compact(
+    _.intersection(
+      ...platformTypes.map((p) => platformTypeConnectionType[p.value])
+    ).map((c) => connectionTypesDefaultOptions.find((o) => o.value === c))
+  );
+}
+
+function getPlatformTypeOptions(connectionTypes: Filter<ConnectionType>[]) {
+  const platformDefaultOptions = [
+    { value: PlatformType.Docker, label: 'Docker' },
+    { value: PlatformType.Azure, label: 'Azure' },
+    { value: PlatformType.Kubernetes, label: 'Kubernetes' },
+  ];
+
+  if (connectionTypes.length === 0) {
+    return platformDefaultOptions;
+  }
+
+  const connectionTypePlatformType = {
+    [ConnectionType.API]: [PlatformType.Docker, PlatformType.Azure],
+    [ConnectionType.Agent]: [PlatformType.Docker, PlatformType.Kubernetes],
+    [ConnectionType.EdgeAgent]: [PlatformType.Kubernetes, PlatformType.Docker],
+    [ConnectionType.EdgeDevice]: [PlatformType.Docker, PlatformType.Kubernetes],
+  };
+
+  return _.compact(
+    _.intersection(
+      ...connectionTypes.map((p) => connectionTypePlatformType[p.value])
+    ).map((c) => platformDefaultOptions.find((o) => o.value === c))
   );
 }
 

@@ -5,8 +5,8 @@ import {
   ResourceGroup,
   Subscription,
 } from '@/react/azure/types';
-import { parseAccessControlFormData } from '@/portainer/access-control/utils';
-import { useIsAdmin } from '@/portainer/hooks/useUser';
+import { parseAccessControlFormData } from '@/react/portainer/access-control/utils';
+import { useUser } from '@/portainer/hooks/useUser';
 import { useProvider } from '@/react/azure/queries/useProvider';
 import { useResourceGroups } from '@/react/azure/queries/useResourceGroups';
 import { useSubscriptions } from '@/react/azure/queries/useSubscriptions';
@@ -37,7 +37,7 @@ export function useFormState(
   resourceGroups: Record<string, ResourceGroup[]> = {},
   providers: Record<string, ProviderViewModel> = {}
 ) {
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useUser();
 
   const subscriptionOptions = subscriptions.map((s) => ({
     value: s.subscriptionId,

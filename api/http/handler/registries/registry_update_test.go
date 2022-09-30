@@ -74,7 +74,7 @@ func delete_TestHandler_registryUpdate(t *testing.T) {
 		},
 	}
 
-	handler.Router.ServeHTTP(w, r)
+	handler.ServeHTTP(w, r)
 	assert.Equal(t, http.StatusOK, w.Code)
 	// Registry type should remain intact
 	assert.Equal(t, registry.Type, updatedRegistry.Type)
@@ -85,5 +85,4 @@ func delete_TestHandler_registryUpdate(t *testing.T) {
 	assert.Equal(t, *payload.Authentication, updatedRegistry.Authentication)
 	assert.Equal(t, *payload.Username, updatedRegistry.Username)
 	assert.Equal(t, *payload.Password, updatedRegistry.Password)
-
 }

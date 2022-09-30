@@ -1,0 +1,72 @@
+<page-header title="'Scene list'" breadcrumbs="['Scene summary']" reload="true"> </page-header>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="datatable">
+            <rd-widget>
+                <rd-widget-body classes="no-padding">
+                    <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
+                        <rd-widget-header icon="box" feather-icon="true" title-text="Scenes" class="!flex-auto !mr-0" parent-classes="!p-0" />
+                        <div class="searchBar vertical-center !mr-0">
+                            <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+                            <input type="text" class="searchInput"
+                                    ng-model="$ctrl.state.textFilter"
+                                    ng-change="$ctrl.onTextFilterChange()"
+                                    placeholder="Search for a scene..."
+                                    auto-focus
+                                    ng-model-options="{ debounce: 300 }"
+                            />
+                        </div>
+                        <div class="actionBar">
+                            <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.scenes.create">
+                                <pr-icon icon="'plus'" feather="true"></pr-icon>
+                                <span>Add</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="blocklist">
+                        <div class="blocklist-item blocklist-item-line" ng-repeat="item in state.scenes">
+                            <div class="blocklist-item-box blocklist-item-box-column" ng-click="handleClick()">
+                                <span class="blocklist-item-title">
+                                    <pr-icon icon="'svg-route'" class="text-blue-8 space-right"></pr-icon>
+                                    <span>{{item.Name}}</span>
+                                </span>
+                                <span class="text-muted">
+                                    {{item.Description}}
+                                </span>
+                            </div>
+                            <div class="blocklist-item-icon btn-group">
+                                <button type="button" class="btn btn-link btn-sm" ui-sref="portainer.scenes.scene({id: item.Id})">
+                                    <pr-icon icon="'edit-2'" feather="true"></pr-icon>
+                                </button>
+                                <button type="button" class="btn btn-link btn-sm" ng-click="removeAction(item)">
+                                    <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer" ng-if="$ctrl.dataset">
+                        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
+                        <div class="paginationControls">
+                            <form class="form-inline vertical-center">
+                                <span class="limitSelector">
+                                  <span style="margin-right: 5px"> Items per page </span>
+                                  <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
+                                    <option value="0">All</option>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                  </select>
+                                </span>
+                                <dir-pagination-controls max-size="5"></dir-pagination-controls>
+                            </form>
+                        </div>
+                    </div>
+                </rd-widget-body>
+            </rd-widget>
+        </div>
+    </div>
+</div>

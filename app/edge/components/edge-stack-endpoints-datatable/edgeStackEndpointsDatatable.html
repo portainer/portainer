@@ -56,8 +56,8 @@
               ng-class="{ active: item.Checked }"
             >
               <td>{{ item.Name }}</td>
-              <td>{{ $ctrl.statusMap[item.Status.Type] || 'Pending' }}</td>
-              <td>{{ item.Status.Error ? item.Status.Error : '-' }}</td>
+              <td>{{ $ctrl.endpointStatusLabel(item.Id) }}</td>
+              <td>{{ $ctrl.endpointStatusError(item.Id) }}</td>
             </tr>
             <tr ng-if="$ctrl.state.loading">
               <td colspan="5" class="text-center text-muted">Loading...</td>

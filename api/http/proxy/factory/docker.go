@@ -3,15 +3,16 @@ package factory
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"net/url"
 	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/docker"
+	"github.com/portainer/portainer/api/internal/url"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (factory *ProxyFactory) newDockerProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
@@ -23,7 +24,7 @@ func (factory *ProxyFactory) newDockerProxy(endpoint *portainer.Endpoint) (http.
 }
 
 func (factory *ProxyFactory) newDockerLocalProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	endpointURL, err := url.Parse(endpoint.URL)
+	endpointURL, err := url.ParseURL(endpoint.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +39,7 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 		rawURL = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}
 
-	endpointURL, err := url.Parse(rawURL)
+	endpointURL, err := url.ParseURL(rawURL)
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +55,15 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 
 		httpTransport.TLSClientConfig = config
 		endpointURL.Scheme = "https"
+	}
+
+	snapshot, err := factory.dataStore.Snapshot().Snapshot(endpoint.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if snapshot.Docker != nil {
+		endpoint.Snapshots = []portainer.DockerSnapshot{*snapshot.Docker}
 	}
 
 	transportParameters := &docker.TransportParameters{
@@ -107,6 +117,6 @@ func (proxy *dockerLocalProxy) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(res.StatusCode)
 
 	if _, err := io.Copy(w, res.Body); err != nil {
-		log.Printf("proxy error: %s\n", err)
+		log.Debug().Err(err).Msg("proxy error")
 	}
 }

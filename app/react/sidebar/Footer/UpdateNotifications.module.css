@@ -1,0 +1,19 @@
+.root {
+  padding: 12px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.dismissTitle {
+  color: var(--white-color);
+}
+
+.dismissBtn {
+  border: none;
+  background: none;
+  color: var(--text-muted-color);
+}
+
+.actions {
+  padding-left: 26px;
+}

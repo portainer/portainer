@@ -31,7 +31,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="logs_since" class="col-sm-1 control-label text-left"> Fetch </label>
+            <label for="logs_since" class="col-sm-2 control-label text-left"> Fetch </label>
             <div class="col-sm-2">
               <select class="form-control" ng-model="$ctrl.sinceTimestamp" id="logs_since">
                 <option selected value="">All logs</option>
@@ -40,20 +40,20 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="logs_search" class="col-sm-1 control-label text-left"> Search </label>
-            <div class="col-sm-11">
+            <label for="logs_search" class="col-sm-2 control-label text-left"> Search </label>
+            <div class="col-sm-8">
               <input class="form-control" type="text" name="logs_search" ng-model="$ctrl.state.search" ng-change="$ctrl.state.selectedLines.length = 0;" placeholder="Filter..." />
             </div>
           </div>
           <div class="form-group">
-            <label for="lines_count" class="col-sm-1 control-label text-left"> Lines </label>
-            <div class="col-sm-11">
+            <label for="lines_count" class="col-sm-2 control-label text-left"> Lines </label>
+            <div class="col-sm-8">
               <input class="form-control" type="number" name="lines_count" ng-model="$ctrl.lineCount" placeholder="Enter no of lines..." />
             </div>
           </div>
           <div class="form-group" ng-if="$ctrl.state.copySupported">
-            <label class="col-sm-1 control-label text-left"> Actions </label>
-            <div class="col-sm-11">
+            <label class="col-sm-2 control-label text-left"> Actions </label>
+            <div class="col-sm-10">
               <button class="btn btn-primary btn-sm" type="button" ng-click="$ctrl.downloadLogs()" style="margin-left: 0"
                 ><pr-icon icon="'download'" feather="true"></pr-icon> Download logs</button
               >
@@ -86,7 +86,7 @@
 <div class="row" style="height: 54%">
   <div class="col-sm-12" style="height: 100%">
     <pre ng-class="{ wrap_lines: $ctrl.state.wrapLines }" class="log_viewer" scroll-glue="$ctrl.state.autoScroll" force-glue>
-      <div ng-repeat="log in $ctrl.state.filteredLogs = ($ctrl.data | filter:{ 'line': $ctrl.state.search }) track by $index" class="line" ng-if="log.line"><p class="inner_line" ng-click="$ctrl.selectLine(log.line)" ng-class="{ 'line_selected': $ctrl.state.selectedLines.indexOf(log.line) > -1 }"><span ng-repeat="span in log.spans" ng-style="{ 'color': span.foregroundColor, 'background-color': span.backgroundColor }">{{ span.text }}</span></p></div>
+      <div ng-repeat="log in $ctrl.state.filteredLogs = ($ctrl.data | filter:{ 'line': $ctrl.state.search }) track by $index" class="line" ng-if="log.line"><p class="inner_line" ng-click="$ctrl.selectLine(log.line)" ng-class="{ 'line_selected': $ctrl.state.selectedLines.indexOf(log.line) > -1 }"><span ng-repeat="span in log.spans track by $index" ng-style="{ 'color': span.foregroundColor, 'background-color': span.backgroundColor, 'font-weight': span.fontWeight }">{{ span.text }}</span></p></div>
       <div ng-if="!$ctrl.state.filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ $ctrl.state.search }}' filter</p></div>
       <div ng-if="$ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line" class="line"><p class="inner_line">No logs available</p></div>
     </pre>

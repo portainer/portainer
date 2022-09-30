@@ -18,6 +18,7 @@ export default class KubernetesApplicationIngressController {
         _.forEach(ingresses, (ingress) => {
           _.forEach(ingress.Paths, (path) => {
             if (path.ServiceName === service.metadata.name) {
+              path.Secure = ingress.TLS && ingress.TLS.filter((tls) => tls.hosts && tls.hosts.includes(path.Host)).length > 0;
               this.applicationIngress.push(path);
               this.hasIngress = true;
             }

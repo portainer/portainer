@@ -30,12 +30,12 @@ type decoratedEdgeGroup struct {
 func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge groups from the database", err}
+		return httperror.InternalServerError("Unable to retrieve Edge groups from the database", err)
 	}
 
 	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge stacks from the database", err}
+		return httperror.InternalServerError("Unable to retrieve Edge stacks from the database", err)
 	}
 
 	usedEdgeGroups := make(map[portainer.EdgeGroupID]bool)
@@ -55,7 +55,7 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 		if edgeGroup.Dynamic {
 			endpointIDs, err := handler.getEndpointsByTags(edgeGroup.TagIDs, edgeGroup.PartialMatch)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments and environment groups for Edge group", err}
+				return httperror.InternalServerError("Unable to retrieve environments and environment groups for Edge group", err)
 			}
 
 			edgeGroup.Endpoints = endpointIDs
@@ -63,7 +63,7 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 
 		endpointTypes, err := getEndpointTypes(handler.DataStore.Endpoint(), edgeGroup.Endpoints)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint types for Edge group", err}
+			return httperror.InternalServerError("Unable to retrieve endpoint types for Edge group", err)
 		}
 
 		edgeGroup.EndpointTypes = endpointTypes
@@ -81,7 +81,7 @@ func getEndpointTypes(endpointService dataservices.EndpointService, endpointIds 
 	for _, endpointID := range endpointIds {
 		endpoint, err := endpointService.Endpoint(endpointID)
 		if err != nil {
-			return nil, fmt.Errorf("failed fetching endpoint: %w", err)
+			return nil, fmt.Errorf("failed fetching environment: %w", err)
 		}
 
 		typeSet[endpoint.Type] = true

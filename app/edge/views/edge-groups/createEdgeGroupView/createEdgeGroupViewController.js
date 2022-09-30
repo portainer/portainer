@@ -39,7 +39,7 @@ export class CreateEdgeGroupController {
     this.state.actionInProgress = true;
     try {
       await this.EdgeGroupService.create(this.model);
-      this.Notifications.success('Edge group successfully created');
+      this.Notifications.success('Success', 'Edge group successfully created');
       this.$state.go('edge.groups');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create edge group');

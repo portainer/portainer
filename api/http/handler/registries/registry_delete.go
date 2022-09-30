@@ -27,27 +27,27 @@ import (
 func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 	if !securityContext.IsAdmin {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to delete registry", httperrors.ErrResourceAccessDenied}
+		return httperror.Forbidden("Permission denied to delete registry", httperrors.ErrResourceAccessDenied)
 	}
 
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
+		return httperror.BadRequest("Invalid registry identifier route variable", err)
 	}
 
 	_, err = handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a registry with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a registry with the specified identifier inside the database", err)
 	}
 
 	err = handler.DataStore.Registry().DeleteRegistry(portainer.RegistryID(registryID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the registry from the database", err}
+		return httperror.InternalServerError("Unable to remove the registry from the database", err)
 	}
 
 	return response.Empty(w)

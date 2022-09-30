@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -68,10 +69,12 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 		func(obj interface{}) (interface{}, error) {
 			endpoint, ok := obj.(*portainer.Endpoint)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Endpoint object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Endpoint object")
 				return nil, fmt.Errorf("failed to convert to Endpoint object: %s", obj)
 			}
+
 			endpoints = append(endpoints, *endpoint)
+
 			return &portainer.Endpoint{}, nil
 		})
 
@@ -80,7 +83,7 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 
 // CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
 func (service *Service) Create(endpoint *portainer.Endpoint) error {
-	return service.connection.CreateObjectWithSetSequence(BucketName, int(endpoint.ID), endpoint)
+	return service.connection.CreateObjectWithId(BucketName, int(endpoint.ID), endpoint)
 }
 
 // GetNextIdentifier returns the next identifier for an environment(endpoint).

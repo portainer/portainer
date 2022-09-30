@@ -44,7 +44,7 @@ export default function AddProfileController($scope, $async, $state, $window, Mo
 
       try {
         await createProfile(name, method, fileContent);
-        Notifications.success('Profile successfully created');
+        Notifications.success('Success', 'Profile successfully created');
         $scope.state.isEditorDirty = false;
         $state.go('portainer.settings.edgeCompute');
       } catch (err) {

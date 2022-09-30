@@ -6,9 +6,10 @@ import KubernetesConfigMapHelper from 'Kubernetes/helpers/configMapHelper';
 
 class KubernetesResourcePoolAccessController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesResourcePoolService, KubernetesConfigMapService, GroupService, AccessService) {
+  constructor($async, $state, $scope, Notifications, KubernetesResourcePoolService, KubernetesConfigMapService, GroupService, AccessService) {
     this.$async = $async;
     this.$state = $state;
+    this.$scope = $scope;
     this.Notifications = Notifications;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesConfigMapService = KubernetesConfigMapService;
@@ -19,7 +20,7 @@ class KubernetesResourcePoolAccessController {
     this.onInit = this.onInit.bind(this);
     this.authorizeAccessAsync = this.authorizeAccessAsync.bind(this);
     this.unauthorizeAccessAsync = this.unauthorizeAccessAsync.bind(this);
-
+    this.onUsersAndTeamsChange = this.onUsersAndTeamsChange.bind(this);
     this.unauthorizeAccess = this.unauthorizeAccess.bind(this);
   }
 
@@ -72,6 +73,7 @@ class KubernetesResourcePoolAccessController {
           return false;
         });
       }
+
       this.availableUsersAndTeams = _.without(endpointAccesses.authorizedUsersAndTeams, ...this.authorizedUsersAndTeams);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve namespace information');
@@ -93,11 +95,17 @@ class KubernetesResourcePoolAccessController {
       const newAccesses = _.concat(this.authorizedUsersAndTeams, this.formValues.multiselectOutput);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
       await this.KubernetesConfigMapService.updateAccess(accessConfigMap);
-      this.Notifications.success('Access successfully created');
+      this.Notifications.success('Success', 'Access successfully created');
       this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create accesses');
     }
+  }
+
+  onUsersAndTeamsChange(value) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.multiselectOutput = value;
+    });
   }
 
   authorizeAccess() {
@@ -113,7 +121,7 @@ class KubernetesResourcePoolAccessController {
       const newAccesses = _.without(this.authorizedUsersAndTeams, ...selectedItems);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
       await this.KubernetesConfigMapService.updateAccess(accessConfigMap);
-      this.Notifications.success('Access successfully removed');
+      this.Notifications.success('Success', 'Access successfully removed');
       this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to remove accesses');

@@ -45,20 +45,20 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	var payload adminInitPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	users, err := handler.DataStore.User().UsersByRole(portainer.AdministratorRole)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
+		return httperror.InternalServerError("Unable to retrieve users from the database", err)
 	}
 
 	if len(users) != 0 {
-		return &httperror.HandlerError{http.StatusConflict, "Unable to create administrator user", errAdminAlreadyInitialized}
+		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Unable to create administrator user", Err: errAdminAlreadyInitialized}
 	}
 
 	if !handler.passwordStrengthChecker.Check(payload.Password) {
-		return &httperror.HandlerError{http.StatusBadRequest, "Password does not meet the requirements", nil}
+		return httperror.BadRequest("Password does not meet the requirements", nil)
 	}
 
 	user := &portainer.User{
@@ -68,12 +68,12 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 
 	user.Password, err = handler.CryptoService.Hash(payload.Password)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errCryptoHashFailure}
+		return httperror.InternalServerError("Unable to hash user password", errCryptoHashFailure)
 	}
 
 	err = handler.DataStore.User().Create(user)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
+		return httperror.InternalServerError("Unable to persist user inside the database", err)
 	}
 
 	return response.JSON(w, user)

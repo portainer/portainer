@@ -1,20 +1,33 @@
 package main
 
 import (
-	"log"
+	stdlog "log"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/pkgerrors"
 )
 
 func configureLogger() {
-	logger := logrus.New() // logger is to implicitly substitute stdlib's log
-	log.SetOutput(logger.Writer())
+	zerolog.ErrorStackFieldName = "stack_trace"
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
-	formatter := &logrus.TextFormatter{DisableTimestamp: false, DisableLevelTruncation: true}
+	stdlog.SetFlags(0)
+	stdlog.SetOutput(log.Logger)
 
-	logger.SetFormatter(formatter)
-	logrus.SetFormatter(formatter)
+	log.Logger = log.Logger.With().Caller().Stack().Logger()
+}
 
-	logger.SetLevel(logrus.DebugLevel)
-	logrus.SetLevel(logrus.DebugLevel)
+func setLoggingLevel(level string) {
+	switch level {
+	case "ERROR":
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	case "WARN":
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	case "INFO":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case "DEBUG":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
 }

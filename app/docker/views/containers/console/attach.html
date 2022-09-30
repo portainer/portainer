@@ -15,21 +15,21 @@
     <rd-widget>
       <rd-widget-header icon="terminal" feather-icon="true" title-text="Attach"></rd-widget-header>
       <rd-widget-body>
-        <div class="small" ng-if="!container.Config.OpenStdin">
+        <div class="small text-warning" ng-if="!container.Config.OpenStdin">
           <p>
             <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
             The interactive-flag is not set. You might not be able to use the console properly.
           </p>
         </div>
 
-        <div class="small" ng-if="!container.Config.Tty">
+        <div class="small text-warning" ng-if="!container.Config.Tty">
           <p>
             <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
             The TTY-flag is not set. You might not be able to use the console properly.
           </p>
         </div>
 
-        <div class="small text-danger" ng-hide="container.State.Running">
+        <div class="small text-warning" ng-hide="container.State.Running">
           <p>
             <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon>
             The container is not running.

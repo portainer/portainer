@@ -14,15 +14,15 @@
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left required">Username</label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.registry_username.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.registry_username.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
+      <div class="help-block" ng-show="registryFormGitlab.registry_username.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="registryFormGitlab.registry_username.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -32,15 +32,15 @@
     <label for="registry_perso_acc_token" class="col-sm-3 col-lg-2 control-label text-left required">Personal Access Token </label>
     <div class="col-sm-9 col-lg-10">
       <input type="password" class="form-control" id="registry_perso_acc_token" name="registry_perso_acc_token" ng-model="$ctrl.model.Token" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.registry_perso_acc_token.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.registry_perso_acc_token.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
+      <div class="help-block" ng-show="registryFormGitlab.registry_perso_acc_token.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="registryFormGitlab.registry_perso_acc_token.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -48,55 +48,65 @@
 
   <div class="form-group">
     <div class="col-sm-12">
-      <a class="small interactive vertical-center" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
+      <button
+        type="button"
+        class="btn btn-link btn-sm hover:no-underline !ml-0 p-0"
+        ng-if="!$ctrl.state.overrideConfiguration"
+        ng-click="$ctrl.state.overrideConfiguration = true;"
+      >
         <pr-icon icon="'tool'" feather="true"></pr-icon>
         Override default configuration
-      </a>
-      <a class="small interactive vertical-center" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.resetDefaults()">
+      </button>
+      <button
+        type="button"
+        class="btn btn-link btn-sm hover:no-underline !ml-0 p-0"
+        ng-if="$ctrl.state.overrideConfiguration"
+        ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.resetDefaults()"
+      >
         <pr-icon icon="'settings'" feather="true"></pr-icon>
         Use default configuration
-      </a>
+      </button>
     </div>
   </div>
 
   <!-- url-input -->
   <div class="form-group" ng-if="$ctrl.state.overrideConfiguration">
-    <label for="instance_url" class="col-sm-3 col-lg-2 control-label text-left">
+    <label for="instance_url" class="col-sm-3 col-lg-2 control-label text-left required">
       Instance URL
       <portainer-tooltip message="'URL of Gitlab instance.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="instance_url" name="instance_url" ng-model="$ctrl.model.Gitlab.InstanceURL" placeholder="https://gitlab.com" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.instance_url.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.instance_url.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
+      <div class="help-block" ng-show="registryFormGitlab.instance_url.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="registryFormGitlab.instance_url.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
   <!-- !url-input -->
   <!-- url-input -->
   <div class="form-group" ng-if="$ctrl.state.overrideConfiguration">
-    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
+    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left required">
       Registry URL
       <portainer-tooltip message="'URL of Gitlab registry instance.'"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="https://registry.gitlab.com" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.registry_url.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.registry_url.$error">
-        <p ng-message="required" class="vertical-center">
-          <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
-          This field is required.
-        </p>
+      <div class="help-block" ng-show="registryFormGitlab.registry_url.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="registryFormGitlab.registry_url.$error">
+            <p ng-message="required" class="vertical-center">
+              <pr-icon icon="'alert-triangle'" feather="true"></pr-icon>
+              This field is required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -1,17 +1,18 @@
 package migrator
 
-import "github.com/portainer/portainer/api/internal/endpointutils"
+import (
+	"github.com/portainer/portainer/api/internal/endpointutils"
+
+	"github.com/rs/zerolog/log"
+)
 
 func (m *Migrator) migrateDBVersionToDB40() error {
-	if err := m.trustCurrentEdgeEndpointsDB40(); err != nil {
-		return err
-	}
-
-	return nil
+	return m.trustCurrentEdgeEndpointsDB40()
 }
 
 func (m *Migrator) trustCurrentEdgeEndpointsDB40() error {
-	migrateLog.Info("- trusting current edge endpoints")
+	log.Info().Msg("trusting current edge endpoints")
+
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
 		return err

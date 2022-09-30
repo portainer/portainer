@@ -2,16 +2,20 @@ package migrator
 
 import (
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 const scheduleScriptExecutionJobType = 1
 
 func (m *Migrator) updateUsersToDBVersion20() error {
-	migrateLog.Info("- updating user authentication")
+	log.Info().Msg("updating user authentication")
+
 	return m.authorizationService.UpdateUsersAuthorizations()
 }
 
 func (m *Migrator) updateSettingsToDBVersion20() error {
+	log.Info().Msg("updating settings")
 	legacySettings, err := m.settingsService.Settings()
 	if err != nil {
 		return err
@@ -23,7 +27,8 @@ func (m *Migrator) updateSettingsToDBVersion20() error {
 }
 
 func (m *Migrator) updateSchedulesToDBVersion20() error {
-	migrateLog.Info("- updating schedules")
+	log.Info().Msg("updating schedules")
+
 	legacySchedules, err := m.scheduleService.Schedules()
 	if err != nil {
 		return err

@@ -1,14 +1,12 @@
 package edgestacks
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -16,6 +14,9 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 )
 
 // @id EdgeStackCreate
@@ -36,12 +37,12 @@ import (
 func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
+		return httperror.BadRequest("Invalid query parameter: method", err)
 	}
 
 	edgeStack, err := handler.createSwarmStack(method, r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Edge stack", err}
+		return httperror.InternalServerError("Unable to create Edge stack", err)
 	}
 
 	return response.JSON(w, edgeStack)
@@ -271,7 +272,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 
 	err = updateEndpointRelations(handler.DataStore.EndpointRelation(), stack.ID, relatedEndpointIds)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
+		return nil, fmt.Errorf("Unable to update environment relations: %w", err)
 	}
 
 	err = handler.DataStore.EdgeStack().Create(stack.ID, stack)
@@ -378,7 +379,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request) (*portai
 
 	err = updateEndpointRelations(handler.DataStore.EndpointRelation(), stack.ID, relatedEndpointIds)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
+		return nil, fmt.Errorf("Unable to update environment relations: %w", err)
 	}
 
 	err = handler.DataStore.EdgeStack().Create(stack.ID, stack)
@@ -408,14 +409,14 @@ func updateEndpointRelations(endpointRelationService dataservices.EndpointRelati
 	for _, endpointID := range relatedEndpointIds {
 		relation, err := endpointRelationService.EndpointRelation(endpointID)
 		if err != nil {
-			return fmt.Errorf("unable to find endpoint relation in database: %w", err)
+			return fmt.Errorf("unable to find environment relation in database: %w", err)
 		}
 
 		relation.EdgeStacks[edgeStackID] = true
 
 		err = endpointRelationService.UpdateEndpointRelation(endpointID, relation)
 		if err != nil {
-			return fmt.Errorf("unable to persist endpoint relation in database: %w", err)
+			return fmt.Errorf("unable to persist environment relation in database: %w", err)
 		}
 	}
 

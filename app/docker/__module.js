@@ -39,13 +39,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
             await StateManager.updateEndpointState(endpoint);
           } catch (e) {
             Notifications.error('Failed loading environment', e);
-            $state.go(
-              'portainer.home',
-              {},
-              {
-                reload: true,
-              }
-            );
+            $state.go('portainer.home', {}, { reload: true });
           }
 
           async function checkEndpointStatus(endpoint) {
@@ -61,9 +55,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
             if (endpoint.Status === status) {
               return;
             }
-            await EndpointService.updateEndpoint(endpoint.Id, {
-              Status: status,
-            });
+            await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
           }
         });
       },
@@ -100,127 +92,6 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
           templateUrl: './views/configs/create/createconfig.html',
           controller: 'CreateConfigController',
           controllerAs: 'ctrl',
-        },
-      },
-    };
-
-    var containers = {
-      name: 'docker.containers',
-      url: '/containers',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/containers.html',
-          controller: 'ContainersController',
-        },
-      },
-    };
-
-    var container = {
-      name: 'docker.containers.container',
-      url: '/:id?nodeName',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/edit/container.html',
-          controller: 'ContainerController',
-        },
-      },
-    };
-
-    var containerAttachConsole = {
-      name: 'docker.containers.container.attach',
-      url: '/attach',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/console/attach.html',
-          controller: 'ContainerConsoleController',
-        },
-      },
-    };
-
-    var containerExecConsole = {
-      name: 'docker.containers.container.exec',
-      url: '/exec',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/console/exec.html',
-          controller: 'ContainerConsoleController',
-        },
-      },
-    };
-
-    var containerCreation = {
-      name: 'docker.containers.new',
-      url: '/new?nodeName&from',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/create/createcontainer.html',
-          controller: 'CreateContainerController',
-        },
-      },
-    };
-
-    var containerInspect = {
-      name: 'docker.containers.container.inspect',
-      url: '/inspect',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/inspect/containerinspect.html',
-          controller: 'ContainerInspectController',
-        },
-      },
-    };
-
-    var containerLogs = {
-      name: 'docker.containers.container.logs',
-      url: '/logs',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/logs/containerlogs.html',
-          controller: 'ContainerLogsController',
-        },
-      },
-    };
-
-    var containerStats = {
-      name: 'docker.containers.container.stats',
-      url: '/stats',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/stats/containerstats.html',
-          controller: 'ContainerStatsController',
-        },
-      },
-    };
-
-    const containerExplorer = {
-      name: 'docker.containers.container.explorer',
-      url: '/explorer',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/explorer/containerExplorer.html',
-          controller: 'ContainerExplorerController',
-        },
-      },
-    };
-
-    const containerExplorerCreate = {
-      name: 'docker.containers.container.explorer.create',
-      url: '/create',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/explorer/create/index.html',
-          controller: 'ContainerExplorerCreateController',
-        },
-      },
-    };
-
-    const containerExplorerUpload = {
-      name: 'docker.containers.container.explorer.upload',
-      url: '/upload',
-      views: {
-        'content@': {
-          templateUrl: './views/containers/explorer/upload/index.html',
-          controller: 'ContainerExplorerUploadController',
         },
       },
     };
@@ -505,6 +376,17 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       },
     };
 
+    var stackContainer = {
+      name: 'docker.stacks.stack.container',
+      url: '/:id?nodeName',
+      views: {
+        'content@': {
+          templateUrl: '~@/docker/views/containers/edit/container.html',
+          controller: 'ContainerController',
+        },
+      },
+    };
+
     var stackCreation = {
       name: 'docker.stacks.newstack',
       url: '/newstack',
@@ -622,7 +504,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     };
 
     const dockerFeaturesConfiguration = {
-      name: 'docker.featuresConfiguration',
+      name: 'docker.host.featuresConfiguration',
       url: '/feat-config',
       views: {
         'content@': {
@@ -631,8 +513,18 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       },
     };
 
-    const registries = {
-      name: 'docker.registries',
+    const swarmFeaturesConfiguration = {
+      name: 'docker.swarm.featuresConfiguration',
+      url: '/feat-config',
+      views: {
+        'content@': {
+          component: 'dockerFeaturesConfigurationView',
+        },
+      },
+    };
+
+    const dockerRegistries = {
+      name: 'docker.host.registries',
       url: '/registries',
       views: {
         'content@': {
@@ -641,8 +533,28 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       },
     };
 
-    const registryAccess = {
-      name: 'docker.registries.access',
+    const swarmRegistries = {
+      name: 'docker.swarm.registries',
+      url: '/registries',
+      views: {
+        'content@': {
+          component: 'endpointRegistriesView',
+        },
+      },
+    };
+
+    const dockerRegistryAccess = {
+      name: 'docker.host.registries.access',
+      url: '/:id/access',
+      views: {
+        'content@': {
+          component: 'dockerRegistryAccessView',
+        },
+      },
+    };
+
+    const swarmRegistryAccess = {
+      name: 'docker.swarm.registries.access',
       url: '/:id/access',
       views: {
         'content@': {
@@ -654,17 +566,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     $stateRegistryProvider.register(configs);
     $stateRegistryProvider.register(config);
     $stateRegistryProvider.register(configCreation);
-    $stateRegistryProvider.register(containers);
-    $stateRegistryProvider.register(container);
-    $stateRegistryProvider.register(containerExecConsole);
-    $stateRegistryProvider.register(containerAttachConsole);
-    $stateRegistryProvider.register(containerCreation);
-    $stateRegistryProvider.register(containerInspect);
-    $stateRegistryProvider.register(containerLogs);
-    $stateRegistryProvider.register(containerStats);
-    $stateRegistryProvider.register(containerExplorer);
-    $stateRegistryProvider.register(containerExplorerCreate);
-    $stateRegistryProvider.register(containerExplorerUpload);
+
     $stateRegistryProvider.register(customTemplates);
     $stateRegistryProvider.register(customTemplatesNew);
     $stateRegistryProvider.register(customTemplatesEdit);
@@ -692,6 +594,7 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     $stateRegistryProvider.register(serviceLogs);
     $stateRegistryProvider.register(stacks);
     $stateRegistryProvider.register(stack);
+    $stateRegistryProvider.register(stackContainer);
     $stateRegistryProvider.register(stackCreation);
     $stateRegistryProvider.register(swarm);
     $stateRegistryProvider.register(swarmVisualizer);
@@ -704,7 +607,10 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     $stateRegistryProvider.register(volumeBrowse);
     $stateRegistryProvider.register(volumeCreation);
     $stateRegistryProvider.register(dockerFeaturesConfiguration);
-    $stateRegistryProvider.register(registries);
-    $stateRegistryProvider.register(registryAccess);
+    $stateRegistryProvider.register(swarmFeaturesConfiguration);
+    $stateRegistryProvider.register(dockerRegistries);
+    $stateRegistryProvider.register(swarmRegistries);
+    $stateRegistryProvider.register(dockerRegistryAccess);
+    $stateRegistryProvider.register(swarmRegistryAccess);
   },
 ]);

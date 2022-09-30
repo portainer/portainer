@@ -20,8 +20,8 @@ export function SearchBar({
   const [searchValue, setSearchValue] = useDebounce(value, onChange);
 
   return (
-    <div className="searchBar items-center flex">
-      <Search className="searchIcon feather" />
+    <div className="searchBar items-center flex min-w-[90px]">
+      <Search className="searchIcon feather shrink-0" />
       <input
         type="text"
         className="searchInput"

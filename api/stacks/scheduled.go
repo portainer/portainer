@@ -14,6 +14,7 @@ func StartStackSchedules(scheduler *scheduler.Scheduler, stackdeployer StackDepl
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch refreshable stacks")
 	}
+
 	for _, stack := range stacks {
 		d, err := time.ParseDuration(stack.AutoUpdate.Interval)
 		if err != nil {

@@ -1,5 +1,5 @@
 import { useStatus } from '@/portainer/services/api/status.service';
-import { useSettings } from '@/portainer/settings/queries';
+import { useSettings } from '@/react/portainer/settings/queries';
 
 export function useAgentDetails() {
   const settingsQuery = useSettings((settings) => settings.AgentSecret);

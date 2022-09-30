@@ -40,15 +40,16 @@ body,
   position: relative;
 }
 
-.white-space-normal {
-  white-space: normal !important;
-}
-
 .logo {
   display: inline;
   max-width: 155px;
   max-height: 55px;
 }
+
+.white-space-normal {
+  white-space: normal !important;
+}
+
 .legend .title {
   padding: 0 0.3em;
   margin: 0.5em;
@@ -86,11 +87,15 @@ body,
 }
 
 .form-section-title {
+  @apply text-gray-9;
+  @apply th-dark:text-gray-5;
+  @apply th-highcontrast:text-white;
+
   margin-top: 5px;
   margin-bottom: 10px;
-  color: var(--text-form-section-title-color);
   padding-left: 0;
   font-weight: 500;
+  font-size: 16px;
 }
 
 .form-horizontal .control-label.text-left {
@@ -114,10 +119,6 @@ input[type='checkbox'] {
   align-content: center;
   line-height: 16px;
   text-align: center;
-}
-
-a[ng-click] {
-  cursor: pointer;
 }
 
 .space-right {
@@ -185,7 +186,7 @@ a[ng-click] {
 }
 
 .text-warning {
-  color: #f0ad4e;
+  @apply text-warning-9 th-dark:text-warning-7 th-highcontrast:text-warning-1;
 }
 
 .widget .widget-body table tbody .image-tag {
@@ -268,6 +269,10 @@ a[ng-click] {
 
 .blocklist-item-box {
   display: flex;
+}
+
+.blocklist-item-box-column{
+  flex-direction: column;
 }
 
 .blocklist-item-line.endpoint-item {
@@ -493,7 +498,7 @@ a[ng-click] {
 
 :root[theme='dark'] .bootbox-checkbox-list,
 :root[theme='highcontrast'] .bootbox-checkbox-list {
-  background-color: var(--black-color);
+  background-color: var(--bg-modal-content-color);
 }
 
 .small-select {
@@ -880,4 +885,20 @@ json-tree .branch-preview {
 .web-editor a:hover {
   color: var(--text-link-hover-color);
   text-decoration-line: underline;
+}
+
+reach-portal > div {
+  z-index: 10;
+}
+
+input[style*='background-image: url("data:image/png'] + [data-cy='auth-passwordInputToggle'] {
+  right: 20px;
+}
+
+input[style*='background-image: url("data:image/png'] {
+  padding-right: 60px;
+}
+
+.web-editor .trancluded-item:empty {
+  display: none;
 }

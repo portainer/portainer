@@ -54,7 +54,7 @@ angular.module('portainer.docker').factory('TaskService', [
 
       Task.logs(parameters)
         .$promise.then(function success(data) {
-          var logs = LogHelper.formatLogs(data.logs, true);
+          var logs = LogHelper.formatLogs(data.logs, { stripHeaders: true, withTimestamps: !!timestamps });
           deferred.resolve(logs);
         })
         .catch(function error(err) {

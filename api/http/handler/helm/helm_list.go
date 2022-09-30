@@ -38,8 +38,6 @@ func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httper
 		KubernetesClusterAccess: clusterAccess,
 	}
 
-	params := r.URL.Query()
-
 	// optional namespace.  The library defaults to "default"
 	namespace, _ := request.RetrieveQueryParameter(r, "namespace", true)
 	if namespace != "" {
@@ -47,18 +45,18 @@ func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httper
 	}
 
 	// optional filter
-	if filter := params.Get("filter"); filter != "" {
+	if filter, _ := request.RetrieveQueryParameter(r, "filter", true); filter != "" {
 		listOpts.Filter = filter
 	}
 
 	// optional selector
-	if selector := params.Get("selector"); selector != "" {
+	if selector, _ := request.RetrieveQueryParameter(r, "selector", true); selector != "" {
 		listOpts.Selector = selector
 	}
 
 	releases, err := handler.helmPackageManager.List(listOpts)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Helm returned an error", err}
+		return httperror.InternalServerError("Helm returned an error", err)
 	}
 
 	return response.JSON(w, releases)

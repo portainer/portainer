@@ -5,11 +5,12 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
+
+	"github.com/gorilla/mux"
 )
 
 // Handler is the HTTP handler used to handle webhook operations.
@@ -42,12 +43,12 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 func (handler *Handler) checkResourceAccess(r *http.Request, resourceID string, resourceControlType portainer.ResourceControlType) *httperror.HandlerError {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
+		return httperror.InternalServerError("Unable to retrieve user info from request context", err)
 	}
 	// non-admins
 	rc, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceID, resourceControlType)
 	if rc == nil || err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the resource", Err: err}
+		return httperror.InternalServerError("Unable to retrieve a resource control associated to the resource", err)
 	}
 	userTeamIDs := make([]portainer.TeamID, 0)
 	for _, membership := range securityContext.UserMemberships {
@@ -63,18 +64,18 @@ func (handler *Handler) checkResourceAccess(r *http.Request, resourceID string, 
 func (handler *Handler) checkAuthorization(r *http.Request, endpoint *portainer.Endpoint, authorizations []portainer.Authorization) (bool, *httperror.HandlerError) {
 	err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return false, &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access environment", Err: err}
+		return false, httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return false, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve user info from request context", Err: err}
+		return false, httperror.InternalServerError("Unable to retrieve user info from request context", err)
 	}
 
 	authService := authorization.NewService(handler.DataStore)
 	isAdminOrAuthorized, err := authService.UserIsAdminOrAuthorized(securityContext.UserID, endpoint.ID, authorizations)
 	if err != nil {
-		return false, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to get user authorizations", Err: err}
+		return false, httperror.InternalServerError("Unable to get user authorizations", err)
 	}
 	return isAdminOrAuthorized, nil
 }

@@ -1,13 +1,13 @@
 <ng-form name="serviceForm">
   <div ng-if="$ctrl.isAdmin()" class="small" ng-show="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">
-    <p style="margin-top: 10px">
-      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon> No Load balancer is available in this cluster, click
-      <a ui-sref="kubernetes.cluster.setup">here</a> to configure load balancer.
+    <p class="text-warning pt-2 vertical-center">
+      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> No Load balancer is available in this cluster, click
+      <a class="hyperlink" ui-sref="kubernetes.cluster.setup">here</a> to configure load balancer.
     </p>
   </div>
   <div ng-if="!$ctrl.isAdmin()" class="small" ng-show="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">
-    <p style="margin-top: 10px">
-      <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon> No Load balancer is available in this cluster, contract your administrator.
+    <p class="text-warning pt-2 vertical-center">
+      <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> No Load balancer is available in this cluster, contact your administrator.
     </p>
   </div>
 
@@ -18,16 +18,16 @@
       $ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.NODE_PORT
     "
   >
-    <div ng-show="!$ctrl.multiItemDisable" class="mt-5 mb-5">
-      <label class="control-label text-left">Published ports</label>
-      <span class="label label-default interactive ml-10 vertical-center" ng-click="$ctrl.addPort()" data-cy="k8sAppCreate-addNewPortButton">
+    <div ng-show="!$ctrl.multiItemDisable" class="mt-5 mb-5 vertical-center">
+      <label class="control-label text-left !pt-0">Published ports</label>
+      <span class="label label-default interactive ml-2.5 vertical-center" ng-click="$ctrl.addPort()" data-cy="k8sAppCreate-addNewPortButton">
         <pr-icon icon="'plus'" mode="'alt'" size="'sm'" feather="true"></pr-icon> publish a new port
       </span>
     </div>
     <div ng-repeat="servicePort in $ctrl.servicePorts" class="mt-5 service-form row">
       <div class="form-group !mx-0 !pl-0 col-sm-3">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">container port</span>
+          <span class="input-group-addon required">Container port</span>
           <input
             type="number"
             class="form-control"
@@ -44,20 +44,24 @@
           />
         </div>
         <span>
-          <div class="small mt-1" ng-if="$ctrl.state.duplicates.targetPort.refs[$index] !== undefined">
+          <div class="small mt-1 text-warning" ng-if="$ctrl.state.duplicates.targetPort.refs[$index] !== undefined">
             <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This container port is already used.
           </div>
-          <div class="small mt-1" ng-messages="serviceForm['container_port_'+$index].$error">
-            <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number is required.</p>
-            <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
-            <p ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
+          <div class="small mt-1 text-warning" ng-messages="serviceForm['container_port_'+$index].$error">
+            <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number is required.</p>
+            <p class="vertical-center" ng-message="min"
+              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p
+            >
+            <p class="vertical-center" ng-message="max"
+              ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p
+            >
           </div>
         </span>
       </div>
 
       <div class="form-group !mx-0 !pl-0 col-sm-3">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">service port</span>
+          <span class="input-group-addon required">Service port</span>
           <input
             type="number"
             class="form-control"
@@ -73,14 +77,18 @@
           />
         </div>
         <span>
-          <div class="small mt-1" ng-if="$ctrl.state.duplicates.servicePort.refs[$index] !== undefined">
+          <div class="small mt-1 text-warning" ng-if="$ctrl.state.duplicates.servicePort.refs[$index] !== undefined">
             <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This service port is already used.
           </div>
-          <div class="small mt-1">
+          <div class="small mt-1 text-warning">
             <div ng-messages="serviceForm['service_port_'+$index].$error">
-              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Service port number is required.</p>
-              <p ng-message="min"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
-              <p ng-message="max"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Container port number must be inside the range 1-65535.</p>
+              <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Service port number is required.</p>
+              <p class="vertical-center" ng-message="min"
+                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Service port number must be inside the range 1-65535.</p
+              >
+              <p class="vertical-center" ng-message="max"
+                ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Service port number must be inside the range 1-65535.</p
+              >
             </div>
           </div>
         </span>
@@ -88,7 +96,7 @@
 
       <div class="form-group !mx-0 !pl-0 col-sm-3" ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.NODE_PORT">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">nodeport</span>
+          <span class="input-group-addon required">Nodeport</span>
           <input
             type="number"
             class="form-control"
@@ -97,20 +105,22 @@
             placeholder="30080"
             ng-min="30000"
             ng-max="32767"
+            required
             ng-change="$ctrl.onChangeNodePort()"
             data-cy="k8sAppCreate-nodeportPort_{{ $index }}"
           />
         </div>
         <div class="w-full">
           <span>
-            <div class="small mt-1">
+            <div class="small mt-1 text-warning">
               <div ng-messages="serviceForm['node_port_'+$index].$error">
-                <p ng-message="min"
-                  ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Node port number must be inside the range 30000-32767 or blank for system
+                <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Nodeport is required.</p>
+                <p class="vertical-center" ng-message="min"
+                  ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Nodeport number must be inside the range 30000-32767 or blank for system
                   allocated.</p
                 >
-                <p ng-message="max"
-                  ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Node port number must be inside the range 30000-32767 or blank for system
+                <p class="vertical-center" ng-message="max"
+                  ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Nodeport number must be inside the range 30000-32767 or blank for system
                   allocated.</p
                 >
               </div>
@@ -120,7 +130,7 @@
       </div>
       <div class="form-group !mx-0 !pl-0 col-sm-3" ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">loadbalancer port</span>
+          <span class="input-group-addon">Loadbalancer port</span>
           <input
             type="number"
             class="form-control"
@@ -138,7 +148,7 @@
 
       <div class="form-group !mx-0 !pl-0 col-sm-3" ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">ingress</span>
+          <span class="input-group-addon">Ingress</span>
           <select
             class="form-control"
             name="ingress_port_{{ $index }}"
@@ -152,9 +162,9 @@
           </select>
         </div>
         <span>
-          <div class="small mt-5">
+          <div class="small mt-5 text-warning">
             <div ng-messages="serviceForm['ingress_port_'+$index].$error">
-              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress selection is required.</p>
+              <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Ingress selection is required.</p>
             </div>
           </div>
         </span>
@@ -162,7 +172,7 @@
 
       <div class="form-group !mx-0 !pl-0 col-sm-3" ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">hostname</span>
+          <span class="input-group-addon">Hostname</span>
           <select
             class="form-control"
             name="hostname_port_{{ $index }}"
@@ -176,9 +186,9 @@
           </select>
         </div>
         <span>
-          <div class="small mt-1">
+          <div class="small mt-1 text-warning">
             <div ng-messages="serviceForm['hostname_port_'+$index].$error">
-              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Host is required.</p>
+              <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Hostname is required.</p>
             </div>
           </div>
         </span>
@@ -186,7 +196,7 @@
 
       <div class="form-group !mx-0 !pl-0 col-sm-3 clear-both" ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType">
         <div class="input-group input-group-sm">
-          <span class="input-group-addon">route</span>
+          <span class="input-group-addon required">Route</span>
           <input
             class="form-control"
             name="ingress_route_{{ $index }}"
@@ -199,10 +209,10 @@
           />
         </div>
         <span>
-          <div class="small mt-1">
+          <div class="small mt-1 text-warning">
             <div ng-messages="serviceForm['ingress_route_'+$index].$error">
-              <p ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Route is required.</p>
-              <p ng-message="pattern"
+              <p class="vertical-center" ng-message="required"><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Route is required.</p>
+              <p class="vertical-center" ng-message="pattern"
                 ><pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> This field must consist of alphanumeric characters or the special characters: '-', '_'
                 or '/'. It must start and end with an alphanumeric character (e.g. 'my-route', or 'route-123').</p
               >
@@ -236,7 +246,7 @@
           <button
             ng-disabled="$ctrl.servicePorts.length === 1"
             ng-show="!$ctrl.multiItemDisable"
-            class="btn btn-sm btn-light btn-only-icon"
+            class="btn btn-sm btn-dangerlight btn-only-icon"
             type="button"
             ng-click="$ctrl.removePort($index)"
             data-cy="k8sAppCreate-rmPortButton_{{ $index }}"

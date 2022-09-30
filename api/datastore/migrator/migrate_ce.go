@@ -1,12 +1,13 @@
 package migrator
 
 import (
-	"errors"
 	"reflect"
 	"runtime"
 
-	werrors "github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 type migration struct {
@@ -15,7 +16,7 @@ type migration struct {
 }
 
 func migrationError(err error, context string) error {
-	return werrors.Wrap(err, "failed in "+context)
+	return errors.Wrap(err, "failed in "+context)
 }
 
 func newMigration(dbversion int, migrate func() error) migration {
@@ -106,6 +107,9 @@ func (m *Migrator) Migrate() error {
 
 		// Portainer 2.15
 		newMigration(60, m.migrateDBVersionToDB60),
+
+		// Portainer 2.16
+		newMigration(70, m.migrateDBVersionToDB70),
 	}
 
 	var lastDbVersion int
@@ -114,7 +118,7 @@ func (m *Migrator) Migrate() error {
 
 			// Print the next line only when the version changes
 			if migration.dbversion > lastDbVersion {
-				migrateLog.Infof("Migrating DB to version %d", migration.dbversion)
+				log.Info().Int("to_version", migration.dbversion).Msg("migrating DB")
 			}
 
 			err := migration.migrate()
@@ -125,12 +129,14 @@ func (m *Migrator) Migrate() error {
 		lastDbVersion = migration.dbversion
 	}
 
-	migrateLog.Infof("Setting DB version to %d", portainer.DBVersion)
+	log.Info().Int("version", portainer.DBVersion).Msg("setting DB version")
+
 	err = m.versionService.StoreDBVersion(portainer.DBVersion)
 	if err != nil {
 		return migrationError(err, "StoreDBVersion")
 	}
-	migrateLog.Infof("Updated DB version to %d", portainer.DBVersion)
+
+	log.Info().Int("version", portainer.DBVersion).Msg("updated DB version")
 
 	// reset DB updating status
 	return m.versionService.StoreIsUpdating(false)

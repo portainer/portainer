@@ -1,12 +1,13 @@
 package offlinegate
 
 import (
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	httperror "github.com/portainer/libhttp/error"
+
+	"github.com/rs/zerolog/log"
 	lock "github.com/viney-shih/go-lock"
 )
 
@@ -40,7 +41,7 @@ func (o *OfflineGate) WaitingMiddleware(timeout time.Duration, next http.Handler
 		}
 
 		if !o.lock.RTryLockWithTimeout(timeout) {
-			log.Println("error: Timeout waiting for the offline gate to signal")
+			log.Error().Msg("timeout waiting for the offline gate to signal")
 			httperror.WriteError(w, http.StatusRequestTimeout, "Timeout waiting for the offline gate to signal", http.ErrHandlerTimeout)
 			return
 		}

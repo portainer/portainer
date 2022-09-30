@@ -19,7 +19,7 @@ class DockerRegistryAccessController {
       this.state.actionInProgress = true;
       try {
         await this.EndpointService.updateRegistryAccess(this.state.endpointId, this.state.registryId, this.registryEndpointAccesses);
-        this.Notifications.success('Access successfully updated');
+        this.Notifications.success('Success', 'Access successfully updated');
         this.$state.reload();
       } catch (err) {
         this.state.actionInProgress = false;
@@ -45,6 +45,10 @@ class DockerRegistryAccessController {
 
   $onInit() {
     return this.$async(async () => {
+      this.Authentication.redirectIfUnauthorized(['PortainerRegistryUpdateAccess']);
+
+      this.registryTo = window.location.hash.match(/#!\/\d+\/docker\/swarm\/registries/) ? 'docker.swarm.registries' : 'docker.host.registries';
+
       try {
         this.state = {
           viewReady: false,

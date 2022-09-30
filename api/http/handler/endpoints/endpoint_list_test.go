@@ -11,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
@@ -19,6 +20,88 @@ import (
 type endpointListTest struct {
 	title    string
 	expected []portainer.EndpointID
+}
+
+func Test_EndpointList_AgentVersion(t *testing.T) {
+
+	version1Endpoint := portainer.Endpoint{
+		ID:      1,
+		GroupID: 1,
+		Type:    portainer.AgentOnDockerEnvironment,
+		Agent: struct {
+			Version string "example:\"1.0.0\""
+		}{
+			Version: "1.0.0",
+		},
+	}
+	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1, Type: portainer.AgentOnDockerEnvironment, Agent: struct {
+		Version string "example:\"1.0.0\""
+	}{Version: "2.0.0"}}
+	noVersionEndpoint := portainer.Endpoint{ID: 3, Type: portainer.AgentOnDockerEnvironment, GroupID: 1}
+	notAgentEnvironments := portainer.Endpoint{ID: 4, Type: portainer.DockerEnvironment, GroupID: 1}
+
+	handler, teardown := setup(t, []portainer.Endpoint{
+		notAgentEnvironments,
+		version1Endpoint,
+		version2Endpoint,
+		noVersionEndpoint,
+	})
+
+	defer teardown()
+
+	type endpointListAgentVersionTest struct {
+		endpointListTest
+		filter []string
+	}
+
+	tests := []endpointListAgentVersionTest{
+		{
+			endpointListTest{
+				"should show version 1 agent endpoints and non-agent endpoints",
+				[]portainer.EndpointID{version1Endpoint.ID, notAgentEnvironments.ID},
+			},
+			[]string{version1Endpoint.Agent.Version},
+		},
+		{
+			endpointListTest{
+				"should show version 2 endpoints and non-agent endpoints",
+				[]portainer.EndpointID{version2Endpoint.ID, notAgentEnvironments.ID},
+			},
+			[]string{version2Endpoint.Agent.Version},
+		},
+		{
+			endpointListTest{
+				"should show version 1 and 2 endpoints and non-agent endpoints",
+				[]portainer.EndpointID{version2Endpoint.ID, notAgentEnvironments.ID, version1Endpoint.ID},
+			},
+			[]string{version2Endpoint.Agent.Version, version1Endpoint.Agent.Version},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.title, func(t *testing.T) {
+			is := assert.New(t)
+			query := ""
+			for _, filter := range test.filter {
+				query += fmt.Sprintf("agentVersions[]=%s&", filter)
+			}
+
+			req := buildEndpointListRequest(query)
+
+			resp, err := doEndpointListRequest(req, handler, is)
+			is.NoError(err)
+
+			is.Equal(len(test.expected), len(resp))
+
+			respIds := []portainer.EndpointID{}
+
+			for _, endpoint := range resp {
+				respIds = append(respIds, endpoint.ID)
+			}
+
+			is.ElementsMatch(test.expected, respIds)
+		})
+	}
 }
 
 func Test_endpointList_edgeDeviceFilter(t *testing.T) {
@@ -48,7 +131,7 @@ func Test_endpointList_edgeDeviceFilter(t *testing.T) {
 	tests := []endpointListEdgeDeviceTest{
 		{
 			endpointListTest: endpointListTest{
-				"should show all endpoints expect of the untrusted devices",
+				"should show all endpoints except of the untrusted devices",
 				[]portainer.EndpointID{trustedEdgeDevice.ID, regularUntrustedEdgeEndpoint.ID, regularTrustedEdgeEndpoint.ID, regularEndpoint.ID},
 			},
 			edgeDevice: nil,
@@ -105,7 +188,7 @@ func Test_endpointList_edgeDeviceFilter(t *testing.T) {
 
 func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, teardown func()) {
 	is := assert.New(t)
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 
 	for _, endpoint := range endpoints {
 		err := store.Endpoint().Create(&endpoint)
@@ -119,6 +202,8 @@ func setup(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, tear
 	handler = NewHandler(bouncer, nil)
 	handler.DataStore = store
 	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
+
+	handler.SnapshotService, _ = snapshot.NewService("1s", store, nil, nil, nil)
 
 	return handler, teardown
 }

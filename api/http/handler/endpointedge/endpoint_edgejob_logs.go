@@ -39,30 +39,30 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "jobID")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid edge job identifier route variable", err}
+		return httperror.BadRequest("Invalid edge job identifier route variable", err)
 	}
 
 	var payload logsPayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an edge job with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find an edge job with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an edge job with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find an edge job with the specified identifier inside the database", err)
 	}
 
 	err = handler.FileService.StoreEdgeJobTaskLogFileFromBytes(strconv.Itoa(edgeJobID), strconv.Itoa(int(endpoint.ID)), []byte(payload.FileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to save task log to the filesystem", err}
+		return httperror.InternalServerError("Unable to save task log to the filesystem", err)
 	}
 
 	meta := edgeJob.Endpoints[endpoint.ID]
@@ -75,7 +75,7 @@ func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Requ
 	handler.ReverseTunnelService.AddEdgeJob(endpoint.ID, edgeJob)
 
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist edge job changes to the database", err}
+		return httperror.InternalServerError("Unable to persist edge job changes to the database", err)
 	}
 
 	return response.JSON(w, nil)

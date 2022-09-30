@@ -123,7 +123,7 @@ angular.module('portainer.app').controller('InitAdminController', [
 
       try {
         await waitPortainerRestart();
-        Notifications.success('The backup has successfully been restored');
+        Notifications.success('Success', 'The backup has successfully been restored');
         $state.go('portainer.auth');
       } catch (err) {
         handleError(err);

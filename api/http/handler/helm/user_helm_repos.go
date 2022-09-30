@@ -47,32 +47,29 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
 	}
 	userID := portainer.UserID(tokenData.ID)
 
 	p := new(addHelmRepoUrlPayload)
 	err = request.DecodeAndValidateJSONPayload(r, p)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusBadRequest,
-			Message:    "Invalid Helm repository URL",
-			Err:        err,
-		}
+		return httperror.BadRequest("Invalid Helm repository URL", err)
 	}
+
 	// lowercase, remove trailing slash
 	p.URL = strings.TrimSuffix(strings.ToLower(p.URL), "/")
 
 	records, err := handler.dataStore.HelmUserRepository().HelmUserRepositoryByUserID(userID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to access the DataStore", err}
+		return httperror.InternalServerError("Unable to access the DataStore", err)
 	}
 
 	// check if repo already exists - by doing case insensitive comparison
 	for _, record := range records {
 		if strings.EqualFold(record.URL, p.URL) {
 			errMsg := "Helm repo already registered for user"
-			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: errMsg, Err: errors.New(errMsg)}
+			return httperror.BadRequest(errMsg, errors.New(errMsg))
 		}
 	}
 
@@ -83,7 +80,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 
 	err = handler.dataStore.HelmUserRepository().Create(&record)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to save a user Helm repository URL", err}
+		return httperror.InternalServerError("Unable to save a user Helm repository URL", err)
 	}
 
 	return response.JSON(w, record)
@@ -106,18 +103,18 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+		return httperror.InternalServerError("Unable to retrieve user authentication token", err)
 	}
 	userID := portainer.UserID(tokenData.ID)
 
 	settings, err := handler.dataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+		return httperror.InternalServerError("Unable to retrieve settings from the database", err)
 	}
 
 	userRepos, err := handler.dataStore.HelmUserRepository().HelmUserRepositoryByUserID(userID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user Helm repositories", err}
+		return httperror.InternalServerError("Unable to get user Helm repositories", err)
 	}
 
 	resp := helmUserRepositoryResponse{

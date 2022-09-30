@@ -2,18 +2,25 @@
   border: 0px;
   font-size: 17px;
   background: none;
-  margin-right: 15px;
+  margin-right: 8px;
   display: flex;
   align-items: center;
+}
+
+.menu-icon {
+  background: var(--user-menu-icon-color);
+  position: relative;
 }
 
 .menu-list {
   background: var(--bg-dropdown-menu-color);
   border-radius: 8px;
   border: 1px solid var(--ui-gray-5) !important;
-  width: 180px;
+  min-width: 180px;
   padding: 5px !important;
   box-shadow: 0 6px 12px rgb(0 0 0 / 18%);
+  @apply th-dark:!border-none;
+  @apply th-highcontrast:!border-none;
 }
 
 .menu-link {

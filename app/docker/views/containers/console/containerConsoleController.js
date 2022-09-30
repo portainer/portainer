@@ -94,8 +94,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
 
       $scope.state = states.connecting;
       var command = $scope.formValues.isCustomCommand ? $scope.formValues.customCommand : $scope.formValues.command;
-      console.log(command);
-
       var execConfig = {
         id: $transition$.params().id,
         AttachStdin: true,
@@ -173,8 +171,6 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
       } else {
         url = url.replace('http://', 'ws://');
       }
-
-      // url = url.replace('8999', '9000');
 
       socket = new WebSocket(url);
 

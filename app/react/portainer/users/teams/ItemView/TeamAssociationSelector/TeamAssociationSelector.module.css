@@ -1,0 +1,11 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-around;
+  gap: 30px;
+}
+
+.root > * {
+  flex: 1;
+}

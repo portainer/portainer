@@ -9,7 +9,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	portainerErrors "github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (store *Store) version() (int, error) {
@@ -73,7 +74,8 @@ func (store *Store) Open() (newStore bool, err error) {
 	}
 
 	if version > 0 {
-		logrus.WithField("version", version).Infof("Opened existing store")
+		log.Debug().Int("version", version).Msg("opened existing store")
+
 		return false, nil
 	}
 
@@ -121,19 +123,21 @@ func (store *Store) encryptDB() error {
 
 	// The DB is not currently encrypted.  First save the encrypted db filename
 	oldFilename := store.connection.GetDatabaseFilePath()
-	logrus.Infof("Encrypting database")
+	log.Info().Msg("encrypting database")
 
 	// export file path for backup
 	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
 
-	logrus.Infof("Exporting database backup to %s", exportFilename)
+	log.Info().Str("filename", exportFilename).Msg("exporting database backup")
+
 	err = store.Export(exportFilename)
 	if err != nil {
-		logrus.WithError(err).Debugf("Failed to export to %s", exportFilename)
+		log.Error().Str("filename", exportFilename).Err(err).Msg("failed to export")
+
 		return err
 	}
 
-	logrus.Infof("Database backup exported")
+	log.Info().Msg("database backup exported")
 
 	// Close existing un-encrypted db so that we can delete the file later
 	store.connection.Close()
@@ -152,22 +156,24 @@ func (store *Store) encryptDB() error {
 	if err != nil {
 		// Remove the new encrypted file that we failed to import
 		os.Remove(store.connection.GetDatabaseFilePath())
-		logrus.Fatal(portainerErrors.ErrDBImportFailed.Error())
+
+		log.Fatal().Err(portainerErrors.ErrDBImportFailed).Msg("")
 	}
 
 	err = os.Remove(oldFilename)
 	if err != nil {
-		logrus.Errorf("Failed to remove the un-encrypted db file")
+		log.Error().Msg("failed to remove the un-encrypted db file")
 	}
 
 	err = os.Remove(exportFilename)
 	if err != nil {
-		logrus.Errorf("Failed to remove the json backup file")
+		log.Error().Msg("failed to remove the json backup file")
 	}
 
 	// Close db connection
 	store.connection.Close()
 
-	logrus.Info("Database successfully encrypted")
+	log.Info().Msg("database successfully encrypted")
+
 	return nil
 }

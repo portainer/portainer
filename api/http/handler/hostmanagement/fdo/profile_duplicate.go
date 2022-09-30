@@ -3,13 +3,14 @@ package fdo
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 // @id duplicate
@@ -26,24 +27,24 @@ import (
 func (handler *Handler) duplicateProfile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Bad request", errors.New("missing 'id' query parameter")}
+		return httperror.BadRequest("Bad request", errors.New("missing 'id' query parameter"))
 	}
 
 	originalProfile, err := handler.DataStore.FDOProfile().FDOProfile(portainer.FDOProfileID(id))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a FDO Profile with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a FDO Profile with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a FDO Profile with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a FDO Profile with the specified identifier inside the database", err)
 	}
 
 	fileContent, err := handler.FileService.GetFileContent(originalProfile.FilePath, "")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Profile file content", err}
+		return httperror.InternalServerError("Unable to retrieve Profile file content", err)
 	}
 
 	profileID := handler.DataStore.FDOProfile().GetNextIdentifier()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to duplicate Profile", err}
+		return httperror.InternalServerError("Unable to duplicate Profile", err)
 	}
 
 	newProfile := &portainer.FDOProfile{
@@ -53,14 +54,14 @@ func (handler *Handler) duplicateProfile(w http.ResponseWriter, r *http.Request)
 
 	filePath, err := handler.FileService.StoreFDOProfileFileFromBytes(strconv.Itoa(int(newProfile.ID)), fileContent)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist profile file on disk", err}
+		return httperror.InternalServerError("Unable to persist profile file on disk", err)
 	}
 	newProfile.FilePath = filePath
 	newProfile.DateCreated = time.Now().Unix()
 
 	err = handler.DataStore.FDOProfile().Create(newProfile)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the profile inside the database", err}
+		return httperror.InternalServerError("Unable to persist the profile inside the database", err)
 	}
 
 	return response.JSON(w, newProfile)

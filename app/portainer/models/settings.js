@@ -28,7 +28,6 @@ export function PublicSettingsViewModel(settings) {
   this.RequiredPasswordLength = settings.RequiredPasswordLength;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.EnforceEdgeID = settings.EnforceEdgeID;
-  this.FeatureFlagSettings = settings.FeatureFlagSettings;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
   this.EnableTelemetry = settings.EnableTelemetry;
@@ -36,6 +35,7 @@ export function PublicSettingsViewModel(settings) {
   this.KubeconfigExpiry = settings.KubeconfigExpiry;
   this.Features = settings.Features;
   this.Edge = new EdgeSettingsViewModel(settings.Edge);
+  this.DefaultRegistry = settings.DefaultRegistry;
 }
 
 export function InternalAuthSettingsViewModel(data) {

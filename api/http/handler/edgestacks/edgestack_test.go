@@ -3,11 +3,9 @@ package edgestacks
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -20,6 +18,8 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
+
+	"github.com/pkg/errors"
 )
 
 type gitService struct {
@@ -35,11 +35,19 @@ func (g *gitService) LatestCommitID(repositoryURL, referenceName, username, pass
 	return g.id, nil
 }
 
+func (g *gitService) ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error) {
+	return nil, nil
+}
+
+func (g *gitService) ListFiles(repositoryURL, referenceName, username, password string, hardRefresh bool, includedExts []string) ([]string, error) {
+	return nil, nil
+}
+
 // Helpers
 func setupHandler(t *testing.T) (*Handler, string, func()) {
 	t.Helper()
 
-	_, store, storeTeardown := datastore.MustNewTestStore(true, true)
+	_, store, storeTeardown := datastore.MustNewTestStore(t, true, true)
 
 	jwtService, err := jwt.NewService("1h", store)
 	if err != nil {
@@ -66,11 +74,7 @@ func setupHandler(t *testing.T) (*Handler, string, func()) {
 		store,
 	)
 
-	tmpDir, err := os.MkdirTemp(os.TempDir(), "portainer-test")
-	if err != nil {
-		storeTeardown()
-		t.Fatal(err)
-	}
+	tmpDir := t.TempDir()
 
 	fs, err := filesystem.NewService(tmpDir, "")
 	if err != nil {

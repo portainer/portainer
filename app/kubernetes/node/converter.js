@@ -13,7 +13,7 @@ class KubernetesNodeConverter {
     }
     res.Id = data.metadata.uid;
     const hostName = _.find(data.status.addresses, { type: 'Hostname' });
-    res.Name = hostName ? hostName.address : data.metadata.Name;
+    res.Name = data.metadata.name ? data.metadata.name : hostName.address;
     res.Labels = data.metadata.labels;
     res.Role = _.has(data.metadata.labels, 'node-role.kubernetes.io/master') ? 'Master' : 'Worker';
 

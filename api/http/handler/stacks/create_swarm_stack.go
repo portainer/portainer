@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
@@ -47,7 +47,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	var payload swarmStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
@@ -55,7 +55,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
 
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 	if !isUnique {
 		return stackExistsError(payload.Name)
@@ -78,28 +78,28 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	stackFolder := strconv.Itoa(int(stack.ID))
 	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
+		return httperror.InternalServerError("Unable to persist Compose file on disk", err)
 	}
 	stack.ProjectPath = projectPath
 
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false, true)
 	if configErr != nil {
 		return configErr
 	}
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	stack.CreatedBy = config.user.Username
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
+		return httperror.InternalServerError("Unable to persist the stack inside the database", err)
 	}
 
 	doCleanUp = false
@@ -157,14 +157,14 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 	var payload swarmStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
 
 	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 	if !isUnique {
 		return stackExistsError(payload.Name)
@@ -174,7 +174,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" {
 		isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook)
 		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for webhook ID collision", Err: err}
+			return httperror.InternalServerError("Unable to check for webhook ID collision", err)
 		}
 		if !isUnique {
 			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), Err: errWebhookIDAlreadyExists}
@@ -217,23 +217,23 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 	err = handler.clone(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryAuthentication, payload.RepositoryUsername, payload.RepositoryPassword)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to clone git repository", Err: err}
+		return httperror.InternalServerError("Unable to clone git repository", err)
 	}
 
 	commitID, err := handler.latestCommitID(payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryAuthentication, payload.RepositoryUsername, payload.RepositoryPassword)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to fetch git repository id", Err: err}
+		return httperror.InternalServerError("Unable to fetch git repository id", err)
 	}
 	stack.GitConfig.ConfigHash = commitID
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false, true)
 	if configErr != nil {
 		return configErr
 	}
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
@@ -249,7 +249,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
+		return httperror.InternalServerError("Unable to persist the stack inside the database", err)
 	}
 
 	doCleanUp = false
@@ -295,7 +295,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	payload := &swarmStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
@@ -303,7 +303,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
 
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+		return httperror.InternalServerError("Unable to check for name collision", err)
 	}
 	if !isUnique {
 		return stackExistsError(payload.Name)
@@ -325,28 +325,28 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
+		return httperror.InternalServerError("Unable to persist Compose file on disk", err)
 	}
 	stack.ProjectPath = projectPath
 
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false, true)
 	if configErr != nil {
 		return configErr
 	}
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+		return httperror.InternalServerError(err.Error(), err)
 	}
 
 	stack.CreatedBy = config.user.Username
 
 	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
+		return httperror.InternalServerError("Unable to persist the stack inside the database", err)
 	}
 
 	doCleanUp = false
@@ -360,23 +360,25 @@ type swarmStackDeploymentConfig struct {
 	prune      bool
 	isAdmin    bool
 	user       *portainer.User
+	pullImage  bool
 }
 
-func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool) (*swarmStackDeploymentConfig, *httperror.HandlerError) {
+func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool, pullImage bool) (*swarmStackDeploymentConfig, *httperror.HandlerError) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	user, err := handler.DataStore.User().User(securityContext.UserID)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+		return nil, httperror.InternalServerError("Unable to load user information from the database", err)
 	}
 
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
+		return nil, httperror.InternalServerError("Unable to retrieve registries from the database", err)
 	}
+
 	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
 	config := &swarmStackDeploymentConfig{
@@ -386,6 +388,7 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 		prune:      prune,
 		isAdmin:    securityContext.IsAdmin,
 		user:       user,
+		pullImage:  pullImage,
 	}
 
 	return config, nil
@@ -413,5 +416,5 @@ func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) err
 		}
 	}
 
-	return handler.StackDeployer.DeploySwarmStack(config.stack, config.endpoint, config.registries, config.prune)
+	return handler.StackDeployer.DeploySwarmStack(config.stack, config.endpoint, config.registries, config.prune, config.pullImage)
 }

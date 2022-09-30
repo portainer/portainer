@@ -11,18 +11,17 @@ import (
 	"github.com/portainer/portainer/api/dataservices/registry"
 	"github.com/portainer/portainer/api/dataservices/resourcecontrol"
 	"github.com/portainer/portainer/api/dataservices/role"
+	"github.com/portainer/portainer/api/dataservices/scene"
 	"github.com/portainer/portainer/api/dataservices/schedule"
 	"github.com/portainer/portainer/api/dataservices/settings"
+	"github.com/portainer/portainer/api/dataservices/snapshot"
 	"github.com/portainer/portainer/api/dataservices/stack"
 	"github.com/portainer/portainer/api/dataservices/tag"
 	"github.com/portainer/portainer/api/dataservices/teammembership"
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
-	plog "github.com/portainer/portainer/api/datastore/log"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
-
-var migrateLog = plog.NewScopedLog("database, migrate")
 
 type (
 	// Migrator defines a service to migrate data after a Portainer version update.
@@ -38,6 +37,7 @@ type (
 		roleService             *role.Service
 		scheduleService         *schedule.Service
 		settingsService         *settings.Service
+		snapshotService         *snapshot.Service
 		stackService            *stack.Service
 		tagService              *tag.Service
 		teamMembershipService   *teammembership.Service
@@ -52,6 +52,7 @@ type (
 	MigratorParameters struct {
 		DatabaseVersion         int
 		EndpointGroupService    *endpointgroup.Service
+		SceneService            *scene.Service
 		EndpointService         *endpoint.Service
 		EndpointRelationService *endpointrelation.Service
 		ExtensionService        *extension.Service
@@ -61,6 +62,7 @@ type (
 		RoleService             *role.Service
 		ScheduleService         *schedule.Service
 		SettingsService         *settings.Service
+		SnapshotService         *snapshot.Service
 		StackService            *stack.Service
 		TagService              *tag.Service
 		TeamMembershipService   *teammembership.Service
@@ -86,6 +88,7 @@ func NewMigrator(parameters *MigratorParameters) *Migrator {
 		roleService:             parameters.RoleService,
 		scheduleService:         parameters.ScheduleService,
 		settingsService:         parameters.SettingsService,
+		snapshotService:         parameters.SnapshotService,
 		tagService:              parameters.TagService,
 		teamMembershipService:   parameters.TeamMembershipService,
 		stackService:            parameters.StackService,

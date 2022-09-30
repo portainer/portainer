@@ -13,7 +13,7 @@ import (
 )
 
 func TestHandler_webhookInvoke(t *testing.T) {
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 	defer teardown()
 
 	webhookID := newGuidString(t)

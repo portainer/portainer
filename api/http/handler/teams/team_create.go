@@ -44,15 +44,15 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 	var payload teamCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	team, err := handler.DataStore.Team().TeamByName(payload.Name)
 	if err != nil && !handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve teams from the database", err}
+		return httperror.InternalServerError("Unable to retrieve teams from the database", err)
 	}
 	if team != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A team with the same name already exists", errors.New("Team already exists")}
+		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "A team with the same name already exists", Err: errors.New("Team already exists")}
 	}
 
 	team = &portainer.Team{
@@ -61,7 +61,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 
 	err = handler.DataStore.Team().Create(team)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the team inside the database", err}
+		return httperror.InternalServerError("Unable to persist the team inside the database", err)
 	}
 
 	for _, teamLeader := range payload.TeamLeaders {
@@ -73,7 +73,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 
 		err = handler.DataStore.TeamMembership().Create(membership)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team leadership inside the database", err}
+			return httperror.InternalServerError("Unable to persist team leadership inside the database", err)
 		}
 	}
 

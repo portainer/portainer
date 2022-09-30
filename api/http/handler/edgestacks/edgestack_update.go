@@ -2,7 +2,6 @@ package edgestacks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 	"strconv"
 
@@ -12,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 type updateEdgeStackPayload struct {
@@ -49,36 +49,36 @@ func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
+		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
 	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find a stack with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
 	}
 
 	var payload updateEdgeStackPayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments relations config from database", err}
+		return httperror.InternalServerError("Unable to retrieve environments relations config from database", err)
 	}
 
 	relatedEndpointIds, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack related environments from database", err}
+		return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 	}
 
 	if payload.EdgeGroups != nil {
 		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, relationConfig.endpoints, relationConfig.endpointGroups, relationConfig.edgeGroups)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack related environments from database", err}
+			return httperror.InternalServerError("Unable to retrieve edge stack related environments from database", err)
 		}
 
 		oldRelatedSet := endpointutils.EndpointSet(relatedEndpointIds)
@@ -94,14 +94,14 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		for endpointID := range endpointsToRemove {
 			relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find environment relation in database", err}
+				return httperror.InternalServerError("Unable to find environment relation in database", err)
 			}
 
 			delete(relation.EdgeStacks, stack.ID)
 
 			err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment relation in database", err}
+				return httperror.InternalServerError("Unable to persist environment relation in database", err)
 			}
 		}
 
@@ -115,14 +115,14 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		for endpointID := range endpointsToAdd {
 			relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find environment relation in database", err}
+				return httperror.InternalServerError("Unable to find environment relation in database", err)
 			}
 
 			relation.EdgeStacks[stack.ID] = true
 
 			err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment relation in database", err}
+				return httperror.InternalServerError("Unable to persist environment relation in database", err)
 			}
 		}
 
@@ -134,7 +134,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		// deployment type was changed - need to delete the old file
 		err = handler.FileService.RemoveDirectory(stack.ProjectPath)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clear old files", err}
+			return httperror.InternalServerError("Unable to clear old files", err)
 		}
 
 		stack.EntryPoint = ""
@@ -150,12 +150,12 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 
 		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
+			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 		}
 
 		err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to convert and persist updated Kubernetes manifest file on disk", err}
+			return httperror.InternalServerError("Unable to convert and persist updated Kubernetes manifest file on disk", err)
 		}
 
 	} else {
@@ -165,16 +165,16 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 
 		hasDockerEndpoint, err := hasDockerEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for existence of docker environment", err}
+			return httperror.InternalServerError("Unable to check for existence of docker environment", err)
 		}
 
 		if hasDockerEndpoint {
-			return &httperror.HandlerError{http.StatusBadRequest, "Edge stack with docker environment cannot be deployed with kubernetes config", err}
+			return httperror.BadRequest("Edge stack with docker environment cannot be deployed with kubernetes config", err)
 		}
 
 		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.ManifestPath, []byte(payload.StackFileContent))
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
+			return httperror.InternalServerError("Unable to persist updated Compose file on disk", err)
 		}
 	}
 
@@ -185,7 +185,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
+		return httperror.InternalServerError("Unable to persist the stack changes inside the database", err)
 	}
 
 	return response.JSON(w, stack)

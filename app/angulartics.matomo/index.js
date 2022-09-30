@@ -15,7 +15,7 @@ export default angular.module('angulartics.matomo', ['angulartics']).config(conf
 function config($analyticsProvider, $windowProvider) {
   const $window = $windowProvider.$get();
 
-  $analyticsProvider.settings.pageTracking.trackRelativePath = false;
+  $analyticsProvider.settings.pageTracking.trackRelativePath = true;
 
   $analyticsProvider.api.setPortainerStatus = setPortainerStatus;
 

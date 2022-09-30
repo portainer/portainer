@@ -3,10 +3,12 @@
   <div ng-if="$ctrl.isPrimary" class="toolBar !flex-col gap-1">
     <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
       <div class="toolBarTitle vertical-center">
-        <pr-icon icon="'box'" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+        <div class="widget-icon space-right">
+          <pr-icon icon="'box'" feather="true"></pr-icon>
+        </div>
         Applications
       </div>
-      <div class="searchBar vertical-center">
+      <div class="searchBar vertical-center !mr-0 min-w-[280px]">
         <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
         <input
           type="text"
@@ -103,15 +105,15 @@
         </span>
       </div>
     </div>
-    <div class="flex flex-row w-full">
-      <span class="small text-muted mt-1 vertical-center" ng-if="!$ctrl.settings.showSystem" authorization="K8sAccessSystemNamespaces">
-        <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
-        <span> System resources are hidden, this can be changed in the table settings. </span>
+    <div class="flex flex-row w-full" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+      <span class="small text-muted mt-1 vertical-center">
+        <pr-icon icon="'info'" feather="true" mode="'primary'" class="vertical-center"></pr-icon>
+        System resources are hidden, this can be changed in the table settings.
       </span>
     </div>
   </div>
   <!-- data table content -->
-  <div class="table-responsive">
+  <div ng-class="{ 'table-responsive': $ctrl.isPrimary, 'inner-datatable': !$ctrl.isPrimary }">
     <table class="table table-hover table-filters nowrap-cells" data-cy="k8sApp-appTable">
       <thead ng-class="{ 'secondary-heading': !$ctrl.isPrimary }">
         <tr role="row">
@@ -236,13 +238,18 @@
             </div>
           </td>
           <td>
-            <a ng-if="item.KubernetesApplications" ui-sref="kubernetes.helm({ name: item.Name, namespace: item.ResourcePool })" ng-click="$event.stopPropagation()"
+            <a
+              ng-if="item.KubernetesApplications"
+              ui-sref="kubernetes.helm({ name: item.Name, namespace: item.ResourcePool })"
+              ng-click="$event.stopPropagation()"
+              class="hyperlink"
               >{{ item.Name }}
             </a>
             <a
               ng-if="!item.KubernetesApplications"
               ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })"
               ng-click="$event.stopPropagation()"
+              class="hyperlink"
               >{{ item.Name }}
             </a>
             <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>

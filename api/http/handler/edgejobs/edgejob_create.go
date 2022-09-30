@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 // @id EdgeJobCreate
@@ -31,7 +32,7 @@ import (
 func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method. Valid values are: file or string", err}
+		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", err)
 	}
 
 	switch method {
@@ -40,7 +41,7 @@ func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *h
 	case "file":
 		return handler.createEdgeJobFromFile(w, r)
 	default:
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method. Valid values are: file or string", errors.New(request.ErrInvalidQueryParameter)}
+		return httperror.BadRequest("Invalid query parameter: method. Valid values are: file or string", errors.New(request.ErrInvalidQueryParameter))
 	}
 }
 
@@ -80,14 +81,14 @@ func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *h
 	var payload edgeJobCreateFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	edgeJob := handler.createEdgeJobObjectFromFileContentPayload(&payload)
 
 	err = handler.addAndPersistEdgeJob(edgeJob, []byte(payload.FileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule Edge job", err}
+		return httperror.InternalServerError("Unable to schedule Edge job", err)
 	}
 
 	return response.JSON(w, edgeJob)
@@ -138,14 +139,14 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 	payload := &edgeJobCreateFromFilePayload{}
 	err := payload.Validate(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	edgeJob := handler.createEdgeJobObjectFromFilePayload(payload)
 
 	err = handler.addAndPersistEdgeJob(edgeJob, payload.File)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule Edge job", err}
+		return httperror.InternalServerError("Unable to schedule Edge job", err)
 	}
 
 	return response.JSON(w, edgeJob)
@@ -200,7 +201,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 			return err
 		}
 
-		if endpoint.Type != portainer.EdgeAgentOnDockerEnvironment && endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
+		if !endpointutils.IsEdgeEndpoint(endpoint) {
 			delete(edgeJob.Endpoints, ID)
 		}
 	}

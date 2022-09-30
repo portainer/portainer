@@ -2,15 +2,14 @@ package cli
 
 import (
 	"errors"
-	"log"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
 
-	"os"
-	"path/filepath"
-	"strings"
-
+	"github.com/rs/zerolog/log"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -62,6 +61,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		MaxBatchSize:              kingpin.Flag("max-batch-size", "Maximum size of a batch").Int(),
 		MaxBatchDelay:             kingpin.Flag("max-batch-delay", "Maximum delay before a batch starts").Duration(),
 		SecretKeyName:             kingpin.Flag("secret-key-name", "Secret key name for encryption and will be used as /run/secrets/<secret-key-name>.").Default(defaultSecretKeyName).String(),
+		LogLevel:                  kingpin.Flag("log-level", "Set the minimum logging level to show").Default("INFO").Enum("DEBUG", "INFO", "WARN", "ERROR"),
 	}
 
 	kingpin.Parse()
@@ -101,11 +101,11 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 
 func displayDeprecationWarnings(flags *portainer.CLIFlags) {
 	if *flags.NoAnalytics {
-		log.Println("Warning: The --no-analytics flag has been kept to allow migration of instances running a previous version of Portainer with this flag enabled, to version 2.0 where enabling this flag will have no effect.")
+		log.Warn().Msg("the --no-analytics flag has been kept to allow migration of instances running a previous version of Portainer with this flag enabled, to version 2.0 where enabling this flag will have no effect")
 	}
 
 	if *flags.SSL {
-		log.Println("Warning: SSL is enabled by default and there is no need for the --ssl flag. It has been kept to allow migration of instances running a previous version of Portainer with this flag enabled")
+		log.Warn().Msg("SSL is enabled by default and there is no need for the --ssl flag, it has been kept to allow migration of instances running a previous version of Portainer with this flag enabled")
 	}
 }
 

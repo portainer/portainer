@@ -1,7 +1,7 @@
 export default class CreateEdgeStackViewController {
   /* @ngInject */
-  constructor($state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async) {
-    Object.assign(this, { $state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async });
+  constructor($state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async, $scope) {
+    Object.assign(this, { $state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async, $scope });
 
     this.formValues = {
       Name: '',
@@ -107,7 +107,7 @@ export default class CreateEdgeStackViewController {
       try {
         await this.createStackByMethod(name, method);
 
-        this.Notifications.success('Stack successfully deployed');
+        this.Notifications.success('Success', 'Stack successfully deployed');
         this.state.isEditorDirty = false;
         this.$state.go('edge.stacks');
       } catch (err) {
@@ -119,9 +119,11 @@ export default class CreateEdgeStackViewController {
   }
 
   onChangeGroups(groups) {
-    this.formValues.Groups = groups;
+    return this.$scope.$evalAsync(() => {
+      this.formValues.Groups = groups;
 
-    this.checkIfEndpointTypes(groups);
+      this.checkIfEndpointTypes(groups);
+    });
   }
 
   checkIfEndpointTypes(groups) {

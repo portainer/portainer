@@ -1,4 +1,4 @@
-<ng-form class="env-item" name="$ctrl.{{ $ctrl.formName }}">
+<ng-form class="env-item mt-1" name="$ctrl.{{ $ctrl.formName }}">
   <div class="col-sm-5">
     <div class="input-group input-group-sm env-item-key w-full">
       <span class="input-group-addon">name</span>
@@ -25,7 +25,7 @@
       </div>
     </div>
   </div>
-  <div ng-if="$ctrl.hasValue()" class="col-sm-6">
+  <div class="col-sm-6">
     <div class="w-full env-item-value">
       <div class="input-group input-group-sm">
         <span class="input-group-addon">value</span>
@@ -39,23 +39,18 @@
           ng-change="$ctrl.onChangeValue($ctrl.variable.value)"
         />
       </div>
-      <button class="btn btn-sm btn-light" type="button" ng-click="$ctrl.removeValue()"> <i class="fa fa-minus" aria-hidden="true"></i> Remove value </button>
     </div>
     <div class="form-group" ng-show="$ctrl[$ctrl.formName].value.$invalid">
       <div class="col-sm-12 small text-warning">
         <div ng-messages="$ctrl[$ctrl.formName].value.$error">
-          <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value is required. </p>
           <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value is invalid. </p>
         </div>
       </div>
     </div>
   </div>
   <div>
-    <button class="btn btn-sm btn-light" type="button" ng-if="!$ctrl.hasValue()" ng-click="$ctrl.onChangeValue('')">
-      <pr-icon icon="'plus'" feather="true"></pr-icon> Add value
-    </button>
-    <button class="btn btn-light" type="button" ng-click="$ctrl.onRemove($ctrl.index)">
-      <pr-icon icon="'trash-2'" feather="true"></pr-icon>
+    <button class="btn btn-dangerlight" type="button" ng-click="$ctrl.onRemove($ctrl.index)">
+      <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
     </button>
   </div>
 </ng-form>

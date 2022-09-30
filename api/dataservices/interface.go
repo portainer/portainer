@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/edgetypes"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -23,13 +24,14 @@ type (
 		BackupTo(w io.Writer) error
 		Export(filename string) (err error)
 		IsErrObjectNotFound(err error) bool
-
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService
 		EdgeStack() EdgeStackService
+		EdgeUpdateSchedule() EdgeUpdateScheduleService
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
+		Scene() ScenesService
 		EndpointRelation() EndpointRelationService
 		FDOProfile() FDOProfileService
 		HelmUserRepository() HelmUserRepositoryService
@@ -38,6 +40,7 @@ type (
 		Role() RoleService
 		APIKeyRepository() APIKeyRepository
 		Settings() SettingsService
+		Snapshot() SnapshotService
 		SSLSettings() SSLSettingsService
 		Stack() StackService
 		Tag() TagService
@@ -81,6 +84,17 @@ type (
 		BucketName() string
 	}
 
+	EdgeUpdateScheduleService interface {
+		ActiveSchedule(environmentID portainer.EndpointID) *edgetypes.EndpointUpdateScheduleRelation
+		ActiveSchedules(environmentIDs []portainer.EndpointID) []edgetypes.EndpointUpdateScheduleRelation
+		List() ([]edgetypes.UpdateSchedule, error)
+		Item(ID edgetypes.UpdateScheduleID) (*edgetypes.UpdateSchedule, error)
+		Create(edgeUpdateSchedule *edgetypes.UpdateSchedule) error
+		Update(ID edgetypes.UpdateScheduleID, edgeUpdateSchedule *edgetypes.UpdateSchedule) error
+		Delete(ID edgetypes.UpdateScheduleID) error
+		BucketName() string
+	}
+
 	// EdgeStackService represents a service to manage Edge stacks
 	EdgeStackService interface {
 		EdgeStacks() ([]portainer.EdgeStack, error)
@@ -110,6 +124,15 @@ type (
 		Create(group *portainer.EndpointGroup) error
 		UpdateEndpointGroup(ID portainer.EndpointGroupID, group *portainer.EndpointGroup) error
 		DeleteEndpointGroup(ID portainer.EndpointGroupID) error
+		BucketName() string
+	}
+
+	ScenesService interface {
+		Create(scene *portainer.Scene) error
+		DeleteScene(ID int) error
+		UpdateScene(ID int, scene *portainer.Scene) error
+		Scene(ID int) (*portainer.Scene, error)
+		Scenes() ([]portainer.Scene, error)
 		BucketName() string
 	}
 
@@ -198,6 +221,15 @@ type (
 		Settings() (*portainer.Settings, error)
 		UpdateSettings(settings *portainer.Settings) error
 		IsFeatureFlagEnabled(feature portainer.Feature) bool
+		BucketName() string
+	}
+
+	SnapshotService interface {
+		Snapshot(endpointID portainer.EndpointID) (*portainer.Snapshot, error)
+		Snapshots() ([]portainer.Snapshot, error)
+		UpdateSnapshot(snapshot *portainer.Snapshot) error
+		DeleteSnapshot(endpointID portainer.EndpointID) error
+		Create(snapshot *portainer.Snapshot) error
 		BucketName() string
 	}
 

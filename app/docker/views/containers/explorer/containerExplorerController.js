@@ -1,9 +1,7 @@
 import './containerExplorer.css';
 import { ItemViewModel } from 'Docker/models/item';
 
-angular
-  .module('portainer.docker')
-  .controller('ContainerExplorerController', [
+angular.module('portainer.docker').controller('ContainerExplorerController', [
     '$scope',
     '$document',
     '$transition$',

@@ -3,7 +3,9 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          <div class="widget-icon space-right">
+            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+          </div>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
@@ -28,7 +30,7 @@
             ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
             data-cy="registry-removeRegistryButton"
           >
-            <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>Remove
+            <pr-icon icon="'trash-2'" feather="true"></pr-icon>Remove
           </button>
           <button type="button" class="btn btn-sm btn-primary h-fit vertical-center !ml-0" ui-sref="portainer.registries.new" data-cy="registry-addRegistryButton">
             <pr-icon icon="'plus'" feather="true"></pr-icon>Add registry
@@ -75,10 +77,12 @@
                   <input id="select_{{ $index }}" type="checkbox" disabled />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <span>DockerHub (anonymous)</span>
+                <span><default-registry-name></default-registry-name></span>
               </td>
-              <td> docker.io </td>
-              <td> - </td>
+              <td> <default-registry-domain></default-registry-domain> </td>
+              <td>
+                <default-registry-action ng-if="$ctrl.isAdmin && !$ctrl.endpointType"></default-registry-action>
+              </td>
             </tr>
             <tr
               dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
@@ -97,9 +101,16 @@
                 {{ item.URL }}
               </td>
               <td>
-                <a ng-if="$ctrl.canManageAccess(item)" ng-click="$ctrl.redirectToManageAccess(item)"> <pr-icon icon="'users'" feather="true"></pr-icon> Manage access </a>
+                <button
+                  type="button"
+                  class="btn btn-link hover:no-underline !ml-0 px-0 vertical-center"
+                  ng-if="$ctrl.canManageAccess(item)"
+                  ng-click="$ctrl.redirectToManageAccess(item)"
+                >
+                  <pr-icon icon="'users'" feather="true"></pr-icon>Manage access
+                </button>
                 <be-feature-indicator feature="$ctrl.limitedFeature" ng-if="$ctrl.canBrowse(item)">
-                  <span class="text-muted space-left" style="padding-right: 5px"> <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon> Browse </span>
+                  <span class="text-muted space-left" style="padding-right: 5px"> <pr-icon icon="'search'" feather="true"></pr-icon> Browse </span>
                 </be-feature-indicator>
 
                 <span ng-if="!$ctrl.canBrowse(item) && !$ctrl.canManageAccess(item)"> - </span>

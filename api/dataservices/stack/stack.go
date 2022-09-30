@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sirupsen/logrus"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -60,13 +60,15 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 		func(obj interface{}) (interface{}, error) {
 			stack, ok := obj.(*portainer.Stack)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
 				return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
+
 			if stack.Name == name {
 				s = stack
 				return nil, stop
 			}
+
 			return &portainer.Stack{}, nil
 		})
 	if err == stop {
@@ -89,12 +91,14 @@ func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
 		func(obj interface{}) (interface{}, error) {
 			stack, ok := obj.(portainer.Stack)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
 				return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
+
 			if stack.Name == name {
 				stacks = append(stacks, stack)
 			}
+
 			return &portainer.Stack{}, nil
 		})
 
@@ -111,10 +115,12 @@ func (service *Service) Stacks() ([]portainer.Stack, error) {
 		func(obj interface{}) (interface{}, error) {
 			stack, ok := obj.(*portainer.Stack)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
 				return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
+
 			stacks = append(stacks, *stack)
+
 			return &portainer.Stack{}, nil
 		})
 
@@ -128,7 +134,7 @@ func (service *Service) GetNextIdentifier() int {
 
 // CreateStack creates a new stack.
 func (service *Service) Create(stack *portainer.Stack) error {
-	return service.connection.CreateObjectWithSetSequence(BucketName, int(stack.ID), stack)
+	return service.connection.CreateObjectWithId(BucketName, int(stack.ID), stack)
 }
 
 // UpdateStack updates a stack.
@@ -156,13 +162,15 @@ func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 			s, ok = obj.(*portainer.Stack)
 
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
+
 				return &portainer.Stack{}, nil
 			}
 
 			if s.AutoUpdate != nil && strings.EqualFold(s.AutoUpdate.Webhook, id) {
 				return nil, stop
 			}
+
 			return &portainer.Stack{}, nil
 		})
 	if err == stop {
@@ -186,12 +194,14 @@ func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
 		func(obj interface{}) (interface{}, error) {
 			stack, ok := obj.(*portainer.Stack)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Stack object")
 				return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
+
 			if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
 				stacks = append(stacks, *stack)
 			}
+
 			return &portainer.Stack{}, nil
 		})
 

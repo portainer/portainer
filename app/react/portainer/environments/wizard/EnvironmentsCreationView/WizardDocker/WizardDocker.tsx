@@ -15,6 +15,7 @@ import { SocketTab } from './SocketTab';
 
 interface Props {
   onCreate(environment: Environment, analytics: AnalyticsStateKey): void;
+  isDockerStandalone?: boolean;
 }
 
 const defaultOptions: BoxSelectorOption<
@@ -22,28 +23,28 @@ const defaultOptions: BoxSelectorOption<
 >[] = [
   {
     id: 'agent',
-    icon: 'fa fa-bolt',
+    icon: 'svg-agent',
     label: 'Agent',
     description: '',
     value: 'agent',
   },
   {
     id: 'api',
-    icon: 'fa fa-cloud',
+    icon: 'svg-api',
     label: 'API',
     description: '',
     value: 'api',
   },
   {
     id: 'socket',
-    icon: 'fab fa-docker',
+    icon: 'svg-socket',
     label: 'Socket',
     description: '',
     value: 'socket',
   },
   {
     id: 'edgeAgent',
-    icon: 'fa fa-cloud', // Todo cloud with docker
+    icon: 'svg-edgeagent',
     label: 'Edge Agent',
     description: '',
     value: 'edgeAgent',
@@ -51,7 +52,7 @@ const defaultOptions: BoxSelectorOption<
   },
 ];
 
-export function WizardDocker({ onCreate }: Props) {
+export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
   const options = useFilterEdgeOptionsIfNeeded(defaultOptions, 'edgeAgent');
 
   const [creationType, setCreationType] = useState(options[0].value);
@@ -60,16 +61,12 @@ export function WizardDocker({ onCreate }: Props) {
 
   return (
     <div className="form-horizontal">
-      <div className="form-group">
-        <div className="col-sm-12">
-          <BoxSelector
-            onChange={(v) => setCreationType(v)}
-            options={options}
-            value={creationType}
-            radioName="creation-type"
-          />
-        </div>
-      </div>
+      <BoxSelector
+        onChange={(v) => setCreationType(v)}
+        options={options}
+        value={creationType}
+        radioName="creation-type"
+      />
 
       {tab}
     </div>
@@ -81,6 +78,7 @@ export function WizardDocker({ onCreate }: Props) {
         return (
           <AgentTab
             onCreate={(environment) => onCreate(environment, 'dockerAgent')}
+            isDockerStandalone={isDockerStandalone}
           />
         );
       case 'api':

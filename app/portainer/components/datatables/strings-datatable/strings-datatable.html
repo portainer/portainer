@@ -2,7 +2,10 @@
   <rd-widget>
     <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap w-full relative">
       <div class="toolBarTitle vertical-center">
-        <pr-icon icon="$ctrl.titleIcon" feather="true" mode="'primary'" class-name="'icon-nested-blue space-right'"></pr-icon>
+        <div class="widget-icon space-right">
+          <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+        </div>
+
         {{ $ctrl.titleText }}
       </div>
       <div class="searchBar vertical-center">

@@ -1,17 +1,14 @@
-import { buildOption } from '@/portainer/components/BoxSelector';
 import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { getTemplateVariables, intersectVariables } from '@/react/portainer/custom-templates/components/utils';
 import { isBE } from '@/portainer/feature-flags/feature-flags.service';
+import { editor, upload } from '@@/BoxSelector/common-options/build-methods';
 
 class KubeCreateCustomTemplateViewController {
   /* @ngInject */
   constructor($async, $state, Authentication, CustomTemplateService, FormValidator, ModalService, Notifications, ResourceControlService) {
     Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, ModalService, Notifications, ResourceControlService });
 
-    this.methodOptions = [
-      buildOption('method_editor', 'svg-custom', 'Web editor', 'Use our Web editor', 'editor'),
-      buildOption('method_upload', 'svg-upload', 'Upload', 'Upload from your computer', 'upload'),
-    ];
+    this.methodOptions = [editor, upload];
 
     this.templates = null;
     this.isTemplateVariablesEnabled = isBE;
@@ -109,7 +106,7 @@ class KubeCreateCustomTemplateViewController {
         const userId = userDetails.ID;
         await this.ResourceControlService.applyResourceControl(userId, accessControlData, customTemplate.ResourceControl);
 
-        this.Notifications.success('Custom template successfully created');
+        this.Notifications.success('Success', 'Custom template successfully created');
         this.state.isEditorDirty = false;
         this.$state.go('kubernetes.templates.custom');
       } catch (err) {

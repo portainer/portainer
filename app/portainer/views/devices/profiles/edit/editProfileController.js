@@ -44,7 +44,7 @@ export default function EditProfileController($scope, $async, $state, $window, M
 
       try {
         await updateProfile($scope.state.profileID, name, fileContent);
-        Notifications.success('Profile successfully updated');
+        Notifications.success('Success', 'Profile successfully updated');
         $scope.state.isEditorDirty = false;
         $state.go('portainer.settings.edgeCompute');
       } catch (err) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -27,13 +28,19 @@ type KubeAppLabels struct {
 	Kind      string
 }
 
+// convert string to valid kubernetes label by replacing invalid characters with periods
+func sanitizeLabel(value string) string {
+	re := regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
+	return re.ReplaceAllString(value, ".")
+}
+
 // ToMap converts KubeAppLabels to a map[string]string
 func (kal *KubeAppLabels) ToMap() map[string]string {
 	return map[string]string{
 		labelPortainerAppStackID: strconv.Itoa(kal.StackID),
 		labelPortainerAppStack:   kal.StackName,
 		labelPortainerAppName:    kal.StackName,
-		labelPortainerAppOwner:   kal.Owner,
+		labelPortainerAppOwner:   sanitizeLabel(kal.Owner),
 		labelPortainerAppKind:    kal.Kind,
 	}
 }
@@ -42,7 +49,7 @@ func (kal *KubeAppLabels) ToMap() map[string]string {
 func GetHelmAppLabels(name, owner string) map[string]string {
 	return map[string]string{
 		labelPortainerAppName:  name,
-		labelPortainerAppOwner: owner,
+		labelPortainerAppOwner: sanitizeLabel(owner),
 	}
 }
 

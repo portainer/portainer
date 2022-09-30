@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Download } from 'react-feather';
 
 import { Environment } from '@/portainer/environments/types';
-import { Query } from '@/portainer/environments/queries/useEnvironmentList';
 import { isKubernetesEnvironment } from '@/portainer/environments/utils';
 import { trackEvent } from '@/angulartics.matomo/analytics-services';
+import { Query } from '@/portainer/environments/queries/useEnvironmentList';
 
 import { Button } from '@@/buttons';
 
-import styles from './KubeconfigButton.module.css';
 import { KubeconfigPrompt } from './KubeconfigPrompt';
+
 import '@reach/dialog/styles.css';
 
 export interface Props {
@@ -29,8 +29,8 @@ export function KubeconfigButton({ environments, envQueryParams }: Props) {
 
   return (
     <>
-      <Button className={styles.kubeconfigButton} onClick={handleClick}>
-        <Download className="feather-icon-white" aria-hidden="true" />{' '}
+      <Button onClick={handleClick} size="medium" className="!ml-3">
+        <Download className="feather icon-white" aria-hidden="true" />{' '}
         Kubeconfig
       </Button>
       {prompt()}

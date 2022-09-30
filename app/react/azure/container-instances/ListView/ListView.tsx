@@ -90,7 +90,7 @@ function useRemoveMutation(environmentId: EnvironmentId) {
   async function handleRemove(groupIds: string[]) {
     deleteMutation.mutate(groupIds, {
       onSuccess: () => {
-        notifySuccess('Container groups successfully removed');
+        notifySuccess('Success', 'Container groups successfully removed');
       },
     });
   }

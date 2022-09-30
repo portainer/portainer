@@ -16,6 +16,64 @@ type filterTest struct {
 	query    EnvironmentsQuery
 }
 
+func Test_Filter_AgentVersion(t *testing.T) {
+
+	version1Endpoint := portainer.Endpoint{ID: 1, GroupID: 1,
+		Type: portainer.AgentOnDockerEnvironment,
+		Agent: struct {
+			Version string "example:\"1.0.0\""
+		}{Version: "1.0.0"}}
+	version2Endpoint := portainer.Endpoint{ID: 2, GroupID: 1,
+		Type: portainer.AgentOnDockerEnvironment,
+		Agent: struct {
+			Version string "example:\"1.0.0\""
+		}{Version: "2.0.0"}}
+	noVersionEndpoint := portainer.Endpoint{ID: 3, GroupID: 1,
+		Type: portainer.AgentOnDockerEnvironment,
+	}
+	notAgentEnvironments := portainer.Endpoint{ID: 4, Type: portainer.DockerEnvironment, GroupID: 1}
+
+	endpoints := []portainer.Endpoint{
+		version1Endpoint,
+		version2Endpoint,
+		noVersionEndpoint,
+		notAgentEnvironments,
+	}
+
+	handler, teardown := setupFilterTest(t, endpoints)
+
+	defer teardown()
+
+	tests := []filterTest{
+		{
+			"should show version 1 endpoints",
+			[]portainer.EndpointID{version1Endpoint.ID},
+			EnvironmentsQuery{
+				agentVersions: []string{version1Endpoint.Agent.Version},
+				types:         []portainer.EndpointType{portainer.AgentOnDockerEnvironment},
+			},
+		},
+		{
+			"should show version 2 endpoints",
+			[]portainer.EndpointID{version2Endpoint.ID},
+			EnvironmentsQuery{
+				agentVersions: []string{version2Endpoint.Agent.Version},
+				types:         []portainer.EndpointType{portainer.AgentOnDockerEnvironment},
+			},
+		},
+		{
+			"should show version 1 and 2 endpoints",
+			[]portainer.EndpointID{version2Endpoint.ID, version1Endpoint.ID},
+			EnvironmentsQuery{
+				agentVersions: []string{version2Endpoint.Agent.Version, version1Endpoint.Agent.Version},
+				types:         []portainer.EndpointType{portainer.AgentOnDockerEnvironment},
+			},
+		},
+	}
+
+	runTests(tests, t, handler, endpoints)
+}
+
 func Test_Filter_edgeDeviceFilter(t *testing.T) {
 
 	trustedEdgeDevice := portainer.Endpoint{ID: 1, UserTrusted: true, IsEdgeDevice: true, GroupID: 1, Type: portainer.EdgeAgentOnDockerEnvironment}
@@ -100,7 +158,7 @@ func runTest(t *testing.T, test filterTest, handler *Handler, endpoints []portai
 
 func setupFilterTest(t *testing.T, endpoints []portainer.Endpoint) (handler *Handler, teardown func()) {
 	is := assert.New(t)
-	_, store, teardown := datastore.MustNewTestStore(true, true)
+	_, store, teardown := datastore.MustNewTestStore(t, true, true)
 
 	for _, endpoint := range endpoints {
 		err := store.Endpoint().Create(&endpoint)

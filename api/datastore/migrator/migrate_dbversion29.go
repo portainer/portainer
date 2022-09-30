@@ -1,12 +1,11 @@
 package migrator
 
-func (m *Migrator) migrateDBVersionToDB30() error {
-	migrateLog.Info("- updating legacy settings")
-	if err := m.MigrateSettingsToDB30(); err != nil {
-		return err
-	}
+import "github.com/rs/zerolog/log"
 
-	return nil
+func (m *Migrator) migrateDBVersionToDB30() error {
+	log.Info().Msg("updating legacy settings")
+
+	return m.MigrateSettingsToDB30()
 }
 
 // so setting to false and "", is what would happen without this code
@@ -20,5 +19,6 @@ func (m *Migrator) MigrateSettingsToDB30() error {
 
 	legacySettings.OAuthSettings.SSO = false
 	legacySettings.OAuthSettings.LogoutURI = ""
+
 	return m.settingsService.UpdateSettings(legacySettings)
 }

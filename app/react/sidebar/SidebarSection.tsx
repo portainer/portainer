@@ -35,12 +35,12 @@ interface TitleProps {
 }
 
 export function SidebarSectionTitle({
-  showWhenOpen,
+  showWhenOpen = true,
   children,
 }: PropsWithChildren<TitleProps>) {
   const { isOpen } = useSidebarState();
 
-  if (!isOpen && !showWhenOpen) {
+  if (!isOpen || !showWhenOpen) {
     return null;
   }
 

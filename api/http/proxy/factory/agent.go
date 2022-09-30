@@ -2,17 +2,17 @@ package factory
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"net/http"
-	"net/url"
-	"strings"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/proxy/factory/agent"
 	"github.com/portainer/portainer/api/internal/endpointutils"
+	"github.com/portainer/portainer/api/internal/url"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // ProxyServer provide an extended proxy with a local server to forward requests
@@ -25,7 +25,7 @@ type ProxyServer struct {
 func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*ProxyServer, error) {
 	urlString := endpoint.URL
 
-	if endpointutils.IsEdgeEndpoint((endpoint)) {
+	if endpointutils.IsEdgeEndpoint(endpoint) {
 		tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed starting tunnel")
@@ -34,7 +34,7 @@ func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*Proxy
 		urlString = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}
 
-	endpointURL, err := parseURL(urlString)
+	endpointURL, err := url.ParseURL(urlString)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed parsing url %s", endpoint.URL)
 	}
@@ -78,15 +78,16 @@ func (proxy *ProxyServer) start() error {
 	}
 
 	proxy.Port = listener.Addr().(*net.TCPAddr).Port
+
 	go func() {
 		proxyHost := fmt.Sprintf("127.0.0.1:%d", proxy.Port)
-		log.Printf("Starting Proxy server on %s...\n", proxyHost)
+		log.Debug().Str("host", proxyHost).Msg("starting proxy server")
 
 		err := proxy.server.Serve(listener)
-		log.Printf("Exiting Proxy server %s\n", proxyHost)
+		log.Debug().Str("host", proxyHost).Msg("exiting proxy server")
 
 		if err != nil && err != http.ErrServerClosed {
-			log.Printf("Proxy server %s exited with an error: %s\n", proxyHost, err)
+			log.Debug().Str("host", proxyHost).Err(err).Msg("proxy server exited with an error")
 		}
 	}()
 
@@ -98,16 +99,4 @@ func (proxy *ProxyServer) Close() {
 	if proxy.server != nil {
 		proxy.server.Close()
 	}
-}
-
-// parseURL parses the endpointURL using url.Parse.
-//
-// to prevent an error when url has port but no protocol prefix
-// we add `//` prefix if needed
-func parseURL(endpointURL string) (*url.URL, error) {
-	if !strings.HasPrefix(endpointURL, "http") && !strings.HasPrefix(endpointURL, "tcp") && !strings.HasPrefix(endpointURL, "//") {
-		endpointURL = fmt.Sprintf("//%s", endpointURL)
-	}
-
-	return url.Parse(endpointURL)
 }

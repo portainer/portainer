@@ -2,11 +2,14 @@
 <div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item template-item !mr-0 !my-0" ng-click="$ctrl.onSelect($ctrl.model)">
   <div class="blocklist-item-box">
     <!-- template-image -->
-    <div ng-if="$ctrl.model.Logo" class="vertical-center justify-center">
-      <img class="blocklist-item-logo" ng-src="{{ $ctrl.model.Logo }}" />
-    </div>
-    <div class="blocklist-item-logo vertical-center justify-center" ng-if="!$ctrl.model.Logo">
-      <pr-icon icon="'svg-rocket'" class-name="'[&>*]:!h-10 [&>*]:!w-auto [&>*>path]:stroke-blue-8'" mode="'primary'"></pr-icon>
+    <div class="vertical-center justify-center min-w-[56px]">
+      <fallback-image
+        src="$ctrl.model.Logo"
+        fallback-icon="'svg-rocket'"
+        class-name="'blocklist-item-logo'"
+        fallback-class-name="'!h-14 !w-14 [&>*]:!h-8 [&>*]:!w-auto icon-nested-blue'"
+        fallback-mode="'primary'"
+      ></fallback-image>
     </div>
     <!-- !template-image -->
     <!-- template-details -->

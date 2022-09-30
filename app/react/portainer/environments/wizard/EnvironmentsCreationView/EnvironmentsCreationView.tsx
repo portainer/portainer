@@ -12,6 +12,7 @@ import { Widget, WidgetBody, WidgetTitle } from '@@/Widget';
 import { PageHeader } from '@@/PageHeader';
 import { Button } from '@@/buttons';
 import { FormSection } from '@@/form-components/FormSection';
+import { Icon } from '@@/Icon';
 
 import { environmentTypes } from '../EnvironmentTypeSelectView/environment-types';
 import { EnvironmentSelectorValue } from '../EnvironmentTypeSelectView/EnvironmentSelector';
@@ -56,6 +57,8 @@ export function EnvironmentCreationView() {
     isLastStep,
   } = useStepper(steps, handleFinish);
 
+  const isDockerStandalone = currentStep.id === 'dockerStandalone';
+
   return (
     <>
       <PageHeader
@@ -65,7 +68,7 @@ export function EnvironmentCreationView() {
 
       <div className={styles.wizardWrapper}>
         <Widget>
-          <WidgetTitle icon="fa-magic" title="Environment Wizard" />
+          <WidgetTitle icon="svg-magic" title="Environment Wizard" />
           <WidgetBody>
             <Stepper steps={steps} currentStep={currentStepIndex + 1} />
 
@@ -74,7 +77,10 @@ export function EnvironmentCreationView() {
                 title={`Connect to your ${currentStep.title}
                     environment`}
               >
-                <Component onCreate={handleCreateEnvironment} />
+                <Component
+                  onCreate={handleCreateEnvironment}
+                  isDockerStandalone={isDockerStandalone}
+                />
 
                 <div
                   className={clsx(
@@ -83,11 +89,11 @@ export function EnvironmentCreationView() {
                   )}
                 >
                   <Button disabled={isFirstStep} onClick={onPreviousClick}>
-                    <i className="fas fa-arrow-left space-right" /> Previous
+                    <Icon icon="arrow-left" feather /> Previous
                   </Button>
                   <Button onClick={onNextClick}>
-                    {isLastStep ? 'Finish' : 'Next'}
-                    <i className="fas fa-arrow-right space-left" />
+                    {isLastStep ? 'Close' : 'Next'}
+                    <Icon icon="arrow-right" feather />
                   </Button>
                 </div>
               </FormSection>
@@ -177,7 +183,8 @@ function useStepper(
 
   function getComponent(id: EnvironmentSelectorValue) {
     switch (id) {
-      case 'docker':
+      case 'dockerStandalone':
+      case 'dockerSwarm':
         return WizardDocker;
       case 'aci':
         return WizardAzure;

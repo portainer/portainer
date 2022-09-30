@@ -30,8 +30,8 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <endpoint-selector ng-if="$ctrl.endpoints && $ctrl.groups" model="$ctrl.formValues.endpoint" endpoints="$ctrl.endpoints" groups="$ctrl.groups"></endpoint-selector>
+        <div class="form-group" ng-if="$ctrl.endpoints && $ctrl.groups">
+          <por-select value="$ctrl.formValues.endpointId" on-change="($ctrl.onChangeEnvironment)" options="$ctrl.environmentSelectorOptions"></por-select>
         </div>
 
         <div class="form-group">

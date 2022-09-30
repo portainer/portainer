@@ -23,5 +23,4 @@ func EndpointRelatedEdgeStacks(endpoint *portainer.Endpoint, endpointGroup *port
 	}
 
 	return relatedEdgeStacks
-
 }

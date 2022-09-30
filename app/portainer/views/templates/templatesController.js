@@ -117,7 +117,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl, generatedVolumeIds);
         })
         .then(function success() {
-          Notifications.success('Container successfully created');
+          Notifications.success('Success', 'Container successfully created');
           $state.go('docker.containers', {}, { reload: true });
         })
         .catch(function error(err) {
@@ -151,7 +151,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
         })
         .then(function success() {
-          Notifications.success('Stack successfully deployed');
+          Notifications.success('Success', 'Stack successfully deployed');
           $state.go('docker.stacks');
         })
         .catch(function error(err) {
@@ -190,7 +190,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
         })
         .then(function success() {
-          Notifications.success('Stack successfully deployed');
+          Notifications.success('Success', 'Stack successfully deployed');
           $state.go('docker.stacks');
         })
         .catch(function error(err) {

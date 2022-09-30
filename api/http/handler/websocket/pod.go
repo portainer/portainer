@@ -3,17 +3,17 @@ package websocket
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
-	"github.com/portainer/portainer/api/http/security"
-
-	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+	"github.com/portainer/portainer/api/http/security"
+
+	"github.com/gorilla/websocket"
+	"github.com/rs/zerolog/log"
 )
 
 // @summary Execute a websocket on pod
@@ -39,44 +39,44 @@ import (
 func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
+		return httperror.BadRequest("Invalid query parameter: endpointId", err)
 	}
 
 	namespace, err := request.RetrieveQueryParameter(r, "namespace", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: namespace", err}
+		return httperror.BadRequest("Invalid query parameter: namespace", err)
 	}
 
 	podName, err := request.RetrieveQueryParameter(r, "podName", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: podName", err}
+		return httperror.BadRequest("Invalid query parameter: podName", err)
 	}
 
 	containerName, err := request.RetrieveQueryParameter(r, "containerName", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: containerName", err}
+		return httperror.BadRequest("Invalid query parameter: containerName", err)
 	}
 
 	command, err := request.RetrieveQueryParameter(r, "command", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: command", err}
+		return httperror.BadRequest("Invalid query parameter: command", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
+		return httperror.NotFound("Unable to find the environment associated to the stack inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}
+		return httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
+		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
 	serviceAccountToken, isAdminToken, err := handler.getToken(r, endpoint, false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user service account token", err}
+		return httperror.InternalServerError("Unable to get user service account token", err)
 	}
 
 	params := &webSocketRequestParams{
@@ -89,20 +89,22 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 	if endpoint.Type == portainer.AgentOnKubernetesEnvironment {
 		err := handler.proxyAgentWebsocketRequest(w, r, params)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to proxy websocket request to agent", err}
+			return httperror.InternalServerError("Unable to proxy websocket request to agent", err)
 		}
+
 		return nil
 	} else if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		err := handler.proxyEdgeAgentWebsocketRequest(w, r, params)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to proxy websocket request to Edge agent", err}
+			return httperror.InternalServerError("Unable to proxy websocket request to Edge agent", err)
 		}
+
 		return nil
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
+		return httperror.InternalServerError("Unable to create Kubernetes client", err)
 	}
 
 	handlerErr := handler.hijackPodExecStartOperation(w, r, cli, serviceAccountToken, isAdminToken, endpoint, namespace, podName, containerName, command)
@@ -126,7 +128,7 @@ func (handler *Handler) hijackPodExecStartOperation(
 
 	websocketConn, err := handler.connectionUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to upgrade the connection", err}
+		return httperror.InternalServerError("Unable to upgrade the connection", err)
 	}
 	defer websocketConn.Close()
 
@@ -149,11 +151,12 @@ func (handler *Handler) hijackPodExecStartOperation(
 
 	// websocket client successfully disconnected
 	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
-		log.Printf("websocket error: %s \n", err.Error())
+		log.Debug().Err(err).Msg("websocket error")
+
 		return nil
 	}
 
-	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to start exec process inside container", err}
+	return httperror.InternalServerError("Unable to start exec process inside container", err)
 }
 
 func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, bool, error) {

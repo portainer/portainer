@@ -1,19 +1,10 @@
 import { PropsWithChildren } from 'react';
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuLink as ReachMenuLink,
-} from '@reach/menu-button';
-import clsx from 'clsx';
-import { User, ChevronDown } from 'react-feather';
-import { UISrefProps, useSref } from '@uirouter/react';
 
-import { useUser } from '@/portainer/hooks/useUser';
-import { AutomationTestingProps } from '@/types';
+import { ContextHelp } from '@@/PageHeader/ContextHelp';
 
 import { useHeaderContext } from './HeaderContainer';
-import styles from './HeaderTitle.module.css';
+import { NotificationsMenu } from './NotificationsMenu';
+import { UserMenu } from './UserMenu';
 
 interface Props {
   title: string;
@@ -21,73 +12,20 @@ interface Props {
 
 export function HeaderTitle({ title, children }: PropsWithChildren<Props>) {
   useHeaderContext();
-  const { user } = useUser();
 
   return (
-    <div className="page white-space-normal">
-      {title}
-      <span className="header_title_content">{children}</span>
-      <Menu>
-        <MenuButton
-          className={clsx(
-            'pull-right flex items-center gap-1',
-            styles.menuButton
-          )}
-          data-cy="userMenu-button"
-          aria-label="User menu toggle"
-        >
-          <User className="icon-nested-gray" />
-          {user && <span>{user.Username}</span>}
-          <ChevronDown className={styles.arrowDown} />
-        </MenuButton>
-
-        <MenuList
-          className={styles.menuList}
-          aria-label="User Menu"
-          data-cy="userMenu"
-        >
-          {!window.ddExtension && (
-            <MenuLink
-              to="portainer.account"
-              label="My account"
-              data-cy="userMenu-myAccount"
-            />
-          )}
-
-          <MenuLink
-            to="portainer.logout"
-            label="Log out"
-            data-cy="userMenu-logOut"
-            params={{ performApiLogout: true }}
-          />
-        </MenuList>
-      </Menu>
+    <div className="flex justify-between whitespace-normal pt-3">
+      <div className="flex items-center gap-2">
+        <div className="font-medium text-2xl text-gray-11 th-dark:text-white th-highcontrast:text-white">
+          {title}
+        </div>
+        {children && <span>{children}</span>}
+      </div>
+      <div className="flex items-end">
+        <NotificationsMenu />
+        <ContextHelp />
+        {!window.ddExtension && <UserMenu />}
+      </div>
     </div>
-  );
-}
-
-interface MenuLinkProps extends AutomationTestingProps, UISrefProps {
-  label: string;
-}
-
-function MenuLink({
-  to,
-  label,
-  params,
-  options,
-  'data-cy': dataCy,
-}: MenuLinkProps) {
-  const anchorProps = useSref(to, params, options);
-
-  return (
-    <ReachMenuLink
-      href={anchorProps.href}
-      onClick={anchorProps.onClick}
-      className={styles.menuLink}
-      aria-label={label}
-      data-cy={dataCy}
-    >
-      {label}
-    </ReachMenuLink>
   );
 }

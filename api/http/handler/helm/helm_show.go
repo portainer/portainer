@@ -2,14 +2,15 @@ package helm
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 
-	"github.com/pkg/errors"
 	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // @id HelmShow
@@ -32,22 +33,22 @@ import (
 func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	repo := r.URL.Query().Get("repo")
 	if repo == "" {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.New("missing `repo` query parameter")}
+		return httperror.BadRequest("Bad request", errors.New("missing `repo` query parameter"))
 	}
 	_, err := url.ParseRequestURI(repo)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.Wrap(err, fmt.Sprintf("provided URL %q is not valid", repo))}
+		return httperror.BadRequest("Bad request", errors.Wrap(err, fmt.Sprintf("provided URL %q is not valid", repo)))
 	}
 
 	chart := r.URL.Query().Get("chart")
 	if chart == "" {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.New("missing `chart` query parameter")}
+		return httperror.BadRequest("Bad request", errors.New("missing `chart` query parameter"))
 	}
 
 	cmd, err := request.RetrieveRouteVariableValue(r, "command")
 	if err != nil {
 		cmd = "all"
-		log.Printf("[DEBUG] [internal,helm] [message: command not provided, defaulting to %s]", cmd)
+		log.Debug().Str("default_command", cmd).Msg("command not provided, using default")
 	}
 
 	showOptions := options.ShowOptions{
@@ -57,11 +58,7 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 	}
 	result, err := handler.helmPackageManager.Show(showOptions)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to show chart",
-			Err:        err,
-		}
+		return httperror.InternalServerError("Unable to show chart", err)
 	}
 
 	w.Header().Set("Content-Type", "text/plain")

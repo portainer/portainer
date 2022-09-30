@@ -3,18 +3,19 @@ package migrator
 import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/authorization"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (m *Migrator) migrateDBVersionToDB36() error {
-	migrateLog.Info("Updating user authorizations")
-	if err := m.migrateUsersToDB36(); err != nil {
-		return err
-	}
+	log.Info().Msg("updating user authorizations")
 
-	return nil
+	return m.migrateUsersToDB36()
 }
 
 func (m *Migrator) migrateUsersToDB36() error {
+	log.Info().Msg("updating user authorizations")
+
 	users, err := m.userService.Users()
 	if err != nil {
 		return err

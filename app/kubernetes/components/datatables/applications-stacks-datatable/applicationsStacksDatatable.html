@@ -4,7 +4,9 @@
     <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
       <!-- title -->
       <div class="toolBarTitle vertical-center">
-        <pr-icon icon="'list'" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+        <div class="widget-icon space-right">
+          <pr-icon icon="'list'" feather="true"></pr-icon>
+        </div>
         Stacks
       </div>
       <!-- actions -->
@@ -71,7 +73,7 @@
                         <option value="300">5min</option>
                       </select>
                       <span>
-                        <i id="refreshRateChange" class="fa fa-check green-icon mt-2" aria-hidden="true"></i>
+                        <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
                       </span>
                     </div>
                   </div>
@@ -86,9 +88,9 @@
       </div>
     </div>
     <!-- info text -->
-    <div class="flex flex-row">
-      <span class="small text-muted mt-1" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-        <pr-icon icon="'info'" feather="true"></pr-icon>
+    <div class="flex flex-row w-full">
+      <span class="small text-muted mt-1 vertical-center" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+        <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
         System resources are hidden, this can be changed in the table settings.
       </span>
     </div>

@@ -3,11 +3,13 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+          <div class="widget-icon space-right">
+            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+          </div>
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
-          <pr-icon icon="'search'" feather="true"></pr-icon>
+          <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
           <input
             type="text"
             class="searchInput"
@@ -57,12 +59,14 @@
           <tbody>
             <tr ng-if="!$ctrl.isRoot">
               <td colspan="4">
-                <a ng-click="$ctrl.goToParent()"><pr-icon icon="'corner-left-up'" feather="true"></pr-icon>Go to parent</a>
+                <button type="button" class="btn btn-link hover:no-underline !ml-0 p-0" ng-click="$ctrl.goToParent()"
+                  ><pr-icon icon="'corner-left-up'" feather="true"></pr-icon>Go to parent</button
+                >
               </td>
             </tr>
             <tr ng-repeat="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder))">
               <td>
-                <span ng-if="item.edit">
+                <span ng-if="item.edit" class="vertical-center">
                   <input
                     class="input-sm"
                     type="text"
@@ -71,14 +75,14 @@
                     auto-focus
                   />
                   <a class="interactive" ng-click="item.edit = false;"><pr-icon icon="'x'" feather="true"></pr-icon></a>
-                  <a class="interactive" ng-click="$ctrl.rename({name: item.Name, newName: item.newName}); item.edit = false;"
-                    ><pr-icon icon="'check-square'" feather="true"></pr-icon
-                  ></a>
+                  <a class="interactive" ng-click="$ctrl.rename({name: item.Name, newName: item.newName}); item.edit = false;"><pr-icon icon="'check'" feather="true"></pr-icon></a>
                 </span>
                 <span ng-if="!item.edit && item.Dir">
-                  <a ng-click="$ctrl.browse({name: item.Name})"><pr-icon icon="'folder'" feather="true" class-name="space-right"></pr-icon>{{ item.Name }}</a>
+                  <button type="button" class="btn btn-link hover:no-underline !ml-0 p-0" ng-click="$ctrl.browse({name: item.Name})" class="vertical-center"
+                    ><pr-icon icon="'folder'" feather="true"></pr-icon>{{ item.Name }}</button
+                  >
                 </span>
-                <span ng-if="!item.edit && !item.Dir"><pr-icon icon="'file'" feather="true" class-name="space-right"></pr-icon>{{ item.Name }} </span>
+                <span ng-if="!item.edit && !item.Dir" class="vertical-center"><pr-icon icon="'file'" feather="true"></pr-icon>{{ item.Name }}</span>
               </td>
               <td>{{ item.Size | humansize }}</td>
               <td>

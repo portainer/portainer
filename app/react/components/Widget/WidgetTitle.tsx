@@ -24,12 +24,14 @@ export function WidgetTitle({
   return (
     <div className="widget-header">
       <div className="row">
-        <span className={clsx('pull-left', className)}>
-          <Icon
-            icon={icon}
-            feather={featherIcon}
-            className="icon-nested-blue icon-primary space-right"
-          />
+        <span className={clsx('pull-left vertical-center', className)}>
+          <div className="widget-icon">
+            <Icon
+              icon={icon}
+              feather={featherIcon}
+              className="space-right feather"
+            />
+          </div>
           <span>{title}</span>
         </span>
         <span className={clsx('pull-right', className)}>{children}</span>

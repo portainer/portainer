@@ -1,8 +1,9 @@
 import { Column } from 'react-table';
 import _ from 'lodash';
 
-import { useEnvironment } from '@/portainer/environments/useEnvironment';
 import type { DockerContainer, Port } from '@/react/docker/containers/types';
+
+import { useRowContext } from '../RowContext';
 
 export const ports: Column<DockerContainer> = {
   Header: 'Published Ports',
@@ -20,11 +21,13 @@ interface Props {
 }
 
 function PortsCell({ value: ports }: Props) {
-  const { PublicURL: publicUrl } = useEnvironment();
+  const { environment } = useRowContext();
 
   if (ports.length === 0) {
     return '-';
   }
+
+  const { PublicURL: publicUrl } = environment;
 
   return _.uniqBy(ports, 'public').map((port) => (
     <a
@@ -36,7 +39,6 @@ function PortsCell({ value: ports }: Props) {
     >
       <i className="fa fa-external-link-alt" aria-hidden="true" />
       {port.public}:{port.private}
-      {port.type === 'tcp' ? '' : `|${port.type}`}
     </a>
   ));
 }

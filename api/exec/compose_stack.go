@@ -8,15 +8,14 @@ import (
 	"path"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	libstack "github.com/portainer/docker-compose-wrapper"
 	"github.com/portainer/docker-compose-wrapper/compose"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/internal/stackutils"
+
+	"github.com/pkg/errors"
 )
 
 // ComposeStackManager is a wrapper for docker-compose binary
@@ -83,6 +82,27 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 
 	err = manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFile)
 	return errors.Wrap(err, "failed to remove a stack")
+}
+
+// Pull an image associated with a service defined in a docker-compose.yml or docker-stack.yml file,
+// but does not start containers based on those images.
+func (manager *ComposeStackManager) Pull(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	url, proxy, err := manager.fetchEndpointProxy(endpoint)
+	if err != nil {
+		return err
+	}
+	if proxy != nil {
+		defer proxy.Close()
+	}
+
+	envFile, err := createEnvFile(stack)
+	if err != nil {
+		return errors.Wrap(err, "failed to create env file")
+	}
+
+	filePaths := stackutils.GetStackFilePaths(stack)
+	err = manager.deployer.Pull(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFile)
+	return errors.Wrap(err, "failed to pull images of the stack")
 }
 
 // NormalizeStackName returns a new stack name with unsupported characters replaced

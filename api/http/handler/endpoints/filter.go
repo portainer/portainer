@@ -24,7 +24,9 @@ type EnvironmentsQuery struct {
 	status              []portainer.EndpointStatus
 	edgeDevice          *bool
 	edgeDeviceUntrusted bool
+	excludeSnapshots    bool
 	name                string
+	agentVersions       []string
 }
 
 func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
@@ -60,6 +62,8 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		return EnvironmentsQuery{}, err
 	}
 
+	agentVersions := getArrayQueryParameter(r, "agentVersions")
+
 	name, _ := request.RetrieveQueryParameter(r, "name", true)
 
 	edgeDeviceParam, _ := request.RetrieveQueryParameter(r, "edgeDevice", true)
@@ -71,6 +75,8 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 
 	edgeDeviceUntrusted, _ := request.RetrieveBooleanQueryParameter(r, "edgeDeviceUntrusted", true)
 
+	excludeSnapshots, _ := request.RetrieveBooleanQueryParameter(r, "excludeSnapshots", true)
+
 	return EnvironmentsQuery{
 		search:              search,
 		types:               endpointTypes,
@@ -81,7 +87,9 @@ func parseQuery(r *http.Request) (EnvironmentsQuery, error) {
 		status:              status,
 		edgeDevice:          edgeDevice,
 		edgeDeviceUntrusted: edgeDeviceUntrusted,
+		excludeSnapshots:    excludeSnapshots,
 		name:                name,
+		agentVersions:       agentVersions,
 	}, nil
 }
 
@@ -133,6 +141,12 @@ func (handler *Handler) filterEndpointsByQuery(filteredEndpoints []portainer.End
 
 	if len(query.tagIds) > 0 {
 		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, query.tagIds, groups, query.tagsPartialMatch)
+	}
+
+	if len(query.agentVersions) > 0 {
+		filteredEndpoints = filter(filteredEndpoints, func(endpoint portainer.Endpoint) bool {
+			return !endpointutils.IsAgentEndpoint(&endpoint) || contains(query.agentVersions, endpoint.Agent.Version)
+		})
 	}
 
 	return filteredEndpoints, totalAvailableEndpoints, nil
@@ -412,4 +426,14 @@ func getNumberArrayQueryParameter[T ~int](r *http.Request, parameter string) ([]
 	}
 
 	return result, nil
+}
+
+func contains(strings []string, param string) bool {
+	for _, str := range strings {
+		if str == param {
+			return true
+		}
+	}
+
+	return false
 }

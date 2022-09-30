@@ -1,28 +1,28 @@
 {
   "reactExample": {
     "registries": {
-      "link": "Registries <strong>Link</strong>",
-      "useSref": "Registries useSref"
+      "link": "注册 <strong>链接</strong>",
+      "useSref": "注册 useSref"
     }
   },
   "users": {
     "access-tokens": {
       "create": {
-        "add-button": "Add access token",
-        "description-field-label": "Description",
-        "done-button": "Done",
+        "add-button": "新增访问令牌",
+        "description-field-label": "描述",
+        "done-button": "完成",
         "form": {
           "description-field": {
             "error": {
-              "required": "this field is required"
+              "required": "此字段为必填项"
             },
-            "label": "Description"
+            "label": "描述"
           }
         },
         "new-access-token": {
-          "copy-button": "Copy access token",
-          "explanation": "Please copy the new access token. You won't be able to view the token again.",
-          "title": "New access token"
+          "copy-button": "复制访问令牌",
+          "explanation": "请复制新的访问令牌。您将无法再次查看令牌。",
+          "title": "新的访问令牌"
         }
       }
     }

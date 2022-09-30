@@ -2,7 +2,7 @@ import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { type EnvironmentGroupId } from '@/portainer/environment-groups/types';
 import { type TagId } from '@/portainer/tags/types';
 import { UserId } from '@/portainer/users/types';
-import { TeamId } from '@/portainer/teams/types';
+import { TeamId } from '@/react/portainer/users/teams/types';
 
 import type {
   Environment,
@@ -24,8 +24,10 @@ export interface EnvironmentsQueryParams {
   status?: EnvironmentStatus[];
   edgeDevice?: boolean;
   edgeDeviceUntrusted?: boolean;
+  excludeSnapshots?: boolean;
   provisioned?: boolean;
   name?: string;
+  agentVersions?: string[];
 }
 
 export interface GetEnvironmentsOptions {
@@ -67,6 +69,17 @@ export async function getEnvironments(
       value: response.data,
       totalAvailable: parseInt(totalAvailable, 10),
     };
+  } catch (e) {
+    throw parseAxiosError(e as Error);
+  }
+}
+
+export async function getAgentVersions() {
+  try {
+    const response = await axios.get<string[]>(
+      buildUrl(undefined, 'agent_versions')
+    );
+    return response.data;
   } catch (e) {
     throw parseAxiosError(e as Error);
   }

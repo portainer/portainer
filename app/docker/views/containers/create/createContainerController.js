@@ -72,7 +72,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       GPU: {
         enabled: false,
         useSpecific: false,
-        selectedGPUs: [],
+        selectedGPUs: ['all'],
         capabilities: ['compute', 'utility'],
       },
       Console: 'none',
@@ -89,6 +89,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       CpuLimit: 0,
       MemoryLimit: 0,
       MemoryReservation: 0,
+      ShmSize: 64,
       CmdMode: 'default',
       EntrypointMode: 'default',
       Env: [],
@@ -414,6 +415,13 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function prepareResources(config) {
+      // Shared Memory Size - Round to 0.125
+      if ($scope.formValues.ShmSize >= 0) {
+        var shmSize = (Math.round($scope.formValues.ShmSize * 8) / 8).toFixed(3);
+        shmSize *= 1024 * 1024;
+        config.HostConfig.ShmSize = shmSize;
+      }
+
       // Memory Limit - Round to 0.125
       if ($scope.formValues.MemoryLimit >= 0) {
         var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
@@ -469,28 +477,24 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     function prepareGPUOptions(config) {
       const driver = 'nvidia';
       const gpuOptions = $scope.formValues.GPU;
-
-      const existingDeviceRequest = _.find($scope.config.HostConfig.DeviceRequests, function (o) {
-        return o.Driver === driver || o.Capabilities[0][0] === 'gpu';
-      });
+      const existingDeviceRequest = _.find($scope.config.HostConfig.DeviceRequests, { Driver: driver });
       if (existingDeviceRequest) {
         _.pullAllBy(config.HostConfig.DeviceRequests, [existingDeviceRequest], 'Driver');
       }
-
       if (!gpuOptions.enabled) {
         return;
       }
-
-      const deviceRequest = existingDeviceRequest || {
+      const deviceRequest = {
         Driver: driver,
         Count: -1,
         DeviceIDs: [], // must be empty if Count != 0 https://github.com/moby/moby/blob/master/daemon/nvidia_linux.go#L50
         Capabilities: [], // array of ORed arrays of ANDed capabilites = [ [c1 AND c2] OR [c1 AND c3] ] : https://github.com/moby/moby/blob/master/api/types/container/host_config.go#L272
         // Options: { property1: "string", property2: "string" }, // seems to never be evaluated/used in docker API ?
       };
-
-      deviceRequest.DeviceIDs = gpuOptions.selectedGPUs;
-      deviceRequest.Count = 0;
+      if (gpuOptions.useSpecific) {
+        deviceRequest.DeviceIDs = gpuOptions.selectedGPUs;
+        deviceRequest.Count = 0;
+      }
       deviceRequest.Capabilities = [gpuOptions.capabilities];
 
       config.HostConfig.DeviceRequests.push(deviceRequest);
@@ -661,6 +665,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         $scope.formValues.GPU.selectedGPUs = deviceRequest.DeviceIDs || [];
         if ($scope.formValues.GPU.useSpecific) {
           $scope.formValues.GPU.selectedGPUs = deviceRequest.DeviceIDs;
+        } else {
+          $scope.formValues.GPU.selectedGPUs = ['all'];
         }
         // we only support a single set of capabilities for now
         // UI needs to be reworked in order to support OR combinations of AND capabilities
@@ -696,6 +702,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
       if (d.HostConfig.MemoryReservation) {
         $scope.formValues.MemoryReservation = d.HostConfig.MemoryReservation / 1024 / 1024;
+      }
+      if (d.HostConfig.ShmSize) {
+        $scope.formValues.ShmSize = d.HostConfig.ShmSize / 1024 / 1024;
       }
     }
 
@@ -814,8 +823,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         function (d) {
           var containers = d;
           $scope.runningContainers = containers;
-          $scope.gpuUseAll = $scope.endpoint.Snapshots[0].GpuUseAll;
-          $scope.gpuUseList = $scope.endpoint.Snapshots[0].GpuUseList;
+          $scope.gpuUseAll = _.get($scope, 'endpoint.Snapshots[0].GpuUseAll', false);
+          $scope.gpuUseList = _.get($scope, 'endpoint.Snapshots[0].GpuUseList', []);
           if ($transition$.params().from) {
             loadFromContainerSpec();
           } else {
@@ -883,7 +892,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         } else {
           await ContainerService.updateLimits($transition$.params().from, config);
           $scope.config = config;
-          Notifications.success('Limits updated');
+          Notifications.success('Success', 'Limits updated');
         }
       } catch (err) {
         Notifications.error('Failure', err, 'Update Limits fail');
@@ -1090,7 +1099,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
 
       function onSuccess() {
-        Notifications.success('Container successfully created');
+        Notifications.success('Success', 'Container successfully created');
         $state.go('docker.containers', {}, { reload: true });
       }
     }

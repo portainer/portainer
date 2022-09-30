@@ -31,27 +31,10 @@
   border-top: 1px solid var(--border-table-top-color);
 }
 
-a {
-  color: inherit;
-  cursor: pointer;
-}
-
-a:hover,
-a:focus {
-  color: inherit;
-  text-decoration: none;
-}
-
 .input-group-addon {
   color: var(--text-input-group-addon-color);
   background-color: var(--bg-input-group-addon-color);
   border: 1px solid var(--border-input-group-addon-color);
-}
-
-.btn-default {
-  color: var(--text-btn-default-color);
-  background-color: var(--bg-btn-default-color);
-  border-color: var(--border-btn-default-color);
 }
 
 .text-danger {
@@ -59,7 +42,7 @@ a:focus {
 }
 
 .table .table {
-  background-color: var(--bg-table-color);
+  background-color: initial;
 }
 
 .table-bordered {
@@ -118,24 +101,50 @@ code {
   background-color: var(--bg-code-color);
 }
 
-.nav-tabs > li.active > a,
-.nav-tabs > li.active > a:hover,
-.nav-tabs > li.active > a:focus {
-  color: var(--text-navtabs-color);
-  background-color: var(--bg-navtabs-color);
-  border: 1px solid var(--border-navtabs-color);
+.nav-container {
+  border: 1px solid var(--border-nav-container-color);
+  background-color: var(--bg-nav-container-color);
+  border-radius: 8px;
+  padding: 10px;
 }
 
 .nav-tabs {
   border-bottom: 1px solid var(--border-navtabs-color);
 }
 
+.nav-tabs > li {
+  background-color: var(--bg-nav-tabs-active-color);
+  border-top-right-radius: 8px;
+}
+
+.nav-tabs > li.active > a {
+  border: 1px solid transparent;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  color: var(--text-nav-tab-active-color);
+  background-color: var(--bg-nav-tab-active-color);
+  border: 1px solid var(--border-navtabs-color);
+}
+
+.nav-tabs > li.disabled > a {
+  border-color: transparent;
+  pointer-events: none;
+}
+
 .nav-tabs > li > a:hover {
   border-color: var(--border-navtabs-color);
 }
 
+.nav > li > a {
+  color: var(--text-navtabs-color);
+}
+
 .nav > li > a:hover,
 .nav > li > a:focus {
+  color: var(--text-navtabs-hover-color);
   background-color: var(--bg-navtabs-hover-color);
 }
 
@@ -207,6 +216,7 @@ code {
 
 .dropdown-menu {
   background: var(--bg-dropdown-menu-color);
+  border-radius: 8px;
 }
 
 .dropdown-menu > li > a {
@@ -215,6 +225,7 @@ code {
 
 pre {
   border: 1px solid var(--border-pre-color);
+  border-radius: 8px;
   background-color: var(--bg-pre-color);
   color: var(--text-pre-color);
 }
@@ -232,37 +243,6 @@ json-tree .branch-preview {
 
 .progress {
   background-color: var(--bg-progress-color);
-}
-
-.ui-select-search,
-.ui-select-toggle {
-  height: 30px;
-  min-width: 260px;
-  padding: 4px 12px;
-}
-
-.ui-select-toggle {
-  justify-content: flex-start !important;
-}
-
-.ui-select-match-text {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-}
-
-.ui-select-match-text > a {
-  verical-align: middle;
-}
-
-.ui-select-bootstrap .ui-select-choices-row > span {
-  color: var(--text-ui-select-color);
-}
-
-.ui-select-bootstrap .ui-select-choices-row > span:hover,
-.ui-select-bootstrap .ui-select-choices-row > span:focus {
-  background-color: var(--bg-ui-select-hover-color);
-  color: var(--text-ui-select-hover-color);
 }
 
 .motd-body {
@@ -318,7 +298,6 @@ json-tree .branch-preview {
 }
 
 input,
-button,
 select,
 textarea {
   background: var(--text-input-textarea);
@@ -398,46 +377,24 @@ input:-webkit-autofill {
   -webkit-text-fill-color: var(--text-input-autofill-color) !important;
 }
 
-.btn:hover {
-  color: var(--text-button-hover-color);
-}
-
-.btn-default:hover {
-  background-color: var(--bg-btn-default-hover-color);
-}
-
-.btn-primary:hover {
-  color: var(--white-color) !important;
-}
-
-.btn-danger:hover {
-  color: var(--white-color);
-}
-
-.btn-success:hover {
-  color: var(--white-color);
-}
-
 /* Overide Vendor CSS */
 
-.btn.disabled,
-.btn[disabled],
-fieldset[disabled] .btn {
-  pointer-events: none;
-  touch-action: none;
+.btn-link:hover {
+  color: var(--text-link-hover-color) !important;
 }
 
 .multiSelect.inlineBlock button {
   margin: 0;
 }
 
-.nav-tabs > li.active > a {
-  border-top: 0px;
-  border-left: 0px;
-  border-right: 0px;
-  border-bottom: 3px solid red;
-}
-
 .label-default {
   line-height: 11px;
+}
+
+/* Code Script Style */
+.code-script {
+  background-color: var(--bg-code-script-color);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding: 5px;
 }

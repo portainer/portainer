@@ -5,11 +5,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
-	log "github.com/sirupsen/logrus"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 type StackAuthorMissingErr struct {
@@ -24,8 +25,7 @@ func (e *StackAuthorMissingErr) Error() string {
 // RedeployWhenChanged pull and redeploy the stack when git repo changed
 // Stack will always be redeployed if force deployment is set to true
 func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) error {
-	logger := log.WithFields(log.Fields{"stackID": stackID})
-	logger.Debug("redeploying stack")
+	log.Debug().Int("stack_id", int(stackID)).Msg("redeploying stack")
 
 	stack, err := datastore.Stack().Stack(stackID)
 	if err != nil {
@@ -43,7 +43,13 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 	user, err := datastore.User().UserByUsername(author)
 	if err != nil {
-		logger.WithFields(log.Fields{"author": author, "stack": stack.Name, "endpointID": stack.EndpointID}).Warn("cannot autoupdate a stack, stack author user is missing")
+		log.Warn().
+			Int("stack_id", int(stackID)).
+			Str("author", author).
+			Str("stack", stack.Name).
+			Int("endpoint_id", int(stack.EndpointID)).
+			Msg("cannot autoupdate a stack, stack author user is missing")
+
 		return &StackAuthorMissingErr{int(stack.ID), author}
 	}
 
@@ -89,17 +95,20 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 	switch stack.Type {
 	case portainer.DockerComposeStack:
-		err := deployer.DeployComposeStack(stack, endpoint, registries, false)
+		err := deployer.DeployComposeStack(stack, endpoint, registries, true, false)
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
 		}
 	case portainer.DockerSwarmStack:
-		err := deployer.DeploySwarmStack(stack, endpoint, registries, true)
+		err := deployer.DeploySwarmStack(stack, endpoint, registries, true, true)
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
 		}
 	case portainer.KubernetesStack:
-		logger.Debugf("deploying a kube app")
+		log.Debug().
+			Int("stack_id", int(stackID)).
+			Msg("deploying a kube app")
+
 		err := deployer.DeployKubernetesStack(stack, endpoint, user)
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a kubternetes app stack %v", stackID)

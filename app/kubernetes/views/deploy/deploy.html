@@ -41,14 +41,14 @@
                   </div>
                 </div>
                 <div class="form-group" ng-if="!ctrl.formValues.Namespace">
-                  <div class="col-sm-12 small text-muted">
+                  <div class="col-sm-12 small text-warning">
                     <pr-icon icon="'alert-triangle'" feather="true" mode="'warning'"></pr-icon>
                     You do not have access to any namespace. Contact your administrator to get access to a namespace.
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label for="stack_name" class="col-lg-2 col-sm-3 control-label text-left">Name</label>
+                  <label for="stack_name" class="col-lg-2 col-sm-3 control-label text-left required">Name</label>
                   <div class="col-sm-8">
                     <input type="text" class="form-control" ng-model="ctrl.formValues.StackName" id="stack_name" placeholder="my-app" auto-focus />
                   </div>
@@ -117,10 +117,12 @@
                   >
                     <editor-description>
                       <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
-                        <p>
+                        <p class="vertical-center">
                           <pr-icon icon="'alert-circle'" mode="'warning'" feather="true"></pr-icon>
-                          Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
-                          not all the Compose format options are supported by Kompose at the moment.
+                          <span>
+                            Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary
+                            that not all the Compose format options are supported by Kompose at the moment.
+                          </span>
                         </p>
                         <p>
                           You can get more information about Compose file format in the
@@ -128,8 +130,8 @@
                         </p>
                       </span>
                       <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
-                        <p>
-                          <pr-icon icon="'alert-circle'" mode="'primary'" feather="true"></pr-icon>
+                        <p class="vertical-center">
+                          <pr-icon icon="'info'" mode="'primary'" feather="true"></pr-icon>
                           This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
                         </p>
                         <p>
@@ -149,7 +151,7 @@
                     <span class="col-sm-12 text-muted small"> Indicate the URL to the manifest. </span>
                   </div>
                   <div class="form-group">
-                    <label for="manifest_url" class="col-sm-3 col-lg-2 control-label text-left">URL</label>
+                    <label for="manifest_url" class="col-sm-3 col-lg-2 control-label text-left required">URL</label>
                     <div class="col-sm-8">
                       <input
                         type="text"
@@ -170,7 +172,7 @@
                   <div class="col-sm-12">
                     <button
                       type="button"
-                      class="btn btn-primary btn-sm"
+                      class="btn btn-primary btn-sm !ml-0"
                       ng-disabled="!deploymentForm.$valid ||ctrl.disableDeploy()"
                       ng-click="ctrl.deploy()"
                       button-spinner="ctrl.state.actionInProgress"

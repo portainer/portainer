@@ -4,9 +4,11 @@ import { Environment } from '@/portainer/environments/types';
 import { useCreateEdgeAgentEnvironmentMutation } from '@/portainer/environments/queries/useCreateEnvironmentMutation';
 import { baseHref } from '@/portainer/helpers/pathHelper';
 import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
+import { useCreateEdgeDeviceParam } from '@/react/portainer/environments/wizard/hooks/useCreateEdgeDeviceParam';
 
 import { FormSection } from '@@/form-components/FormSection';
 import { LoadingButton } from '@@/buttons/LoadingButton';
+import { Icon } from '@@/Icon';
 
 import { MoreSettingsSection } from '../../MoreSettingsSection';
 import { Hardware } from '../../Hardware/Hardware';
@@ -24,6 +26,8 @@ interface Props {
 const initialValues = buildInitialValues();
 
 export function EdgeAgentForm({ onCreate, readonly, showGpus = false }: Props) {
+  const createEdgeDevice = useCreateEdgeDeviceParam();
+
   const createMutation = useCreateEdgeAgentEnvironmentMutation();
 
   return (
@@ -52,11 +56,15 @@ export function EdgeAgentForm({ onCreate, readonly, showGpus = false }: Props) {
             <div className="row">
               <div className="col-sm-12">
                 <LoadingButton
+                  className="vertical-center"
                   isLoading={createMutation.isLoading}
                   loadingText="Creating environment..."
                   disabled={!isValid}
                 >
-                  <i className="fa fa-plug space-right" />
+                  <Icon
+                    icon="svg-plug"
+                    className="icon icon-sm vertical-center"
+                  />
                   Create
                 </LoadingButton>
               </div>
@@ -68,11 +76,14 @@ export function EdgeAgentForm({ onCreate, readonly, showGpus = false }: Props) {
   );
 
   function handleSubmit(values: typeof initialValues) {
-    createMutation.mutate(values, {
-      onSuccess(environment) {
-        onCreate(environment);
-      },
-    });
+    createMutation.mutate(
+      { ...values, isEdgeDevice: createEdgeDevice },
+      {
+        onSuccess(environment) {
+          onCreate(environment);
+        },
+      }
+    );
   }
 }
 

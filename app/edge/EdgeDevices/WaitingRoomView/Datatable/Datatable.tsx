@@ -109,19 +109,22 @@ export function DataTable({
     <div className="row">
       <div className="col-sm-12">
         <Table.Container>
-          <Table.Title label="Edge Devices Waiting Room" icon="" />
-          <Table.Actions>
-            <Button
-              onClick={() =>
-                handleAssociateDevice(selectedFlatRows.map((r) => r.original))
-              }
-              disabled={selectedFlatRows.length === 0}
-            >
-              Associate Device
-            </Button>
-          </Table.Actions>
-
-          <SearchBar onChange={handleSearchBarChange} value={searchBarValue} />
+          <Table.Title label="Edge Devices Waiting Room" icon="">
+            <SearchBar
+              onChange={handleSearchBarChange}
+              value={searchBarValue}
+            />
+            <Table.Actions>
+              <Button
+                onClick={() =>
+                  handleAssociateDevice(selectedFlatRows.map((r) => r.original))
+                }
+                disabled={selectedFlatRows.length === 0}
+              >
+                Associate Device
+              </Button>
+            </Table.Actions>
+          </Table.Title>
 
           <Table
             className={tableProps.className}
@@ -204,7 +207,7 @@ export function DataTable({
       devices.map((d) => d.Id),
       {
         onSuccess() {
-          notifySuccess('Edge devices associated successfully');
+          notifySuccess('Success', 'Edge devices associated successfully');
         },
       }
     );

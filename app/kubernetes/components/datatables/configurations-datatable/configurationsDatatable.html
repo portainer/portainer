@@ -3,9 +3,11 @@
     <rd-widget-body classes="no-padding">
       <!-- table title and action menu -->
       <div class="toolBar !flex-col gap-1">
-        <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
+        <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !px-0 !py-1 w-full">
           <div class="toolBarTitle">
-            <pr-icon icon="'lock'" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+            <div class="widget-icon space-right">
+              <pr-icon icon="'lock'" feather="true"></pr-icon>
+            </div>
             ConfigMaps & Secrets
           </div>
           <div class="searchBar vertical-center w-72 !mr-0">
@@ -73,7 +75,7 @@
                           <option value="300">5min</option>
                         </select>
                         <span>
-                          <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none"></i>
+                          <pr-icon id="refreshRateChange" icon="'check'" feather="true" mode="'success'" size="'sm'"></pr-icon>
                         </span>
                       </div>
                     </div>
@@ -88,7 +90,7 @@
         </div>
         <div ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem" class="flex flex-row w-full">
           <span class="small text-muted mt-1 vertical-center">
-            <pr-icon icon="'info'" feather="true" class-name="'!mb-0.5'" mode="'primary'"></pr-icon>
+            <pr-icon icon="'info'" feather="true" mode="'primary'" class="vertical-center"></pr-icon>
             <div> System resources are hidden, this can be changed in the table settings. </div>
           </span>
         </div>
@@ -123,11 +125,11 @@
               </th>
               <th>
                 <table-column-header
-                  col-title="'Type'"
+                  col-title="'Kind'"
                   can-sort="true"
-                  is-sorted="$ctrl.state.orderBy === 'Type'"
-                  is-sorted-desc="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"
-                  ng-click="$ctrl.changeOrderBy('Type')"
+                  is-sorted="$ctrl.state.orderBy === 'Kind'"
+                  is-sorted-desc="$ctrl.state.orderBy === 'Kind' && $ctrl.state.reverseOrder"
+                  ng-click="$ctrl.changeOrderBy('Kind')"
                 ></table-column-header>
               </th>
               <th>
@@ -158,7 +160,7 @@
               <td>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.Namespace })">{{ item.Namespace }}</a>
               </td>
-              <td>{{ item.Type | kubernetesConfigurationTypeText }}</td>
+              <td>{{ item.Kind | kubernetesConfigurationKindText }}</td>
               <td>{{ item.CreationDate | getisodate }} {{ item.ConfigurationOwner ? 'by ' + item.ConfigurationOwner : '' }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

@@ -4,10 +4,12 @@
     <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap !p-0 w-full">
       <!-- title -->
       <div class="toolBarTitle vertical-center">
-        <pr-icon icon="'repeat'" feather="true" class-name="'icon-nested-blue'" mode="'primary'"></pr-icon>
+        <div class="widget-icon space-right">
+          <pr-icon icon="'svg-dataflow'" class-name="'[&>*]:mr-0.5'"></pr-icon>
+        </div>
         Port mappings
       </div>
-      <div class="searchBar vertical-center">
+      <div class="searchBar vertical-center !mr-0 min-w-[300px]">
         <pr-icon icon="'search'" feather="true" class-name="'icon !h-3'"></pr-icon>
         <input
           type="text"
@@ -75,8 +77,8 @@
     </div>
     <!-- info text -->
     <div class="flex flex-row w-full">
-      <span class="small text-muted mt-1" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
-        <pr-icon icon="'info'" feather="true" class-name="'icon'"></pr-icon>
+      <span class="small text-muted mt-1 vertical-center" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+        <pr-icon icon="'info'" feather="true" mode="'primary'"></pr-icon>
         System resources are hidden, this can be changed in the table settings.
       </span>
     </div>
@@ -160,7 +162,7 @@
               </span>
             </span>
             <!-- Internal -->
-            <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP"> <i class="fa fa-list-alt mr-0.5" aria-hidden="true"></i> ClusterIP </span>
+            <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP"> <pr-icon icon="'list'" feather="true"></pr-icon> ClusterIP </span>
             <!-- Cluster -->
             <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.NODE_PORT"> <pr-icon icon="'list'" feather="true" class-name="'icon'"></pr-icon> NodePort </span>
           </td>

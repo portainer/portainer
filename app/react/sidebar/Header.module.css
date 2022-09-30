@@ -1,0 +1,9 @@
+.logo {
+  display: inline;
+  max-height: 55px;
+  max-width: min(100%, 230px);
+}
+
+.collapseBtn:hover {
+  background-color: var(--bg-btn-default-hover-color);
+}

@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
+import { Briefcase } from 'react-feather';
 
 import './BEFeatureIndicator.css';
 
@@ -24,19 +25,16 @@ export function BEFeatureIndicator({
   if (!limitedToBE) {
     return null;
   }
-
   return (
     <a
-      className={clsx('be-indicator', className)}
+      className={clsx('be-indicator vertical-center', className)}
       href={url}
       target="_blank"
       rel="noopener noreferrer"
     >
       {children}
-      {showIcon && (
-        <i className="fas fa-briefcase space-right be-indicator-icon" />
-      )}
-      <span className="be-indicator-label break-words">
+      {showIcon && <Briefcase className="icon icon-sm vertical-center" />}
+      <span className="be-indicator-label break-words space-left">
         Business Edition Feature
       </span>
     </a>

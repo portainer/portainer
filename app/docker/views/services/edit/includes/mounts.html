@@ -2,8 +2,8 @@
   <rd-widget>
     <rd-widget-header icon="list" feather-icon="true" title-text="Mounts">
       <div class="nopadding" authorization="DockerServiceUpdate">
-        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addMount(service)" ng-disabled="isUpdating">
-          <pr-icon icon="'plus'" mode="'alt'" feather="true"></pr-icon> mount
+        <a class="btn btn-secondary btn-sm pull-right" ng-click="isUpdating ||addMount(service)" ng-disabled="isUpdating">
+          <pr-icon icon="'plus'" feather="true"></pr-icon> mount
         </a>
       </div>
     </rd-widget-header>
@@ -40,9 +40,9 @@
               <select
                 class="form-control"
                 ng-model="mount.Source"
+                ng-change="updateMount(service, mount)"
                 ng-options="vol.Id as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30))  for vol in availableVolumes"
                 ng-if="mount.Type === 'volume'"
-                ng-change="updateMount(service, mount)"
                 disable-authorization="DockerServiceUpdate"
               >
                 <option selected disabled hidden value="">Select a volume</option>
@@ -57,7 +57,9 @@
                 ng-disabled="isUpdating || (!isAdmin && !allowBindMounts && mount.Type === 'bind')"
                 ng-if="mount.Type === 'bind'"
               />
-              <div class="col-sm-12 small" ng-show="!mount.Source"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Source is required. </div>
+              <div class="col-sm-12 small text-warning" ng-show="!mount.Source">
+                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Source is required.
+              </div>
             </td>
             <td>
               <input
@@ -69,15 +71,17 @@
                 ng-disabled="isUpdating"
                 disable-authorization="DockerServiceUpdate"
               />
-              <div class="col-sm-12 small" ng-show="!mount.Target"> <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target is required. </div>
+              <div class="col-sm-12 small text-warning" ng-show="!mount.Target">
+                <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> Target is required.
+              </div>
             </td>
             <td authorization="DockerServiceUpdate">
               <input type="checkbox" class="form-control" ng-model="mount.ReadOnly" ng-change="updateMount(service, mount)" ng-disabled="isUpdating" />
             </td>
             <td authorization="DockerServiceUpdate">
               <span class="input-group-btn">
-                <button class="btn btn-sm btn-light" type="button" ng-click="removeMount(service, $index)" ng-disabled="isUpdating">
-                  <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+                <button class="btn btn-dangerlight" type="button" ng-click="removeMount(service, $index)" ng-disabled="isUpdating">
+                  <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
                 </button>
               </span>
             </td>

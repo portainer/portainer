@@ -1,9 +1,9 @@
 import clsx from 'clsx';
-import { Home } from 'react-feather';
+import { Home, Box, Layers } from 'react-feather';
 
 import { useUser } from '@/portainer/hooks/useUser';
 import { useIsTeamLeader } from '@/portainer/users/queries';
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
 
 import styles from './Sidebar.module.css';
 import { EdgeComputeSidebar } from './EdgeComputeSidebar';
@@ -13,6 +13,7 @@ import { SidebarItem } from './SidebarItem';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { SidebarProvider } from './useSidebarState';
+import {SidebarSection } from './SidebarSection';
 
 export function Sidebar() {
   const { isAdmin, user } = useUser();
@@ -29,32 +30,41 @@ export function Sidebar() {
   return (
     /* in the future (when we remove r2a) this should wrap the whole app - to change root styles */
     <SidebarProvider>
-      <nav
-        className={clsx(
-          styles.root,
-          'p-5 flex flex-col be:bg-gray-11 bg-blue-10'
-        )}
-        aria-label="Main"
-      >
+      <nav className={clsx(styles.root, 'p-5 flex flex-col')} aria-label="Main">
         <Header logo={LogoURL} />
 
         {/* negative margin + padding -> scrollbar won't hide the content */}
         <div className="mt-6 overflow-y-auto flex-1 -mr-4 pr-4">
           <ul className="space-y-9">
-            <SidebarItem
-              to="portainer.home"
-              icon={Home}
-              label="Home"
-              data-cy="portainerSidebar-home"
-            />
+            <SidebarSection>
+              <SidebarItem
+                to="portainer.home"
+                icon={Home}
+                label="Home"
+                data-cy="portainerSidebar-home"
+              />
+
+              <SidebarItem
+                  to="portainer.scenes"
+                  icon={Box}
+                  label="Scenes"
+                  data-cy="portainerSidebar-scenes"
+              />
+
+              <SidebarItem
+                  to="portainer.namespaces"
+                  icon={Layers}
+                  label="Namespaces"
+                  data-cy="portainerSidebar-namespaces"
+              />
+
+            </SidebarSection>
 
             <EnvironmentSidebar />
 
             {isAdmin && EnableEdgeComputeFeatures && <EdgeComputeSidebar />}
 
-            {(isAdmin || isTeamLeader) && (
-              <SettingsSidebar isAdmin={isAdmin} isTeamLeader={isTeamLeader} />
-            )}
+            <SettingsSidebar isAdmin={isAdmin} isTeamLeader={isTeamLeader} />
           </ul>
         </div>
 

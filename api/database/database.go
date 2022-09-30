@@ -16,5 +16,6 @@ func NewDatabase(storeType, storePath string, encryptionKey []byte) (connection 
 			EncryptionKey: encryptionKey,
 		}, nil
 	}
-	return nil, fmt.Errorf("unknown storage database: %s", storeType)
+
+	return nil, fmt.Errorf("Unknown storage database: %s", storeType)
 }

@@ -5,6 +5,7 @@ import { FormControl } from '@@/form-components/FormControl';
 import { FormSectionTitle } from '@@/form-components/FormSectionTitle';
 import { Input } from '@@/form-components/Input';
 import { Button } from '@@/buttons';
+import { TextTip } from '@@/Tip/TextTip';
 
 const initialValues = {
   kubeConfig: '',
@@ -24,26 +25,22 @@ export function KubeConfigTeaserForm() {
 
           <div className="form-group">
             <div className="col-sm-12">
-              <span className="text-primary">
-                <i
-                  className="fa fa-exclamation-circle space-right"
-                  aria-hidden="true"
-                />
-              </span>
-              <span className="text-muted small">
-                Import the
-                <a
-                  href="https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/"
-                  target="_blank"
-                  className="space-right space-left"
-                  rel="noreferrer"
-                >
-                  kubeconfig file
-                </a>
-                of an existing Kubernetes cluster located on-premise or on a
-                cloud platform. This will create a corresponding environment in
-                Portainer and install the agent on the cluster. Please ensure:
-              </span>
+              <TextTip color="blue">
+                <span className="text-muted">
+                  <a
+                    href="https://docs.portainer.io/start/install/agent/kubernetes/import"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mx-1"
+                  >
+                    Import the kubeconfig file
+                  </a>
+                  of an existing Kubernetes cluster located on-premise or on a
+                  cloud platform. This will create a corresponding environment
+                  in Portainer and install the agent on the cluster. Please
+                  ensure:
+                </span>
+              </TextTip>
             </div>
             <div className="col-sm-12 text-muted small">
               <ul className="p-2 pl-4">

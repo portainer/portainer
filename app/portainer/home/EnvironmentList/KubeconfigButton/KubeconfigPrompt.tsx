@@ -1,13 +1,17 @@
+import { X } from 'react-feather';
+import clsx from 'clsx';
 import { useState } from 'react';
 import { DialogOverlay } from '@reach/dialog';
 
 import * as kcService from '@/kubernetes/services/kubeconfig.service';
 import * as notifications from '@/portainer/services/notifications';
 import { EnvironmentType } from '@/portainer/environments/types';
-import { EnvironmentsQueryParams } from '@/portainer/environments/environment.service/index';
 import { usePaginationLimitState } from '@/portainer/hooks/usePaginationLimitState';
-import { useEnvironmentList } from '@/portainer/environments/queries/useEnvironmentList';
-import { usePublicSettings } from '@/portainer/settings/queries';
+import { usePublicSettings } from '@/react/portainer/settings/queries';
+import {
+  Query,
+  useEnvironmentList,
+} from '@/portainer/environments/queries/useEnvironmentList';
 
 import { PaginationControls } from '@@/PaginationControls';
 import { Checkbox } from '@@/form-components/Checkbox';
@@ -18,7 +22,7 @@ import styles from './KubeconfigPrompt.module.css';
 import '@reach/dialog/styles.css';
 
 export interface KubeconfigPromptProps {
-  envQueryParams: EnvironmentsQueryParams;
+  envQueryParams: Query;
   onClose: () => void;
 }
 const storageKey = 'home_endpoints';
@@ -57,7 +61,7 @@ export function KubeconfigPrompt({
         <div className="modal-content">
           <div className="modal-header">
             <button type="button" className="close" onClick={onClose}>
-              ×
+              <X />
             </button>
             <h5 className="modal-title">Download kubeconfig file</h5>
           </div>
@@ -72,16 +76,24 @@ export function KubeconfigPrompt({
               </div>
             </form>
             <br />
-            <Checkbox
-              id="settings-container-truncate-nae"
-              label="Select all (in this page)"
-              checked={isAllPageSelected}
-              onChange={handleSelectAll}
-            />
+            <div className="h-8 flex items-center">
+              <Checkbox
+                id="settings-container-truncate-name"
+                label="Select all (in this page)"
+                checked={isAllPageSelected}
+                onChange={handleSelectAll}
+              />
+            </div>
             <div className="datatable">
               <div className="bootbox-checkbox-list">
                 {environments.map((env) => (
-                  <div className={styles.checkbox}>
+                  <div
+                    key={env.Id}
+                    className={clsx(
+                      styles.checkbox,
+                      'h-8 flex items-center pt-1'
+                    )}
+                  >
                     <Checkbox
                       id={`${env.Id}`}
                       label={`${env.Name} (${env.URL})`}
@@ -93,7 +105,7 @@ export function KubeconfigPrompt({
                   </div>
                 ))}
               </div>
-              <div className="footer">
+              <div className="pt-3 flex justify-end w-full">
                 <PaginationControls
                   showAll={totalCount <= 100}
                   page={page}
@@ -109,7 +121,9 @@ export function KubeconfigPrompt({
             <Button onClick={onClose} color="default">
               Cancel
             </Button>
-            <Button onClick={handleDownload}>Download File</Button>
+            <Button onClick={handleDownload} disabled={selectionSize < 1}>
+              Download File
+            </Button>
           </div>
         </div>
       </div>
@@ -141,7 +155,7 @@ export function KubeconfigPrompt({
 }
 
 export function expiryMessage(expiry: string) {
-  const prefix = 'Kubeconfig file will';
+  const prefix = 'The kubeconfig file will';
   switch (expiry) {
     case '24h':
       return `${prefix} expire in 1 day.`;

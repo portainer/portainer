@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -68,10 +69,12 @@ func (service *Service) Schedules() ([]portainer.Schedule, error) {
 		func(obj interface{}) (interface{}, error) {
 			schedule, ok := obj.(*portainer.Schedule)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Schedule object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Schedule object")
 				return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
 			}
+
 			schedules = append(schedules, *schedule)
+
 			return &portainer.Schedule{}, nil
 		})
 
@@ -89,12 +92,14 @@ func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portain
 		func(obj interface{}) (interface{}, error) {
 			schedule, ok := obj.(*portainer.Schedule)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to Schedule object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Schedule object")
 				return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
 			}
+
 			if schedule.JobType == jobType {
 				schedules = append(schedules, *schedule)
 			}
+
 			return &portainer.Schedule{}, nil
 		})
 
@@ -103,7 +108,7 @@ func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portain
 
 // Create assign an ID to a new schedule and saves it.
 func (service *Service) CreateSchedule(schedule *portainer.Schedule) error {
-	return service.connection.CreateObjectWithSetSequence(BucketName, int(schedule.ID), schedule)
+	return service.connection.CreateObjectWithId(BucketName, int(schedule.ID), schedule)
 }
 
 // GetNextIdentifier returns the next identifier for a schedule.

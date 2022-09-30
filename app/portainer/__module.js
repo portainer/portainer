@@ -6,9 +6,6 @@ import settingsModule from './settings';
 import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
 import servicesModule from './services';
-import teamsModule from './teams';
-import homeModule from './home';
-import { accessControlModule } from './access-control';
 import { reactModule } from './react';
 import { sidebarModule } from './react/views/sidebar';
 import environmentsModule from './environments';
@@ -31,7 +28,6 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
 
 angular
   .module('portainer.app', [
-    homeModule,
     'portainer.oauth',
     'portainer.rbac',
     componentsModule,
@@ -40,8 +36,6 @@ angular
     userActivityModule,
     'portainer.shared.datatable',
     servicesModule,
-    teamsModule,
-    accessControlModule,
     reactModule,
     sidebarModule,
     environmentsModule,
@@ -172,8 +166,7 @@ angular
         url: '/endpoints',
         views: {
           'content@': {
-            templateUrl: './views/endpoints/endpoints.html',
-            controller: 'EndpointsController',
+            component: 'endpointsView',
           },
         },
       };
@@ -424,25 +417,47 @@ angular
           },
         },
       };
-
-      var teams = {
-        name: 'portainer.teams',
-        url: '/teams',
+	  
+	  var scenes = {
+        name: 'portainer.scenes',
+        url: '/scenes',
         views: {
           'content@': {
-            templateUrl: './views/teams/teams.html',
-            controller: 'TeamsController',
+            templateUrl: './views/scenes/scenes.html',
+            controller: 'ScenesController',
           },
         },
       };
 
-      var team = {
-        name: 'portainer.teams.team',
+      let sceneCreate = {
+        name: 'portainer.scenes.create',
+        url: '/create',
+        views: {
+          'content@': {
+            templateUrl: './views/scenes/create/createscene.html',
+            controller: 'CreateSceneController',
+          },
+        },
+      };
+
+      let scene = {
+        name: 'portainer.scenes.scene',
         url: '/:id',
         views: {
           'content@': {
-            templateUrl: './views/teams/edit/team.html',
-            controller: 'TeamController',
+            templateUrl: './views/scenes/edit/editscene.html',
+            controller: 'EditSceneController',
+          },
+        },
+      };
+
+      var namespaces = {
+        name: 'portainer.namespaces',
+        url: '/namespaces',
+        views: {
+          'content@': {
+            templateUrl: './views/namespaces/namespaces.html',
+            controller: 'NamespacesController',
           },
         },
       };
@@ -478,8 +493,11 @@ angular
       $stateRegistryProvider.register(tags);
       $stateRegistryProvider.register(users);
       $stateRegistryProvider.register(user);
-      $stateRegistryProvider.register(teams);
-      $stateRegistryProvider.register(team);
+	  
+	  $stateRegistryProvider.register(scenes);
+      $stateRegistryProvider.register(sceneCreate);
+      $stateRegistryProvider.register(scene);
+      $stateRegistryProvider.register(namespaces);
     },
   ]);
 

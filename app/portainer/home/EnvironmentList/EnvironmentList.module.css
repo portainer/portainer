@@ -9,7 +9,6 @@
 
 .refresh-environments-button {
   margin-left: 0 !important;
-  padding: 8px 15px;
 }
 
 .filter-container {
@@ -46,10 +45,12 @@
 }
 
 .clear-button {
-  display: inline-block;
+  white-space: nowrap;
+
   border: 0px;
-  padding: 10px;
-  height: 60px;
+  padding: 5px 10px;
+
+  background: transparent;
 }
 
 .action-button {
@@ -71,7 +72,6 @@
 .filterSearchbar {
   display: inline-block;
   width: 100%;
-  padding-left: 10px;
 }
 
 .filterSearchbar input[type='text'] {

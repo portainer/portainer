@@ -8,7 +8,7 @@
     </div>
     <!-- info message -->
     <div class="form-group" ng-show="formValues.Configs.$invalid" style="margin-bottom: 0px">
-      <div class="col-sm-12 small" style="padding-left: 35px; padding-top: 20px">
+      <div class="col-sm-12 small text-warning" style="padding-left: 35px; padding-top: 20px">
         <pr-icon icon="'alert-triangle'" mode="'warning'" feather="true"></pr-icon> {{ formValues.Configs.$error }}
       </div>
     </div>
@@ -16,7 +16,7 @@
       <div ng-repeat="config in formValues.Configs" style="margin-top: 2px">
         <div class="input-group col-sm-4 input-group-sm">
           <span class="input-group-addon">config</span>
-          <select class="form-control" ng-model="config.model" ng-change="checkIfConfigDuplicated()" ng-options="config.Name for config in availableConfigs | orderBy: 'Name'">
+          <select class="form-control" ng-change="checkIfConfigDuplicated()" ng-model="config.model" ng-options="config.Name for config in availableConfigs | orderBy: 'Name'">
             <option value="" selected="selected">Select a config</option>
           </select>
         </div>
@@ -24,8 +24,8 @@
           <span class="input-group-addon">Path in container</span>
           <input class="form-control" ng-model="config.FileName" placeholder="e.g. /path/in/container" />
         </div>
-        <button class="btn btn-sm btn-light" type="button" ng-click="removeConfig($index)">
-          <pr-icon icon="'trash-2'" feather="true" class-name="'icon-secondary icon-md'"></pr-icon>
+        <button class="btn btn-dangerlight" type="button" ng-click="removeConfig($index)">
+          <pr-icon icon="'trash-2'" feather="true" size="'md'"></pr-icon>
         </button>
       </div>
     </div>

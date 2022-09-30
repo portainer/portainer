@@ -9,7 +9,7 @@ import {
   ContainerInstanceFormValues,
   ResourceGroup,
 } from '@/react/azure/types';
-import { applyResourceControl } from '@/portainer/access-control/access-control.service';
+import { applyResourceControl } from '@/react/portainer/access-control/access-control.service';
 
 import { getSubscriptionResourceGroups } from './utils';
 

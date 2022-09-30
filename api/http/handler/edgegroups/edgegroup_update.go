@@ -4,12 +4,14 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/endpointutils"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type edgeGroupUpdatePayload struct {
@@ -50,30 +52,30 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge group identifier route variable", err}
+		return httperror.BadRequest("Invalid Edge group identifier route variable", err)
 	}
 
 	var payload edgeGroupUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return httperror.BadRequest("Invalid request payload", err)
 	}
 
 	edgeGroup, err := handler.DataStore.EdgeGroup().EdgeGroup(portainer.EdgeGroupID(edgeGroupID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge group with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find an Edge group with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge group with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find an Edge group with the specified identifier inside the database", err)
 	}
 
 	if payload.Name != "" {
 		edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge groups from the database", err}
+			return httperror.InternalServerError("Unable to retrieve Edge groups from the database", err)
 		}
 		for _, edgeGroup := range edgeGroups {
 			if edgeGroup.Name == payload.Name && edgeGroup.ID != portainer.EdgeGroupID(edgeGroupID) {
-				return &httperror.HandlerError{http.StatusBadRequest, "Edge group name must be unique", errors.New("Edge group name must be unique")}
+				return httperror.BadRequest("Edge group name must be unique", errors.New("Edge group name must be unique"))
 			}
 		}
 
@@ -81,12 +83,12 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from database", err}
+		return httperror.InternalServerError("Unable to retrieve environments from database", err)
 	}
 
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from database", err}
+		return httperror.InternalServerError("Unable to retrieve environment groups from database", err)
 	}
 
 	oldRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
@@ -99,10 +101,10 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		for _, endpointID := range payload.Endpoints {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment from the database", err}
+				return httperror.InternalServerError("Unable to retrieve environment from the database", err)
 			}
 
-			if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+			if endpointutils.IsEdgeEndpoint(endpoint) {
 				endpointIDs = append(endpointIDs, endpoint.ID)
 			}
 		}
@@ -115,7 +117,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.DataStore.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Edge group changes inside the database", err}
+		return httperror.InternalServerError("Unable to persist Edge group changes inside the database", err)
 	}
 
 	newRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
@@ -124,7 +126,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	for _, endpointID := range endpointsToUpdate {
 		err = handler.updateEndpoint(endpointID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Environment relation changes inside the database", err}
+			return httperror.InternalServerError("Unable to persist Environment relation changes inside the database", err)
 		}
 	}
 

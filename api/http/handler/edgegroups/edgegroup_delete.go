@@ -24,34 +24,33 @@ import (
 func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge group identifier route variable", err}
+		return httperror.BadRequest("Invalid Edge group identifier route variable", err)
 	}
 
 	_, err = handler.DataStore.EdgeGroup().EdgeGroup(portainer.EdgeGroupID(edgeGroupID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge group with the specified identifier inside the database", err}
+		return httperror.NotFound("Unable to find an Edge group with the specified identifier inside the database", err)
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge group with the specified identifier inside the database", err}
+		return httperror.InternalServerError("Unable to find an Edge group with the specified identifier inside the database", err)
 	}
 
 	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge stacks from the database", err}
+		return httperror.InternalServerError("Unable to retrieve Edge stacks from the database", err)
 	}
 
 	for _, edgeStack := range edgeStacks {
 		for _, groupID := range edgeStack.EdgeGroups {
 			if groupID == portainer.EdgeGroupID(edgeGroupID) {
-				return &httperror.HandlerError{http.StatusForbidden, "Edge group is used by an Edge stack", errors.New("Edge group is used by an Edge stack")}
+				return httperror.Forbidden("Edge group is used by an Edge stack", errors.New("Edge group is used by an Edge stack"))
 			}
 		}
 	}
 
 	err = handler.DataStore.EdgeGroup().DeleteEdgeGroup(portainer.EdgeGroupID(edgeGroupID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the Edge group from the database", err}
+		return httperror.InternalServerError("Unable to remove the Edge group from the database", err)
 	}
 
 	return response.Empty(w)
-
 }

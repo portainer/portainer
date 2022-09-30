@@ -3,7 +3,10 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle vertical-center">
-          <pr-icon icon="$ctrl.titleIcon" feather="true" class-name="'icon-nested-blue'"></pr-icon>
+          <div class="widget-icon space-right">
+            <pr-icon icon="$ctrl.titleIcon" feather="true"></pr-icon>
+          </div>
+
           {{ $ctrl.titleText }}
         </div>
         <div class="searchBar vertical-center">
@@ -101,7 +104,7 @@
                   {{ path.Host ? path.Host : path.IP }}{{ path.Path }}
                 </a>
                 <span ng-if="path.ApplicationName !== '-'">
-                  <i class="fas fa-long-arrow-alt-right" style="margin: 2px"></i>
+                  <pr-icon icon="'svg-arrowright'" class-name="'m-0.5'"></pr-icon>
                   <a ui-sref="kubernetes.applications.application({ name: path.ApplicationName, namespace: item.Namespace })">{{ path.ApplicationName }}</a>
                 </span>
                 <span class="label label-warning image-tag label-margins" ng-if="path.ApplicationName === '-'">unused</span>

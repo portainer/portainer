@@ -34,7 +34,7 @@ export function Head({
   const { isOpen } = useSidebarState();
   const anchorProps = useSrefActive(
     to,
-    'bg-blue-8 be:bg-gray-8',
+    'bg-blue-8 be:bg-gray-8 th-dark:bg-gray-true-8',
     params,
     options,
     ignorePaths
@@ -48,7 +48,7 @@ export function Head({
         anchorProps.className,
         'text-inherit no-underline hover:no-underline hover:text-inherit focus:no-underline focus:text-inherit',
         'w-full flex-1 rounded-md flex items-center h-8 space-x-4 text-sm',
-        'hover:bg-blue-9 be:hover:bg-gray-9 transition-colors duration-200',
+        'hover:bg-blue-9 th-dark:hover:bg-gray-true-9 be:hover:bg-gray-9 transition-colors duration-200',
         {
           'px-3 justify-start w-full': isOpen,
           'justify-center w-8': !isOpen,

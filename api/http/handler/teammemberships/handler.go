@@ -1,11 +1,11 @@
 package teammemberships
 
 import (
+	"net/http"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
-
-	"net/http"
 
 	"github.com/gorilla/mux"
 )

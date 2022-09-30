@@ -1,4 +1,4 @@
-import { ResourceControlType } from '@/portainer/access-control/types';
+import { ResourceControlType } from '@/react/portainer/access-control/types';
 
 angular.module('portainer.docker').controller('ConfigController', [
   '$scope',
@@ -16,7 +16,7 @@ angular.module('portainer.docker').controller('ConfigController', [
     $scope.removeConfig = function removeConfig(configId) {
       ConfigService.remove(configId)
         .then(function success() {
-          Notifications.success('Config successfully removed');
+          Notifications.success('Success', 'Configuration successfully removed');
           $state.go('docker.configs', {});
         })
         .catch(function error(err) {

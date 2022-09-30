@@ -2,13 +2,12 @@ package cli
 
 import (
 	"fmt"
-	cmap "github.com/orcaman/concurrent-map"
 	"net/http"
 	"strconv"
 	"sync"
 
+	cmap "github.com/orcaman/concurrent-map"
 	"github.com/pkg/errors"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"k8s.io/client-go/kubernetes"

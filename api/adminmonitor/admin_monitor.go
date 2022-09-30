@@ -2,7 +2,6 @@ package adminmonitor
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -11,9 +10,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
-)
 
-var logFatalf = log.Fatalf
+	"github.com/rs/zerolog/log"
+)
 
 const RedirectReasonAdminInitTimeout string = "AdminInitTimeout"
 
@@ -26,7 +25,7 @@ type Monitor struct {
 	adminInitDisabled bool
 }
 
-// New creates a monitor that when started will wait for the timeout duration and then sends the timeout signal to disable the application
+// New creates a monitor that when started will wait for the timeout duration and then shutdown the application unless it has been initialized.
 func New(timeout time.Duration, datastore dataservices.DataStore, shutdownCtx context.Context) *Monitor {
 	return &Monitor{
 		timeout:           timeout,
@@ -49,24 +48,28 @@ func (m *Monitor) Start() {
 	m.cancellationFunc = cancellationFunc
 
 	go func() {
-		log.Println("[DEBUG] [internal,init] [message: start initialization monitor ]")
+		log.Debug().Msg("start initialization monitor")
+
 		select {
 		case <-time.After(m.timeout):
 			initialized, err := m.WasInitialized()
 			if err != nil {
-				logFatalf("%s", err)
+				log.Fatal().Err(err).Msg("")
 			}
+
 			if !initialized {
-				log.Println("[INFO] [internal,init] The Portainer instance timed out for security purposes. To re-enable your Portainer instance, you will need to restart Portainer")
+				log.Info().Msg("the Portainer instance timed out for security purposes, to re-enable your Portainer instance, you will need to restart Portainer")
+
 				m.mu.Lock()
 				defer m.mu.Unlock()
+
 				m.adminInitDisabled = true
 				return
 			}
 		case <-cancellationCtx.Done():
-			log.Println("[DEBUG] [internal,init] [message: canceling initialization monitor]")
+			log.Debug().Msg("canceling initialization monitor")
 		case <-m.shutdownCtx.Done():
-			log.Println("[DEBUG] [internal,init] [message: shutting down initialization monitor]")
+			log.Debug().Msg("shutting down initialization monitor")
 		}
 	}()
 }
@@ -102,12 +105,10 @@ func (m *Monitor) WasInstanceDisabled() bool {
 // Otherwise, it will pass through the request to next
 func (m *Monitor) WithRedirect(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if m.WasInstanceDisabled() {
-			if strings.HasPrefix(r.RequestURI, "/api") && r.RequestURI != "/api/status" && r.RequestURI != "/api/settings/public" {
-				w.Header().Set("redirect-reason", RedirectReasonAdminInitTimeout)
-				httperror.WriteError(w, http.StatusSeeOther, "Administrator initialization timeout", nil)
-				return
-			}
+		if m.WasInstanceDisabled() && strings.HasPrefix(r.RequestURI, "/api") && r.RequestURI != "/api/status" && r.RequestURI != "/api/settings/public" {
+			w.Header().Set("redirect-reason", RedirectReasonAdminInitTimeout)
+			httperror.WriteError(w, http.StatusSeeOther, "Administrator initialization timeout", nil)
+			return
 		}
 
 		next.ServeHTTP(w, r)

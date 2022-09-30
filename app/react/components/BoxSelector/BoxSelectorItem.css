@@ -1,15 +1,16 @@
 .boxselector_wrapper > div,
 .box-selector-item {
-  --selected-item-color: var(--ui-blue-6);
   flex: 1;
 }
 
 .boxselector_wrapper .boxselector_header,
 .box-selector-item .boxselector_header {
   font-size: 18px;
+  margin-right: 20px;
   margin-bottom: 5px;
   font-weight: bold;
   user-select: none;
+  color: var(--text-boxselector-header);
 }
 
 .boxselector_header .fa,
@@ -22,38 +23,42 @@
   display: none;
 }
 
-.boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
-.box-selector-item input[type='radio']:not(:disabled) ~ label {
-  cursor: pointer;
-  background-color: var(--bg-boxselector-wrapper-disabled-color);
+.boxselector_wrapper label,
+.box-selector-item label {
+  @apply border border-solid;
+  @apply bg-gray-2 border-gray-5 text-black;
+  @apply th-dark:bg-gray-iron-10 th-dark:border-gray-neutral-8 th-dark:text-white;
+
+  font-weight: normal;
+  font-size: 12px;
+  display: block;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: left;
+  box-shadow: var(--shadow-boxselector-color);
+  position: relative;
+
   text-align: left;
   height: 100%;
 }
 
-.boxselector_wrapper input[type='radio']:not(:disabled):hover ~ label:hover,
-.box-selector-item input[type='radio']:not(:disabled):hover ~ label:hover {
+/* not disabled */
+.boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
+.box-selector-item input[type='radio']:not(:disabled) ~ label {
+  background-color: var(--bg-boxselector-color);
+
+  box-shadow: none;
   cursor: pointer;
 }
 
-.boxselector_wrapper label,
-.box-selector-item label {
-  font-weight: normal;
-  font-size: 12px;
-  display: block;
-  background: var(--bg-boxselector-color);
-  border: 1px solid var(--border-boxselector-color);
-  border-radius: 2px;
-  padding: 10px 10px 0 10px;
-  text-align: left;
-  box-shadow: var(--shadow-boxselector-color);
-  position: relative;
-}
-
+/* disabled */
 .box-selector-item input:disabled + label,
 .boxselector_wrapper label.boxselector_disabled {
-  background: var(--bg-boxselector-disabled-color) !important;
-  border-color: #787878;
-  color: #787878;
+  @apply !bg-white;
+  @apply th-dark:!bg-gray-7;
+  @apply th-highcontrast:!bg-black;
+  filter: opacity(0.3) grayscale(1);
+
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -63,30 +68,20 @@
   pointer-events: auto;
 }
 
+/* checked */
 .boxselector_wrapper input[type='radio']:checked + label,
 .box-selector-item input[type='radio']:checked + label {
-  color: white;
+  @apply bg-blue-2 border-blue-6;
+  @apply th-dark:bg-blue-10 th-dark:border-blue-7;
+  @apply th-highcontrast:bg-blue-10 th-highcontrast:border-blue-7;
+
   background-image: url(../../../assets/ico/checked.svg);
   background-repeat: no-repeat;
   background-position: right 15px top 15px;
-  border-color: var(--selected-item-color);
-}
 
-.box-selector-item input[type='radio']:checked:disabled + label {
-  color: #787878;
-}
-
-.boxselector_wrapper input[type='radio']:checked + label .box_selector_mask_icon {
-  color: var(--selected-item-color);
-}
-
-:root[theme='highcontrast'] .box_selector_mask_icon,
-:root[theme='dark'] .box_selector_mask_icon {
-  color: var(--bg-boxselector-wrapper-disabled-color);
-}
-
-.box_selector_mask_icon {
-  color: var(--bg-boxselector-color);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: none;
 }
 
 @media only screen and (max-width: 700px) {
@@ -95,50 +90,29 @@
   }
 }
 
-.box-selector-item.limited.business {
-  --selected-item-color: var(--BE-only);
-}
-
-.box-selector-item.limited.business label {
-  border-color: var(--BE-only);
-  border-width: 2px;
-}
-
-.box-selector-item .limited-icon {
-  position: absolute;
-  left: 1em;
-  top: calc(50% - 0.5em);
-  height: 1em;
-}
-
-@media (min-width: 992px) {
-  .box-selector-item .limited-icon {
-    left: 2em;
-  }
-}
-
-.box-selector-item.limited.business :checked + label {
-  background-color: initial;
-  color: initial;
+.box-selector-item.limited.business label,
+.box-selector-item.limited.business input[type='radio'] + label {
+  @apply border-warning-7 bg-warning-1 text-black;
+  @apply th-dark:bg-warning-8 th-dark:bg-opacity-10;
+  @apply th-highcontrast:bg-warning-8 th-highcontrast:bg-opacity-10;
 }
 
 .boxselector_img_container {
   width: 100%;
   margin-bottom: 20px;
   text-align: left;
-}
 
-.boxselector_img {
-  height: 48px;
-  width: 48px;
-  left: 5px;
+  line-height: 90px;
+  margin-bottom: 0;
 }
 
 .boxselector_icon,
 .boxselector_icon img {
-  color: var(--ui-blue-8);
   font-size: 90px;
-  display: block;
+}
+
+.boxselector_icon > svg {
+  margin-left: -5px;
 }
 
 .boxselector_header pr-icon {
@@ -149,11 +123,6 @@
   padding-left: 20px;
 }
 
-.boxselector_wrapper input[type='radio']:not(:disabled) ~ label,
-.box-selector-item input[type='radio']:not(:disabled) ~ label {
-  background-color: var(--ui-gray-2);
-}
-
 .boxselector_img_container {
   line-height: 90px;
   margin-bottom: 0;
@@ -161,4 +130,5 @@
 
 .box-selector-item p {
   margin-bottom: 0;
+  color: var(--text-boxselector-header);
 }

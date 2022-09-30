@@ -39,6 +39,22 @@ export class EdgeStackEndpointsDatatableController {
     this.onTextFilterChange = onTextFilterChange;
   }
 
+  getEndpointStatus(endpointId) {
+    return this.endpointsStatus[endpointId];
+  }
+
+  endpointStatusLabel(endpointId) {
+    const status = this.getEndpointStatus(endpointId);
+
+    return status ? this.statusMap[status.Type] : 'Pending';
+  }
+
+  endpointStatusError(endpointId) {
+    const status = this.getEndpointStatus(endpointId);
+
+    return status && status.Error ? status.Error : '-';
+  }
+
   $onInit() {
     this.setDefaults();
     this.prepareTableFromDataset();

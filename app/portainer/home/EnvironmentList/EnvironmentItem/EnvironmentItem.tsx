@@ -14,8 +14,8 @@ import {
   isEdgeEnvironment,
 } from '@/portainer/environments/utils';
 import type { TagId } from '@/portainer/tags/types';
-import { useIsAdmin } from '@/portainer/hooks/useUser';
 import { useTags } from '@/portainer/tags/queries';
+import { useUser } from '@/portainer/hooks/useUser';
 
 import { Icon } from '@@/Icon';
 import { Link } from '@@/Link';
@@ -34,7 +34,7 @@ interface Props {
 }
 
 export function EnvironmentItem({ environment, onClick, groupName }: Props) {
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useUser();
   const isEdge = isEdgeEnvironment(environment.Type);
 
   const snapshotTime = getSnapshotTime(environment);
@@ -46,12 +46,11 @@ export function EnvironmentItem({ environment, onClick, groupName }: Props) {
     <div className={styles.root}>
       <button
         type="button"
-        color="link"
         onClick={() => onClick(environment)}
         className={styles.wrapperButton}
       >
         <Link
-          className={clsx('blocklist-item', styles.item)}
+          className={clsx('blocklist-item no-link', styles.item)}
           to={route}
           params={{
             endpointId: environment.Id,

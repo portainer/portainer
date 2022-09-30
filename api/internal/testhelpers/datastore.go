@@ -12,6 +12,7 @@ type testDatastore struct {
 	customTemplate          dataservices.CustomTemplateService
 	edgeGroup               dataservices.EdgeGroupService
 	edgeJob                 dataservices.EdgeJobService
+	edgeUpdateSchedule      dataservices.EdgeUpdateScheduleService
 	edgeStack               dataservices.EdgeStackService
 	endpoint                dataservices.EndpointService
 	endpointGroup           dataservices.EndpointGroupService
@@ -24,6 +25,7 @@ type testDatastore struct {
 	role                    dataservices.RoleService
 	sslSettings             dataservices.SSLSettingsService
 	settings                dataservices.SettingsService
+	snapshot                dataservices.SnapshotService
 	stack                   dataservices.StackService
 	tag                     dataservices.TagService
 	teamMembership          dataservices.TeamMembershipService
@@ -47,6 +49,9 @@ func (d *testDatastore) EdgeJob() dataservices.EdgeJobService               { re
 func (d *testDatastore) EdgeStack() dataservices.EdgeStackService           { return d.edgeStack }
 func (d *testDatastore) Endpoint() dataservices.EndpointService             { return d.endpoint }
 func (d *testDatastore) EndpointGroup() dataservices.EndpointGroupService   { return d.endpointGroup }
+func (d *testDatastore) EdgeUpdateSchedule() dataservices.EdgeUpdateScheduleService {
+	return d.edgeUpdateSchedule
+}
 func (d *testDatastore) FDOProfile() dataservices.FDOProfileService {
 	return d.fdoProfile
 }
@@ -65,6 +70,7 @@ func (d *testDatastore) APIKeyRepository() dataservices.APIKeyRepository {
 	return d.apiKeyRepositoryService
 }
 func (d *testDatastore) Settings() dataservices.SettingsService             { return d.settings }
+func (d *testDatastore) Snapshot() dataservices.SnapshotService             { return d.snapshot }
 func (d *testDatastore) SSLSettings() dataservices.SSLSettingsService       { return d.sslSettings }
 func (d *testDatastore) Stack() dataservices.StackService                   { return d.stack }
 func (d *testDatastore) Tag() dataservices.TagService                       { return d.tag }

@@ -6,11 +6,11 @@ import { Button } from '../buttons';
 import { Breadcrumbs } from './Breadcrumbs';
 import { Crumb } from './Breadcrumbs/Breadcrumbs';
 import { HeaderContainer } from './HeaderContainer';
-import { HeaderContent } from './HeaderContent';
 import { HeaderTitle } from './HeaderTitle';
 import styles from './PageHeader.module.css';
 
 interface Props {
+  id?: string;
   reload?: boolean;
   loading?: boolean;
   onReload?(): Promise<void> | void;
@@ -19,6 +19,7 @@ interface Props {
 }
 
 export function PageHeader({
+  id,
   title,
   breadcrumbs = [],
   reload,
@@ -32,10 +33,9 @@ export function PageHeader({
   }
 
   return (
-    <HeaderContainer>
-      <HeaderContent>
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
-      </HeaderContent>
+    <HeaderContainer id={id}>
+      <Breadcrumbs breadcrumbs={breadcrumbs} />
+
       <HeaderTitle title={title}>
         {reload && (
           <Button
