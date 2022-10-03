@@ -44,6 +44,7 @@
             <ingress-class-datatable
               on-change-availability="(ctrl.onChangeAvailability)"
               ingress-controllers="ctrl.originalIngressControllers"
+              is-loading="ctrl.isIngressControllersLoading"
               description="'Enabling ingress controllers in your cluster allows them to be available in the Portainer UI for users to publish applications over HTTP/HTTPS. A controller must have a class name for it to be included here.'"
               no-ingress-controller-label="'No supported ingress controllers found.'"
               view="'cluster'"

@@ -19,6 +19,7 @@ interface Props {
   ) => void; // angular function to save the ingress class list
   description: string;
   ingressControllers: IngressControllerClassMap[] | undefined;
+  isLoading: boolean;
   noIngressControllerLabel: string;
   view: string;
 }
@@ -27,6 +28,7 @@ export function IngressClassDatatable({
   onChangeAvailability,
   description,
   ingressControllers,
+  isLoading,
   noIngressControllerLabel,
   view,
 }: Props) {
@@ -42,7 +44,7 @@ export function IngressClassDatatable({
         storageKey="ingressClasses"
         columns={columns}
         settingsStore={settings}
-        isLoading={!ingControllerFormValues}
+        isLoading={isLoading}
         emptyContentLabel={noIngressControllerLabel}
         titleOptions={{
           icon: 'database',
