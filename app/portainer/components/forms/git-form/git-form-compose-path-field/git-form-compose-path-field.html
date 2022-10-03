@@ -5,10 +5,8 @@
       <span
         >Indicate the path to the {{ $ctrl.deployMethod == 'compose' ? 'Compose' : 'Manifest' }} file from the root of your repository.
         <span ng-if="$ctrl.isDockerStandalone">
-          To enable rebuilding of an image if already present on Docker standalone environments, include<code>pull_policy: build</code>in your compose file as per<a
-            href="https://docs.docker.com/compose/compose-file/#pull_policy"
-            >Docker documentation</a
-          >.</span
+          To enable rebuilding of an image if already present on Docker standalone environments, include<code>pull_policy: build</code>in your compose file as per
+          <a href="https://docs.docker.com/compose/compose-file/#pull_policy">Docker documentation</a>.</span
         ></span
       >
     </span>
