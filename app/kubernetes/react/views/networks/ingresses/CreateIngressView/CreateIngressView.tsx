@@ -14,7 +14,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Option } from '@@/form-components/Input/Select';
 import { Button } from '@@/buttons';
 
-import { Ingress } from '../types';
+import { Ingress, IngressController } from '../types';
 import {
   useCreateIngress,
   useIngresses,
@@ -228,7 +228,7 @@ export function CreateIngressView() {
         ingressRule,
         ingressNames || [],
         servicesOptions || [],
-        !!existingIngressClass
+        existingIngressClass
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -301,7 +301,7 @@ export function CreateIngressView() {
     ingressRule: Rule,
     ingressNames: string[],
     serviceOptions: Option<string>[],
-    existingIngressClass: boolean
+    existingIngressClass?: IngressController
   ) {
     const errors: Record<string, ReactNode> = {};
     const rule = { ...ingressRule };
@@ -332,7 +332,12 @@ export function CreateIngressView() {
         'No ingress class is currently set for this ingress - use of the Portainer UI requires one to be set.';
     }
 
-    if (isEdit && !existingIngressClass && ingressRule.IngressClassName) {
+    if (
+      isEdit &&
+      (!existingIngressClass ||
+        (existingIngressClass && !existingIngressClass.Availability)) &&
+      ingressRule.IngressClassName
+    ) {
       if (!rule.IngressType) {
         errors.className =
           'Currently set to an ingress class that cannot be found in the cluster - you must select a valid class.';
