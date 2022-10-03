@@ -131,7 +131,9 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 
 	cli := handler.KubernetesClient
 	currentControllers := cli.GetIngressControllers()
-	existingClasses := endpoint.Kubernetes.Configuration.IngressClasses
+	kubernetesConfig := endpoint.Kubernetes.Configuration
+	existingClasses := kubernetesConfig.IngressClasses
+	ingressAvailabilityPerNamespace := kubernetesConfig.IngressAvailabilityPerNamespace
 	var updatedClasses []portainer.KubernetesIngressClassConfig
 	var controllers models.K8sIngressControllers
 	for i := range currentControllers {
@@ -155,10 +157,12 @@ func (handler *Handler) getKubernetesIngressControllersByNamespace(w http.Respon
 
 			globallyblocked = existingClass.GloballyBlocked
 
-			// Check if the current namespace is blocked.
-			for _, ns := range existingClass.BlockedNamespaces {
-				if namespace == ns {
-					currentControllers[i].Availability = false
+			// Check if the current namespace is blocked if ingressAvailabilityPerNamespace is set to true
+			if ingressAvailabilityPerNamespace {
+				for _, ns := range existingClass.BlockedNamespaces {
+					if namespace == ns {
+						currentControllers[i].Availability = false
+					}
 				}
 			}
 		}
