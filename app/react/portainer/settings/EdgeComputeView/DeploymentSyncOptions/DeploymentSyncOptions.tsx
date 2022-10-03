@@ -1,8 +1,8 @@
 import { Form, Formik } from 'formik';
 import { useReducer } from 'react';
 
-import { EdgeCheckinIntervalField } from '@/edge/components/EdgeCheckInIntervalField';
-import { EdgeAsyncIntervalsForm } from '@/edge/components/EdgeAsyncIntervalsForm';
+import { EdgeCheckinIntervalField } from '@/react/edge/components/EdgeCheckInIntervalField';
+import { EdgeAsyncIntervalsForm } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 import { notifySuccess } from '@/portainer/services/notifications';
 
 import { FormControl } from '@@/form-components/FormControl';

@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { EdgeDevicesView } from '@/edge/EdgeDevices/EdgeDevicesView';
+import { ListView } from '@/react/edge/edge-devices/ListView';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { r2a } from '@/react-tools/react2angular';
 import { withReactQuery } from '@/react-tools/withReactQuery';
@@ -10,5 +10,5 @@ export const viewsModule = angular
   .module('portainer.edge.react.views', [])
   .component(
     'edgeDevicesView',
-    r2a(withUIRouter(withReactQuery(withCurrentUser(EdgeDevicesView))), [])
+    r2a(withUIRouter(withReactQuery(withCurrentUser(ListView))), [])
   ).name;

@@ -3,7 +3,6 @@ import { useRowSelectColumn } from '@lineup-lite/hooks';
 import _ from 'lodash';
 
 import { Environment } from '@/react/portainer/environments/types';
-import { AMTDevicesDatatable } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/AMTDevicesDatatable';
 import { EnvironmentGroup } from '@/react/portainer/environments/environment-groups/types';
 
 import { PaginationControls } from '@@/PaginationControls';
@@ -26,6 +25,7 @@ import { TableFooter } from '@@/datatables/TableFooter';
 import { SelectedRowsCount } from '@@/datatables/SelectedRowsCount';
 import { TextTip } from '@@/Tip/TextTip';
 
+import { AMTDevicesDatatable } from './AMTDevicesDatatable';
 import { EdgeDevicesDatatableActions } from './EdgeDevicesDatatableActions';
 import { EdgeDevicesDatatableSettings } from './EdgeDevicesDatatableSettings';
 import { RowProvider } from './columns/RowContext';

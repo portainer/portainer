@@ -1,14 +1,14 @@
 import { usePagination, useTable } from 'react-table';
 
 import { Device } from '@/portainer/hostmanagement/open-amt/model';
-import { useAMTDevices } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/useAMTDevices';
-import { RowProvider } from '@/edge/EdgeDevices/EdgeDevicesView/AMTDevicesDatatable/columns/RowContext';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import PortainerError from '@/portainer/error';
 
 import { InnerDatatable } from '@@/datatables/InnerDatatable';
 import { Table, TableContainer, TableHeaderRow, TableRow } from '@@/datatables';
 
+import { RowProvider } from './columns/RowContext';
+import { useAMTDevices } from './useAMTDevices';
 import { useColumns } from './columns';
 
 export interface AMTDevicesTableProps {

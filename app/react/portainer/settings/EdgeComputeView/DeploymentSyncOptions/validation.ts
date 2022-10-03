@@ -1,6 +1,6 @@
 import { boolean, number, object, SchemaOf } from 'yup';
 
-import { options as asyncIntervalOptions } from '@/edge/components/EdgeAsyncIntervalsForm';
+import { options as asyncIntervalOptions } from '@/react/edge/components/EdgeAsyncIntervalsForm';
 
 import { FormValues } from './types';
 
