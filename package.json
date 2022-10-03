@@ -165,7 +165,7 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/angular": "^1.8.3",
-    "@types/bootbox": "^5.2.2",
+    "@types/bootbox": "^5.2.4",
     "@types/file-saver": "^2.0.4",
     "@types/jest": "^27.0.3",
     "@types/jquery": "^3.5.10",
