@@ -168,7 +168,8 @@ export function CreateIngressView() {
   ];
 
   if (
-    !existingIngressClass &&
+    (!existingIngressClass ||
+      (existingIngressClass && !existingIngressClass.Availability)) &&
     ingressRule.IngressClassName &&
     ingressControllersResults.data
   ) {
