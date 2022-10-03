@@ -44,8 +44,10 @@ type BuildInfo struct {
 // @success 200 {object} versionResponse "Success"
 // @router /status/version [get]
 func (handler *Handler) version(w http.ResponseWriter, r *http.Request) {
+
 	result := &versionResponse{
-		ServerVersion: portainer.APIVersion,
+		ServerVersion:   portainer.APIVersion,
+		DatabaseVersion: portainer.APIVersion,
 		Build: BuildInfo{
 			BuildNumber:    build.BuildNumber,
 			ImageTag:       build.ImageTag,

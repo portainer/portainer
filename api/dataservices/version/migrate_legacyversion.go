@@ -102,6 +102,8 @@ func (service *Service) migrateLegacyVersion() error {
 		return err
 	}
 
+	defer service.StoreIsUpdating(false)
+
 	v := &models.Version{
 		SchemaVersion: dbVersionToSemanticVersion(dbVersion),
 		Edition:       edition,
@@ -117,11 +119,6 @@ func (service *Service) migrateLegacyVersion() error {
 	service.connection.DeleteObject(BucketName, []byte(legacyDBVersionKey))
 	service.connection.DeleteObject(BucketName, []byte(legacyEditionKey))
 	service.connection.DeleteObject(BucketName, []byte(legacyInstanceKey))
-
-	err = service.StoreIsUpdating(false)
-	if err != nil {
-		return err
-	}
 
 	return nil
 }
