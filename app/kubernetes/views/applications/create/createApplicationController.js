@@ -32,6 +32,8 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
+import { updateIngress, getIngresses } from '@/kubernetes/react/views/networks/ingresses/service';
+import { confirmUpdateAppIngress } from '@/portainer/services/modal.service/prompt';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -144,6 +146,8 @@ class KubernetesCreateApplicationController {
     this.setPullImageValidity = this.setPullImageValidity.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.onServicePublishChange = this.onServicePublishChange.bind(this);
+    this.checkIngressesToUpdate = this.checkIngressesToUpdate.bind(this);
+    this.confirmUpdateApplicationAsync = this.confirmUpdateApplicationAsync.bind(this);
   }
   /* #endregion */
 
@@ -1015,7 +1019,16 @@ class KubernetesCreateApplicationController {
     }
   }
 
-  async updateApplicationAsync() {
+  async updateApplicationAsync(ingressesToUpdate, rulePlural) {
+    if (ingressesToUpdate.length) {
+      try {
+        await Promise.all(ingressesToUpdate.map((ing) => updateIngress(this.endpoint.Id, ing)));
+        this.Notifications.success('Success', `Ingress ${rulePlural} successfully updated`);
+      } catch (error) {
+        this.Notifications.error('Failure', error, 'Unable to update ingress');
+      }
+    }
+
     try {
       this.state.actionInProgress = true;
       await this.KubernetesApplicationService.patch(this.savedFormValues, this.formValues);
@@ -1028,13 +1041,98 @@ class KubernetesCreateApplicationController {
     }
   }
 
-  deployApplication() {
-    if (this.state.isEdit) {
-      this.ModalService.confirmUpdate('Updating the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
-        if (confirmed) {
-          return this.$async(this.updateApplicationAsync);
+  async confirmUpdateApplicationAsync() {
+    const [ingressesToUpdate, servicePortsToUpdate] = await this.checkIngressesToUpdate();
+    // if there is an ingressesToUpdate, then show a warning modal with asking if they want to update the ingresses
+    if (ingressesToUpdate.length) {
+      const rulePlural = ingressesToUpdate.length > 1 ? 'rules' : 'rule';
+      const noMatchSentence =
+        servicePortsToUpdate.length > 1
+          ? `Service ports in this application no longer match the ingress ${rulePlural}.`
+          : `A service port in this application no longer matches the ingress ${rulePlural} which may break ingress rule paths.`;
+      const message = `
+        <ul class="ml-3">
+          <li>Updating the application may cause a service interruption.</li>
+          <li>${noMatchSentence}</li>
+        </ul>
+      `;
+      const inputLabel = `Update ingress ${rulePlural} to match the service port changes`;
+      confirmUpdateAppIngress(`Are you sure?`, message, inputLabel, (value) => {
+        if (value === null) {
+          return;
+        }
+        if (value.length === 0) {
+          return this.$async(this.updateApplicationAsync, [], '');
+        }
+        if (value[0] === '1') {
+          return this.$async(this.updateApplicationAsync, ingressesToUpdate, rulePlural);
         }
       });
+    } else {
+      this.ModalService.confirmUpdate('Updating the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
+        if (confirmed) {
+          return this.$async(this.updateApplicationAsync, [], '');
+        }
+      });
+    }
+  }
+
+  // check if service ports with ingresses have changed and allow the user to update the ingress to the new port values with a modal
+  async checkIngressesToUpdate() {
+    let ingressesToUpdate = [];
+    let servicePortsToUpdate = [];
+    const fullIngresses = await getIngresses(this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name);
+    this.formValues.Services.forEach((service) => {
+      const oldServiceIndex = this.oldFormValues.Services.findIndex((oldService) => oldService.Name === service.Name);
+      // if the service has an ingress and the amount of ports for the service hasn't changed
+      if (service.Ingress && this.oldFormValues.Services[oldServiceIndex].Ports.length === service.Ports.length) {
+        const ingressesForService = fullIngresses.filter((ing) => {
+          const ingServiceNames = ing.Paths.map((path) => path.ServiceName);
+          if (ingServiceNames.includes(service.Name)) {
+            return true;
+          }
+        });
+        ingressesForService.forEach((ingressForService) => {
+          service.Ports.forEach((servicePort, pIndex) => {
+            if (servicePort.ingress) {
+              // if there isn't a ingress path that has a matching service name and port
+              const doesIngressPathMatchServicePort = ingressForService.Paths.find((ingPath) => ingPath.ServiceName === service.Name && ingPath.Port === servicePort.port);
+              if (!doesIngressPathMatchServicePort) {
+                // then find the ingress path index to update by looking for the matching port in the old form values
+                const oldServicePort = this.oldFormValues.Services[oldServiceIndex].Ports[pIndex].port;
+                const newServicePort = servicePort.port;
+
+                const ingressPathIndex = ingressForService.Paths.findIndex((ingPath) => {
+                  return ingPath.ServiceName === service.Name && ingPath.Port === oldServicePort;
+                });
+                if (ingressPathIndex !== -1) {
+                  // if the ingress to update isn't in the ingressesToUpdate list
+                  const ingressUpdateIndex = ingressesToUpdate.findIndex((ing) => ing.Name === ingressForService.Name);
+                  if (ingressUpdateIndex === -1) {
+                    // then add it to the list with the new port
+                    const ingressToUpdate = angular.copy(ingressForService);
+                    ingressToUpdate.Paths[ingressPathIndex].Port = newServicePort;
+                    ingressesToUpdate.push(ingressToUpdate);
+                  } else {
+                    // if the ingress is already in the list, then update the path with the new port
+                    ingressesToUpdate[ingressUpdateIndex].Paths[ingressPathIndex].Port = newServicePort;
+                  }
+                  if (!servicePortsToUpdate.includes(newServicePort)) {
+                    servicePortsToUpdate.push(newServicePort);
+                  }
+                }
+              }
+            }
+          });
+        });
+      }
+    });
+    return [ingressesToUpdate, servicePortsToUpdate];
+  }
+
+  deployApplication() {
+    if (this.state.isEdit) {
+      return this.$async(this.confirmUpdateApplicationAsync);
     } else {
       return this.$async(this.deployApplicationAsync);
     }
@@ -1153,6 +1251,8 @@ class KubernetesCreateApplicationController {
         }
 
         this.formValues.IsPublishingService = this.formValues.PublishedPorts.length > 0;
+
+        this.oldFormValues = angular.copy(this.formValues);
 
         this.updateNamespaceLimits();
         this.updateSliders();
