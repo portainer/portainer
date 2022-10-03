@@ -7,8 +7,8 @@ import PortainerError from '@/portainer/error';
 import { InnerDatatable } from '@@/datatables/InnerDatatable';
 import { Table, TableContainer, TableHeaderRow, TableRow } from '@@/datatables';
 
-import { RowProvider } from './columns/RowContext';
 import { useAMTDevices } from './useAMTDevices';
+import { RowProvider } from './columns/RowContext';
 import { useColumns } from './columns';
 
 export interface AMTDevicesTableProps {

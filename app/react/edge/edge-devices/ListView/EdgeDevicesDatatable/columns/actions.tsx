@@ -5,7 +5,7 @@ import { useRouter, useSref } from '@uirouter/react';
 import { Environment } from '@/react/portainer/environments/types';
 import { snapshotEndpoint } from '@/react/portainer/environments/environment.service';
 import * as notifications from '@/portainer/services/notifications';
-import { getRoute } from '@/react/portainer/environments/utils';
+import { getDashboardRoute } from '@/react/portainer/environments/utils';
 
 import { ActionsMenu } from '@@/datatables/ActionsMenu';
 
@@ -27,19 +27,33 @@ export function ActionsCell({
 }: CellProps<Environment>) {
   const router = useRouter();
 
-  const environmentRoute = getRoute(environment);
+  const environmentRoute = getDashboardRoute(environment);
   const browseLinkProps = useSref(environmentRoute, {
     id: environment.Id,
     endpointId: environment.Id,
+  });
+
+  const snapshotLinkProps = useSref('edge.browse.dashboard', {
+    environmentId: environment.Id,
   });
 
   const showRefreshSnapshot = false; // remove and show MenuItem when feature is available
 
   return (
     <ActionsMenu>
-      <MenuLink href={browseLinkProps.href} onClick={browseLinkProps.onClick}>
-        Browse
-      </MenuLink>
+      {environment.Edge.AsyncMode ? (
+        <MenuLink
+          className="!text-inherit hover:!no-underline"
+          href={snapshotLinkProps.href}
+          onClick={snapshotLinkProps.onClick}
+        >
+          Browse Snapshot
+        </MenuLink>
+      ) : (
+        <MenuLink href={browseLinkProps.href} onClick={browseLinkProps.onClick}>
+          Browse
+        </MenuLink>
+      )}
       {showRefreshSnapshot && (
         <MenuItem hidden onSelect={() => handleRefreshSnapshotClick()}>
           Refresh Snapshot
