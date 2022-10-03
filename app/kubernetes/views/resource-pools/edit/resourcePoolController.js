@@ -144,7 +144,7 @@ class KubernetesResourcePoolController {
     try {
       this.checkDefaults();
       await this.KubernetesResourcePoolService.patch(oldFormValues, newFormValues);
-      await updateIngressControllerClassMap(this.endpoint.Id, this.ingressControllers, this.formValues.Name);
+      await updateIngressControllerClassMap(this.endpoint.Id, this.ingressControllers || [], this.formValues.Name);
       this.Notifications.success('Namespace successfully updated', this.pool.Namespace.Name);
       this.$state.reload(this.$state.current);
     } catch (err) {
