@@ -14,6 +14,7 @@ export interface Path {
   Port: number;
   Path: string;
   PathType: string;
+  HasService?: boolean;
 }
 
 export interface TLS {
