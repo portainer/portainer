@@ -78,13 +78,11 @@ func (b *KubernetesStackGitBuilder) Deploy(payload *StackPayload, endpoint *port
 		Kind:      "git",
 	}
 
-	k8sDeploymentConfig, cleanupFunc, err := deployments.CreateKubernetesStackDeploymentConfig(b.stack, b.KuberneteDeployer, k8sAppLabel, b.user, endpoint)
+	k8sDeploymentConfig, err := deployments.CreateKubernetesStackDeploymentConfig(b.stack, b.KuberneteDeployer, k8sAppLabel, b.user, endpoint)
 	if err != nil {
 		b.err = httperror.InternalServerError("failed to create temp kub deployment files", err)
 		return b
 	}
-
-	defer cleanupFunc()
 
 	b.deploymentConfiger = k8sDeploymentConfig
 
@@ -94,14 +92,6 @@ func (b *KubernetesStackGitBuilder) Deploy(payload *StackPayload, endpoint *port
 func (b *KubernetesStackGitBuilder) SetAutoUpdate(payload *StackPayload) GitMethodStackBuildProcess {
 	b.GitMethodStackBuilder.SetAutoUpdate(payload)
 	return b
-}
-
-func (b *KubernetesStackGitBuilder) SaveStack() *httperror.HandlerError {
-	return b.GitMethodStackBuilder.SaveStack()
-}
-
-func (b *KubernetesStackGitBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.GitMethodStackBuilder.GetStack()
 }
 
 func (b *KubernetesStackGitBuilder) GetResponse() string {

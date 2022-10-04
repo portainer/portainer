@@ -58,11 +58,6 @@ func (config *ComposeStackDeploymentConfig) GetUsername() string {
 	return ""
 }
 
-// TODO: libcompose uses credentials store into a config.json file to pull images from
-// private registries. Right now the only solution is to re-use the embedded Docker binary
-// to login/logout, which will generate the required data in the config.json file and then
-// clean it. Hence the use of the mutex.
-// We should contribute to libcompose to support authentication without using the config.json file.
 func (config *ComposeStackDeploymentConfig) Deploy() error {
 	if config.FileService == nil || config.StackDeployer == nil {
 		log.Println("[deployment, compose] file service or stack deployer is not initialised")

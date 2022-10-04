@@ -15,9 +15,7 @@ type UrlMethodStackBuildProcess interface {
 	// Deploy stack based on the configuration
 	Deploy(payload *StackPayload, endpoint *portainer.Endpoint) UrlMethodStackBuildProcess
 	// Save the stack information to database
-	SaveStack() *httperror.HandlerError
-	// Get stack object
-	GetStack() (*portainer.Stack, *httperror.HandlerError)
+	SaveStack() (*portainer.Stack, *httperror.HandlerError)
 	// Get reponse from http request. Use if it is needed
 	GetResponse() string
 	// Set manifest url
@@ -63,14 +61,6 @@ func (b *UrlMethodStackBuilder) Deploy(payload *StackPayload, endpoint *portaine
 	}
 
 	return b
-}
-
-func (b *UrlMethodStackBuilder) SaveStack() *httperror.HandlerError {
-	return b.StackBuilder.SaveStack()
-}
-
-func (b *UrlMethodStackBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.StackBuilder.GetStack()
 }
 
 func (b *UrlMethodStackBuilder) GetResponse() string {

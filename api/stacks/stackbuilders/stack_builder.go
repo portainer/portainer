@@ -28,24 +28,20 @@ func CreateStackBuilder(dataStore dataservices.DataStore, fileService portainer.
 	}
 }
 
-func (b *StackBuilder) SaveStack() *httperror.HandlerError {
+func (b *StackBuilder) SaveStack() (*portainer.Stack, *httperror.HandlerError) {
 	defer b.cleanUp()
 	if b.hasError() {
-		return b.err
+		return nil, b.err
 	}
 
 	err := b.dataStore.Stack().Create(b.stack)
 	if err != nil {
 		b.err = httperror.InternalServerError("Unable to persist the stack inside the database", err)
-		return b.err
+		return nil, b.err
 	}
 
 	b.doCleanUp = false
-	return nil
-}
-
-func (b *StackBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.stack, b.err
+	return b.stack, nil
 }
 
 func (b *StackBuilder) cleanUp() error {

@@ -81,12 +81,10 @@ func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *
 		appLabels.Kind = "git"
 	}
 
-	k8sDeploymentConfig, cleanupFunc, err := CreateKubernetesStackDeploymentConfig(stack, d.kubernetesDeployer, appLabels, user, endpoint)
+	k8sDeploymentConfig, err := CreateKubernetesStackDeploymentConfig(stack, d.kubernetesDeployer, appLabels, user, endpoint)
 	if err != nil {
 		return errors.Wrap(err, "failed to create temp kub deployment files")
 	}
-
-	defer cleanupFunc()
 
 	err = k8sDeploymentConfig.Deploy()
 	if err != nil {

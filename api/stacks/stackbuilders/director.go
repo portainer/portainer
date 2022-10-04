@@ -18,7 +18,7 @@ func NewStackBuilderDirector(b interface{}) *StackBuilderDirector {
 	}
 }
 
-func (d *StackBuilderDirector) Build(payload *StackPayload, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (d *StackBuilderDirector) Build(payload *StackPayload, endpoint *portainer.Endpoint) (*portainer.Stack, *httperror.HandlerError) {
 
 	switch builder := d.builder.(type) {
 	case GitMethodStackBuildProcess:
@@ -51,5 +51,5 @@ func (d *StackBuilderDirector) Build(payload *StackPayload, endpoint *portainer.
 			SaveStack()
 	}
 
-	return httperror.BadRequest("Invalid value for query parameter: method. Value must be one of: string or repository or url or file", errors.New(request.ErrInvalidQueryParameter))
+	return nil, httperror.BadRequest("Invalid value for query parameter: method. Value must be one of: string or repository or url or file", errors.New(request.ErrInvalidQueryParameter))
 }

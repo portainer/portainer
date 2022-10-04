@@ -57,7 +57,7 @@ func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r 
 
 	// stop scheduler updates of the stack before removal
 	if stack.AutoUpdate != nil {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 	}
 
 	err = handler.DataStore.Stack().DeleteStack(stack.ID)
@@ -130,13 +130,8 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		handler.StackDeployer)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(composeStackBuilder)
-	httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
-	if httpErr != nil && httpErr.Err != nil {
-		return httpErr
-	}
-
-	stack, httpErr := composeStackBuilder.GetStack()
-	if httpErr != nil && httpErr.Err != nil {
+	stack, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	if httpErr != nil {
 		return httpErr
 	}
 
@@ -272,13 +267,8 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		handler.StackDeployer)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(composeStackBuilder)
-	httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
-	if httpErr != nil && httpErr.Err != nil {
-		return httpErr
-	}
-
-	stack, httpErr := composeStackBuilder.GetStack()
-	if httpErr != nil && httpErr.Err != nil {
+	stack, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	if httpErr != nil {
 		return httpErr
 	}
 
@@ -365,13 +355,8 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		handler.StackDeployer)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(composeStackBuilder)
-	httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
-	if httpErr != nil && httpErr.Err != nil {
-		return httpErr
-	}
-
-	stack, httpErr := composeStackBuilder.GetStack()
-	if httpErr != nil && httpErr.Err != nil {
+	stack, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	if httpErr != nil {
 		return httpErr
 	}
 

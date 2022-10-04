@@ -179,7 +179,7 @@ func (handler *Handler) updateAndDeployStack(r *http.Request, stack *portainer.S
 func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 		stack.AutoUpdate = nil
 	}
 	if stack.GitConfig != nil {
@@ -244,7 +244,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	// Must not be git based stack. stop the auto update job if there is any
 	if stack.AutoUpdate != nil {
-		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 		stack.AutoUpdate = nil
 	}
 	if stack.GitConfig != nil {

@@ -92,25 +92,15 @@ func (b *K8sStackFileContentBuilder) Deploy(payload *StackPayload, endpoint *por
 		Kind:      "content",
 	}
 
-	k8sDeploymentConfig, cleanupFunc, err := deployments.CreateKubernetesStackDeploymentConfig(b.stack, b.KuberneteDeployer, k8sAppLabel, b.User, endpoint)
+	k8sDeploymentConfig, err := deployments.CreateKubernetesStackDeploymentConfig(b.stack, b.KuberneteDeployer, k8sAppLabel, b.User, endpoint)
 	if err != nil {
 		b.err = httperror.InternalServerError("failed to create temp kub deployment files", err)
 		return b
 	}
 
-	defer cleanupFunc()
-
 	b.deploymentConfiger = k8sDeploymentConfig
 
 	return b.FileContentMethodStackBuilder.Deploy(payload, endpoint)
-}
-
-func (b *K8sStackFileContentBuilder) SaveStack() *httperror.HandlerError {
-	return b.FileContentMethodStackBuilder.SaveStack()
-}
-
-func (b *K8sStackFileContentBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.FileContentMethodStackBuilder.GetStack()
 }
 
 func (b *K8sStackFileContentBuilder) GetResponse() string {

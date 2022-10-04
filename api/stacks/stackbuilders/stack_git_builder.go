@@ -20,10 +20,8 @@ type GitMethodStackBuildProcess interface {
 	SetUniqueInfo(payload *StackPayload) GitMethodStackBuildProcess
 	// Deploy stack based on the configuration
 	Deploy(payload *StackPayload, endpoint *portainer.Endpoint) GitMethodStackBuildProcess
-	// Save the stack information to database
-	SaveStack() *httperror.HandlerError
-	// Get stack object
-	GetStack() (*portainer.Stack, *httperror.HandlerError)
+	// Save the stack information to database and return the stack object
+	SaveStack() (*portainer.Stack, *httperror.HandlerError)
 	// Get reponse from http request. Use if it is needed
 	GetResponse() string
 	// Set git repository configuration
@@ -125,14 +123,6 @@ func (b *GitMethodStackBuilder) SetAutoUpdate(payload *StackPayload) GitMethodSt
 		b.stack.AutoUpdate.JobID = jobID
 	}
 	return b
-}
-
-func (b *GitMethodStackBuilder) SaveStack() *httperror.HandlerError {
-	return b.StackBuilder.SaveStack()
-}
-
-func (b *GitMethodStackBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.StackBuilder.GetStack()
 }
 
 func (b *GitMethodStackBuilder) GetResponse() string {

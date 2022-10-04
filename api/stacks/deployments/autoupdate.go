@@ -24,7 +24,7 @@ func StartAutoupdate(stackID portainer.StackID, interval string, scheduler *sche
 	return jobID, nil
 }
 
-func StopAutoupdate(stackID portainer.StackID, jobID string, scheduler scheduler.Scheduler) {
+func StopAutoupdate(stackID portainer.StackID, jobID string, scheduler *scheduler.Scheduler) {
 	if jobID == "" {
 		return
 	}

@@ -80,15 +80,3 @@ func (b *SwarmStackFileContentBuilder) Deploy(payload *StackPayload, endpoint *p
 
 	return b.FileContentMethodStackBuilder.Deploy(payload, endpoint)
 }
-
-func (b *SwarmStackFileContentBuilder) SaveStack() *httperror.HandlerError {
-	return b.FileContentMethodStackBuilder.SaveStack()
-}
-
-func (b *SwarmStackFileContentBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.FileContentMethodStackBuilder.GetStack()
-}
-
-func (b *SwarmStackFileContentBuilder) GetResponse() string {
-	return b.FileContentMethodStackBuilder.GetResponse()
-}

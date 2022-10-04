@@ -75,15 +75,3 @@ func (b *ComposeStackGitBuilder) SetAutoUpdate(payload *StackPayload) GitMethodS
 	b.GitMethodStackBuilder.SetAutoUpdate(payload)
 	return b
 }
-
-func (b *ComposeStackGitBuilder) SaveStack() *httperror.HandlerError {
-	return b.GitMethodStackBuilder.SaveStack()
-}
-
-func (b *ComposeStackGitBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.GitMethodStackBuilder.GetStack()
-}
-
-func (b *ComposeStackGitBuilder) GetResponse() string {
-	return b.GitMethodStackBuilder.GetResponse()
-}

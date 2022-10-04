@@ -16,9 +16,7 @@ type FileUploadMethodStackBuildProcess interface {
 	// Deploy stack based on the configuration
 	Deploy(payload *StackPayload, endpoint *portainer.Endpoint) FileUploadMethodStackBuildProcess
 	// Save the stack information to database
-	SaveStack() *httperror.HandlerError
-	// Get stack object
-	GetStack() (*portainer.Stack, *httperror.HandlerError)
+	SaveStack() (*portainer.Stack, *httperror.HandlerError)
 	// Get reponse from http request. Use if it is needed
 	GetResponse() string
 	// Process the upload file
@@ -73,14 +71,6 @@ func (b *FileUploadMethodStackBuilder) Deploy(payload *StackPayload, endpoint *p
 
 	b.doCleanUp = false
 	return b
-}
-
-func (b *FileUploadMethodStackBuilder) SaveStack() *httperror.HandlerError {
-	return b.StackBuilder.SaveStack()
-}
-
-func (b *FileUploadMethodStackBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.StackBuilder.GetStack()
 }
 
 func (b *FileUploadMethodStackBuilder) GetResponse() string {

@@ -53,7 +53,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	if stack.GitConfig != nil {
 		//stop the autoupdate job if there is any
 		if stack.AutoUpdate != nil {
-			deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+			deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 		}
 
 		var payload kubernetesGitStackUpdatePayload

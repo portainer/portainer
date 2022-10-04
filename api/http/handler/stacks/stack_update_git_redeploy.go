@@ -204,6 +204,11 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 }
 
 func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pullImage bool, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	var (
+		deploymentConfiger deployments.StackDeploymentConfiger
+		err                error
+	)
+
 	switch stack.Type {
 	case portainer.DockerSwarmStack:
 		prune := false
@@ -217,15 +222,11 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pul
 			return httperror.InternalServerError("Unable to retrieve info from request context", err)
 		}
 
-		deploymentConfiger, err := deployments.CreateSwarmStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, prune, pullImage)
+		deploymentConfiger, err = deployments.CreateSwarmStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, prune, pullImage)
 		if err != nil {
 			return httperror.InternalServerError(err.Error(), err)
 		}
 
-		err = deploymentConfiger.Deploy()
-		if err != nil {
-			return httperror.InternalServerError(err.Error(), err)
-		}
 	case portainer.DockerComposeStack:
 		// Create compose deployment config
 		securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -233,12 +234,7 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pul
 			return httperror.InternalServerError("Unable to retrieve info from request context", err)
 		}
 
-		deploymentConfiger, err := deployments.CreateComposeStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, pullImage, true)
-		if err != nil {
-			return httperror.InternalServerError(err.Error(), err)
-		}
-
-		err = deploymentConfiger.Deploy()
+		deploymentConfiger, err = deployments.CreateComposeStackDeploymentConfig(securityContext, stack, endpoint, handler.DataStore, handler.FileService, handler.StackDeployer, pullImage, true)
 		if err != nil {
 			return httperror.InternalServerError(err.Error(), err)
 		}
@@ -251,19 +247,29 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, pul
 			return httperror.BadRequest("Failed to retrieve user token data", err)
 		}
 
-		_, err = handler.deployKubernetesStack(tokenData.ID, endpoint, stack, k.KubeAppLabels{
+		user := &portainer.User{
+			ID:       tokenData.ID,
+			Username: tokenData.Username,
+		}
+
+		appLabel := k.KubeAppLabels{
 			StackID:   int(stack.ID),
 			StackName: stack.Name,
 			Owner:     tokenData.Username,
 			Kind:      "git",
-		})
-		if err != nil {
-			return httperror.InternalServerError("Unable to redeploy Kubernetes stack", errors.WithMessage(err, "failed to deploy kube application"))
 		}
 
+		deploymentConfiger, err = deployments.CreateKubernetesStackDeploymentConfig(stack, handler.KubernetesDeployer, appLabel, user, endpoint)
+		if err != nil {
+			return httperror.InternalServerError(err.Error(), err)
+		}
 	default:
 		return httperror.InternalServerError("Unsupported stack", errors.Errorf("unsupported stack type: %v", stack.Type))
 	}
 
+	err = deploymentConfiger.Deploy()
+	if err != nil {
+		return httperror.InternalServerError(err.Error(), err)
+	}
 	return nil
 }

@@ -77,15 +77,3 @@ func (b *SwarmStackGitBuilder) SetAutoUpdate(payload *StackPayload) GitMethodSta
 	b.GitMethodStackBuilder.SetAutoUpdate(payload)
 	return b
 }
-
-func (b *SwarmStackGitBuilder) SaveStack() *httperror.HandlerError {
-	return b.GitMethodStackBuilder.SaveStack()
-}
-
-func (b *SwarmStackGitBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.GitMethodStackBuilder.GetStack()
-}
-
-func (b *SwarmStackGitBuilder) GetResponse() string {
-	return b.GitMethodStackBuilder.GetResponse()
-}

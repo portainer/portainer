@@ -151,8 +151,8 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		user)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(k8sStackBuilder)
-	httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
-	if httpErr != nil && httpErr.Err != nil {
+	_, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	if httpErr != nil {
 		return httpErr
 	}
 
@@ -213,8 +213,8 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		user)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(k8sStackBuilder)
-	httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
-	if httpErr != nil && httpErr.Err != nil {
+	_, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	if httpErr != nil {
 		return httpErr
 	}
 
@@ -255,8 +255,8 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 		user)
 
 	stackBuilderDirector := stackbuilders.NewStackBuilderDirector(k8sStackBuilder)
-	httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
-	if httpErr != nil && httpErr.Err != nil {
+	_, httpErr := stackBuilderDirector.Build(&stackPayload, endpoint)
+	if httpErr != nil {
 		return httpErr
 	}
 
@@ -274,12 +274,10 @@ func (handler *Handler) deployKubernetesStack(userID portainer.UserID, endpoint 
 	user := &portainer.User{
 		ID: userID,
 	}
-	k8sDeploymentConfig, cleanupFunc, err := deployments.CreateKubernetesStackDeploymentConfig(stack, handler.KubernetesDeployer, appLabels, user, endpoint)
+	k8sDeploymentConfig, err := deployments.CreateKubernetesStackDeploymentConfig(stack, handler.KubernetesDeployer, appLabels, user, endpoint)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to create temp kub deployment files")
 	}
-
-	defer cleanupFunc()
 
 	err = k8sDeploymentConfig.Deploy()
 	if err != nil {

@@ -15,9 +15,7 @@ type FileContentMethodStackBuildProcess interface {
 	// Deploy stack based on the configuration
 	Deploy(payload *StackPayload, endpoint *portainer.Endpoint) FileContentMethodStackBuildProcess
 	// Save the stack information to database
-	SaveStack() *httperror.HandlerError
-	// Get stack object
-	GetStack() (*portainer.Stack, *httperror.HandlerError)
+	SaveStack() (*portainer.Stack, *httperror.HandlerError)
 	// Get reponse from http request. Use if it is needed
 	GetResponse() string
 	// Process the file content
@@ -63,14 +61,6 @@ func (b *FileContentMethodStackBuilder) Deploy(payload *StackPayload, endpoint *
 	}
 
 	return b
-}
-
-func (b *FileContentMethodStackBuilder) SaveStack() *httperror.HandlerError {
-	return b.StackBuilder.SaveStack()
-}
-
-func (b *FileContentMethodStackBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.StackBuilder.GetStack()
 }
 
 func (b *FileContentMethodStackBuilder) GetResponse() string {

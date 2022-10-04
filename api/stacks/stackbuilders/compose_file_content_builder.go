@@ -79,15 +79,3 @@ func (b *ComposeStackFileContentBuilder) Deploy(payload *StackPayload, endpoint 
 
 	return b.FileContentMethodStackBuilder.Deploy(payload, endpoint)
 }
-
-func (b *ComposeStackFileContentBuilder) SaveStack() *httperror.HandlerError {
-	return b.FileContentMethodStackBuilder.SaveStack()
-}
-
-func (b *ComposeStackFileContentBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.FileContentMethodStackBuilder.GetStack()
-}
-
-func (b *ComposeStackFileContentBuilder) GetResponse() string {
-	return b.FileContentMethodStackBuilder.GetResponse()
-}

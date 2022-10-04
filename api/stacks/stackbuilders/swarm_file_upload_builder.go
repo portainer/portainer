@@ -72,15 +72,3 @@ func (b *SwarmStackFileUploadBuilder) Deploy(payload *StackPayload, endpoint *po
 
 	return b.FileUploadMethodStackBuilder.Deploy(payload, endpoint)
 }
-
-func (b *SwarmStackFileUploadBuilder) SaveStack() *httperror.HandlerError {
-	return b.FileUploadMethodStackBuilder.SaveStack()
-}
-
-func (b *SwarmStackFileUploadBuilder) GetStack() (*portainer.Stack, *httperror.HandlerError) {
-	return b.FileUploadMethodStackBuilder.GetStack()
-}
-
-func (b *SwarmStackFileUploadBuilder) GetResponse() string {
-	return b.FileUploadMethodStackBuilder.GetResponse()
-}
