@@ -73,18 +73,7 @@ func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r
 		updatedClasses = append(updatedClasses, updatedClass)
 	}
 
-	// Update the database to match the list of found + modified controllers.
-	// This includes pruning out controllers which no longer exist.
-	var newClasses []portainer.KubernetesIngressClassConfig
-	for _, controller := range controllers {
-		var class portainer.KubernetesIngressClassConfig
-		class.Name = controller.ClassName
-		class.Type = controller.Type
-		class.GloballyBlocked = !controller.Availability
-		class.BlockedNamespaces = []string{}
-		newClasses = append(newClasses, class)
-	}
-	endpoint.Kubernetes.Configuration.IngressClasses = newClasses
+	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
 	err = handler.DataStore.Endpoint().UpdateEndpoint(
 		portainer.EndpointID(endpointID),
 		endpoint,
@@ -272,19 +261,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 		}
 	}
 
-	// Update the database to match the list of found + modified controllers.
-	// This includes pruning out controllers which no longer exist.
-	var newClasses []portainer.KubernetesIngressClassConfig
-	for _, controller := range controllers {
-		var class portainer.KubernetesIngressClassConfig
-		class.Name = controller.ClassName
-		class.Type = controller.Type
-		class.GloballyBlocked = !controller.Availability
-		class.BlockedNamespaces = []string{}
-		newClasses = append(newClasses, class)
-	}
-
-	endpoint.Kubernetes.Configuration.IngressClasses = newClasses
+	endpoint.Kubernetes.Configuration.IngressClasses = updatedClasses
 	err = handler.DataStore.Endpoint().UpdateEndpoint(
 		portainer.EndpointID(endpointID),
 		endpoint,
