@@ -61,7 +61,7 @@ import (
 	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
-	stackdeployer "github.com/portainer/portainer/api/stacks"
+	"github.com/portainer/portainer/api/stacks/deployments"
 
 	"github.com/rs/zerolog/log"
 )
@@ -100,7 +100,7 @@ type Server struct {
 	Scheduler                   *scheduler.Scheduler
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
-	StackDeployer               stackdeployer.StackDeployer
+	StackDeployer               deployments.StackDeployer
 	DemoService                 *demo.Service
 }
 

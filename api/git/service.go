@@ -2,7 +2,6 @@ package git
 
 import (
 	"context"
-	"errors"
 	"log"
 	"strings"
 	"sync"
@@ -12,9 +11,6 @@ import (
 )
 
 var (
-	ErrIncorrectRepositoryURL = errors.New("Git repository could not be found, please ensure that the URL is correct.")
-	ErrAuthenticationFailure  = errors.New("Authentication failed, please ensure that the git credentials are correct.")
-
 	REPOSITORY_CACHE_SIZE = 4
 	REPOSITORY_CACHE_TTL  = 5 * time.Minute
 )

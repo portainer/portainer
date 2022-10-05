@@ -14,7 +14,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/registryutils"
-	"github.com/portainer/portainer/api/internal/stackutils"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
 // SwarmStackManager represents a service for managing stacks.
@@ -90,7 +90,7 @@ func (manager *SwarmStackManager) Logout(endpoint *portainer.Endpoint) error {
 
 // Deploy executes the docker stack deploy command.
 func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, pullImage bool, endpoint *portainer.Endpoint) error {
-	filePaths := stackutils.GetStackFilePaths(stack)
+	filePaths := stackutils.GetStackFilePaths(stack, false)
 	command, args, err := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
 	if err != nil {
 		return err

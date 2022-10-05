@@ -1,14 +1,12 @@
-package stacks
+package deployments
 
 import (
 	"context"
-	"os"
 	"sync"
 
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/internal/stackutils"
 	k "github.com/portainer/portainer/api/kubernetes"
 )
 
@@ -83,13 +81,12 @@ func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *
 		appLabels.Kind = "git"
 	}
 
-	manifestFilePaths, tempDir, err := stackutils.CreateTempK8SDeploymentFiles(stack, d.kubernetesDeployer, appLabels)
+	k8sDeploymentConfig, err := CreateKubernetesStackDeploymentConfig(stack, d.kubernetesDeployer, appLabels, user, endpoint)
 	if err != nil {
 		return errors.Wrap(err, "failed to create temp kub deployment files")
 	}
-	defer os.RemoveAll(tempDir)
 
-	_, err = d.kubernetesDeployer.Deploy(user.ID, endpoint, manifestFilePaths, stack.Namespace)
+	err = k8sDeploymentConfig.Deploy()
 	if err != nil {
 		return errors.Wrap(err, "failed to deploy kubernetes application")
 	}

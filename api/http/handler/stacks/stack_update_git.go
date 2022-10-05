@@ -12,7 +12,8 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/stackutils"
+	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
 type stackGitUpdatePayload struct {
@@ -26,7 +27,7 @@ type stackGitUpdatePayload struct {
 }
 
 func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
-	if err := validateStackAutoUpdate(payload.AutoUpdate); err != nil {
+	if err := stackutils.ValidateStackAutoUpdate(payload.AutoUpdate); err != nil {
 		return err
 	}
 	return nil
@@ -131,7 +132,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 
 	//stop the autoupdate job if there is any
 	if stack.AutoUpdate != nil {
-		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		deployments.StopAutoupdate(stack.ID, stack.AutoUpdate.JobID, handler.Scheduler)
 	}
 
 	//update retrieved stack data based on the payload
@@ -165,7 +166,7 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
-		jobID, e := startAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
+		jobID, e := deployments.StartAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
 		if e != nil {
 			return e
 		}

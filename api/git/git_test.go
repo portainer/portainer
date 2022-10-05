@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/portainer/portainer/api/archive"
-
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/pkg/errors"
+	"github.com/portainer/portainer/api/archive"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -148,7 +148,7 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 				password:      "test-token",
 			},
 			expect: expectResult{
-				err: ErrAuthenticationFailure,
+				err: gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -159,7 +159,7 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 				password:      "",
 			},
 			expect: expectResult{
-				err: ErrAuthenticationFailure,
+				err: gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -170,7 +170,7 @@ func Test_listRefsPrivateRepository(t *testing.T) {
 				password:      accessToken,
 			},
 			expect: expectResult{
-				err: ErrIncorrectRepositoryURL,
+				err: gittypes.ErrIncorrectRepositoryURL,
 			},
 		},
 	}
@@ -222,7 +222,7 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 			},
 			expect: expectResult{
 				shouldFail: true,
-				err:        ErrAuthenticationFailure,
+				err:        gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -237,7 +237,7 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 			},
 			expect: expectResult{
 				shouldFail: true,
-				err:        ErrAuthenticationFailure,
+				err:        gittypes.ErrAuthenticationFailure,
 			},
 		},
 		{
@@ -281,7 +281,7 @@ func Test_listFilesPrivateRepository(t *testing.T) {
 			},
 			expect: expectResult{
 				shouldFail: true,
-				err:        ErrIncorrectRepositoryURL,
+				err:        gittypes.ErrIncorrectRepositoryURL,
 			},
 		},
 	}

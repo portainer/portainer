@@ -17,6 +17,7 @@ import (
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
+	gittypes "github.com/portainer/portainer/api/git/types"
 )
 
 const (
@@ -483,9 +484,9 @@ func (a *azureClient) listFiles(ctx context.Context, opt fetchOption) ([]string,
 
 func checkAzureStatusCode(err error, code int) error {
 	if code == http.StatusNotFound {
-		return ErrIncorrectRepositoryURL
+		return gittypes.ErrIncorrectRepositoryURL
 	} else if code == http.StatusUnauthorized || code == http.StatusNonAuthoritativeInfo {
-		return ErrAuthenticationFailure
+		return gittypes.ErrAuthenticationFailure
 	}
 	return err
 }
