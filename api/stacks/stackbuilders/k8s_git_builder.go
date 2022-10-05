@@ -36,6 +36,7 @@ func CreateKubernetesStackGitBuilder(dataStore dataservices.DataStore,
 		},
 		stackCreateMut:    &sync.Mutex{},
 		KuberneteDeployer: kuberneteDeployer,
+		user:              user,
 	}
 }
 

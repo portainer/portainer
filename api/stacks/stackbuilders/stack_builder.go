@@ -41,7 +41,7 @@ func (b *StackBuilder) SaveStack() (*portainer.Stack, *httperror.HandlerError) {
 	}
 
 	b.doCleanUp = false
-	return b.stack, nil
+	return b.stack, b.err
 }
 
 func (b *StackBuilder) cleanUp() error {
