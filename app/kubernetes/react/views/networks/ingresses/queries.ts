@@ -78,7 +78,7 @@ export function useIngresses(
 
       // get all services in only the namespaces that the ingresses are in to find missing services
       const uniqueNamespacesWithIngress = [
-        ...new Set(filteredIngresses.map((ing) => ing.Namespace)),
+        ...new Set(filteredIngresses.map((ing) => ing?.Namespace)),
       ];
       const settledServicesPromise = await Promise.allSettled(
         uniqueNamespacesWithIngress.map((ns) => getServices(environmentId, ns))
@@ -91,7 +91,7 @@ export function useIngresses(
       // check if each ingress path service has a service that still exists
       filteredIngresses.forEach((ing, iIndex) => {
         const servicesInNamespace = services?.filter(
-          (service) => service.Namespace === ing.Namespace
+          (service) => service?.Namespace === ing?.Namespace
         );
         const serviceNamesInNamespace = servicesInNamespace?.map(
           (service) => service.Name
