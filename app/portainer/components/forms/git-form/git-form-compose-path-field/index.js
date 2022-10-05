@@ -4,5 +4,6 @@ export const gitFormComposePathField = {
     deployMethod: '@',
     value: '<',
     onChange: '<',
+    isDockerStandalone: '<',
   },
 };

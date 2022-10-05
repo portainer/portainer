@@ -10,6 +10,7 @@
     value="$ctrl.model.ComposeFilePathInRepository"
     on-change="($ctrl.onChangeComposePath)"
     deploy-method="{{ $ctrl.deployMethod }}"
+    is-docker-standalone="$ctrl.isDockerStandalone"
   ></git-form-compose-path-field>
 
   <git-form-additional-files-panel ng-if="$ctrl.additionalFile" model="$ctrl.model" on-change="($ctrl.onChange)"></git-form-additional-files-panel>
