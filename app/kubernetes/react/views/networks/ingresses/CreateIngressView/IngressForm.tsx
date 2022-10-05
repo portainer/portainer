@@ -102,9 +102,8 @@ export function IngressForm({
   }
   const hasNoHostRule = rule.Hosts?.some((host) => host.NoHost);
   const placeholderAnnotation =
-    PlaceholderAnnotations[rule.IngressType || 'other'] ||
-    PlaceholderAnnotations.other;
-  const pathTypes = PathTypes[rule.IngressType || 'other'] || PathTypes.other;
+    PlaceholderAnnotations[rule.IngressType || 'other'];
+  const pathTypes = PathTypes[rule.IngressType || 'other'];
 
   return (
     <Widget>
@@ -170,7 +169,7 @@ export function IngressForm({
                 </div>
               </div>
 
-              <div className="form-group" key={ingressClassOptions.toString()}>
+              <div className="form-group" key={rule.IngressClassName}>
                 <label
                   className="control-label text-muted col-sm-3 col-lg-2 required"
                   htmlFor="ingress_class"

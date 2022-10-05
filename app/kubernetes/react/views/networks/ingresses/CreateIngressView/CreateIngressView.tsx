@@ -14,7 +14,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Option } from '@@/form-components/Input/Select';
 import { Button } from '@@/buttons';
 
-import { Ingress, IngressController } from '../types';
+import { Ingress } from '../types';
 import {
   useCreateIngress,
   useIngresses,
@@ -66,8 +66,7 @@ export function CreateIngressView() {
     (servicesResults.isLoading &&
       configResults.isLoading &&
       namespacesResults.isLoading &&
-      ingressesResults.isLoading &&
-      ingressControllersResults.isLoading) ||
+      ingressesResults.isLoading) ||
     (isEdit && !ingressRule.IngressName);
 
   const [ingressNames, ingresses, ruleCounterByNamespace, hostWithTLS] =
@@ -167,12 +166,7 @@ export function CreateIngressView() {
       })) || []),
   ];
 
-  if (
-    (!existingIngressClass ||
-      (existingIngressClass && !existingIngressClass.Availability)) &&
-    ingressRule.IngressClassName &&
-    ingressControllersResults.data
-  ) {
+  if (!existingIngressClass && ingressRule.IngressClassName) {
     ingressClassOptions.push({
       label: !ingressRule.IngressType
         ? `${ingressRule.IngressClassName} - NOT FOUND`
@@ -195,12 +189,7 @@ export function CreateIngressView() {
   ];
 
   useEffect(() => {
-    if (
-      !!params.name &&
-      ingressesResults.data &&
-      !ingressRule.IngressName &&
-      ingressControllersResults.data
-    ) {
+    if (!!params.name && ingressesResults.data && !ingressRule.IngressName) {
       // if it is an edit screen, prepare the rule from the ingress
       const ing = ingressesResults.data?.find(
         (ing) => ing.Name === params.name && ing.Namespace === params.namespace
@@ -210,7 +199,7 @@ export function CreateIngressView() {
           (c) => c.ClassName === ing.ClassName
         )?.Type;
         const r = prepareRuleFromIngress(ing);
-        r.IngressType = type || r.IngressType;
+        r.IngressType = type;
         setIngressRule(r);
       }
     }
@@ -228,10 +217,9 @@ export function CreateIngressView() {
         ingressRule,
         ingressNames || [],
         servicesOptions || [],
-        existingIngressClass
+        !!existingIngressClass
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     ingressRule,
     namespace,
@@ -301,7 +289,7 @@ export function CreateIngressView() {
     ingressRule: Rule,
     ingressNames: string[],
     serviceOptions: Option<string>[],
-    existingIngressClass?: IngressController
+    existingIngressClass: boolean
   ) {
     const errors: Record<string, ReactNode> = {};
     const rule = { ...ingressRule };
@@ -332,12 +320,7 @@ export function CreateIngressView() {
         'No ingress class is currently set for this ingress - use of the Portainer UI requires one to be set.';
     }
 
-    if (
-      isEdit &&
-      (!existingIngressClass ||
-        (existingIngressClass && !existingIngressClass.Availability)) &&
-      ingressRule.IngressClassName
-    ) {
+    if (isEdit && !existingIngressClass && ingressRule.IngressClassName) {
       if (!rule.IngressType) {
         errors.className =
           'Currently set to an ingress class that cannot be found in the cluster - you must select a valid class.';
