@@ -1082,28 +1082,30 @@ class KubernetesCreateApplicationController {
     let ingressesToUpdate = [];
     let servicePortsToUpdate = [];
     const fullIngresses = await getIngresses(this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name);
-    this.formValues.Services.forEach((service) => {
-      const oldServiceIndex = this.oldFormValues.Services.findIndex((oldService) => oldService.Name === service.Name);
-      // if the service has an ingress and the amount of ports for the service hasn't changed
-      if (service.Ingress && this.oldFormValues.Services[oldServiceIndex].Ports.length === service.Ports.length) {
+    this.formValues.Services.forEach((updatedService) => {
+      const oldServiceIndex = this.oldFormValues.Services.findIndex((oldService) => oldService.Name === updatedService.Name);
+      const numberOfPortsInOldService = this.oldFormValues.Services[oldServiceIndex] && this.oldFormValues.Services[oldServiceIndex].Ports.length;
+      // if the service has an ingress and there is the same number of ports or more in the updated service
+      if (updatedService.Ingress && numberOfPortsInOldService && numberOfPortsInOldService <= updatedService.Ports.length) {
+        const updatedOldPorts = updatedService.Ports.slice(0, numberOfPortsInOldService);
         const ingressesForService = fullIngresses.filter((ing) => {
           const ingServiceNames = ing.Paths.map((path) => path.ServiceName);
-          if (ingServiceNames.includes(service.Name)) {
+          if (ingServiceNames.includes(updatedService.Name)) {
             return true;
           }
         });
         ingressesForService.forEach((ingressForService) => {
-          service.Ports.forEach((servicePort, pIndex) => {
+          updatedOldPorts.forEach((servicePort, pIndex) => {
             if (servicePort.ingress) {
               // if there isn't a ingress path that has a matching service name and port
-              const doesIngressPathMatchServicePort = ingressForService.Paths.find((ingPath) => ingPath.ServiceName === service.Name && ingPath.Port === servicePort.port);
+              const doesIngressPathMatchServicePort = ingressForService.Paths.find((ingPath) => ingPath.ServiceName === updatedService.Name && ingPath.Port === servicePort.port);
               if (!doesIngressPathMatchServicePort) {
                 // then find the ingress path index to update by looking for the matching port in the old form values
                 const oldServicePort = this.oldFormValues.Services[oldServiceIndex].Ports[pIndex].port;
                 const newServicePort = servicePort.port;
 
                 const ingressPathIndex = ingressForService.Paths.findIndex((ingPath) => {
-                  return ingPath.ServiceName === service.Name && ingPath.Port === oldServicePort;
+                  return ingPath.ServiceName === updatedService.Name && ingPath.Port === oldServicePort;
                 });
                 if (ingressPathIndex !== -1) {
                   // if the ingress to update isn't in the ingressesToUpdate list
