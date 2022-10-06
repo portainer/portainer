@@ -223,6 +223,19 @@ export function CreateIngressView() {
   ]);
 
   useEffect(() => {
+    // for each host, if the tls selection doesn't exist as an option, change it to the first option
+    if (ingressRule?.Hosts?.length) {
+      ingressRule.Hosts.forEach((host, hIndex) => {
+        const secret = host.Secret || '';
+        const tlsOptionVals = tlsOptions.map((o) => o.value);
+        if (tlsOptions?.length && !tlsOptionVals?.includes(secret)) {
+          handleTLSChange(hIndex, tlsOptionVals[0]);
+        }
+      });
+    }
+  }, [tlsOptions, ingressRule.Hosts]);
+
+  useEffect(() => {
     if (namespace.length > 0) {
       validate(
         ingressRule,
