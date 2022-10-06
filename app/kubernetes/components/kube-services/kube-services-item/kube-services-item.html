@@ -36,6 +36,8 @@
             placeholder="80"
             ng-min="1"
             ng-max="65535"
+            min="1"
+            max="65535"
             ng-change="$ctrl.servicePort($index)"
             required
             ng-disabled="$ctrl.originalIngresses.length === 0 || ($ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled)"
@@ -70,6 +72,8 @@
             placeholder="80"
             ng-min="1"
             ng-max="65535"
+            min="1"
+            max="65535"
             required
             ng-disabled="$ctrl.originalIngresses.length === 0 || ($ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled)"
             ng-change="$ctrl.onChangeServicePort()"
@@ -105,6 +109,8 @@
             placeholder="30080"
             ng-min="30000"
             ng-max="32767"
+            min="30000"
+            max="32767"
             required
             ng-change="$ctrl.onChangeNodePort()"
             data-cy="k8sAppCreate-nodeportPort_{{ $index }}"
@@ -139,6 +145,8 @@
             placeholder="80"
             ng-min="1"
             ng-max="65535"
+            min="1"
+            max="65535"
             required
             ng-disabled="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled"
             data-cy="k8sAppCreate-loadbalancerPort_{{ $index }}"
