@@ -1291,7 +1291,12 @@
                   </div>
 
                   <!-- kubernetes services options -->
-                  <kube-services-view form-values="ctrl.formValues" is-edit="ctrl.state.isEdit" loadbalancer-enabled="ctrl.publishViaLoadBalancerEnabled()"></kube-services-view>
+                  <kube-services-view
+                    form-values="ctrl.formValues"
+                    is-edit="ctrl.state.isEdit"
+                    namespaces="ctrl.allNamespaces"
+                    loadbalancer-enabled="ctrl.publishViaLoadBalancerEnabled()"
+                  ></kube-services-view>
                   <!-- kubernetes services options -->
 
                   <!-- summary -->
@@ -1349,7 +1354,7 @@
                   ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
                   type="button"
                   class="btn btn-primary btn-sm !ml-0"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.imageValidityIsValid()"
+                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.imageValidityIsValid() || ctrl.hasPortErrors()"
                   ng-click="ctrl.deployApplication()"
                   button-spinner="ctrl.state.actionInProgress"
                   data-cy="k8sAppCreate-deployButton"
