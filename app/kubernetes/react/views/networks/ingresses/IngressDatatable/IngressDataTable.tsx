@@ -29,7 +29,10 @@ export function IngressDataTable() {
   const environmentId = useEnvironmentId();
 
   const nsResult = useNamespaces(environmentId);
-  const result = useIngresses(environmentId, Object.keys(nsResult?.data || {}));
+  const ingressesQuery = useIngresses(
+    environmentId,
+    Object.keys(nsResult?.data || {})
+  );
 
   const settings = useStore();
 
@@ -40,11 +43,11 @@ export function IngressDataTable() {
 
   return (
     <Datatable
-      dataset={result.data || []}
+      dataset={ingressesQuery.data || []}
       storageKey="ingressClassesNameSpace"
       columns={columns}
       settingsStore={settings}
-      isLoading={result.isLoading}
+      isLoading={ingressesQuery.isLoading}
       emptyContentLabel="No supported ingresses found"
       titleOptions={{
         icon: 'svg-route',

@@ -7,6 +7,8 @@ import {
   withInvalidate,
 } from '@/react-tools/react-query';
 
+import { getServices } from '../services/service';
+
 import {
   getIngresses,
   getIngress,
@@ -65,11 +67,43 @@ export function useIngresses(
       'ingress',
     ],
     async () => {
-      const ingresses = await Promise.all(
+      const settledIngressesPromise = await Promise.allSettled(
         namespaces.map((namespace) => getIngresses(environmentId, namespace))
       );
+      const ingresses = settledIngressesPromise
+        .filter(isFulfilled)
+        ?.map((i) => i.value);
       // flatten the array and remove empty ingresses
       const filteredIngresses = ingresses.flat().filter((ing) => ing);
+
+      // get all services in only the namespaces that the ingresses are in to find missing services
+      const uniqueNamespacesWithIngress = [
+        ...new Set(filteredIngresses.map((ing) => ing?.Namespace)),
+      ];
+      const settledServicesPromise = await Promise.allSettled(
+        uniqueNamespacesWithIngress.map((ns) => getServices(environmentId, ns))
+      );
+      const services = settledServicesPromise
+        .filter(isFulfilled)
+        ?.map((s) => s.value)
+        .flat();
+
+      // check if each ingress path service has a service that still exists
+      filteredIngresses.forEach((ing, iIndex) => {
+        const servicesInNamespace = services?.filter(
+          (service) => service?.Namespace === ing?.Namespace
+        );
+        const serviceNamesInNamespace = servicesInNamespace?.map(
+          (service) => service.Name
+        );
+        ing.Paths.forEach((path, pIndex) => {
+          if (!serviceNamesInNamespace?.includes(path.ServiceName)) {
+            filteredIngresses[iIndex].Paths[pIndex].HasService = false;
+          } else {
+            filteredIngresses[iIndex].Paths[pIndex].HasService = true;
+          }
+        });
+      });
       return filteredIngresses;
     },
     {
@@ -155,4 +189,10 @@ export function useIngressControllers(
       ...withError('Unable to get ingress controllers'),
     }
   );
+}
+
+function isFulfilled<T>(
+  input: PromiseSettledResult<T>
+): input is PromiseFulfilledResult<T> {
+  return input.status === 'fulfilled';
 }
