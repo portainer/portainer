@@ -37,7 +37,7 @@ export class EndpointsController {
       return this.$async(async () => {
         try {
           await Promise.all(endpoints.map(({ Id }) => this.EndpointService.deleteEndpoint(Id)));
-          this.Notifications.success('Environments successfully removed', map(endpoints, 'Id').join(', '));
+          this.Notifications.success('Environments successfully removed', map(endpoints, 'Name').join(', '));
         } catch (err) {
           this.Notifications.error('Failure', err, 'Unable to remove environment');
         }
