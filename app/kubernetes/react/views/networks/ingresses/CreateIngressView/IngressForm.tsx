@@ -290,7 +290,8 @@ export function IngressForm({
                     )}
 
                     <Button
-                      className="btn btn-sm btn-dangerlight ml-2"
+                      className="btn btn-sm ml-2"
+                      color="dangerlight"
                       type="button"
                       data-cy={`k8sAppCreate-rmHostButton_${hostIndex}`}
                       onClick={() => removeIngressHost(hostIndex)}
@@ -534,7 +535,8 @@ export function IngressForm({
 
                     <div className="form-group !pl-0 col-sm-1 !m-0">
                       <Button
-                        className="btn btn-sm btn-dangerlight btn-only-icon !ml-0 vertical-center"
+                        className="btn btn-sm btn-only-icon !ml-0 vertical-center"
+                        color="dangerlight"
                         type="button"
                         data-cy={`k8sAppCreate-rmPortButton_${hostIndex}-${pathIndex}`}
                         onClick={() => removeIngressRoute(hostIndex, pathIndex)}

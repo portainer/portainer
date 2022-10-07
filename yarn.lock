@@ -4455,10 +4455,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bootbox@^5.2.2":
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/@types/bootbox/-/bootbox-5.2.3.tgz#86aa918eb4df2499631887bb7b6b23f0195a751d"
-  integrity sha512-6O9474usap0SRkRhPYhmtrAWPfQ2Kwb5WsSxVkM8uT5FwRp/TQijSrhg344r+zJb4K38b96DlXaqs/BrW4Banw==
+"@types/bootbox@^5.2.4":
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/@types/bootbox/-/bootbox-5.2.4.tgz#b86363715f7cd2b60edcc70217ad67c919a1942a"
+  integrity sha512-YYywaPrgRtLgui/dhZujO8ZLw4vFW7eRgRbL/6MO7RG6Hah08gZmeOQv7jKZaltWafixZEPmmFKMSw9qC2rlbw==
   dependencies:
     "@types/jquery" "*"
 

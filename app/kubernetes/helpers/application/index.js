@@ -308,13 +308,17 @@ class KubernetesApplicationHelper {
             svcport.targetPort = port.targetPort;
 
             app.Ingresses.value.forEach((ingress) => {
-              const ingressMatched = _.find(ingress.Paths, { ServiceName: service.metadata.name });
-              if (ingressMatched) {
+              const ingressNameMatched = ingress.Paths.find((ingPath) => ingPath.ServiceName === service.metadata.name);
+              const ingressPortMatched = ingress.Paths.find((ingPath) => ingPath.Port === port.port);
+              // only add ingress info to the port if the ingress serviceport matches the port in the service
+              if (ingressPortMatched) {
                 svcport.ingress = {
-                  IngressName: ingressMatched.IngressName,
-                  Host: ingressMatched.Host,
-                  Path: ingressMatched.Path,
+                  IngressName: ingressPortMatched.IngressName,
+                  Host: ingressPortMatched.Host,
+                  Path: ingressPortMatched.Path,
                 };
+              }
+              if (ingressNameMatched) {
                 svc.Ingress = true;
               }
             });
