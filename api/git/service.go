@@ -2,12 +2,12 @@ package git
 
 import (
 	"context"
-	"log"
 	"strings"
 	"sync"
 	"time"
 
 	lru "github.com/hashicorp/golang-lru"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -74,12 +74,12 @@ func newService(ctx context.Context, cacheSize int, cacheTTL time.Duration) *Ser
 		var err error
 		service.repoRefCache, err = lru.New(cacheSize)
 		if err != nil {
-			log.Printf("[DEBUG] [git] [message: failed to create ref cache: %v\n", err)
+			log.Debug().Err(err).Msg("failed to create ref cache")
 		}
 
 		service.repoFileCache, err = lru.New(cacheSize)
 		if err != nil {
-			log.Printf("[DEBUG] [git] [message: failed to create file cache: %v\n", err)
+			log.Debug().Err(err).Msg("failed to create file cache")
 		}
 
 		if cacheTTL > 0 {
