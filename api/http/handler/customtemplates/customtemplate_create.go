@@ -390,16 +390,17 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	payload.FileContent = composeFileContent
 
 	varsString, _ := request.RetrieveMultiPartFormValue(r, "Variables", true)
-	err = json.Unmarshal([]byte(varsString), &payload.Variables)
-	if err != nil {
-		return errors.New("Invalid variables. Ensure that the variables are valid JSON")
+	if varsString != "" {
+		err = json.Unmarshal([]byte(varsString), &payload.Variables)
+		if err != nil {
+			return errors.New("Invalid variables. Ensure that the variables are valid JSON")
+		}
+	
+		err = validateVariablesDefinitions(payload.Variables)
+		if err != nil {
+			return err
+		}
 	}
-
-	err = validateVariablesDefinitions(payload.Variables)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
