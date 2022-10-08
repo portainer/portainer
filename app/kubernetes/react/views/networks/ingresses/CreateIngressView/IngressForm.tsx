@@ -102,8 +102,9 @@ export function IngressForm({
   }
   const hasNoHostRule = rule.Hosts?.some((host) => host.NoHost);
   const placeholderAnnotation =
-    PlaceholderAnnotations[rule.IngressType || 'other'];
-  const pathTypes = PathTypes[rule.IngressType || 'other'];
+    PlaceholderAnnotations[rule.IngressType || 'other'] ||
+    PlaceholderAnnotations.other;
+  const pathTypes = PathTypes[rule.IngressType || 'other'] || PathTypes.other;
 
   return (
     <Widget>
@@ -169,7 +170,7 @@ export function IngressForm({
                 </div>
               </div>
 
-              <div className="form-group" key={rule.IngressClassName}>
+              <div className="form-group" key={ingressClassOptions.toString()}>
                 <label
                   className="control-label text-muted col-sm-3 col-lg-2 required"
                   htmlFor="ingress_class"
@@ -289,7 +290,8 @@ export function IngressForm({
                     )}
 
                     <Button
-                      className="btn btn-sm btn-dangerlight ml-2"
+                      className="btn btn-sm ml-2"
+                      color="dangerlight"
                       type="button"
                       data-cy={`k8sAppCreate-rmHostButton_${hostIndex}`}
                       onClick={() => removeIngressHost(hostIndex)}
@@ -533,7 +535,8 @@ export function IngressForm({
 
                     <div className="form-group !pl-0 col-sm-1 !m-0">
                       <Button
-                        className="btn btn-sm btn-dangerlight btn-only-icon !ml-0 vertical-center"
+                        className="btn btn-sm btn-only-icon !ml-0 vertical-center"
+                        color="dangerlight"
                         type="button"
                         data-cy={`k8sAppCreate-rmPortButton_${hostIndex}-${pathIndex}`}
                         onClick={() => removeIngressRoute(hostIndex, pathIndex)}

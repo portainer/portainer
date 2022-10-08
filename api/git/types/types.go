@@ -1,5 +1,12 @@
 package gittypes
 
+import "errors"
+
+var (
+	ErrIncorrectRepositoryURL = errors.New("Git repository could not be found, please ensure that the URL is correct.")
+	ErrAuthenticationFailure  = errors.New("Authentication failed, please ensure that the git credentials are correct.")
+)
+
 // RepoConfig represents a configuration for a repo
 type RepoConfig struct {
 	// The repo url

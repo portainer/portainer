@@ -94,12 +94,7 @@ class KubeCreateCustomTemplateViewController {
 
       this.state.actionInProgress = true;
       try {
-        const formValues = { ...this.formValues, Variables: null };
-        if (this.formValues.Variables.length > 0) {
-          formValues.Variables = JSON.stringify(this.formValues.Variables);
-        }
-
-        const customTemplate = await this.createCustomTemplateByMethod(method, formValues);
+        const customTemplate = await this.createCustomTemplateByMethod(method, this.formValues);
 
         const accessControlData = this.formValues.AccessControlData;
         const userDetails = this.Authentication.getUserDetails();

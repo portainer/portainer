@@ -6,10 +6,6 @@
   margin-bottom: 5px !important;
 }
 
-.header > div:last-child {
-  padding-right: 0;
-}
-
 .header .meta div {
   white-space: nowrap;
   overflow: hidden;

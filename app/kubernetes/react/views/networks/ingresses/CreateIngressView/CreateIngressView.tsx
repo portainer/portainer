@@ -14,7 +14,7 @@ import { PageHeader } from '@@/PageHeader';
 import { Option } from '@@/form-components/Input/Select';
 import { Button } from '@@/buttons';
 
-import { Ingress } from '../types';
+import { Ingress, IngressController } from '../types';
 import {
   useCreateIngress,
   useIngresses,
@@ -66,7 +66,8 @@ export function CreateIngressView() {
     (servicesResults.isLoading &&
       configResults.isLoading &&
       namespacesResults.isLoading &&
-      ingressesResults.isLoading) ||
+      ingressesResults.isLoading &&
+      ingressControllersResults.isLoading) ||
     (isEdit && !ingressRule.IngressName);
 
   const [ingressNames, ingresses, ruleCounterByNamespace, hostWithTLS] =
@@ -137,17 +138,21 @@ export function CreateIngressView() {
     { label: 'Select a service', value: '' },
     ...(servicesOptions || []),
   ];
-  const servicePorts = clusterIpServices
-    ? Object.fromEntries(
-        clusterIpServices?.map((service) => [
-          service.Name,
-          service.Ports.map((port) => ({
-            label: String(port.Port),
-            value: String(port.Port),
-          })),
-        ])
-      )
-    : {};
+  const servicePorts = useMemo(
+    () =>
+      clusterIpServices
+        ? Object.fromEntries(
+            clusterIpServices?.map((service) => [
+              service.Name,
+              service.Ports.map((port) => ({
+                label: String(port.Port),
+                value: String(port.Port),
+              })),
+            ])
+          )
+        : {},
+    [clusterIpServices]
+  );
 
   const existingIngressClass = useMemo(
     () =>
@@ -166,7 +171,12 @@ export function CreateIngressView() {
       })) || []),
   ];
 
-  if (!existingIngressClass && ingressRule.IngressClassName) {
+  if (
+    (!existingIngressClass ||
+      (existingIngressClass && !existingIngressClass.Availability)) &&
+    ingressRule.IngressClassName &&
+    ingressControllersResults.data
+  ) {
     ingressClassOptions.push({
       label: !ingressRule.IngressType
         ? `${ingressRule.IngressClassName} - NOT FOUND`
@@ -189,7 +199,12 @@ export function CreateIngressView() {
   ];
 
   useEffect(() => {
-    if (!!params.name && ingressesResults.data && !ingressRule.IngressName) {
+    if (
+      !!params.name &&
+      ingressesResults.data &&
+      !ingressRule.IngressName &&
+      ingressControllersResults.data
+    ) {
       // if it is an edit screen, prepare the rule from the ingress
       const ing = ingressesResults.data?.find(
         (ing) => ing.Name === params.name && ing.Namespace === params.namespace
@@ -199,7 +214,7 @@ export function CreateIngressView() {
           (c) => c.ClassName === ing.ClassName
         )?.Type;
         const r = prepareRuleFromIngress(ing);
-        r.IngressType = type;
+        r.IngressType = type || r.IngressType;
         setIngressRule(r);
       }
     }
@@ -212,14 +227,41 @@ export function CreateIngressView() {
   ]);
 
   useEffect(() => {
+    // for each path in each host, if the service port doesn't exist as an option, change it to the first option
+    if (ingressRule?.Hosts?.length) {
+      ingressRule.Hosts.forEach((host, hIndex) => {
+        host?.Paths?.forEach((path, pIndex) => {
+          const serviceName = path.ServiceName;
+          const currentServicePorts = servicePorts[serviceName]?.map(
+            (p) => p.value
+          );
+          if (
+            currentServicePorts?.length &&
+            !currentServicePorts?.includes(String(path.ServicePort))
+          ) {
+            handlePathChange(
+              hIndex,
+              pIndex,
+              'ServicePort',
+              currentServicePorts[0]
+            );
+          }
+        });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ingressRule, servicePorts]);
+
+  useEffect(() => {
     if (namespace.length > 0) {
       validate(
         ingressRule,
         ingressNames || [],
         servicesOptions || [],
-        !!existingIngressClass
+        existingIngressClass
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     ingressRule,
     namespace,
@@ -289,7 +331,7 @@ export function CreateIngressView() {
     ingressRule: Rule,
     ingressNames: string[],
     serviceOptions: Option<string>[],
-    existingIngressClass: boolean
+    existingIngressClass?: IngressController
   ) {
     const errors: Record<string, ReactNode> = {};
     const rule = { ...ingressRule };
@@ -320,7 +362,12 @@ export function CreateIngressView() {
         'No ingress class is currently set for this ingress - use of the Portainer UI requires one to be set.';
     }
 
-    if (isEdit && !existingIngressClass && ingressRule.IngressClassName) {
+    if (
+      isEdit &&
+      (!existingIngressClass ||
+        (existingIngressClass && !existingIngressClass.Availability)) &&
+      ingressRule.IngressClassName
+    ) {
       if (!rule.IngressType) {
         errors.className =
           'Currently set to an ingress class that cannot be found in the cluster - you must select a valid class.';

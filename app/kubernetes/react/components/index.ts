@@ -15,6 +15,7 @@ export const componentsModule = angular
       'onChangeAvailability',
       'description',
       'ingressControllers',
+      'isLoading',
       'noIngressControllerLabel',
       'view',
     ])

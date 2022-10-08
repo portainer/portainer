@@ -563,10 +563,40 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
       },
     };
 
+    const containerExplorer = {
+      name: 'docker.containers.container.explorer',
+      url: '/explorer',
+      views: {
+        'content@': {
+          templateUrl: './views/containers/explorer/containerExplorer.html',
+          controller: 'ContainerExplorerController',
+        },
+      },
+    };
+    const containerExplorerCreate = {
+      name: 'docker.containers.container.explorer.create',
+      url: '/create',
+      views: {
+        'content@': {
+          templateUrl: './views/containers/explorer/create/index.html',
+          controller: 'ContainerExplorerCreateController',
+        },
+      },
+    };
+    const containerExplorerUpload = {
+      name: 'docker.containers.container.explorer.upload',
+      url: '/upload',
+      views: {
+        'content@': {
+          templateUrl: './views/containers/explorer/upload/index.html',
+          controller: 'ContainerExplorerUploadController',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(configs);
     $stateRegistryProvider.register(config);
     $stateRegistryProvider.register(configCreation);
-
     $stateRegistryProvider.register(customTemplates);
     $stateRegistryProvider.register(customTemplatesNew);
     $stateRegistryProvider.register(customTemplatesEdit);
@@ -612,5 +642,9 @@ angular.module('portainer.docker', ['portainer.app', reactModule]).config([
     $stateRegistryProvider.register(swarmRegistries);
     $stateRegistryProvider.register(dockerRegistryAccess);
     $stateRegistryProvider.register(swarmRegistryAccess);
+
+    $stateRegistryProvider.register(containerExplorer);
+    $stateRegistryProvider.register(containerExplorerCreate);
+    $stateRegistryProvider.register(containerExplorerUpload);
   },
 ]);

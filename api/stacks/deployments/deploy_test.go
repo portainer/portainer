@@ -1,4 +1,4 @@
-package stacks
+package deployments
 
 import (
 	"errors"

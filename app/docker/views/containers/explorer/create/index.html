@@ -1,10 +1,21 @@
-<rd-header>
-  <rd-header-title title-text="Container Explorer"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a> &gt;
-    <a ui-sref="docker.containers.container.explorer({id: container.Id})">Explorer</a> &gt; New folder
-  </rd-header-content>
-</rd-header>
+<page-header
+  title="'Container Explorer'"
+  breadcrumbs="[
+    { label:'Containers', link:'docker.containers' },
+    { 
+      label:(container.Name | trimcontainername),
+      link: 'docker.containers.container', 
+      linkParams:container.Id
+    }, 
+    { 
+      label: 'Explorer',
+      link: 'docker.containers.container.explorer', 
+      linkParams:container.Id
+    }, 
+    'New folder'
+    ]"
+>
+</page-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">

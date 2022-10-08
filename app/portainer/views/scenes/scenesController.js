@@ -1,7 +1,7 @@
 angular.module('portainer.app').controller('ScenesController', ScenesController);
 import _ from 'lodash';
 
-function ScenesController($scope, $state, $async, SceneService, Notifications) {
+function ScenesController($scope, $state, $async, ModalService, SceneService, Notifications) {
   $scope.state = {
     actionInProgress: false,
     scenes: [],
@@ -14,7 +14,14 @@ function ScenesController($scope, $state, $async, SceneService, Notifications) {
   $scope.removeAction = removeAction;
 
   function removeAction(item) {
-    return $async(removeActionAsync, item);
+    ModalService.confirmDeletion(
+      'Are you sure that you want to remove the selected ?',
+      (confirmed) => {
+        if (confirmed) {
+          return $async(removeActionAsync, item);
+        }
+      }
+    );
   }
 
   async function removeActionAsync(item) {

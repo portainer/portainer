@@ -98,8 +98,12 @@ export function WizardDocker({ onCreate, isDockerStandalone }: Props) {
           <EdgeAgentTab
             onCreate={(environment) => onCreate(environment, 'dockerEdgeAgent')}
             commands={{
-              linux: [commandsTabs.swarmLinux, commandsTabs.standaloneLinux],
-              win: [commandsTabs.swarmWindows, commandsTabs.standaloneWindow],
+              linux: isDockerStandalone
+                ? [commandsTabs.standaloneLinux]
+                : [commandsTabs.swarmLinux],
+              win: isDockerStandalone
+                ? [commandsTabs.standaloneWindow]
+                : [commandsTabs.swarmWindows],
             }}
           />
         );

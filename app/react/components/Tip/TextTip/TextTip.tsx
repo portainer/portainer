@@ -27,13 +27,15 @@ export function TextTip({
   }
 
   return (
-    <p className="text-muted small vertical-center">
-      <Icon
-        icon="alert-circle"
-        feather
-        className={clsx(`${iconClass}`, 'space-right')}
-      />
-      {children}
+    <p className="small vertical-center">
+      <i className="icon-container">
+        <Icon
+          icon="alert-circle"
+          feather
+          className={clsx(`${iconClass}`, 'space-right')}
+        />
+      </i>
+      <span className="text-muted">{children}</span>
     </p>
   );
 }

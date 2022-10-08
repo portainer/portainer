@@ -1,6 +1,7 @@
 import { CellProps, Column } from 'react-table';
 
 import { Icon } from '@@/Icon';
+import { Badge } from '@@/Badge';
 
 import { Ingress, TLS, Path } from '../../types';
 
@@ -31,11 +32,17 @@ export const ingressRules: Column<Ingress> = {
       const isHttp = isHTTP(row.original.TLS || [], path.Host);
       return (
         <div key={`${path.Host}${path.Path}${path.ServiceName}:${path.Port}`}>
-          {link(path.Host, path.Path, isHttp)}
-          <span className="px-2">
+          <span className="flex px-2 flex-nowrap items-center gap-1">
+            {link(path.Host, path.Path, isHttp)}
             <Icon icon="arrow-right" feather />
+            {`${path.ServiceName}:${path.Port}`}
+            {!path.HasService && (
+              <Badge type="warn" className="ml-1 gap-1">
+                <Icon icon="alert-triangle" feather />
+                Service doesn&apos;t exist
+              </Badge>
+            )}
           </span>
-          {`${path.ServiceName}:${path.Port}`}
         </div>
       );
     });
