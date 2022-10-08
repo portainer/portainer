@@ -138,17 +138,21 @@ export function CreateIngressView() {
     { label: 'Select a service', value: '' },
     ...(servicesOptions || []),
   ];
-  const servicePorts = clusterIpServices
-    ? Object.fromEntries(
-        clusterIpServices?.map((service) => [
-          service.Name,
-          service.Ports.map((port) => ({
-            label: String(port.Port),
-            value: String(port.Port),
-          })),
-        ])
-      )
-    : {};
+  const servicePorts = useMemo(
+    () =>
+      clusterIpServices
+        ? Object.fromEntries(
+            clusterIpServices?.map((service) => [
+              service.Name,
+              service.Ports.map((port) => ({
+                label: String(port.Port),
+                value: String(port.Port),
+              })),
+            ])
+          )
+        : {},
+    [clusterIpServices]
+  );
 
   const existingIngressClass = useMemo(
     () =>
@@ -234,6 +238,32 @@ export function CreateIngressView() {
       });
     }
   }, [tlsOptions, ingressRule.Hosts]);
+
+  useEffect(() => {
+    // for each path in each host, if the service port doesn't exist as an option, change it to the first option
+    if (ingressRule?.Hosts?.length) {
+      ingressRule.Hosts.forEach((host, hIndex) => {
+        host?.Paths?.forEach((path, pIndex) => {
+          const serviceName = path.ServiceName;
+          const currentServicePorts = servicePorts[serviceName]?.map(
+            (p) => p.value
+          );
+          if (
+            currentServicePorts?.length &&
+            !currentServicePorts?.includes(String(path.ServicePort))
+          ) {
+            handlePathChange(
+              hIndex,
+              pIndex,
+              'ServicePort',
+              currentServicePorts[0]
+            );
+          }
+        });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ingressRule, servicePorts]);
 
   useEffect(() => {
     if (namespace.length > 0) {

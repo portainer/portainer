@@ -18,6 +18,7 @@ interface InputOption {
 
 interface PromptOptions {
   title: string;
+  message?: string;
   inputType?:
     | 'text'
     | 'textarea'
@@ -45,9 +46,12 @@ export async function promptAsync(options: Omit<PromptOptions, 'callback'>) {
   });
 }
 
+// the ts-ignore is required because the bootbox typings are not up to date
+// remove the ts-ignore when the typings are updated in
 export function prompt(options: PromptOptions) {
   const box = bootbox.prompt({
     title: options.title,
+    message: options.message || '',
     inputType: options.inputType,
     inputOptions: options.inputOptions,
     buttons: options.buttons ? confirmButtons(options.buttons) : undefined,
@@ -78,6 +82,32 @@ export function confirmContainerDeletion(
       confirm: {
         label: 'Remove',
         className: 'btn-danger',
+      },
+    },
+    callback,
+  });
+}
+
+export function confirmUpdateAppIngress(
+  title: string,
+  message: string,
+  inputText: string,
+  callback: PromptCallback
+) {
+  prompt({
+    title: buildTitle(title),
+    inputType: 'checkbox',
+    message,
+    inputOptions: [
+      {
+        text: `${inputText}<i></i>`,
+        value: '1',
+      },
+    ],
+    buttons: {
+      confirm: {
+        label: 'Update',
+        className: 'btn-primary',
       },
     },
     callback,

@@ -164,6 +164,12 @@ const docURLs = [
     examples: ['#!/1/kubernetes/applications', '#!/1/kubernetes/applications/new', '#!/1/kubernetes/deploy?templateId=', '#!/1/kubernetes/applications/metallb-system/controller'],
   },
   {
+    desc: 'Kubernetes / Ingresses',
+    docURL: 'https://docs.portainer.io/user/kubernetes/ingresses',
+    locationRegex: /#!\/\d+\/kubernetes\/ingresses/,
+    examples: ['#!/1/kubernetes/ingresses'],
+  },
+  {
     desc: 'Kubernetes / ConfigMaps & Secrets',
     docURL: 'https://docs.portainer.io/user/kubernetes/configurations',
     locationRegex: /#!\/\d+\/kubernetes\/configurations/,
@@ -176,12 +182,6 @@ const docURLs = [
     examples: ['#!/1/kubernetes/volumes'],
   },
   {
-    desc: 'Kubernetes / Cluster',
-    docURL: 'https://docs.portainer.io/user/kubernetes/cluster',
-    locationRegex: /#!\/\d+\/kubernetes\/cluster/,
-    examples: ['#!/1/kubernetes/cluster', '#!/1/kubernetes/cluster/ip-10-138-11-102', '#!/1/kubernetes/cluster/ip-10-138-11-102/stats'],
-  },
-  {
     desc: 'Kubernetes / Cluster / Set up',
     docURL: 'https://docs.portainer.io/user/kubernetes/cluster/setup',
     locationRegex: /#!\/\d+\/kubernetes\/cluster\/configure/,
@@ -192,6 +192,12 @@ const docURLs = [
     docURL: 'https://docs.portainer.io/user/kubernetes/cluster/security',
     locationRegex: /#!\/\d+\/kubernetes\/cluster\/securityConstraint/,
     examples: ['#!/1/kubernetes/cluster/securityConstraint'],
+  },
+  {
+    desc: 'Kubernetes / Cluster',
+    docURL: 'https://docs.portainer.io/user/kubernetes/cluster',
+    locationRegex: /#!\/\d+\/kubernetes\/cluster/,
+    examples: ['#!/1/kubernetes/cluster', '#!/1/kubernetes/cluster/ip-10-138-11-102', '#!/1/kubernetes/cluster/ip-10-138-11-102/stats'],
   },
   {
     desc: 'Kubernetes / Cluster / Registries',
@@ -330,6 +336,12 @@ const docURLs = [
     docURL: 'https://docs.portainer.io/admin/settings/authentication',
     locationRegex: /#!\/settings\/auth/,
     examples: ['#!/settings/auth'],
+  },
+  {
+    desc: 'Settings / Settings / Notifications',
+    docURL: 'https://docs.portainer.io/admin/notifications',
+    locationRegex: /#!\/notifications/,
+    examples: ['#!/notifications'],
   },
   {
     desc: 'Settings / Settings / Cloud settings',
