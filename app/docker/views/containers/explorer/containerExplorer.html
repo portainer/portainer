@@ -94,7 +94,7 @@
                       >
                         <td>
                           <a href="">
-                            <i class="fa fa-archive" ng-show="item.model.type === 'dir'"></i>
+                            <i class="fa fa-folder" ng-show="item.model.type === 'dir'"></i>
                             <i class="fa fa-file" ng-show="item.model.type === 'file'"></i>
                             {{ item.model.name }}
                           </a>
@@ -160,8 +160,8 @@
           <i class="fa fa-chevron-right" ng-show="!isInThisPath(node.absPath)"></i>
       </span>
 
-      <i class="fa fa-archive" ng-show="!isInThisPath(node.absPath)"></i>
-      <i class="fal fa-folder-open" ng-show="isInThisPath(node.absPath)"></i>
+      <i class="fa fa-folder" ng-show="!isInThisPath(node.absPath)"></i>
+      <i class="fa fa-folder-open" ng-show="isInThisPath(node.absPath)"></i>
       {{node.name }}
   </a>
   <ul class="nav nav-sidebar">

@@ -3,32 +3,15 @@ package stacks
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"github.com/portainer/portainer/api/internal/stackutils"
-
-	"github.com/docker/cli/cli/compose/loader"
-	"github.com/docker/cli/cli/compose/types"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
-
-func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
-	if !*doCleanUp {
-		return nil
-	}
-
-	err := handler.FileService.RemoveDirectory(stack.ProjectPath)
-	if err != nil {
-		log.Error().Err(err).Msg("unable to cleanup stack creation")
-	}
-
-	return nil
-}
 
 // @id StackCreate
 // @summary Deploy a new stack
@@ -153,63 +136,6 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 		return handler.createKubernetesStackFromManifestURL(w, r, endpoint, userID)
 	}
 	return httperror.BadRequest("Invalid value for query parameter: method. Value must be one of: string or repository", errors.New(request.ErrInvalidQueryParameter))
-}
-
-func (handler *Handler) isValidStackFile(stackFileContent []byte, securitySettings *portainer.EndpointSecuritySettings) error {
-	composeConfigYAML, err := loader.ParseYAML(stackFileContent)
-	if err != nil {
-		return err
-	}
-
-	composeConfigFile := types.ConfigFile{
-		Config: composeConfigYAML,
-	}
-
-	composeConfigDetails := types.ConfigDetails{
-		ConfigFiles: []types.ConfigFile{composeConfigFile},
-		Environment: map[string]string{},
-	}
-
-	composeConfig, err := loader.Load(composeConfigDetails, func(options *loader.Options) {
-		options.SkipValidation = true
-		options.SkipInterpolation = true
-	})
-	if err != nil {
-		return err
-	}
-
-	for key := range composeConfig.Services {
-		service := composeConfig.Services[key]
-		if !securitySettings.AllowBindMountsForRegularUsers {
-			for _, volume := range service.Volumes {
-				if volume.Type == "bind" {
-					return errors.New("bind-mount disabled for non administrator users")
-				}
-			}
-		}
-
-		if !securitySettings.AllowPrivilegedModeForRegularUsers && service.Privileged == true {
-			return errors.New("privileged mode disabled for non administrator users")
-		}
-
-		if !securitySettings.AllowHostNamespaceForRegularUsers && service.Pid == "host" {
-			return errors.New("pid host disabled for non administrator users")
-		}
-
-		if !securitySettings.AllowDeviceMappingForRegularUsers && service.Devices != nil && len(service.Devices) > 0 {
-			return errors.New("device mapping disabled for non administrator users")
-		}
-
-		if !securitySettings.AllowSysctlSettingForRegularUsers && service.Sysctls != nil && len(service.Sysctls) > 0 {
-			return errors.New("sysctl setting disabled for non administrator users")
-		}
-
-		if !securitySettings.AllowContainerCapabilitiesForRegularUsers && (len(service.CapAdd) > 0 || len(service.CapDrop) > 0) {
-			return errors.New("container capabilities disabled for non administrator users")
-		}
-	}
-
-	return nil
 }
 
 func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
