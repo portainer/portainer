@@ -14,5 +14,4 @@ storybook-static
 __debug_bin
 
 api/docs
-.idea
 .env
