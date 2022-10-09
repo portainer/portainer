@@ -5,7 +5,7 @@ import {
   SortableTableSettings,
 } from '@/react/components/datatables/types';
 
-export type QuickAction = 'attach' | 'exec' | 'inspect' | 'logs' | 'stats';
+export type QuickAction = 'attach' | 'exec' | 'inspect' | 'logs' | 'stats' | 'explorer';
 
 export interface SettableQuickActionsTableSettings<TAction> {
   hiddenQuickActions: TAction[];

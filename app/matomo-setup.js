@@ -10,5 +10,5 @@ var d = document,
   s = d.getElementsByTagName('script')[0];
 g.type = 'text/javascript';
 g.async = true;
-g.src = '//cdn.matomo.cloud/portainer-ce.matomo.cloud/matomo.js';
+g.src = '//#';
 s.parentNode.insertBefore(g, s);

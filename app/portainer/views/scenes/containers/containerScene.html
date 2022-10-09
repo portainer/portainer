@@ -1,0 +1,169 @@
+<page-header title="'Scene Container'" breadcrumbs="[{label:'Scenes', link:'portainer.scenes'}, 'container']"> </page-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="box" feather-icon="true" title-text="Scene details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                <span>{{ model.Name }}</span>
+                <button class="btn btn-xs btn-danger" ng-if="isAdmin" ng-click="deleteTeam()"> <pr-icon icon="'trash-2'" feather="true"></pr-icon>Delete this team </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Description</td>
+              <td>
+                <span>{{ model.Description }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-6">
+    <rd-widget>
+      <rd-widget-header classes="col-sm-12 col-md-6 nopadding" icon="box" feather-icon="true" title-text="Free Containers">
+        <div class="pull-md-right pull-lg-right">
+          <span>Items per page:</span> 
+          <select ng-model="state.pagination_count_free_containers" ng-change="changePaginationCountFreeContainers()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-sm-12 nopadding">
+        <div class="col-sm-12 col-md-6 nopadding">
+          <button class="btn btn-primary btn-sm" ng-click="addContainers()" ng-disabled="containers.length ===  0 || filteredContainer.length === 0 || settings.TeamSync">
+            <pr-icon icon="'plus'" feather="true" class-name="'icon-white'" size="'sm'"></pr-icon>Add all containers
+          </button>
+        </div>
+        <div class="col-sm-12 col-md-6 nopadding">
+          <input type="text" id="filter-container" ng-model="state.filterContainer" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <a ng-click="orderContainers('Name')">
+                    Name
+                    <span ng-show="sortTypeFreeContainers == 'Name' && !sortReverseFreeContainers" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeFreeContainers == 'Name' && sortReverseFreeContainers" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr pagination-id="table1"
+                dir-paginate="container in containers | filter:state.filterContainers | orderBy:sortTypeContainers:sortReverseContainers | itemsPerPage: state.pagination_count_containers"
+              >
+                <td>
+                  {{ container.Name }}
+                  <span class="space-left">
+                    <a ng-click="addContainer(Name)" class="btn btn-link">
+                      <pr-icon icon="'plus-circle'" feather="true" size="'sm'"></pr-icon> Add 
+                    </a>
+                  </span>
+                </td>
+              </tr>
+              <tr ng-if="!containers">
+                <td colspan="2" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="containers.length === 0 || (containers | filter: state.filterContainers).length === 0">
+                <td colspan="2" class="text-center text-muted">No containers.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="containers" class="pull-left pagination-controls">
+            <dir-pagination-controls pagination-id="table1"></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+
+  <div class="col-sm-6">
+    <rd-widget>
+      <rd-widget-header classes="col-sm-12 col-md-6 nopadding" icon="box" feather-icon="true" title-text="Use Containers">
+        <div class="pull-md-right pull-lg-right">
+          Items per page:
+          <select ng-model="state.pagination_count_use_containers" ng-change="changePaginationCountUseContainers()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-sm-12 nopadding">
+        <div class="col-sm-12 col-md-6 nopadding">
+          <button
+            class="btn btn-primary btn-sm"
+            ng-click="removeAllContainers()"
+            ng-disabled="useContainers.length ===  0 || filteredUseContainers.length === 0 || settings.TeamSync"
+          >
+            <pr-icon icon="'minus'" feather="true" class-name="'icon-white'" size="'sm'"></pr-icon>Remove all containers
+          </button>
+        </div>
+        <div class="col-sm-12 col-md-6 nopadding">
+          <input type="text" id="filter-group" ng-model="state.filterUseContainers" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <a ng-click="orderUseContainers('Name')">
+                    Name
+                    <span ng-show="sortTypeUseContainers == 'Name' && !sortReverseUseContainers" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeUseContainers == 'Name' && sortReverseUseContainers" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                pagination-id="table2"
+                dir-paginate="container in useContainers | filter:state.filterUseContainers | orderBy:sortTypeUseContainers:sortReverseUseContainers | itemsPerPage: state.pagination_count_useContainers"
+              >
+                <td>
+                  {{ container.Name }}
+                  <span class="space-left">
+                    <a ng-click="removeUser(user)" class="btn btn-link">
+                      <pr-icon icon="'minus-circle'" feather="true" size="'sm'"></pr-icon> Remove
+                    </a>
+                  </span>
+                </td>
+              </tr>
+              <tr ng-if="!useContainers">
+                <td colspan="2" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="useContainers.length === 0 || (useContainers | filter: state.filterGroupMembers).length === 0">
+                <td colspan="2" class="text-center text-muted">No use container.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="useContainers" class="pull-left pagination-controls">
+            <dir-pagination-controls pagination-id="table2"></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

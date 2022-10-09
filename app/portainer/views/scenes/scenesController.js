@@ -1,16 +1,17 @@
 angular.module('portainer.app').controller('ScenesController', ScenesController);
 import _ from 'lodash';
 
-function ScenesController($scope, $state, $async, ModalService, SceneService, Notifications) {
+function ScenesController($scope, $state, $async, ModalService, SceneService, PaginationService, Notifications) {
   $scope.state = {
     actionInProgress: false,
+    pagination_count_scenes: PaginationService.getPaginationLimit('scenes'),
     scenes: [],
   };
 
   $scope.handleClick = (item) => {
-    alert(item);
+    Notifications.success(item.Name, '');
   };
-
+  
   $scope.removeAction = removeAction;
 
   function removeAction(item) {
@@ -41,7 +42,6 @@ function ScenesController($scope, $state, $async, ModalService, SceneService, No
     SceneService.scenes()
       .then((data) => {
         $scope.state.scenes = data;
-        console.log('scenes: ', $scope.state.scenes);
       })
       .catch((err) => {
         Notifications.error('Failure', err, 'Unable to retrieve scenes');

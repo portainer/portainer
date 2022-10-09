@@ -418,13 +418,24 @@ angular
         },
       };
 
-      var scenes = {
+      let scenes = {
         name: 'portainer.scenes',
         url: '/scenes',
         views: {
           'content@': {
             templateUrl: './views/scenes/scenes.html',
             controller: 'ScenesController',
+          },
+        },
+      };
+
+      let sceneContainers = {
+        name: 'portainer.scenes.containers',
+        url: '/:id',
+        views: {
+          'content@': {
+            templateUrl: './views/scenes/containers/containerScene.html',
+            controller: 'ContainerSceneController',
           },
         },
       };
@@ -451,7 +462,7 @@ angular
         },
       };
 
-      var namespaces = {
+      let namespaces = {
         name: 'portainer.namespaces',
         url: '/namespaces',
         views: {
@@ -495,6 +506,7 @@ angular
       $stateRegistryProvider.register(user);
 
       $stateRegistryProvider.register(scenes);
+      $stateRegistryProvider.register(sceneContainers);
       $stateRegistryProvider.register(sceneCreate);
       $stateRegistryProvider.register(scene);
       $stateRegistryProvider.register(namespaces);
