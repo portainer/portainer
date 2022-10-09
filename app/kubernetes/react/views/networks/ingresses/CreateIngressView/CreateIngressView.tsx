@@ -190,13 +190,16 @@ export function CreateIngressView() {
       config.SecretType === 'kubernetes.io/tls' &&
       config.Namespace === namespace
   );
-  const tlsOptions: Option<string>[] = [
-    { label: 'No TLS', value: '' },
-    ...(matchedConfigs?.map((config) => ({
-      label: config.Name,
-      value: config.Name,
-    })) || []),
-  ];
+  const tlsOptions: Option<string>[] = useMemo(
+    () => [
+      { label: 'No TLS', value: '' },
+      ...(matchedConfigs?.map((config) => ({
+        label: config.Name,
+        value: config.Name,
+      })) || []),
+    ],
+    [matchedConfigs]
+  );
 
   useEffect(() => {
     if (
