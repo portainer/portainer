@@ -190,13 +190,16 @@ export function CreateIngressView() {
       config.SecretType === 'kubernetes.io/tls' &&
       config.Namespace === namespace
   );
-  const tlsOptions: Option<string>[] = [
-    { label: 'No TLS', value: '' },
-    ...(matchedConfigs?.map((config) => ({
-      label: config.Name,
-      value: config.Name,
-    })) || []),
-  ];
+  const tlsOptions: Option<string>[] = useMemo(
+    () => [
+      { label: 'No TLS', value: '' },
+      ...(matchedConfigs?.map((config) => ({
+        label: config.Name,
+        value: config.Name,
+      })) || []),
+    ],
+    [matchedConfigs]
+  );
 
   useEffect(() => {
     if (
@@ -225,6 +228,19 @@ export function CreateIngressView() {
     ingressRule.IngressName,
     params.namespace,
   ]);
+
+  useEffect(() => {
+    // for each host, if the tls selection doesn't exist as an option, change it to the first option
+    if (ingressRule?.Hosts?.length) {
+      ingressRule.Hosts.forEach((host, hIndex) => {
+        const secret = host.Secret || '';
+        const tlsOptionVals = tlsOptions.map((o) => o.value);
+        if (tlsOptions?.length && !tlsOptionVals?.includes(secret)) {
+          handleTLSChange(hIndex, tlsOptionVals[0]);
+        }
+      });
+    }
+  }, [tlsOptions, ingressRule.Hosts]);
 
   useEffect(() => {
     // for each path in each host, if the service port doesn't exist as an option, change it to the first option
