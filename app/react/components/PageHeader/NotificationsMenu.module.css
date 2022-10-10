@@ -52,6 +52,7 @@
 }
 
 .notification-details {
+  word-break: break-all;
   white-space: normal;
   overflow: hidden;
   text-overflow: ellipsis;
