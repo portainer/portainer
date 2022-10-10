@@ -175,7 +175,7 @@ export function CreateIngressView() {
     (!existingIngressClass ||
       (existingIngressClass && !existingIngressClass.Availability)) &&
     ingressRule.IngressClassName &&
-    ingressControllersResults.data
+    !ingressControllersResults.isLoading
   ) {
     ingressClassOptions.push({
       label: !ingressRule.IngressType
@@ -206,7 +206,7 @@ export function CreateIngressView() {
       !!params.name &&
       ingressesResults.data &&
       !ingressRule.IngressName &&
-      ingressControllersResults.data
+      !ingressControllersResults.isLoading
     ) {
       // if it is an edit screen, prepare the rule from the ingress
       const ing = ingressesResults.data?.find(
@@ -221,6 +221,7 @@ export function CreateIngressView() {
         setIngressRule(r);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     params.name,
     ingressesResults.data,
