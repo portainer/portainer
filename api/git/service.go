@@ -167,9 +167,10 @@ func (service *Service) LatestCommitID(repositoryURL, referenceName, username, p
 
 // ListRefs will list target repository's references without cloning the repository
 func (service *Service) ListRefs(repositoryURL, username, password string, hardRefresh bool) ([]string, error) {
+	refCacheKey := generateCacheKey(repositoryURL, password)
 	if service.cacheEnabled && hardRefresh {
 		// Should remove the cache explicitly, so that the following normal list can show the correct result
-		service.repoRefCache.Remove(repositoryURL)
+		service.repoRefCache.Remove(refCacheKey)
 		// Remove file caches pointed to the same repository
 		for _, fileCacheKey := range service.repoFileCache.Keys() {
 			key, ok := fileCacheKey.(string)
@@ -183,7 +184,7 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 
 	if service.repoRefCache != nil {
 		// Lookup the refs cache first
-		cache, ok := service.repoRefCache.Get(repositoryURL)
+		cache, ok := service.repoRefCache.Get(refCacheKey)
 		if ok {
 			refs, success := cache.([]string)
 			if success {
@@ -215,7 +216,7 @@ func (service *Service) ListRefs(repositoryURL, username, password string, hardR
 	}
 
 	if service.cacheEnabled && service.repoRefCache != nil {
-		service.repoRefCache.Add(options.repositoryUrl, refs)
+		service.repoRefCache.Add(refCacheKey, refs)
 	}
 	return refs, nil
 }
