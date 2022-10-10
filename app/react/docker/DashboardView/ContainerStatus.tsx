@@ -60,7 +60,11 @@ function runningContainersFilter(containers: DockerContainer[]) {
     .length;
 }
 function stoppedContainersFilter(containers: DockerContainer[]) {
-  return containers.filter((container) => container.Status === 'exited').length;
+  // keep status 'stopped' for upgraded environment.
+  return containers.filter(
+    (container) =>
+      container.Status === 'exited' || container.Status === 'stopped'
+  ).length;
 }
 function healthyContainersFilter(containers: DockerContainer[]) {
   return containers.filter((container) => container.Status === 'healthy')
