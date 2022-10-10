@@ -1,10 +1,10 @@
+import { formatLogs } from '../helpers/logHelper';
 import { TaskViewModel } from '../models/task';
 
 angular.module('portainer.docker').factory('TaskService', [
   '$q',
   'Task',
-  'LogHelper',
-  function TaskServiceFactory($q, Task, LogHelper) {
+  function TaskServiceFactory($q, Task) {
     'use strict';
     var service = {};
 
@@ -54,7 +54,7 @@ angular.module('portainer.docker').factory('TaskService', [
 
       Task.logs(parameters)
         .$promise.then(function success(data) {
-          var logs = LogHelper.formatLogs(data.logs, { stripHeaders: true, withTimestamps: !!timestamps });
+          var logs = formatLogs(data.logs, { stripHeaders: true, withTimestamps: !!timestamps });
           deferred.resolve(logs);
         })
         .catch(function error(err) {

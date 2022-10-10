@@ -77,9 +77,10 @@
 
   <div class="row">
     <div class="col-sm-12 h-[max(400px,calc(100vh-380px))]">
-      <pre
-        class="log_viewer widget"
-      ><div ng-repeat="line in ctrl.state.filteredLogs = (ctrl.applicationLogs | filter:ctrl.state.search) track by $index" class="line" ng-if="line"><p class="inner_line">{{ line }}</p></div><div ng-if="ctrl.applicationLogs.length && !ctrl.state.filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ ctrl.state.search }}' filter</p></div><div ng-if="ctrl.applicationLogs.length === 0" class="line"><p class="inner_line">No logs available</p></div></pre>
+      <pre class="log_viewer widget">
+        <div ng-repeat="line in ctrl.state.filteredLogs = (ctrl.applicationLogs | filter:ctrl.state.search) track by $index" class="line" ng-if="line"><p class="inner_line">{{ line }}</p></div>
+        <div ng-if="ctrl.applicationLogs.length && !ctrl.state.filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ ctrl.state.search }}' filter</p></div>
+        <div ng-if="ctrl.applicationLogs.length === 0" class="line"><p class="inner_line">No logs available</p></div></pre>
     </div>
   </div>
 </div>
