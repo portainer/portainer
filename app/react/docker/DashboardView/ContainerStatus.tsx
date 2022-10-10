@@ -60,7 +60,6 @@ function runningContainersFilter(containers: DockerContainer[]) {
     .length;
 }
 function stoppedContainersFilter(containers: DockerContainer[]) {
-  // keep status 'stopped' for upgraded environment.
   return containers.filter(
     (container) =>
       container.Status === 'exited' || container.Status === 'stopped'
