@@ -9,8 +9,9 @@ import {
   TableInstance,
   TableState,
 } from 'react-table';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useRowSelectColumn } from '@lineup-lite/hooks';
+import clsx from 'clsx';
 
 import { PaginationControls } from '@@/PaginationControls';
 import { IconProps } from '@@/Icon';
@@ -55,6 +56,7 @@ interface Props<
   isLoading?: boolean;
   totalCount?: number;
   description?: JSX.Element;
+  initialActiveItem?: string;
 }
 
 export function Datatable<
@@ -76,6 +78,7 @@ export function Datatable<
   isLoading,
   totalCount = dataset.length,
   description,
+  initialActiveItem,
 }: Props<D, TSettings>) {
   const [searchBarValue, setSearchBarValue] = useSearchBarState(storageKey);
 
@@ -120,6 +123,7 @@ export function Datatable<
   );
 
   const {
+    rows,
     selectedFlatRows,
     getTableProps,
     getTableBodyProps,
@@ -131,6 +135,21 @@ export function Datatable<
     setGlobalFilter,
     state: { pageIndex, pageSize },
   } = tableInstance;
+
+  useEffect(() => {
+    if (initialActiveItem && pageSize !== rows.length) {
+      const paginatedData = [...Array(Math.ceil(rows.length / pageSize))].map(
+        (_, i) => rows.slice(pageSize * i, pageSize + pageSize * i)
+      );
+
+      const itemPage = paginatedData.findIndex((sub) =>
+        sub.some((row) => row.id === initialActiveItem)
+      );
+
+      gotoPage(itemPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialActiveItem]);
 
   const tableProps = getTableProps();
   const tbodyProps = getTableBodyProps();
@@ -194,7 +213,12 @@ export function Datatable<
                     <Table.Row<D>
                       cells={row.cells}
                       key={key}
-                      className={className}
+                      className={clsx(
+                        className,
+                        initialActiveItem &&
+                          initialActiveItem === row.id &&
+                          'active'
+                      )}
                       role={role}
                       style={style}
                     />
