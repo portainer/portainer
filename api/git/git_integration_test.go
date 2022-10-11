@@ -297,9 +297,9 @@ func TestService_HardRefresh_ListRefs_GitHub(t *testing.T) {
 	assert.GreaterOrEqual(t, len(refs), 1)
 	assert.Equal(t, 1, service.repoRefCache.Len())
 
-	refs, err = service.ListRefs(repositoryUrl, username, "fake-token", true)
+	refs, err = service.ListRefs(repositoryUrl, username, "fake-token", false)
 	assert.Error(t, err)
-	assert.Equal(t, 0, service.repoRefCache.Len())
+	assert.Equal(t, 1, service.repoRefCache.Len())
 }
 
 func TestService_HardRefresh_ListRefs_And_RemoveAllCaches_GitHub(t *testing.T) {
@@ -325,10 +325,13 @@ func TestService_HardRefresh_ListRefs_And_RemoveAllCaches_GitHub(t *testing.T) {
 	assert.GreaterOrEqual(t, len(files), 1)
 	assert.Equal(t, 2, service.repoFileCache.Len())
 
+	refs, err = service.ListRefs(repositoryUrl, username, "fake-token", false)
+	assert.Error(t, err)
+	assert.Equal(t, 1, service.repoRefCache.Len())
+
 	refs, err = service.ListRefs(repositoryUrl, username, "fake-token", true)
 	assert.Error(t, err)
-	assert.Equal(t, 0, service.repoRefCache.Len())
-
+	assert.Equal(t, 1, service.repoRefCache.Len())
 	// The relevant file caches should be removed too
 	assert.Equal(t, 0, service.repoFileCache.Len())
 }
