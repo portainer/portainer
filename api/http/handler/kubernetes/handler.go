@@ -217,7 +217,7 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 			)
 			return
 		}
-		kubeCli, err := handler.KubernetesClientFactory.CreateKubeClientFromKubeConfig(endpoint.Name, yaml)
+		kubeCli, err := handler.KubernetesClientFactory.CreateKubeClientFromKubeConfig(endpoint.Name, []byte(yaml))
 		if err != nil {
 			httperror.WriteError(
 				w,

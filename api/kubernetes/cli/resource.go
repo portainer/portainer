@@ -7,7 +7,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 )
 
-func GenerateYAML(obj runtime.Object) ([]byte, error) {
+func GenerateYAML(obj runtime.Object) (string, error) {
 	serializer := json.NewSerializerWithOptions(
 		json.DefaultMetaFactory, nil, nil,
 		json.SerializerOptions{
@@ -20,8 +20,8 @@ func GenerateYAML(obj runtime.Object) ([]byte, error) {
 	b := new(bytes.Buffer)
 	err := serializer.Encode(obj, b)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return b.Bytes(), nil
+	return b.String(), nil
 }
