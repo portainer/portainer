@@ -29,7 +29,9 @@ export function DefaultRegistryAction() {
       {!hideDefaultRegistry ? (
         <div className="vertical-center">
           <Button
-            className="btn btn-xs btn-light vertical-center"
+            color="danger"
+            size="xsmall"
+            className="vertical-center"
             onClick={() => handleShowOrHide(true)}
             disabled={isLimited}
           >
@@ -47,7 +49,8 @@ export function DefaultRegistryAction() {
       ) : (
         <div className="vertical-center">
           <Button
-            className="btn btn-xs btn-success vertical-center"
+            size="xsmall"
+            className="vertical-center"
             onClick={() => handleShowOrHide(false)}
           >
             <Icon icon="eye" feather />
