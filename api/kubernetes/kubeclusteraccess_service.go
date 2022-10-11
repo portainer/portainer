@@ -106,7 +106,7 @@ func (service *kubeClusterAccessService) GetData(hostURL string, endpointID port
 		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
 	}
 
-	log.Info().
+	log.Debug().
 		Str("host_URL", hostURL).
 		Str("HTTPS_bind_address", service.httpsBindAddr).
 		Str("base_URL", baseURL).

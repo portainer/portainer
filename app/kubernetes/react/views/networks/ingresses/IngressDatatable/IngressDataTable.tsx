@@ -3,7 +3,7 @@ import { useRouter } from '@uirouter/react';
 
 import { useEnvironmentId } from '@/portainer/hooks/useEnvironmentId';
 import { useNamespaces } from '@/react/kubernetes/namespaces/queries';
-import { Authorized } from '@/portainer/hooks/useUser';
+import { useAuthorizations, Authorized } from '@/portainer/hooks/useUser';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 
 import { Datatable } from '@@/datatables';
@@ -52,6 +52,7 @@ export function IngressDataTable() {
       }}
       getRowId={(row) => row.Name + row.Type + row.Namespace}
       renderTableActions={tableActions}
+      disableSelect={useCheckboxes()}
     />
   );
 
@@ -77,7 +78,7 @@ export function IngressDataTable() {
           </Button>
         </Authorized>
 
-        <Authorized authorizations="K8sIngressesAdd">
+        <Authorized authorizations="K8sIngressesW">
           <Link to="kubernetes.ingresses.create" className="space-left">
             <Button
               icon={Plus}
@@ -88,7 +89,7 @@ export function IngressDataTable() {
             </Button>
           </Link>
         </Authorized>
-        <Authorized authorizations="K8sApplicationsW">
+        <Authorized authorizations="K8sIngressesW">
           <Link to="kubernetes.deploy" className="space-left">
             <Button icon={Plus} className="btn-wrapper">
               Create from manifest
@@ -97,6 +98,10 @@ export function IngressDataTable() {
         </Authorized>
       </div>
     );
+  }
+
+  function useCheckboxes() {
+    return !useAuthorizations(['K8sIngressesW']);
   }
 
   async function handleRemoveClick(ingresses: SelectedIngress[]) {

@@ -1357,7 +1357,7 @@ type (
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
 		DeleteNamespace(namespace string) error
 		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
-		GetIngressControllers() models.K8sIngressControllers
+		GetIngressControllers() (models.K8sIngressControllers, error)
 		CreateIngress(namespace string, info models.K8sIngressInfo) error
 		UpdateIngress(namespace string, info models.K8sIngressInfo) error
 		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
