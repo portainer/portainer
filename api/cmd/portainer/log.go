@@ -2,6 +2,7 @@ package main
 
 import (
 	stdlog "log"
+	"os"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -29,5 +30,14 @@ func setLoggingLevel(level string) {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	case "DEBUG":
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+}
+
+func setLoggingMode(mode string) {
+	switch mode {
+	case "PRETTY":
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: true})
+	case "JSON":
+		log.Logger = log.Output(os.Stderr)
 	}
 }
