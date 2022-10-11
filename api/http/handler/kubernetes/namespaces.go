@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"net/http"
+	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -10,12 +11,28 @@ import (
 )
 
 func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.kubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
 
 	namespaces, err := cli.GetNamespaces()
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to retrieve namespaces",
 			err,
 		)
 	}
@@ -24,10 +41,26 @@ func (handler *Handler) getKubernetesNamespaces(w http.ResponseWriter, r *http.R
 }
 
 func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.kubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
 
 	var payload models.K8sNamespaceDetails
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return httperror.BadRequest(
 			"Invalid request payload",
@@ -38,7 +71,7 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 	err = cli.CreateNamespace(payload)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to create namespace",
 			err,
 		)
 	}
@@ -46,7 +79,23 @@ func (handler *Handler) createKubernetesNamespace(w http.ResponseWriter, r *http
 }
 
 func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.kubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
 
 	namespace, err := request.RetrieveRouteVariableValue(r, "namespace")
 	if err != nil {
@@ -59,7 +108,7 @@ func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *htt
 	err = cli.DeleteNamespace(namespace)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve nodes limits",
+			"Unable to delete namespace",
 			err,
 		)
 	}
@@ -68,10 +117,26 @@ func (handler *Handler) deleteKubernetesNamespaces(w http.ResponseWriter, r *htt
 }
 
 func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	cli := handler.KubernetesClient
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return httperror.BadRequest(
+			"Invalid environment identifier route variable",
+			err,
+		)
+	}
+
+	cli, ok := handler.kubernetesClientFactory.GetProxyKubeClient(
+		strconv.Itoa(endpointID), r.Header.Get("Authorization"),
+	)
+	if !ok {
+		return httperror.InternalServerError(
+			"Failed to lookup KubeClient",
+			nil,
+		)
+	}
 
 	var payload models.K8sNamespaceDetails
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{
 			StatusCode: http.StatusBadRequest,
@@ -82,11 +147,7 @@ func (handler *Handler) updateKubernetesNamespace(w http.ResponseWriter, r *http
 
 	err = cli.UpdateNamespace(payload)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to retrieve nodes limits",
-			Err:        err,
-		}
+		return httperror.InternalServerError("Unable to update namespace", err)
 	}
 	return nil
 }
