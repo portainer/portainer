@@ -23,6 +23,8 @@ const _KubernetesService = Object.freeze({
   Note: '',
   Ingress: false,
   Selector: {},
+  nodePortError: false,
+  servicePortError: false,
 });
 
 export class KubernetesService {

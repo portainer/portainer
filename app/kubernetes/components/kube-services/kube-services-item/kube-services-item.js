@@ -5,15 +5,10 @@ angular.module('portainer.kubernetes').component('kubeServicesItemView', {
   templateUrl: './kube-services-item.html',
   controller,
   bindings: {
-    serviceType: '<',
-    servicePorts: '=',
-    serviceRoutes: '=',
-    ingressType: '<',
-    originalIngresses: '<',
+    nodePortServices: '<',
+    formServices: '<',
+    service: '=',
     isEdit: '<',
-    serviceName: '<',
-    multiItemDisable: '<',
-    serviceIndex: '<',
     loadbalancerEnabled: '<',
   },
 });
