@@ -109,7 +109,7 @@ export const componentsModule = angular
   .component('boxSelectorBadgeIcon', r2a(BadgeIcon, ['featherIcon', 'icon']))
   .component(
     'accessControlPanel',
-    r2a(withReactQuery(withCurrentUser(AccessControlPanel)), [
+    r2a(withUIRouter(withReactQuery(withCurrentUser(AccessControlPanel))), [
       'disableOwnershipChange',
       'onUpdateSuccess',
       'resourceControl',
