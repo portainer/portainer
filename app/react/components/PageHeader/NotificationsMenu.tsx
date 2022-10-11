@@ -34,6 +34,13 @@ export function NotificationsMenu() {
     (state) => state.userNotifications[user.Id]
   );
 
+  if (userNotifications && userNotifications.length > 1) {
+    userNotifications.sort(
+      (a, b) =>
+        new Date(b.timeStamp).getTime() - new Date(a.timeStamp).getTime()
+    );
+  }
+
   const [badge, setBadge] = useState(false);
 
   useEffect(() => {
@@ -63,21 +70,26 @@ export function NotificationsMenu() {
           )}
         >
           <Icon icon="bell" feather />
-          <span className={badge ? clsx(notificationStyles.badge) : ''} />
+          <span className={badge ? notificationStyles.badge : ''} />
         </div>
       </MenuButton>
 
       <MenuList
-        className={headerStyles.menuList}
+        className={clsx(headerStyles.menuList, notificationStyles.root)}
         aria-label="Notifications Menu"
         data-cy="notificationsMenu"
       >
         <div>
-          <div className={clsx(notificationStyles.notificationContainer)}>
+          <div
+            className={clsx(
+              notificationStyles.notificationContainer,
+              'vertical-center'
+            )}
+          >
             <div>
               <h4>Notifications</h4>
             </div>
-            <div className={clsx(notificationStyles.itemLast)}>
+            <div className={notificationStyles.itemLast}>
               {userNotifications?.length > 0 && (
                 <Button
                   color="none"
@@ -96,26 +108,26 @@ export function NotificationsMenu() {
         </div>
         {userNotifications?.length > 0 ? (
           <>
-            {userNotifications.map((notification) => (
-              <MenuLink
-                to="portainer.notifications"
-                params={{ notificationFrom: notification.timeStamp }}
-                notification={notification}
-                key={notification.id}
-                onDelete={() => onDelete(notification.id)}
-              />
-            ))}
+            <div className={notificationStyles.notifications}>
+              {userNotifications.map((notification) => (
+                <MenuLink
+                  to="portainer.notifications"
+                  params={{ id: notification.id }}
+                  notification={notification}
+                  key={notification.id}
+                  onDelete={() => onDelete(notification.id)}
+                />
+              ))}
+            </div>
 
-            <div className={clsx(notificationStyles.notificationLink)}>
+            <div className={notificationStyles.notificationLink}>
               <Link to="portainer.notifications">View all notifications</Link>
             </div>
           </>
         ) : (
-          <div>
+          <div className="flex flex-col items-center">
             <Icon icon="bell" feather size="xl" />
-            <div>
-              <p>You have no notifications yet.</p>
-            </div>
+            <p className="my-5">You have no notifications yet.</p>
           </div>
         )}
       </MenuList>
@@ -136,35 +148,35 @@ interface MenuLinkProps extends AutomationTestingProps, UISrefProps {
   onDelete: () => void;
 }
 
-function MenuLink({
-  to,
-  params,
-  options,
-  notification,
-  onDelete,
-}: MenuLinkProps) {
-  const anchorProps = useSref(to, params, options);
+function MenuLink({ to, params, notification, onDelete }: MenuLinkProps) {
+  const anchorProps = useSref(to, params);
 
   return (
-    <ReachMenuLink href={anchorProps.href} className={headerStyles.menuLink}>
-      <div className={clsx(notificationStyles.container)}>
-        <div className={clsx(notificationStyles.notificationIcon)}>
+    <ReachMenuLink
+      href={anchorProps.href}
+      onClick={anchorProps.onClick}
+      className={clsx(headerStyles.menuLink, notificationStyles.notification)}
+    >
+      <div className={notificationStyles.container}>
+        <div className={notificationStyles.notificationIcon}>
           {notification.type === 'success' ? (
             <Icon icon="check-circle" feather size="lg" mode="success" />
           ) : (
             <Icon icon="alert-circle" feather size="lg" mode="danger" />
           )}
         </div>
-        <div className={clsx(notificationStyles.notificationBody)}>
-          <p className={clsx(notificationStyles.notificationTitle)}>
+        <div className={notificationStyles.notificationBody}>
+          <p className={notificationStyles.notificationTitle}>
             {notification.title}
           </p>
-          <p>{notification.details}</p>
+          <p className={notificationStyles.notificationDetails}>
+            {notification.details}
+          </p>
           <p className="small text-muted">
             {formatTime(notification.timeStamp)}
           </p>
         </div>
-        <div className={clsx(notificationStyles.deleteButton)}>
+        <div className={notificationStyles.deleteButton}>
           <Button
             color="none"
             onClick={(e) => {
