@@ -38,7 +38,7 @@ export function UsersSelector({
       data-cy={dataCy}
       inputId={inputId}
       placeholder={placeholder}
-      isDisabled={disabled === null ? false : disabled}
+      isDisabled={disabled}
     />
   );
 }
