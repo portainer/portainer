@@ -65,12 +65,6 @@ export function formatLogs(
       const tokenLines = (token[1] as string).split(splitter);
 
       tokenLines.forEach((tokenLine, idx) => {
-        if (idx) {
-          formattedLogs.push({ line, spans });
-          line = '';
-          spans = [];
-        }
-
         const text = stripEscapeCodes(tokenLine);
         if (
           (!withTimestamps &&
@@ -82,6 +76,11 @@ export function formatLogs(
           const lines = formatJSONLine(text, withTimestamps);
           formattedLogs.push(...lines);
         } else {
+          if (idx && line) {
+            formattedLogs.push({ line, spans });
+            line = '';
+            spans = [];
+          }
           spans.push({ fgColor, bgColor, text });
           line += text;
         }
@@ -91,6 +90,7 @@ export function formatLogs(
   if (line) {
     formattedLogs.push({ line, spans });
   }
+
   return formattedLogs;
 }
 
