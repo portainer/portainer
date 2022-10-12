@@ -73,7 +73,16 @@ export function formatJSONLine(
   const lines: FormattedLine[] = [];
   let line = '';
 
-  const text = withTimestamps ? rawText.substring(TIMESTAMP_LENGTH) : rawText;
+  let text = withTimestamps ? rawText.substring(TIMESTAMP_LENGTH) : rawText;
+  if (text.startsWith('"{')) {
+    text = text.slice(1);
+  }
+  if (text.endsWith('}"')) {
+    text = text.slice(0, -1);
+  }
+  if (text.startsWith('{\\"')) {
+    text = JSON.parse(`"${text}"`);
+  }
   const json: JSONObject = JSON.parse(text);
   const { time, level, caller, message, stack_trace: stackTrace } = json;
 

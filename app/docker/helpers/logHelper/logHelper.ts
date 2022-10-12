@@ -12,15 +12,24 @@ import { Token, Span, TIMESTAMP_LENGTH, FormattedLine } from './types';
 type FormatOptions = {
   stripHeaders?: boolean;
   withTimestamps?: boolean;
+  splitter?: string;
+};
+
+const defaultOptions: FormatOptions = {
+  splitter: '\n',
 };
 
 export function formatLogs(
   rawLogs: string,
-  { stripHeaders: skipHeaders, withTimestamps }: FormatOptions
+  {
+    stripHeaders,
+    withTimestamps,
+    splitter = '\n',
+  }: FormatOptions = defaultOptions
 ) {
   let logs = rawLogs;
-  if (skipHeaders) {
-    logs = stripHeaders(logs);
+  if (stripHeaders) {
+    logs = stripHeadersFunc(logs);
   }
 
   const tokens: Token[][] = tokenize(logs);
@@ -53,7 +62,7 @@ export function formatLogs(
       fgColor = undefined;
       bgColor = undefined;
     } else if (type === 'text') {
-      const tokenLines = (token[1] as string).split('\n');
+      const tokenLines = (token[1] as string).split(splitter);
 
       tokenLines.forEach((tokenLine, idx) => {
         if (idx) {
@@ -64,8 +73,11 @@ export function formatLogs(
 
         const text = stripEscapeCodes(tokenLine);
         if (
-          (!withTimestamps && text.startsWith('{')) ||
-          (withTimestamps && text.substring(TIMESTAMP_LENGTH).startsWith('{'))
+          (!withTimestamps &&
+            (text.startsWith('{') || text.startsWith('"{'))) ||
+          (withTimestamps &&
+            (text.substring(TIMESTAMP_LENGTH).startsWith('{') ||
+              text.substring(TIMESTAMP_LENGTH).startsWith('"{')))
         ) {
           const lines = formatJSONLine(text, withTimestamps);
           formattedLogs.push(...lines);
@@ -82,7 +94,7 @@ export function formatLogs(
   return formattedLogs;
 }
 
-function stripHeaders(logs: string) {
+function stripHeadersFunc(logs: string) {
   return logs.substring(8).replace(/\r?\n(.{8})/g, '\n');
 }
 
