@@ -45,6 +45,7 @@ class CustomTemplatesViewController {
       formValidationError: '',
       actionInProgress: false,
       isEditorVisible: false,
+      isEditorReadOnly: false,
       deployable: false,
       templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
       templateContent: '',
@@ -184,6 +185,7 @@ class CustomTemplatesViewController {
   async unselectTemplateAsync(template) {
     template.Selected = false;
     this.state.selectedTemplate = null;
+    this.state.isEditorReadOnly = false;
 
     this.formValues = {
       network: '',
@@ -203,6 +205,8 @@ class CustomTemplatesViewController {
     }
 
     template.Selected = true;
+    // TODO: change this to only make repository based template readonly
+    this.state.isEditorReadOnly = false;
 
     this.formValues.network = _.find(this.availableNetworks, function (o) {
       return o.Name === 'bridge';

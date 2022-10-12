@@ -13,11 +13,36 @@ class EditCustomTemplateViewController {
 
     this.isTemplateVariablesEnabled = isBE;
 
-    this.formValues = null;
+    this.formValues = {
+      Title: '',
+      FileContent: '',
+      File: null,
+      RepositoryURL: '',
+      RepositoryURLValid: false,
+      RepositoryReferenceName: 'refs/heads/main',
+      RepositoryAuthentication: false,
+      RepositoryUsername: '',
+      RepositoryPassword: '',
+      SelectedGitCredential: null,
+      GitCredentials: [],
+      SaveCredential: true,
+      RepositoryGitCredentialID: 0,
+      NewCredentialName: '',
+      NewCredentialNameExist: false,
+      ComposeFilePathInRepository: 'docker-compose.yml',
+      Description: '',
+      Note: '',
+      Logo: '',
+      Platform: 1,
+      Type: 1,
+      AccessControlData: new AccessControlFormData(),
+      Variables: [],
+    };
     this.state = {
       formValidationError: '',
       isEditorDirty: false,
       isTemplateValid: true,
+      isEditorReadOnly: false,
     };
     this.templates = [];
 
@@ -39,9 +64,11 @@ class EditCustomTemplateViewController {
         this.CustomTemplateService.customTemplate(this.$state.params.id),
         this.CustomTemplateService.customTemplateFile(this.$state.params.id),
       ]);
+      // TODO: change this to only make repository based template readonly
+      this.state.isEditorReadOnly = false;
       template.FileContent = file;
       template.Variables = template.Variables || [];
-      this.formValues = template;
+      this.formValues = { ...this.formValues, ...template };
       this.parseTemplate(template.FileContent);
 
       this.oldFileContent = this.formValues.FileContent;
