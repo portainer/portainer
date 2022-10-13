@@ -1,4 +1,5 @@
 import tokenize from '@nxmix/tokenize-ansi';
+import { FontWeight } from 'xterm';
 
 import {
   colors,
@@ -7,6 +8,7 @@ import {
   RGBColor,
 } from './colors';
 import { formatJSONLine } from './formatJSONLogs';
+import { formatZerologLogs, ZerologRegex } from './formatZerologLogs';
 import { Token, Span, TIMESTAMP_LENGTH, FormattedLine } from './types';
 
 type FormatOptions = {
@@ -37,6 +39,7 @@ export function formatLogs(
 
   let fgColor: string | undefined;
   let bgColor: string | undefined;
+  let fontWeight: FontWeight | undefined;
   let line = '';
   let spans: Span[] = [];
 
@@ -61,10 +64,21 @@ export function formatLogs(
     } else if (type === 'reset') {
       fgColor = undefined;
       bgColor = undefined;
+      fontWeight = undefined;
+    } else if (type === 'bold') {
+      fontWeight = 'bold';
+    } else if (type === 'normal') {
+      fontWeight = 'normal';
     } else if (type === 'text') {
       const tokenLines = (token[1] as string).split(splitter);
 
       tokenLines.forEach((tokenLine, idx) => {
+        if (idx && line) {
+          formattedLogs.push({ line, spans });
+          line = '';
+          spans = [];
+        }
+
         const text = stripEscapeCodes(tokenLine);
         if (
           (!withTimestamps &&
@@ -75,13 +89,11 @@ export function formatLogs(
         ) {
           const lines = formatJSONLine(text, withTimestamps);
           formattedLogs.push(...lines);
+        } else if (ZerologRegex.test(text)) {
+          const lines = formatZerologLogs(text, withTimestamps);
+          formattedLogs.push(...lines);
         } else {
-          if (idx && line) {
-            formattedLogs.push({ line, spans });
-            line = '';
-            spans = [];
-          }
-          spans.push({ fgColor, bgColor, text });
+          spans.push({ fgColor, bgColor, text, fontWeight });
           line += text;
         }
       });
