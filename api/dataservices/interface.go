@@ -251,6 +251,7 @@ type (
 		Tag(ID portainer.TagID) (*portainer.Tag, error)
 		Create(tag *portainer.Tag) error
 		UpdateTag(ID portainer.TagID, tag *portainer.Tag) error
+		UpdateTagFunc(ID portainer.TagID, updateFunc func(tag *portainer.Tag)) error
 		DeleteTag(ID portainer.TagID) error
 		BucketName() string
 	}

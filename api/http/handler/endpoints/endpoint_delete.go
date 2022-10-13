@@ -62,15 +62,13 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 	}
 
 	for _, tagID := range endpoint.TagIDs {
-		tag, err := handler.DataStore.Tag().Tag(tagID)
-		if err != nil {
+		err = handler.DataStore.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
+			delete(tag.Endpoints, endpoint.ID)
+		})
+
+		if handler.DataStore.IsErrObjectNotFound(err) {
 			return httperror.NotFound("Unable to find tag inside the database", err)
-		}
-
-		delete(tag.Endpoints, endpoint.ID)
-
-		err = handler.DataStore.Tag().UpdateTag(tagID, tag)
-		if err != nil {
+		} else if err != nil {
 			return httperror.InternalServerError("Unable to persist tag relation inside the database", err)
 		}
 	}
