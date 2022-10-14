@@ -142,12 +142,7 @@ func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) e
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 
-	err := validateVariablesDefinitions(payload.Variables)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return validateVariablesDefinitions(payload.Variables)
 }
 
 func isValidNote(note string) bool {
@@ -251,12 +246,7 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 
-	err := validateVariablesDefinitions(payload.Variables)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return validateVariablesDefinitions(payload.Variables)
 }
 
 func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (*portainer.CustomTemplate, error) {
@@ -395,12 +385,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 		return errors.New("Invalid variables. Ensure that the variables are valid JSON")
 	}
 
-	err = validateVariablesDefinitions(payload.Variables)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return validateVariablesDefinitions(payload.Variables)
 }
 
 func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*portainer.CustomTemplate, error) {
