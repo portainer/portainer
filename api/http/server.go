@@ -340,7 +340,7 @@ func (server *Server) Start() error {
 		Handler: handler,
 	}
 
-	httpsServer.TLSConfig = crypto.CreateServerTLSConfiguration()
+	httpsServer.TLSConfig = crypto.CreateTLSConfiguration()
 	httpsServer.TLSConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 		return server.SSLService.GetRawCertificate(), nil
 	}
