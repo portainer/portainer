@@ -128,12 +128,7 @@ func (handler *Handler) addDefaultProfile() error {
 	profile.FilePath = filePath
 	profile.DateCreated = time.Now().Unix()
 
-	err = handler.DataStore.FDOProfile().Create(profile)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return handler.DataStore.FDOProfile().Create(profile)
 }
 
 const defaultProfileFileContent = `

@@ -190,12 +190,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		switch *payload.Status {
 		case 1:
 			endpoint.Status = portainer.EndpointStatusUp
-			break
 		case 2:
 			endpoint.Status = portainer.EndpointStatusDown
-			break
-		default:
-			break
 		}
 	}
 

@@ -29,7 +29,7 @@ func NewRateLimiter(maxRequests int, duration time.Duration, banDuration time.Du
 func (limiter *RateLimiter) LimitAccess(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := StripAddrPort(r.RemoteAddr)
-		if banned := limiter.Inc(ip); banned == true {
+		if banned := limiter.Inc(ip); banned {
 			httperror.WriteError(w, http.StatusForbidden, "Access denied", errors.ErrResourceAccessDenied)
 			return
 		}
