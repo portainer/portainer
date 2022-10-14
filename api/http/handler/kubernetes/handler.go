@@ -109,6 +109,7 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 				"Invalid environment identifier route variable",
 				err,
 			)
+			return
 		}
 
 		endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
@@ -119,6 +120,7 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 				"Unable to find an environment with the specified identifier inside the database",
 				err,
 			)
+			return
 		} else if err != nil {
 			httperror.WriteError(
 				w,
@@ -126,12 +128,14 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 				"Unable to find an environment with the specified identifier inside the database",
 				err,
 			)
+			return
 		}
 
 		if handler.KubernetesClientFactory == nil {
 			next.ServeHTTP(w, r)
 			return
 		}
+
 		kubeCli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 		if err != nil {
 			httperror.WriteError(
@@ -140,8 +144,9 @@ func (handler *Handler) kubeClient(next http.Handler) http.Handler {
 				"Unable to create Kubernetes client",
 				err,
 			)
-
+			return
 		}
+
 		handler.KubernetesClient = kubeCli
 		next.ServeHTTP(w, r)
 	})
