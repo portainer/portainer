@@ -8,7 +8,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
@@ -18,7 +17,6 @@ import (
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/database"
-	"github.com/portainer/portainer/api/database/boltdb"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/demo"
@@ -71,17 +69,9 @@ func initFileService(dataStorePath string) portainer.FileService {
 }
 
 func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase("boltdb", *flags.Data, secretKey)
+	connection, err := database.NewDatabase("sqlite", *flags.Data, secretKey)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed creating database connection")
-	}
-
-	if bconn, ok := connection.(*boltdb.DbConnection); ok {
-		bconn.MaxBatchSize = *flags.MaxBatchSize
-		bconn.MaxBatchDelay = *flags.MaxBatchDelay
-		bconn.InitialMmapSize = *flags.InitialMmapSize
-	} else {
-		log.Fatal().Msg("failed creating database connection: expecting a boltdb database type but a different one was received")
 	}
 
 	store := datastore.NewStore(*flags.Data, fileService, connection)
@@ -90,17 +80,17 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		log.Fatal().Err(err).Msg("failed opening store")
 	}
 
-	if *flags.Rollback {
-		err := store.Rollback(false)
-		if err != nil {
-			log.Fatal().Err(err).Msg("failed rolling back")
-		}
+	// if *flags.Rollback {
+	// 	err := store.Rollback(false)
+	// 	if err != nil {
+	// 		log.Fatal().Err(err).Msg("failed rolling back")
+	// 	}
 
-		log.Info().Msg("exiting rollback")
-		os.Exit(0)
+	// 	log.Info().Msg("exiting rollback")
+	// 	os.Exit(0)
 
-		return nil
-	}
+	// 	return nil
+	// }
 
 	// Init sets some defaults - it's basically a migration
 	err = store.Init()
@@ -117,17 +107,17 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 			log.Fatal().Err(err).Msg("failed updating settings from flags")
 		}
 	} else {
-		storedVersion, err := store.VersionService.DBVersion()
-		if err != nil {
-			log.Fatal().Err(err).Msg("failure during creation of new database")
-		}
+		// storedVersion, err := store.VersionService.DBVersion()
+		// if err != nil {
+		// 	log.Fatal().Err(err).Msg("failure during creation of new database")
+		// }
 
-		if storedVersion != portainer.DBVersion {
-			err = store.MigrateData()
-			if err != nil {
-				log.Fatal().Err(err).Msg("failed migration")
-			}
-		}
+		// if storedVersion != portainer.DBVersion {
+		// 	err = store.MigrateData()
+		// 	if err != nil {
+		// 		log.Fatal().Err(err).Msg("failed migration")
+		// 	}
+		// }
 	}
 
 	err = updateSettingsFromFlags(store, flags)
@@ -140,14 +130,14 @@ func initDataStore(flags *portainer.CLIFlags, secretKey []byte, fileService port
 		<-shutdownCtx.Done()
 		defer connection.Close()
 
-		exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
+		// exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
 
-		err := store.Export(exportFilename)
-		if err != nil {
-			log.Error().Str("filename", exportFilename).Err(err).Msg("failed to export")
-		} else {
-			log.Debug().Str("filename", exportFilename).Msg("exported")
-		}
+		// err := store.Export(exportFilename)
+		// if err != nil {
+		// 	log.Error().Str("filename", exportFilename).Err(err).Msg("failed to export")
+		// } else {
+		// 	log.Debug().Str("filename", exportFilename).Msg("exported")
+		// }
 	}()
 
 	return store

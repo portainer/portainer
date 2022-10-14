@@ -1,18 +1,11 @@
 package version
 
 import (
+	"fmt"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
-)
-
-const (
-	// BucketName represents the name of the bucket where this service stores data.
-	BucketName  = "version"
-	versionKey  = "DB_VERSION"
-	instanceKey = "INSTANCE_ID"
-	editionKey  = "EDITION"
-	updatingKey = "DB_UPDATING"
+	"github.com/portainer/portainer/api/database/models"
 )
 
 // Service represents a service to manage stored versions.
@@ -20,17 +13,8 @@ type Service struct {
 	connection portainer.Connection
 }
 
-func (service *Service) BucketName() string {
-	return BucketName
-}
-
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Service{
 		connection: connection,
 	}, nil
@@ -38,22 +22,24 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 // DBVersion retrieves the stored database version.
 func (service *Service) DBVersion() (int, error) {
-	var version string
-	err := service.connection.GetObject(BucketName, []byte(versionKey), &version)
-	if err != nil {
-		return 0, err
+	db := service.connection.GetDB()
+	var version models.Version
+	tx := db.First(&version, `key = ?`, models.VersionKey)
+	if tx.Error != nil {
+		return 0, tx.Error
 	}
-	return strconv.Atoi(version)
+	return strconv.Atoi(version.Value)
 }
 
 // Edition retrieves the stored portainer edition.
 func (service *Service) Edition() (portainer.SoftwareEdition, error) {
-	var edition string
-	err := service.connection.GetObject(BucketName, []byte(editionKey), &edition)
-	if err != nil {
-		return 0, err
+	db := service.connection.GetDB()
+	var version models.Version
+	tx := db.First(&version, `key = ?`, models.EditionKey)
+	if tx.Error != nil {
+		return 0, tx.Error
 	}
-	e, err := strconv.Atoi(edition)
+	e, err := strconv.Atoi(version.Value)
 	if err != nil {
 		return 0, err
 	}
@@ -61,31 +47,56 @@ func (service *Service) Edition() (portainer.SoftwareEdition, error) {
 }
 
 // StoreDBVersion store the database version.
-func (service *Service) StoreDBVersion(version int) error {
-	return service.connection.UpdateObject(BucketName, []byte(versionKey), strconv.Itoa(version))
+func (service *Service) StoreDBVersion(v int) error {
+	db := service.connection.GetDB()
+	version := &models.Version{Key: models.VersionKey}
+	fmt.Printf("## version %s", version)
+	tx := db.Model(version).Update("value", strconv.FormatInt(int64(v), 10))
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }
 
 // IsUpdating retrieves the database updating status.
 func (service *Service) IsUpdating() (bool, error) {
-	var isUpdating bool
-	err := service.connection.GetObject(BucketName, []byte(updatingKey), &isUpdating)
-	return isUpdating, err
+	db := service.connection.GetDB()
+	var version models.Version
+	tx := db.First(&version, `key = ?`, models.UpdatingKey)
+	if tx.Error != nil {
+		return false, tx.Error
+	}
+	return version.Value == "true", nil
 }
 
 // StoreIsUpdating store the database updating status.
 func (service *Service) StoreIsUpdating(isUpdating bool) error {
-	return service.connection.UpdateObject(BucketName, []byte(updatingKey), isUpdating)
+	db := service.connection.GetDB()
+	tx := db.Model(&models.Version{Key: models.UpdatingKey}).Update("value", strconv.FormatBool(isUpdating))
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }
 
 // InstanceID retrieves the stored instance ID.
 func (service *Service) InstanceID() (string, error) {
-	var id string
-	err := service.connection.GetObject(BucketName, []byte(instanceKey), &id)
-	return id, err
+	db := service.connection.GetDB()
+	var version models.Version
+	tx := db.First(&version, `key = ?`, models.InstanceKey)
+	if tx.Error != nil {
+		return "", tx.Error
+	}
+	return version.Value, nil
 }
 
 // StoreInstanceID store the instance ID.
 func (service *Service) StoreInstanceID(ID string) error {
-	return service.connection.UpdateObject(BucketName, []byte(instanceKey), ID)
+	db := service.connection.GetDB()
+	tx := db.FirstOrCreate(&models.Version{Key: models.InstanceKey, Value: ID})
+	if tx.Error != nil {
+		return tx.Error
+	}
 
+	return nil
 }

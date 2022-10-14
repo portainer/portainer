@@ -3,7 +3,6 @@ package dataservices
 // 	"github.com/portainer/portainer/api/dataservices"
 
 import (
-	"io"
 	"time"
 
 	"github.com/portainer/portainer/api/dataservices/errors"
@@ -18,11 +17,8 @@ type (
 		Open() (newStore bool, err error)
 		Init() error
 		Close() error
-		MigrateData() error
-		Rollback(force bool) error
+
 		CheckCurrentEdition() error
-		BackupTo(w io.Writer) error
-		Export(filename string) (err error)
 		IsErrObjectNotFound(err error) bool
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
@@ -59,7 +55,6 @@ type (
 		Create(customTemplate *portainer.CustomTemplate) error
 		UpdateCustomTemplate(ID portainer.CustomTemplateID, customTemplate *portainer.CustomTemplate) error
 		DeleteCustomTemplate(ID portainer.CustomTemplateID) error
-		BucketName() string
 	}
 
 	// EdgeGroupService represents a service to manage Edge groups
@@ -69,7 +64,6 @@ type (
 		Create(group *portainer.EdgeGroup) error
 		UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error
 		DeleteEdgeGroup(ID portainer.EdgeGroupID) error
-		BucketName() string
 	}
 
 	// EdgeJobService represents a service to manage Edge jobs
@@ -80,7 +74,6 @@ type (
 		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int
-		BucketName() string
 	}
 
 	EdgeUpdateScheduleService interface {
@@ -91,7 +84,6 @@ type (
 		Create(edgeUpdateSchedule *edgetypes.UpdateSchedule) error
 		Update(ID edgetypes.UpdateScheduleID, edgeUpdateSchedule *edgetypes.UpdateSchedule) error
 		Delete(ID edgetypes.UpdateScheduleID) error
-		BucketName() string
 	}
 
 	// EdgeStackService represents a service to manage Edge stacks
@@ -102,7 +94,6 @@ type (
 		UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error
 		DeleteEdgeStack(ID portainer.EdgeStackID) error
 		GetNextIdentifier() int
-		BucketName() string
 	}
 
 	// EndpointService represents a service for managing environment(endpoint) data
@@ -113,7 +104,6 @@ type (
 		UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error
 		DeleteEndpoint(ID portainer.EndpointID) error
 		GetNextIdentifier() int
-		BucketName() string
 	}
 
 	// EndpointGroupService represents a service for managing environment(endpoint) group data
@@ -123,7 +113,6 @@ type (
 		Create(group *portainer.EndpointGroup) error
 		UpdateEndpointGroup(ID portainer.EndpointGroupID, group *portainer.EndpointGroup) error
 		DeleteEndpointGroup(ID portainer.EndpointGroupID) error
-		BucketName() string
 	}
 
 	// EndpointRelationService represents a service for managing environment(endpoint) relations data
@@ -133,7 +122,6 @@ type (
 		Create(endpointRelation *portainer.EndpointRelation) error
 		UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error
 		DeleteEndpointRelation(EndpointID portainer.EndpointID) error
-		BucketName() string
 	}
 
 	// FDOProfileService represents a service to manage FDO Profiles
@@ -144,7 +132,6 @@ type (
 		Update(ID portainer.FDOProfileID, FDOProfile *portainer.FDOProfile) error
 		Delete(ID portainer.FDOProfileID) error
 		GetNextIdentifier() int
-		BucketName() string
 	}
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
@@ -154,7 +141,6 @@ type (
 		Create(record *portainer.HelmUserRepository) error
 		UpdateHelmUserRepository(ID portainer.HelmUserRepositoryID, repository *portainer.HelmUserRepository) error
 		DeleteHelmUserRepository(ID portainer.HelmUserRepositoryID) error
-		BucketName() string
 	}
 
 	// JWTService represents a service for managing JWT tokens
@@ -173,7 +159,6 @@ type (
 		Create(registry *portainer.Registry) error
 		UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error
 		DeleteRegistry(ID portainer.RegistryID) error
-		BucketName() string
 	}
 
 	// ResourceControlService represents a service for managing resource control data
@@ -184,7 +169,6 @@ type (
 		Create(rc *portainer.ResourceControl) error
 		UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error
 		DeleteResourceControl(ID portainer.ResourceControlID) error
-		BucketName() string
 	}
 
 	// RoleService represents a service for managing user roles
@@ -193,7 +177,6 @@ type (
 		Roles() ([]portainer.Role, error)
 		Create(role *portainer.Role) error
 		UpdateRole(ID portainer.RoleID, role *portainer.Role) error
-		BucketName() string
 	}
 
 	// APIKeyRepositoryService
@@ -211,7 +194,6 @@ type (
 		Settings() (*portainer.Settings, error)
 		UpdateSettings(settings *portainer.Settings) error
 		IsFeatureFlagEnabled(feature portainer.Feature) bool
-		BucketName() string
 	}
 
 	SnapshotService interface {
@@ -220,14 +202,12 @@ type (
 		UpdateSnapshot(snapshot *portainer.Snapshot) error
 		DeleteSnapshot(endpointID portainer.EndpointID) error
 		Create(snapshot *portainer.Snapshot) error
-		BucketName() string
 	}
 
 	// SSLSettingsService represents a service for managing application settings
 	SSLSettingsService interface {
 		Settings() (*portainer.SSLSettings, error)
 		UpdateSettings(settings *portainer.SSLSettings) error
-		BucketName() string
 	}
 
 	// StackService represents a service for managing stack data
@@ -242,7 +222,6 @@ type (
 		GetNextIdentifier() int
 		StackByWebhookID(ID string) (*portainer.Stack, error)
 		RefreshableStacks() ([]portainer.Stack, error)
-		BucketName() string
 	}
 
 	// TagService represents a service for managing tag data
@@ -252,7 +231,6 @@ type (
 		Create(tag *portainer.Tag) error
 		UpdateTag(ID portainer.TagID, tag *portainer.Tag) error
 		DeleteTag(ID portainer.TagID) error
-		BucketName() string
 	}
 
 	// TeamService represents a service for managing user data
@@ -263,7 +241,6 @@ type (
 		Create(team *portainer.Team) error
 		UpdateTeam(ID portainer.TeamID, team *portainer.Team) error
 		DeleteTeam(ID portainer.TeamID) error
-		BucketName() string
 	}
 
 	// TeamMembershipService represents a service for managing team membership data
@@ -277,14 +254,12 @@ type (
 		DeleteTeamMembership(ID portainer.TeamMembershipID) error
 		DeleteTeamMembershipByUserID(userID portainer.UserID) error
 		DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error
-		BucketName() string
 	}
 
 	// TunnelServerService represents a service for managing data associated to the tunnel server
 	TunnelServerService interface {
 		Info() (*portainer.TunnelServerInfo, error)
 		UpdateInfo(info *portainer.TunnelServerInfo) error
-		BucketName() string
 	}
 
 	// UserService represents a service for managing user data
@@ -296,7 +271,6 @@ type (
 		Create(user *portainer.User) error
 		UpdateUser(ID portainer.UserID, user *portainer.User) error
 		DeleteUser(ID portainer.UserID) error
-		BucketName() string
 	}
 
 	// VersionService represents a service for managing version data
@@ -306,7 +280,6 @@ type (
 		InstanceID() (string, error)
 		StoreDBVersion(version int) error
 		StoreInstanceID(ID string) error
-		BucketName() string
 	}
 
 	// WebhookService represents a service for managing webhook data.
@@ -318,7 +291,6 @@ type (
 		WebhookByResourceID(resourceID string) (*portainer.Webhook, error)
 		WebhookByToken(token string) (*portainer.Webhook, error)
 		DeleteWebhook(ID portainer.WebhookID) error
-		BucketName() string
 	}
 )
 

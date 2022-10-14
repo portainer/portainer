@@ -1,16 +1,9 @@
 package datastore
 
 import (
-	"fmt"
-	"io"
-	"os"
-	"path"
-	"time"
-
 	portainer "github.com/portainer/portainer/api"
 	portainerErrors "github.com/portainer/portainer/api/dataservices/errors"
-
-	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 )
 
 func (store *Store) version() (int, error) {
@@ -41,18 +34,6 @@ func NewStore(storePath string, fileService portainer.FileService, connection po
 func (store *Store) Open() (newStore bool, err error) {
 	newStore = true
 
-	encryptionReq, err := store.connection.NeedsEncryptionMigration()
-	if err != nil {
-		return false, err
-	}
-
-	if encryptionReq {
-		err = store.encryptDB()
-		if err != nil {
-			return false, err
-		}
-	}
-
 	err = store.connection.Open()
 	if err != nil {
 		return newStore, err
@@ -64,32 +45,26 @@ func (store *Store) Open() (newStore bool, err error) {
 	}
 
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
-	version, err := store.VersionService.DBVersion()
-	if err != nil {
-		if store.IsErrObjectNotFound(err) {
-			return newStore, nil
-		}
+	// version, err := store.VersionService.DBVersion()
+	// if err != nil {
+	// 	if store.IsErrObjectNotFound(err) {
+	// 		return newStore, nil
+	// 	}
 
-		return newStore, err
-	}
+	// 	return newStore, err
+	// }
 
-	if version > 0 {
-		log.Debug().Int("version", version).Msg("opened existing store")
+	// if version > 0 {
+	// 	log.Debug().Int("version", version).Msg("opened existing store")
 
-		return false, nil
-	}
+	// 	return false, nil
+	// }
 
 	return newStore, nil
 }
 
 func (store *Store) Close() error {
 	return store.connection.Close()
-}
-
-// BackupTo backs up db to a provided writer.
-// It does hot backup and doesn't block other database reads and writes
-func (store *Store) BackupTo(w io.Writer) error {
-	return store.connection.BackupTo(w)
 }
 
 // CheckCurrentEdition checks if current edition is community edition
@@ -102,78 +77,5 @@ func (store *Store) CheckCurrentEdition() error {
 
 // TODO: move the use of this to dataservices.IsErrObjectNotFound()?
 func (store *Store) IsErrObjectNotFound(e error) bool {
-	return e == portainerErrors.ErrObjectNotFound
-}
-
-func (store *Store) Rollback(force bool) error {
-	return store.connectionRollback(force)
-}
-
-func (store *Store) encryptDB() error {
-	store.connection.SetEncrypted(false)
-	err := store.connection.Open()
-	if err != nil {
-		return err
-	}
-
-	err = store.initServices()
-	if err != nil {
-		return err
-	}
-
-	// The DB is not currently encrypted.  First save the encrypted db filename
-	oldFilename := store.connection.GetDatabaseFilePath()
-	log.Info().Msg("encrypting database")
-
-	// export file path for backup
-	exportFilename := path.Join(store.databasePath() + "." + fmt.Sprintf("backup-%d.json", time.Now().Unix()))
-
-	log.Info().Str("filename", exportFilename).Msg("exporting database backup")
-
-	err = store.Export(exportFilename)
-	if err != nil {
-		log.Error().Str("filename", exportFilename).Err(err).Msg("failed to export")
-
-		return err
-	}
-
-	log.Info().Msg("database backup exported")
-
-	// Close existing un-encrypted db so that we can delete the file later
-	store.connection.Close()
-
-	// Tell the db layer to create an encrypted db when opened
-	store.connection.SetEncrypted(true)
-	store.connection.Open()
-
-	// We have to init services before import
-	err = store.initServices()
-	if err != nil {
-		return err
-	}
-
-	err = store.Import(exportFilename)
-	if err != nil {
-		// Remove the new encrypted file that we failed to import
-		os.Remove(store.connection.GetDatabaseFilePath())
-
-		log.Fatal().Err(portainerErrors.ErrDBImportFailed).Msg("")
-	}
-
-	err = os.Remove(oldFilename)
-	if err != nil {
-		log.Error().Msg("failed to remove the un-encrypted db file")
-	}
-
-	err = os.Remove(exportFilename)
-	if err != nil {
-		log.Error().Msg("failed to remove the json backup file")
-	}
-
-	// Close db connection
-	store.connection.Close()
-
-	log.Info().Msg("database successfully encrypted")
-
-	return nil
+	return e == gorm.ErrRecordNotFound
 }

@@ -1,31 +1,41 @@
 package datastore
 
 import (
+	"fmt"
+
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database/models"
 )
 
 // Init creates the default data set.
 func (store *Store) Init() error {
-	err := store.checkOrCreateInstanceID()
+	conn := store.GetConnection()
+	err := conn.Init()
 	if err != nil {
 		return err
 	}
 
-	err = store.checkOrCreateDefaultSettings()
+	err = store.initVersions()
 	if err != nil {
 		return err
 	}
 
-	err = store.checkOrCreateDefaultSSLSettings()
-	if err != nil {
-		return err
-	}
+	// err = store.checkOrCreateDefaultSettings()
+	// if err != nil {
+	// 	return err
+	// }
 
-	return store.checkOrCreateDefaultData()
+	// err = store.checkOrCreateDefaultSSLSettings()
+	// if err != nil {
+	// 	return err
+	// }
+
+	// return store.checkOrCreateDefaultData()
+	return nil
 }
 
-func (store *Store) checkOrCreateInstanceID() error {
+func (store *Store) initVersions() error {
 	_, err := store.VersionService.InstanceID()
 	if store.IsErrObjectNotFound(err) {
 		uid, err := uuid.NewV4()
@@ -34,10 +44,37 @@ func (store *Store) checkOrCreateInstanceID() error {
 		}
 
 		instanceID := uid.String()
-		return store.VersionService.StoreInstanceID(instanceID)
+
+		db := store.connection.GetDB()
+
+		fmt.Println("updating instance id")
+		tx := db.Create(&models.Version{Key: models.InstanceKey, Value: instanceID})
+		if tx.Error != nil {
+			return tx.Error
+		}
+
+		fmt.Printf("updating version id %s\n", models.VersionKey)
+		tx = db.Create(&models.Version{Key: models.VersionKey, Value: fmt.Sprint(portainer.DBVersion)})
+		if tx.Error != nil {
+			return tx.Error
+		}
+
+		fmt.Println("updating updating id")
+		tx = db.Create(&models.Version{Key: models.UpdatingKey, Value: "false"})
+		if tx.Error != nil {
+			return tx.Error
+		}
+
+		fmt.Println("updating edition id")
+		tx = db.Create(&models.Version{Key: models.EditionKey, Value: fmt.Sprint(portainer.PortainerCE)})
+		if tx.Error != nil {
+			return tx.Error
+		}
+	} else {
+		return err
 	}
 
-	return err
+	return nil
 }
 
 func (store *Store) checkOrCreateDefaultSettings() error {

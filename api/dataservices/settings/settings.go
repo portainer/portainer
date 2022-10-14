@@ -21,11 +21,6 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Service{
 		connection: connection,
 	}, nil
@@ -35,29 +30,14 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) Settings() (*portainer.Settings, error) {
 	var settings portainer.Settings
 
-	err := service.connection.GetObject(BucketName, []byte(settingsKey), &settings)
-	if err != nil {
-		return nil, err
-	}
-
 	return &settings, nil
 }
 
 // UpdateSettings persists a Settings object.
 func (service *Service) UpdateSettings(settings *portainer.Settings) error {
-	return service.connection.UpdateObject(BucketName, []byte(settingsKey), settings)
+	return nil
 }
 
 func (service *Service) IsFeatureFlagEnabled(feature portainer.Feature) bool {
-	settings, err := service.Settings()
-	if err != nil {
-		return false
-	}
-
-	featureFlagSetting, ok := settings.FeatureFlagSettings[feature]
-	if ok {
-		return featureFlagSetting
-	}
-
 	return false
 }

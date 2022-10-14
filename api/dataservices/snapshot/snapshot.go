@@ -1,11 +1,7 @@
 package snapshot
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -21,10 +17,6 @@ func (service *Service) BucketName() string {
 }
 
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
 
 	return &Service{
 		connection: connection,
@@ -33,12 +25,6 @@ func NewService(connection portainer.Connection) (*Service, error) {
 
 func (service *Service) Snapshot(endpointID portainer.EndpointID) (*portainer.Snapshot, error) {
 	var snapshot portainer.Snapshot
-	identifier := service.connection.ConvertToKey(int(endpointID))
-
-	err := service.connection.GetObject(BucketName, identifier, &snapshot)
-	if err != nil {
-		return nil, err
-	}
 
 	return &snapshot, nil
 }
@@ -46,32 +32,17 @@ func (service *Service) Snapshot(endpointID portainer.EndpointID) (*portainer.Sn
 func (service *Service) Snapshots() ([]portainer.Snapshot, error) {
 	var snapshots = make([]portainer.Snapshot, 0)
 
-	err := service.connection.GetAllWithJsoniter(
-		BucketName,
-		&portainer.Snapshot{},
-		func(obj interface{}) (interface{}, error) {
-			snapshot, ok := obj.(*portainer.Snapshot)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Snapshot object")
-				return nil, fmt.Errorf("failed to convert to Snapshot object: %s", obj)
-			}
-			snapshots = append(snapshots, *snapshot)
-			return &portainer.Snapshot{}, nil
-		})
-
-	return snapshots, err
+	return snapshots, nil
 }
 
 func (service *Service) UpdateSnapshot(snapshot *portainer.Snapshot) error {
-	identifier := service.connection.ConvertToKey(int(snapshot.EndpointID))
-	return service.connection.UpdateObject(BucketName, identifier, snapshot)
+	return nil
 }
 
 func (service *Service) DeleteSnapshot(endpointID portainer.EndpointID) error {
-	identifier := service.connection.ConvertToKey(int(endpointID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }
 
 func (service *Service) Create(snapshot *portainer.Snapshot) error {
-	return service.connection.CreateObjectWithId(BucketName, int(snapshot.EndpointID), snapshot)
+	return nil
 }

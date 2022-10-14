@@ -1,11 +1,7 @@
 package endpointrelation
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,10 +20,10 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -38,50 +34,53 @@ func NewService(connection portainer.Connection) (*Service, error) {
 func (service *Service) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	var all = make([]portainer.EndpointRelation, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.EndpointRelation{},
-		func(obj interface{}) (interface{}, error) {
-			r, ok := obj.(*portainer.EndpointRelation)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointRelation object")
-				return nil, fmt.Errorf("Failed to convert to EndpointRelation object: %s", obj)
-			}
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.EndpointRelation{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		r, ok := obj.(*portainer.EndpointRelation)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EndpointRelation object")
+	// 			return nil, fmt.Errorf("Failed to convert to EndpointRelation object: %s", obj)
+	// 		}
 
-			all = append(all, *r)
+	// 		all = append(all, *r)
 
-			return &portainer.EndpointRelation{}, nil
-		})
+	// 		return &portainer.EndpointRelation{}, nil
+	// 	})
 
-	return all, err
+	return all, nil
 }
 
 // EndpointRelation returns a Environment(Endpoint) relation object by EndpointID
 func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*portainer.EndpointRelation, error) {
 	var endpointRelation portainer.EndpointRelation
-	identifier := service.connection.ConvertToKey(int(endpointID))
+	// identifier := service.connection.ConvertToKey(int(endpointID))
 
-	err := service.connection.GetObject(BucketName, identifier, &endpointRelation)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &endpointRelation)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &endpointRelation, nil
 }
 
 // CreateEndpointRelation saves endpointRelation
 func (service *Service) Create(endpointRelation *portainer.EndpointRelation) error {
-	return service.connection.CreateObjectWithId(BucketName, int(endpointRelation.EndpointID), endpointRelation)
+	// return service.connection.CreateObjectWithId(BucketName, int(endpointRelation.EndpointID), endpointRelation)
+	return nil
 }
 
 // UpdateEndpointRelation updates an Environment(Endpoint) relation object
 func (service *Service) UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
-	identifier := service.connection.ConvertToKey(int(EndpointID))
-	return service.connection.UpdateObject(BucketName, identifier, endpointRelation)
+	// identifier := service.connection.ConvertToKey(int(EndpointID))
+	// return service.connection.UpdateObject(BucketName, identifier, endpointRelation)
+	return nil
 }
 
 // DeleteEndpointRelation deletes an Environment(Endpoint) relation object
 func (service *Service) DeleteEndpointRelation(EndpointID portainer.EndpointID) error {
-	identifier := service.connection.ConvertToKey(int(EndpointID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	// identifier := service.connection.ConvertToKey(int(EndpointID))
+	// return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }

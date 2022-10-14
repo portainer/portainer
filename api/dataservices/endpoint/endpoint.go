@@ -1,11 +1,7 @@
 package endpoint
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,10 +20,10 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -37,56 +33,60 @@ func NewService(connection portainer.Connection) (*Service, error) {
 // Endpoint returns an environment(endpoint) by ID.
 func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	var endpoint portainer.Endpoint
-	identifier := service.connection.ConvertToKey(int(ID))
+	// identifier := service.connection.ConvertToKey(int(ID))
 
-	err := service.connection.GetObject(BucketName, identifier, &endpoint)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &endpoint)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &endpoint, nil
 }
 
 // UpdateEndpoint updates an environment(endpoint).
 func (service *Service) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, endpoint)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.UpdateObject(BucketName, identifier, endpoint)
+	return nil
 }
 
 // DeleteEndpoint deletes an environment(endpoint).
 func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }
 
 // Endpoints return an array containing all the environments(endpoints).
 func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
-	err := service.connection.GetAllWithJsoniter(
-		BucketName,
-		&portainer.Endpoint{},
-		func(obj interface{}) (interface{}, error) {
-			endpoint, ok := obj.(*portainer.Endpoint)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Endpoint object")
-				return nil, fmt.Errorf("failed to convert to Endpoint object: %s", obj)
-			}
+	// err := service.connection.GetAllWithJsoniter(
+	// 	BucketName,
+	// 	&portainer.Endpoint{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		endpoint, ok := obj.(*portainer.Endpoint)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Endpoint object")
+	// 			return nil, fmt.Errorf("failed to convert to Endpoint object: %s", obj)
+	// 		}
 
-			endpoints = append(endpoints, *endpoint)
+	// 		endpoints = append(endpoints, *endpoint)
 
-			return &portainer.Endpoint{}, nil
-		})
+	// 		return &portainer.Endpoint{}, nil
+	// 	})
 
-	return endpoints, err
+	return endpoints, nil
 }
 
 // CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
 func (service *Service) Create(endpoint *portainer.Endpoint) error {
-	return service.connection.CreateObjectWithId(BucketName, int(endpoint.ID), endpoint)
+	// return service.connection.CreateObjectWithId(BucketName, int(endpoint.ID), endpoint)
+	return nil
 }
 
 // GetNextIdentifier returns the next identifier for an environment(endpoint).
 func (service *Service) GetNextIdentifier() int {
-	return service.connection.GetNextIdentifier(BucketName)
+	// return service.connection.GetNextIdentifier(BucketName)
+	return 0
 }

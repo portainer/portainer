@@ -1,11 +1,7 @@
 package role
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,10 +20,10 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
+	// err := connection.SetServiceName(BucketName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &Service{
 		connection: connection,
@@ -37,12 +33,12 @@ func NewService(connection portainer.Connection) (*Service, error) {
 // Role returns a Role by ID
 func (service *Service) Role(ID portainer.RoleID) (*portainer.Role, error) {
 	var set portainer.Role
-	identifier := service.connection.ConvertToKey(int(ID))
+	// identifier := service.connection.ConvertToKey(int(ID))
 
-	err := service.connection.GetObject(BucketName, identifier, &set)
-	if err != nil {
-		return nil, err
-	}
+	// err := service.connection.GetObject(BucketName, identifier, &set)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &set, nil
 }
@@ -51,37 +47,39 @@ func (service *Service) Role(ID portainer.RoleID) (*portainer.Role, error) {
 func (service *Service) Roles() ([]portainer.Role, error) {
 	var sets = make([]portainer.Role, 0)
 
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.Role{},
-		func(obj interface{}) (interface{}, error) {
-			set, ok := obj.(*portainer.Role)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Role object")
-				return nil, fmt.Errorf("Failed to convert to Role object: %s", obj)
-			}
+	// err := service.connection.GetAll(
+	// 	BucketName,
+	// 	&portainer.Role{},
+	// 	func(obj interface{}) (interface{}, error) {
+	// 		set, ok := obj.(*portainer.Role)
+	// 		if !ok {
+	// 			log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Role object")
+	// 			return nil, fmt.Errorf("Failed to convert to Role object: %s", obj)
+	// 		}
 
-			sets = append(sets, *set)
+	// 		sets = append(sets, *set)
 
-			return &portainer.Role{}, nil
-		})
+	// 		return &portainer.Role{}, nil
+	// 	})
 
-	return sets, err
+	return sets, nil
 }
 
 // CreateRole creates a new Role.
 func (service *Service) Create(role *portainer.Role) error {
-	return service.connection.CreateObject(
-		BucketName,
-		func(id uint64) (int, interface{}) {
-			role.ID = portainer.RoleID(id)
-			return int(role.ID), role
-		},
-	)
+	// return service.connection.CreateObject(
+	// 	BucketName,
+	// 	func(id uint64) (int, interface{}) {
+	// 		role.ID = portainer.RoleID(id)
+	// 		return int(role.ID), role
+	// 	},
+	// )
+	return nil
 }
 
 // UpdateRole updates a role.
 func (service *Service) UpdateRole(ID portainer.RoleID, role *portainer.Role) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, role)
+	// identifier := service.connection.ConvertToKey(int(ID))
+	// return service.connection.UpdateObject(BucketName, identifier, role)
+	return nil
 }

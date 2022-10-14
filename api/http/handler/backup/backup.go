@@ -1,14 +1,9 @@
 package backup
 
 import (
-	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
-	operations "github.com/portainer/portainer/api/backup"
 )
 
 type (
@@ -36,20 +31,20 @@ func (p *backupPayload) Validate(r *http.Request) error {
 // @failure 500 "Server error"
 // @router /backup [post]
 func (h *Handler) backup(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload backupPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
-		return httperror.BadRequest("Invalid request payload", err)
-	}
+	// var payload backupPayload
+	// err := request.DecodeAndValidateJSONPayload(r, &payload)
+	// if err != nil {
+	// 	return httperror.BadRequest("Invalid request payload", err)
+	// }
 
-	archivePath, err := operations.CreateBackupArchive(payload.Password, h.gate, h.dataStore, h.filestorePath)
-	if err != nil {
-		return httperror.InternalServerError("Failed to create backup", err)
-	}
-	defer os.RemoveAll(filepath.Dir(archivePath))
+	// archivePath, err := operations.CreateBackupArchive(payload.Password, h.gate, h.dataStore, h.filestorePath)
+	// if err != nil {
+	// 	return httperror.InternalServerError("Failed to create backup", err)
+	// }
+	// defer os.RemoveAll(filepath.Dir(archivePath))
 
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fmt.Sprintf("portainer-backup_%s", filepath.Base(archivePath))))
-	http.ServeFile(w, r, archivePath)
+	// w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fmt.Sprintf("portainer-backup_%s", filepath.Base(archivePath))))
+	// http.ServeFile(w, r, archivePath)
 
 	return nil
 }

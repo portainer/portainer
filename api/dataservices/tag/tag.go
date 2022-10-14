@@ -1,11 +1,7 @@
 package tag
 
 import (
-	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,11 +20,6 @@ func (service *Service) BucketName() string {
 
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
-	err := connection.SetServiceName(BucketName)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Service{
 		connection: connection,
 	}, nil
@@ -37,57 +28,26 @@ func NewService(connection portainer.Connection) (*Service, error) {
 // Tags return an array containing all the tags.
 func (service *Service) Tags() ([]portainer.Tag, error) {
 	var tags = make([]portainer.Tag, 0)
-
-	err := service.connection.GetAll(
-		BucketName,
-		&portainer.Tag{},
-		func(obj interface{}) (interface{}, error) {
-			tag, ok := obj.(*portainer.Tag)
-			if !ok {
-				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to Tag object")
-				return nil, fmt.Errorf("Failed to convert to Tag object: %s", obj)
-			}
-
-			tags = append(tags, *tag)
-
-			return &portainer.Tag{}, nil
-		})
-
-	return tags, err
+	return tags, nil
 }
 
 // Tag returns a tag by ID.
 func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 	var tag portainer.Tag
-	identifier := service.connection.ConvertToKey(int(ID))
-
-	err := service.connection.GetObject(BucketName, identifier, &tag)
-	if err != nil {
-		return nil, err
-	}
-
 	return &tag, nil
 }
 
 // CreateTag creates a new tag.
 func (service *Service) Create(tag *portainer.Tag) error {
-	return service.connection.CreateObject(
-		BucketName,
-		func(id uint64) (int, interface{}) {
-			tag.ID = portainer.TagID(id)
-			return int(tag.ID), tag
-		},
-	)
+	return nil
 }
 
 // UpdateTag updates a tag.
 func (service *Service) UpdateTag(ID portainer.TagID, tag *portainer.Tag) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.UpdateObject(BucketName, identifier, tag)
+	return nil
 }
 
 // DeleteTag deletes a tag.
 func (service *Service) DeleteTag(ID portainer.TagID) error {
-	identifier := service.connection.ConvertToKey(int(ID))
-	return service.connection.DeleteObject(BucketName, identifier)
+	return nil
 }

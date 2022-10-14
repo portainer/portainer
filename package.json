@@ -34,7 +34,7 @@
     "dev:nodl": "grunt clean:server && grunt clean:client && grunt build:server && grunt start:client",
     "dev:extension": "grunt build && make local -f build/docker-extension/Makefile",
     "start:toolkit": "grunt start:toolkit",
-    "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
+    "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=1 go build --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
     "clean:all": "grunt clean:all",
     "format": "prettier --loglevel warn --write \"**/*.{js,css,html,jsx,tsx,ts,json}\"",
     "lint": "yarn lint:client; yarn lint:server",
