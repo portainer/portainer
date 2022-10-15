@@ -20,6 +20,10 @@ const (
 	labelPortainerAppKind    = "io.portainer.kubernetes.application.kind"
 )
 
+var (
+	labelRegexp = regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
+)
+
 // KubeAppLabels are labels applied to all resources deployed in a kubernetes stack
 type KubeAppLabels struct {
 	StackID   int
@@ -30,8 +34,7 @@ type KubeAppLabels struct {
 
 // convert string to valid kubernetes label by replacing invalid characters with periods
 func sanitizeLabel(value string) string {
-	re := regexp.MustCompile(`[^A-Za-z0-9\.\-\_]+`)
-	return re.ReplaceAllString(value, ".")
+	return labelRegexp.ReplaceAllString(value, ".")
 }
 
 // ToMap converts KubeAppLabels to a map[string]string
