@@ -1,7 +1,6 @@
 package version
 
 import (
-	"fmt"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
@@ -49,9 +48,7 @@ func (service *Service) Edition() (portainer.SoftwareEdition, error) {
 // StoreDBVersion store the database version.
 func (service *Service) StoreDBVersion(v int) error {
 	db := service.connection.GetDB()
-	version := &models.Version{Key: models.VersionKey}
-	fmt.Printf("## version %s", version)
-	tx := db.Model(version).Update("value", strconv.FormatInt(int64(v), 10))
+	tx := db.Model(&models.Version{}).Where("key = ?", models.VersionKey).Update("value", strconv.FormatInt(int64(v), 10)).Limit(1)
 	if tx.Error != nil {
 		return tx.Error
 	}
@@ -72,7 +69,7 @@ func (service *Service) IsUpdating() (bool, error) {
 // StoreIsUpdating store the database updating status.
 func (service *Service) StoreIsUpdating(isUpdating bool) error {
 	db := service.connection.GetDB()
-	tx := db.Model(&models.Version{Key: models.UpdatingKey}).Update("value", strconv.FormatBool(isUpdating))
+	tx := db.Model(&models.Version{}).Where("key = ?", models.UpdatingKey).Update("value", strconv.FormatBool(isUpdating)).Limit(1)
 	if tx.Error != nil {
 		return tx.Error
 	}

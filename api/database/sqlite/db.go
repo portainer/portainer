@@ -8,6 +8,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 	"github.com/rs/zerolog/log"
 )
@@ -163,5 +164,6 @@ func (connection *DbConnection) getEncryptionKey() []byte {
 
 func (connection *DbConnection) Init() error {
 	connection.DB.AutoMigrate(&models.Version{})
+	connection.DB.AutoMigrate(&portainer.Settings{})
 	return nil
 }

@@ -1,6 +1,8 @@
 package models
 
-import "net/http"
+import (
+	"net/http"
+)
 
 const (
 	VersionKey  string = "DB_VERSION"
@@ -10,7 +12,7 @@ const (
 )
 
 type Version struct {
-	Key   string `json:"Key"`
+	Key   string `json:"Key" gorm:"unique,primaryKey"`
 	Value string `json:"Value"`
 }
 

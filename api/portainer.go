@@ -829,18 +829,19 @@ type (
 
 	// Settings represents the application settings
 	Settings struct {
+		ID uint `json:"Id" example:"1" gorm:"primaryKey,autoIncrement"`
 		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
 		LogoURL string `json:"LogoURL" example:"https://mycompany.mydomain.tld/logo.png"`
 		// A list of label name & value that will be used to hide containers when querying containers
-		BlackListedLabels []Pair `json:"BlackListedLabels"`
+		BlackListedLabels []Pair `json:"BlackListedLabels" gorm:"serializer:json"`
 		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
-		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
-		InternalAuthSettings InternalAuthSettings `json:"InternalAuthSettings" example:""`
-		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
-		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
-		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration" example:""`
-		FDOConfiguration     FDOConfiguration     `json:"fdoConfiguration" example:""`
-		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
+		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1" gorm:"serializer:json"`
+		InternalAuthSettings InternalAuthSettings `json:"InternalAuthSettings" example:"" gorm:"serializer:json"`
+		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:"" gorm:"serializer:json"`
+		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:"" gorm:"serializer:json"`
+		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration" example:"" gorm:"serializer:json"`
+		FDOConfiguration     FDOConfiguration     `json:"fdoConfiguration" example:"" gorm:"serializer:json"`
+		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:"" gorm:"serializer:json"`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -877,7 +878,7 @@ type (
 			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
 			// EdgeAsyncMode enables edge async mode by default
 			AsyncMode bool
-		}
+		} `json:"Edge" gorm:"serializer:json"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
