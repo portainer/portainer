@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/edgetypes"
-	"github.com/sirupsen/logrus"
+
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -84,7 +85,7 @@ func (service *Service) List() ([]edgetypes.UpdateSchedule, error) {
 		func(obj interface{}) (interface{}, error) {
 			item, ok := obj.(*edgetypes.UpdateSchedule)
 			if !ok {
-				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeUpdateSchedule object")
+				log.Debug().Str("obj", fmt.Sprintf("%#v", obj)).Msg("failed to convert to EdgeUpdateSchedule object")
 				return nil, fmt.Errorf("Failed to convert to EdgeUpdateSchedule object: %s", obj)
 			}
 			list = append(list, *item)

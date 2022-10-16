@@ -328,7 +328,7 @@ PayloadLoop:
 			updatedClass.GloballyBlocked = existingClass.GloballyBlocked
 
 			// Handle "allow"
-			if p.Availability == true {
+			if p.Availability {
 				// remove the namespace from the list of blocked namespaces
 				// in the existingClass.
 				for _, blockedNS := range existingClass.BlockedNamespaces {

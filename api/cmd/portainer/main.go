@@ -316,12 +316,7 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 		sslSettings.HTTPEnabled = true
 	}
 
-	err = dataStore.SSLSettings().UpdateSettings(sslSettings)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return dataStore.SSLSettings().UpdateSettings(sslSettings)
 }
 
 // enableFeaturesFromFlags turns on or off feature flags

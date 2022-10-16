@@ -251,12 +251,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {
 	settings.SnapshotInterval = snapshotInterval
 
-	err := handler.SnapshotService.SetSnapshotInterval(snapshotInterval)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return handler.SnapshotService.SetSnapshotInterval(snapshotInterval)
 }
 
 func (handler *Handler) updateTLS(settings *portainer.Settings) *httperror.HandlerError {

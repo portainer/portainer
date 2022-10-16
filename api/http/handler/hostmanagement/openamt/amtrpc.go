@@ -295,29 +295,6 @@ func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings po
 	}
 
 	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
-	if err != nil {
-		return err
-	}
 
-	return nil
-}
-
-func (handler *Handler) deactivateDevice(endpoint *portainer.Endpoint, settings portainer.Settings) error {
-	ctx := context.TODO()
-
-	config := settings.OpenAMTConfiguration
-	cmdLine := []string{
-		"deactivate",
-		"-n",
-		"-v",
-		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
-		"-password", config.MPSPassword,
-	}
-
-	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

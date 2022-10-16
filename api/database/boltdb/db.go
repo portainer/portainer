@@ -179,7 +179,7 @@ func (connection *DbConnection) ConvertToKey(v int) []byte {
 	return b
 }
 
-// CreateBucket is a generic function used to create a bucket inside a database database.
+// CreateBucket is a generic function used to create a bucket inside a database.
 func (connection *DbConnection) SetServiceName(bucketName string) error {
 	return connection.Batch(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
@@ -187,7 +187,7 @@ func (connection *DbConnection) SetServiceName(bucketName string) error {
 	})
 }
 
-// GetObject is a generic function used to retrieve an unmarshalled object from a database database.
+// GetObject is a generic function used to retrieve an unmarshalled object from a database.
 func (connection *DbConnection) GetObject(bucketName string, key []byte, object interface{}) error {
 	var data []byte
 
@@ -219,7 +219,7 @@ func (connection *DbConnection) getEncryptionKey() []byte {
 	return connection.EncryptionKey
 }
 
-// UpdateObject is a generic function used to update an object inside a database database.
+// UpdateObject is a generic function used to update an object inside a database.
 func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object interface{}) error {
 	data, err := connection.MarshalObject(object)
 	if err != nil {
@@ -232,7 +232,33 @@ func (connection *DbConnection) UpdateObject(bucketName string, key []byte, obje
 	})
 }
 
-// DeleteObject is a generic function used to delete an object inside a database database.
+// UpdateObjectFunc is a generic function used to update an object safely without race conditions.
+func (connection *DbConnection) UpdateObjectFunc(bucketName string, key []byte, object any, updateFn func()) error {
+	return connection.Batch(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+
+		data := bucket.Get(key)
+		if data == nil {
+			return dserrors.ErrObjectNotFound
+		}
+
+		err := connection.UnmarshalObjectWithJsoniter(data, object)
+		if err != nil {
+			return err
+		}
+
+		updateFn()
+
+		data, err = connection.MarshalObject(object)
+		if err != nil {
+			return err
+		}
+
+		return bucket.Put(key, data)
+	})
+}
+
+// DeleteObject is a generic function used to delete an object inside a database.
 func (connection *DbConnection) DeleteObject(bucketName string, key []byte) error {
 	return connection.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))

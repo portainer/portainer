@@ -1,5 +1,7 @@
 import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models/constants';
+import { getServices } from 'Kubernetes/react/views/networks/services/service';
+import { notifyError } from '@/portainer/services/notifications';
 
 export default class KubeServicesViewController {
   /* @ngInject */
@@ -7,6 +9,7 @@ export default class KubeServicesViewController {
     this.$async = $async;
     this.EndpointProvider = EndpointProvider;
     this.Authentication = Authentication;
+    this.asyncOnInit = this.asyncOnInit.bind(this);
   }
 
   addEntry(service) {
@@ -74,6 +77,21 @@ export default class KubeServicesViewController {
         return 'fa fa-project-diagram';
     }
   }
+
+  async asyncOnInit() {
+    try {
+      // get all nodeport services in the cluster, to validate unique nodeports in the form
+      const allSettledServices = await Promise.allSettled(this.namespaces.map((namespace) => getServices(this.state.endpointId, namespace)));
+      const allServices = allSettledServices
+        .filter((settledService) => settledService.status === 'fulfilled' && settledService.value)
+        .map((fulfilledService) => fulfilledService.value)
+        .flat();
+      this.nodePortServices = allServices.filter((service) => service.Type === 'NodePort');
+    } catch (error) {
+      notifyError('Failure', error, 'Failed getting services');
+    }
+  }
+
   $onInit() {
     this.state = {
       serviceType: [
@@ -93,5 +111,6 @@ export default class KubeServicesViewController {
       selected: KubernetesApplicationPublishingTypes.CLUSTER_IP,
       endpointId: this.EndpointProvider.endpointID(),
     };
+    return this.$async(this.asyncOnInit);
   }
 }
