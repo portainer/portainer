@@ -13,23 +13,9 @@ import (
 )
 
 type (
-	// AccessPolicy represent a policy that can be associated to a user or team
-	AccessPolicy struct {
-		// Role identifier. Reference the role that will be associated to this access policy
-		RoleID RoleID `json:"RoleId" example:"1"`
-	}
 
 	// AgentPlatform represents a platform type for an Agent
 	AgentPlatform int
-
-	// AuthenticationMethod represents the authentication method used to authenticate a user
-	AuthenticationMethod int
-
-	// Authorization represents an authorization associated to an operation
-	Authorization string
-
-	// Authorizations represents a set of authorizations associated to a role
-	Authorizations map[Authorization]bool
 
 	// AzureCredentials represents the credentials used to connect to an Azure
 	// environment(endpoint).
@@ -42,58 +28,6 @@ type (
 		AuthenticationKey string `json:"AuthenticationKey" example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="`
 	}
 
-	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
-	OpenAMTConfiguration struct {
-		Enabled          bool   `json:"enabled"`
-		MPSServer        string `json:"mpsServer"`
-		MPSUser          string `json:"mpsUser"`
-		MPSPassword      string `json:"mpsPassword"`
-		MPSToken         string `json:"mpsToken"` // retrieved from API
-		CertFileName     string `json:"certFileName"`
-		CertFileContent  string `json:"certFileContent"`
-		CertFilePassword string `json:"certFilePassword"`
-		DomainName       string `json:"domainName"`
-	}
-
-	// OpenAMTDeviceInformation represents an AMT managed device information
-	OpenAMTDeviceInformation struct {
-		GUID             string                        `json:"guid"`
-		HostName         string                        `json:"hostname"`
-		ConnectionStatus bool                          `json:"connectionStatus"`
-		PowerState       PowerState                    `json:"powerState"`
-		EnabledFeatures  *OpenAMTDeviceEnabledFeatures `json:"features"`
-	}
-
-	// OpenAMTDeviceEnabledFeatures represents an AMT managed device features information
-	OpenAMTDeviceEnabledFeatures struct {
-		Redirection bool   `json:"redirection"`
-		KVM         bool   `json:"KVM"`
-		SOL         bool   `json:"SOL"`
-		IDER        bool   `json:"IDER"`
-		UserConsent string `json:"userConsent"`
-	}
-
-	// PowerState represents an AMT managed device power state
-	PowerState int
-
-	FDOConfiguration struct {
-		Enabled       bool   `json:"enabled"`
-		OwnerURL      string `json:"ownerURL"`
-		OwnerUsername string `json:"ownerUsername"`
-		OwnerPassword string `json:"ownerPassword"`
-	}
-
-	// FDOProfileID represents a fdo profile id
-	FDOProfileID int
-
-	FDOProfile struct {
-		ID            FDOProfileID `json:"id"`
-		Name          string       `json:"name"`
-		FilePath      string       `json:"filePath"`
-		NumberDevices int          `json:"numberDevices"`
-		DateCreated   int64        `json:"dateCreated"`
-	}
-
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr                      *string
@@ -104,11 +38,11 @@ type (
 		AdminPasswordFile         *string
 		Assets                    *string
 		Data                      *string
-		FeatureFlags              *[]Pair
+		FeatureFlags              *[]models.Pair
 		DemoEnvironment           *bool
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
-		Labels                    *[]Pair
+		Labels                    *[]models.Pair
 		Logo                      *string
 		NoAnalytics               *bool
 		Templates                 *string
@@ -153,7 +87,7 @@ type (
 		// Path to the Stack file
 		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
 		// User identifier who created this template
-		CreatedByUserID UserID `json:"CreatedByUserId" example:"3"`
+		CreatedByUserID models.UserID `json:"CreatedByUserId" example:"3"`
 		// A note that will be displayed in the UI. Supports HTML content
 		Note string `json:"Note" example:"This is my <b>custom</b> template"`
 		// Platform associated to the template.
@@ -314,10 +248,10 @@ type (
 		// Environment(Endpoint) group identifier
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
-		PublicURL        string           `json:"PublicURL" example:"docker.mydomain.tld:2375"`
-		Gpus             []Pair           `json:"Gpus"`
-		TLSConfig        TLSConfiguration `json:"TLSConfig"`
-		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty" example:""`
+		PublicURL        string                  `json:"PublicURL" example:"docker.mydomain.tld:2375"`
+		Gpus             []models.Pair           `json:"Gpus"`
+		TLSConfig        models.TLSConfiguration `json:"TLSConfig"`
+		AzureCredentials AzureCredentials        `json:"AzureCredentials,omitempty" example:""`
 		// List of tag identifiers to which this environment(endpoint) is associated
 		TagIDs []TagID `json:"TagIds"`
 		// The status of the environment(endpoint) (1 - up, 2 - down)
@@ -327,7 +261,7 @@ type (
 		// List of user identifiers authorized to connect to this environment(endpoint)
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		// List of team identifiers authorized to connect to this environment(endpoint)
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
+		TeamAccessPolicies models.TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
 		// The identifier of the edge agent associated with this environment(endpoint)
 		EdgeID string `json:"EdgeID,omitempty" example:""`
 		// The key which is used to map the agent to Portainer
@@ -374,15 +308,15 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+		AuthorizedUsers []models.UserID `json:"AuthorizedUsers"`
+		AuthorizedTeams []models.TeamID `json:"AuthorizedTeams"`
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
-	EndpointAuthorizations map[EndpointID]Authorizations
+	EndpointAuthorizations map[EndpointID]models.Authorizations
 
 	// EndpointGroup represents a group of environments(endpoints)
 	EndpointGroup struct {
@@ -391,18 +325,18 @@ type (
 		// Environment(Endpoint) group name
 		Name string `json:"Name" example:"my-environment-group"`
 		// Description associated to the environment(endpoint) group
-		Description        string             `json:"Description" example:"Environment(Endpoint) group description"`
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" example:""`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
+		Description        string                    `json:"Description" example:"Environment(Endpoint) group description"`
+		UserAccessPolicies UserAccessPolicies        `json:"UserAccessPolicies" example:""`
+		TeamAccessPolicies models.TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
 		// List of tags associated to this environment(endpoint) group
 		TagIDs []TagID `json:"TagIds"`
 
 		// Deprecated fields
-		Labels []Pair `json:"Labels"`
+		Labels []models.Pair `json:"Labels"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+		AuthorizedUsers []models.UserID `json:"AuthorizedUsers"`
+		AuthorizedTeams []models.TeamID `json:"AuthorizedTeams"`
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
@@ -476,9 +410,6 @@ type (
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
-	// Feature represents a feature that can be enabled or disabled via feature flags
-	Feature string
-
 	// GitlabRegistryData represents data required for gitlab registry to work
 	GitlabRegistryData struct {
 		ProjectID   int    `json:"ProjectId"`
@@ -493,7 +424,7 @@ type (
 		// Membership Identifier
 		ID HelmUserRepositoryID `json:"Id" example:"1"`
 		// User identifier
-		UserID UserID `json:"UserId" example:"1"`
+		UserID models.UserID `json:"UserId" example:"1"`
 		// Helm repository URL
 		URL string `json:"URL" example:"https://charts.bitnami.com/bitnami"`
 	}
@@ -525,8 +456,8 @@ type (
 	K8sNodesLimits map[string]*K8sNodeLimits
 
 	K8sNamespaceAccessPolicy struct {
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+		UserAccessPolicies UserAccessPolicies        `json:"UserAccessPolicies"`
+		TeamAccessPolicies models.TeamAccessPolicies `json:"TeamAccessPolicies"`
 	}
 
 	// KubernetesData contains all the Kubernetes related environment(endpoint) information
@@ -580,88 +511,12 @@ type (
 		ShellExecCommand string
 	}
 
-	// InternalAuthSettings represents settings used for the default 'internal' authentication
-	InternalAuthSettings struct {
-		RequiredPasswordLength int
-	}
-
-	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
-	LDAPGroupSearchSettings struct {
-		// The distinguished name of the element from which the LDAP server will search for groups
-		GroupBaseDN string `json:"GroupBaseDN" example:"dc=ldap,dc=domain,dc=tld"`
-		// The LDAP search filter used to select group elements, optional
-		GroupFilter string `json:"GroupFilter" example:"(objectClass=account"`
-		// LDAP attribute which denotes the group membership
-		GroupAttribute string `json:"GroupAttribute" example:"member"`
-	}
-
-	// LDAPSearchSettings represents settings used to search for users in a LDAP server
-	LDAPSearchSettings struct {
-		// The distinguished name of the element from which the LDAP server will search for users
-		BaseDN string `json:"BaseDN" example:"dc=ldap,dc=domain,dc=tld"`
-		// Optional LDAP search filter used to select user elements
-		Filter string `json:"Filter" example:"(objectClass=account)"`
-		// LDAP attribute which denotes the username
-		UserNameAttribute string `json:"UserNameAttribute" example:"uid"`
-	}
-
-	// LDAPSettings represents the settings used to connect to a LDAP server
-	LDAPSettings struct {
-		// Enable this option if the server is configured for Anonymous access. When enabled, ReaderDN and Password will not be used
-		AnonymousMode bool `json:"AnonymousMode" example:"true" validate:"validate_bool"`
-		// Account that will be used to search for users
-		ReaderDN string `json:"ReaderDN" example:"cn=readonly-account,dc=ldap,dc=domain,dc=tld" validate:"required_if=AnonymousMode false"`
-		// Password of the account that will be used to search users
-		Password string `json:"Password,omitempty" example:"readonly-password" validate:"required_if=AnonymousMode false"`
-		// URL or IP address of the LDAP server
-		URL       string           `json:"URL" example:"myldap.domain.tld:389" validate:"hostname_port"`
-		TLSConfig TLSConfiguration `json:"TLSConfig"`
-		// Whether LDAP connection should use StartTLS
-		StartTLS            bool                      `json:"StartTLS" example:"true"`
-		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
-		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
-		// Automatically provision users and assign them to matching LDAP group names
-		AutoCreateUsers bool `json:"AutoCreateUsers" example:"true"`
-	}
-
-	// LDAPUser represents a LDAP user
-	LDAPUser struct {
-		Name   string
-		Groups []string
-	}
-
 	// LicenseInformation represents information about an extension license
 	LicenseInformation struct {
 		LicenseKey string `json:"LicenseKey,omitempty"`
 		Company    string `json:"Company,omitempty"`
 		Expiration string `json:"Expiration,omitempty"`
 		Valid      bool   `json:"Valid,omitempty"`
-	}
-
-	// MembershipRole represents the role of a user within a team
-	MembershipRole int
-
-	// OAuthSettings represents the settings used to authorize with an authorization server
-	OAuthSettings struct {
-		ClientID             string `json:"ClientID"`
-		ClientSecret         string `json:"ClientSecret,omitempty"`
-		AccessTokenURI       string `json:"AccessTokenURI"`
-		AuthorizationURI     string `json:"AuthorizationURI"`
-		ResourceURI          string `json:"ResourceURI"`
-		RedirectURI          string `json:"RedirectURI"`
-		UserIdentifier       string `json:"UserIdentifier"`
-		Scopes               string `json:"Scopes"`
-		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
-		DefaultTeamID        TeamID `json:"DefaultTeamID"`
-		SSO                  bool   `json:"SSO"`
-		LogoutURI            string `json:"LogoutURI"`
-		KubeSecretKey        []byte `json:"KubeSecretKey"`
-	}
-
-	// Pair defines a key/value string pair
-	Pair struct {
-		Name  string `json:"name" example:"name"`
-		Value string `json:"value" example:"value"`
 	}
 
 	// Registry represents a Docker registry with all the info required
@@ -693,12 +548,12 @@ type (
 		// Deprecated in DBVersion == 31
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		// Deprecated in DBVersion == 31
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+		TeamAccessPolicies models.TeamAccessPolicies `json:"TeamAccessPolicies"`
 
 		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
+		AuthorizedUsers []models.UserID `json:"AuthorizedUsers"`
 		// Deprecated in DBVersion == 18
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+		AuthorizedTeams []models.TeamID `json:"AuthorizedTeams"`
 
 		// Stores temporary access token
 		AccessToken       string `json:"AccessToken,omitempty"`
@@ -708,9 +563,9 @@ type (
 	RegistryAccesses map[EndpointID]RegistryAccessPolicies
 
 	RegistryAccessPolicies struct {
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
-		Namespaces         []string           `json:"Namespaces"`
+		UserAccessPolicies UserAccessPolicies        `json:"UserAccessPolicies"`
+		TeamAccessPolicies models.TeamAccessPolicies `json:"TeamAccessPolicies"`
+		Namespaces         []string                  `json:"Namespaces"`
 	}
 
 	// RegistryID represents a registry identifier
@@ -719,21 +574,18 @@ type (
 	// RegistryManagementConfiguration represents a configuration that can be used to query
 	// the registry API via the registry management extension.
 	RegistryManagementConfiguration struct {
-		Type              RegistryType     `json:"Type"`
-		Authentication    bool             `json:"Authentication"`
-		Username          string           `json:"Username"`
-		Password          string           `json:"Password"`
-		TLSConfig         TLSConfiguration `json:"TLSConfig"`
-		Ecr               EcrData          `json:"Ecr"`
-		AccessToken       string           `json:"AccessToken,omitempty"`
-		AccessTokenExpiry int64            `json:"AccessTokenExpiry,omitempty"`
+		Type              RegistryType            `json:"Type"`
+		Authentication    bool                    `json:"Authentication"`
+		Username          string                  `json:"Username"`
+		Password          string                  `json:"Password"`
+		TLSConfig         models.TLSConfiguration `json:"TLSConfig"`
+		Ecr               EcrData                 `json:"Ecr"`
+		AccessToken       string                  `json:"AccessToken,omitempty"`
+		AccessTokenExpiry int64                   `json:"AccessTokenExpiry,omitempty"`
 	}
 
 	// RegistryType represents a type of registry
 	RegistryType int
-
-	// ResourceAccessLevel represents the level of control associated to a resource
-	ResourceAccessLevel int
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
@@ -746,9 +598,9 @@ type (
 		SubResourceIDs []string `json:"SubResourceIds" example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"`
 		// Type of Docker resource. Valid values are: 1- container, 2 -service
 		// 3 - volume, 4 - secret, 5 - stack, 6 - config or 7 - custom template
-		Type         ResourceControlType  `json:"Type" example:"1"`
-		UserAccesses []UserResourceAccess `json:"UserAccesses" example:""`
-		TeamAccesses []TeamResourceAccess `json:"TeamAccesses" example:""`
+		Type         ResourceControlType         `json:"Type" example:"1"`
+		UserAccesses []UserResourceAccess        `json:"UserAccesses" example:""`
+		TeamAccesses []models.TeamResourceAccess `json:"TeamAccesses" example:""`
 		// Permit access to the associated resource to any user
 		Public bool `json:"Public" example:"true"`
 		// Permit access to resource only to admins
@@ -757,8 +609,8 @@ type (
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 2
-		OwnerID     UserID              `json:"OwnerId,omitempty"`
-		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
+		OwnerID     models.UserID              `json:"OwnerId,omitempty"`
+		AccessLevel models.ResourceAccessLevel `json:"AccessLevel,omitempty"`
 	}
 
 	// ResourceControlID represents a resource control identifier
@@ -767,35 +619,18 @@ type (
 	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...)
 	ResourceControlType int
 
-	// Role represents a set of authorizations that can be associated to a user or
-	// to a team.
-	Role struct {
-		// Role Identifier
-		ID RoleID `json:"Id" example:"1"`
-		// Role name
-		Name string `json:"Name" example:"HelpDesk"`
-		// Role description
-		Description string `json:"Description" example:"Read-only access of all resources in an environment(endpoint)"`
-		// Authorizations associated to a role
-		Authorizations Authorizations `json:"Authorizations"`
-		Priority       int            `json:"Priority"`
-	}
-
-	// RoleID represents a role identifier
-	RoleID int
-
 	// APIKeyID represents an API key identifier
 	APIKeyID int
 
 	// APIKey represents an API key
 	APIKey struct {
-		ID          APIKeyID `json:"id" example:"1"`
-		UserID      UserID   `json:"userId" example:"1"`
-		Description string   `json:"description" example:"portainer-api-key"`
-		Prefix      string   `json:"prefix"`           // API key identifier (7 char prefix)
-		DateCreated int64    `json:"dateCreated"`      // Unix timestamp (UTC) when the API key was created
-		LastUsed    int64    `json:"lastUsed"`         // Unix timestamp (UTC) when the API key was last used
-		Digest      []byte   `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
+		ID          APIKeyID      `json:"id" example:"1"`
+		UserID      models.UserID `json:"userId" example:"1"`
+		Description string        `json:"description" example:"portainer-api-key"`
+		Prefix      string        `json:"prefix"`           // API key identifier (7 char prefix)
+		DateCreated int64         `json:"dateCreated"`      // Unix timestamp (UTC) when the API key was created
+		LastUsed    int64         `json:"lastUsed"`         // Unix timestamp (UTC) when the API key was last used
+		Digest      []byte        `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
 	}
 
 	// Schedule represents a scheduled job.
@@ -827,73 +662,6 @@ type (
 		RetryInterval int
 	}
 
-	// Settings represents the application settings
-	Settings struct {
-		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
-		LogoURL string `json:"LogoURL" example:"https://mycompany.mydomain.tld/logo.png"`
-		// A list of label name & value that will be used to hide containers when querying containers
-		BlackListedLabels []Pair `json:"BlackListedLabels"`
-		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
-		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
-		InternalAuthSettings InternalAuthSettings `json:"InternalAuthSettings" example:""`
-		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
-		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
-		OpenAMTConfiguration OpenAMTConfiguration `json:"openAMTConfiguration" example:""`
-		FDOConfiguration     FDOConfiguration     `json:"fdoConfiguration" example:""`
-		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
-		// The interval in which environment(endpoint) snapshots are created
-		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
-		// URL to the templates that will be displayed in the UI when navigating to App Templates
-		TemplatesURL string `json:"TemplatesURL" example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
-		// The default check in interval for edge agent (in seconds)
-		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
-		// Whether edge compute features are enabled
-		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:""`
-		// The duration of a user session
-		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
-		// The expiry of a Kubeconfig
-		KubeconfigExpiry string `json:"KubeconfigExpiry" example:"24h"`
-		// Whether telemetry is enabled
-		EnableTelemetry bool `json:"EnableTelemetry" example:"false"`
-		// Helm repository URL, defaults to "https://charts.bitnami.com/bitnami"
-		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
-		// KubectlImage, defaults to portainer/kubectl-shell
-		KubectlShellImage string `json:"KubectlShellImage" example:"portainer/kubectl-shell"`
-		// TrustOnFirstConnect makes Portainer accepting edge agent connection by default
-		TrustOnFirstConnect bool `json:"TrustOnFirstConnect" example:"false"`
-		// EnforceEdgeID makes Portainer store the Edge ID instead of accepting anyone
-		EnforceEdgeID bool `json:"EnforceEdgeID" example:"false"`
-		// Container environment parameter AGENT_SECRET
-		AgentSecret string `json:"AgentSecret"`
-		// EdgePortainerURL is the URL that is exposed to edge agents
-		EdgePortainerURL string `json:"EdgePortainerUrl"`
-
-		Edge struct {
-			// The command list interval for edge agent - used in edge async mode (in seconds)
-			CommandInterval int `json:"CommandInterval" example:"5"`
-			// The ping interval for edge agent - used in edge async mode (in seconds)
-			PingInterval int `json:"PingInterval" example:"5"`
-			// The snapshot interval for edge agent - used in edge async mode (in seconds)
-			SnapshotInterval int `json:"SnapshotInterval" example:"5"`
-			// EdgeAsyncMode enables edge async mode by default
-			AsyncMode bool
-		}
-
-		// Deprecated fields
-		DisplayDonationHeader       bool
-		DisplayExternalContributors bool
-
-		// Deprecated fields v26
-		EnableHostManagementFeatures              bool `json:"EnableHostManagementFeatures"`
-		AllowVolumeBrowserForRegularUsers         bool `json:"AllowVolumeBrowserForRegularUsers"`
-		AllowBindMountsForRegularUsers            bool `json:"AllowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers        bool `json:"AllowPrivilegedModeForRegularUsers"`
-		AllowHostNamespaceForRegularUsers         bool `json:"AllowHostNamespaceForRegularUsers"`
-		AllowStackManagementForRegularUsers       bool `json:"AllowStackManagementForRegularUsers"`
-		AllowDeviceMappingForRegularUsers         bool `json:"AllowDeviceMappingForRegularUsers"`
-		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers"`
-	}
-
 	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
 	SnapshotJob struct{}
 
@@ -923,7 +691,7 @@ type (
 		// Path to the Stack file
 		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
 		// A list of environment(endpoint) variables used during stack deployment
-		Env []Pair `json:"Env" example:""`
+		Env []models.Pair `json:"Env" example:""`
 		//
 		ResourceControl *ResourceControl `json:"ResourceControl" example:""`
 		// Stack status (1 - active, 2 - inactive)
@@ -1002,41 +770,6 @@ type (
 	// TagID represents a tag identifier
 	TagID int
 
-	// Team represents a list of user accounts
-	Team struct {
-		// Team Identifier
-		ID TeamID `json:"Id" example:"1"`
-		// Team name
-		Name string `json:"Name" example:"developers"`
-	}
-
-	// TeamAccessPolicies represent the association of an access policy and a team
-	TeamAccessPolicies map[TeamID]AccessPolicy
-
-	// TeamID represents a team identifier
-	TeamID int
-
-	// TeamMembership represents a membership association between a user and a team
-	TeamMembership struct {
-		// Membership Identifier
-		ID TeamMembershipID `json:"Id" example:"1"`
-		// User identifier
-		UserID UserID `json:"UserID" example:"1"`
-		// Team identifier
-		TeamID TeamID `json:"TeamID" example:"1"`
-		// Team role (1 for team leader and 2 for team member)
-		Role MembershipRole `json:"Role" example:"1"`
-	}
-
-	// TeamMembershipID represents a team membership identifier
-	TeamMembershipID int
-
-	// TeamResourceAccess represents the level of control on a resource for a specific team
-	TeamResourceAccess struct {
-		TeamID      TeamID              `json:"TeamId"`
-		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
-	}
-
 	// Template represents an application template that can be used as an App Template
 	// or an Edge template
 	Template struct {
@@ -1090,7 +823,7 @@ type (
 		// A list of ports exposed by the container
 		Ports []string `json:"ports,omitempty" example:"8080:80/tcp"`
 		// Container labels
-		Labels []Pair `json:"labels,omitempty" example:""`
+		Labels []models.Pair `json:"labels,omitempty" example:""`
 		// Whether the container should be started in privileged mode
 		Privileged bool `json:"privileged,omitempty" example:"true"`
 		// Whether the container should be started in
@@ -1153,27 +886,13 @@ type (
 		ReadOnly bool `json:"readonly,omitempty" example:"true"`
 	}
 
-	// TLSConfiguration represents a TLS configuration
-	TLSConfiguration struct {
-		// Use TLS
-		TLS bool `json:"TLS" example:"true"`
-		// Skip the verification of the server TLS certificate
-		TLSSkipVerify bool `json:"TLSSkipVerify" example:"false"`
-		// Path to the TLS CA certificate file
-		TLSCACertPath string `json:"TLSCACert,omitempty" example:"/data/tls/ca.pem"`
-		// Path to the TLS client certificate file
-		TLSCertPath string `json:"TLSCert,omitempty" example:"/data/tls/cert.pem"`
-		// Path to the TLS client key file
-		TLSKeyPath string `json:"TLSKey,omitempty" example:"/data/tls/key.pem"`
-	}
-
 	// TLSFileType represents a type of TLS file required to connect to a Docker environment(endpoint).
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID                  UserID
+		ID                  models.UserID
 		Username            string
 		Role                UserRole
 		ForceChangePassword bool
@@ -1196,9 +915,9 @@ type (
 	// User represents a user account
 	User struct {
 		// User Identifier
-		ID       UserID `json:"Id" example:"1"`
-		Username string `json:"Username" example:"bob"`
-		Password string `json:"Password,omitempty" swaggerignore:"true"`
+		ID       models.UserID `json:"Id" example:"1"`
+		Username string        `json:"Username" example:"bob"`
+		Password string        `json:"Password,omitempty" swaggerignore:"true"`
 		// User Theme
 		UserTheme string `example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)
@@ -1207,20 +926,17 @@ type (
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 25
-		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
+		PortainerAuthorizations models.Authorizations  `json:"PortainerAuthorizations"`
 		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
 	}
 
 	// UserAccessPolicies represent the association of an access policy and a user
-	UserAccessPolicies map[UserID]AccessPolicy
-
-	// UserID represents a user identifier
-	UserID int
+	UserAccessPolicies map[models.UserID]models.AccessPolicy
 
 	// UserResourceAccess represents the level of control on a resource for a specific user
 	UserResourceAccess struct {
-		UserID      UserID              `json:"UserId"`
-		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+		UserID      models.UserID              `json:"UserId"`
+		AccessLevel models.ResourceAccessLevel `json:"AccessLevel"`
 	}
 
 	// UserRole represents the role of a user. It can be either an administrator
@@ -1336,10 +1052,10 @@ type (
 
 	// OpenAMTService represents a service for managing OpenAMT
 	OpenAMTService interface {
-		Configure(configuration OpenAMTConfiguration) error
-		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
-		EnableDeviceFeatures(configuration OpenAMTConfiguration, deviceGUID string, features OpenAMTDeviceEnabledFeatures) (string, error)
-		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
+		Configure(configuration models.OpenAMTConfiguration) error
+		DeviceInformation(configuration models.OpenAMTConfiguration, deviceGUID string) (*models.OpenAMTDeviceInformation, error)
+		EnableDeviceFeatures(configuration models.OpenAMTConfiguration, deviceGUID string, features models.OpenAMTDeviceEnabledFeatures) (string, error)
+		ExecuteDeviceAction(configuration models.OpenAMTConfiguration, deviceGUID string, action string) error
 	}
 
 	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
@@ -1377,8 +1093,8 @@ type (
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes environment(endpoint)
 	KubernetesDeployer interface {
-		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
-		Remove(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
+		Deploy(userID models.UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
+		Remove(userID models.UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 
@@ -1389,16 +1105,16 @@ type (
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
 	LDAPService interface {
-		AuthenticateUser(username, password string, settings *LDAPSettings) error
-		TestConnectivity(settings *LDAPSettings) error
-		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
-		SearchGroups(settings *LDAPSettings) ([]LDAPUser, error)
-		SearchUsers(settings *LDAPSettings) ([]string, error)
+		AuthenticateUser(username, password string, settings *models.LDAPSettings) error
+		TestConnectivity(settings *models.LDAPSettings) error
+		GetUserGroups(username string, settings *models.LDAPSettings) ([]string, error)
+		SearchGroups(settings *models.LDAPSettings) ([]models.LDAPUser, error)
+		SearchUsers(settings *models.LDAPSettings) ([]string, error)
 	}
 
 	// OAuthService represents a service used to authenticate users using OAuth
 	OAuthService interface {
-		Authenticate(code string, configuration *OAuthSettings) (string, error)
+		Authenticate(code string, configuration *models.OAuthSettings) (string, error)
 	}
 
 	// ReverseTunnelService represents a service used to manage reverse tunnel connections.
@@ -1487,22 +1203,12 @@ const (
 	WebSocketKeepAlive = 1 * time.Hour
 )
 
-const FeatureFlagEdgeRemoteUpdate Feature = "edgeRemoteUpdate"
+const FeatureFlagEdgeRemoteUpdate models.Feature = "edgeRemoteUpdate"
 
 // List of supported features
-var SupportedFeatureFlags = []Feature{
+var SupportedFeatureFlags = []models.Feature{
 	FeatureFlagEdgeRemoteUpdate,
 }
-
-const (
-	_ AuthenticationMethod = iota
-	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)
-	AuthenticationInternal
-	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
-	AuthenticationLDAP
-	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
-	AuthenticationOAuth
-)
 
 const (
 	_ AgentPlatform = iota
@@ -1580,7 +1286,7 @@ const (
 )
 
 const (
-	_ MembershipRole = iota
+	_ models.MembershipRole = iota
 	// TeamLeader represents a leader role inside a team
 	TeamLeader
 	// TeamMember represents a member role inside a team
@@ -1616,7 +1322,7 @@ const (
 )
 
 const (
-	_ ResourceAccessLevel = iota
+	_ models.ResourceAccessLevel = iota
 	// ReadWriteAccessLevel represents an access level with read-write permissions on a resource
 	ReadWriteAccessLevel
 )
@@ -1706,220 +1412,220 @@ const (
 
 // represents an authorization type
 const (
-	OperationDockerContainerArchiveInfo         Authorization = "DockerContainerArchiveInfo"
-	OperationDockerContainerList                Authorization = "DockerContainerList"
-	OperationDockerContainerExport              Authorization = "DockerContainerExport"
-	OperationDockerContainerChanges             Authorization = "DockerContainerChanges"
-	OperationDockerContainerInspect             Authorization = "DockerContainerInspect"
-	OperationDockerContainerTop                 Authorization = "DockerContainerTop"
-	OperationDockerContainerLogs                Authorization = "DockerContainerLogs"
-	OperationDockerContainerStats               Authorization = "DockerContainerStats"
-	OperationDockerContainerAttachWebsocket     Authorization = "DockerContainerAttachWebsocket"
-	OperationDockerContainerArchive             Authorization = "DockerContainerArchive"
-	OperationDockerContainerCreate              Authorization = "DockerContainerCreate"
-	OperationDockerContainerPrune               Authorization = "DockerContainerPrune"
-	OperationDockerContainerKill                Authorization = "DockerContainerKill"
-	OperationDockerContainerPause               Authorization = "DockerContainerPause"
-	OperationDockerContainerUnpause             Authorization = "DockerContainerUnpause"
-	OperationDockerContainerRestart             Authorization = "DockerContainerRestart"
-	OperationDockerContainerStart               Authorization = "DockerContainerStart"
-	OperationDockerContainerStop                Authorization = "DockerContainerStop"
-	OperationDockerContainerWait                Authorization = "DockerContainerWait"
-	OperationDockerContainerResize              Authorization = "DockerContainerResize"
-	OperationDockerContainerAttach              Authorization = "DockerContainerAttach"
-	OperationDockerContainerExec                Authorization = "DockerContainerExec"
-	OperationDockerContainerRename              Authorization = "DockerContainerRename"
-	OperationDockerContainerUpdate              Authorization = "DockerContainerUpdate"
-	OperationDockerContainerPutContainerArchive Authorization = "DockerContainerPutContainerArchive"
-	OperationDockerContainerDelete              Authorization = "DockerContainerDelete"
-	OperationDockerImageList                    Authorization = "DockerImageList"
-	OperationDockerImageSearch                  Authorization = "DockerImageSearch"
-	OperationDockerImageGetAll                  Authorization = "DockerImageGetAll"
-	OperationDockerImageGet                     Authorization = "DockerImageGet"
-	OperationDockerImageHistory                 Authorization = "DockerImageHistory"
-	OperationDockerImageInspect                 Authorization = "DockerImageInspect"
-	OperationDockerImageLoad                    Authorization = "DockerImageLoad"
-	OperationDockerImageCreate                  Authorization = "DockerImageCreate"
-	OperationDockerImagePrune                   Authorization = "DockerImagePrune"
-	OperationDockerImagePush                    Authorization = "DockerImagePush"
-	OperationDockerImageTag                     Authorization = "DockerImageTag"
-	OperationDockerImageDelete                  Authorization = "DockerImageDelete"
-	OperationDockerImageCommit                  Authorization = "DockerImageCommit"
-	OperationDockerImageBuild                   Authorization = "DockerImageBuild"
-	OperationDockerNetworkList                  Authorization = "DockerNetworkList"
-	OperationDockerNetworkInspect               Authorization = "DockerNetworkInspect"
-	OperationDockerNetworkCreate                Authorization = "DockerNetworkCreate"
-	OperationDockerNetworkConnect               Authorization = "DockerNetworkConnect"
-	OperationDockerNetworkDisconnect            Authorization = "DockerNetworkDisconnect"
-	OperationDockerNetworkPrune                 Authorization = "DockerNetworkPrune"
-	OperationDockerNetworkDelete                Authorization = "DockerNetworkDelete"
-	OperationDockerVolumeList                   Authorization = "DockerVolumeList"
-	OperationDockerVolumeInspect                Authorization = "DockerVolumeInspect"
-	OperationDockerVolumeCreate                 Authorization = "DockerVolumeCreate"
-	OperationDockerVolumePrune                  Authorization = "DockerVolumePrune"
-	OperationDockerVolumeDelete                 Authorization = "DockerVolumeDelete"
-	OperationDockerExecInspect                  Authorization = "DockerExecInspect"
-	OperationDockerExecStart                    Authorization = "DockerExecStart"
-	OperationDockerExecResize                   Authorization = "DockerExecResize"
-	OperationDockerSwarmInspect                 Authorization = "DockerSwarmInspect"
-	OperationDockerSwarmUnlockKey               Authorization = "DockerSwarmUnlockKey"
-	OperationDockerSwarmInit                    Authorization = "DockerSwarmInit"
-	OperationDockerSwarmJoin                    Authorization = "DockerSwarmJoin"
-	OperationDockerSwarmLeave                   Authorization = "DockerSwarmLeave"
-	OperationDockerSwarmUpdate                  Authorization = "DockerSwarmUpdate"
-	OperationDockerSwarmUnlock                  Authorization = "DockerSwarmUnlock"
-	OperationDockerNodeList                     Authorization = "DockerNodeList"
-	OperationDockerNodeInspect                  Authorization = "DockerNodeInspect"
-	OperationDockerNodeUpdate                   Authorization = "DockerNodeUpdate"
-	OperationDockerNodeDelete                   Authorization = "DockerNodeDelete"
-	OperationDockerServiceList                  Authorization = "DockerServiceList"
-	OperationDockerServiceInspect               Authorization = "DockerServiceInspect"
-	OperationDockerServiceLogs                  Authorization = "DockerServiceLogs"
-	OperationDockerServiceCreate                Authorization = "DockerServiceCreate"
-	OperationDockerServiceUpdate                Authorization = "DockerServiceUpdate"
-	OperationDockerServiceDelete                Authorization = "DockerServiceDelete"
-	OperationDockerSecretList                   Authorization = "DockerSecretList"
-	OperationDockerSecretInspect                Authorization = "DockerSecretInspect"
-	OperationDockerSecretCreate                 Authorization = "DockerSecretCreate"
-	OperationDockerSecretUpdate                 Authorization = "DockerSecretUpdate"
-	OperationDockerSecretDelete                 Authorization = "DockerSecretDelete"
-	OperationDockerConfigList                   Authorization = "DockerConfigList"
-	OperationDockerConfigInspect                Authorization = "DockerConfigInspect"
-	OperationDockerConfigCreate                 Authorization = "DockerConfigCreate"
-	OperationDockerConfigUpdate                 Authorization = "DockerConfigUpdate"
-	OperationDockerConfigDelete                 Authorization = "DockerConfigDelete"
-	OperationDockerTaskList                     Authorization = "DockerTaskList"
-	OperationDockerTaskInspect                  Authorization = "DockerTaskInspect"
-	OperationDockerTaskLogs                     Authorization = "DockerTaskLogs"
-	OperationDockerPluginList                   Authorization = "DockerPluginList"
-	OperationDockerPluginPrivileges             Authorization = "DockerPluginPrivileges"
-	OperationDockerPluginInspect                Authorization = "DockerPluginInspect"
-	OperationDockerPluginPull                   Authorization = "DockerPluginPull"
-	OperationDockerPluginCreate                 Authorization = "DockerPluginCreate"
-	OperationDockerPluginEnable                 Authorization = "DockerPluginEnable"
-	OperationDockerPluginDisable                Authorization = "DockerPluginDisable"
-	OperationDockerPluginPush                   Authorization = "DockerPluginPush"
-	OperationDockerPluginUpgrade                Authorization = "DockerPluginUpgrade"
-	OperationDockerPluginSet                    Authorization = "DockerPluginSet"
-	OperationDockerPluginDelete                 Authorization = "DockerPluginDelete"
-	OperationDockerSessionStart                 Authorization = "DockerSessionStart"
-	OperationDockerDistributionInspect          Authorization = "DockerDistributionInspect"
-	OperationDockerBuildPrune                   Authorization = "DockerBuildPrune"
-	OperationDockerBuildCancel                  Authorization = "DockerBuildCancel"
-	OperationDockerPing                         Authorization = "DockerPing"
-	OperationDockerInfo                         Authorization = "DockerInfo"
-	OperationDockerEvents                       Authorization = "DockerEvents"
-	OperationDockerSystem                       Authorization = "DockerSystem"
-	OperationDockerVersion                      Authorization = "DockerVersion"
+	OperationDockerContainerArchiveInfo         models.Authorization = "DockerContainerArchiveInfo"
+	OperationDockerContainerList                models.Authorization = "DockerContainerList"
+	OperationDockerContainerExport              models.Authorization = "DockerContainerExport"
+	OperationDockerContainerChanges             models.Authorization = "DockerContainerChanges"
+	OperationDockerContainerInspect             models.Authorization = "DockerContainerInspect"
+	OperationDockerContainerTop                 models.Authorization = "DockerContainerTop"
+	OperationDockerContainerLogs                models.Authorization = "DockerContainerLogs"
+	OperationDockerContainerStats               models.Authorization = "DockerContainerStats"
+	OperationDockerContainerAttachWebsocket     models.Authorization = "DockerContainerAttachWebsocket"
+	OperationDockerContainerArchive             models.Authorization = "DockerContainerArchive"
+	OperationDockerContainerCreate              models.Authorization = "DockerContainerCreate"
+	OperationDockerContainerPrune               models.Authorization = "DockerContainerPrune"
+	OperationDockerContainerKill                models.Authorization = "DockerContainerKill"
+	OperationDockerContainerPause               models.Authorization = "DockerContainerPause"
+	OperationDockerContainerUnpause             models.Authorization = "DockerContainerUnpause"
+	OperationDockerContainerRestart             models.Authorization = "DockerContainerRestart"
+	OperationDockerContainerStart               models.Authorization = "DockerContainerStart"
+	OperationDockerContainerStop                models.Authorization = "DockerContainerStop"
+	OperationDockerContainerWait                models.Authorization = "DockerContainerWait"
+	OperationDockerContainerResize              models.Authorization = "DockerContainerResize"
+	OperationDockerContainerAttach              models.Authorization = "DockerContainerAttach"
+	OperationDockerContainerExec                models.Authorization = "DockerContainerExec"
+	OperationDockerContainerRename              models.Authorization = "DockerContainerRename"
+	OperationDockerContainerUpdate              models.Authorization = "DockerContainerUpdate"
+	OperationDockerContainerPutContainerArchive models.Authorization = "DockerContainerPutContainerArchive"
+	OperationDockerContainerDelete              models.Authorization = "DockerContainerDelete"
+	OperationDockerImageList                    models.Authorization = "DockerImageList"
+	OperationDockerImageSearch                  models.Authorization = "DockerImageSearch"
+	OperationDockerImageGetAll                  models.Authorization = "DockerImageGetAll"
+	OperationDockerImageGet                     models.Authorization = "DockerImageGet"
+	OperationDockerImageHistory                 models.Authorization = "DockerImageHistory"
+	OperationDockerImageInspect                 models.Authorization = "DockerImageInspect"
+	OperationDockerImageLoad                    models.Authorization = "DockerImageLoad"
+	OperationDockerImageCreate                  models.Authorization = "DockerImageCreate"
+	OperationDockerImagePrune                   models.Authorization = "DockerImagePrune"
+	OperationDockerImagePush                    models.Authorization = "DockerImagePush"
+	OperationDockerImageTag                     models.Authorization = "DockerImageTag"
+	OperationDockerImageDelete                  models.Authorization = "DockerImageDelete"
+	OperationDockerImageCommit                  models.Authorization = "DockerImageCommit"
+	OperationDockerImageBuild                   models.Authorization = "DockerImageBuild"
+	OperationDockerNetworkList                  models.Authorization = "DockerNetworkList"
+	OperationDockerNetworkInspect               models.Authorization = "DockerNetworkInspect"
+	OperationDockerNetworkCreate                models.Authorization = "DockerNetworkCreate"
+	OperationDockerNetworkConnect               models.Authorization = "DockerNetworkConnect"
+	OperationDockerNetworkDisconnect            models.Authorization = "DockerNetworkDisconnect"
+	OperationDockerNetworkPrune                 models.Authorization = "DockerNetworkPrune"
+	OperationDockerNetworkDelete                models.Authorization = "DockerNetworkDelete"
+	OperationDockerVolumeList                   models.Authorization = "DockerVolumeList"
+	OperationDockerVolumeInspect                models.Authorization = "DockerVolumeInspect"
+	OperationDockerVolumeCreate                 models.Authorization = "DockerVolumeCreate"
+	OperationDockerVolumePrune                  models.Authorization = "DockerVolumePrune"
+	OperationDockerVolumeDelete                 models.Authorization = "DockerVolumeDelete"
+	OperationDockerExecInspect                  models.Authorization = "DockerExecInspect"
+	OperationDockerExecStart                    models.Authorization = "DockerExecStart"
+	OperationDockerExecResize                   models.Authorization = "DockerExecResize"
+	OperationDockerSwarmInspect                 models.Authorization = "DockerSwarmInspect"
+	OperationDockerSwarmUnlockKey               models.Authorization = "DockerSwarmUnlockKey"
+	OperationDockerSwarmInit                    models.Authorization = "DockerSwarmInit"
+	OperationDockerSwarmJoin                    models.Authorization = "DockerSwarmJoin"
+	OperationDockerSwarmLeave                   models.Authorization = "DockerSwarmLeave"
+	OperationDockerSwarmUpdate                  models.Authorization = "DockerSwarmUpdate"
+	OperationDockerSwarmUnlock                  models.Authorization = "DockerSwarmUnlock"
+	OperationDockerNodeList                     models.Authorization = "DockerNodeList"
+	OperationDockerNodeInspect                  models.Authorization = "DockerNodeInspect"
+	OperationDockerNodeUpdate                   models.Authorization = "DockerNodeUpdate"
+	OperationDockerNodeDelete                   models.Authorization = "DockerNodeDelete"
+	OperationDockerServiceList                  models.Authorization = "DockerServiceList"
+	OperationDockerServiceInspect               models.Authorization = "DockerServiceInspect"
+	OperationDockerServiceLogs                  models.Authorization = "DockerServiceLogs"
+	OperationDockerServiceCreate                models.Authorization = "DockerServiceCreate"
+	OperationDockerServiceUpdate                models.Authorization = "DockerServiceUpdate"
+	OperationDockerServiceDelete                models.Authorization = "DockerServiceDelete"
+	OperationDockerSecretList                   models.Authorization = "DockerSecretList"
+	OperationDockerSecretInspect                models.Authorization = "DockerSecretInspect"
+	OperationDockerSecretCreate                 models.Authorization = "DockerSecretCreate"
+	OperationDockerSecretUpdate                 models.Authorization = "DockerSecretUpdate"
+	OperationDockerSecretDelete                 models.Authorization = "DockerSecretDelete"
+	OperationDockerConfigList                   models.Authorization = "DockerConfigList"
+	OperationDockerConfigInspect                models.Authorization = "DockerConfigInspect"
+	OperationDockerConfigCreate                 models.Authorization = "DockerConfigCreate"
+	OperationDockerConfigUpdate                 models.Authorization = "DockerConfigUpdate"
+	OperationDockerConfigDelete                 models.Authorization = "DockerConfigDelete"
+	OperationDockerTaskList                     models.Authorization = "DockerTaskList"
+	OperationDockerTaskInspect                  models.Authorization = "DockerTaskInspect"
+	OperationDockerTaskLogs                     models.Authorization = "DockerTaskLogs"
+	OperationDockerPluginList                   models.Authorization = "DockerPluginList"
+	OperationDockerPluginPrivileges             models.Authorization = "DockerPluginPrivileges"
+	OperationDockerPluginInspect                models.Authorization = "DockerPluginInspect"
+	OperationDockerPluginPull                   models.Authorization = "DockerPluginPull"
+	OperationDockerPluginCreate                 models.Authorization = "DockerPluginCreate"
+	OperationDockerPluginEnable                 models.Authorization = "DockerPluginEnable"
+	OperationDockerPluginDisable                models.Authorization = "DockerPluginDisable"
+	OperationDockerPluginPush                   models.Authorization = "DockerPluginPush"
+	OperationDockerPluginUpgrade                models.Authorization = "DockerPluginUpgrade"
+	OperationDockerPluginSet                    models.Authorization = "DockerPluginSet"
+	OperationDockerPluginDelete                 models.Authorization = "DockerPluginDelete"
+	OperationDockerSessionStart                 models.Authorization = "DockerSessionStart"
+	OperationDockerDistributionInspect          models.Authorization = "DockerDistributionInspect"
+	OperationDockerBuildPrune                   models.Authorization = "DockerBuildPrune"
+	OperationDockerBuildCancel                  models.Authorization = "DockerBuildCancel"
+	OperationDockerPing                         models.Authorization = "DockerPing"
+	OperationDockerInfo                         models.Authorization = "DockerInfo"
+	OperationDockerEvents                       models.Authorization = "DockerEvents"
+	OperationDockerSystem                       models.Authorization = "DockerSystem"
+	OperationDockerVersion                      models.Authorization = "DockerVersion"
 
-	OperationDockerAgentPing         Authorization = "DockerAgentPing"
-	OperationDockerAgentList         Authorization = "DockerAgentList"
-	OperationDockerAgentHostInfo     Authorization = "DockerAgentHostInfo"
-	OperationDockerAgentBrowseDelete Authorization = "DockerAgentBrowseDelete"
-	OperationDockerAgentBrowseGet    Authorization = "DockerAgentBrowseGet"
-	OperationDockerAgentBrowseList   Authorization = "DockerAgentBrowseList"
-	OperationDockerAgentBrowsePut    Authorization = "DockerAgentBrowsePut"
-	OperationDockerAgentBrowseRename Authorization = "DockerAgentBrowseRename"
+	OperationDockerAgentPing         models.Authorization = "DockerAgentPing"
+	OperationDockerAgentList         models.Authorization = "DockerAgentList"
+	OperationDockerAgentHostInfo     models.Authorization = "DockerAgentHostInfo"
+	OperationDockerAgentBrowseDelete models.Authorization = "DockerAgentBrowseDelete"
+	OperationDockerAgentBrowseGet    models.Authorization = "DockerAgentBrowseGet"
+	OperationDockerAgentBrowseList   models.Authorization = "DockerAgentBrowseList"
+	OperationDockerAgentBrowsePut    models.Authorization = "DockerAgentBrowsePut"
+	OperationDockerAgentBrowseRename models.Authorization = "DockerAgentBrowseRename"
 
-	OperationPortainerDockerHubInspect      Authorization = "PortainerDockerHubInspect"
-	OperationPortainerDockerHubUpdate       Authorization = "PortainerDockerHubUpdate"
-	OperationPortainerEndpointGroupCreate   Authorization = "PortainerEndpointGroupCreate"
-	OperationPortainerEndpointGroupList     Authorization = "PortainerEndpointGroupList"
-	OperationPortainerEndpointGroupDelete   Authorization = "PortainerEndpointGroupDelete"
-	OperationPortainerEndpointGroupInspect  Authorization = "PortainerEndpointGroupInspect"
-	OperationPortainerEndpointGroupUpdate   Authorization = "PortainerEndpointGroupEdit"
-	OperationPortainerEndpointGroupAccess   Authorization = "PortainerEndpointGroupAccess "
-	OperationPortainerEndpointList          Authorization = "PortainerEndpointList"
-	OperationPortainerEndpointInspect       Authorization = "PortainerEndpointInspect"
-	OperationPortainerEndpointCreate        Authorization = "PortainerEndpointCreate"
-	OperationPortainerEndpointJob           Authorization = "PortainerEndpointJob"
-	OperationPortainerEndpointSnapshots     Authorization = "PortainerEndpointSnapshots"
-	OperationPortainerEndpointSnapshot      Authorization = "PortainerEndpointSnapshot"
-	OperationPortainerEndpointUpdate        Authorization = "PortainerEndpointUpdate"
-	OperationPortainerEndpointUpdateAccess  Authorization = "PortainerEndpointUpdateAccess"
-	OperationPortainerEndpointDelete        Authorization = "PortainerEndpointDelete"
-	OperationPortainerExtensionList         Authorization = "PortainerExtensionList"
-	OperationPortainerExtensionInspect      Authorization = "PortainerExtensionInspect"
-	OperationPortainerExtensionCreate       Authorization = "PortainerExtensionCreate"
-	OperationPortainerExtensionUpdate       Authorization = "PortainerExtensionUpdate"
-	OperationPortainerExtensionDelete       Authorization = "PortainerExtensionDelete"
-	OperationPortainerMOTD                  Authorization = "PortainerMOTD"
-	OperationPortainerRegistryList          Authorization = "PortainerRegistryList"
-	OperationPortainerRegistryInspect       Authorization = "PortainerRegistryInspect"
-	OperationPortainerRegistryCreate        Authorization = "PortainerRegistryCreate"
-	OperationPortainerRegistryConfigure     Authorization = "PortainerRegistryConfigure"
-	OperationPortainerRegistryUpdate        Authorization = "PortainerRegistryUpdate"
-	OperationPortainerRegistryUpdateAccess  Authorization = "PortainerRegistryUpdateAccess"
-	OperationPortainerRegistryDelete        Authorization = "PortainerRegistryDelete"
-	OperationPortainerResourceControlCreate Authorization = "PortainerResourceControlCreate"
-	OperationPortainerResourceControlUpdate Authorization = "PortainerResourceControlUpdate"
-	OperationPortainerResourceControlDelete Authorization = "PortainerResourceControlDelete"
-	OperationPortainerRoleList              Authorization = "PortainerRoleList"
-	OperationPortainerRoleInspect           Authorization = "PortainerRoleInspect"
-	OperationPortainerRoleCreate            Authorization = "PortainerRoleCreate"
-	OperationPortainerRoleUpdate            Authorization = "PortainerRoleUpdate"
-	OperationPortainerRoleDelete            Authorization = "PortainerRoleDelete"
-	OperationPortainerScheduleList          Authorization = "PortainerScheduleList"
-	OperationPortainerScheduleInspect       Authorization = "PortainerScheduleInspect"
-	OperationPortainerScheduleFile          Authorization = "PortainerScheduleFile"
-	OperationPortainerScheduleTasks         Authorization = "PortainerScheduleTasks"
-	OperationPortainerScheduleCreate        Authorization = "PortainerScheduleCreate"
-	OperationPortainerScheduleUpdate        Authorization = "PortainerScheduleUpdate"
-	OperationPortainerScheduleDelete        Authorization = "PortainerScheduleDelete"
-	OperationPortainerSettingsInspect       Authorization = "PortainerSettingsInspect"
-	OperationPortainerSettingsUpdate        Authorization = "PortainerSettingsUpdate"
-	OperationPortainerSettingsLDAPCheck     Authorization = "PortainerSettingsLDAPCheck"
-	OperationPortainerStackList             Authorization = "PortainerStackList"
-	OperationPortainerStackInspect          Authorization = "PortainerStackInspect"
-	OperationPortainerStackFile             Authorization = "PortainerStackFile"
-	OperationPortainerStackCreate           Authorization = "PortainerStackCreate"
-	OperationPortainerStackMigrate          Authorization = "PortainerStackMigrate"
-	OperationPortainerStackUpdate           Authorization = "PortainerStackUpdate"
-	OperationPortainerStackDelete           Authorization = "PortainerStackDelete"
-	OperationPortainerTagList               Authorization = "PortainerTagList"
-	OperationPortainerTagCreate             Authorization = "PortainerTagCreate"
-	OperationPortainerTagDelete             Authorization = "PortainerTagDelete"
-	OperationPortainerTeamMembershipList    Authorization = "PortainerTeamMembershipList"
-	OperationPortainerTeamMembershipCreate  Authorization = "PortainerTeamMembershipCreate"
-	OperationPortainerTeamMembershipUpdate  Authorization = "PortainerTeamMembershipUpdate"
-	OperationPortainerTeamMembershipDelete  Authorization = "PortainerTeamMembershipDelete"
-	OperationPortainerTeamList              Authorization = "PortainerTeamList"
-	OperationPortainerTeamInspect           Authorization = "PortainerTeamInspect"
-	OperationPortainerTeamMemberships       Authorization = "PortainerTeamMemberships"
-	OperationPortainerTeamCreate            Authorization = "PortainerTeamCreate"
-	OperationPortainerTeamUpdate            Authorization = "PortainerTeamUpdate"
-	OperationPortainerTeamDelete            Authorization = "PortainerTeamDelete"
-	OperationPortainerTemplateList          Authorization = "PortainerTemplateList"
-	OperationPortainerTemplateInspect       Authorization = "PortainerTemplateInspect"
-	OperationPortainerTemplateCreate        Authorization = "PortainerTemplateCreate"
-	OperationPortainerTemplateUpdate        Authorization = "PortainerTemplateUpdate"
-	OperationPortainerTemplateDelete        Authorization = "PortainerTemplateDelete"
-	OperationPortainerUploadTLS             Authorization = "PortainerUploadTLS"
-	OperationPortainerUserList              Authorization = "PortainerUserList"
-	OperationPortainerUserInspect           Authorization = "PortainerUserInspect"
-	OperationPortainerUserMemberships       Authorization = "PortainerUserMemberships"
-	OperationPortainerUserCreate            Authorization = "PortainerUserCreate"
-	OperationPortainerUserListToken         Authorization = "PortainerUserListToken"
-	OperationPortainerUserCreateToken       Authorization = "PortainerUserCreateToken"
-	OperationPortainerUserRevokeToken       Authorization = "PortainerUserRevokeToken"
-	OperationPortainerUserUpdate            Authorization = "PortainerUserUpdate"
-	OperationPortainerUserUpdatePassword    Authorization = "PortainerUserUpdatePassword"
-	OperationPortainerUserDelete            Authorization = "PortainerUserDelete"
-	OperationPortainerWebsocketExec         Authorization = "PortainerWebsocketExec"
-	OperationPortainerWebhookList           Authorization = "PortainerWebhookList"
-	OperationPortainerWebhookCreate         Authorization = "PortainerWebhookCreate"
-	OperationPortainerWebhookDelete         Authorization = "PortainerWebhookDelete"
+	OperationPortainerDockerHubInspect      models.Authorization = "PortainerDockerHubInspect"
+	OperationPortainerDockerHubUpdate       models.Authorization = "PortainerDockerHubUpdate"
+	OperationPortainerEndpointGroupCreate   models.Authorization = "PortainerEndpointGroupCreate"
+	OperationPortainerEndpointGroupList     models.Authorization = "PortainerEndpointGroupList"
+	OperationPortainerEndpointGroupDelete   models.Authorization = "PortainerEndpointGroupDelete"
+	OperationPortainerEndpointGroupInspect  models.Authorization = "PortainerEndpointGroupInspect"
+	OperationPortainerEndpointGroupUpdate   models.Authorization = "PortainerEndpointGroupEdit"
+	OperationPortainerEndpointGroupAccess   models.Authorization = "PortainerEndpointGroupAccess "
+	OperationPortainerEndpointList          models.Authorization = "PortainerEndpointList"
+	OperationPortainerEndpointInspect       models.Authorization = "PortainerEndpointInspect"
+	OperationPortainerEndpointCreate        models.Authorization = "PortainerEndpointCreate"
+	OperationPortainerEndpointJob           models.Authorization = "PortainerEndpointJob"
+	OperationPortainerEndpointSnapshots     models.Authorization = "PortainerEndpointSnapshots"
+	OperationPortainerEndpointSnapshot      models.Authorization = "PortainerEndpointSnapshot"
+	OperationPortainerEndpointUpdate        models.Authorization = "PortainerEndpointUpdate"
+	OperationPortainerEndpointUpdateAccess  models.Authorization = "PortainerEndpointUpdateAccess"
+	OperationPortainerEndpointDelete        models.Authorization = "PortainerEndpointDelete"
+	OperationPortainerExtensionList         models.Authorization = "PortainerExtensionList"
+	OperationPortainerExtensionInspect      models.Authorization = "PortainerExtensionInspect"
+	OperationPortainerExtensionCreate       models.Authorization = "PortainerExtensionCreate"
+	OperationPortainerExtensionUpdate       models.Authorization = "PortainerExtensionUpdate"
+	OperationPortainerExtensionDelete       models.Authorization = "PortainerExtensionDelete"
+	OperationPortainerMOTD                  models.Authorization = "PortainerMOTD"
+	OperationPortainerRegistryList          models.Authorization = "PortainerRegistryList"
+	OperationPortainerRegistryInspect       models.Authorization = "PortainerRegistryInspect"
+	OperationPortainerRegistryCreate        models.Authorization = "PortainerRegistryCreate"
+	OperationPortainerRegistryConfigure     models.Authorization = "PortainerRegistryConfigure"
+	OperationPortainerRegistryUpdate        models.Authorization = "PortainerRegistryUpdate"
+	OperationPortainerRegistryUpdateAccess  models.Authorization = "PortainerRegistryUpdateAccess"
+	OperationPortainerRegistryDelete        models.Authorization = "PortainerRegistryDelete"
+	OperationPortainerResourceControlCreate models.Authorization = "PortainerResourceControlCreate"
+	OperationPortainerResourceControlUpdate models.Authorization = "PortainerResourceControlUpdate"
+	OperationPortainerResourceControlDelete models.Authorization = "PortainerResourceControlDelete"
+	OperationPortainerRoleList              models.Authorization = "PortainerRoleList"
+	OperationPortainerRoleInspect           models.Authorization = "PortainerRoleInspect"
+	OperationPortainerRoleCreate            models.Authorization = "PortainerRoleCreate"
+	OperationPortainerRoleUpdate            models.Authorization = "PortainerRoleUpdate"
+	OperationPortainerRoleDelete            models.Authorization = "PortainerRoleDelete"
+	OperationPortainerScheduleList          models.Authorization = "PortainerScheduleList"
+	OperationPortainerScheduleInspect       models.Authorization = "PortainerScheduleInspect"
+	OperationPortainerScheduleFile          models.Authorization = "PortainerScheduleFile"
+	OperationPortainerScheduleTasks         models.Authorization = "PortainerScheduleTasks"
+	OperationPortainerScheduleCreate        models.Authorization = "PortainerScheduleCreate"
+	OperationPortainerScheduleUpdate        models.Authorization = "PortainerScheduleUpdate"
+	OperationPortainerScheduleDelete        models.Authorization = "PortainerScheduleDelete"
+	OperationPortainerSettingsInspect       models.Authorization = "PortainerSettingsInspect"
+	OperationPortainerSettingsUpdate        models.Authorization = "PortainerSettingsUpdate"
+	OperationPortainerSettingsLDAPCheck     models.Authorization = "PortainerSettingsLDAPCheck"
+	OperationPortainerStackList             models.Authorization = "PortainerStackList"
+	OperationPortainerStackInspect          models.Authorization = "PortainerStackInspect"
+	OperationPortainerStackFile             models.Authorization = "PortainerStackFile"
+	OperationPortainerStackCreate           models.Authorization = "PortainerStackCreate"
+	OperationPortainerStackMigrate          models.Authorization = "PortainerStackMigrate"
+	OperationPortainerStackUpdate           models.Authorization = "PortainerStackUpdate"
+	OperationPortainerStackDelete           models.Authorization = "PortainerStackDelete"
+	OperationPortainerTagList               models.Authorization = "PortainerTagList"
+	OperationPortainerTagCreate             models.Authorization = "PortainerTagCreate"
+	OperationPortainerTagDelete             models.Authorization = "PortainerTagDelete"
+	OperationPortainerTeamMembershipList    models.Authorization = "PortainerTeamMembershipList"
+	OperationPortainerTeamMembershipCreate  models.Authorization = "PortainerTeamMembershipCreate"
+	OperationPortainerTeamMembershipUpdate  models.Authorization = "PortainerTeamMembershipUpdate"
+	OperationPortainerTeamMembershipDelete  models.Authorization = "PortainerTeamMembershipDelete"
+	OperationPortainerTeamList              models.Authorization = "PortainerTeamList"
+	OperationPortainerTeamInspect           models.Authorization = "PortainerTeamInspect"
+	OperationPortainerTeamMemberships       models.Authorization = "PortainerTeamMemberships"
+	OperationPortainerTeamCreate            models.Authorization = "PortainerTeamCreate"
+	OperationPortainerTeamUpdate            models.Authorization = "PortainerTeamUpdate"
+	OperationPortainerTeamDelete            models.Authorization = "PortainerTeamDelete"
+	OperationPortainerTemplateList          models.Authorization = "PortainerTemplateList"
+	OperationPortainerTemplateInspect       models.Authorization = "PortainerTemplateInspect"
+	OperationPortainerTemplateCreate        models.Authorization = "PortainerTemplateCreate"
+	OperationPortainerTemplateUpdate        models.Authorization = "PortainerTemplateUpdate"
+	OperationPortainerTemplateDelete        models.Authorization = "PortainerTemplateDelete"
+	OperationPortainerUploadTLS             models.Authorization = "PortainerUploadTLS"
+	OperationPortainerUserList              models.Authorization = "PortainerUserList"
+	OperationPortainerUserInspect           models.Authorization = "PortainerUserInspect"
+	OperationPortainerUserMemberships       models.Authorization = "PortainerUserMemberships"
+	OperationPortainerUserCreate            models.Authorization = "PortainerUserCreate"
+	OperationPortainerUserListToken         models.Authorization = "PortainerUserListToken"
+	OperationPortainerUserCreateToken       models.Authorization = "PortainerUserCreateToken"
+	OperationPortainerUserRevokeToken       models.Authorization = "PortainerUserRevokeToken"
+	OperationPortainerUserUpdate            models.Authorization = "PortainerUserUpdate"
+	OperationPortainerUserUpdatePassword    models.Authorization = "PortainerUserUpdatePassword"
+	OperationPortainerUserDelete            models.Authorization = "PortainerUserDelete"
+	OperationPortainerWebsocketExec         models.Authorization = "PortainerWebsocketExec"
+	OperationPortainerWebhookList           models.Authorization = "PortainerWebhookList"
+	OperationPortainerWebhookCreate         models.Authorization = "PortainerWebhookCreate"
+	OperationPortainerWebhookDelete         models.Authorization = "PortainerWebhookDelete"
 
-	OperationDockerUndefined      Authorization = "DockerUndefined"
-	OperationDockerAgentUndefined Authorization = "DockerAgentUndefined"
-	OperationPortainerUndefined   Authorization = "PortainerUndefined"
+	OperationDockerUndefined      models.Authorization = "DockerUndefined"
+	OperationDockerAgentUndefined models.Authorization = "DockerAgentUndefined"
+	OperationPortainerUndefined   models.Authorization = "PortainerUndefined"
 
-	EndpointResourcesAccess Authorization = "EndpointResourcesAccess"
+	EndpointResourcesAccess models.Authorization = "EndpointResourcesAccess"
 
 	// Deprecated operations
-	OperationPortainerEndpointExtensionAdd    Authorization = "PortainerEndpointExtensionAdd"
-	OperationPortainerEndpointExtensionRemove Authorization = "PortainerEndpointExtensionRemove"
-	OperationIntegrationStoridgeAdmin         Authorization = "IntegrationStoridgeAdmin"
+	OperationPortainerEndpointExtensionAdd    models.Authorization = "PortainerEndpointExtensionAdd"
+	OperationPortainerEndpointExtensionRemove models.Authorization = "PortainerEndpointExtensionRemove"
+	OperationIntegrationStoridgeAdmin         models.Authorization = "IntegrationStoridgeAdmin"
 )
 
 const (
