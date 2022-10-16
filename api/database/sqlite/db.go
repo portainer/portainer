@@ -31,6 +31,12 @@ type DbConnection struct {
 }
 
 func (connection *DbConnection) GetDB() *gorm.DB {
+	if connection.DB == nil {
+		err := connection.Open()
+		if err != nil {
+			panic(err)
+		}
+	}
 	return connection.DB
 }
 
@@ -127,12 +133,24 @@ func (connection *DbConnection) Open() error {
 	if err != nil {
 		return err
 	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+	sqlDB.SetMaxOpenConns(5)
+	sqlDB.SetMaxOpenConns(10)
 	connection.DB = db
+
 	return nil
 }
 
 func (connection *DbConnection) Close() error {
-	return nil // TODO: check if we need to close the db
+	sqlDB, err := connection.DB.DB()
+	if err != nil {
+		return err
+	}
+	connection.DB = nil
+	return sqlDB.Close()
 }
 
 func (connection *DbConnection) getEncryptionKey() []byte {
