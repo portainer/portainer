@@ -2,7 +2,7 @@
 <div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item template-item mx-[10px]" ng-click="$ctrl.onSelect($ctrl.model)">
   <div class="blocklist-item-box">
     <!-- helmchart-image -->
-    <span ng-if="$ctrl.model.icon">
+    <span class="shrink-0">
       <fallback-image
         src="$ctrl.model.icon"
         fallback-icon="'svg-helm'"
@@ -12,10 +12,6 @@
         size="'xl'"
       ></fallback-image>
     </span>
-
-    <div class="widget-icon space-right" ng-if="!$ctrl.model.icon">
-      <pr-icon icon="'svg-helm'"></pr-icon>
-    </div>
 
     <!-- !helmchart-image -->
     <!-- helmchart-details -->

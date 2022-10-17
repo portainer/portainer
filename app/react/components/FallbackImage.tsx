@@ -34,7 +34,7 @@ export function FallbackImage({
     setError(false);
   }, [src]);
 
-  if (!error) {
+  if (!error && src) {
     return (
       <img
         className={classes}
