@@ -51,7 +51,6 @@ export async function promptAsync(options: Omit<PromptOptions, 'callback'>) {
 export function prompt(options: PromptOptions) {
   const box = bootbox.prompt({
     title: options.title,
-    message: options.message || '',
     inputType: options.inputType,
     inputOptions: options.inputOptions,
     buttons: options.buttons ? confirmButtons(options.buttons) : undefined,
