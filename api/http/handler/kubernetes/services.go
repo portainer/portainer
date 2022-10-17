@@ -87,7 +87,7 @@ func (handler *Handler) createKubernetesService(w http.ResponseWriter, r *http.R
 	err = cli.CreateService(namespace, payload)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve sercices",
+			"Unable to create sercice",
 			err,
 		)
 	}
@@ -125,7 +125,7 @@ func (handler *Handler) deleteKubernetesServices(w http.ResponseWriter, r *http.
 	err = cli.DeleteServices(payload)
 	if err != nil {
 		return httperror.InternalServerError(
-			"Unable to retrieve delete services",
+			"Unable to delete service",
 			err,
 		)
 	}
