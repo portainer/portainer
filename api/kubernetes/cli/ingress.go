@@ -5,11 +5,12 @@ import (
 	"strings"
 
 	"github.com/portainer/portainer/api/database/models"
+	"github.com/rs/zerolog/log"
 	netv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (kcl *KubeClient) GetIngressControllers() models.K8sIngressControllers {
+func (kcl *KubeClient) GetIngressControllers() (models.K8sIngressControllers, error) {
 	var controllers []models.K8sIngressController
 
 	// We know that each existing class points to a controller so we can start
@@ -17,19 +18,22 @@ func (kcl *KubeClient) GetIngressControllers() models.K8sIngressControllers {
 	classClient := kcl.cli.NetworkingV1().IngressClasses()
 	classList, err := classClient.List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	// We want to know which of these controllers is in use.
 	var ingresses []models.K8sIngressInfo
 	namespaces, err := kcl.GetNamespaces()
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	for namespace := range namespaces {
 		t, err := kcl.GetIngresses(namespace)
 		if err != nil {
-			return nil
+			// User might not be able to list ingresses in system/not allowed
+			// namespaces.
+			log.Debug().Err(err).Msg("failed to list ingresses for the current user, skipped sending ingress")
+			continue
 		}
 		ingresses = append(ingresses, t...)
 	}
@@ -58,7 +62,7 @@ func (kcl *KubeClient) GetIngressControllers() models.K8sIngressControllers {
 		}
 		controllers = append(controllers, controller)
 	}
-	return controllers
+	return controllers, nil
 }
 
 // GetIngresses gets all the ingresses for a given namespace in a k8s endpoint.
