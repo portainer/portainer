@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"mime"
 	"net/http"
 
@@ -37,7 +37,7 @@ func buildOperation(request *http.Request) error {
 	var buffer []byte
 	switch mediaType {
 	case "":
-		body, err := ioutil.ReadAll(request.Body)
+		body, err := io.ReadAll(request.Body)
 		if err != nil {
 			return err
 		}
@@ -81,7 +81,7 @@ func buildOperation(request *http.Request) error {
 
 			log.Info().Str("filename", hdr.Filename).Int64("size", hdr.Size).Msg("upload the file to build image")
 
-			content, err := ioutil.ReadAll(f)
+			content, err := io.ReadAll(f)
 			if err != nil {
 				return err
 			}
@@ -105,7 +105,7 @@ func buildOperation(request *http.Request) error {
 		return nil
 	}
 
-	request.Body = ioutil.NopCloser(bytes.NewReader(buffer))
+	request.Body = io.NopCloser(bytes.NewReader(buffer))
 	request.ContentLength = int64(len(buffer))
 	request.Header.Set("Content-Type", "application/x-tar")
 

@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path"
 	"regexp"
@@ -197,7 +197,7 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 
 		r.Method = http.MethodPost
 
-		r.Body = ioutil.NopCloser(bytes.NewReader(newBody))
+		r.Body = io.NopCloser(bytes.NewReader(newBody))
 		r.ContentLength = int64(len(newBody))
 	}
 

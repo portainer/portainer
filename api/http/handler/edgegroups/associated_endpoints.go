@@ -1,7 +1,7 @@
 package edgegroups
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type endpointSetType map[portainer.EndpointID]bool

@@ -2,8 +2,9 @@ package webhooks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/http/security"
 	"net/http"
+
+	"github.com/portainer/portainer/api/http/security"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
