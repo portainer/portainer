@@ -2,7 +2,6 @@ package archive
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -28,10 +27,10 @@ func listFiles(dir string) []string {
 func Test_shouldCreateArhive(t *testing.T) {
 	tmpdir := t.TempDir()
 	content := []byte("content")
-	ioutil.WriteFile(path.Join(tmpdir, "outer"), content, 0600)
+	os.WriteFile(path.Join(tmpdir, "outer"), content, 0600)
 	os.MkdirAll(path.Join(tmpdir, "dir"), 0700)
-	ioutil.WriteFile(path.Join(tmpdir, "dir", ".dotfile"), content, 0600)
-	ioutil.WriteFile(path.Join(tmpdir, "dir", "inner"), content, 0600)
+	os.WriteFile(path.Join(tmpdir, "dir", ".dotfile"), content, 0600)
+	os.WriteFile(path.Join(tmpdir, "dir", "inner"), content, 0600)
 
 	gzPath, err := TarGzDir(tmpdir)
 	assert.Nil(t, err)
@@ -48,7 +47,7 @@ func Test_shouldCreateArhive(t *testing.T) {
 	wasExtracted := func(p string) {
 		fullpath := path.Join(extractionDir, p)
 		assert.Contains(t, extractedFiles, fullpath)
-		copyContent, _ := ioutil.ReadFile(fullpath)
+		copyContent, _ := os.ReadFile(fullpath)
 		assert.Equal(t, content, copyContent)
 	}
 
@@ -60,10 +59,10 @@ func Test_shouldCreateArhive(t *testing.T) {
 func Test_shouldCreateArhiveXXXXX(t *testing.T) {
 	tmpdir := t.TempDir()
 	content := []byte("content")
-	ioutil.WriteFile(path.Join(tmpdir, "outer"), content, 0600)
+	os.WriteFile(path.Join(tmpdir, "outer"), content, 0600)
 	os.MkdirAll(path.Join(tmpdir, "dir"), 0700)
-	ioutil.WriteFile(path.Join(tmpdir, "dir", ".dotfile"), content, 0600)
-	ioutil.WriteFile(path.Join(tmpdir, "dir", "inner"), content, 0600)
+	os.WriteFile(path.Join(tmpdir, "dir", ".dotfile"), content, 0600)
+	os.WriteFile(path.Join(tmpdir, "dir", "inner"), content, 0600)
 
 	gzPath, err := TarGzDir(tmpdir)
 	assert.Nil(t, err)
@@ -80,7 +79,7 @@ func Test_shouldCreateArhiveXXXXX(t *testing.T) {
 	wasExtracted := func(p string) {
 		fullpath := path.Join(extractionDir, p)
 		assert.Contains(t, extractedFiles, fullpath)
-		copyContent, _ := ioutil.ReadFile(fullpath)
+		copyContent, _ := os.ReadFile(fullpath)
 		assert.Equal(t, content, copyContent)
 	}
 

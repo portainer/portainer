@@ -1,7 +1,7 @@
 package kubernetes
 
 import (
-	"io/ioutil"
+	"os"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -28,7 +28,7 @@ func NewTokenManager(kubecli portainer.KubeClient, dataStore dataservices.DataSt
 	}
 
 	if setLocalAdminToken {
-		token, err := ioutil.ReadFile(defaultServiceAccountTokenFile)
+		token, err := os.ReadFile(defaultServiceAccountTokenFile)
 		if err != nil {
 			return nil, err
 		}

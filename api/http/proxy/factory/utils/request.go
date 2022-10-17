@@ -2,7 +2,7 @@ package utils
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 )
@@ -25,7 +25,7 @@ func RewriteRequest(request *http.Request, newData interface{}) error {
 		return err
 	}
 
-	body := ioutil.NopCloser(bytes.NewReader(data))
+	body := io.NopCloser(bytes.NewReader(data))
 
 	request.Body = body
 	request.ContentLength = int64(len(data))

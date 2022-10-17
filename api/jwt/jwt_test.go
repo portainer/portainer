@@ -1,9 +1,10 @@
 package jwt
 
 import (
-	i "github.com/portainer/portainer/api/internal/testhelpers"
 	"testing"
 	"time"
+
+	i "github.com/portainer/portainer/api/internal/testhelpers"
 
 	"github.com/golang-jwt/jwt"
 	portainer "github.com/portainer/portainer/api"

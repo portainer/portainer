@@ -2,7 +2,7 @@ package kubernetes
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 
@@ -38,7 +38,7 @@ const certDataString = "MIIC5TCCAc2gAwIBAgIJAJ+poiEBdsplMA0GCSqGSIb3DQEBCwUAMBQx
 func createTempFile(filename, content string, t *testing.T) string {
 	tempPath := t.TempDir()
 	filePath := fmt.Sprintf("%s/%s", tempPath, filename)
-	ioutil.WriteFile(filePath, []byte(content), 0644)
+	os.WriteFile(filePath, []byte(content), 0644)
 
 	return filePath
 }

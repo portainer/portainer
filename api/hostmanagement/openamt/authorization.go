@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -33,7 +33,7 @@ func (service *Service) Authorization(configuration portainer.OpenAMTConfigurati
 	if err != nil {
 		return "", err
 	}
-	responseBody, readErr := ioutil.ReadAll(response.Body)
+	responseBody, readErr := io.ReadAll(response.Body)
 	if readErr != nil {
 		return "", readErr
 	}

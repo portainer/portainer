@@ -1,7 +1,6 @@
 package filesystem
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -19,12 +18,12 @@ func Test_copyFile_returnsError_whenSourceDoesNotExist(t *testing.T) {
 func Test_copyFile_shouldMakeAbackup(t *testing.T) {
 	tmpdir := t.TempDir()
 	content := []byte("content")
-	ioutil.WriteFile(path.Join(tmpdir, "origin"), content, 0600)
+	os.WriteFile(path.Join(tmpdir, "origin"), content, 0600)
 
 	err := copyFile(path.Join(tmpdir, "origin"), path.Join(tmpdir, "copy"))
 	assert.NoError(t, err)
 
-	copyContent, _ := ioutil.ReadFile(path.Join(tmpdir, "copy"))
+	copyContent, _ := os.ReadFile(path.Join(tmpdir, "copy"))
 	assert.Equal(t, content, copyContent)
 }
 
@@ -59,13 +58,13 @@ func Test_CopyPath_shouldSkipWhenNotExist(t *testing.T) {
 func Test_CopyPath_shouldCopyFile(t *testing.T) {
 	tmpdir := t.TempDir()
 	content := []byte("content")
-	ioutil.WriteFile(path.Join(tmpdir, "file"), content, 0600)
+	os.WriteFile(path.Join(tmpdir, "file"), content, 0600)
 
 	os.MkdirAll(path.Join(tmpdir, "backup"), 0700)
 	err := CopyPath(path.Join(tmpdir, "file"), path.Join(tmpdir, "backup"))
 	assert.NoError(t, err)
 
-	copyContent, err := ioutil.ReadFile(path.Join(tmpdir, "backup", "file"))
+	copyContent, err := os.ReadFile(path.Join(tmpdir, "backup", "file"))
 	assert.NoError(t, err)
 	assert.Equal(t, content, copyContent)
 }
