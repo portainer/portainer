@@ -1,34 +1,34 @@
+import { confirmDeletionAsync } from 'Portainer/services/modal.service/confirm';
 angular.module('portainer.docker').controller('SecretsController', [
   '$scope',
   '$state',
   'SecretService',
   'Notifications',
   function ($scope, $state, SecretService, Notifications) {
-    this.ModalService.confirmDeletion('Do you want to remove the selected secret(s)?', (confirmed) => {
+    $scope.removeAction = async function (selectedItems) {
+      const confirmed = await confirmDeletionAsync('Do you want to remove the selected secret(s)?');
       if (!confirmed) {
-        return;
+        return null;
       }
-      $scope.removeAction = function (selectedItems) {
-        var actionCount = selectedItems.length;
-        angular.forEach(selectedItems, function (secret) {
-          SecretService.remove(secret.Id)
-            .then(function success() {
-              Notifications.success('Secret successfully removed', secret.Name);
-              var index = $scope.secrets.indexOf(secret);
-              $scope.secrets.splice(index, 1);
-            })
-            .catch(function error(err) {
-              Notifications.error('Failure', err, 'Unable to remove secret');
-            })
-            .finally(function final() {
-              --actionCount;
-              if (actionCount === 0) {
-                $state.reload();
-              }
-            });
-        });
-      };
-    });
+      var actionCount = selectedItems.length;
+      angular.forEach(selectedItems, function (secret) {
+        SecretService.remove(secret.Id)
+          .then(function success() {
+            Notifications.success('Secret successfully removed', secret.Name);
+            var index = $scope.secrets.indexOf(secret);
+            $scope.secrets.splice(index, 1);
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to remove secret');
+          })
+          .finally(function final() {
+            --actionCount;
+            if (actionCount === 0) {
+              $state.reload();
+            }
+          });
+      });
+    };
 
     $scope.getSecrets = getSecrets;
 

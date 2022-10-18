@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import DockerNetworkHelper from 'Docker/helpers/networkHelper';
 import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
+import { confirmDeletionAsync } from 'Portainer/services/modal.service/confirm';
 
 angular.module('portainer.docker').controller('NetworksController', [
   '$q',
@@ -11,32 +12,30 @@ angular.module('portainer.docker').controller('NetworksController', [
   'HttpRequestHelper',
   'endpoint',
   'AgentService',
-  'ModalService',
-  function ($q, $scope, $state, NetworkService, Notifications, HttpRequestHelper, endpoint, AgentService, ModalService) {
-    $scope.removeAction = function (selectedItems) {
-      ModalService.confirmDeletion('Do you want to remove the selected network(s)?', (confirmed) => {
-        if (!confirmed) {
-          return;
-        }
-        var actionCount = selectedItems.length;
-        angular.forEach(selectedItems, function (network) {
-          HttpRequestHelper.setPortainerAgentTargetHeader(network.NodeName);
-          NetworkService.remove(network.Id)
-            .then(function success() {
-              Notifications.success('Network successfully removed', network.Name);
-              var index = $scope.networks.indexOf(network);
-              $scope.networks.splice(index, 1);
-            })
-            .catch(function error(err) {
-              Notifications.error('Failure', err, 'Unable to remove network');
-            })
-            .finally(function final() {
-              --actionCount;
-              if (actionCount === 0) {
-                $state.reload();
-              }
-            });
-        });
+  function ($q, $scope, $state, NetworkService, Notifications, HttpRequestHelper, endpoint, AgentService) {
+    $scope.removeAction = async function (selectedItems) {
+      const confirmed = await confirmDeletionAsync('Do you want to remove the selected network(s)?');
+      if (!confirmed) {
+        return null;
+      }
+      var actionCount = selectedItems.length;
+      angular.forEach(selectedItems, function (network) {
+        HttpRequestHelper.setPortainerAgentTargetHeader(network.NodeName);
+        NetworkService.remove(network.Id)
+          .then(function success() {
+            Notifications.success('Network successfully removed', network.Name);
+            var index = $scope.networks.indexOf(network);
+            $scope.networks.splice(index, 1);
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to remove network');
+          })
+          .finally(function final() {
+            --actionCount;
+            if (actionCount === 0) {
+              $state.reload();
+            }
+          });
       });
     };
 
