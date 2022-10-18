@@ -2,11 +2,12 @@ import angular from 'angular';
 
 class ConfigsController {
   /* @ngInject */
-  constructor($state, ConfigService, Notifications, $async) {
+  constructor($state, ConfigService, Notifications, $async, ModalService) {
     this.$state = $state;
     this.ConfigService = ConfigService;
     this.Notifications = Notifications;
     this.$async = $async;
+    this.ModalService = ModalService;
 
     this.removeAction = this.removeAction.bind(this);
     this.removeActionAsync = this.removeActionAsync.bind(this);
@@ -32,7 +33,12 @@ class ConfigsController {
   }
 
   removeAction(selectedItems) {
-    return this.$async(this.removeActionAsync, selectedItems);
+    this.ModalService.confirmDeletion('Do you want to remove the selected config(s)?', (confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+      return this.$async(this.removeActionAsync, selectedItems);
+    });
   }
 
   async removeActionAsync(selectedItems) {
