@@ -2,7 +2,6 @@ package deployments
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/pkg/errors"
@@ -41,7 +40,7 @@ func (config *KubernetesStackDeploymentConfig) Deploy() error {
 
 	manifestFilePaths := make([]string, len(fileNames))
 
-	tmpDir, err := ioutil.TempDir("", "kub_deployment")
+	tmpDir, err := os.MkdirTemp("", "kub_deployment")
 	if err != nil {
 		return errors.Wrap(err, "failed to create temp kub deployment directory")
 	}
@@ -50,7 +49,7 @@ func (config *KubernetesStackDeploymentConfig) Deploy() error {
 
 	for _, fileName := range fileNames {
 		manifestFilePath := filesystem.JoinPaths(tmpDir, fileName)
-		manifestContent, err := ioutil.ReadFile(filesystem.JoinPaths(config.stack.ProjectPath, fileName))
+		manifestContent, err := os.ReadFile(filesystem.JoinPaths(config.stack.ProjectPath, fileName))
 		if err != nil {
 			return errors.Wrap(err, "failed to read manifest file")
 		}

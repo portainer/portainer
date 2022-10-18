@@ -31,7 +31,6 @@ type (
 		EdgeUpdateSchedule() EdgeUpdateScheduleService
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
-		Scene() ScenesService
 		EndpointRelation() EndpointRelationService
 		FDOProfile() FDOProfileService
 		HelmUserRepository() HelmUserRepositoryService
@@ -50,6 +49,8 @@ type (
 		User() UserService
 		Version() VersionService
 		Webhook() WebhookService
+		Scene() ScenesService
+		Namespace() NamespacesService
 	}
 
 	// CustomTemplateService represents a service to manage custom templates
@@ -124,15 +125,6 @@ type (
 		Create(group *portainer.EndpointGroup) error
 		UpdateEndpointGroup(ID portainer.EndpointGroupID, group *portainer.EndpointGroup) error
 		DeleteEndpointGroup(ID portainer.EndpointGroupID) error
-		BucketName() string
-	}
-
-	ScenesService interface {
-		Create(scene *portainer.Scene) error
-		DeleteScene(ID int) error
-		UpdateScene(ID int, scene *portainer.Scene) error
-		Scene(ID int) (*portainer.Scene, error)
-		Scenes() ([]portainer.Scene, error)
 		BucketName() string
 	}
 
@@ -261,6 +253,7 @@ type (
 		Tag(ID portainer.TagID) (*portainer.Tag, error)
 		Create(tag *portainer.Tag) error
 		UpdateTag(ID portainer.TagID, tag *portainer.Tag) error
+		UpdateTagFunc(ID portainer.TagID, updateFunc func(tag *portainer.Tag)) error
 		DeleteTag(ID portainer.TagID) error
 		BucketName() string
 	}
@@ -328,6 +321,25 @@ type (
 		WebhookByResourceID(resourceID string) (*portainer.Webhook, error)
 		WebhookByToken(token string) (*portainer.Webhook, error)
 		DeleteWebhook(ID portainer.WebhookID) error
+		BucketName() string
+	}
+
+	ScenesService interface {
+		Create(scene *portainer.Scene) error
+		DeleteScene(ID int) error
+		UpdateScene(ID int, scene *portainer.Scene) error
+		Scene(ID int) (*portainer.Scene, error)
+		Scenes() ([]portainer.Scene, error)
+		BucketName() string
+	}
+
+	NamespacesService interface {
+		Create(namespace *portainer.Namespace) error
+		DeleteNamespace(name string) error
+		UpdateNamespace(name string, namespace *portainer.Namespace) error
+		Namespace(name string) (*portainer.Namespace, error)
+		NamespaceByContainerID(containerID string) (*portainer.Namespace, error)
+		Namespaces() ([]portainer.Namespace, error)
 		BucketName() string
 	}
 )

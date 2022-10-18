@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -139,7 +139,7 @@ func pullImage(ctx context.Context, docker *client.Client, imageName string) err
 	}
 
 	defer out.Close()
-	outputBytes, err := ioutil.ReadAll(out)
+	outputBytes, err := io.ReadAll(out)
 	if err != nil {
 		log.Error().Str("image_name", imageName).Err(err).Msg("could not read image pull output")
 
@@ -261,7 +261,7 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 		return "", err
 	}
 
-	outputBytes, err := ioutil.ReadAll(out)
+	outputBytes, err := io.ReadAll(out)
 	if err != nil {
 		log.Error().
 			Str("image_name", imageName).
@@ -295,29 +295,6 @@ func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings po
 	}
 
 	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
-	if err != nil {
-		return err
-	}
 
-	return nil
-}
-
-func (handler *Handler) deactivateDevice(endpoint *portainer.Endpoint, settings portainer.Settings) error {
-	ctx := context.TODO()
-
-	config := settings.OpenAMTConfiguration
-	cmdLine := []string{
-		"deactivate",
-		"-n",
-		"-v",
-		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
-		"-password", config.MPSPassword,
-	}
-
-	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

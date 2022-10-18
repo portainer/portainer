@@ -237,8 +237,8 @@ func initDockerClientFactory(signatureService portainer.DigitalSignatureService,
 	return docker.NewClientFactory(signatureService, reverseTunnelService)
 }
 
-func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore dataservices.DataStore) *kubecli.ClientFactory {
-	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID, dataStore)
+func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, dataStore dataservices.DataStore, instanceID, addrHTTPS, userSessionTimeout string) (*kubecli.ClientFactory, error) {
+	return kubecli.NewClientFactory(signatureService, reverseTunnelService, dataStore, instanceID, addrHTTPS, userSessionTimeout)
 }
 
 func initSnapshotService(
@@ -314,12 +314,7 @@ func updateSettingsFromFlags(dataStore dataservices.DataStore, flags *portainer.
 		sslSettings.HTTPEnabled = true
 	}
 
-	err = dataStore.SSLSettings().UpdateSettings(sslSettings)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return dataStore.SSLSettings().UpdateSettings(sslSettings)
 }
 
 // enableFeaturesFromFlags turns on or off feature flags
@@ -615,7 +610,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx)
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
-	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, instanceID, dataStore)
+	kubernetesClientFactory, err := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, dataStore, instanceID, *flags.AddrHTTPS, settings.UserSessionTimeout)
 
 	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx)
 	if err != nil {
@@ -714,8 +709,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	scheduler := scheduler.NewScheduler(shutdownCtx)
-	//stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
-	//stacks.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
+	//stackDeployer := deployments.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
+	//deployments.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
 
 	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {

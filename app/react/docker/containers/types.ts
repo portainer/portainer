@@ -34,6 +34,7 @@ type DecoratedDockerContainer = {
   StatusText: string;
   Image: string;
   Gpus: string;
+  Host: string;
 };
 
 export type DockerContainer = DecoratedDockerContainer &

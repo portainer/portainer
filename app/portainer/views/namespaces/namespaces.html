@@ -1,31 +1,54 @@
-<page-header title="'Namespace list'" breadcrumbs="['Namespaces summary']" reload="true"> </page-header>
+<page-header title="'Namespace list'" breadcrumbs="['Namespaces']" reload="true"> </page-header>
 
 <div class="row">
   <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="layers" feather-icon="true" title-text="Namespace"> </rd-widget-header>
-      <rd-widget-body>
-        <div class="dashboard-grid-4 mx-3">
-          <a class="no-link" ui-sref="docker.volumes">
-            <dashboard-item feather-icon="true" icon="'codepen'" type="'nginx'" value="1"></dashboard-item>
-          </a>
-          <a class="no-link" ui-sref="docker.volumes">
-            <dashboard-item feather-icon="true" icon="'codepen'" type="'bisna-v1.0'" value="5"></dashboard-item>
-          </a>
-          <a class="no-link" ui-sref="docker.volumes">
-            <dashboard-item feather-icon="true" icon="'codepen'" type="'bisna-v1.2'" value="2"></dashboard-item>
-          </a>
-          <a class="no-link" ui-sref="docker.volumes">
-            <dashboard-item feather-icon="true" icon="'codepen'" type="'bisna-v1.4'" value="3"></dashboard-item>
-          </a>
-          <a class="no-link" ui-sref="docker.volumes">
-            <dashboard-item feather-icon="true" icon="'codepen'" type="'unity3d-x64'" value="3"></dashboard-item>
-          </a>
-          <a class="no-link" ui-sref="docker.volumes">
-            <dashboard-item feather-icon="true" icon="'codepen'" type="'unity3d-webGL'" value="3"></dashboard-item>
-          </a>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
+    <div class="datatable">
+      <rd-widget>
+        <rd-widget-body classes="no-padding">
+          <div class="toolBar vertical-center !gap-x-5 !gap-y-1 flex-wrap">
+            <rd-widget-header icon="layers" feather-icon="true" title-text="Namespaces" class="!flex-auto !mr-0" parent-classes="!p-0" />
+            <div class="searchBar vertical-center !mr-0">
+                <pr-icon icon="'search'" feather="true" class-name="'searchIcon'"></pr-icon>
+                <input type="text" class="searchInput"
+                        ng-model="$ctrl.state.textFilter"
+                        ng-change="$ctrl.onTextFilterChange()"
+                        placeholder="Search for a namespace..."
+                        auto-focus
+                        ng-model-options="{ debounce: 300 }"
+                />
+            </div>
+            <div class="actionBar">
+                <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.namespaces.create">
+                    <pr-icon icon="'plus'" feather="true"></pr-icon>
+                    <span>Add</span>
+                </button>
+            </div>
+          </div>
+          
+          <div class="gridlist">
+            <div class="gridlist-item" ng-repeat="item in state.namespaces">
+              <div class="gridlist-item-box" ui-sref="portainer.namespaces.container(item)">
+                <div class="icon-badge text-2xl mr-4 !p-2 bg-blue-3 text-blue-8 th-dark:bg-blue-3 th-dark:text-blue-8 th-highcontrast:bg-blue-3 th-highcontrast:text-blue-8">
+                    <pr-icon icon="'box'" feather="true" class="feather icon"></pr-icon>
+                </div>
+                <div class="gridlist-item-body">
+                  <span class="font-medium text-2xl text-gray-9 th-dark:text-white th-highcontrast:text-white">
+                    {{item.Containers | mapLength}}
+                  </span>
+                  <span class="text-xl text-gray-7 th-dark:text-gray-warm-5 th-highcontrast:text-gray-warm-5">
+                    {{item.Name}}
+                  </span>
+                </div>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-link btn-sm" ng-click="removeAction(item)">
+                    <pr-icon icon="'trash-2'" feather="true" mode="'danger'"></pr-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
   </div>
 </div>

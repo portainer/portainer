@@ -24,6 +24,7 @@ type Connection interface {
 	SetServiceName(bucketName string) error
 	GetObject(bucketName string, key []byte, object interface{}) error
 	UpdateObject(bucketName string, key []byte, object interface{}) error
+	UpdateObjectFunc(bucketName string, key []byte, object any, updateFn func()) error
 	DeleteObject(bucketName string, key []byte) error
 	DeleteAllObjects(bucketName string, matching func(o interface{}) (id int, ok bool)) error
 	GetNextIdentifier(bucketName string) int

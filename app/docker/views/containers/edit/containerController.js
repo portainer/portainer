@@ -65,6 +65,7 @@ angular.module('portainer.docker').controller('ContainerController', [
       joinNetworkInProgress: false,
       leaveNetworkInProgress: false,
       pullImageValidity: false,
+      namespaces: [],
     };
 
     $scope.setPullImageValidity = setPullImageValidity;
@@ -106,6 +107,10 @@ angular.module('portainer.docker').controller('ContainerController', [
           $scope.container = container;
           $scope.container.edit = false;
           $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
+
+          $scope.container.editNamespace = false;
+          $scope.container.newNamespace = container.Namespace;
+
 
           if (container.State.Running) {
             $scope.activityTime = moment.duration(moment(container.State.StartedAt).utc().diff(moment().utc())).humanize();
@@ -149,6 +154,19 @@ angular.module('portainer.docker').controller('ContainerController', [
             !allowSysctlSettingForRegularUsers ||
             !allowHostNamespaceForRegularUsers ||
             !allowPrivilegedModeForRegularUsers;
+          
+          ContainerService.getNamespace($transition$.params().id)
+            .then(function success(data) {
+            $scope.container.Namespace = data.Name;
+          }).catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to retrieve container namespace info');
+          });
+
+          ContainerService.getNamespaces().then(function success(data) {
+            $scope.state.namespaces = data
+          }).catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to load namespace');
+          });
 
           $scope.displayRecreateButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers);
           $scope.displayCreateWebhookButton = $scope.displayRecreateButton;
@@ -225,6 +243,33 @@ angular.module('portainer.docker').controller('ContainerController', [
           $scope.$apply();
         });
     };
+
+    $scope.changeNamespace = function () {
+      let container = $scope.container;
+      container.editNamespace = true;
+     
+      
+    };
+
+    $scope.updateNamespace = function () {
+      let container = $scope.container;
+      if (container.newNamespace === container.Namespace) {
+        $scope.container.editNamespace = false;
+        return;
+      }
+      ContainerService.updateNamespace($transition$.params().id, container.newNamespace)
+          .then(function success() {
+            container.Namespace = container.newNamespace
+            Notifications.success('Container successfully update Namespace', container.Name);
+          }).catch(function error(err) {
+            container.newNamespace = container.Namespace;
+            Notifications.error('Failure', err, 'Unable to update Namespace container');
+          })
+          .finally(function final() {
+            $scope.container.editNamespace = false;
+            $scope.$apply();
+          });
+    }
 
     $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
       $scope.state.leaveNetworkInProgress = true;

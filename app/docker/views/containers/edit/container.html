@@ -84,6 +84,24 @@
                 </form>
               </td>
             </tr>
+            <tr>
+              <td>Namespace</td>
+              <td ng-if="!container.editNamespace">
+                {{ container.Namespace }}
+                <a authorization="DockerContainerRename" href="" data-toggle="tooltip" title="Edit namespace name" ng-click="changeNamespace()"
+                  ><pr-icon icon="'edit'" feather="true" className="'space-right'"></pr-icon
+                ></a>
+              </td>
+              <td ng-if="container.editNamespace">
+                <form ng-submit="updateNamespace()">
+                  <select ng-model="container.newNamespace">
+                    <option value="{{item.Name}}" ng-repeat="item in state.namespaces">{{item.Name}}</option>
+                  </select>
+                  <a href="" ng-click="container.editNamespace = false;"><i class="fa fa-times"></i></a>
+                  <a href="" ng-click="updateNamespace()"><i class="fa fa-check"></i></a>
+                </form>
+              </td>
+            </tr>
             <tr ng-if="container.NetworkSettings.IPAddress">
               <td>IP address</td>
               <td>{{ container.NetworkSettings.IPAddress }}</td>

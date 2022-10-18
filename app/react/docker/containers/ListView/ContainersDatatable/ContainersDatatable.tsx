@@ -48,12 +48,11 @@ export function ContainersDatatable({
   );
 
   const containersQuery = useContainers(
-    environment.Id,
+    environment,
     true,
     undefined,
     settings.autoRefreshRate * 1000
   );
-
   return (
     <RowProvider context={{ environment }}>
       <Datatable
@@ -77,7 +76,6 @@ export function ContainersDatatable({
           const columnsToHide = tableInstance.allColumns.filter((colInstance) =>
             hidableColumns?.includes(colInstance.id)
           );
-
           return (
             <>
               <ColumnVisibilityMenu<DockerContainer>

@@ -36,20 +36,20 @@ func (payload *sceneUpdatePayload) Validate(r *http.Request) error {
 func (handler *Handler) sceneUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	sceneID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid scenes identifier route variable", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid scenes identifier route variable", Err: err}
 	}
 
 	var payload sceneUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
 	scene, err := handler.DataStore.Scene().Scene(sceneID)
 	if handler.DataStore.IsErrObjectNotFound(err) {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a scenes with the specified identifier inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find a scenes with the specified identifier inside the database", Err: err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a scenes with the specified identifier inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find a scenes with the specified identifier inside the database", Err: err}
 	}
 
 	if payload.Name != "" {
@@ -62,7 +62,7 @@ func (handler *Handler) sceneUpdate(w http.ResponseWriter, r *http.Request) *htt
 
 	err = handler.DataStore.Scene().UpdateScene(scene.ID, scene)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist scenes changes inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist scenes changes inside the database", Err: err}
 	}
 	return response.JSON(w, scene)
 }

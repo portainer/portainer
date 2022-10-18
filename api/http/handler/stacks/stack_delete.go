@@ -3,7 +3,6 @@ package stacks
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -200,7 +199,7 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 		//then process the remove operation
 		if stack.IsComposeFormat {
 			fileNames := stackutils.GetStackFilePaths(stack, false)
-			tmpDir, err := ioutil.TempDir("", "kube_delete")
+			tmpDir, err := os.MkdirTemp("", "kube_delete")
 			if err != nil {
 				return errors.Wrap(err, "failed to create temp directory for deleting kub stack")
 			}

@@ -2,6 +2,7 @@ package endpointproxy
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -56,6 +57,10 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 		prefix = "/" + id + "/docker"
 	}
 
+	fmt.Println("1 r.URL.Path = ", r.URL.Path)
+
 	http.StripPrefix(prefix, proxy).ServeHTTP(w, r)
+
+	fmt.Println("2 r.URL.Path = ", r.URL.Path)
 	return nil
 }

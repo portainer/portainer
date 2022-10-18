@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path"
 	"regexp"
@@ -189,7 +189,7 @@ func decorateAgentDockerHubRequest(r *http.Request, dataStore dataservices.DataS
 	}
 
 	r.Method = http.MethodPost
-	r.Body = ioutil.NopCloser(bytes.NewReader(newBody))
+	r.Body = io.NopCloser(bytes.NewReader(newBody))
 	r.ContentLength = int64(len(newBody))
 
 	return nil

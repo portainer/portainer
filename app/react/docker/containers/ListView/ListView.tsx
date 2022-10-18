@@ -18,6 +18,7 @@ export function ListView({ endpoint: environment }: Props) {
   const isSwarmManager = !!envInfoQuery.data;
   let isHostColumnVisible = isAgent && isSwarmManager;
   isHostColumnVisible = true;
+
   return (
     <>
       <PageHeader

@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"crypto/tls"
+	"github.com/portainer/portainer/api/http/handler/namespaces"
 	"github.com/portainer/portainer/api/http/handler/scenes"
 	"net/http"
 	"path/filepath"
@@ -282,6 +283,10 @@ func (server *Server) Start() error {
 	scenesHandler.AuthorizationService = server.AuthorizationService
 	scenesHandler.DataStore = server.DataStore
 
+	var namespacesHandler = namespaces.NewHandler(requestBouncer)
+	namespacesHandler.AuthorizationService = server.AuthorizationService
+	namespacesHandler.DataStore = server.DataStore
+
 	server.Handler = &handler.Handler{
 		RoleHandler:               roleHandler,
 		AuthHandler:               authHandler,
@@ -321,6 +326,7 @@ func (server *Server) Start() error {
 		WebSocketHandler:          websocketHandler,
 		WebhookHandler:            webhookHandler,
 		ScenesHandler:             scenesHandler,
+		NamespacesHandler:         namespacesHandler,
 	}
 
 	handler := adminMonitor.WithRedirect(offlineGate.WaitingMiddleware(time.Minute, server.Handler))

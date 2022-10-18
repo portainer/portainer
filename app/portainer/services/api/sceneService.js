@@ -1,4 +1,4 @@
-import { SceneModel, SceneUpdateRequest } from '../../models/scene';
+import { SceneModel } from '../../models/scene';
 
 angular.module('portainer.app').factory('SceneService', [
   '$q',
@@ -17,7 +17,7 @@ angular.module('portainer.app').factory('SceneService', [
     };
 
     service.updateScene = function (data) {
-      var payload = new SceneUpdateRequest(data);
+      var payload = new SceneModel(data);
       return Scenes.update(payload).$promise;
     };
 

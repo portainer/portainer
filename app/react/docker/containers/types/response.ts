@@ -91,4 +91,5 @@ export interface DockerContainerResponse {
 
   Portainer: PortainerMetadata;
   IsPortainer: boolean;
+  Host: string;
 }

@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 
-import { EnvironmentId } from '@/portainer/environments/types';
+import { Environment } from '@/portainer/environments/types';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
 
 import { urlBuilder } from '../containers.service';
@@ -11,14 +11,14 @@ import { Filters } from './types';
 import { queryKeys } from './query-keys';
 
 export function useContainers(
-  environmentId: EnvironmentId,
+  environment: Environment,
   all = true,
   filters?: Filters,
   autoRefreshRate?: number
 ) {
   return useQuery(
-    queryKeys.filters(environmentId, all, filters),
-    () => getContainers(environmentId, all, filters),
+    queryKeys.filters(environment.Id, all, filters),
+    () => getContainers(environment, all, filters),
     {
       meta: {
         title: 'Failure',
@@ -32,18 +32,18 @@ export function useContainers(
 }
 
 async function getContainers(
-  environmentId: EnvironmentId,
+  environment: Environment,
   all = true,
   filters?: Filters
 ) {
   try {
     const { data } = await axios.get<DockerContainerResponse[]>(
-      urlBuilder(environmentId, undefined, 'json'),
+      urlBuilder(environment.Id, undefined, 'json'),
       {
         params: { all, filters: filters && JSON.stringify(filters) },
       }
     );
-    return data.map((c) => parseViewModel(c));
+    return data.map((c) => parseViewModel(environment.URL, c));
   } catch (error) {
     throw parseAxiosError(error as Error, 'Unable to retrieve containers');
   }

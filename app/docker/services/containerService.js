@@ -8,6 +8,9 @@ import {
   resumeContainer,
   startContainer,
   stopContainer,
+  updateNamespace,
+  getNamespace,
+  getNamespaces,
 } from '@/react/docker/containers/containers.service';
 import { ContainerDetailsViewModel, ContainerStatsViewModel, ContainerViewModel } from '../models/container';
 
@@ -26,6 +29,9 @@ function ContainerServiceFactory($q, Container, LogHelper, $timeout, EndpointPro
     remove: withEndpointId(removeContainer),
     updateRestartPolicy,
     updateLimits,
+    updateNamespace: withEndpointId(updateNamespace),
+    getNamespace,
+    getNamespaces,
   };
 
   service.container = function (id) {

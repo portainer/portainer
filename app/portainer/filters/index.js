@@ -16,6 +16,7 @@ import {
   stripProtocol,
   truncate,
   truncateLeftRight,
+  mapLength,
 } from './filters';
 
 angular
@@ -35,4 +36,5 @@ angular
   .filter('labelsToStr', () => labelsToStr)
   .filter('endpointtypename', () => endpointTypeName)
   .filter('endpointtypeicon', () => environmentTypeIcon)
-  .filter('ownershipicon', () => ownershipIcon);
+  .filter('ownershipicon', () => ownershipIcon)
+  .filter('mapLength', () => mapLength);

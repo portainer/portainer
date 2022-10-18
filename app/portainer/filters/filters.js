@@ -132,3 +132,11 @@ export function truncate(text, length, end) {
     return String(text).substring(0, length - end.length) + end;
   }
 }
+
+export function mapLength(data) {
+  if (data === null || data === undefined) {
+    return 0
+  } else {
+    return Object.keys(data).length
+  }
+}

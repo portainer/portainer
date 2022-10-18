@@ -31,7 +31,6 @@ func (store *Store) MigrateData() error {
 	migratorParams := &migrator.MigratorParameters{
 		DatabaseVersion:         version,
 		EndpointGroupService:    store.EndpointGroupService,
-		SceneService:            store.SceneService,
 		EndpointService:         store.EndpointService,
 		EndpointRelationService: store.EndpointRelationService,
 		ExtensionService:        store.ExtensionService,
@@ -50,6 +49,7 @@ func (store *Store) MigrateData() error {
 		FileService:             store.fileService,
 		DockerhubService:        store.DockerHubService,
 		AuthorizationService:    authorization.NewService(store),
+		SceneService:            store.SceneService,
 	}
 
 	// restore on error

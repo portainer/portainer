@@ -2,7 +2,6 @@ package stacks
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -105,7 +104,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		return httperror.BadRequest("Failed to retrieve user token data", err)
 	}
 
-	tempFileDir, _ := ioutil.TempDir("", "kub_file_content")
+	tempFileDir, _ := os.MkdirTemp("", "kub_file_content")
 	defer os.RemoveAll(tempFileDir)
 
 	if err := filesystem.WriteToFile(filesystem.JoinPaths(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {

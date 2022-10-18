@@ -203,12 +203,7 @@ func (manager *SwarmStackManager) updateDockerCLIConfiguration(configPath string
 	headersObject["X-PortainerAgent-Signature"] = signature
 	headersObject["X-PortainerAgent-PublicKey"] = manager.signatureService.EncodedPublicKey()
 
-	err = manager.fileService.WriteJSONToFile(configFilePath, config)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return manager.fileService.WriteJSONToFile(configFilePath, config)
 }
 
 func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (map[string]interface{}, error) {

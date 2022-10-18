@@ -8,6 +8,7 @@ import { DockerContainer, ContainerStatus } from './types';
 import { DockerContainerResponse } from './types/response';
 
 export function parseViewModel(
+  URL: string,
   response: DockerContainerResponse
 ): DockerContainer {
   const resourceControl =
@@ -25,6 +26,8 @@ export function parseViewModel(
     labels['com.docker.stack.namespace'];
 
   const status = createStatus(response.Status);
+
+  const host = URL
 
   const ports = _.compact(
     response.Ports?.map(
@@ -47,6 +50,7 @@ export function parseViewModel(
     Ports: ports,
     StatusText: response.Status,
     Gpus: '',
+    Host: host,
   };
 }
 

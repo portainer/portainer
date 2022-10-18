@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/http/handler/namespaces"
 	"github.com/portainer/portainer/api/http/handler/scenes"
 	"net/http"
 	"strings"
@@ -83,7 +84,8 @@ type Handler struct {
 	UserHandler               *users.Handler
 	WebSocketHandler          *websocket.Handler
 	WebhookHandler            *webhooks.Handler
-	ScenesHandler          *scenes.Handler
+	ScenesHandler             *scenes.Handler
+	NamespacesHandler         *namespaces.Handler
 }
 
 // @title PortainerCE API
@@ -163,7 +165,7 @@ type Handler struct {
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("[" + r.Method + "] r.URL.Path = " + r.URL.Path)
+	fmt.Println("[" + r.Method + "] enter: URL.Path = " + r.URL.Path)
 
 	switch {
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
@@ -251,9 +253,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(r.URL.Path, "/api/websocket"):
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/webhooks"):
-		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)	
+		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/scenes"):
 		http.StripPrefix("/api", h.ScenesHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/namespaces"):
+		http.StripPrefix("/api", h.NamespacesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/storybook"):
 		http.StripPrefix("/storybook", h.StorybookHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/"):

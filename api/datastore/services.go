@@ -3,9 +3,10 @@ package datastore
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/portainer/portainer/api/dataservices/namespace"
 	"github.com/portainer/portainer/api/dataservices/scene"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
+	"os"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
@@ -55,7 +56,6 @@ type Store struct {
 	EdgeUpdateScheduleService *edgeupdateschedule.Service
 	EdgeStackService          *edgestack.Service
 	EndpointGroupService      *endpointgroup.Service
-	SceneService              *scene.Service
 	EndpointService           *endpoint.Service
 	EndpointRelationService   *endpointrelation.Service
 	ExtensionService          *extension.Service
@@ -77,6 +77,8 @@ type Store struct {
 	UserService               *user.Service
 	VersionService            *version.Service
 	WebhookService            *webhook.Service
+	SceneService              *scene.Service
+	NamespaceService          *namespace.Service
 }
 
 func (store *Store) initServices() error {
@@ -254,6 +256,12 @@ func (store *Store) initServices() error {
 	}
 	store.SceneService = sceneService
 
+	namespaceService, err := namespace.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.NamespaceService = namespaceService
+
 	return nil
 }
 
@@ -385,6 +393,10 @@ func (store *Store) Scene() dataservices.ScenesService {
 	return store.SceneService
 }
 
+func (store *Store) Namespace() dataservices.NamespacesService {
+	return store.NamespaceService
+}
+
 type storeExport struct {
 	CustomTemplate     []portainer.CustomTemplate     `json:"customtemplates,omitempty"`
 	EdgeGroup          []portainer.EdgeGroup          `json:"edgegroups,omitempty"`
@@ -412,6 +424,7 @@ type storeExport struct {
 	Webhook            []portainer.Webhook            `json:"webhooks,omitempty"`
 	Metadata           map[string]interface{}         `json:"metadata,omitempty"`
 	Scene              []portainer.Scene              `json:"Scene,omitempty"`
+	Namespace          []portainer.Namespace          `json:"Namespace,omitempty"`
 }
 
 func (store *Store) Export(filename string) (err error) {
@@ -610,6 +623,14 @@ func (store *Store) Export(filename string) (err error) {
 		backup.Scene = e
 	}
 
+	if e, err := store.Namespace().Namespaces(); err != nil {
+		if !store.IsErrObjectNotFound(err) {
+			logrus.WithError(err).Errorf("Exporting Namespaces")
+		}
+	} else {
+		backup.Namespace = e
+	}
+
 	v, err := store.Version().DBVersion()
 	if err != nil && !store.IsErrObjectNotFound(err) {
 		log.Error().Err(err).Msg("exporting DB version")
@@ -629,13 +650,13 @@ func (store *Store) Export(filename string) (err error) {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filename, b, 0600)
+	return os.WriteFile(filename, b, 0600)
 }
 
 func (store *Store) Import(filename string) (err error) {
 	backup := storeExport{}
 
-	s, err := ioutil.ReadFile(filename)
+	s, err := os.ReadFile(filename)
 	if err != nil {
 		return err
 	}
@@ -727,6 +748,10 @@ func (store *Store) Import(filename string) (err error) {
 
 	for _, v := range backup.Scene {
 		store.Scene().UpdateScene(v.ID, &v)
+	}
+
+	for _, v := range backup.Namespace {
+		store.Namespace().UpdateNamespace(v.Name, &v)
 	}
 
 	store.TunnelServer().UpdateInfo(&backup.TunnelServer)

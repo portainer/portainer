@@ -43,7 +43,7 @@ func IsValidStackFile(stackFileContent []byte, securitySettings *portainer.Endpo
 			}
 		}
 
-		if !securitySettings.AllowPrivilegedModeForRegularUsers && service.Privileged == true {
+		if !securitySettings.AllowPrivilegedModeForRegularUsers && service.Privileged {
 			return errors.New("privileged mode disabled for non administrator users")
 		}
 

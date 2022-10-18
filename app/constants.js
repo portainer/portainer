@@ -34,6 +34,7 @@ export const TEMPLATE_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
 export const BROWSER_OS_PLATFORM = navigator.userAgent.indexOf('Windows') > -1 ? 'win' : navigator.userAgent.indexOf('Mac') > -1 ? 'mac' : 'lin';
 export const NEW_LINE_BREAKER = BROWSER_OS_PLATFORM === 'win' ? '\r\n' : '\n';
 export const API_ENDPOINT_SCENES = 'api/scenes';
+export const API_ENDPOINT_NAMESPACES = 'api/namespaces';
 
 // don't declare new constants, either:
 // - if only used in one file or module, declare in that file or module (as a regular js constant)
@@ -69,4 +70,5 @@ angular
   .constant('CONSOLE_COMMANDS_LABEL_PREFIX', CONSOLE_COMMANDS_LABEL_PREFIX)
   .constant('PREDEFINED_NETWORKS', PREDEFINED_NETWORKS)
   .constant('BROWSER_OS_PLATFORM', BROWSER_OS_PLATFORM)
-  .constant('API_ENDPOINT_SCENES', API_ENDPOINT_SCENES);
+  .constant('API_ENDPOINT_SCENES', API_ENDPOINT_SCENES)
+  .constant('API_ENDPOINT_NAMESPACES', API_ENDPOINT_NAMESPACES);

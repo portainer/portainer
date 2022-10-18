@@ -3,10 +3,11 @@ package webhooks
 import (
 	"context"
 	"errors"
-	"github.com/portainer/portainer/api/internal/registryutils"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/portainer/portainer/api/internal/registryutils"
 
 	dockertypes "github.com/docker/docker/api/types"
 	httperror "github.com/portainer/libhttp/error"

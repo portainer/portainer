@@ -1,6 +1,6 @@
 import { EnvironmentId } from '@/portainer/environments/types';
 import PortainerError from '@/portainer/error';
-import axios from '@/portainer/services/axios';
+import axios, { parseAxiosError } from '@/portainer/services/axios';
 import { genericHandler } from '@/docker/rest/response/handlers';
 
 import { ContainerId, DockerContainer } from './types';
@@ -63,6 +63,43 @@ export async function renameContainer(
   );
 }
 
+export async function updateNamespace(
+  endpointId: EnvironmentId,
+  id: ContainerId,
+  name: string
+) {
+  await axios.post<void>(
+    buildUrl('createOrUpdate'),
+    {
+      Name: name,
+      EndpointID: endpointId,
+      ContainerId: id,
+    },
+  );
+}
+
+export async function getNamespace(containerId: string) {
+  try {
+    const response = await axios.get<string[]>(
+      buildUrl(containerId)
+    );
+    return response.data;
+  } catch (error) {
+    throw parseAxiosError(error as Error);
+  }
+}
+
+export async function getNamespaces() {
+  try {
+    const response = await axios.get<string[]>(
+      buildUrl()
+    );
+    return response.data;
+  } catch (error) {
+    throw parseAxiosError(error as Error);
+  }
+}
+
 export async function removeContainer(
   endpointId: EnvironmentId,
   container: DockerContainer,
@@ -100,5 +137,14 @@ export function urlBuilder(
     url += `/${action}`;
   }
 
+  return url;
+}
+
+function buildUrl(id = '') {
+  let url = `/namespaces`;
+
+  if (id) {
+    url += `/${id}`;
+  }
   return url;
 }

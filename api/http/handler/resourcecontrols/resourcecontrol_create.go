@@ -29,10 +29,7 @@ type resourceControlCreatePayload struct {
 	SubResourceIDs []string `example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"`
 }
 
-var (
-	errResourceControlAlreadyExists = errors.New("A resource control is already applied on this resource") //http/resourceControl
-	errInvalidResourceControlType   = errors.New("Unsupported resource control type")                      //http/resourceControl
-)
+var errResourceControlAlreadyExists = errors.New("A resource control is already applied on this resource") //http/resourceControl
 
 func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.ResourceID) {

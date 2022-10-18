@@ -1,0 +1,38 @@
+.gridlist{
+  display: flex;
+  justify-content: left;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+.gridlist-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 1px solid var(--border-blocklist);
+  border-radius: 8px;
+  margin-right: 10px;
+  min-width: 370px;
+}
+
+.gridlist-item:hover {
+  @apply border border-blue-7;
+  background-color: var(--bg-blocklist-hover-color);
+  color: var(--text-blocklist-hover-color);
+}
+
+.gridlist-item-box {
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  width: 100%;
+}
+
+.gridlist-item-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}

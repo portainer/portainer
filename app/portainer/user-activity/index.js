@@ -36,5 +36,8 @@ function config($stateRegistryProvider) {
         component: 'notifications',
       },
     },
+    params: {
+      id: '',
+    },
   });
 }

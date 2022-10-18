@@ -414,6 +414,18 @@ type (
 		Description string `json:"Description" example:"Scene description"`
 	}
 
+	NamespaceContainer struct {
+		Used       int        `json:"used" example:"0"`
+		EndpointID EndpointID `json:"EndpointId" example:"1"`
+	}
+
+	Namespace struct {
+		Name       string                        `json:"Name" example:"Namespace name"`
+		Containers map[string]NamespaceContainer `json:"Containers"`
+	}
+
+	NamespaceMap map[string]*Namespace
+
 	// EndpointGroupID represents an environment(endpoint) group identifier
 	EndpointGroupID int
 
@@ -1364,7 +1376,7 @@ type (
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
 		DeleteNamespace(namespace string) error
 		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
-		GetIngressControllers() models.K8sIngressControllers
+		GetIngressControllers() (models.K8sIngressControllers, error)
 		CreateIngress(namespace string, info models.K8sIngressInfo) error
 		UpdateIngress(namespace string, info models.K8sIngressInfo) error
 		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)

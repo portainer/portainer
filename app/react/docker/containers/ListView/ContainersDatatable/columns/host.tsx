@@ -4,7 +4,7 @@ import type { DockerContainer } from '@/react/docker/containers/types';
 
 export const host: Column<DockerContainer> = {
   Header: 'Host',
-  accessor: (row) => row.NodeName || '-',
+  accessor: 'Host',
   id: 'host',
   disableFilters: true,
   canHide: true,

@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	cmap "github.com/orcaman/concurrent-map"
+	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -23,6 +25,8 @@ type (
 		signatureService     portainer.DigitalSignatureService
 		instanceID           string
 		endpointClients      cmap.ConcurrentMap
+		endpointProxyClients *cache.Cache
+		AddrHTTPS            string
 	}
 
 	// KubeClient represent a service used to execute Kubernetes operations
@@ -34,14 +38,24 @@ type (
 )
 
 // NewClientFactory returns a new instance of a ClientFactory
-func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore dataservices.DataStore) *ClientFactory {
+func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, dataStore dataservices.DataStore, instanceID, addrHTTPS, userSessionTimeout string) (*ClientFactory, error) {
+	if userSessionTimeout == "" {
+		userSessionTimeout = portainer.DefaultUserSessionTimeout
+	}
+	timeout, err := time.ParseDuration(userSessionTimeout)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ClientFactory{
 		dataStore:            dataStore,
 		signatureService:     signatureService,
 		reverseTunnelService: reverseTunnelService,
 		instanceID:           instanceID,
 		endpointClients:      cmap.New(),
-	}
+		endpointProxyClients: cache.New(timeout, timeout),
+		AddrHTTPS:            addrHTTPS,
+	}, nil
 }
 
 func (factory *ClientFactory) GetInstanceID() (instanceID string) {
@@ -59,7 +73,7 @@ func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (porta
 	key := strconv.Itoa(int(endpoint.ID))
 	client, ok := factory.endpointClients.Get(key)
 	if !ok {
-		client, err := factory.createKubeClient(endpoint)
+		client, err := factory.createCachedAdminKubeClient(endpoint)
 		if err != nil {
 			return nil, err
 		}
@@ -71,7 +85,49 @@ func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (porta
 	return client.(portainer.KubeClient), nil
 }
 
-func (factory *ClientFactory) createKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
+// GetProxyKubeClient retrieves a KubeClient from the cache. You should be
+// calling SetProxyKubeClient before first. It is normally, called the
+// kubernetes middleware.
+func (factory *ClientFactory) GetProxyKubeClient(endpointID, token string) (portainer.KubeClient, bool) {
+	client, ok := factory.endpointProxyClients.Get(endpointID + "." + token)
+	if !ok {
+		return nil, false
+	}
+	return client.(portainer.KubeClient), true
+}
+
+// SetProxyKubeClient stores a kubeclient in the cache.
+func (factory *ClientFactory) SetProxyKubeClient(endpointID, token string, cli portainer.KubeClient) {
+	factory.endpointProxyClients.Set(endpointID+"."+token, cli, 0)
+}
+
+// CreateKubeClientFromKubeConfig creates a KubeClient from a clusterID, and
+// Kubernetes config.
+func (factory *ClientFactory) CreateKubeClientFromKubeConfig(clusterID string, kubeConfig []byte) (portainer.KubeClient, error) {
+	config, err := clientcmd.NewClientConfigFromBytes([]byte(kubeConfig))
+	if err != nil {
+		return nil, err
+	}
+	cliConfig, err := config.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	cli, err := kubernetes.NewForConfig(cliConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	kubecli := &KubeClient{
+		cli:        cli,
+		instanceID: factory.instanceID,
+		lock:       &sync.Mutex{},
+	}
+
+	return kubecli, nil
+}
+
+func (factory *ClientFactory) createCachedAdminKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
 	cli, err := factory.CreateClient(endpoint)
 	if err != nil {
 		return nil, err
