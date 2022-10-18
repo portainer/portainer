@@ -19,6 +19,7 @@ export function EdgeGroupsSelector({ items, value, onChange }: Props) {
 
   return (
     <Select
+      aria-label="Edge groups"
       options={items}
       isMulti
       getOptionLabel={(item) => item.Name}
@@ -29,6 +30,9 @@ export function EdgeGroupsSelector({ items, value, onChange }: Props) {
       }}
       placeholder="Select one or multiple group(s)"
       closeMenuOnSelect={false}
+      // selectProps={{
+      //   'data-cy': 'edgeGroupCreate-edgeGroupsSelector',
+      // }}
     />
   );
 }
