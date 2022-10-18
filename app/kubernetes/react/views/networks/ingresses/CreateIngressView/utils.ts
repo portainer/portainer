@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import { Annotation } from '@/kubernetes/react/views/networks/ingresses/components/annotations/types';
+import { SupportedIngControllerTypes } from '@/react/kubernetes/cluster/ingressClass/types';
 
 import { TLS, Ingress } from '../types';
 
@@ -99,12 +100,15 @@ export function getAnnotationsForEdit(
   return result;
 }
 
-export function prepareRuleFromIngress(ing: Ingress): Rule {
+export function prepareRuleFromIngress(
+  ing: Ingress,
+  type?: SupportedIngControllerTypes
+): Rule {
   return {
     Key: uuidv4(),
     IngressName: ing.Name,
     Namespace: ing.Namespace,
-    IngressClassName: ing.ClassName,
+    IngressClassName: type === 'custom' ? 'none' : ing.ClassName,
     Hosts: prepareRuleHostsFromIngress(ing) || [],
     Annotations: ing.Annotations ? getAnnotationsForEdit(ing.Annotations) : [],
     IngressType: ing.Type,

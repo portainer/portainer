@@ -157,7 +157,9 @@ export function CreateIngressView() {
   const existingIngressClass = useMemo(
     () =>
       ingressControllersResults.data?.find(
-        (i) => i.ClassName === ingressRule.IngressClassName
+        (i) =>
+          i.ClassName === ingressRule.IngressClassName ||
+          (i.Type === 'custom' && ingressRule.IngressClassName === '')
       ),
     [ingressControllersResults.data, ingressRule.IngressClassName]
   );
@@ -177,10 +179,11 @@ export function CreateIngressView() {
     ingressRule.IngressClassName &&
     !ingressControllersResults.isLoading
   ) {
+    const optionLabel = !ingressRule.IngressType
+      ? `${ingressRule.IngressClassName} - NOT FOUND`
+      : `${ingressRule.IngressClassName} - DISALLOWED`;
     ingressClassOptions.push({
-      label: !ingressRule.IngressType
-        ? `${ingressRule.IngressClassName} - NOT FOUND`
-        : `${ingressRule.IngressClassName} - DISALLOWED`,
+      label: optionLabel,
       value: ingressRule.IngressClassName,
     });
   }
@@ -206,17 +209,20 @@ export function CreateIngressView() {
       !!params.name &&
       ingressesResults.data &&
       !ingressRule.IngressName &&
-      !ingressControllersResults.isLoading
+      !ingressControllersResults.isLoading &&
+      ingressControllersResults.data
     ) {
       // if it is an edit screen, prepare the rule from the ingress
       const ing = ingressesResults.data?.find(
         (ing) => ing.Name === params.name && ing.Namespace === params.namespace
       );
       if (ing) {
-        const type = ingressControllersResults.data?.find(
-          (c) => c.ClassName === ing.ClassName
+        const type = ingressControllersResults.data.find(
+          (c) =>
+            c.ClassName === ing.ClassName ||
+            (c.Type === 'custom' && !ing.ClassName)
         )?.Type;
-        const r = prepareRuleFromIngress(ing);
+        const r = prepareRuleFromIngress(ing, type);
         r.IngressType = type || r.IngressType;
         setIngressRule(r);
       }
