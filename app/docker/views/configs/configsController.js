@@ -3,12 +3,11 @@ import { confirmDeletionAsync } from 'Portainer/services/modal.service/confirm';
 
 class ConfigsController {
   /* @ngInject */
-  constructor($state, ConfigService, Notifications, $async, ModalService) {
+  constructor($state, ConfigService, Notifications, $async) {
     this.$state = $state;
     this.ConfigService = ConfigService;
     this.Notifications = Notifications;
     this.$async = $async;
-    this.ModalService = ModalService;
 
     this.removeAction = this.removeAction.bind(this);
     this.removeActionAsync = this.removeActionAsync.bind(this);
