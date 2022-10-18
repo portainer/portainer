@@ -1,10 +1,6 @@
 import { Clock, Trash2 } from 'lucide-react';
 import { useStore } from 'zustand';
 
-import {
-  FeatureFlag,
-  useRedirectFeatureFlag,
-} from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 import { notifySuccess } from '@/portainer/services/notifications';
 import { confirmDeletionAsync } from '@/portainer/services/modal.service/confirm';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
@@ -28,8 +24,6 @@ const settingsStore = createStore(storageKey);
 export default withLimitToBE(ListView);
 
 export function ListView() {
-  useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
-
   const settings = useStore(settingsStore);
   const [search, setSearch] = useSearchBarState(storageKey);
 

@@ -4,10 +4,6 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { object, SchemaOf } from 'yup';
 
 import { notifySuccess } from '@/portainer/services/notifications';
-import {
-  useRedirectFeatureFlag,
-  FeatureFlag,
-} from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 
 import { PageHeader } from '@@/PageHeader';
@@ -29,8 +25,6 @@ import { BetaAlert } from '../common/BetaAlert';
 export default withLimitToBE(ItemView);
 
 function ItemView() {
-  useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
-
   const {
     params: { id: idParam },
   } = useCurrentStateAndParams();

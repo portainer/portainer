@@ -9,10 +9,6 @@ import {
 } from 'lucide-react';
 
 import { usePublicSettings } from '@/react/portainer/settings/queries';
-import {
-  FeatureFlag,
-  useFeatureFlag,
-} from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
 
 import { SidebarItem } from './SidebarItem';
@@ -27,10 +23,6 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
   const teamSyncQuery = usePublicSettings<boolean>({
     select: (settings) => settings.TeamSync,
   });
-
-  const isEdgeRemoteUpgradeEnabledQuery = useFeatureFlag(
-    FeatureFlag.EdgeRemoteUpdate
-  );
 
   const showUsersSection =
     !window.ddExtension && (isAdmin || (isTeamLeader && !teamSyncQuery.data));
@@ -78,7 +70,7 @@ export function SettingsSidebar({ isAdmin, isTeamLeader }: Props) {
               label="Tags"
               data-cy="portainerSidebar-environmentTags"
             />
-            {isBE && isEdgeRemoteUpgradeEnabledQuery.data && (
+            {isBE && (
               <SidebarItem
                 to="portainer.endpoints.updateSchedules"
                 label="Update & Rollback"

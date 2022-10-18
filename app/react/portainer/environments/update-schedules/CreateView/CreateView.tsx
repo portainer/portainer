@@ -3,10 +3,6 @@ import { Formik, Form as FormikForm } from 'formik';
 import { useRouter } from '@uirouter/react';
 
 import { notifySuccess } from '@/portainer/services/notifications';
-import {
-  useRedirectFeatureFlag,
-  FeatureFlag,
-} from '@/react/portainer/feature-flags/useRedirectFeatureFlag';
 import { withLimitToBE } from '@/react/hooks/useLimitToBE';
 
 import { PageHeader } from '@@/PageHeader';
@@ -33,7 +29,6 @@ const initialValues: FormValues = {
 export default withLimitToBE(CreateView);
 
 function CreateView() {
-  useRedirectFeatureFlag(FeatureFlag.EdgeRemoteUpdate);
   const schedulesQuery = useList();
 
   const createMutation = useCreateMutation();
