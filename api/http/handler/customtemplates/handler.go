@@ -36,6 +36,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateUpdate))).Methods(http.MethodPut)
 	h.Handle("/custom_templates/{id}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateDelete))).Methods(http.MethodDelete)
+	h.Handle("/custom_templates/{id}/git_fetch",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateGitFetch))).Methods(http.MethodPut)
 	return h
 }
 

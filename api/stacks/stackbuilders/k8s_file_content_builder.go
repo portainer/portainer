@@ -53,6 +53,7 @@ func (b *K8sStackFileContentBuilder) SetUniqueInfo(payload *StackPayload) FileCo
 	b.stack.Namespace = payload.Namespace
 	b.stack.CreatedBy = b.User.Username
 	b.stack.IsComposeFormat = payload.ComposeFormat
+	b.stack.FromAppTemplate = payload.FromAppTemplate
 	return b
 }
 
