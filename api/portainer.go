@@ -554,6 +554,7 @@ type (
 		IngressClasses                  []KubernetesIngressClassConfig `json:"IngressClasses"`
 		RestrictDefaultNamespace        bool                           `json:"RestrictDefaultNamespace"`
 		IngressAvailabilityPerNamespace bool                           `json:"IngressAvailabilityPerNamespace"`
+		AllowNoneIngressClass           bool                           `json:"AllowNoneIngressClass"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration

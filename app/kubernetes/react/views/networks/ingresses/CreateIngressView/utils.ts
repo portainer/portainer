@@ -62,7 +62,7 @@ export function prepareRuleHostsFromIngress(ing: Ingress) {
     h.Host = host;
     h.Secret = getSecretByHost(host, ing.TLS);
     h.Paths = [];
-    ing.Paths.forEach((path) => {
+    ing.Paths?.forEach((path) => {
       if (path.Host === host) {
         h.Paths.push({
           Route: path.Path,

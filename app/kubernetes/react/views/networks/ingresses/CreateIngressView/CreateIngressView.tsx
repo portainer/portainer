@@ -636,7 +636,7 @@ export function CreateIngressView() {
     setIngressRule(rule);
   }
 
-  function addNewAnnotation(type?: 'rewrite' | 'regex') {
+  function addNewAnnotation(type?: 'rewrite' | 'regex' | 'ingressClass') {
     const rule = { ...ingressRule };
 
     const annotation: Annotation = {
@@ -644,13 +644,21 @@ export function CreateIngressView() {
       Value: '',
       ID: uuidv4(),
     };
-    if (type === 'rewrite') {
-      annotation.Key = 'nginx.ingress.kubernetes.io/rewrite-target';
-      annotation.Value = '/$1';
-    }
-    if (type === 'regex') {
-      annotation.Key = 'nginx.ingress.kubernetes.io/use-regex';
-      annotation.Value = 'true';
+    switch (type) {
+      case 'rewrite':
+        annotation.Key = 'nginx.ingress.kubernetes.io/rewrite-target';
+        annotation.Value = '/$1';
+        break;
+      case 'regex':
+        annotation.Key = 'nginx.ingress.kubernetes.io/use-regex';
+        annotation.Value = 'true';
+        break;
+      case 'ingressClass':
+        annotation.Key = 'kubernetes.io/ingress.class';
+        annotation.Value = '';
+        break;
+      default:
+        break;
     }
     rule.Annotations = rule.Annotations || [];
     rule.Annotations?.push(annotation);
@@ -690,10 +698,13 @@ export function CreateIngressView() {
   function handleCreateIngressRules() {
     const rule = { ...ingressRule };
 
+    const classNameToSend =
+      rule.IngressClassName === 'none' ? '' : rule.IngressClassName;
+
     const ingress: Ingress = {
       Namespace: namespace,
       Name: rule.IngressName,
-      ClassName: rule.IngressClassName,
+      ClassName: classNameToSend,
       Hosts: rule.Hosts.map((host) => host.Host),
       Paths: preparePaths(rule.IngressName, rule.Hosts),
       TLS: prepareTLS(rule.Hosts),
