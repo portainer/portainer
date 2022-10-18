@@ -23,14 +23,17 @@ type kubernetesStringDeploymentPayload struct {
 	ComposeFormat    bool
 	Namespace        string
 	StackFileContent string
+	// Whether the stack is from a app template
+	FromAppTemplate bool `example:"false"`
 }
 
-func createStackPayloadFromK8sFileContentPayload(name, namespace, fileContent string, composeFormat bool) stackbuilders.StackPayload {
+func createStackPayloadFromK8sFileContentPayload(name, namespace, fileContent string, composeFormat, fromAppTemplate bool) stackbuilders.StackPayload {
 	return stackbuilders.StackPayload{
 		StackName:        name,
 		Namespace:        namespace,
 		StackFileContent: fileContent,
 		ComposeFormat:    composeFormat,
+		FromAppTemplate:  fromAppTemplate,
 	}
 }
 
@@ -146,7 +149,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.StackName), Err: stackutils.ErrStackAlreadyExists}
 	}
 
-	stackPayload := createStackPayloadFromK8sFileContentPayload(payload.StackName, payload.Namespace, payload.StackFileContent, payload.ComposeFormat)
+	stackPayload := createStackPayloadFromK8sFileContentPayload(payload.StackName, payload.Namespace, payload.StackFileContent, payload.ComposeFormat, payload.FromAppTemplate)
 
 	k8sStackBuilder := stackbuilders.CreateK8sStackFileContentBuilder(handler.DataStore,
 		handler.FileService,

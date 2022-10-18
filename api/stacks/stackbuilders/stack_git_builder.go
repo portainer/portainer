@@ -1,6 +1,7 @@
 package stackbuilders
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -82,7 +83,12 @@ func (b *GitMethodStackBuilder) SetGitRepository(payload *StackPayload) GitMetho
 	// Set the project path on the disk
 	b.stack.ProjectPath = b.fileService.GetStackProjectPath(stackFolder)
 
-	commitHash, err := stackutils.DownloadGitRepository(b.stack.ID, repoConfig, b.gitService, b.fileService)
+	getProjectPath := func() string {
+		stackFolder := fmt.Sprintf("%d", b.stack.ID)
+		return b.fileService.GetStackProjectPath(stackFolder)
+	}
+
+	commitHash, err := stackutils.DownloadGitRepository(repoConfig, b.gitService, getProjectPath)
 	if err != nil {
 		b.err = httperror.InternalServerError(err.Error(), err)
 		return b

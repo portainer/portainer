@@ -3,7 +3,6 @@ package customtemplates
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"regexp"
@@ -18,6 +17,7 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/rs/zerolog/log"
 )
 
@@ -215,6 +215,8 @@ type customTemplateFromGitRepositoryPayload struct {
 	Variables []portainer.CustomTemplateVariableDefinition
 	// TLSSkipVerify skips SSL verification when cloning the Git repository
 	TLSSkipVerify bool `example:"false"`
+	// IsComposeFormat indicates if the Kubernetes template is created from a Docker Compose file
+	IsComposeFormat bool `example:"false"`
 }
 
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -234,14 +236,10 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 
-	if payload.Type == portainer.KubernetesStack {
-		return errors.New("Creating a Kubernetes custom template from git is not supported")
-	}
-
 	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
 	}
-	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
+	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack && payload.Type != portainer.KubernetesStack {
 		return errors.New("Invalid custom template type")
 	}
 	if !isValidNote(payload.Note) {
@@ -260,34 +258,43 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:          portainer.CustomTemplateID(customTemplateID),
-		Title:       payload.Title,
-		EntryPoint:  payload.ComposeFilePathInRepository,
-		Description: payload.Description,
-		Note:        payload.Note,
-		Platform:    payload.Platform,
-		Type:        payload.Type,
-		Logo:        payload.Logo,
-		Variables:   payload.Variables,
+		ID:              portainer.CustomTemplateID(customTemplateID),
+		Title:           payload.Title,
+		Description:     payload.Description,
+		Note:            payload.Note,
+		Platform:        payload.Platform,
+		Type:            payload.Type,
+		Logo:            payload.Logo,
+		Variables:       payload.Variables,
+		IsComposeFormat: payload.IsComposeFormat,
 	}
 
-	projectPath := handler.FileService.GetCustomTemplateProjectPath(strconv.Itoa(customTemplateID))
+	getProjectPath := func() string {
+		return handler.FileService.GetCustomTemplateProjectPath(strconv.Itoa(customTemplateID))
+	}
+	projectPath := getProjectPath()
 	customTemplate.ProjectPath = projectPath
 
-	repositoryUsername := payload.RepositoryUsername
-	repositoryPassword := payload.RepositoryPassword
-	if !payload.RepositoryAuthentication {
-		repositoryUsername = ""
-		repositoryPassword = ""
+	gitConfig := &gittypes.RepoConfig{
+		URL:            payload.RepositoryURL,
+		ReferenceName:  payload.RepositoryReferenceName,
+		ConfigFilePath: payload.ComposeFilePathInRepository,
 	}
 
-	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword, payload.TLSSkipVerify)
-	if err != nil {
-		if err == gittypes.ErrAuthenticationFailure {
-			return nil, fmt.Errorf("invalid git credential")
+	if payload.RepositoryAuthentication {
+		gitConfig.Authentication = &gittypes.GitAuthentication{
+			Username: payload.RepositoryUsername,
+			Password: payload.RepositoryPassword,
 		}
+	}
+
+	commitHash, err := stackutils.DownloadGitRepository(*gitConfig, handler.GitService, getProjectPath)
+	if err != nil {
 		return nil, err
 	}
+
+	gitConfig.ConfigHash = commitHash
+	customTemplate.GitConfig = gitConfig
 
 	isValidProject := true
 	defer func() {
@@ -298,7 +305,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		}
 	}()
 
-	entryPath := filesystem.JoinPaths(projectPath, customTemplate.EntryPoint)
+	entryPath := filesystem.JoinPaths(projectPath, gitConfig.ConfigFilePath)
 
 	exists, err := handler.FileService.FileExists(entryPath)
 	if err != nil || !exists {
