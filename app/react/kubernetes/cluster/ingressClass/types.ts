@@ -1,4 +1,4 @@
-type SupportedIngControllerNames = 'nginx' | 'traefik' | 'unknown';
+type SupportedIngControllerNames = 'nginx' | 'traefik' | 'unknown' | 'custom';
 
 export interface IngressControllerClassMap extends Record<string, unknown> {
   Name: string;

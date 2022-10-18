@@ -96,8 +96,11 @@ export function useIngresses(
         const serviceNamesInNamespace = servicesInNamespace?.map(
           (service) => service.Name
         );
-        ing.Paths.forEach((path, pIndex) => {
-          if (!serviceNamesInNamespace?.includes(path.ServiceName)) {
+        ing.Paths?.forEach((path, pIndex) => {
+          if (
+            !serviceNamesInNamespace?.includes(path.ServiceName) &&
+            filteredIngresses[iIndex].Paths
+          ) {
             filteredIngresses[iIndex].Paths[pIndex].HasService = false;
           } else {
             filteredIngresses[iIndex].Paths[pIndex].HasService = true;

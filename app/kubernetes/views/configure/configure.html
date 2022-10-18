@@ -42,7 +42,8 @@
             </div>
 
             <ingress-class-datatable
-              on-change-availability="(ctrl.onChangeAvailability)"
+              on-change-controllers="(ctrl.onChangeControllers)"
+              allow-none-ingress-class="ctrl.formValues.AllowNoneIngressClass"
               ingress-controllers="ctrl.originalIngressControllers"
               is-loading="ctrl.isIngressControllersLoading"
               description="'Enabling ingress controllers in your cluster allows them to be available in the Portainer UI for users to publish applications over HTTP/HTTPS. A controller must have a class name for it to be included here.'"
@@ -50,18 +51,46 @@
               view="'cluster'"
             ></ingress-class-datatable>
 
-            <div class="form-group">
-              <div class="col-sm-12">
-                <por-switch-field
-                  checked="ctrl.formValues.IngressAvailabilityPerNamespace"
-                  name="'ingressAvailabilityPerNamespace'"
-                  label="'Configure ingress controller availability per namespace'"
-                  tooltip="'This allows an administrator to configure, in each namespace, which ingress controllers will be available for users to select when setting up ingresses for applications.'"
-                  on-change="(ctrl.onToggleIngressAvailabilityPerNamespace)"
-                  label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
-                  switch-class="'col-sm-8'"
-                >
-                </por-switch-field>
+            <label htmlFor="foldingButtonIngControllerSettings" class="col-sm-12 form-section-title cursor-pointer flex items-center">
+              <button
+                id="foldingButtonIngControllerSettings"
+                type="button"
+                class="border-0 mx-2 bg-transparent inline-flex justify-center items-center w-2 !ml-0"
+                ng-click="ctrl.toggleAdvancedIngSettings()"
+              >
+                <pr-icon ng-if="!ctrl.state.isIngToggleSectionExpanded" feather="true" icon="'chevron-right'"></pr-icon>
+                <pr-icon ng-if="ctrl.state.isIngToggleSectionExpanded" feather="true" icon="'chevron-down'"></pr-icon>
+              </button>
+              More settings
+            </label>
+            <div ng-if="ctrl.state.isIngToggleSectionExpanded" class="ml-4">
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <por-switch-field
+                    checked="ctrl.formValues.AllowNoneIngressClass"
+                    name="'allowNoIngressClass'"
+                    label="'Allow &quot;none&quot; ingress class to be set'"
+                    tooltip="'When setting an ingress, this allows users to set &quot;none&quot; as an ingress class option.'"
+                    on-change="(ctrl.onToggleAllowNoneIngressClass)"
+                    label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                    switch-class="'col-sm-8'"
+                  >
+                  </por-switch-field>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <por-switch-field
+                    checked="ctrl.formValues.IngressAvailabilityPerNamespace"
+                    name="'ingressAvailabilityPerNamespace'"
+                    label="'Configure ingress controller availability per namespace'"
+                    tooltip="'This allows an administrator to configure, in each namespace, which ingress controllers will be available for users to select when setting up ingresses for applications.'"
+                    on-change="(ctrl.onToggleIngressAvailabilityPerNamespace)"
+                    label-class="'col-sm-5 col-lg-4 px-0 !m-0'"
+                    switch-class="'col-sm-8'"
+                  >
+                  </por-switch-field>
+                </div>
               </div>
             </div>
 

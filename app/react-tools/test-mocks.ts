@@ -75,6 +75,7 @@ export function createMockEnvironment(): Environment {
       Configuration: {
         IngressClasses: [],
         IngressAvailabilityPerNamespace: false,
+        AllowNoneIngressClass: false,
       },
     },
     EdgeKey: '',
