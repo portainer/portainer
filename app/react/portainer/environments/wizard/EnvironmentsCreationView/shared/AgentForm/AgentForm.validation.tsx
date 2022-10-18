@@ -4,11 +4,11 @@ import { gpusListValidation } from '@/react/portainer/environments/wizard/Enviro
 import { CreateAgentEnvironmentValues } from '@/portainer/environments/environment.service/create';
 
 import { metadataValidation } from '../MetadataFieldset/validation';
-import { nameValidation } from '../NameField';
+import { useNameValidation } from '../NameField';
 
-export function validation(): SchemaOf<CreateAgentEnvironmentValues> {
+export function useValidation(): SchemaOf<CreateAgentEnvironmentValues> {
   return object({
-    name: nameValidation(),
+    name: useNameValidation(),
     environmentUrl: environmentValidation(),
     meta: metadataValidation(),
     gpus: gpusListValidation(),

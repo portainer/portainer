@@ -17,7 +17,7 @@ import { Icon } from '@@/Icon';
 import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
-import { validation } from './APIForm.validation';
+import { useValidation } from './APIForm.validation';
 import { FormValues } from './types';
 import { TLSFieldset } from './TLSFieldset';
 
@@ -41,6 +41,8 @@ export function APIForm({ onCreate }: Props) {
   const mutation = useCreateRemoteEnvironmentMutation(
     EnvironmentCreationTypes.LocalDockerEnvironment
   );
+
+  const validation = useValidation();
 
   return (
     <Formik

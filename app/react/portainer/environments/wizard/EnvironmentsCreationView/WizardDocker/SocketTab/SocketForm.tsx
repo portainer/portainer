@@ -15,7 +15,7 @@ import { Icon } from '@@/Icon';
 import { NameField } from '../../shared/NameField';
 import { MoreSettingsSection } from '../../shared/MoreSettingsSection';
 
-import { validation } from './SocketForm.validation';
+import { useValidation } from './SocketForm.validation';
 import { FormValues } from './types';
 
 interface Props {
@@ -33,6 +33,7 @@ export function SocketForm({ onCreate }: Props) {
   };
 
   const mutation = useCreateLocalDockerEnvironmentMutation();
+  const validation = useValidation();
 
   return (
     <Formik

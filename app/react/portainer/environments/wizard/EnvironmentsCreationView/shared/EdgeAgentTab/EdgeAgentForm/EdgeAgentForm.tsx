@@ -14,7 +14,7 @@ import { MoreSettingsSection } from '../../MoreSettingsSection';
 import { Hardware } from '../../Hardware/Hardware';
 
 import { EdgeAgentFieldset } from './EdgeAgentFieldset';
-import { validationSchema } from './EdgeAgentForm.validation';
+import { useValidationSchema } from './EdgeAgentForm.validation';
 import { FormValues } from './types';
 
 interface Props {
@@ -29,13 +29,14 @@ export function EdgeAgentForm({ onCreate, readonly, showGpus = false }: Props) {
   const createEdgeDevice = useCreateEdgeDeviceParam();
 
   const createMutation = useCreateEdgeAgentEnvironmentMutation();
+  const validation = useValidationSchema();
 
   return (
     <Formik<FormValues>
       initialValues={initialValues}
       onSubmit={handleSubmit}
       validateOnMount
-      validationSchema={validationSchema}
+      validationSchema={validation}
     >
       {({ isValid, setFieldValue, values }) => (
         <Form>
