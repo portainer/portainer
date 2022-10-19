@@ -279,6 +279,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 			err,
 		)
 	}
+
 	// Add none controller if "AllowNone" is set for endpoint.
 	if endpoint.Kubernetes.Configuration.AllowNoneIngressClass {
 		controllers = append(controllers, models.K8sIngressController{
@@ -287,6 +288,7 @@ func (handler *Handler) updateKubernetesIngressControllers(w http.ResponseWriter
 			Type:      "custom",
 		})
 	}
+
 	var updatedClasses []portainer.KubernetesIngressClassConfig
 	for i := range controllers {
 		controllers[i].Availability = true

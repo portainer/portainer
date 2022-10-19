@@ -66,6 +66,9 @@
       },
       "LastCheckInDate": 0,
       "Name": "local",
+      "PostInitMigrations": {
+        "MigrateIngresses": true
+      },
       "PublicURL": "",
       "QueryDate": 0,
       "SecuritySettings": {

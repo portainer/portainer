@@ -352,6 +352,9 @@ type (
 		// Whether the device has been trusted or not by the user
 		UserTrusted bool
 
+		// Whether we need to run any "post init migrations".
+		PostInitMigrations EndpointPostInitMigrations `json:"PostInitMigrations"`
+
 		Edge struct {
 			// Whether the device has been started in edge async mode
 			AsyncMode bool
@@ -451,6 +454,11 @@ type (
 	EndpointRelation struct {
 		EndpointID EndpointID
 		EdgeStacks map[EdgeStackID]bool
+	}
+
+	// EndpointPostInitMigrations
+	EndpointPostInitMigrations struct {
+		MigrateIngresses bool `json:"MigrateIngresses"`
 	}
 
 	// Extension represents a deprecated Portainer extension
