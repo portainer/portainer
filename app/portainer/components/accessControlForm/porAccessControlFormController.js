@@ -71,19 +71,16 @@ angular.module('portainer.app').controller('porAccessControlFormController', [
       })
         .then(function success(data) {
           ctrl.availableUsers = _.orderBy(data.availableUsers, 'Username', 'asc');
-
-          var availableTeams = _.orderBy(data.availableTeams, 'Name', 'asc');
-          ctrl.availableTeams = availableTeams;
-          if (!isAdmin && availableTeams.length === 1) {
-            ctrl.formData.AuthorizedTeams = availableTeams;
+          ctrl.availableTeams = _.orderBy(data.availableTeams, 'Name', 'asc');
+          if (!isAdmin && ctrl.availableTeams.length === 1) {
+            ctrl.formData.AuthorizedTeams = ctrl.availableTeams;
           }
-
           return $q.when(ctrl.resourceControl && ResourceControlService.retrieveOwnershipDetails(ctrl.resourceControl));
         })
         .then(function success(data) {
           if (data) {
-            var authorizedUsers = data.authorizedUsers;
-            var authorizedTeams = data.authorizedTeams;
+            const authorizedTeams = !isAdmin && ctrl.availableTeams.length === 1 ? ctrl.availableTeams : data.authorizedTeams;
+            const authorizedUsers = !isAdmin && authorizedTeams.length === 1 ? [] : data.authorizedUsers;
             setOwnership(ctrl.resourceControl, isAdmin);
             setAuthorizedUsersAndTeams(authorizedUsers, authorizedTeams);
           }
