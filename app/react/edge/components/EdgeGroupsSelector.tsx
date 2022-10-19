@@ -30,9 +30,6 @@ export function EdgeGroupsSelector({ items, value, onChange }: Props) {
       }}
       placeholder="Select one or multiple group(s)"
       closeMenuOnSelect={false}
-      // selectProps={{
-      //   'data-cy': 'edgeGroupCreate-edgeGroupsSelector',
-      // }}
     />
   );
 }
