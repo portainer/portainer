@@ -231,10 +231,13 @@ function isUnsavedChanges(
   oldIngressControllers: IngressControllerClassMap[],
   newIngressControllers: IngressControllerClassMap[]
 ) {
-  for (let i = 0; i < oldIngressControllers.length; i += 1) {
+  if (oldIngressControllers.length !== newIngressControllers.length) {
+    return true;
+  }
+  for (let i = 0; i < newIngressControllers.length; i += 1) {
     if (
-      oldIngressControllers[i].Availability !==
-      newIngressControllers[i].Availability
+      oldIngressControllers[i]?.Availability !==
+      newIngressControllers[i]?.Availability
     ) {
       return true;
     }
