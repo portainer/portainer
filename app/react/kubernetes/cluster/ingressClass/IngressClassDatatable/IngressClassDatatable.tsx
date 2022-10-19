@@ -46,18 +46,22 @@ export function IngressClassDatatable({
     }
 
     let newIngFormValues: IngressControllerClassMap[];
+    const isCustomTypeExist = ingControllerFormValues.some(
+      (ic) => ic.Type === 'custom'
+    );
     if (allowNoneIngressClass) {
-      newIngFormValues = [
-        ...ingControllerFormValues,
-        {
+      newIngFormValues = [...ingControllerFormValues];
+      // add the ingress controller type 'custom' with a 'none' ingress class name
+      if (!isCustomTypeExist) {
+        newIngFormValues.push({
           Name: 'none',
           ClassName: 'none',
           Type: 'custom',
           Availability: true,
           New: false,
           Used: false,
-        },
-      ];
+        });
+      }
     } else {
       newIngFormValues = ingControllerFormValues.filter(
         (ingController) => ingController.ClassName !== 'none'
