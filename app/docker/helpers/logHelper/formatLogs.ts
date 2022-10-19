@@ -33,6 +33,9 @@ export function formatLogs(
   if (stripHeaders) {
     logs = stripHeadersFunc(logs);
   }
+  if (logs.includes('\\n')) {
+    logs = JSON.parse(logs);
+  }
 
   const tokens: Token[][] = tokenize(logs);
   const formattedLogs: FormattedLine[] = [];
@@ -81,11 +84,8 @@ export function formatLogs(
 
         const text = stripEscapeCodes(tokenLine);
         if (
-          (!withTimestamps &&
-            (text.startsWith('{') || text.startsWith('"{'))) ||
-          (withTimestamps &&
-            (text.substring(TIMESTAMP_LENGTH).startsWith('{') ||
-              text.substring(TIMESTAMP_LENGTH).startsWith('"{')))
+          (!withTimestamps && text.startsWith('{')) ||
+          (withTimestamps && text.substring(TIMESTAMP_LENGTH).startsWith('{'))
         ) {
           const lines = formatJSONLine(text, withTimestamps);
           formattedLogs.push(...lines);

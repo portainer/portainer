@@ -14,20 +14,6 @@ function removeKnownKeys(keys: string[]) {
   return without(keys, 'time', 'level', 'caller', 'message', 'stack_trace');
 }
 
-function normalizeText(text: string) {
-  let res = text;
-  if (text.startsWith('"{')) {
-    res = text.slice(1);
-  }
-  if (text.endsWith('}"')) {
-    res = text.slice(0, -1);
-  }
-  if (text.startsWith('{\\"')) {
-    res = JSON.parse(`"${text}"`);
-  }
-  return res;
-}
-
 export function formatJSONLine(
   rawText: string,
   withTimestamps?: boolean
@@ -36,8 +22,7 @@ export function formatJSONLine(
   const lines: FormattedLine[] = [];
   let line = '';
 
-  let text = withTimestamps ? rawText.substring(TIMESTAMP_LENGTH) : rawText;
-  text = normalizeText(text);
+  const text = withTimestamps ? rawText.substring(TIMESTAMP_LENGTH) : rawText;
 
   const json: JSONLogs = JSON.parse(text);
   const { time, level, caller, message, stack_trace: stackTrace } = json;
