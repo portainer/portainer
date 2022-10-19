@@ -7,8 +7,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/database/models"
 	portainerDsErrors "github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/portainer/portainer/api/kubernetes/models"
 )
 
 func (handler *Handler) getKubernetesIngressControllers(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

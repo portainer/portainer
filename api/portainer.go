@@ -7,8 +7,8 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/volume"
-	"github.com/portainer/portainer/api/database/models"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	kubeModels "github.com/portainer/portainer/api/kubernetes/models"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -1353,20 +1353,20 @@ type (
 
 		HasStackName(namespace string, stackName string) (bool, error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
-		CreateNamespace(info models.K8sNamespaceDetails) error
-		UpdateNamespace(info models.K8sNamespaceDetails) error
+		CreateNamespace(info kubeModels.K8sNamespaceDetails) error
+		UpdateNamespace(info kubeModels.K8sNamespaceDetails) error
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
 		DeleteNamespace(namespace string) error
-		GetConfigMapsAndSecrets(namespace string) ([]models.K8sConfigMapOrSecret, error)
-		GetIngressControllers() models.K8sIngressControllers
-		CreateIngress(namespace string, info models.K8sIngressInfo) error
-		UpdateIngress(namespace string, info models.K8sIngressInfo) error
-		GetIngresses(namespace string) ([]models.K8sIngressInfo, error)
-		DeleteIngresses(reqs models.K8sIngressDeleteRequests) error
-		CreateService(namespace string, service models.K8sServiceInfo) error
-		UpdateService(namespace string, service models.K8sServiceInfo) error
-		GetServices(namespace string) ([]models.K8sServiceInfo, error)
-		DeleteServices(reqs models.K8sServiceDeleteRequests) error
+		GetConfigMapsAndSecrets(namespace string) ([]kubeModels.K8sConfigMapOrSecret, error)
+		GetIngressControllers() kubeModels.K8sIngressControllers
+		CreateIngress(namespace string, info kubeModels.K8sIngressInfo) error
+		UpdateIngress(namespace string, info kubeModels.K8sIngressInfo) error
+		GetIngresses(namespace string) ([]kubeModels.K8sIngressInfo, error)
+		DeleteIngresses(reqs kubeModels.K8sIngressDeleteRequests) error
+		CreateService(namespace string, service kubeModels.K8sServiceInfo) error
+		UpdateService(namespace string, service kubeModels.K8sServiceInfo) error
+		GetServices(namespace string) ([]kubeModels.K8sServiceInfo, error)
+		DeleteServices(reqs kubeModels.K8sServiceDeleteRequests) error
 		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
