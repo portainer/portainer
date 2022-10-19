@@ -713,6 +713,23 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
 	stacks.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
 
+	// FIXME: In 2.16 we changed the way ingress controller permissions are
+	// stored. Instead of being stored as annotation on an ingress rule, we keep
+	// them in our database. However, in order to run the migration we need an
+	// admin kube client to run lookup the old ingress rules and compare them
+	// with the current existing ingress classes.
+	//
+	// Unfortunately, our migrations run as part of the database initialization
+	// and our kubeclients require an initialized database. So it is not
+	// possible to do this migration as part of our normal flow. We DO have a
+	// migration which toggles a boolean in kubernetes configuration that
+	// indicated that this "post init" migration should be run. If/when this is
+	// resolved we can remove this function.
+	err = kubernetesClientFactory.PostInitMigrateIngresses()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failure during creation of new database")
+	}
+
 	return &http.Server{
 		AuthorizationService:        authorizationService,
 		ReverseTunnelService:        reverseTunnelService,
