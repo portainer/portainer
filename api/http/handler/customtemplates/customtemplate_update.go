@@ -55,12 +55,7 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 		return errors.New("Invalid note. <img> tag is not supported")
 	}
 
-	err := validateVariablesDefinitions(payload.Variables)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return validateVariablesDefinitions(payload.Variables)
 }
 
 // @id CustomTemplateUpdate

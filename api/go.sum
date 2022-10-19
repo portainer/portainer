@@ -352,6 +352,8 @@ github.com/opencontainers/image-spec v1.0.2 h1:9yCKha/T5XdGtO0q9Q9a6T5NUCsTn/DrB
 github.com/opencontainers/image-spec v1.0.2/go.mod h1:BtxoFyWECRxE4U/7sNtV5W15zMzWCbyJoFRP3s7yZA0=
 github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6 h1:lNCW6THrCKBiJBpz8kbVGjC7MgdCGKwuvBgc7LoD6sw=
 github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
+github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaRUnok+kx1WdO15EQc=
+github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=
 github.com/peterbourgon/diskv v2.0.1+incompatible/go.mod h1:uqqh8zWWbv1HBMNONnaR/tNboyR3/BZd58JJSHlUSCU=
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
@@ -363,8 +365,10 @@ github.com/portainer/docker-compose-wrapper v0.0.0-20220708023447-a69a4ebaa021 h
 github.com/portainer/docker-compose-wrapper v0.0.0-20220708023447-a69a4ebaa021/go.mod h1:WxDlJWZxCnicdLCPnLNEv7/gRhjeIVuCGmsv+iOPH3c=
 github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a h1:B0z3skIMT+OwVNJPQhKp52X+9OWW6A9n5UWig3lHBJk=
 github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a/go.mod h1:n54EEIq+MM0NNtqLeCby8ljL+l275VpolXO0ibHegLE=
-github.com/portainer/libhelm v0.0.0-20210929000907-825e93d62108 h1:5e8KAnDa2G3cEHK7aV/ue8lOaoQwBZUzoALslwWkR04=
-github.com/portainer/libhelm v0.0.0-20210929000907-825e93d62108/go.mod h1:YvYAk7krKTzB+rFwDr0jQ3sQu2BtiXK1AR0sZH7nhJA=
+github.com/portainer/libhelm v0.0.0-20221017001602-b619e0ddf8fc h1:Ms8ZDGvSydX7aoCfu06Rk8II2N4tlX3cn7whtGC5fDA=
+github.com/portainer/libhelm v0.0.0-20221017001602-b619e0ddf8fc/go.mod h1:YvYAk7krKTzB+rFwDr0jQ3sQu2BtiXK1AR0sZH7nhJA=
+github.com/portainer/libhelm v0.0.0-20221018213433-5ad83b50dbc9 h1:PMw+45hocpYsMQ7WLIlzsf4854BhDM8C631kr0DVJtc=
+github.com/portainer/libhelm v0.0.0-20221018213433-5ad83b50dbc9/go.mod h1:YvYAk7krKTzB+rFwDr0jQ3sQu2BtiXK1AR0sZH7nhJA=
 github.com/portainer/libhttp v0.0.0-20220916153711-5d61e12f4b0a h1:BJ5V4EDNhg3ImYbmXnGS8vrMhq6rzsEneIXyJh0g4dc=
 github.com/portainer/libhttp v0.0.0-20220916153711-5d61e12f4b0a/go.mod h1:ckuHnoLA5kLuE5WkvPBXmrw63LUMdSH4aX71QRi9y10=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
@@ -747,6 +751,8 @@ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b h1:h8qDotaEPuJATrMmW04NCwg7v22aHH28wwpauUhK9Oo=
 gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
+gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gotest.tools/v3 v3.0.2/go.mod h1:3SzNCllyD9/Y+b5r9JIKQ474KzkZyqLqEfYqMsX94Bk=
 gotest.tools/v3 v3.0.3 h1:4AuOwCGf4lLR9u3YOe2awrHygurzhO/HeQ6laiA6Sx0=
 gotest.tools/v3 v3.0.3/go.mod h1:Z7Lb0S5l+klDB31fvDQX8ss/FlKDxtlFlw3Oa8Ymbl8=

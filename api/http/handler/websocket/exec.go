@@ -121,12 +121,7 @@ func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer
 		return err
 	}
 
-	err = hijackRequest(websocketConn, httpConn, execStartRequest)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return hijackRequest(websocketConn, httpConn, execStartRequest)
 }
 
 func createExecStartRequest(execID string) (*http.Request, error) {

@@ -11,7 +11,9 @@
       </tr>
       <tr ng-repeat="ingress in $ctrl.applicationIngress">
         <td
-          ><a ui-sref="kubernetes.ingresses.edit({ name: ingress.IngressName, namespace: $ctrl.application.ResourcePool })">{{ ingress.IngressName }}</a></td
+          ><a authorization="K8sIngressesW" ui-sref="kubernetes.ingresses.edit({ name: ingress.IngressName, namespace: $ctrl.application.ResourcePool })">{{
+            ingress.IngressName
+          }}</a></td
         >
         <td>{{ ingress.ServiceName }}</td>
         <td>{{ ingress.Host }}</td>

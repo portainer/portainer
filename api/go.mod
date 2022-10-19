@@ -31,15 +31,15 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/portainer/docker-compose-wrapper v0.0.0-20220708023447-a69a4ebaa021
 	github.com/portainer/libcrypto v0.0.0-20220506221303-1f4fb3b30f9a
-	github.com/portainer/libhelm v0.0.0-20210929000907-825e93d62108
+	github.com/portainer/libhelm v0.0.0-20221018213433-5ad83b50dbc9
 	github.com/portainer/libhttp v0.0.0-20220916153711-5d61e12f4b0a
 	github.com/rkl-/digest v0.0.0-20180419075440-8316caa4a777
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.28.0
-	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/viney-shih/go-lock v1.1.1
 	go.etcd.io/bbolt v1.3.6
@@ -48,7 +48,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.22.5
 	k8s.io/apimachinery v0.22.5
 	k8s.io/client-go v0.22.5
@@ -105,6 +105,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce // indirect
 	github.com/x448/float16 v0.8.4 // indirect

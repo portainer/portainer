@@ -91,15 +91,13 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 	}
 
 	for _, tagID := range endpointGroup.TagIDs {
-		tag, err := handler.DataStore.Tag().Tag(tagID)
-		if err != nil {
-			return httperror.InternalServerError("Unable to retrieve tag from the database", err)
-		}
+		handler.DataStore.Tag().UpdateTagFunc(tagID, func(tag *portainer.Tag) {
+			tag.EndpointGroups[endpointGroup.ID] = true
+		})
 
-		tag.EndpointGroups[endpointGroup.ID] = true
-
-		err = handler.DataStore.Tag().UpdateTag(tagID, tag)
-		if err != nil {
+		if handler.DataStore.IsErrObjectNotFound(err) {
+			return httperror.InternalServerError("Unable to find a tag inside the database", err)
+		} else if err != nil {
 			return httperror.InternalServerError("Unable to persist tag changes inside the database", err)
 		}
 	}

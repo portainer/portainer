@@ -1,5 +1,6 @@
 import { Bell, Trash2 } from 'react-feather';
 import { useStore } from 'zustand';
+import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
 import { react2angular } from '@/react-tools/react2angular';
@@ -17,18 +18,21 @@ import { columns } from './columns';
 import { createStore } from './datatable-store';
 
 const storageKey = 'notifications-list';
-const useSettingsStore = createStore(storageKey);
+const useSettingsStore = createStore(storageKey, 'time', true);
 
 export function NotificationsView() {
   const settingsStore = useSettingsStore();
   const { user } = useUser();
 
-  const userNotifications: ToastNotification[] = useStore(
-    notificationsStore,
-    (state) => state.userNotifications[user.Id]
-  );
+  const userNotifications: ToastNotification[] =
+    useStore(notificationsStore, (state) => state.userNotifications[user.Id]) ||
+    [];
 
   const breadcrumbs = 'Notifications';
+
+  const {
+    params: { id },
+  } = useCurrentStateAndParams();
 
   return (
     <>
@@ -47,6 +51,7 @@ export function NotificationsView() {
         renderTableActions={(selectedRows) => (
           <TableActions selectedRows={selectedRows} />
         )}
+        initialActiveItem={id}
       />
     </>
   );

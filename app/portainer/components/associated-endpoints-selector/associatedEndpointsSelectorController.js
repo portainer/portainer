@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 
 import { EdgeTypes } from '@/portainer/environments/types';
 import { getEnvironments } from '@/portainer/environments/environment.service';
+import { getTags } from '@/portainer/tags/tags.service';
 
 class AssoicatedEndpointsSelectorController {
   /* @ngInject */
@@ -47,6 +48,7 @@ class AssoicatedEndpointsSelectorController {
   }
 
   loadData() {
+    this.getTags();
     this.getAvailableEndpoints();
     this.getAssociatedEndpoints();
   }
@@ -77,6 +79,14 @@ class AssoicatedEndpointsSelectorController {
       }
 
       this.setTableData('associated', response.value, response.totalCount);
+    });
+  }
+
+  getTags() {
+    return this.$async(async () => {
+      let tags = { value: [], totalCount: 0 };
+      tags = await getTags();
+      this.tags = tags;
     });
   }
   /* #endregion */

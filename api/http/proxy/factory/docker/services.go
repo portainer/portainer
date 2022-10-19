@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/docker/docker/api/types"
@@ -116,7 +116,7 @@ func (transport *Transport) decorateServiceCreationOperation(request *http.Reque
 			return nil, err
 		}
 
-		body, err := ioutil.ReadAll(request.Body)
+		body, err := io.ReadAll(request.Body)
 		if err != nil {
 			return nil, err
 		}
@@ -135,7 +135,7 @@ func (transport *Transport) decorateServiceCreationOperation(request *http.Reque
 			}
 		}
 
-		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		request.Body = io.NopCloser(bytes.NewBuffer(body))
 	}
 
 	return transport.replaceRegistryAuthenticationHeader(request)

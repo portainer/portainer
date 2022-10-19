@@ -13,7 +13,7 @@ import (
 // Person with better knowledge is welcomed to improve it.
 // sourced from https://golang.org/src/crypto/cipher/example_test.go
 
-var emptySalt []byte = make([]byte, 0, 0)
+var emptySalt []byte = make([]byte, 0)
 
 // AesEncrypt reads from input, encrypts with AES-256 and writes to the output.
 // passphrase is used to generate an encryption key.

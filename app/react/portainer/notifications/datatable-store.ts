@@ -19,11 +19,15 @@ interface TableSettings
     SettableColumnsTableSettings,
     RefreshableTableSettings {}
 
-export function createStore(storageKey: string) {
+export function createStore(
+  storageKey: string,
+  initialSortBy?: string,
+  desc?: boolean
+) {
   return create<TableSettings>()(
     persist(
       (set) => ({
-        ...sortableSettings(set),
+        ...sortableSettings(set, initialSortBy, desc),
         ...paginationSettings(set),
         ...hiddenColumnsSettings(set),
         ...refreshableSettings(set),

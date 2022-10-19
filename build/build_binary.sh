@@ -18,8 +18,8 @@ go get -t -d -v ./...
 
 # the build takes 2 seconds
 GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build \
+	-trimpath \
 	--installsuffix cgo \
-	--gcflags="-trimpath $(pwd)" \
 	--ldflags "-s \
 	--X 'github.com/portainer/portainer/api/build.BuildNumber=${BUILDNUMBER}' \
 	--X 'github.com/portainer/portainer/api/build.ImageTag=${CONTAINER_IMAGE_TAG}' \

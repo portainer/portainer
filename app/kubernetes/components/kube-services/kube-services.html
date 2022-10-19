@@ -44,10 +44,9 @@
         {{ $ctrl.serviceType(service.Type) }}
       </div>
       <kube-services-item-view
-        service-routes="$ctrl.formValues.Services[$index].IngressRoute"
-        ingress-type="$ctrl.formValues.Services[$index].Ingress"
-        service-type="$ctrl.formValues.Services[$index].Type"
-        service-ports="$ctrl.formValues.Services[$index].Ports"
+        node-port-services="$ctrl.nodePortServices"
+        form-services="$ctrl.formValues.Services"
+        service="$ctrl.formValues.Services[$index]"
         is-edit="$ctrl.isEdit"
         loadbalancer-enabled="$ctrl.loadbalancerEnabled"
       ></kube-services-item-view>
