@@ -18,7 +18,7 @@ import { columns } from './columns';
 import { createStore } from './datatable-store';
 
 const storageKey = 'notifications-list';
-const useSettingsStore = createStore(storageKey, 'time');
+const useSettingsStore = createStore(storageKey, 'time', true);
 
 export function NotificationsView() {
   const settingsStore = useSettingsStore();
