@@ -2,6 +2,7 @@ package customtemplates
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
@@ -14,15 +15,20 @@ import (
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
-	DataStore   dataservices.DataStore
-	FileService portainer.FileService
-	GitService  portainer.GitService
+	DataStore      dataservices.DataStore
+	FileService    portainer.FileService
+	GitService     portainer.GitService
+	gitFetchMutexs map[portainer.TemplateID]*sync.Mutex
 }
 
 // NewHandler creates a handler to manage environment(endpoint) group operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, dataStore dataservices.DataStore, fileService portainer.FileService, gitService portainer.GitService) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:         mux.NewRouter(),
+		DataStore:      dataStore,
+		FileService:    fileService,
+		GitService:     gitService,
+		gitFetchMutexs: make(map[portainer.TemplateID]*sync.Mutex),
 	}
 	h.Handle("/custom_templates",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateCreate))).Methods(http.MethodPost)

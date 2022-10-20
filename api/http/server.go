@@ -140,10 +140,7 @@ func (server *Server) Start() error {
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore
 
-	var customTemplatesHandler = customtemplates.NewHandler(requestBouncer)
-	customTemplatesHandler.DataStore = server.DataStore
-	customTemplatesHandler.FileService = server.FileService
-	customTemplatesHandler.GitService = server.GitService
+	var customTemplatesHandler = customtemplates.NewHandler(requestBouncer, server.DataStore, server.FileService, server.GitService)
 
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.DataStore = server.DataStore
