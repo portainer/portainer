@@ -5,7 +5,7 @@ import Microsoft from '@/assets/ico/vendor/microsoft.svg?c';
 import Google from '@/assets/ico/vendor/google.svg?c';
 import Github from '@/assets/ico/vendor/github.svg?c';
 
-import { BadgeIcon } from '@@/BoxSelector/BadgeIcon';
+import { BadgeIcon } from '@@/BadgeIcon';
 
 export const options = [
   {
