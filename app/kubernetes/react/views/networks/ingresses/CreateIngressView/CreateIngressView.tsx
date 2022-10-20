@@ -210,14 +210,14 @@ export function CreateIngressView() {
       ingressesResults.data &&
       !ingressRule.IngressName &&
       !ingressControllersResults.isLoading &&
-      ingressControllersResults.data
+      !ingressControllersResults.isLoading
     ) {
       // if it is an edit screen, prepare the rule from the ingress
       const ing = ingressesResults.data?.find(
         (ing) => ing.Name === params.name && ing.Namespace === params.namespace
       );
       if (ing) {
-        const type = ingressControllersResults.data.find(
+        const type = ingressControllersResults.data?.find(
           (c) =>
             c.ClassName === ing.ClassName ||
             (c.Type === 'custom' && !ing.ClassName)
