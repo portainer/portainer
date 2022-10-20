@@ -1,3 +1,5 @@
+import { Eye, EyeOff } from 'react-feather';
+
 import { notifySuccess } from '@/portainer/services/notifications';
 import { FeatureId } from '@/portainer/feature-flags/enums';
 import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
@@ -8,7 +10,6 @@ import {
 
 import { Tooltip } from '@@/Tip/Tooltip';
 import { Button } from '@@/buttons';
-import { Icon } from '@@/Icon';
 import { BEFeatureIndicator } from '@@/BEFeatureIndicator';
 
 export function DefaultRegistryAction() {
@@ -31,11 +32,10 @@ export function DefaultRegistryAction() {
           <Button
             color="danger"
             size="xsmall"
-            className="vertical-center"
+            icon={EyeOff}
             onClick={() => handleShowOrHide(true)}
             disabled={isLimited}
           >
-            <Icon icon="eye-off" feather />
             Hide for all users
           </Button>
           <BEFeatureIndicator featureId={FeatureId.HIDE_DOCKER_HUB_ANONYMOUS} />
@@ -51,9 +51,9 @@ export function DefaultRegistryAction() {
           <Button
             size="xsmall"
             className="vertical-center"
+            icon={Eye}
             onClick={() => handleShowOrHide(false)}
           >
-            <Icon icon="eye" feather />
             Show for all users
           </Button>
           <Tooltip
