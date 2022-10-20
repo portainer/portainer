@@ -31,7 +31,6 @@ export function DefaultRegistryAction() {
         <div className="vertical-center">
           <Button
             color="danger"
-            size="xsmall"
             icon={EyeOff}
             onClick={() => handleShowOrHide(true)}
             disabled={isLimited}
@@ -48,12 +47,7 @@ export function DefaultRegistryAction() {
         </div>
       ) : (
         <div className="vertical-center">
-          <Button
-            size="xsmall"
-            className="vertical-center"
-            icon={Eye}
-            onClick={() => handleShowOrHide(false)}
-          >
+          <Button icon={Eye} onClick={() => handleShowOrHide(false)}>
             Show for all users
           </Button>
           <Tooltip
