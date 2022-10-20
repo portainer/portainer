@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -21,8 +22,9 @@ import (
 // @security jwt
 // @produce json
 // @param id path int true "Template identifier"
-// @success 200 {object} portaineree.CustomTemplate "Success"
+// @success 200 {object} fileResponse "Success"
 // @failure 400 "Invalid request"
+// @failure 404 "Custom template not found"
 // @failure 500 "Server error"
 // @router /custom_templates/{id}/git_fetch [put]
 func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -38,30 +40,41 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 		return httperror.InternalServerError("Unable to find a custom template with the specified identifier inside the database", err)
 	}
 
-	if customTemplate.GitConfig != nil {
-		// back up the current custom template folder
-		backupPath, err := backupCustomTemplate(customTemplate.ProjectPath)
+	if customTemplate.GitConfig == nil {
+		return httperror.BadRequest("Git configuration does not exist in this custom template", err)
+	}
+
+	// If multiple users are trying to fetch the same custom template simultaneously, a lock needs to be added
+	mu, ok := handler.gitFetchMutexs[portainer.TemplateID(customTemplateID)]
+	if !ok {
+		mu = &sync.Mutex{}
+		handler.gitFetchMutexs[portainer.TemplateID(customTemplateID)] = mu
+	}
+	mu.Lock()
+	defer mu.Unlock()
+
+	// back up the current custom template folder
+	backupPath, err := backupCustomTemplate(customTemplate.ProjectPath)
+	if err != nil {
+		return httperror.InternalServerError("Failed to backup the custom template folder", err)
+	}
+
+	// remove backup custom template folder
+	defer cleanUpBackupCustomTemplate(backupPath)
+
+	commitHash, err := stackutils.DownloadGitRepository(*customTemplate.GitConfig, handler.GitService, func() string {
+		return customTemplate.ProjectPath
+	})
+	if err != nil {
+		err = rollbackCustomTemplate(backupPath, customTemplate.ProjectPath)
 		if err != nil {
-			return httperror.InternalServerError("Failed to backup the custom template folder", err)
+			return httperror.InternalServerError("Failed to rollback the custom template folder", err)
 		}
+		return httperror.InternalServerError(err.Error(), err)
+	}
 
-		// remove backup custom template folder
-		defer cleanUpBackupCustomTemplate(backupPath)
-
-		commitHash, err := stackutils.DownloadGitRepository(*customTemplate.GitConfig, handler.GitService, func() string {
-			return customTemplate.ProjectPath
-		})
-		if err != nil {
-			err = rollbackCustomTemplate(backupPath, customTemplate.ProjectPath)
-			if err != nil {
-				return httperror.InternalServerError("Failed to rollback the custom template folder", err)
-			}
-			return httperror.InternalServerError(err.Error(), err)
-		}
-
-		if customTemplate.GitConfig.ConfigHash != commitHash {
-			customTemplate.GitConfig.ConfigHash = commitHash
-		}
+	if customTemplate.GitConfig.ConfigHash != commitHash {
+		customTemplate.GitConfig.ConfigHash = commitHash
 
 		err = handler.DataStore.CustomTemplate().UpdateCustomTemplate(customTemplate.ID, customTemplate)
 		if err != nil {
@@ -69,7 +82,12 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	return response.JSON(w, customTemplate)
+	fileContent, err := handler.FileService.GetFileContent(customTemplate.ProjectPath, customTemplate.GitConfig.ConfigFilePath)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve custom template file from disk", err)
+	}
+
+	return response.JSON(w, &fileResponse{FileContent: string(fileContent)})
 }
 
 func backupCustomTemplate(projectPath string) (string, error) {
