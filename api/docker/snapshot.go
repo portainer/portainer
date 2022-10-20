@@ -159,7 +159,7 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 	gpuUseSet := make(map[string]struct{})
 	gpuUseAll := false
 	for _, container := range containers {
-		if container.State == "exited" {
+		if container.State == "exited" || container.State == "stopped" {
 			stoppedContainers++
 		} else if container.State == "running" {
 			runningContainers++
