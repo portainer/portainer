@@ -189,6 +189,7 @@ export function useIngressControllers(
     },
     {
       enabled: !!namespace,
+      cacheTime: 0,
       ...withError('Unable to get ingress controllers'),
     }
   );
