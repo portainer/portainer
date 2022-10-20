@@ -86,8 +86,17 @@ func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, er
 // ProxyDockerRequest intercepts a Docker API request and apply logic based
 // on the requested operation.
 func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, error) {
-	requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
-	request.URL.Path = requestPath
+	requestPath := request.URL.Path
+
+	token := request.Header.Get("X-Podman-API")
+	if token == "" {
+		// we're not dealing with a Podman API request - this is a Docker API request
+		// therefore we can keep the old behavior of stripping any version number from the URL path
+		// TODO: REVIEW
+		// I'm not sure whether this should be kept or not but for now it will keep the usual behavior without introducing potential breaking changes
+		requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
+		request.URL.Path = requestPath
+	}
 
 	if transport.endpoint.Type == portainer.AgentOnDockerEnvironment || transport.endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)

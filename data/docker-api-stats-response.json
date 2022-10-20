@@ -1,0 +1,176 @@
+{
+  "read": "2022-05-22T21:48:08.399402957Z",
+  "preread": "2022-05-22T21:48:07.375507846Z",
+  "pids_stats": {
+    "current": 4
+  },
+  "blkio_stats": {
+    "io_service_bytes_recursive": [
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Read",
+        "value": 18489344
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Write",
+        "value": 851968
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Sync",
+        "value": 19341312
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Async",
+        "value": 0
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Discard",
+        "value": 0
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Total",
+        "value": 19341312
+      }
+    ],
+    "io_serviced_recursive": [
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Read",
+        "value": 233
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Write",
+        "value": 45
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Sync",
+        "value": 278
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Async",
+        "value": 0
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Discard",
+        "value": 0
+      },
+      {
+        "major": 252,
+        "minor": 0,
+        "op": "Total",
+        "value": 278
+      }
+    ],
+    "io_queue_recursive": [],
+    "io_service_time_recursive": [],
+    "io_wait_time_recursive": [],
+    "io_merged_recursive": [],
+    "io_time_recursive": [],
+    "sectors_recursive": []
+  },
+  "num_procs": 0,
+  "storage_stats": {},
+  "cpu_stats": {
+    "cpu_usage": {
+      "total_usage": 28453797088,
+      "percpu_usage": [28453797088],
+      "usage_in_kernelmode": 1160000000,
+      "usage_in_usermode": 1820000000
+    },
+    "system_cpu_usage": 354365630000000,
+    "online_cpus": 1,
+    "throttling_data": {
+      "periods": 0,
+      "throttled_periods": 0,
+      "throttled_time": 0
+    }
+  },
+  "precpu_stats": {
+    "cpu_usage": {
+      "total_usage": 28453389806,
+      "percpu_usage": [28453389806],
+      "usage_in_kernelmode": 1160000000,
+      "usage_in_usermode": 1820000000
+    },
+    "system_cpu_usage": 354364640000000,
+    "online_cpus": 1,
+    "throttling_data": {
+      "periods": 0,
+      "throttled_periods": 0,
+      "throttled_time": 0
+    }
+  },
+  "memory_stats": {
+    "usage": 14176256,
+    "max_usage": 27635712,
+    "stats": {
+      "active_anon": 5677056,
+      "active_file": 3854336,
+      "cache": 7593984,
+      "dirty": 0,
+      "hierarchical_memory_limit": 9223372036854772000,
+      "hierarchical_memsw_limit": 0,
+      "inactive_anon": 0,
+      "inactive_file": 3739648,
+      "mapped_file": 7163904,
+      "pgfault": 7095,
+      "pgmajfault": 132,
+      "pgpgin": 10428,
+      "pgpgout": 7167,
+      "rss": 5763072,
+      "rss_huge": 0,
+      "total_active_anon": 5677056,
+      "total_active_file": 3854336,
+      "total_cache": 7593984,
+      "total_dirty": 0,
+      "total_inactive_anon": 0,
+      "total_inactive_file": 3739648,
+      "total_mapped_file": 7163904,
+      "total_pgfault": 7095,
+      "total_pgmajfault": 132,
+      "total_pgpgin": 10428,
+      "total_pgpgout": 7167,
+      "total_rss": 5763072,
+      "total_rss_huge": 0,
+      "total_unevictable": 0,
+      "total_writeback": 0,
+      "unevictable": 0,
+      "writeback": 0
+    },
+    "limit": 1024348160
+  },
+  "name": "/anthony-sandboxportainerio-registry-1",
+  "id": "e62c2d8aab615216b6c9ae7b8e1551c38432684aff46aa008188c8af26fe6fc0",
+  "networks": {
+    "eth0": {
+      "rx_bytes": 852665,
+      "rx_packets": 353,
+      "rx_errors": 0,
+      "rx_dropped": 0,
+      "tx_bytes": 35249,
+      "tx_packets": 180,
+      "tx_errors": 0,
+      "tx_dropped": 0
+    }
+  }
+}
