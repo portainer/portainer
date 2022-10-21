@@ -478,22 +478,22 @@ angular
         url: '/create',
         views: {
           'content@': {
-            templateUrl: './views/namespaces/create/createnamespace.html',
+            templateUrl: './views/namespaces/create/createNamespace.html',
             controller: 'CreateNamespaceController',
           },
         },
       };
 
-      let namespaceContainer = {
-        name: 'portainer.namespaces.container',
-        url: '/container',
-        views: {
-          'content@': {
-            templateUrl: './views/namespaces/containers/namespaceContainer.html',
-            controller: 'NamespaceContainerController',
-          },
-        },
-      };
+      // let namespaceContainer = {
+      //   name: 'portainer.namespaces.containers',
+      //   url: '/container',
+      //   views: {
+      //     'content@': {
+      //       templateUrl: './views/namespaces/containers/namespaceContainer.html',
+      //       controller: 'NamespaceContainerController',
+      //     },
+      //   },
+      // };
 
       $stateRegistryProvider.register(root);
       $stateRegistryProvider.register(endpointRoot);
@@ -533,7 +533,6 @@ angular
       $stateRegistryProvider.register(scene);
       $stateRegistryProvider.register(namespaces);
       $stateRegistryProvider.register(namespaceCreate);
-      $stateRegistryProvider.register(namespaceContainer);
     },
   ]);
 

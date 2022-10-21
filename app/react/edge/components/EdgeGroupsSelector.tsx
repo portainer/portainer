@@ -19,6 +19,7 @@ export function EdgeGroupsSelector({ items, value, onChange }: Props) {
 
   return (
     <Select
+      aria-label="Edge groups"
       options={items}
       isMulti
       getOptionLabel={(item) => item.Name}

@@ -130,6 +130,7 @@ type (
 		MaxBatchDelay             *time.Duration
 		SecretKeyName             *string
 		LogLevel                  *string
+		LogMode                   *string
 	}
 
 	// CustomTemplateVariableDefinition

@@ -1,75 +1,98 @@
 import './namespaces.css'
+import _ from 'lodash';
 
-angular.module('portainer.app').controller('NamespacesController', NamespacesController);
-import _, { isNull } from 'lodash';
+angular.module('portainer.app').controller('NamespacesController', [
+  '$scope',
+  '$q',
+  '$state',
+  '$async',
+  'ModalService',
+  'NamespaceService',
+  'PaginationService',
+  'Notifications',
+  'PAGINATION_MAX_ITEMS',
+  function ($scope, $q, $state, $async, ModalService, NamespaceService, PaginationService, Notifications, PAGINATION_MAX_ITEMS) {
+    $scope.state = {
+      actionInProgress: false,
+      pagination_count_namespaces: PaginationService.getPaginationLimit('namespaces'),
+      namespaces: [],
 
-function NamespacesController($scope, $state, $async, ModalService, NamespaceService, Notifications) {
-  $scope.state = {
-    actionInProgress: false,
-    namespaces: [],
-    containers: {},
-    subContainers: '',
-    subEndpointIds: []
-  };
+      paginatedItemLimit: PAGINATION_MAX_ITEMS,
+      orderBy: this.orderBy,
+      loading: true,
+      pageNumber: 1,
+      filteredDataSet: [],
+      totalFilteredDataset: 0,
 
-  $scope.handleClick = (item) => {
-    Notifications.success('Namespaces =', item.Name)
-    $scope.state.subEndpointIds = []
+      
+    };
+    $scope.namespace = {}
 
-    $scope.state.subContainers = item.Containers
-
-    if (!isNull($scope.state.subContainers)) {
-      // eval('debugger')
-      $scope.state.subEndpointIds = Object.values($scope.state.subContainers)
-                                      .map(v => v.EndpointId)
-                                      .filter((x, index, self) => self.indexOf(x) === index)
+    $scope.changePaginationLimit = () => {
+      PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
     }
-    
-    console.log('subContainers = ',  $scope.state.subContainers)
-    console.log('Ids = ', $scope.state.subEndpointIds)
-  };
 
-  $scope.removeAction = removeAction;
+    $scope.onPageChange = function (newPageNumber) {
+      this.state.pageNumber = newPageNumber;
+      $scope.paginationChanged();
+    };
 
-  function removeAction(item) {
-    ModalService.confirmDeletion(
-      'Are you sure that you want to remove the selected ?',
-      (confirmed) => {
-        if (confirmed) {
-          return $async(removeActionAsync, item);
-        }
+    this.paginationChanged = async function () {
+      try {
+        this.state.loading = true;
+        this.state.filteredDataSet = [];
+        const start = (this.state.pageNumber - 1) * this.state.paginatedItemLimit + 1;
+        const { endpoints, totalCount } = await this.retrievePage(start, this.state.paginatedItemLimit, this.state.textFilter);
+        this.state.filteredDataSet = endpoints;
+        this.state.totalFilteredDataSet = totalCount;
+        this.refreshSelectedItems();
+      } finally {
+        this.state.loading = false;
       }
-    );
-  }
+    };
 
-  async function removeActionAsync(item) {
-    try {
-        await NamespaceService.deleteNamespace(item.Name).then(() => {
-        Notifications.success('Namespaces successfully removed', item.Name);
-        _.remove($scope.namespaces, item);
-      });
-    } catch (err) {
-      Notifications.error('Failure', err, 'Unable to remove namespaces');
+    $scope.removeAction = removeAction;
+    function removeAction(item) {
+      ModalService.confirmDeletion(
+        'Are you sure that you want to remove the selected ?',
+        (confirmed) => {
+          if (confirmed) {
+            return $async(removeActionAsync, item);
+          }
+        }
+      );
     }
-    $state.reload();
+
+    async function removeActionAsync(item) {
+      try {
+        await NamespaceService.deleteNamespace(item.Name).then(() => {
+          Notifications.success('Namespaces successfully removed', item.Name);
+          _.remove($scope.namespaces, item);
+        });
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to remove namespaces');
+      }
+      $state.reload();
+    }
+
+    function initView() {
+      NamespaceService.namespaces().then((data) => {
+          $scope.state.namespaces = data.map(item => ({
+            Name: item.Name,
+            Containers: item.Containers ? Object.entries(item.Containers).map(([key, value]) => ({
+              ContainerId: key,
+              Used: value.used,
+              EndpointId: value.EndpointId
+            }),
+            ) : {}
+          }))
+        })
+        .catch((err) => {
+          Notifications.error('Failure', err, 'Unable to retrieve namespaces');
+          $scope.state.namespaces = [];
+        });
+    }
+
+    initView();
   }
-
-  // function uniques(array) {
-  //   var x = new Set(array);
-  //   return [...x];
-  // }
-
-  function initView() {
-    NamespaceService.namespaces()
-      .then((data) => {
-        console.log('namespaces = ', data);
-        $scope.state.namespaces = data;
-      })
-      .catch((err) => {
-        Notifications.error('Failure', err, 'Unable to retrieve namespaces');
-        $scope.state.namespaces = [];
-      });
-  }
-
-  initView();
-}
+])

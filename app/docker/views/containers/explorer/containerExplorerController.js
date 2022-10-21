@@ -52,14 +52,10 @@ angular
           e.pageY -= menu.height();
         }
 
-        menu
-          .hide()
-          .css({
+        menu.hide().css({
             left: e.pageX,
             top: e.pageY,
-          })
-          .appendTo('body')
-          .show();
+          }).appendTo('body').show();
         e.preventDefault();
       });
 

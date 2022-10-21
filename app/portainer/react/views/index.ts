@@ -1,4 +1,5 @@
 import angular from 'angular';
+import {namespacesModule} from "Portainer/react/views/namespaces";
 
 import { HomeView } from '@/portainer/home';
 import { withCurrentUser } from '@/react-tools/withCurrentUser';
@@ -18,6 +19,7 @@ export const viewsModule = angular
     wizardModule,
     teamsModule,
     updateSchedulesModule,
+    namespacesModule,
   ])
   .component(
     'homeView',

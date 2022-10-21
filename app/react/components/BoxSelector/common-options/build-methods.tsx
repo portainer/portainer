@@ -2,7 +2,8 @@ import { Edit, FileText, Globe, Upload } from 'react-feather';
 
 import GitIcon from '@/assets/ico/git.svg?c';
 
-import { BadgeIcon } from '../BadgeIcon';
+import { BadgeIcon } from '@@/BadgeIcon';
+
 import { BoxSelectorOption } from '../types';
 
 export const editor: BoxSelectorOption<'editor'> = {

@@ -130,6 +130,17 @@ export type Environment = {
   Gpus: { name: string; value: string }[];
 };
 
+export type NamespaceContainerChild = {
+  ContainerId: string;
+  Used: number;
+  EndpointId: EnvironmentId;
+}
+
+export type NamespaceContainer = {
+  Name: string;
+  Containers?: NamespaceContainerChild[];
+}
+
 /**
  * TS reference of endpoint_create.go#EndpointCreationType iota
  */

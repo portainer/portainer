@@ -1,5 +1,6 @@
 import angular from 'angular';
-import _ from 'lodash-es';
+
+import { concatLogsToString, formatLogs } from '@/docker/helpers/logHelper';
 
 class KubernetesApplicationLogsController {
   /* @ngInject */
@@ -39,13 +40,15 @@ class KubernetesApplicationLogsController {
   }
 
   downloadLogs() {
-    const data = new this.Blob([_.reduce(this.applicationLogs, (acc, log) => acc + '\n' + log, '')]);
+    const logsAsString = concatLogsToString(this.applicationLogs);
+    const data = new this.Blob([logsAsString]);
     this.FileSaver.saveAs(data, this.podName + '_logs.txt');
   }
 
   async getApplicationLogsAsync() {
     try {
-      this.applicationLogs = await this.KubernetesPodService.logs(this.application.ResourcePool, this.podName, this.containerName);
+      const rawLogs = await this.KubernetesPodService.logs(this.application.ResourcePool, this.podName, this.containerName);
+      this.applicationLogs = formatLogs(rawLogs);
     } catch (err) {
       this.stopRepeater();
       this.Notifications.error('Failure', err, 'Unable to retrieve application logs');
@@ -70,13 +73,8 @@ class KubernetesApplicationLogsController {
     this.containerName = containerName;
 
     try {
-      const [application, applicationLogs] = await Promise.all([
-        this.KubernetesApplicationService.get(namespace, applicationName),
-        this.KubernetesPodService.logs(namespace, podName, containerName),
-      ]);
-
-      this.application = application;
-      this.applicationLogs = applicationLogs;
+      this.application = await this.KubernetesApplicationService.get(namespace, applicationName);
+      await this.getApplicationLogsAsync();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application logs');
     } finally {

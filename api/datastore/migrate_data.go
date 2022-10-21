@@ -50,6 +50,7 @@ func (store *Store) MigrateData() error {
 		DockerhubService:        store.DockerHubService,
 		AuthorizationService:    authorization.NewService(store),
 		SceneService:            store.SceneService,
+		NamespaceService:        store.NamespaceService,
 	}
 
 	// restore on error

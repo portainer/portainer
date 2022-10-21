@@ -4457,7 +4457,7 @@
 
 "@types/bootbox@^5.2.4":
   version "5.2.4"
-  resolved "https://registry.npmmirror.com/@types/bootbox/-/bootbox-5.2.4.tgz#b86363715f7cd2b60edcc70217ad67c919a1942a"
+  resolved "https://registry.yarnpkg.com/@types/bootbox/-/bootbox-5.2.4.tgz#b86363715f7cd2b60edcc70217ad67c919a1942a"
   integrity sha512-YYywaPrgRtLgui/dhZujO8ZLw4vFW7eRgRbL/6MO7RG6Hah08gZmeOQv7jKZaltWafixZEPmmFKMSw9qC2rlbw==
   dependencies:
     "@types/jquery" "*"
@@ -18980,11 +18980,6 @@ x-default-browser@^0.4.0:
   integrity sha512-7LKo7RtWfoFN/rHx1UELv/2zHGMx8MkZKDq1xENmOCTkfIqZJ0zZ26NEJX8czhnPXVcqS0ARjjfJB+eJ0/5Cvw==
   optionalDependencies:
     default-browser-id "^1.0.4"
-
-x256@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/x256/-/x256-0.0.2.tgz#c9af18876f7a175801d564fe70ad9e8317784934"
-  integrity sha1-ya8Yh296F1gB1WT+cK2egxd4STQ=
 
 xml-name-validator@^3.0.0:
   version "3.0.0"
