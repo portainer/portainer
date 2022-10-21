@@ -23,7 +23,7 @@ type filePayload struct {
 
 type fileResponse struct {
 	// The requested file content
-	FileContent string `example: "version:2"`
+	FileContent string `example:"version:2"`
 }
 
 func (payload *filePayload) Validate(r *http.Request) error {
